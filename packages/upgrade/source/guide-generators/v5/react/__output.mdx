@@ -227,21 +227,25 @@ There are a number of Clerk primitives that contain images, and previously they 
 
 <Accordion
   titles={[
-    '<code>ExternalAccount.picture</code> -&gt; <code>.imageUrl</code>',
-    '<code>Organization.logoUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>',
+    '<code>User.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>ExternalAccount.avatarUrl</code> -&gt; <code>.imageUrl</code>',
     '<code>OrganizationMembershipPublicUserData.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
-    '<code>Organization.logoUrl</code> -&gt; <code>.imageUrl</code>',
   ]}
 >
   <AccordionPanel>
-    The `picture` property of any [`ExternalAcccount`
+    The `logoUrl` property of any [`Organization`
+    object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to
+    `imageUrl`.
+  </AccordionPanel>
+  <AccordionPanel>The `profileImageUrl` property of any `User` object has been changed to `imageUrl`.</AccordionPanel>
+  <AccordionPanel>
+    The `avatarUrl` property of any [`ExternalAcccount`
     object](https://clerk.com/docs/references/javascript/external-account) has been changed to `imageUrl`.
   </AccordionPanel>
-  <AccordionPanel>The `logoUrl` property of any `Organization` object has been changed to `imageUrl`.</AccordionPanel>
   <AccordionPanel>
     The `profileImageUrl` property of any `OrganizationMembershipPublicUserData` object has been changed to `imageUrl`.
   </AccordionPanel>
-  <AccordionPanel>The `logoUrl` property of any `Organization` object has been changed to `imageUrl`.</AccordionPanel>
 </Accordion>
 
 ## Deprecation removals & housekeeping
@@ -275,7 +279,7 @@ As part of this major version, a number of previously deprecated props, arugment
 
 ### Other Breaking Changes
 
-<Accordion titles={["<code>MagicLinkErrorCode</code> -&gt; <code>EmailLinkErrorCode</code>", "<code>useMagicLink</code> -&gt; <code>useEmailLink</code>", "<code>isMagicLinkError</code> -&gt; <code>isEmailLinkError</code>", "<code>MagicLinkError</code> -&gt; <code>EmailLinkError</code>", "<code>handleMagicLinkVerification</code> -&gt; <code>handleEmailLinkVerification</code>", "<code>setSession</code> -&gt; <code>setActive</code>", "<code>invitationList</code> -&gt; <code>invitations</code> as param to <code>useOrganizations</code>", "<code>membershipList</code> -&gt; <code>members</code> as param to <code>useOrganization</code>", "<code>useOrganizations</code> -&gt; <code>useOrganizationList</code>", "<code>userProfile</code> -&gt; <code>userProfileProps</code> for <code>UserButton</code>", "<code>WithSession</code> component removed", "<code>WithClerk</code> component removed", "<code>WithUser</code> component removed", "<code>withClerk</code> function removed", "<code>withSession</code> function removed", "<code>withUser</code> function removed", "<code>MultisessionAppSupport</code> import moved to <code>/internal</code>", "Replace <code>signOutCallback</code> prop on <code>SignOutButton</code> with <code>redirectUrl</code>", "<code>Organization.getOrganizationList()</code> return type changed", "<code>User.getOrganizationMembershipList()</code> return type changed", "<code>Organization.getRoles</code> arguments changed", "<code>Organization.getMemberships</code> arguments changed", "<code>Organization.getDomains</code> arguments changed", "<code>Organization.getInvitations</code> arguments changed", "<code>Organization.getMembershipRequests</code> arguments changed", "<code>User.getOrganizationInvitations</code> arguments changed", "<code>User.getOrganizationSuggestions</code> arguments changed", "<code>User.getOrganizationMemberships</code> arguments changed"]}>
+<Accordion titles={["<code>MagicLinkErrorCode</code> -&gt; <code>EmailLinkErrorCode</code>", "<code>useMagicLink</code> -&gt; <code>useEmailLink</code>", "<code>isMagicLinkError</code> -&gt; <code>isEmailLinkError</code>", "<code>MagicLinkError</code> -&gt; <code>EmailLinkError</code>", "<code>handleMagicLinkVerification</code> -&gt; <code>handleEmailLinkVerification</code>", "<code>setSession</code> -&gt; <code>setActive</code>", "<code>invitationList</code> -&gt; <code>invitations</code> as param to <code>useOrganizations</code>", "<code>membershipList</code> -&gt; <code>members</code> as param to <code>useOrganization</code>", "<code>useOrganizations</code> -&gt; <code>useOrganizationList</code>", "<code>userProfile</code> -&gt; <code>userProfileProps</code> for <code>UserButton</code>", "<code>MultisessionAppSupport</code> import moved to <code>/internal</code>", "Replace <code>signOutCallback</code> prop on <code>SignOutButton</code> with <code>redirectUrl</code>"]}>
   <AccordionPanel>    
     Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
   </AccordionPanel>
@@ -395,117 +399,6 @@ As part of this major version, a number of previously deprecated props, arugment
     ```
   </AccordionPanel>
   <AccordionPanel>    
-    The `WithSession` higher order component has been removed. If you would still like to use this function in the way its implemented, it can be created quickly using Clerk's [custom hooks](https://clerk.com/docs/references/react/overview). An example of how to do so is below:
-    
-    ```js
-    export const WithSession = ({ children }) => {
-      const session = useSession();
-      if (typeof children !== 'function') throw new Error();
-    
-      return {children(session)};
-    };
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `WithClerk` higher order component has been removed. If you would still like to use this function in the way its implemented, it can be created quickly using Clerk's [custom hooks](https://clerk.com/docs/references/react/overview). An example of how to do so is below:
-    
-    ```js
-    export const WithClerk = ({ children }) => {
-      const clerk = useClerk();
-      if (typeof children !== 'function') throw new Error();
-    
-      return {children(clerk)};
-    };
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `WithUser` higher order component has been removed. If you would still like to use this function in the way its implemented, it can be created quickly using Clerk's [custom hooks](https://clerk.com/docs/references/react/overview). An example of how to do so is below:
-    
-    ```js
-    export const WithUser = ({ children }) => {
-      const user = useUser();
-      if (typeof children !== 'function') throw new Error();
-    
-      return {children(user)};
-    };
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `withClerk` higher order function has been removed. If you would still like to use this function in the way its implemented, it can be created quickly using Clerk's [custom hooks](https://clerk.com/docs/references/react/overview). An example of how to do so is below:
-    
-    ```js
-    function withClerk(Component, displayName) {
-      displayName = displayName || Component.displayName || Component.name || 'Component';
-      Component.displayName = displayName;
-      const HOC = props => {
-        const clerk = useIsomorphicClerkContext();
-    
-        if (!clerk.loaded) return null;
-    
-        return (
-          <Component
-            {...props}
-            clerk={clerk}
-          />
-        );
-      };
-    
-      HOC.displayName = `withClerk(${displayName})`;
-      return HOC;
-    }
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `withSession` higher order function has been removed. If you would still like to use this function in the way its implemented, it can be created quickly using Clerk's [custom hooks](https://clerk.com/docs/references/react/overview). An example of how to do so is below:
-    
-    ```js
-    function withSession(Component, displayName) {
-      displayName = displayName || Component.displayName || Component.name || 'Component';
-      Component.displayName = displayName;
-      const HOC = props => {
-        const session = useSessionContext();
-    
-        if (!session) return null;
-    
-        return (
-          <Component
-            {...props}
-            session={session}
-          />
-        );
-      };
-    
-      HOC.displayName = `withSession(${displayName})`;
-      return HOC;
-    }
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `withUser` higher order function has been removed. If you would still like to use this function in the way its implemented, it can be created quickly using Clerk's [custom hooks](https://clerk.com/docs/references/react/overview). An example of how to do so is below:
-    
-    ```js
-    function withUser(Component, displayName) {
-      displayName = displayName || Component.displayName || Component.name || 'Component';
-      Component.displayName = displayName;
-      const HOC = props => {
-        const clerk = useUserContext();
-    
-        if (!user) return null;
-    
-        return (
-          <Component
-            {...props}
-            user={user}
-          />
-        );
-      };
-    
-      HOC.displayName = `withUser(${displayName})`;
-      return HOC;
-    }
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
     `MultiSessionAppSupport` is a component that handles the intermediate “undefined” state for multisession apps by unmounting and remounting the components during the session switch (` setActive`` call) in order to solve theoretical edge-cases that can arise while switching sessions. It is undocumented and intended only for internal use, so it has been moved to an  `/internal` import path. Please note that internal imports are not intended for public use, and are outside the scope of semver.
     
     ```diff
@@ -529,124 +422,6 @@ As part of this major version, a number of previously deprecated props, arugment
           </SignOutButton>
         )
       }
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
-    
-    ```diff
-      const { organization } = useOrganization()
-      const orgList = organization.getOrganizationList()
-    
-    - orgList.forEach(() => {})
-    + orgList.data.forEach(() => {})
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
-    
-    ```diff
-      const { user } = useUser()
-      const membershipList = user.getOrganizationMembershipList()
-    
-    - membershipList.forEach(() => {})
-    + membershipList.data.forEach(() => {})
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
-    
-    ```diff
-      const { data } = await organization.getRoles({
-    -   limit: 10,
-    +   pageSize: 10,
-    -   offset: 10,
-    +   initialPage: 2,
-      })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
-    
-    ```diff
-      const { data } = await organization.getMemberships({
-    -   limit: 10,
-    +   pageSize: 10,
-    -   offset: 10,
-    +   initialPage: 2,
-      })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
-    
-    ```diff
-      const { data } = await organization.getDomains({
-    -   limit: 10,
-    +   pageSize: 10,
-    -   offset: 10,
-    +   initialPage: 2,
-      })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
-    
-    ```diff
-      const { data } = await organization.getInvitations({
-    -   limit: 10,
-    +   pageSize: 10,
-    -   offset: 10,
-    +   initialPage: 2,
-      })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
-    
-    ```diff
-      const { data } = await organization.getMembershipRequests({
-    -   limit: 10,
-    +   pageSize: 10,
-    -   offset: 10,
-    +   initialPage: 2,
-      })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
-    
-    ```diff
-      const { data } = await user.getOrganizationInvitations({
-    -   limit: 10,
-    +   pageSize: 10,
-    -   offset: 10,
-    +   initialPage: 2,
-      })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
-    
-    ```diff
-      const { data } = await user.getOrganizationSuggestions({
-    -   limit: 10,
-    +   pageSize: 10,
-    -   offset: 10,
-    +   initialPage: 2,
-      })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
-    
-    ```diff
-      const { data } = await user.getOrganizationMemberships({
-    -   limit: 10,
-    +   pageSize: 10,
-    -   offset: 10,
-    +   initialPage: 2,
-      })
     ```
   </AccordionPanel>
 </Accordion>

@@ -167,21 +167,20 @@ There are a number of Clerk primitives that contain images, and previously they 
 
 <Accordion
   titles={[
-    '<code>ExternalAccount.picture</code> -&gt; <code>.imageUrl</code>',
-    '<code>Organization.logoUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>',
+    '<code>User.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
     '<code>OrganizationMembershipPublicUserData.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
-    '<code>Organization.logoUrl</code> -&gt; <code>.imageUrl</code>',
   ]}
 >
   <AccordionPanel>
-    The `picture` property of any [`ExternalAcccount`
-    object](https://clerk.com/docs/references/javascript/external-account) has been changed to `imageUrl`.
+    The `logoUrl` property of any [`Organization`
+    object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to
+    `imageUrl`.
   </AccordionPanel>
-  <AccordionPanel>The `logoUrl` property of any `Organization` object has been changed to `imageUrl`.</AccordionPanel>
+  <AccordionPanel>The `profileImageUrl` property of any `User` object has been changed to `imageUrl`.</AccordionPanel>
   <AccordionPanel>
     The `profileImageUrl` property of any `OrganizationMembershipPublicUserData` object has been changed to `imageUrl`.
   </AccordionPanel>
-  <AccordionPanel>The `logoUrl` property of any `Organization` object has been changed to `imageUrl`.</AccordionPanel>
 </Accordion>
 
 ## Deprecation removals & housekeeping

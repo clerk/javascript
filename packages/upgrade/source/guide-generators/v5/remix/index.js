@@ -17,7 +17,7 @@ const packageName = '@clerk/remix';
 const cwd = `${version}/${name}`;
 
 async function generate() {
-  const data = loadVersionChangeData(version, name);
+  const data = await loadVersionChangeData(version, name);
 
   return assembleContent({ data: data, cwd }, [
     frontmatter({

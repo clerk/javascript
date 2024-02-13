@@ -210,66 +210,26 @@ CLERK_SIGN_UP_URL=/sign-up
 
 There are a number of Clerk primitives that contain images, and previously they each had different property names, like `avatarUrl`, `logoUrl`, `profileImageUrl`, etc. In order to promote consistency and make it simpler for developers to know where to find associated images, all image properties are now named `imageUrl`. See the list below for all affected classes:
 
-<Accordion titles={["<code>isMagicLinkError</code> -&gt; <code>isEmailLinkError</code>", "<code>useMagicLink</code> -&gt; <code>useEmailLink</code>", "<code>MagicLinkErrorCode</code> -&gt; <code>EmailLinkErrorCode</code>", "<code>setSession</code> -&gt; <code>setActive</code>", "Replace <code>signOutCallback</code> prop on <code>SignOutButton</code> with <code>redirectUrl</code>", "<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>"]}>
-  <AccordionPanel>    
-    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
+<Accordion
+  titles={[
+    '<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>',
+    '<code>User.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>ExternalAccount.avatarUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>OrganizationMembershipPublicUserData.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
+  ]}
+>
+  <AccordionPanel>
+    The `logoUrl` property of any [`Organization`
+    object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to
+    `imageUrl`.
   </AccordionPanel>
-  <AccordionPanel>    
-    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects functionality.
+  <AccordionPanel>The `profileImageUrl` property of any `User` object has been changed to `imageUrl`.</AccordionPanel>
+  <AccordionPanel>
+    The `avatarUrl` property of any [`ExternalAcccount`
+    object](https://clerk.com/docs/references/javascript/external-account) has been changed to `imageUrl`.
   </AccordionPanel>
-  <AccordionPanel>    
-    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
-  </AccordionPanel>
-  <AccordionPanel>    
-    `setSession` should be replaced with `setActive`. The format of the parameters has changed slightly - `setActive` takes an object where `setSession` took params directly. The `setActive` function also can accept an `organization` param that is used to set the currently active organization. The return signature did not change. Read the [API documentation](/docs/references/javascript/clerk/session-methods#set-active) for more detail. This function should be expected to be returned from one of the following Clerk hooks: `useSessionList`, `useSignUp`, or `useSignIn`. Some migration examples:
-    
-    ```diff
-    - await setSession('sessionID', () => void)
-    + await setActive({ session: 'sessionID',  beforeEmit: () => void })
-    
-    - await setSession(sessionObj)
-    + await setActive({ session: sessionObj })
-    
-    - await setSession(sessionObj, () => void)
-    + await setActive({ session: sessionObj,  beforeEmit: () => void })
-    ```
-    
-    `setActive` also supports setting an active organization:
-    
-    ```js
-    await setActive({
-      session: 'sessionID',
-      organization: 'orgID',
-      beforeEmit: () => void
-    })
-    
-    await setActive({
-      session: sessionObj,
-      organization: orgObj,
-      beforeEmit: () => void
-    })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `signOutCallback` prop on the [`<SignOutButton />` component](https://clerk.com/docs/components/unstyled/sign-out-button) has been removed. Instead, you can use the `redirectUrl` prop. Example below:
-    
-    ```diff
-      import { SignOutButton } from "@clerk/clerk-react";
-    
-      export const Signout = () => {
-        return (
-          <SignOutButton
-    -       signOutCallback={() => { window.location.href = "/your-path" }}
-    +       redirectUrl="/your-path"
-          >
-            <button>Sign Out</button>
-          </SignOutButton>
-        )
-      }
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `logoUrl` property of any [`Organization` object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to `imageUrl`.
+  <AccordionPanel>
+    The `profileImageUrl` property of any `OrganizationMembershipPublicUserData` object has been changed to `imageUrl`.
   </AccordionPanel>
 </Accordion>
 
@@ -285,72 +245,167 @@ As part of this major version, a number of previously deprecated props, arugment
 
 ### Deprecation removals
 
-<Accordion titles={["<code>isMagicLinkError</code> -&gt; <code>isEmailLinkError</code>", "<code>useMagicLink</code> -&gt; <code>useEmailLink</code>", "<code>MagicLinkErrorCode</code> -&gt; <code>EmailLinkErrorCode</code>", "<code>setSession</code> -&gt; <code>setActive</code>", "Replace <code>signOutCallback</code> prop on <code>SignOutButton</code> with <code>redirectUrl</code>", "<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>"]}>
-  <AccordionPanel>    
-    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
-  </AccordionPanel>
-  <AccordionPanel>    
-    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects functionality.
-  </AccordionPanel>
-  <AccordionPanel>    
-    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
-  </AccordionPanel>
-  <AccordionPanel>    
-    `setSession` should be replaced with `setActive`. The format of the parameters has changed slightly - `setActive` takes an object where `setSession` took params directly. The `setActive` function also can accept an `organization` param that is used to set the currently active organization. The return signature did not change. Read the [API documentation](/docs/references/javascript/clerk/session-methods#set-active) for more detail. This function should be expected to be returned from one of the following Clerk hooks: `useSessionList`, `useSignUp`, or `useSignIn`. Some migration examples:
-    
-    ```diff
-    - await setSession('sessionID', () => void)
-    + await setActive({ session: 'sessionID',  beforeEmit: () => void })
-    
-    - await setSession(sessionObj)
-    + await setActive({ session: sessionObj })
-    
-    - await setSession(sessionObj, () => void)
-    + await setActive({ session: sessionObj,  beforeEmit: () => void })
-    ```
-    
-    `setActive` also supports setting an active organization:
-    
-    ```js
-    await setActive({
-      session: 'sessionID',
-      organization: 'orgID',
-      beforeEmit: () => void
-    })
-    
-    await setActive({
-      session: sessionObj,
-      organization: orgObj,
-      beforeEmit: () => void
-    })
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `signOutCallback` prop on the [`<SignOutButton />` component](https://clerk.com/docs/components/unstyled/sign-out-button) has been removed. Instead, you can use the `redirectUrl` prop. Example below:
-    
-    ```diff
-      import { SignOutButton } from "@clerk/clerk-react";
-    
-      export const Signout = () => {
-        return (
-          <SignOutButton
-    -       signOutCallback={() => { window.location.href = "/your-path" }}
-    +       redirectUrl="/your-path"
-          >
-            <button>Sign Out</button>
-          </SignOutButton>
-        )
-      }
-    ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `logoUrl` property of any [`Organization` object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to `imageUrl`.
+<Accordion titles={['<code>CLERK_FRONTEND_API</code> replaced by <code>CLERK_PUBLISHABLE_KEY</code>']}>
+  <AccordionPanel>
+    If you are using a `CLERK_FRONTEND_API` environment variable, the name must be changed to `CLERK_PUBLISHABLE_KEY`
+    instead. Note that the values are different as well, so this is not just a key replacement. You can find the
+    publishable key in your Clerk dashboard. Make sure you do this in both your dev and production environments.
   </AccordionPanel>
 </Accordion>
 
 ### Other Breaking Changes
 
-<Accordion titles={["<code>isMagicLinkError</code> -&gt; <code>isEmailLinkError</code>", "<code>useMagicLink</code> -&gt; <code>useEmailLink</code>", "<code>MagicLinkErrorCode</code> -&gt; <code>EmailLinkErrorCode</code>", "<code>setSession</code> -&gt; <code>setActive</code>", "Replace <code>signOutCallback</code> prop on <code>SignOutButton</code> with <code>redirectUrl</code>", "<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>"]}>
+<Accordion titles={["<code>Organization.getRoles</code> arguments changed", "<code>Organization.getMemberships</code> arguments changed", "<code>Organization.getDomains</code> arguments changed", "<code>Organization.getInvitations</code> arguments changed", "<code>Organization.getMembershipRequests</code> arguments changed", "<code>User.getOrganizationInvitations</code> arguments changed", "<code>User.getOrganizationSuggestions</code> arguments changed", "<code>User.getOrganizationMemberships</code> arguments changed", "<code>Users.getOrganizationInvitationList</code> return signature changed", "<code>Organizations.getOrganizationInvitationList</code> return type changed", "<code>User.getOrganizationMembershipList()</code> return type changed", "<code>Users.getOrganizationList</code> return signature changed", "<code>Organization.getOrganizationList()</code> return type changed", "<code>isMagicLinkError</code> -&gt; <code>isEmailLinkError</code>", "<code>useMagicLink</code> -&gt; <code>useEmailLink</code>", "<code>MagicLinkErrorCode</code> -&gt; <code>EmailLinkErrorCode</code>", "<code>setSession</code> -&gt; <code>setActive</code>", "Replace <code>signOutCallback</code> prop on <code>SignOutButton</code> with <code>redirectUrl</code>"]}>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getRoles({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getMemberships({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getDomains({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getInvitations({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getMembershipRequests({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationInvitations({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationSuggestions({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationMemberships({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The response payload of `Users.getOrganizationInvitationList` was changed as part of the v5 release. Rather than directly returning ` data`, the return signature is now `{ data, totalCount }`. Since backend API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily, and this change in the backend SDK aligns the response shape with what the backend API returns directly.
+    
+    Here's an example of how the response shape would change with this modification:
+    
+    ```diff
+    - const data = await clerkClient.users.getOrganizationInvitationList()
+    + const { data, totalCount } = await clerkClient.users.getOrganizationInvitationList()
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
+    
+    ```diff
+      const data = await clerkClient.organizations.getOrganizationInvitationList({
+        organizationId: "...",
+      })
+    
+    - data.forEach(() => {})
+    + data.data.forEach(() => {})
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
+    
+    ```diff
+      const { user } = useUser()
+      const membershipList = user.getOrganizationMembershipList()
+    
+    - membershipList.forEach(() => {})
+    + membershipList.data.forEach(() => {})
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The response payload of `Users.getOrganizationList` was changed as part of the v5 release. Rather than directly returning ` data`, the return signature is now `{ data, totalCount }`. Since backend API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily, and this change in the backend SDK aligns the response shape with what the backend API returns directly.
+    
+    Here's an example of how the response shape would change with this modification:
+    
+    ```diff
+    - const data = await clerkClient.users.getOrganizationList()
+    + const { data, totalCount } = await clerkClient.users.getOrganizationList()
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
+    
+    ```diff
+      const { organization } = useOrganization()
+      const orgList = organization.getOrganizationList()
+    
+    - orgList.forEach(() => {})
+    + orgList.data.forEach(() => {})
+    ```
+  </AccordionPanel>
   <AccordionPanel>    
     Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
   </AccordionPanel>
@@ -407,8 +462,5 @@ As part of this major version, a number of previously deprecated props, arugment
         )
       }
     ```
-  </AccordionPanel>
-  <AccordionPanel>    
-    The `logoUrl` property of any [`Organization` object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to `imageUrl`.
   </AccordionPanel>
 </Accordion>

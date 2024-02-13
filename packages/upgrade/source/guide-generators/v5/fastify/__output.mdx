@@ -122,24 +122,24 @@ There are a number of Clerk primitives that contain images, and previously they 
 
 <Accordion
   titles={[
-    '<code>API_URL</code> value has changed',
-    '<code>Clerk</code> -&gt; <code>{ createClerkClient }</code>',
     '<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>',
+    '<code>User.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>ExternalAccount.avatarUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>OrganizationMembershipPublicUserData.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
   ]}
 >
-  <AccordionPanel>
-    The value of this export has changed from `https://api.clerk.dev` to `https://api.clerk.com`. If you were relying on
-    the text content of this value not changing, you may need to make adjustments.
-  </AccordionPanel>
-  <AccordionPanel>
-    The `Clerk` default import has changed to `createClerkClient` and been moved to a named import rather than default.
-    You must update your import path in order for it to work correctly. Example below of the fix that needs to be made:
-    ```diff - import Clerk from "@clerk/fastify" + import {createClerkClient} from "@clerk/fastify" ```
-  </AccordionPanel>
   <AccordionPanel>
     The `logoUrl` property of any [`Organization`
     object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to
     `imageUrl`.
+  </AccordionPanel>
+  <AccordionPanel>The `profileImageUrl` property of any `User` object has been changed to `imageUrl`.</AccordionPanel>
+  <AccordionPanel>
+    The `avatarUrl` property of any [`ExternalAcccount`
+    object](https://clerk.com/docs/references/javascript/external-account) has been changed to `imageUrl`.
+  </AccordionPanel>
+  <AccordionPanel>
+    The `profileImageUrl` property of any `OrganizationMembershipPublicUserData` object has been changed to `imageUrl`.
   </AccordionPanel>
 </Accordion>
 
@@ -155,50 +155,207 @@ As part of this major version, a number of previously deprecated props, arugment
 
 ### Deprecation removals
 
-<Accordion
-  titles={[
-    '<code>API_URL</code> value has changed',
-    '<code>Clerk</code> -&gt; <code>{ createClerkClient }</code>',
-    '<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>',
-  ]}
->
-  <AccordionPanel>
-    The value of this export has changed from `https://api.clerk.dev` to `https://api.clerk.com`. If you were relying on
-    the text content of this value not changing, you may need to make adjustments.
+<Accordion titles={["<code>CLERK_API_KEY</code> replaced by <code>CLERK_SECRET_KEY</code>", "<code>CLERK_FRONTEND_API</code> replaced by <code>CLERK_PUBLISHABLE_KEY</code>", "<code>apiKey</code> -&gt; <code>secretKey</code> as param to createClerkClient", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as param to createClerkClient", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as param to clerkPlugin"]}>
+  <AccordionPanel>    
+    The `CLERK_API_KEY` environment variable was renamed to `CLERK_SECRET_KEY`. You can visit your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) to copy/paste the new keys after choosing your framework. Make sure to update this in all environments (e.g. dev, staging, production).
   </AccordionPanel>
-  <AccordionPanel>
-    The `Clerk` default import has changed to `createClerkClient` and been moved to a named import rather than default.
-    You must update your import path in order for it to work correctly. Example below of the fix that needs to be made:
-    ```diff - import Clerk from "@clerk/fastify" + import {createClerkClient} from "@clerk/fastify" ```
+  <AccordionPanel>    
+    The `CLERK_FRONTEND_API` environment variable was renamed to `CLERK_PUBLISHABLE_KEY`. You can visit your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) to copy/paste the new keys after choosing your framework. Make sure to update this in all environments (e.g. dev, staging, production). **Note:** The values are different, so this is not just a key replacement. [More information](/docs/deployments/overview#api-keys-and-environment-variables).
   </AccordionPanel>
-  <AccordionPanel>
-    The `logoUrl` property of any [`Organization`
-    object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to
-    `imageUrl`.
+  <AccordionPanel>    
+    The `apiKey` argument passed to `createClerkClient` must be changed to `secretKey`.
+    
+    ```diff
+    import { createClerkClient } from '@clerk/fastify';
+    
+    - createClerkClient({ apiKey: '...' });
+    + createClerkClient({ secretKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` argument passed to `createClerkClient` must be changed to `publishableKey`. Note that the values of the two keys are different, so both keys and values need to be changed. You can find your application's publishable key in the Clerk dashboard.
+    
+    ```diff
+    import { createClerkClient } from '@clerk/fastify';
+    
+    - createClerkClient({ frontendApi: '...' });
+    + createClerkClient({ publishableKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` argument passed to `clerkPlugin` must be changed to `publishableKey`. Note that the values of the two keys are different, so both keys and values need to be changed. You can find your application's publishable key in the Clerk dashboard.
+    
+    ```diff
+    import { clerkPlugin } from '@clerk/fastify';
+    
+    - fastify.register(clerkPlugin, { frontendApi: '...' });
+    + fastify.register(clerkPlugin, { publishableKey: '...' });
+    ```
   </AccordionPanel>
 </Accordion>
 
 ### Other Breaking Changes
 
-<Accordion
-  titles={[
-    '<code>API_URL</code> value has changed',
-    '<code>Clerk</code> -&gt; <code>{ createClerkClient }</code>',
-    '<code>Organization.logoUrl</code> -&gt; <code>Organization.imageUrl</code>',
-  ]}
->
-  <AccordionPanel>
-    The value of this export has changed from `https://api.clerk.dev` to `https://api.clerk.com`. If you were relying on
-    the text content of this value not changing, you may need to make adjustments.
+<Accordion titles={["<code>Organization.getRoles</code> arguments changed", "<code>Organization.getMemberships</code> arguments changed", "<code>Organization.getDomains</code> arguments changed", "<code>Organization.getInvitations</code> arguments changed", "<code>Organization.getMembershipRequests</code> arguments changed", "<code>User.getOrganizationInvitations</code> arguments changed", "<code>User.getOrganizationSuggestions</code> arguments changed", "<code>User.getOrganizationMemberships</code> arguments changed", "<code>Users.getOrganizationInvitationList</code> return signature changed", "<code>Organizations.getOrganizationInvitationList</code> return type changed", "<code>User.getOrganizationMembershipList()</code> return type changed", "<code>Users.getOrganizationList</code> return signature changed", "<code>Organization.getOrganizationList()</code> return type changed", "<code>API_URL</code> value has changed", "<code>Clerk</code> -&gt; <code>{ createClerkClient }</code>"]}>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getRoles({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
   </AccordionPanel>
-  <AccordionPanel>
-    The `Clerk` default import has changed to `createClerkClient` and been moved to a named import rather than default.
-    You must update your import path in order for it to work correctly. Example below of the fix that needs to be made:
-    ```diff - import Clerk from "@clerk/fastify" + import {createClerkClient} from "@clerk/fastify" ```
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getMemberships({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
   </AccordionPanel>
-  <AccordionPanel>
-    The `logoUrl` property of any [`Organization`
-    object](https://clerk.com/docs/references/javascript/organization/organization#organization) has been changed to
-    `imageUrl`.
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getDomains({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getInvitations({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getMembershipRequests({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationInvitations({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationSuggestions({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationMemberships({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The response payload of `Users.getOrganizationInvitationList` was changed as part of the v5 release. Rather than directly returning ` data`, the return signature is now `{ data, totalCount }`. Since backend API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily, and this change in the backend SDK aligns the response shape with what the backend API returns directly.
+    
+    Here's an example of how the response shape would change with this modification:
+    
+    ```diff
+    - const data = await clerkClient.users.getOrganizationInvitationList()
+    + const { data, totalCount } = await clerkClient.users.getOrganizationInvitationList()
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
+    
+    ```diff
+      const data = await clerkClient.organizations.getOrganizationInvitationList({
+        organizationId: "...",
+      })
+    
+    - data.forEach(() => {})
+    + data.data.forEach(() => {})
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
+    
+    ```diff
+      const { user } = useUser()
+      const membershipList = user.getOrganizationMembershipList()
+    
+    - membershipList.forEach(() => {})
+    + membershipList.data.forEach(() => {})
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The response payload of `Users.getOrganizationList` was changed as part of the v5 release. Rather than directly returning ` data`, the return signature is now `{ data, totalCount }`. Since backend API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily, and this change in the backend SDK aligns the response shape with what the backend API returns directly.
+    
+    Here's an example of how the response shape would change with this modification:
+    
+    ```diff
+    - const data = await clerkClient.users.getOrganizationList()
+    + const { data, totalCount } = await clerkClient.users.getOrganizationList()
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
+    
+    ```diff
+      const { organization } = useOrganization()
+      const orgList = organization.getOrganizationList()
+    
+    - orgList.forEach(() => {})
+    + orgList.data.forEach(() => {})
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The value of this export has changed from `https://api.clerk.dev` to `https://api.clerk.com`. If you were relying on the text content of this value not changing, you may need to make adjustments.
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `Clerk` default import has changed to `createClerkClient` and been moved to a named import rather than default. You must update your import path in order for it to work correctly. Example below of the fix that needs to be made:
+    
+    ```diff
+    - import Clerk from "@clerk/fastify"
+    + import { createClerkClient } from "@clerk/fastify"
+    ```
   </AccordionPanel>
 </Accordion>
