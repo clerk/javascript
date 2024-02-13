@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
@@ -121,6 +122,7 @@ export const roRO: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Invitațiile nu au putut fi trimise. Există deja invitații în așteptare pentru următoarele adrese de e-mail: {{email_addresses}}.',
       formButtonPrimary__continue: 'Trimiteți invitații',
+      selectDropdown__role: 'Select role',
       subtitle: 'Invitați noi membri în această organizație',
       successMessage: 'Invitații trimise cu succes',
       title: 'Invitați membri',
@@ -279,6 +281,12 @@ export const roRO: LocalizationResource = {
   paginationRowText__displaying: 'Afișarea',
   paginationRowText__of: 'de',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Obțineți ajutor',
       actionText: 'Don’t have any of these?',
@@ -595,12 +603,14 @@ export const roRO: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Continuați',
     formButtonPrimary__finish: 'Finalizare',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Anulează',
     mfaPage: {
       formHint: 'Selectați o metodă de adăugat.',
       title: 'Adăugați verificarea în doi pași',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Adăugați un număr de telefon',
       removeResource: {
         messageLine1: '{{identifier}} nu va mai primi coduri de verificare atunci când se conectează.',
@@ -613,8 +623,11 @@ export const roRO: LocalizationResource = {
         'Selectați un număr de telefon pentru a vă înregistra pentru verificarea în doi pași a codului SMS.',
       subtitle__unavailablePhoneNumbers:
         'Nu există numere de telefon disponibile pentru a vă înregistra pentru verificarea în doi pași prin cod SMS.',
-      successMessage:
-        'Verificarea în doi pași a codului SMS este acum activată pentru acest număr de telefon. Când vă conectați, va trebui să introduceți un cod de verificare trimis la acest număr de telefon ca pas suplimentar.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Adăugați verificarea codului SMS',
     },
     mfaTOTPPage: {
@@ -661,7 +674,6 @@ export const roRO: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'La acest număr de telefon va fi trimis un mesaj text conținând un link de verificare.',
-      infoText__secondary: 'Se pot aplica tarife pentru mesaje și date.',
       removeResource: {
         messageLine1: '{{identifier}} va fi eliminat din acest cont.',
         messageLine2: 'Nu veți mai putea să vă conectați folosind acest număr de telefon.',
@@ -691,6 +703,8 @@ export const roRO: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizați acum',
         destructiveActionTitle: 'Eliminați',
         primaryButton: 'Conectați-vă contul',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Conturi conectate',
       },
       dangerSection: {

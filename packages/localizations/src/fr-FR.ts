@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
@@ -120,6 +121,7 @@ export const frFR: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Les invitations suivantes n’ont pas pu être envoyées. Veuillez régler ce problème et réessayer:',
       formButtonPrimary__continue: 'Envoyer des invitations',
+      selectDropdown__role: 'Select role',
       subtitle: 'Inviter des membres à rejoindre l’organisation',
       successMessage: 'Les invitations ont été envoyées.',
       title: 'Inviter des membres',
@@ -277,6 +279,12 @@ export const frFR: LocalizationResource = {
   paginationRowText__displaying: 'Affichage',
   paginationRowText__of: 'de',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: "Obtenir de l'aide",
       actionText: 'Don’t have any of these?',
@@ -593,12 +601,14 @@ export const frFR: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Continuer',
     formButtonPrimary__finish: 'Retour',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Annuler',
     mfaPage: {
       formHint: 'Sélectionnez une méthode à ajouter.',
       title: 'Ajouter la vérification en deux étapes',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Ajouter un numéro de téléphone',
       removeResource: {
         messageLine1: '{{identifier}} ne recevra plus de codes de validation lors de la connexion.',
@@ -610,8 +620,11 @@ export const frFR: LocalizationResource = {
         'Sélectionnez un numéro de téléphone pour vous inscrire à la vérification en deux étapes du code SMS.',
       subtitle__unavailablePhoneNumbers:
         "Il n'y a pas de numéros de téléphone disponibles pour s'inscrire à la vérification en deux étapes du code SMS.",
-      successMessage:
-        'La vérification en deux étapes du code SMS est désormais activée pour ce numéro de téléphone. Lors de la connexion, vous devrez saisir un code de vérification envoyé à ce numéro de téléphone comme étape supplémentaire.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Ajouter la vérification du code SMS',
     },
     mfaTOTPPage: {
@@ -656,7 +669,6 @@ export const frFR: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Un message texte contenant un lien de vérification sera envoyé à ce numéro de téléphone.',
-      infoText__secondary: 'Des messages et débits de données peuvent être appliqués.',
       removeResource: {
         messageLine1: '{{identifier}} sera supprimé de ce compte.',
         messageLine2: 'Vous ne pourrez plus vous connecter avec ce numéro de téléphone.',
@@ -686,6 +698,8 @@ export const frFR: LocalizationResource = {
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Retirer',
         primaryButton: 'Connecter le compte',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Comptes connectés',
       },
       dangerSection: {

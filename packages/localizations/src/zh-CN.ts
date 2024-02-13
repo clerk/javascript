@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
@@ -118,6 +119,7 @@ export const zhCN: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: '邀请无法发送。修复以下问题然后重试：',
       formButtonPrimary__continue: '发送邀请',
+      selectDropdown__role: 'Select role',
       subtitle: '邀请新成员加入此组织',
       successMessage: '邀请成功发送',
       title: '邀请成员',
@@ -274,6 +276,12 @@ export const zhCN: LocalizationResource = {
   paginationRowText__displaying: '显示',
   paginationRowText__of: '的',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: '获取帮助',
       actionText: 'Don’t have any of these?',
@@ -581,12 +589,14 @@ export const zhCN: LocalizationResource = {
     },
     formButtonPrimary__continue: '继续',
     formButtonPrimary__finish: '完成',
+    formButtonPrimary__save: 'Save',
     formButtonReset: '取消',
     mfaPage: {
       formHint: '选择一个添加的方法。',
       title: '添加两步验证',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: '添加电话号码',
       removeResource: {
         messageLine1: '{{identifier}} 将不再在登录时接收验证代码。',
@@ -596,8 +606,11 @@ export const zhCN: LocalizationResource = {
       },
       subtitle__availablePhoneNumbers: '选择一个电话号码来注册短信验证码两步验证。',
       subtitle__unavailablePhoneNumbers: '没有可用的电话号码来注册短信验证码两步验证。',
-      successMessage:
-        '现在已启用此电话号码的短信验证码两步验证。在登录时，您需要输入发送到这个电话号码的验证码作为额外步骤。',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: '添加短信验证码验证',
     },
     mfaTOTPPage: {
@@ -637,7 +650,6 @@ export const zhCN: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: '一条包含验证链接的短信将会发送到这个电话号码。',
-      infoText__secondary: '可能会产生信息和数据费用。',
       removeResource: {
         messageLine1: '{{identifier}} 将从此账户中被移除。',
         messageLine2: '您将无法使用这个电话号码登录。',
@@ -666,6 +678,8 @@ export const zhCN: LocalizationResource = {
         actionLabel__reauthorize: '立即授权',
         destructiveActionTitle: '移除',
         primaryButton: '连接账户',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: '已连接的账户',
       },
       dangerSection: {

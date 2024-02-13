@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
@@ -118,6 +119,7 @@ export const heIL: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'לא היה ניתן לשלוח את ההזמנות. תקן את הבעיות הבאות ונסה שוב:',
       formButtonPrimary__continue: 'שלח הזמנות',
+      selectDropdown__role: 'Select role',
       subtitle: 'הזמן חברים חדשים לארגון זה',
       successMessage: 'ההזמנות נשלחו בהצלחה',
       title: 'הזמן חברים',
@@ -274,6 +276,12 @@ export const heIL: LocalizationResource = {
   paginationRowText__displaying: 'מציג',
   paginationRowText__of: 'מתוך',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'קבל עזרה',
       actionText: 'Don’t have any of these?',
@@ -583,12 +591,14 @@ export const heIL: LocalizationResource = {
     },
     formButtonPrimary__continue: 'המשך',
     formButtonPrimary__finish: 'סיים',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'בטל',
     mfaPage: {
       formHint: 'בחר שיטה להוספה.',
       title: 'הוסף אימות דו-שלבי',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'הוסף מספר טלפון',
       removeResource: {
         messageLine1: '{{identifier}} לא יקבל יותר קודים לאימות בעת ההתחברות.',
@@ -598,8 +608,11 @@ export const heIL: LocalizationResource = {
       },
       subtitle__availablePhoneNumbers: 'בחר מספר טלפון להרשמה לאימות קוד SMS דו-שלבי.',
       subtitle__unavailablePhoneNumbers: 'אין מספרי טלפון זמינים להרשמה לאימות קוד SMS דו-שלבי.',
-      successMessage:
-        'אימות קוד SMS דו-שלבי כעת מופעל למספר הטלפון הזה. בעת ההתחברות, תידרש להכניס קוד אימות שנשלח למספר הטלפון הזה כשלב נוסף.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'הוסף אימות קוד SMS',
     },
     mfaTOTPPage: {
@@ -641,7 +654,6 @@ export const heIL: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'הודעת טקסט שמכילה קישור לאימות תישלח למספר טלפון זה.',
-      infoText__secondary: 'עשויות לחול תעריפים להודעות ונתונים.',
       removeResource: {
         messageLine1: '{{identifier}} יוסר מהחשבון הזה.',
         messageLine2: 'לא תוכל יותר להתחבר באמצעות מספר טלפון זה.',
@@ -670,6 +682,8 @@ export const heIL: LocalizationResource = {
         actionLabel__reauthorize: 'אשר עכשיו',
         destructiveActionTitle: 'הסר',
         primaryButton: 'חבר חשבון',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'חשבונות מחוברים',
       },
       dangerSection: {

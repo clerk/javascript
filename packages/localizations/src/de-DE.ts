@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
@@ -122,6 +123,7 @@ export const deDE: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Die Einladungen konnten nicht versendet werden. Beheben Sie Folgendes und versuchen Sie es erneut:',
       formButtonPrimary__continue: 'Einladungen verschicken',
+      selectDropdown__role: 'Select role',
       subtitle: 'Laden Sie neue Mitglieder zu dieser Organisation ein',
       successMessage: 'Einladungen erfolgreich versendet',
       title: 'Mitglieder einladen',
@@ -281,6 +283,12 @@ export const deDE: LocalizationResource = {
   paginationRowText__displaying: 'Anzeigen',
   paginationRowText__of: 'von',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Hilfe',
       actionText: 'Haben Sie keine davon?',
@@ -596,12 +604,14 @@ export const deDE: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Fortsetzen',
     formButtonPrimary__finish: 'Fertig',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Zurücksetzen',
     mfaPage: {
       formHint: 'Wählen Sie eine Methode aus.',
       title: 'Aktivieren Sie Zweifaktor-Authentifizierung',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Fügen Sie eine Telefonnummer hinzu',
       removeResource: {
         messageLine1: '{{identifier}} erhält bei der Anmeldung keine Bestätigungscodes mehr.',
@@ -613,8 +623,11 @@ export const deDE: LocalizationResource = {
         'Wählen Sie eine Telefonnummer aus, um sich für die Bestätigung in zwei Schritten per SMS-Code zu registrieren.',
       subtitle__unavailablePhoneNumbers:
         'Es sind keine Telefonnummern verfügbar, um sich für die SMS-Code-Bestätigung in zwei Schritten zu registrieren.',
-      successMessage:
-        'Die SMS-Code-Bestätigung in zwei Schritten ist jetzt für diese Telefonnummer aktiviert. Bei der Anmeldung müssen Sie als zusätzlichen Schritt einen Bestätigungscode eingeben, der an diese Telefonnummer gesendet wird.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'SMS-Code-Bestätigung hinzufügen',
     },
     mfaTOTPPage: {
@@ -661,7 +674,6 @@ export const deDE: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'An diese Telefonnummer wird eine SMS mit einem Bestätigungslink gesendet.',
-      infoText__secondary: 'Nachrichten- und Datengebühren können anfallen.',
       removeResource: {
         messageLine1: '{{identifier}} wird aus diesem Konto entfernt.',
         messageLine2: 'Sie können sich nicht mehr mit dieser Telefonnummer anmelden.',
@@ -690,6 +702,8 @@ export const deDE: LocalizationResource = {
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Entfernen',
         primaryButton: 'Konto verbinden',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Verbundene Konten',
       },
       dangerSection: {

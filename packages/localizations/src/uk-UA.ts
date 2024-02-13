@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const ukUA: LocalizationResource = {
@@ -119,6 +120,7 @@ export const ukUA: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Запрошення не вдалося надіслати. Виправте наступне і повторіть спробу:',
       formButtonPrimary__continue: 'Надіслати запрошення',
+      selectDropdown__role: 'Select role',
       subtitle: 'Запросіть нових учасників до цієї організації',
       successMessage: 'Запрошення успішно надіслано',
       title: 'Запросити учасників',
@@ -276,6 +278,12 @@ export const ukUA: LocalizationResource = {
   paginationRowText__displaying: 'Відображення',
   paginationRowText__of: 'з',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Допомога',
       actionText: 'Don’t have any of these?',
@@ -589,12 +597,14 @@ export const ukUA: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Продовжити',
     formButtonPrimary__finish: 'Завершити',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Скасувати',
     mfaPage: {
       formHint: 'Виберіть метод для додавання.',
       title: 'Додати двофакторну аутентифікацію',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Додати номер телефону',
       removeResource: {
         messageLine1: '{{identifier}} більше не буде отримувати коди підтвердження при вході в систему.',
@@ -605,8 +615,11 @@ export const ukUA: LocalizationResource = {
       subtitle__availablePhoneNumbers: 'Виберіть номер телефону для реєстрації у двоетапній перевірці з кодом з SMS.',
       subtitle__unavailablePhoneNumbers:
         'Немає доступних номерів телефону для реєстрації в двоетапній перевірці з кодом з SMS.',
-      successMessage:
-        'Двоетапна перевірка з кодом з SMS увімкнена для цього номера телефону. Під час входу в систему вам потрібно буде ввести код підтвердження, надісланий на цей номер телефону як додатковий крок.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Додати перевірку кодом з SMS',
     },
     mfaTOTPPage: {
@@ -652,7 +665,6 @@ export const ukUA: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'На цей номер телефону буде надіслано текстове повідомлення з верифікаційним посиланням.',
-      infoText__secondary: 'Можуть бути застосовані тарифи на повідомлення і дані.',
       removeResource: {
         messageLine1: '{{identifier}} буде видалено з цього облікового запису.',
         messageLine2: 'Ви більше не зможете увійти, використовуючи цей номер телефону.',
@@ -681,6 +693,8 @@ export const ukUA: LocalizationResource = {
         actionLabel__reauthorize: 'Авторизувати зараз',
         destructiveActionTitle: 'Видалити',
         primaryButton: 'Підключити акаунт',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Підключені акаунти',
       },
       dangerSection: {

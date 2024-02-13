@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const ptPT: LocalizationResource = {
@@ -118,6 +119,7 @@ export const ptPT: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Os convites não puderam ser enviados. Corrija o seguinte e tente novamente:',
       formButtonPrimary__continue: 'Enviar convites',
+      selectDropdown__role: 'Select role',
       subtitle: 'Convidar novos membros para esta organização',
       successMessage: 'Convites enviados com sucesso',
       title: 'Convidar membros',
@@ -276,6 +278,12 @@ export const ptPT: LocalizationResource = {
   paginationRowText__displaying: 'Apresentando',
   paginationRowText__of: 'de',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Ajuda',
       actionText: 'Don’t have any of these?',
@@ -589,12 +597,14 @@ export const ptPT: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Continuar',
     formButtonPrimary__finish: 'Finalizar',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Cancelar',
     mfaPage: {
       formHint: 'Selecione um método para adicionar.',
       title: 'Adicione verificação de duas etapas',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Adicione um número de telemóvel',
       removeResource: {
         messageLine1: '{{identifier}} não receberá mais códigos de verificação ao realizar o login.',
@@ -606,8 +616,11 @@ export const ptPT: LocalizationResource = {
         'Selecione um número de telemóvel para registrar a verificação de duas etapas por código SMS.',
       subtitle__unavailablePhoneNumbers:
         'Não há números de telemóvel disponíveis para registrar a verificação de duas etapas por código SMS.',
-      successMessage:
-        'Verificação de duas etapas por código SMS agora está ativa para este número de telemóvel. Ao fazer login, precisará de inserir um código de verificação enviado para este número de telemóvel como etapa adicional.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Adicionar verificação por SMS',
     },
     mfaTOTPPage: {
@@ -652,7 +665,6 @@ export const ptPT: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Um SMS contendo um link de verificação será enviado para este telemóvel.',
-      infoText__secondary: 'Poderá haver cobranças extras pelo envio do SMS.',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Não vai conseguir fazer login novamente com este número de telemóvel.',
@@ -681,6 +693,8 @@ export const ptPT: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Contas conectadas',
       },
       dangerSection: {

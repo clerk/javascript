@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const esMX: LocalizationResource = {
@@ -120,6 +121,7 @@ export const esMX: LocalizationResource = {
       detailsTitle__inviteFailed:
         'No se pudieron enviar las invitaciones. Solucione lo siguiente y vuelva a intentarlo:',
       formButtonPrimary__continue: 'Enviar invitaciones',
+      selectDropdown__role: 'Select role',
       subtitle: 'Invitar nuevos miembros a esta organización',
       successMessage: 'Invitaciones enviadas con éxito',
       title: 'Invitar miembros',
@@ -277,6 +279,12 @@ export const esMX: LocalizationResource = {
   paginationRowText__displaying: 'Mostrando',
   paginationRowText__of: 'de',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Consigue ayuda',
       actionText: 'Don’t have any of these?',
@@ -592,12 +600,14 @@ export const esMX: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Continuar',
     formButtonPrimary__finish: 'Terminar',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Cancelar',
     mfaPage: {
       formHint: 'Seleccione un método para agregar.',
       title: 'Agregar verificación en dos pasos',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Agregar un número de teléfono',
       removeResource: {
         messageLine1: '{{identifier}} dejará de recibir el Código de verificación al iniciar sesión.',
@@ -609,8 +619,11 @@ export const esMX: LocalizationResource = {
         'Seleccione un número de teléfono para registrarse para la verificación en dos pasos del código SMS.',
       subtitle__unavailablePhoneNumbers:
         'No hay números de teléfono disponibles para registrarse para la verificación en dos pasos del código SMS.',
-      successMessage:
-        'La verificación en dos pasos del código SMS ahora está habilitada para este número de teléfono. Al iniciar sesión, deberá ingresar un Código de verificación enviado a este número de teléfono como un paso adicional.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Agregar verificación de código SMS',
     },
     mfaTOTPPage: {
@@ -655,7 +668,6 @@ export const esMX: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Se enviará un mensaje de texto con un enlace de verificación a este número de teléfono.',
-      infoText__secondary: 'Se pueden aplicar tarifas por mensajes y datos.',
       removeResource: {
         messageLine1: '{{identifier}} será eliminado de esta cuenta.',
         messageLine2: 'Ya no podrá iniciar sesión con este número de teléfono.',
@@ -684,6 +696,8 @@ export const esMX: LocalizationResource = {
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Quitar',
         primaryButton: 'Conectar cuenta',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Cuentas conectadas',
       },
       dangerSection: {
