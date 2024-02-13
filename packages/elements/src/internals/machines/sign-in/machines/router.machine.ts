@@ -1,6 +1,6 @@
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, setup, stopChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
@@ -10,6 +10,7 @@ import type {
   SignInRouterNextEvent,
   SignInRouterSchema,
 } from '~/internals/machines/sign-in/types';
+import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
@@ -26,6 +27,9 @@ const needsStatus =
 export const SignInRouterMachineId = 'SignInRouter';
 
 export const SignInRouterMachine = setup({
+  actors: {
+    thirdParty: ThirdPartyMachine,
+  },
   actions: {
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path }: { path: string }) => {
@@ -35,8 +39,11 @@ export const SignInRouterMachine = setup({
       context.router.push(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
-    setActive({ context, event }) {
-      const session = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn).createdSessionId;
+    setActive({ context, event }, params?: { useLastActiveSession?: boolean }) {
+      const session =
+        (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
+        ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn).createdSessionId;
+
       const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignInUrl());
       void context.clerk.setActive({ session, beforeEmit });
     },
@@ -47,9 +54,11 @@ export const SignInRouterMachine = setup({
       },
     }),
     resetError: assign({ error: undefined }),
-    transfer: ({ context }) => context.router?.push(context.clerk.buildSignUpUrl()),
+    transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl() + '/sso-callback'),
   },
   guards: {
+    hasAuthenticatedViaClerkJS: ({ context }) =>
+      Boolean(context.clerk.client.signIn.status === null && context.clerk.client.lastActiveSessionId),
     hasResource: ({ context }) => Boolean(context.clerk.client.signIn.status),
 
     isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode']),
@@ -94,6 +103,7 @@ export const SignInRouterMachine = setup({
         const { id, logic, input } = event;
 
         if (!self.getSnapshot().children[id]) {
+          // @ts-expect-error - This is valid (See: https://discord.com/channels/795785288994652170/1203714033190969405/1205595237293096960)
           enqueue.spawnChild(logic, {
             id,
             systemId: id,
@@ -125,6 +135,10 @@ export const SignInRouterMachine = setup({
           target: 'Error',
         },
         {
+          guard: 'needsCallback',
+          target: 'Callback',
+        },
+        {
           guard: 'needsStart',
           actions: { type: 'navigateInternal', params: { path: '/' } },
           target: 'Start',
@@ -138,10 +152,6 @@ export const SignInRouterMachine = setup({
           guard: 'needsSecondFactor',
           actions: { type: 'navigateInternal', params: { path: '/continue' } },
           target: 'SecondFactor',
-        },
-        {
-          guard: 'needsCallback',
-          target: 'Callback',
         },
         {
           actions: { type: 'navigateInternal', params: { path: '/' } },
@@ -208,11 +218,31 @@ export const SignInRouterMachine = setup({
     },
     Callback: {
       tags: 'route:callback',
+      invoke: {
+        id: THIRD_PARTY_MACHINE_ID,
+        systemId: THIRD_PARTY_MACHINE_ID,
+        src: 'thirdParty',
+        input: ({ context }) => ({
+          basePath: context.router?.basePath ?? '/sign-in',
+          clerk: context.clerk,
+          flow: 'signIn',
+        }),
+      },
+      entry: sendTo(THIRD_PARTY_MACHINE_ID, { type: 'CALLBACK' }),
       on: {
         NEXT: [
           {
             guard: 'isComplete',
             actions: 'setActive',
+          },
+          {
+            description: 'Handle a case where the user has already been authenticated via ClerkJS',
+            guard: 'hasAuthenticatedViaClerkJS',
+            actions: { type: 'setActive', params: { useLastActiveSession: true } },
+          },
+          {
+            guard: 'statusNeedsIdentifier',
+            actions: 'transfer',
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -227,9 +257,6 @@ export const SignInRouterMachine = setup({
             reenter: true,
           },
         ],
-        TRANSFER: {
-          actions: 'transfer',
-        },
       },
     },
     Error: {
