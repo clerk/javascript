@@ -92,7 +92,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
   } = props;
   const popoverCtx = usePopover({
     autoUpdate: true,
-    adjustToParentWidth: portal,
+    adjustToReferenceWidth: !!referenceElement,
     referenceElement: referenceElement,
   });
   const togglePopover = popoverCtx.toggle;

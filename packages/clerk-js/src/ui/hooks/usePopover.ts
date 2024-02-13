@@ -9,7 +9,7 @@ type UsePopoverProps = {
   shoudFlip?: boolean;
   autoUpdate?: boolean;
   outsidePress?: boolean | ((event: MouseEvent) => boolean);
-  adjustToParentWidth?: boolean;
+  adjustToReferenceWidth?: boolean;
   referenceElement?: React.RefObject<HTMLElement> | null;
   bubbles?:
     | boolean
@@ -22,14 +22,14 @@ type UsePopoverProps = {
 export type UsePopoverReturn = ReturnType<typeof usePopover>;
 
 export const usePopover = (props: UsePopoverProps = {}) => {
-  const { bubbles = false, shoudFlip = true, outsidePress, adjustToParentWidth = false } = props;
+  const { bubbles = false, shoudFlip = true, outsidePress, adjustToReferenceWidth = false, referenceElement } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
   const { update, refs, strategy, x, y, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
     elements: {
-      reference: adjustToParentWidth ? props.referenceElement?.current : undefined,
+      reference: referenceElement?.current,
     },
     nodeId,
     whileElementsMounted: props.autoUpdate === false ? undefined : autoUpdate,
@@ -38,13 +38,14 @@ export const usePopover = (props: UsePopoverProps = {}) => {
       offset(props.offset || 6),
       shoudFlip && flip(),
       shift(),
-      adjustToParentWidth &&
-        size({
-          apply({ elements }) {
+      size({
+        apply({ elements }) {
+          if (adjustToReferenceWidth) {
             const reference = elements.reference as any as HTMLElement;
             elements.floating.style.width = reference ? `${reference?.offsetWidth}px` : '';
-          },
-        }),
+          }
+        },
+      }),
     ],
   });
   // Names are aliased because in @floating-ui/react-dom@2.0.0 the top-level elements were removed
