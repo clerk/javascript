@@ -1,0 +1,51 @@
+### Path routing is now the default
+
+On components like [`<SignIn />`](/docs/components/authentication/sign-in) you can define the props `routing` and `path`. `routing` can be set to `'hash' | 'path' | 'virtual'` and describes the routing strategy that should be used. `path` defines where the component is mounted when `routing="path"` is used.
+
+In the latest version, the **default** `routing` strategy has become `'path'`. Unless you change the `routing` prop, you'll need to define the `path` prop. The affected components are:
+
+- `<SignIn />`
+- `<SignUp />`
+- `<UserProfile />`
+- `<CreateOrganization />`
+- `<OrganizationProfile />`
+
+Here's how you'd use the components going forward:
+
+```jsx
+<SignIn path="/sign-in" />
+<SignUp path="/sign-up" />
+<UserProfile path="/user-profile" />
+<CreateOrganization path="/create-org" />
+<OrganizationProfile path="/org-profile" />
+```
+
+If you don't define the `path` prop an error will be thrown. Of course, you can still use `routing="hash"` or `routing="virtual"`.
+
+```jsx
+<UserProfile routing="hash" />
+<OrganizationProfile routing="virtual" />
+```
+
+However, there are two exceptions to this behavior. If you're using `@clerk/nextjs` or `@clerk/remix`, you can set environment variables for `<SignIn />` and `<SignUp />`.
+
+<CodeBlockTabs options={["Next.js", "Remix"]}>
+```env filename=".env.local"
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+```
+
+```env filename=".env"
+CLERK_SIGN_IN_URL=/sign-in
+CLERK_SIGN_UP_URL=/sign-up
+```
+
+</CodeBlockTabs>
+
+**Only** if you're using one of these two frameworks and defined both environment variables, you're able to use the `<SignIn />` and `<SignUp />` components without any props.
+
+```jsx
+// Only works for Next.js / Remix when environment variables are set
+<SignIn />
+<SignUp />
+```

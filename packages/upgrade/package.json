@@ -23,6 +23,7 @@
   "dependencies": {
     "@inkjs/ui": "^1.0.0",
     "@jescalan/ink-markdown": "^2.0.0",
+    "ejs": "3.1.9",
     "globby": "^14.0.0",
     "gray-matter": "^4.0.3",
     "index-to-position": "^0.1.2",

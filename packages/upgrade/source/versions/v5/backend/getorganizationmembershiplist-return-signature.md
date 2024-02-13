@@ -1,6 +1,7 @@
 ---
 title: '`Users.getOrganizationMembershipList` return signature changed'
 matcher: "\\.users\\.getOrganizationMembershipList\\("
+category: 'pagination-return'
 warning: true
 ---
 

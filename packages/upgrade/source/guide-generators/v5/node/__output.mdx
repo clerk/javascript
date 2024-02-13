@@ -1,0 +1,345 @@
+---
+title: 'Upgrading Node from v4 to v5'
+description: "Learn how to upgrade Clerk's Node SDK from v4 to v5."
+---
+
+# Upgrading `@clerk/clerk-sdk-node` from v4 to v5
+
+Version 5 of the Node SDK ships with a variety of smaller DX improvements and housekeeping items. Each of the potentially breaking changes are detailed in this guide, below.
+
+By the end of this guide, you’ll have successfully upgraded your Node project to use `@clerk/clerk-sdk-node` v5. You’ll learn how to update your dependencies, resolve breaking changes, and find deprecations. Step-by-step instructions will lead you through the process.
+
+## Preparing to upgrade
+
+Before uprading, it's highly recommended that you update your Clerk SDKs to the latest v4 version. Some changes required for v5 can be applied incrementally to the latest v4, which should contribute to a smoother upgrading experience.
+
+After updating, look out for deprecation messages in your terminal and browser console. By resolving these deprecations you'll be able to skip many breaking changes for v5.
+
+Additionally, some of the minumum version requirements for some base dependencies have been updated such that versions that are no longer supported or are at end-of-life are no longer guaranteed to work correctly with Clerk.
+
+**Updating Node.js**
+
+You need to have Node.js `18.17.0` or later installed. Last year, Node.js 16 entered EOL (End of life) status so it's time to bump the required version for `@clerk/nextjs`, too. You can check your Node.js version by running `node -v` in your terminal. Learn more about how to [update and install Node.js](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs).
+
+## Updating to v5
+
+Whenever you feel ready, go ahead and install the latest beta version of any Clerk SDKs you are using. Make sure that you are prepared to patch some breaking changes before your app will work properly, however. Some examples for how to unstall commonly used SDKs are below:
+
+<CodeBlockTabs type="installer" options={["npm", "yarn", "pnpm"]}>
+    ```bash filename="terminal"
+    npm install @clerk/clerk-sdk-node@beta
+    ```
+
+    ```bash filename="terminal"
+    yarn add @clerk/clerk-sdk-node@beta
+    ```
+
+    ```bash filename="terminal"
+    pnpm add @clerk/clerk-sdk-node@beta
+    ```
+
+</CodeBlockTabs>
+
+## CLI Upgrade Helper
+
+As of this major version Clerk provides a `@clerk/upgrade` CLI tool that you can use to ease the upgrade. A CLI prompt will ask you a couple of questions, it will scan your codebase, and afterwards you'll get a list of changes you'll need to apply to your project, as well as the locations where they need to be applied. This should catch the vast majority of the changes needed for a successful upgrade to v5, and can save a lot of time reading through changes to things that aren't actually in your project.
+
+To run the CLI tool, navigate to your project and run it in the terminal:
+
+<CodeBlockTabs type="installer" options={["npm", "yarn", "pnpm"]}>
+  ```bash filename="terminal"
+  npx @clerk/upgrade
+  ```
+
+```bash filename="terminal"
+yarn dlx @clerk/upgrade
+```
+
+```bash filename="terminal"
+pnpm dlx @clerk/upgrade
+```
+
+</CodeBlockTabs>
+
+If you are having trouble with `npx`, it's also possible to install directly with `npm i @clerk/upgrade -g`, and can then be run with the `clerk-upgrade` command.
+
+## Breaking Changes
+
+### `cjs/instance` and `esm/instance` imports no longer needed
+
+If you are using either of these import paths, they are no longer necessary and you can import directly from the top level `@clerk/express` path.
+
+```diff
+- import { ... } from "@clerk/clerk-sdk-node/esm/instance";
+- import { ... } from "@clerk/clerk-sdk-node/cjs/instance";
++ import { ... } from "@clerk/clerk-sdk-node";
+```
+
+### Clerk client setters removed in favor of `createClerkClient` options
+
+The following setter methods have been removed in the lastest version. If you were using any of these functions, their functionality can be replaced by instead passing the correponding option to `createClerkClient`.
+
+- `setClerkApiVersion`
+- `setClerkHttpOptions`
+- `setClerkServerApiUrl`
+- `setClerkApiKey`
+
+Code example:
+
+```diff
+  import {
+     clerkClient,
+-    setClerkApiKey,
+-    setClerkApiVersion,
+-    setClerkHttpOptions,
+-    setClerkServerApiUrl
+} from "@clerk/clerk-sdk-node"
+
+- setClerkApiKey("...")
+- setClerkApiVersion("...")
+- setClerkHttpOptions("...")
+- setClerkServerApiUrl("...")
+
+  const clerkClient = createClerkClient({
++     secretKey: "..."
++     apiVersion: "..."
++     httpOptions: "..."
++     serverApiUrl: "..."
+  })
+
+  await clerkClient.users.getUser(userId);
+```
+
+### Removed: `orgs` claim on JWT
+
+In v4 of Clerk's SDKs, if you decode the session token that Clerk returns from the server, you'll currently find an `orgs` claim on it. It lists all the orgs associated with the given user. In v5 Clerk returns the `org_id`, `org_slug`, and `org_role` of the **active** organization.
+
+The `orgs` claim was part of the `JwtPayload`. Here are a few examples of where the `JwtPayload` could be found.
+
+<Accordion titles={["Next.js", "Fastify", "@clerk/backend", "@clerk/clerk-sdk-node"]} heading="h5">
+  <AccordionPanel>
+    ```typescript filename="Next.js"
+    import { getAuth } from "@clerk/nextjs/server"
+    const claims: JwtPayload = getAuth(request).sessionClaims
+
+    import { getAuth } from "@clerk/ssr.server"
+    const claims: JwtPayload = (await getAuth(request)).sessionClaims
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    ```typescript filename="Fastify"
+    import { getAuth } from "@clerk/fastify"
+    const claims: JwtPayload = (await getAuth(request)).sessionClaims
+    ```
+  </AccordionPanel>
+  <AccordionPanel>
+    ```typescript filename="@clerk/backend"
+    import { createClerkClient } from "@clerk/backend"
+
+    const clerkClient = createClerkClient({ secretKey: "" })
+    const requestState = await clerkClient.authenticateRequest(
+      request,
+      { publishableKey: "" }
+    )
+    const claims: JwtPayload = requestState.toAuth().sessionClaims
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    ```typescript filename="@clerk/clerk-sdk-node"
+    import { clerkClient } from "@clerk/clerk-sdk-node"
+
+    router.use((...args) => clerkClient.expressRequireAuth()(...args))
+    router.get("/me", async (req, reply: Response) => {
+      return reply.json({ auth: req.auth })
+    })
+    ```
+
+  </AccordionPanel>
+</Accordion>
+
+If you would like to have your JWT return all of the user's organizations, you can create a [custom JWT template](/docs/backend-requests/making/jwt-templates) in your dashboard. Add `{ "orgs": "user.organizations" }` to it.
+
+### Image URL Name Consolidation
+
+There are a number of Clerk primitives that contain images, and previously they each had different property names, like `avatarUrl`, `logoUrl`, `profileImageUrl`, etc. In order to promote consistency and make it simpler for developers to know where to find associated images, all image properties are now named `imageUrl`. See the list below for all affected classes:
+
+<Accordion
+  titles={[
+    '<code>ExternalAccount.picture</code> -&gt; <code>.imageUrl</code>',
+    '<code>Organization.logoUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>OrganizationMembershipPublicUserData.profileImageUrl</code> -&gt; <code>.imageUrl</code>',
+    '<code>Organization.logoUrl</code> -&gt; <code>.imageUrl</code>',
+  ]}
+>
+  <AccordionPanel>
+    The `picture` property of any [`ExternalAcccount`
+    object](https://clerk.com/docs/references/javascript/external-account) has been changed to `imageUrl`.
+  </AccordionPanel>
+  <AccordionPanel>The `logoUrl` property of any `Organization` object has been changed to `imageUrl`.</AccordionPanel>
+  <AccordionPanel>
+    The `profileImageUrl` property of any `OrganizationMembershipPublicUserData` object has been changed to `imageUrl`.
+  </AccordionPanel>
+  <AccordionPanel>The `logoUrl` property of any `Organization` object has been changed to `imageUrl`.</AccordionPanel>
+</Accordion>
+
+## Deprecation removals & housekeeping
+
+As part of this major version, a number of previously deprecated props, arugments, methods, etc have been removed. Additionally there have been some changes to things that are only used internally, or only used very rarely. It's highly unlikely that any given app will encounter any of these items, but they are all breaking changes, so they have all been documented below.
+
+<Callout type='info'>
+  For this section more than any other one, please use the CLI upgrade tool (`npx @clerk/upgrade`). There are a lot of
+  changes, each of which are very unlikely to appear in your codebase, that would take a very long time to look for
+  manually.
+</Callout>
+
+### Deprecation removals
+
+<Accordion titles={["<code>CLERK_API_KEY</code> replaced by <code>CLERK_SECRET_KEY</code>", "<code>CLERK_FRONTEND_API</code> replaced by <code>CLERK_PUBLISHABLE_KEY</code>", "<code>apiKey</code> -&gt; <code>secretKey</code> as param to ClerkExpressRequireAuth", "<code>apiKey</code> -&gt; <code>secretKey</code> as param to ClerkExpressWithAuth", "<code>apiKey</code> -&gt; <code>secretKey</code> as param to createClerkClient", "<code>apiKey</code> -&gt; <code>secretKey</code> as param to createClerkExpressRequireAuth", "<code>apiKey</code> -&gt; <code>secretKey</code> as param to createClerkExpressWithAuth", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as param to createClerkClient", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as param to createClerkExpressRequireAuth", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as param to ClerkExpressRequireAuth", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as param to createClerkExpressWithAuth", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as param to ClerkExpressWithAuth"]}>
+  <AccordionPanel>    
+    The `CLERK_API_KEY` environment variable was renamed to `CLERK_SECRET_KEY`. You can visit your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) to copy/paste the new keys after choosing your framework. Make sure to update this in all environments (e.g. dev, staging, production).
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `CLERK_FRONTEND_API` environment variable was renamed to `CLERK_PUBLISHABLE_KEY`. You can visit your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) to copy/paste the new keys after choosing your framework. Make sure to update this in all environments (e.g. dev, staging, production). **Note:** The values are different, so this is not just a key replacement. [More information](/docs/deployments/overview#api-keys-and-environment-variables).
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `apiKey` argument passed to `ClerkExpressRequireAuth` must be changed to `secretKey`.
+    
+    ```diff
+    import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+    
+    - ClerkExpressRequireAuth({ apiKey: '...' });
+    + ClerkExpressRequireAuth({ secretKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `apiKey` argument passed to `ClerkExpressWithAuth` must be changed to `secretKey`.
+    
+    ```diff
+    import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
+    
+    - ClerkExpressWithAuth({ apiKey: '...' });
+    + ClerkExpressWithAuth({ secretKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `apiKey` argument passed to `createClerkClient` must be changed to `secretKey`.
+    
+    ```diff
+    import { createClerkClient } from '@clerk/clerk-sdk-node';
+    
+    - createClerkClient({ apiKey: '...' });
+    + createClerkClient({ secretKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `apiKey` argument passed to `createClerkExpressRequireAuth` must be changed to `secretKey`.
+    
+    ```diff
+    import { createClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+    
+    - createClerkExpressRequireAuth({ apiKey: '...' });
+    + createClerkExpressRequireAuth({ secretKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `apiKey` argument passed to `createClerkExpressWithAuth` must be changed to `secretKey`.
+    
+    ```diff
+    import { createClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
+    
+    - createClerkExpressWithAuth({ apiKey: '...' });
+    + createClerkExpressWithAuth({ secretKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` argument passed to `createClerkClient` must be changed to `publishableKey`. Note that the values of the two keys are different, so both keys and values need to be changed. You can find your application's publishable key in the Clerk dashboard.
+    
+    ```diff
+    import { createClerkClient } from '@clerk/clerk-sdk-node';
+    
+    - createClerkClient({ frontendApi: '...' });
+    + createClerkClient({ publishableKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` argument passed to `createClerkExpressRequireAuth` must be changed to `publishableKey`. Note that the values of the two keys are different, so both keys and values need to be changed. You can find your application's publishable key in the Clerk dashboard.
+    
+    ```diff
+    import { createClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+    
+    - createClerkExpressRequireAuth({ frontendApi: '...' });
+    + createClerkExpressRequireAuth({ publishableKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` argument passed to `ClerkExpressRequireAuth` must be changed to `publishableKey`. Note that the values of the two keys are different, so both keys and values need to be changed. You can find your application's publishable key in the Clerk dashboard.
+    
+    ```diff
+    import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
+    
+    - ClerkExpressRequireAuth({ frontendApi: '...' });
+    + ClerkExpressRequireAuth({ publishableKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` argument passed to `createClerkExpressWithAuth` must be changed to `publishableKey`. Note that the values of the two keys are different, so both keys and values need to be changed. You can find your application's publishable key in the Clerk dashboard.
+    
+    ```diff
+    import { createClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
+    
+    - createClerkExpressWithAuth({ frontendApi: '...' });
+    + createClerkExpressWithAuth({ publishableKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` argument passed to `ClerkExpressWithAuth` must be changed to `publishableKey`. Note that the values of the two keys are different, so both keys and values need to be changed. You can find your application's publishable key in the Clerk dashboard.
+    
+    ```diff
+    import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
+    
+    - ClerkExpressWithAuth({ frontendApi: '...' });
+    + ClerkExpressWithAuth({ publishableKey: '...' });
+    ```
+  </AccordionPanel>
+</Accordion>
+
+### Other Breaking Changes
+
+<Accordion titles={["<code>API_URL</code> value has changed", "<code>LegacyAuthObject</code> type -&gt; <code>AuthObject</code>", "<code>Clerk</code> -&gt; <code>{ createClerkClient }</code>"]}>
+  <AccordionPanel>    
+    The value of this export has changed from `https://api.clerk.dev` to `https://api.clerk.com`. If you were relying on the text content of this value not changing, you may need to make adjustments.
+  </AccordionPanel>
+  <AccordionPanel>    
+    We changed the values that our middleware adds to the `request` object after running. Previously it returned a `LegacyAuthObject` type, and now it returns an `AuthObject` type, the difference between the two types is as such:
+    
+    ```diff
+    - type LegacyAuthObject = {
+    + type AuthObject = {
+        sessionId: string | null;
+        actor: ActClaim | undefined | null;
+        userId: string | null;
+        getToken: ServerGetToken | null;
+        debug: AuthObjectDebug | null;
+    -   claims: JwtPayload | null;
+    +   sessionClaims: JwtPayload | null;
+    +   orgId: string | undefined | null;
+    +   orgRole: OrganizationCustomRoleKey | undefined | null;
+    +   orgSlug: string | undefined | null;
+    +   orgPermissions: OrganizationCustomPermissionKey[] | undefined | null;
+    +   has: CheckAuthorizationWithCustomPermissions | null;
+      }
+    ```
+    
+    If you were using the `claims` key on the request after running middleware, you will need to instead use `sessionClaims`. Additionally, if you were using the `LooseAuthProp` or `StrictAuthProp` exported types anywhere, note that these have been adjusted to fit the shape of the new middleware response typing.
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `Clerk` default import has changed to `createClerkClient` and been moved to a named import rather than default. You must update your import path in order for it to work correctly. Example below of the fix that needs to be made:
+    
+    ```diff
+    - import Clerk from "@clerk/clerk-sdk-node"
+    + import { createClerkClient } from "@clerk/clerk-sdk-node"
+    ```
+  </AccordionPanel>
+</Accordion>

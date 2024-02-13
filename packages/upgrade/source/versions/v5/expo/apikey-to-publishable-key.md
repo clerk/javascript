@@ -1,5 +1,6 @@
 ---
 title: '`CLERK_FRONTEND_API` replaced by `CLERK_PUBLISHABLE_KEY`'
+category: 'deprecation-removal'
 matcher: 'CLERK_FRONTEND_API'
 ---
 

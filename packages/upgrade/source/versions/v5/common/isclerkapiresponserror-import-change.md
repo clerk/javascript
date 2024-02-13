@@ -2,6 +2,7 @@
 title: '`isClerkAPIResponseError` import moved under `/errors`'
 matcher: "import\\s+{[\\s\\S]*?isClerkAPIResponseError[\\s\\S]*?from\\s+['\"]@clerk\\/(clerk-react)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
+category: 'error-imports'
 replaceWithString: 'clerk-react/errors'
 ---
 

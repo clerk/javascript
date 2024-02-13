@@ -1,6 +1,7 @@
 ---
 title: '`apiKey` -> `secretKey` as argument to createClerkClient'
 matcher: "createClerkClient\\({[\\s\\S]*?apiKey:[\\s\\S]*?}\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: '`Clerk.experimental_captchaURL` property removed'
+category: 'deprecation-removal'
 matcher: 'experimental_captchaURL'
 ---
 

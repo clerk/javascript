@@ -1,6 +1,7 @@
 ---
 title: '`frontendApi` -> `publishableKey` as prop to `ClerkProvider`'
 matcher: "<ClerkProvider[\\s\\S]*?frontendApi=[\\s\\S]*?>"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: '`Clerk.experimental_canUseCaptcha` property removed'
+category: 'deprecation-removal'
 matcher: 'experimental_canUseCaptcha'
 ---
 

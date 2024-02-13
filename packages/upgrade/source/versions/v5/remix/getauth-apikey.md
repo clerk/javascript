@@ -1,6 +1,7 @@
 ---
 title: '`apiKey` -> `secretKey` as argument to getAuth'
 matcher: "getAuth\\({[\\s\\S]*?apiKey:[\\s\\S]*?}\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

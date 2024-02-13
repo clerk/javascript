@@ -1,5 +1,6 @@
 ---
 title: '`Clerk.experimental_captchaSiteKey` property removed'
+category: 'deprecation-removal'
 matcher: 'experimental_captchaSiteKey'
 ---
 

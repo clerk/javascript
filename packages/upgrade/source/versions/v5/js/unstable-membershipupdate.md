@@ -1,5 +1,6 @@
 ---
 title: '`Clerk.__unstable__membershipUpdate` removed'
+category: 'deprecation-removal'
 matcher: '__unstable__membershipUpdate'
 ---
 

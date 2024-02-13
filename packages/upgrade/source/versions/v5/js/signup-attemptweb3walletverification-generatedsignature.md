@@ -1,6 +1,7 @@
 ---
 title: '`generatedSignature` -> `signature` as param of Signup.attemptWeb3WalletVerification()'
 matcher: "attemptWeb3WalletVerification\\([\\s\\S]*?generatedSignature:[\\s\\S]*?\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 
@@ -9,7 +10,7 @@ The `generatedSignature` param to [`Signup.attemptWeb3WalletVerification()`](htt
 ```js
 // before
 s.attemptWeb3WalletVerification({
-	generatedSignature: async () => 'signatureString',
+  generatedSignature: async () => 'signatureString',
 });
 
 // after

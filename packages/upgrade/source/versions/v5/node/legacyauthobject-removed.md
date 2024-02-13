@@ -14,7 +14,7 @@ We changed the values that our middleware adds to the `request` object after r
     getToken: ServerGetToken | null;
     debug: AuthObjectDebug | null;
 -   claims: JwtPayload | null;
--   sessionClaims: JwtPayload | null;
++   sessionClaims: JwtPayload | null;
 +   orgId: string | undefined | null;
 +   orgRole: OrganizationCustomRoleKey | undefined | null;
 +   orgSlug: string | undefined | null;

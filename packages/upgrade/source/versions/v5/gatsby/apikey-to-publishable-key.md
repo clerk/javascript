@@ -1,5 +1,6 @@
 ---
 title: '`GASTBY_CLERK_FRONTEND_API` replaced by `GATSBY_CLERK_PUBLISHABLE_KEY`'
+category: 'deprecation-removal'
 matcher: 'GATSBY_CLERK_FRONTEND_API'
 ---
 

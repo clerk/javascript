@@ -1,6 +1,7 @@
 ---
 title: '`frontendApi` -> `publishableKey` as argument to rootAuthLoader'
 matcher: "rootAuthLoader\\({[\\s\\S]*?frontendApi:[\\s\\S]*?}\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

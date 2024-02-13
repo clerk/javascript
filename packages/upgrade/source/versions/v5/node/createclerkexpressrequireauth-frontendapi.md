@@ -1,6 +1,7 @@
 ---
 title: '`frontendApi` -> `publishableKey` as param to createClerkExpressRequireAuth'
 matcher: "createClerkExpressRequireAuth\\([\\s\\S]*?frontendApi:[\\s\\S]*?\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

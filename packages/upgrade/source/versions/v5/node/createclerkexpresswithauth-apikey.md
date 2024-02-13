@@ -1,6 +1,7 @@
 ---
 title: '`apiKey` -> `secretKey` as param to createClerkExpressWithAuth'
 matcher: "createClerkExpressWithAuth\\([\\s\\S]*?apiKey:[\\s\\S]*?\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

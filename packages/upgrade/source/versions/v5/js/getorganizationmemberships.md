@@ -5,10 +5,7 @@ matcher: "Clerk.getOrganizationMemberships\\("
 
 The `getOrganizationMemberships` [method on the `Clerk` class](https://clerk.com/docs/references/javascript/clerk/clerk#organization) has been removed. Instead, use `getOrganizationMemberships` on a user instance.
 
-```js
-// before
-Clerk.getOrganizationMemberships();
-
-// after
-user.getOrganizationMemberships();
+```diff
+- Clerk.getOrganizationMemberships();
++ user.getOrganizationMemberships();
 ```

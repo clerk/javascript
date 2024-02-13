@@ -1,6 +1,7 @@
 ---
 title: '`redirect_url` -> `redirectUrl` as param of `User.createExternalAccount`'
 matcher: "createExternalAccount\\(\\s*{[\\s\\S]*?(redirect_url):[\\s\\S]*?\\)"
+category: 'deprecation-removal'
 replaceWithString: 'redirectUrl'
 ---
 

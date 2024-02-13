@@ -1,6 +1,7 @@
 ---
 title: '`cjs/instance` and `esm/instance` imports no longer needed'
 matcher: "@clerk\\/clerk-sdk-node(\\/(?:cjs|esm)\\/instance)"
+category: 'cjs-esm-instance'
 replaceWithString: ''
 ---
 

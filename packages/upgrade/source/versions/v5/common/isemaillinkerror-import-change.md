@@ -2,6 +2,7 @@
 title: '`isEmailLinkError` import moved under `/errors`'
 matcher: "import\\s+{[\\s\\S]*?isEmailLinkError[\\s\\S]*?from\\s+['\"]@clerk\\/(clerk-react)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
+category: 'error-imports'
 replaceWithString: 'clerk-react/errors'
 ---
 

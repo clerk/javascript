@@ -46,7 +46,6 @@ const reactChangesList = [
   'signoutcallback-to-redirecturl',
   'min-react-version',
   'getorganizationlist-return-type-change',
-  'getorganizationinvitationlist-return-type-change',
   'getorganizationmembershiplist-return-type-change',
   'organization-getroles-arguments-changed',
   'organization-getmemberships-arguments-changed',
@@ -56,10 +55,14 @@ const reactChangesList = [
   'user-getorganizationinvitations-arguments-chanaged',
   'user-getorganizationsuggestions-arguments-chanaged',
   'user-getorganizationmemberships-arguments-chanaged',
+  'externalaccount-picture',
+  'organizationmembershippublicuserdata-profileimageurl',
+  'organization-logourl',
+  'user-profileimageurl',
 ];
 
 export default {
-  nextjs: load('next', [
+  nextjs: load('nextjs', [
     'api-key-to-secret-key',
     'frontend-api-to-publishable-key',
     'with-clerk-middleware-removed',
@@ -136,7 +139,6 @@ export default {
     'redirecttosignin-import-path',
     'redirecttosignup-import-path',
     'getorganizationlist-return-type-change',
-    'getorganizationinvitationlist-return-type-change',
     'getorganizationmembershiplist-return-type-change',
     'organization-getroles-arguments-changed',
     'organization-getmemberships-arguments-changed',
@@ -146,6 +148,10 @@ export default {
     'user-getorganizationinvitations-arguments-chanaged',
     'user-getorganizationsuggestions-arguments-chanaged',
     'user-getorganizationmemberships-arguments-chanaged',
+    'externalaccount-picture',
+    'organizationmembershippublicuserdata-profileimageurl',
+    'organization-logourl',
+    'user-profileimageurl',
   ]),
   // since we export clerk-react at the top level from the gatsby plugin
   // if you're using gatsby, we also need to scan for the react changes
@@ -184,7 +190,6 @@ export default {
     'signoutcallback-to-redirecturl',
     'clerk-import-change',
     'getorganizationlist-return-type-change',
-    'getorganizationinvitationlist-return-type-change',
     'getorganizationmembershiplist-return-type-change',
     'organization-getroles-arguments-changed',
     'organization-getmemberships-arguments-changed',
@@ -194,6 +199,10 @@ export default {
     'user-getorganizationinvitations-arguments-chanaged',
     'user-getorganizationsuggestions-arguments-chanaged',
     'user-getorganizationmemberships-arguments-chanaged',
+    'externalaccount-picture',
+    'organizationmembershippublicuserdata-profileimageurl',
+    'organization-logourl',
+    'user-profileimageurl',
   ]),
   expo: load('expo', [
     'apikey-to-publishable-key',
@@ -218,8 +227,11 @@ export default {
     'changed-localization-keys',
     'signoutcallback-to-redirecturl',
     'getorganizationlist-return-type-change',
-    'getorganizationinvitationlist-return-type-change',
     'getorganizationmembershiplist-return-type-change',
+    'externalaccount-picture',
+    'organization-logourl',
+    'organizationmembershippublicuserdata-profileimageurl',
+    'user-profileimageurl',
   ]),
   fastify: load('fastify', [
     'api-key-to-secret-key',
@@ -229,6 +241,10 @@ export default {
     'createclerkclient-frontendapi',
     'clerkplugin-frontendapi',
     'clerk-import-change',
+    'externalaccount-picture',
+    'organization-logourl',
+    'organizationmembershippublicuserdata-profileimageurl',
+    'user-profileimageurl',
   ]),
   node: load('node', [
     'api-key-to-secret-key',
@@ -251,6 +267,10 @@ export default {
     'cjs-esm-instance',
     'legacyauthobject-removed',
     'clerk-import-change',
+    'externalaccount-picture',
+    'organization-logourl',
+    'organizationmembershippublicuserdata-profileimageurl',
+    'user-profileimageurl',
   ]),
   react: load('react', reactChangesList),
   js: load('js', [
@@ -259,9 +279,9 @@ export default {
     'magiclinkerrorcode',
     'usemagiclink',
     'handlemagiclinkverification',
-    'external-account-avatarurl', // shared w/ all
-    'organization-logourl', // shared w/ all
-    'user-orgpublicdata-profileimageurl', // shared w/ all
+    'external-account-avatarurl',
+    'organization-logourl',
+    'user-orgpublicdata-profileimageurl',
     'setsession',
     'user-update-password', // shared w/ all
     'experimental-canusecaptcha',
@@ -301,6 +321,9 @@ export default {
     'removed-localization-keys',
     'changed-localization-keys',
     'signoutcallback-to-redirecturl',
+    'externalaccount-picture',
+    'organizationmembershippublicuserdata-profileimageurl',
+    'user-profileimageurl',
   ]),
   shared: load('shared', [
     'magiclinkerror',

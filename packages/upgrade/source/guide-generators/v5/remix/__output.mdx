@@ -1,0 +1,367 @@
+---
+title: 'Upgrading Remix from v4 to v5'
+description: 'Learn how to upgrade from version 4 to version 5 of the Clerk Remix SDK.'
+---
+
+# Upgrading `@clerk/remix` from v4 to v5
+
+Version 5 of the Remix SDK ships with an improved design and UX for its built-in components, no "flash of white page" when authenticating, no more need to add a custom error boundary, and a variety of smaller DX improvements and housekeeping items. Each of the potentially breaking changes are detailed in this guide, below.
+
+By the end of this guide, you’ll have successfully upgraded your Next.js project to use `@clerk/remix` v5. You’ll learn how to update your dependencies, resolve breaking changes, and find deprecations. Step-by-step instructions will lead you through the process.
+
+## Preparing to upgrade
+
+Before uprading, it's highly recommended that you update your Clerk SDKs to the latest v4 version. Some changes required for v5 can be applied incrementally to the latest v4, which should contribute to a smoother upgrading experience.
+
+After updating, look out for deprecation messages in your terminal and browser console. By resolving these deprecations you'll be able to skip many breaking changes for v5.
+
+Additionally, some of the minumum version requirements for some base dependencies have been updated such that versions that are no longer supported or are at end-of-life are no longer guaranteed to work correctly with Clerk.
+
+**Updating Node.js**
+
+You need to have Node.js `18.17.0` or later installed. Last year, Node.js 16 entered EOL (End of life) status so it's time to bump the required version for `@clerk/nextjs`, too. You can check your Node.js version by running `node -v` in your terminal. Learn more about how to [update and install Node.js](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs).
+
+**Updating React**
+
+All react-dependent Clerk SDKs now require you to use React 18 or higher. You can update your project by installing the latest version of `react` and `react-dom`.
+
+<CodeBlockTabs type="installer" options={["npm", "yarn", "pnpm"]}>
+    ```bash filename="terminal"
+    npm install react@latest react-dom@latest
+    ```
+
+    ```bash filename="terminal"
+    yarn add react@latest react-dom@latest
+    ```
+
+    ```bash filename="terminal"
+    pnpm add react@latest react-dom@latest
+    ```
+
+</CodeBlockTabs>
+
+If you are upgrading from React 17 or lower, make sure to [learn about how to upgrade your React version to 18](https://react.dev/blog/2022/03/08/react-18-upgrade-guide) as well.
+
+## Updating to v5
+
+Whenever you feel ready, go ahead and install the latest beta version of any Clerk SDKs you are using. Make sure that you are prepared to patch some breaking changes before your app will work properly, however. Some examples for how to unstall commonly used SDKs are below:
+
+<CodeBlockTabs type="installer" options={["npm", "yarn", "pnpm"]}>
+    ```bash filename="terminal"
+    npm install @clerk/remix@beta
+    ```
+
+    ```bash filename="terminal"
+    yarn add @clerk/remix@beta
+    ```
+
+    ```bash filename="terminal"
+    pnpm add @clerk/remix@beta
+    ```
+
+</CodeBlockTabs>
+
+## CLI Upgrade Helper
+
+As of this major version Clerk provides a `@clerk/upgrade` CLI tool that you can use to ease the upgrade. A CLI prompt will ask you a couple of questions, it will scan your codebase, and afterwards you'll get a list of changes you'll need to apply to your project, as well as the locations where they need to be applied. This should catch the vast majority of the changes needed for a successful upgrade to v5, and can save a lot of time reading through changes to things that aren't actually in your project.
+
+To run the CLI tool, navigate to your project and run it in the terminal:
+
+<CodeBlockTabs type="installer" options={["npm", "yarn", "pnpm"]}>
+  ```bash filename="terminal"
+  npx @clerk/upgrade
+  ```
+
+```bash filename="terminal"
+yarn dlx @clerk/upgrade
+```
+
+```bash filename="terminal"
+pnpm dlx @clerk/upgrade
+```
+
+</CodeBlockTabs>
+
+If you are having trouble with `npx`, it's also possible to install directly with `npm i @clerk/upgrade -g`, and can then be run with the `clerk-upgrade` command.
+
+## Breaking Changes
+
+### `ClerkErrorBoundary` removed
+
+`ClerkErrorBoundary` is no longer needed for correct error handling in remix, so we have removed this function from the remix SDK, and it can be removed from your code as well. Example below:
+
+```diff
+ import { rootAuthLoader } from '@clerk/remix/ssr.server';
+ import {
+     ClerkApp,
+-    ClerkErrorBoundary
+ } from '@clerk/remix';
+
+ export const loader = (args: DataFunctionArgs) => {
+   return rootAuthLoader(args);
+ };
+
+ export default ClerkApp(App);
+
+- export const ErrorBoundary = ClerkErrorBoundary();
+```
+
+### Component design adjustments
+
+The new version ships with improved design and UX across all of Clerk's [UI components](/docs/components/overview). If you have used the [`appearance` prop](/docs/components/customization/overview) or tokens for a [custom theme](/docs/components/customization/overview#create-a-custom-theme), you will likely need to make some adjustments to ensure your styling is still looking great. If you're using the [localization prop](/docs/components/customization/localization) you will likely need to make adjustments to account for added or removed localization keys.
+
+[More detail on these changes &raquo;](#redesigned-components)
+
+## Deprecation removals & housekeeping
+
+As part of this major version, a number of previously deprecated props, arugments, methods, etc have been removed. Additionally there have been some changes to things that are only used internally, or only used very rarely. It's highly unlikely that any given app will encounter any of these items, but they are all breaking changes, so they have all been documented below.
+
+<Callout type='info'>
+  For this section more than any other one, please use the CLI upgrade tool (`npx @clerk/upgrade`). There are a lot of
+  changes, each of which are very unlikely to appear in your codebase, that would take a very long time to look for
+  manually.
+</Callout>
+
+### Deprecation removals
+
+<Accordion titles={["<code>apiKey</code> -&gt; <code>secretKey</code> as argument to createClerkClient", "<code>apiKey</code> -&gt; <code>secretKey</code> as argument to rootAuthLoader", "<code>apiKey</code> -&gt; <code>secretKey</code> as argument to getAuth", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as prop to <code>ClerkProvider</code>", "<code>frontendApi</code> -&gt; <code>publishableKey</code> as argument to rootAuthLoader", "<code>CLERK_FRONTEND_API</code> replaced by <code>CLERK_PUBLISHABLE_KEY</code>", "<code>CLERK_API_KEY</code> replaced by <code>CLERK_SECRET_KEY</code>", "<code>Clerk</code> -&gt; <code>{ createClerkClient }</code>"]}>
+  <AccordionPanel>    
+    The `apiKey` argument passed to `createClerkClient` must be changed to `secretKey`.
+    
+    ```diff
+    import { createClerkClient } from '@clerk/remix/api.server';
+    
+    - createClerkClient({ apiKey: '...' });
+    + createClerkClient({ secretKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `apiKey` argument passed to `rootAuthLoader` must be changed to `secretKey`.
+    
+    ```diff
+    import { rootAuthLoader } from '@clerk/remix/ssr.server';
+    
+    - export const loader = args => rootAuthLoader(args, { apiKey: '...' });
+    + export const loader = args => rootAuthLoader(args, { secretKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `apiKey` argument passed to `getAuth` must be changed to `secretKey`.
+    
+    ```diff
+    import { getAuth } from '@clerk/remix/ssr.server';
+    
+    export const loader: LoaderFunction = async args => {
+    -  return getAuth(args, { apiKey: '...' });
+    +  return getAuth(args, { secretKey: '...' });
+    };
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` prop passed to `<ClerkProvider>` was renamed to `publishableKey`. **Note:** The values are different, so this is not just a key replacement. You can visit your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) to copy/paste the new keys after choosing your framework. Make sure to update this in all environments (e.g. dev, staging, production). [More information](/docs/deployments/overview#api-keys-and-environment-variables).
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `frontendApi` argument passed to `rootAuthLoader` must be changed to `publishableKey`.
+    
+    ```diff
+    import { rootAuthLoader } from '@clerk/remix/ssr.server';
+    
+    - export const loader = args => rootAuthLoader(args, { frontendApi: '...' });
+    + export const loader = args => rootAuthLoader(args, { publishableKey: '...' });
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `CLERK_FRONTEND_API` environment variable was renamed to `CLERK_PUBLISHABLE_KEY`. You can visit your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) to copy/paste the new keys after choosing your framework. Make sure to update this in all environments (e.g. dev, staging, production). **Note:** The values are different, so this is not just a key replacement. [More information](/docs/deployments/overview#api-keys-and-environment-variables).
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `CLERK_API_KEY` environment variable was renamed to `CLERK_SECRET_KEY`. You can visit your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) to copy/paste the new keys after choosing your framework. Make sure to update this in all environments (e.g. dev, staging, production).
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `Clerk` default import has changed to `createClerkClient` and been moved to a named import rather than default. You must update your import path in order for it to work correctly. Example below of the fix that needs to be made:
+    
+    ```diff
+    - import Clerk from "@clerk/remix"
+    + import { createClerkClient } from "@clerk/remix"
+    ```
+  </AccordionPanel>
+</Accordion>
+
+### Other Breaking Changes
+
+<Accordion titles={["<code>isMagicLinkError</code> -&gt; <code>isEmailLinkError</code>", "<code>MagicLinkErrorCode</code> -&gt; <code>EmailLinkErrorCode</code>", "<code>useMagicLink</code> -&gt; <code>useEmailLink</code>", "<code>setSession</code> -&gt; <code>setActive</code>", "Replace <code>signOutCallback</code> prop on <code>SignOutButton</code> with <code>redirectUrl</code>", "<code>Organization.getOrganizationList()</code> return type changed", "<code>User.getOrganizationMembershipList()</code> return type changed", "<code>Organization.getRoles</code> arguments changed", "<code>Organization.getMemberships</code> arguments changed", "<code>Organization.getDomains</code> arguments changed", "<code>Organization.getInvitations</code> arguments changed", "<code>Organization.getMembershipRequests</code> arguments changed", "<code>User.getOrganizationInvitations</code> arguments changed", "<code>User.getOrganizationSuggestions</code> arguments changed", "<code>User.getOrganizationMemberships</code> arguments changed"]}>
+  <AccordionPanel>    
+    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
+  </AccordionPanel>
+  <AccordionPanel>    
+    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects the functionality.
+  </AccordionPanel>
+  <AccordionPanel>    
+    Across Clerk's documentation and codebases the term "magic link" was changed to "email link" as it more accurately reflects functionality.
+  </AccordionPanel>
+  <AccordionPanel>    
+    `setSession` should be replaced with `setActive`. The format of the parameters has changed slightly - `setActive` takes an object where `setSession` took params directly. The `setActive` function also can accept an `organization` param that is used to set the currently active organization. The return signature did not change. Read the [API documentation](/docs/references/javascript/clerk/session-methods#set-active) for more detail. This function should be expected to be returned from one of the following Clerk hooks: `useSessionList`, `useSignUp`, or `useSignIn`. Some migration examples:
+    
+    ```diff
+    - await setSession('sessionID', () => void)
+    + await setActive({ session: 'sessionID',  beforeEmit: () => void })
+    
+    - await setSession(sessionObj)
+    + await setActive({ session: sessionObj })
+    
+    - await setSession(sessionObj, () => void)
+    + await setActive({ session: sessionObj,  beforeEmit: () => void })
+    ```
+    
+    `setActive` also supports setting an active organization:
+    
+    ```js
+    await setActive({
+      session: 'sessionID',
+      organization: 'orgID',
+      beforeEmit: () => void
+    })
+    
+    await setActive({
+      session: sessionObj,
+      organization: orgObj,
+      beforeEmit: () => void
+    })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The `signOutCallback` prop on the [`<SignOutButton />` component](https://clerk.com/docs/components/unstyled/sign-out-button) has been removed. Instead, you can use the `redirectUrl` prop. Example below:
+    
+    ```diff
+      import { SignOutButton } from "@clerk/clerk-react";
+    
+      export const Signout = () => {
+        return (
+          <SignOutButton
+    -       signOutCallback={() => { window.location.href = "/your-path" }}
+    +       redirectUrl="/your-path"
+          >
+            <button>Sign Out</button>
+          </SignOutButton>
+        )
+      }
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
+    
+    ```diff
+      const { organization } = useOrganization()
+      const orgList = organization.getOrganizationList()
+    
+    - orgList.forEach(() => {})
+    + orgList.data.forEach(() => {})
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    The return type for this function was previously `[Items]` but has now been updated to `{ data: [Items], totalCount: number }`. Since Clerk's API responses are paginated, the `totalCount` property is helpful in determining the total number of items in the response easily. A before/after code example can be seen below:
+    
+    ```diff
+      const { user } = useUser()
+      const membershipList = user.getOrganizationMembershipList()
+    
+    - membershipList.forEach(() => {})
+    + membershipList.data.forEach(() => {})
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getRoles({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getMemberships({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getDomains({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getInvitations({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await organization.getMembershipRequests({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationInvitations({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationSuggestions({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+  <AccordionPanel>    
+    There have been a couple changes to the pagination arguments that can be passed into this function - `limit` has been renamed to `pageSize`, and `offset` has been renamed to `initialPage`. This will help to make it more clear and simple to reason about pagination control. Example of how changes might look below:
+    
+    ```diff
+      const { data } = await user.getOrganizationMemberships({
+    -   limit: 10,
+    +   pageSize: 10,
+    -   offset: 10,
+    +   initialPage: 2,
+      })
+    ```
+  </AccordionPanel>
+</Accordion>

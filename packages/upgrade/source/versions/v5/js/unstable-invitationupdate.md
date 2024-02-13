@@ -1,5 +1,6 @@
 ---
 title: '`Clerk.__unstable__invitationUpdate` removed'
+category: 'deprecation-removal'
 matcher: '__unstable__invitationUpdate'
 ---
 

@@ -1,0 +1,18 @@
+# Upgrading from v4 to v5
+
+Clerk's SDKs include React, Next.js, Remix, Expo, Redwood, and others. This guide helps you with uprading to the next major version of your SDK.
+
+Version 5 ships with an improved design and UX for its built-in components, no "flash of white page" when authenticating, and a new middleware for Next.js which defaults to not protecting any routes. Along with these highly requested features some smaller DX improvements and housekeeping items made its way into the release. If you want to know everything that's new, read the [v5 announcement post](https://clerk.com/changelog/2024-01-16).
+
+<Callout type='info'>
+  Version 5/v5 refers to the [`@clerk/clerk-js`](https://www.npmjs.com/package/@clerk/clerk-js) package version.
+  However, other SDKs like `@clerk/backend` or `@clerk/clerk-expo` are versioned independently (and would upgrade from
+  v1 to v2). To make this page easier to read for instances of general advice only v5 is mentioned. You can think of v4
+  as the previous major of your SDK and v5 as the current in those cases.
+</Callout>
+
+If you're curious about Clerk's approach to versioning and support, head to the [long term support](/docs/upgrade-guides/long-term-support) document. Version 5 includes [potentially breaking changes](#breaking-changes), as well as the removal of [previously deprecated features](#previously-deprecated-features).
+
+For most users we expect a smooth upgrade path as only a couple of changes will be required: [Update dependencies](#update-dependencies), run the `@clerk/upgrade` CLI, [update Clerk](#update-clerk), and handle any [breaking changes](#breaking-changes).
+
+If you're using **Next.js**, you can read a more streamlined [Upgrading Next.js from v4 to v5](/docs/upgrade-guides/upgrading-nextjs-from-v4-to-v5) guide.

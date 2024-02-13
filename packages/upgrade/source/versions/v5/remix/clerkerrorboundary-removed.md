@@ -1,6 +1,7 @@
 ---
 title: '`ClerkErrorBoundary` removed'
 matcher: "import\\s+{[\\s\\S]*?ClerkErrorBoundary[\\s\\S]*?from\\s+['\"]@clerk\\/remix[\\s\\S]*?['\"]"
+category: 'error-boundary-removed'
 matcherFlags: 'm'
 ---
 
