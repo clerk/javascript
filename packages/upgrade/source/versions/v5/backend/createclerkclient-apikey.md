@@ -1,6 +1,7 @@
 ---
 title: '`apiKey` -> `secretKey` as param to createClerkClient'
 matcher: "(?:createClerkClient|Clerk)\\(\\s*{[\\s\\S]*?frontendApi:[\\s\\S]*?\\)"
+category: 'deprecation-removal'
 matcherFlags: 'm'
 ---
 

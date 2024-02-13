@@ -3,6 +3,7 @@ title: '`TokenVerificationErrorAction` import moved to `@clerk/backend/errors`'
 matcher: "import\\s+{[\\s\\S]*?TokenVerificationErrorAction[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)['\"]"
 matcherFlags: 'm'
 replaceWithString: 'backend/errors'
+category: 'import-paths'
 ---
 
 The `TokenVerificationErrorAction` import path has changed from `@clerk/backend` to `@clerk/backend/errors`. You must update your import path in order for it to work correctly. Example below of the fix that needs to be made:

@@ -17,7 +17,7 @@ const packageName = '@clerk/clerk-sdk-node';
 const cwd = `${version}/${name}`;
 
 async function generate() {
-  const data = loadVersionChangeData(version, name);
+  const data = await loadVersionChangeData(version, name);
 
   return assembleContent({ data, cwd }, [
     frontmatter({

@@ -8,19 +8,16 @@ The `tokenCache` prop has been renamed to `storageCache` in order to accomodate 
 
 ```ts
 type StorageCache = {
-	createKey: (...keys: string[]) => string;
-	get: <T = any>(key: string) => Promise<T>;
-	remove: (key: string) => Promise<void>;
-	set: (key: string, value: string) => Promise<void>;
+  createKey: (...keys: string[]) => string;
+  get: <T = any>(key: string) => Promise<T>;
+  remove: (key: string) => Promise<void>;
+  set: (key: string, value: string) => Promise<void>;
 };
 ```
 
 And here's a full before/after example:
 
-```jsx
-// before
-<ClerkProvider tokenCache={/* ... */}>
-
-// after
-<ClerkProvider storageCache={/* ... */}>
+```diff
+- <ClerkProvider tokenCache={/* ... */}>
++ <ClerkProvider storageCache={/* ... */}>
 ```

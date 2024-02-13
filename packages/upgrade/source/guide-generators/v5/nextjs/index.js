@@ -16,7 +16,7 @@ const packageName = '@clerk/nextjs';
 const cwd = 'v5/nextjs';
 
 async function generate() {
-  const data = loadVersionChangeData(version, name);
+  const data = await loadVersionChangeData(version, name);
 
   return assembleContent({ data, cwd }, [
     frontmatter({
@@ -39,7 +39,7 @@ async function generate() {
     markdown('orgs-claim'),
     markdown('path-routing'),
     markdown('image-url'),
-    accordionForCategory('image-url', {}),
+    accordionForCategory('image-url'),
     deprecationRemovalsAndHousekeeping(['hof-removal', 'pagination-return', 'pagination-args', 'error-imports']),
   ]);
 }

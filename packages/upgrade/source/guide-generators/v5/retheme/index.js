@@ -25,7 +25,7 @@ async function generate() {
     '## Appearance Changes',
     accordionForCategory('appearance', { additionalItems: defaultsChangeItem }),
     '## Localization Changes',
-    accordionForCategory('localization', {}),
+    accordionForCategory('localization'),
   ]);
 }
 

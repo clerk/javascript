@@ -1,7 +1,6 @@
 import {
   accordionForCategory,
   assembleContent,
-  deprecationRemovalsAndHousekeeping,
   frontmatter,
   loadVersionChangeData,
   markdown,
@@ -11,17 +10,17 @@ import {
 } from '../../text-generation.js';
 
 const version = 'v5';
-const name = 'react';
-const properName = 'React';
-const packageName = '@clerk/clerk-react';
-const cwd = `${version}/${name}`;
+const name = 'chromeExtension';
+const properName = 'Chrome Extension';
+const packageName = '@clerk/chrome-extension';
+const cwd = `${version}/chromeExtension`;
 
 async function generate() {
   const data = await loadVersionChangeData(version, name);
 
   return assembleContent({ data, cwd }, [
     frontmatter({
-      title: `Upgrading ${properName} from v4 to v5`,
+      title: `Upgrading ${properName} SDK from v4 to v5`,
       description: `Learn how to upgrade Clerk's ${properName} SDK from v4 to v5.`,
     }),
     `# Upgrading \`${packageName}\` from v4 to v5`,
@@ -32,14 +31,13 @@ async function generate() {
     markdownTemplate('update-v5', { packageName }),
     markdown('cli'),
     '## Breaking Changes',
+    singleItem('clerkprovider-tokencache'),
     markdown('redesign-preview'),
     markdown('after-sign-x-handling'),
-    singleItem('navigate-to-routerpush-routerreplace'),
     markdown('orgs-claim'),
     markdown('path-routing'),
     markdown('image-url'),
     accordionForCategory('image-url'),
-    deprecationRemovalsAndHousekeeping(),
   ]);
 }
 
