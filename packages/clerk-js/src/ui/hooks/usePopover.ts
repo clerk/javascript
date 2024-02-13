@@ -1,5 +1,5 @@
 import type { UseFloatingOptions } from '@floating-ui/react';
-import { autoUpdate, flip, offset, shift, useDismiss, useFloating, useFloatingNodeId } from '@floating-ui/react';
+import { autoUpdate, flip, offset, shift, size, useDismiss, useFloating, useFloatingNodeId } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
 type UsePopoverProps = {
@@ -9,6 +9,8 @@ type UsePopoverProps = {
   shoudFlip?: boolean;
   autoUpdate?: boolean;
   outsidePress?: boolean | ((event: MouseEvent) => boolean);
+  adjustToReferenceWidth?: boolean;
+  referenceElement?: React.RefObject<HTMLElement> | null;
   bubbles?:
     | boolean
     | {
@@ -20,16 +22,31 @@ type UsePopoverProps = {
 export type UsePopoverReturn = ReturnType<typeof usePopover>;
 
 export const usePopover = (props: UsePopoverProps = {}) => {
-  const { bubbles = false, shoudFlip = true, outsidePress } = props;
+  const { bubbles = false, shoudFlip = true, outsidePress, adjustToReferenceWidth = false, referenceElement } = props;
   const [isOpen, setIsOpen] = React.useState(props.defaultOpen || false);
   const nodeId = useFloatingNodeId();
   const { update, refs, strategy, x, y, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
+    elements: {
+      reference: referenceElement?.current,
+    },
     nodeId,
     whileElementsMounted: props.autoUpdate === false ? undefined : autoUpdate,
     placement: props.placement || 'bottom-start',
-    middleware: [offset(props.offset || 6), shoudFlip && flip(), shift()],
+    middleware: [
+      offset(props.offset || 6),
+      shoudFlip && flip(),
+      shift(),
+      size({
+        apply({ elements }) {
+          if (adjustToReferenceWidth) {
+            const reference = elements.reference as any as HTMLElement;
+            elements.floating.style.width = reference ? `${reference?.offsetWidth}px` : '';
+          }
+        },
+      }),
+    ],
   });
   // Names are aliased because in @floating-ui/react-dom@2.0.0 the top-level elements were removed
   // This keeps the API shape for consumers of usePopover

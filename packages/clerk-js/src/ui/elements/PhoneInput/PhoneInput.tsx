@@ -27,6 +27,7 @@ type PhoneInputProps = PropsOfComponent<typeof Input> & { locationBasedCountryIs
 const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedbackType?: FeedbackType }>((props, ref) => {
   const { onChange: onChangeProp, value, locationBasedCountryIso, feedbackType, sx, ...rest } = props;
   const phoneInputRef = useRef<HTMLInputElement>(null);
+  const phoneInputBox = useRef<HTMLDivElement>(null);
   const { setNumber, setIso, setNumberAndIso, numberWithCode, iso, formattedNumber } = useFormattedPhoneNumber({
     initPhoneWithCode: value as string,
     locationBasedCountryIso,
@@ -70,6 +71,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
       direction='row'
       hasError={rest.hasError}
       data-feedback={feedbackType}
+      ref={phoneInputBox}
       sx={theme => ({
         ...common.borderVariants(theme, { hasError: rest.hasError }).normal,
         position: 'relative',
@@ -81,6 +83,8 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         elementId='countryCode'
         value={selectedCountryOption.value}
         options={countryOptions}
+        portal
+        referenceElement={phoneInputBox}
         renderOption={(option, _index, isSelected) => (
           <CountryCodeListItem
             sx={theme => ({
@@ -129,7 +133,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           </Text>
         </SelectButton>
         <SelectOptionList
-          sx={{ width: '100%', padding: '0 0' }}
+          sx={{ padding: '0 0' }}
           containerSx={theme => ({ gap: 0, padding: `${theme.space.$0x5} 0` })}
         />
       </Select>
