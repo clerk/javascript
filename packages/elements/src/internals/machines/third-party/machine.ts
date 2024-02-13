@@ -67,7 +67,7 @@ const machine = setup({
     },
     Redirecting: {
       description: 'Redirects to the third-party provider for authentication',
-      tags: ['state:redirect', 'loading'],
+      tags: ['state:redirect', 'state:loading'],
       entry: 'assignActiveStrategy',
       exit: 'unassignActiveStrategy',
       invoke: {
@@ -91,7 +91,7 @@ const machine = setup({
     },
     HandlingCallback: {
       description: 'Handles the callback from the third-party provider',
-      tags: ['state:callback', 'loading'],
+      tags: ['state:callback', 'state:loading'],
       invoke: {
         id: 'handleRedirectCallback',
         src: 'handleRedirectCallback',
@@ -103,18 +103,10 @@ const machine = setup({
       },
       on: {
         'CLERKJS.NAVIGATE.*': {
-          actions: sendParent(({ event }) => {
-            switch (event.type) {
-              case 'CLERKJS.NAVIGATE.SIGN_IN':
-              case 'CLERKJS.NAVIGATE.SIGN_UP':
-                return event;
-              case 'CLERKJS.NAVIGATE.VERIFICATION':
-                return { type: 'CLERKJS.NAVIGATE.SIGN_UP' };
-              default:
-                return { type: 'NEXT' };
-            }
-          }),
-          target: 'Idle',
+          actions: sendParent(({ context }) => ({
+            type: 'NEXT',
+            resource: context.clerk.client[context.flow],
+          })),
         },
       },
     },

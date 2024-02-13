@@ -1,8 +1,8 @@
 import type { SignUpStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, setup, stopChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import type { ClerkElementsError } from '~/internals/errors';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type {
@@ -11,6 +11,7 @@ import type {
   SignUpRouterNextEvent,
   SignUpRouterSchema,
 } from '~/internals/machines/sign-up/types';
+import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
 
 const isCurrentPath =
   (path: `/${string}`) =>
@@ -26,6 +27,9 @@ export const SignUpRouterMachineId = 'SignUpRouter';
 export type TSignUpRouterMachine = typeof SignUpRouterMachine;
 
 export const SignUpRouterMachine = setup({
+  actors: {
+    thirdParty: ThirdPartyMachine,
+  },
   actions: {
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path }: { path: string }) => {
@@ -35,10 +39,12 @@ export const SignUpRouterMachine = setup({
       context.router.push(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
-    setActive({ context, event }) {
-      const session = ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
-      const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignUpUrl());
+    setActive({ context, event }, params?: { useLastActiveSession?: boolean }) {
+      const session =
+        (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
+        ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
 
+      const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignUpUrl());
       void context.clerk.setActive({ session, beforeEmit });
     },
     setError: assign({
@@ -54,6 +60,8 @@ export const SignUpRouterMachine = setup({
     areFieldsMissing: ({ context }) => context.clerk.client.signUp.missingFields.length > 0,
     areFieldsUnverified: ({ context }) => context.clerk.client.signUp.unverifiedFields.length > 0,
 
+    hasAuthenticatedViaClerkJS: ({ context }) =>
+      Boolean(context.clerk.client.signUp.status === null && context.clerk.client.lastActiveSessionId),
     isStatusAbandoned: needsStatus('abandoned'),
     isStatusComplete: ({ context, event }) => {
       const resource = (event as SignUpRouterNextEvent)?.resource;
@@ -75,7 +83,7 @@ export const SignUpRouterMachine = setup({
     needsIdentifier: or(['statusNeedsIdentifier', isCurrentPath('/')]),
     needsContinue: and(['statusNeedsContinue', isCurrentPath('/continue')]),
     needsVerification: and(['statusNeedsVerification', isCurrentPath('/continue')]),
-    needsCallback: isCurrentPath('/sso-callback'),
+    needsCallback: isCurrentPath(SSO_CALLBACK_PATH_ROUTE),
 
     statusNeedsIdentifier: or([not('hasResource'), 'isStatusAbandoned']),
     statusNeedsContinue: or(['isMissingRequiredFields']),
@@ -101,6 +109,7 @@ export const SignUpRouterMachine = setup({
         const { id, logic, input } = event;
 
         if (!system.get(id)) {
+          // @ts-expect-error - This is valid (See: https://discord.com/channels/795785288994652170/1203714033190969405/1205595237293096960)
           enqueue.spawnChild(logic, {
             id,
             systemId: id,
@@ -128,6 +137,10 @@ export const SignUpRouterMachine = setup({
           ],
         },
         {
+          guard: 'needsCallback',
+          target: 'Callback',
+        },
+        {
           guard: 'needsIdentifier',
           actions: { type: 'navigateInternal', params: { path: '/' } },
           target: 'Start',
@@ -141,10 +154,6 @@ export const SignUpRouterMachine = setup({
           guard: 'needsContinue',
           actions: { type: 'navigateInternal', params: { path: '/continue' } },
           target: 'Continue',
-        },
-        {
-          guard: 'needsCallback',
-          target: 'Callback',
         },
         {
           actions: { type: 'navigateInternal', params: { path: '/' } },
@@ -211,6 +220,17 @@ export const SignUpRouterMachine = setup({
     },
     Callback: {
       tags: 'route:callback',
+      invoke: {
+        id: THIRD_PARTY_MACHINE_ID,
+        systemId: THIRD_PARTY_MACHINE_ID,
+        src: 'thirdParty',
+        input: ({ context }) => ({
+          basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
+          clerk: context.clerk,
+          flow: 'signUp',
+        }),
+      },
+      entry: sendTo(THIRD_PARTY_MACHINE_ID, { type: 'CALLBACK' }),
       on: {
         NEXT: [
           {
@@ -218,9 +238,14 @@ export const SignUpRouterMachine = setup({
             actions: 'setActive',
           },
           {
+            description: 'Handle a case where the user has already been authenticated via ClerkJS',
+            guard: 'hasAuthenticatedViaClerkJS',
+            actions: { type: 'setActive', params: { useLastActiveSession: true } },
+          },
+          {
             guard: 'statusNeedsVerification',
-            target: 'Verification',
             actions: { type: 'navigateInternal', params: { path: '/verify' } },
+            target: 'Verification',
           },
           {
             guard: 'statusNeedsContinue',
@@ -229,11 +254,9 @@ export const SignUpRouterMachine = setup({
           },
           {
             actions: { type: 'navigateInternal', params: { path: '/' } },
+            target: 'Start',
           },
         ],
-        TRANSFER: {
-          actions: 'transfer',
-        },
       },
     },
     Error: {

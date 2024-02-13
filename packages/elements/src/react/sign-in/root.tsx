@@ -18,11 +18,8 @@ function SignInFlowProvider({ children }: SignInFlowProviderProps) {
   const router = useClerkRouter();
   const inspector = useConsoleInspector();
 
-  // const { inspector } = useBrowserInspector();
-
   const ref = useActorRef(SignInRouterMachine, {
     input: { clerk, router, signUpPath: '/sign-up' },
-    // inspect: inspector?.inspect,
     inspect: inspector,
   });
 
@@ -46,12 +43,6 @@ export type SignInRootProps = SignInFlowProviderProps & { path?: string };
 export function SignInRoot({ children, path = SIGN_IN_DEFAULT_BASE_PATH }: SignInRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
-
-  // const { loading: inspectorLoading } = useBrowserInspector();
-
-  // if (inspectorLoading) {
-  //   return null;
-  // }
 
   return (
     <ClerkLoaded>
