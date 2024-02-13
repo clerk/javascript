@@ -7,19 +7,12 @@ import type {
   SignUpUpdateParams,
   SignUpVerificationsResource,
 } from '@clerk/types';
-import type { SetOptional, Simplify } from 'type-fest';
 import { fromCallback, fromPromise } from 'xstate';
 
-import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
+import { ClerkElementsError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
 
-import type {
-  AuthenticateWithRedirectOAuthParams,
-  AuthenticateWithRedirectSamlParams,
-  WithClerk,
-  WithParams,
-  WithUnsafeMetadata,
-} from '../shared.types';
+import type { WithClerk, WithClient, WithParams } from '../shared.types';
 
 // ================= startSignUpEmailLinkFlow ================= //
 
@@ -31,17 +24,16 @@ export const startSignUpEmailLinkFlow = fromCallback<StartSignUpEmailLinkFlowEve
     const { run, stop } = Poller();
 
     void run(async () =>
-      clerk.client.signUp
-        .reload()
-        .then(resource => {
-          const status = resource.verifications.emailAddress.status;
+      clerk.client.signUp.reload().then(resource => {
+        stop();
+        const status = resource.verifications.emailAddress.status;
 
-          if (status === 'verified' || status === 'expired') {
-            stop();
-            sendBack({ type: `EMAIL_LINK.${status.toUpperCase()}`, resource });
-          }
-        })
-        .catch(error => sendBack({ type: 'EMAIL_LINK.FAILURE', error })),
+        if (status) {
+          return sendBack({ type: `EMAIL_LINK.${status?.toUpperCase()}`, resource });
+        } else {
+          throw new ClerkElementsError('verify-email-link-missing-status', 'No email verification status found');
+        }
+      }),
     );
 
     receive(event => {
@@ -54,44 +46,26 @@ export const startSignUpEmailLinkFlow = fromCallback<StartSignUpEmailLinkFlowEve
   },
 );
 
-// ================= authenticateWithSignUpRedirect ================= //
-
-export type AuthenticateWithRedirectSignUpParams = SetOptional<
-  WithUnsafeMetadata<AuthenticateWithRedirectOAuthParams> | WithUnsafeMetadata<AuthenticateWithRedirectSamlParams>,
-  'redirectUrl' | 'redirectUrlComplete'
->;
-
-export type AuthenticateWithRedirectSignUpInput = Simplify<WithClerk<WithParams<AuthenticateWithRedirectSignUpParams>>>;
-
-export const authenticateWithSignUpRedirect = fromPromise<void, AuthenticateWithRedirectSignUpInput>(
-  async ({ input: { clerk, params } }) =>
-    clerk.client.signUp.authenticateWithRedirect({
-      redirectUrl: params.redirectUrl || clerk.buildUrlWithAuth(`/sign-up${SSO_CALLBACK_PATH_ROUTE}`),
-      redirectUrlComplete: params.redirectUrlComplete || clerk.buildAfterSignUpUrl(),
-      ...params,
-    }),
-);
-
 // ================= Verification ================= //
 
-export type PrepareVerificationInput = WithClerk<
+export type PrepareVerificationInput = WithClient<
   WithParams<PrepareVerificationParams> & { skipIfVerified: keyof SignUpVerificationsResource }
 >;
 
 export const prepareVerification = fromPromise<SignUpResource, PrepareVerificationInput>(
-  async ({ input: { clerk, params, skipIfVerified: skipKey } }) => {
-    if (!clerk.client.signUp.status || clerk.client.signUp.verifications[skipKey].status === 'verified') {
-      return Promise.resolve(clerk.client.signUp);
+  ({ input: { client, params, skipIfVerified: skipKey } }) => {
+    if (!client.signUp.status || client.signUp.verifications[skipKey].status === 'verified') {
+      return Promise.resolve(client.signUp);
     }
 
-    return await clerk.client.signUp.prepareVerification(params);
+    return client.signUp.prepareVerification(params);
   },
 );
 
-export type AttemptVerificationInput = WithClerk<WithParams<AttemptVerificationParams>>;
+export type AttemptVerificationInput = WithClient<WithParams<AttemptVerificationParams>>;
 
 export const attemptVerification = fromPromise<SignUpResource, AttemptVerificationInput>(
-  async ({ input: { clerk, params } }) => clerk.client.signUp.attemptVerification(params),
+  ({ input: { client, params } }) => client.signUp.attemptVerification(params),
 );
 
 // ================= Start / Continue ================= //

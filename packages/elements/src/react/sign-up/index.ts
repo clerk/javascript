@@ -1,6 +1,6 @@
 'use client';
 
-import { SignUpCtx } from '~/react/sign-up/contexts/sign-up.context';
+import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 export { SignUpContinue as Continue } from './continue';
 export { SignUpRoot as SignUp, SignUpRoot as Root } from './root';
@@ -12,7 +12,7 @@ export { SignUpStart as Start } from './start';
 export { SignUpVerification as Verification, SignUpVerify as Verify } from './verifications';
 
 /** @internal Internal use only */
-export const useSignUpActorRef_internal = SignUpCtx.useActorRef;
+export const useSignUpActorRef_internal = SignUpRouterCtx.useActorRef;
 
 /** @internal Internal use only */
-export const useSignUpSelector_internal = SignUpCtx.useSelector;
+export const useSignUpSelector_internal = SignUpRouterCtx.useSelector;

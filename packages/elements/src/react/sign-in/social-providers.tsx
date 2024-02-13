@@ -4,14 +4,18 @@ import type { OAuthProvider, Web3Provider } from '@clerk/types';
 
 import type { SocialProviderProps } from '~/react/common/third-party-providers/social-provider';
 import { SocialProvider, SocialProviderIcon } from '~/react/common/third-party-providers/social-provider';
-import { useThirdPartyProvider } from '~/react/sign-in/hooks/use-third-party-provider.hook';
+import { useThirdPartyProvider } from '~/react/hooks';
+
+import { SignInStartCtx } from './start';
 
 export interface SignInSocialProviderProps extends Omit<SocialProviderProps, 'provider'> {
   name: OAuthProvider | Web3Provider;
 }
 
+// TODO: Consolidate with sign-up/social-providers.tsx
 export function SignInSocialProvider({ name, ...rest }: SignInSocialProviderProps) {
-  const thirdPartyProvider = useThirdPartyProvider(name);
+  const ref = SignInStartCtx.useActorRef();
+  const thirdPartyProvider = useThirdPartyProvider(ref, name);
 
   return (
     <SocialProvider

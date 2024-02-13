@@ -19,7 +19,7 @@ import React, { createContext, useCallback, useContext, useEffect } from 'react'
 import type { SetRequired } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
-import type { ClerkElementsError } from '~/internals/errors/error';
+import type { ClerkElementsError } from '~/internals/errors';
 import {
   fieldErrorsSelector,
   fieldHasValueSelector,
