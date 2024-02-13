@@ -602,7 +602,8 @@ export type Layout = {
    */
   shimmer?: boolean;
   /**
-   * This option enables animations
+   * This option enables/disables animations for the components. If you want to disable animations, you can set this to false.
+   * Also the prefers-reduced-motion media query is respected and animations are disabled if the user has set it to reduce motion regardless of this option.
    * @default true
    */
   animations?: boolean;

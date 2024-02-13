@@ -8,13 +8,11 @@ type AnimatedProps = PropsWithChildren<{ asChild?: boolean }>;
 export const Animated = (props: AnimatedProps) => {
   const { children, asChild } = props;
   const { animations } = useAppearance().parsedLayout;
-  const [parent, setEnabled] = useAutoAnimate();
-
-  setEnabled(animations);
+  const [parent] = useAutoAnimate();
 
   if (asChild) {
-    return cloneElement(children as any, { ref: parent });
+    return cloneElement(children as any, { ref: animations ? parent : null });
   }
 
-  return <div ref={parent}>{children}</div>;
+  return <div ref={animations ? parent : null}>{children}</div>;
 };
