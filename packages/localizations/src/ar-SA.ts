@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
@@ -118,6 +119,7 @@ export const arSA: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'لا يمكن إرسال الدعوات. انظر لتفاصيل المشكلة وحاول مرة أخرى:',
       formButtonPrimary__continue: 'إرسال الدعوات',
+      selectDropdown__role: 'Select role',
       subtitle: 'دعوة أعضاء جدد لهذه المنظمة',
       successMessage: 'تم إرسال الدعوات بنجاح',
       title: 'دعوة أعضاء',
@@ -274,6 +276,12 @@ export const arSA: LocalizationResource = {
   paginationRowText__displaying: 'عرض',
   paginationRowText__of: 'من',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'الحصول على المساعدة',
       actionText: 'Don’t have any of these?',
@@ -586,12 +594,14 @@ export const arSA: LocalizationResource = {
     },
     formButtonPrimary__continue: 'متابعة',
     formButtonPrimary__finish: 'انهاء',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'الغاء',
     mfaPage: {
       formHint: 'أختر طريقة للأضافة',
       title: 'أضافة التحقق بخطوتين',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'إضافة رقم جوال',
       removeResource: {
         messageLine1: 'لن يتم إستلام اي رموز تحقق على {{identifier}} عند تسجيل الدخول',
@@ -601,8 +611,11 @@ export const arSA: LocalizationResource = {
       },
       subtitle__availablePhoneNumbers: 'أختر رقم جوال لأضافة التحقق بخطوتين عن طريق الرسائل النصية',
       subtitle__unavailablePhoneNumbers: 'لا يوجد رقم جوال لأضافة التحقق بخطوتين عن طريق الرسائل النصية',
-      successMessage:
-        'التحقق بخطوتين عن طريق الرسائل النصية مفعل الآن لرقم الجوال هذا. عند تسجيل الدخول, سوف يطلب منك إدخال رمز التحقق المرسل إلى رقم الجوال كخطوة إضافية',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'أضافة التحقق عن طريق رمز الرسائل النصية',
     },
     mfaTOTPPage: {
@@ -645,7 +658,6 @@ export const arSA: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'سيتم إرسال رسالة نصية تحتوي على رابط التحقق إلى رقم الهاتف هذا.',
-      infoText__secondary: 'قد تنطبق عليك رسوم للرسائل أو البيانات',
       removeResource: {
         messageLine1: 'سيتم حذف هذا الإيميل من حسابك {{identifier}}',
         messageLine2: 'لن تتمكن من تسجيل الدخول بإستخدام رقم الجوال هذا',
@@ -674,6 +686,8 @@ export const arSA: LocalizationResource = {
         actionLabel__reauthorize: 'أعطى الصلاحية الآن',
         destructiveActionTitle: 'حذف',
         primaryButton: 'ربط حساب',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'الحسابات المتصلة',
       },
       dangerSection: {

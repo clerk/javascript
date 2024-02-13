@@ -120,7 +120,6 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
 };
 
 export type OTPInputProps = {
-  // TODO-RETHEME make label required again
   label?: string | LocalizationKey;
   resendButton?: LocalizationKey;
   description?: string | LocalizationKey;

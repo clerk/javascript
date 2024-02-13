@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
@@ -120,6 +121,7 @@ export const elGR: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Οι προσκλήσεις δεν μπορούσαν να σταλούν. Διορθώστε τα παρακάτω στοιχεία και δοκιμάστε ξανά:',
       formButtonPrimary__continue: 'Αποστολή προσκλήσεων',
+      selectDropdown__role: 'Select role',
       subtitle: 'Προσκαλέστε νέα μέλη σε αυτόν τον οργανισμό',
       successMessage: 'Οι προσκλήσεις εστάλησαν με επιτυχία',
       title: 'Πρόσκληση μελών',
@@ -277,6 +279,12 @@ export const elGR: LocalizationResource = {
   paginationRowText__displaying: 'Εμφάνιση',
   paginationRowText__of: 'από',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Λήψη βοήθειας',
       actionText: 'Don’t have any of these?',
@@ -594,12 +602,14 @@ export const elGR: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Συνέχεια',
     formButtonPrimary__finish: 'Ολοκλήρωση',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Ακύρωση',
     mfaPage: {
       formHint: 'Επιλέξτε μια μέθοδο για προσθήκη.',
       title: 'Προσθήκη διπλής επαλήθευσης',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Προσθήκη αριθμού τηλεφώνου',
       removeResource: {
         messageLine1: 'Ο {{identifier}} δεν θα λαμβάνει πλέον κωδικούς επαλήθευσης κατά τη σύνδεση.',
@@ -611,8 +621,11 @@ export const elGR: LocalizationResource = {
         'Επιλέξτε έναν αριθμό τηλεφώνου για να εγγραφείτε για τη διπλή επαλήθευση με κωδικούς SMS.',
       subtitle__unavailablePhoneNumbers:
         'Δεν υπάρχουν διαθέσιμοι αριθμοί τηλεφώνου για εγγραφή στην διπλή επαλήθευση με κωδικούς SMS.',
-      successMessage:
-        'Η διπλή επαλήθευση με κωδικούς SMS είναι τώρα ενεργοποιημένη για αυτόν τον αριθμό τηλεφώνου. Κατά τη σύνδεση, θα πρέπει να εισαγάγετε έναν κωδικό επαλήθευσης που θα σταλεί σε αυτόν τον αριθμό τηλεφώνου ως επιπλέον βήμα.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Προσθήκη επαλήθευσης κωδικού SMS',
     },
     mfaTOTPPage: {
@@ -659,7 +672,6 @@ export const elGR: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Θα σταλεί ένα μήνυμα κειμένου που περιέχει ένα σύνδεσμο επαλήθευσης σε αυτόν τον αριθμό τηλεφώνου.',
-      infoText__secondary: 'Μπορεί να ισχύουν χρεώσεις για μηνύματα και δεδομένα.',
       removeResource: {
         messageLine1: 'Ο αριθμός {{identifier}} θα αφαιρεθεί από αυτόν τον λογαριασμό.',
         messageLine2: 'Δεν θα μπορείτε πλέον να συνδεθείτε χρησιμοποιώντας αυτόν τον αριθμό τηλεφώνου.',
@@ -689,6 +701,8 @@ export const elGR: LocalizationResource = {
         actionLabel__reauthorize: 'Εξουσιοδοτήστε τώρα',
         destructiveActionTitle: 'Αφαίρεση',
         primaryButton: 'Σύνδεση λογαριασμού',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Συνδεδεμένοι λογαριασμοί',
       },
       dangerSection: {

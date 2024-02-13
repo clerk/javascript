@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
@@ -119,6 +120,7 @@ export const koKR: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: '초대를 보낼 수 없습니다. 다음을 수정하고 다시 시도하세요:',
       formButtonPrimary__continue: '초대 보내기',
+      selectDropdown__role: 'Select role',
       subtitle: '이 조직에 새 멤버 초대',
       successMessage: '초대가 성공적으로 전송되었습니다',
       title: '회원 초대',
@@ -274,6 +276,12 @@ export const koKR: LocalizationResource = {
   paginationRowText__displaying: '표시중',
   paginationRowText__of: '의',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: '도움 요청하기',
       actionText: 'Don’t have any of these?',
@@ -584,12 +592,14 @@ export const koKR: LocalizationResource = {
     },
     formButtonPrimary__continue: '계속',
     formButtonPrimary__finish: '완료',
+    formButtonPrimary__save: 'Save',
     formButtonReset: '취소',
     mfaPage: {
       formHint: '추가할 방법을 선택합니다.',
       title: '2단계 인증 추가',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: '휴대폰 번호 추가',
       removeResource: {
         messageLine1: '{{identifier}}는 로그인할 때 더 이상 인증 코드를 받지 않습니다.',
@@ -599,8 +609,11 @@ export const koKR: LocalizationResource = {
       },
       subtitle__availablePhoneNumbers: 'SMS 코드 2단계 인증을 위해 등록할 휴대폰 번호를 선택하세요.',
       subtitle__unavailablePhoneNumbers: 'SMS 코드 2단계 인증에 등록할 수 있는 휴대폰 번호가 없습니다.',
-      successMessage:
-        '이제 이 휴대폰 번호에 대해 SMS 코드 2단계 인증이 활성화되었습니다. 로그인할 때 추가 단계로 이 휴대폰 번호로 전송된 인증 코드를 입력해야 합니다.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'SMS 코드 인증 추가',
     },
     mfaTOTPPage: {
@@ -642,7 +655,6 @@ export const koKR: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: '인증 링크가 포함된 문자 메시지가 이 휴대폰 번호로 전송됩니다.',
-      infoText__secondary: '메시지 및 데이터 요금이 적용될 수 있습니다.',
       removeResource: {
         messageLine1: '{{identifier}}가 당신의 계정에서 제거 될 예정입니다.',
         messageLine2: '더 이상 이 휴대폰 번호로 로그인할 수 없습니다.',
@@ -671,6 +683,8 @@ export const koKR: LocalizationResource = {
         actionLabel__reauthorize: '지금 인증하기',
         destructiveActionTitle: '제거',
         primaryButton: '계정 연결하기',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: '연결된 계정',
       },
       dangerSection: {

@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
@@ -119,6 +120,7 @@ export const itIT: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: "L'invito non puó essere inviato. Correggi i seguenti e riprova:",
       formButtonPrimary__continue: 'Invia inviti',
+      selectDropdown__role: 'Select role',
       subtitle: 'Invita un nuovo membro in questa organizzazione',
       successMessage: 'Invito inviato con successo',
       title: 'Invita membri',
@@ -276,6 +278,12 @@ export const itIT: LocalizationResource = {
   paginationRowText__displaying: 'Visualizzando',
   paginationRowText__of: 'di',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Richiedi aiuto',
       actionText: 'Don’t have any of these?',
@@ -589,12 +597,14 @@ export const itIT: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Continua',
     formButtonPrimary__finish: 'Concludi',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Cancella',
     mfaPage: {
       formHint: 'Seleziona un metodo da aggiungere.',
       title: 'Aggiungi verifica in 2 passaggi',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Aggiungi un numero di telefono',
       removeResource: {
         messageLine1: "{{identifier}} non riceverá piú i codici di verifica all'accesso.",
@@ -606,8 +616,11 @@ export const itIT: LocalizationResource = {
         'Seleziona un numero di telefono da registrare per la verifica in 2 passaggi tramite SMS.',
       subtitle__unavailablePhoneNumbers:
         'Non ci sono numeri di telefono da registrare per la verifica in 2 passaggi tramite SMS.',
-      successMessage:
-        "La verifica in 2 passaggi tramite SMS é stata abilitata per questo numero di telefono. All'accesso sará richiesto di inserire un codice di verifica ricevuto tramite SMS come ulteriore passaggio.",
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Aggiungi verifica tramite SMS',
     },
     mfaTOTPPage: {
@@ -652,7 +665,6 @@ export const itIT: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Un SMS contenente un link di verifica é stato inviato a questo numero di telefono.',
-      infoText__secondary: 'Potrebbero essere applicati dei costi.',
       removeResource: {
         messageLine1: '{{identifier}} sará rimosso dal tuo account.',
         messageLine2: 'Non sarai piú in grado di accedere utilizzando questo numero di telefono.',
@@ -681,6 +693,8 @@ export const itIT: LocalizationResource = {
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Rimuovi',
         primaryButton: 'Collega account',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Account collegati',
       },
       dangerSection: {

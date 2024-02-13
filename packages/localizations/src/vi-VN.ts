@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
@@ -119,6 +120,7 @@ export const viVN: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Không thể gửi lời mời. Sửa các lỗi sau và thử lại:',
       formButtonPrimary__continue: 'Gửi lời mời',
+      selectDropdown__role: 'Select role',
       subtitle: 'Mời thành viên mới vào tổ chức này',
       successMessage: 'Mời đã được gửi thành công',
       title: 'Mời thành viên',
@@ -276,6 +278,12 @@ export const viVN: LocalizationResource = {
   paginationRowText__displaying: 'Hiển thị',
   paginationRowText__of: 'của',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Nhận trợ giúp',
       actionText: 'Don’t have any of these?',
@@ -590,12 +598,14 @@ export const viVN: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Tiếp tục',
     formButtonPrimary__finish: 'Hoàn thành',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Hủy',
     mfaPage: {
       formHint: 'Chọn một phương pháp để thêm.',
       title: 'Thêm xác minh hai bước',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Thêm số điện thoại',
       removeResource: {
         messageLine1: '{{identifier}} sẽ không còn nhận được mã xác thực khi đăng nhập.',
@@ -606,8 +616,11 @@ export const viVN: LocalizationResource = {
       subtitle__availablePhoneNumbers: 'Chọn một số điện thoại để đăng ký xác thực hai bước bằng mã SMS.',
       subtitle__unavailablePhoneNumbers:
         'Không có số điện thoại nào khả dụng để đăng ký xác thực hai bước bằng mã SMS.',
-      successMessage:
-        'Xác thực hai bước bằng mã SMS đã được kích hoạt cho số điện thoại này. Khi đăng nhập, bạn sẽ cần nhập mã xác thực được gửi đến số điện thoại này như một bước bổ sung.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Thêm mã xác thực SMS',
     },
     mfaTOTPPage: {
@@ -652,7 +665,6 @@ export const viVN: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Một tin nhắn chứa liên kết xác minh sẽ được gửi đến số điện thoại này.',
-      infoText__secondary: 'Có thể áp dụng phí tin nhắn và dữ liệu.',
       removeResource: {
         messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
         messageLine2: 'Bạn sẽ không thể đăng nhập bằng số điện thoại này nữa.',
@@ -681,6 +693,8 @@ export const viVN: LocalizationResource = {
         actionLabel__reauthorize: 'Xác thực ngay',
         destructiveActionTitle: 'Xóa',
         primaryButton: 'Kết nối tài khoản',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Tài khoản đã kết nối',
       },
       dangerSection: {
