@@ -14,15 +14,16 @@ import {
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
+import { animations } from '../styledSystem';
 import type { FeedbackType, useFormControlFeedback } from '../utils';
 
 export function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations } = useAppearance().parsedLayout;
+  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
 
   const getFormTextAnimation = useCallback(
     (enterAnimation: boolean, options?: { inDelay?: boolean }): ThemableCssProp => {
-      if (prefersReducedMotion || !animations) {
+      if (prefersReducedMotion || !appearanceAnimations) {
         return {
           animation: 'none',
         };
@@ -39,7 +40,7 @@ export function useFormTextAnimation() {
         transitionTimingFunction: t.transitionTiming.$common,
       });
     },
-    [prefersReducedMotion, animations],
+    [prefersReducedMotion],
   );
 
   return {
