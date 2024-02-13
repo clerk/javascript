@@ -1,8 +1,7 @@
 import type { FormControlProps } from '@radix-ui/react-form';
 import { Control as RadixControl } from '@radix-ui/react-form';
-import { Slot } from '@radix-ui/react-slot';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
-import { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, Fragment, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 
 export const OTP_MAXLENGTH_DEFAULT = 6;
 
@@ -79,9 +78,23 @@ const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputPro
             setSelectionRange([-1, -1]);
             rest?.onBlur?.(event);
           }}
-          onSelect={event => {
-            setSelectionRange(cur => selectionRangeUpdater(cur, innerRef));
-            rest?.onSelect?.(event);
+          onMouseDownCapture={event => {
+            if (event.button !== 0 || event.ctrlKey) return;
+            if (event.shiftKey || event.metaKey) return;
+            if (!(event.currentTarget instanceof HTMLElement)) return;
+            if (!(innerRef.current instanceof HTMLInputElement)) return;
+            event.stopPropagation();
+            event.preventDefault();
+
+            const { left, width } = event.currentTarget.getBoundingClientRect();
+            const eventX = event.clientX - left;
+            const index = Math.floor((eventX / width) * maxLength);
+
+            if (document.activeElement !== innerRef.current) {
+              innerRef.current?.focus();
+            }
+
+            setSelectionRange([index, index + 1]);
           }}
           style={{
             display: 'block',
@@ -98,12 +111,11 @@ const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputPro
           className={className}
           aria-hidden
           style={{
-            zIndex: 1,
-            pointerEvents: 'none',
+            zIndex: -1,
           }}
         >
           {Array.from({ length: maxLength }).map((_, i) => (
-            <Slot key={i}>
+            <Fragment key={i}>
               {render({
                 value: String(props.value)[i] || '',
                 status:
@@ -114,7 +126,7 @@ const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputPro
                     : 'none',
                 index: i,
               })}
-            </Slot>
+            </Fragment>
           ))}
         </div>
       </div>
@@ -128,6 +140,8 @@ const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputPro
 function selectionRangeUpdater(cur: [number, number], inputRef: RefObject<HTMLInputElement>) {
   let direction: 'forward' | 'backward' = 'forward' as const;
   let updated: [number, number] = [inputRef.current?.selectionStart ?? 0, inputRef.current?.selectionEnd ?? 0];
+
+  // console.log({ cur, updated, direction })
 
   // Abort unnecessary updates
   if (cur[0] === updated[0] && cur[1] === updated[1]) {

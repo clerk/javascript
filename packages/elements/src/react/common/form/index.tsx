@@ -165,6 +165,7 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
         onChange(event);
       },
       type: 'text',
+      spellCheck: false,
     };
   }
 
