@@ -1,11 +1,10 @@
 'use client';
 
 import { GlobalError, Submit } from '@clerk/elements/common';
-import { SignIn, SocialProvider, Start, Verification, Verify } from '@clerk/elements/sign-in';
+import { SignIn, SocialProvider, SocialProviderIcon, Start, Verification, Verify } from '@clerk/elements/sign-in';
 
 import { H1, H3, HR as Hr, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
-import { SocialProviderIcon } from '@/components/social-providers';
 
 export default function SignInPage() {
   return (
