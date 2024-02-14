@@ -121,13 +121,14 @@ export const OrganizationMembers = withCardStateProvider(() => {
               <Animated asChild>
                 <Flex
                   justify='end'
-                  sx={{
+                  sx={t => ({
                     width: '100%',
                     marginLeft: 'auto',
+                    padding: `${t.space.$none} ${t.space.$1}`,
                     [mqu.md]: {
                       display: 'none',
                     },
-                  }}
+                  })}
                 >
                   <Action.Trigger value='invite'>
                     <InviteMembersButton />
