@@ -3,9 +3,9 @@ name: 'Lock stale PRs and issues'
 on:
   workflow_dispatch:
   schedule:
-    # This runs 4 times a day:
-    # https://crontab.guru/#0_0,12_*_*_*
-    - cron: '0 0,6,12,18 * * *'
+    # This runs once a day
+    # https://crontab.guru/every-day
+    - cron: '0 0 * * *'
 
 permissions:
   contents: write # only for delete-branch option
@@ -20,7 +20,8 @@ jobs:
     timeout-minutes: ${{  fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
     steps:
-      - uses: actions/stale@v8
+      - uses: actions/stale@v9
+        name: Regular stale action
         with:
           repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
           days-before-issue-stale: 30
@@ -28,7 +29,7 @@ jobs:
           days-before-issue-close: 10
           days-before-pr-close: 10
           exempt-all-assignees: true
-          exempt-issue-labels: 'needs-triage,prioritized,feature-request'
+          exempt-issue-labels: 'needs-triage,prioritized,confirmed,needs-reproduction'
           stale-issue-message: |
             Hello 👋
 
@@ -57,15 +58,20 @@ jobs:
             After 60 days of no activity, we'll close this PR. Keep in mind, I'm just a robot, so if I've closed this PR in error, please reply here and my human colleagues will reopen it.
 
             Thanks for being a part of the Clerk community! 🙏
-      - uses: actions/stale@v8
+      - uses: actions/stale@v9
+        name: Stale action for needs-reproduction issues
         with:
           repo-token: ${{ secrets.CLERK_COOKIE_PAT }}
           days-before-issue-stale: 7
           days-before-issue-close: 1
           exempt-all-assignees: true
-          only-issue-labels: 'needs-reproduction'
+          any-of-issue-labels: 'needs-reproduction'
           stale-issue-message: |
-            In an effort to keep our GitHub issues clean and focused, we close any issues that are awaiting a reproduction after 8 days on inactivity, and it has been 7 days. This issue will be closed tomorrow unless a reproduction is produced. If it takes longer than this to get a reproduction, that's ok, just drop a comment and we will re-open the issue then.
+            Hello 👋
+
+            In an effort to keep our GitHub issues clean and focused, we close any issues that are awaiting a reproduction after 8 days on inactivity, and it has been 7 days. This issue will be closed tomorrow unless a reproduction is provided. If it takes longer than this to get a reproduction, that's ok, just drop a comment and we will remove the Stale label.
+
+            [How to create a minimal reproduction](https://clerkdev.notion.site/clerkdev/Creating-a-Minimal-Reproduction-0436afc4203f41aa9aa8700968aaef48)
 
             Thanks for being a part of the Clerk community! 🙏
           close-issue-message: |
