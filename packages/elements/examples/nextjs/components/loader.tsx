@@ -58,7 +58,7 @@ const Loader = ({ count = 5 }) => {
 };
 
 export function Loading({ children }: { children: React.ReactNode }) {
-  const isLoading = unstable_useIsLoading();
+  const [isLoading] = unstable_useIsLoading();
 
   return isLoading ? <Loader /> : children;
 }
