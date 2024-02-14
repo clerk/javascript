@@ -7,7 +7,7 @@ import { SignInFirstFactorCtx, SignInSecondFactorCtx } from '~/react/sign-in/ver
  * Caution: This hook is unstable and may disappear in the future.
  * This is a temporary hook until the actual loading API is explored and implemented.
  */
-export const unstable_useIsLoading = () => {
+export const useIsLoading_unstable = () => {
   let startLoading = false;
   let firstFactorLoading = false;
   let secondFactorLoading = false;

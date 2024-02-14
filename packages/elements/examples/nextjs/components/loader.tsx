@@ -1,5 +1,5 @@
 'use client';
-import { unstable_useIsLoading } from '@clerk/elements/sign-in';
+import { useIsLoading_unstable } from '@clerk/elements/sign-in';
 import { motion } from 'framer-motion';
 
 const colors = ['#22238f', '#6b45fa', '#ca3286', '#fe2b49', '#fe652d'];
@@ -58,7 +58,7 @@ const Loader = ({ count = 5 }) => {
 };
 
 export function Loading({ children }: { children: React.ReactNode }) {
-  const [isLoading] = unstable_useIsLoading();
+  const [isLoading] = useIsLoading_unstable();
 
   return isLoading ? <Loader /> : children;
 }
