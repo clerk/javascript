@@ -258,7 +258,7 @@ type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> &
       }
   );
 
-type FormGlobalErrorProps = FormErrorProps<ComponentProps<'span'>>;
+type FormGlobalErrorProps = FormErrorProps<ComponentProps<'div'>>;
 type FormFieldErrorProps = FormErrorProps<FormMessageProps & { name?: string }>;
 
 function GlobalError({ children, code, ...rest }: FormGlobalErrorProps) {
@@ -273,12 +273,12 @@ function GlobalError({ children, code, ...rest }: FormGlobalErrorProps) {
   const child = typeof children === 'function' ? children(error) : children;
 
   return (
-    <span
+    <div
       role='alert'
       {...rest}
     >
       {child || error.message}
-    </span>
+    </div>
   );
 }
 
