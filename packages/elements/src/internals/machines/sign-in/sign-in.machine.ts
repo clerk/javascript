@@ -52,7 +52,7 @@ export interface SignInMachineInput {
   signUpPath: string;
 }
 
-export type SignInMachineTags = 'state:start' | 'state:first-factor' | 'state:second-factor' | 'external' | 'loading';
+export type SignInMachineTags = 'state:start' | 'state:first-factor' | 'state:second-factor' | 'external';
 
 export type SignInMachineEvents =
   | ErrorActorEvent
@@ -247,7 +247,7 @@ export const SignInMachine = setup({
     },
     Start: {
       id: 'Start',
-      tags: ['state:start'],
+      tags: 'state:start',
       description: 'The initial state of the sign-in flow.',
       initial: 'AwaitingInput',
       on: {
@@ -287,7 +287,6 @@ export const SignInMachine = setup({
           },
         },
         Attempting: {
-          tags: ['loading'],
           invoke: {
             id: 'createSignIn',
             src: 'createSignIn',
@@ -329,7 +328,7 @@ export const SignInMachine = setup({
           always: [
             {
               description: 'If the current factor is not password, prepare the factor',
-              guard: and([not('isCurrentFactorPassword'), { type: 'isCurrentPath', params: { path: '/continue' } }]),
+              guard: not('isCurrentFactorPassword'),
               target: 'Preparing',
             },
             {
@@ -339,7 +338,6 @@ export const SignInMachine = setup({
           ],
         },
         Preparing: {
-          tags: ['loading'],
           invoke: {
             id: 'prepareFirstFactor',
             src: 'prepareFirstFactor',
@@ -374,7 +372,6 @@ export const SignInMachine = setup({
           },
         },
         Attempting: {
-          tags: ['loading'],
           invoke: {
             id: 'attemptFirstFactor',
             src: 'attemptFirstFactor',
@@ -401,7 +398,7 @@ export const SignInMachine = setup({
       },
     },
     SecondFactor: {
-      tags: ['state:second-factor'],
+      tags: 'state:second-factor',
       initial: 'DeterminingState',
       entry: [{ type: 'navigateTo', params: { path: '/continue' } }, 'assignStartingSecondFactor'],
       onDone: [
@@ -415,7 +412,7 @@ export const SignInMachine = setup({
           always: [
             {
               description: 'If the current factor is not TOTP, prepare the factor',
-              guard: and([not('isCurrentFactorTOTP'), { type: 'isCurrentPath', params: { path: '/continue' } }]),
+              guard: not('isCurrentFactorTOTP'),
               target: 'Preparing',
               reenter: true,
             },
@@ -427,7 +424,6 @@ export const SignInMachine = setup({
           ],
         },
         Preparing: {
-          tags: ['loading'],
           invoke: {
             id: 'prepareSecondFactor',
             src: 'prepareSecondFactor',
@@ -455,7 +451,6 @@ export const SignInMachine = setup({
           },
         },
         Attempting: {
-          tags: ['loading'],
           invoke: {
             id: 'attemptSecondFactor',
             src: 'attemptSecondFactor',
@@ -486,7 +481,6 @@ export const SignInMachine = setup({
       },
     },
     AuthenticatingWithRedirect: {
-      tags: ['loading'],
       invoke: {
         id: 'authenticateWithSignInRedirect',
         src: 'authenticateWithSignInRedirect',
@@ -521,7 +515,7 @@ export const SignInMachine = setup({
       },
     },
     SSOCallback: {
-      tags: ['external'],
+      tags: 'external',
       initial: 'Attempting',
       on: {
         'CLERKJS.NAVIGATE.COMPLETE': '#SignIn.Complete',
@@ -561,7 +555,6 @@ export const SignInMachine = setup({
       },
       states: {
         Attempting: {
-          tags: ['loading'],
           invoke: {
             id: 'handleRedirectCallback',
             src: 'handleRedirectCallback',
