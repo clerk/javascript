@@ -22,7 +22,6 @@ export const SecurityPage = withCardStateProvider(() => {
       elementDescriptor={descriptors.page}
       sx={t => ({ gap: t.space.$8 })}
     >
-      <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('security')}
@@ -34,6 +33,7 @@ export const SecurityPage = withCardStateProvider(() => {
             textVariant='h2'
           />
         </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         {showPassword && <PasswordSection />}
         {showMfa && <MfaSection />}
         <ActiveDevicesSection />
