@@ -34,7 +34,6 @@ export const FormContainer = (props: PageProps) => {
       {...rest}
       sx={[sx]}
     >
-      <Card.Alert>{card.error}</Card.Alert>
       {(headerTitle || headerSubtitle) && (
         <Header.Root>
           {headerTitle && (
@@ -51,6 +50,7 @@ export const FormContainer = (props: PageProps) => {
           )}
         </Header.Root>
       )}
+      <Card.Alert>{card.error}</Card.Alert>
       <Col gap={8}>{children}</Col>
     </Col>
   );

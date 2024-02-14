@@ -57,7 +57,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
       elementDescriptor={descriptors.page}
       gap={2}
     >
-      <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationMembers')}
@@ -92,6 +91,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
               )}
             </Header.Root>
           </Animated>
+          <Card.Alert>{card.error}</Card.Alert>
           {canReadMemberships && (
             <Animated>
               <Action.Open value='invite'>
