@@ -115,7 +115,7 @@ export function createConsoleInspector(): Observer<InspectionEvent> {
     }
   }
 
-  const defaults = 'font-weight: bold; line-height: 2; border-radius: 8px; padding: 6px 10px;';
+  const defaults = 'font-weight: bold; line-height: 1.5; border-radius: 8px; padding: 4px 10px;';
   const reset = 'color: inherit;';
 
   const Styles = {

@@ -18,6 +18,8 @@ export {
   SignInVerify as Verify,
 } from './verifications';
 
+export { useIsLoading_unstable } from './hooks/use-loading.hook';
+
 /** @internal Internal use only */
 export const useSignInActorRef_internal = SignInRouterCtx.useActorRef;
 
