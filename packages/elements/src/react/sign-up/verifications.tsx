@@ -69,10 +69,10 @@ export type SignUpVerificationProps = WithChildrenProp<{ name: SignUpVerificatio
  */
 export function SignUpVerification({ children, name: tag }: SignUpVerificationProps) {
   const ref = SignUpVerificationCtx.useActorRef();
-  const active = useActiveTags(ref, [
+  const { active } = useActiveTags(ref, [
     `verification:${tag}`,
     `verification:category:${tag}`,
-  ] as unknown as SignUpVerificationTags);
+  ] as unknown as SignUpVerificationTags[]);
 
   if (!ref) {
     return null;

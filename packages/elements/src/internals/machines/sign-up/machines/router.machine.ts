@@ -12,6 +12,7 @@ import type {
   SignUpRouterSchema,
 } from '~/internals/machines/sign-up/types';
 import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
+import { shouldUseVirutalRouting } from '~/internals/machines/utils/next';
 
 const isCurrentPath =
   (path: `/${string}`) =>
@@ -32,15 +33,19 @@ export const SignUpRouterMachine = setup({
   },
   actions: {
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
-    navigateInternal: ({ context }, { path }: { path: string }) => {
+    navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
-      const resolvedPath = [context.router?.basePath, path].join('/').replace(/\/\/g/, '/');
+      if (!force && shouldUseVirutalRouting()) return;
+
+      const resolvedPath = [context.router.basePath, path].join('/').replace(/\/\/g/, '/');
       if (resolvedPath === context.router.pathname()) return;
+
       context.router.push(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
-    setActive({ context, event }, params?: { useLastActiveSession?: boolean }) {
+    setActive({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) {
       const session =
+        params?.sessionId ||
         (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
         ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
 
@@ -62,6 +67,9 @@ export const SignUpRouterMachine = setup({
 
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signUp.status === null && context.clerk.client.lastActiveSessionId),
+
+    hasCreatedSession: ({ context }) => Boolean(context.router?.searchParams().get('__clerk_created_session')),
+    hasClerkStatus: ({ context }) => Boolean(context.router?.searchParams().get('__clerk_status')),
     isStatusAbandoned: needsStatus('abandoned'),
     isStatusComplete: ({ context, event }) => {
       const resource = (event as SignUpRouterNextEvent)?.resource;
@@ -82,12 +90,12 @@ export const SignUpRouterMachine = setup({
 
     needsIdentifier: or(['statusNeedsIdentifier', isCurrentPath('/')]),
     needsContinue: and(['statusNeedsContinue', isCurrentPath('/continue')]),
-    needsVerification: and(['statusNeedsVerification', isCurrentPath('/continue')]),
+    needsVerification: and(['statusNeedsVerification', isCurrentPath('/verify')]),
     needsCallback: isCurrentPath(SSO_CALLBACK_PATH_ROUTE),
 
     statusNeedsIdentifier: or([not('hasResource'), 'isStatusAbandoned']),
     statusNeedsContinue: or(['isMissingRequiredFields']),
-    statusNeedsVerification: or(['isMissingRequiredUnverifiedFields']),
+    statusNeedsVerification: or(['isMissingRequiredUnverifiedFields', and(['areFieldsMissing', 'hasClerkStatus'])]),
   },
   delays: {
     'TIMEOUT.POLLING': 300_000, // 5 minutes
@@ -142,21 +150,21 @@ export const SignUpRouterMachine = setup({
         },
         {
           guard: 'needsIdentifier',
-          actions: { type: 'navigateInternal', params: { path: '/' } },
+          actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
           target: 'Start',
         },
         {
           guard: 'needsVerification',
-          actions: { type: 'navigateInternal', params: { path: '/verify' } },
+          actions: { type: 'navigateInternal', params: { force: true, path: '/verify' } },
           target: 'Verification',
         },
         {
           guard: 'needsContinue',
-          actions: { type: 'navigateInternal', params: { path: '/continue' } },
+          actions: { type: 'navigateInternal', params: { force: true, path: '/continue' } },
           target: 'Continue',
         },
         {
-          actions: { type: 'navigateInternal', params: { path: '/' } },
+          actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
           target: 'Start',
         },
       ],
@@ -172,12 +180,12 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'statusNeedsVerification',
             target: 'Verification',
-            // actions: { type: 'navigateInternal', params: { path: '/verify' } },
+            actions: { type: 'navigateInternal', params: { path: '/verify' } },
             reenter: true,
           },
           {
             guard: 'statusNeedsContinue',
-            // actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'Continue',
             reenter: true,
           },
@@ -195,7 +203,7 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'statusNeedsVerification',
             target: 'Verification',
-            // actions: { type: 'navigateInternal', params: { path: '/verify' } },
+            actions: { type: 'navigateInternal', params: { path: '/verify' } },
             reenter: true,
           },
         ],
@@ -203,6 +211,23 @@ export const SignUpRouterMachine = setup({
     },
     Verification: {
       tags: 'route:verification',
+      always: [
+        {
+          guard: 'hasCreatedSession',
+          actions: ({ context }) => ({
+            type: 'setActive',
+            params: { sessionId: context.router?.searchParams().get('__clerk_created_session') },
+          }),
+        },
+        {
+          guard: ({ context }) => context.router?.searchParams().get('__clerk_status') === 'verified',
+          actions: { type: 'navigateInternal', params: { force: true, path: '/continue' } },
+        },
+        {
+          guard: ({ context }) => context.router?.searchParams().get('__clerk_status') === 'expired',
+          actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
+        },
+      ],
       on: {
         NEXT: [
           {
@@ -211,7 +236,7 @@ export const SignUpRouterMachine = setup({
           },
           {
             guard: 'statusNeedsContinue',
-            // actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'Continue',
             reenter: true,
           },

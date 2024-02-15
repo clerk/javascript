@@ -44,14 +44,17 @@ export function SignInVerification({ children, name }: SignInVerificationProps) 
 
 export function SignInVerifications(props: SignInVerifyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
+  const { activeTags: activeRoutes } = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
 
-  return activeState ? (
-    <>
-      <SignInFirstFactor {...props} />
-      <SignInSecondFactor {...props} />
-    </>
-  ) : null;
+  if (activeRoutes.has('route:first-factor')) {
+    return <SignInFirstFactorInner {...props} />;
+  }
+
+  if (activeRoutes.has('route:second-factor')) {
+    return <SignInSecondFactorInner {...props} />;
+  }
+
+  return null;
 }
 
 export function SignInFirstFactor(props: SignInVerifyProps) {
