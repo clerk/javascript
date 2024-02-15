@@ -43,7 +43,7 @@ export function SignInVerification({ children, name }: SignInVerificationProps) 
   return active ? children : null;
 }
 
-export function SignInVerify(props: SignInVerifyProps) {
+export function SignInVerifications(props: SignInVerifyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
 

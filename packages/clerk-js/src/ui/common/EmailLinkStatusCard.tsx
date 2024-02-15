@@ -36,11 +36,11 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
     <Flow.Part part='emailLinkStatus'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
           <Header.Root>
             <Header.Title localizationKey={props.title} />
             <Header.Subtitle localizationKey={props.subtitle} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           <Col elementDescriptor={descriptors.main}>
             <StatusRow status={props.status} />
           </Col>

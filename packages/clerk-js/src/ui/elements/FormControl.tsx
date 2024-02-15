@@ -2,7 +2,15 @@ import { titleize } from '@clerk/shared';
 import type { FieldId } from '@clerk/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { descriptors, Flex, FormErrorText, FormInfoText, FormSuccessText, FormWarningText } from '../customizables';
+import {
+  descriptors,
+  Flex,
+  FormErrorText,
+  FormInfoText,
+  FormSuccessText,
+  FormWarningText,
+  useAppearance,
+} from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
@@ -11,10 +19,11 @@ import type { FeedbackType, useFormControlFeedback } from '../utils';
 
 export function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
 
   const getFormTextAnimation = useCallback(
     (enterAnimation: boolean, options?: { inDelay?: boolean }): ThemableCssProp => {
-      if (prefersReducedMotion) {
+      if (prefersReducedMotion || !appearanceAnimations) {
         return {
           animation: 'none',
         };

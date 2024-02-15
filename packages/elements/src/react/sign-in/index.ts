@@ -15,8 +15,10 @@ export {
   SignInFirstFactor as FirstFactor,
   SignInSecondFactor as SecondFactor,
   SignInVerification as Verification,
-  SignInVerify as Verify,
+  SignInVerifications as Verifications,
 } from './verifications';
+
+export { useIsLoading_unstable } from './hooks/use-loading.hook';
 
 /** @internal Internal use only */
 export const useSignInActorRef_internal = SignInRouterCtx.useActorRef;

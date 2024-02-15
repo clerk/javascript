@@ -1,17 +1,17 @@
-import type { FormControlProps } from '@radix-ui/react-form';
 import { Control as RadixControl } from '@radix-ui/react-form';
 import { Slot } from '@radix-ui/react-slot';
-import type { CSSProperties, ReactNode, RefObject } from 'react';
-import { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import * as React from 'react';
+
+import type { FormControlProps } from '~/react/common/form';
 
 export type OTPInputProps = Exclude<
   FormControlProps,
   'type' | 'autoComplete' | 'maxLength' | 'inputMode' | 'pattern'
 > & {
-  render?: (props: { value: string; status: 'cursor' | 'selected' | 'none'; index: number }) => ReactNode;
+  render?: (props: { value: string; status: 'cursor' | 'selected' | 'none'; index: number }) => React.ReactNode;
 };
 
-export const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(props, ref) {
+export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(props, ref) {
   const treatAsSegmented = typeof props.render !== 'undefined';
 
   if (treatAsSegmented) {
@@ -36,18 +36,18 @@ export const OTPInput = forwardRef<HTMLInputElement, OTPInputProps>(function OTP
  * A custom input component to handle accepting OTP codes. An invisible input element is used to capture input and handle native input
  * interactions, while the provided render prop is used to visually render the input's contents.
  */
-const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputProps, 'render'>> & OTPInputProps>(
+const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPInputProps, 'render'>> & OTPInputProps>(
   function OTPInput(props, ref) {
     const { className, render, maxLength = 6, ...rest } = props;
 
-    const innerRef = useRef<HTMLInputElement>(null);
-    const [selectionRange, setSelectionRange] = useState<[number, number]>(props.autoFocus ? [0, 0] : [-1, -1]);
+    const innerRef = React.useRef<HTMLInputElement>(null);
+    const [selectionRange, setSelectionRange] = React.useState<[number, number]>(props.autoFocus ? [0, 0] : [-1, -1]);
 
     // This ensures we can access innerRef internally while still exposing it via the ref prop
-    useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
+    React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
 
     // A layout effect is used here to avoid any perceived visual lag when changing the selection
-    useLayoutEffect(() => {
+    React.useLayoutEffect(() => {
       if (document.activeElement !== innerRef.current) {
         return;
       }
@@ -59,7 +59,7 @@ const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputPro
         style={
           {
             position: 'relative',
-          } as CSSProperties
+          } as React.CSSProperties
         }
       >
         {/* We can't target pseud-elements with the style prop, so we inject a tag here */}
@@ -123,7 +123,7 @@ const OTPInputSegmented = forwardRef<HTMLInputElement, Required<Pick<OTPInputPro
 /**
  * Handle updating the input selection range to ensure a single character is selected when moving the cursor, or if the input value changes.
  */
-function selectionRangeUpdater(cur: [number, number], inputRef: RefObject<HTMLInputElement>) {
+function selectionRangeUpdater(cur: [number, number], inputRef: React.RefObject<HTMLInputElement>) {
   let direction: 'forward' | 'backward' = 'forward' as const;
   let updated: [number, number] = [inputRef.current?.selectionStart ?? 0, inputRef.current?.selectionEnd ?? 0];
 
