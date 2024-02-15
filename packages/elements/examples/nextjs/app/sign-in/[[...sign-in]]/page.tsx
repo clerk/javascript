@@ -1,7 +1,14 @@
 'use client';
 
 import { GlobalError, Submit } from '@clerk/elements/common';
-import { SignIn, SocialProvider, SocialProviderIcon, Start, Verification, Verify } from '@clerk/elements/sign-in';
+import {
+  SignIn,
+  SocialProvider,
+  SocialProviderIcon,
+  Start,
+  Verification,
+  Verifications,
+} from '@clerk/elements/sign-in';
 
 import { H1, H3, HR as Hr, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
@@ -65,7 +72,7 @@ export default function SignInPage() {
           </div>
         </Start>
 
-        <Verify>
+        <Verifications>
           <div className='flex gap-6 flex-col'>
             <H1>VERFIY</H1>
 
@@ -112,10 +119,8 @@ export default function SignInPage() {
               </Verification>
             </Loading>
           </div>
-        </Verify>
+        </Verifications>
       </div>
-
-      {/* <SignInDebug /> */}
     </SignIn>
   );
 }

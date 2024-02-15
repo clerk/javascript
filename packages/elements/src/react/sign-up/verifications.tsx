@@ -5,13 +5,14 @@ import type { PropsWithChildren } from 'react';
 import type { TSignUpVerificationMachine } from '~/internals/machines/sign-up/machines';
 import { SignUpVerificationMachine } from '~/internals/machines/sign-up/machines';
 import type { SignUpVerificationFriendlyTags, SignUpVerificationTags } from '~/internals/machines/sign-up/types';
+import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
 import { SignUpRouterCtx, useSignUpRouteRegistration } from '~/react/sign-up/context';
 
 import { createContextFromActorRef } from '../utils/create-context-from-actor-ref';
 
-export type SignUpVerifyProps = PropsWithChildren;
+export type SignUpVerificationsProps = FormProps;
 
 export const SignUpVerificationCtx = createContextFromActorRef<TSignUpVerificationMachine>('SignUpVerificationCtx');
 
@@ -22,20 +23,20 @@ export const SignUpVerificationCtx = createContextFromActorRef<TSignUpVerificati
  *
  * export default SignUpPage = () => (
  *  <SignUp>
- *   <Verify>
+ *   <Verification>
  *    Please verify your account.
  *   </Verify>
  *  </SignUp>
  * )
  */
-export function SignUpVerify(props: SignUpVerifyProps) {
+export function SignUpVerifications(props: SignUpVerificationsProps) {
   const ref = SignUpRouterCtx.useActorRef();
   const activeState = useActiveTags(ref, 'route:verification');
 
   return activeState ? <SignUpVerifyInner {...props} /> : null;
 }
 
-function SignUpVerifyInner(props: SignUpVerifyProps) {
+function SignUpVerifyInner(props: SignUpVerificationsProps) {
   const ref = useSignUpRouteRegistration('verification', SignUpVerificationMachine);
 
   if (!ref) {

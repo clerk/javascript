@@ -1,15 +1,14 @@
 'use client';
 
-import type { PropsWithChildren } from 'react';
-
 import type { TSignInStartMachine } from '~/internals/machines/sign-in/machines';
 import { SignInStartMachine } from '~/internals/machines/sign-in/machines';
+import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
 import { SignInRouterCtx, useSignInRouteRegistration } from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
-export type SignInStartProps = PropsWithChildren;
+export type SignInStartProps = FormProps;
 
 export const SignInStartCtx = createContextFromActorRef<TSignInStartMachine>('SignInStartCtx');
 
