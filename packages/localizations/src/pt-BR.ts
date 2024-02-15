@@ -141,10 +141,6 @@ export const ptBR: LocalizationResource = {
           headerTitle: 'Convites automáticos',
           primaryButton: 'Gerenciar domínios verificados',
         },
-        manualInvitations: {
-          headerSubtitle: 'Convide manualmente membros e gerencie convites existentes.',
-          headerTitle: 'Convites individuais',
-        },
         table__emptyRow: 'Nenhum convite para exibir',
       },
       invitedMembersTab: {
@@ -160,10 +156,6 @@ export const ptBR: LocalizationResource = {
         },
         menuAction__approve: 'Aprovar',
         menuAction__reject: 'Rejeitar',
-        requests: {
-          headerSubtitle: 'Navegue e gerencie usuários que solicitaram participação na organização.',
-          headerTitle: 'Solicitações',
-        },
         tableHeader__requested: 'Acesso solicitado',
         table__emptyRow: 'Nenhuma solicitação para exibir',
       },

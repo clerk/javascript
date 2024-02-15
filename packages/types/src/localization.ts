@@ -632,10 +632,6 @@ type _LocalizationResource = {
       };
       invitationsTab: {
         table__emptyRow: LocalizationValue;
-        manualInvitations: {
-          headerTitle: LocalizationValue;
-          headerSubtitle: LocalizationValue;
-        };
         autoInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
@@ -647,10 +643,6 @@ type _LocalizationResource = {
         menuAction__approve: LocalizationValue;
         menuAction__reject: LocalizationValue;
         table__emptyRow: LocalizationValue;
-        requests: {
-          headerTitle: LocalizationValue;
-          headerSubtitle: LocalizationValue;
-        };
         autoSuggestions: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;

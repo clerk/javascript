@@ -144,10 +144,6 @@ export const roRO: LocalizationResource = {
           headerTitle: 'Invitații automate',
           primaryButton: 'Gestionați domeniile verificate',
         },
-        manualInvitations: {
-          headerSubtitle: 'Invitați manual membrii și gestionați invitațiile existente.',
-          headerTitle: 'Invitații individuale',
-        },
         table__emptyRow: 'Nu există invitații de afișare',
       },
       invitedMembersTab: {
@@ -163,10 +159,6 @@ export const roRO: LocalizationResource = {
         },
         menuAction__approve: 'Aprobarea',
         menuAction__reject: 'Respingeți',
-        requests: {
-          headerSubtitle: 'Răsfoiți și gestionați utilizatorii care au solicitat să se alăture organizației.',
-          headerTitle: 'Cereri',
-        },
         tableHeader__requested: 'Accesul solicitat',
         table__emptyRow: 'Nu există cereri de afișare',
       },

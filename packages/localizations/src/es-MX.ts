@@ -143,10 +143,6 @@ export const esMX: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Invita manualmente a miembros y gestiona invitaciones existentes.',
-          headerTitle: 'Invitación individual',
-        },
         table__emptyRow: 'No hay invitaciones para mostrar',
       },
       invitedMembersTab: {
@@ -162,10 +158,6 @@ export const esMX: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },

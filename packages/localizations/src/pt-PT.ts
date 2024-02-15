@@ -141,10 +141,6 @@ export const ptPT: LocalizationResource = {
           headerTitle: 'Convites automáticos',
           primaryButton: 'Configurar domínios verificados',
         },
-        manualInvitations: {
-          headerSubtitle: 'Convide manualmente membros e configure convites existentes.',
-          headerTitle: 'Convites individuais',
-        },
         table__emptyRow: 'Nenhum convite a mostrar',
       },
       invitedMembersTab: {
@@ -160,10 +156,6 @@ export const ptPT: LocalizationResource = {
         },
         menuAction__approve: 'Aprovar',
         menuAction__reject: 'Rejeitar',
-        requests: {
-          headerSubtitle: 'Navegue e configure utilizadores que solicitaram participação na organização.',
-          headerTitle: 'Pedidos',
-        },
         tableHeader__requested: 'Acesso solicitado',
         table__emptyRow: 'Nenhuma solicitação a mostrar',
       },
