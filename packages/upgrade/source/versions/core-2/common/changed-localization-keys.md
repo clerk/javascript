@@ -102,7 +102,6 @@ const changedValues = {
     },
   },
   userProfile: {
-    formButtonPrimary__continue: 'Save',
     start: {
       headerTitle__account: 'Profile details',
       profileSection: {

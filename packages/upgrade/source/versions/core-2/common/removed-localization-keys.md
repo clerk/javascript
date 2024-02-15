@@ -32,7 +32,6 @@ matcher:
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?title__conectionFailed:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?title__connectionFailed:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?title__reauthorize:"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?subtitle__reauthorize:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?actionLabel__conectionFailed:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?destructiveActionSubtitle:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?destructiveActionAccordionSubtitle:"
@@ -111,7 +110,6 @@ const deletedKeys = [
   'userProfile.start.connectedAccountsSection.title__conectionFailed',
   'userProfile.start.connectedAccountsSection.title__connectionFailed',
   'userProfile.start.connectedAccountsSection.title__reauthorize',
-  'userProfile.start.connectedAccountsSection.subtitle__reauthorize',
   'userProfile.start.connectedAccountsSection.actionLabel__conectionFailed',
   'userProfile.start.connectedAccountsSection.destructiveActionSubtitle',
   'userProfile.start.connectedAccountsSection.destructiveActionAccordionSubtitle',

@@ -54,9 +54,13 @@ const newValues = {
     backupCodeMfa: {
       subtitle: 'Your backup code is the one you got when setting up two-step authentication.',
     },
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+    },
   },
   userProfile: {
-    formButtonPrimary__continue: 'Save',
+    formButtonPrimary__save: 'Save',
     start: {
       headerTitle__account: 'Profile details',
       profileSection: {
