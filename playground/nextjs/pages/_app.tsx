@@ -133,7 +133,7 @@ const AppBar = (props: AppBarProps) => {
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
       <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
-      <div style={{ position: 'absolute', left: '10px', bottom: '10px', display: 'inline-flex', gap: '10px' }}>
+      <div style={{ position: 'fixed', left: '10px', bottom: '10px', display: 'inline-flex', gap: '10px' }}>
         <button
           onClick={props.onResetStyles}
         >
