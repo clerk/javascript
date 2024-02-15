@@ -10,6 +10,5 @@ export const shadows = Object.freeze({
   input: '0px 0px 1px 0px {{color}}',
   focusRing: '0px 0px 0px 4px {{color}}',
   badge: '0px 2px 0px -1px rgba(0, 0, 0, 0.04)',
-  tableBodyShadow:
-    '0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 0px 1px rgba(25, 28, 33, 0.06)',
+  tableBodyShadow: '0px 0px 1px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.12)',
 } as const);
