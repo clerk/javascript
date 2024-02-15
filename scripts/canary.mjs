@@ -46,7 +46,7 @@ const success = !res.stderr.includes('No unreleased changesets found');
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
 
 // TODO: Remove once @clerk/elements hits 1.0.0
-await $`npx json -I -f ${constants.ElementsPackageJson} -e "this.peerDependencies['@clerk/clerk-react'] = ${constants.ElementsPeerDeps.react};this.peerDependencies['@clerk/shared'] = ${constants.ElementsPeerDeps.shared}"`;
+await $`npx json -I -f ${constants.ElementsPackageJson} -e "this.peerDependencies['@clerk/clerk-react'] = '${constants.ElementsPeerDeps.react}';this.peerDependencies['@clerk/shared'] = '${constants.ElementsPeerDeps.shared}'"`;
 
 if (success) {
   echo('success=1');
