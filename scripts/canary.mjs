@@ -45,6 +45,9 @@ const success = !res.stderr.includes('No unreleased changesets found');
 
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
 
+// TODO: Remove once @clerk/elements hits 1.0.0
+await $`git checkout HEAD -- ${constants.ElementsPackageJson}`;
+
 if (success) {
   echo('success=1');
 } else {
