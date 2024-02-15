@@ -33,9 +33,20 @@ export const MembersActionsRow = () => {
       {canManageMemberships && (
         <Animated>
           <Action.Open value='invite'>
-            <Action.Card>
-              <InviteMembersScreen />
-            </Action.Card>
+            <Flex
+              sx={t => ({
+                paddingBottom: t.space.$6,
+                padding: `${t.space.$none} ${t.space.$1} ${t.space.$6} ${t.space.$2}`,
+              })}
+            >
+              <Action.Card
+                sx={{
+                  width: '100%',
+                }}
+              >
+                <InviteMembersScreen />
+              </Action.Card>
+            </Flex>
           </Action.Open>
         </Animated>
       )}
