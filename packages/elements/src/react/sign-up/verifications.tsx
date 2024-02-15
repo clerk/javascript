@@ -1,7 +1,5 @@
 'use client';
 
-import type { PropsWithChildren } from 'react';
-
 import type { TSignUpVerificationMachine } from '~/internals/machines/sign-up/machines';
 import { SignUpVerificationMachine } from '~/internals/machines/sign-up/machines';
 import type { SignUpVerificationFriendlyTags, SignUpVerificationTags } from '~/internals/machines/sign-up/types';
@@ -53,7 +51,7 @@ function SignUpVerifyInner(props: SignUpVerificationsProps) {
   );
 }
 
-export type SignUpVerificationProps = PropsWithChildren<{ name: SignUpVerificationFriendlyTags }>;
+export type SignUpVerificationProps = WithChildrenProp<{ name: SignUpVerificationFriendlyTags }>;
 
 /**
  * Conditionally renders its children based on the currently active verification method (e.g. password, email code, etc.).

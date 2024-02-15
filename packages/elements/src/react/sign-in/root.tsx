@@ -2,7 +2,6 @@
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import { useActorRef } from '@xstate/react';
-import type { PropsWithChildren } from 'react';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
@@ -11,7 +10,7 @@ import { useConsoleInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
-type SignInFlowProviderProps = Required<PropsWithChildren>;
+type SignInFlowProviderProps = WithChildrenProp;
 
 function SignInFlowProvider({ children }: SignInFlowProviderProps) {
   const clerk = useClerk();

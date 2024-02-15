@@ -34,7 +34,7 @@ export function createContextFromActorRef<TMachine extends AnyStateMachine, TRef
   const ReactContext = React.createContext<TRef | null>(null);
   const OriginalProvider = ReactContext.Provider;
 
-  function Provider({ children, actorRef }: Required<React.PropsWithChildren<{ actorRef: TRef }>>) {
+  function Provider({ children, actorRef }: WithChildrenProp<{ actorRef: TRef }>) {
     return React.createElement(
       OriginalProvider,
       {
