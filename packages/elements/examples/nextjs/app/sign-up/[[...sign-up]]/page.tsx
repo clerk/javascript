@@ -8,7 +8,7 @@ import {
   SocialProviderIcon,
   Start,
   Verification,
-  Verify,
+  Verifications,
 } from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
@@ -80,7 +80,7 @@ export default function SignUpPage() {
           <CustomSubmit>Sign Up</CustomSubmit>
         </Continue>
 
-        <Verify>
+        <Verifications>
           <H1>Verify your information:</H1>
 
           <GlobalError className='block text-red-400 font-mono' />
@@ -95,10 +95,8 @@ export default function SignUpPage() {
           </Verification>
 
           <Verification name='email_link'>Please check your email for a link to verify your account.</Verification>
-        </Verify>
+        </Verifications>
       </div>
-
-      {/* <SignUpDebug /> */}
     </SignUp>
   );
 }

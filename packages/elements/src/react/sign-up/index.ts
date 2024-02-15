@@ -9,7 +9,7 @@ export {
   SignUpSocialProviderIcon as SocialProviderIcon,
 } from './social-providers';
 export { SignUpStart as Start } from './start';
-export { SignUpVerification as Verification, SignUpVerify as Verify } from './verifications';
+export { SignUpVerification as Verification, SignUpVerifications as Verifications } from './verifications';
 
 /** @internal Internal use only */
 export const useSignUpActorRef_internal = SignUpRouterCtx.useActorRef;

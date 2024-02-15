@@ -1,22 +1,22 @@
+import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
-  FormControlProps,
-  FormFieldProps,
-  FormLabelProps,
-  FormMessageProps,
-  FormProps,
+  FormControlProps as RadixFormControlProps,
+  FormFieldProps as RadixFormFieldProps,
+  FormMessageProps as RadixFormMessageProps,
+  FormProps as RadixFormProps,
   FormSubmitProps as RadixFormSubmitProps,
 } from '@radix-ui/react-form';
 import {
   Control as RadixControl,
   Field as RadixField,
   Form as RadixForm,
-  FormMessage,
+  FormMessage as RadixFormMessage,
   Label as RadixLabel,
   Submit as RadixSubmit,
 } from '@radix-ui/react-form';
-import type { ComponentProps, ReactNode } from 'react';
-import React, { createContext, useCallback, useContext, useEffect } from 'react';
-import type { SetRequired } from 'type-fest';
+import { Slot } from '@radix-ui/react-slot';
+import * as React from 'react';
+import type { SetRequired, Simplify } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
@@ -34,8 +34,16 @@ import type { OTPInputProps } from './otp';
 import { OTPInput } from './otp';
 import type { FieldStates } from './types';
 
-const FieldContext = createContext<Pick<FieldDetails, 'name'> | null>(null);
-const useFieldContext = () => useContext(FieldContext);
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+const FieldContext = React.createContext<Pick<FieldDetails, 'name'> | null>(null);
+const useFieldContext = () => React.useContext(FieldContext);
+
+/* -------------------------------------------------------------------------------------------------
+ * Hooks
+ * -----------------------------------------------------------------------------------------------*/
 
 /**
  * Provides the form submission handler along with the form's validity via a data attribute
@@ -46,7 +54,7 @@ const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }
 
   // Register the onSubmit handler for form submission
   // TODO: merge user-provided submit handler
-  const onSubmit = useCallback(
+  const onSubmit = React.useCallback(
     (event: React.FormEvent<Element>) => {
       event.preventDefault();
       if (flowActor) {
@@ -122,7 +130,7 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
   const hasValue = Boolean(value);
 
   // Register the field in the machine context
-  useEffect(() => {
+  React.useEffect(() => {
     if (!name || ref.getSnapshot().context.fields.get(name)) return;
 
     ref.send({ type: 'FIELD.ADD', field: { name, value: initialValue } });
@@ -131,7 +139,7 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Register the onChange handler for field updates to persist to the machine context
-  const onChange = useCallback(
+  const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
       if (!name) return;
@@ -181,41 +189,75 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
   };
 };
 
-function Form({ flowActor, ...props }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> } & FormProps) {
+/* -------------------------------------------------------------------------------------------------
+ * Form
+ * -----------------------------------------------------------------------------------------------*/
+
+const FORM_NAME = 'ClerkElementsForm';
+
+type FormElement = React.ElementRef<typeof RadixForm>;
+type FormProps = SetRequired<RadixFormProps, 'children'> & {
+  flowActor?: BaseActorRef<{ type: 'SUBMIT' }>;
+};
+
+const Form = React.forwardRef<FormElement, FormProps>(({ flowActor, onSubmit, ...rest }, forwardedRef) => {
   const form = useForm({ flowActor: flowActor });
+
+  const { onSubmit: internalOnSubmit, ...internalFormProps } = form.props;
 
   return (
     <RadixForm
-      {...form.props}
-      {...props}
+      {...internalFormProps}
+      {...rest}
+      onSubmit={composeEventHandlers(internalOnSubmit, onSubmit)}
+      ref={forwardedRef}
     />
   );
-}
+});
 
-function Field(props: FormFieldProps) {
+Form.displayName = FORM_NAME;
+
+/* -------------------------------------------------------------------------------------------------
+ * Field
+ * -----------------------------------------------------------------------------------------------*/
+
+const FIELD_NAME = 'ClerkElementsField';
+const FIELD_INNER_NAME = 'ClerkElementsFieldInner';
+
+type FormFieldElement = React.ElementRef<typeof RadixField>;
+type FormFieldProps = RadixFormFieldProps;
+
+const Field = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
   return (
     <FieldContext.Provider value={{ name: props.name }}>
-      <InnerField {...props} />
+      <FieldInner
+        {...props}
+        ref={forwardedRef}
+      />
     </FieldContext.Provider>
   );
-}
+});
 
-function InnerField(props: FormFieldProps) {
+const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
   const field = useField({ name: props.name });
 
   return (
     <RadixField
       {...field.props}
       {...props}
+      ref={forwardedRef}
     />
   );
-}
+});
+
+Field.displayName = FIELD_NAME;
+FieldInner.displayName = FIELD_INNER_NAME;
 
 /**
  * A helper to access the state of the field programmatically. This can be useful if you need to trigger
  * animations or certain behavior based on the field's state independent of the existing components.
  */
-function FieldState({ children }: { children: (state: { state: FieldStates }) => ReactNode }) {
+function FieldState({ children }: { children: (state: { state: FieldStates }) => React.ReactNode }) {
   const field = useFieldContext();
   const error = useFormSelector(fieldErrorsSelector(field?.name));
   const state = error ? ('invalid' as const) : ('valid' as const);
@@ -225,91 +267,139 @@ function FieldState({ children }: { children: (state: { state: FieldStates }) =>
   return children(fieldState);
 }
 
-type FormInputProps = FormControlProps | ({ type: 'otp' } & OTPInputProps);
+/* -------------------------------------------------------------------------------------------------
+ * Input
+ * -----------------------------------------------------------------------------------------------*/
 
-function Input(props: FormInputProps) {
+const INPUT_NAME = 'ClerkElementsLabel';
+
+type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
+
+const Input = (props: FormInputProps) => {
   const field = useInput(props);
-
   return <field.Element {...field.props} />;
-}
+};
 
-function Label(props: FormLabelProps) {
-  return <RadixLabel {...props} />;
-}
+Input.displayName = INPUT_NAME;
+
+/* -------------------------------------------------------------------------------------------------
+ * Label
+ * -----------------------------------------------------------------------------------------------*/
+
+const LABEL_NAME = 'ClerkElementsLabel';
+
+const Label = RadixLabel;
+
+Label.displayName = LABEL_NAME;
+
+/* -------------------------------------------------------------------------------------------------
+ * Submit
+ * -----------------------------------------------------------------------------------------------*/
+
+const SUBMIT_NAME = 'ClerkElementsSubmit';
 
 type FormSubmitProps = SetRequired<RadixFormSubmitProps, 'children'>;
+type FormSubmitComponent = React.ForwardRefExoticComponent<FormSubmitProps & React.RefAttributes<HTMLButtonElement>>;
 
-function Submit(props: FormSubmitProps) {
-  return <RadixSubmit {...props} />;
-}
+const Submit = RadixSubmit as FormSubmitComponent;
 
-// ================= ERRORS ================= //
+Submit.displayName = SUBMIT_NAME;
+
+/* -------------------------------------------------------------------------------------------------
+ * GlobalError & FieldError
+ * -----------------------------------------------------------------------------------------------*/
+
+const GLOBAL_ERROR_NAME = 'ClerkElementsGlobalError';
+const FIELD_ERROR_NAME = 'ClerkElementsFieldError';
 
 type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
-type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> &
-  (
-    | {
-        children?: (error: FormErrorRenderProps) => React.ReactNode;
-        code?: string;
-      }
-    | {
-        children: React.ReactNode;
-        code: string;
-      }
-  );
 
-type FormGlobalErrorProps = FormErrorProps<ComponentProps<'div'>>;
-type FormFieldErrorProps = FormErrorProps<FormMessageProps & { name?: string }>;
+type FormErrorPropsRenderFn = {
+  asChild?: never;
+  children?: (error: FormErrorRenderProps) => React.ReactNode;
+  code?: string;
+};
 
-function GlobalError({ children, code, ...rest }: FormGlobalErrorProps) {
-  const { errors } = useGlobalErrors();
+type FormErrorPropsStd = {
+  asChild?: false;
+  children: React.ReactNode;
+  code: string;
+};
 
-  const error = errors?.[0];
+type FormErrorPropsAsChild = {
+  asChild?: true;
+  children: React.ReactElement;
+  code: string;
+};
 
-  if (!error || (code && error.code !== code)) {
-    return null;
-  }
+type FormErrorProps<T> = Simplify<
+  Omit<T, 'asChild' | 'children'> & (FormErrorPropsRenderFn | FormErrorPropsStd | FormErrorPropsAsChild)
+>;
 
-  const child = typeof children === 'function' ? children(error) : children;
+type FormGlobalErrorElement = React.ElementRef<'div'>;
+type FormGlobalErrorProps = FormErrorProps<React.ComponentPropsWithoutRef<'div'>>;
+type FormFieldErrorElement = React.ElementRef<typeof RadixFormMessage>;
+type FormFieldErrorProps = FormErrorProps<RadixFormMessageProps & { name?: string }>;
 
-  return (
-    <div
-      role='alert'
-      {...rest}
-    >
-      {child || error.message}
-    </div>
-  );
-}
+const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProps>(
+  ({ asChild = false, children, code, ...rest }, forwardedRef) => {
+    const { errors } = useGlobalErrors();
 
-function FieldError({ children, code, name, ...rest }: FormFieldErrorProps) {
-  const fieldContext = useFieldContext();
-  const fieldName = fieldContext?.name || name;
-  const { errors } = useFieldErrors({ name: fieldName });
+    const error = errors?.[0];
 
-  const error = errors?.[0];
+    if (!error || (code && error.code !== code)) {
+      return null;
+    }
 
-  if (!error) {
-    return null;
-  }
+    const Comp = asChild ? Slot : 'div';
+    const child = typeof children === 'function' ? children(error) : children;
 
-  const child = typeof children === 'function' ? children(error) : children;
-  const forceMatch = code ? error.code === code : true;
+    return (
+      <Comp
+        role='alert'
+        {...rest}
+        ref={forwardedRef}
+      >
+        {child || error.message}
+      </Comp>
+    );
+  },
+);
 
-  return (
-    <FormMessage
-      data-error-code={error.code}
-      forceMatch={forceMatch}
-      {...rest}
-    >
-      {child || error.message}
-    </FormMessage>
-  );
-}
+const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
+  ({ children, code, name, ...rest }, forwardedRef) => {
+    const fieldContext = useFieldContext();
+    const fieldName = fieldContext?.name || name;
+    const { errors } = useFieldErrors({ name: fieldName });
+
+    const error = errors?.[0];
+
+    if (!error) {
+      return null;
+    }
+
+    const child = typeof children === 'function' ? children(error) : children;
+    const forceMatch = code ? error.code === code : true;
+
+    return (
+      <RadixFormMessage
+        data-error-code={error.code}
+        forceMatch={forceMatch}
+        {...rest}
+        ref={forwardedRef}
+      >
+        {child || error.message}
+      </RadixFormMessage>
+    );
+  },
+);
+
+GlobalError.displayName = GLOBAL_ERROR_NAME;
+FieldError.displayName = FIELD_ERROR_NAME;
 
 export { Field, FieldError, FieldState, Form, GlobalError, Input, Label, Submit };
 export type {
-  FormControlProps,
+  RadixFormControlProps as FormControlProps,
   FormFieldErrorProps,
   FormErrorProps,
   FormErrorRenderProps,

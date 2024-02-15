@@ -40,14 +40,16 @@ const Loader = ({ count = 5 }) => {
       {Array(count)
         .fill(null)
         .map((_, index) => {
+          const color = colors[index % colors.length];
+
           return (
             <motion.div
-              key={index}
+              key={color}
               variants={dotVariants}
               style={{
                 height: 20,
                 width: 20,
-                backgroundColor: colors[index % colors.length],
+                backgroundColor: color,
                 borderRadius: 20,
               }}
             />
