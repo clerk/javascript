@@ -2,7 +2,6 @@
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import { useActorRef } from '@xstate/react';
-import type { PropsWithChildren } from 'react';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
@@ -11,7 +10,7 @@ import { useConsoleInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
-type SignUpFlowProviderProps = Required<PropsWithChildren>;
+type SignUpFlowProviderProps = WithChildrenProp;
 
 function SignUpFlowProvider({ children }: SignUpFlowProviderProps) {
   const clerk = useClerk();
@@ -26,7 +25,7 @@ function SignUpFlowProvider({ children }: SignUpFlowProviderProps) {
   return <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider>;
 }
 
-export type SignUpRootProps = SignUpFlowProviderProps & { path?: string };
+export type SignUpRootProps = WithChildrenProp<{ path?: string }>;
 
 /**
  * Root component for the sign-up flow. It sets up providers and state management for its children.

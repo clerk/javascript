@@ -2,7 +2,6 @@
 
 import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import { useSelector } from '@xstate/react';
-import type { PropsWithChildren } from 'react';
 import { useCallback } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
@@ -14,7 +13,7 @@ import { useActiveTags } from '~/react/hooks';
 import { SignInRouterCtx, StrategiesContext, useSignInRouteRegistration, useStrategy } from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
-export type SignInVerifyProps = Required<PropsWithChildren> & { preferred?: ClerkSignInStrategy };
+export type SignInVerifyProps = WithChildrenProp<{ preferred?: ClerkSignInStrategy }>;
 
 export const SignInFirstFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInFirstFactorCtx');
 export const SignInSecondFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInSecondFactorCtx');
@@ -36,11 +35,11 @@ function SignInStrategiesProvider({
   );
 }
 
-export type SignInVerificationProps = React.PropsWithChildren<{ name: SignInStrategyName }>;
+export type SignInVerificationProps = WithChildrenProp<{ name: SignInStrategyName }>;
 
 export function SignInVerification({ children, name }: SignInVerificationProps) {
   const { active } = useStrategy(name);
-  return active ? children : null;
+  return active ? <>{children}</> : null; // eslint-disable-line react/jsx-no-useless-fragment
 }
 
 export function SignInVerifications(props: SignInVerifyProps) {
