@@ -2,40 +2,17 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
-import {
-  Animated,
-  Card,
-  Header,
-  Tab,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  TabsList,
-  useCardState,
-  withCardStateProvider,
-} from '../../elements';
+import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Animated, Card, Header, Tab, TabPanel, TabPanels, Tabs, TabsList, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
-import { mqu, type ThemableCssProp } from '../../styledSystem';
+import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
-import { InviteMembersScreen } from './InviteMembersScreen';
+import { MembersActionsRow } from './MembersActions';
 import { MembershipWidget } from './MembershipWidget';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
-export const InviteMembersButton = (props: { sx?: ThemableCssProp }) => {
-  return (
-    <Button
-      {...props}
-      elementDescriptor={descriptors.membersPageInviteButton}
-      aria-label='Invite'
-      textVariant='buttonSmall'
-      localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
-    />
-  );
-};
-
-export const OrganizationMembers = withCardStateProvider(() => {
+export const OrganizationMembers = () => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
@@ -77,32 +54,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
                 textVariant='h2'
               />
-              {canManageMemberships && (
-                <Action.Trigger value='invite'>
-                  <InviteMembersButton
-                    sx={{
-                      display: 'none',
-                      [mqu.md]: {
-                        display: 'inline-flex',
-                      },
-                    }}
-                  />
-                </Action.Trigger>
-              )}
             </Header.Root>
           </Animated>
           <Card.Alert>{card.error}</Card.Alert>
-          {canReadMemberships && (
-            <Animated>
-              <Action.Open value='invite'>
-                <Action.Card>
-                  <InviteMembersScreen />
-                </Action.Card>
-              </Action.Open>
-            </Animated>
-          )}
           <Tabs>
-            <TabsList>
+            <TabsList sx={t => ({ gap: t.space.$4 })}>
               {canReadMemberships && (
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
               )}
@@ -117,25 +73,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 </Tab>
               )}
             </TabsList>
-            {canManageMemberships && (
-              <Animated asChild>
-                <Flex
-                  justify='end'
-                  sx={t => ({
-                    width: '100%',
-                    marginLeft: 'auto',
-                    padding: `${t.space.$none} ${t.space.$1}`,
-                    [mqu.md]: {
-                      display: 'none',
-                    },
-                  })}
-                >
-                  <Action.Trigger value='invite'>
-                    <InviteMembersButton />
-                  </Action.Trigger>
-                </Flex>
-              </Animated>
-            )}
             <TabPanels>
               {canReadMemberships && (
                 <TabPanel sx={{ width: '100%' }}>
@@ -147,7 +84,16 @@ export const OrganizationMembers = withCardStateProvider(() => {
                     }}
                   >
                     {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
-                    <ActiveMembersList />
+                    <Flex
+                      gap={2}
+                      direction='col'
+                      sx={{
+                        width: '100%',
+                      }}
+                    >
+                      <MembersActionsRow />
+                      <ActiveMembersList />
+                    </Flex>
                   </Flex>
                 </TabPanel>
               )}
@@ -167,4 +113,4 @@ export const OrganizationMembers = withCardStateProvider(() => {
       </Col>
     </Col>
   );
-});
+};

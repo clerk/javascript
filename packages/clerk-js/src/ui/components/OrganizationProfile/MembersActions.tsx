@@ -1,0 +1,44 @@
+import { useProtect } from '../../common';
+import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Animated } from '../../elements';
+import { Action } from '../../elements/Action';
+import { InviteMembersScreen } from './InviteMembersScreen';
+
+export const MembersActionsRow = () => {
+  const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
+
+  return (
+    <Action.Root animate={false}>
+      <Animated asChild>
+        <Flex
+          justify='end'
+          sx={t => ({
+            width: '100%',
+            marginLeft: 'auto',
+            padding: `${t.space.$none} ${t.space.$1}`,
+          })}
+        >
+          {canManageMemberships && (
+            <Action.Trigger value='invite'>
+              <Button
+                elementDescriptor={descriptors.membersPageInviteButton}
+                aria-label='Invite'
+                textVariant='buttonSmall'
+                localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
+              />
+            </Action.Trigger>
+          )}
+        </Flex>
+      </Animated>
+      {canManageMemberships && (
+        <Animated>
+          <Action.Open value='invite'>
+            <Action.Card>
+              <InviteMembersScreen />
+            </Action.Card>
+          </Action.Open>
+        </Animated>
+      )}
+    </Action.Root>
+  );
+};
