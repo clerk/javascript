@@ -3,7 +3,18 @@ import { useOrganization } from '@clerk/shared/react';
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
-import { Animated, Card, Header, Tab, TabPanel, TabPanels, Tabs, TabsList, useCardState } from '../../elements';
+import {
+  Animated,
+  Card,
+  Header,
+  Tab,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  TabsList,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { Action } from '../../elements/Action';
 import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
@@ -12,7 +23,7 @@ import { MembershipWidget } from './MembershipWidget';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
-export const OrganizationMembers = () => {
+export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
@@ -113,4 +124,4 @@ export const OrganizationMembers = () => {
       </Col>
     </Col>
   );
-};
+});
