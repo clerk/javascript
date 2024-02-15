@@ -19,6 +19,7 @@ export type ClerkState = {
     __clerkJSVersion: string | undefined;
     __telemetryDisabled: boolean | undefined;
     __telemetryDebug: boolean | undefined;
+    __environment: string | undefined;
   };
 };
 

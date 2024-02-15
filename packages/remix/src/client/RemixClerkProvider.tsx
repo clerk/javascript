@@ -61,6 +61,7 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
     __clerkJSVersion,
     __telemetryDisabled,
     __telemetryDebug,
+    __environment,
   } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
@@ -94,7 +95,10 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
         routerPush={(to: string) => awaitableNavigateRef.current?.(to)}
         routerReplace={(to: string) => awaitableNavigateRef.current?.(to, { replace: true })}
         initialState={__clerk_ssr_state}
-        sdkMetadata={SDK_METADATA}
+        sdkMetadata={{
+          ...SDK_METADATA,
+          environment: __environment,
+        }}
         {...mergedProps}
         {...restProps}
       >
