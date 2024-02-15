@@ -36,7 +36,7 @@ export const MembersActionsRow = () => {
             <Flex
               sx={t => ({
                 paddingBottom: t.space.$6,
-                padding: `${t.space.$none} ${t.space.$1} ${t.space.$6} ${t.space.$2}`,
+                padding: `${t.space.$none} ${t.space.$1} ${t.space.$6} ${t.space.$1}`,
               })}
             >
               <Action.Card
