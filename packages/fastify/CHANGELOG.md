@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.0.0-beta.22
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2de442b24`](https://github.com/clerk/javascript/commit/2de442b2465cc5d424b8a0b21aa57c557f3aa2e7)]:
+  - @clerk/backend@1.0.0-beta.20
+  - @clerk/shared@2.0.0-beta.13
+  - @clerk/types@4.0.0-beta.15
+
 ## 1.0.0-beta-v5.21
 
 ### Minor Changes

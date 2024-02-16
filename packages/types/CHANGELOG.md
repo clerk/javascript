@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-beta.15
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.0.0-beta-v5.14
 
 ### Minor Changes

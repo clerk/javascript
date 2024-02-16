@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.0.0-beta.22
+
+### Minor Changes
+
+- Use sigUpUrl from props / context / repo-level to construct a redirectUrl in sign-in from email-link flow. ([#2756](https://github.com/clerk/javascript/pull/2756)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Ensure the token returned from `getToken()` and the token in the session cookie remain in sync. ([#2809](https://github.com/clerk/javascript/pull/2809)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2de442b24`](https://github.com/clerk/javascript/commit/2de442b2465cc5d424b8a0b21aa57c557f3aa2e7)]:
+  - @clerk/localizations@2.0.0-beta.14
+  - @clerk/shared@2.0.0-beta.13
+  - @clerk/types@4.0.0-beta.15
+
 ## 5.0.0-beta-v5.21
 
 ### Minor Changes

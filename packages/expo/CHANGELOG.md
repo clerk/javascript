@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.0.0-beta.22
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2de442b24`](https://github.com/clerk/javascript/commit/2de442b2465cc5d424b8a0b21aa57c557f3aa2e7), [`73849836f`](https://github.com/clerk/javascript/commit/73849836f2df88a44fbc0ad7ac994498b9709ed5), [`45c92006c`](https://github.com/clerk/javascript/commit/45c92006cbc7f55810fd1ba9b3c30a1743de57dd)]:
+  - @clerk/clerk-js@5.0.0-beta.22
+  - @clerk/clerk-react@5.0.0-beta.19
+  - @clerk/shared@2.0.0-beta.13
+
 ## 1.0.0-beta-v5.21
 
 ### Patch Changes
