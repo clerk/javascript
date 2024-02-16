@@ -1,3 +1,4 @@
+import { joinURL } from '@clerk/shared';
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   Attribute,
@@ -133,7 +134,7 @@ export const SignUpMachine = setup({
       context.router.replace(path);
     },
     navigateInternal({ context }, { path }: { path: string }) {
-      const resolvedPath = [context.router.basePath, path].join('/').replace(/\/\/g/, '/');
+      const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;
       context.router.replace(resolvedPath);
     },

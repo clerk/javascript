@@ -36,8 +36,6 @@ export type AttemptFirstFactorInput = WithClient<{ fields: FormFields; currentFa
 export type AttemptSecondFactorInput = WithClient<{ fields: FormFields; currentFactor: SignInSecondFactor | null }>;
 
 export const SignInVerificationMachineId = 'SignInVerification';
-export const SignInFirstFactorMachineId = 'SignInFirstFactor';
-export const SignInSecondFactorMachineId = 'SignInSecondFactor';
 
 const SignInVerificationMachine = setup({
   actors: {
@@ -129,7 +127,7 @@ const SignInVerificationMachine = setup({
 export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(async ({ input }) => {
-      console.log('input', input);
+      console.log('prepare', input);
       const { client, params, strategy } = input as PrepareFirstFactorInput;
 
       if (strategy === 'password') {
@@ -147,6 +145,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       return client.signIn.prepareFirstFactor(params);
     }),
     attempt: fromPromise(async ({ input }) => {
+      console.log('attempt', input);
       const { client, fields, currentFactor } = input as AttemptFirstFactorInput;
 
       assertIsDefined(currentFactor);
@@ -233,7 +232,10 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       }
 
       assertIsDefined(params);
-      return client.signIn.prepareSecondFactor(params);
+      return client.signIn.prepareSecondFactor({
+        strategy: params.strategy,
+        phoneNumberId: params?.phoneNumberId,
+      });
     }),
     attempt: fromPromise(async ({ input }) => {
       const { client, fields, currentFactor } = input as AttemptSecondFactorInput;

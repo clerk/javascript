@@ -109,9 +109,9 @@ export function createConsoleInspector(): Observer<InspectionEvent> {
 
   function logEvent(labelOrMsg: any, ...optionalParams: any[]): void {
     if (optionalParams && optionalParams.length > 0) {
-      console.debug(`%c${labelOrMsg}%c`, 'color: #4CAF50; font-weight: bold;', 'color: inherit;', ...optionalParams);
+      console.log(`%c${labelOrMsg}%c`, 'font-weight: bold;', 'color: inherit;', ...optionalParams);
     } else {
-      console.debug(labelOrMsg);
+      console.log(labelOrMsg);
     }
   }
 

@@ -85,9 +85,9 @@ export default function SignUpPage() {
 
           <GlobalError className='block text-red-400 font-mono' />
 
-          <Verification name='code'>
+          <Verification name='email_code'>
             <CustomField
-              label='Code'
+              label='Email Code'
               name='code'
             />
 

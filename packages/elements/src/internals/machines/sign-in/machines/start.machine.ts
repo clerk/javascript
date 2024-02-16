@@ -26,7 +26,7 @@ export const SignInStartMachine = setup({
           : {};
 
         return client.signIn.create({
-          identifier: identifier?.value as string,
+          identifier: (identifier?.value as string) || '',
           ...passwordParams,
         });
       },

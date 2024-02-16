@@ -11,7 +11,7 @@ import type {
 import type { Writable } from 'type-fest';
 import { and, assign, enqueueActions, fromCallback, fromPromise, raise, sendParent, sendTo, setup } from 'xstate';
 
-import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { MAGIC_LINK_VERIFY_PATH_ROUTE, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type {
   SignUpVerificationContext,
@@ -246,7 +246,7 @@ export const SignUpVerificationMachine = setup({
               clerk: context.clerk,
               params: {
                 strategy: 'email_link',
-                redirectUrl: context.clerk.buildAfterSignUpUrl(),
+                redirectUrl: context.clerk.buildUrlWithAuth(`${context.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`),
               },
             }),
             onDone: {

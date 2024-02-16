@@ -1,3 +1,4 @@
+import { joinURL } from '@clerk/shared';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
@@ -11,6 +12,7 @@ import type {
   SignInRouterSchema,
 } from '~/internals/machines/sign-in/types';
 import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
+import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
@@ -32,10 +34,13 @@ export const SignInRouterMachine = setup({
   },
   actions: {
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
-    navigateInternal: ({ context }, { path }: { path: string }) => {
+    navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
-      const resolvedPath = [context.router?.basePath, path].join('/').replace(/\/\/g/, '/');
+      if (!force && shouldUseVirtualRouting()) return;
+
+      const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;
+
       context.router.push(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
@@ -140,21 +145,21 @@ export const SignInRouterMachine = setup({
         },
         {
           guard: 'needsStart',
-          actions: { type: 'navigateInternal', params: { path: '/' } },
+          actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
           target: 'Start',
         },
         {
           guard: 'needsFirstFactor',
-          actions: { type: 'navigateInternal', params: { path: '/continue' } },
+          actions: { type: 'navigateInternal', params: { force: true, path: '/continue' } },
           target: 'FirstFactor',
         },
         {
           guard: 'needsSecondFactor',
-          actions: { type: 'navigateInternal', params: { path: '/continue' } },
+          actions: { type: 'navigateInternal', params: { force: true, path: '/continue' } },
           target: 'SecondFactor',
         },
         {
-          actions: { type: 'navigateInternal', params: { path: '/' } },
+          actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
           target: 'Start',
         },
       ],
@@ -169,13 +174,13 @@ export const SignInRouterMachine = setup({
           },
           {
             guard: 'statusNeedsFirstFactor',
-            // actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'FirstFactor',
             reenter: true,
           },
           {
             guard: 'statusNeedsSecondFactor',
-            // actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
             reenter: true,
           },
@@ -192,7 +197,7 @@ export const SignInRouterMachine = setup({
           },
           {
             guard: 'statusNeedsSecondFactor',
-            // actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
             reenter: true,
           },

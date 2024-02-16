@@ -5,7 +5,12 @@ import { useSelector } from '@xstate/react';
 import { useCallback } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
-import { SignInFirstFactorMachine, type TSignInFirstFactorMachine } from '~/internals/machines/sign-in/machines';
+import {
+  SignInFirstFactorMachine,
+  SignInSecondFactorMachine,
+  type TSignInFirstFactorMachine,
+  type TSignInSecondFactorMachine,
+} from '~/internals/machines/sign-in/machines';
 import type { SignInStrategyName } from '~/internals/machines/sign-in/types';
 import { matchStrategy } from '~/internals/machines/utils/strategies';
 import { Form } from '~/react/common/form';
@@ -16,7 +21,7 @@ import { createContextFromActorRef } from '~/react/utils/create-context-from-act
 export type SignInVerifyProps = WithChildrenProp<{ preferred?: ClerkSignInStrategy }>;
 
 export const SignInFirstFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInFirstFactorCtx');
-export const SignInSecondFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInSecondFactorCtx');
+export const SignInSecondFactorCtx = createContextFromActorRef<TSignInSecondFactorMachine>('SignInSecondFactorCtx');
 
 const strategiesSelector = (state: SnapshotFrom<TSignInFirstFactorMachine>) => state.context.currentFactor?.strategy;
 
@@ -44,14 +49,17 @@ export function SignInVerification({ children, name }: SignInVerificationProps) 
 
 export function SignInVerifications(props: SignInVerifyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
+  const { activeTags: activeRoutes } = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
 
-  return activeState ? (
-    <>
-      <SignInFirstFactor {...props} />
-      <SignInSecondFactor {...props} />
-    </>
-  ) : null;
+  if (activeRoutes.has('route:first-factor')) {
+    return <SignInFirstFactorInner {...props} />;
+  }
+
+  if (activeRoutes.has('route:second-factor')) {
+    return <SignInSecondFactorInner {...props} />;
+  }
+
+  return null;
 }
 
 export function SignInFirstFactor(props: SignInVerifyProps) {
@@ -86,7 +94,7 @@ export function SignInFirstFactorInner(props: SignInVerifyProps) {
 }
 
 export function SignInSecondFactorInner(props: SignInVerifyProps) {
-  const ref = useSignInRouteRegistration('secondFactor', SignInFirstFactorMachine);
+  const ref = useSignInRouteRegistration('secondFactor', SignInSecondFactorMachine);
 
   if (!ref) {
     return null;
