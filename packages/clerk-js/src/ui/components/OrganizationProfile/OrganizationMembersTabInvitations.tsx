@@ -1,13 +1,14 @@
 import { Protect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, Flex, localizationKeys, Text } from '../../customizables';
-import { Header, ProfileSection } from '../../elements';
+import { Header, ProfileSection, withCardStateProvider } from '../../elements';
 import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
+import { MembersActionsRow } from './MembersActions';
 import { MembershipWidget } from './MembershipWidget';
 
-export const OrganizationMembersTabInvitations = () => {
+export const OrganizationMembersTabInvitations = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   //@ts-expect-error
   const { __unstable_manageBillingUrl, navigateToGeneralPageRoot } = useOrganizationProfileContext();
@@ -30,6 +31,8 @@ export const OrganizationMembersTabInvitations = () => {
               width: '100%',
               gap: t.space.$8,
               paddingBottom: t.space.$4,
+              paddingLeft: t.space.$1,
+              paddingRight: t.space.$1,
               borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
               [mqu.md]: {
                 flexDirection: 'column',
@@ -83,32 +86,14 @@ export const OrganizationMembersTabInvitations = () => {
 
       <Flex
         direction='col'
-        gap={4}
+        gap={2}
         sx={{
           width: '100%',
         }}
       >
-        <Flex
-          justify={'between'}
-          align={'center'}
-        >
-          <Header.Root>
-            <Header.Title
-              localizationKey={localizationKeys(
-                'organizationProfile.membersPage.invitationsTab.manualInvitations.headerTitle',
-              )}
-              textVariant='h3'
-            />
-            <Header.Subtitle
-              localizationKey={localizationKeys(
-                'organizationProfile.membersPage.invitationsTab.manualInvitations.headerSubtitle',
-              )}
-              variant='body'
-            />
-          </Header.Root>
-        </Flex>
+        <MembersActionsRow />
         <InvitedMembersList />
       </Flex>
     </Col>
   );
-};
+});

@@ -142,10 +142,6 @@ export const bgBG: LocalizationResource = {
           headerTitle: 'Автоматични покани',
           primaryButton: 'Управление на верифицираните домейни',
         },
-        manualInvitations: {
-          headerSubtitle: 'Ръчно поканете членове и управлявайте съществуващи покани.',
-          headerTitle: 'Индивидуални покани',
-        },
         table__emptyRow: 'Няма покани за показване',
       },
       invitedMembersTab: {
@@ -161,11 +157,6 @@ export const bgBG: LocalizationResource = {
         },
         menuAction__approve: 'Одобрение',
         menuAction__reject: 'Отхвърляне',
-        requests: {
-          headerSubtitle:
-            'Преглеждайте и управлявайте потребители, които са заявили да се присъединят към организацията.',
-          headerTitle: 'Заявки',
-        },
         tableHeader__requested: 'Заявен достъп',
         table__emptyRow: 'Няма заявки за показване',
       },

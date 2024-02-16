@@ -141,10 +141,6 @@ export const arSA: LocalizationResource = {
           headerTitle: 'الدعوات التلقائية',
           primaryButton: 'أدارة النطاقات الموثوقة',
         },
-        manualInvitations: {
-          headerSubtitle: 'دعوة الأعضاء يدويًا وإدارة الدعوات الموجودة.',
-          headerTitle: 'الدعوات الفردية',
-        },
         table__emptyRow: 'لا دعوات للعرض',
       },
       invitedMembersTab: {
@@ -160,10 +156,6 @@ export const arSA: LocalizationResource = {
         },
         menuAction__approve: 'قبول',
         menuAction__reject: 'رفض',
-        requests: {
-          headerSubtitle: 'تصفٌح وإدارة المستخدمين الذين طلبوا الانضمام إلى المنظمة.',
-          headerTitle: 'الطلبات',
-        },
         tableHeader__requested: 'طلب الأنضمام',
         table__emptyRow: 'لا توجد طلبات للعرض',
       },

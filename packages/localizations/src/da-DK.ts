@@ -142,10 +142,6 @@ export const daDK: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -161,10 +157,6 @@ export const daDK: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },

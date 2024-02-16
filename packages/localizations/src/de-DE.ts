@@ -145,10 +145,6 @@ export const deDE: LocalizationResource = {
           headerTitle: 'Automatische Einladungen',
           primaryButton: 'Verwalten Sie verifizierte Domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Laden Sie manuell Mitglieder ein und verwalten Sie existierende Einladungen.',
-          headerTitle: 'Individuelle Einladungen',
-        },
         table__emptyRow: 'Keine Einladungen verfügbar',
       },
       invitedMembersTab: {
@@ -164,11 +160,6 @@ export const deDE: LocalizationResource = {
         },
         menuAction__approve: 'Bestätigen',
         menuAction__reject: 'Ablehnen',
-        requests: {
-          headerSubtitle:
-            'Durchsuchen und Verwalten von Benutzern, die eine Mitgliedschaft in der Organisation beantragt haben.',
-          headerTitle: 'Anfragen',
-        },
         tableHeader__requested: 'Angefragte Zugänge',
         table__emptyRow: 'Keine Anfragen verfügbar',
       },
