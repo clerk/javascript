@@ -6,6 +6,7 @@ import { Card, Header, useCardState, withCardStateProvider } from '../../element
 import { ConnectedAccountsSection } from './ConnectedAccountsSection';
 import { EmailsSection } from './EmailsSection';
 import { EnterpriseAccountsSection } from './EnterpriseAccountsSection';
+import { PasskeysSection } from './PasskeysSection';
 import { PhoneSection } from './PhoneSection';
 import { UsernameSection } from './UsernameSection';
 import { UserProfileSection } from './UserProfileSection';
@@ -21,7 +22,7 @@ export const AccountPage = withCardStateProvider(() => {
   const showConnectedAccounts = social && Object.values(social).filter(p => p.enabled).length > 0;
   const showSamlAccounts = saml && saml.enabled && user && user.samlAccounts.length > 0;
   const showWeb3 = attributes.web3_wallet.enabled;
-
+  const showPasskeys = true;
   return (
     <Col
       elementDescriptor={descriptors.page}
@@ -43,6 +44,7 @@ export const AccountPage = withCardStateProvider(() => {
 
         <UserProfileSection />
         {showUsername && <UsernameSection />}
+        {showPasskeys && <PasskeysSection />}
         {showEmail && <EmailsSection />}
         {showPhone && <PhoneSection />}
         {showConnectedAccounts && <ConnectedAccountsSection />}

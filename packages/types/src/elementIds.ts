@@ -30,6 +30,7 @@ export type ProfileSectionId =
   | 'web3Wallets'
   | 'password'
   | 'mfa'
+  | 'passkeys'
   | 'danger'
   | 'activeDevices'
   | 'organizationProfile'
