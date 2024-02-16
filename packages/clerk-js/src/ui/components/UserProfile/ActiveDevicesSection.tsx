@@ -28,7 +28,7 @@ export const ActiveDevicesSection = () => {
         {isLoading ? (
           <FullHeightLoader />
         ) : (
-          sessions?.sort(currentSessionFirst(session.id)).map(sa => (
+          sessions?.sort(currentSessionFirst(session!.id)).map(sa => (
             <DeviceItem
               key={sa.id}
               session={sa}
