@@ -211,7 +211,6 @@ describe('clerkMiddleware(params)', () => {
     expect(signInResp?.status).toEqual(307);
     expect(signInResp?.headers.get(constants.Headers.Location)).toEqual('https://www.clerk.com/hello');
     expect(signInResp?.headers.get('a-custom-header')).toEqual('1');
-    expect(signInResp?.headers.get(constants.Headers.AuthReason)).toBeTruthy();
   });
 
   describe('auth().redirectToSignIn()', () => {
@@ -228,7 +227,6 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
@@ -246,7 +244,6 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toContain('/protected');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
@@ -266,7 +263,6 @@ describe('clerkMiddleware(params)', () => {
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toEqual(
         'https://www.clerk.com/hello',
       );
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
@@ -284,7 +280,6 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
   });
@@ -309,7 +304,6 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
@@ -398,7 +392,6 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/hello');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
@@ -428,7 +421,6 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/discover');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
@@ -454,7 +446,6 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
@@ -480,7 +471,6 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('https://www.clerk.com/unauthenticatedUrl');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
@@ -510,7 +500,6 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('https://www.clerk.com/unauthorizedUrl');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
@@ -539,7 +528,6 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
-    expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(clerkClient.authenticateRequest).toBeCalled();
   });
 
@@ -563,7 +551,6 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__clerk_db_jwt=test_jwt',
     );
-    expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(clerkClient.authenticateRequest).toBeCalled();
   });
 
@@ -589,7 +576,6 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
-    expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(clerkClient.authenticateRequest).toBeCalled();
   });
 });

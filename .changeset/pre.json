@@ -1,6 +1,6 @@
 {
   "mode": "pre",
-  "tag": "beta-v5",
+  "tag": "beta",
   "initialVersions": {
     "@clerk/backend": "0.31.3",
     "@clerk/chrome-extension": "0.4.10",

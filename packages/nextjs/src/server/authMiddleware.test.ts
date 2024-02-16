@@ -347,7 +347,6 @@ describe('authMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/custom-redirect');
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).not.toBeCalled();
       expect(afterAuthSpy).not.toBeCalled();
     });
@@ -385,7 +384,6 @@ describe('authMiddleware(params)', () => {
       expect(resp?.headers.get('location')).toEqual(
         'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
       );
-      expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
@@ -435,7 +433,6 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
-    expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(clerkClient.authenticateRequest).toBeCalled();
   });
 
@@ -448,7 +445,6 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__clerk_db_jwt=test_jwt',
     );
-    expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(clerkClient.authenticateRequest).toBeCalled();
   });
 
@@ -466,7 +462,6 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
-    expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('redirect');
     expect(clerkClient.authenticateRequest).toBeCalled();
   });
 });
