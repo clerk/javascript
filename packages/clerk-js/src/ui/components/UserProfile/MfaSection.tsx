@@ -45,7 +45,13 @@ export const MfaSection = () => {
         <ProfileSection.ItemList id='mfa'>
           {showTOTP && (
             <Action.Root>
-              <ProfileSection.Item id='mfa'>
+              <ProfileSection.Item
+                id='mfa'
+                sx={t => ({
+                  borderRadius: t.radii.$lg,
+                  ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
+                })}
+              >
                 <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                   <Icon
                     icon={AuthApp}
@@ -73,7 +79,13 @@ export const MfaSection = () => {
               const isDefault = !showTOTP && phone.defaultSecondFactor;
               return (
                 <Action.Root key={phone.id}>
-                  <ProfileSection.Item id='mfa'>
+                  <ProfileSection.Item
+                    id='mfa'
+                    sx={t => ({
+                      borderRadius: t.radii.$lg,
+                      ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
+                    })}
+                  >
                     <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                       <Icon
                         icon={Mobile}
@@ -102,7 +114,13 @@ export const MfaSection = () => {
 
           {showBackupCode && (
             <Action.Root>
-              <ProfileSection.Item id='mfa'>
+              <ProfileSection.Item
+                id='mfa'
+                sx={t => ({
+                  borderRadius: t.radii.$lg,
+                  ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
+                })}
+              >
                 <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                   <Icon
                     icon={DotCircle}
