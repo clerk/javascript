@@ -145,7 +145,14 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         }}
       >
         <Text
-          sx={{ position: 'absolute', left: '1ch', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+          sx={t => ({
+            position: 'absolute',
+            left: '1ch',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+            opacity: props.isDisabled ? t.opacity.$disabled : 1,
+          })}
         >
           +{selectedCountryOption.country.code}
         </Text>
