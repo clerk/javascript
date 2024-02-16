@@ -12,6 +12,7 @@ import {
 const version = 'v5';
 const name = 'gatsby';
 const properName = 'Gatsby';
+const packageName = 'gatsby-plugin-clerk';
 const cwd = `${version}/${name}`;
 
 async function generate() {
@@ -22,9 +23,9 @@ async function generate() {
       title: `Upgrading ${properName} from v4 to v5`,
       description: `Learn how to upgrade Clerk's ${properName} SDK from v4 to v5.`,
     }),
-    '# Upgrading `gatsby-plugin-clerk` from v4 to v5',
+    `# Upgrading \`${packageName}\` from v4 to v5`,
     markdown('intro'),
-    markdown('prepare'),
+    markdownTemplate('prepare', { version, packageName }),
     markdown('node-version'),
     markdown('react-version'),
     markdownTemplate('update-version', { packageName: 'gatsby-plugin-clerk' }),
@@ -33,7 +34,7 @@ async function generate() {
     markdown('redesign-preview'),
     markdown('after-sign-x-handling'),
     markdown('orgs-claim'),
-    markdown('path-routing'),
+    markdownTemplate('path-routing', { packageName }),
     markdown('image-url'),
     accordionForCategory('image-url'),
     deprecationRemovalsAndHousekeeping(),

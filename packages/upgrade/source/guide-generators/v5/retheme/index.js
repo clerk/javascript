@@ -1,9 +1,16 @@
-import { accordionForCategory, assembleContent, frontmatter, markdown, writeToFile } from '../../text-generation.js';
+import {
+  accordionForCategory,
+  assembleContent,
+  frontmatter,
+  loadVersionChangeData,
+  markdown,
+  writeToFile,
+} from '../../text-generation.js';
 
 const cwd = 'v5/retheme';
 
 async function generate() {
-  const data = (await import(`../../../versions/v5/index.js`)).default.nextjs;
+  const data = await loadVersionChangeData('v5', 'nextjs');
 
   const defaultsChangeItem = {
     title: 'Changes to default variables',

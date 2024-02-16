@@ -34,7 +34,7 @@ async function generate() {
     markdown('redesign-preview'),
     markdown('after-sign-x-handling'),
     markdown('orgs-claim'),
-    markdown('path-routing', { packageName }),
+    markdownTemplate('path-routing', { packageName }),
     markdown('image-url'),
     accordionForCategory('image-url'),
     deprecationRemovalsAndHousekeeping(['hof-removal', 'pagination-return', 'pagination-args', 'error-imports']),

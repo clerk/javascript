@@ -87,7 +87,7 @@ export const deprecationRemovalsAndHousekeeping = partial((includeCategories, op
   }
 
   if (hasOtherChanges) {
-    content.push('#### Other Breaking Changes');
+    content.push('#### Other Breaking changes');
     content.push(accordionForCategory([undefined, ...includeCategories]));
   }
 
