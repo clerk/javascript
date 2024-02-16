@@ -13,7 +13,7 @@ import type {
   SignUpRouterSchema,
 } from '~/internals/machines/sign-up/types';
 import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
-import { shouldUseVirutalRouting } from '~/internals/machines/utils/next';
+import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 const isCurrentPath =
   (path: `/${string}`) =>
@@ -36,7 +36,7 @@ export const SignUpRouterMachine = setup({
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
-      if (!force && shouldUseVirutalRouting()) return;
+      if (!force && shouldUseVirtualRouting()) return;
 
       const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;

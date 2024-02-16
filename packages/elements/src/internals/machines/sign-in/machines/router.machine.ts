@@ -12,7 +12,7 @@ import type {
   SignInRouterSchema,
 } from '~/internals/machines/sign-in/types';
 import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
-import { shouldUseVirutalRouting } from '~/internals/machines/utils/next';
+import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
@@ -36,7 +36,7 @@ export const SignInRouterMachine = setup({
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
-      if (!force && shouldUseVirutalRouting()) return;
+      if (!force && shouldUseVirtualRouting()) return;
 
       const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;
