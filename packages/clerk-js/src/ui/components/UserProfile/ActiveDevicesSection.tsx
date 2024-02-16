@@ -21,11 +21,14 @@ export const ActiveDevicesSection = () => {
       centered={false}
       id='activeDevices'
     >
-      <ProfileSection.ItemList id='activeDevices'>
+      <ProfileSection.ItemList
+        id='activeDevices'
+        disableAnimation
+      >
         {isLoading ? (
           <FullHeightLoader />
         ) : (
-          sessions?.sort(currentSessionFirst(session!.id)).map(sa => (
+          sessions?.sort(currentSessionFirst(session.id)).map(sa => (
             <DeviceItem
               key={sa.id}
               session={sa}

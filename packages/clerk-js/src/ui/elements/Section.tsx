@@ -93,13 +93,19 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
   );
 };
 
-type ProfileSectionItemListProps = PropsOfComponent<typeof Col> & { id: ProfileSectionId };
+type ProfileSectionItemListProps = PropsOfComponent<typeof Col> & {
+  id: ProfileSectionId;
+  disableAnimation?: boolean;
+};
 
 const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
-  const { children, id, ...rest } = props;
+  const { children, id, disableAnimation = false, ...rest } = props;
 
   return (
-    <Animated asChild>
+    <Animated
+      asChild
+      disableAnimation={disableAnimation}
+    >
       <Col
         elementDescriptor={descriptors.profileSectionItemList}
         elementId={descriptors.profileSectionItemList.setId(id)}
