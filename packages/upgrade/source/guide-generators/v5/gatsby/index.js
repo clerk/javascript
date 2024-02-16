@@ -27,7 +27,7 @@ async function generate() {
     markdown('prepare'),
     markdown('node-version'),
     markdown('react-version'),
-    markdownTemplate('update-v5', { packageName: 'gatsby-plugin-clerk' }),
+    markdownTemplate('update-version', { packageName: 'gatsby-plugin-clerk' }),
     markdown('cli'),
     '## Breaking Changes',
     markdown('redesign-preview'),

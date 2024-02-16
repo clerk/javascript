@@ -21,22 +21,22 @@ async function generate() {
 
   return assembleContent({ data, cwd }, [
     frontmatter({
-      title: `Upgrading ${properName} from v4 to v5`,
-      description: `Learn how to upgrade Clerk's ${properName} SDK from v4 to v5.`,
+      title: `Upgrading ${properName} to Core 2`,
+      description: `Learn how to upgrade Clerk's ${properName} SDK to the lastest version.`,
     }),
-    `# Upgrading \`${packageName}\` from v4 to v5`,
+    `# Upgrading \`${packageName}\` to Core 2`,
     markdown('intro'),
-    markdown('prepare'),
+    markdownTemplate('prepare', { version, packageName }),
     markdown('node-version'),
-    markdownTemplate('update-v5', { packageName }),
+    markdownTemplate('update-version', { packageName }),
     markdown('cli'),
     '## Breaking Changes',
     singleItem('cjs-esm-instance'),
     markdown('node-setters-removals'),
     markdown('orgs-claim'),
     markdown('image-url'),
-    accordionForCategory('image-url', {}),
-    deprecationRemovalsAndHousekeeping(),
+    accordionForCategory('image-url'),
+    deprecationRemovalsAndHousekeeping(['pagination-return', 'pagination-args', 'error-imports']),
   ]);
 }
 

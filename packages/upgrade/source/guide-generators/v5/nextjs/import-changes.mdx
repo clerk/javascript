@@ -2,7 +2,9 @@
 
 As part of this release, some of the top-level exports of `@clerk/nextjs` have been changed in order to improve bundle size and tree-shaking efficiency. These changes have resulted in a ~75% reduction in build size for middleware bundles. However, you will likely need to make some changes to import paths as a result.
 
-<Callout type='info'>Use the CLI tool, `npx @clerk/upgrade`, to automatically find occurences of old imports.</Callout>
+<Callout type='info'>
+  Use [the CLI tool](#cli-upgrade-helper) to automatically find occurences of imports that need to be changed.
+</Callout>
 
 <Accordion titles={["@clerk/nextjs/server", "@clerk/nextjs/errors", "@clerk/nextjs/app-beta", "@clerk/nextjs/ssr", "@clerk/nextjs/edge-middleware", "@clerk/nextjs/edge-middlewarefiles", "@clerk/nextjs/api"]} heading="h4">
   <AccordionPanel>

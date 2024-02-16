@@ -1,5 +1,5 @@
 ---
-title: '`generatedSignature` -> `signature` as param of Signup.attemptWeb3WalletVerification()'
+title: '`generatedSignature` -> `signature` as param of `Signup.attemptWeb3WalletVerification`'
 matcher: "attemptWeb3WalletVerification\\([\\s\\S]*?generatedSignature:[\\s\\S]*?\\)"
 category: 'deprecation-removal'
 matcherFlags: 'm'

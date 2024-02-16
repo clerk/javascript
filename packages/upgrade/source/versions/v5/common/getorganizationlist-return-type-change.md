@@ -1,5 +1,5 @@
 ---
-title: '`Organization.getOrganizationList()` return type changed'
+title: '`Organization.getOrganizationList` return type changed'
 matcher: "\\.getOrganizationList\\("
 category: 'pagination-return'
 ---

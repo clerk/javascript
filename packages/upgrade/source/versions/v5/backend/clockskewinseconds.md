@@ -5,6 +5,7 @@ matcher:
   - "verifyToken\\([\\s\\S]*?(clockSkewInSeconds):[\\s\\S]*?\\)"
   - "authenticateRequest\\([\\s\\S]*?(clockSkewInSeconds):[\\s\\S]*?\\)"
 matcherFlags: 'm'
+category: 'skip'
 replaceWithString: 'clockSkewInMs'
 ---
 

@@ -20,14 +20,14 @@ async function generate() {
 
   return assembleContent({ data, cwd }, [
     frontmatter({
-      title: `Upgrading ${properName} from v4 to v5`,
-      description: `Learn how to upgrade Clerk's ${properName} SDK from v4 to v5.`,
+      title: `Upgrading ${properName} to Core 2`,
+      description: `Learn how to upgrade Clerk's ${properName} SDK to the latest version.`,
     }),
-    `# Upgrading \`${packageName}\` from v4 to v5`,
+    `# Upgrading \`${packageName}\` to Core 2`,
     markdown('intro'),
-    markdown('prepare'),
+    markdownTemplate('prepare', { version: 'v1', packageName }),
     markdown('node-version'),
-    markdownTemplate('update-v5', { packageName }),
+    markdownTemplate('update-version', { packageName }),
     markdown('cli'),
     '## Breaking Changes',
     markdown('orgs-claim'),

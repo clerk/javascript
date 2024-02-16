@@ -2,6 +2,7 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+node $SCRIPT_DIR/overview/index.js
 node $SCRIPT_DIR/backend/index.js
 node $SCRIPT_DIR/chromeExtension/index.js
 node $SCRIPT_DIR/expo/index.js

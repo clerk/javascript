@@ -27,25 +27,31 @@ If you don't define the `path` prop an error will be thrown. Of course, you can 
 <OrganizationProfile routing="virtual" />
 ```
 
-However, there are two exceptions to this behavior. If you're using `@clerk/nextjs` or `@clerk/remix`, you can set environment variables for `<SignIn />` and `<SignUp />`.
+<% if (['@clerk/nextjs', '@clerk/remix'].includes(packageName)) { %>
+For the <%= packageName %> SDK, you can set environment variables for the sign up/in URLs and avoid needing to explicitly pass the path to the `<SignIn />` and `<SignUp />` components.
 
-<CodeBlockTabs options={["Next.js", "Remix"]}>
+<% if (packageName === '@clerk/nextjs') { %>
+
 ```env filename=".env.local"
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 ```
+
+<% } %>
+<% if (packageName === '@clerk/remix') { %>
 
 ```env filename=".env"
 CLERK_SIGN_IN_URL=/sign-in
 CLERK_SIGN_UP_URL=/sign-up
 ```
 
-</CodeBlockTabs>
+<% } %>
 
-**Only** if you're using one of these two frameworks and defined both environment variables, you're able to use the `<SignIn />` and `<SignUp />` components without any props.
+If you have defined both environment variables, you're able to use the `<SignIn />` and `<SignUp />` components without any props, as such:
 
 ```jsx
-// Only works for Next.js / Remix when environment variables are set
 <SignIn />
 <SignUp />
 ```
+
+<% } %>

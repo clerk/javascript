@@ -21,6 +21,7 @@ const changesAffectingAll = [
   'getorganizationlist-return-type-change',
   'organization-logourl',
   'user-profileimageurl',
+  'user-update-password',
 ];
 
 const reactChangesList = [
@@ -258,6 +259,7 @@ export default {
       'legacyauthobject-removed',
       'clerk-import-change',
       'organizationmembershippublicuserdata-profileimageurl',
+      'externalaccount-picture',
     ]),
   ),
   react: load('react', dedupeMerge(changesAffectingAll, reactChangesList)),
@@ -272,7 +274,6 @@ export default {
       'external-account-avatarurl',
       'user-orgpublicdata-profileimageurl',
       'setsession', // shared with all?
-      'user-update-password', // shared w/ all
       'experimental-canusecaptcha',
       'experimental-captchaurl',
       'experimental-captchasitekey',

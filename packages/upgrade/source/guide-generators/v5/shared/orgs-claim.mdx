@@ -1,6 +1,6 @@
 ### Removed: `orgs` claim on JWT
 
-In v4 of Clerk's SDKs, if you decode the session token that Clerk returns from the server, you'll currently find an `orgs` claim on it. It lists all the orgs associated with the given user. In v5 Clerk returns the `org_id`, `org_slug`, and `org_role` of the **active** organization.
+In the previous version of Clerk's SDKs, if you decode the session token that Clerk returns from the server, you'll currently find an `orgs` claim on it. It lists all the orgs associated with the given user. Now, Clerk returns the `org_id`, `org_slug`, and `org_role` of the **active** organization.
 
 The `orgs` claim was part of the `JwtPayload`. Here are a few examples of where the `JwtPayload` could be found.
 

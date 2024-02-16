@@ -59,7 +59,7 @@ ${item.content.trim()}`;
 // Typically used to present a set of related changes or a longer list of changes
 // that are de-emphasized as they are unlikely to be present for most users.
 export const accordionForCategory = partial((categories, options, { data }) => {
-  const items = data.filter(i => [].concat(categories).includes(i.category));
+  const items = filterCategories(data, categories);
   options ||= {};
 
   if (options.additionalItems) items.push(...[].concat(options.additionalItems));
@@ -76,22 +76,32 @@ ${items.map(i => `  <AccordionPanel>${indent('\n' + i.content.trim(), 4)}\n  </A
 export const deprecationRemovalsAndHousekeeping = partial((includeCategories, opts) => {
   includeCategories ||= [];
 
-  return assembleContent(opts, [
-    '## Deprecation removals & housekeeping',
-    markdown('deprecation-removals'),
+  const hasDeprecations = filterCategories(opts.data, 'deprecation-removal').length;
+  const hasOtherChanges = filterCategories(opts.data, [undefined, ...includeCategories]).length;
 
-    '### Deprecation removals',
-    accordionForCategory('deprecation-removal'),
+  const content = ['### Deprecation removals & housekeeping', markdown('deprecation-removals')];
 
-    '### Other Breaking Changes',
-    accordionForCategory([undefined, ...includeCategories]),
-  ]);
+  if (hasDeprecations) {
+    content.push('#### Deprecation removals');
+    content.push(accordionForCategory('deprecation-removal'));
+  }
+
+  if (hasOtherChanges) {
+    content.push('#### Other Breaking Changes');
+    content.push(accordionForCategory([undefined, ...includeCategories]));
+  }
+
+  return assembleContent(opts, content);
 });
 
 // writes output to an mdx file
 export const writeToFile = partial((cwd, content) => {
   writeFileSync(path.join(__dirname, cwd, '__output.mdx'), content);
 });
+
+function filterCategories(data, categories) {
+  return data.filter(i => [].concat(categories).includes(i.category));
+}
 
 // Small internal utility to ensure proper indentation within the resulting markup.
 function indent(str, numSpaces) {

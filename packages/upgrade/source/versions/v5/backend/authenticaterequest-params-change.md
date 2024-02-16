@@ -1,6 +1,7 @@
 ---
 title: '`request` separated from `options` as params to `authenticateRequest`'
 warning: true
+category: 'skip'
 matcher: "authenticateRequest\\("
 ---
 
