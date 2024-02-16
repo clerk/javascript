@@ -101,23 +101,22 @@ type ProfileSectionItemListProps = PropsOfComponent<typeof Col> & {
 const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
   const { children, id, disableAnimation = false, ...rest } = props;
 
-  return (
-    <Animated
-      asChild
-      disableAnimation={disableAnimation}
+  const componentBody = (
+    <Col
+      elementDescriptor={descriptors.profileSectionItemList}
+      elementId={descriptors.profileSectionItemList.setId(id)}
+      sx={t => ({
+        gap: t.space.$0x5,
+      })}
+      {...rest}
     >
-      <Col
-        elementDescriptor={descriptors.profileSectionItemList}
-        elementId={descriptors.profileSectionItemList.setId(id)}
-        sx={t => ({
-          gap: t.space.$0x5,
-        })}
-        {...rest}
-      >
-        {children}
-      </Col>
-    </Animated>
+      {children}
+    </Col>
   );
+
+  if (disableAnimation) return componentBody;
+
+  return <Animated asChild>{componentBody}</Animated>;
 };
 
 type ProfileSectionItemProps = Omit<PropsOfComponent<typeof Flex>, 'id'> & {
