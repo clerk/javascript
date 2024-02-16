@@ -50,10 +50,7 @@ export const EmailsSection = () => {
             <Action.Root key={email.emailAddress}>
               <ProfileSection.Item
                 id='emailAddresses'
-                sx={t => ({
-                  borderRadius: t.radii.$lg,
-                  ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-                })}
+                hoverable
               >
                 <Flex
                   as='span'

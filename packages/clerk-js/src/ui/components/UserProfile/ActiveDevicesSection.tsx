@@ -25,7 +25,7 @@ export const ActiveDevicesSection = () => {
         {isLoading ? (
           <FullHeightLoader />
         ) : (
-          sessions?.sort(currentSessionFirst(session!.id)).map(sa => (
+          sessions?.sort(currentSessionFirst(session.id)).map(sa => (
             <DeviceItem
               key={sa.id}
               session={sa}
@@ -53,12 +53,10 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       id='activeDevices'
       elementDescriptor={descriptors.activeDeviceListItem}
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
-      sx={t => ({
+      hoverable
+      sx={{
         alignItems: 'flex-start',
-        padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
-        borderRadius: t.radii.$lg,
-        ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-      })}
+      }}
     >
       {status.isLoading && <FullHeightLoader />}
       {!status.isLoading && (

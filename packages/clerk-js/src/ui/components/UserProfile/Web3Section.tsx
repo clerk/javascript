@@ -45,10 +45,7 @@ export const Web3Section = withCardStateProvider(() => {
                       key={wallet.id}
                       id='web3Wallets'
                       align='start'
-                      sx={t => ({
-                        borderRadius: t.radii.$lg,
-                        ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-                      })}
+                      hoverable
                     >
                       <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
                         {strategyToDisplayData[strategy].iconUrl && (

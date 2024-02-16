@@ -51,10 +51,7 @@ export const PhoneSection = () => {
               <Action.Closed value=''>
                 <ProfileSection.Item
                   id='phoneNumbers'
-                  sx={t => ({
-                    borderRadius: t.radii.$lg,
-                    ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-                  })}
+                  hoverable
                 >
                   <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex

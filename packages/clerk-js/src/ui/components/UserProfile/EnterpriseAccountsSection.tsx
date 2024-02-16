@@ -14,13 +14,7 @@ export const EnterpriseAccountsSection = () => {
       id='enterpriseAccounts'
       centered={false}
     >
-      <ProfileSection.ItemList
-        id='enterpriseAccounts'
-        sx={t => ({
-          borderRadius: t.radii.$lg,
-          ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-        })}
-      >
+      <ProfileSection.ItemList id='enterpriseAccounts'>
         {user?.samlAccounts.map(account => {
           const label = account.emailAddress;
           const providerName = getSamlProviderName(account.provider);
@@ -34,6 +28,7 @@ export const EnterpriseAccountsSection = () => {
                 gap: t.space.$2,
                 justifyContent: 'start',
               })}
+              hoverable
               key={account.id}
             >
               <Image

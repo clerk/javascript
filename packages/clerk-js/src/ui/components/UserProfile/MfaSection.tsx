@@ -47,10 +47,7 @@ export const MfaSection = () => {
             <Action.Root>
               <ProfileSection.Item
                 id='mfa'
-                sx={t => ({
-                  borderRadius: t.radii.$lg,
-                  ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-                })}
+                hoverable
               >
                 <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
                   <Icon

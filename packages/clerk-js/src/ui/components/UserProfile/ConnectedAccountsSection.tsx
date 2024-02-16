@@ -63,10 +63,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
               <Action.Root key={account.id}>
                 <ProfileSection.Item
                   id='connectedAccounts'
-                  sx={t => ({
-                    borderRadius: t.radii.$lg,
-                    ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-                  })}
+                  hoverable
                 >
                   <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
                     <Image
