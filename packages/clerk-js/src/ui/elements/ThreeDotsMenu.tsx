@@ -23,11 +23,8 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
     <Menu elementId={elementId}>
       <MenuTrigger>
         <Button
-          size='sm'
           sx={t => ({
-            width: t.sizes.$6,
-            height: t.sizes.$6,
-            padding: 0,
+            padding: t.space.$0x25,
             opacity: t.opacity.$inactive,
             ':hover': {
               opacity: 1,
@@ -38,7 +35,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
         >
           <Icon
             icon={ThreeDots}
-            sx={t => ({ width: 'auto', height: t.sizes.$5 })}
+            sx={t => ({ width: 'auto', height: t.sizes.$4 })}
           />
         </Button>
       </MenuTrigger>
