@@ -114,10 +114,13 @@ const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
   );
 };
 
-type ProfileSectionItemProps = Omit<PropsOfComponent<typeof Flex>, 'id'> & { id: ProfileSectionId };
+type ProfileSectionItemProps = Omit<PropsOfComponent<typeof Flex>, 'id'> & {
+  id: ProfileSectionId;
+  hoverable?: boolean;
+};
 
 const ProfileSectionItem = (props: ProfileSectionItemProps) => {
-  const { children, id, sx, ...rest } = props;
+  const { children, id, sx, hoverable, ...rest } = props;
 
   return (
     <Flex
@@ -128,8 +131,13 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$4}`,
+          padding: `${t.space.$2} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
           gap: t.space.$2,
+          ...(hoverable && {
+            padding: `${t.space.$1} ${t.space.$1} ${t.space.$1} ${t.space.$2x5}`,
+            borderRadius: t.radii.$lg,
+            ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
+          }),
         }),
         sx,
       ]}

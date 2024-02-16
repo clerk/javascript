@@ -111,7 +111,10 @@ export const DomainList = withProtect(
         {domainList.map(domain => {
           return (
             <Action.Root key={domain.id}>
-              <ProfileSection.Item id='organizationDomains'>
+              <ProfileSection.Item
+                id='organizationDomains'
+                hoverable
+              >
                 <Flex sx={t => ({ gap: t.space.$1 })}>
                   <Text>{domain.name}</Text>
                   <EnrollmentBadge organizationDomain={domain} />

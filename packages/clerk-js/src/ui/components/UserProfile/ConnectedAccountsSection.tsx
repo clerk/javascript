@@ -61,7 +61,10 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
 
             return (
               <Action.Root key={account.id}>
-                <ProfileSection.Item id='connectedAccounts'>
+                <ProfileSection.Item
+                  id='connectedAccounts'
+                  hoverable
+                >
                   <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
                     <Image
                       elementDescriptor={[descriptors.providerIcon]}

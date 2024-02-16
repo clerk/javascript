@@ -53,12 +53,10 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       id='activeDevices'
       elementDescriptor={descriptors.activeDeviceListItem}
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
-      sx={t => ({
+      hoverable
+      sx={{
         alignItems: 'flex-start',
-        padding: `${t.space.$1x5} ${t.space.$1x5} ${t.space.$1x5} ${t.space.$3}`,
-        borderRadius: t.radii.$lg,
-        ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-      })}
+      }}
     >
       {status.isLoading && <FullHeightLoader />}
       {!status.isLoading && (
