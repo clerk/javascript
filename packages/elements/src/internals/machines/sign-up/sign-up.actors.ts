@@ -2,15 +2,14 @@ import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptVerificationParams,
   PrepareVerificationParams,
-  SignUpCreateParams,
   SignUpResource,
-  SignUpUpdateParams,
   SignUpVerificationsResource,
 } from '@clerk/types';
 import { fromCallback, fromPromise } from 'xstate';
 
 import { ClerkElementsError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
+import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
 
 import type { WithClerk, WithClient, WithParams } from '../shared.types';
 
@@ -69,37 +68,6 @@ export const attemptVerification = fromPromise<SignUpResource, AttemptVerificati
 );
 
 // ================= Start / Continue ================= //
-
-export const SignUpAdditionalKeys = [
-  'firstName',
-  'lastName',
-  'emailAddress',
-  'username',
-  'password',
-  'phoneNumber',
-] as const;
-
-export type SignUpAdditionalKeys = (typeof SignUpAdditionalKeys)[number];
-
-const updateSignUpKeys = new Set<SignUpAdditionalKeys>(SignUpAdditionalKeys);
-
-function isSignUpParam<T extends SignUpAdditionalKeys>(key: string): key is T {
-  return updateSignUpKeys.has(key as T);
-}
-
-function fieldsToSignUpParams<T extends SignUpCreateParams | SignUpUpdateParams>(
-  fields: FormFields,
-): Pick<T, SignUpAdditionalKeys> {
-  const params: SignUpUpdateParams = {};
-
-  fields.forEach(({ value }, key) => {
-    if (isSignUpParam(key) && value !== undefined) {
-      params[key] = value as string;
-    }
-  });
-
-  return params;
-}
 
 export type CreateSignUpInput = WithClerk<{ fields: FormFields }>;
 export type UpdateSignUpInput = WithClerk<{ fields: FormFields }>;
