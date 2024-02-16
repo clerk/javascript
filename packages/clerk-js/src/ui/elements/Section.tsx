@@ -252,7 +252,7 @@ type ProfileSectionActionMenuProps = {
   destructive?: boolean;
   triggerLocalizationKey?: LocalizationKey;
   triggerSx?: ThemableCssProp;
-  id?: ProfileSectionId;
+  id: ProfileSectionId;
 };
 
 export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) => {
@@ -266,9 +266,7 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
       <Menu elementId={id}>
         <MenuTrigger>
           <ProfileSectionArrowButton
-            id='connectedAccounts'
-            elementDescriptor={descriptors.profileSectionPrimaryButton}
-            elementId={descriptors.profileSectionPrimaryButton.setId(id)}
+            id={id}
             textLocalizationKey={triggerLocalizationKey}
             sx={[
               t => ({
