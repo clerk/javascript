@@ -1,3 +1,4 @@
+import { joinURL } from '@clerk/shared';
 import type { SignUpStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
@@ -37,7 +38,7 @@ export const SignUpRouterMachine = setup({
       if (!context.router) return;
       if (!force && shouldUseVirutalRouting()) return;
 
-      const resolvedPath = [context.router.basePath, path].join('/').replace(/\/\/g/, '/');
+      const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;
 
       context.router.push(resolvedPath);
