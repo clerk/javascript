@@ -19,6 +19,7 @@ const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof
           zIndex: t.zIndices.$modal,
           borderRadius: t.radii.$xl,
           animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$fast}`,
+          outline: 'none',
         })}
       >
         {props.children}
