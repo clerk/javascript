@@ -26,12 +26,13 @@ export type UseActiveTagsReturn<TTag> = UseActiveTagsSingleReturn | UseActiveTag
  *
  * useActiveTags(ref, 'external');
  * useActiveTags(ref, ['external', 'email_code']);
+ * useActiveTags(ref, ['external', 'email_code'], 'all');
  *
  * @param actor {ActorRef} Machine actor reference
- * @param tag {string | string[]} The tag(s) to check
- * @param mode {ActiveTagsMode} Whether to match all tags or any tag
+ * @param tag {(string | string[])} The tag(s) to check
+ * @param mode {UseActiveTagsMode} Whether to match all tags or any tag
  *
- * @returns {boolean} | {UseActiveTagsMultiReturn<TTag>} Whether the tag(s) are active
+ * @returns {(boolean|UseActiveTagsReturn)} Whether the tag(s) are active
  */
 export function useActiveTags<TActor extends AnyActorRef, TTag extends TaggedActor<TActor>>(
   actor: TActor,
@@ -60,6 +61,10 @@ export function useActiveTags<TActor extends AnyActorRef, TTag extends TaggedAct
 
   if (typeof tags === 'string') {
     return state.hasTag(tags);
+  }
+
+  if (!Array.isArray(tags)) {
+    throw new Error('Invalid tags parameter provided to useActiveTags');
   }
 
   switch (mode) {
