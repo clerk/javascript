@@ -9,6 +9,7 @@ import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationSuggestionResource, OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
+import type { PasskeyResource } from './passkey';
 import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
 import type { SamlAccountResource } from './samlAccount';
@@ -88,6 +89,7 @@ export interface UserResource extends ClerkResource {
   updatePassword: (params: UpdateUserPasswordParams) => Promise<UserResource>;
   removePassword: (params: RemoveUserPasswordParams) => Promise<UserResource>;
   createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;
+  createPasskey: () => Promise<PasskeyResource>;
   createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
   createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;

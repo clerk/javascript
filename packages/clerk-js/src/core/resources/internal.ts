@@ -20,6 +20,7 @@ export * from './OrganizationMembershipRequest';
 export * from './OrganizationSuggestion';
 export * from './SamlAccount';
 export * from './Session';
+export * from './Passkey';
 export * from './PublicUserData';
 export * from './SessionWithActivities';
 export * from './SignIn';

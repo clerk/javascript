@@ -136,6 +136,27 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   backup_codes?: string[];
 }
 
+export interface PasskeyJSON extends ClerkResourceJSON {
+  object: 'passkey';
+  id: string;
+  credential_id: string | null;
+  public_key: string | null;
+  challenge: string; // Base64 string
+  user_id: string;
+  user_name: string;
+  user_display_name: string; // can be empty string ""
+  rp_id: string; // domain name like "example.com" or "login.example.com"
+  pub_key_cred_params: { type: 'public-key'; alg: number }[];
+  hints: [];
+  attestation: 'none';
+  authenticator_selection: Record<string, unknown>;
+  exclude_credentials: {
+    id: string;
+    transports?: ('ble' | 'hybrid' | 'internal' | 'nfc' | 'usb')[];
+    type: 'public-key';
+  }[];
+}
+
 export interface Web3WalletJSON extends ClerkResourceJSON {
   object: 'web3_wallet';
   id: string;
