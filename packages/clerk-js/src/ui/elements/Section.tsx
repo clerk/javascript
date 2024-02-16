@@ -128,7 +128,7 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$4}`,
+          padding: `${t.space.$1x5} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
           gap: t.space.$2,
         }),
         sx,

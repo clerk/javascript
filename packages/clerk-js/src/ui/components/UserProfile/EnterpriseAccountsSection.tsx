@@ -14,7 +14,13 @@ export const EnterpriseAccountsSection = () => {
       id='enterpriseAccounts'
       centered={false}
     >
-      <ProfileSection.ItemList id='enterpriseAccounts'>
+      <ProfileSection.ItemList
+        id='enterpriseAccounts'
+        sx={t => ({
+          borderRadius: t.radii.$lg,
+          ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
+        })}
+      >
         {user?.samlAccounts.map(account => {
           const label = account.emailAddress;
           const providerName = getSamlProviderName(account.provider);

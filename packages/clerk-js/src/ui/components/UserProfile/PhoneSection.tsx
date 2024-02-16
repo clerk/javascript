@@ -49,7 +49,13 @@ export const PhoneSection = () => {
           {user?.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
             <Action.Root key={phone.id}>
               <Action.Closed value=''>
-                <ProfileSection.Item id='phoneNumbers'>
+                <ProfileSection.Item
+                  id='phoneNumbers'
+                  sx={t => ({
+                    borderRadius: t.radii.$lg,
+                    ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
+                  })}
+                >
                   <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex
                       gap={2}

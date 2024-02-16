@@ -48,7 +48,13 @@ export const EmailsSection = () => {
         <ProfileSection.ItemList id='emailAddresses'>
           {user?.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
             <Action.Root key={email.emailAddress}>
-              <ProfileSection.Item id='emailAddresses'>
+              <ProfileSection.Item
+                id='emailAddresses'
+                sx={t => ({
+                  borderRadius: t.radii.$lg,
+                  ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
+                })}
+              >
                 <Flex
                   as='span'
                   sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}
