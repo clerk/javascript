@@ -7,7 +7,7 @@ The `Clerk.redirectToHome` method has been removed. If you are looking for a gen
 
 To set the `afterSignUpUrl` or `afterSignInUrl`, you can:
 
-    - [pass the desired values into ClerkProvider](https://clerk.com/docs/components/clerk-provider#properties)
-    - if using nextjs SDK, set with `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` or `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`
-    - if using remix SDK, set with `CLERK_AFTER_SIGN_IN_URL` or `CLERK_AFTER_SIGN_UP_URL`
-    - If not using a react-based SDK, they can be passed into `Clerk.load` as such: `Clerk.load({ afterSignUpUrl: 'x', afterSignInUrl: 'y' })`
+- If not using a react-based SDK, pass the values into `Clerk.load` as such: `Clerk.load({ afterSignUpUrl: 'x', afterSignInUrl: 'y' })`
+- If using a react-based SDK, [pass the desired values into ClerkProvider](https://clerk.com/docs/components/clerk-provider#properties)
+- If using the Next.js SDK, set with `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` or `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`
+- If using remix SDK, set with `CLERK_AFTER_SIGN_IN_URL` or `CLERK_AFTER_SIGN_UP_URL`

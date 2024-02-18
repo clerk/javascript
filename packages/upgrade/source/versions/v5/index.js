@@ -24,14 +24,15 @@ const changesAffectingAll = [
   'user-update-password',
 ];
 
-const reactChangesList = [
+const jsChanges = ['setsession', 'organization-create-string', 'organization-getpendinginvitations', 'mfa-dropdown'];
+
+const reactChanges = [
   'magiclinkerrorcode',
   'usemagiclink',
   'ismagiclinkerror',
   'magiclinkerror',
   'handlemagiclinkverification',
   'clerkprovider-frontendapi-2',
-  'setsession',
   'navigate-to-routerpush-routerreplace',
   'afterswitchorganizationurl',
   'appearance-organizationpreview-organizationswitcher',
@@ -41,7 +42,6 @@ const reactChangesList = [
   'userprofile-prop',
   'organizationprofile-settings',
   'userprofile-security',
-  'mfa-dropdown',
   'connected-accounts-dropdown',
   'userbuttonpopoveractionbuttontext-removed',
   'userbuttontrigger-userbuttonbox-invert',
@@ -71,7 +71,7 @@ const reactChangesList = [
 export default {
   nextjs: load(
     'nextjs',
-    dedupeMerge(changesAffectingAll, [
+    dedupeMerge(changesAffectingAll, jsChanges, [
       'api-key-to-secret-key',
       'frontend-api-to-publishable-key',
       'with-clerk-middleware-removed',
@@ -103,10 +103,8 @@ export default {
       'ismagiclinkerror',
       'usemagiclink',
       'magiclinkerrorcode',
-      'setsession',
       'organizationprofile-settings',
       'userprofile-security',
-      'mfa-dropdown',
       'connected-accounts-dropdown',
       'userbuttonpopoveractionbuttontext-removed',
       'userbuttontrigger-userbuttonbox-invert',
@@ -155,7 +153,7 @@ export default {
   // if you're using gatsby, we also need to scan for the react changes
   gatsby: load(
     'gatsby',
-    dedupeMerge(changesAffectingAll, reactChangesList, [
+    dedupeMerge(changesAffectingAll, reactChanges, jsChanges, [
       'api-key-to-secret-key',
       'createclerkclient-apikey',
       'apikey-to-publishable-key',
@@ -163,7 +161,6 @@ export default {
       'ismagiclinkerror',
       'usemagiclink',
       'magiclinkerrorcode',
-      'setsession',
       'api-url-value-change',
       'withserverauth-return-type',
       'clerk-import-change',
@@ -171,7 +168,7 @@ export default {
   ),
   remix: load(
     'remix',
-    dedupeMerge(changesAffectingAll, [
+    dedupeMerge(changesAffectingAll, jsChanges, [
       'clerkerrorboundary-removed',
       'createclerkclient-apikey',
       'rootauthloader-apikey',
@@ -183,7 +180,6 @@ export default {
       'ismagiclinkerror',
       'magiclinkerrorcode',
       'usemagiclink',
-      'setsession',
       'new-localization-keys',
       'removed-localization-keys',
       'changed-localization-keys',
@@ -195,15 +191,13 @@ export default {
   ),
   expo: load(
     'expo',
-    dedupeMerge(changesAffectingAll, [
+    dedupeMerge(changesAffectingAll, jsChanges, [
       'apikey-to-publishable-key',
       'ismagiclinkerror',
       'usemagiclink',
       'magiclinkerrorcode',
-      'setsession',
       'organizationprofile-settings',
       'userprofile-security',
-      'mfa-dropdown',
       'connected-accounts-dropdown',
       'userbuttonpopoveractionbuttontext-removed',
       'userbuttontrigger-userbuttonbox-invert',
@@ -262,10 +256,10 @@ export default {
       'externalaccount-picture',
     ]),
   ),
-  react: load('react', dedupeMerge(changesAffectingAll, reactChangesList)),
+  react: load('react', dedupeMerge(changesAffectingAll, reactChanges, jsChanges)),
   js: load(
     'js',
-    dedupeMerge(changesAffectingAll, [
+    dedupeMerge(changesAffectingAll, jsChanges, [
       'magiclinkerror',
       'ismagiclinkerror',
       'magiclinkerrorcode',
@@ -273,7 +267,6 @@ export default {
       'handlemagiclinkverification',
       'external-account-avatarurl',
       'user-orgpublicdata-profileimageurl',
-      'setsession', // shared with all?
       'experimental-canusecaptcha',
       'experimental-captchaurl',
       'experimental-captchasitekey',
@@ -281,14 +274,11 @@ export default {
       'lastorganizationinvitation-member',
       'unstable-invitationupdate',
       'unstable-membershipupdate',
-      'organization-create-string', // maybe shared with all?
-      'organization-getpendinginvitations', // maybe shared with all?
       'user-createexternalaccount-redirecturl', // maybe shared with all?
       'signup-attemptweb3walletverification-generatedsignature',
       'redirecttohome',
       'organizationprofile-settings',
       'userprofile-security',
-      'mfa-dropdown',
       'connected-accounts-dropdown',
       'userbuttonpopoveractionbuttontext-removed',
       'userbuttontrigger-userbuttonbox-invert',
@@ -316,7 +306,7 @@ export default {
     'organizationcontext',
     'useorganizationlist-organizationlist', // shared outside this pkg?
   ]),
-  chromeExtension: load('chromeExtension', dedupeMerge(changesAffectingAll, ['clerkprovider-tokencache'])),
+  chromeExtension: load('chromeExtension', dedupeMerge(changesAffectingAll, jsChanges, ['clerkprovider-tokencache'])),
   localizations: load('localization', [
     'new-localization-keys',
     'removed-localization-keys',
