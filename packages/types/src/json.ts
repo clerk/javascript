@@ -140,7 +140,7 @@ export interface PasskeyJSON extends ClerkResourceJSON {
   object: 'passkey';
   id: string;
   credential_id: string | null;
-  public_key: string | null;
+  publicKey: any;
   challenge: string; // Base64 string
   user_id: string;
   user_name: string;

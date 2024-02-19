@@ -436,6 +436,8 @@ export const enUS: LocalizationResource = {
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+    passkey_exists: 'The authenticator was previously registered',
+    passkey_registration_cancelled: 'The operation either timed out or was cancelled',
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_not_found: '',

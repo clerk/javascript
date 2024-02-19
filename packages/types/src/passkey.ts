@@ -5,7 +5,7 @@ export interface PublicKeyOptions extends PublicKeyCredentialCreationOptions {}
 export interface PasskeyResource extends ClerkResource {
   id: string;
   credentialId: string | null;
-  publicKey: string | null;
+  // publicKey: string | null;
   challenge: string;
   user: {
     id: string;
@@ -24,4 +24,5 @@ export interface PasskeyResource extends ClerkResource {
     transports?: ('ble' | 'hybrid' | 'internal' | 'nfc' | 'usb')[];
     type: 'public-key';
   }[];
+  publicKey: PublicKeyOptions;
 }

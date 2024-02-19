@@ -1,20 +1,20 @@
 import type { PasskeyJSON, PasskeyResource, PublicKeyOptions } from '@clerk/types';
 
 import { isSupportedPasskeysSupported } from '../../utils/passkeys';
-import { BaseResource } from './internal';
+import { BaseResource, ClerkRuntimeError } from './internal';
 
 // Move this somewhere else
 class Base64Converter {
   static encode(buffer: ArrayBuffer): string {
-    const binary = new Uint8Array(buffer);
-    let base64 = '';
-    binary.forEach(byte => {
-      base64 += String.fromCharCode(byte);
-    });
-    return btoa(base64);
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
   }
 
-  static decode(base64: string): ArrayBuffer {
+  static decode(base64url: string): ArrayBuffer {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+
     const binaryString = atob(base64);
     const length = binaryString.length;
     const bytes = new Uint8Array(length);
@@ -29,7 +29,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
   pathRoot = '/me/passkeys';
   credentialId: string | null = null;
-  publicKey: string | null = null;
+  publicKey: PublicKeyOptions = {};
   challenge: string = '';
   user!: PasskeyResource['user'];
   rp!: PasskeyResource['rp'];
@@ -56,29 +56,27 @@ export class Passkey extends BaseResource implements PasskeyResource {
   }
 
   private static async finishRegistration(publicKeyCredential: any) {
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+    });
     return await BaseResource._fetch({
       path: `/me/passkeys/finalize`,
       method: 'POST',
-      body: { publicKeyCredential } as any,
+      headers,
+      body: JSON.stringify(publicKeyCredential) as any,
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
 
   static async create() {
-    const options = await this.startRegistration();
+    const { publicKey: options } = await this.startRegistration();
 
-    const userIdBuffer = Base64Converter.decode(options.user.id);
-    const challengeBuffer = Base64Converter.decode(options.challenge);
+    const userIdBuffer = Base64Converter.decode(options.user.id as unknown as string);
+    const challengeBuffer = Base64Converter.decode(options.challenge as unknown as string);
 
     const excludeCredentialsWithBuffer = (options.excludeCredentials || []).map(cred => ({
       ...cred,
       id: Base64Converter.decode(cred.id),
     }));
-
-    // Use platform authenticator and discoverable credential.
-    options.authenticatorSelection = {
-      authenticatorAttachment: 'platform',
-      requireResidentKey: true,
-    };
 
     const publicKey: PublicKeyOptions = {
       ...options,
@@ -88,22 +86,37 @@ export class Passkey extends BaseResource implements PasskeyResource {
         ...options.user,
         id: userIdBuffer,
       },
-      rp: {
-        id: options.rp.id,
-        name: options.rp.id,
-      },
     };
 
     // Invoke the WebAuthn create() method.
-    const cred = (await navigator.credentials.create({
-      publicKey,
-    })) as PublicKeyCredential;
+    const { cred, error } = await navigator.credentials
+      .create({
+        publicKey,
+      })
+      .then(v => ({ cred: v as PublicKeyCredential, error: null }))
+      .catch(e => {
+        // Map webauthn errors to Clerk errors
+        if (e.name === 'InvalidStateError') {
+          return { error: new ClerkRuntimeError(e.message, { code: 'passkey_exists' }) };
+        } else if (e.name === 'NotAllowedError') {
+          return { error: new ClerkRuntimeError(e.message, { code: 'passkey_registration_cancelled' }) };
+        }
+        return { error: e, cred: null };
+      });
+
+    if (!cred) {
+      throw error;
+    }
 
     const response = cred.response as AuthenticatorAttestationResponse;
 
     // Register the credential to the server endpoint.
+    // TODO: Which of these do we actually need ?
     const credential = {
-      ...cred,
+      type: cred.type,
+      id: cred.id,
+      rawId: Base64Converter.encode(cred.rawId),
+      authenticatorAttachment: cred.authenticatorAttachment,
       response: {
         clientDataJSON: Base64Converter.encode(response.clientDataJSON),
         attestationObject: Base64Converter.encode(response.attestationObject),
@@ -161,7 +174,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
     this.id = data.id;
     this.credentialId = data.credential_id;
-    this.publicKey = data.public_key;
+    this.publicKey = data.publicKey;
     this.challenge = data.challenge;
     this.user = {
       id: data.user_id,
