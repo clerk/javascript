@@ -15,7 +15,7 @@ export class OauthAccessToken {
       data.provider,
       data.token,
       data.public_metadata,
-      data.label,
+      data.label || '',
       data.scopes,
       data.token_secret,
     );

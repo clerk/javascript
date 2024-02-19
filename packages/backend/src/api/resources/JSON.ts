@@ -168,7 +168,7 @@ export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: typeof ObjectType.OrganizationMembership;
-  public_metadata: OrganizationMembershipPublicMetadata | null;
+  public_metadata: OrganizationMembershipPublicMetadata;
   private_metadata?: OrganizationMembershipPrivateMetadata;
   role: OrganizationMembershipRole;
   permissions: string[];
