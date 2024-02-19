@@ -1,7 +1,7 @@
 export default [
   { label: '@clerk/nextjs', value: 'nextjs' },
   { label: '@clerk/remix', value: 'remix' },
-  { label: 'gatsby-plugin-clerk', value: 'gatsby' },
+  // { label: 'gatsby-plugin-clerk', value: 'gatsby' },
   { label: '@clerk/redwood', value: 'redwood' },
   { label: '@clerk/react', value: 'react' },
   { label: '@clerk/expo', value: 'expo' },
