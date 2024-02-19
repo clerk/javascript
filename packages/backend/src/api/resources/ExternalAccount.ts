@@ -28,7 +28,7 @@ export class ExternalAccount {
       data.email_address,
       data.first_name,
       data.last_name,
-      data.image_url,
+      data.image_url || '',
       data.username,
       data.public_metadata,
       data.label,

@@ -22,7 +22,7 @@ export class Organization {
       data.id,
       data.name,
       data.slug,
-      data.image_url,
+      data.image_url || '',
       data.has_image,
       data.created_by,
       data.created_at,
