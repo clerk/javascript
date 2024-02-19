@@ -1,30 +1,70 @@
 import { isValidBrowser } from '@clerk/shared/browser';
+import { ClerkRuntimeError } from '@clerk/shared/error';
 
-export async function isSupportedPasskeysSupported() {
-  if (!isValidBrowser()) {
-    return Promise.reject('Non valid browser');
+function isWebAuthnSupported() {
+  return isValidBrowser() && typeof window.PublicKeyCredential === 'function';
+}
+
+async function isWebAuthnAutofillSupported(): Promise<boolean> {
+  if (!isWebAuthnSupported() || typeof window?.PublicKeyCredential?.isConditionalMediationAvailable !== 'function') {
+    return new Promise(resolve => resolve(false));
   }
+
+  return PublicKeyCredential.isConditionalMediationAvailable();
+}
+
+async function isWebAuthnPlatformAuthenticatorSupported(): Promise<boolean> {
   if (
-    typeof window?.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable !== 'function' ||
-    typeof window?.PublicKeyCredential?.isConditionalMediationAvailable !== 'function'
+    !isWebAuthnSupported() ||
+    typeof window?.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable !== 'function'
   ) {
-    return Promise.reject('Not supported');
+    return new Promise(resolve => resolve(false));
+  }
+  return PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+}
+
+class Base64Converter {
+  static encode(buffer: ArrayBuffer): string {
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
   }
 
-  try {
-    const results = await Promise.all([
-      // Is platform authenticator available in this browser?
-      PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+  static decode(base64url: string): ArrayBuffer {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
 
-      // Is conditional UI available in this browser?
-      PublicKeyCredential.isConditionalMediationAvailable(),
-    ]);
-
-    if (results.every(r => r === true)) {
-      return Promise.resolve(true);
+    const binaryString = atob(base64);
+    const length = binaryString.length;
+    const bytes = new Uint8Array(length);
+    for (let i = 0; i < length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
     }
-    return Promise.resolve(false);
-  } catch (e) {
-    return Promise.reject('Something failed');
+    return bytes.buffer;
   }
 }
+
+/**
+ * Map webauthn errors from `navigator.credentials.create()` to Clerk-js errors
+ * @param error
+ */
+function handlePublicKeyCreateError(error: Error): ClerkRuntimeError | Error {
+  if (error.name === 'InvalidStateError') {
+    return new ClerkRuntimeError(error.message, { code: 'passkey_exists' });
+  } else if (error.name === 'NotAllowedError') {
+    return new ClerkRuntimeError(error.message, { code: 'passkey_registration_cancelled' });
+  }
+  return error;
+}
+
+const bufferToBase64Url = Base64Converter.encode.bind(Base64Converter);
+const base64UrlToBuffer = Base64Converter.decode.bind(Base64Converter);
+
+export {
+  isWebAuthnPlatformAuthenticatorSupported,
+  isWebAuthnAutofillSupported,
+  isWebAuthnSupported,
+  base64UrlToBuffer,
+  bufferToBase64Url,
+  handlePublicKeyCreateError,
+};

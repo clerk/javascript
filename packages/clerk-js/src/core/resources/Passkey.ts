@@ -1,29 +1,12 @@
 import type { PasskeyJSON, PasskeyResource, PublicKeyOptions } from '@clerk/types';
 
-import { isSupportedPasskeysSupported } from '../../utils/passkeys';
+import {
+  base64UrlToBuffer,
+  bufferToBase64Url,
+  handlePublicKeyCreateError,
+  isWebAuthnPlatformAuthenticatorSupported,
+} from '../../utils/passkeys';
 import { BaseResource, ClerkRuntimeError } from './internal';
-
-// Move this somewhere else
-class Base64Converter {
-  static encode(buffer: ArrayBuffer): string {
-    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
-  }
-
-  static decode(base64url: string): ArrayBuffer {
-    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-
-    const binaryString = atob(base64);
-    const length = binaryString.length;
-    const bytes = new Uint8Array(length);
-    for (let i = 0; i < length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes.buffer;
-  }
-}
 
 export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
@@ -42,10 +25,6 @@ export class Passkey extends BaseResource implements PasskeyResource {
   public constructor(data: PasskeyJSON) {
     super();
     this.fromJSON(data);
-  }
-
-  static async isSupported() {
-    return isSupportedPasskeysSupported();
   }
 
   private static async startRegistration() {
@@ -68,14 +47,24 @@ export class Passkey extends BaseResource implements PasskeyResource {
   }
 
   static async create() {
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+
+    if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
+      throw new ClerkRuntimeError('Platform authenticator is not supported', {
+        code: 'passkeys_unsupported_platform_authenticator',
+      });
+    }
     const { publicKey: options } = await this.startRegistration();
 
-    const userIdBuffer = Base64Converter.decode(options.user.id as unknown as string);
-    const challengeBuffer = Base64Converter.decode(options.challenge as unknown as string);
+    const userIdBuffer = base64UrlToBuffer(options.user.id as unknown as string);
+    const challengeBuffer = base64UrlToBuffer(options.challenge as unknown as string);
 
     const excludeCredentialsWithBuffer = (options.excludeCredentials || []).map(cred => ({
       ...cred,
-      id: Base64Converter.decode(cred.id),
+      id: base64UrlToBuffer(cred.id as unknown as string),
     }));
 
     const publicKey: PublicKeyOptions = {
@@ -94,15 +83,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
         publicKey,
       })
       .then(v => ({ cred: v as PublicKeyCredential, error: null }))
-      .catch(e => {
-        // Map webauthn errors to Clerk errors
-        if (e.name === 'InvalidStateError') {
-          return { error: new ClerkRuntimeError(e.message, { code: 'passkey_exists' }) };
-        } else if (e.name === 'NotAllowedError') {
-          return { error: new ClerkRuntimeError(e.message, { code: 'passkey_registration_cancelled' }) };
-        }
-        return { error: e, cred: null };
-      });
+      .catch(e => ({ error: handlePublicKeyCreateError(e), cred: null }));
 
     if (!cred) {
       throw error;
@@ -115,12 +96,14 @@ export class Passkey extends BaseResource implements PasskeyResource {
     const credential = {
       type: cred.type,
       id: cred.id,
-      rawId: Base64Converter.encode(cred.rawId),
+      rawId: bufferToBase64Url(cred.rawId),
       authenticatorAttachment: cred.authenticatorAttachment,
       response: {
-        clientDataJSON: Base64Converter.encode(response.clientDataJSON),
-        attestationObject: Base64Converter.encode(response.attestationObject),
+        clientDataJSON: bufferToBase64Url(response.clientDataJSON),
+        attestationObject: bufferToBase64Url(response.attestationObject),
         transports: response.getTransports(),
+        // TODO: Do we need publicKey here ?
+        // publicKey: response.getPublicKey(),
       },
     };
 
