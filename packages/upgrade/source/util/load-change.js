@@ -10,8 +10,8 @@ export default function createLoader({ version, baseUrl }) {
     // Note: This could benefit perf-wise by being converted to async, but it would
     // make the code a decent amount more complex.
     return slugs.map(slug => {
-      const sdkPath = path.join(__dirname, '../versions', `v${version}`, sdk, `${slug}.md`);
-      const sharedPath = path.join(__dirname, '../versions', `v${version}`, 'common', `${slug}.md`);
+      const sdkPath = path.join(__dirname, '../versions', `${version}`, sdk, `${slug}.md`);
+      const sharedPath = path.join(__dirname, '../versions', `${version}`, 'common', `${slug}.md`);
 
       const loadPath = fs.existsSync(sdkPath) ? sdkPath : sharedPath;
       const content = fs.readFileSync(loadPath, 'utf8');

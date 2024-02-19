@@ -13,5 +13,5 @@ export default [
   { label: '@clerk/localizations', value: 'localizations' },
   { label: '@clerk/shared', value: 'shared' },
   { label: '@clerk/types', value: 'types' },
-  { label: '@clerk/chrome-extension', value: 'chromeExtension' },
+  { label: '@clerk/chrome-extension', value: 'chrome-extension' },
 ];
