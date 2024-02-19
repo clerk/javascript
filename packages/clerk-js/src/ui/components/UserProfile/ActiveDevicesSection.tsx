@@ -21,7 +21,10 @@ export const ActiveDevicesSection = () => {
       centered={false}
       id='activeDevices'
     >
-      <ProfileSection.ItemList id='activeDevices'>
+      <ProfileSection.ItemList
+        id='activeDevices'
+        disableAnimation
+      >
         {isLoading ? (
           <FullHeightLoader />
         ) : (
