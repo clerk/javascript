@@ -1,3 +1,5 @@
+import type { SamlAccountJSON } from '@clerk/types';
+
 import type {
   InvitationStatus,
   OrganizationInvitationStatus,
@@ -65,16 +67,17 @@ export interface ClientJSON extends ClerkResourceJSON {
 
 export interface EmailJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Email;
+  slug?: string | null;
   from_email_name: string;
   to_email_address?: string;
   email_address_id: string | null;
+  user_id?: string | null;
   subject?: string;
   body?: string;
   body_plain?: string | null;
   status?: string;
-  slug?: string | null;
   data?: Record<string, any> | null;
-  delivered_by_clerk?: boolean;
+  delivered_by_clerk: boolean;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
@@ -93,9 +96,9 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   email_address: string;
   first_name: string;
   last_name: string;
-  image_url: string;
+  image_url?: string;
   username: string | null;
-  public_metadata: Record<string, unknown> | null;
+  public_metadata?: Record<string, unknown> | null;
   label: string | null;
   verification: VerificationJSON | null;
 }
@@ -108,18 +111,19 @@ export interface InvitationJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Invitation;
   email_address: string;
   public_metadata: Record<string, unknown> | null;
+  revoked?: boolean;
+  status: InvitationStatus;
+  url?: string;
   created_at: number;
   updated_at: number;
-  status: InvitationStatus;
-  revoked?: boolean;
 }
 
 export interface OauthAccessTokenJSON {
   object: typeof ObjectType.OauthAccessToken;
-  provider: string;
   token: string;
+  provider: string;
   public_metadata: Record<string, unknown>;
-  label: string;
+  label: string | null;
   // Only set in OAuth 2.0 tokens
   scopes?: string[];
   // Only set in OAuth 1.0 tokens
@@ -129,39 +133,49 @@ export interface OauthAccessTokenJSON {
 export interface OrganizationJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Organization;
   name: string;
-  slug: string | null;
-  image_url: string;
+  slug: string;
+  image_url?: string;
   has_image: boolean;
+  members_count?: number;
+  pending_invitations_count?: number;
+  max_allowed_memberships: number;
+  admin_delete_enabled: boolean;
   public_metadata: OrganizationPublicMetadata | null;
   private_metadata?: OrganizationPrivateMetadata;
   created_by: string;
   created_at: number;
   updated_at: number;
-  max_allowed_memberships: number;
-  admin_delete_enabled: boolean;
-  members_count?: number;
 }
 
 export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   email_address: string;
+  role: OrganizationMembershipRole;
   organization_id: string;
+  public_organization_data?: PublicOrganizationDataJSON | null;
+  status?: OrganizationInvitationStatus;
   public_metadata: OrganizationInvitationPublicMetadata;
   private_metadata: OrganizationInvitationPrivateMetadata;
-  role: OrganizationMembershipRole;
-  status: OrganizationInvitationStatus;
   created_at: number;
   updated_at: number;
 }
 
+export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
+  name: string;
+  slug: string;
+  image_url?: string;
+  has_image: boolean;
+}
+
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   object: typeof ObjectType.OrganizationMembership;
-  organization: OrganizationJSON;
-  public_metadata: OrganizationMembershipPublicMetadata;
+  public_metadata: OrganizationMembershipPublicMetadata | null;
   private_metadata?: OrganizationMembershipPrivateMetadata;
-  public_user_data: OrganizationMembershipPublicUserDataJSON;
   role: OrganizationMembershipRole;
+  permissions: string[];
   created_at: number;
   updated_at: number;
+  organization: OrganizationJSON;
+  public_user_data: OrganizationMembershipPublicUserDataJSON;
 }
 
 export interface OrganizationMembershipPublicUserDataJSON {
@@ -178,8 +192,10 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   phone_number: string;
   reserved_for_second_factor: boolean;
   default_second_factor: boolean;
-  linked_to: IdentificationLinkJSON[];
+  reserved: boolean;
   verification: VerificationJSON | null;
+  linked_to: IdentificationLinkJSON[];
+  backup_codes: string[];
 }
 
 export interface RedirectUrlJSON extends ClerkResourceJSON {
@@ -194,6 +210,8 @@ export interface SessionJSON extends ClerkResourceJSON {
   client_id: string;
   user_id: string;
   status: string;
+  last_active_organization_id?: string;
+  actor?: Record<string, unknown>;
   last_active_at: number;
   expire_at: number;
   abandon_at: number;
@@ -238,35 +256,43 @@ export interface SMSMessageJSON extends ClerkResourceJSON {
   from_phone_number: string;
   to_phone_number: string;
   phone_number_id: string | null;
+  user_id?: string;
   message: string;
   status: string;
   data?: Record<string, any> | null;
+  delivered_by_clerk: boolean;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
   object: typeof ObjectType.User;
   username: string | null;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   image_url: string;
   has_image: boolean;
-  primary_email_address_id: string;
+  primary_email_address_id: string | null;
   primary_phone_number_id: string | null;
   primary_web3_wallet_id: string | null;
   password_enabled: boolean;
+  two_factor_enabled: boolean;
   totp_enabled: boolean;
   backup_code_enabled: boolean;
-  two_factor_enabled: boolean;
-  banned: boolean;
   email_addresses: EmailAddressJSON[];
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
+  organization_memberships: OrganizationMembershipJSON[] | null;
   external_accounts: ExternalAccountJSON[];
-  external_id: string | null;
-  last_sign_in_at: number | null;
+  saml_accounts: SamlAccountJSON[];
+  password_last_updated_at: number | null;
   public_metadata: UserPublicMetadata;
   private_metadata: UserPrivateMetadata;
   unsafe_metadata: UserUnsafeMetadata;
+  external_id: string | null;
+  last_sign_in_at: number | null;
+  banned: boolean;
+  locked: boolean;
+  lockout_expires_in_seconds: number | null;
+  verification_attempts_remaining: number | null;
   created_at: number;
   updated_at: number;
   last_active_at: number | null;
@@ -274,14 +300,13 @@ export interface UserJSON extends ClerkResourceJSON {
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
-  attempts?: number | null;
-  expire_at: number | null;
-  external_verification_redirect_url?: string;
-  nonce?: string | null;
   status: string;
   strategy: string;
+  attempts: number | null;
+  expire_at: number | null;
   verified_at_client?: string;
-  // error?
+  external_verification_redirect_url?: string | null;
+  nonce?: string | null;
 }
 
 export interface Web3WalletJSON extends ClerkResourceJSON {
