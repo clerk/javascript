@@ -139,11 +139,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           sx={{ padding: '0 0' }}
           containerSx={theme => ({
             gap: 0,
-            padding: `${theme.space.$0x5} ${theme.space.$0x5}`,
-            ':last-of-type': {
-              borderBottomRightRadius: theme.radii.$md,
-              borderBottomLeftRadius: theme.radii.$md,
-            },
+            padding: `${theme.space.$0x5} 0`,
           })}
         />
       </Select>
