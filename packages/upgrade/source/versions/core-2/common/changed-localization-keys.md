@@ -3,53 +3,53 @@ title: 'Localization keys changed'
 matcherFlags: 'm'
 category: 'localization'
 matcher:
-  - 'formFieldLabel__organizationName:'
-  - 'formFieldLabel__organizationSlug:'
-  - 'formFieldInputPlaceholder__emailAddresses:'
-  - 'formFieldInputPlaceholder__organizationSlug:'
-  - "signUp:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?subtitle:"
-  - "signUp:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?actionText:"
-  - "signUp:\\s+{[\\s\\S]*?emailCode:\\s+{[\\s\\S]*?subtitle:"
-  - "signUp:\\s+{[\\s\\S]*?phoneCode:\\s+{[\\s\\S]*?subtitle:"
-  - "signUp:\\s+{[\\s\\S]*?continue:\\s+{[\\s\\S]*?subtitle:"
-  - "signUp:\\s+{[\\s\\S]*?continue:\\s+{[\\s\\S]*?actionText:"
-  - "signIn:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?title:"
-  - "signIn:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?subtitle:"
-  - "signIn:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?actionText:"
-  - "signIn:\\s+{[\\s\\S]*?password:\\s+{[\\s\\S]*?subtitle:"
-  - "signIn:\\s+{[\\s\\S]*?forgotPasswordAlternativeMethods:\\s+{[\\s\\S]*?label__alternativeMethods:"
-  - "signIn:\\s+{[\\s\\S]*?resetPassword:\\s+{[\\s\\S]*?title:"
-  - "signIn:\\s+{[\\s\\S]*?phoneCodeMfa:\\s+{[\\s\\S]*?subtitle:"
-  - "signIn:\\s+{[\\s\\S]*?totpMfa:\\s+{[\\s\\S]*?subtitle:"
-  - "signIn:\\s+{[\\s\\S]*?backupCodeMfa:\\s+{[\\s\\S]*?subtitle:"
-  - "userProfile:\\s+{[\\s\\S]*?formButtonPrimary__continue:"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?headerTitle__account"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?profileSection:\\s+{[\\s\\S]*?primaryButton:"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?emailAddressesSection:\\s+{[\\s\\S]*?detailsAction__unverified:"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?emailAddressesSection:\\s+{[\\s\\S]*?destructiveAction:"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?mfaSection:\\s+{[\\s\\S]*?phoneCode:\\s+{[\\s\\S]*?destructiveActionLabel:"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?mfaSection:\\s+{[\\s\\S]*?backupCodes:\\s+{[\\s\\S]*?actionLabel__regenerate:"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?dangerSection:\\s+{[\\s\\S]*?title:"
-  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?dangerSection:\\s+{[\\s\\S]*?deleteAccountButton:"
-  - "userProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?imageFormSubtitle:"
-  - "userProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?imageFormDestructiveActionSubtitle:"
-  - "userProfile:\\s+{[\\s\\S]*?phoneNumberPage:\\s+{[\\s\\S]*?title:"
-  - "userProfile:\\s+{[\\s\\S]*?phoneNumberPage:\\s+{[\\s\\S]*?infoText:"
-  - "userProfile:\\s+{[\\s\\S]*?connectedAccountPage:\\s+{[\\s\\S]*?socialButtonsBlockButton:"
-  - "userProfile:\\s+{[\\s\\S]*?mfaPhoneCodePage:\\s+{[\\s\\S]*?subtitle__availablePhoneNumbers:"
-  - "userProfile:\\s+{[\\s\\S]*?mfaPhoneCodePage:\\s+{[\\s\\S]*?subtitle__unavailablePhoneNumbers:"
-  - "userProfile:\\s+{[\\s\\S]*?deletePage:\\s+{[\\s\\S]*?actionDescription:"
-  - "organizationSwitcher:\\s+{[\\s\\S]*?action__createOrganization:"
-  - "organizationSwitcher:\\s+{[\\s\\S]*?action__manageOrganization:"
-  - "organizationProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?title:"
-  - "organizationProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?dangerSection:\\s+{[\\s\\S]*?title:"
-  - "organizationProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?dangerSection:\\s+{[\\s\\S]*?leaveOrganization:\\s+{[\\s\\S]*?actionDescription:"
-  - "organizationProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?dangerSection:\\s+{[\\s\\S]*?deleteOrganization:\\s+{[\\s\\S]*?actionDescription:"
-  - "organizationProfile:\\s+{[\\s\\S]*?invitePage:\\s+{[\\s\\S]*?title:"
-  - "organizationProfile:\\s+{[\\s\\S]*?invitePage:\\s+{[\\s\\S]*?subtitle:"
-  - "createOrganization:\\s+{[\\s\\S]*?title:"
-  - "organizationList:\\s+{[\\s\\S]*?title:"
-  - "organizationList:\\s+{[\\s\\S]*?titleWithoutPersonal:"
+  - "formFieldLabel__organizationName:"
+  - "formFieldLabel__organizationSlug:"
+  - "formFieldInputPlaceholder__emailAddresses:"
+  - "formFieldInputPlaceholder__organizationSlug:"
+  - "signUp:\s+{[\s\S]*?start:\s+{[\s\S]*?subtitle:"
+  - "signUp:\s+{[\s\S]*?start:\s+{[\s\S]*?actionText:"
+  - "signUp:\s+{[\s\S]*?emailCode:\s+{[\s\S]*?subtitle:"
+  - "signUp:\s+{[\s\S]*?phoneCode:\s+{[\s\S]*?subtitle:"
+  - "signUp:\s+{[\s\S]*?continue:\s+{[\s\S]*?subtitle:"
+  - "signUp:\s+{[\s\S]*?continue:\s+{[\s\S]*?actionText:"
+  - "signIn:\s+{[\s\S]*?start:\s+{[\s\S]*?title:"
+  - "signIn:\s+{[\s\S]*?start:\s+{[\s\S]*?subtitle:"
+  - "signIn:\s+{[\s\S]*?start:\s+{[\s\S]*?actionText:"
+  - "signIn:\s+{[\s\S]*?password:\s+{[\s\S]*?subtitle:"
+  - "signIn:\s+{[\s\S]*?forgotPasswordAlternativeMethods:\s+{[\s\S]*?label__alternativeMethods:"
+  - "signIn:\s+{[\s\S]*?resetPassword:\s+{[\s\S]*?title:"
+  - "signIn:\s+{[\s\S]*?phoneCodeMfa:\s+{[\s\S]*?subtitle:"
+  - "signIn:\s+{[\s\S]*?totpMfa:\s+{[\s\S]*?subtitle:"
+  - "signIn:\s+{[\s\S]*?backupCodeMfa:\s+{[\s\S]*?subtitle:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?headerTitle__account:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?emailAddressesSection:\s+{[\s\S]*?primaryButton:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?emailAddressesSection:\s+{[\s\S]*?detailsAction__unverified:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?emailAddressesSection:\s+{[\s\S]*?destructiveAction:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?phoneNumbersSection:\s+{[\s\S]*?primaryButton:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?mfaSection:\s+{[\s\S]*?phoneCode:\s+{[\s\S]*?destructiveActionLabel:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?mfaSection:\s+{[\s\S]*?backupCodes:\s+{[\s\S]*?actionLabel__regenerate:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?dangerSection:\s+{[\s\S]*?title:"
+  - "userProfile:\s+{[\s\S]*?start:\s+{[\s\S]*?dangerSection:\s+{[\s\S]*?deleteAccountButton:"
+  - "userProfile:\s+{[\s\S]*?profilePage:\s+{[\s\S]*?imageFormSubtitle:"
+  - "userProfile:\s+{[\s\S]*?profilePage:\s+{[\s\S]*?imageFormDestructiveActionSubtitle:"
+  - "userProfile:\s+{[\s\S]*?profilePage:\s+{[\s\S]*?fileDropAreaHint:"
+  - "userProfile:\s+{[\s\S]*?phoneNumberPage:\s+{[\s\S]*?infoText:"
+  - "userProfile:\s+{[\s\S]*?connectedAccountPage:\s+{[\s\S]*?socialButtonsBlockButton:"
+  - "userProfile:\s+{[\s\S]*?mfaPhoneCodePage:\s+{[\s\S]*?primaryButton__addPhoneNumber:"
+  - "userProfile:\s+{[\s\S]*?mfaPhoneCodePage:\s+{[\s\S]*?subtitle__availablePhoneNumbers:"
+  - "userProfile:\s+{[\s\S]*?mfaPhoneCodePage:\s+{[\s\S]*?subtitle__unavailablePhoneNumbers:"
+  - "userProfile:\s+{[\s\S]*?deletePage:\s+{[\s\S]*?actionDescription:"
+  - "organizationSwitcher:\s+{[\s\S]*?action__createOrganization:"
+  - "organizationSwitcher:\s+{[\s\S]*?action__manageOrganization:"
+  - "organizationProfile:\s+{[\s\S]*?profilePage:\s+{[\s\S]*?title:"
+  - "organizationProfile:\s+{[\s\S]*?profilePage:\s+{[\s\S]*?dangerSection:\s+{[\s\S]*?leaveOrganization:\s+{[\s\S]*?actionDescription:"
+  - "organizationProfile:\s+{[\s\S]*?profilePage:\s+{[\s\S]*?dangerSection:\s+{[\s\S]*?deleteOrganization:\s+{[\s\S]*?actionDescription:"
+  - "organizationProfile:\s+{[\s\S]*?invitePage:\s+{[\s\S]*?title:"
+  - "organizationProfile:\s+{[\s\S]*?invitePage:\s+{[\s\S]*?subtitle:"
+  - "createOrganization:\s+{[\s\S]*?title:"
+  - "organizationList:\s+{[\s\S]*?title:"
+  - "organizationList:\s+{[\s\S]*?titleWithoutPersonal:"
 ---
 
 The values of some keys have been changed on the default [en-US localization object](https://github.com/clerk/javascript/blob/main/packages/localizations/src/en-US.ts). The list below shows you the new defaults (as of writing this guide) which you can either use or overwrite. If you have overridden these values, make sure to double check so you can be sure that your modifications are appropriate.
@@ -104,12 +104,13 @@ const changedValues = {
   userProfile: {
     start: {
       headerTitle__account: 'Profile details',
-      profileSection: {
-        primaryButton: 'Edit profile',
-      },
       emailAddressesSection: {
+        primaryButton: 'Add email address',
         detailsAction__unverified: 'Verify',
         destructiveAction: 'Remove email',
+      },
+      phoneNumbersSection: {
+        primaryButton: 'Add phone number',
       },
       mfaSection: {
         phoneCode: {
@@ -120,30 +121,31 @@ const changedValues = {
         },
       },
       dangerSection: {
-        title: 'Account termination',
+        title: 'Delete account',
         deleteAccountButton: 'Delete account',
       },
     },
     profilePage: {
       imageFormSubtitle: 'Upload',
       imageFormDestructiveActionSubtitle: 'Remove',
+      fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',
     },
     phoneNumberPage: {
-      title: 'Add a phone number',
       infoText:
-        'A text message containing a verification link will be sent to this phone number. Message and data rates may apply.',
+        'A text message containing a verification code will be sent to this phone number. Message and data rates may apply.',
     },
     connectedAccountPage: {
       socialButtonsBlockButton: '{{provider|titleize}}',
     },
     mfaPhoneCodePage: {
+      primaryButton__addPhoneNumber: 'Add phone number',
       subtitle__availablePhoneNumbers:
         'Select an existing phone number to register for SMS code two-step verification or add a new one.',
       subtitle__unavailablePhoneNumbers:
         'There are no available phone numbers to register for SMS code two-step verification, please add a new one.',
     },
     deletePage: {
-      actionDescription: 'Type "Delete account" below to continue.',
+      actionDescription: "Type 'Delete account' below to continue.",
     },
   },
   organizationSwitcher: {
@@ -154,12 +156,11 @@ const changedValues = {
     profilePage: {
       title: 'Update Profile',
       dangerSection: {
-        title: 'Danger',
         leaveOrganization: {
-          actionDescription: 'Type "{{organizationName}}" below to continue.',
+          actionDescription: "Type '{{organizationName}}' below to continue.",
         },
         deleteOrganization: {
-          actionDescription: 'Type "{{organizationName}}" below to continue.',
+          actionDescription: "Type '{{organizationName}}' below to continue.",
         },
       },
     },

@@ -66,6 +66,7 @@ const reactChanges = [
   'min-react-version',
   'externalaccount-avatarurl',
   'organizationmembershippublicuserdata-profileimageurl',
+  'appearance-variables-breaking-changes',
 ];
 
 export default {

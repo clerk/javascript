@@ -12,15 +12,6 @@ const cwd = 'core-2/retheme';
 async function generate() {
   const data = await loadVersionChangeData('core-2', 'nextjs');
 
-  const appearancePropBreakingChanges = {
-    title: 'Breaking Changes to appearance variables',
-    content: `\nSeveral appearance variables have been removed or renamed. If you were using these variables in your application, you will need to update your code to use the new variables.
-
-    - The \`fontSmoothing\` variable has been removed.
-    - The \`shadowShimmer\` variable has been removed.
-    - The \`colorAlphaShade\` variable has been renamed to \`colorNeutral\`.\n`,
-  };
-
   const defaultsChangeItem = {
     title: 'Changes to default variables',
     content: `\nThe default values of some [appearance variables](/docs/components/customization/variables) have changed which may impact your UI (if you are not already overriding them).
@@ -38,7 +29,8 @@ async function generate() {
     '# Redesigned Components in v5',
     markdown('intro'),
     '## Appearance Changes',
-    accordionForCategory('appearance', { additionalItems: [appearancePropBreakingChanges, defaultsChangeItem] }),
+    accordionForCategory('appearance-breaking-changes'),
+    accordionForCategory('appearance', { additionalItems: [defaultsChangeItem] }),
     '## Localization Changes',
     accordionForCategory('localization'),
   ]);
