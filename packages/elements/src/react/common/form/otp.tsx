@@ -1,15 +1,21 @@
 import { Control as RadixControl } from '@radix-ui/react-form';
-import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 
 import type { FormControlProps } from '~/react/common/form';
 
 export type OTPInputProps = Exclude<
   FormControlProps,
-  'type' | 'autoComplete' | 'maxLength' | 'inputMode' | 'pattern'
+  'type' | 'autoComplete' | 'minLength' | 'maxLength' | 'inputMode' | 'pattern' | 'spellCheck'
 > & {
   render?: (props: { value: string; status: 'cursor' | 'selected' | 'none'; index: number }) => React.ReactNode;
+  length?: number;
 };
+
+type SelectionRange = readonly [start: number, end: number];
+const ZERO: SelectionRange = [0, 0];
+const OUTSIDE: SelectionRange = [-1, -1];
+
+export const OTP_LENGTH_DEFAULT = 6;
 
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(props, ref) {
   const treatAsSegmented = typeof props.render !== 'undefined';
@@ -38,10 +44,10 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(functi
  */
 const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPInputProps, 'render'>> & OTPInputProps>(
   function OTPInput(props, ref) {
-    const { className, render, maxLength = 6, ...rest } = props;
+    const { className, render, length = OTP_LENGTH_DEFAULT, ...rest } = props;
 
     const innerRef = React.useRef<HTMLInputElement>(null);
-    const [selectionRange, setSelectionRange] = React.useState<[number, number]>(props.autoFocus ? [0, 0] : [-1, -1]);
+    const [selectionRange, setSelectionRange] = React.useState<SelectionRange>(props.autoFocus ? ZERO : OUTSIDE);
 
     // This ensures we can access innerRef internally while still exposing it via the ref prop
     React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
@@ -62,7 +68,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           } as React.CSSProperties
         }
       >
-        {/* We can't target pseud-elements with the style prop, so we inject a tag here */}
+        {/* We can't target pseudo-elements with the style prop, so we inject a tag here */}
         <style>{`
       input[data-otp-input]::selection {
         color: transparent;
@@ -72,7 +78,6 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
         <RadixControl
           ref={innerRef}
           {...rest}
-          maxLength={maxLength}
           onBlur={event => {
             setSelectionRange([-1, -1]);
             rest?.onBlur?.(event);
@@ -100,8 +105,8 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
             pointerEvents: 'none',
           }}
         >
-          {Array.from({ length: maxLength }).map((_, i) => (
-            <Slot key={i}>
+          {Array.from({ length }).map((_, i) => (
+            <React.Fragment key={i}>
               {render({
                 value: String(props.value)[i] || '',
                 status:
@@ -112,7 +117,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
                     : 'none',
                 index: i,
               })}
-            </Slot>
+            </React.Fragment>
           ))}
         </div>
       </div>
@@ -123,7 +128,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
 /**
  * Handle updating the input selection range to ensure a single character is selected when moving the cursor, or if the input value changes.
  */
-function selectionRangeUpdater(cur: [number, number], inputRef: React.RefObject<HTMLInputElement>) {
+function selectionRangeUpdater(cur: SelectionRange, inputRef: React.RefObject<HTMLInputElement>) {
   let direction: 'forward' | 'backward' = 'forward' as const;
   let updated: [number, number] = [inputRef.current?.selectionStart ?? 0, inputRef.current?.selectionEnd ?? 0];
 
