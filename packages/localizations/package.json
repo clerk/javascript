@@ -91,7 +91,7 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-beta.15",
+    "@clerk/types": "4.0.0-beta.16",
     "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "tsup": "*",
