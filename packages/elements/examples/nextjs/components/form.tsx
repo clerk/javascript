@@ -41,7 +41,6 @@ export const CustomField = React.forwardRef<typeof Input, { name: string; label:
             render: OTPInputSegment,
             className: 'flex gap-3',
             required,
-            type: 'otp',
           }
         : {
             className: 'bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500',
