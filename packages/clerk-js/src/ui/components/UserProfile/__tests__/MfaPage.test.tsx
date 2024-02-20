@@ -289,7 +289,7 @@ describe('MfaPage', () => {
       getByText(/remove two-step verification/i);
       getByText('Your account may not be as secure. Are you sure you want to continue?');
 
-      await userEvent.click(getByRole('button', { name: /^save$/i }));
+      await userEvent.click(getByRole('button', { name: /^remove$/i }));
 
       expect(fixtures.clerk.user?.phoneNumbers[0].setReservedForSecondFactor).toHaveBeenCalledWith({ reserved: false });
     });
@@ -323,7 +323,7 @@ describe('MfaPage', () => {
       getByText('Your account may not be as secure. Are you sure you want to continue?');
       getByText('Verification codes from this authenticator will no longer be required when signing in.');
 
-      await userEvent.click(getByRole('button', { name: /^save$/i }));
+      await userEvent.click(getByRole('button', { name: /^remove$/i }));
 
       expect(fixtures.clerk.user?.disableTOTP).toHaveBeenCalled();
     });
