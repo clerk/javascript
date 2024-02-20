@@ -266,6 +266,8 @@ type _LocalizationResource = {
     formButtonPrimary__continue: LocalizationValue;
     formButtonPrimary__save: LocalizationValue;
     formButtonPrimary__finish: LocalizationValue;
+    formButtonPrimary__remove: LocalizationValue;
+    formButtonPrimary__add: LocalizationValue;
     formButtonReset: LocalizationValue;
     navbar: {
       title: LocalizationValue;
@@ -364,6 +366,7 @@ type _LocalizationResource = {
     };
     emailAddressPage: {
       title: LocalizationValue;
+      verifyTitle: LocalizationValue;
       emailCode: {
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
@@ -387,6 +390,8 @@ type _LocalizationResource = {
     };
     phoneNumberPage: {
       title: LocalizationValue;
+      verifyTitle: LocalizationValue;
+      verifySubtitle: LocalizationValue;
       successMessage: LocalizationValue;
       infoText: LocalizationValue;
       removeResource: {

@@ -249,6 +249,7 @@ const RadioGroup = (
 
 const OTPInput = (props: OTPInputProps) => {
   const { ref, ...restInputProps } = props.otpControl.otpInputProps;
+  const { centerAlign = true } = props;
   return (
     // Use Field.Root in order to pass feedback down to Field.Feedback
     // @ts-ignore
@@ -258,7 +259,7 @@ const OTPInput = (props: OTPInputProps) => {
         <Col
           elementDescriptor={descriptors.form}
           gap={2}
-          align='center'
+          align={centerAlign ? 'center' : 'start'}
         >
           <Flex
             elementDescriptor={descriptors.otpCodeField}

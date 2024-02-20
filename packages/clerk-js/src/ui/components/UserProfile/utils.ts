@@ -1,4 +1,10 @@
-import type { Attributes, EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/types';
+import type {
+  Attributes,
+  EmailAddressResource,
+  EnvironmentResource,
+  PhoneNumberResource,
+  UserResource,
+} from '@clerk/types';
 
 type IDable = { id: string };
 
@@ -40,4 +46,29 @@ export function getSecondFactorsAvailableToAdd(attributes: Attributes, user: Use
   }
 
   return sfs;
+}
+
+export function sortIdentificationBasedOnVerification<T extends Array<EmailAddressResource | PhoneNumberResource>>(
+  array: T | null | undefined,
+  primaryId: string | null | undefined,
+): T {
+  if (!array) return [] as unknown as T;
+  const primaryItem = array.filter(item => item.id === primaryId);
+  const itemsWithoutPrimary = array.filter(item => item.id !== primaryId);
+  const verifiedItems = itemsWithoutPrimary.filter(item => item.verification?.status === 'verified');
+  const unverifiedItems = itemsWithoutPrimary.filter(
+    item => !!item.verification?.status && item.verification?.status !== 'verified',
+  );
+  const unverifiedItemsWithoutVerification = itemsWithoutPrimary.filter(item => !item.verification.status);
+
+  // Sorting verified items alphabetically by name
+  verifiedItems.sort((a, b) => a.id.localeCompare(b.id));
+
+  // Sorting unverified items by expireAt, most recent last
+  unverifiedItems.sort((a, b) => {
+    if (!a.verification?.expireAt || !b.verification?.expireAt) return 0;
+    return a.verification.expireAt.getTime() - b.verification.expireAt.getTime();
+  });
+
+  return [...primaryItem, ...verifiedItems, ...unverifiedItems, ...unverifiedItemsWithoutVerification] as T;
 }

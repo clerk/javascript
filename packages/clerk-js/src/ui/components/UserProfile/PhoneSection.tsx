@@ -9,7 +9,7 @@ import type { PropsOfComponent } from '../../styledSystem';
 import { handleError, stringToFormattedPhoneString } from '../../utils';
 import { PhoneForm } from './PhoneForm';
 import { RemovePhoneForm } from './RemoveResourceForm';
-import { primaryIdentificationFirst } from './utils';
+import { sortIdentificationBasedOnVerification } from './utils';
 
 type RemovePhoneScreenProps = { phoneId: string };
 const RemovePhoneScreen = (props: RemovePhoneScreenProps) => {
@@ -46,7 +46,7 @@ export const PhoneSection = () => {
     >
       <Action.Root>
         <ProfileSection.ItemList id='phoneNumbers'>
-          {user?.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
+          {sortIdentificationBasedOnVerification(user?.phoneNumbers, user?.primaryPhoneNumberId).map(phone => (
             <Action.Root key={phone.id}>
               <Action.Closed value=''>
                 <ProfileSection.Item
