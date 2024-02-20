@@ -3,3 +3,5 @@ export { useActiveTags } from './use-active-tags.hook';
 export { useBrowserInspector } from './use-browser-inspector.hook';
 export { useThirdPartyProvider } from './use-third-party-provider.hook';
 export { consoleInspector, useConsoleInspector } from './use-console-inspector.hook';
+export { useCodeInput } from "./use-code-input.hook"
+export { useFocus } from './use-focus.hook';

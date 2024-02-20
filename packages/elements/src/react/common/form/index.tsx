@@ -31,7 +31,7 @@ import {
 import type { FieldDetails } from '~/internals/machines/form/form.types';
 
 import type { OTPInputProps } from './otp';
-import { OTP_MAXLENGTH_DEFAULT, OTPInput } from './otp';
+import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
 import type { FieldStates } from './types';
 
 /* -------------------------------------------------------------------------------------------------
@@ -159,14 +159,16 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
 
   let props = {};
   if (inputType === 'otp') {
-    const maxLength = passthroughProps?.maxLength || OTP_MAXLENGTH_DEFAULT;
+    const p = passthroughProps as Omit<OTPInputProps, 'name' | 'value' | 'type'>;
+    const length = p.length || OTP_LENGTH_DEFAULT;
 
     props = {
       'data-otp-input': true,
       autoComplete: 'one-time-code',
       inputMode: 'numeric',
-      pattern: `[0-9]{${maxLength}}`,
-      maxLength,
+      pattern: `[0-9]{${length}}`,
+      minLength: length,
+      maxLength: length,
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         // Only accept numbers
         event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
@@ -273,7 +275,7 @@ function FieldState({ children }: { children: (state: { state: FieldStates }) =>
  * Input
  * -----------------------------------------------------------------------------------------------*/
 
-const INPUT_NAME = 'ClerkElementsLabel';
+const INPUT_NAME = 'ClerkElementsInput';
 
 type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
 

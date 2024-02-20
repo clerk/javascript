@@ -21,6 +21,11 @@ export default function SignInPage() {
           <div className='flex flex-col items-center justify-center  gap-12'>
             <H1>START</H1>
 
+            <CustomField
+              label='Email Code'
+              name='code'
+            />
+
             <GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
