@@ -90,6 +90,15 @@ export function determineStartingSignInFactor(
     return null;
   }
 
+  //TODO: Create proper function like `determineStrategyWhenOTPIsPreferred`
+  if (preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Passkey) {
+    return (
+      firstFactors.find(f => f.strategy === PREFERRED_SIGN_IN_STRATEGIES.Passkey) || {
+        strategy: 'passkey',
+      }
+    );
+  }
+
   return preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Password
     ? determineStrategyWhenPasswordIsPreferred(firstFactors, identifier)
     : determineStrategyWhenOTPIsPreferred(firstFactors, identifier);
@@ -103,7 +112,7 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
   return titleize(signIn.userData?.firstName) || titleize(signIn.userData?.lastName) || signIn?.identifier || '';
 }
 
-const localStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
+const localStrategies: SignInStrategy[] = ['passkey', 'email_code', 'password', 'phone_code', 'email_link'];
 
 export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {
   if (!factor) {

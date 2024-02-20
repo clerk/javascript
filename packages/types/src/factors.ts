@@ -3,6 +3,7 @@ import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
+  PasskeyStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
   ResetPasswordEmailCodeStrategy,
@@ -42,6 +43,10 @@ export type Web3SignatureFactor = {
 
 export type PasswordFactor = {
   strategy: PasswordStrategy;
+};
+
+export type PasskeyFactor = {
+  strategy: PasskeyStrategy;
 };
 
 export type OauthFactor = {
@@ -85,6 +90,7 @@ export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
 };
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
 export type Web3SignatureConfig = Web3SignatureFactor;
+export type PassKeyConfig = PasskeyFactor;
 export type OAuthConfig = OauthFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
@@ -113,6 +119,11 @@ export type PhoneCodeAttempt = {
 export type PasswordAttempt = {
   strategy: PasswordStrategy;
   password: string;
+};
+
+export type PasskeyAttempt = {
+  strategy: PasskeyStrategy;
+  signature: string;
 };
 
 export type Web3Attempt = {

@@ -8,6 +8,9 @@ import type {
   EmailLinkFactor,
   OAuthConfig,
   OauthFactor,
+  PasskeyAttempt,
+  PassKeyConfig,
+  PasskeyFactor,
   PasswordAttempt,
   PasswordFactor,
   PhoneCodeAttempt,
@@ -49,6 +52,7 @@ import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
+  PasskeyStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
   ResetPasswordEmailCodeStrategy,
@@ -89,6 +93,7 @@ export interface SignInResource extends ClerkResource {
   authenticateWithWeb3: (params: AuthenticateWithWeb3Params) => Promise<SignInResource>;
 
   authenticateWithMetamask: () => Promise<SignInResource>;
+  authenticateWithPasskey: (params: { conditionalUI: boolean }) => Promise<SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
@@ -113,6 +118,7 @@ export type SignInFirstFactor =
   | EmailLinkFactor
   | PhoneCodeFactor
   | PasswordFactor
+  | PasskeyFactor
   | ResetPasswordPhoneCodeFactor
   | ResetPasswordEmailCodeFactor
   | Web3SignatureFactor
@@ -135,12 +141,14 @@ export type PrepareFirstFactorParams =
   | EmailLinkConfig
   | PhoneCodeConfig
   | Web3SignatureConfig
+  | PassKeyConfig
   | ResetPasswordPhoneCodeFactorConfig
   | ResetPasswordEmailCodeFactorConfig
   | OAuthConfig
   | SamlConfig;
 
 export type AttemptFirstFactorParams =
+  | PasskeyAttempt
   | EmailCodeAttempt
   | PhoneCodeAttempt
   | PasswordAttempt
@@ -198,6 +206,7 @@ export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams
 }
 
 export type SignInStrategy =
+  | PasskeyStrategy
   | PasswordStrategy
   | ResetPasswordPhoneCodeStrategy
   | ResetPasswordEmailCodeStrategy

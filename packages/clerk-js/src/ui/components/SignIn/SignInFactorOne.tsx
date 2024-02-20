@@ -11,6 +11,7 @@ import { AlternativeMethods } from './AlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
+import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
@@ -33,6 +34,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
 export function _SignInFactorOne(): JSX.Element {
   const signIn = useCoreSignIn();
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
+  console.log('Prefered', preferredSignInStrategy);
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
 
@@ -41,7 +43,8 @@ export function _SignInFactorOne(): JSX.Element {
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => ({
-    currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, preferredSignInStrategy),
+    // TODO: bring back `preferredSignInStrategy`
+    currentFactor: determineStartingSignInFactor(availableFactors, signIn.identifier, 'passkey'),
     prevCurrentFactor: undefined,
   }));
 
@@ -112,6 +115,22 @@ export function _SignInFactorOne(): JSX.Element {
   }
 
   switch (currentFactor?.strategy) {
+    case 'passkey':
+      return (
+        <SignInFactorOnePasskey
+          onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
+            handleFactorPrepare();
+            setFactor(prev => ({
+              currentFactor: {
+                ...factor,
+              },
+              prevCurrentFactor: prev.currentFactor,
+            }));
+          }}
+          onShowAlternativeMethodsClick={toggleAllStrategies}
+        />
+      );
+
     case 'password':
       return (
         <SignInFactorOnePasswordCard

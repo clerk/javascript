@@ -7,6 +7,8 @@ import type {
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
+  PassKeyConfig,
+  PasskeyFactor,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -28,6 +30,7 @@ import type {
 } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import { base64UrlToBuffer, bufferToBase64Url, handlePublicKeyCreateError } from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
 import {
   clerkInvalidFAPIResponse,
@@ -74,6 +77,9 @@ export class SignIn extends BaseResource implements SignInResource {
   prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
     let config;
     switch (factor.strategy) {
+      case 'passkey':
+        config = {} as PassKeyConfig;
+        break;
       case 'email_link':
         config = {
           emailAddressId: factor.emailAddressId,
@@ -223,6 +229,71 @@ export class SignIn extends BaseResource implements SignInResource {
     return this.attemptFirstFactor({
       signature,
       strategy: 'web3_metamask_signature',
+    });
+  };
+
+  public authenticateWithPasskey = async ({
+    conditionalUI = false,
+  }: {
+    conditionalUI: boolean;
+  }): Promise<SignInResource> => {
+    const isConditionalUI = conditionalUI;
+    // TODO: Call create({}) when flow has not been initialized (conditional UI)
+
+    const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
+
+    // @ts-ignore
+    const { publicKey: options } = await this.prepareFirstFactor(passKeyFactor);
+
+    // const { nonce } = this.firstFactorVerification;
+
+    const challengeBuffer = base64UrlToBuffer(options.challenge as unknown as string);
+
+    const allowCredentialsWithBuffer = (options.allowCredentials || []).map((cred: any) => ({
+      ...cred,
+      id: base64UrlToBuffer(cred.id as unknown as string),
+    }));
+
+    const publicKey: CredentialRequestOptions['publicKey'] = {
+      ...options,
+      challenge: challengeBuffer,
+      allowCredentials: allowCredentialsWithBuffer,
+    };
+    // Invoke the WebAuthn create() method.
+    const { cred, error } = await navigator.credentials
+      .get({
+        publicKey,
+        mediation: isConditionalUI ? 'conditional' : 'optional',
+      })
+      .then(v => ({ cred: v as PublicKeyCredential, error: null }))
+      // TODO: handle error differently from register
+      .catch(e => ({ error: handlePublicKeyCreateError(e), cred: null }));
+
+    if (!cred) {
+      throw error;
+    }
+
+    const { id, rawId, type } = cred;
+    const response = cred.response as AuthenticatorAssertionResponse;
+
+    const credential = {
+      id,
+      rawId: bufferToBase64Url(rawId),
+      type,
+      clientExtensionResults: cred.getClientExtensionResults(),
+      authenticatorAttachment: cred.authenticatorAttachment,
+      response: {
+        authenticatorData: bufferToBase64Url(response.authenticatorData),
+        clientDataJSON: bufferToBase64Url(response.clientDataJSON),
+        signature: bufferToBase64Url(response.signature),
+        userHandle: response.userHandle ? bufferToBase64Url(response.userHandle) : null,
+      },
+    };
+
+    return this.attemptFirstFactor({
+      // @ts-ignore
+      credential,
+      strategy: 'passkey',
     });
   };
 

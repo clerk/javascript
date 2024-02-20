@@ -5,6 +5,7 @@ import {
   bufferToBase64Url,
   handlePublicKeyCreateError,
   isWebAuthnPlatformAuthenticatorSupported,
+  isWebAuthnSupported,
 } from '../../utils/passkeys';
 import { BaseResource, ClerkRuntimeError } from './internal';
 
@@ -12,7 +13,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
   pathRoot = '/me/passkeys';
   credentialId: string | null = null;
-  publicKey: PublicKeyOptions = {};
+  publicKey!: PublicKeyOptions;
   challenge: string = '';
   user!: PasskeyResource['user'];
   rp!: PasskeyResource['rp'];
@@ -51,10 +52,9 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
-
-    if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
-      throw new ClerkRuntimeError('Platform authenticator is not supported', {
-        code: 'passkeys_unsupported_platform_authenticator',
+    if (!isWebAuthnSupported()) {
+      throw new ClerkRuntimeError('Passkeys are not supported', {
+        code: 'passkeys_unsupported',
       });
     }
     const { publicKey: options } = await this.startRegistration();
@@ -66,6 +66,14 @@ export class Passkey extends BaseResource implements PasskeyResource {
       ...cred,
       id: base64UrlToBuffer(cred.id as unknown as string),
     }));
+
+    if (options.authenticatorSelection?.authenticatorAttachment === 'platform') {
+      if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
+        throw new ClerkRuntimeError('Platform authenticator is not supported', {
+          code: 'passkeys_unsupported_platform_authenticator',
+        });
+      }
+    }
 
     const publicKey: PublicKeyOptions = {
       ...options,
