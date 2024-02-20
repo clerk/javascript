@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 
+import { FadeInOut, usePresence } from '..';
 import { useActionContext } from './ActionRoot';
 
 const ScrollWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren>((props, ref) => (
@@ -15,6 +16,13 @@ type ActionOpenProps = PropsWithChildren<{ value: string }>;
 export const ActionOpen = ({ children, value }: ActionOpenProps) => {
   const { active } = useActionContext();
   const ref = useRef<HTMLDivElement>(null);
+  const isVisible = active === value;
+  const presence = usePresence(isVisible);
+  const animate = useRef(false);
+
+  useLayoutEffect(() => {
+    animate.current = true;
+  }, []);
 
   useEffect(() => {
     const element = ref.current;
@@ -36,9 +44,16 @@ export const ActionOpen = ({ children, value }: ActionOpenProps) => {
     return () => observer.disconnect();
   }, [active, value]);
 
-  if (active !== value) {
+  if (!presence.isPresent) {
     return null;
   }
 
-  return <ScrollWrapper ref={ref}>{children}</ScrollWrapper>;
+  return (
+    <FadeInOut
+      ref={presence.ref as any}
+      data-state={animate.current ? (isVisible ? 'active' : 'inactive') : null}
+    >
+      {children}
+    </FadeInOut>
+  );
 };

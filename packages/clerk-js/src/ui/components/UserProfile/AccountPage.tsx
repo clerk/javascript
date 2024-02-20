@@ -3,13 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, Header, useCardState, withCardStateProvider } from '../../elements';
-import { ConnectedAccountsSection } from './ConnectedAccountsSection';
-import { EmailsSection } from './EmailsSection';
-import { EnterpriseAccountsSection } from './EnterpriseAccountsSection';
-import { PhoneSection } from './PhoneSection';
-import { UsernameSection } from './UsernameSection';
 import { UserProfileSection } from './UserProfileSection';
-import { Web3Section } from './Web3Section';
 
 export const AccountPage = withCardStateProvider(() => {
   const { attributes, saml, social } = useEnvironment().userSettings;
@@ -42,12 +36,12 @@ export const AccountPage = withCardStateProvider(() => {
         <Card.Alert>{card.error}</Card.Alert>
 
         <UserProfileSection />
-        {showUsername && <UsernameSection />}
+        {/* {showUsername && <UsernameSection />}
         {showEmail && <EmailsSection />}
         {showPhone && <PhoneSection />}
         {showConnectedAccounts && <ConnectedAccountsSection />}
         {showSamlAccounts && <EnterpriseAccountsSection />}
-        {showWeb3 && <Web3Section />}
+        {showWeb3 && <Web3Section />} */}
       </Col>
     </Col>
   );

@@ -6,6 +6,28 @@ const spinning = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }`;
 
+const actionActive = keyframes`
+  0% {
+    opacity: 0;
+    grid-template-rows: 0fr;
+  }
+  100% {
+    opacity: 1;
+    grid-template-rows: 1fr;
+  }
+`;
+
+const actionInactive = keyframes`
+  0% {
+    opacity: 1;
+    grid-template-rows: 1fr;
+  }
+  100% {
+    opacity: 0;
+    grid-template-rows: 0fr;
+  }
+`;
+
 const dropdownSlideInScaleAndFade = keyframes`
   0% {
     opacity: 0;
@@ -128,6 +150,8 @@ export const animations = {
   dropdownSlideInScaleAndFade,
   modalSlideAndFade,
   fadeIn,
+  actionActive,
+  actionInactive,
   textInSmall,
   textInBig,
   blockBigIn,
