@@ -1,90 +1,99 @@
 'use client';
 
-import { GlobalError, Submit } from '@clerk/elements/common';
-import {
-  SignIn,
-  SocialProvider,
-  SocialProviderIcon,
-  Start,
-  Verification,
-  Verifications,
-} from '@clerk/elements/sign-in';
+import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
+import { SignIn, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-in';
+import Link from 'next/link';
+import { type ComponentProps, useState } from 'react';
 
-import { H1, H3, HR as Hr, P } from '@/components/design';
+import { H1, H3, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
 
+function CustomSocialProvider({
+  children,
+  provider,
+}: {
+  children: string;
+  provider: ComponentProps<typeof SocialProvider>['name'];
+}) {
+  return (
+    <SocialProvider
+      name={provider}
+      className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
+    >
+      <SocialProviderIcon
+        className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
+      />
+      <span className='leading-loose'>{children}</span>
+    </SocialProvider>
+  );
+}
+
 export default function SignInPage() {
+  const [continueWithEmail, setContinueWithEmail] = useState(false);
+
   return (
     <SignIn>
-      <div className='m-auto w-max text-sm'>
-        <Start>
-          <div className='flex flex-col items-center justify-center  gap-12'>
-            <H1>START</H1>
+      <div className='h-dvh flex flex-col justify-center items-center bg-[rgb(4,4,4)] text-[rgb(243,243,243)] gap-10'>
+        <div className='text-center'>
+          <H1>Sign In</H1>
+          <p className='text-sm'>
+            Don&apos;t have an account? <Link href='/sign-up'>Sign Up</Link>.
+          </p>
+        </div>
 
+        <Step name='start'>
+          <div className='flex flex-col items-center  gap-12 w-96'>
             <GlobalError className='block text-red-400 font-mono' />
 
-            <div className='flex flex-col items-stretch justify-center gap-2'>
-              <SocialProvider
-                name='github'
-                className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
-              >
-                <SocialProviderIcon className='invert' />
-                Sign In with GitHub
-              </SocialProvider>
-
-              <SocialProvider
-                name='google'
-                className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
-              >
-                <SocialProviderIcon />
-                Sign In with Google
-              </SocialProvider>
-
-              <SocialProvider
-                name='metamask'
-                className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
-              >
-                <SocialProviderIcon />
-                Sign In with Metamask
-              </SocialProvider>
+            <div className='flex flex-col gap-2 self-stretch'>
+              <CustomSocialProvider provider='github'>Continue with GitHub</CustomSocialProvider>
+              <CustomSocialProvider provider='google'>Continue with Google</CustomSocialProvider>
+              <CustomSocialProvider provider='metamask'>Continue with Metamask</CustomSocialProvider>
             </div>
 
-            <Hr />
+            {continueWithEmail ? (
+              <>
+                <Field
+                  className='flex flex-col gap-4 w-full'
+                  name='identifier'
+                >
+                  <Label className='sr-only'>Email</Label>
+                  <Input
+                    className='bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded data-[invalid=true]:border-red-400 w-full placeholder-[rgb(100,100,100)] px-4 py-2'
+                    placeholder='Enter your email address'
+                  />
+                  <FieldError className='block text-red-400 font-mono w-full' />
+                </Field>
 
-            <div className='flex gap-6 flex-col'>
-              {/* <Loading> */}
-              <CustomField
-                label='Email'
-                name='identifier'
-              />
-              {/* </Loading> */}
-
-              {/* <Hr />
-
-              <CustomField
-                label='Phone'
-                name='identifier'
-              /> */}
-
-              <CustomSubmit>Sign In</CustomSubmit>
-            </div>
+                <CustomSubmit className='flex h-11 px-7 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,108,0)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(128,128,128)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'>
+                  Sign in with Email
+                </CustomSubmit>
+              </>
+            ) : (
+              <button
+                className='m-0 py-3 px-6 text-sm font-medium text-[rgb(144,144,144)] transition-colors duration-150 hover:text-[rgb(204,204,204)]'
+                onClick={() => setContinueWithEmail(true)}
+                type='button'
+              >
+                Continue with Email
+              </button>
+            )}
           </div>
-        </Start>
+        </Step>
 
-        <Verifications>
+        <Step name='verifications'>
           <div className='flex gap-6 flex-col'>
             <H1>VERFIY</H1>
 
             <GlobalError className='block text-red-400 font-mono' />
 
-            {/* <Loading> */}
             <Verification name='password'>
               <CustomField
                 label='Password'
                 name='password'
               />
 
-              <CustomSubmit>Sign In</CustomSubmit>
+              <CustomSubmit>Verify</CustomSubmit>
             </Verification>
 
             <Verification name='email_code'>
@@ -93,7 +102,7 @@ export default function SignInPage() {
                 name='code'
               />
 
-              <CustomSubmit>Sign In</CustomSubmit>
+              <CustomSubmit>Verify</CustomSubmit>
             </Verification>
 
             <Verification name='phone_code'>
@@ -102,23 +111,16 @@ export default function SignInPage() {
                 name='code'
               />
 
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Sign In
-              </Submit>
+              <CustomSubmit>Verify</CustomSubmit>
             </Verification>
 
             <Verification name='reset_password_email_code'>
               <H3>Verify your email</H3>
 
               <P>Please check your email for a verification code...</P>
-
-              <Submit className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'>
-                Verify
-              </Submit>
             </Verification>
-            {/* </Loading> */}
           </div>
-        </Verifications>
+        </Step>
       </div>
     </SignIn>
   );

@@ -4,6 +4,7 @@ import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 export { SignUpContinue as Continue } from './continue';
 export { SignUpRoot as SignUp, SignUpRoot as Root } from './root';
+export { SignUpStep as Step } from './step';
 export {
   SignUpSocialProvider as SocialProvider,
   SignUpSocialProviderIcon as SocialProviderIcon,
