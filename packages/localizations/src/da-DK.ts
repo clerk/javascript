@@ -586,9 +586,12 @@ export const daDK: LocalizationResource = {
         title: 'Fjern e-mailadresse',
       },
       title: 'Tilføj e-mailadresse',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Fortsæt',
     formButtonPrimary__finish: 'Afslut',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Annuller',
     mfaPage: {
@@ -664,6 +667,8 @@ export const daDK: LocalizationResource = {
       },
       successMessage: '{{identifier}} er blevet tilføjet til din konto.',
       title: 'Tilføj telefonnummer',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Upload a JPG, PNG, GIF, or WEBP image smaller than 10 MB',

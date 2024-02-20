@@ -580,9 +580,12 @@ export const heIL: LocalizationResource = {
         title: 'הסר כתובת אימייל',
       },
       title: 'הוסף כתובת אימייל',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'המשך',
     formButtonPrimary__finish: 'סיים',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'בטל',
     mfaPage: {
@@ -654,6 +657,8 @@ export const heIL: LocalizationResource = {
       },
       successMessage: '{{identifier}} התווסף לחשבון שלך.',
       title: 'הוסף מספר טלפון',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'העלה תמונה בפורמט JPG, PNG, GIF, או WEBP הקטנה מ-10 מ"ב',

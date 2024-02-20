@@ -586,9 +586,12 @@ export const ukUA: LocalizationResource = {
         title: 'Видалити адресу електронної пошти',
       },
       title: 'Додати адресу електронної пошти',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Продовжити',
     formButtonPrimary__finish: 'Завершити',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Скасувати',
     mfaPage: {
@@ -665,6 +668,8 @@ export const ukUA: LocalizationResource = {
       },
       successMessage: '{{identifier}} було додано до вашого облікового запису.',
       title: 'Додати номер телефону',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Завантажте зображення у форматах JPG, PNG, GIF або WEBP розміром менше 10 МБ',

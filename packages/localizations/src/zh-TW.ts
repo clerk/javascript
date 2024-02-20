@@ -578,9 +578,12 @@ export const zhTW: LocalizationResource = {
         title: '移除電子郵件地址',
       },
       title: '添加電子郵件地址',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: '繼續',
     formButtonPrimary__finish: '完成',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: '取消',
     mfaPage: {
@@ -650,6 +653,8 @@ export const zhTW: LocalizationResource = {
       },
       successMessage: '{{identifier}} 已被添加到您的帳戶。',
       title: '添加電話號碼',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: '上傳小於10MB的JPG, PNG, GIF, 或WEBP格式的圖片',

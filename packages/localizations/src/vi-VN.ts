@@ -587,9 +587,12 @@ export const viVN: LocalizationResource = {
         title: 'Xóa địa chỉ email',
       },
       title: 'Thêm địa chỉ email',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Tiếp tục',
     formButtonPrimary__finish: 'Hoàn thành',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Hủy',
     mfaPage: {
@@ -665,6 +668,8 @@ export const viVN: LocalizationResource = {
       },
       successMessage: '{{identifier}} đã được thêm vào tài khoản của bạn.',
       title: 'Thêm số điện thoại',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Tải lên ảnh JPG, PNG, GIF, hoặc WEBP có dung lượng nhỏ hơn 10 MB',

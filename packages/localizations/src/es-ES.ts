@@ -588,9 +588,12 @@ export const esES: LocalizationResource = {
         title: 'Eliminar dirección de correo electrónico',
       },
       title: 'Agregar dirección de correo electrónico',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continuar',
     formButtonPrimary__finish: 'Terminar',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Cancelar',
     mfaPage: {
@@ -667,6 +670,8 @@ export const esES: LocalizationResource = {
       },
       successMessage: '{{identifier}} ha sido añadido a tu cuenta.',
       title: 'Agregar el número de teléfono',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Cargue una imagen JPG, PNG, GIF o WEBP de menos de 10 MB',

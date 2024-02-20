@@ -577,11 +577,11 @@ export const enUS: LocalizationResource = {
       title: 'Add email address',
       verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continue',
     formButtonPrimary__finish: 'Finish',
-    formButtonPrimary__save: 'Save',
     formButtonPrimary__remove: 'Remove',
-    formButtonPrimary__add: 'Add',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Cancel',
     mfaPage: {
       formHint: 'Select a method to add.',
@@ -657,8 +657,8 @@ export const enUS: LocalizationResource = {
       },
       successMessage: '{{identifier}} has been added to your account.',
       title: 'Add phone number',
-      verifyTitle: 'Verify phone number',
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',

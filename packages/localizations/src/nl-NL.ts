@@ -586,9 +586,12 @@ export const nlNL: LocalizationResource = {
         title: 'Verwijder e-mailadres',
       },
       title: 'E-mailadres toevoegen',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Doorgaan',
     formButtonPrimary__finish: 'Afronden',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Annuleren',
     mfaPage: {
@@ -663,6 +666,8 @@ export const nlNL: LocalizationResource = {
       },
       successMessage: '{{identifier}} is toegevoegd aan je account.',
       title: 'Telefoonnummer toevoegen',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Upload een JPG, PNG, GIF, of WEBP afbeelding kleiner dan 10 MB',
