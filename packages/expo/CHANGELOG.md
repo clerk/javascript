@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.0.0-beta.23
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@5.0.0-beta.23
+  - @clerk/clerk-react@5.0.0-beta.20
+
 ## 1.0.0-beta.22
 
 ### Patch Changes
