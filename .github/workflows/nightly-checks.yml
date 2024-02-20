@@ -52,16 +52,11 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           E2E_NEXTJS_VERSION: 'canary'
-  notify-slack:
-    name: Notify Slack
-    needs: integration-tests
-    if: ${{ contains(needs.*.result, 'failure') }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
-    steps:
       - name: Report Status
+        if: always()
         uses: ravsamhq/notify-slack-action@v1
         with:
-          status: 'failure'
+          status: ${{ job.status }}
           notify_when: 'failure'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SDK_E2E_ALERTS_WEBHOOK_URL }}
