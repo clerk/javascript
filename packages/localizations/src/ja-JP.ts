@@ -585,9 +585,12 @@ export const jaJP: LocalizationResource = {
         title: 'メールアドレスの削除',
       },
       title: 'メールアドレスの追加',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: '続行',
     formButtonPrimary__finish: '完了',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'キャンセル',
     mfaPage: {
@@ -661,6 +664,8 @@ export const jaJP: LocalizationResource = {
       },
       successMessage: '{{identifier}}がアカウントに追加されました。',
       title: '電話番号の追加',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: '10MB未満のJPG、PNG、GIF、またはWEBP画像をアップロードしてください',

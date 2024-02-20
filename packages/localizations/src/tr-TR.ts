@@ -587,9 +587,12 @@ export const trTR: LocalizationResource = {
         title: 'E-posta adresini kaldır',
       },
       title: 'E-posta adresi ekle',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'İlerle',
     formButtonPrimary__finish: 'Bitir',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'İptal',
     mfaPage: {
@@ -665,6 +668,8 @@ export const trTR: LocalizationResource = {
       },
       successMessage: '{{identifier}} numarası hesabınıza eklendi.',
       title: 'Telefon numarası ekle',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: "10 MB'tan küçük boyutta bir JPG, PNG, GIF, veya WEBP dosyası yükle",

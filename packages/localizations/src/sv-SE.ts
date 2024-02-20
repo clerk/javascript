@@ -586,9 +586,12 @@ export const svSE: LocalizationResource = {
         title: 'Ta bort e-postadress',
       },
       title: 'Lägg till e-postadress',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Fortsätt',
     formButtonPrimary__finish: 'Slutför',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Avbryt',
     mfaPage: {
@@ -663,6 +666,8 @@ export const svSE: LocalizationResource = {
       },
       successMessage: '{{identifier}} har lagts till i ditt konto.',
       title: 'Lägg till telefonnummer',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Ladda upp en JPG, PNG, GIF, eller WEBP bild som är mindre än 10 MB',

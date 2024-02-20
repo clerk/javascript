@@ -36,7 +36,6 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
           <Header.Root showLogo>
             <Header.Title localizationKey={props.cardTitle} />
             <VerificationLink
-              formTitle={props.formTitle}
               formSubtitle={props.formSubtitle}
               resendButton={props.resendButton}
               onResendCodeClicked={props.onResendCodeClicked}
@@ -67,8 +66,7 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
 };
 
 type VerificationLinkProps = {
-  formTitle: LocalizationKey;
-  formSubtitle: LocalizationKey;
+  formSubtitle?: LocalizationKey;
   resendButton: LocalizationKey;
   onResendCodeClicked: React.MouseEventHandler;
   children?: React.ReactNode;
@@ -85,11 +83,13 @@ export const VerificationLink = (props: VerificationLinkProps) => {
         elementDescriptor={descriptors.formHeader}
         gap={1}
       >
-        <Text
-          localizationKey={props.formSubtitle}
-          elementDescriptor={descriptors.formHeaderSubtitle}
-          colorScheme='neutral'
-        />
+        {!!props.formSubtitle && (
+          <Text
+            localizationKey={props.formSubtitle}
+            elementDescriptor={descriptors.formHeaderSubtitle}
+            colorScheme='neutral'
+          />
+        )}
         {props.children}
       </Col>
       <TimerButton

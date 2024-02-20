@@ -58,7 +58,7 @@ describe('PhoneSection', () => {
       await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
 
       getByLabelText(/phone number/i);
-      getByText(/A text message containing a verification link will be sent to this phone number./i);
+      getByText(/A text message containing a verification code will be sent to this phone number./i);
       getByText(/Message and data rates may apply./i);
     });
 
@@ -72,7 +72,7 @@ describe('PhoneSection', () => {
       fixtures.clerk.user?.createPhoneNumber.mockReturnValueOnce(Promise.resolve({} as any));
 
       await userEvent.type(getByLabelText(/phone number/i), '6911111111');
-      await userEvent.click(getByRole('button', { name: /save$/i }));
+      await userEvent.click(getByRole('button', { name: /add$/i }));
       expect(fixtures.clerk.user?.createPhoneNumber).toHaveBeenCalledWith({ phoneNumber: '+16911111111' }); //default is +1
     });
 
@@ -83,7 +83,7 @@ describe('PhoneSection', () => {
         await userEvent.click(getByRole('button', { name: 'Add phone number' }));
         await waitFor(() => getByRole('heading', { name: /Add phone number/i }));
 
-        expect(screen.getByText(/save$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
+        expect(screen.getByText(/add$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
       });
 
       it('hides screen when when pressing cancel', async () => {
@@ -152,7 +152,7 @@ describe('PhoneSection', () => {
       await userEvent.click(getByRole('menuitem', { name: /remove phone number/i }));
       await waitFor(() => getByRole('heading', { name: /Remove phone number/i }));
 
-      await userEvent.click(getByRole('button', { name: /save/i }));
+      await userEvent.click(getByRole('button', { name: /remove/i }));
       expect(fixtures.clerk.user?.phoneNumbers[0].destroy).toHaveBeenCalled();
 
       await waitFor(() => expect(queryByRole('heading', { name: /Remove phone number/i })).not.toBeInTheDocument());
@@ -177,7 +177,7 @@ describe('PhoneSection', () => {
         getByRole('menuitem', { name: /remove phone number/i });
         await userEvent.click(getByRole('menuitem', { name: /remove phone number/i }));
         await waitFor(() => getByRole('heading', { name: /Remove phone number/i }));
-        expect(getByRole('button', { name: /save$/i })).not.toHaveAttribute('disabled');
+        expect(getByRole('button', { name: /remove$/i })).not.toHaveAttribute('disabled');
       });
 
       it('hides screen when when pressing cancel', async () => {

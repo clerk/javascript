@@ -581,9 +581,12 @@ export const koKR: LocalizationResource = {
         title: '이메일 제거',
       },
       title: '이메일 주소 추가',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: '계속',
     formButtonPrimary__finish: '완료',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: '취소',
     mfaPage: {
@@ -655,6 +658,8 @@ export const koKR: LocalizationResource = {
       },
       successMessage: '{{identifier}}가 당신의 계정에 추가되었습니다.',
       title: '휴대폰 번호 추가',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: '10MB보다 작은 JPG, PNG, GIF 또는 WEBP 이미지를 업로드합니다',

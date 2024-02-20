@@ -592,9 +592,12 @@ export const roRO: LocalizationResource = {
         title: 'Eliminați adresa de e-mail',
       },
       title: 'Adăugați adresa de e-mail',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continuați',
     formButtonPrimary__finish: 'Finalizare',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Anulează',
     mfaPage: {
@@ -674,6 +677,8 @@ export const roRO: LocalizationResource = {
       },
       successMessage: '{{identifier}} a fost adăugat în contul dumneavoastră.',
       title: 'Adăugați numărul de telefon',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Încărcați o imagine JPG, PNG, GIF sau WEBP mai mică de 10 MB',

@@ -119,7 +119,7 @@ describe('ConnectedAccountsSection ', () => {
       await userEvent.click(getByRole('menuitem', { name: /remove/i }));
       await waitFor(() => getByRole('heading', { name: /Remove connected account/i }));
 
-      await userEvent.click(getByRole('button', { name: /save/i }));
+      await userEvent.click(getByRole('button', { name: /remove/i }));
       expect(fixtures.clerk.user?.externalAccounts[1].destroy).toHaveBeenCalled();
 
       await waitFor(() =>

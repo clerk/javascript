@@ -583,9 +583,12 @@ export const arSA: LocalizationResource = {
         title: 'حذف عنوان البريد الإلكتروني هذا',
       },
       title: 'أضافة البريد الإلكتروني',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'متابعة',
     formButtonPrimary__finish: 'انهاء',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'الغاء',
     mfaPage: {
@@ -658,6 +661,8 @@ export const arSA: LocalizationResource = {
       },
       successMessage: 'تم إضافة رقم الجوال هذا {{identifier}}',
       title: 'إضافة رقم جوال',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'أرفع صورة بصيغة JPG, PNG, GIF أو WEBP أقل من 10 ميغابايت',

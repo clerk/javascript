@@ -590,9 +590,12 @@ export const frFR: LocalizationResource = {
         title: "Supprimer l'adresse e-mail",
       },
       title: 'Ajouter une adresse e-mail',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continuer',
     formButtonPrimary__finish: 'Retour',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Annuler',
     mfaPage: {
@@ -669,6 +672,8 @@ export const frFR: LocalizationResource = {
       },
       successMessage: '{{identifier}} a été vérifié et ajouté à votre compte.',
       title: 'Ajouter un numéro de téléphone',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Téléchargez une image JPG, PNG, GIF ou WEBP inférieure à 10 Mo',

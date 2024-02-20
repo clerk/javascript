@@ -127,6 +127,7 @@ export type OTPInputProps = {
   isDisabled?: boolean;
   onResendCode?: React.MouseEventHandler<HTMLButtonElement>;
   otpControl: ReturnType<typeof useFieldOTP>['otpControl'];
+  centerAlign?: boolean;
 };
 
 const [OTPInputContext, useOTPInputContext] = createContextAndHook<OTPInputProps>('OTPInputContext');
@@ -159,7 +160,7 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
   const refs = React.useRef<Array<HTMLInputElement | null>>([]);
   const firstClickRef = React.useRef(false);
 
-  const { otpControl, isLoading, isDisabled } = useOTPInputContext();
+  const { otpControl, isLoading, isDisabled, centerAlign = true } = useOTPInputContext();
   const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
 
   React.useImperativeHandle(ref, () => ({
@@ -269,14 +270,15 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
     }
   };
 
+  const centerSx = centerAlign ? { justifyContent: 'center', alignItems: 'center' } : {};
+
   return (
     <Flex
       isLoading={isLoading}
       hasError={feedbackType === 'error'}
       elementDescriptor={descriptors.otpCodeFieldInputs}
       gap={2}
-      center
-      sx={t => ({ direction: 'ltr', padding: t.space.$1 })}
+      sx={t => ({ direction: 'ltr', padding: t.space.$1, marginLeft: `-${t.space.$1}`, ...centerSx })}
     >
       {values.map((value, index: number) => (
         <SingleCharInput

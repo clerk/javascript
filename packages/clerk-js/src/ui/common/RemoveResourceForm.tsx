@@ -1,4 +1,4 @@
-import { Text } from '../customizables';
+import { localizationKeys, Text } from '../customizables';
 import type { FormProps } from '../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../elements';
 import type { LocalizationKey } from '../localization';
@@ -35,6 +35,7 @@ export const RemoveResourceForm = withCardStateProvider((props: RemoveFormProps)
           localizationKey={messageLine2}
         />
         <FormButtons
+          submitLabel={localizationKeys('userProfile.formButtonPrimary__remove')}
           colorScheme='danger'
           onReset={onReset}
         />

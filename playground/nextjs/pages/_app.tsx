@@ -61,9 +61,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           colorPrimary: primaryColor,
         },
         layout: {
-          helpPageUrl: '/help',
-          privacyPageUrl: '/privacy',
-          termsPageUrl: '/terms',
           animations,
         },
       }}
@@ -134,16 +131,8 @@ const AppBar = (props: AppBarProps) => {
       <button onClick={props.onToggleDark}>toggle dark mode</button>
       <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
       <div style={{ position: 'fixed', left: '10px', bottom: '10px', display: 'inline-flex', gap: '10px' }}>
-        <button
-          onClick={props.onResetStyles}
-        >
-          simple styles: {props.styleReset ? 'On' : 'Off'}
-        </button>
-        <button
-          onClick={props.onToggleAnimations}
-        >
-          animations: {props.animations ? 'On' : 'Off'}
-        </button>
+        <button onClick={props.onResetStyles}>simple styles: {props.styleReset ? 'On' : 'Off'}</button>
+        <button onClick={props.onToggleAnimations}>animations: {props.animations ? 'On' : 'Off'}</button>
       </div>
       <input
         type='color'

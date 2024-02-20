@@ -31,7 +31,7 @@ export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
       />
       <VerifyPhone
         resourceRef={phoneNumberRef}
-        title={localizationKeys('userProfile.phoneNumberPage.title')}
+        title={localizationKeys('userProfile.phoneNumberPage.verifyTitle')}
         onSuccess={onSuccess}
         onReset={wizard.prevStep}
       />
@@ -99,6 +99,7 @@ export const AddPhone = (props: AddPhoneProps) => {
           )}
 
           <FormButtons
+            submitLabel={localizationKeys('userProfile.formButtonPrimary__add')}
             isDisabled={!canSubmit}
             onReset={onReset}
           />
@@ -117,7 +118,12 @@ export const VerifyPhone = (props: VerifyPhoneProps) => {
   const { title, onSuccess, resourceRef, onReset } = props;
 
   return (
-    <FormContainer headerTitle={title}>
+    <FormContainer
+      headerTitle={title}
+      headerSubtitle={localizationKeys('userProfile.phoneNumberPage.verifySubtitle', {
+        identifier: resourceRef.current?.phoneNumber,
+      })}
+    >
       <VerifyWithCode
         nextStep={onSuccess}
         identification={resourceRef.current}

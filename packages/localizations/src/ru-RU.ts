@@ -590,9 +590,12 @@ export const ruRU: LocalizationResource = {
         title: 'Удалить адрес электронной почты',
       },
       title: 'Добавить адрес электронной почты',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Продолжить',
     formButtonPrimary__finish: 'Готово',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Отмена',
     mfaPage: {
@@ -669,6 +672,8 @@ export const ruRU: LocalizationResource = {
       },
       successMessage: '{{identifier}} был добавлен к вашей учетной записи.',
       title: 'Добавить номер телефона',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Загрузите изображение в форматах JPG, PNG, GIF или WEBP размером меньше 10 МБ',

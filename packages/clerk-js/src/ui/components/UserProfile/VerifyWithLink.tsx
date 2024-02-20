@@ -46,10 +46,6 @@ export const VerifyWithLink = (props: VerifyWithLinkProps) => {
   return (
     <>
       <VerificationLink
-        formTitle={localizationKeys('userProfile.emailAddressPage.emailLink.formTitle')}
-        formSubtitle={localizationKeys('userProfile.emailAddressPage.emailLink.formSubtitle', {
-          identifier: email.emailAddress,
-        })}
         resendButton={localizationKeys('userProfile.emailAddressPage.emailLink.resendButton')}
         onResendCodeClicked={startVerification}
       />
