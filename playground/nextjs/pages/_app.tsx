@@ -20,6 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof themes>('default');
   const [selectedSmoothing, setSelectedSmoothing] = useState<boolean>(true);
   const [styleReset, setStyleReset] = useState<boolean>(false);
+  const [animations, setAnimations] = useState<boolean>(true);
   const [primaryColor, setPrimaryColor] = useState<string | undefined>(undefined);
 
   const onToggleDark = () => {
@@ -30,6 +31,10 @@ function MyApp({ Component, pageProps }: AppProps) {
       setSelectedTheme('dark');
       window.document.body.classList.add('dark-mode');
     }
+  };
+
+  const onToggleAnimations = () => {
+    setAnimations(s => !s);
   };
 
   const onToggleSmooth = () => {
@@ -59,6 +64,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           helpPageUrl: '/help',
           privacyPageUrl: '/privacy',
           termsPageUrl: '/terms',
+          animations,
         },
       }}
       {...pageProps}
@@ -68,6 +74,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         onToggleDark={onToggleDark}
         onToggleSmooth={onToggleSmooth}
         onResetStyles={() => setStyleReset(s => !s)}
+        onToggleAnimations={onToggleAnimations}
+        animations={animations}
         styleReset={styleReset}
         smooth={selectedSmoothing}
         onPrimaryColorChange={setPrimaryColor}
@@ -82,8 +90,10 @@ type AppBarProps = {
   onToggleDark: React.MouseEventHandler<HTMLButtonElement>;
   onToggleSmooth: React.MouseEventHandler<HTMLButtonElement>;
   onResetStyles: React.MouseEventHandler<HTMLButtonElement>;
+  onToggleAnimations: React.MouseEventHandler<HTMLButtonElement>;
   smooth: boolean;
   styleReset: boolean;
+  animations: boolean;
   onPrimaryColorChange: (primaryColor: string | undefined) => void;
 };
 
@@ -123,12 +133,18 @@ const AppBar = (props: AppBarProps) => {
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
       <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
-      <button
-        onClick={props.onResetStyles}
-        style={{ position: 'absolute', left: '10px', bottom: '10px' }}
-      >
-        simple styles: {props.styleReset ? 'On' : 'Off'}
-      </button>
+      <div style={{ position: 'fixed', left: '10px', bottom: '10px', display: 'inline-flex', gap: '10px' }}>
+        <button
+          onClick={props.onResetStyles}
+        >
+          simple styles: {props.styleReset ? 'On' : 'Off'}
+        </button>
+        <button
+          onClick={props.onToggleAnimations}
+        >
+          animations: {props.animations ? 'On' : 'Off'}
+        </button>
+      </div>
       <input
         type='color'
         onChange={e => props.onPrimaryColorChange(e.target.value)}

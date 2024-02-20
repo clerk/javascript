@@ -2,18 +2,16 @@
 
 import { GlobalError, Submit } from '@clerk/elements/common';
 import {
-  Continue,
-  Factor,
   SignIn,
   SocialProvider,
   SocialProviderIcon,
   Start,
   Verification,
+  Verifications,
 } from '@clerk/elements/sign-in';
 
-import { H1, H2, H3, HR as Hr, P } from '@/components/design';
+import { H1, H3, HR as Hr, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
-import { SignInDebug } from '@/components/sign-in-debug';
 
 export default function SignInPage() {
   return (
@@ -54,10 +52,12 @@ export default function SignInPage() {
             <Hr />
 
             <div className='flex gap-6 flex-col'>
+              {/* <Loading> */}
               <CustomField
                 label='Email'
                 name='identifier'
               />
+              {/* </Loading> */}
 
               {/* <Hr />
 
@@ -71,14 +71,13 @@ export default function SignInPage() {
           </div>
         </Start>
 
-        <Continue>
+        <Verifications>
           <div className='flex gap-6 flex-col'>
-            <H1>STRATEGIES (FIRST/SECOND FACTOR)</H1>
+            <H1>VERFIY</H1>
 
-            <H2>
-              Current Factor: <Factor first>First</Factor> | <Factor second>Second</Factor>
-            </H2>
+            <GlobalError className='block text-red-400 font-mono' />
 
+            {/* <Loading> */}
             <Verification name='password'>
               <CustomField
                 label='Password'
@@ -117,11 +116,10 @@ export default function SignInPage() {
                 Verify
               </Submit>
             </Verification>
+            {/* </Loading> */}
           </div>
-        </Continue>
+        </Verifications>
       </div>
-
-      <SignInDebug />
     </SignIn>
   );
 }

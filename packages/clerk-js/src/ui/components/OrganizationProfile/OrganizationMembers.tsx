@@ -2,7 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Button, Col, descriptors, Flex, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   Animated,
   Card,
@@ -16,24 +16,12 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { Action } from '../../elements/Action';
-import { mqu, type ThemableCssProp } from '../../styledSystem';
+import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
-import { InviteMembersScreen } from './InviteMembersScreen';
+import { MembersActionsRow } from './MembersActions';
 import { MembershipWidget } from './MembershipWidget';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
-
-export const InviteMembersButton = (props: { sx?: ThemableCssProp }) => {
-  return (
-    <Button
-      {...props}
-      elementDescriptor={descriptors.membersPageInviteButton}
-      aria-label='Invite'
-      textVariant='buttonSmall'
-      localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
-    />
-  );
-};
 
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
@@ -57,7 +45,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
       elementDescriptor={descriptors.page}
       gap={2}
     >
-      <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationMembers')}
@@ -78,31 +65,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
                 textVariant='h2'
               />
-              {canManageMemberships && (
-                <Action.Trigger value='invite'>
-                  <InviteMembersButton
-                    sx={{
-                      display: 'none',
-                      [mqu.md]: {
-                        display: 'inline-flex',
-                      },
-                    }}
-                  />
-                </Action.Trigger>
-              )}
             </Header.Root>
           </Animated>
-          {canReadMemberships && (
-            <Animated>
-              <Action.Open value='invite'>
-                <Action.Card>
-                  <InviteMembersScreen />
-                </Action.Card>
-              </Action.Open>
-            </Animated>
-          )}
+          <Card.Alert>{card.error}</Card.Alert>
           <Tabs>
-            <TabsList>
+            <TabsList sx={t => ({ gap: t.space.$4 })}>
               {canReadMemberships && (
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
               )}
@@ -117,24 +84,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 </Tab>
               )}
             </TabsList>
-            {canManageMemberships && (
-              <Animated asChild>
-                <Flex
-                  justify='end'
-                  sx={{
-                    width: '100%',
-                    marginLeft: 'auto',
-                    [mqu.md]: {
-                      display: 'none',
-                    },
-                  }}
-                >
-                  <Action.Trigger value='invite'>
-                    <InviteMembersButton />
-                  </Action.Trigger>
-                </Flex>
-              </Animated>
-            )}
             <TabPanels>
               {canReadMemberships && (
                 <TabPanel sx={{ width: '100%' }}>
@@ -146,7 +95,16 @@ export const OrganizationMembers = withCardStateProvider(() => {
                     }}
                   >
                     {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
-                    <ActiveMembersList />
+                    <Flex
+                      gap={2}
+                      direction='col'
+                      sx={{
+                        width: '100%',
+                      }}
+                    >
+                      <MembersActionsRow />
+                      <ActiveMembersList />
+                    </Flex>
                   </Flex>
                 </TabPanel>
               )}

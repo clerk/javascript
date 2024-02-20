@@ -1,5 +1,25 @@
 # Change Log
 
+## 1.0.0-beta.22
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2de442b24`](https://github.com/clerk/javascript/commit/2de442b2465cc5d424b8a0b21aa57c557f3aa2e7), [`73849836f`](https://github.com/clerk/javascript/commit/73849836f2df88a44fbc0ad7ac994498b9709ed5), [`45c92006c`](https://github.com/clerk/javascript/commit/45c92006cbc7f55810fd1ba9b3c30a1743de57dd)]:
+  - @clerk/clerk-js@5.0.0-beta.22
+  - @clerk/clerk-react@5.0.0-beta.19
+  - @clerk/shared@2.0.0-beta.13
+
+## 1.0.0-beta-v5.21
+
+### Patch Changes
+
+- Updated dependencies [[`6ac9e717a`](https://github.com/clerk/javascript/commit/6ac9e717a7ce8f09c1604f324add5e7e02041c07), [`6c2d88ee8`](https://github.com/clerk/javascript/commit/6c2d88ee8412aaa73ee78dd47d32ddaca2c9bb67), [`7466fa505`](https://github.com/clerk/javascript/commit/7466fa505a1dde91d28bd41d6456304d68a7c472), [`ee57f21ac`](https://github.com/clerk/javascript/commit/ee57f21ac62fc2dd0d9d68b965f35081b538c85e), [`9737ef510`](https://github.com/clerk/javascript/commit/9737ef5104346821461972d31f3c69e93924f0e0), [`0ee1777e0`](https://github.com/clerk/javascript/commit/0ee1777e030916ad5111f0f817c71ff5a78a8ed6), [`8b466a9ba`](https://github.com/clerk/javascript/commit/8b466a9ba93ca10315b534079b09fa5d76ffa305), [`1affbb22a`](https://github.com/clerk/javascript/commit/1affbb22a040e210cfce8f72d52b7961057c02d1), [`8daf8451c`](https://github.com/clerk/javascript/commit/8daf8451cb564bc834dd856174ffc2cdfa932e37), [`7f751c4ef`](https://github.com/clerk/javascript/commit/7f751c4ef2d14410058cf65ea984a93b50c0b87e), [`aaa457097`](https://github.com/clerk/javascript/commit/aaa457097da641d9ad7b3d086217f9fb4f5d42c5), [`be991365e`](https://github.com/clerk/javascript/commit/be991365e1c78d0f1dfc59bb33dd533b6fad223a), [`5d6937c9f`](https://github.com/clerk/javascript/commit/5d6937c9f952f5dc586439b7fcf053abc9fcf320), [`750337633`](https://github.com/clerk/javascript/commit/750337633a07bf3bb92d015f558ead2bfdca8613), [`11fbfdeec`](https://github.com/clerk/javascript/commit/11fbfdeec6aa609d02d23d997b319c94793e452f)]:
+  - @clerk/clerk-react@5.0.0-beta-v5.18
+  - @clerk/clerk-js@5.0.0-beta-v5.21
+  - @clerk/shared@2.0.0-beta-v5.12
+
 ## 1.0.0-beta-v5.20
 
 ### Patch Changes

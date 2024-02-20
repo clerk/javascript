@@ -16,6 +16,7 @@ const camelize = (s: string) => s.replace(/-./g, x => x[1].toUpperCase());
 export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'button',
   'input',
+  'table',
 
   'rootBox',
   'cardBox',
@@ -168,6 +169,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'identityPreviewText',
   'identityPreviewEditButton',
   'identityPreviewEditButtonIcon',
+
+  'accountSwitcherActionButton',
+  'accountSwitcherActionButtonIconBox',
+  'accountSwitcherActionButtonIcon',
 
   'alert',
   'alertIcon',

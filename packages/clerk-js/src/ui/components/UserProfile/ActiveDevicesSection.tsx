@@ -21,7 +21,10 @@ export const ActiveDevicesSection = () => {
       centered={false}
       id='activeDevices'
     >
-      <ProfileSection.ItemList id='activeDevices'>
+      <ProfileSection.ItemList
+        id='activeDevices'
+        disableAnimation
+      >
         {isLoading ? (
           <FullHeightLoader />
         ) : (
@@ -53,12 +56,10 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       id='activeDevices'
       elementDescriptor={descriptors.activeDeviceListItem}
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
-      sx={t => ({
+      hoverable
+      sx={{
         alignItems: 'flex-start',
-        padding: `${t.space.$2} ${t.space.$4}`,
-        borderRadius: t.radii.$md,
-        ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
-      })}
+      }}
     >
       {status.isLoading && <FullHeightLoader />}
       {!status.isLoading && (

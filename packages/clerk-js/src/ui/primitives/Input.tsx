@@ -20,7 +20,6 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     aspectRatio: props.type === 'checkbox' ? '1/1' : 'unset',
     accentColor: theme.colors.$primary500,
     ...common.textVariants(theme).body,
-    ...common.borderVariants(theme, props).normal,
     ...common.disabled(theme),
     [mqu.ios]: {
       fontSize: theme.fontSizes.$lg,
@@ -29,7 +28,21 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
       animationName: 'onAutoFillStart',
     },
   },
-  variants: {},
+  variants: {
+    variant: {
+      default: {
+        ...common.borderVariants(theme, props).normal,
+      },
+      unstyled: {
+        border: 0,
+        boxShadow: 'unset',
+        backgroundColor: 'transparent',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 }));
 
 type OwnProps = {
@@ -91,7 +104,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       aria-required={_required}
       aria-disabled={_disabled}
       data-feedback={feedbackType}
-      css={applyVariants(propsWithoutVariants)}
+      data-variant={props.variant || 'default'}
+      css={applyVariants(props)}
     />
   );
 });

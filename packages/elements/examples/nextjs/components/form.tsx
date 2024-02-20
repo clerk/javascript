@@ -1,5 +1,6 @@
 'use client';
 
+import type { FormSubmitProps } from '@clerk/elements/common';
 import {
   Field as ElementsField,
   FieldError,
@@ -9,7 +10,7 @@ import {
   Submit as ElementsSubmit,
 } from '@clerk/elements/common';
 import clsx from 'clsx';
-import { forwardRef } from 'react';
+import * as React from 'react';
 
 function OTPInputSegment({ value, status }: any) {
   return (
@@ -32,7 +33,7 @@ function OTPInputSegment({ value, status }: any) {
   );
 }
 
-export const CustomField = forwardRef<typeof Input, { name: string; label: string; required?: boolean }>(
+export const CustomField = React.forwardRef<typeof Input, { name: string; label: string; required?: boolean }>(
   function CustomField({ name, label, required = false }, forwardedRef) {
     const inputProps =
       name === 'code'
@@ -68,18 +69,21 @@ export const CustomField = forwardRef<typeof Input, { name: string; label: strin
   },
 );
 
-export const CustomSubmit = forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(
-  function CustomButton(props, forwardedRef) {
-    return (
-      <ElementsSubmit
-        className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'
-        {...props}
-        type='submit'
-        ref={forwardedRef}
-      />
-    );
-  },
-);
+type CustomSubmitElement = React.ElementRef<typeof ElementsSubmit>;
+
+export const CustomSubmit = React.forwardRef<CustomSubmitElement, FormSubmitProps>(function CustomButton(
+  props,
+  forwardedRef,
+) {
+  return (
+    <ElementsSubmit
+      className='px-4 py-2 b-1 bg-blue-950 bg-opacity-20 hover:bg-opacity-10 active:bg-opacity-5 rounded-md dark:bg-opacity-100 dark:hover:bg-opacity-80 dark:active:bg-opacity-50 transition'
+      {...props}
+      type='submit'
+      ref={forwardedRef}
+    />
+  );
+});
 
 const Field = CustomField;
 const Submit = CustomSubmit;

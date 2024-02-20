@@ -1,59 +1,58 @@
 'use client';
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
-import type { PropsWithChildren } from 'react';
+import { useActorRef } from '@xstate/react';
 
-import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
+import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { FormStoreProvider } from '~/internals/machines/form/form.context';
+import { SignUpRouterMachine } from '~/internals/machines/sign-up/machines';
+import { useConsoleInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
-import { SignUpCtx } from '~/react/sign-up/contexts/sign-up.context';
-import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
+import { SignUpRouterCtx } from '~/react/sign-up/context';
 
-const { useBrowserInspector } = createBrowserInspectorReactHook();
+type SignUpFlowProviderProps = WithChildrenProp;
 
-function SignUpFlowProvider({ children }: PropsWithChildren) {
+function SignUpFlowProvider({ children }: SignUpFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
-  const form = useFormStore();
-  const { loading: inspectorLoading, inspector } = useBrowserInspector();
+  const inspector = useConsoleInspector();
 
-  if (!router) {
-    throw new Error('clerk: Unable to locate ClerkRouter, make sure this is rendered within `<Router>`.');
-  }
+  const ref = useActorRef(SignUpRouterMachine, {
+    input: { clerk, router, signInPath: SIGN_IN_DEFAULT_BASE_PATH },
+    inspect: inspector,
+  });
 
-  if (inspectorLoading) {
-    return null;
-  }
-
-  return (
-    <SignUpCtx.Provider
-      options={{
-        input: {
-          clerk,
-          router,
-          form,
-        },
-        inspect: inspector?.inspect,
-      }}
-    >
-      {children}
-    </SignUpCtx.Provider>
-  );
+  return <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider>;
 }
 
-export function SignUpRoot({ children }: PropsWithChildren): JSX.Element | null {
+export type SignUpRootProps = WithChildrenProp<{ path?: string }>;
+
+/**
+ * Root component for the sign-up flow. It sets up providers and state management for its children.
+ * Must wrap all sign-up related components.
+ *
+ * @example
+ * import { SignUp } from "@clerk/elements/sign-up"
+ *
+ * export default SignUpPage = () => (
+ *  <SignUp>
+ *  </SignUp>
+ * )
+ */
+export function SignUpRoot({ children, path = SIGN_UP_DEFAULT_BASE_PATH }: SignUpRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
 
   return (
-    <Router
-      router={router}
-      basePath='/sign-in'
-    >
-      <ClerkLoaded>
+    <ClerkLoaded>
+      <Router
+        basePath={path}
+        router={router}
+      >
         <FormStoreProvider>
           <SignUpFlowProvider>{children}</SignUpFlowProvider>
         </FormStoreProvider>
-      </ClerkLoaded>
-    </Router>
+      </Router>
+    </ClerkLoaded>
   );
 }

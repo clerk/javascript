@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
@@ -119,6 +120,7 @@ export const daDK: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Invitationerne kunne ikke sendes. Ret følgende, og prøv igen:',
       formButtonPrimary__continue: 'Send invitationer',
+      selectDropdown__role: 'Select role',
       subtitle: 'Inviter nye medlemmer til denne organisation',
       successMessage: 'Invitationer blev sendt',
       title: 'Inviter medlemmer',
@@ -140,10 +142,6 @@ export const daDK: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -159,10 +157,6 @@ export const daDK: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -276,6 +270,12 @@ export const daDK: LocalizationResource = {
   paginationRowText__displaying: 'Viser',
   paginationRowText__of: 'af',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Få hjælp',
       actionText: 'Don’t have any of these?',
@@ -589,12 +589,14 @@ export const daDK: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Fortsæt',
     formButtonPrimary__finish: 'Afslut',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Annuller',
     mfaPage: {
       formHint: 'Vælg en metode, der skal tilføjes.',
       title: 'Tilføj totrinsbekræftelse',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Tilføj et telefonnummer',
       removeResource: {
         messageLine1: '{{identifier}} vil ikke længere modtage bekræftelseskoder, når du logger ind.',
@@ -606,8 +608,11 @@ export const daDK: LocalizationResource = {
         'Vælg et telefonnummer for at registrere SMS bekræftelse til totrinsbekræftelse.',
       subtitle__unavailablePhoneNumbers:
         'Der er ingen tilgængelige telefonnumre til at registrere til SMS bekræftelse til totrinsbekræftelse.',
-      successMessage:
-        'SMS bekræftelse er nu aktiveret for dette telefonnummer. Når du logger ind, skal du indtaste en bekræftelseskode sendt til dette telefonnummer som et ekstra trin.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Tilføj SMS bekræftelse',
     },
     mfaTOTPPage: {
@@ -651,7 +656,6 @@ export const daDK: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'En sms, der indeholder et bekræftelseslink, sendes til dette telefonnummer.',
-      infoText__secondary: 'Besked- og datatakster kan være gældende.',
       removeResource: {
         messageLine1: '{{identifier}} vil blive fjernet fra denne konto.',
         messageLine2: 'Du vil ikke længere kunne logge ind med dette telefonnummer.',
@@ -680,6 +684,8 @@ export const daDK: LocalizationResource = {
         actionLabel__reauthorize: 'Godkend nu',
         destructiveActionTitle: 'Fjern',
         primaryButton: 'Tilknyt konto',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Tilknyttede konti',
       },
       dangerSection: {

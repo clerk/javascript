@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
@@ -119,6 +120,7 @@ export const csCZ: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Pozvánky se nepodařilo odeslat. Opravte následující a zkuste to znovu:',
       formButtonPrimary__continue: 'Odeslat pozvánky',
+      selectDropdown__role: 'Select role',
       subtitle: 'Pozvat nové členy do této organizace',
       successMessage: 'Pozvánky byly úspěšně odeslány',
       title: 'Pozvat členy',
@@ -140,10 +142,6 @@ export const csCZ: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -159,10 +157,6 @@ export const csCZ: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -275,6 +269,12 @@ export const csCZ: LocalizationResource = {
   paginationRowText__displaying: 'Zobrazuje se',
   paginationRowText__of: 'z',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Získat pomoc',
       actionText: 'Don’t have any of these?',
@@ -587,12 +587,14 @@ export const csCZ: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Pokračovat',
     formButtonPrimary__finish: 'Dokončit',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Zrušit',
     mfaPage: {
       formHint: 'Vyberte způsob přidání.',
       title: 'Přidat dvoufaktorové ověřování',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Přidat telefonní číslo',
       removeResource: {
         messageLine1: '{{identifier}} již nebude dostávat ověřovací kódy při přihlašování.',
@@ -604,8 +606,11 @@ export const csCZ: LocalizationResource = {
         'Vyberte telefonní číslo pro registraci dvoufaktorového ověřování pomocí SMS kódu.',
       subtitle__unavailablePhoneNumbers:
         'Nejsou k dispozici žádná dostupná telefonní čísla pro registraci dvoufaktorového ověřování pomocí SMS kódu.',
-      successMessage:
-        'Dvoufaktorové ověřování pomocí SMS kódu je nyní povoleno pro toto telefonní číslo. Při přihlášení budete muset zadat ověřovací kód zaslaný na toto telefonní číslo jako další krok.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Přidat ověřování pomocí SMS kódu',
     },
     mfaTOTPPage: {
@@ -650,7 +655,6 @@ export const csCZ: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Na toto telefonní číslo bude odeslána textová zpráva obsahující ověřovací odkaz.',
-      infoText__secondary: 'Mohou se vztahovat poplatky za zprávy a data.',
       removeResource: {
         messageLine1: '{{identifier}} bude odebráno z tohoto účtu.',
         messageLine2: 'Nebudete již moci přihlásit se pomocí tohoto telefonního čísla.',
@@ -679,6 +683,8 @@ export const csCZ: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizovat nyní',
         destructiveActionTitle: 'Odstranit',
         primaryButton: 'Připojit účet',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Připojené účty',
       },
       dangerSection: {

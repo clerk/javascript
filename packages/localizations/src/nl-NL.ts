@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const nlNL: LocalizationResource = {
@@ -120,6 +121,7 @@ export const nlNL: LocalizationResource = {
       detailsTitle__inviteFailed:
         'De uitnodigingen konden niet verzonden worden. Los het volgende op en probeer het opnieuw:',
       formButtonPrimary__continue: 'Uitnodigingen verzenden',
+      selectDropdown__role: 'Select role',
       subtitle: 'Nodig nieuwe leden uit voor deze organisatie',
       successMessage: 'Uitnodigingen succesvol verzonden',
       title: 'Leden uitnodigen',
@@ -141,10 +143,6 @@ export const nlNL: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -160,10 +158,6 @@ export const nlNL: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -277,6 +271,12 @@ export const nlNL: LocalizationResource = {
   paginationRowText__displaying: 'Weergeven',
   paginationRowText__of: 'van',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Help',
       actionText: 'Don’t have any of these?',
@@ -589,12 +589,14 @@ export const nlNL: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Doorgaan',
     formButtonPrimary__finish: 'Afronden',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Annuleren',
     mfaPage: {
       formHint: 'Kies een methode om toe te voegen.',
       title: 'Tweestapsverificatie toevoegen',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Telefoonnummer toevoegen',
       removeResource: {
         messageLine1: '{{identifier}} zal niet langer verificatiecodes ontvangen bij het inloggen.',
@@ -606,8 +608,11 @@ export const nlNL: LocalizationResource = {
         'Selecteer een telefoonnummer om je te registreren voor SMS-code twee-stapsverificatie.',
       subtitle__unavailablePhoneNumbers:
         'Er zijn geen beschikbare telefoonnummers om te registreren voor SMS-code tweestapsverificatie.',
-      successMessage:
-        'De tweestapsverificatie met SMS-code is nu ingeschakeld voor dit telefoonnummer. Bij het aanmelden moet je een verificatiecode invoeren die naar dit telefoonnummer is verzonden als extra stap.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Voeg SMS-code verificatie toe',
     },
     mfaTOTPPage: {
@@ -650,7 +655,6 @@ export const nlNL: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Een SMS met daarin een verificatiecode is verstuurd naar dit nummer.',
-      infoText__secondary: 'Bericht- en datakosten kunnen van toepassing zijn.',
       removeResource: {
         messageLine1: '{{identifier}} zal van deze account verwijderd worden.',
         messageLine2: 'Je zal niet meer kunnen inloggen met dit telefoonnummer.',
@@ -679,6 +683,8 @@ export const nlNL: LocalizationResource = {
         actionLabel__reauthorize: 'Authoriseer nu',
         destructiveActionTitle: 'Verwijderen',
         primaryButton: 'Verbind een account',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Aangesloten accounts',
       },
       dangerSection: {
@@ -762,8 +768,3 @@ export const nlNL: LocalizationResource = {
     },
   },
 } as const;
-
-export const nlBE: LocalizationResource = {
-  locale: 'nl-BE',
-  ...nlNL,
-};

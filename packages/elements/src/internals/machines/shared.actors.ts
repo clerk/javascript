@@ -2,9 +2,10 @@ import type { Clerk, HandleOAuthCallbackParams, HandleSamlCallbackParams, Loaded
 import type { AnyEventObject, EventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';
 
-import { ClerkElementsRuntimeError } from '~/internals/errors/error';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 
+// TODO: Remove
 /** @deprecated Use clerkLoader instead */
 export const waitForClerk = fromPromise<LoadedClerk, Clerk | LoadedClerk>(({ input: clerk }) => {
   return new Promise((resolve, reject) => {
@@ -43,6 +44,7 @@ export type HandleRedirectCallbackParams<T = Required<HandleOAuthCallbackParams 
 
 export type HandleRedirectCallbackInput = LoadedClerk;
 
+// TODO: Remove
 /**
  * This function hijacks handleRedirectCallback from ClerkJS to handle navigation events
  * from the state machine.

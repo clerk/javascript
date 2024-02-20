@@ -135,6 +135,7 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
 export type ElementsConfig = {
   button: WithOptions;
   input: WithOptions;
+  table: WithOptions;
 
   rootBox: WithOptions;
   cardBox: WithOptions;
@@ -292,6 +293,10 @@ export type ElementsConfig = {
   identityPreviewText: WithOptions;
   identityPreviewEditButton: WithOptions;
   identityPreviewEditButtonIcon: WithOptions;
+
+  accountSwitcherActionButton: WithOptions<'addAccount' | 'signOutAll'>;
+  accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
+  accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
@@ -597,6 +602,12 @@ export type Layout = {
    * @default true
    */
   shimmer?: boolean;
+  /**
+   * This option enables/disables animations for the components. If you want to disable animations, you can set this to false.
+   * Also the prefers-reduced-motion media query is respected and animations are disabled if the user has set it to reduce motion regardless of this option.
+   * @default true
+   */
+  animations?: boolean;
 };
 
 export type SignInTheme = Theme;

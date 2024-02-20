@@ -1,5 +1,70 @@
 # Change Log
 
+## 1.0.0-beta.20
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2de442b24`](https://github.com/clerk/javascript/commit/2de442b2465cc5d424b8a0b21aa57c557f3aa2e7)]:
+  - @clerk/shared@2.0.0-beta.13
+
+## 1.0.0-beta-v5.19
+
+### Major Changes
+
+- Make all listing API requests to return consistent `{ data: Resource[], totalCount: number }`. ([#2714](https://github.com/clerk/javascript/pull/2714)) by [@dimkl](https://github.com/dimkl)
+
+  Support pagination request params `{ limit, offset }` to:
+
+  - `sessions.getSessionList({ limit, offset })`
+  - `clients.getClientList({ limit, offset })`
+
+  Since the `users.getUserList()` does not return the `total_count` as a temporary solution that
+  method will perform 2 BAPI requests:
+
+  1. retrieve the data
+  2. retrieve the total count (invokes `users.getCount()` internally)
+
+### Minor Changes
+
+- Add `unbanUser`, `lockUser`, and `unlockUser` methods to the UserAPI class. ([#2780](https://github.com/clerk/javascript/pull/2780)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for X/Twitter v2 OAuth provider ([#2690](https://github.com/clerk/javascript/pull/2690)) by [@kostaspt](https://github.com/kostaspt)
+
+- Add `banUser` method to the User operations (accessible under `clerkClient.users`). Executes the [Ban a user](https://clerk.com/docs/reference/backend-api/tag/Users#operation/BanUser) backend API call. ([#2766](https://github.com/clerk/javascript/pull/2766)) by [@bartlenaerts](https://github.com/bartlenaerts)
+
+### Patch Changes
+
+- Expose resources types ([#2660](https://github.com/clerk/javascript/pull/2660)) by [@panteliselef](https://github.com/panteliselef)
+
+- The `auth().redirectToSignIn()` helper no longer needs to be explicitly returned when called within the middleware. The following examples are now equivalent: ([#2691](https://github.com/clerk/javascript/pull/2691)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  ```js
+  // Before
+  export default clerkMiddleware(auth => {
+    if (protectedRoute && !auth.user) {
+      return auth().redirectToSignIn()
+    }
+  })
+
+  // After
+  export default clerkMiddleware(auth => {
+    if (protectedRoute && !auth.user) {
+      auth().redirectToSignIn()
+    }
+  })
+  ```
+
+  Calling `auth().protect()` from a page will now automatically redirect back to the same page by setting `redirect_url` to the request url before the redirect to the sign-in URL takes place.
+
+- Fix `clerkClient.organizations.getOrganizationMembershipList()` return type to be `{ data, totalCount }` ([#2681](https://github.com/clerk/javascript/pull/2681)) by [@dimkl](https://github.com/dimkl)
+
+- Preserve url protocol when joining paths. ([#2745](https://github.com/clerk/javascript/pull/2745)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`8daf8451c`](https://github.com/clerk/javascript/commit/8daf8451cb564bc834dd856174ffc2cdfa932e37), [`be991365e`](https://github.com/clerk/javascript/commit/be991365e1c78d0f1dfc59bb33dd533b6fad223a)]:
+  - @clerk/shared@2.0.0-beta-v5.12
+
 ## 1.0.0-beta-v5.18
 
 ### Major Changes

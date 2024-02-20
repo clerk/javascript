@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
@@ -119,6 +120,7 @@ export const svSE: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Inbjudningarna kunde inte skickas. Åtgärda följande och försök igen:',
       formButtonPrimary__continue: 'Skicka inbjudningar',
+      selectDropdown__role: 'Select role',
       subtitle: 'Bjud in nya medlemmar till denna organisation',
       successMessage: 'Inbjudningar skickade',
       title: 'Bjud in medlemmar',
@@ -140,10 +142,6 @@ export const svSE: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -159,10 +157,6 @@ export const svSE: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -276,6 +270,12 @@ export const svSE: LocalizationResource = {
   paginationRowText__displaying: 'Visar',
   paginationRowText__of: 'av',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Få hjälp',
       actionText: 'Don’t have any of these?',
@@ -589,12 +589,14 @@ export const svSE: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Fortsätt',
     formButtonPrimary__finish: 'Slutför',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Avbryt',
     mfaPage: {
       formHint: 'Välj en metod att lägga till.',
       title: 'Lägg till tvåstegsverifiering',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Lägg till ett telefonnummer',
       removeResource: {
         messageLine1: '{{identifier}} kommer inte längre att ta emot verifieringskoder vid inloggning.',
@@ -605,8 +607,11 @@ export const svSE: LocalizationResource = {
       subtitle__availablePhoneNumbers: 'Välj ett telefonnummer att registrera för SMS-kod tvåstegsverifiering.',
       subtitle__unavailablePhoneNumbers:
         'Det finns inga tillgängliga telefonnummer att registrera för SMS-kod tvåstegsverifiering.',
-      successMessage:
-        'SMS-kod tvåstegsverifiering är nu aktiverat för detta telefonnummer. Vid inloggning behöver du ange en verifieringskod skickad till detta telefonnummer som ett extra steg.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Lägg till SMS-kodverifiering',
     },
     mfaTOTPPage: {
@@ -650,7 +655,6 @@ export const svSE: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Ett textmeddelande med en verifieringslänk kommer att skickas till detta telefonnummer.',
-      infoText__secondary: 'Avgifter för meddelanden och data kan tillkomma.',
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
         messageLine2: 'Du kommer inte längre att kunna logga in med detta telefonnummer.',
@@ -679,6 +683,8 @@ export const svSE: LocalizationResource = {
         actionLabel__reauthorize: 'Autorisera nu',
         destructiveActionTitle: 'Ta bort',
         primaryButton: 'Anslut konto',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Anslutna konton',
       },
       dangerSection: {

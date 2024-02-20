@@ -49,7 +49,10 @@ export const PhoneSection = () => {
           {user?.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
             <Action.Root key={phone.id}>
               <Action.Closed value=''>
-                <ProfileSection.Item id='phoneNumbers'>
+                <ProfileSection.Item
+                  id='phoneNumbers'
+                  hoverable
+                >
                   <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex
                       gap={2}

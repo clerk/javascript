@@ -44,6 +44,7 @@ export type SignUpContextType = SignUpCtx & {
   navigateAfterSignUp: () => any;
   queryParams: ParsedQs;
   signInUrl: string;
+  signUpUrl: string;
   secondFactorUrl: string;
   authQueryString: string | null;
 };
@@ -83,8 +84,6 @@ export const useSignUpContext = (): SignUpContextType => {
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
-  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
-
   // Add query strings to the sign in URL
   const authQs = buildAuthQueryString({
     afterSignInUrl: afterSignInUrl,
@@ -92,8 +91,13 @@ export const useSignUpContext = (): SignUpContextType => {
     displayConfig: displayConfig,
   });
 
-  // Todo: Look for a better way than checking virtual
-  if (authQs && ctx.routing != 'virtual') {
+  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
+  if (authQs && ctx.routing !== 'virtual') {
+    signUpUrl += `#/?${authQs}`;
+  }
+
+  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
+  if (authQs && ctx.routing !== 'virtual') {
     signInUrl += `#/?${authQs}`;
   }
 
@@ -104,6 +108,7 @@ export const useSignUpContext = (): SignUpContextType => {
     ...ctx,
     componentName,
     signInUrl,
+    signUpUrl,
     secondFactorUrl,
     afterSignUpUrl,
     afterSignInUrl,

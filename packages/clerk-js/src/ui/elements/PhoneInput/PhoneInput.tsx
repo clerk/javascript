@@ -5,6 +5,7 @@ import { descriptors, Flex, Icon, Input, Text } from '../../customizables';
 import { Select, SelectButton, SelectOptionList } from '../../elements';
 import { ArrowUpDown, Check } from '../../icons';
 import { common, type PropsOfComponent } from '../../styledSystem';
+import type { FeedbackType } from '../../utils';
 import { mergeRefs } from '../../utils';
 import type { CountryEntry, CountryIso } from './countryCodeData';
 import { IsoToCountryMap } from './countryCodeData';
@@ -23,9 +24,10 @@ const countryOptions = [...IsoToCountryMap.values()].map(createSelectOption);
 
 type PhoneInputProps = PropsOfComponent<typeof Input> & { locationBasedCountryIso?: CountryIso };
 
-const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
-  const { onChange: onChangeProp, value, locationBasedCountryIso, sx, ...rest } = props;
+const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedbackType?: FeedbackType }>((props, ref) => {
+  const { onChange: onChangeProp, value, locationBasedCountryIso, feedbackType, sx, ...rest } = props;
   const phoneInputRef = useRef<HTMLInputElement>(null);
+  const phoneInputBox = useRef<HTMLDivElement>(null);
   const { setNumber, setIso, setNumberAndIso, numberWithCode, iso, formattedNumber } = useFormattedPhoneNumber({
     initPhoneWithCode: value as string,
     locationBasedCountryIso,
@@ -68,8 +70,10 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
       elementDescriptor={descriptors.phoneInputBox}
       direction='row'
       hasError={rest.hasError}
+      data-feedback={feedbackType}
+      ref={phoneInputBox}
       sx={theme => ({
-        ...common.borderVariants(theme).normal,
+        ...common.borderVariants(theme, { hasError: rest.hasError }).normal,
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
@@ -79,6 +83,8 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         elementId='countryCode'
         value={selectedCountryOption.value}
         options={countryOptions}
+        portal
+        referenceElement={phoneInputBox}
         renderOption={(option, _index, isSelected) => (
           <CountryCodeListItem
             sx={theme => ({
@@ -127,7 +133,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
           </Text>
         </SelectButton>
         <SelectOptionList
-          sx={{ width: '100%', padding: '0 0' }}
+          sx={{ padding: '0 0' }}
           containerSx={theme => ({ gap: 0, padding: `${theme.space.$0x5} 0` })}
         />
       </Select>
@@ -139,29 +145,37 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref
         }}
       >
         <Text
-          sx={{ position: 'absolute', left: '1ch', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+          sx={t => ({
+            position: 'absolute',
+            left: '1ch',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+            opacity: props.isDisabled ? t.opacity.$disabled : 1,
+          })}
         >
           +{selectedCountryOption.country.code}
         </Text>
         <Input
           value={formattedNumber}
+          variant='unstyled'
           onPaste={handlePaste}
           onChange={handlePhoneNumberChange}
           maxLength={25}
           type='tel'
           sx={[
-            {
+            t => ({
               boxShadow: 'none',
-              border: 'none',
-              ':hover:not(:focus)': {
-                border: 'none',
-                boxShadow: 'none',
-              },
+              borderRadius: t.radii.$md,
+              ...common.focusRing(t),
               height: '100%',
               borderTopLeftRadius: '0',
               borderBottomLeftRadius: '0',
               paddingLeft: `${`+${selectedCountryOption.country.code}`.length + 1.5}ch`,
-            },
+              transitionProperty: t.transitionProperty.$common,
+              transitionTimingFunction: t.transitionTiming.$common,
+              transitionDuration: t.transitionDuration.$focusRing,
+            }),
             sx,
           ]}
           //use our internal ref while forwarding
@@ -209,15 +223,17 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
   );
 });
 
-export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>((props, ref) => {
-  // @ts-expect-error
-  const { __internal_country } = useClerk();
+export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps & { feedbackType?: FeedbackType }>(
+  (props, ref) => {
+    // @ts-expect-error
+    const { __internal_country } = useClerk();
 
-  return (
-    <PhoneInputBase
-      {...props}
-      locationBasedCountryIso={__internal_country as CountryIso}
-      ref={ref}
-    />
-  );
-});
+    return (
+      <PhoneInputBase
+        {...props}
+        locationBasedCountryIso={__internal_country as CountryIso}
+        ref={ref}
+      />
+    );
+  },
+);

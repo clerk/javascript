@@ -30,6 +30,8 @@ type SelectProps<O extends Option> = {
   noResultsMessage?: string;
   renderOption?: RenderOption<O>;
   elementId?: SelectId;
+  portal?: boolean;
+  referenceElement?: React.RefObject<HTMLElement>;
 };
 
 type SelectState<O extends Option> = Pick<
@@ -44,6 +46,7 @@ type SelectState<O extends Option> = Pick<
   select: (option: O) => void;
   focusedItemRef: React.RefObject<HTMLDivElement>;
   onTriggerClick: () => void;
+  portal?: boolean;
 };
 
 const [SelectStateCtx, useSelectState] = createContextAndHook<SelectState<any>>('SelectState');
@@ -83,9 +86,15 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     searchPlaceholder,
     elementId,
     children,
+    portal = false,
+    referenceElement = null,
     ...rest
   } = props;
-  const popoverCtx = usePopover({ autoUpdate: true });
+  const popoverCtx = usePopover({
+    autoUpdate: true,
+    adjustToReferenceWidth: !!referenceElement,
+    referenceElement: referenceElement,
+  });
   const togglePopover = popoverCtx.toggle;
   const focusedItemRef = React.useRef<HTMLDivElement>(null);
   const searchInputCtx = useSearchInput({
@@ -126,6 +135,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
           select,
           onTriggerClick: togglePopover,
           elementId,
+          portal,
         },
       }}
       {...rest}
@@ -229,6 +239,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     select,
     onTriggerClick,
     elementId,
+    portal,
   } = useSelectState();
   const { filteredItems: options, searchInputProps } = searchInputCtx;
   const [focusedIndex, setFocusedIndex] = useState(0);
@@ -287,7 +298,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
-      portal={false}
+      portal={portal || false}
       order={['content']}
     >
       <Flex

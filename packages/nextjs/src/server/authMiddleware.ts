@@ -173,7 +173,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return setHeader(NextResponse.next(), constants.Headers.AuthReason, 'skip');
     } else if (beforeAuthRes && isRedirect(beforeAuthRes)) {
       logger.debug('Before auth returned redirect, following redirect');
-      return setHeader(beforeAuthRes, constants.Headers.AuthReason, 'redirect');
+      return setHeader(beforeAuthRes, constants.Headers.AuthReason, 'before-auth-redirect');
     }
 
     const requestState = await clerkClient.authenticateRequest(
@@ -206,8 +206,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
-      const res = setHeader(finalRes, constants.Headers.AuthReason, 'redirect');
-      return serverRedirectWithAuth(clerkRequest, res, options);
+      return serverRedirectWithAuth(clerkRequest, finalRes, options);
     }
 
     if (options.debug) {

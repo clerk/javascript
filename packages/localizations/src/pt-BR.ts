@@ -9,12 +9,8 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
-import type { LocalizationResource } from '@clerk/types'; // PT-BR Nomenclature
 
-// PT-BR Nomenclature
-// Phone Number  = "Telefone" instead of "Celular"
-// Email Address = "Endereço de E-mail" instead of "Email"
-// Sign-in       = "Fazer login" instead of "Conectar", "Sign-in", "Logar", "Entrar"
+import type { LocalizationResource } from '@clerk/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
@@ -123,6 +119,7 @@ export const ptBR: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Os convites não puderam ser enviados. Corrija o seguinte e tente novamente:',
       formButtonPrimary__continue: 'Enviar convites',
+      selectDropdown__role: 'Select role',
       subtitle: 'Convidar novos membros para esta organização',
       successMessage: 'Convites enviados com sucesso',
       title: 'Convidar membros',
@@ -144,10 +141,6 @@ export const ptBR: LocalizationResource = {
           headerTitle: 'Convites automáticos',
           primaryButton: 'Gerenciar domínios verificados',
         },
-        manualInvitations: {
-          headerSubtitle: 'Convide manualmente membros e gerencie convites existentes.',
-          headerTitle: 'Convites individuais',
-        },
         table__emptyRow: 'Nenhum convite para exibir',
       },
       invitedMembersTab: {
@@ -163,10 +156,6 @@ export const ptBR: LocalizationResource = {
         },
         menuAction__approve: 'Aprovar',
         menuAction__reject: 'Rejeitar',
-        requests: {
-          headerSubtitle: 'Navegue e gerencie usuários que solicitaram participação na organização.',
-          headerTitle: 'Solicitações',
-        },
         tableHeader__requested: 'Acesso solicitado',
         table__emptyRow: 'Nenhuma solicitação para exibir',
       },
@@ -281,6 +270,12 @@ export const ptBR: LocalizationResource = {
   paginationRowText__displaying: 'Exibindo',
   paginationRowText__of: 'de',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Ajuda',
       actionText: 'Don’t have any of these?',
@@ -595,12 +590,14 @@ export const ptBR: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Continuar',
     formButtonPrimary__finish: 'Finalizar',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Cancelar',
     mfaPage: {
       formHint: 'Selecione um método para adicionar.',
       title: 'Adicione verificação em duas etapas',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Adicione um número de telefone',
       removeResource: {
         messageLine1: '{{identifier}} não receberá mais códigos de verificação ao realizar o login.',
@@ -612,8 +609,11 @@ export const ptBR: LocalizationResource = {
         'Selecione um número de telefone para registrar a verificação em duas etapas por código SMS.',
       subtitle__unavailablePhoneNumbers:
         'Não há números de telefone disponíveis para registrar a verificação em duas etapas por código SMS.',
-      successMessage:
-        'Verificação em duas etapas por código SMS agora está habilitada para este número de telefone. Ao fazer login, você precisará inserir um código de verificação enviado para este número de telefone como uma etapa adicional.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Adicionar verificação por SMS',
     },
     mfaTOTPPage: {
@@ -660,7 +660,6 @@ export const ptBR: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Um SMS contendo um link de verificação será enviado para este telefone.',
-      infoText__secondary: 'Pode haver cobranças extras para envio de mensagem e dados por SMS.',
       removeResource: {
         messageLine1: '{{identifier}} será removido desta conta.',
         messageLine2: 'Você não conseguirá fazer login novamente utilizando este número de telefone.',
@@ -689,6 +688,8 @@ export const ptBR: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Contas conectadas',
       },
       dangerSection: {

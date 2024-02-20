@@ -4,6 +4,7 @@ import { Col, Flex, localizationKeys, Text } from '../../customizables';
 import { Header, ProfileSection } from '../../elements';
 import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
+import { MembersActionsRow } from './MembersActions';
 import { MembershipWidget } from './MembershipWidget';
 import { RequestToJoinList } from './RequestToJoinList';
 
@@ -29,7 +30,9 @@ export const OrganizationMembersTabRequests = () => {
             sx={t => ({
               width: '100%',
               gap: t.space.$8,
-              paddingBottom: `${t.space.$4}`,
+              paddingBottom: t.space.$4,
+              paddingLeft: t.space.$1,
+              paddingRight: t.space.$1,
               borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
               [mqu.md]: {
                 flexDirection: 'column',
@@ -83,26 +86,12 @@ export const OrganizationMembersTabRequests = () => {
 
       <Flex
         direction='col'
-        gap={4}
+        gap={2}
         sx={{
           width: '100%',
         }}
       >
-        <Flex
-          justify={'between'}
-          align={'center'}
-        >
-          <Header.Root>
-            <Header.Title
-              localizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.requests.headerTitle')}
-              textVariant='h3'
-            />
-            <Header.Subtitle
-              localizationKey={localizationKeys('organizationProfile.membersPage.requestsTab.requests.headerSubtitle')}
-              variant='body'
-            />
-          </Header.Root>
-        </Flex>
+        <MembersActionsRow />
         <RequestToJoinList />
       </Flex>
     </Col>

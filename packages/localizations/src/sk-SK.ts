@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
@@ -119,6 +120,7 @@ export const skSK: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Pozvánky sa nepodarilo odoslať. Opravte nasledujúce a skúste to znovu:',
       formButtonPrimary__continue: 'Odoslať pozvánky',
+      selectDropdown__role: 'Select role',
       subtitle: 'Pozvať nových členov do tejto organizácie',
       successMessage: 'Pozvánky boli úspešne odoslané.',
       title: 'Pozvať členov',
@@ -140,10 +142,6 @@ export const skSK: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -159,10 +157,6 @@ export const skSK: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -276,6 +270,12 @@ export const skSK: LocalizationResource = {
   paginationRowText__displaying: 'Zobrazuje sa',
   paginationRowText__of: 'z',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Získať pomoc',
       actionText: 'Don’t have any of these?',
@@ -588,12 +588,14 @@ export const skSK: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Pokračovať',
     formButtonPrimary__finish: 'Dokončiť',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Zrušiť',
     mfaPage: {
       formHint: 'Vyberte spôsob pridania.',
       title: 'Pridať dvojfaktorové overenie',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Pridať telefónne číslo',
       removeResource: {
         messageLine1: '{{identifier}} už nebude dostávať overovacie kódy pri prihlasovaní.',
@@ -605,8 +607,11 @@ export const skSK: LocalizationResource = {
         'Vyberte telefónne číslo pre registráciu dvojfaktorového overovania pomocou SMS kódu.',
       subtitle__unavailablePhoneNumbers:
         'Nie sú k dispozícii žiadne dostupné telefónne čísla pre registráciu dvojfaktorového overovania pomocou SMS kódu.',
-      successMessage:
-        'Dvojfaktorové overovanie pomocou SMS kódu je teraz povolené pre toto telefónne číslo. Pri prihlásení budete musieť zadať overovací kód zaslaný na toto telefónne číslo ako ďalší krok.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Pridať overovanie pomocou SMS kódu',
     },
     mfaTOTPPage: {
@@ -651,7 +656,6 @@ export const skSK: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Na toto telefónne číslo bude odoslaná textová správa obsahujúca overovací odkaz.',
-      infoText__secondary: 'Mohú sa vzťahovať poplatky za správy a dáta.',
       removeResource: {
         messageLine1: '{{identifier}} bude odobrané z tohto účtu.',
         messageLine2: 'Nebudete sa môcť prihlásiť pomocou tohto telefónneho čísla.',
@@ -680,6 +684,8 @@ export const skSK: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizovať teraz',
         destructiveActionTitle: 'Odstrániť',
         primaryButton: 'Pripojiť účet',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Pripojené účty',
       },
       dangerSection: {

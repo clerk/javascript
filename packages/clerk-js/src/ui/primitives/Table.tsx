@@ -11,7 +11,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       borderSpacing: '0',
       borderCollapse: 'separate',
       border: theme.borders.$normal,
-      borderColor: 'transparent',
+      borderColor: theme.colors.$neutralAlpha100,
       borderRadius: theme.radii.$lg,
       boxShadow: theme.shadows.$tableBodyShadow,
       width: '100%',

@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
@@ -118,6 +119,7 @@ export const zhTW: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: '邀請無法發送。修覆以下問題然後重試：',
       formButtonPrimary__continue: '發送邀請',
+      selectDropdown__role: 'Select role',
       subtitle: '邀請新成員加入此組織',
       successMessage: '邀請成功發送',
       title: '邀請成員',
@@ -139,10 +141,6 @@ export const zhTW: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -158,10 +156,6 @@ export const zhTW: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -274,6 +268,12 @@ export const zhTW: LocalizationResource = {
   paginationRowText__displaying: '顯示',
   paginationRowText__of: '的',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: '獲取幫助',
       actionText: 'Don’t have any of these?',
@@ -581,12 +581,14 @@ export const zhTW: LocalizationResource = {
     },
     formButtonPrimary__continue: '繼續',
     formButtonPrimary__finish: '完成',
+    formButtonPrimary__save: 'Save',
     formButtonReset: '取消',
     mfaPage: {
       formHint: '選擇一個添加的方法。',
       title: '添加兩步驗證',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: '添加電話號碼',
       removeResource: {
         messageLine1: '{{identifier}} 將不再在登錄時接收驗證代碼。',
@@ -596,8 +598,11 @@ export const zhTW: LocalizationResource = {
       },
       subtitle__availablePhoneNumbers: '選擇一個電話號碼來註冊簡訊驗證碼兩步驗證。',
       subtitle__unavailablePhoneNumbers: '沒有可用的電話號碼來註冊簡訊驗證碼兩步驗證。',
-      successMessage:
-        '現在已啟用此電話號碼的簡訊驗證碼兩步驗證。在登錄時，您需要輸入發送到這個電話號碼的驗證碼作為額外步驟。',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: '添加簡訊驗證碼驗證',
     },
     mfaTOTPPage: {
@@ -637,7 +642,6 @@ export const zhTW: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: '一條包含驗證連結的簡訊將會發送到這個電話號碼。',
-      infoText__secondary: '可能會產生資訊和數據費用。',
       removeResource: {
         messageLine1: '{{identifier}} 將從此帳戶中被移除。',
         messageLine2: '您將無法使用這個電話號碼登錄。',
@@ -666,6 +670,8 @@ export const zhTW: LocalizationResource = {
         actionLabel__reauthorize: '立即授權',
         destructiveActionTitle: '移除',
         primaryButton: '連接帳戶',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: '已連接的帳戶',
       },
       dangerSection: {

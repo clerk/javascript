@@ -93,31 +93,39 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
   );
 };
 
-type ProfileSectionItemListProps = PropsOfComponent<typeof Col> & { id: ProfileSectionId };
-
-const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
-  const { children, id, ...rest } = props;
-
-  return (
-    <Animated asChild>
-      <Col
-        elementDescriptor={descriptors.profileSectionItemList}
-        elementId={descriptors.profileSectionItemList.setId(id)}
-        sx={t => ({
-          gap: t.space.$0x5,
-        })}
-        {...rest}
-      >
-        {children}
-      </Col>
-    </Animated>
-  );
+type ProfileSectionItemListProps = PropsOfComponent<typeof Col> & {
+  id: ProfileSectionId;
+  disableAnimation?: boolean;
 };
 
-type ProfileSectionItemProps = Omit<PropsOfComponent<typeof Flex>, 'id'> & { id: ProfileSectionId };
+const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
+  const { children, id, disableAnimation = false, ...rest } = props;
+
+  const componentBody = (
+    <Col
+      elementDescriptor={descriptors.profileSectionItemList}
+      elementId={descriptors.profileSectionItemList.setId(id)}
+      sx={t => ({
+        gap: t.space.$0x5,
+      })}
+      {...rest}
+    >
+      {children}
+    </Col>
+  );
+
+  if (disableAnimation) return componentBody;
+
+  return <Animated asChild>{componentBody}</Animated>;
+};
+
+type ProfileSectionItemProps = Omit<PropsOfComponent<typeof Flex>, 'id'> & {
+  id: ProfileSectionId;
+  hoverable?: boolean;
+};
 
 const ProfileSectionItem = (props: ProfileSectionItemProps) => {
-  const { children, id, sx, ...rest } = props;
+  const { children, id, sx, hoverable, ...rest } = props;
 
   return (
     <Flex
@@ -128,8 +136,13 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          padding: `${t.space.$1x5} ${t.space.$none} ${t.space.$1x5} ${t.space.$4}`,
+          padding: `${t.space.$2} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
           gap: t.space.$2,
+          ...(hoverable && {
+            padding: `${t.space.$1} ${t.space.$1} ${t.space.$1} ${t.space.$2x5}`,
+            borderRadius: t.radii.$lg,
+            ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
+          }),
         }),
         sx,
       ]}
@@ -252,7 +265,7 @@ type ProfileSectionActionMenuProps = {
   destructive?: boolean;
   triggerLocalizationKey?: LocalizationKey;
   triggerSx?: ThemableCssProp;
-  id?: ProfileSectionId;
+  id: ProfileSectionId;
 };
 
 export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) => {
@@ -266,9 +279,7 @@ export const ProfileSectionActionMenu = (props: ProfileSectionActionMenuProps) =
       <Menu elementId={id}>
         <MenuTrigger>
           <ProfileSectionArrowButton
-            id='connectedAccounts'
-            elementDescriptor={descriptors.profileSectionPrimaryButton}
-            elementId={descriptors.profileSectionPrimaryButton.setId(id)}
+            id={id}
             textLocalizationKey={triggerLocalizationKey}
             sx={[
               t => ({

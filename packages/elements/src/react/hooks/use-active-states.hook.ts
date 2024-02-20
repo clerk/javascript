@@ -42,8 +42,8 @@ export function useActiveStates<TActor extends AnyActorRef, TState extends State
   );
 
   if (Array.isArray(states)) {
-    return states.some(s => currentState.hasTag(s));
+    return states.some(s => currentState.matches(s));
   }
 
-  return currentState.hasTag(states);
+  return currentState.matches(states);
 }

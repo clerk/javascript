@@ -99,8 +99,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     }
 
     if (isRedirect(handlerResult)) {
-      const res = setHeader(handlerResult, constants.Headers.AuthReason, 'redirect');
-      return serverRedirectWithAuth(clerkRequest, res, options);
+      return serverRedirectWithAuth(clerkRequest, handlerResult, options);
     }
 
     if (options.debug) {

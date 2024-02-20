@@ -257,6 +257,8 @@ type _LocalizationResource = {
     accountSwitcher: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      action__addAccount: LocalizationValue;
+      action__signOutAll: LocalizationValue;
     };
   };
   userProfile: {
@@ -304,6 +306,7 @@ type _LocalizationResource = {
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         actionLabel__reauthorize: LocalizationValue;
+        subtitle__reauthorize: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
       };
       enterpriseAccountsSection: {
@@ -386,8 +389,6 @@ type _LocalizationResource = {
       title: LocalizationValue;
       successMessage: LocalizationValue;
       infoText: LocalizationValue;
-      // TODO-RETHEME remove
-      infoText__secondary: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;
@@ -458,8 +459,6 @@ type _LocalizationResource = {
       backButton: LocalizationValue;
       subtitle__availablePhoneNumbers: LocalizationValue;
       subtitle__unavailablePhoneNumbers: LocalizationValue;
-      // TODO-RETHEME remove
-      successMessage: LocalizationValue;
       successTitle: LocalizationValue;
       successMessage1: LocalizationValue;
       successMessage2: LocalizationValue;
@@ -633,10 +632,6 @@ type _LocalizationResource = {
       };
       invitationsTab: {
         table__emptyRow: LocalizationValue;
-        manualInvitations: {
-          headerTitle: LocalizationValue;
-          headerSubtitle: LocalizationValue;
-        };
         autoInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
@@ -648,10 +643,6 @@ type _LocalizationResource = {
         menuAction__approve: LocalizationValue;
         menuAction__reject: LocalizationValue;
         table__emptyRow: LocalizationValue;
-        requests: {
-          headerTitle: LocalizationValue;
-          headerSubtitle: LocalizationValue;
-        };
         autoSuggestions: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;

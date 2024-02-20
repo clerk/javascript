@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
@@ -119,6 +120,7 @@ export const nbNO: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Invitasjonene kunne ikke sendes. Fiks følgende og prøv igjen:',
       formButtonPrimary__continue: 'Send invitasjoner',
+      selectDropdown__role: 'Select role',
       subtitle: 'Inviter nye medlemmer til denne organisasjonen',
       successMessage: 'Invitasjoner er sendt',
       title: 'Inviter medlemmer',
@@ -140,10 +142,6 @@ export const nbNO: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -159,10 +157,6 @@ export const nbNO: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -276,6 +270,12 @@ export const nbNO: LocalizationResource = {
   paginationRowText__displaying: 'Viser',
   paginationRowText__of: 'av',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Få hjelp',
       actionText: 'Don’t have any of these?',
@@ -590,12 +590,14 @@ export const nbNO: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Fortsett',
     formButtonPrimary__finish: 'Fullfør',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Avbryt',
     mfaPage: {
       formHint: 'Velg en metode for å legge til.',
       title: 'Legg til to-trinns verifisering',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Legg til et telefonnummer',
       removeResource: {
         messageLine1: '{{identifier}} vil ikke lenger motta verifiseringskoder ved pålogging.',
@@ -607,8 +609,11 @@ export const nbNO: LocalizationResource = {
         'Velg et telefonnummer for å registrere deg for SMS-kode to-trinns verifisering.',
       subtitle__unavailablePhoneNumbers:
         'Det er ingen tilgjengelige telefonnummer å registrere seg for SMS-kode to-trinns verifisering.',
-      successMessage:
-        'SMS-kode to-trinns verifisering er nå aktivert for dette telefonnummeret. Når du logger inn, må du angi en verifiseringskode sendt til dette telefonnummeret som et ekstra trinn.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Legg til SMS-kodeverifisering',
     },
     mfaTOTPPage: {
@@ -653,7 +658,6 @@ export const nbNO: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'En tekstmelding med en verifiseringslenke vil bli sendt til dette telefonnummeret.',
-      infoText__secondary: 'Meldings- og datatilleggskostnader kan påløpe.',
       removeResource: {
         messageLine1: '{{identifier}} vil bli fjernet fra denne kontoen.',
         messageLine2: 'Du vil ikke lenger kunne logge inn med dette telefonnummeret.',
@@ -682,6 +686,8 @@ export const nbNO: LocalizationResource = {
         actionLabel__reauthorize: 'Autoriser nå',
         destructiveActionTitle: 'Fjern',
         primaryButton: 'Koble til konto',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Tilkoblede kontoer',
       },
       dangerSection: {

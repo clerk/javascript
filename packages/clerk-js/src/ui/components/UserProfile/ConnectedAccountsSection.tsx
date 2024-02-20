@@ -55,10 +55,16 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
             const error = account.verification?.error?.longMessage;
             const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
             const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
+            const errorMessage = !reauthorizationRequired
+              ? error
+              : localizationKeys('userProfile.start.connectedAccountsSection.subtitle__reauthorize');
 
             return (
               <Action.Root key={account.id}>
-                <ProfileSection.Item id='connectedAccounts'>
+                <ProfileSection.Item
+                  id='connectedAccounts'
+                  hoverable
+                >
                   <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
                     <Image
                       elementDescriptor={[descriptors.providerIcon]}
@@ -95,6 +101,13 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
 
                   <ConnectedAccountMenu account={account} />
                 </ProfileSection.Item>
+                {(error || reauthorizationRequired) && (
+                  <Text
+                    colorScheme='danger'
+                    sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$10}` })}
+                    localizationKey={errorMessage}
+                  />
+                )}
 
                 <Action.Open value='remove'>
                   <Action.Card variant='destructive'>

@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
@@ -119,6 +120,7 @@ export const jaJP: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: '招待状を送信できませんでした。以下を修正してもう一度試してください:',
       formButtonPrimary__continue: '招待状を送信する',
+      selectDropdown__role: 'Select role',
       subtitle: 'この組織に新しいメンバーを招待する',
       successMessage: '招待状が正常に送信されました',
       title: 'メンバーを招待',
@@ -140,10 +142,6 @@ export const jaJP: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -159,10 +157,6 @@ export const jaJP: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -276,6 +270,12 @@ export const jaJP: LocalizationResource = {
   paginationRowText__displaying: '表示中',
   paginationRowText__of: '全',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'ヘルプを取得',
       actionText: 'Don’t have any of these?',
@@ -588,12 +588,14 @@ export const jaJP: LocalizationResource = {
     },
     formButtonPrimary__continue: '続行',
     formButtonPrimary__finish: '完了',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'キャンセル',
     mfaPage: {
       formHint: '追加する方法を選択してください。',
       title: '二段階認証の追加',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: '電話番号を追加',
       removeResource: {
         messageLine1: '{{identifier}}はサインイン時に認証コードを受け取らなくなります。',
@@ -603,8 +605,11 @@ export const jaJP: LocalizationResource = {
       },
       subtitle__availablePhoneNumbers: 'SMSコード二段階認証のために登録する電話番号を選択してください。',
       subtitle__unavailablePhoneNumbers: 'SMSコード二段階認証のために利用可能な電話番号はありません。',
-      successMessage:
-        'この電話番号でSMSコード二段階認証が有効になりました。サインイン時には、この電話番号に送信された認証コードを追加のステップとして入力する必要があります。',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'SMSコード認証の追加',
     },
     mfaTOTPPage: {
@@ -648,7 +653,6 @@ export const jaJP: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'この電話番号には検証リンクが含まれたテキストメッセージが送信されます。',
-      infoText__secondary: 'メッセージおよびデータ料金が発生する場合があります。',
       removeResource: {
         messageLine1: '{{identifier}}はこのアカウントから削除されます。',
         messageLine2: 'この電話番号を使用してのサインインはできなくなります。',
@@ -677,6 +681,8 @@ export const jaJP: LocalizationResource = {
         actionLabel__reauthorize: '今すぐ認証',
         destructiveActionTitle: '削除',
         primaryButton: 'アカウントを連携する',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: '連携アカウント',
       },
       dangerSection: {

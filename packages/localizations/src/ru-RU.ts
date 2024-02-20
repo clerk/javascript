@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
@@ -119,6 +120,7 @@ export const ruRU: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Приглашения не удалось отправить. Исправьте следующее и повторите попытку:',
       formButtonPrimary__continue: 'Отправить приглашения',
+      selectDropdown__role: 'Select role',
       subtitle: 'Пригласите новых участников в эту организацию',
       successMessage: 'Приглашения успешно отправлены',
       title: 'Пригласить участников',
@@ -140,10 +142,6 @@ export const ruRU: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -159,10 +157,6 @@ export const ruRU: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -280,6 +274,12 @@ export const ruRU: LocalizationResource = {
   paginationRowText__displaying: 'Отображение',
   paginationRowText__of: 'из',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Помощь',
       actionText: 'Don’t have any of these?',
@@ -593,12 +593,14 @@ export const ruRU: LocalizationResource = {
     },
     formButtonPrimary__continue: 'Продолжить',
     formButtonPrimary__finish: 'Готово',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'Отмена',
     mfaPage: {
       formHint: 'Выберите метод для добавления.',
       title: 'Добавить двухфакторную аутентификацию',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Добавить номер телефона',
       removeResource: {
         messageLine1: '{{identifier}} больше не будет получать коды подтверждения при входе в систему.',
@@ -609,8 +611,11 @@ export const ruRU: LocalizationResource = {
       subtitle__availablePhoneNumbers: 'Выберите номер телефона для регистрации в двухэтапной проверке с кодом из SMS.',
       subtitle__unavailablePhoneNumbers:
         'Нет доступных номеров телефона для регистрации в двухэтапной проверке с кодом из SMS.',
-      successMessage:
-        'Двухэтапная проверка с кодом из SMS включена для этого номера телефона. При входе в систему вам нужно будет ввести код подтверждения, отправленный на этот номер телефона в качестве дополнительного шага.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'Добавить проверку кодом из SMS',
     },
     mfaTOTPPage: {
@@ -656,7 +661,6 @@ export const ruRU: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'На этот номер телефона будет отправлено текстовое сообщение с верификационной ссылкой.',
-      infoText__secondary: 'Могут быть применены тарифы на сообщения и данные.',
       removeResource: {
         messageLine1: '{{identifier}} будет удален из этой учетной записи.',
         messageLine2: 'Вы больше не сможете войти, используя этот номер телефона.',
@@ -685,6 +689,8 @@ export const ruRU: LocalizationResource = {
         actionLabel__reauthorize: 'Авторизовать сейчас',
         destructiveActionTitle: 'Удалить',
         primaryButton: 'Подключить аккаунт',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Подключенные аккаунты',
       },
       dangerSection: {

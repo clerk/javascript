@@ -9,6 +9,7 @@
  * Use of this file is at your own risk and discretion.
  * =====================================================================================
  */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
@@ -119,6 +120,7 @@ export const trTR: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'Daveiyeler gönderilemedi. Aşağıda belirtilen sorunları giderip tekrar deneyin:',
       formButtonPrimary__continue: 'Davetiye gönder',
+      selectDropdown__role: 'Select role',
       subtitle: 'Bu organizasyona yeni üyeler davet edin',
       successMessage: 'Davetiyeler başarıyla gönderildi',
       title: 'Davetiye gönder',
@@ -140,10 +142,6 @@ export const trTR: LocalizationResource = {
           headerTitle: 'Automatic invitations',
           primaryButton: 'Manage verified domains',
         },
-        manualInvitations: {
-          headerSubtitle: 'Manually invite members and manage existing invitations.',
-          headerTitle: 'Individual invitations',
-        },
         table__emptyRow: 'No invitations to display',
       },
       invitedMembersTab: {
@@ -159,10 +157,6 @@ export const trTR: LocalizationResource = {
         },
         menuAction__approve: 'Approve',
         menuAction__reject: 'Reject',
-        requests: {
-          headerSubtitle: 'Browse and manage users who requested to join the organization.',
-          headerTitle: 'Requests',
-        },
         tableHeader__requested: 'Requested access',
         table__emptyRow: 'No requests to display',
       },
@@ -276,6 +270,12 @@ export const trTR: LocalizationResource = {
   paginationRowText__displaying: 'Sayfa bilgisi:',
   paginationRowText__of: '-',
   signIn: {
+    accountSwitcher: {
+      action__addAccount: 'Add account',
+      action__signOutAll: 'Sign out of all accounts',
+      subtitle: 'Select the account with which you wish to continue.',
+      title: 'Choose an account',
+    },
     alternativeMethods: {
       actionLink: 'Yardım al',
       actionText: 'Don’t have any of these?',
@@ -590,12 +590,14 @@ export const trTR: LocalizationResource = {
     },
     formButtonPrimary__continue: 'İlerle',
     formButtonPrimary__finish: 'Bitir',
+    formButtonPrimary__save: 'Save',
     formButtonReset: 'İptal',
     mfaPage: {
       formHint: 'Eklemek için bir yöntem seçiniz.',
       title: 'İki aşamalı doğrulama yöntemi ekle',
     },
     mfaPhoneCodePage: {
+      backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Telefon numarası ekle',
       removeResource: {
         messageLine1: 'Giriş yaparken artık {{identifier}} numarasına SMS kodu gönderilmeyecektir.',
@@ -606,8 +608,11 @@ export const trTR: LocalizationResource = {
       subtitle__availablePhoneNumbers: 'İki aşamalı SMS kodu doğrulaması için bir telefon numarası seçin.',
       subtitle__unavailablePhoneNumbers:
         'İki aşamalı SMS kodu doğrulaması için kullanılabilir bir telefon numarası yok.',
-      successMessage:
-        'İki aşamalı doğrulama yöntemi başarıyla eklendi. Oturum açarken, ek bir adım olarak bu telefon numarasına gönderilen bir doğrulama kodu girmeniz gerekecektir.',
+      successMessage1:
+        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+      successMessage2:
+        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
+      successTitle: 'SMS code verification enabled',
       title: 'SMS kodu doğrulaması ekle',
     },
     mfaTOTPPage: {
@@ -652,7 +657,6 @@ export const trTR: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'Belirtilen numaraya doğrulama kodunu içeren bir SMS gönderilecektir.',
-      infoText__secondary: 'Ücretlendirmeye tabii olabilir.',
       removeResource: {
         messageLine1: '{{identifier}} numarası hesabınızdan kaldırılacaktır.',
         messageLine2: 'Artık bu telefon numarasını kullanarak oturum açmanız mümkün olmayacaktır.',
@@ -681,6 +685,8 @@ export const trTR: LocalizationResource = {
         actionLabel__reauthorize: 'Yetkilendir',
         destructiveActionTitle: 'Kaldır',
         primaryButton: 'Hesap bağla',
+        subtitle__reauthorize:
+          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Bağlı hesaplar',
       },
       dangerSection: {

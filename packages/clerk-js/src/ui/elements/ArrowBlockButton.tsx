@@ -62,6 +62,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
           justifyContent: 'center',
           borderColor: theme.colors.$neutralAlpha100,
           alignItems: 'center',
+          padding: `${theme.space.$1x5} ${theme.space.$3} ${theme.space.$1x5} ${theme.space.$2x5}`,
           '--arrow-opacity': '0',
           '--arrow-transform': `translateX(-${theme.space.$2});`,
           '&:hover,&:focus ': {

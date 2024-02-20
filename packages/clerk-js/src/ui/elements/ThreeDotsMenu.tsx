@@ -23,21 +23,20 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
     <Menu elementId={elementId}>
       <MenuTrigger>
         <Button
-          size='xs'
           sx={t => ({
-            width: t.sizes.$5,
-            height: t.sizes.$5,
-            padding: 0,
+            padding: t.space.$0x5,
+            boxSizing: 'content-box',
             opacity: t.opacity.$inactive,
             ':hover': {
               opacity: 1,
             },
           })}
           variant='ghost'
+          colorScheme='neutral'
         >
           <Icon
             icon={ThreeDots}
-            sx={t => ({ width: 'auto', height: t.sizes.$4 })}
+            sx={t => ({ width: 'auto', height: t.sizes.$5 })}
           />
         </Button>
       </MenuTrigger>

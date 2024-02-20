@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.0.0-beta.14
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 2.0.0-beta-v5.13
+
+### Patch Changes
+
+- Improve German translations ([#2675](https://github.com/clerk/javascript/pull/2675)) by [@TobiasMaehl-pIX](https://github.com/TobiasMaehl-pIX)
+
 ## 2.0.0-beta-v5.12
 
 ### Major Changes

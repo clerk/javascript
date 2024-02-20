@@ -1,5 +1,21 @@
 # Change Log
 
+## 2.0.0-beta.13
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 2.0.0-beta-v5.12
+
+### Minor Changes
+
+- Add `error` for each paginated property return by `useOrganization` and `useOrganizationList` hooks. ([#2743](https://github.com/clerk/javascript/pull/2743)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add `joinURL` helper to `@clerk/shared/url` ([#2725](https://github.com/clerk/javascript/pull/2725)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 2.0.0-beta-v5.11
 
 ### Patch Changes
