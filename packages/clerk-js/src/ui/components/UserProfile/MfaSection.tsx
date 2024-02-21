@@ -241,26 +241,28 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
 
   return (
     <>
-      <ProfileSection.ActionMenu
-        id='mfa'
-        triggerLocalizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
-      >
-        {strategies.map(
-          method =>
-            method && (
-              <ProfileSection.ActionMenuItem
-                key={method.key}
-                id={method.key}
-                localizationKey={method.text}
-                leftIcon={method.icon}
-                onClick={() => {
-                  setSelectedStrategy(method.key);
-                  open('multi-factor');
-                }}
-              />
-            ),
-        )}
-      </ProfileSection.ActionMenu>
+      <Action.Closed value='multi-factor'>
+        <ProfileSection.ActionMenu
+          id='mfa'
+          triggerLocalizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
+        >
+          {strategies.map(
+            method =>
+              method && (
+                <ProfileSection.ActionMenuItem
+                  key={method.key}
+                  id={method.key}
+                  localizationKey={method.text}
+                  leftIcon={method.icon}
+                  onClick={() => {
+                    setSelectedStrategy(method.key);
+                    open('multi-factor');
+                  }}
+                />
+              ),
+          )}
+        </ProfileSection.ActionMenu>
+      </Action.Closed>
       <Action.Open value='multi-factor'>
         <Action.Card>{selectedStrategy && <MfaScreen selectedStrategy={selectedStrategy} />}</Action.Card>
       </Action.Open>
