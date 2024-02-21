@@ -4,10 +4,9 @@ import type React from 'react';
 import { useCallback } from 'react';
 import type { ActorRef, SnapshotFrom } from 'xstate';
 
-import type { SignInStartEvents } from '~/internals/machines/sign-in/types';
-import type { SignUpMachineEvents } from '~/internals/machines/sign-up/sign-up.machine';
-import type { ThirdPartyMachine } from '~/internals/machines/third-party/machine';
-import { THIRD_PARTY_MACHINE_ID } from '~/internals/machines/third-party/machine';
+import type { SignInRouterEvents } from '~/internals/machines/sign-in/types';
+import type { SignUpRouterEvents } from '~/internals/machines/sign-up/types';
+import { type ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party/machine';
 import type { UseThirdPartyProviderReturn } from '~/react/common/third-party-providers/social-provider';
 
 /**
@@ -17,12 +16,12 @@ const selector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotFro
   state.context.thirdPartyProviders.providerToDisplayData[provider];
 
 export const useThirdPartyProvider = <
-  TActor extends ActorRef<any, SignInStartEvents> | ActorRef<any, SignUpMachineEvents>,
+  TActor extends ActorRef<any, SignInRouterEvents> | ActorRef<any, SignUpRouterEvents>,
 >(
   ref: TActor,
   provider: OAuthProvider | Web3Provider,
 ): UseThirdPartyProviderReturn => {
-  const details = useSelector(ref.system.get(THIRD_PARTY_MACHINE_ID), selector(provider));
+  const details = useSelector(ref.system.get(ThirdPartyMachineId), selector(provider));
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {
