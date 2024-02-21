@@ -1,14 +1,14 @@
 'use client';
 
 import { Field, Input, Label } from '@clerk/elements/common';
-import { SignIn, Start } from '@clerk/elements/sign-in';
+import { SignIn, Step } from '@clerk/elements/sign-in';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Page() {
   return (
     <SignIn path='/otp-playground'>
-      <Start>
+      <Step name='start'>
         <div className='h-dvh flex items-center justify-center bg-neutral-800'>
           <Field name='code'>
             <Label className='sr-only'>Label</Label>
@@ -48,7 +48,7 @@ export default function Page() {
             />
           </Field>
         </div>
-      </Start>
+      </Step>
     </SignIn>
   );
 }
