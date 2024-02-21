@@ -9,7 +9,8 @@ import {
   writeToFile,
 } from '../../text-generation.js';
 
-const version = 'v5';
+const version = 'core-2';
+const semverVersion = 'v5';
 const name = 'js';
 const properName = 'Javascript';
 const packageName = '@clerk/clerk-js';
@@ -25,7 +26,7 @@ async function generate() {
     }),
     `# Upgrading \`${packageName}\` to Core 2`,
     markdown('intro'),
-    markdownTemplate('prepare', { version, packageName }),
+    markdownTemplate('prepare', { version: semverVersion, packageName }),
     markdownTemplate('update-version', { packageName }),
     markdown('cli'),
     '## Breaking Changes',

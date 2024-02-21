@@ -1,4 +1,4 @@
-## Changes to top-level exports
+### Changes to top-level exports
 
 As part of this release, some of the top-level exports of `@clerk/nextjs` have been changed in order to improve bundle size and tree-shaking efficiency. These changes have resulted in a ~75% reduction in build size for middleware bundles. However, you will likely need to make some changes to import paths as a result.
 
@@ -8,7 +8,7 @@ As part of this release, some of the top-level exports of `@clerk/nextjs` have b
 
 <Accordion titles={["@clerk/nextjs/server", "@clerk/nextjs/errors", "@clerk/nextjs/app-beta", "@clerk/nextjs/ssr", "@clerk/nextjs/edge-middleware", "@clerk/nextjs/edge-middlewarefiles", "@clerk/nextjs/api"]}>
   <AccordionPanel>
-    Previously these exports have been exported both from `@clerk/nextjs` and `@clerk/nextjs/server`. As of v5 they are only exported from the latter.
+    Previously these exports have been exported both from `@clerk/nextjs` and `@clerk/nextjs/server`. As of v5 they are only exported from the latter. Going forward, the expectation can be that any imports that are intended to run within react on the client side, will come from `@clerk/nextjs` and imports that are intended to run on the server, will come from `@clerk/nextjs/server`.
 
     ```diff
       import {

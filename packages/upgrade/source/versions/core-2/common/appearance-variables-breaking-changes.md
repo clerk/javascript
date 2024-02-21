@@ -1,7 +1,7 @@
 ---
 title: 'Breaking Changes to appearance variables'
 matcherFlags: 'm'
-category: 'appearance-breaking-changes'
+category: 'appearance'
 matcher:
   - "variables:\\s+{[\\s\\S]*?fontSmoothing:"
   - "variables:\\s+{[\\s\\S]*?shadowShimmer:"
@@ -10,6 +10,6 @@ matcher:
 
 Several appearance variables have been removed or renamed. If you were using these variables in your application, you will need to update your code to use the new variables.
 
-- The \`fontSmoothing\` variable has been removed.
-- The \`shadowShimmer\` variable has been removed.
-- The \`colorAlphaShade\` variable has been renamed to \`colorNeutral\`.
+- The `fontSmoothing` variable has been removed.
+- The `shadowShimmer` variable has been removed.
+- The `colorAlphaShade` variable has been renamed to `colorNeutral`.

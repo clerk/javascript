@@ -1,10 +1,10 @@
-## New Middleware architecture
+### New Middleware architecture
 
-User and customer feedback about `authMiddleware()` has been clear in that Middleware logic was a often friction point. As such, in v5 you will find a completely new Middleware helper called [`clerkMiddleware()`](/docs/references/nextjs/clerk-middleware) that will hopefully alleviate all of the issues folks had with `authMiddleware()`.
+User and customer feedback about `authMiddleware()` has been clear in that Middleware logic was a often friction point. As such, in v5 you will find a completely new Middleware helper called [`clerkMiddleware()`](/docs/references/nextjs/clerk-middleware) that should alleviate the issues folks had with `authMiddleware()`.
 
 Additionally, there are now new helpers that enable controlling auth on a _per-page and/or per-layout basis_ when using App Router. While you can still configure which routes are protected via Middleware, the page-based protection strategy is what is now recommended, as the co-location of auth protection configuration with the code for the pages themselves results in a superior developer experience that adds clarity as you navigate your codebase.
 
-### Per-route auth config
+#### Per-route auth config
 
 Sometimes, code speaks louder than words. Let's get right into an example:
 
@@ -39,35 +39,13 @@ Sometimes, code speaks louder than words. Let's get right into an example:
   </Tab>
 </Tabs>
 
-In this example, you add `auth().protect()` to a layout and that layout and all of it's children will be gated by auth. The same logic can be applied for pages.
+In this example, you add [`auth().protect()`](/docs/references/nextjs/auth#protect) to a layout and that layout and all of it's children will be gated by auth. The same logic can be applied for pages.
 
-Want to get more specific with permission gating? Add the role you are gating as a param to `protect()` as such:
-
-```ts filename="app/src/admin/layout.tsx"
-import { auth } from '@clerk/nextjs/server';
-
-export default async function AdminLayout({ children }) {
-  auth().protect({ role: 'org:admin' });
-
-  return <>{children}</>;
-}
-```
-
-Note that in order for this to work, you will still need Middleware to be present, but it only requires the most minimal configuration:
-
-```ts filename="middleware.ts"
-import { clerkMiddleware } from '@clerk/nextjs/server';
-
-export default clerkMiddleware();
-
-export const config = {
-  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
-};
-```
+For more details on route protection, check out the [route protection guide](/references/nextjs/route-protection).
 
 If you are using the pages router, per-route gating won't work. Instead, configure your auth gating via Middleware as described in the next section.
 
-### Middleware auth config
+#### Middleware auth config
 
 If you prefer to define your auth logic within the Middleware, you can still do this using the new `clerkMiddleware`. The primary change from the previous `authMiddleware()` is that `clerkMiddleware()` does not protect any routes by default, instead requiring the developer to add routes they would like to be protected by auth. This is a substantial contrast to the previous `authMiddleware()`, which protected all routes by default, requiring the developer to add exceptions. The API was also substantially simplified, and it has become easier to combine with other Middleware helpers smoothly as well.
 
@@ -77,7 +55,7 @@ Here's an example that replicates the auth protection scheme above, but entirely
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isDashboardRoute = createRouteMatcher(['/dashboard(.*)']);
-const isAdminRoute = createRouteMatcher(['/admin']);
+const isAdminRoute = createRouteMatcher(['/admin(.*)']);
 
 export default clerkMiddleware((auth, req) => {
   // Restrict admin route to users with specific role
@@ -98,7 +76,7 @@ A couple things to note here:
 - With `clerkMiddleware`, you're defining the routes you want **to be protected**, rather than the routes you don't want to be protected.
 - You are able to use the same `auth().protect()` helpers that you can use within layouts/pages here in the Middleware.
 
-### Migrating to `clerkMiddleware()`
+#### Migrating to `clerkMiddleware()`
 
 Clerk strongly recommends migrating to the new `clerkMiddleware()` for an improved DX and access to all present and upcoming features, but also want to note that `authMiddleware()`, while deprecated, will continue to work in v5 and will not be removed until the next major version, so you do not _need_ to make any changes to your Middleware setup this version.
 

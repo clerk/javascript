@@ -24,7 +24,13 @@ const changesAffectingAll = [
   'user-update-password',
 ];
 
-const jsChanges = ['setsession', 'organization-create-string', 'organization-getpendinginvitations', 'mfa-dropdown'];
+const jsChanges = [
+  'setsession',
+  'organization-create-string',
+  'organization-getpendinginvitations',
+  'mfa-dropdown',
+  'appearance-variables-breaking-changes',
+];
 
 const reactChanges = [
   'magiclinkerrorcode',
@@ -66,7 +72,6 @@ const reactChanges = [
   'min-react-version',
   'externalaccount-avatarurl',
   'organizationmembershippublicuserdata-profileimageurl',
-  'appearance-variables-breaking-changes',
 ];
 
 export default {

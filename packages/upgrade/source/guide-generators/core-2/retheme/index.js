@@ -23,13 +23,12 @@ async function generate() {
 
   return assembleContent({ data: data, cwd }, [
     frontmatter({
-      title: 'Redesigned Components in v5',
-      description: 'Learn how to handle changes as a result of redesigned components in Clerk version 5',
+      title: 'Redesigned Components in Core 2',
+      description: 'Learn how to handle changes as a result of redesigned components in Clerk Core 2',
     }),
-    '# Redesigned Components in v5',
+    '# Redesigned Components in Core 2',
     markdown('intro'),
     '## Appearance Changes',
-    accordionForCategory('appearance-breaking-changes'),
     accordionForCategory('appearance', { additionalItems: [defaultsChangeItem] }),
     '## Localization Changes',
     accordionForCategory('localization'),
