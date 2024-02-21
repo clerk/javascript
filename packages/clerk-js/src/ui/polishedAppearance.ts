@@ -156,7 +156,6 @@ export const polishedAppearance: Appearance = {
         border: 0,
         boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
       },
-      selectSearchInput: { margin: '4px' },
       phoneInputBox: (() => {
         const boxShadow = [
           `0px 0px 0px 1px ${theme.colors.$neutralAlpha150}`,
