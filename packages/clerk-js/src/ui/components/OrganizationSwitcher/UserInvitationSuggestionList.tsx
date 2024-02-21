@@ -109,7 +109,6 @@ const Preview = (
       sx={t => ({
         justifyContent: 'space-between',
         padding: `${t.space.$4} ${t.space.$5}`,
-        borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
       })}
     >
       <OrganizationPreview
@@ -225,6 +224,11 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
   // Solve weird bug with swr while running unit tests
   const userInvitationsData = userInvitations.data?.filter(a => !!a);
   const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+
+  if (!hasAnyData && !isLoading) {
+    return null;
+  }
+
   return (
     <SwitcherInvitationActions
       showBorder={hasAnyData || isLoading}
