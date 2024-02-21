@@ -237,12 +237,10 @@ type FormFieldProps = RadixFormFieldProps;
  * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `email`, `password`, `phone`, `code`, and `identifier`.
  *
  * @example
- * export default Component = () => (
- *  <Field name="email">
- *    <Label>Email</Label>
- *    <Input />
- *  </Field>
- * )
+ * <Field name="email">
+ *   <Label>Email</Label>
+ *   <Input />
+ * </Field>
  */
 const Field = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
   return (
@@ -272,10 +270,10 @@ FieldInner.displayName = FIELD_INNER_NAME;
 
 /**
  * Programmatically access the state of the wrapping `<Field>`. Useful for implementing animations when direct access to the value is necessary.
+ *
  * @param {Function} children - A render prop function that receives `state` as an argument. `state` will be either `'valid'` or `'invalid'`.
  *
  * @example
- * export default Component = () => (
  * <Field name="email">
  *  <FieldState>
  *    {({ state }) => (
@@ -302,6 +300,38 @@ const INPUT_NAME = 'ClerkElementsInput';
 
 type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
 
+/**
+ * Renders an `<input />` element within Clerk's flow. Passes all props to the underlying input element. The `<input />` element will have two data properties: `data-valid` and `data-invalid`. An input is invalid if it has an associated error.
+ *
+ * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` component.
+ *
+ * @example
+ * <Field name="identifier">
+ *   <Label>Email</Label>
+ *   <Input type="email" autoComplete="email" className="emailInput" />
+ * </Field>
+ *
+ * @param {Number} [length] - The length of the OTP input. Defaults to 6.
+ * @param {string} [type] - Type of control to render. Supports a special `'otp'` type for one-time password inputs. If the wrapping `<Field>` component has `name='code'`, the type will default to `'otp'`. With the `'otp'` type, the input will have a pattern and length set to 6 by default and render a single `<input />` element.
+ *
+ * @example
+ * <Field name="code">
+ *   <Label>Email code</Label>
+ *   <Input type="otp" />
+ * </Field>
+ *
+ * @param {Function} [render] - Optionally, you can use a render prop that controls how each individual character is rendered. If no `render` prop is provided, a single text `<input />` will be rendered.
+ *
+ * @example
+ * <Field name="code">
+ *   <Label>Email code</Label>
+ *   <Input
+ *     type="otp"
+ *     render={({ value, status }) => <span data-status={status}>{value}</span>}
+ *   />
+ * </Field>
+ */
 const Input = (props: FormInputProps) => {
   const field = useInput(props);
   return <field.Element {...field.props} />;
@@ -315,6 +345,17 @@ Input.displayName = INPUT_NAME;
 
 const LABEL_NAME = 'ClerkElementsLabel';
 
+/**
+ * Renders a `<label>` element within Clerk's flow. Is automatically associated with its sibling `<Input />` component inside of a `<Field>`. Passes all props to the underlying label element.
+ *
+ * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ *
+ * @example
+ * <Field name="email">
+ *   <Label>Email</Label>
+ *   <Input />
+ * </Field>
+ */
 const Label = RadixLabel;
 
 Label.displayName = LABEL_NAME;
@@ -328,6 +369,11 @@ const SUBMIT_NAME = 'ClerkElementsSubmit';
 type FormSubmitProps = SetRequired<RadixFormSubmitProps, 'children'>;
 type FormSubmitComponent = React.ForwardRefExoticComponent<FormSubmitProps & React.RefAttributes<HTMLButtonElement>>;
 
+/**
+ * A `<button type="submit">` element.
+ *
+ * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ */
 const Submit = RadixSubmit as FormSubmitComponent;
 
 Submit.displayName = SUBMIT_NAME;
@@ -370,26 +416,24 @@ type FormFieldErrorProps = FormErrorProps<RadixFormMessageProps & { name?: strin
 
 /**
  * Renders errors that are returned from Clerk's API but are not associated with a specific field. By default, it will render the error's message wrapped in an unstyled `<div>` element. **Must** be placed inside components like `<SignIn>` or `<SignUp>` to work correctly.
+ *
  * @param {string} [code] - Forces the message with the matching code to be shown. This is useful when using server-side validation.
  * @param {Function} [children] - A render prop function that receives `message` and `code` as arguments.
  * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
  *
  * @example
- * export default Component = () => (
- *  <SignIn>
- *    <GlobalError />
- *  </SignIn>
- * )
+ * <SignIn>
+ *   <GlobalError />
+ * </SignIn>
+ *
  * @example
- * export default Component = () => (
- *  <SignUp>
- *    <GlobalError>
- *      {({ message, code }) => (
- *        <span data-error-code={code}>{message}</span>
- *      )}
- *    </GlobalError>
- *  </SignUp>
- * )
+ * <SignUp>
+ *   <GlobalError>
+ *     {({ message, code }) => (
+ *       <span data-error-code={code}>{message}</span>
+ *     )}
+ *   </GlobalError>
+ * </SignUp>
  */
 const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProps>(
   ({ asChild = false, children, code, ...rest }, forwardedRef) => {
@@ -418,27 +462,24 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
 
 /**
  * Renders error messages associated with the parent `<Field>` component. By default, it will render the error message wrapped in an unstyled `<span>` element.
- * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` part.
+ *
+ * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` component.
  * @param {string} [code] - Forces the message with the matching code to be shown. This is useful when using server-side validation.
  * @param {Function} [children] - A render prop function that receives `message` and `code` as arguments.
  *
  * @example
- * export default Component = () => (
- *  <Field name="email">
- *    <FieldError />
- *  </Field>
- * )
+ * <Field name="email">
+ *   <FieldError />
+ * </Field>
  *
  * @example
- * export default Component = () => (
- *  <Field name="email">
- *    <FieldError>
- *      {({ message, code }) => (
- *        <span data-error-code={code}>{message}</span>
- *      )}
- *    </FieldError>
- *  </Field>
- * )
+ * <Field name="email">
+ *   <FieldError>
+ *     {({ message, code }) => (
+ *       <span data-error-code={code}>{message}</span>
+ *     )}
+ *   </FieldError>
+ * </Field>
  */
 const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
   ({ children, code, name, ...rest }, forwardedRef) => {

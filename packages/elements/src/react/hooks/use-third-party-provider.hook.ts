@@ -39,7 +39,9 @@ export const useThirdPartyProvider = <
   );
 
   if (!details) {
-    console.warn(`Please ensure that ${provider} is enabled.`);
+    console.error(
+      `Please ensure that ${provider} is enabled for your project. Go to your Clerk dashboard and navigate to "User & Authentication" > "Social Connections" to enable it.`,
+    );
     return null;
   }
 

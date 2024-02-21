@@ -12,6 +12,12 @@ export interface SignInSocialProviderProps extends Omit<SocialProviderProps, 'pr
 }
 
 // TODO: Consolidate with sign-up/social-providers.tsx
+
+/**
+ * Renders a social provider button for the given `name`. Renders a button that will trigger a sign-in attempt. If your instance does not have the social provider enabled an error will be thrown.
+ *
+ * @param {string} name - Name of the provider to render
+ */
 export function SignInSocialProvider({ name, ...rest }: SignInSocialProviderProps) {
   const ref = SignInRouterCtx.useActorRef();
   const thirdPartyProvider = useThirdPartyProvider(ref, name);
@@ -24,4 +30,14 @@ export function SignInSocialProvider({ name, ...rest }: SignInSocialProviderProp
   );
 }
 
+/**
+ * Renders the icon of the `<SocialProvider>` it is used within. Hence, it must be used within a `<SocialProvider>`.
+ *
+ * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ *
+ * @example
+ * <SocialProvider name="google">
+ *  <SocialProviderIcon />
+ * </SocialProvider>
+ */
 export const SignInSocialProviderIcon = SocialProviderIcon;
