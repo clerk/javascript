@@ -42,7 +42,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
             },
             zIndex: t.zIndices.$modal,
             position: 'absolute',
-            top: t.space.$0x5,
+            top: t.space.$2,
             right: t.space.$2,
           })}
         >
