@@ -1,14 +1,17 @@
 import { assertEvent, assign, enqueueActions, log, sendParent, setup } from 'xstate';
 
+import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 
 import { handleRedirectCallback, redirect } from './actors';
 import type { ThirdPartyMachineSchema } from './types';
 
-const THIRD_PARTY_MACHINE_ID = 'ThirdParty';
+export const ThirdPartyMachineId: string = 'ThirdParty';
 
-const machine = setup({
+export type TThirdPartyMachine = typeof ThirdPartyMachine;
+
+export const ThirdPartyMachine = setup({
   actors: {
     handleRedirectCallback,
     redirect,
@@ -40,7 +43,7 @@ const machine = setup({
   },
   types: {} as ThirdPartyMachineSchema,
 }).createMachine({
-  id: THIRD_PARTY_MACHINE_ID,
+  id: ThirdPartyMachineId,
   context: ({ input }) => ({
     activeStrategy: null,
     basePath: input.basePath,
@@ -76,11 +79,19 @@ const machine = setup({
         input: ({ context, event }) => {
           assertEvent(event, 'REDIRECT');
 
+          const redirectUrl =
+            event.params.redirectUrl || context.clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`);
+          const redirectUrlComplete = event.params.redirectUrlComplete || redirectUrl;
+
           return {
             basePath: context.basePath,
             clerk: context.clerk,
             flow: context.flow,
-            params: event.params,
+            params: {
+              redirectUrl,
+              redirectUrlComplete,
+              ...event.params,
+            },
           };
         },
         onError: {
@@ -112,5 +123,3 @@ const machine = setup({
     },
   },
 });
-
-export { THIRD_PARTY_MACHINE_ID, machine as ThirdPartyMachine };

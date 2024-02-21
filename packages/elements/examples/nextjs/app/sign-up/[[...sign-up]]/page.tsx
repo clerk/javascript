@@ -1,15 +1,7 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import {
-  Continue,
-  SignUp,
-  SocialProvider,
-  SocialProviderIcon,
-  Start,
-  Verification,
-  Verifications,
-} from '@clerk/elements/sign-up';
+import { SignUp, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
@@ -18,7 +10,7 @@ export default function SignUpPage() {
   return (
     <SignUp>
       <div className='m-auto w-max text-sm'>
-        <Start>
+        <Step name='start'>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>Sign Up</H1>
 
@@ -65,9 +57,9 @@ export default function SignUpPage() {
               <CustomSubmit>Sign Up</CustomSubmit>
             </div>
           </div>
-        </Start>
+        </Step>
 
-        <Continue>
+        <Step name='continue'>
           <H1>Please enter additional information:</H1>
 
           <GlobalError className='block text-red-400 font-mono' />
@@ -78,12 +70,21 @@ export default function SignUpPage() {
           />
 
           <CustomSubmit>Sign Up</CustomSubmit>
-        </Continue>
+        </Step>
 
-        <Verifications>
+        <Step name='verifications'>
           <H1>Verify your information:</H1>
 
           <GlobalError className='block text-red-400 font-mono' />
+
+          <Verification name='phone_code'>
+            <CustomField
+              label='SMS Code'
+              name='code'
+            />
+
+            <CustomSubmit>Verify</CustomSubmit>
+          </Verification>
 
           <Verification name='email_code'>
             <CustomField
@@ -95,7 +96,7 @@ export default function SignUpPage() {
           </Verification>
 
           <Verification name='email_link'>Please check your email for a link to verify your account.</Verification>
-        </Verifications>
+        </Step>
       </div>
     </SignUp>
   );

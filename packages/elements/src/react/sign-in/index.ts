@@ -3,6 +3,7 @@
 import { SignInRouterCtx } from './context';
 
 export { SignInRoot as SignIn, SignInRoot as Root } from './root';
+export { SignInStep as Step } from './step';
 
 export {
   SignInSocialProvider as SocialProvider,

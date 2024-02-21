@@ -7,6 +7,7 @@ import type {
   BaseRouterInput,
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
+  BaseRouterRedirectEvent,
   BaseRouterRouteRegisterEvent,
   BaseRouterRouteUnregisterEvent,
   BaseRouterTransferEvent,
@@ -41,6 +42,7 @@ export type SignUpRouterNextEvent = BaseRouterNextEvent<SignUpResource>;
 export type SignUpRouterPrevEvent = BaseRouterPrevEvent;
 export type SignUpRouterErrorEvent = BaseRouterErrorEvent;
 export type SignUpRouterTransferEvent = BaseRouterTransferEvent;
+export type SignUpRouterRedirectEvent = BaseRouterRedirectEvent;
 
 export type SignUpRouterRouteRegisterEvent<TLogic extends AnyActorLogic = AnyActorLogic> = BaseRouterRouteRegisterEvent<
   SignUpRouterSystemId,
@@ -55,6 +57,7 @@ export type SignUpRouterEvents =
   | SignUpRouterPrevEvent
   | SignUpRouterErrorEvent
   | SignUpRouterTransferEvent
+  | SignUpRouterRedirectEvent
   | SignUpRouterRouteEvents;
 
 // ---------------------------------- Delays ---------------------------------- //

@@ -1,9 +1,14 @@
 import { joinURL } from '@clerk/shared';
-import type { SignUpStatus } from '@clerk/types';
+import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
+import {
+  SEARCH_PARAMS,
+  SIGN_IN_DEFAULT_BASE_PATH,
+  SIGN_UP_DEFAULT_BASE_PATH,
+  SSO_CALLBACK_PATH_ROUTE,
+} from '~/internals/constants';
 import type { ClerkElementsError } from '~/internals/errors';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type {
@@ -12,7 +17,7 @@ import type {
   SignUpRouterNextEvent,
   SignUpRouterSchema,
 } from '~/internals/machines/sign-up/types';
-import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
+import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party/machine';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 const isCurrentPath =
@@ -68,9 +73,15 @@ export const SignUpRouterMachine = setup({
 
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signUp.status === null && context.clerk.client.lastActiveSessionId),
+    hasCreatedSession: ({ context }) => Boolean(context.router?.searchParams().get(SEARCH_PARAMS.createdSession)),
+    hasClerkStatus: ({ context }, params?: { status: VerificationStatus }) => {
+      const value = context.router?.searchParams().get(SEARCH_PARAMS.status);
+      if (!params) return Boolean(value);
+      return value === params.status;
+    },
+    hasClerkTransfer: ({ context }) => Boolean(context.router?.searchParams().get(SEARCH_PARAMS.transfer)),
+    hasResource: ({ context }) => Boolean(context.clerk.client.signUp),
 
-    hasCreatedSession: ({ context }) => Boolean(context.router?.searchParams().get('__clerk_created_session')),
-    hasClerkStatus: ({ context }) => Boolean(context.router?.searchParams().get('__clerk_status')),
     isStatusAbandoned: needsStatus('abandoned'),
     isStatusComplete: ({ context, event }) => {
       const resource = (event as SignUpRouterNextEvent)?.resource;
@@ -86,8 +97,6 @@ export const SignUpRouterMachine = setup({
     isLoggedIn: or(['isStatusComplete', ({ context }) => Boolean(context.clerk.user)]),
     isMissingRequiredFields: and(['isStatusMissingRequirements', 'areFieldsMissing']),
     isMissingRequiredUnverifiedFields: and(['isStatusMissingRequirements', 'areFieldsUnverified']),
-
-    hasResource: ({ context }) => Boolean(context.clerk.client.signUp),
 
     needsIdentifier: or(['statusNeedsIdentifier', isCurrentPath('/')]),
     needsContinue: and(['statusNeedsContinue', isCurrentPath('/continue')]),
@@ -109,8 +118,32 @@ export const SignUpRouterMachine = setup({
     router: input.router,
     signInPath: input.signInPath || SIGN_IN_DEFAULT_BASE_PATH,
   }),
+  invoke: {
+    id: ThirdPartyMachineId,
+    systemId: ThirdPartyMachineId,
+    src: 'thirdParty',
+    input: ({ context }) => ({
+      basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
+      clerk: context.clerk,
+      flow: 'signUp',
+    }),
+  },
   initial: 'Init',
   on: {
+    'AUTHENTICATE.OAUTH': {
+      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+        type: 'REDIRECT',
+        params: {
+          strategy: event.strategy,
+        },
+      })),
+    },
+    'AUTHENTICATE.SAML': {
+      actions: sendTo(ThirdPartyMachineId, {
+        type: 'REDIRECT',
+        params: { strategy: 'saml' },
+      }),
+    },
     PREV: '.Hist',
     'ROUTE.REGISTER': {
       actions: enqueueActions(({ context, enqueue, event, self, system }) => {
@@ -150,17 +183,12 @@ export const SignUpRouterMachine = setup({
           target: 'Callback',
         },
         {
-          guard: 'needsIdentifier',
-          actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
-          target: 'Start',
-        },
-        {
           guard: 'needsVerification',
           actions: { type: 'navigateInternal', params: { force: true, path: '/verify' } },
           target: 'Verification',
         },
         {
-          guard: 'needsContinue',
+          guard: or(['needsContinue', 'hasClerkTransfer']),
           actions: { type: 'navigateInternal', params: { force: true, path: '/continue' } },
           target: 'Continue',
         },
@@ -217,15 +245,15 @@ export const SignUpRouterMachine = setup({
           guard: 'hasCreatedSession',
           actions: ({ context }) => ({
             type: 'setActive',
-            params: { sessionId: context.router?.searchParams().get('__clerk_created_session') },
+            params: { sessionId: context.router?.searchParams().get(SEARCH_PARAMS.createdSession) },
           }),
         },
         {
-          guard: ({ context }) => context.router?.searchParams().get('__clerk_status') === 'verified',
+          guard: { type: 'hasClerkStatus', params: { status: 'verified' } },
           actions: { type: 'navigateInternal', params: { force: true, path: '/continue' } },
         },
         {
-          guard: ({ context }) => context.router?.searchParams().get('__clerk_status') === 'expired',
+          guard: { type: 'hasClerkStatus', params: { status: 'expired' } },
           actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
         },
       ],
@@ -246,17 +274,7 @@ export const SignUpRouterMachine = setup({
     },
     Callback: {
       tags: 'route:callback',
-      invoke: {
-        id: THIRD_PARTY_MACHINE_ID,
-        systemId: THIRD_PARTY_MACHINE_ID,
-        src: 'thirdParty',
-        input: ({ context }) => ({
-          basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
-          clerk: context.clerk,
-          flow: 'signUp',
-        }),
-      },
-      entry: sendTo(THIRD_PARTY_MACHINE_ID, { type: 'CALLBACK' }),
+      entry: sendTo(ThirdPartyMachineId, { type: 'CALLBACK' }),
       on: {
         NEXT: [
           {
