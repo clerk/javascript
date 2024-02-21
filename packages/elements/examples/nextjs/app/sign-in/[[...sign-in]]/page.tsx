@@ -33,11 +33,17 @@ export default function SignInPage() {
 
   return (
     <SignIn>
-      <div className='h-dvh flex flex-col justify-center items-center bg-[rgb(4,4,4)] text-[rgb(243,243,243)] gap-10'>
+      <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
         <div className='text-center'>
           <H1>Sign In</H1>
-          <p className='text-sm'>
-            Don&apos;t have an account? <Link href='/sign-up'>Sign Up</Link>.
+          <p className='text-base text-zinc-400'>
+            Don&apos;t have an account?{' '}
+            <Link
+              href='/sign-up'
+              className='no-underline hover:underline'
+            >
+              Sign Up
+            </Link>
           </p>
         </div>
 
@@ -65,13 +71,11 @@ export default function SignInPage() {
                   <FieldError className='block text-red-400 font-mono w-full' />
                 </Field>
 
-                <CustomSubmit className='flex h-11 px-7 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,108,0)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(128,128,128)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'>
-                  Sign in with Email
-                </CustomSubmit>
+                <CustomSubmit>Sign in with Email</CustomSubmit>
               </>
             ) : (
               <button
-                className='m-0 py-3 px-6 text-sm font-medium text-[rgb(144,144,144)] transition-colors duration-150 hover:text-[rgb(204,204,204)]'
+                className='m-0 py-3 px-6 text-base font-medium text-zinc-400 transition-colors duration-150 hover:text-[rgb(204,204,204)]'
                 onClick={() => setContinueWithEmail(true)}
                 type='button'
               >
@@ -83,7 +87,7 @@ export default function SignInPage() {
 
         <Step name='verifications'>
           <div className='flex gap-6 flex-col'>
-            <H1>VERFIY</H1>
+            <H1>Verify</H1>
 
             <GlobalError className='block text-red-400 font-mono' />
 

@@ -17,4 +17,4 @@ export const SEARCH_PARAMS = {
   synced: '__clerk_synced',
   ticket: '__clerk_ticket',
   transfer: '__clerk_transfer',
-};
+} as const;
