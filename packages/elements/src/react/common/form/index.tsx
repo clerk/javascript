@@ -227,6 +227,19 @@ const FIELD_INNER_NAME = 'ClerkElementsFieldInner';
 type FormFieldElement = React.ElementRef<typeof RadixField>;
 type FormFieldProps = RadixFormFieldProps;
 
+/**
+ * A wrapper component used to associate its child elements with a specific form field. Automatically handles unique ID generation and associating labels with inputs.
+ *
+ * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `email`, `password`, `phone`, `code`, and `identifier`.
+ *
+ * @example
+ * export default Component = () => (
+ *  <Field name="email">
+ *    <Label>Email</Label>
+ *    <Input />
+ *  </Field>
+ * )
+ */
 const Field = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
   return (
     <FieldContext.Provider value={{ name: props.name }}>
@@ -254,8 +267,18 @@ Field.displayName = FIELD_NAME;
 FieldInner.displayName = FIELD_INNER_NAME;
 
 /**
- * A helper to access the state of the field programmatically. This can be useful if you need to trigger
- * animations or certain behavior based on the field's state independent of the existing components.
+ * Programmatically access the state of the wrapping `<Field>`. Useful for implementing animations when direct access to the value is necessary.
+ * @param {Function} children - A render prop function that receives `state` as an argument. `state` will be either `'valid'` or `'invalid'`.
+ *
+ * @example
+ * export default Component = () => (
+ * <Field name="email">
+ *  <FieldState>
+ *    {({ state }) => (
+ *      <pre>Field state: {state}</pre>
+ *    )}
+ *  </FieldState>
+ * </Field>
  */
 function FieldState({ children }: { children: (state: { state: FieldStates }) => React.ReactNode }) {
   const field = useFieldContext();
@@ -341,6 +364,29 @@ type FormGlobalErrorProps = FormErrorProps<React.ComponentPropsWithoutRef<'div'>
 type FormFieldErrorElement = React.ElementRef<typeof RadixFormMessage>;
 type FormFieldErrorProps = FormErrorProps<RadixFormMessageProps & { name?: string }>;
 
+/**
+ * Renders errors that are returned from Clerk's API but are not associated with a specific field. By default, it will render the error's message wrapped in an unstyled `<div>` element. **Must** be placed inside components like `<SignIn>` or `<SignUp>` to work correctly.
+ * @param {string} [code] - Forces the message with the matching code to be shown. This is useful when using server-side validation.
+ * @param {Function} [children] - A render prop function that receives `message` and `code` as arguments.
+ * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ *
+ * @example
+ * export default Component = () => (
+ *  <SignIn>
+ *    <GlobalError />
+ *  </SignIn>
+ * )
+ * @example
+ * export default Component = () => (
+ *  <SignUp>
+ *    <GlobalError>
+ *      {({ message, code }) => (
+ *        <span data-error-code={code}>{message}</span>
+ *      )}
+ *    </GlobalError>
+ *  </SignUp>
+ * )
+ */
 const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProps>(
   ({ asChild = false, children, code, ...rest }, forwardedRef) => {
     const { errors } = useGlobalErrors();
@@ -366,6 +412,30 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
   },
 );
 
+/**
+ * Renders error messages associated with the parent `<Field>` component. By default, it will render the error message wrapped in an unstyled `<span>` element.
+ * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` part.
+ * @param {string} [code] - Forces the message with the matching code to be shown. This is useful when using server-side validation.
+ * @param {Function} [children] - A render prop function that receives `message` and `code` as arguments.
+ *
+ * @example
+ * export default Component = () => (
+ *  <Field name="email">
+ *    <FieldError />
+ *  </Field>
+ * )
+ *
+ * @example
+ * export default Component = () => (
+ *  <Field name="email">
+ *    <FieldError>
+ *      {({ message, code }) => (
+ *        <span data-error-code={code}>{message}</span>
+ *      )}
+ *    </FieldError>
+ *  </Field>
+ * )
+ */
 const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
   ({ children, code, name, ...rest }, forwardedRef) => {
     const fieldContext = useFieldContext();
