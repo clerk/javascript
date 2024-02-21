@@ -479,6 +479,11 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
  *
  * @example
  * <Field name="email">
+ *   <FieldError code="form_password_incorrect">Your custom error message.</FieldError>
+ * </Field>
+ *
+ * @example
+ * <Field name="email">
  *   <FieldError>
  *     {({ message, code }) => (
  *       <span data-error-code={code}>{message}</span>
