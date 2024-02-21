@@ -591,9 +591,12 @@ export const elGR: LocalizationResource = {
         title: 'Αφαίρεση διεύθυνσης email',
       },
       title: 'Προσθήκη διεύθυνσης email',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Συνέχεια',
     formButtonPrimary__finish: 'Ολοκλήρωση',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Ακύρωση',
     mfaPage: {
@@ -672,6 +675,8 @@ export const elGR: LocalizationResource = {
       },
       successMessage: 'Ο αριθμός τηλεφώνου {{identifier}} έχει προστεθεί στον λογαριασμό σας.',
       title: 'Προσθήκη αριθμού τηλεφώνου',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Ανεβάστε μια εικόνα σε μορφή JPG, PNG, GIF ή WEBP μικρότερη των 10 MB',

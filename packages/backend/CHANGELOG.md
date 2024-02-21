@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.0-beta.21
+
+### Patch Changes
+
+- fix(backend): Align types based on FAPI/BAPI structs ([#2818](https://github.com/clerk/javascript/pull/2818)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.0.0-beta.20
 
 ### Patch Changes

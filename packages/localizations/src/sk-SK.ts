@@ -585,9 +585,12 @@ export const skSK: LocalizationResource = {
         title: 'Odstrániť e-mailovú adresu',
       },
       title: 'Pridať e-mailovú adresu',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Pokračovať',
     formButtonPrimary__finish: 'Dokončiť',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Zrušiť',
     mfaPage: {
@@ -664,6 +667,8 @@ export const skSK: LocalizationResource = {
       },
       successMessage: '{{identifier}} bolo pridané k vášmu účtu.',
       title: 'Pridať telefónne číslo',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Nahrajte obrázok vo formátoch JPG, PNG, GIF alebo WEBP s veľkosťou menšou než 10 MB',

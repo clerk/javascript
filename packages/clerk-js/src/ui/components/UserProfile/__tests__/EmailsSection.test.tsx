@@ -61,7 +61,7 @@ describe('EmailSection', () => {
       fixtures.clerk.user?.createEmailAddress.mockReturnValueOnce(Promise.resolve({} as any));
 
       await userEvent.type(getByLabelText(/email address/i), 'test+2@clerk.com');
-      await userEvent.click(getByRole('button', { name: /save$/i }));
+      await userEvent.click(getByRole('button', { name: /add$/i }));
       expect(fixtures.clerk.user?.createEmailAddress).toHaveBeenCalledWith({ email: 'test+2@clerk.com' });
     });
 
@@ -72,7 +72,7 @@ describe('EmailSection', () => {
         await userEvent.click(getByRole('button', { name: 'Add email address' }));
         await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
-        expect(getByText(/save$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
+        expect(getByText(/add$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
       });
       it('hides card when when pressing cancel', async () => {
         const { wrapper } = await createFixtures(initConfig);
@@ -132,7 +132,7 @@ describe('EmailSection', () => {
       await userEvent.click(getByRole('menuitem', { name: /remove email/i }));
       await waitFor(() => getByRole('heading', { name: /Remove email address/i }));
 
-      await userEvent.click(getByRole('button', { name: /save/i }));
+      await userEvent.click(getByRole('button', { name: /remove/i }));
       expect(fixtures.clerk.user?.emailAddresses[0].destroy).toHaveBeenCalled();
 
       await waitFor(() => expect(queryByRole('heading', { name: /Remove email address/i })).not.toBeInTheDocument());
@@ -157,7 +157,7 @@ describe('EmailSection', () => {
         getByRole('menuitem', { name: /remove email/i });
         await userEvent.click(getByRole('menuitem', { name: /remove email/i }));
         await waitFor(() => getByRole('heading', { name: /Remove email address/i }));
-        expect(getByRole('button', { name: /save$/i })).not.toHaveAttribute('disabled');
+        expect(getByRole('button', { name: /remove$/i })).not.toHaveAttribute('disabled');
       });
 
       it('hides screen when when pressing cancel', async () => {

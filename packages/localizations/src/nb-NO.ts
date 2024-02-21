@@ -587,9 +587,12 @@ export const nbNO: LocalizationResource = {
         title: 'Fjern e-postadresse',
       },
       title: 'Legg til e-postadresse',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Fortsett',
     formButtonPrimary__finish: 'Fullfør',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Avbryt',
     mfaPage: {
@@ -666,6 +669,8 @@ export const nbNO: LocalizationResource = {
       },
       successMessage: '{{identifier}} har blitt lagt til kontoen din.',
       title: 'Legg til telefonnummer',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Last opp et JPG, PNG, GIF eller WEBP-bilde som er mindre enn 10 MB',

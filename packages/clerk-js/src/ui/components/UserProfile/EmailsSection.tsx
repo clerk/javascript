@@ -1,6 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 
+import { sortIdentificationBasedOnVerification } from '../../components/UserProfile/utils';
 import { Badge, Flex, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
@@ -9,7 +10,6 @@ import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { EmailForm } from './EmailForm';
 import { RemoveEmailForm } from './RemoveResourceForm';
-import { primaryIdentificationFirst } from './utils';
 
 type RemoveEmailScreenProps = { emailId: string };
 const RemoveEmailScreen = (props: RemoveEmailScreenProps) => {
@@ -46,7 +46,7 @@ export const EmailsSection = () => {
     >
       <Action.Root>
         <ProfileSection.ItemList id='emailAddresses'>
-          {user?.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
+          {sortIdentificationBasedOnVerification(user?.emailAddresses, user?.primaryEmailAddressId).map(email => (
             <Action.Root key={email.emailAddress}>
               <ProfileSection.Item
                 id='emailAddresses'

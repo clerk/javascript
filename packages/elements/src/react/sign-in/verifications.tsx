@@ -18,7 +18,7 @@ import { useActiveTags } from '~/react/hooks';
 import { SignInRouterCtx, StrategiesContext, useSignInRouteRegistration, useStrategy } from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
-export type SignInVerifyProps = WithChildrenProp<{ preferred?: ClerkSignInStrategy }>;
+export type SignInVerificationsProps = WithChildrenProp<{ preferred?: ClerkSignInStrategy }>;
 
 export const SignInFirstFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInFirstFactorCtx');
 export const SignInSecondFactorCtx = createContextFromActorRef<TSignInSecondFactorMachine>('SignInSecondFactorCtx');
@@ -29,7 +29,7 @@ function SignInStrategiesProvider({
   children,
   preferred,
   actorRef,
-}: SignInVerifyProps & { actorRef: ActorRefFrom<TSignInFirstFactorMachine> }) {
+}: SignInVerificationsProps & { actorRef: ActorRefFrom<TSignInFirstFactorMachine> }) {
   const current = useSelector(actorRef, strategiesSelector);
   const isActive = useCallback((name: string) => (current ? matchStrategy(current, name) : false), [current]);
 
@@ -47,7 +47,7 @@ export function SignInVerification({ children, name }: SignInVerificationProps) 
   return active ? <>{children}</> : null; // eslint-disable-line react/jsx-no-useless-fragment
 }
 
-export function SignInVerifications(props: SignInVerifyProps) {
+export function SignInVerifications(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const { activeTags: activeRoutes } = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
 
@@ -62,21 +62,21 @@ export function SignInVerifications(props: SignInVerifyProps) {
   return null;
 }
 
-export function SignInFirstFactor(props: SignInVerifyProps) {
+export function SignInFirstFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:first-factor');
 
   return activeState ? <SignInFirstFactorInner {...props} /> : null;
 }
 
-export function SignInSecondFactor(props: SignInVerifyProps) {
+export function SignInSecondFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:second-factor');
 
   return activeState ? <SignInSecondFactorInner {...props} /> : null;
 }
 
-export function SignInFirstFactorInner(props: SignInVerifyProps) {
+export function SignInFirstFactorInner(props: SignInVerificationsProps) {
   const ref = useSignInRouteRegistration('firstFactor', SignInFirstFactorMachine);
 
   if (!ref) {
@@ -93,7 +93,7 @@ export function SignInFirstFactorInner(props: SignInVerifyProps) {
   ) : null;
 }
 
-export function SignInSecondFactorInner(props: SignInVerifyProps) {
+export function SignInSecondFactorInner(props: SignInVerificationsProps) {
   const ref = useSignInRouteRegistration('secondFactor', SignInSecondFactorMachine);
 
   if (!ref) {

@@ -17,7 +17,6 @@ type EmailFormProps = FormProps & {
 };
 export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const { emailId: id, onSuccess, onReset } = props;
-  const title = localizationKeys('userProfile.emailAddressPage.title');
   const card = useCardState();
   const { user } = useUser();
   const environment = useEnvironment();
@@ -52,7 +51,7 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   return (
     <Wizard {...wizard.props}>
       <FormContainer
-        headerTitle={title}
+        headerTitle={localizationKeys('userProfile.emailAddressPage.title')}
         headerSubtitle={
           preferEmailLinks
             ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
@@ -67,13 +66,25 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
             />
           </Form.ControlRow>
           <FormButtons
+            submitLabel={localizationKeys('userProfile.formButtonPrimary__add')}
             isDisabled={!canSubmit}
             onReset={onReset}
           />
         </Form.Root>
       </FormContainer>
 
-      <FormContainer headerTitle={title}>
+      <FormContainer
+        headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
+        headerSubtitle={
+          preferEmailLinks
+            ? localizationKeys('userProfile.emailAddressPage.emailLink.formSubtitle', {
+                identifier: emailAddressRef.current?.emailAddress,
+              })
+            : localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', {
+                identifier: emailAddressRef.current?.emailAddress,
+              })
+        }
+      >
         {preferEmailLinks ? (
           <VerifyWithLink
             nextStep={onSuccess}

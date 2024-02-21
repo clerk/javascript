@@ -584,9 +584,12 @@ export const csCZ: LocalizationResource = {
         title: 'Odstranit e-mailovou adresu',
       },
       title: 'Přidat e-mailovou adresu',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Pokračovat',
     formButtonPrimary__finish: 'Dokončit',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Zrušit',
     mfaPage: {
@@ -663,6 +666,8 @@ export const csCZ: LocalizationResource = {
       },
       successMessage: '{{identifier}} bylo přidáno k vašemu účtu.',
       title: 'Přidat telefonní číslo',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Nahrajte obrázek ve formátech JPG, PNG, GIF nebo WEBP s velikostí menší než 10 MB',

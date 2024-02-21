@@ -1,6 +1,6 @@
 // ---------------------------------- Events ---------------------------------- //
 
-import type { ClerkResource, LoadedClerk } from '@clerk/types';
+import type { ClerkResource, LoadedClerk, OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
 import type { AnyActorLogic, InputFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
@@ -21,6 +21,15 @@ export type BaseRouterRouteRegisterEvent<TSystemId extends string, TLogic extend
 };
 
 export type BaseRouterRouteUnregisterEvent<T extends string> = { type: 'ROUTE.UNREGISTER'; id: T };
+
+export type BaseRouterRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
+export type BaseRouterRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };
+export type BaseRouterRedirectWeb3Event = { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy };
+
+export type BaseRouterRedirectEvent =
+  | BaseRouterRedirectOauthEvent
+  | BaseRouterRedirectSamlEvent
+  | BaseRouterRedirectWeb3Event;
 
 // ---------------------------------- Input ---------------------------------- //
 

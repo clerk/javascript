@@ -11,7 +11,7 @@ import type {
   SignInRouterNextEvent,
   SignInRouterSchema,
 } from '~/internals/machines/sign-in/types';
-import { THIRD_PARTY_MACHINE_ID, ThirdPartyMachine } from '~/internals/machines/third-party/machine';
+import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party/machine';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
@@ -59,7 +59,10 @@ export const SignInRouterMachine = setup({
       },
     }),
     resetError: assign({ error: undefined }),
-    transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl() + SSO_CALLBACK_PATH_ROUTE),
+    transfer: ({ context }) => {
+      const searchParams = new URLSearchParams({ __clerk_transfer: '1' });
+      context.router?.push(`${context.signUpPath}?${searchParams}`);
+    },
   },
   guards: {
     hasAuthenticatedViaClerkJS: ({ context }) =>
@@ -99,8 +102,32 @@ export const SignInRouterMachine = setup({
     router: input.router,
     signUpPath: input.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
   }),
+  invoke: {
+    id: ThirdPartyMachineId,
+    systemId: ThirdPartyMachineId,
+    src: 'thirdParty',
+    input: ({ context }) => ({
+      basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
+      clerk: context.clerk,
+      flow: 'signIn',
+    }),
+  },
   initial: 'Init',
   on: {
+    'AUTHENTICATE.OAUTH': {
+      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+        type: 'REDIRECT',
+        params: {
+          strategy: event.strategy,
+        },
+      })),
+    },
+    'AUTHENTICATE.SAML': {
+      actions: sendTo(ThirdPartyMachineId, {
+        type: 'REDIRECT',
+        params: { strategy: 'saml' },
+      }),
+    },
     PREV: '.Hist',
     'ROUTE.REGISTER': {
       actions: enqueueActions(({ context, enqueue, event, self }) => {
@@ -223,17 +250,7 @@ export const SignInRouterMachine = setup({
     },
     Callback: {
       tags: 'route:callback',
-      invoke: {
-        id: THIRD_PARTY_MACHINE_ID,
-        systemId: THIRD_PARTY_MACHINE_ID,
-        src: 'thirdParty',
-        input: ({ context }) => ({
-          basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
-          clerk: context.clerk,
-          flow: 'signIn',
-        }),
-      },
-      entry: sendTo(THIRD_PARTY_MACHINE_ID, { type: 'CALLBACK' }),
+      entry: sendTo(ThirdPartyMachineId, { type: 'CALLBACK' }),
       on: {
         NEXT: [
           {

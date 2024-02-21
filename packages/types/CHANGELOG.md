@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-beta.16
+
+### Patch Changes
+
+- Update social provider `docsUrl` entries to point to new URLs ([#2817](https://github.com/clerk/javascript/pull/2817)) by [@kylemac](https://github.com/kylemac)
+
 ## 4.0.0-beta.15
 
 ### Patch Changes

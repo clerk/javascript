@@ -575,9 +575,12 @@ export const enUS: LocalizationResource = {
         title: 'Remove email address',
       },
       title: 'Add email address',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continue',
     formButtonPrimary__finish: 'Finish',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Cancel',
     mfaPage: {
@@ -645,7 +648,7 @@ export const enUS: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText:
-        'A text message containing a verification link will be sent to this phone number. Message and data rates may apply.',
+        'A text message containing a verification code will be sent to this phone number. Message and data rates may apply.',
       removeResource: {
         messageLine1: '{{identifier}} will be removed from this account.',
         messageLine2: 'You will no longer be able to sign in using this phone number.',
@@ -654,6 +657,8 @@ export const enUS: LocalizationResource = {
       },
       successMessage: '{{identifier}} has been added to your account.',
       title: 'Add phone number',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Recommended size 1:1, up to 10MB.',

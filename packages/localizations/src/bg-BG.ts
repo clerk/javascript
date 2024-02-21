@@ -587,9 +587,12 @@ export const bgBG: LocalizationResource = {
         title: 'Премахни имейл адрес',
       },
       title: 'Добави имейл адрес',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Продължи',
     formButtonPrimary__finish: 'Завърши',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Откажи',
     mfaPage: {
@@ -667,6 +670,8 @@ export const bgBG: LocalizationResource = {
       },
       successMessage: '{{identifier}} беше добавен към вашия профил.',
       title: 'Добави телефонен номер',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Препоръчителен размер 1:1, до 10MB.',

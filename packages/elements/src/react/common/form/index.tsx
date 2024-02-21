@@ -31,7 +31,7 @@ import {
 import type { FieldDetails } from '~/internals/machines/form/form.types';
 
 import type { OTPInputProps } from './otp';
-import { OTPInput } from './otp';
+import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
 import type { FieldStates } from './types';
 
 /* -------------------------------------------------------------------------------------------------
@@ -86,7 +86,6 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
       [`data-${validity}`]: true,
       'data-hidden': shouldBeHidden ? true : undefined,
       serverInvalid: hasError,
-      tabIndex: shouldBeHidden ? -1 : 0,
     },
   };
 };
@@ -160,17 +159,23 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
 
   let props = {};
   if (inputType === 'otp') {
+    const p = passthroughProps as Omit<OTPInputProps, 'name' | 'value' | 'type'>;
+    const length = p.length || OTP_LENGTH_DEFAULT;
+
     props = {
       'data-otp-input': true,
       autoComplete: 'one-time-code',
       inputMode: 'numeric',
-      pattern: '[0-9]*',
-      maxLength: 6,
+      pattern: `[0-9]{${length}}`,
+      minLength: length,
+      maxLength: length,
       onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
         // Only accept numbers
         event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
         onChange(event);
       },
+      type: 'text',
+      spellCheck: false,
     };
   }
 
@@ -182,7 +187,6 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
       onChange,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
-      tabIndex: shouldBeHidden ? -1 : 0,
       ...props,
       ...passthroughProps,
     },
@@ -294,7 +298,7 @@ function FieldState({ children }: { children: (state: { state: FieldStates }) =>
  * Input
  * -----------------------------------------------------------------------------------------------*/
 
-const INPUT_NAME = 'ClerkElementsLabel';
+const INPUT_NAME = 'ClerkElementsInput';
 
 type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
 

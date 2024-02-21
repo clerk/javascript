@@ -587,9 +587,12 @@ export const ptBR: LocalizationResource = {
         title: 'Remover e-mail',
       },
       title: 'Adicionar e-mail',
+      verifyTitle: 'Verify email address',
     },
+    formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continuar',
     formButtonPrimary__finish: 'Finalizar',
+    formButtonPrimary__remove: 'Remove',
     formButtonPrimary__save: 'Save',
     formButtonReset: 'Cancelar',
     mfaPage: {
@@ -668,6 +671,8 @@ export const ptBR: LocalizationResource = {
       },
       successMessage: '{{identifier}} foi adicionado na sua conta.',
       title: 'Adicionar telefone',
+      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
+      verifyTitle: 'Verify phone number',
     },
     profilePage: {
       fileDropAreaHint: 'Carregue uma imagem JPG, PNG, GIF ou WEBP menor que 10 MB',
