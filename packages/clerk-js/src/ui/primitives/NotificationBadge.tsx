@@ -2,13 +2,15 @@ import type { PropsOfComponent, StyleVariants } from '../styledSystem';
 import { common, createCssVariables, createVariants } from '../styledSystem';
 import { Flex } from './Flex';
 
-const vars = createCssVariables('accent', 'bg');
+const vars = createCssVariables('accent', 'bg', 'borderColor');
 
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     color: vars.accent,
     background: vars.bg,
+    border: theme.borders.$normal,
     borderRadius: theme.radii.$lg,
+    borderColor: vars.borderColor,
     height: theme.space.$4,
     minWidth: theme.space.$5,
     padding: `${theme.space.$0x5} ${theme.space.$1}`,
@@ -20,6 +22,11 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       primary: {
         [vars.accent]: theme.colors.$colorTextOnPrimaryBackground,
         [vars.bg]: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%), ${theme.colors.$primary500}`,
+      },
+      neutral: {
+        [vars.accent]: theme.colors.$neutralAlpha600,
+        [vars.bg]: theme.colors.$neutralAlpha50,
+        [vars.borderColor]: theme.colors.$neutralAlpha150,
       },
     },
   },

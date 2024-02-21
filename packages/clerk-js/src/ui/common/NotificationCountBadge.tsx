@@ -4,7 +4,7 @@ import type { ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 
 type NotificationCountBadgeProps = {
-  notificationCount: number;
+  notificationCount: number | string;
   containerSx?: ThemableCssProp;
 };
 
@@ -35,7 +35,12 @@ export const NotificationCountBadge = ({ notificationCount, containerSx }: Notif
         containerSx,
       ]}
     >
-      <NotificationBadge sx={enterExitAnimation}>{notificationCount}</NotificationBadge>
+      <NotificationBadge
+        sx={enterExitAnimation}
+        colorScheme='neutral'
+      >
+        {notificationCount}
+      </NotificationBadge>
     </Flex>
   );
 };
