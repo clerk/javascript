@@ -9,40 +9,39 @@ Additionally, there are now new helpers that enable controlling auth on a _per-p
 Sometimes, code speaks louder than words. Let's get right into an example:
 
 <Tabs type="auth-protect-layout-page" items={["Layout", "Page"]}>
-<Tab>
-```ts filename="app/src/dashboard/layout.tsx"
-import { auth } from '@clerk/nextjs/server'
+  <Tab>
+    ```ts filename="app/src/dashboard/layout.tsx"
+    import { auth } from '@clerk/nextjs/server'
 
-export default async function DashboardLayout({ children }) {
-    auth().protect();
-    // 👆 This one line is all it takes - the layout and all its children
-    // will now redirect to your sign in page for un-authenticated users.
+    export default async function DashboardLayout({ children }) {
+        auth().protect();
+        // 👆 This one line is all it takes - the layout and all its children
+        // will now redirect to your sign in page for un-authenticated users.
 
-    return <>{children}</>
+        return <>{children}</>
+    }
+    ```
 
-}
+  </Tab>
+  <Tab>
+    ```ts filename="app/src/dashboard/page.tsx"
+    import { auth } from '@clerk/nextjs/server'
 
-````
-</Tab>
-<Tab>
-```ts filename="app/src/dashboard/page.tsx"
-import { auth } from '@clerk/nextjs/server'
+    export default async function DashboardPage() {
+        auth().protect();
+        // 👆 This one line is all it takes - the layout and all its children
+        // will now redirect to your sign in page for un-authenticated users.
 
-export default async function DashboardPage() {
-    auth().protect();
-    // 👆 This one line is all it takes - the layout and all its children
-    // will now redirect to your sign in page for un-authenticated users.
+        return <p>This page is now protected!</p>
+    }
+    ```
 
-    return <p>This page is now protected!</p>
-}
-````
-
-</Tab>
+  </Tab>
 </Tabs>
 
-In this example, you add `auth().protect()` to a layout, and like magic, that layout and all of it's children will be gated by auth. The same logic can be applied for pages.
+In this example, you add `auth().protect()` to a layout and that layout and all of it's children will be gated by auth. The same logic can be applied for pages.
 
-Want to get more specific with permission gating? Add the role you are gating as a param:
+Want to get more specific with permission gating? Add the role you are gating as a param to `protect()` as such:
 
 ```ts filename="app/src/admin/layout.tsx"
 import { auth } from '@clerk/nextjs/server';
@@ -103,14 +102,14 @@ A couple things to note here:
 
 Clerk strongly recommends migrating to the new `clerkMiddleware()` for an improved DX and access to all present and upcoming features, but also want to note that `authMiddleware()`, while deprecated, will continue to work in v5 and will not be removed until the next major version, so you do not _need_ to make any changes to your Middleware setup this version.
 
-The most basic migration will be updating the import and changing out the default export.
+The most basic migration will be updating the import and changing out the default export, then mirroring the previous behavior of protecting all routes as such:
 
 ```diff
 - import { authMiddleware } from "@clerk/nextjs"
 + import { clerkMiddleware } from '@clerk/nextjs/server'
 
 - export default authMiddleware()
-+ export default clerkMiddleware()
++ export default clerkMiddleware((auth) => auth().protect())
 
   export const config = {
     matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
@@ -181,9 +180,7 @@ Of course, in most cases you'll have a more complicated setup than this. You can
     const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
 
     export default clerkMiddleware((auth, request) => {
-      if (isDashboardRoute(request)) {
-        auth().protect()
-      }
+      if (isDashboardRoute(request)) auth().protect()
     })
 
     export const config = {
@@ -235,9 +232,7 @@ Of course, in most cases you'll have a more complicated setup than this. You can
     const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
 
     export default clerkMiddleware((auth, request) => {
-      if (isDashboardRoute(request)) {
-        auth().protect()
-      }
+      if (isDashboardRoute(request)) auth().protect()
 
       return intlMiddleware(request)
     })
