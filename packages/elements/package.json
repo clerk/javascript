@@ -70,8 +70,8 @@
     "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@statelyai/inspect": "^0.1.0",
-    "@xstate/react": "^4.0.2",
-    "xstate": "^5.4.1"
+    "@xstate/react": "^4.1.0",
+    "xstate": "^5.7.1"
   },
   "devDependencies": {
     "@clerk/clerk-react": "5.0.0-beta.19",
