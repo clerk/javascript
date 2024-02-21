@@ -17,6 +17,11 @@ export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
   const resource = user?.emailAddresses.find(e => e.id === id);
   const ref = React.useRef(resource?.emailAddress);
 
+  const unableToSignInText =
+    resource?.verification?.status === 'verified'
+      ? localizationKeys('userProfile.emailAddressPage.removeResource.messageLine2')
+      : undefined;
+
   if (!ref.current) {
     return null;
   }
@@ -27,7 +32,7 @@ export const RemoveEmailForm = (props: RemoveEmailFormProps) => {
       messageLine1={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine1', {
         identifier: ref.current,
       })}
-      messageLine2={localizationKeys('userProfile.emailAddressPage.removeResource.messageLine2')}
+      messageLine2={unableToSignInText}
       successMessage={localizationKeys('userProfile.emailAddressPage.removeResource.successMessage', {
         emailAddress: ref.current,
       })}
@@ -48,6 +53,11 @@ export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
   const resource = user?.phoneNumbers.find(e => e.id === id);
   const ref = React.useRef(resource?.phoneNumber);
 
+  const unableToSignInText =
+    resource?.verification?.status === 'verified'
+      ? localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine2')
+      : undefined;
+
   if (!ref.current) {
     return null;
   }
@@ -58,7 +68,7 @@ export const RemovePhoneForm = (props: RemovePhoneFormProps) => {
       messageLine1={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine1', {
         identifier: ref.current,
       })}
-      messageLine2={localizationKeys('userProfile.phoneNumberPage.removeResource.messageLine2')}
+      messageLine2={unableToSignInText}
       successMessage={localizationKeys('userProfile.phoneNumberPage.removeResource.successMessage', {
         phoneNumber: ref.current,
       })}
@@ -111,6 +121,11 @@ export const RemoveWeb3WalletForm = (props: RemoveWeb3WalletFormProps) => {
   const resource = user?.web3Wallets.find(e => e.id === id);
   const ref = React.useRef(resource?.web3Wallet);
 
+  const unableToSignInText =
+    resource?.verification?.status === 'verified'
+      ? localizationKeys('userProfile.web3WalletPage.removeResource.messageLine2')
+      : undefined;
+
   if (!ref.current) {
     return null;
   }
@@ -121,7 +136,7 @@ export const RemoveWeb3WalletForm = (props: RemoveWeb3WalletFormProps) => {
       messageLine1={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine1', {
         identifier: ref.current,
       })}
-      messageLine2={localizationKeys('userProfile.web3WalletPage.removeResource.messageLine2')}
+      messageLine2={unableToSignInText}
       successMessage={localizationKeys('userProfile.web3WalletPage.removeResource.successMessage', {
         web3Wallet: ref.current,
       })}

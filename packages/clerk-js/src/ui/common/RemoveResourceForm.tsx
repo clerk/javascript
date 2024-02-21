@@ -7,7 +7,7 @@ import { handleError } from '../utils';
 type RemoveFormProps = FormProps & {
   title: LocalizationKey;
   messageLine1: LocalizationKey;
-  messageLine2: LocalizationKey;
+  messageLine2?: LocalizationKey;
   successMessage?: LocalizationKey;
   deleteResource: () => Promise<any>;
 };
@@ -30,10 +30,12 @@ export const RemoveResourceForm = withCardStateProvider((props: RemoveFormProps)
       headerSubtitle={messageLine1}
     >
       <Form.Root onSubmit={handleSubmit}>
-        <Text
-          colorScheme='neutral'
-          localizationKey={messageLine2}
-        />
+        {messageLine2 ? (
+          <Text
+            colorScheme='neutral'
+            localizationKey={messageLine2}
+          />
+        ) : null}
         <FormButtons
           submitLabel={localizationKeys('userProfile.formButtonPrimary__remove')}
           colorScheme='danger'
