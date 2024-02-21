@@ -195,7 +195,7 @@ describe('OrganizationMembers', () => {
     await waitForLoadingCompleted(container);
 
     expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-    expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
     expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
 
     expect(queryByText('test_user1')).toBeInTheDocument();
@@ -232,7 +232,7 @@ describe('OrganizationMembers', () => {
     await waitForLoadingCompleted(container);
 
     expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-    expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
     expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
 
     await userEvent.click(getByLabelText(/next/i));
