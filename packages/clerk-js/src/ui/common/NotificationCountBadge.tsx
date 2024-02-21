@@ -6,11 +6,13 @@ import { animations } from '../styledSystem';
 type NotificationCountBadgeProps = {
   notificationCount: number | string;
   containerSx?: ThemableCssProp;
+  colorScheme?: 'primary' | 'neutral';
 };
 
-export const NotificationCountBadge = ({ notificationCount, containerSx }: NotificationCountBadgeProps) => {
+export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
+  const { notificationCount, containerSx, colorScheme = 'primary' } = props;
   const prefersReducedMotion = usePrefersReducedMotion();
-  const showNotification = useDelayedVisibility(notificationCount > 0, 350) || false;
+  const showNotification = useDelayedVisibility(!!notificationCount, 350) || false;
 
   const enterExitAnimation: ThemableCssProp = t => ({
     animation: prefersReducedMotion
@@ -37,7 +39,7 @@ export const NotificationCountBadge = ({ notificationCount, containerSx }: Notif
     >
       <NotificationBadge
         sx={enterExitAnimation}
-        colorScheme='neutral'
+        colorScheme={colorScheme}
       >
         {notificationCount}
       </NotificationBadge>
