@@ -427,6 +427,11 @@ type FormFieldErrorProps = FormErrorProps<RadixFormMessageProps & { name?: strin
  * </SignIn>
  *
  * @example
+ * <SignIn>
+ *   <GlobalError code="user_locked">Your custom error message.</GlobalError>
+ * </SignIn>
+ *
+ * @example
  * <SignUp>
  *   <GlobalError>
  *     {({ message, code }) => (
