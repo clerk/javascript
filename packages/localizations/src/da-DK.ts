@@ -652,6 +652,8 @@ export const daDK: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Din adgangskode er blevet opdateret.',
       changePasswordTitle: 'Skift kodeord',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: 'Alle andre enheder er blevet logget ud.',
       successMessage: 'Din adgangskode er blevet indstillet.',

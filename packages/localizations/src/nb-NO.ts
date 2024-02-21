@@ -654,6 +654,8 @@ export const nbNO: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Passordet ditt har blitt oppdatert.',
       changePasswordTitle: 'Endre passord',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Passordet ditt kan for øyeblikket ikke endres fordi du kun kan logge inn via bedriftstilkoblingen.',
       sessionsSignedOutSuccessMessage: 'Alle andre enheter har blitt logget ut.',
       successMessage: 'Passordet ditt er satt.',

@@ -653,6 +653,8 @@ export const viVN: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Mật khẩu của bạn đã được cập nhật.',
       changePasswordTitle: 'Thay đổi mật khẩu',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Hiện tại bạn không thể chỉnh sửa mật khẩu vì bạn chỉ có thể đăng nhập qua kết nối doanh nghiệp.',
       sessionsSignedOutSuccessMessage: 'Tất cả các thiết bị khác đã được đăng xuất.',
       successMessage: 'Mật khẩu của bạn đã được thiết lập.',

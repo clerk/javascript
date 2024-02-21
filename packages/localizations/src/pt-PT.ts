@@ -653,6 +653,8 @@ export const ptPT: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'A sua palavra-passe foi atualizada.',
       changePasswordTitle: 'Trocar palavra-passe',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'A sua palavra-passe não pode ser editada porque só pode fazer login por meio da conexão da empresa.',
       sessionsSignedOutSuccessMessage: 'Todos os outros dispositivos foram desconectados.',
       successMessage: 'A sua palavra-passe foi guardada.',

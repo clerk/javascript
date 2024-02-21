@@ -661,6 +661,8 @@ export const roRO: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Parola dvs. a fost actualizată.',
       changePasswordTitle: 'Modificați parola',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'În prezent, parola dvs. nu poate fi modificată, deoarece vă puteți conecta numai prin intermediul conexiunii întreprinderii.',
       sessionsSignedOutSuccessMessage: 'Toate celelalte dispozitive au fost deconectate.',

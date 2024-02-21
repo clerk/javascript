@@ -433,6 +433,7 @@ type _LocalizationResource = {
       successMessage: LocalizationValue;
       changePasswordSuccessMessage: LocalizationValue;
       sessionsSignedOutSuccessMessage: LocalizationValue;
+      checkboxInfoText__signOutOfOtherSessions: LocalizationValue;
     };
     mfaPage: {
       title: LocalizationValue;

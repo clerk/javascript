@@ -659,6 +659,8 @@ export const elGR: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Ο κωδικός πρόσβασής σας έχει ενημερωθεί.',
       changePasswordTitle: 'Αλλαγή κωδικού πρόσβασης',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Ο κωδικός πρόσβασής σας δεν μπορεί να επεξεργαστεί αυτήν τη στιγμή επειδή μπορείτε να συνδεθείτε μόνο μέσω της σύνδεσης με την επιχείρηση.',
       sessionsSignedOutSuccessMessage: 'Όλες οι άλλες συνεδρίες έχουν αποσυνδεθεί.',

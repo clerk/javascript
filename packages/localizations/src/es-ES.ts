@@ -655,6 +655,8 @@ export const esES: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Tu contraseña ha sido actualizada.',
       changePasswordTitle: 'Cambiar contraseña',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: 'Todos los demás dispositivos han cerrado sesión.',
       successMessage: 'Su contraseña ha sido establecida.',

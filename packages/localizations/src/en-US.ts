@@ -641,6 +641,8 @@ export const enUS: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Your password has been updated.',
       changePasswordTitle: 'Change password',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: 'All other devices have been signed out.',
       successMessage: 'Your password has been set.',

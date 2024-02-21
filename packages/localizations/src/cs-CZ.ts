@@ -651,6 +651,8 @@ export const csCZ: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Vaše heslo bylo aktualizováno.',
       changePasswordTitle: 'Změnit heslo',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: 'Všechna ostatní zařízení byla odhlášena.',
       successMessage: 'Vaše heslo bylo nastaveno.',

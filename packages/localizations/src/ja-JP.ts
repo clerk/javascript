@@ -649,6 +649,8 @@ export const jaJP: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'パスワードが更新されました。',
       changePasswordTitle: 'パスワードの変更',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: '他のすべてのデバイスからサインアウトされました。',
       successMessage: 'パスワードが設定されました。',

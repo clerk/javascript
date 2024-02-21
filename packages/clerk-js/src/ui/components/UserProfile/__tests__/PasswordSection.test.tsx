@@ -55,7 +55,7 @@ describe('PasswordSection', () => {
       getByLabelText(/new password/i);
       getByLabelText(/confirm password/i);
       getByLabelText(/Sign out of all other devices/i);
-      getByLabelText(/It is advised to logout of all other devices that may user an old password/i);
+      getByLabelText(/It is recommended to sign out of all other devices which may have used your old password./i);
     });
 
     it('sets a new password and calls the appropriate function and closes', async () => {
@@ -217,7 +217,7 @@ describe('PasswordSection', () => {
       getByLabelText(/new password/i);
       getByLabelText(/confirm password/i);
       getByLabelText(/Sign out of all other devices/i);
-      getByLabelText(/It is advised to logout of all other devices that may user an old password/i);
+      getByLabelText(/It is recommended to sign out of all other devices which may have used your old password./i);
     });
 
     it('changes a new password and calls the appropriate function and closes', async () => {
