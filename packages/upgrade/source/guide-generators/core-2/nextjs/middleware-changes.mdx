@@ -118,9 +118,9 @@ The most basic migration will be updating the import and changing out the defaul
 
 Of course, in most cases you'll have a more complicated setup than this. You can find some examples below for how to migrate a few common use cases. Be sure to review the [`clerkMiddleware()` documentation](/docs/references/nextjs/clerk-middleware) and [route protection guide](/docs/references/nextjs/route-protection) if your specific use case is not mentioned.
 
-<Accordion titles={["Making the index page public", "Protecting a single route path", "Combining with other Middlewares (like i18n)"]} heading="h4">
+<Accordion titles={["Protecting all routes except one or more public paths", "Protecting a single route path", "Combining with other Middlewares (like i18n)"]} heading="h4">
   <AccordionPanel>
-    By default, `clerkMiddleware()` treats all pages as public, so you no longer need to explcitly set `/` as public.
+    By default, `clerkMiddleware()` treats all pages as public unless explicitly protected. If you prefer for it to operate the other way around (all pages are protected unless explicitly made public), you can reverse the middleware logic in this way:
 
     Before:
 
@@ -128,7 +128,7 @@ Of course, in most cases you'll have a more complicated setup than this. You can
     import { authMiddleware } from "@clerk/nextjs"
 
     export default authMiddleware({
-      publicRoutes: ["/"],
+      publicRoutes: ["/", "/contact"],
     })
 
     export const config = {
@@ -144,7 +144,12 @@ Of course, in most cases you'll have a more complicated setup than this. You can
       createRouteMatcher
     } from "@clerk/nextjs/server"
 
-    export default clerkMiddleware()
+    const isPublicRoute = createRouteMatcher(["/", "/contact"])
+
+    export default clerkMiddleware((auth, req) => {
+      if (isPublicRoute(req)) return // if it's a public route, do nothing
+      auth().protect() // for any other route, require auth
+    })
 
     export const config = {
       matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
@@ -153,7 +158,7 @@ Of course, in most cases you'll have a more complicated setup than this. You can
 
   </AccordionPanel>
   <AccordionPanel>
-    Having all routes public except everything under `/dashboard`.
+    An example can be seen below of code that ensures that all routes are public except everything under `/dashboard`.
 
     Before:
 
