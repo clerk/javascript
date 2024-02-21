@@ -33,40 +33,42 @@ function OTPInputSegment({ value, status }: any) {
   );
 }
 
-export const CustomField = React.forwardRef<typeof Input, { name: string; label: string; required?: boolean }>(
-  function CustomField({ name, label, required = false }, forwardedRef) {
-    const inputProps =
-      name === 'code'
-        ? {
-            render: OTPInputSegment,
-            className: 'flex gap-3',
-            required,
-          }
-        : {
-            className: 'bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500',
-            ref: forwardedRef,
-            required,
-          };
+export const CustomField = React.forwardRef<
+  typeof Input,
+  { name: string; label: string; required?: boolean; autoSubmit?: boolean }
+>(function CustomField({ name, label, required = false, autoSubmit = false }, forwardedRef) {
+  const inputProps =
+    name === 'code'
+      ? {
+          render: OTPInputSegment,
+          className: 'flex gap-3',
+          required,
+          autoSubmit,
+        }
+      : {
+          className: 'bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500',
+          ref: forwardedRef,
+          required,
+        };
 
-    return (
-      <ElementsField
-        name={name}
-        className='flex flex-col gap-4'
-      >
-        <div className='flex gap-4 justify-between items-center'>
-          <Label>{label}</Label>
-          <Input
-            name={name}
-            {...inputProps}
-          />
-        </div>
+  return (
+    <ElementsField
+      name={name}
+      className='flex flex-col gap-4'
+    >
+      <div className='flex gap-4 justify-between items-center'>
+        <Label>{label}</Label>
+        <Input
+          name={name}
+          {...inputProps}
+        />
+      </div>
 
-        <FieldError className='block text-red-400 font-mono' />
-        <FieldState>{({ state }) => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
-      </ElementsField>
-    );
-  },
-);
+      <FieldError className='block text-red-400 font-mono' />
+      <FieldState>{({ state }) => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
+    </ElementsField>
+  );
+});
 
 type CustomSubmitElement = React.ElementRef<typeof ElementsSubmit>;
 
