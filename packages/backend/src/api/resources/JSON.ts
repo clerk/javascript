@@ -224,6 +224,7 @@ export interface SignInJSON extends ClerkResourceJSON {
   status: SignInStatus;
   identifier: string;
   created_session_id: string | null;
+  publicKey: any;
 }
 
 export interface SignInTokenJSON extends ClerkResourceJSON {

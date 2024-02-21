@@ -54,6 +54,7 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData!: UserData;
+  publicKey: any;
 
   constructor(data: SignInJSON | null = null) {
     super();
@@ -326,6 +327,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
+      this.publicKey = data.publicKey;
     }
     return this;
   }
