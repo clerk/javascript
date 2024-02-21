@@ -4,13 +4,13 @@ import { SignInRouterCtx } from './context';
 
 export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export { SignInStep as Step } from './step';
+export { SignInStart as Start } from './start';
+export { SignInGoBack as GoBack } from './go-back';
 
 export {
   SignInSocialProvider as SocialProvider,
   SignInSocialProviderIcon as SocialProviderIcon,
 } from './social-providers';
-
-export { SignInStart as Start } from './start';
 
 export {
   SignInFirstFactor as FirstFactor,
