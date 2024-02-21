@@ -152,6 +152,10 @@ export const polishedAppearance: Appearance = {
           },
         },
       },
+      tagPillContainer: {
+        border: 0,
+        boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
+      },
       phoneInputBox: (() => {
         const boxShadow = [
           `0px 0px 0px 1px ${theme.colors.$neutralAlpha150}`,
