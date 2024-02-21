@@ -655,6 +655,8 @@ export const ptBR: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Sua senha foi atualizada.',
       changePasswordTitle: 'Trocar senha',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Sua senha atualmente não pode ser editada porque você só pode fazer login por meio da conexão da empresa.',
       sessionsSignedOutSuccessMessage: 'Todos os outros dispositivos foram desconectados.',

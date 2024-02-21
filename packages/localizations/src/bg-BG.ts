@@ -654,6 +654,8 @@ export const bgBG: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Паролата ви беше обновена.',
       changePasswordTitle: 'Промени паролата',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Вашата парола в момента не може да бъде редактирана, тъй като можете да влизате само чрез корпоративна връзка.',
       sessionsSignedOutSuccessMessage: 'Всички други устройства бяха излезли.',

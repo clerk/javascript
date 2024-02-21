@@ -653,6 +653,8 @@ export const ukUA: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Ваш пароль було оновлено.',
       changePasswordTitle: 'Змінити пароль',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: 'Усі інші пристрої були виведені із системи.',
       successMessage: 'Ваш пароль встановлено.',

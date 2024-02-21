@@ -642,6 +642,8 @@ export const heIL: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'הסיסמה שלך עודכנה.',
       changePasswordTitle: 'שנה סיסמה',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: 'כל המכשירים האחרים התנתקו.',
       successMessage: 'הסיסמה שלך הוגדרה.',

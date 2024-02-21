@@ -654,6 +654,8 @@ export const plPL: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'Twoje hasło zostało zaktualizowane.',
       changePasswordTitle: 'Zmień hasło',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: 'Wylogowano z wszystkich innych urządzeń.',
       successMessage: 'Twoje hasło zostało ustawione.',

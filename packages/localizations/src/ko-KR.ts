@@ -643,6 +643,8 @@ export const koKR: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: '비밀번호가 업데이트되었습니다.',
       changePasswordTitle: '비밀번호 변경',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       sessionsSignedOutSuccessMessage: '다른 모든 기기는 로그아웃되었습니다.',
       successMessage: '비밀번호가 설정되었습니다.',

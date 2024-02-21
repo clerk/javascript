@@ -646,6 +646,8 @@ export const arSA: LocalizationResource = {
     passwordPage: {
       changePasswordSuccessMessage: 'تم تحديث كلمة السر',
       changePasswordTitle: 'تغيير كلمة المرور',
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'لا يمكن تعديل كلمة المرور لأنه لا يمكنك تسجيل الدخول إلى عن طريق حساب المؤسسة',
       sessionsSignedOutSuccessMessage: 'تم تسجيل الخروج من جميع الأجهزة.',
       successMessage: 'تم تعيين كلمة السر.',
