@@ -123,6 +123,9 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           })}
           isDisabled={rest.isDisabled}
           icon={ArrowUpDown}
+          iconSx={t => ({
+            color: rest.isDisabled ? t.colors.$neutralAlpha300 : t.colors.$neutralAlpha500,
+          })}
         >
           <Text
             sx={{
@@ -134,7 +137,10 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         </SelectButton>
         <SelectOptionList
           sx={{ padding: '0 0' }}
-          containerSx={theme => ({ gap: 0, padding: `${theme.space.$0x5} 0` })}
+          containerSx={theme => ({
+            gap: 0,
+            padding: `${theme.space.$0x5} 0`,
+          })}
         />
       </Select>
 

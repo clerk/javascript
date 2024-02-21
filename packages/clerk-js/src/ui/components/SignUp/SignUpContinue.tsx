@@ -186,7 +186,9 @@ function _SignUpContinue() {
               />
             </SocialButtonsReversibleContainerWithDivider>
           </Flex>
+        </Card.Content>
 
+        <Card.Footer>
           <Card.Action elementId='signUp'>
             <Card.ActionText localizationKey={localizationKeys('signUp.continue.actionText')} />
             <Card.ActionLink
@@ -194,9 +196,7 @@ function _SignUpContinue() {
               to={clerk.buildUrlWithAuth(signInUrl)}
             />
           </Card.Action>
-        </Card.Content>
-
-        <Card.Footer />
+        </Card.Footer>
       </Card.Root>
     </Flow.Part>
   );

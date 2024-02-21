@@ -104,6 +104,7 @@ export default function SignInPage() {
               <CustomField
                 label='Email Code'
                 name='code'
+                autoSubmit
               />
 
               <CustomSubmit>Verify</CustomSubmit>

@@ -1,4 +1,4 @@
-import type { Appearance } from '@clerk/types';
+import type { Appearance, Elements } from '@clerk/types';
 
 import type { InternalTheme } from './foundations';
 
@@ -67,8 +67,8 @@ const inputStyles = (theme: InternalTheme) => ({
   }),
 });
 
-export const polishedAppearance = {
-  elements: ({ theme }: { theme: InternalTheme }) => {
+export const polishedAppearance: Appearance = {
+  elements: ({ theme }: { theme: InternalTheme }): Elements => {
     return {
       button: {
         '&[data-variant="solid"]': {
@@ -92,9 +92,21 @@ export const polishedAppearance = {
           },
           '&[data-color="primary"]': {
             boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$primary500),
+            '&:focus': {
+              boxShadow: [
+                BUTTON_SOLID_SHADOW(theme.colors.$primary500),
+                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+              ].toString(),
+            },
           },
           '&[data-color="danger"]': {
             boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$danger500),
+            '&:focus': {
+              boxShadow: [
+                BUTTON_SOLID_SHADOW(theme.colors.$danger500),
+                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$dangerAlpha200),
+              ].toString(),
+            },
           },
         },
         '&[data-variant="outline"]': {
@@ -140,7 +152,10 @@ export const polishedAppearance = {
           },
         },
       },
-      selectSearchInput: { margin: '4px' },
+      tagPillContainer: {
+        border: 0,
+        boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
+      },
       phoneInputBox: (() => {
         const boxShadow = [
           `0px 0px 0px 1px ${theme.colors.$neutralAlpha150}`,
@@ -156,6 +171,10 @@ export const polishedAppearance = {
           '&:focus': { boxShadow },
         };
       })(),
+      selectSearchInput__countryCode: {
+        boxShadow: 'none',
+        '&:focus': { boxShadow: 'none' },
+      },
       cardBox: {
         border: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,

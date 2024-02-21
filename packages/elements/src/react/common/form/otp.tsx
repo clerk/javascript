@@ -9,6 +9,7 @@ export type OTPInputProps = Exclude<
 > & {
   render?: (props: { value: string; status: 'cursor' | 'selected' | 'none'; index: number }) => React.ReactNode;
   length?: number;
+  autoSubmit?: boolean;
 };
 
 type SelectionRange = readonly [start: number, end: number];
@@ -44,7 +45,7 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(functi
  */
 const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPInputProps, 'render'>> & OTPInputProps>(
   function OTPInput(props, ref) {
-    const { className, render, length = OTP_LENGTH_DEFAULT, ...rest } = props;
+    const { className, render, length = OTP_LENGTH_DEFAULT, autoSubmit = false, ...rest } = props;
 
     const innerRef = React.useRef<HTMLInputElement>(null);
     const [selectionRange, setSelectionRange] = React.useState<SelectionRange>(props.autoFocus ? ZERO : OUTSIDE);
@@ -59,6 +60,13 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
       }
       setSelectionRange(cur => selectionRangeUpdater(cur, innerRef));
     }, [props.value]);
+
+    // Fire the requestSubmit callback when the input has the required length and autoSubmit is enabled
+    React.useEffect(() => {
+      if (String(props.value).length === length && autoSubmit) {
+        innerRef.current?.form?.requestSubmit();
+      }
+    }, [props.value, length, autoSubmit]);
 
     return (
       <div
@@ -86,16 +94,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
             setSelectionRange(cur => selectionRangeUpdater(cur, innerRef));
             rest?.onSelect?.(event);
           }}
-          style={{
-            display: 'block',
-            cursor: 'default',
-            background: 'none',
-            outline: 'none',
-            appearance: 'none',
-            color: 'transparent',
-            position: 'absolute',
-            inset: 0,
-          }}
+          style={inputStyle}
         />
         <div
           className={className}
@@ -106,7 +105,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           }}
         >
           {Array.from({ length }).map((_, i) => (
-            <React.Fragment key={i}>
+            <React.Fragment key={`otp-segment-${i}`}>
               {render({
                 value: String(props.value)[i] || '',
                 status:
@@ -152,3 +151,14 @@ function selectionRangeUpdater(cur: SelectionRange, inputRef: React.RefObject<HT
 
   return updated;
 }
+
+const inputStyle = {
+  display: 'block',
+  cursor: 'default',
+  background: 'none',
+  outline: 'none',
+  appearance: 'none',
+  color: 'transparent',
+  position: 'absolute',
+  inset: 0,
+} satisfies React.CSSProperties;

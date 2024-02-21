@@ -191,7 +191,7 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
   const { elementId } = useSelectState();
 
   return (
-    <Flex sx={t => ({ padding: `${t.space.$1} ${t.space.$1} 0 ${t.space.$1}` })}>
+    <Flex sx={t => ({ padding: t.space.$0x5 })}>
       <Input
         elementDescriptor={descriptors.selectSearchInput}
         elementId={descriptors.selectSearchInput.setId(elementId)}
@@ -199,7 +199,7 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
         sx={[
           t => ({
             borderRadius: t.radii.$md,
-            backgroundColor: t.colors.$neutralAlpha50,
+            backgroundColor: t.colors.$neutralAlpha100,
             padding: t.space.$2,
           }),
           sx,
@@ -215,7 +215,13 @@ export const SelectNoResults = (props: PropsOfComponent<typeof Text>) => {
   return (
     <Text
       as='div'
-      sx={[theme => ({ width: '100%', padding: `${theme.space.$2} 0 0 ${theme.space.$4}` }), sx]}
+      sx={[
+        theme => ({
+          width: '100%',
+          padding: `${theme.space.$1} ${theme.space.$2} ${theme.space.$2} ${theme.space.$2}`,
+        }),
+        sx,
+      ]}
       {...rest}
     />
   );
@@ -372,9 +378,10 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 export const SelectButton = (
   props: PropsOfComponent<typeof Button> & {
     icon?: React.ReactElement | React.ComponentType;
+    iconSx?: ThemableCssProp;
   },
 ) => {
-  const { sx, children, icon, ...rest } = props;
+  const { sx, children, icon, iconSx, ...rest } = props;
   const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
   const { reference } = popoverCtx;
 
@@ -413,6 +420,7 @@ export const SelectButton = (
         elementId={descriptors.selectButtonIcon.setId(elementId)}
         size='md'
         icon={icon || ChevronDown}
+        sx={iconSx}
       />
     </Button>
   );

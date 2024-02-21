@@ -71,7 +71,8 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
           borderBottomLeftRadius: 'inherit',
           borderBottomRightRadius: 'inherit',
           '&:empty': {
-            padding: '0',
+            padding: 0,
+            marginTop: 0,
           },
         }),
         sx,
