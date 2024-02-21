@@ -1,4 +1,5 @@
 import type { AuthenticateWithRedirectParams, LoadedClerk } from '@clerk/types';
+import type { SetOptional } from 'type-fest';
 
 import type { ClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 import type { EnabledThirdPartyProviders } from '~/utils/third-party-strategies';
@@ -39,7 +40,7 @@ export interface ThirdPartyMachineInput {
 
 export type RedirectEvent = {
   type: 'REDIRECT';
-  params: AuthenticateWithRedirectParams;
+  params: SetOptional<AuthenticateWithRedirectParams, 'redirectUrl' | 'redirectUrlComplete'>;
 };
 export type RedirectCallbackEvent = { type: 'CALLBACK' };
 export type CallbackNavigationEvent = { type: ClerkJSNavigationEvent };

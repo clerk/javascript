@@ -1,5 +1,5 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { LoadedClerk, OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
+import type { LoadedClerk } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form/form.machine';
@@ -13,16 +13,7 @@ export type SignInStartTags = 'state:pending' | 'state:attempting' | 'state:load
 
 export type SignInStartSubmitEvent = { type: 'SUBMIT' };
 
-export type SignInStartRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
-export type SignInStartRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };
-export type SignInStartRedirectWeb3Event = { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy };
-
-export type SignInStartRedirectEvent =
-  | SignInStartRedirectOauthEvent
-  | SignInStartRedirectSamlEvent
-  | SignInStartRedirectWeb3Event;
-
-export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent | SignInStartRedirectEvent;
+export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 
