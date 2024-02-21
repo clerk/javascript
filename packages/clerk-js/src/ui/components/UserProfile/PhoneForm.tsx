@@ -33,7 +33,7 @@ export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
         resourceRef={phoneNumberRef}
         title={localizationKeys('userProfile.phoneNumberPage.verifyTitle')}
         onSuccess={onSuccess}
-        onReset={wizard.prevStep}
+        onReset={onReset}
       />
     </Wizard>
   );
