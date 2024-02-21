@@ -1,16 +1,15 @@
 import { Flex, NotificationBadge } from '../customizables';
 import { useDelayedVisibility, usePrefersReducedMotion } from '../hooks';
-import type { ThemableCssProp } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 
-type NotificationCountBadgeProps = {
+type NotificationCountBadgeProps = PropsOfComponent<typeof NotificationBadge> & {
   notificationCount: number | string;
   containerSx?: ThemableCssProp;
-  colorScheme?: 'primary' | 'neutral';
 };
 
 export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
-  const { notificationCount, containerSx, colorScheme = 'primary' } = props;
+  const { notificationCount, containerSx, ...restProps } = props;
   const prefersReducedMotion = usePrefersReducedMotion();
   const showNotification = useDelayedVisibility(!!notificationCount, 350) || false;
 
@@ -39,7 +38,7 @@ export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
     >
       <NotificationBadge
         sx={enterExitAnimation}
-        colorScheme={colorScheme}
+        {...restProps}
       >
         {notificationCount}
       </NotificationBadge>
