@@ -214,7 +214,7 @@ export const esMX: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Miembros',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -236,7 +236,6 @@ export const esMX: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -654,14 +653,14 @@ export const esMX: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Tu contraseña ha sido actualizada.',
-      changePasswordTitle: 'Cambiar contraseña',
+      successMessage__set: 'Su contraseña ha sido establecida.',
+      successMessage__update: 'Tu contraseña ha sido actualizada.',
+      successMessage__signOutOfOtherSessions: 'Todos los demás dispositivos han cerrado sesión.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Todos los demás dispositivos han cerrado sesión.',
-      successMessage: 'Su contraseña ha sido establecida.',
-      title: 'Configurar la clave',
+      title__set: 'Configurar la clave',
+      title__update: 'Cambiar contraseña',
     },
     phoneNumberPage: {
       infoText: 'Se enviará un mensaje de texto con un enlace de verificación a este número de teléfono.',
@@ -736,7 +735,7 @@ export const esMX: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Cambiar contraseña',
+        primaryButton__updatePassword: 'Cambiar contraseña',
         primaryButton__setPassword: 'Establecer contraseña ',
         title: 'Contraseña',
       },
@@ -749,11 +748,11 @@ export const esMX: LocalizationResource = {
         title: 'Números telefónicos',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Perfil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Cambiar nombre de usuario',
+        primaryButton__updateUsername: 'Cambiar nombre de usuario',
         primaryButton__setUsername: 'Crear nombre de usuario',
         title: 'Nombre de usuario',
       },
@@ -765,7 +764,8 @@ export const esMX: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Su nombre de usuario ha sido actualizado.',
-      title: 'Actualizar nombre de usuario',
+      title__set: 'Actualizar nombre de usuario',
+      title__update: 'Actualizar nombre de usuario',
     },
     web3WalletPage: {
       removeResource: {

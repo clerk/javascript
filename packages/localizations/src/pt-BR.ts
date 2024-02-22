@@ -212,7 +212,7 @@ export const ptBR: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Membros',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -234,7 +234,6 @@ export const ptBR: LocalizationResource = {
         calloutInfoLabel: 'Alterar o modo de inscrição afetará apenas os novos usuários.',
         calloutInvitationCountLabel: 'Convites pendentes enviados aos usuários: {{count}}',
         calloutSuggestionCountLabel: 'Sugestões pendentes enviadas aos usuários: {{count}}',
-        formButton__save: 'Salvar',
         manualInvitationOption__description: 'Os usuários só podem ser convidados manualmente para a organização.',
         manualInvitationOption__label: 'Sem inscrição automática',
         subtitle: 'Escolha como os usuários deste domínio podem se juntar à organização.',
@@ -653,15 +652,15 @@ export const ptBR: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Sua senha foi atualizada.',
-      changePasswordTitle: 'Trocar senha',
+      successMessage__set: 'Sua senha foi salva.',
+      successMessage__update: 'Sua senha foi atualizada.',
+      successMessage__signOutOfOtherSessions: 'Todos os outros dispositivos foram desconectados.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Sua senha atualmente não pode ser editada porque você só pode fazer login por meio da conexão da empresa.',
-      sessionsSignedOutSuccessMessage: 'Todos os outros dispositivos foram desconectados.',
-      successMessage: 'Sua senha foi salva.',
-      title: 'Defina a senha',
+      title__set: 'Defina a senha',
+      title__update: 'Trocar senha',
     },
     phoneNumberPage: {
       infoText: 'Um SMS contendo um link de verificação será enviado para este telefone.',
@@ -736,7 +735,7 @@ export const ptBR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Trocar a senha',
+        primaryButton__updatePassword: 'Trocar a senha',
         primaryButton__setPassword: 'Defina a senha',
         title: 'Senha',
       },
@@ -749,11 +748,11 @@ export const ptBR: LocalizationResource = {
         title: 'Números de telefone',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Perfil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Trocar nome de usuário',
+        primaryButton__updateUsername: 'Trocar nome de usuário',
         primaryButton__setUsername: 'Definir nome de usuário',
         title: 'Nome de usuário',
       },
@@ -765,7 +764,8 @@ export const ptBR: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Seu nome de usuário foi atualizado.',
-      title: 'Atualizar nome de usuário',
+      title__set: 'Atualizar nome de usuário',
+      title__update: 'Atualizar nome de usuário',
     },
     web3WalletPage: {
       removeResource: {

@@ -213,7 +213,7 @@ export const nbNO: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Medlemmer',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -235,7 +235,6 @@ export const nbNO: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -652,14 +651,14 @@ export const nbNO: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Passordet ditt har blitt oppdatert.',
-      changePasswordTitle: 'Endre passord',
+      successMessage__set: 'Passordet ditt er satt.',
+      successMessage__update: 'Passordet ditt har blitt oppdatert.',
+      successMessage__signOutOfOtherSessions: 'Alle andre enheter har blitt logget ut.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Passordet ditt kan for øyeblikket ikke endres fordi du kun kan logge inn via bedriftstilkoblingen.',
-      sessionsSignedOutSuccessMessage: 'Alle andre enheter har blitt logget ut.',
-      successMessage: 'Passordet ditt er satt.',
-      title: 'Sett passord',
+      title__set: 'Sett passord',
+      title__update: 'Endre passord',
     },
     phoneNumberPage: {
       infoText: 'En tekstmelding med en verifiseringslenke vil bli sendt til dette telefonnummeret.',
@@ -734,7 +733,7 @@ export const nbNO: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Endre passord',
+        primaryButton__updatePassword: 'Endre passord',
         primaryButton__setPassword: 'Opprett passord',
         title: 'Passord',
       },
@@ -747,11 +746,11 @@ export const nbNO: LocalizationResource = {
         title: 'Telefonnumre',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Endre brukernavn',
+        primaryButton__updateUsername: 'Endre brukernavn',
         primaryButton__setUsername: 'Angi brukernavn',
         title: 'Brukernavn',
       },
@@ -763,7 +762,8 @@ export const nbNO: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Brukernavnet ditt har blitt oppdatert.',
-      title: 'Oppdater brukernavn',
+      title__set: 'Oppdater brukernavn',
+      title__update: 'Oppdater brukernavn',
     },
     web3WalletPage: {
       removeResource: {

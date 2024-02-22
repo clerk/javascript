@@ -211,7 +211,7 @@ export const heIL: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'חברים',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -233,7 +233,6 @@ export const heIL: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -640,14 +639,14 @@ export const heIL: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'הסיסמה שלך עודכנה.',
-      changePasswordTitle: 'שנה סיסמה',
+      successMessage__set: 'הסיסמה שלך הוגדרה.',
+      successMessage__update: 'הסיסמה שלך עודכנה.',
+      successMessage__signOutOfOtherSessions: 'כל המכשירים האחרים התנתקו.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'כל המכשירים האחרים התנתקו.',
-      successMessage: 'הסיסמה שלך הוגדרה.',
-      title: 'הגדר סיסמה',
+      title__set: 'הגדר סיסמה',
+      title__update: 'שנה סיסמה',
     },
     phoneNumberPage: {
       infoText: 'הודעת טקסט שמכילה קישור לאימות תישלח למספר טלפון זה.',
@@ -721,7 +720,7 @@ export const heIL: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'שנה סיסמה',
+        primaryButton__updatePassword: 'שנה סיסמה',
         primaryButton__setPassword: 'הגדר סיסמה',
         title: 'סיסמה',
       },
@@ -734,11 +733,11 @@ export const heIL: LocalizationResource = {
         title: 'מספרי טלפון',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'פרופיל',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'שנה שם משתמש',
+        primaryButton__updateUsername: 'שנה שם משתמש',
         primaryButton__setUsername: 'הגדר שם משתמש',
         title: 'שם משתמש',
       },
@@ -750,7 +749,8 @@ export const heIL: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'שם המשתמש שלך עודכן.',
-      title: 'עדכן שם משתמש',
+      title__set: 'עדכן שם משתמש',
+      title__update: 'עדכן שם משתמש',
     },
     web3WalletPage: {
       removeResource: {

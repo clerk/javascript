@@ -214,7 +214,7 @@ export const elGR: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Μέλη',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -236,7 +236,6 @@ export const elGR: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -657,15 +656,15 @@ export const elGR: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Ο κωδικός πρόσβασής σας έχει ενημερωθεί.',
-      changePasswordTitle: 'Αλλαγή κωδικού πρόσβασης',
+      successMessage__set: 'Ο κωδικός πρόσβασής σας έχει οριστεί.',
+      successMessage__update: 'Ο κωδικός πρόσβασής σας έχει ενημερωθεί.',
+      successMessage__signOutOfOtherSessions: 'Όλες οι άλλες συνεδρίες έχουν αποσυνδεθεί.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Ο κωδικός πρόσβασής σας δεν μπορεί να επεξεργαστεί αυτήν τη στιγμή επειδή μπορείτε να συνδεθείτε μόνο μέσω της σύνδεσης με την επιχείρηση.',
-      sessionsSignedOutSuccessMessage: 'Όλες οι άλλες συνεδρίες έχουν αποσυνδεθεί.',
-      successMessage: 'Ο κωδικός πρόσβασής σας έχει οριστεί.',
-      title: 'Ορισμός κωδικού πρόσβασης',
+      title__set: 'Ορισμός κωδικού πρόσβασης',
+      title__update: 'Αλλαγή κωδικού πρόσβασης',
     },
     phoneNumberPage: {
       infoText: 'Θα σταλεί ένα μήνυμα κειμένου που περιέχει ένα σύνδεσμο επαλήθευσης σε αυτόν τον αριθμό τηλεφώνου.',
@@ -741,7 +740,7 @@ export const elGR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Αλλαγή κωδικού πρόσβασης',
+        primaryButton__updatePassword: 'Αλλαγή κωδικού πρόσβασης',
         primaryButton__setPassword: 'Ορισμός κωδικού πρόσβασης',
         title: 'Κωδικός πρόσβασης',
       },
@@ -754,11 +753,11 @@ export const elGR: LocalizationResource = {
         title: 'Αριθμοί τηλεφώνου',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Προφίλ',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Αλλαγή ονόματος χρήστη',
+        primaryButton__updateUsername: 'Αλλαγή ονόματος χρήστη',
         primaryButton__setUsername: 'Ορισμός ονόματος χρήστη',
         title: 'Όνομα χρήστη',
       },
@@ -770,7 +769,8 @@ export const elGR: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Το όνομα χρήστη σας έχει ενημερωθεί.',
-      title: 'Ενημέρωση ονόματος χρήστη',
+      title__set: 'Ενημέρωση ονόματος χρήστη',
+      title__update: 'Ενημέρωση ονόματος χρήστη',
     },
     web3WalletPage: {
       removeResource: {

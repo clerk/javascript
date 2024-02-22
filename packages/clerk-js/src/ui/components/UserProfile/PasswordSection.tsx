@@ -45,7 +45,7 @@ export const PasswordSection = () => {
                 id='password'
                 localizationKey={
                   passwordEnabled
-                    ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')
+                    ? localizationKeys('userProfile.start.passwordSection.primaryButton__updatePassword')
                     : localizationKeys('userProfile.start.passwordSection.primaryButton__setPassword')
                 }
               />

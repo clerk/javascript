@@ -189,7 +189,7 @@ export const enUS: LocalizationResource = {
         title: 'Verified domains',
       },
       successMessage: 'The organization has been updated.',
-      title: 'Update Profile',
+      title: 'Update profile',
     },
     removeDomainPage: {
       messageLine1: 'The email domain {{domain}} will be removed.',
@@ -201,7 +201,7 @@ export const enUS: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: 'Update profile',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -223,7 +223,6 @@ export const enUS: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -639,14 +638,14 @@ export const enUS: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Your password has been updated.',
-      changePasswordTitle: 'Change password',
+      successMessage__set: 'Your password has been set.',
+      successMessage__update: 'Your password has been updated.',
+      successMessage__signOutOfOtherSessions: 'All other devices have been signed out.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'All other devices have been signed out.',
-      successMessage: 'Your password has been set.',
-      title: 'Set password',
+      title__set: 'Set password',
+      title__update: 'Update password',
     },
     phoneNumberPage: {
       infoText:
@@ -722,7 +721,7 @@ export const enUS: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Change password',
+        primaryButton__updatePassword: 'Update password',
         primaryButton__setPassword: 'Set password',
         title: 'Password',
       },
@@ -735,11 +734,11 @@ export const enUS: LocalizationResource = {
         title: 'Phone numbers',
       },
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: 'Update profile',
         title: 'Profile',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Change username',
+        primaryButton__updateUsername: 'Update username',
         primaryButton__setUsername: 'Set username',
         title: 'Username',
       },
@@ -751,7 +750,8 @@ export const enUS: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Your username has been updated.',
-      title: 'Update username',
+      title__set: 'Set username',
+      title__update: 'Update username',
     },
     web3WalletPage: {
       removeResource: {

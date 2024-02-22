@@ -214,7 +214,7 @@ export const frFR: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Membres',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -236,7 +236,6 @@ export const frFR: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -655,14 +654,14 @@ export const frFR: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Votre mot de passe a été mis à jour.',
-      changePasswordTitle: 'Changer le mot de passe',
+      successMessage__set: 'Votre mot de passe a été mis à jour.',
+      successMessage__update: 'Votre mot de passe a été mis à jour.',
+      successMessage__signOutOfOtherSessions: 'Tous les autres appareils ont été déconnectés.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Tous les autres appareils ont été déconnectés.',
-      successMessage: 'Votre mot de passe a été mis à jour.',
-      title: 'Mettre à jour le mot de passe',
+      title__set: 'Mettre à jour le mot de passe',
+      title__update: 'Changer le mot de passe',
     },
     phoneNumberPage: {
       infoText: 'Un message texte contenant un lien de vérification sera envoyé à ce numéro de téléphone.',
@@ -738,7 +737,7 @@ export const frFR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Changer le mot de passe',
+        primaryButton__updatePassword: 'Changer le mot de passe',
         primaryButton__setPassword: 'Définir le mot de passe',
         title: 'Mot de passe',
       },
@@ -751,11 +750,11 @@ export const frFR: LocalizationResource = {
         title: 'Les numéros de téléphone',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: "Changer le nom d'utilisateur",
+        primaryButton__updateUsername: "Changer le nom d'utilisateur",
         primaryButton__setUsername: "Définir le nom d'utilisateur",
         title: "Nom d'utilisateur",
       },
@@ -767,7 +766,8 @@ export const frFR: LocalizationResource = {
     },
     usernamePage: {
       successMessage: "Votre nom d'utilisateur a été mis à jour.",
-      title: "Mettre à jour le nom d'utilisateur",
+      title__set: "Mettre à jour le nom d'utilisateur",
+      title__update: "Mettre à jour le nom d'utilisateur",
     },
     web3WalletPage: {
       removeResource: {

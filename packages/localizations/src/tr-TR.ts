@@ -213,7 +213,7 @@ export const trTR: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Üyeler',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -235,7 +235,6 @@ export const trTR: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -651,14 +650,14 @@ export const trTR: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Şifreniz günceellendi.',
-      changePasswordTitle: 'Yeni şifre girin',
+      successMessage__set: 'Şifreniz başarıyla değiştirildi.',
+      successMessage__update: 'Şifreniz günceellendi.',
+      successMessage__signOutOfOtherSessions: 'Diğer tüm cihazlardaki oturumlarınız sonlandırıldı.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Diğer tüm cihazlardaki oturumlarınız sonlandırıldı.',
-      successMessage: 'Şifreniz başarıyla değiştirildi.',
-      title: 'Şifreyi değiştir',
+      title__set: 'Şifreyi değiştir',
+      title__update: 'Yeni şifre girin',
     },
     phoneNumberPage: {
       infoText: 'Belirtilen numaraya doğrulama kodunu içeren bir SMS gönderilecektir.',
@@ -733,7 +732,7 @@ export const trTR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Şifreyi değiştir',
+        primaryButton__updatePassword: 'Şifreyi değiştir',
         primaryButton__setPassword: 'Şifreyi güncelle',
         title: 'Şifre',
       },
@@ -746,11 +745,11 @@ export const trTR: LocalizationResource = {
         title: 'Telefon numaraları',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Kullanıcı adını değiştir',
+        primaryButton__updateUsername: 'Kullanıcı adını değiştir',
         primaryButton__setUsername: 'Güncelle',
         title: 'Kullanıcı adı',
       },
@@ -762,7 +761,8 @@ export const trTR: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Kullanıcı adınız güncellendi.',
-      title: 'Kullanıcı adını güncelle',
+      title__set: 'Kullanıcı adını güncelle',
+      title__update: 'Kullanıcı adını güncelle',
     },
     web3WalletPage: {
       removeResource: {

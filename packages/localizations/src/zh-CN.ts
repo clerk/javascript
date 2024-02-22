@@ -211,7 +211,7 @@ export const zhCN: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: '成员',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -233,7 +233,6 @@ export const zhCN: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -636,14 +635,14 @@ export const zhCN: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: '您的密码已更新。',
-      changePasswordTitle: '更改密码',
+      successMessage__set: '您的密码已设置。',
+      successMessage__update: '您的密码已更新。',
+      successMessage__signOutOfOtherSessions: '所有其他设备已退出。',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: '所有其他设备已退出。',
-      successMessage: '您的密码已设置。',
-      title: '设置密码',
+      title__set: '设置密码',
+      title__update: '更改密码',
     },
     phoneNumberPage: {
       infoText: '一条包含验证链接的短信将会发送到这个电话号码。',
@@ -717,7 +716,7 @@ export const zhCN: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: '更改密码',
+        primaryButton__updatePassword: '更改密码',
         primaryButton__setPassword: '设置密码',
         title: '密码',
       },
@@ -730,11 +729,11 @@ export const zhCN: LocalizationResource = {
         title: '电话号码',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: '个人资料',
       },
       usernameSection: {
-        primaryButton__changeUsername: '更改用户名',
+        primaryButton__updateUsername: '更改用户名',
         primaryButton__setUsername: '设置用户名',
         title: '用户名',
       },
@@ -746,7 +745,8 @@ export const zhCN: LocalizationResource = {
     },
     usernamePage: {
       successMessage: '您的用户名已更新。',
-      title: '更新用户名',
+      title__set: '更新用户名',
+      title__update: '更新用户名',
     },
     web3WalletPage: {
       removeResource: {

@@ -24,24 +24,24 @@ describe('UsernameScreen', () => {
 
     const { userEvent } = render(<UsernameSection />, { wrapper });
 
-    await userEvent.click(screen.getByText(/change username/i));
+    await userEvent.click(screen.getByText(/update username/i));
     await waitFor(() => {
-      screen.getByText(/update username/i);
+      screen.getByLabelText(/username/i);
     });
 
     screen.getByRole('heading', { name: /Update username/i });
   });
 
   describe('Actions', () => {
-    it('calls the appropriate function upon pressing continue', async () => {
+    it('calls the appropriate function upon pressing save', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
       fixtures.clerk.user?.update.mockResolvedValue({} as UserResource);
       const { userEvent } = render(<UsernameSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/change username/i));
+      await userEvent.click(screen.getByText(/update username/i));
       await waitFor(() => {
-        screen.getByText(/update username/i);
+        screen.getByLabelText(/username/i);
       });
 
       await userEvent.type(screen.getByLabelText(/username/i), 'test');
@@ -54,14 +54,16 @@ describe('UsernameScreen', () => {
 
       const { userEvent } = render(<UsernameSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/change username/i));
+      await userEvent.click(screen.getByText(/update username/i));
       await waitFor(() => {
-        screen.getByText(/update username/i);
+        screen.getByLabelText(/username/i);
       });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
       await waitFor(() => {
-        screen.getByText(/change username/i);
+        screen.getByRole('button', {
+          name: /update username/i,
+        });
       });
     });
   });
