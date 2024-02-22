@@ -201,7 +201,7 @@ export const enUS: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: 'Update profile',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -223,7 +223,6 @@ export const enUS: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',

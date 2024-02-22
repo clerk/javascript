@@ -591,7 +591,6 @@ type _LocalizationResource = {
         automaticInvitationOption__description: LocalizationValue;
         automaticSuggestionOption__label: LocalizationValue;
         automaticSuggestionOption__description: LocalizationValue;
-        formButton__save: LocalizationValue;
         calloutInfoLabel: LocalizationValue;
         calloutInvitationCountLabel: LocalizationValue;
         calloutSuggestionCountLabel: LocalizationValue;
