@@ -1,25 +1,16 @@
 # Upgrading to Clerk Core 2
 
-On TODO:DATE, the first beta Core 2 for all Clerk SDKs [was released](https://clerk.com/changelog/2024-01-16), broadly featuring the following upgrades:
+In Febrary 2024, the first beta Core 2 for all Clerk SDKs [was released](https://clerk.com/changelog/2024-01-16), broadly featuring the following upgrades:
 
 - 💅 Redesigned and improved component UIs.
 - 🔪 The 401 & "flash of white page" that was visible sometimes when syncing auth state was eliminated.
-- 🔒 New middleware for next.js SDK with improved DX.
-- 📉 ~75% build size reduction for next.js SDK due to deprecation removals and top level import changes.
-- 🤖 A new CLI tool that will scan codebases and detect breaking changes to aid with migration.
 - 🧹 A large number of smaller housekeeping changes, bugfixes, and improvements.
 - 📊 [Telemetry](/docs/telemetry) to allow us to better determine feature usage and priority (easy opt-out if you don't like this)
 
-<Callout type='info'>
-  The term "Core 2" refers to the current release cycle across all SDK libraries, rather than a specific version of any
-  individual SDK. See [how Clerk SDKs are versioned](sdk-versioning) for more details!
-</Callout>
-
-If you're curious about Clerk's approach to long term version support, head to the [long term support](/docs/upgrade-guides/long-term-support) document. Core 2 includes potentially breaking changes as well as the removal of previously deprecated features. It's very likely that all Clerk apps will need to make some code changes in order to upgrade successfully, however, in the majority of cases, the changes needed should be quick to implement.
-
 ## SDK Guides
 
-Select the SDK(s) you are using for your project from the list below to get started with the upgrade process:
+Core 2 brings both UI changes and breaking code changes, so each SDK has been updated to a new major version.
+We expect upgrades to take less than 30 minutes, and are providing a CLI tool to assist with the process. Please select your SDK below to get started:
 
 - [Next.js](/nextjs)
 - [Remix](/remix)
