@@ -77,6 +77,9 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
+        '&:focus-within': {
+          boxShadow: theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+        },
       })}
     >
       <Select
@@ -173,7 +176,6 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             t => ({
               boxShadow: 'none',
               borderRadius: t.radii.$md,
-              ...common.focusRing(t),
               height: '100%',
               borderTopLeftRadius: '0',
               borderBottomLeftRadius: '0',

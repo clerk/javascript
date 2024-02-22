@@ -162,13 +162,24 @@ export const polishedAppearance: Appearance = {
           theme.shadows.$input.replace('{{color}}', theme.colors.$neutralAlpha100),
         ].toString();
         return {
-          borderWidth: 0,
-          '> div > input': {
+          border: 0,
+          'div > input': {
             boxShadow: 'unset',
+            '&:focus': {
+              boxShadow: 'unset',
+            },
+            '&:hover': {
+              boxShadow: 'unset',
+            },
           },
           boxShadow,
           '&:hover': { boxShadow },
-          '&:focus': { boxShadow },
+          '&:focus-within': {
+            boxShadow: [
+              boxShadow,
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha100),
+            ].toString(),
+          },
         };
       })(),
       selectSearchInput__countryCode: {
