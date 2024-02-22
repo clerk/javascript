@@ -229,7 +229,7 @@ const FIELD_NAME = 'ClerkElementsField';
 const FIELD_INNER_NAME = 'ClerkElementsFieldInner';
 
 type FormFieldElement = React.ElementRef<typeof RadixField>;
-type FormFieldProps = RadixFormFieldProps;
+type FormFieldProps = RadixFormFieldProps & { alwaysShow?: boolean };
 
 /**
  * A wrapper component used to associate its child elements with a specific form field. Automatically handles unique ID generation and associating labels with inputs.
@@ -242,11 +242,15 @@ type FormFieldProps = RadixFormFieldProps;
  *   <Input />
  * </Field>
  */
-const Field = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
-  return (
-    <FieldContext.Provider value={{ name: props.name }}>
+const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, ...rest }, forwardedRef) => {
+  const formRef = useFormStore();
+  const formCtx = formRef.getSnapshot().context;
+  const shouldHide = alwaysShow ? false : formCtx.progressive && formCtx.hidden?.has(rest.name);
+
+  return shouldHide ? null : (
+    <FieldContext.Provider value={{ name: rest.name }}>
       <FieldInner
-        {...props}
+        {...rest}
         ref={forwardedRef}
       />
     </FieldContext.Provider>
