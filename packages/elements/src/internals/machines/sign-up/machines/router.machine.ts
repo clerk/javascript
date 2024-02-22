@@ -156,7 +156,7 @@ export const SignUpRouterMachine = setup({
             id,
             systemId: id,
             input: { basePath: context.router?.basePath, parent: self, ...input },
-            syncSnapshot: false, // Subscribes to the spawned actor and send back snapshot events
+            syncSnapshot: true, // Subscribes to the spawned actor and send back snapshot events
           });
         }
       }),
