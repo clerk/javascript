@@ -1,9 +1,9 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { LoadedClerk, SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form/form.machine';
-import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
+import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines';
 
 // ---------------------------------- Tags ---------------------------------- //
 
@@ -17,19 +17,17 @@ export type SignInVerificationEvents = ErrorActorEvent | SignInVerificationSubmi
 // ---------------------------------- Input ---------------------------------- //
 
 export interface SignInVerificationInput {
-  clerk: LoadedClerk;
   form: ActorRefFrom<typeof FormMachine>;
-  router: ActorRefFrom<typeof SignInRouterMachine>;
+  parent: ActorRefFrom<TSignInRouterMachine>;
 }
 
 // ---------------------------------- Context ---------------------------------- //
 
 export interface SignInVerificationContext {
   currentFactor: SignInFactor | null;
-  clerk: LoadedClerk;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
-  routerRef: ActorRefFrom<typeof SignInRouterMachine>;
+  parent: ActorRefFrom<TSignInRouterMachine>;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

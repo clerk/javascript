@@ -9,10 +9,12 @@ import type {
   VerificationStrategy,
 } from '@clerk/types';
 import type { Writable } from 'type-fest';
+import type { ActorRefFrom } from 'xstate';
 import { and, assign, enqueueActions, fromCallback, fromPromise, raise, sendParent, sendTo, setup } from 'xstate';
 
 import { MAGIC_LINK_VERIFY_PATH_ROUTE, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
+import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 import type {
   SignUpVerificationContext,
   SignUpVerificationEvents,
@@ -20,13 +22,15 @@ import type {
 } from '~/internals/machines/sign-up/types';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-import type { WithClerk, WithParams } from '../../shared.types';
+import type { WithParams } from '../../shared.types';
 
 export type SignUpVerificationsResourceKey = keyof SignUpVerificationsResource;
 export type TSignUpVerificationMachine = typeof SignUpVerificationMachine;
 
 export type StartSignUpEmailLinkFlowEvents = { type: 'STOP' };
-export type StartSignUpEmailLinkFlowInput = WithClerk;
+export type StartSignUpEmailLinkFlowInput = {
+  parent: ActorRefFrom<TSignUpRouterMachine>;
+};
 
 export const SignUpVerificationMachineId = 'SignUpVerification';
 
@@ -53,20 +57,26 @@ const shouldVerify = (field: SignUpVerifiableField, strategy?: VerificationStrat
   return and(guards);
 };
 
-export type PrepareVerificationInput = WithClerk<WithParams<PrepareVerificationParams>>;
-export type AttemptVerificationInput = WithClerk<WithParams<AttemptVerificationParams>>;
+export type PrepareVerificationInput = {
+  parent: ActorRefFrom<TSignUpRouterMachine>;
+} & WithParams<PrepareVerificationParams>;
+export type AttemptVerificationInput = {
+  parent: ActorRefFrom<TSignUpRouterMachine>;
+} & WithParams<AttemptVerificationParams>;
 
 export const SignUpVerificationMachine = setup({
   actors: {
-    prepare: fromPromise<SignUpResource, PrepareVerificationInput>(({ input: { clerk, params } }) =>
-      clerk.client.signUp.prepareVerification(params),
+    prepare: fromPromise<SignUpResource, PrepareVerificationInput>(({ input: { params, parent } }) =>
+      parent.getSnapshot().context.clerk.client.signUp.prepareVerification(params),
     ),
-    attempt: fromPromise<SignUpResource, AttemptVerificationInput>(({ input: { clerk, params } }) =>
-      clerk.client.signUp.attemptVerification(params),
+    attempt: fromPromise<SignUpResource, AttemptVerificationInput>(async ({ input: { params, parent } }) =>
+      parent.getSnapshot().context.clerk.client.signUp.attemptVerification(params),
     ),
     attemptEmailLinkVerification: fromCallback<StartSignUpEmailLinkFlowEvents, StartSignUpEmailLinkFlowInput>(
-      ({ receive, sendBack, input: { clerk } }) => {
+      ({ receive, sendBack, input: { parent } }) => {
         const { run, stop } = Poller();
+
+        const clerk = parent.getSnapshot().context.clerk;
 
         void run(async () =>
           clerk.client.signUp
@@ -146,7 +156,9 @@ export const SignUpVerificationMachine = setup({
       { attribute, strategy }: { attribute: Attribute; strategy: VerificationStrategy },
     ) =>
       Boolean(
-        context.clerk.__unstable__environment?.userSettings.attributes[attribute].verifications.includes(strategy),
+        context.parent
+          .getSnapshot()
+          .context.clerk.__unstable__environment?.userSettings.attributes[attribute].verifications.includes(strategy),
       ),
     shouldVerifyPhoneCode: shouldVerify('phone_number'),
     shouldVerifyEmailLink: shouldVerify('email_address', 'email_link'),
@@ -158,10 +170,9 @@ export const SignUpVerificationMachine = setup({
   initial: 'Init',
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
-    clerk: input.clerk,
-    resource: input.clerk.client.signUp,
+    resource: input.parent.getSnapshot().context.clerk.client.signUp,
     formRef: input.form,
-    routerRef: input.router,
+    parent: input.parent,
   }),
   on: {
     NEXT: [
@@ -243,10 +254,12 @@ export const SignUpVerificationMachine = setup({
             id: 'prepareEmailLinkVerification',
             src: 'prepare',
             input: ({ context }) => ({
-              clerk: context.clerk,
+              parent: context.parent,
               params: {
                 strategy: 'email_link',
-                redirectUrl: context.clerk.buildUrlWithAuth(`${context.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`),
+                redirectUrl: context.parent
+                  .getSnapshot()
+                  .context.clerk.buildUrlWithAuth(`${context.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`),
               },
             }),
             onDone: {
@@ -275,7 +288,7 @@ export const SignUpVerificationMachine = setup({
             id: 'attemptEmailLinkVerification',
             src: 'attemptEmailLinkVerification',
             input: ({ context }) => ({
-              clerk: context.clerk,
+              parent: context.parent,
             }),
           },
           after: {
@@ -302,7 +315,7 @@ export const SignUpVerificationMachine = setup({
             id: 'prepareEmailAddressCodeVerification',
             src: 'prepare',
             input: ({ context }) => ({
-              clerk: context.clerk,
+              parent: context.parent,
               params: {
                 strategy: 'email_code',
               },
@@ -336,7 +349,7 @@ export const SignUpVerificationMachine = setup({
             id: 'attemptEmailAddressCodeVerification',
             src: 'attempt',
             input: ({ context }) => ({
-              clerk: context.clerk,
+              parent: context.parent,
               params: {
                 strategy: 'email_code',
                 code: (context.formRef.getSnapshot().context.fields.get('code')?.value as string) || '',
@@ -363,7 +376,7 @@ export const SignUpVerificationMachine = setup({
             id: 'preparePhoneCodeVerification',
             src: 'prepare',
             input: ({ context }) => ({
-              clerk: context.clerk,
+              parent: context.parent,
               params: {
                 strategy: 'phone_code',
               },
@@ -402,7 +415,7 @@ export const SignUpVerificationMachine = setup({
             id: 'attemptPhoneNumberVerification',
             src: 'attempt',
             input: ({ context }) => ({
-              clerk: context.clerk,
+              parent: context.parent,
               params: {
                 strategy: 'phone_code',
                 code: (context.formRef.getSnapshot().context.fields.get('code')?.value as string) || '',

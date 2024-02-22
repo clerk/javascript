@@ -13,11 +13,13 @@ import type {
   SignInStrategy,
   Web3Attempt,
 } from '@clerk/types';
+import type { ActorRefFrom } from 'xstate';
 import { assign, fromPromise, sendParent, sendTo, setup } from 'xstate';
 
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
-import type { WithClient, WithParams } from '~/internals/machines/shared.types';
+import type { WithParams } from '~/internals/machines/shared.types';
+import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
 import type { SignInVerificationSchema } from '~/internals/machines/sign-in/types';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
@@ -25,15 +27,19 @@ import { assertActorEventError, assertIsDefined } from '~/internals/machines/uti
 export type TSignInFirstFactorMachine = typeof SignInFirstFactorMachine;
 export type TSignInSecondFactorMachine = typeof SignInSecondFactorMachine;
 
-export type PrepareFirstFactorInput = WithClient<
-  WithParams<PrepareFirstFactorParams | null> & { strategy?: SignInStrategy }
->;
-export type PrepareSecondFactorInput = WithClient<
-  WithParams<PrepareSecondFactorParams | null> & { strategy?: SignInStrategy }
->;
+type Parent = ActorRefFrom<typeof SignInRouterMachine>;
 
-export type AttemptFirstFactorInput = WithClient<{ fields: FormFields; currentFactor: SignInFirstFactor | null }>;
-export type AttemptSecondFactorInput = WithClient<{ fields: FormFields; currentFactor: SignInSecondFactor | null }>;
+export type PrepareFirstFactorInput = WithParams<PrepareFirstFactorParams | null> & {
+  parent: Parent;
+  strategy?: SignInStrategy;
+};
+export type PrepareSecondFactorInput = WithParams<PrepareSecondFactorParams | null> & {
+  parent: Parent;
+  strategy?: SignInStrategy;
+};
+
+export type AttemptFirstFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInFirstFactor | null };
+export type AttemptSecondFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInSecondFactor | null };
 
 export const SignInVerificationMachineId = 'SignInVerification';
 
@@ -66,9 +72,8 @@ const SignInVerificationMachine = setup({
   id: SignInVerificationMachineId,
   context: ({ input }) => ({
     currentFactor: null,
-    clerk: input.clerk,
     formRef: input.form,
-    routerRef: input.router,
+    parent: input.parent,
   }),
   initial: 'Preparing',
   entry: 'determineStartingFactor',
@@ -80,7 +85,7 @@ const SignInVerificationMachine = setup({
         src: 'prepare',
         input: ({ context }) => {
           return {
-            client: context.clerk.client,
+            parent: context.parent,
             params: context.currentFactor as PrepareFirstFactorParams,
             strategy: context.currentFactor?.strategy,
           };
@@ -108,7 +113,7 @@ const SignInVerificationMachine = setup({
         id: 'attempt',
         src: 'attempt',
         input: ({ context }) => ({
-          client: context.clerk.client,
+          parent: context.parent,
           currentFactor: context.currentFactor as SignInFirstFactor,
           fields: context.formRef.getSnapshot().context.fields,
         }),
@@ -128,10 +133,11 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(async ({ input }) => {
       console.log('prepare', input);
-      const { client, params, strategy } = input as PrepareFirstFactorInput;
+      const { params, parent, strategy } = input;
+      const clerk = parent.getSnapshot().context.clerk;
 
       if (strategy === 'password') {
-        return Promise.resolve(client.signIn);
+        return Promise.resolve(clerk.client.signIn);
       }
 
       if (!params) {
@@ -142,11 +148,11 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         );
       }
 
-      return client.signIn.prepareFirstFactor(params);
+      return clerk.client.signIn.prepareFirstFactor(params);
     }),
     attempt: fromPromise(async ({ input }) => {
       console.log('attempt', input);
-      const { client, fields, currentFactor } = input as AttemptFirstFactorInput;
+      const { currentFactor, fields, parent } = input as AttemptFirstFactorInput;
 
       assertIsDefined(currentFactor);
 
@@ -206,16 +212,18 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
           throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
       }
 
-      return client.signIn.attemptFirstFactor(attemptParams);
+      return parent.getSnapshot().context.clerk.client.signIn.attemptFirstFactor(attemptParams);
     }),
   },
   actions: {
     determineStartingFactor: assign({
       currentFactor: ({ context }) => {
+        const clerk = context.parent.getSnapshot().context.clerk;
+
         return determineStartingSignInFactor(
-          context.clerk.client.signIn.supportedFirstFactors,
-          context.clerk.client.signIn.identifier,
-          context.clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
+          clerk.client.signIn.supportedFirstFactors,
+          clerk.client.signIn.identifier,
+          clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
         );
       },
     }),
@@ -225,27 +233,29 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(({ input }) => {
-      const { client, params, strategy } = input as PrepareSecondFactorInput;
+      const { params, parent, strategy } = input;
+      const clerk = parent.getSnapshot().context.clerk;
 
       if (strategy === 'totp') {
-        return Promise.resolve(client.signIn);
+        return Promise.resolve(clerk.client.signIn);
       }
 
       assertIsDefined(params);
-      return client.signIn.prepareSecondFactor({
+
+      return clerk.client.signIn.prepareSecondFactor({
         strategy: params.strategy,
-        phoneNumberId: params?.phoneNumberId,
+        phoneNumberId: params.phoneNumberId,
       });
     }),
     attempt: fromPromise(async ({ input }) => {
-      const { client, fields, currentFactor } = input as AttemptSecondFactorInput;
+      const { fields, parent, currentFactor } = input as AttemptSecondFactorInput;
 
       const code = fields.get('code')?.value as string;
 
       assertIsDefined(currentFactor);
       assertIsDefined(code);
 
-      return client.signIn.attemptSecondFactor({
+      return parent.getSnapshot().context.clerk.client.signIn.attemptSecondFactor({
         strategy: currentFactor.strategy,
         code,
       });
@@ -254,7 +264,9 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
   actions: {
     determineStartingFactor: assign({
       currentFactor: ({ context }) =>
-        determineStartingSignInSecondFactor(context.clerk.client.signIn.supportedSecondFactors),
+        determineStartingSignInSecondFactor(
+          context.parent.getSnapshot().context.clerk.client.signIn.supportedSecondFactors,
+        ),
     }),
   },
 });

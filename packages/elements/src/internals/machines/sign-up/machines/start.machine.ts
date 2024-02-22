@@ -1,9 +1,10 @@
 import type { SignUpResource } from '@clerk/types';
+import type { ActorRefFrom } from 'xstate';
 import { fromPromise, sendParent, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
-import type { WithClient } from '~/internals/machines/shared.types';
+import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 import type { SignUpStartSchema } from '~/internals/machines/sign-up/types';
 import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
 import { ThirdPartyMachine } from '~/internals/machines/third-party/machine';
@@ -15,10 +16,12 @@ export const SignUpStartMachineId = 'SignUpStart';
 
 export const SignUpStartMachine = setup({
   actors: {
-    attempt: fromPromise<SignUpResource, WithClient<{ fields: FormFields }>>(({ input: { client, fields } }) => {
-      const params = fieldsToSignUpParams(fields);
-      return client.signUp.create(params);
-    }),
+    attempt: fromPromise<SignUpResource, { parent: ActorRefFrom<TSignUpRouterMachine>; fields: FormFields }>(
+      ({ input: { fields, parent } }) => {
+        const params = fieldsToSignUpParams(fields);
+        return parent.getSnapshot().context.clerk.client.signUp.create(params);
+      },
+    ),
     thirdParty: ThirdPartyMachine,
   },
   actions: {
@@ -38,9 +41,8 @@ export const SignUpStartMachine = setup({
   id: SignUpStartMachineId,
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
-    clerk: input.clerk,
     formRef: input.form,
-    routerRef: input.router,
+    parent: input.parent,
   }),
   initial: 'Pending',
   states: {
@@ -60,7 +62,7 @@ export const SignUpStartMachine = setup({
         id: 'attemptCreate',
         src: 'attempt',
         input: ({ context }) => ({
-          client: context.clerk.client,
+          parent: context.parent,
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {

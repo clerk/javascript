@@ -13,7 +13,7 @@ import type { UseThirdPartyProviderReturn } from '~/react/common/third-party-pro
  * Selects the clerk third-party provider
  */
 const selector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotFrom<typeof ThirdPartyMachine>) =>
-  state.context.thirdPartyProviders.providerToDisplayData[provider];
+  state?.context.thirdPartyProviders.providerToDisplayData[provider];
 
 export const useThirdPartyProvider = <
   TActor extends ActorRef<any, SignInRouterEvents> | ActorRef<any, SignUpRouterEvents>,

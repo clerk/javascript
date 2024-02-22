@@ -122,10 +122,11 @@ export const SignUpRouterMachine = setup({
     id: ThirdPartyMachineId,
     systemId: ThirdPartyMachineId,
     src: 'thirdParty',
-    input: ({ context }) => ({
+    input: ({ context, self }) => ({
       basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
-      clerk: context.clerk,
+      environment: context.clerk.__unstable__environment,
       flow: 'signUp',
+      parent: self,
     }),
   },
   initial: 'Init',
@@ -147,7 +148,6 @@ export const SignUpRouterMachine = setup({
     PREV: '.Hist',
     'ROUTE.REGISTER': {
       actions: enqueueActions(({ context, enqueue, event, self, system }) => {
-        const { clerk, router } = context;
         const { id, logic, input } = event;
 
         if (!system.get(id)) {
@@ -155,7 +155,7 @@ export const SignUpRouterMachine = setup({
           enqueue.spawnChild(logic, {
             id,
             systemId: id,
-            input: { basePath: router?.basePath, clerk, router: self, ...input },
+            input: { basePath: context.router?.basePath, parent: self, ...input },
             syncSnapshot: false, // Subscribes to the spawned actor and send back snapshot events
           });
         }
