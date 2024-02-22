@@ -139,6 +139,8 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
       return localizationKeys('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword');
     case 'reset_password_phone_code':
       return localizationKeys('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword');
+    case 'passkey':
+      return 'Sign in with passkey';
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }

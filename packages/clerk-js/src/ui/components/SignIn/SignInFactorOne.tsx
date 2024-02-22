@@ -114,6 +114,7 @@ export function _SignInFactorOne(): JSX.Element {
     return <LoadingCard />;
   }
 
+  console.log(currentFactor);
   switch (currentFactor?.strategy) {
     case 'passkey':
       return (

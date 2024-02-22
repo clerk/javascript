@@ -92,11 +92,7 @@ export function determineStartingSignInFactor(
 
   //TODO: Create proper function like `determineStrategyWhenOTPIsPreferred`
   if (preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Passkey) {
-    return (
-      firstFactors.find(f => f.strategy === PREFERRED_SIGN_IN_STRATEGIES.Passkey) || {
-        strategy: 'passkey',
-      }
-    );
+    return firstFactors.find(f => f.strategy === PREFERRED_SIGN_IN_STRATEGIES.Passkey);
   }
 
   return preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Password

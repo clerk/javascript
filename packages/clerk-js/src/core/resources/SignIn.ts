@@ -79,7 +79,9 @@ export class SignIn extends BaseResource implements SignInResource {
     let config;
     switch (factor.strategy) {
       case 'passkey':
-        config = {} as PassKeyConfig;
+        config = {
+          // isDiscoverable: factor.isDiscoverable
+        } as PassKeyConfig;
         break;
       case 'email_link':
         config = {
@@ -239,18 +241,27 @@ export class SignIn extends BaseResource implements SignInResource {
     conditionalUI: boolean;
   }): Promise<SignInResource> => {
     const isConditionalUI = conditionalUI;
+
+    if (isConditionalUI) {
+      await this.create({
+        //     // Support this
+        //     strategy: 'passkey',
+      });
+    }
     // TODO: Call create({}) when flow has not been initialized (conditional UI)
 
     const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
 
     // @ts-ignore
-    const { publicKey: options } = await this.prepareFirstFactor(passKeyFactor);
-
-    // const { nonce } = this.firstFactorVerification;
+    const { publicKey: options } = await this.prepareFirstFactor({
+      ...passKeyFactor,
+      //TODO: This can be implicit as well, as discoverable means that allowCredentials needs to be an empty array
+      // isDiscoverable: isConditionalUI,
+    });
 
     const challengeBuffer = base64UrlToBuffer(options.challenge as unknown as string);
 
-    const allowCredentialsWithBuffer = (options.allowCredentials || []).map((cred: any) => ({
+    const allowCredentialsWithBuffer = (isConditionalUI ? [] : options.allowCredentials || []).map((cred: any) => ({
       ...cred,
       id: base64UrlToBuffer(cred.id as unknown as string),
     }));
@@ -321,7 +332,13 @@ export class SignIn extends BaseResource implements SignInResource {
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
-      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[];
+      this.supportedFirstFactors = deepSnakeToCamel([
+        ...data.supported_first_factors,
+        {
+          strategy: 'passkey',
+          is_discoverable: true,
+        },
+      ]) as SignInFirstFactor[];
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[];
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);

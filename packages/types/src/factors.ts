@@ -46,6 +46,7 @@ export type PasswordFactor = {
 };
 
 export type PasskeyFactor = {
+  isDiscoverable: boolean;
   strategy: PasskeyStrategy;
 };
 

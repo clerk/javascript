@@ -2,6 +2,7 @@ import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
 
+import { useCoreSignIn } from '../contexts';
 import type { LocalizationKey } from '../customizables';
 import {
   Button,
@@ -45,6 +46,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
   const card = useCardState();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
+  const signIn = useCoreSignIn();
   const [firstStrategyRef, firstElementRect] = useResizeObserver();
 
   const strategies = [
@@ -150,6 +152,14 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           })}
         </Grid>
       ))}
+
+      {/*TODO: Remove this wait for UI, this is just for testing*/}
+      {/*@ts-ignore*/}
+      <SocialButtonBlock
+        key={'passkeys'}
+        onClick={() => signIn.authenticateWithPasskey({ conditionalUI: true })}
+        label={'Sign in with passkey'}
+      />
     </Flex>
   );
 });

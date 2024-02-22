@@ -191,6 +191,7 @@ export type SignInCreateParams = (
       identifier: string;
       redirectUrl?: string;
     }
+  | { strategy: PasskeyStrategy }
   | {
       identifier: string;
     }

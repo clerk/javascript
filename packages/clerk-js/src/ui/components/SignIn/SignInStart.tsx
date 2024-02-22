@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam } from '../../../utils';
+import { isWebAuthnAutofillSupported } from '../../../utils/passkeys';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
@@ -162,6 +163,18 @@ export function _SignInStart(): JSX.Element {
       });
   }, []);
 
+  // TODO: Build useFetch for mutations :)
+  useEffect(() => {
+    //TODO: check env if conditional UI is available
+
+    isWebAuthnAutofillSupported().then(isSupported => {
+      if (!isSupported) {
+        return;
+      }
+      signIn.authenticateWithPasskey({ conditionalUI: true }).then(console.log).catch(console.log);
+    });
+  }, []);
+
   useEffect(() => {
     async function handleOauthError() {
       const error = signIn?.firstFactorVerification?.error;
@@ -316,6 +329,7 @@ export function _SignInStart(): JSX.Element {
                         onActionClicked={switchToNextIdentifier}
                         {...identifierFieldProps}
                         autoFocus={shouldAutofocus}
+                        autoComplete={'webauthn'}
                       />
                     </Form.ControlRow>
                     <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
