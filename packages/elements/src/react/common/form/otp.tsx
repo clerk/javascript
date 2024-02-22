@@ -71,6 +71,7 @@ const OTPInputStandard = React.forwardRef<HTMLInputElement, Omit<OTPInputProps, 
     <RadixControl
       ref={innerRef}
       {...rest}
+      data-input-otp-standard
     />
   );
 });
@@ -106,11 +107,8 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
 
     return (
       <div
-        style={
-          {
-            position: 'relative',
-          } as React.CSSProperties
-        }
+        data-otp-input-segmented-wrapper
+        style={wrapperStyle}
       >
         {/* We can't target pseudo-elements with the style prop, so we inject a tag here */}
         <style>
@@ -138,10 +136,8 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
         <div
           className={className}
           aria-hidden
-          style={{
-            zIndex: 1,
-            pointerEvents: 'none',
-          }}
+          style={renderStyle}
+          data-otp-input-segmented-render
         >
           {Array.from({ length }).map((_, i) => (
             <React.Fragment key={`otp-segment-${i}`}>
@@ -191,13 +187,31 @@ function selectionRangeUpdater(cur: SelectionRange, inputRef: React.RefObject<HT
   return updated;
 }
 
+const wrapperStyle = {
+  position: 'relative',
+  userSelect: 'none',
+} as React.CSSProperties;
+
+const renderStyle = {
+  zIndex: 1,
+  pointerEvents: 'none',
+} as React.CSSProperties;
+
 const inputStyle = {
   display: 'block',
   cursor: 'default',
-  background: 'none',
-  outline: 'none',
+  background: 'transparent',
+  opacity: 1,
+  outline: 'transparent solid 0px',
   appearance: 'none',
   color: 'transparent',
   position: 'absolute',
   inset: 0,
+  width: 'calc(100% + 6ch)',
+  height: '100%',
+  caretColor: 'transparent',
+  border: '0px solid transparent',
+  font: 'inherit',
+  letterSpacing: 'inherit',
+  textIndent: 'inherit',
 } satisfies React.CSSProperties;

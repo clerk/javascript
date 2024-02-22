@@ -13,7 +13,7 @@ export default function Page() {
           <Field name='code-one'>
             <Input
               type='otp'
-              className='text-black'
+              className='text-black mb-8'
             />
           </Field>
           <Field name='code'>
