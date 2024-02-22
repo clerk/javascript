@@ -18,23 +18,59 @@ const OUTSIDE: SelectionRange = [-1, -1];
 
 export const OTP_LENGTH_DEFAULT = 6;
 
+/**
+ * If the render prop is provided a custom, segmented input will be rendered. Otherwise, a standard input will be rendered.
+ */
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(props, ref) {
-  const treatAsSegmented = typeof props.render !== 'undefined';
+  const { render, length, autoSubmit, ...rest } = props;
+  const hasRenderProp = typeof render !== 'undefined';
 
-  if (treatAsSegmented) {
+  if (hasRenderProp) {
     return (
-      // @ts-expect-error -- treatAsSegment guard above ensures props.render is defined
       <OTPInputSegmented
-        {...props}
+        {...rest}
         ref={ref}
+        render={render}
+        length={length}
+        autoSubmit={autoSubmit}
       />
     );
   }
 
   return (
-    <RadixControl
-      {...props}
+    <OTPInputStandard
+      {...rest}
       ref={ref}
+      length={length}
+      autoSubmit={autoSubmit}
+    />
+  );
+});
+
+/**
+ * Standard `<input />` element that receives the same props as the OTPInput component except for the render prop.
+ */
+const OTPInputStandard = React.forwardRef<HTMLInputElement, Omit<OTPInputProps, 'render'>>(function OTPInput(
+  props,
+  ref,
+) {
+  const { length = OTP_LENGTH_DEFAULT, autoSubmit = false, ...rest } = props;
+
+  const innerRef = React.useRef<HTMLInputElement>(null);
+  // This ensures we can access innerRef internally while still exposing it via the ref prop
+  React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
+
+  // Fire the requestSubmit callback when the input has the required length and autoSubmit is enabled
+  React.useEffect(() => {
+    if (String(props.value).length === length && autoSubmit) {
+      innerRef.current?.form?.requestSubmit();
+    }
+  }, [props.value, length, autoSubmit]);
+
+  return (
+    <RadixControl
+      ref={innerRef}
+      {...rest}
     />
   );
 });
@@ -77,12 +113,14 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
         }
       >
         {/* We can't target pseudo-elements with the style prop, so we inject a tag here */}
-        <style>{`
-      input[data-otp-input]::selection {
+        <style>
+          {`
+        input[data-otp-input-segmented]::selection {
         color: transparent;
-        background-color: none;
+          background-color: transparent;
       }
-      `}</style>
+        `}
+        </style>
         <RadixControl
           ref={innerRef}
           {...rest}
@@ -95,6 +133,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
             rest?.onSelect?.(event);
           }}
           style={inputStyle}
+          data-otp-input-segmented
         />
         <div
           className={className}
