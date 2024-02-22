@@ -1,9 +1,8 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { formatToCompactNumber } from '../../../ui/utils';
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
   Animated,
   Card,
@@ -29,18 +28,12 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const card = useCardState();
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
-  const { t } = useLocalizations();
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
-    invitations: true,
+    invitations: canManageMemberships,
     memberships: true,
   });
-
-  const localeKey = t(localizationKeys('locale'));
-  const membershipRequestsCount = formatToCompactNumber(membershipRequests?.count || 0, localeKey);
-  const invitationsCount = formatToCompactNumber(invitations?.count || 0, localeKey);
-  const membershipsCount = formatToCompactNumber(memberships?.count || 0, localeKey);
 
   // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
   const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
@@ -82,7 +75,8 @@ export const OrganizationMembers = withCardStateProvider(() => {
               {canReadMemberships && (
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
                   <NotificationCountBadge
-                    notificationCount={membershipsCount}
+                    notificationCount={memberships?.count || 0}
+                    shouldDelayVisibility
                     colorScheme='neutral'
                   />
                 </Tab>
@@ -92,7 +86,8 @@ export const OrganizationMembers = withCardStateProvider(() => {
                   localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
                 >
                   <NotificationCountBadge
-                    notificationCount={invitationsCount}
+                    notificationCount={invitations?.count || 0}
+                    shouldDelayVisibility
                     colorScheme='neutral'
                   />
                 </Tab>
@@ -100,7 +95,8 @@ export const OrganizationMembers = withCardStateProvider(() => {
               {canManageMemberships && isDomainsEnabled && (
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
                   <NotificationCountBadge
-                    notificationCount={membershipRequestsCount}
+                    notificationCount={membershipRequests?.count || 0}
+                    shouldDelayVisibility
                     colorScheme='neutral'
                   />
                 </Tab>
