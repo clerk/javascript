@@ -4,7 +4,6 @@ import { SignInRouterCtx } from './context';
 
 export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export { SignInStep as Step } from './step';
-export { SignInStart as Start } from './start';
 export { SignInGoBack as GoBack } from './go-back';
 
 export {
@@ -16,7 +15,6 @@ export {
   SignInFirstFactor as FirstFactor,
   SignInSecondFactor as SecondFactor,
   SignInVerification as Verification,
-  SignInVerifications as Verifications,
 } from './verifications';
 
 export { useIsLoading_unstable } from './hooks/use-loading.hook';
