@@ -133,7 +133,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(async ({ input }) => {
       console.log('prepare', input);
-      const { params, parent, strategy } = input;
+      const { params, parent, strategy } = input as PrepareFirstFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       if (strategy === 'password') {
@@ -233,7 +233,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(({ input }) => {
-      const { params, parent, strategy } = input;
+      const { params, parent, strategy } = input as PrepareSecondFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       if (strategy === 'totp') {
