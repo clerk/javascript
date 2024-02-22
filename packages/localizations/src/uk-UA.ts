@@ -213,7 +213,7 @@ export const ukUA: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Учасники',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -650,14 +650,14 @@ export const ukUA: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Ваш пароль було оновлено.',
-      changePasswordTitle: 'Змінити пароль',
+      successMessage__set: 'Ваш пароль встановлено.',
+      successMessage__update: 'Ваш пароль було оновлено.',
+      successMessage__signOutOfOtherSessions: 'Усі інші пристрої були виведені із системи.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Усі інші пристрої були виведені із системи.',
-      successMessage: 'Ваш пароль встановлено.',
-      title: 'Встановити пароль',
+      title__set: 'Встановити пароль',
+      title__update: 'Змінити пароль',
     },
     phoneNumberPage: {
       infoText: 'На цей номер телефону буде надіслано текстове повідомлення з верифікаційним посиланням.',
@@ -732,7 +732,7 @@ export const ukUA: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Змінити пароль',
+        primaryButton__updatePassword: 'Змінити пароль',
         primaryButton__setPassword: 'Встановити пароль',
         title: 'Пароль',
       },
@@ -745,11 +745,11 @@ export const ukUA: LocalizationResource = {
         title: 'Номери телефонів',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Профіль',
       },
       usernameSection: {
-        primaryButton__changeUsername: "Змінити ім'я користувача",
+        primaryButton__updateUsername: "Змінити ім'я користувача",
         primaryButton__setUsername: "Встановити ім'я користувача",
         title: "Ім'я користувача",
       },
@@ -761,7 +761,8 @@ export const ukUA: LocalizationResource = {
     },
     usernamePage: {
       successMessage: "Ім'я користувача було оновлено.",
-      title: "Оновити ім'я користувача",
+      title__set: "Оновити ім'я користувача",
+      title__update: "Оновити ім'я користувача",
     },
     web3WalletPage: {
       removeResource: {

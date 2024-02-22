@@ -21,12 +21,10 @@ describe('ProfileSection', () => {
     });
     const { userEvent } = render(<UserProfileSection />, { wrapper });
 
-    await userEvent.click(screen.getByText(/edit profile/i));
+    await userEvent.click(screen.getByText(/update profile/i));
     await waitFor(() => {
-      screen.getByText(/update profile/i);
+      screen.getByRole('heading', { name: /Update Profile/i });
     });
-
-    screen.getByRole('heading', { name: /Update Profile/i });
   });
 
   describe('First and last name', () => {
@@ -39,11 +37,11 @@ describe('ProfileSection', () => {
           last_name: 'L',
         });
       });
-      const { userEvent } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByRole } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/edit profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
       await waitFor(() => {
-        screen.getByText(/update profile/i);
+        getByRole('heading', { name: /Update Profile/i });
       });
 
       const firstNameInput: HTMLInputElement = screen.getByLabelText(/first name/i);
@@ -80,11 +78,11 @@ describe('ProfileSection', () => {
 
       const { wrapper } = await createFixtures(config);
 
-      const { userEvent } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByRole } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/edit profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
       await waitFor(() => {
-        screen.getByText(/update profile/i);
+        getByRole('heading', { name: /Update Profile/i });
       });
 
       expect(screen.getByRole('textbox', { name: 'First name' })).toBeDisabled();
@@ -119,11 +117,11 @@ describe('ProfileSection', () => {
 
       const { wrapper } = await createFixtures(config);
 
-      const { userEvent } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByRole } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/edit profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
       await waitFor(() => {
-        screen.getByText(/update profile/i);
+        getByRole('heading', { name: /Update Profile/i });
       });
 
       expect(screen.getByRole('textbox', { name: 'First name' })).not.toBeDisabled();
@@ -161,10 +159,12 @@ describe('ProfileSection', () => {
         });
       });
       fixtures.clerk.user?.setProfileImage.mockReturnValueOnce(Promise.resolve({} as ImageResource));
-      const { userEvent, getByText, findByRole } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByText, getByRole } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(getByText(/edit profile/i));
-      expect(await findByRole('heading', { name: /update profile/i })).toBeInTheDocument();
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => {
+        getByRole('heading', { name: /Update Profile/i });
+      });
 
       await userEvent.click(getByText(/remove$/i));
       expect(fixtures.clerk.user?.setProfileImage).toHaveBeenCalledWith({ file: null });
@@ -179,11 +179,11 @@ describe('ProfileSection', () => {
         });
       });
       fixtures.clerk.user?.setProfileImage.mockReturnValueOnce(Promise.resolve({} as ImageResource));
-      const { userEvent } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByRole } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/edit profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
       await waitFor(() => {
-        screen.getByText(/update profile/i);
+        getByRole('heading', { name: /Update Profile/i });
       });
 
       expect(screen.queryByText(/remove image/i)).not.toBeInTheDocument();
@@ -198,11 +198,11 @@ describe('ProfileSection', () => {
           email_addresses: ['test@clerk.com'],
         });
       });
-      const { userEvent } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByRole } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/edit profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
       await waitFor(() => {
-        screen.getByText(/update profile/i);
+        getByRole('heading', { name: /Update Profile/i });
       });
 
       screen.getByRole('button', { name: /cancel$/i });
@@ -216,16 +216,16 @@ describe('ProfileSection', () => {
           email_addresses: ['test@clerk.com'],
         });
       });
-      const { userEvent } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByRole } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/edit profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
       await waitFor(() => {
-        screen.getByText(/update profile/i);
+        getByRole('heading', { name: /Update Profile/i });
       });
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
       await waitFor(() => {
-        screen.getByText(/edit profile/i);
+        getByRole('button', { name: /update Profile/i });
       });
     });
 
@@ -236,12 +236,10 @@ describe('ProfileSection', () => {
           email_addresses: ['test@clerk.com'],
         });
       });
-      const { userEvent } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByLabelText } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/edit profile/i));
-      await waitFor(() => {
-        screen.getByText(/update profile/i);
-      });
+      await userEvent.click(screen.getByText(/update profile/i));
+      await waitFor(() => getByLabelText(/first name/i));
 
       expect(screen.getByText(/save/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
     });
@@ -253,10 +251,12 @@ describe('ProfileSection', () => {
           email_addresses: ['test@clerk.com'],
         });
       });
-      const { userEvent, getByText } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByRole, getByText } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(getByText(/edit profile/i));
-      await waitFor(() => getByText(/update profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => {
+        getByRole('heading', { name: /Update Profile/i });
+      });
 
       expect(getByText(/save$/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
       await userEvent.type(screen.getByText(/First name/i), 'George');
@@ -273,10 +273,12 @@ describe('ProfileSection', () => {
         });
       });
       fixtures.clerk.user?.update.mockReturnValueOnce(Promise.resolve({} as any));
-      const { userEvent, getByText, getByLabelText } = render(<UserProfileSection />, { wrapper });
+      const { userEvent, getByRole, getByText, getByLabelText } = render(<UserProfileSection />, { wrapper });
 
-      await userEvent.click(getByText(/edit profile/i));
-      await waitFor(() => getByText(/update profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => {
+        getByRole('heading', { name: /Update Profile/i });
+      });
 
       await userEvent.type(getByLabelText(/first name/i), 'George');
       await userEvent.type(getByLabelText(/last name/i), 'Clerk');

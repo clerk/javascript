@@ -212,7 +212,7 @@ export const csCZ: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Členové',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -648,14 +648,14 @@ export const csCZ: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Vaše heslo bylo aktualizováno.',
-      changePasswordTitle: 'Změnit heslo',
+      successMessage__set: 'Vaše heslo bylo nastaveno.',
+      successMessage__update: 'Vaše heslo bylo aktualizováno.',
+      successMessage__signOutOfOtherSessions: 'Všechna ostatní zařízení byla odhlášena.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Všechna ostatní zařízení byla odhlášena.',
-      successMessage: 'Vaše heslo bylo nastaveno.',
-      title: 'Nastavit heslo',
+      title__set: 'Nastavit heslo',
+      title__update: 'Změnit heslo',
     },
     phoneNumberPage: {
       infoText: 'Na toto telefonní číslo bude odeslána textová zpráva obsahující ověřovací odkaz.',
@@ -730,7 +730,7 @@ export const csCZ: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Změnit heslo',
+        primaryButton__updatePassword: 'Změnit heslo',
         primaryButton__setPassword: 'Nastavit heslo',
         title: 'Heslo',
       },
@@ -743,11 +743,11 @@ export const csCZ: LocalizationResource = {
         title: 'Telefonní čísla',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Změnit uživatelské jméno',
+        primaryButton__updateUsername: 'Změnit uživatelské jméno',
         primaryButton__setUsername: 'Nastavit uživatelské jméno',
         title: 'Uživatelské jméno',
       },
@@ -759,7 +759,8 @@ export const csCZ: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Vaše uživatelské jméno bylo aktualizováno.',
-      title: 'Aktualizovat uživatelské jméno',
+      title__update: 'Aktualizovat uživatelské jméno',
+      title__set: 'Aktualizovat uživatelské jméno',
     },
     web3WalletPage: {
       removeResource: {

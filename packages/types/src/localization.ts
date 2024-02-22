@@ -284,7 +284,7 @@ type _LocalizationResource = {
       };
       usernameSection: {
         title: LocalizationValue;
-        primaryButton__changeUsername: LocalizationValue;
+        primaryButton__updateUsername: LocalizationValue;
         primaryButton__setUsername: LocalizationValue;
       };
       emailAddressesSection: {
@@ -316,7 +316,7 @@ type _LocalizationResource = {
       };
       passwordSection: {
         title: LocalizationValue;
-        primaryButton__changePassword: LocalizationValue;
+        primaryButton__updatePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
       };
       mfaSection: {
@@ -361,8 +361,9 @@ type _LocalizationResource = {
       successMessage: LocalizationValue;
     };
     usernamePage: {
-      title: LocalizationValue;
       successMessage: LocalizationValue;
+      title__set: LocalizationValue;
+      title__update: LocalizationValue;
     };
     emailAddressPage: {
       title: LocalizationValue;
@@ -427,13 +428,13 @@ type _LocalizationResource = {
       };
     };
     passwordPage: {
-      title: LocalizationValue;
-      changePasswordTitle: LocalizationValue;
-      readonly: LocalizationValue;
-      successMessage: LocalizationValue;
-      changePasswordSuccessMessage: LocalizationValue;
-      sessionsSignedOutSuccessMessage: LocalizationValue;
+      successMessage__set: LocalizationValue;
+      successMessage__update: LocalizationValue;
+      successMessage__signOutOfOtherSessions: LocalizationValue;
       checkboxInfoText__signOutOfOtherSessions: LocalizationValue;
+      readonly: LocalizationValue;
+      title__set: LocalizationValue;
+      title__update: LocalizationValue;
     };
     mfaPage: {
       title: LocalizationValue;

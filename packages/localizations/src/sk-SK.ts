@@ -213,7 +213,7 @@ export const skSK: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Členovia',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -649,14 +649,14 @@ export const skSK: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Vaše heslo bolo aktualizované.',
-      changePasswordTitle: 'Zmeniť heslo',
+      successMessage__set: 'Vaše heslo bolo nastavené.',
+      successMessage__update: 'Vaše heslo bolo aktualizované.',
+      successMessage__signOutOfOtherSessions: 'Všetky ostatné zariadenia boli odhlásené.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Všetky ostatné zariadenia boli odhlásené.',
-      successMessage: 'Vaše heslo bolo nastavené.',
-      title: 'Nastaviť heslo',
+      title__set: 'Nastaviť heslo',
+      title__update: 'Zmeniť heslo',
     },
     phoneNumberPage: {
       infoText: 'Na toto telefónne číslo bude odoslaná textová správa obsahujúca overovací odkaz.',
@@ -731,7 +731,7 @@ export const skSK: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Zmeniť heslo',
+        primaryButton__updatePassword: 'Zmeniť heslo',
         primaryButton__setPassword: 'Nastaviť heslo',
         title: 'Heslo',
       },
@@ -744,11 +744,11 @@ export const skSK: LocalizationResource = {
         title: 'Telefónne čísla',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Zmeniť užívateľské meno',
+        primaryButton__updateUsername: 'Zmeniť užívateľské meno',
         primaryButton__setUsername: 'Nastaviť užívateľské meno',
         title: 'Užívateľské meno',
       },
@@ -760,7 +760,8 @@ export const skSK: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Vaše užívateľské meno bolo aktualizované.',
-      title: 'Aktualizovať užívateľské meno',
+      title__set: 'Aktualizovať užívateľské meno',
+      title__update: 'Aktualizovať užívateľské meno',
     },
     web3WalletPage: {
       removeResource: {

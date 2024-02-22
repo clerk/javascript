@@ -214,7 +214,7 @@ export const nlNL: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Leden',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -648,14 +648,14 @@ export const nlNL: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Your password has been updated.',
-      changePasswordTitle: 'Change password',
+      successMessage__set: 'Je wachtwoord is ingesteld.',
+      successMessage__update: 'Your password has been updated.',
+      successMessage__signOutOfOtherSessions: 'All other devices have been signed out.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'All other devices have been signed out.',
-      successMessage: 'Je wachtwoord is ingesteld.',
-      title: 'Stel wachtwoord in',
+      title__set: 'Stel wachtwoord in',
+      title__update: 'Change password',
     },
     phoneNumberPage: {
       infoText: 'Een SMS met daarin een verificatiecode is verstuurd naar dit nummer.',
@@ -729,7 +729,7 @@ export const nlNL: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Wachtwoord wijzigen',
+        primaryButton__updatePassword: 'Wachtwoord wijzigen',
         primaryButton__setPassword: 'Wachtwoord instellen',
         title: 'Wachtwoord',
       },
@@ -742,11 +742,11 @@ export const nlNL: LocalizationResource = {
         title: 'Telefoonnummers',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profiel',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Wijzig gebruikersnaam',
+        primaryButton__updateUsername: 'Wijzig gebruikersnaam',
         primaryButton__setUsername: 'Stel gebruikersnaam in',
         title: 'Gebruikersnaam',
       },
@@ -758,7 +758,8 @@ export const nlNL: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Je gebruikersnaam is bijgewerkt.',
-      title: 'Gebruikersnaam bijwerken',
+      title__set: 'Gebruikersnaam bijwerken',
+      title__update: 'Gebruikersnaam bijwerken',
     },
     web3WalletPage: {
       removeResource: {

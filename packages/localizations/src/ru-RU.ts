@@ -213,7 +213,7 @@ export const ruRU: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Участники',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -235,7 +235,6 @@ export const ruRU: LocalizationResource = {
         calloutInfoLabel: 'Изменение способа присоединения повлияет только на новых пользователей.',
         calloutInvitationCountLabel: 'Приглашений отправлено: {{count}}',
         calloutSuggestionCountLabel: 'Рекомендаций отправлено: {{count}}',
-        formButton__save: 'Сохранить',
         manualInvitationOption__description:
           'Пользователи не смогут присоединяться самостоятельно, можно добавлять их только вручную.',
         manualInvitationOption__label: 'Только ручное добавление',
@@ -655,14 +654,14 @@ export const ruRU: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Ваш пароль был обновлен.',
-      changePasswordTitle: 'Изменить пароль',
+      successMessage__set: 'Ваш пароль установлен.',
+      successMessage__update: 'Ваш пароль был обновлен.',
+      successMessage__signOutOfOtherSessions: 'Все другие устройства были выведены из системы.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Все другие устройства были выведены из системы.',
-      successMessage: 'Ваш пароль установлен.',
-      title: 'Установить пароль',
+      title__set: 'Установить пароль',
+      title__update: 'Изменить пароль',
     },
     phoneNumberPage: {
       infoText: 'На этот номер телефона будет отправлено текстовое сообщение с верификационной ссылкой.',
@@ -737,7 +736,7 @@ export const ruRU: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Изменить пароль',
+        primaryButton__updatePassword: 'Изменить пароль',
         primaryButton__setPassword: 'Установить пароль',
         title: 'Пароль',
       },
@@ -750,11 +749,11 @@ export const ruRU: LocalizationResource = {
         title: 'Номера телефонов',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Профиль',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Изменить имя пользователя',
+        primaryButton__updateUsername: 'Изменить имя пользователя',
         primaryButton__setUsername: 'Установить имя пользователя',
         title: 'Имя пользователя',
       },
@@ -766,7 +765,8 @@ export const ruRU: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Имя пользователя было обновлено.',
-      title: 'Обновить имя пользователя',
+      title__set: 'Обновить имя пользователя',
+      title__update: 'Обновить имя пользователя',
     },
     web3WalletPage: {
       removeResource: {

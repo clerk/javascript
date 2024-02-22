@@ -47,7 +47,7 @@ export const UsernameSection = () => {
                 id='username'
                 localizationKey={
                   user.username
-                    ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')
+                    ? localizationKeys('userProfile.start.usernameSection.primaryButton__updateUsername')
                     : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
                 }
               />

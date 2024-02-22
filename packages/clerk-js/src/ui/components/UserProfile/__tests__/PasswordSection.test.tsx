@@ -12,7 +12,7 @@ const initConfig = createFixtures.config(f => {
   f.withUser({});
 });
 
-const changePasswordConfig = createFixtures.config(f => {
+const updatePasswordConfig = createFixtures.config(f => {
   f.withUser({ password_enabled: true });
 });
 
@@ -30,8 +30,8 @@ describe('PasswordSection', () => {
     getByRole('button', { name: /set password/i });
   });
 
-  it('renders the section with change button', async () => {
-    const { wrapper } = await createFixtures(changePasswordConfig);
+  it('renders the section with update button', async () => {
+    const { wrapper } = await createFixtures(updatePasswordConfig);
 
     const { getByText, getByRole } = render(
       <CardStateProvider>
@@ -40,7 +40,7 @@ describe('PasswordSection', () => {
       { wrapper },
     );
     getByText(/^Password/i);
-    getByRole('button', { name: /change password/i });
+    getByRole('button', { name: /update password/i });
   });
 
   describe('Set password', () => {
@@ -204,14 +204,14 @@ describe('PasswordSection', () => {
     });
   });
 
-  describe('Change password', () => {
+  describe('Update password', () => {
     it('renders the set password screen', async () => {
-      const { wrapper } = await createFixtures(changePasswordConfig);
+      const { wrapper } = await createFixtures(updatePasswordConfig);
 
       const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
 
-      await userEvent.click(getByRole('button', { name: /change password/i }));
-      await waitFor(() => getByRole('heading', { name: /change password/i }));
+      await userEvent.click(getByRole('button', { name: /update password/i }));
+      await waitFor(() => getByRole('heading', { name: /update password/i }));
 
       getByLabelText(/current password/i);
       getByLabelText(/new password/i);
@@ -221,11 +221,11 @@ describe('PasswordSection', () => {
     });
 
     it('changes a new password and calls the appropriate function and closes', async () => {
-      const { wrapper, fixtures } = await createFixtures(changePasswordConfig);
+      const { wrapper, fixtures } = await createFixtures(updatePasswordConfig);
 
       const { getByRole, userEvent, getByLabelText, queryByRole } = render(<PasswordSection />, { wrapper });
-      await userEvent.click(getByRole('button', { name: /change password/i }));
-      await waitFor(() => getByRole('heading', { name: /change password/i }));
+      await userEvent.click(getByRole('button', { name: /update password/i }));
+      await waitFor(() => getByRole('heading', { name: /update password/i }));
 
       await userEvent.type(getByLabelText(/current password/i), 'testtest1234');
       await userEvent.type(getByLabelText(/new password/i), 'testtest');
@@ -236,8 +236,8 @@ describe('PasswordSection', () => {
         newPassword: 'testtest',
         signOutOfOtherSessions: true,
       });
-      await waitFor(() => getByRole('button', { name: /change password/i }));
-      expect(queryByRole('heading', { name: /change password/i })).not.toBeInTheDocument();
+      await waitFor(() => getByRole('button', { name: /update password/i }));
+      expect(queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument();
     });
 
     describe('with SAML', () => {
@@ -264,8 +264,8 @@ describe('PasswordSection', () => {
         const { wrapper } = await createFixtures(config);
 
         const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: /change password/i }));
-        await waitFor(() => getByRole('heading', { name: /change password/i }));
+        await userEvent.click(getByRole('button', { name: /update password/i }));
+        await waitFor(() => getByRole('heading', { name: /update password/i }));
 
         expect(getByLabelText(/current password/i)).toBeDisabled();
         expect(getByLabelText(/new password/i)).toBeDisabled();
@@ -302,8 +302,8 @@ describe('PasswordSection', () => {
         const { wrapper } = await createFixtures(config);
 
         const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: /change password/i }));
-        await waitFor(() => getByRole('heading', { name: /change password/i }));
+        await userEvent.click(getByRole('button', { name: /update password/i }));
+        await waitFor(() => getByRole('heading', { name: /update password/i }));
 
         expect(getByLabelText(/current password/i)).not.toBeDisabled();
         expect(getByLabelText(/new password/i)).not.toBeDisabled();
@@ -320,10 +320,10 @@ describe('PasswordSection', () => {
 
     describe('Form buttons', () => {
       it('save button is disabled until current password is set', async () => {
-        const { wrapper } = await createFixtures(changePasswordConfig);
+        const { wrapper } = await createFixtures(updatePasswordConfig);
         const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
-        await userEvent.click(getByRole('button', { name: /change password/i }));
-        await waitFor(() => getByRole('heading', { name: /change password/i }));
+        await userEvent.click(getByRole('button', { name: /update password/i }));
+        await waitFor(() => getByRole('heading', { name: /update password/i }));
 
         await userEvent.type(getByLabelText(/new password/i), 'testtest');
         await userEvent.type(getByLabelText(/confirm password/i), 'testtest');

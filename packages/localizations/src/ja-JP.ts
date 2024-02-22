@@ -213,7 +213,7 @@ export const jaJP: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'メンバー',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -646,14 +646,14 @@ export const jaJP: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'パスワードが更新されました。',
-      changePasswordTitle: 'パスワードの変更',
+      successMessage__set: 'パスワードが設定されました。',
+      successMessage__update: 'パスワードが更新されました。',
+      successMessage__signOutOfOtherSessions: '他のすべてのデバイスからサインアウトされました。',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: '他のすべてのデバイスからサインアウトされました。',
-      successMessage: 'パスワードが設定されました。',
-      title: 'パスワードの設定',
+      title__set: 'パスワードの設定',
+      title__update: 'パスワードの変更',
     },
     phoneNumberPage: {
       infoText: 'この電話番号には検証リンクが含まれたテキストメッセージが送信されます。',
@@ -728,7 +728,7 @@ export const jaJP: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'パスワードを変更する',
+        primaryButton__updatePassword: 'パスワードを変更する',
         primaryButton__setPassword: 'パスワードを設定する',
         title: 'パスワード',
       },
@@ -741,11 +741,11 @@ export const jaJP: LocalizationResource = {
         title: '電話番号',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'プロフィール',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'ユーザー名の変更',
+        primaryButton__updateUsername: 'ユーザー名の変更',
         primaryButton__setUsername: 'ユーザー名の設定',
         title: 'ユーザー名',
       },
@@ -757,7 +757,8 @@ export const jaJP: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'ユーザー名が更新されました。',
-      title: 'ユーザー名の更新',
+      title__set: 'ユーザー名の更新',
+      title__update: 'ユーザー名の更新',
     },
     web3WalletPage: {
       removeResource: {

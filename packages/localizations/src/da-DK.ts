@@ -213,7 +213,7 @@ export const daDK: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Medlemmer',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -649,14 +649,14 @@ export const daDK: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Din adgangskode er blevet opdateret.',
-      changePasswordTitle: 'Skift kodeord',
+      successMessage__set: 'Din adgangskode er blevet indstillet.',
+      successMessage__update: 'Din adgangskode er blevet opdateret.',
+      successMessage__signOutOfOtherSessions: 'Alle andre enheder er blevet logget ud.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Alle andre enheder er blevet logget ud.',
-      successMessage: 'Din adgangskode er blevet indstillet.',
-      title: 'Sæt adgangskode',
+      title__set: 'Sæt adgangskode',
+      title__update: 'Skift kodeord',
     },
     phoneNumberPage: {
       infoText: 'En sms, der indeholder et bekræftelseslink, sendes til dette telefonnummer.',
@@ -678,7 +678,7 @@ export const daDK: LocalizationResource = {
       imageFormTitle: 'Profile image',
       readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
       successMessage: 'Your profile has been updated.',
-      title: 'Update profile',
+      title: '',
     },
     start: {
       activeDevicesSection: {
@@ -731,7 +731,7 @@ export const daDK: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Skift adgangskode',
+        primaryButton__updatePassword: 'Skift adgangskode',
         primaryButton__setPassword: 'Indtast adgangskode',
         title: 'Adgangskode',
       },
@@ -744,11 +744,11 @@ export const daDK: LocalizationResource = {
         title: 'Telefonnumre',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Skift brugernavn',
+        primaryButton__updateUsername: 'Skift brugernavn',
         primaryButton__setUsername: 'Sæt brugernavn',
         title: 'Brugernavn',
       },
@@ -760,7 +760,8 @@ export const daDK: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Dit brugernavn er blevet opdateret.',
-      title: 'Opdater profil',
+      title__set: 'Opdater profil',
+      title__update: 'Opdater profil',
     },
     web3WalletPage: {
       removeResource: {

@@ -213,7 +213,7 @@ export const viVN: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Thành viên',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -650,14 +650,14 @@ export const viVN: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Mật khẩu của bạn đã được cập nhật.',
-      changePasswordTitle: 'Thay đổi mật khẩu',
+      successMessage__set: 'Mật khẩu của bạn đã được thiết lập.',
+      successMessage__update: 'Mật khẩu của bạn đã được cập nhật.',
+      successMessage__signOutOfOtherSessions: 'Tất cả các thiết bị khác đã được đăng xuất.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Hiện tại bạn không thể chỉnh sửa mật khẩu vì bạn chỉ có thể đăng nhập qua kết nối doanh nghiệp.',
-      sessionsSignedOutSuccessMessage: 'Tất cả các thiết bị khác đã được đăng xuất.',
-      successMessage: 'Mật khẩu của bạn đã được thiết lập.',
-      title: 'Thiết lập mật khẩu',
+      title__set: 'Thiết lập mật khẩu',
+      title__update: 'Thay đổi mật khẩu',
     },
     phoneNumberPage: {
       infoText: 'Một tin nhắn chứa liên kết xác minh sẽ được gửi đến số điện thoại này.',
@@ -732,7 +732,7 @@ export const viVN: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Thay đổi mật khẩu',
+        primaryButton__updatePassword: 'Thay đổi mật khẩu',
         primaryButton__setPassword: 'Đặt mật khẩu',
         title: 'Mật khẩu',
       },
@@ -745,11 +745,11 @@ export const viVN: LocalizationResource = {
         title: 'Số điện thoại',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Hồ sơ',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Thay đổi tên người dùng',
+        primaryButton__updateUsername: 'Thay đổi tên người dùng',
         primaryButton__setUsername: 'Đặt tên người dùng',
         title: 'Tên người dùng',
       },
@@ -761,7 +761,8 @@ export const viVN: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Tên người dùng của bạn đã được cập nhật.',
-      title: 'Cập nhật tên người dùng',
+      title__set: 'Cập nhật tên người dùng',
+      title__update: 'Cập nhật tên người dùng',
     },
     web3WalletPage: {
       removeResource: {

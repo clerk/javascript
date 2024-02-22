@@ -211,7 +211,7 @@ export const arSA: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'الأعضاء',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -233,7 +233,6 @@ export const arSA: LocalizationResource = {
         calloutInfoLabel: 'إن تغيير وضع التسجيل سيؤثر فقط على المستخدمين الجدد.',
         calloutInvitationCountLabel: 'هناك {{count}} دعوة معلقة مرسلة إلى المستخدمين',
         calloutSuggestionCountLabel: 'هناك {{count}} أقتراح معلق مرسلة إلى المستخدمين',
-        formButton__save: 'حفظ',
         manualInvitationOption__description: 'يمكن دعوة المستخدمين يدويًا فقط للمؤسسة.',
         manualInvitationOption__label: 'لا يوجد تسجيل تلقائي',
         subtitle: 'أختر كيف يمكن للمستخدمين في هذا النطاق تسجيل الدخول إلى المنظمة',
@@ -644,14 +643,14 @@ export const arSA: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'تم تحديث كلمة السر',
-      changePasswordTitle: 'تغيير كلمة المرور',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
+      successMessage__set: 'تم تعيين كلمة السر.',
+      successMessage__signOutOfOtherSessions: 'تم تسجيل الخروج من جميع الأجهزة.',
+      successMessage__update: 'تم تحديث كلمة السر',
       readonly: 'لا يمكن تعديل كلمة المرور لأنه لا يمكنك تسجيل الدخول إلى عن طريق حساب المؤسسة',
-      sessionsSignedOutSuccessMessage: 'تم تسجيل الخروج من جميع الأجهزة.',
-      successMessage: 'تم تعيين كلمة السر.',
-      title: 'تعيين كلمة المرور',
+      title__set: 'تعيين كلمة المرور',
+      title__update: 'تغيير كلمة المرور',
     },
     phoneNumberPage: {
       infoText: 'سيتم إرسال رسالة نصية تحتوي على رابط التحقق إلى رقم الهاتف هذا.',
@@ -726,7 +725,7 @@ export const arSA: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'تغيير كلمة المرور',
+        primaryButton__updatePassword: 'تغيير كلمة المرور',
         primaryButton__setPassword: 'تعيين كلمة المرور',
         title: 'كلمة المرور',
       },
@@ -739,11 +738,11 @@ export const arSA: LocalizationResource = {
         title: 'رقم الجوال',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'الملف الشخصي',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'تغيير اسم المستخدم',
+        primaryButton__updateUsername: 'تغيير اسم المستخدم',
         primaryButton__setUsername: 'تعيين اسم المستخدم',
         title: 'اسم المستخدم',
       },
@@ -755,7 +754,8 @@ export const arSA: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'تم تحديث اسم المستخدم',
-      title: 'تحديث اسم المستخدم',
+      title__set: 'تحديث اسم المستخدم',
+      title__update: 'تحديث اسم المستخدم',
     },
     web3WalletPage: {
       removeResource: {

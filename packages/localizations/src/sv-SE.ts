@@ -213,7 +213,7 @@ export const svSE: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Medlemmar',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -648,14 +648,14 @@ export const svSE: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Ditt lösenord har uppdaterats.',
-      changePasswordTitle: 'Byt lösenord',
+      successMessage__set: 'Ditt lösenord har angetts.',
+      successMessage__update: 'Ditt lösenord har uppdaterats.',
+      successMessage__signOutOfOtherSessions: 'Alla andra enheter har loggats ut.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Alla andra enheter har loggats ut.',
-      successMessage: 'Ditt lösenord har angetts.',
-      title: 'Ange lösenord',
+      title__set: 'Ange lösenord',
+      title__update: 'Byt lösenord',
     },
     phoneNumberPage: {
       infoText: 'Ett textmeddelande med en verifieringslänk kommer att skickas till detta telefonnummer.',
@@ -730,7 +730,7 @@ export const svSE: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Byt lösenord',
+        primaryButton__updatePassword: 'Byt lösenord',
         primaryButton__setPassword: 'Ställ in lösenord',
         title: 'Lösenord',
       },
@@ -743,11 +743,11 @@ export const svSE: LocalizationResource = {
         title: 'Telefonnummer',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Ändra användarnamn',
+        primaryButton__updateUsername: 'Ändra användarnamn',
         primaryButton__setUsername: 'Sätt användarnamn',
         title: 'Användarnamn',
       },
@@ -759,7 +759,8 @@ export const svSE: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Ditt användarnamn har uppdaterats.',
-      title: 'Uppdatera användarnamn',
+      title__set: 'Uppdatera användarnamn',
+      title__update: 'Uppdatera användarnamn',
     },
     web3WalletPage: {
       removeResource: {

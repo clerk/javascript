@@ -215,7 +215,7 @@ export const roRO: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Membri',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -237,7 +237,6 @@ export const roRO: LocalizationResource = {
         calloutInfoLabel: 'Schimbarea modului de înscriere va afecta doar utilizatorii noi.',
         calloutInvitationCountLabel: 'Invitații în așteptare trimise utilizatorilor: {{count}}',
         calloutSuggestionCountLabel: 'Sugestii în așteptare trimise utilizatorilor: {{count}}',
-        formButton__save: 'Salvați',
         manualInvitationOption__description: 'Utilizatorii pot fi invitați doar manual în organizație.',
         manualInvitationOption__label: 'Fără înscriere automată',
         subtitle: 'Alegeți modul în care utilizatorii din acest domeniu se pot alătura organizației.',
@@ -659,15 +658,15 @@ export const roRO: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Parola dvs. a fost actualizată.',
-      changePasswordTitle: 'Modificați parola',
+      successMessage__set: 'Parola dvs. a fost setată.',
+      successMessage__update: 'Parola dvs. a fost actualizată.',
+      successMessage__signOutOfOtherSessions: 'Toate celelalte dispozitive au fost deconectate.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'În prezent, parola dvs. nu poate fi modificată, deoarece vă puteți conecta numai prin intermediul conexiunii întreprinderii.',
-      sessionsSignedOutSuccessMessage: 'Toate celelalte dispozitive au fost deconectate.',
-      successMessage: 'Parola dvs. a fost setată.',
-      title: 'Setați parola',
+      title__set: 'Setați parola',
+      title__update: 'Modificați parola',
     },
     phoneNumberPage: {
       infoText: 'La acest număr de telefon va fi trimis un mesaj text conținând un link de verificare.',
@@ -743,7 +742,7 @@ export const roRO: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Modificați parola',
+        primaryButton__updatePassword: 'Modificați parola',
         primaryButton__setPassword: 'Setați parola',
         title: 'Parola',
       },
@@ -756,11 +755,11 @@ export const roRO: LocalizationResource = {
         title: 'Numere de telefon',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Schimbă numele de utilizator',
+        primaryButton__updateUsername: 'Schimbă numele de utilizator',
         primaryButton__setUsername: 'Setați numele de utilizator',
         title: 'Nume utilizator',
       },
@@ -772,7 +771,8 @@ export const roRO: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Numele dvs. de utilizator a fost actualizat.',
-      title: 'Actualizați numele de utilizator',
+      title__set: 'Actualizați numele de utilizator',
+      title__update: 'Actualizați numele de utilizator',
     },
     web3WalletPage: {
       removeResource: {
