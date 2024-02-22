@@ -31,7 +31,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
-    invitations: canManageMemberships,
+    invitations: canManageMemberships || undefined,
     memberships: true,
   });
 
@@ -87,7 +87,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 >
                   <NotificationCountBadge
                     notificationCount={invitations?.count || 0}
-                    shouldDelayVisibility
                     colorScheme='neutral'
                   />
                 </Tab>
@@ -96,7 +95,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
                   <NotificationCountBadge
                     notificationCount={membershipRequests?.count || 0}
-                    shouldDelayVisibility
                     colorScheme='neutral'
                   />
                 </Tab>
