@@ -4,6 +4,7 @@ import type { SDKMetadata } from '@clerk/types';
 
 import type { ApiClient, CreateBackendApiOptions } from './api';
 import { createBackendApiClient } from './api';
+import telemetryNotification from './telemetry-notification';
 import type { CreateAuthenticateRequestOptions } from './tokens/factory';
 import { createAuthenticateRequest } from './tokens/factory';
 
@@ -36,6 +37,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
     secretKey: opts.secretKey,
     ...(opts.sdkMetadata ? { sdk: opts.sdkMetadata.name, sdkVersion: opts.sdkMetadata.version } : {}),
   });
+  void telemetryNotification();
 
   return {
     ...apiClient,

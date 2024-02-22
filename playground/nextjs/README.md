@@ -12,7 +12,7 @@ npm run yalc:all
 At current directory level:
 
 ```bash
-npm run yalc:add
+npm run yalc
 npm i
 ```
 
