@@ -7,7 +7,7 @@ const BUTTON_SOLID_SHADOW = (color: string) =>
   `${BORDER_SHADOW_LENGTH} ${color}, 0px 1px 1px 0px rgba(255, 255, 255, 0.07) inset, 0px 2px 3px 0px rgba(34, 42, 53, 0.20), 0px 1px 1px 0px rgba(0, 0, 0, 0.24)`;
 
 const cardContentStyles = (theme: InternalTheme) => ({
-  border: 0,
+  borderWidth: 0,
   boxShadow: `${theme.shadows.$cardContentShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha50}`,
 });
 
@@ -36,7 +36,7 @@ const inputShadowStyles = (
 };
 
 const inputStyles = (theme: InternalTheme) => ({
-  border: 0,
+  borderWidth: 0,
   ...inputShadowStyles(theme, {
     idle1: theme.colors.$neutralAlpha150,
     idle2: theme.colors.$neutralAlpha100,
@@ -72,7 +72,7 @@ export const polishedAppearance: Appearance = {
     return {
       button: {
         '&[data-variant="solid"]': {
-          border: 0,
+          borderWidth: '0px',
           '&:after': {
             position: 'absolute',
             content: '""',
@@ -110,12 +110,12 @@ export const polishedAppearance: Appearance = {
           },
         },
         '&[data-variant="outline"]': {
-          border: 0,
+          borderWidth: 0,
           boxShadow: `0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02), 0px 0px 0px 1px ${theme.colors.$neutralAlpha100}`,
         },
       },
       badge: {
-        border: 0,
+        borderWidth: 0,
         margin: '1px',
         '&[data-color="primary"]': {
           boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
@@ -153,7 +153,7 @@ export const polishedAppearance: Appearance = {
         },
       },
       tagPillContainer: {
-        border: 0,
+        borderWidth: 0,
         boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
       },
       phoneInputBox: (() => {
@@ -162,7 +162,7 @@ export const polishedAppearance: Appearance = {
           theme.shadows.$input.replace('{{color}}', theme.colors.$neutralAlpha100),
         ].toString();
         return {
-          border: 0,
+          borderWidth: 0,
           '> div > input': {
             boxShadow: 'unset',
           },
@@ -176,7 +176,7 @@ export const polishedAppearance: Appearance = {
         '&:focus': { boxShadow: 'none' },
       },
       cardBox: {
-        border: 0,
+        borderWidth: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
       },
       card: {
@@ -192,15 +192,15 @@ export const polishedAppearance: Appearance = {
         ...cardContentStyles(theme),
       },
       menuList: {
-        border: 0,
+        borderWidth: 0,
         boxShadow: `${theme.shadows.$menuShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
       },
       actionCard: {
-        border: 0,
+        borderWidth: 0,
         boxShadow: `${theme.shadows.$actionCardShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
       },
       table: {
-        border: 0,
+        borderWidth: 0,
         boxShadow: `0px 0px 2px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 0px 1px ${theme.colors.$neutralAlpha100}`,
       },
     };

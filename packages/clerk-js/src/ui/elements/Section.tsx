@@ -34,7 +34,9 @@ const ProfileSectionRoot = (props: ProfileSectionProps) => {
       sx={[
         t => ({
           flexDirection: 'row-reverse',
-          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+          borderTopWidth: t.borderWidths.$normal,
+          borderTopStyle: t.borderStyles.$solid,
+          borderTopColor: t.colors.$neutralAlpha100,
           paddingTop: t.space.$4,
           paddingBottom: t.space.$4,
           gap: t.space.$6,

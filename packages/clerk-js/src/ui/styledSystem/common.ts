@@ -108,7 +108,8 @@ const borderVariants = (t: InternalTheme, props?: any) => {
   return {
     normal: {
       borderRadius: t.radii.$md,
-      border: t.borders.$normal,
+      borderWidth: t.borderWidths.$normal,
+      borderStyle: t.borderStyles.$solid,
       borderColor: !props?.hasError ? t.colors.$neutralAlpha150 : t.colors.$dangerAlpha500,
       boxShadow: t.shadows.$input.replace(
         '{{color}}',

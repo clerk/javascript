@@ -8,7 +8,8 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     color: vars.accent,
     background: vars.bg,
-    border: theme.borders.$normal,
+    borderWidth: theme.borderWidths.$normal,
+    borderStyle: theme.borderStyles.$solid,
     borderRadius: theme.radii.$lg,
     borderColor: vars.borderColor,
     height: theme.space.$4,
@@ -22,7 +23,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       primary: {
         [vars.accent]: theme.colors.$colorTextOnPrimaryBackground,
         [vars.bg]: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%), ${theme.colors.$primary500}`,
-        border: 0,
+        borderWidth: 0,
       },
       outline: {
         [vars.accent]: theme.colors.$neutralAlpha600,

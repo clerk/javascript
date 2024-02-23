@@ -15,7 +15,9 @@ export const PreviewListItems = (props: PropsWithChildren) => {
       sx={t => ({
         maxHeight: `calc(8 * ${t.sizes.$12})`,
         overflowY: 'auto',
-        borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+        borderTopWidth: t.borderWidths.$normal,
+        borderTopStyle: t.borderStyles.$solid,
+        borderTopColor: t.colors.$neutralAlpha100,
         ...common.unstyledScrollbar(t),
       })}
     >
@@ -48,7 +50,9 @@ export const PreviewListItem = (
         t => ({
           minHeight: 'unset',
           justifyContent: 'space-between',
-          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+          borderTopWidth: t.borderWidths.$normal,
+          borderTopStyle: t.borderStyles.$solid,
+          borderTopColor: t.colors.$neutralAlpha100,
         }),
         sharedStyles,
       ]}

@@ -76,9 +76,10 @@ export const TabsList = (props: TabsListProps) => {
       elementDescriptor={descriptors.tabListContainer}
       onKeyDown={onKeyDown}
       sx={[
-        theme => ({
-          borderBottom: theme.borders.$normal,
-          borderColor: theme.colors.$neutralAlpha100,
+        t => ({
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomWidth: t.borderWidths.$normal,
+          borderColor: t.colors.$neutralAlpha100,
         }),
         sx,
       ]}
@@ -138,9 +139,10 @@ export const Tab = (props: TabProps) => {
           color: isActive ? t.colors.$primary500 : t.colors.$neutralAlpha700,
           gap: t.space.$1x5,
           fontWeight: t.fontWeights.$medium,
-          borderBottom: t.borders.$normal,
-          marginBottom: '-1px',
-          borderColor: isActive ? t.colors.$primary500 : t.colors.$transparent,
+          borderBottomWidth: isActive ? t.borderWidths.$normal : 0,
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomColor: t.colors.$primary500,
+          marginBottom: isActive ? '-1px' : 0,
           borderRadius: 0,
           padding: `${t.space.$2x5} ${t.space.$0x25}`,
           width: 'fit-content',

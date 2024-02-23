@@ -34,7 +34,9 @@ const _SignInAccountSwitcher = () => {
             elementDescriptor={descriptors.main}
             gap={8}
             sx={t => ({
-              borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+              borderTopWidth: t.borderWidths.$normal,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$neutralAlpha100,
             })}
           >
             <Actions role='menu'>
@@ -95,7 +97,7 @@ const _SignInAccountSwitcher = () => {
               width: '100%',
               '>:first-of-type': {
                 width: '100%',
-                borderBottom: 'none',
+                borderBottomWidth: 0,
               },
             }}
           >

@@ -158,7 +158,7 @@ export const TagInput = (props: TagInputProps) => {
         autoFocus={autoFocus}
         sx={t => ({
           flexGrow: 1,
-          border: 'none',
+          borderWidth: 0,
           width: 'initial',
           padding: 0,
           lineHeight: t.space.$5,
@@ -193,7 +193,8 @@ const TagPill = (props: TagPillProps) => {
         color: t.colors.$primary500,
         backgroundColor: t.colors.$neutralAlpha50,
         boxShadow: t.shadows.$badge,
-        border: t.borders.$normal,
+        borderWidth: t.borderWidths.$normal,
+        borderStyle: t.borderStyles.$solid,
         borderColor: t.colors.$neutralAlpha100,
         display: 'inline-flex',
         marginRight: '1px',
