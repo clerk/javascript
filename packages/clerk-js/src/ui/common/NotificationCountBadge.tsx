@@ -1,21 +1,28 @@
-import { Flex, NotificationBadge } from '../customizables';
+import { formatToCompactNumber } from '../../ui/utils/intl';
+import { Flex, localizationKeys, NotificationBadge, useLocalizations } from '../customizables';
 import { useDelayedVisibility, usePrefersReducedMotion } from '../hooks';
-import type { ThemableCssProp } from '../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 
-type NotificationCountBadgeProps = {
+type NotificationCountBadgeProps = PropsOfComponent<typeof NotificationBadge> & {
   notificationCount: number;
+  shouldDelayVisibility?: boolean;
   containerSx?: ThemableCssProp;
 };
 
-export const NotificationCountBadge = ({ notificationCount, containerSx }: NotificationCountBadgeProps) => {
+export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
+  const { notificationCount, containerSx, shouldDelayVisibility, ...restProps } = props;
   const prefersReducedMotion = usePrefersReducedMotion();
-  const showNotification = useDelayedVisibility(notificationCount > 0, 350) || false;
+  const delayVisibility = shouldDelayVisibility || notificationCount > 0;
+  const showNotification = useDelayedVisibility(delayVisibility, 350) || false;
+  const { t } = useLocalizations();
+  const localeKey = t(localizationKeys('locale'));
+  const formatedNotificationCount = formatToCompactNumber(notificationCount, localeKey);
 
   const enterExitAnimation: ThemableCssProp = t => ({
     animation: prefersReducedMotion
       ? 'none'
-      : `${notificationCount ? animations.notificationAnimation : animations.outAnimation} ${
+      : `${showNotification ? animations.notificationAnimation : animations.outAnimation} ${
           t.transitionDuration.$textField
         } ${t.transitionTiming.$slowBezier} 0s 1 normal forwards`,
   });
@@ -35,7 +42,12 @@ export const NotificationCountBadge = ({ notificationCount, containerSx }: Notif
         containerSx,
       ]}
     >
-      <NotificationBadge sx={enterExitAnimation}>{notificationCount}</NotificationBadge>
+      <NotificationBadge
+        sx={enterExitAnimation}
+        {...restProps}
+      >
+        {formatedNotificationCount}
+      </NotificationBadge>
     </Flex>
   );
 };
