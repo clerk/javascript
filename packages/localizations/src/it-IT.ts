@@ -213,7 +213,7 @@ export const itIT: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Membri',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -235,7 +235,6 @@ export const itIT: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -651,14 +650,14 @@ export const itIT: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'La tua password è stata aggiornata.',
-      changePasswordTitle: 'Cambia password',
+      successMessage__set: 'La tua password é stata impostata.',
+      successMessage__update: 'La tua password è stata aggiornata.',
+      successMessage__signOutOfOtherSessions: 'Tutti gli altri dispositivi sono stati disconnessi.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Tutti gli altri dispositivi sono stati disconnessi.',
-      successMessage: 'La tua password é stata impostata.',
-      title: 'Imposta password',
+      title__set: 'Imposta password',
+      title__update: 'Cambia password',
     },
     phoneNumberPage: {
       infoText: 'Un SMS contenente un link di verifica é stato inviato a questo numero di telefono.',
@@ -733,7 +732,7 @@ export const itIT: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Cambia password',
+        primaryButton__updatePassword: 'Cambia password',
         primaryButton__setPassword: 'Imposta password',
         title: 'Password',
       },
@@ -746,11 +745,11 @@ export const itIT: LocalizationResource = {
         title: 'Numeri di telefono',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profilo',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Cambia username',
+        primaryButton__updateUsername: 'Cambia username',
         primaryButton__setUsername: 'Imposta username',
         title: 'Username',
       },
@@ -762,7 +761,8 @@ export const itIT: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Il tuo username é stato aggiornato.',
-      title: 'Aggiorna username',
+      title__set: 'Aggiorna username',
+      title__update: 'Aggiorna username',
     },
     web3WalletPage: {
       removeResource: {

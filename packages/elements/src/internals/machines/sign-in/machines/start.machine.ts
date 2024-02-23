@@ -1,8 +1,10 @@
-import type { ClientResource, SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/types';
+import type { ActorRefFrom } from 'xstate';
 import { fromPromise, sendParent, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
+import { type TSignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
 import type { SignInStartSchema } from '~/internals/machines/sign-in/types';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
@@ -12,8 +14,10 @@ export const SignInStartMachineId = 'SignInStart';
 
 export const SignInStartMachine = setup({
   actors: {
-    attempt: fromPromise<SignInResource, { client: ClientResource; fields: FormFields }>(
-      ({ input: { client, fields } }) => {
+    attempt: fromPromise<SignInResource, { parent: ActorRefFrom<TSignInRouterMachine>; fields: FormFields }>(
+      ({ input: { fields, parent } }) => {
+        const clerk = parent.getSnapshot().context.clerk;
+
         const password = fields.get('password');
         const identifier = fields.get('identifier');
 
@@ -24,7 +28,7 @@ export const SignInStartMachine = setup({
             }
           : {};
 
-        return client.signIn.create({
+        return clerk.client.signIn.create({
           identifier: (identifier?.value as string) || '',
           ...passwordParams,
         });
@@ -48,9 +52,8 @@ export const SignInStartMachine = setup({
   id: SignInStartMachineId,
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
-    clerk: input.clerk,
+    parent: input.parent,
     formRef: input.form,
-    routerRef: input.router,
   }),
   initial: 'Pending',
   states: {
@@ -70,7 +73,7 @@ export const SignInStartMachine = setup({
         id: 'attempt',
         src: 'attempt',
         input: ({ context }) => ({
-          client: context.clerk.client,
+          parent: context.parent,
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {

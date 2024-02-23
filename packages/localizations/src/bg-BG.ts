@@ -213,7 +213,7 @@ export const bgBG: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Членове',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -235,7 +235,6 @@ export const bgBG: LocalizationResource = {
         calloutInfoLabel: 'Промяната на режима на записване ще засегне само новите потребители.',
         calloutInvitationCountLabel: 'Чакащи покани, изпратени на потребители: {{count}}',
         calloutSuggestionCountLabel: 'Чакащи предложения, изпратени на потребители: {{count}}',
-        formButton__save: 'Запазване',
         manualInvitationOption__description: 'Потребителите могат да бъдат поканени само ръчно в организацията.',
         manualInvitationOption__label: 'Без автоматично записване',
         subtitle: 'Изберете как потребителите от този домейн могат да се присъединят към организацията.',
@@ -652,15 +651,15 @@ export const bgBG: LocalizationResource = {
       title: 'Профил',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Паролата ви беше обновена.',
-      changePasswordTitle: 'Промени паролата',
+      successMessage__set: 'Паролата ви беше зададена.',
+      successMessage__update: 'Паролата ви беше обновена.',
+      successMessage__signOutOfOtherSessions: 'Всички други устройства бяха излезли.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Вашата парола в момента не може да бъде редактирана, тъй като можете да влизате само чрез корпоративна връзка.',
-      sessionsSignedOutSuccessMessage: 'Всички други устройства бяха излезли.',
-      successMessage: 'Паролата ви беше зададена.',
-      title: 'Задай парола',
+      title__set: 'Задай парола',
+      title__update: 'Промени паролата',
     },
     phoneNumberPage: {
       infoText: 'Съобщение, съдържащо линк за потвърждение, ще бъде изпратено на този телефонен номер.',
@@ -735,7 +734,7 @@ export const bgBG: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Промени паролата',
+        primaryButton__updatePassword: 'Промени паролата',
         primaryButton__setPassword: 'Задай парола',
         title: 'Парола',
       },
@@ -752,7 +751,7 @@ export const bgBG: LocalizationResource = {
         title: 'Профил',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Промени потребителското име',
+        primaryButton__updateUsername: 'Промени потребителското име',
         primaryButton__setUsername: 'Задай потребителско име',
         title: 'Потребителско име',
       },
@@ -764,7 +763,8 @@ export const bgBG: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Вашето потребителско име е актуализирано.',
-      title: 'Актуализиране на потребителското име',
+      title__set: 'Актуализиране на потребителското име',
+      title__update: 'Актуализиране на потребителското име',
     },
     web3WalletPage: {
       removeResource: {

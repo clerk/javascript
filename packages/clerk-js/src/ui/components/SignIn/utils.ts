@@ -2,7 +2,7 @@ import { titleize } from '@clerk/shared';
 import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
 
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
-import { otpPrefFactorComparator, passwordPrefFactorComparator } from './strategies/factorSortingUtils';
+import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 
 const FONT_SIZE_STEP = 2;
 

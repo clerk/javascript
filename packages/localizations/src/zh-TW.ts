@@ -211,7 +211,7 @@ export const zhTW: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: '成員',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -233,7 +233,6 @@ export const zhTW: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -636,14 +635,14 @@ export const zhTW: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: '您的密碼已更新。',
-      changePasswordTitle: '更改密碼',
+      successMessage__set: '您的密碼已設置。',
+      successMessage__update: '您的密碼已更新。',
+      successMessage__signOutOfOtherSessions: '所有其他設備已退出。',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: '所有其他設備已退出。',
-      successMessage: '您的密碼已設置。',
-      title: '設置密碼',
+      title__set: '設置密碼',
+      title__update: '更改密碼',
     },
     phoneNumberPage: {
       infoText: '一條包含驗證連結的簡訊將會發送到這個電話號碼。',
@@ -717,7 +716,7 @@ export const zhTW: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: '更改密碼',
+        primaryButton__updatePassword: '更改密碼',
         primaryButton__setPassword: '設置密碼',
         title: '密碼',
       },
@@ -730,11 +729,11 @@ export const zhTW: LocalizationResource = {
         title: '電話號碼',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: '個人資料',
       },
       usernameSection: {
-        primaryButton__changeUsername: '更改使用者名稱',
+        primaryButton__updateUsername: '更改使用者名稱',
         primaryButton__setUsername: '設置使用者名稱',
         title: '使用者名稱',
       },
@@ -746,7 +745,8 @@ export const zhTW: LocalizationResource = {
     },
     usernamePage: {
       successMessage: '您的使用者名稱已更新。',
-      title: '更新使用者名稱',
+      title__set: '更新使用者名稱',
+      title__update: '更新使用者名稱',
     },
     web3WalletPage: {
       removeResource: {

@@ -5,16 +5,30 @@ import { assign, enqueueActions, setup } from 'xstate';
 
 import { ClerkElementsError, ClerkElementsFieldError } from '~/internals/errors';
 
-import type { FieldDetails, FormFields } from './form.types';
+import type { FieldDetails, FormDefaultValues, FormFields } from './form.types';
 
 export interface FormMachineContext extends MachineContext {
-  fields: FormFields;
+  defaultValues: FormDefaultValues;
   errors: ClerkElementsError[];
+  fields: FormFields;
+  hidden?: Set<string>;
+  missing?: Set<string>;
+  optional?: Set<string>;
+  progressive: boolean;
+  required?: Set<string>;
 }
 
 export type FormMachineEvents =
   | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'value'> }
   | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'name'> }
+  | {
+      type: 'MARK_AS_PROGRESSIVE';
+      defaultValues: FormDefaultValues;
+      missing: string[];
+      optional: string[];
+      required: string[];
+    }
+  | { type: 'UNMARK_AS_PROGRESSIVE' }
   | {
       type: 'FIELD.UPDATE';
       field: Pick<FieldDetails, 'name' | 'value'>;
@@ -59,8 +73,10 @@ export const FormMachine = setup({
 }).createMachine({
   id: 'Form',
   context: () => ({
-    fields: new Map(),
+    defaultValues: new Map(),
     errors: [],
+    fields: new Map(),
+    progressive: false,
   }),
   on: {
     'ERRORS.SET': {
@@ -106,10 +122,13 @@ export const FormMachine = setup({
         errors: () => [],
       }),
     },
+
     'FIELD.ADD': {
       actions: assign({
         fields: ({ context, event }) => {
           if (!event.field.name) throw new Error('Field name is required');
+
+          event.field.value = event.field.value || context.defaultValues.get(event.field.name) || undefined;
 
           context.fields.set(event.field.name, event.field);
           return context.fields;
@@ -157,6 +176,30 @@ export const FormMachine = setup({
 
           return context.fields;
         },
+      }),
+    },
+    MARK_AS_PROGRESSIVE: {
+      actions: assign(({ event }) => {
+        const missing = new Set(event.missing);
+
+        return {
+          defaultValues: event.defaultValues,
+          hidden: new Set([...event.required.filter(f => !missing.has(f)), ...event.optional]),
+          missing,
+          optional: new Set(event.optional),
+          progressive: true,
+          required: new Set(event.required),
+        };
+      }),
+    },
+    UNMARK_AS_PROGRESSIVE: {
+      actions: assign({
+        defaultValues: new Map(),
+        hidden: undefined,
+        missing: undefined,
+        optional: undefined,
+        progressive: false,
+        required: undefined,
       }),
     },
   },

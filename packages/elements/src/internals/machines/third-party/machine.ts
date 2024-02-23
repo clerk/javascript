@@ -1,4 +1,5 @@
-import { assertEvent, assign, enqueueActions, log, sendParent, setup } from 'xstate';
+import type { LoadedClerk } from '@clerk/types';
+import { assertEvent, assign, log, sendParent, setup } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
@@ -31,15 +32,9 @@ export const ThirdPartyMachine = setup({
         return event.params.strategy;
       },
     }),
-    assignThirdPartyProviders: assign(({ context }) => ({
-      thirdPartyProviders: getEnabledThirdPartyProviders(context.clerk.__unstable__environment),
-    })),
     unassignActiveStrategy: assign({
       activeStrategy: null,
     }),
-  },
-  guards: {
-    hasThirdPartyProviders: ({ context }) => Boolean(context.thirdPartyProviders?.authenticatableOauthStrategies),
   },
   types: {} as ThirdPartyMachineSchema,
 }).createMachine({
@@ -47,19 +42,14 @@ export const ThirdPartyMachine = setup({
   context: ({ input }) => ({
     activeStrategy: null,
     basePath: input.basePath,
-    clerk: input.clerk,
     flow: input.flow,
-    thirdPartyProviders: getEnabledThirdPartyProviders(input.clerk.__unstable__environment),
+    parent: input.parent,
+    thirdPartyProviders: getEnabledThirdPartyProviders(input.environment),
   }),
   initial: 'Idle',
   states: {
     Idle: {
       description: 'Sets third-party providers if not already set, and waits for a redirect or callback event',
-      entry: enqueueActions(({ check, enqueue }) => {
-        if (!check('hasThirdPartyProviders')) {
-          enqueue('assignThirdPartyProviders');
-        }
-      }),
       on: {
         CALLBACK: 'HandlingCallback',
         REDIRECT: {
@@ -79,19 +69,21 @@ export const ThirdPartyMachine = setup({
         input: ({ context, event }) => {
           assertEvent(event, 'REDIRECT');
 
+          const clerk: LoadedClerk = context.parent.getSnapshot().context.clerk;
+
           const redirectUrl =
-            event.params.redirectUrl || context.clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`);
+            event.params.redirectUrl || clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`);
           const redirectUrlComplete = event.params.redirectUrlComplete || redirectUrl;
 
           return {
             basePath: context.basePath,
-            clerk: context.clerk,
             flow: context.flow,
             params: {
               redirectUrl,
               redirectUrlComplete,
               ...event.params,
             },
+            parent: context.parent,
           };
         },
         onError: {
@@ -106,7 +98,7 @@ export const ThirdPartyMachine = setup({
       invoke: {
         id: 'handleRedirectCallback',
         src: 'handleRedirectCallback',
-        input: ({ context }) => context.clerk,
+        input: ({ context }) => context.parent,
         onError: {
           actions: ['logError', 'reportError'],
           target: 'Idle',
@@ -114,10 +106,7 @@ export const ThirdPartyMachine = setup({
       },
       on: {
         'CLERKJS.NAVIGATE.*': {
-          actions: sendParent(({ context }) => ({
-            type: 'NEXT',
-            resource: context.clerk.client[context.flow],
-          })),
+          actions: sendParent({ type: 'NEXT' }),
         },
       },
     },

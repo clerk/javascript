@@ -211,7 +211,7 @@ export const koKR: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: '멤버',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -233,7 +233,6 @@ export const koKR: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -641,14 +640,14 @@ export const koKR: LocalizationResource = {
       title: '게정',
     },
     passwordPage: {
-      changePasswordSuccessMessage: '비밀번호가 업데이트되었습니다.',
-      changePasswordTitle: '비밀번호 변경',
+      successMessage__set: '비밀번호가 설정되었습니다.',
+      successMessage__update: '비밀번호가 업데이트되었습니다.',
+      successMessage__signOutOfOtherSessions: '다른 모든 기기는 로그아웃되었습니다.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: '다른 모든 기기는 로그아웃되었습니다.',
-      successMessage: '비밀번호가 설정되었습니다.',
-      title: '비밀번호 설정',
+      title__set: '비밀번호 설정',
+      title__update: '비밀번호 변경',
     },
     phoneNumberPage: {
       infoText: '인증 링크가 포함된 문자 메시지가 이 휴대폰 번호로 전송됩니다.',
@@ -722,7 +721,7 @@ export const koKR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: '비밀번호 변경',
+        primaryButton__updatePassword: '비밀번호 변경',
         primaryButton__setPassword: '비밀번호 설정',
         title: '비밀번호',
       },
@@ -739,7 +738,7 @@ export const koKR: LocalizationResource = {
         title: '프로필',
       },
       usernameSection: {
-        primaryButton__changeUsername: '사용자 이름 변경',
+        primaryButton__updateUsername: '사용자 이름 변경',
         primaryButton__setUsername: '사용자 이름 설정',
         title: '사용자 이름',
       },
@@ -751,7 +750,8 @@ export const koKR: LocalizationResource = {
     },
     usernamePage: {
       successMessage: '당신읭 사용자 이름이 업데이트되었습니다.',
-      title: '사용자 이름 업데이트',
+      title__set: '사용자 이름 업데이트',
+      title__update: '사용자 이름 업데이트',
     },
     web3WalletPage: {
       removeResource: {

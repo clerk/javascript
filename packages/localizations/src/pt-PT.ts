@@ -212,7 +212,7 @@ export const ptPT: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Membros',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -234,7 +234,6 @@ export const ptPT: LocalizationResource = {
         calloutInfoLabel: 'Alterar o modo de inscrição afetará apenas os novos utilizadores.',
         calloutInvitationCountLabel: 'Convites pendentes enviados aos utilizadores: {{count}}',
         calloutSuggestionCountLabel: 'Sugestões pendentes enviadas aos utilizadores: {{count}}',
-        formButton__save: 'Guardar',
         manualInvitationOption__description: 'Os utilizadores só podem ser convidados manualmente para a organização.',
         manualInvitationOption__label: 'Sem inscrição automática',
         subtitle: 'Escolha como os utilizadores deste domínio se podem entrar na organização.',
@@ -651,14 +650,14 @@ export const ptPT: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'A sua palavra-passe foi atualizada.',
-      changePasswordTitle: 'Trocar palavra-passe',
+      successMessage__set: 'A sua palavra-passe foi guardada.',
+      successMessage__update: 'A sua palavra-passe foi atualizada.',
+      successMessage__signOutOfOtherSessions: 'Todos os outros dispositivos foram desconectados.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'A sua palavra-passe não pode ser editada porque só pode fazer login por meio da conexão da empresa.',
-      sessionsSignedOutSuccessMessage: 'Todos os outros dispositivos foram desconectados.',
-      successMessage: 'A sua palavra-passe foi guardada.',
-      title: 'Defina a palavra-passe',
+      title__set: 'Defina a palavra-passe',
+      title__update: 'Trocar palavra-passe',
     },
     phoneNumberPage: {
       infoText: 'Um SMS contendo um link de verificação será enviado para este telemóvel.',
@@ -733,7 +732,7 @@ export const ptPT: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Trocar palavra-passe',
+        primaryButton__updatePassword: 'Trocar palavra-passe',
         primaryButton__setPassword: 'Definir palavra-passe',
         title: 'Palavra-passe',
       },
@@ -746,11 +745,11 @@ export const ptPT: LocalizationResource = {
         title: 'Números de telemóvel',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Perfil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Trocar nome de utilizador',
+        primaryButton__updateUsername: 'Trocar nome de utilizador',
         primaryButton__setUsername: 'Definir nome de utilizador',
         title: 'Nome de utilizador',
       },
@@ -762,7 +761,8 @@ export const ptPT: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'O nome de utilizador foi atualizado.',
-      title: 'Atualizar nome de utilizador',
+      title__set: 'Atualizar nome de utilizador',
+      title__update: 'Atualizar nome de utilizador',
     },
     web3WalletPage: {
       removeResource: {

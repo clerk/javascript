@@ -1,9 +1,9 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { LoadedClerk, SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/types';
 import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form/form.machine';
-import type { SignUpRouterMachine } from '~/internals/machines/sign-up/machines';
+import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 
 // ---------------------------------- Tags ---------------------------------- //
 
@@ -61,20 +61,18 @@ export type SignUpVerificationEvents =
 
 export type SignUpVerificationInput = {
   basePath?: string;
-  clerk: LoadedClerk;
   form: ActorRefFrom<typeof FormMachine>;
-  router: ActorRefFrom<typeof SignUpRouterMachine>;
+  parent: ActorRefFrom<TSignUpRouterMachine>;
 };
 
 // ---------------------------------- Context ---------------------------------- //
 
 export interface SignUpVerificationContext {
   basePath: string;
-  clerk: LoadedClerk;
   resource: SignUpResource;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
-  routerRef: ActorRefFrom<typeof SignUpRouterMachine>;
+  parent: ActorRefFrom<TSignUpRouterMachine>;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

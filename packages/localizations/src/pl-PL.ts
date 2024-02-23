@@ -213,7 +213,7 @@ export const plPL: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Członkowie',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: '',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -235,7 +235,6 @@ export const plPL: LocalizationResource = {
         calloutInfoLabel: 'Changing the enrollment mode will only affect new users.',
         calloutInvitationCountLabel: 'Pending invitations sent to users: {{count}}',
         calloutSuggestionCountLabel: 'Pending suggestions sent to users: {{count}}',
-        formButton__save: 'Save',
         manualInvitationOption__description: 'Users can only be invited manually to the organization.',
         manualInvitationOption__label: 'No automatic enrollment',
         subtitle: 'Choose how users from this domain can join the organization.',
@@ -652,14 +651,14 @@ export const plPL: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Twoje hasło zostało zaktualizowane.',
-      changePasswordTitle: 'Zmień hasło',
+      successMessage__set: 'Twoje hasło zostało ustawione.',
+      successMessage__update: 'Twoje hasło zostało zaktualizowane.',
+      successMessage__signOutOfOtherSessions: 'Wylogowano z wszystkich innych urządzeń.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      sessionsSignedOutSuccessMessage: 'Wylogowano z wszystkich innych urządzeń.',
-      successMessage: 'Twoje hasło zostało ustawione.',
-      title: 'Ustaw hasło',
+      title__set: 'Ustaw hasło',
+      title__update: 'Zmień hasło',
     },
     phoneNumberPage: {
       infoText: 'Wiadomość tekstowa zawierająca link weryfikacyjny zostanie wysłana na ten numer telefonu.',
@@ -734,7 +733,7 @@ export const plPL: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Zmień hasło',
+        primaryButton__updatePassword: 'Zmień hasło',
         primaryButton__setPassword: 'Ustaw hasło',
         title: 'Hasło',
       },
@@ -747,11 +746,11 @@ export const plPL: LocalizationResource = {
         title: 'Numery telefonów',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Zmień nazwę użytkownika',
+        primaryButton__updateUsername: 'Zmień nazwę użytkownika',
         primaryButton__setUsername: 'Ustaw nazwę użytkownika',
         title: 'Nazwa użytkownika',
       },
@@ -763,7 +762,8 @@ export const plPL: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Twoja nazwa użytkownika została zaktualizowana.',
-      title: 'Zmień nazwę użytkownika',
+      title__set: 'Zmień nazwę użytkownika',
+      title__update: 'Zmień nazwę użytkownika',
     },
     web3WalletPage: {
       removeResource: {

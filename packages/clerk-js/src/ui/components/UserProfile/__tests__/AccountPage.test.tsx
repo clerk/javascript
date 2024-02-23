@@ -16,32 +16,34 @@ describe('AccountPage', () => {
   });
 
   describe('Sections', () => {
-    it('open the profile section and can edit name', async () => {
+    it('open the profile section and can update name', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withName();
         f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Clerk', last_name: 'User' });
       });
 
-      const { getByText, getByRole, userEvent, queryByText, queryByLabelText } = render(<AccountPage />, { wrapper });
+      const { getByText, getByLabelText, getByRole, userEvent, queryByText, queryByLabelText } = render(
+        <AccountPage />,
+        { wrapper },
+      );
       getByText('Clerk User');
-      await userEvent.click(getByRole('button', { name: /edit profile/i }));
-      await waitFor(() => getByText(/update profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => getByLabelText(/first name/i));
       expect(queryByText('Clerk User')).not.toBeInTheDocument();
-      expect(queryByLabelText(/first name/i)).toBeInTheDocument();
       expect(queryByLabelText(/last name/i)).toBeInTheDocument();
 
       expect(getByRole('button', { name: /save$/i })).toBeDisabled();
     });
 
-    it('open the profile section and cannot edit name', async () => {
+    it('open the profile section and cannot update name', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Clerk', last_name: 'User' });
       });
 
       const { getByText, getByRole, userEvent, queryByText, queryByLabelText } = render(<AccountPage />, { wrapper });
       getByText('Clerk User');
-      await userEvent.click(getByRole('button', { name: /edit profile/i }));
-      await waitFor(() => getByText(/update profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => getByRole('button', { name: /save/i }));
       expect(queryByText('Clerk User')).not.toBeInTheDocument();
       expect(queryByLabelText(/first name/i)).not.toBeInTheDocument();
       expect(queryByLabelText(/last name/i)).not.toBeInTheDocument();

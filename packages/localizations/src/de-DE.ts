@@ -238,7 +238,6 @@ export const deDE: LocalizationResource = {
         calloutInfoLabel: 'Änderungen des Anmeldemodus wirkt sich nur auf neue Benutzer aus.',
         calloutInvitationCountLabel: 'Ausstehende Einladungen gesendet an Benutzer: {{count}}',
         calloutSuggestionCountLabel: 'Ausstehende Vorschläge gesendet an Benutzer: {{count}}',
-        formButton__save: 'Speichern',
         manualInvitationOption__description: 'Benutzer können nur manuell in die Organisation eingeladen werden.',
         manualInvitationOption__label: 'Keine automatische Aufnahme',
         subtitle: 'Wählen Sie, wie Benutzer mit dieser Domain der Organisation beitreten können.',
@@ -658,15 +657,15 @@ export const deDE: LocalizationResource = {
       title: 'Benutzerkonto',
     },
     passwordPage: {
-      changePasswordSuccessMessage: 'Dein Passwort wurde aktualisiert.',
-      changePasswordTitle: 'Passwort ändern',
+      successMessage__set: 'Ihr Passwort wurde festgelegt.',
+      successMessage__update: 'Dein Passwort wurde aktualisiert.',
+      successMessage__signOutOfOtherSessions: 'Alle anderen Geräte wurden abgemeldet.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Ihr Passwort kann derzeit nicht geändert werden, da Sie sich nur über die Enterprise-Verbindung anmelden können.',
-      sessionsSignedOutSuccessMessage: 'Alle anderen Geräte wurden abgemeldet.',
-      successMessage: 'Ihr Passwort wurde festgelegt.',
-      title: 'Passwort festlegen',
+      title__set: 'Passwort festlegen',
+      title__update: 'Passwort ändern',
     },
     phoneNumberPage: {
       infoText: 'An diese Telefonnummer wird eine SMS mit einem Bestätigungslink gesendet.',
@@ -741,7 +740,7 @@ export const deDE: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__changePassword: 'Passwort ändern',
+        primaryButton__updatePassword: 'Passwort ändern',
         primaryButton__setPassword: 'Passwort festlegen',
         title: 'Passwort',
       },
@@ -754,11 +753,11 @@ export const deDE: LocalizationResource = {
         title: 'Telefonnummern',
       },
       profileSection: {
-        primaryButton: 'Edit Profile',
+        primaryButton: '',
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__changeUsername: 'Benutzernamen ändern',
+        primaryButton__updateUsername: 'Benutzernamen ändern',
         primaryButton__setUsername: 'Benutzernamen festlegen',
         title: 'Nutzername',
       },
@@ -770,7 +769,8 @@ export const deDE: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Ihr Benutzername wurde aktualisiert.',
-      title: 'Benutzernamen aktualisieren',
+      title__set: 'Benutzernamen aktualisieren',
+      title__update: 'Benutzernamen aktualisieren',
     },
     web3WalletPage: {
       removeResource: {

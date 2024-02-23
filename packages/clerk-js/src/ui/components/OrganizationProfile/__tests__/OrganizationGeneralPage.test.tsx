@@ -60,7 +60,7 @@ describe('OrganizationSettings', () => {
     const { getByText, getByRole } = render(<OrganizationGeneralPage />, { wrapper });
     await waitFor(() => {
       expect(getByText('General')).toBeDefined();
-      getByRole('button', { name: /edit profile/i });
+      getByRole('button', { name: /update profile/i });
       expect(getByRole('button', { name: /leave organization/i })).not.toBeDisabled();
     });
   });
@@ -87,7 +87,7 @@ describe('OrganizationSettings', () => {
     const { getByText, queryByRole } = render(<OrganizationGeneralPage />, { wrapper });
     await waitFor(() => {
       expect(getByText('General')).toBeDefined();
-      expect(queryByRole('button', { name: /edit profile/i })).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: /update profile/i })).not.toBeInTheDocument();
       expect(queryByRole('button', { name: /leave organization/i })).not.toBeDisabled();
     });
   });
@@ -255,12 +255,15 @@ describe('OrganizationSettings', () => {
         });
       });
 
-      const { getByText, getByRole, userEvent, queryByText, queryByLabelText } = render(<OrganizationGeneralPage />, {
-        wrapper,
-      });
+      const { getByText, getByLabelText, getByRole, userEvent, queryByText, queryByLabelText } = render(
+        <OrganizationGeneralPage />,
+        {
+          wrapper,
+        },
+      );
       getByText('Org1');
-      await userEvent.click(getByRole('button', { name: /edit profile/i }));
-      await waitFor(() => getByText(/update profile/i));
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => getByLabelText(/name/i));
       expect(queryByText('Logo')).toBeInTheDocument();
       expect(queryByLabelText(/name/i)).toBeInTheDocument();
       expect(queryByLabelText(/slug/i)).toBeInTheDocument();

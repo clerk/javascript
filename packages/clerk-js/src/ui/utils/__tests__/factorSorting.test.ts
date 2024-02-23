@@ -4,7 +4,7 @@ import {
   allStrategiesButtonsComparator,
   otpPrefFactorComparator,
   passwordPrefFactorComparator,
-} from './factorSortingUtils';
+} from '../factorSorting';
 
 describe('otpPrefFactorComparator(a,b)', function () {
   it('sorts an array of factors based on the otp pref sorter', function () {
