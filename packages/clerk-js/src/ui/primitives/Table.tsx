@@ -10,7 +10,8 @@ const { applyVariants, filterProps } = createVariants(theme => {
     base: {
       borderSpacing: '0',
       borderCollapse: 'separate',
-      border: theme.borders.$normal,
+      borderWidth: theme.borderWidths.$normal,
+      borderStyle: theme.borderStyles.$solid,
       borderColor: theme.colors.$neutralAlpha100,
       borderRadius: theme.radii.$lg,
       boxShadow: theme.shadows.$tableBodyShadow,
@@ -30,8 +31,9 @@ const { applyVariants, filterProps } = createVariants(theme => {
         paddingLeft: theme.space.$2,
       },
       'tr > td': {
-        borderTop: theme.borders.$normal,
-        borderColor: theme.colors.$neutralAlpha100,
+        borderTopWidth: theme.borderWidths.$normal,
+        borderTopStyle: theme.borderStyles.$solid,
+        borderTopColor: theme.colors.$neutralAlpha100,
         paddingBottom: theme.space.$2,
         paddingTop: theme.space.$2,
         paddingLeft: theme.space.$4,

@@ -34,7 +34,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
         ...common.borderVariants(theme, props).normal,
       },
       unstyled: {
-        border: 0,
+        borderWidth: 0,
         boxShadow: 'unset',
         backgroundColor: 'transparent',
       },

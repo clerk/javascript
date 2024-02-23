@@ -16,7 +16,7 @@ const { applyVariants, filterProps } = createVariants(
       base: {
         margin: 0,
         padding: 0,
-        border: 0,
+        borderWidth: 0,
         outline: 0,
         userSelect: 'none',
         cursor: 'pointer',
@@ -74,7 +74,8 @@ const { applyVariants, filterProps } = createVariants(
             backgroundColor: vars.accent,
             color: vars.accentContrast,
             boxShadow: theme.shadows.$buttonShadow,
-            border: theme.borders.$normal,
+            borderWidth: theme.borderWidths.$normal,
+            borderStyle: theme.borderStyles.$solid,
             borderColor: vars.accent,
             '&:hover': {
               backgroundColor: vars.accentHover,
@@ -86,7 +87,8 @@ const { applyVariants, filterProps } = createVariants(
               : undefined,
           },
           outline: {
-            border: theme.borders.$normal,
+            borderWidth: theme.borderWidths.$normal,
+            borderStyle: theme.borderStyles.$solid,
             borderColor: theme.colors.$neutralAlpha100,
             color: theme.colors.$neutralAlpha600,
             '&:hover': { backgroundColor: theme.colors.$neutralAlpha50 },

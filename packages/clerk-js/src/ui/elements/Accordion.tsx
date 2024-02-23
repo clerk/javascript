@@ -93,7 +93,7 @@ export const AccordionItem = (props: AccordionItemProps) => {
           sx={t => ({
             animation: `${animations.blockBigIn} ${t.transitionDuration.$slow} ease`,
             padding: `${t.space.$4} ${t.space.$8}`,
-            borderTop: 0,
+            borderTopWidth: 0,
           })}
         >
           {children}

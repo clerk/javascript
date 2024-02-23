@@ -25,8 +25,9 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
     },
     '>:not(:first-of-type)': {
       padding: `${t.space.$4} ${t.space.$8}`,
-      borderTop: t.borders.$normal,
-      borderColor: t.colors.$neutralAlpha100,
+      borderTopWidth: t.borderWidths.$normal,
+      borderTopStyle: t.borderStyles.$solid,
+      borderTopColor: t.colors.$neutralAlpha100,
     },
   });
 

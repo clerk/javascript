@@ -57,9 +57,9 @@ export const InputGroup = forwardRef<
         sx={[
           {
             boxShadow: 'none',
-            border: 'none',
+            borderWidth: 0,
             ':hover:not(:focus)': {
-              border: 'none',
+              borderWidth: 0,
               boxShadow: 'none',
             },
             height: '100%',

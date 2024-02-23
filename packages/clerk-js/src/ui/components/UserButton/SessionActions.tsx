@@ -35,7 +35,9 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
         label={localizationKeys('userButton.action__manageAccount')}
         onClick={handleManageAccountClicked}
         sx={t => ({
-          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+          borderTopWidth: t.borderWidths.$normal,
+          borderTopStyle: t.borderStyles.$solid,
+          borderTopColor: t.colors.$neutralAlpha100,
           padding: `${t.space.$4} ${t.space.$5}`,
         })}
       />
@@ -184,7 +186,9 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
       role='menu'
       sx={t => ({
         padding: t.space.$2,
-        borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+        borderBottomWidth: t.borderWidths.$normal,
+        borderBottomStyle: t.borderStyles.$solid,
+        borderBottomColor: t.colors.$neutralAlpha100,
       })}
     >
       <Action
@@ -202,7 +206,7 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
         sx={t => ({
           backgroundColor: t.colors.$transparent,
           padding: `${t.space.$2} ${t.space.$3}`,
-          borderBottom: 'none',
+          borderBottomWidth: 0,
           borderRadius: t.radii.$lg,
         })}
         spinnerSize='md'

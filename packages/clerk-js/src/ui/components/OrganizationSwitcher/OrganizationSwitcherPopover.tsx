@@ -155,7 +155,11 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           />
           <Actions
             role='menu'
-            sx={t => ({ borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}` })}
+            sx={t => ({
+              borderBottomWidth: t.borderWidths.$normal,
+              borderBottomStyle: t.borderStyles.$solid,
+              borderBottomColor: t.colors.$neutralAlpha100,
+            })}
           >
             <Flex
               justify='between'

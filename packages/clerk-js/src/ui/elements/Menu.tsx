@@ -122,20 +122,21 @@ export const MenuList = (props: MenuListProps) => {
         role='menu'
         onKeyDown={onKeyDown}
         sx={[
-          theme => ({
-            backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
-            border: theme.borders.$normal,
-            borderColor: theme.colors.$neutralAlpha50,
+          t => ({
+            backgroundColor: colors.makeSolid(t.colors.$colorBackground),
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$neutralAlpha50,
             outline: 'none',
-            borderRadius: theme.radii.$md,
-            padding: theme.space.$0x5,
+            borderRadius: t.radii.$md,
+            padding: t.space.$0x5,
             overflow: 'hidden',
-            top: `calc(100% + ${theme.space.$2})`,
-            animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
+            top: `calc(100% + ${t.space.$2})`,
+            animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: theme.shadows.$menuShadow,
-            zIndex: theme.zIndices.$dropdown,
-            gap: theme.space.$0x5,
+            boxShadow: t.shadows.$menuShadow,
+            zIndex: t.zIndices.$dropdown,
+            gap: t.space.$0x5,
           }),
           sx,
         ]}
