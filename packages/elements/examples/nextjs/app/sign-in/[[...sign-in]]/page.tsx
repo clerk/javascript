@@ -1,7 +1,16 @@
 'use client';
 
 import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
-import { SignIn, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-in';
+import {
+  AvailableStrategy,
+  ChooseAlternateStrategy,
+  GoBack,
+  SignIn,
+  SocialProvider,
+  SocialProviderIcon,
+  Step,
+  Verification,
+} from '@clerk/elements/sign-in';
 import Link from 'next/link';
 import { type ComponentProps, useState } from 'react';
 
@@ -25,6 +34,30 @@ function CustomSocialProvider({
       />
       <span className='leading-loose'>{children}</span>
     </SocialProvider>
+  );
+}
+
+function TextButton({ children, ...props }: ComponentProps<'button'>) {
+  return (
+    <button
+      type='button'
+      className='m-0 py-3 px-6 text-sm font-medium text-zinc-400 transition-colors duration-150 hover:text-[rgb(204,204,204)] text-center w-full'
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Button({ children, ...props }: ComponentProps<'button'>) {
+  return (
+    <button
+      type='button'
+      className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
+      {...props}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -74,21 +107,41 @@ export default function SignInPage() {
                 <CustomSubmit>Sign in with Email</CustomSubmit>
               </>
             ) : (
-              <button
-                className='m-0 py-3 px-6 text-base font-medium text-zinc-400 transition-colors duration-150 hover:text-[rgb(204,204,204)]'
-                onClick={() => setContinueWithEmail(true)}
-                type='button'
-              >
-                Continue with Email
-              </button>
+              <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
             )}
+          </div>
+        </Step>
+
+        <Step name='choose-strategy'>
+          <div className='flex flex-col items-center  gap-6 w-96'>
+            <H3>CHOOSE STRATEGY:</H3>
+
+            <CustomSocialProvider provider='github'>Continue with GitHub</CustomSocialProvider>
+            <CustomSocialProvider provider='google'>Continue with Google</CustomSocialProvider>
+            <CustomSocialProvider provider='metamask'>Continue with Metamask</CustomSocialProvider>
+
+            <AvailableStrategy
+              asChild
+              name='reset_password_email_code'
+            >
+              <Button>Reset Password</Button>
+            </AvailableStrategy>
+
+            <AvailableStrategy
+              asChild
+              name='password'
+            >
+              <Button>Password</Button>
+            </AvailableStrategy>
+
+            <GoBack asChild>
+              <TextButton>Go back</TextButton>
+            </GoBack>
           </div>
         </Step>
 
         <Step name='verifications'>
           <div className='flex gap-6 flex-col'>
-            <H1>Verify</H1>
-
             <GlobalError className='block text-red-400 font-mono' />
 
             <Verification name='password'>
@@ -125,6 +178,10 @@ export default function SignInPage() {
               <P>Please check your email for a verification code...</P>
             </Verification>
           </div>
+
+          <ChooseAlternateStrategy asChild>
+            <TextButton>Use another method</TextButton>
+          </ChooseAlternateStrategy>
         </Step>
       </div>
     </SignIn>

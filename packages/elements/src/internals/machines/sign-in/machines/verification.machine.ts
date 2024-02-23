@@ -4,19 +4,17 @@ import type {
   PasswordAttempt,
   PhoneCodeAttempt,
   PrepareFirstFactorParams,
-  PrepareSecondFactorParams,
   ResetPasswordEmailCodeAttempt,
   ResetPasswordPhoneCodeAttempt,
   SignInFirstFactor,
   SignInResource,
   SignInSecondFactor,
-  SignInStrategy,
   Web3Attempt,
 } from '@clerk/types';
 import type { ActorRefFrom } from 'xstate';
 import { assign, fromPromise, sendParent, sendTo, setup } from 'xstate';
 
-import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
 import type { WithParams } from '~/internals/machines/shared.types';
 import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
@@ -29,13 +27,11 @@ export type TSignInSecondFactorMachine = typeof SignInSecondFactorMachine;
 
 type Parent = ActorRefFrom<typeof SignInRouterMachine>;
 
-export type PrepareFirstFactorInput = WithParams<PrepareFirstFactorParams | null> & {
+export type PrepareFirstFactorInput = WithParams<SignInFirstFactor | null> & {
   parent: Parent;
-  strategy?: SignInStrategy;
 };
-export type PrepareSecondFactorInput = WithParams<PrepareSecondFactorParams | null> & {
+export type PrepareSecondFactorInput = WithParams<SignInSecondFactor | null> & {
   parent: Parent;
-  strategy?: SignInStrategy;
 };
 
 export type AttemptFirstFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInFirstFactor | null };
@@ -86,8 +82,7 @@ const SignInVerificationMachine = setup({
         input: ({ context }) => {
           return {
             parent: context.parent,
-            params: context.currentFactor as PrepareFirstFactorParams,
-            strategy: context.currentFactor?.strategy,
+            params: context.currentFactor as SignInFirstFactor | null,
           };
         },
         onDone: 'Pending',
@@ -101,8 +96,19 @@ const SignInVerificationMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
+        'STRATEGY.CHOOSE': 'ChooseFactor',
         SUBMIT: {
           target: 'Attempting',
+          reenter: true,
+        },
+      },
+    },
+    ChooseFactor: {
+      tags: ['state:choose-factor'],
+      on: {
+        'STRATEGY.UPDATE': {
+          actions: assign({ currentFactor: ({ event }) => event.factor || null }),
+          target: 'Preparing',
           reenter: true,
         },
       },
@@ -132,26 +138,18 @@ const SignInVerificationMachine = setup({
 export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(async ({ input }) => {
-      console.log('prepare', input);
-      const { params, parent, strategy } = input as PrepareFirstFactorInput;
+      const { params, parent } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
-      if (strategy === 'password') {
+      if (!params?.strategy || params.strategy === 'password') {
         return Promise.resolve(clerk.client.signIn);
       }
 
-      if (!params) {
-        // enUS.signIn.noAvailableMethods
-        throw new ClerkElementsError(
-          'noAvailableMethods',
-          "Cannot proceed with sign in. There's no available authentication factor.",
-        );
-      }
+      assertIsDefined(params);
 
-      return clerk.client.signIn.prepareFirstFactor(params);
+      return clerk.client.signIn.prepareFirstFactor(params as PrepareFirstFactorParams);
     }),
     attempt: fromPromise(async ({ input }) => {
-      console.log('attempt', input);
       const { currentFactor, fields, parent } = input as AttemptFirstFactorInput;
 
       assertIsDefined(currentFactor);
@@ -233,14 +231,14 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(({ input }) => {
-      const { params, parent, strategy } = input as PrepareSecondFactorInput;
+      const { params, parent } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
-      if (strategy === 'totp') {
+      assertIsDefined(params);
+
+      if (params.strategy !== 'phone_code') {
         return Promise.resolve(clerk.client.signIn);
       }
-
-      assertIsDefined(params);
 
       return clerk.client.signIn.prepareSecondFactor({
         strategy: params.strategy,
