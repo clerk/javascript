@@ -55,7 +55,7 @@ export const Avatar = (props: AvatarProps) => {
       sx={[
         t => ({
           flexShrink: 0,
-          borderRadius: rounded ? t.radii.$circle : t.radii.$md,
+          borderRadius: rounded ? t.radii.$circle : t.radii.$avatar,
           overflow: 'hidden',
           width: size(t),
           height: size(t),
@@ -93,7 +93,7 @@ export const Avatar = (props: AvatarProps) => {
             borderWidth: t.borderWidths.$heavy,
             borderStyle: t.borderStyles.$solid,
             borderColor: t.colors.$colorShimmer,
-            borderRadius: rounded ? t.radii.$circle : t.radii.$md,
+            borderRadius: rounded ? t.radii.$circle : t.radii.$avatar,
           },
         })}
       />
