@@ -14,7 +14,7 @@ export const Actions = (props: PropsOfComponent<typeof Flex>) => {
       sx={[
         t => ({
           '> button,div': { border: `0 solid ${t.colors.$neutralAlpha100}` },
-          '>:not([hidden])~:not([hidden])': {
+          '>:not([hidden],:empty)~:not([hidden],:empty)': {
             borderTopWidth: '1px',
             borderBottomWidth: '0',
           },
