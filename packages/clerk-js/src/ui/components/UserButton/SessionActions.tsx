@@ -21,7 +21,9 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
       elementDescriptor={descriptors.userButtonPopoverActions}
       elementId={descriptors.userButtonPopoverActions.setId('singleSession')}
       sx={t => ({
-        borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+        borderTopWidth: t.borderWidths.$normal,
+        borderBottomStyle: t.borderStyles.$solid,
+        borderBottomColor: t.colors.$neutralAlpha100,
       })}
     >
       <Action
@@ -120,7 +122,9 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
       <Actions
         role='menu'
         sx={t => ({
-          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+          borderTopStyle: t.borderStyles.$solid,
+          borderTopWidth: t.borderWidths.$normal,
+          borderTopColor: t.colors.$neutralAlpha100,
         })}
       >
         {otherSessions.map(session => (
@@ -186,9 +190,6 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
       role='menu'
       sx={t => ({
         padding: t.space.$2,
-        borderBottomWidth: t.borderWidths.$normal,
-        borderBottomStyle: t.borderStyles.$solid,
-        borderBottomColor: t.colors.$neutralAlpha100,
       })}
     >
       <Action
