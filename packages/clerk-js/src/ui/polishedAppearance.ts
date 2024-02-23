@@ -177,7 +177,7 @@ export const polishedAppearance: Appearance = {
           '&:focus-within': {
             boxShadow: [
               boxShadow,
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha150),
             ].toString(),
           },
         };
