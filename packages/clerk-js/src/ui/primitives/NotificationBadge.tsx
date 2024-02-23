@@ -22,6 +22,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       primary: {
         [vars.accent]: theme.colors.$colorTextOnPrimaryBackground,
         [vars.bg]: `linear-gradient(180deg, ${theme.colors.$whiteAlpha300} 0%, ${theme.colors.$transparent} 100%), ${theme.colors.$primary500}`,
+        border: 0,
       },
       outline: {
         [vars.accent]: theme.colors.$neutralAlpha600,
