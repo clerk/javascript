@@ -233,6 +233,24 @@ export const SignInRouterMachine = setup({
           },
         ],
       },
+      initial: 'Idle',
+      states: {
+        Idle: {
+          on: {
+            'STRATEGY.SELECT': 'ChoosingStrategy',
+          },
+        },
+        ChoosingStrategy: {
+          tags: ['route:choose-strategy'],
+          on: {
+            PREV: 'Idle',
+            'STRATEGY.UPDATE': {
+              actions: sendTo('firstFactor', ({ event }) => event),
+              target: 'Idle',
+            },
+          },
+        },
+      },
     },
     SecondFactor: {
       tags: 'route:second-factor',

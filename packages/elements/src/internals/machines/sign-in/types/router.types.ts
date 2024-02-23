@@ -1,6 +1,7 @@
 import type { SignInResource } from '@clerk/types';
 import type { AnyActorLogic } from 'xstate';
 
+import type { SignInVerificationFactorEvent } from '~/internals/machines/sign-in/types';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
@@ -22,6 +23,7 @@ export const SignInRouterRoutes = {
   callback: 'route:callback',
   error: 'route:error',
   forgotPassword: 'route:forgot-password',
+  chooseStrategy: 'route:choose-strategy',
 } as const;
 
 export type SignInRouterRoutes = keyof typeof SignInRouterRoutes;
@@ -59,7 +61,8 @@ export type SignInRouterEvents =
   | SignInRouterErrorEvent
   | SignInRouterTransferEvent
   | SignInRouterRouteEvents
-  | SignInRouterRedirectEvent;
+  | SignInRouterRedirectEvent
+  | SignInVerificationFactorEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 export interface SignInRouterInput extends BaseRouterInput {

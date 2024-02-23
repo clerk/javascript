@@ -7,6 +7,12 @@ export { SignInStep as Step } from './step';
 export { SignInGoBack as GoBack } from './go-back';
 
 export {
+  SignInChooseStrategy as ChooseStrategy,
+  SignInChooseAlternateStrategy as ChooseAlternateStrategy,
+  SignInAvailableStrategy as AvailableStrategy,
+} from './choose-strategy';
+
+export {
   SignInSocialProvider as SocialProvider,
   SignInSocialProviderIcon as SocialProviderIcon,
 } from './social-providers';
