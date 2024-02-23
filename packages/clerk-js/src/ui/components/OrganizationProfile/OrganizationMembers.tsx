@@ -77,7 +77,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                   <NotificationCountBadge
                     notificationCount={memberships?.count || 0}
                     shouldDelayVisibility
-                    colorScheme='neutral'
+                    colorScheme='outline'
                   />
                 </Tab>
               )}
@@ -87,7 +87,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 >
                   <NotificationCountBadge
                     notificationCount={invitations?.count || 0}
-                    colorScheme='neutral'
+                    colorScheme='outline'
                   />
                 </Tab>
               )}
@@ -95,7 +95,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
                   <NotificationCountBadge
                     notificationCount={membershipRequests?.count || 0}
-                    colorScheme='neutral'
+                    colorScheme='outline'
                   />
                 </Tab>
               )}
