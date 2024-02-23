@@ -5,12 +5,12 @@ import type {
   LoadedClerk,
 } from '@clerk/types';
 import type { SetOptional } from 'type-fest';
-import type { AnyEventObject } from 'xstate';
+import type { AnyActorRef, AnyEventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import type { WithClerk, WithParams, WithUnsafeMetadata } from '~/internals/machines/shared.types';
+import type { WithParams, WithUnsafeMetadata } from '~/internals/machines/shared.types';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 
 type OptionalRedirectParams = 'redirectUrl' | 'redirectUrlComplete';
@@ -21,15 +21,14 @@ export type AuthenticateWithRedirectSignUpParams = SetOptional<
   OptionalRedirectParams
 >;
 
-export type AuthenticateWithRedirectInput = WithClerk<
-  (
-    | (WithParams<AuthenticateWithRedirectSignInParams> & { flow: 'signIn' })
-    | (WithParams<AuthenticateWithRedirectSignUpParams> & { flow: 'signUp' })
-  ) & { basePath: string }
->;
+export type AuthenticateWithRedirectInput = (
+  | (WithParams<AuthenticateWithRedirectSignInParams> & { flow: 'signIn' })
+  | (WithParams<AuthenticateWithRedirectSignUpParams> & { flow: 'signUp' })
+) & { basePath: string; parent: AnyActorRef }; // TODO: Fix circular dependency
 
 export const redirect = fromPromise<void, AuthenticateWithRedirectInput>(
-  async ({ input: { basePath, clerk, flow, params } }) => {
+  async ({ input: { basePath, flow, params, parent } }) => {
+    const clerk: LoadedClerk = parent.getSnapshot().context.clerk;
     const path = clerk.buildUrlWithAuth(`${basePath}${SSO_CALLBACK_PATH_ROUTE}`);
 
     return clerk.client[flow].authenticateWithRedirect({
@@ -44,19 +43,18 @@ export type HandleRedirectCallbackParams<T = Required<HandleOAuthCallbackParams 
   [K in keyof T]: NonNullable<T[K]>;
 };
 
-export type HandleRedirectCallbackInput = LoadedClerk;
+export type HandleRedirectCallbackInput = AnyActorRef;
 
 /**
  * This function hijacks handleRedirectCallback from ClerkJS to handle navigation events
  * from the state machine.
  */
 export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirectCallbackInput>(
-  ({ sendBack, input: clerk }) => {
+  ({ sendBack, input: parent }) => {
+    const clerk: LoadedClerk = parent.getSnapshot().context.clerk;
     const displayConfig = clerk.__unstable__environment?.displayConfig;
 
     const customNavigate = (to: string) => {
-      console.debug('CLERKJS Event:', to);
-
       if (isClerkJSNavigationEvent(to)) {
         // Handle known redefined navigation events
         sendBack({ type: to });

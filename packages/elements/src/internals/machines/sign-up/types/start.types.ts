@@ -1,9 +1,9 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { LoadedClerk, OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
+import type { OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form/form.machine';
-import type { SignUpRouterMachine } from '~/internals/machines/sign-up/machines';
+import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 
 // ---------------------------------- Tags ---------------------------------- //
 
@@ -29,19 +29,17 @@ export type SignUpStartEvents = ErrorActorEvent | SignUpStartSubmitEvent | SignU
 
 export type SignUpStartInput = {
   basePath?: string;
-  clerk: LoadedClerk;
   form: ActorRefFrom<typeof FormMachine>;
-  router: ActorRefFrom<typeof SignUpRouterMachine>;
+  parent: ActorRefFrom<TSignUpRouterMachine>;
 };
 
 // ---------------------------------- Context ---------------------------------- //
 
 export interface SignUpStartContext {
   basePath: string;
-  clerk: LoadedClerk;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
-  routerRef: ActorRefFrom<typeof SignUpRouterMachine>;
+  parent: ActorRefFrom<TSignUpRouterMachine>;
 }
 
 // ---------------------------------- Schema ---------------------------------- //
