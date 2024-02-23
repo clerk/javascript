@@ -20,6 +20,9 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
       role='menu'
       elementDescriptor={descriptors.userButtonPopoverActions}
       elementId={descriptors.userButtonPopoverActions.setId('singleSession')}
+      sx={t => ({
+        borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+      })}
     >
       <Action
         elementDescriptor={descriptors.userButtonPopoverActionButton}
@@ -83,9 +86,6 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
         role='menu'
         elementDescriptor={descriptors.userButtonPopoverActions}
         elementId={descriptors.userButtonPopoverActions.setId('multiSession')}
-        sx={t => ({
-          borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
-        })}
       >
         <Flex
           justify='between'
@@ -115,7 +115,12 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
           />
         </Flex>
       </SmallActions>
-      <Actions role='menu'>
+      <Actions
+        role='menu'
+        sx={t => ({
+          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+        })}
+      >
         {otherSessions.map(session => (
           <PreviewButton
             key={session.id}

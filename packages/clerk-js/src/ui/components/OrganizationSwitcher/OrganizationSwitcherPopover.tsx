@@ -177,7 +177,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           sx={t => ({
             width: '100%',
             paddingRight: t.space.$5,
-            borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
           })}
         >
           <OrganizationPreview
@@ -204,24 +203,28 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
           {...rest}
         >
           <PopoverCard.Content elementDescriptor={descriptors.organizationSwitcherPopoverMain}>
-            {currentOrg
-              ? selectedOrganizationPreview(currentOrg)
-              : !hidePersonal && (
-                  <PersonalWorkspacePreview
-                    user={userWithoutIdentifiers}
-                    sx={t => ({
-                      padding: `${t.space.$4} ${t.space.$5}`,
-                      borderBottom: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
-                      width: '100%',
-                    })}
-                    title={localizationKeys('organizationSwitcher.personalWorkspace')}
-                  />
-                )}
-            <OrganizationActionList
-              onCreateOrganizationClick={handleCreateOrganizationClicked}
-              onPersonalWorkspaceClick={handlePersonalWorkspaceClicked}
-              onOrganizationClick={handleOrganizationClicked}
-            />
+            <Actions
+              elementDescriptor={descriptors.organizationSwitcherPopoverActions}
+              role='menu'
+            >
+              {currentOrg
+                ? selectedOrganizationPreview(currentOrg)
+                : !hidePersonal && (
+                    <PersonalWorkspacePreview
+                      user={userWithoutIdentifiers}
+                      sx={t => ({
+                        padding: `${t.space.$4} ${t.space.$5}`,
+                        width: '100%',
+                      })}
+                      title={localizationKeys('organizationSwitcher.personalWorkspace')}
+                    />
+                  )}
+              <OrganizationActionList
+                onCreateOrganizationClick={handleCreateOrganizationClicked}
+                onPersonalWorkspaceClick={handlePersonalWorkspaceClicked}
+                onOrganizationClick={handleOrganizationClicked}
+              />
+            </Actions>
           </PopoverCard.Content>
           <PopoverCard.Footer elementDescriptor={descriptors.organizationSwitcherPopoverFooter} />
         </PopoverCard.Root>

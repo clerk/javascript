@@ -2,7 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import { descriptors, localizationKeys } from '../../customizables';
-import { Action, Actions } from '../../elements';
+import { Action } from '../../elements';
 import { Add } from '../../icons';
 import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
@@ -33,7 +33,6 @@ const CreateOrganizationButton = ({
       label={localizationKeys('organizationSwitcher.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({
-        borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
         padding: `${t.space.$5} ${t.space.$5}`,
       })}
       iconSx={t => ({
@@ -55,13 +54,8 @@ export const OrganizationActionList = (props: OrganizationActionListProps) => {
   return (
     <>
       <UserInvitationSuggestionList onOrganizationClick={onOrganizationClick} />
-      <Actions
-        elementDescriptor={descriptors.organizationSwitcherPopoverActions}
-        role='menu'
-      >
-        <UserMembershipList {...{ onPersonalWorkspaceClick, onOrganizationClick }} />
-        <CreateOrganizationButton {...{ onCreateOrganizationClick }} />
-      </Actions>
+      <UserMembershipList {...{ onPersonalWorkspaceClick, onOrganizationClick }} />
+      <CreateOrganizationButton {...{ onCreateOrganizationClick }} />
     </>
   );
 };

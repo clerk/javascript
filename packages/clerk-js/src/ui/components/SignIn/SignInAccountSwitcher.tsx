@@ -33,7 +33,9 @@ const _SignInAccountSwitcher = () => {
           <Col
             elementDescriptor={descriptors.main}
             gap={8}
-            sx={t => ({ borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}` })}
+            sx={t => ({
+              borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100}`,
+            })}
           >
             <Actions role='menu'>
               {activeSessions.map(s => (

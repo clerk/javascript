@@ -64,10 +64,12 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
         // 4 items + 4px border (four 1px borders)
         maxHeight: `calc((4 * ${t.sizes.$17}) + 4px)`,
         overflowY: 'auto',
-        ...common.unstyledScrollbar(t),
-        '> button:not(:first-of-type)': {
-          borderTop: `${t.borders.$normal} ${t.colors.$neutralAlpha100} `,
+        '> button,div': { border: `0 solid ${t.colors.$neutralAlpha100}` },
+        '>:not([hidden])~:not([hidden])': {
+          borderTopWidth: '1px',
+          borderBottomWidth: '0',
         },
+        ...common.unstyledScrollbar(t),
       })}
       role='group'
       aria-label={hidePersonal ? 'List of all organization memberships' : 'List of all accounts'}
@@ -93,6 +95,9 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           icon={SwitchArrowRight}
           onClick={() => onOrganizationClick(organization)}
           role='menuitem'
+          sx={t => ({
+            border: `0 solid ${t.colors.$neutralAlpha100}`,
+          })}
         >
           <OrganizationPreview
             elementId='organizationSwitcherListedOrganization'
