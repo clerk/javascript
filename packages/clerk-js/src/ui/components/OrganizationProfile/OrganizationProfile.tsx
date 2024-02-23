@@ -5,7 +5,7 @@ import React from 'react';
 import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
-import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
+import { Animated, NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
@@ -20,13 +20,15 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
 
   return (
     <Flow.Root flow='organizationProfile'>
-      <Flow.Part>
-        <Switch>
-          <Route>
-            <AuthenticatedRoutes />
-          </Route>
-        </Switch>
-      </Flow.Part>
+      <Animated asChild>
+        <ProfileCard.Root>
+          <Switch>
+            <Route>
+              <AuthenticatedRoutes />
+            </Route>
+          </Switch>
+        </ProfileCard.Root>
+      </Animated>
     </Flow.Root>
   );
 };
@@ -34,16 +36,12 @@ const _OrganizationProfile = (_: OrganizationProfileProps) => {
 const AuthenticatedRoutes = withCoreUserGuard(() => {
   const contentRef = React.useRef<HTMLDivElement>(null);
   return (
-    <ProfileCard.Root
-      sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
-    >
-      <OrganizationProfileNavbar contentRef={contentRef}>
-        <NavbarMenuButtonRow navbarTitleLocalizationKey={localizationKeys('organizationProfile.navbar.title')} />
-        <ProfileCard.Content contentRef={contentRef}>
-          <OrganizationProfileRoutes />
-        </ProfileCard.Content>
-      </OrganizationProfileNavbar>
-    </ProfileCard.Root>
+    <OrganizationProfileNavbar contentRef={contentRef}>
+      <NavbarMenuButtonRow navbarTitleLocalizationKey={localizationKeys('organizationProfile.navbar.title')} />
+      <ProfileCard.Content contentRef={contentRef}>
+        <OrganizationProfileRoutes />
+      </ProfileCard.Content>
+    </OrganizationProfileNavbar>
   );
 });
 

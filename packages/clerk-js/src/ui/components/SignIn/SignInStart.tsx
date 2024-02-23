@@ -285,58 +285,56 @@ export function _SignInStart(): JSX.Element {
   const { action, ...identifierFieldProps } = identifierField.props;
   return (
     <Flow.Part part='start'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          {/*TODO: extract main in its own component */}
-          <Col
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            <SocialButtonsReversibleContainerWithDivider>
-              {hasSocialOrWeb3Buttons && (
-                <SignInSocialButtons
-                  enableWeb3Providers
-                  enableOAuthProviders
-                />
-              )}
-              {standardFormAttributes.length ? (
-                <Form.Root
-                  onSubmit={handleFirstPartySubmit}
-                  gap={8}
-                >
-                  <Col gap={6}>
-                    <Form.ControlRow elementId={identifierField.id}>
-                      <DynamicField
-                        actionLabel={nextIdentifier?.action}
-                        onActionClicked={switchToNextIdentifier}
-                        {...identifierFieldProps}
-                        autoFocus={shouldAutofocus}
-                      />
-                    </Form.ControlRow>
-                    <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
-                  </Col>
-                  <Form.SubmitButton hasArrow />
-                </Form.Root>
-              ) : null}
-            </SocialButtonsReversibleContainerWithDivider>
-          </Col>
-        </Card.Content>
+      <Card.Content>
+        <Header.Root showLogo>
+          <Header.Title localizationKey={localizationKeys('signIn.start.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('signIn.start.subtitle')} />
+        </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
+        {/*TODO: extract main in its own component */}
+        <Col
+          elementDescriptor={descriptors.main}
+          gap={6}
+        >
+          <SocialButtonsReversibleContainerWithDivider>
+            {hasSocialOrWeb3Buttons && (
+              <SignInSocialButtons
+                enableWeb3Providers
+                enableOAuthProviders
+              />
+            )}
+            {standardFormAttributes.length ? (
+              <Form.Root
+                onSubmit={handleFirstPartySubmit}
+                gap={8}
+              >
+                <Col gap={6}>
+                  <Form.ControlRow elementId={identifierField.id}>
+                    <DynamicField
+                      actionLabel={nextIdentifier?.action}
+                      onActionClicked={switchToNextIdentifier}
+                      {...identifierFieldProps}
+                      autoFocus={shouldAutofocus}
+                    />
+                  </Form.ControlRow>
+                  <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
+                </Col>
+                <Form.SubmitButton hasArrow />
+              </Form.Root>
+            ) : null}
+          </SocialButtonsReversibleContainerWithDivider>
+        </Col>
+      </Card.Content>
 
-        <Card.Footer>
-          <Card.Action elementId='signIn'>
-            <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('signIn.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signUpUrl)}
-            />
-          </Card.Action>
-        </Card.Footer>
-      </Card.Root>
+      <Card.Footer>
+        <Card.Action elementId='signIn'>
+          <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
+          <Card.ActionLink
+            localizationKey={localizationKeys('signIn.start.actionLink')}
+            to={clerk.buildUrlWithAuth(signUpUrl)}
+          />
+        </Card.Action>
+      </Card.Footer>
     </Flow.Part>
   );
 }

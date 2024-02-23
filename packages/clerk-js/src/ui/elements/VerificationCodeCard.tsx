@@ -41,7 +41,7 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
   });
 
   return (
-    <Card.Root>
+    <>
       <Card.Content>
         <Header.Root showLogo>
           <Header.Title localizationKey={props.cardTitle} />
@@ -85,6 +85,6 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
       </Card.Content>
 
       <Card.Footer />
-    </Card.Root>
+    </>
   );
 };

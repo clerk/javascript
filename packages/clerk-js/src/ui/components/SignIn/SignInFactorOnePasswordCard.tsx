@@ -91,57 +91,55 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
 
   return (
     <Flow.Part part='password'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
-            <IdentityPreview
-              identifier={signIn.identifier}
-              avatarUrl={signIn.userData.imageUrl}
-              onClick={goBack}
-            />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          {/*TODO: extract main in its own component */}
-          <Flex
-            direction='col'
-            elementDescriptor={descriptors.main}
-            gap={4}
+      <Card.Content>
+        <Header.Root showLogo>
+          <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
+          <IdentityPreview
+            identifier={signIn.identifier}
+            avatarUrl={signIn.userData.imageUrl}
+            onClick={goBack}
+          />
+        </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
+        {/*TODO: extract main in its own component */}
+        <Flex
+          direction='col'
+          elementDescriptor={descriptors.main}
+          gap={4}
+        >
+          <Form.Root
+            onSubmit={handlePasswordSubmit}
+            gap={8}
           >
-            <Form.Root
-              onSubmit={handlePasswordSubmit}
-              gap={8}
-            >
-              {/* For password managers */}
-              <input
-                readOnly
-                id='identifier-field'
-                name='identifier'
-                value={signIn.identifier || ''}
-                style={{ display: 'none' }}
+            {/* For password managers */}
+            <input
+              readOnly
+              id='identifier-field'
+              name='identifier'
+              value={signIn.identifier || ''}
+              style={{ display: 'none' }}
+            />
+            <Form.ControlRow elementId={passwordControl.id}>
+              <Form.PasswordInput
+                {...passwordControl.props}
+                autoFocus
               />
-              <Form.ControlRow elementId={passwordControl.id}>
-                <Form.PasswordInput
-                  {...passwordControl.props}
-                  autoFocus
-                />
-              </Form.ControlRow>
-              <Form.SubmitButton hasArrow />
-            </Form.Root>
-            <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
-              <Card.ActionLink
-                localizationKey={localizationKeys(
-                  onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
-                )}
-                onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
-              />
-            </Card.Action>
-          </Flex>
-        </Card.Content>
+            </Form.ControlRow>
+            <Form.SubmitButton hasArrow />
+          </Form.Root>
+          <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
+            <Card.ActionLink
+              localizationKey={localizationKeys(
+                onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+              )}
+              onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
+            />
+          </Card.Action>
+        </Flex>
+      </Card.Content>
 
-        <Card.Footer />
-      </Card.Root>
+      <Card.Footer />
     </Flow.Part>
   );
 };

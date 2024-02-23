@@ -32,13 +32,11 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
 
   return (
     <Flow.Part part='ssoCallback'>
-      <Card.Root>
-        <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <LoadingCardContainer />
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
+      <Card.Content>
+        <Card.Alert>{card.error}</Card.Alert>
+        <LoadingCardContainer />
+      </Card.Content>
+      <Card.Footer />
     </Flow.Part>
   );
 };

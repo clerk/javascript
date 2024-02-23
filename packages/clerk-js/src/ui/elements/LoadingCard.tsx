@@ -29,12 +29,12 @@ export const LoadingCardContainer = ({ children }: PropsWithChildren) => {
 export const LoadingCard = withCardStateProvider(() => {
   const card = useCardState();
   return (
-    <Card.Root>
+    <>
       <Card.Content>
         <Card.Alert>{card.error}</Card.Alert>
         <LoadingCardContainer />
       </Card.Content>
       <Card.Footer />
-    </Card.Root>
+    </>
   );
 });

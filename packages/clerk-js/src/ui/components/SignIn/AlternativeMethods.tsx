@@ -37,84 +37,82 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
 
   return (
     <Flow.Part part={asForgotPassword ? 'forgotPasswordMethods' : 'alternativeMethods'}>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title
-              localizationKey={localizationKeys(
-                asForgotPassword ? 'signIn.forgotPasswordAlternativeMethods.title' : 'signIn.alternativeMethods.title',
-              )}
+      <Card.Content>
+        <Header.Root showLogo>
+          <Header.Title
+            localizationKey={localizationKeys(
+              asForgotPassword ? 'signIn.forgotPasswordAlternativeMethods.title' : 'signIn.alternativeMethods.title',
+            )}
+          />
+          {!asForgotPassword && (
+            <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
+          )}
+        </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
+        {/*TODO: extract main in its own component */}
+        <Flex
+          direction='col'
+          elementDescriptor={descriptors.main}
+          gap={6}
+        >
+          {asForgotPassword && resetPasswordFactor && (
+            <Button
+              localizationKey={getButtonLabel(resetPasswordFactor)}
+              elementDescriptor={descriptors.alternativeMethodsBlockButton}
+              isDisabled={card.isLoading}
+              onClick={() => onFactorSelected(resetPasswordFactor)}
             />
-            {!asForgotPassword && (
-              <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
-            )}
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          {/*TODO: extract main in its own component */}
-          <Flex
-            direction='col'
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            {asForgotPassword && resetPasswordFactor && (
-              <Button
-                localizationKey={getButtonLabel(resetPasswordFactor)}
-                elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                isDisabled={card.isLoading}
-                onClick={() => onFactorSelected(resetPasswordFactor)}
-              />
-            )}
-            {asForgotPassword && hasAnyStrategy && (
-              <Divider
-                dividerText={localizationKeys('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}
-              />
-            )}
-            <Col gap={4}>
-              {hasAnyStrategy && (
-                <Flex
-                  elementDescriptor={descriptors.alternativeMethods}
-                  direction='col'
-                  gap={2}
-                >
-                  <SignInSocialButtons
-                    enableWeb3Providers
-                    enableOAuthProviders
-                  />
-                  {firstPartyFactors.map((factor, i) => (
-                    <ArrowBlockButton
-                      leftIcon={getButtonIcon(factor)}
-                      textLocalizationKey={getButtonLabel(factor)}
-                      elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                      textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
-                      arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
-                      key={i}
-                      isDisabled={card.isLoading}
-                      onClick={() => onFactorSelected(factor)}
-                    />
-                  ))}
-                </Flex>
-              )}
-              {onBackLinkClick && (
-                <BackLink
-                  boxElementDescriptor={descriptors.backRow}
-                  linkElementDescriptor={descriptors.backLink}
-                  onClick={onBackLinkClick}
+          )}
+          {asForgotPassword && hasAnyStrategy && (
+            <Divider
+              dividerText={localizationKeys('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}
+            />
+          )}
+          <Col gap={4}>
+            {hasAnyStrategy && (
+              <Flex
+                elementDescriptor={descriptors.alternativeMethods}
+                direction='col'
+                gap={2}
+              >
+                <SignInSocialButtons
+                  enableWeb3Providers
+                  enableOAuthProviders
                 />
-              )}
-            </Col>
-          </Flex>
-        </Card.Content>
+                {firstPartyFactors.map((factor, i) => (
+                  <ArrowBlockButton
+                    leftIcon={getButtonIcon(factor)}
+                    textLocalizationKey={getButtonLabel(factor)}
+                    elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                    textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                    arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
+                    key={i}
+                    isDisabled={card.isLoading}
+                    onClick={() => onFactorSelected(factor)}
+                  />
+                ))}
+              </Flex>
+            )}
+            {onBackLinkClick && (
+              <BackLink
+                boxElementDescriptor={descriptors.backRow}
+                linkElementDescriptor={descriptors.backLink}
+                onClick={onBackLinkClick}
+              />
+            )}
+          </Col>
+        </Flex>
+      </Card.Content>
 
-        <Card.Footer>
-          <Card.Action elementId='havingTrouble'>
-            <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
-              onClick={onHavingTroubleClick}
-            />
-          </Card.Action>
-        </Card.Footer>
-      </Card.Root>
+      <Card.Footer>
+        <Card.Action elementId='havingTrouble'>
+          <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
+          <Card.ActionLink
+            localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+            onClick={onHavingTroubleClick}
+          />
+        </Card.Action>
+      </Card.Footer>
     </Flow.Part>
   );
 };

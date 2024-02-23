@@ -34,19 +34,17 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
   const card = useCardState();
   return (
     <Flow.Part part='emailLinkStatus'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root>
-            <Header.Title localizationKey={props.title} />
-            <Header.Subtitle localizationKey={props.subtitle} />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Col elementDescriptor={descriptors.main}>
-            <StatusRow status={props.status} />
-          </Col>
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
+      <Card.Content>
+        <Header.Root>
+          <Header.Title localizationKey={props.title} />
+          <Header.Subtitle localizationKey={props.subtitle} />
+        </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
+        <Col elementDescriptor={descriptors.main}>
+          <StatusRow status={props.status} />
+        </Col>
+      </Card.Content>
+      <Card.Footer />
     </Flow.Part>
   );
 };

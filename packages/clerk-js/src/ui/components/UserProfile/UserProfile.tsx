@@ -13,17 +13,15 @@ import { VerificationSuccessPage } from './VerifyWithLink';
 const _UserProfile = (_: UserProfileProps) => {
   return (
     <Flow.Root flow='userProfile'>
-      <Flow.Part>
-        <Switch>
-          {/* PublicRoutes */}
-          <Route path='verify'>
-            <VerificationSuccessPage />
-          </Route>
-          <Route>
-            <AuthenticatedRoutes />
-          </Route>
-        </Switch>
-      </Flow.Part>
+      <Switch>
+        {/* PublicRoutes */}
+        <Route path='verify'>
+          <VerificationSuccessPage />
+        </Route>
+        <Route>
+          <AuthenticatedRoutes />
+        </Route>
+      </Switch>
     </Flow.Root>
   );
 };

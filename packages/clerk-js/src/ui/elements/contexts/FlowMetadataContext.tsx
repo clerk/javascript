@@ -1,8 +1,7 @@
-import { createContextAndHook } from '@clerk/shared/react';
-import React from 'react';
+import React, { useContext, useState } from 'react';
 
 type FlowMetadata = {
-  flow:
+  flow?:
     | 'signIn'
     | 'signUp'
     | 'userButton'
@@ -32,12 +31,25 @@ type FlowMetadata = {
     | 'accountSwitcher';
 };
 
-const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');
+// set the defaults
+const FlowMetadataCtx = React.createContext<FlowMetadata & { setPart: (part: FlowMetadata['part']) => void }>({
+  flow: undefined,
+  part: undefined,
+  setPart: () => {},
+});
 
 const FlowMetadataProvider = (props: React.PropsWithChildren<FlowMetadata>) => {
-  const { flow, part } = props;
-  const value = React.useMemo(() => ({ value: props }), [flow, part]);
-  return <FlowMetadataCtx.Provider value={value}>{props.children}</FlowMetadataCtx.Provider>;
+  const [part, setPart] = useState(props.part);
+
+  return (
+    <FlowMetadataCtx.Provider value={{ flow: props.flow, part: part, setPart: setPart as any }}>
+      {props.children}
+    </FlowMetadataCtx.Provider>
+  );
+};
+const useFlowMetadata = () => {
+  const { flow, part, setPart } = useContext(FlowMetadataCtx);
+  return { flow, part, setPart };
 };
 
 export { useFlowMetadata, FlowMetadataProvider };

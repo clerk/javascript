@@ -49,7 +49,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
   const { hidePersonal } = useOrganizationListContext();
 
   return (
-    <Card.Root>
+    <>
       <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
         <Card.Alert sx={t => ({ margin: `${t.space.$none} ${t.space.$5}` })}>{card.error}</Card.Alert>
         {isLoading && (
@@ -73,7 +73,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
         {!isLoading && <OrganizationListFlows showListInitially={!(hidePersonal && !hasAnyData)} />}
       </Card.Content>
       <Card.Footer />
-    </Card.Root>
+    </>
   );
 });
 

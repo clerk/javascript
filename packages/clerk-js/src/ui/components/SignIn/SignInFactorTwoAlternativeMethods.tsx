@@ -38,52 +38,50 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 
   return (
     <Flow.Part part='alternativeMethods'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          {/*TODO: extract main in its own component */}
-          <Col
-            elementDescriptor={descriptors.main}
-            gap={3}
-          >
-            <Col gap={2}>
-              {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
-                <ArrowBlockButton
-                  textLocalizationKey={getButtonLabel(factor)}
-                  elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                  textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
-                  arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
-                  key={i}
-                  isDisabled={card.isLoading}
-                  onClick={() => onFactorSelected(factor)}
-                />
-              ))}
-            </Col>
-            <Card.Action elementId='alternativeMethods'>
-              {onBackLinkClick && (
-                <Card.ActionLink
-                  localizationKey={localizationKeys('backButton')}
-                  onClick={props.onBackLinkClick}
-                />
-              )}
-            </Card.Action>
+      <Card.Content>
+        <Header.Root showLogo>
+          <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
+        </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
+        {/*TODO: extract main in its own component */}
+        <Col
+          elementDescriptor={descriptors.main}
+          gap={3}
+        >
+          <Col gap={2}>
+            {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
+              <ArrowBlockButton
+                textLocalizationKey={getButtonLabel(factor)}
+                elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
+                key={i}
+                isDisabled={card.isLoading}
+                onClick={() => onFactorSelected(factor)}
+              />
+            ))}
           </Col>
-        </Card.Content>
-
-        <Card.Footer>
-          <Card.Action elementId='havingTrouble'>
-            <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
-              onClick={onHavingTroubleClick}
-            />
+          <Card.Action elementId='alternativeMethods'>
+            {onBackLinkClick && (
+              <Card.ActionLink
+                localizationKey={localizationKeys('backButton')}
+                onClick={props.onBackLinkClick}
+              />
+            )}
           </Card.Action>
-        </Card.Footer>
-      </Card.Root>
+        </Col>
+      </Card.Content>
+
+      <Card.Footer>
+        <Card.Action elementId='havingTrouble'>
+          <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
+          <Card.ActionLink
+            localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+            onClick={onHavingTroubleClick}
+          />
+        </Card.Action>
+      </Card.Footer>
     </Flow.Part>
   );
 };

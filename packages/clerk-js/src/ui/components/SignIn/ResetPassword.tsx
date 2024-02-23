@@ -96,7 +96,7 @@ export const _ResetPassword = () => {
   };
 
   return (
-    <Card.Root>
+    <>
       <Card.Content>
         <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
@@ -162,7 +162,7 @@ export const _ResetPassword = () => {
         </Col>
       </Card.Content>
       <Card.Footer />
-    </Card.Root>
+    </>
   );
 };
 

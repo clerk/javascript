@@ -5,6 +5,7 @@ import React from 'react';
 import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { ComponentContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
+import { Animated, Card } from '../../elements';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
@@ -25,61 +26,65 @@ function SignUpRoutes(): JSX.Element {
 
   return (
     <Flow.Root flow='signUp'>
-      <Switch>
-        <Route
-          path='verify-email-address'
-          canActivate={clerk => !!clerk.client.signUp.emailAddress}
-        >
-          <SignUpVerifyEmail />
-        </Route>
-        <Route
-          path='verify-phone-number'
-          canActivate={clerk => !!clerk.client.signUp.phoneNumber}
-        >
-          <SignUpVerifyPhone />
-        </Route>
-        <Route path='sso-callback'>
-          <SignUpSSOCallback
-            afterSignUpUrl={signUpContext.afterSignUpUrl}
-            afterSignInUrl={signUpContext.afterSignInUrl}
-            redirectUrl={signUpContext.redirectUrl}
-            secondFactorUrl={signUpContext.secondFactorUrl}
-            continueSignUpUrl='../continue'
-            verifyEmailAddressUrl='../verify-email-address'
-            verifyPhoneNumberUrl='../verify-phone-number'
-          />
-        </Route>
-        <Route path='verify'>
-          <SignUpEmailLinkFlowComplete
-            redirectUrlComplete={signUpContext.afterSignUpUrl || signUpContext.redirectUrl || undefined}
-            verifyEmailPath='../verify-email-address'
-            verifyPhonePath='../verify-phone-number'
-          />
-        </Route>
-        <Route path='continue'>
-          <Route
-            path='verify-email-address'
-            canActivate={clerk => !!clerk.client.signUp.emailAddress}
-          >
-            <SignUpVerifyEmail />
-          </Route>
-          <Route
-            path='verify-phone-number'
-            canActivate={clerk => !!clerk.client.signUp.phoneNumber}
-          >
-            <SignUpVerifyPhone />
-          </Route>
-          <Route index>
-            <SignUpContinue />
-          </Route>
-        </Route>
-        <Route index>
-          <SignUpStart />
-        </Route>
-        <Route>
-          <RedirectToSignUp />
-        </Route>
-      </Switch>
+      <Animated asChild>
+        <Card.Root>
+          <Switch>
+            <Route
+              path='verify-email-address'
+              canActivate={clerk => !!clerk.client.signUp.emailAddress}
+            >
+              <SignUpVerifyEmail />
+            </Route>
+            <Route
+              path='verify-phone-number'
+              canActivate={clerk => !!clerk.client.signUp.phoneNumber}
+            >
+              <SignUpVerifyPhone />
+            </Route>
+            <Route path='sso-callback'>
+              <SignUpSSOCallback
+                afterSignUpUrl={signUpContext.afterSignUpUrl}
+                afterSignInUrl={signUpContext.afterSignInUrl}
+                redirectUrl={signUpContext.redirectUrl}
+                secondFactorUrl={signUpContext.secondFactorUrl}
+                continueSignUpUrl='../continue'
+                verifyEmailAddressUrl='../verify-email-address'
+                verifyPhoneNumberUrl='../verify-phone-number'
+              />
+            </Route>
+            <Route path='verify'>
+              <SignUpEmailLinkFlowComplete
+                redirectUrlComplete={signUpContext.afterSignUpUrl || signUpContext.redirectUrl || undefined}
+                verifyEmailPath='../verify-email-address'
+                verifyPhonePath='../verify-phone-number'
+              />
+            </Route>
+            <Route path='continue'>
+              <Route
+                path='verify-email-address'
+                canActivate={clerk => !!clerk.client.signUp.emailAddress}
+              >
+                <SignUpVerifyEmail />
+              </Route>
+              <Route
+                path='verify-phone-number'
+                canActivate={clerk => !!clerk.client.signUp.phoneNumber}
+              >
+                <SignUpVerifyPhone />
+              </Route>
+              <Route index>
+                <SignUpContinue />
+              </Route>
+            </Route>
+            <Route index>
+              <SignUpStart />
+            </Route>
+            <Route>
+              <RedirectToSignUp />
+            </Route>
+          </Switch>
+        </Card.Root>
+      </Animated>
     </Flow.Root>
   );
 }

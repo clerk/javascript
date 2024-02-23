@@ -31,36 +31,34 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
 
   return (
     <Flow.Part part='emailLinkVerify'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={props.cardTitle} />
-            <VerificationLink
-              formSubtitle={props.formSubtitle}
-              resendButton={props.resendButton}
-              onResendCodeClicked={props.onResendCodeClicked}
-            >
-              {' '}
-              <IdentityPreview
-                identifier={props.safeIdentifier}
-                avatarUrl={props.profileImageUrl}
-                onClick={goBack}
-              />
-            </VerificationLink>
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Card.Action elementId='alternativeMethods'>
-            {props.onShowAlternativeMethodsClicked && (
-              <Card.ActionLink
-                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-                onClick={props.onShowAlternativeMethodsClicked}
-              />
-            )}
-          </Card.Action>
-        </Card.Content>
+      <Card.Content>
+        <Header.Root showLogo>
+          <Header.Title localizationKey={props.cardTitle} />
+          <VerificationLink
+            formSubtitle={props.formSubtitle}
+            resendButton={props.resendButton}
+            onResendCodeClicked={props.onResendCodeClicked}
+          >
+            {' '}
+            <IdentityPreview
+              identifier={props.safeIdentifier}
+              avatarUrl={props.profileImageUrl}
+              onClick={goBack}
+            />
+          </VerificationLink>
+        </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
+        <Card.Action elementId='alternativeMethods'>
+          {props.onShowAlternativeMethodsClicked && (
+            <Card.ActionLink
+              localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+              onClick={props.onShowAlternativeMethodsClicked}
+            />
+          )}
+        </Card.Action>
+      </Card.Content>
 
-        <Card.Footer />
-      </Card.Root>
+      <Card.Footer />
     </Flow.Part>
   );
 };

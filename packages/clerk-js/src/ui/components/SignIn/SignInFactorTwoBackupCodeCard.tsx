@@ -63,7 +63,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
   };
 
   return (
-    <Card.Root>
+    <>
       <Card.Content>
         <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
@@ -104,6 +104,6 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
       </Card.Content>
 
       <Card.Footer />
-    </Card.Root>
+    </>
   );
 };

@@ -5,6 +5,7 @@ import React from 'react';
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
 import { ComponentContext, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
+import { Animated, Card } from '../../elements';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
@@ -27,46 +28,50 @@ function SignInRoutes(): JSX.Element {
 
   return (
     <Flow.Root flow='signIn'>
-      <Switch>
-        <Route path='factor-one'>
-          <SignInFactorOne />
-        </Route>
-        <Route path='factor-two'>
-          <SignInFactorTwo />
-        </Route>
-        <Route path='reset-password'>
-          <ResetPassword />
-        </Route>
-        <Route path='reset-password-success'>
-          <ResetPasswordSuccess />
-        </Route>
-        <Route path='sso-callback'>
-          <SignInSSOCallback
-            afterSignInUrl={signInContext.afterSignInUrl}
-            afterSignUpUrl={signInContext.afterSignUpUrl}
-            redirectUrl={signInContext.redirectUrl}
-            continueSignUpUrl={signInContext.signUpContinueUrl}
-            firstFactorUrl={'../factor-one'}
-            secondFactorUrl={'../factor-two'}
-            resetPasswordUrl={'../reset-password'}
-          />
-        </Route>
-        <Route path='choose'>
-          <SignInAccountSwitcher />
-        </Route>
-        <Route path='verify'>
-          <SignInEmailLinkFlowComplete
-            redirectUrlComplete={signInContext.afterSignInUrl || signInContext.redirectUrl || undefined}
-            redirectUrl='../factor-two'
-          />
-        </Route>
-        <Route index>
-          <SignInStart />
-        </Route>
-        <Route>
-          <RedirectToSignIn />
-        </Route>
-      </Switch>
+      <Animated asChild>
+        <Card.Root>
+          <Switch>
+            <Route path='factor-one'>
+              <SignInFactorOne />
+            </Route>
+            <Route path='factor-two'>
+              <SignInFactorTwo />
+            </Route>
+            <Route path='reset-password'>
+              <ResetPassword />
+            </Route>
+            <Route path='reset-password-success'>
+              <ResetPasswordSuccess />
+            </Route>
+            <Route path='sso-callback'>
+              <SignInSSOCallback
+                afterSignInUrl={signInContext.afterSignInUrl}
+                afterSignUpUrl={signInContext.afterSignUpUrl}
+                redirectUrl={signInContext.redirectUrl}
+                continueSignUpUrl={signInContext.signUpContinueUrl}
+                firstFactorUrl={'../factor-one'}
+                secondFactorUrl={'../factor-two'}
+                resetPasswordUrl={'../reset-password'}
+              />
+            </Route>
+            <Route path='choose'>
+              <SignInAccountSwitcher />
+            </Route>
+            <Route path='verify'>
+              <SignInEmailLinkFlowComplete
+                redirectUrlComplete={signInContext.afterSignInUrl || signInContext.redirectUrl || undefined}
+                redirectUrl='../factor-two'
+              />
+            </Route>
+            <Route index>
+              <SignInStart />
+            </Route>
+            <Route>
+              <RedirectToSignIn />
+            </Route>
+          </Switch>
+        </Card.Root>
+      </Animated>
     </Flow.Root>
   );
 }

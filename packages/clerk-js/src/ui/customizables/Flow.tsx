@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import type { FlowMetadata } from '../elements';
 import { FlowMetadataProvider, InvisibleRootBox, useFlowMetadata } from '../elements';
@@ -26,15 +26,13 @@ const Root = (props: FlowRootProps) => {
 type FlowPartProps = React.PropsWithChildren<Pick<FlowMetadata, 'part'>>;
 
 const Part = (props: FlowPartProps) => {
-  const { flow } = useFlowMetadata();
-  return (
-    <FlowMetadataProvider
-      flow={flow}
-      part={props.part}
-    >
-      <InternalThemeProvider>{props.children}</InternalThemeProvider>
-    </FlowMetadataProvider>
-  );
+  const { setPart } = useFlowMetadata();
+
+  useEffect(() => {
+    setPart(props.part);
+  }, [props.part]);
+
+  return <InternalThemeProvider>{props.children}</InternalThemeProvider>;
 };
 
 export const Flow = {

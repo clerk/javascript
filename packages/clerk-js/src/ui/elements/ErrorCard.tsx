@@ -34,40 +34,38 @@ export const ErrorCard = (props: ErrorCardProps) => {
 
   return (
     <Flow.Part part='havingTrouble'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={props.cardTitle || 'Error'} />
-            {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          {/*TODO: extract main in its own component */}
-          <Flex
-            direction='col'
-            elementDescriptor={descriptors.main}
-            gap={4}
-          >
-            {props.message && (
-              <Text
-                colorScheme='neutral'
-                localizationKey={props.message}
-              />
-            )}
-            <Button
-              localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
-              onClick={handleEmailSupport}
-              hasArrow
+      <Card.Content>
+        <Header.Root showLogo>
+          <Header.Title localizationKey={props.cardTitle || 'Error'} />
+          {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
+        </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
+        {/*TODO: extract main in its own component */}
+        <Flex
+          direction='col'
+          elementDescriptor={descriptors.main}
+          gap={4}
+        >
+          {props.message && (
+            <Text
+              colorScheme='neutral'
+              localizationKey={props.message}
             />
-            <Card.Action elementId='alternativeMethods'>
-              <Card.ActionLink
-                localizationKey={localizationKeys('backButton')}
-                onClick={goBack}
-              />
-            </Card.Action>
-          </Flex>
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
+          )}
+          <Button
+            localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
+            onClick={handleEmailSupport}
+            hasArrow
+          />
+          <Card.Action elementId='alternativeMethods'>
+            <Card.ActionLink
+              localizationKey={localizationKeys('backButton')}
+              onClick={goBack}
+            />
+          </Card.Action>
+        </Flex>
+      </Card.Content>
+      <Card.Footer />
     </Flow.Part>
   );
 };

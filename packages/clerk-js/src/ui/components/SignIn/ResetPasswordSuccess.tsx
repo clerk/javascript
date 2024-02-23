@@ -7,7 +7,7 @@ export const _ResetPasswordSuccess = () => {
   const card = useCardState();
   useSetSessionWithTimeout();
   return (
-    <Card.Root>
+    <>
       <Card.Content>
         <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
@@ -31,7 +31,7 @@ export const _ResetPasswordSuccess = () => {
         </Col>
       </Card.Content>
       <Card.Footer />
-    </Card.Root>
+    </>
   );
 };
 

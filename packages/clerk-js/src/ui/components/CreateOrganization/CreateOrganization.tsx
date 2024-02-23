@@ -3,7 +3,7 @@ import type { CreateOrganizationModalProps } from '@clerk/types';
 import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
-import { withCardStateProvider } from '../../elements';
+import { Animated, Card, withCardStateProvider } from '../../elements';
 import { Route, Switch } from '../../router';
 import type { CreateOrganizationCtx } from '../../types';
 import { CreateOrganizationPage } from './CreateOrganizationPage';
@@ -11,13 +11,15 @@ import { CreateOrganizationPage } from './CreateOrganizationPage';
 const _CreateOrganization = () => {
   return (
     <Flow.Root flow='createOrganization'>
-      <Flow.Part>
-        <Switch>
-          <Route>
-            <AuthenticatedRoutes />
-          </Route>
-        </Switch>
-      </Flow.Part>
+      <Animated asChild>
+        <Card.Root sx={t => ({ width: t.sizes.$108 })}>
+          <Switch>
+            <Route>
+              <AuthenticatedRoutes />
+            </Route>
+          </Switch>
+        </Card.Root>
+      </Animated>
     </Flow.Root>
   );
 };

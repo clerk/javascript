@@ -242,49 +242,47 @@ function _SignUpStart(): JSX.Element {
 
   return (
     <Flow.Part part='start'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signUp.start.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Flex
-            direction='col'
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            <SocialButtonsReversibleContainerWithDivider>
-              {(showOauthProviders || showWeb3Providers) && (
-                <SignUpSocialButtons
-                  enableOAuthProviders={showOauthProviders}
-                  enableWeb3Providers={showWeb3Providers}
-                  continueSignUp={missingRequirementsWithTicket}
-                />
-              )}
-              {shouldShowForm && (
-                <SignUpForm
-                  handleSubmit={handleSubmit}
-                  fields={fields}
-                  formState={formState}
-                  canToggleEmailPhone={canToggleEmailPhone}
-                  handleEmailPhoneToggle={handleChangeActive}
-                />
-              )}
-            </SocialButtonsReversibleContainerWithDivider>
-          </Flex>
-        </Card.Content>
+      <Card.Content>
+        <Header.Root showLogo>
+          <Header.Title localizationKey={localizationKeys('signUp.start.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
+        </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
+        <Flex
+          direction='col'
+          elementDescriptor={descriptors.main}
+          gap={6}
+        >
+          <SocialButtonsReversibleContainerWithDivider>
+            {(showOauthProviders || showWeb3Providers) && (
+              <SignUpSocialButtons
+                enableOAuthProviders={showOauthProviders}
+                enableWeb3Providers={showWeb3Providers}
+                continueSignUp={missingRequirementsWithTicket}
+              />
+            )}
+            {shouldShowForm && (
+              <SignUpForm
+                handleSubmit={handleSubmit}
+                fields={fields}
+                formState={formState}
+                canToggleEmailPhone={canToggleEmailPhone}
+                handleEmailPhoneToggle={handleChangeActive}
+              />
+            )}
+          </SocialButtonsReversibleContainerWithDivider>
+        </Flex>
+      </Card.Content>
 
-        <Card.Footer>
-          <Card.Action elementId='signUp'>
-            <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('signUp.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
-            />
-          </Card.Action>
-        </Card.Footer>
-      </Card.Root>
+      <Card.Footer>
+        <Card.Action elementId='signUp'>
+          <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
+          <Card.ActionLink
+            localizationKey={localizationKeys('signUp.start.actionLink')}
+            to={clerk.buildUrlWithAuth(signInUrl)}
+          />
+        </Card.Action>
+      </Card.Footer>
     </Flow.Part>
   );
 }
