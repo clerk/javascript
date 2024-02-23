@@ -95,20 +95,20 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
     const [selectionRange, setSelectionRange] = React.useState<SelectionRange>(props.autoFocus ? ZERO : OUTSIDE);
     const isFocused = useFocus(innerRef)
 
+    // Attach this component's UI state "selectionRange" to the native .select() to update it on focus changes
     React.useEffect(() => {
-      const el = innerRef.current
+      const element = innerRef.current
 
-      if (!el) return
+      if (!element) return
 
-      const _select = el.select.bind(el)
-      el.select = () => {
-        _select()
-
-        // Proxy to update UI as native .select() does not trigger focus event
-        setSelectionRange([0, el.value.length])
+      const originalSelect = element.select.bind(element)
+      element.select = () => {
+        originalSelect()
+        setSelectionRange([0, element.value.length])
       }
     }, [])
-
+    
+    // Continuously update the selection range when the input is focused
     React.useEffect(() => {
       if (!isFocused) return
 
@@ -132,7 +132,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
       }
     }, [previousValue, value, length, autoSubmit]);
 
-    function _selectListener() {
+    const _select = React.useCallback(() => {
       if (!innerRef.current) return
 
       const _start = innerRef.current.selectionStart
@@ -166,8 +166,8 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
         }
       }
 
-      immediateTimeout(() => setSelectionRange([innerRef.current?.selectionStart ?? null, innerRef.current?.selectionEnd ?? null]))
-    }
+      setSelectionRange([innerRef.current?.selectionStart ?? null, innerRef.current?.selectionEnd ?? null])
+    }, [innerRef, value, length])
 
     return (
       <div
@@ -188,15 +188,13 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           {...rest}
           value={value}
           onSelect={e => {
-            _selectListener()
+            _select()
             rest?.onSelect?.(e);
           }}
           onTouchEnd={e => {
             const isFocusing = document.activeElement === e.currentTarget
             if (isFocusing) {
-              setTimeout(() => {
-                _selectListener()
-              }, 50)
+              _select()
             }
   
             rest?.onTouchEnd?.(e)
@@ -204,9 +202,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           onTouchMove={e => {
             const isFocusing = document.activeElement === e.currentTarget
             if (isFocusing) {
-              setTimeout(() => {
-                _selectListener()
-              }, 50)
+              _select()
             }
   
             rest?.onTouchMove?.(e)
@@ -216,24 +212,24 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
 
             if (isFocusing) {
               e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)
-              immediateTimeout(_selectListener)
+              _select()
             }
 
             rest?.onDoubleClick?.(e)
           }}
           onInput={e => {
-            immediateTimeout(_selectListener)
+            _select()
   
             rest?.onInput?.(e)
           }}
           onKeyDown={e => {
             // _keyDownListener(e)
-            immediateTimeout(_selectListener)
+            _select()
   
             rest?.onKeyDown?.(e)
           }}
           onKeyUp={e => {
-            immediateTimeout(_selectListener)
+            _select()
   
             rest?.onKeyUp?.(e)
           }}
@@ -282,13 +278,15 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
   },
 );
 
-function immediateTimeout(cb: (...args: any[]) => unknown) {
-  return setTimeout(cb, 0);
+// @ts-ignore - test
+const getSelectionState = (input: HTMLInputElement): SelectionRange => {
+  return [input.selectionStart, input.selectionEnd]
 }
 
 /**
  * Handle updating the input selection range to ensure a single character is selected when moving the cursor, or if the input value changes.
  */
+// @ts-ignore - test
 function selectionRangeUpdater(cur: SelectionRange, inputRef: React.RefObject<HTMLInputElement>) {
   let direction: 'forward' | 'backward' = 'forward' as const;
   let updated: [number, number] = [inputRef.current?.selectionStart ?? 0, inputRef.current?.selectionEnd ?? 0];
