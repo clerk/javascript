@@ -22,8 +22,8 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
       elementId={descriptors.userButtonPopoverActions.setId('singleSession')}
       sx={t => ({
         borderTopWidth: t.borderWidths.$normal,
-        borderBottomStyle: t.borderStyles.$solid,
-        borderBottomColor: t.colors.$neutralAlpha100,
+        borderTopStyle: t.borderStyles.$solid,
+        borderTopColor: t.colors.$neutralAlpha100,
       })}
     >
       <Action
