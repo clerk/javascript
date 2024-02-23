@@ -245,7 +245,11 @@ type FormFieldProps = RadixFormFieldProps & { alwaysShow?: boolean };
 const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, ...rest }, forwardedRef) => {
   const formRef = useFormStore();
   const formCtx = formRef.getSnapshot().context;
-  const shouldHide = alwaysShow ? false : formCtx.progressive && formCtx.hidden?.has(rest.name);
+  // A field is marked as hidden if it's optional OR if it's a filled-out required field
+  const isHiddenField = formCtx.progressive && Boolean(formCtx.hidden?.has(rest.name));
+
+  // Only alwaysShow={true} should force behavior to render the field, on `undefined` or alwaysShow={false} the isHiddenField logic should take over
+  const shouldHide = alwaysShow ? false : isHiddenField;
 
   return shouldHide ? null : (
     <FieldContext.Provider value={{ name: rest.name }}>
