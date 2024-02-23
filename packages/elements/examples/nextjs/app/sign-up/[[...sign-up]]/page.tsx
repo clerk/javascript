@@ -51,8 +51,8 @@ export default function SignUpPage() {
               />
 
               <CustomField
-                label='Password'
-                name='password'
+                label='Phone Number'
+                name='phoneNumber'
               />
               <CustomSubmit>Sign Up</CustomSubmit>
             </div>
@@ -65,6 +65,12 @@ export default function SignUpPage() {
           <GlobalError className='block text-red-400 font-mono' />
 
           <CustomField
+            label='Password'
+            name='password'
+          />
+
+          <CustomField
+            alwaysShow
             label='Phone Number'
             name='phoneNumber'
           />

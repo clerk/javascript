@@ -1,9 +1,10 @@
+import { snakeToCamel } from '@clerk/shared';
 import type { SignUpResource } from '@clerk/types';
 import type { ActorRefFrom } from 'xstate';
-import { fromPromise, sendParent, sendTo, setup } from 'xstate';
+import { fromPromise, sendParent, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
-import type { FormFields } from '~/internals/machines/form/form.types';
+import type { FormDefaultValues, FormFields } from '~/internals/machines/form/form.types';
 import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 import type { SignUpContinueSchema } from '~/internals/machines/sign-up/types';
 import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
@@ -23,16 +24,38 @@ export const SignUpContinueMachine = setup({
     ),
   },
   actions: {
-    setFormErrors: sendTo(
-      ({ context }) => context.formRef,
-      ({ event }) => {
-        assertActorEventError(event);
-        return {
-          type: 'ERRORS.SET',
-          error: event.error,
-        };
-      },
-    ),
+    setFormErrors: ({ context, event }) => {
+      assertActorEventError(event);
+      context.formRef.send({
+        type: 'ERRORS.SET',
+        error: event.error,
+      });
+    },
+    markFormAsProgressive: ({ context }) => {
+      const signUp = context.parent.getSnapshot().context.clerk.client.signUp;
+
+      const missing = signUp.missingFields.map(snakeToCamel);
+      const optional = signUp.optionalFields.map(snakeToCamel);
+      const required = signUp.requiredFields.map(snakeToCamel);
+
+      const progressiveFieldValues: FormDefaultValues = new Map();
+
+      for (const key of required.concat(optional) as (keyof SignUpResource)[]) {
+        if (key in signUp) {
+          // @ts-expect-error - TS doesn't understand that key is a valid key of SignUpResource
+          progressiveFieldValues.set(key, signUp[key]);
+        }
+      }
+
+      context.formRef.send({
+        type: 'MARK_AS_PROGRESSIVE',
+        missing,
+        optional,
+        required,
+        defaultValues: progressiveFieldValues,
+      });
+    },
+    unmarkFormAsProgressive: ({ context }) => context.formRef.send({ type: 'UNMARK_AS_PROGRESSIVE' }),
   },
   types: {} as SignUpContinueSchema,
 }).createMachine({
@@ -42,6 +65,10 @@ export const SignUpContinueMachine = setup({
     formRef: input.form,
     parent: input.parent,
   }),
+  entry: 'markFormAsProgressive',
+  onDone: {
+    actions: 'unmarkFormAsProgressive',
+  },
   initial: 'Pending',
   states: {
     Pending: {

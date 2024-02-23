@@ -35,8 +35,8 @@ function OTPInputSegment({ value, status }: any) {
 
 export const CustomField = React.forwardRef<
   typeof Input,
-  { name: string; label: string; required?: boolean; autoSubmit?: boolean }
->(function CustomField({ name, label, required = false, autoSubmit = false }, forwardedRef) {
+  { alwaysShow?: boolean; name: string; label: string; required?: boolean; autoSubmit?: boolean }
+>(function CustomField({ alwaysShow, name, label, required = false, autoSubmit = false }, forwardedRef) {
   const inputProps =
     name === 'code'
       ? {
@@ -53,6 +53,7 @@ export const CustomField = React.forwardRef<
 
   return (
     <ElementsField
+      alwaysShow={alwaysShow}
       name={name}
       className='flex flex-col gap-4'
     >
