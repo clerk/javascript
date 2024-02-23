@@ -28,11 +28,11 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const card = useCardState();
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
-  const isDomainsEnabled = organizationSettings?.domains?.enabled;
+  const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
     invitations: canManageMemberships || undefined,
-    memberships: true,
+    memberships: canManageMemberships || undefined,
   });
 
   // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
