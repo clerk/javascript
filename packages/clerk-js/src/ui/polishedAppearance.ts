@@ -34,9 +34,7 @@ const inputShadowStyles = (
       ? {
           boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
         }
-      : {
-          boxShadow: hoverShadow,
-        },
+      : {},
   };
 };
 
