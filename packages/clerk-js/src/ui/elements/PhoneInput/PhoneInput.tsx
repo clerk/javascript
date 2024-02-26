@@ -159,11 +159,9 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         <Text
           sx={t => ({
             position: 'absolute',
-            left: t.space.$1,
-            top: '0px',
-            bottom: '0px',
-            display: 'flex',
-            alignItems: 'center',
+            left: '1ch',
+            top: '50%',
+            transform: 'translateY(-50%)',
             pointerEvents: 'none',
             opacity: props.isDisabled ? t.opacity.$disabled : 1,
           })}

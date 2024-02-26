@@ -161,7 +161,6 @@ export const polishedAppearance: Appearance = {
         'div > input': {
           boxShadow: 'unset',
           '&[data-feedback]': {
-            boxShadow: 'unset',
             '&:focus-within': {
               boxShadow: 'unset',
             },
