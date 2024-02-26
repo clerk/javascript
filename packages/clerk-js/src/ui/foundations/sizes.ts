@@ -66,6 +66,7 @@ const sizes = Object.freeze({ ...space } as const);
 const radii = Object.freeze({
   none: '0px',
   circle: '50%',
+  avatar: '0.375rem',
   sm: '0.25rem',
   md: '0.375rem',
   lg: '0.5rem',
