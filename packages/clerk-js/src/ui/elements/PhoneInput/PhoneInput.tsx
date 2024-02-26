@@ -113,13 +113,14 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         <SelectButton
           variant='ghost'
           sx={t => ({
-            border: 'none',
+            borderWidth: '0',
             borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
             borderBottomRightRadius: '0',
             borderTopRightRadius: '0',
             paddingRight: t.space.$2,
             ':focus': {
               zIndex: 2,
+              boxShadow: 'none',
             },
             ':active': {
               zIndex: 2,
