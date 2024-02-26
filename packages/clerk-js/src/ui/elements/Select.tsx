@@ -205,7 +205,6 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
           sx,
         ]}
         {...rest}
-        hasError={false}
       />
     </Flex>
   );
