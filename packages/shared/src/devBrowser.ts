@@ -19,20 +19,49 @@ export function setDevBrowserJWTInURL(url: URL, jwt: string): URL {
   return resultURL;
 }
 
-// Gets the dev_browser JWT from either the hash or the search
-// Side effect:
-// Removes dev_browser JWT from the URL as a side effect and updates the browser history
-export function getDevBrowserJWTFromURL(url: URL): string {
-  const resultURL = new URL(url);
-
-  // extract & strip existing jwt from search
-  const jwt = resultURL.searchParams.get(DEV_BROWSER_JWT_KEY) || '';
-  resultURL.searchParams.delete(DEV_BROWSER_JWT_KEY);
-
-  // eslint-disable-next-line valid-typeof
-  if (jwt && typeof globalThis.history !== undefined) {
-    globalThis.history.replaceState(null, '', resultURL.href);
+/**
+ * Gets the __clerk_db_jwt JWT from either the hash or the search
+ * Side effect:
+ * Removes __clerk_db_jwt JWT from the URL (hash and searchParams) and updates the browser history
+ */
+export function extractDevBrowserJWTFromURL(url: URL): string {
+  const jwt = readDevBrowserJwtFromSearchParams(url);
+  if (jwt && typeof globalThis.history !== 'undefined') {
+    globalThis.history.replaceState(null, '', removeDevBrowserJwt(url));
   }
-
   return jwt;
 }
+
+const readDevBrowserJwtFromSearchParams = (url: URL) => {
+  return url.searchParams.get(DEV_BROWSER_JWT_KEY) || '';
+};
+
+const removeDevBrowserJwt = (url: URL) => {
+  return removeDevBrowserJwtFromURLSearchParams(removeLegacyDevBrowserJwtFromURLHash(new URL(url)));
+};
+
+const removeDevBrowserJwtFromURLSearchParams = (_url: URL) => {
+  const url = new URL(_url);
+  url.searchParams.delete(DEV_BROWSER_JWT_KEY);
+  return url;
+};
+
+/**
+ * Removes the __clerk_db_jwt JWT from the URL hash.
+ * We no longer need to use this value, however, we should remove it from the URL
+ * Existing v4 apps will write the JWT to the hash and the search params in order to ensure
+ * backwards compatibility with older v4 apps.
+ * The only use case where this is needed now is when a user upgrades to clerk@5 locally
+ * without changing the component's version on their dashboard.
+ * In this scenario, the AP@4 -> localhost@5 redirect will still have the JWT in the hash,
+ * in which case we need to remove it.
+ */
+const removeLegacyDevBrowserJwtFromURLHash = (_url: URL) => {
+  const DEV_BROWSER_JWT_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
+  const url = new URL(_url);
+  url.hash = url.hash.replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
+  if (url.href.endsWith('#')) {
+    url.hash = '';
+  }
+  return url;
+};
