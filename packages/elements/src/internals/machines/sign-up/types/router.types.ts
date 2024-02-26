@@ -10,6 +10,7 @@ import type {
   BaseRouterRedirectEvent,
   BaseRouterRouteRegisterEvent,
   BaseRouterRouteUnregisterEvent,
+  BaseRouterStartEvent,
   BaseRouterTransferEvent,
 } from '~/internals/machines/types';
 
@@ -39,6 +40,7 @@ export type SignUpRouterSystemId = keyof typeof SignUpRouterSystemId;
 // ---------------------------------- Events ---------------------------------- //
 
 export type SignUpRouterNextEvent = BaseRouterNextEvent<SignUpResource>;
+export type SignUpRouterStartEvent = BaseRouterStartEvent;
 export type SignUpRouterPrevEvent = BaseRouterPrevEvent;
 export type SignUpRouterErrorEvent = BaseRouterErrorEvent;
 export type SignUpRouterTransferEvent = BaseRouterTransferEvent;
@@ -52,9 +54,11 @@ export type SignUpRouterRouteUnregisterEvent = BaseRouterRouteUnregisterEvent<Si
 
 export type SignUpRouterRouteEvents = SignUpRouterRouteRegisterEvent | SignUpRouterRouteUnregisterEvent;
 
+export type SignUpRouterNavigationEvents = SignUpRouterStartEvent | SignUpRouterPrevEvent;
+
 export type SignUpRouterEvents =
   | SignUpRouterNextEvent
-  | SignUpRouterPrevEvent
+  | SignUpRouterNavigationEvents
   | SignUpRouterErrorEvent
   | SignUpRouterTransferEvent
   | SignUpRouterRedirectEvent

@@ -4,11 +4,10 @@ import { SignInRouterCtx } from './context';
 
 export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export { SignInStep as Step } from './step';
-export { SignInGoBack as GoBack } from './go-back';
+export { SignInNavigate as Navigate } from './navigation';
 
 export {
   SignInChooseStrategy as ChooseStrategy,
-  SignInChooseAlternateStrategy as ChooseAlternateStrategy,
   SignInAvailableStrategy as AvailableStrategy,
 } from './choose-strategy';
 

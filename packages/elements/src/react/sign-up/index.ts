@@ -4,7 +4,7 @@ import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 export { SignUpRoot as SignUp, SignUpRoot as Root } from './root';
 export { SignUpStep as Step } from './step';
-export { SignUpGoBack as GoBack } from './go-back';
+export { SignUpNavigate as Navigate } from './navigation';
 export { SignUpVerification as Verification } from './verifications';
 
 export {

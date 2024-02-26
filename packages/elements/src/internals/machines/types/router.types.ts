@@ -9,7 +9,8 @@ import type { ClerkRouter } from '~/react/router';
 // ---------------------------------- Events ---------------------------------- //
 
 export type BaseRouterNextEvent<T extends ClerkResource> = { type: 'NEXT'; resource?: T };
-export type BaseRouterPrevEvent = { type: 'PREV' };
+export type BaseRouterPrevEvent = { type: 'NAVIGATE.PREVIOUS' };
+export type BaseRouterStartEvent = { type: 'NAVIGATE.START' };
 export type BaseRouterErrorEvent = { type: 'ERROR'; error: Error };
 export type BaseRouterTransferEvent = { type: 'TRANSFER' };
 
