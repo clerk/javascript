@@ -83,49 +83,55 @@ const OTPInputStandard = React.forwardRef<HTMLInputElement, Omit<OTPInputProps, 
  */
 const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPInputProps, 'render'>> & OTPInputProps>(
   function OTPInput(props, ref) {
-    const { className: userProvidedClassName, render, length = OTP_LENGTH_DEFAULT, autoSubmit = false, ...rest } = props;
+    const {
+      className: userProvidedClassName,
+      render,
+      length = OTP_LENGTH_DEFAULT,
+      autoSubmit = false,
+      ...rest
+    } = props;
 
-    const value = props.value as string
-    const previousValue = usePrevious(value)
+    const value = props.value as string;
+    const previousValue = usePrevious(value);
 
     const innerRef = React.useRef<HTMLInputElement>(null);
     // This ensures we can access innerRef internally while still exposing it via the ref prop
     React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
 
     const [selectionRange, setSelectionRange] = React.useState<SelectionRange>(props.autoFocus ? ZERO : OUTSIDE);
-    const isFocused = useFocus(innerRef)
+    const isFocused = useFocus(innerRef);
 
     // Attach this component's UI state "selectionRange" to the native .select() to update it on focus changes
     React.useEffect(() => {
-      const element = innerRef.current
+      const element = innerRef.current;
 
-      if (!element) return
+      if (!element) return;
 
-      const originalSelect = element.select.bind(element)
+      const originalSelect = element.select.bind(element);
       element.select = () => {
-        originalSelect()
-        setSelectionRange([0, element.value.length])
-      }
-    }, [])
-    
+        originalSelect();
+        setSelectionRange([0, element.value.length]);
+      };
+    }, []);
+
     // Continuously update the selection range when the input is focused
     React.useEffect(() => {
-      if (!isFocused) return
+      if (!isFocused) return;
 
       const interval = setInterval(() => {
         if (innerRef.current && document.activeElement === innerRef.current) {
           setSelectionRange([innerRef.current.selectionStart, innerRef.current.selectionEnd]);
         }
-      }, 50)
+      }, 50);
 
       return () => {
-        clearInterval(interval)
-      }
-    }, [isFocused, selectionRange])
+        clearInterval(interval);
+      };
+    }, [isFocused]);
 
     // Fire the requestSubmit callback when the input has the required length and autoSubmit is enabled
     React.useEffect(() => {
-      if (previousValue === undefined) return
+      if (previousValue === undefined) return;
 
       if (value !== previousValue && previousValue.length < length && value.length === length && autoSubmit) {
         innerRef.current?.form?.requestSubmit();
@@ -133,41 +139,18 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
     }, [previousValue, value, length, autoSubmit]);
 
     const _select = React.useCallback(() => {
-      if (!innerRef.current) return
+      if (!innerRef.current) return;
 
-      const _start = innerRef.current.selectionStart
-      const _end = innerRef.current.selectionEnd
-      const isSelected = _start !== null && _end !== null
+      const [start, end] = transformSelectionRange({ innerRef, length, value });
+      setSelectionRange([start, end]);
+    }, [innerRef, value, length]);
 
-      if (value.length !== 0 && isSelected) {
-        const isSingleCaret = _start === _end
-        const isInsertMode = _start === value.length && value.length < length
-
-        if (isSingleCaret && !isInsertMode) {
-          const caretPos = _start
-
-          let start = -1
-          let end = -1
-
-          if (caretPos === 0) {
-            start = 0
-            end = 1
-          } else if (caretPos === value.length) {
-            start = value.length - 1
-            end = value.length
-          } else {
-            start = caretPos
-            end = caretPos + 1
-          }
-
-          if (start !== -1 && end !== -1) {
-            innerRef.current.setSelectionRange(start, end)
-          }
-        }
-      }
-
-      setSelectionRange([innerRef.current?.selectionStart ?? null, innerRef.current?.selectionEnd ?? null])
-    }, [innerRef, value, length])
+    const _keyDown = React.useCallback(
+      (e: React.KeyboardEvent<HTMLInputElement>) => {
+        transformKeydownEvent({ e, innerRef, value });
+      },
+      [innerRef, value],
+    );
 
     return (
       <div
@@ -188,60 +171,60 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           {...rest}
           value={value}
           onSelect={e => {
-            _select()
+            _select();
             rest?.onSelect?.(e);
           }}
           onTouchEnd={e => {
-            const isFocusing = document.activeElement === e.currentTarget
+            const isFocusing = document.activeElement === e.currentTarget;
             if (isFocusing) {
-              _select()
+              _select();
             }
-  
-            rest?.onTouchEnd?.(e)
+
+            rest?.onTouchEnd?.(e);
           }}
           onTouchMove={e => {
-            const isFocusing = document.activeElement === e.currentTarget
+            const isFocusing = document.activeElement === e.currentTarget;
             if (isFocusing) {
-              _select()
+              _select();
             }
-  
-            rest?.onTouchMove?.(e)
+
+            rest?.onTouchMove?.(e);
           }}
           onDoubleClick={e => {
-            const isFocusing = document.activeElement === e.currentTarget
+            const isFocusing = document.activeElement === e.currentTarget;
 
             if (isFocusing) {
-              e.currentTarget.setSelectionRange(0, e.currentTarget.value.length)
-              _select()
+              e.currentTarget.setSelectionRange(0, e.currentTarget.value.length);
+              _select();
             }
 
-            rest?.onDoubleClick?.(e)
+            rest?.onDoubleClick?.(e);
           }}
           onInput={e => {
-            _select()
-  
-            rest?.onInput?.(e)
+            _select();
+
+            rest?.onInput?.(e);
           }}
           onKeyDown={e => {
-            // _keyDownListener(e)
-            _select()
-  
-            rest?.onKeyDown?.(e)
+            _keyDown(e);
+            _select();
+
+            rest?.onKeyDown?.(e);
           }}
           onKeyUp={e => {
-            _select()
-  
-            rest?.onKeyUp?.(e)
+            _select();
+
+            rest?.onKeyUp?.(e);
           }}
-          onFocus={(e) => {
+          onFocus={e => {
             if (innerRef.current) {
-              const start = Math.min(innerRef.current.value.length, length - 1)
-              const end = innerRef.current.value.length
-              innerRef.current.setSelectionRange(start, end)
-              setSelectionRange([start, end])
+              const start = Math.min(innerRef.current.value.length, length - 1);
+              const end = innerRef.current.value.length;
+              innerRef.current.setSelectionRange(start, end);
+              setSelectionRange([start, end]);
             }
 
-            rest?.onFocus?.(e)
+            rest?.onFocus?.(e);
           }}
           style={inputStyle}
           data-otp-input-segmented
@@ -252,25 +235,25 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           style={renderStyle}
           data-otp-input-segmented-render
         >
-          {Array.from({ length }).map((_, i) => {
-            const value = String(props.value)[i] || ''
-            const isCursor = isFocused && selectionRange[0] === selectionRange[1] && selectionRange[0] === i
-            const isSelected = isFocused && (selectionRange[0] !== null && selectionRange[0] <= i) && (selectionRange[1] !== null && selectionRange[1] > i)
+          {Array.from({ length: length }).map((_, i) => {
+            const value = String(props.value)[i] || '';
+            const isCursor = isFocused && selectionRange[0] === selectionRange[1] && selectionRange[0] === i;
+            const isSelected =
+              isFocused &&
+              selectionRange[0] !== null &&
+              selectionRange[0] <= i &&
+              selectionRange[1] !== null &&
+              selectionRange[1] > i;
 
             return (
               <React.Fragment key={`otp-segment-${i}`}>
                 {render({
                   value,
-                  status:
-                    isCursor
-                      ? 'cursor'
-                      : isSelected
-                      ? 'selected'
-                      : 'none',
+                  status: isCursor ? 'cursor' : isSelected ? 'selected' : 'none',
                   index: i,
                 })}
               </React.Fragment>
-            )
+            );
           })}
         </div>
       </div>
@@ -278,47 +261,110 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
   },
 );
 
-// @ts-ignore - test
-const getSelectionState = (input: HTMLInputElement): SelectionRange => {
-  return [input.selectionStart, input.selectionEnd]
-}
-
 /**
- * Handle updating the input selection range to ensure a single character is selected when moving the cursor, or if the input value changes.
+ * Get the current selection range of the input
  */
-// @ts-ignore - test
-function selectionRangeUpdater(cur: SelectionRange, inputRef: React.RefObject<HTMLInputElement>) {
-  let direction: 'forward' | 'backward' = 'forward' as const;
-  let updated: [number, number] = [inputRef.current?.selectionStart ?? 0, inputRef.current?.selectionEnd ?? 0];
+const getSelectionState = (input: HTMLInputElement): SelectionRange => {
+  return [input.selectionStart, input.selectionEnd];
+};
 
-  // Abort unnecessary updates
-  if (cur[0] === updated[0] && cur[1] === updated[1]) {
-    return cur;
-  }
+type SaveProps = {
+  innerRef: React.RefObject<HTMLInputElement>;
+  length: number;
+  value: string;
+};
 
-  // When moving the selection, we want to select either the previous or next character instead of only moving the cursor.
-  // If the start and end indices are the same, it means only the cursor has moved and we need to make a decision on which character to select.
-  if (updated[0] === updated[1]) {
-    if (updated[0] > 0 && cur[0] === updated[0] && cur[1] === updated[0] + 1) {
-      direction = 'backward' as const;
-      updated = [updated[0] - 1, updated[1]];
-    } else if (typeof inputRef.current?.value[updated[0]] !== 'undefined') {
-      updated = [updated[0], updated[1] + 1];
+const transformSelectionRange = ({ innerRef, length, value }: SaveProps): SelectionRange => {
+  const ref = innerRef.current as HTMLInputElement;
+  const [_start, _end] = getSelectionState(ref);
+  const isSelected = _start !== null && _end !== null;
+
+  if (value.length !== 0 && isSelected) {
+    const isSingleCaret = _start === _end;
+    const isInsertMode = _start === value.length && value.length < length;
+
+    if (isSingleCaret && !isInsertMode) {
+      const caretPos = _start;
+
+      let start = -1;
+      let end = -1;
+
+      if (caretPos === 0) {
+        start = 0;
+        end = 1;
+      } else if (caretPos === value.length) {
+        start = value.length - 1;
+        end = value.length;
+      } else {
+        start = caretPos;
+        end = caretPos + 1;
+      }
+
+      if (start !== -1 && end !== -1) {
+        ref.setSelectionRange(start, end);
+      }
     }
   }
 
-  inputRef.current?.setSelectionRange(updated[0], updated[1], direction);
+  return [_start, _end];
+};
 
-  return updated;
-}
+type TransformKeydownEventProps = {
+  e: React.KeyboardEvent<HTMLInputElement>;
+  innerRef: React.RefObject<HTMLInputElement>;
+  value: string;
+};
 
-function usePrevious<T>(value: T) {
-  const ref = React.useRef<T>()
+const transformKeydownEvent = ({ e, innerRef, value }: TransformKeydownEventProps): void => {
+  if (!innerRef.current) return;
+
+  const [_start, _end] = getSelectionState(innerRef.current);
+  if (_start === null || _end === null) return;
+
+  let eventType: 'caret' | 'char' | 'multi' | 'unknown' = 'unknown';
+
+  if (_start === _end) {
+    eventType = 'caret';
+  } else if (_end - _start === 1) {
+    eventType = 'char';
+  } else if (_end - _start > 1) {
+    eventType = 'multi';
+  }
+
+  if (eventType === 'char' && e.key === 'ArrowLeft' && !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    e.preventDefault();
+
+    const start = Math.max(_start - 1, 0);
+    const end = Math.max(_end - 1, 1);
+
+    innerRef.current.setSelectionRange(start, end);
+  }
+
+  if (e.altKey && !e.shiftKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    e.preventDefault();
+
+    if (e.key === 'ArrowLeft') {
+      const start = 0;
+      const end = Math.min(1, value.length);
+
+      innerRef.current.setSelectionRange(start, end);
+    }
+    if (e.key === 'ArrowRight') {
+      const start = Math.max(0, value.length - 1);
+      const end = value.length;
+
+      innerRef.current.setSelectionRange(start, end);
+    }
+  }
+};
+
+const usePrevious = <T,>(value: T) => {
+  const ref = React.useRef<T>();
   React.useEffect(() => {
-    ref.current = value
-  })
-  return ref.current
-}
+    ref.current = value;
+  });
+  return ref.current;
+};
 
 const wrapperStyle = {
   position: 'relative',
