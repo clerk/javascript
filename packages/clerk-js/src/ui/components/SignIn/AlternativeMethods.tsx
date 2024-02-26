@@ -2,7 +2,7 @@ import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { Button, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, BackLink, Card, Divider, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
@@ -54,7 +54,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
-            gap={3}
+            gap={6}
           >
             {asForgotPassword && resetPasswordFactor && (
               <Button
@@ -64,13 +64,13 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                 onClick={() => onFactorSelected(resetPasswordFactor)}
               />
             )}
-            {hasAnyStrategy && (
-              <>
-                {asForgotPassword && (
-                  <Divider
-                    dividerText={localizationKeys('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}
-                  />
-                )}
+            {asForgotPassword && hasAnyStrategy && (
+              <Divider
+                dividerText={localizationKeys('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}
+              />
+            )}
+            <Col gap={4}>
+              {hasAnyStrategy && (
                 <Flex
                   elementDescriptor={descriptors.alternativeMethods}
                   direction='col'
@@ -93,15 +93,15 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                     />
                   ))}
                 </Flex>
-              </>
-            )}
-            {onBackLinkClick && (
-              <BackLink
-                boxElementDescriptor={descriptors.backRow}
-                linkElementDescriptor={descriptors.backLink}
-                onClick={onBackLinkClick}
-              />
-            )}
+              )}
+              {onBackLinkClick && (
+                <BackLink
+                  boxElementDescriptor={descriptors.backRow}
+                  linkElementDescriptor={descriptors.backLink}
+                  onClick={onBackLinkClick}
+                />
+              )}
+            </Col>
           </Flex>
         </Card.Content>
 
