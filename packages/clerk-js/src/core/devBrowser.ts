@@ -1,4 +1,4 @@
-import { DEV_BROWSER_JWT_HEADER, getDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
+import { DEV_BROWSER_JWT_HEADER, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { parseErrors } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON } from '@clerk/types';
 
@@ -61,8 +61,8 @@ export function createDevBrowser({ frontendApi, fapiClient }: CreateDevBrowserOp
       }
     });
 
-    // 1. Get the JWT from hash or search parameters when the redirection comes from AP
-    const devBrowserToken = getDevBrowserJWTFromURL(new URL(window.location.href));
+    // 1. Get the JWT from search parameters when the redirection comes from AP
+    const devBrowserToken = extractDevBrowserJWTFromURL(new URL(window.location.href));
     if (devBrowserToken) {
       setDevBrowserJWT(devBrowserToken);
       return;

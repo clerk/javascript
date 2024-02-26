@@ -31,4 +31,4 @@ export * from './underscore';
 export * from './url';
 export * from './object';
 export { createWorkerTimers } from './workerTimers';
-export { DEV_BROWSER_JWT_KEY, getDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';
+export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';

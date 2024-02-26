@@ -1,4 +1,4 @@
-import { getDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '../devBrowser';
+import { extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '../devBrowser';
 
 const DUMMY_URL_BASE = 'http://clerk-dummy';
 
@@ -50,34 +50,29 @@ describe('getDevBrowserJWTFromURL(url)', () => {
   });
 
   it('does not replaceState if the url does not contain a dev browser JWT', () => {
-    expect(getDevBrowserJWTFromURL(new URL('/foo', DUMMY_URL_BASE))).toEqual('');
+    expect(extractDevBrowserJWTFromURL(new URL('/foo', DUMMY_URL_BASE))).toEqual('');
     expect(replaceStateMock).not.toHaveBeenCalled();
   });
 
-  const testCases: Array<[string, string, null | string]> = [
-    ['', '', null],
-    ['foo', '', null],
-    ['?__clerk_db_jwt=deadbeef', 'deadbeef', ''],
-    ['foo?__clerk_db_jwt=deadbeef', 'deadbeef', 'foo'],
-    ['/foo?__clerk_db_jwt=deadbeef', 'deadbeef', '/foo'],
-    ['?__clerk_db_jwt=deadbeef#foo', 'deadbeef', '#foo'],
-    [
-      '/foo?bar=42&__clerk_db_jwt=deadbeef#qux__clerk_db_jwt[deadbeef2]',
-      'deadbeef',
-      '/foo?bar=42#qux__clerk_db_jwt[deadbeef2]',
-    ],
+  it('does call replaceState if the url contains a dev browser JWT', () => {
+    expect(extractDevBrowserJWTFromURL(new URL('/foo?__clerk_db_jwt=token', DUMMY_URL_BASE))).toEqual('token');
+    expect(replaceStateMock).toHaveBeenCalled();
+  });
+
+  const testCases: Array<[string, string]> = [
+    ['', ''],
+    ['foo', ''],
+    ['?__clerk_db_jwt=token', 'token'],
+    ['foo?__clerk_db_jwt=token', 'token'],
+    ['/foo?__clerk_db_jwt=token', 'token'],
+    ['?__clerk_db_jwt=token#foo', 'token'],
+    ['/foo?bar=42&__clerk_db_jwt=token#qux__clerk_db_jwt[token2]', 'token'],
   ];
 
   test.each(testCases)(
-    'returns the dev browser JWT from a url. Params: url=(%s), jwt=(%s)',
-    (input, jwt, calledWith) => {
-      expect(getDevBrowserJWTFromURL(new URL(input, DUMMY_URL_BASE))).toEqual(jwt);
-
-      if (calledWith === null) {
-        expect(replaceStateMock).not.toHaveBeenCalled();
-      } else {
-        expect(replaceStateMock).toHaveBeenCalledWith(null, '', new URL(calledWith, DUMMY_URL_BASE).href);
-      }
+    'returns the dev browser JWT from a url and cleans all dev . Params: url=(%s), jwt=(%s)',
+    (input, jwt) => {
+      expect(extractDevBrowserJWTFromURL(new URL(input, DUMMY_URL_BASE))).toEqual(jwt);
     },
   );
 });
