@@ -134,6 +134,13 @@ export default function SignInPage() {
               <Button>Password</Button>
             </AvailableStrategy>
 
+            <AvailableStrategy
+              asChild
+              name='email_code'
+            >
+              <Button>Email code to X</Button>
+            </AvailableStrategy>
+
             <GoBack asChild>
               <TextButton>Go back</TextButton>
             </GoBack>
@@ -167,6 +174,7 @@ export default function SignInPage() {
               <CustomField
                 label='Phone Code'
                 name='code'
+                autoFocus
               />
 
               <CustomSubmit>Verify</CustomSubmit>
