@@ -5,7 +5,6 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   BeforeEmitCallback,
-  BuildUrlWithAuthParams,
   Clerk,
   ClientResource,
   CreateOrganizationParams,
@@ -123,7 +122,7 @@ type IsomorphicLoadedClerk = Omit<
   // TODO: Align return type
   buildHomeUrl: () => string | void;
   // TODO: Align return type
-  buildUrlWithAuth: (to: string, opts?: BuildUrlWithAuthParams | undefined) => string | void;
+  buildUrlWithAuth: (to: string) => string | void;
 
   // TODO: Align optional props
   mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
@@ -311,8 +310,8 @@ export default class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  buildUrlWithAuth = (to: string, opts?: BuildUrlWithAuthParams | undefined): string | void => {
-    const callback = () => this.clerkjs?.buildUrlWithAuth(to, opts) || '';
+  buildUrlWithAuth = (to: string): string | void => {
+    const callback = () => this.clerkjs?.buildUrlWithAuth(to) || '';
     if (this.clerkjs && this.#loaded) {
       return callback();
     } else {
