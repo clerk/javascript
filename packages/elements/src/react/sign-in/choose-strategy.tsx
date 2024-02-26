@@ -48,14 +48,14 @@ export type SignInAvailableStrategyElement = React.ElementRef<'button'>;
 export type SignInAvailableStrategyProps = WithChildrenProp<{ asChild?: boolean; name: SignInFirstFactor['strategy'] }>;
 
 /**
- * Renders a button which will trigger a change in sign-in strategies. It must be used within the `choose-strategy` Step.
+ * By default, renders a button which will trigger a change in the chosen sign-in strategy. It **must** be used within a `<Step name='choose-strategy'>` component.
  *
  * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
  *
  * @example
  * <Step name='choose-strategy'>
- *   <AvailableStrategy name="pasword">
- *     Password
+ *   <AvailableStrategy name='password'>
+ *     Sign in with password
  *   </AvailableStrategy>
  * </Step
  */
@@ -106,18 +106,17 @@ type ChooseAlternateStrategyElement = React.ElementRef<'button'>;
 type ChooseAlternateStrategyProps = WithChildrenProp<{ asChild?: boolean }>;
 
 /**
- * Renders a button which will trigger the choose strategy step. It must be used within the `verifications` Step.
+ * By default, renders a button which will display the `<Step name='choose-strategy'>` component. It **must** be used within the `<Step name='verifications'>` component.
  *
  * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
  *
  * @example
  * <Step name='verifications'>
- *   <ChooseAlternateStrategy name="pasword">
- *     Password
+ *   <ChooseAlternateStrategy>
+ *     Use another method
  *   </ChooseAlternateStrategy>
  * </Step>
  */
-
 export const SignInChooseAlternateStrategy = React.forwardRef<
   ChooseAlternateStrategyElement,
   ChooseAlternateStrategyProps

@@ -12,6 +12,19 @@ export type SignInGoBackProps = WithChildrenProp<{
   asChild?: boolean;
 }>;
 
+/**
+ * By default, renders a button which will try to navigate to the previous step of the current sign-in flow (if possible). One use case is inside the `<Step name='choose-strategy'>` component to allow getting back to the previous input (e.g. reverting the "Use another method" action).
+ *
+ * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ *
+ * @example
+ * <Step name='choose-strategy'>
+ *  <AvailableStrategy name='password'>
+ *    Sign in with password
+ *  </AvailableStrategy>
+ *  <GoBack>Go back</GoBack>
+ * </Step>
+ */
 export const SignInGoBack = React.forwardRef<SignInGoBackElement, SignInGoBackProps>(
   ({ asChild, ...rest }, forwardedRef) => {
     const actorRef = SignInRouterCtx.useActorRef();
