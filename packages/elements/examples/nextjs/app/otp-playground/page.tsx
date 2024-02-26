@@ -9,12 +9,17 @@ export default function Page() {
   return (
     <SignIn path='/otp-playground'>
       <Step name='start'>
-        <div className='h-dvh flex items-center justify-center bg-neutral-800'>
+        <div className='h-dvh flex items-center justify-center bg-neutral-800 flex-col'>
+          <Field name='code-one'>
+            <Input
+              type='otp'
+              className='text-black mb-8'
+            />
+          </Field>
           <Field name='code'>
             <Label className='sr-only'>Label</Label>
             <Input
               className='flex gap-3 text-white isolate font-semibold text-2xl'
-              data-1p-ignore
               type='otp'
               render={({ value, status }) => (
                 <div

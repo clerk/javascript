@@ -23,5 +23,5 @@ export const useFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
     };
   }, [inputRef, setIsFocused]);
 
-  return isFocused;
+  return Boolean(isFocused);
 };
