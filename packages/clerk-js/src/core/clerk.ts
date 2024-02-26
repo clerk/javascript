@@ -19,7 +19,6 @@ import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   BeforeEmitCallback,
-  BuildUrlWithAuthParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkOptions,
@@ -726,7 +725,7 @@ export default class Clerk implements ClerkInterface {
     return await customNavigate(stripOrigin(toURL));
   };
 
-  public buildUrlWithAuth(to: string, options?: BuildUrlWithAuthParams): string {
+  public buildUrlWithAuth(to: string): string {
     if (this.#instanceType === 'production' || !this.#devBrowserHandler?.usesUrlBasedSessionSync()) {
       return to;
     }
@@ -742,10 +741,7 @@ export default class Clerk implements ClerkInterface {
       return clerkMissingDevBrowserJwt();
     }
 
-    // Use query param for Account Portal pages so that SSR can access the dev_browser JWT
-    const asQueryParam = !!options?.useQueryParam || isDevAccountPortalOrigin(toURL.hostname);
-
-    return setDevBrowserJWTInURL(toURL, devBrowserJwt, asQueryParam).href;
+    return setDevBrowserJWTInURL(toURL, devBrowserJwt).href;
   }
 
   public buildSignInUrl(options?: SignInRedirectOptions): string {
@@ -1691,8 +1687,7 @@ export default class Clerk implements ClerkInterface {
       return false;
     }
 
-    const buildUrlWithAuthParams: BuildUrlWithAuthParams = { useQueryParam: true };
-    await this.navigate(this.buildUrlWithAuth(redirectUrl, buildUrlWithAuthParams));
+    await this.navigate(this.buildUrlWithAuth(redirectUrl));
     return true;
   };
 }

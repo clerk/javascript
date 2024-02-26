@@ -3,7 +3,7 @@ export const DEV_BROWSER_JWT_MARKER = '__clerk_db_jwt';
 const DEV_BROWSER_JWT_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
 
 // Sets the dev_browser JWT in the hash or the search
-export function setDevBrowserJWTInURL(url: URL, jwt: string, asQueryParam: boolean): URL {
+export function setDevBrowserJWTInURL(url: URL, jwt: string, opts = { hash: true }): URL {
   const resultURL = new URL(url);
 
   const jwtFromHash = extractDevBrowserJWTFromURLHash(resultURL);
@@ -12,11 +12,9 @@ export function setDevBrowserJWTInURL(url: URL, jwt: string, asQueryParam: boole
   const jwtToSet = jwtFromHash || jwtFromSearch || jwt;
 
   if (jwtToSet) {
-    if (asQueryParam) {
-      // Temporarily add the dev browser jwt to both the `__clerk_db_jwt` and `__dev_session`
-      resultURL.searchParams.append(DEV_BROWSER_SSO_JWT_PARAMETER, jwtToSet);
-      resultURL.searchParams.append(DEV_BROWSER_JWT_MARKER, jwtToSet);
-    } else {
+    resultURL.searchParams.append(DEV_BROWSER_SSO_JWT_PARAMETER, jwtToSet);
+    resultURL.searchParams.append(DEV_BROWSER_JWT_MARKER, jwtToSet);
+    if (opts.hash) {
       resultURL.hash = resultURL.hash + `${DEV_BROWSER_JWT_MARKER}[${jwtToSet}]`;
     }
   }

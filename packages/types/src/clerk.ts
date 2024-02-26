@@ -328,7 +328,7 @@ export interface Clerk {
    * @param {string} to
    * @param opts A {@link BuildUrlWithAuthParams} object
    */
-  buildUrlWithAuth(to: string, opts?: BuildUrlWithAuthParams): string;
+  buildUrlWithAuth(to: string): string;
 
   /**
    * Returns the configured url where <SignIn/> is mounted or a custom sign-in page is rendered.
@@ -411,6 +411,7 @@ export interface Clerk {
    * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
   handleRedirectCallback: (
+    // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
     params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ) => Promise<unknown>;
@@ -519,13 +520,6 @@ export type HandleOAuthCallbackParams = {
 };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
-
-export type BuildUrlWithAuthParams = {
-  /**
-   * Controls if dev browser JWT is added as a query param
-   */
-  useQueryParam?: boolean | null;
-};
 
 // TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
 // (to: string) => Promise<unknown>

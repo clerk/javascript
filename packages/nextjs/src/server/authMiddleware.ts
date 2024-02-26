@@ -18,7 +18,6 @@ import {
 } from './errors';
 import { redirectToSignIn } from './redirect';
 import type { NextMiddlewareResult, WithAuthOptions } from './types';
-import { isDevAccountPortalOrigin } from './url';
 import {
   apiEndpointUnauthorizedNextResponse,
   decorateRequest,
@@ -309,11 +308,7 @@ const appendDevBrowserOnCrossOrigin = (req: WithClerkUrl<NextRequest>, res: Resp
 
     // Next.js 12.1+ allows redirects only to absolute URLs
     const url = new URL(location);
-
-    // Use query param for Account Portal pages so that SSR can access the dev_browser JWT
-    const asQueryParam = isDevAccountPortalOrigin(url.hostname);
-
-    const urlWithDevBrowser = setDevBrowserJWTInURL(url, dbJwt, asQueryParam);
+    const urlWithDevBrowser = setDevBrowserJWTInURL(url, dbJwt, { hash: false });
 
     return NextResponse.redirect(urlWithDevBrowser.href, res);
   }
