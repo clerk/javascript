@@ -156,6 +156,7 @@ export const TagInput = (props: TagInputProps) => {
         onBlur={handleOnBlur}
         focusRing={false}
         autoFocus={autoFocus}
+        variant='unstyled'
         sx={t => ({
           flexGrow: 1,
           borderWidth: 0,
