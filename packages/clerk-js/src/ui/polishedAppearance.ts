@@ -29,7 +29,7 @@ const inputShadowStyles = (
     '&:hover': {
       boxShadow: hoverShadow,
     },
-    '&:focus': {
+    '&:focus-within': {
       boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
     },
   };
@@ -156,21 +156,26 @@ export const polishedAppearance: Appearance = {
         borderWidth: 0,
         boxShadow: `${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha150}, ${theme.shadows.$badge}`,
       },
-      phoneInputBox: (() => {
-        const boxShadow = [
-          `0px 0px 0px 1px ${theme.colors.$neutralAlpha150}`,
-          theme.shadows.$input.replace('{{color}}', theme.colors.$neutralAlpha100),
-        ].toString();
-        return {
-          borderWidth: 0,
-          '> div > input': {
+      phoneInputBox: {
+        ...inputStyles(theme),
+        'div > input': {
+          boxShadow: 'unset',
+          '&[data-feedback]': {
+            '&:focus-within': {
+              boxShadow: 'unset',
+            },
+            '&:hover': {
+              boxShadow: 'unset',
+            },
+          },
+          '&:focus-within': {
             boxShadow: 'unset',
           },
-          boxShadow,
-          '&:hover': { boxShadow },
-          '&:focus': { boxShadow },
-        };
-      })(),
+          '&:hover': {
+            boxShadow: 'unset',
+          },
+        },
+      },
       selectSearchInput__countryCode: {
         boxShadow: 'none',
         '&:focus': { boxShadow: 'none' },

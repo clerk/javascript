@@ -77,6 +77,9 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
+        '&:focus-within': {
+          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
+        },
       })}
     >
       <Select
@@ -110,17 +113,20 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         <SelectButton
           variant='ghost'
           sx={t => ({
-            borderWidth: 0,
+            borderWidth: '0',
             borderRadius: t.radii.$md, // needs to be specified as we can't use overflow: hidden on the parent, hides the popover
             borderBottomRightRadius: '0',
             borderTopRightRadius: '0',
+            paddingRight: t.space.$2,
             ':focus': {
               zIndex: 2,
+              boxShadow: 'none',
             },
             ':active': {
               zIndex: 2,
             },
           })}
+          hoverAsFocus
           isDisabled={rest.isDisabled}
           icon={ArrowUpDown}
           iconSx={t => ({
@@ -173,7 +179,6 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             t => ({
               boxShadow: 'none',
               borderRadius: t.radii.$md,
-              ...common.focusRing(t),
               height: '100%',
               borderTopLeftRadius: '0',
               borderBottomLeftRadius: '0',
