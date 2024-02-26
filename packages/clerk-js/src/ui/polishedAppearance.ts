@@ -131,11 +131,13 @@ export const polishedAppearance: Appearance = {
         },
       },
       input: {
-        ...inputStyles(theme),
-        '&[type="radio"]': {
-          boxShadow: 'none',
-          '&:hover': {
+        '&[data-variant="default"]': {
+          ...inputStyles(theme),
+          '&[type="radio"]': {
             boxShadow: 'none',
+            '&:hover': {
+              boxShadow: 'none',
+            },
           },
         },
       },
@@ -158,27 +160,6 @@ export const polishedAppearance: Appearance = {
       },
       phoneInputBox: {
         ...inputStyles(theme),
-        'div > input': {
-          boxShadow: 'unset',
-          '&[data-feedback]': {
-            '&:focus-within': {
-              boxShadow: 'unset',
-            },
-            '&:hover': {
-              boxShadow: 'unset',
-            },
-          },
-          '&:focus-within': {
-            boxShadow: 'unset',
-          },
-          '&:hover': {
-            boxShadow: 'unset',
-          },
-        },
-      },
-      selectSearchInput__countryCode: {
-        boxShadow: 'none',
-        '&:focus': { boxShadow: 'none' },
       },
       cardBox: {
         borderWidth: 0,

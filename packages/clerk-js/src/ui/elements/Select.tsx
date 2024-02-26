@@ -196,6 +196,7 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
         elementDescriptor={descriptors.selectSearchInput}
         elementId={descriptors.selectSearchInput.setId(elementId)}
         focusRing={false}
+        variant='unstyled'
         sx={[
           t => ({
             borderRadius: t.radii.$md,
