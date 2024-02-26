@@ -126,6 +126,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
               zIndex: 2,
             },
           })}
+          hoverAsFocus
           isDisabled={rest.isDisabled}
           icon={ArrowUpDown}
           iconSx={t => ({
