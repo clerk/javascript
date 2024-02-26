@@ -22,7 +22,8 @@ const resetPasswordStrategies: Set<TSignInStrategy> = new Set([
 ]);
 
 export function isResetPasswordStrategy(strategy: TSignInStrategy | null | undefined): boolean {
-  return !!strategy && resetPasswordStrategies.has(strategy as TSignInStrategy);
+  if (!strategy) return false;
+  return resetPasswordStrategies.has(strategy as TSignInStrategy);
 }
 
 export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {
@@ -42,24 +43,29 @@ export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
   return activeState ? children : null;
 }
 
-const AVAILABLE_STRATEGY_NAME = 'SignInAvailableStrategy';
+const STRATEGY_OPTION_NAME = 'SignInStrategyOption';
 
-export type SignInAvailableStrategyElement = React.ElementRef<'button'>;
-export type SignInAvailableStrategyProps = WithChildrenProp<{ asChild?: boolean; name: SignInFirstFactor['strategy'] }>;
+export type SignInStrategyOptionElement = React.ElementRef<'button'>;
+export type SignInStrategyOptionProps = WithChildrenProp<{
+  asChild?: boolean;
+  name: Exclude<SignInFirstFactor['strategy'], `oauth_${string}` | 'saml'>;
+}>;
 
 /**
  * By default, renders a button which will trigger a change in the chosen sign-in strategy. It **must** be used within a `<Step name='choose-strategy'>` component.
+ *
+ * @description This component will only render enabled options which are not the current strategy.
  *
  * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
  *
  * @example
  * <Step name='choose-strategy'>
- *   <AvailableStrategy name='password'>
+ *   <StrategyOption name='password'>
  *     Sign in with password
- *   </AvailableStrategy>
+ *   </StrategyOption>
  * </Step
  */
-export const SignInAvailableStrategy = React.forwardRef<SignInAvailableStrategyElement, SignInAvailableStrategyProps>(
+export const SignInStrategyOption = React.forwardRef<SignInStrategyOptionElement, SignInStrategyOptionProps>(
   ({ asChild, children, name, ...rest }, forwardedRef) => {
     const routerRef = SignInRouterCtx.useActorRef();
     const snapshot = routerRef.getSnapshot();
@@ -96,4 +102,4 @@ export const SignInAvailableStrategy = React.forwardRef<SignInAvailableStrategyE
   },
 );
 
-SignInAvailableStrategy.displayName = AVAILABLE_STRATEGY_NAME;
+SignInStrategyOption.displayName = STRATEGY_OPTION_NAME;

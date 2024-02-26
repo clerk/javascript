@@ -6,10 +6,7 @@ export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export { SignInStep as Step } from './step';
 export { SignInNavigate as Navigate } from './navigation';
 
-export {
-  SignInChooseStrategy as ChooseStrategy,
-  SignInAvailableStrategy as AvailableStrategy,
-} from './choose-strategy';
+export { SignInChooseStrategy as ChooseStrategy, SignInStrategyOption as StrategyOption } from './choose-strategy';
 
 export {
   SignInSocialProvider as SocialProvider,

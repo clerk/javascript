@@ -2,12 +2,12 @@
 
 import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
 import {
-  AvailableStrategy,
   Navigate,
   SignIn,
   SocialProvider,
   SocialProviderIcon,
   Step,
+  StrategyOption,
   Verification,
 } from '@clerk/elements/sign-in';
 import Link from 'next/link';
@@ -119,26 +119,26 @@ export default function SignInPage() {
             <CustomSocialProvider provider='google'>Continue with Google</CustomSocialProvider>
             <CustomSocialProvider provider='metamask'>Continue with Metamask</CustomSocialProvider>
 
-            <AvailableStrategy
+            <StrategyOption
               asChild
               name='reset_password_email_code'
             >
               <Button>Reset Password</Button>
-            </AvailableStrategy>
+            </StrategyOption>
 
-            <AvailableStrategy
+            <StrategyOption
               asChild
               name='password'
             >
               <Button>Password</Button>
-            </AvailableStrategy>
+            </StrategyOption>
 
-            <AvailableStrategy
+            <StrategyOption
               asChild
               name='email_code'
             >
               <Button>Email code to X</Button>
-            </AvailableStrategy>
+            </StrategyOption>
 
             <Navigate
               asChild
