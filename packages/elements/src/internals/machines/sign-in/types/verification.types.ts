@@ -17,12 +17,12 @@ export type SignInVerificationTags =
 // ---------------------------------- Events ---------------------------------- //
 
 export type SignInVerificationSubmitEvent = { type: 'SUBMIT' };
-export type SignInVerificationFactorChooseEvent = { type: 'STRATEGY.SELECT' };
 export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
 
-export type SignInVerificationFactorEvent = SignInVerificationFactorChooseEvent | SignInVerificationFactorUpdateEvent;
-
-export type SignInVerificationEvents = ErrorActorEvent | SignInVerificationSubmitEvent | SignInVerificationFactorEvent;
+export type SignInVerificationEvents =
+  | ErrorActorEvent
+  | SignInVerificationSubmitEvent
+  | SignInVerificationFactorUpdateEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 

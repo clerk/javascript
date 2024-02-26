@@ -3,8 +3,7 @@
 import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
 import {
   AvailableStrategy,
-  ChooseAlternateStrategy,
-  GoBack,
+  Navigate,
   SignIn,
   SocialProvider,
   SocialProviderIcon,
@@ -141,9 +140,12 @@ export default function SignInPage() {
               <Button>Email code to X</Button>
             </AvailableStrategy>
 
-            <GoBack asChild>
+            <Navigate
+              asChild
+              to='previous'
+            >
               <TextButton>Go back</TextButton>
-            </GoBack>
+            </Navigate>
           </div>
         </Step>
 
@@ -172,9 +174,10 @@ export default function SignInPage() {
 
             <Verification name='phone_code'>
               <CustomField
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
                 label='Phone Code'
                 name='code'
-                autoFocus
               />
 
               <CustomSubmit>Verify</CustomSubmit>
@@ -187,9 +190,12 @@ export default function SignInPage() {
             </Verification>
           </div>
 
-          <ChooseAlternateStrategy asChild>
+          <Navigate
+            asChild
+            to='choose-strategy'
+          >
             <TextButton>Use another method</TextButton>
-          </ChooseAlternateStrategy>
+          </Navigate>
         </Step>
       </div>
     </SignIn>

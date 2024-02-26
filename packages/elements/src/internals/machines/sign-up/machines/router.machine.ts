@@ -145,7 +145,8 @@ export const SignUpRouterMachine = setup({
         params: { strategy: 'saml' },
       }),
     },
-    PREV: '.Hist',
+    'NAVIGATE.PREVIOUS': '.Hist',
+    'NAVIGATE.START': '.Start',
     'ROUTE.REGISTER': {
       actions: enqueueActions(({ context, enqueue, event, self, system }) => {
         const { id, logic, input } = event;

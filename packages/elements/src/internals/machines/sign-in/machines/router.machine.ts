@@ -129,7 +129,8 @@ export const SignInRouterMachine = setup({
         params: { strategy: 'saml' },
       }),
     },
-    PREV: '.Hist',
+    'NAVIGATE.PREVIOUS': '.Hist',
+    'NAVIGATE.START': '.Start',
     'ROUTE.REGISTER': {
       actions: enqueueActions(({ context, enqueue, event, self }) => {
         const { id, logic, input } = event;
@@ -194,6 +195,7 @@ export const SignInRouterMachine = setup({
     Start: {
       tags: 'route:start',
       on: {
+        'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
         NEXT: [
           {
             guard: 'isComplete',
@@ -217,6 +219,7 @@ export const SignInRouterMachine = setup({
     FirstFactor: {
       tags: 'route:first-factor',
       on: {
+        'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
         NEXT: [
           {
             guard: 'isComplete',
@@ -237,13 +240,13 @@ export const SignInRouterMachine = setup({
       states: {
         Idle: {
           on: {
-            'STRATEGY.SELECT': 'ChoosingStrategy',
+            'NAVIGATE.CHOOSE_STRATEGY': 'ChoosingStrategy',
           },
         },
         ChoosingStrategy: {
           tags: ['route:choose-strategy'],
           on: {
-            PREV: 'Idle',
+            'NAVIGATE.PREVIOUS': 'Idle',
             'STRATEGY.UPDATE': {
               actions: sendTo('firstFactor', ({ event }) => event),
               target: 'Idle',

@@ -4,10 +4,13 @@ import { SignUpContinue, type SignUpContinueProps } from './continue';
 import { SignUpStart, type SignUpStartProps } from './start';
 import { SignUpVerifications, type SignUpVerificationsProps } from './verifications';
 
+type SignUpStep = 'start' | 'continue' | 'verifications';
+type StepWithProps<N extends SignUpStep, T> = { name: N } & T;
+
 export type SignUpStepProps =
-  | ({ name: 'start' } & SignUpStartProps)
-  | ({ name: 'continue' } & SignUpContinueProps)
-  | ({ name: 'verifications' } & SignUpVerificationsProps);
+  | StepWithProps<'start', SignUpStartProps>
+  | StepWithProps<'continue', SignUpContinueProps>
+  | StepWithProps<'verifications', SignUpVerificationsProps>;
 
 /**
  * Render different steps of the sign-up flow. Initially the `'start'` step is rendered. Optionally, you can render additional fields in the `'continue'` step. Once a sign-up attempt has been created, `'verifications'` will be displayed.
