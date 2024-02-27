@@ -74,8 +74,8 @@
     "xstate": "^5.7.1"
   },
   "devDependencies": {
-    "@clerk/clerk-react": "5.0.0-beta.21",
-    "@clerk/shared": "2.0.0-beta.14",
+    "@clerk/clerk-react": "5.0.0-beta.22",
+    "@clerk/shared": "2.0.0-beta.15",
     "@clerk/types": "^4.0.0-beta.16",
     "@types/node": "^18.17.0",
     "@types/react": "*",

@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.15
+
+### Patch Changes
+
+- Remove legacy \_\_dev_session from URL search params ([#2867](https://github.com/clerk/javascript/pull/2867)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.0.0-beta.14
 
 ### Patch Changes
