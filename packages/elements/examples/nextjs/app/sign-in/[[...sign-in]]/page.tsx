@@ -135,9 +135,16 @@ export default function SignInPage() {
 
             <StrategyOption
               asChild
+              name='phone_code'
+            >
+              <Button>Send a code to your phone</Button>
+            </StrategyOption>
+
+            <StrategyOption
+              asChild
               name='email_code'
             >
-              <Button>Email code to X</Button>
+              <Button>Send a code to your email</Button>
             </StrategyOption>
 
             <Navigate
@@ -164,9 +171,11 @@ export default function SignInPage() {
 
             <Verification name='email_code'>
               <CustomField
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                autoSubmit
                 label='Email Code'
                 name='code'
-                autoSubmit
               />
 
               <CustomSubmit>Verify</CustomSubmit>
@@ -176,6 +185,7 @@ export default function SignInPage() {
               <CustomField
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
+                autoSubmit
                 label='Phone Code'
                 name='code'
               />

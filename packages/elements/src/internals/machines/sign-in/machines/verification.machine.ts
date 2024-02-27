@@ -79,12 +79,10 @@ const SignInVerificationMachine = setup({
       invoke: {
         id: 'prepare',
         src: 'prepare',
-        input: ({ context }) => {
-          return {
-            parent: context.parent,
-            params: context.currentFactor as SignInFirstFactor | null,
-          };
-        },
+        input: ({ context }) => ({
+          parent: context.parent,
+          params: context.currentFactor as SignInFirstFactor | null,
+        }),
         onDone: 'Pending',
         onError: {
           actions: 'setFormErrors',
@@ -96,20 +94,16 @@ const SignInVerificationMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
-        'STRATEGY.CHOOSE': 'ChooseFactor',
-        SUBMIT: {
-          target: 'Attempting',
-          reenter: true,
-        },
+        'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
+        SUBMIT: 'Attempting',
       },
     },
-    ChooseFactor: {
-      tags: ['state:choose-factor'],
+    ChooseStrategy: {
+      tags: ['state:choose-strategy'],
       on: {
         'STRATEGY.UPDATE': {
           actions: assign({ currentFactor: ({ event }) => event.factor || null }),
           target: 'Preparing',
-          reenter: true,
         },
       },
     },

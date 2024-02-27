@@ -276,10 +276,7 @@ export const SignUpVerificationMachine = setup({
           description: 'Placeholder for allowing resending of email link',
           tags: ['state:pending'],
           on: {
-            NEXT: {
-              target: 'Preparing',
-              reenter: true,
-            },
+            NEXT: 'Preparing',
           },
         },
         Attempting: {
@@ -337,10 +334,7 @@ export const SignUpVerificationMachine = setup({
         Pending: {
           tags: ['state:pending'],
           on: {
-            SUBMIT: {
-              target: 'Attempting',
-              reenter: true,
-            },
+            SUBMIT: 'Attempting',
           },
         },
         Attempting: {
@@ -403,10 +397,7 @@ export const SignUpVerificationMachine = setup({
         Pending: {
           tags: ['state:pending'],
           on: {
-            SUBMIT: {
-              target: 'Attempting',
-              reenter: true,
-            },
+            SUBMIT: 'Attempting',
           },
         },
         Attempting: {

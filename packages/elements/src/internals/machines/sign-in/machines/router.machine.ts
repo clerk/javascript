@@ -205,13 +205,11 @@ export const SignInRouterMachine = setup({
             guard: 'statusNeedsFirstFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'FirstFactor',
-            reenter: true,
           },
           {
             guard: 'statusNeedsSecondFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
-            reenter: true,
           },
         ],
       },
@@ -229,7 +227,6 @@ export const SignInRouterMachine = setup({
             guard: 'statusNeedsSecondFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
-            reenter: true,
           },
           {
             actions: ['logUnknownError', { type: 'navigateInternal', params: { path: '/' } }],
@@ -240,7 +237,11 @@ export const SignInRouterMachine = setup({
       states: {
         Idle: {
           on: {
-            'NAVIGATE.CHOOSE_STRATEGY': 'ChoosingStrategy',
+            'NAVIGATE.CHOOSE_STRATEGY': {
+              description: 'Send event to verification machine to update the current factor.',
+              actions: sendTo('firstFactor', ({ event }) => event),
+              target: 'ChoosingStrategy',
+            },
           },
         },
         ChoosingStrategy: {
@@ -248,6 +249,7 @@ export const SignInRouterMachine = setup({
           on: {
             'NAVIGATE.PREVIOUS': 'Idle',
             'STRATEGY.UPDATE': {
+              description: 'Send event to verification machine to update the current factor.',
               actions: sendTo('firstFactor', ({ event }) => event),
               target: 'Idle',
             },
@@ -291,13 +293,11 @@ export const SignInRouterMachine = setup({
             guard: 'statusNeedsFirstFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'FirstFactor',
-            reenter: true,
           },
           {
             guard: 'statusNeedsSecondFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
-            reenter: true,
           },
         ],
       },
@@ -308,7 +308,6 @@ export const SignInRouterMachine = setup({
         NEXT: {
           target: 'Start',
           actions: 'resetError',
-          reenter: true,
         },
       },
     },
@@ -318,7 +317,6 @@ export const SignInRouterMachine = setup({
     Hist: {
       type: 'history',
       exit: 'resetError',
-      reenter: true,
     },
   },
 });

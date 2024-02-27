@@ -8,11 +8,11 @@ import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines
 // ---------------------------------- Tags ---------------------------------- //
 
 export type SignInVerificationTags =
-  | 'state:pending'
-  | 'state:preparing'
   | 'state:attempting'
+  | 'state:choose-strategy'
   | 'state:loading'
-  | 'state:choose-factor';
+  | 'state:pending'
+  | 'state:preparing';
 
 // ---------------------------------- Events ---------------------------------- //
 
