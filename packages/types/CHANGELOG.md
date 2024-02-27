@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.62.1
+
+### Patch Changes
+
+- Append the devBrowser JWT to searchParams always in order to make v4 support both older v4 versions as well as v5 versions when a redirect flow is goes through AccountPortal ([#2857](https://github.com/clerk/javascript/pull/2857)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 3.62.0
 
 ### Minor Changes
