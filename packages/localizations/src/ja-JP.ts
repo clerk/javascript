@@ -444,10 +444,8 @@ export const jaJP: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
   unstable__errors: {
-    captcha_invalid:
-      'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
-    captcha_unavailable:
-      'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+    captcha_invalid: 'セキュリティ検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
+    captcha_unavailable: 'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
     form_code_incorrect: 'フォームコードが正しくありません。',
     form_identifier_exists: '識別子が既に存在します。',
     form_identifier_not_found: '識別子が見つかりません。',
@@ -607,7 +605,7 @@ export const jaJP: LocalizationResource = {
       title: '二段階認証の追加',
     },
     mfaPhoneCodePage: {
-      backButton: 'Use existing number',
+      backButton: '既存の番号を使用',
       primaryButton__addPhoneNumber: '電話番号を追加',
       removeResource: {
         messageLine1: '{{identifier}}はサインイン時に認証コードを受け取らなくなります。',
@@ -650,10 +648,10 @@ export const jaJP: LocalizationResource = {
     },
     mobileButton__menu: 'メニュー',
     navbar: {
-      account: 'Profile',
-      description: 'Manage your account info.',
-      security: 'Security',
-      title: 'Account',
+      account: 'プロファイル',
+      description: 'アカウント情報を管理します。',
+      security: 'セキュリティ',
+      title: 'アカウント',
     },
     passwordPage: {
       successMessage__set: 'パスワードが設定されました。',
@@ -661,7 +659,7 @@ export const jaJP: LocalizationResource = {
       successMessage__signOutOfOtherSessions: '他のすべてのデバイスからサインアウトされました。',
       checkboxInfoText__signOutOfOtherSessions:
         '古いパスワードを使用している他のすべてのデバイスからサインアウトすることをお勧めします。',
-      readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      readonly: 'プロファイル情報はエンタープライズ接続によって提供されており、編集できません。',
       title__set: 'パスワードの設定',
       title__update: 'パスワードの更新',
     },
@@ -683,7 +681,7 @@ export const jaJP: LocalizationResource = {
       imageFormDestructiveActionSubtitle: '画像の削除',
       imageFormSubtitle: '画像のアップロード',
       imageFormTitle: 'プロフィール画像',
-      readonly: 'Your profile information has been provided by the enterprise connection and cannot be edited.',
+      readonly: 'プロファイル情報はエンタープライズ接続によって提供されており、編集できません。',
       successMessage: 'プロフィールが更新されました。',
       title: 'プロフィールの更新',
     },
@@ -698,7 +696,7 @@ export const jaJP: LocalizationResource = {
         destructiveActionTitle: '削除',
         primaryButton: 'アカウントを連携する',
         subtitle__reauthorize:
-          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
+          '必要なスコープが更新され、機能が制限されている可能性があります。問題を避けるために、このアプリケーションを再認証してください。',
         title: '連携アカウント',
       },
       dangerSection: {
@@ -714,7 +712,7 @@ export const jaJP: LocalizationResource = {
         title: 'メールアドレス',
       },
       enterpriseAccountsSection: {
-        title: 'Enterprise accounts',
+        title: 'エンタープライズアカウント',
       },
       headerTitle__account: 'アカウント',
       headerTitle__security: 'セキュリティ',
