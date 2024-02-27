@@ -76,6 +76,12 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
             padding: 0,
             marginTop: 0,
           },
+          '>:not(:first-of-type)': {
+            padding: `${t.space.$4} ${t.space.$8}`,
+            borderTopWidth: t.borderWidths.$normal,
+            borderTopStyle: t.borderStyles.$solid,
+            borderTopColor: t.colors.$neutralAlpha100,
+          },
         }),
         sx,
       ]}
