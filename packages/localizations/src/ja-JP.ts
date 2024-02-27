@@ -564,7 +564,7 @@ export const jaJP: LocalizationResource = {
       title: '連携アカウントの追加',
     },
     deletePage: {
-      actionDescription: '続行するには「アカウント削除」を下に入力してください。',
+      actionDescription: '続行するには下記に「Delete account」を入力してください。',
       confirm: 'アカウント削除',
       messageLine1: 'アカウントを削除してもよろしいですか？',
       messageLine2: 'この操作は永久的で取り消すことはできません。',
