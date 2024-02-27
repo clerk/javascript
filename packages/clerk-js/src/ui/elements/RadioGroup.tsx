@@ -19,7 +19,6 @@ const RadioIndicator = forwardRef<HTMLInputElement, { value: string; id: string 
         width: 'fit-content',
         marginTop: t.space.$0x5,
       })}
-      type='radio'
       value={props.value}
       checked={props.value === value}
     />

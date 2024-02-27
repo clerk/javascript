@@ -223,7 +223,6 @@ const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
         width: 'fit-content',
         marginTop: t.space.$0x5,
       })}
-      type='checkbox'
     />
   );
 });
