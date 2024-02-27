@@ -11,6 +11,8 @@ export * from './Image';
 export * from './Alert';
 export * from './AlertIcon';
 export * from './Input';
+export * from './CheckboxInput';
+export * from './RadioInput';
 export * from './FormErrorText';
 export * from './FormInfoText';
 export * from './FormSuccessText';

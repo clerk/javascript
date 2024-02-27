@@ -16,8 +16,8 @@ const camelize = (s: string) => s.replace(/-./g, x => x[1].toUpperCase());
 export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'button',
   'input',
-  'checkboxInput',
-  'radioInput',
+  'checkbox',
+  'radio',
   'table',
 
   'rootBox',
