@@ -26,7 +26,7 @@ export function setDevBrowserJWTInURL(url: URL, jwt: string): URL {
  */
 export function extractDevBrowserJWTFromURL(url: URL): string {
   const jwt = readDevBrowserJwtFromSearchParams(url);
-  if (jwt && typeof globalThis.history !== 'undefined') {
+  if (typeof globalThis.history !== 'undefined') {
     globalThis.history.replaceState(null, '', removeDevBrowserJwt(url));
   }
   return jwt;
