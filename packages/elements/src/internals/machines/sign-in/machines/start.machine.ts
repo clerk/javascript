@@ -61,10 +61,7 @@ export const SignInStartMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
-        SUBMIT: {
-          target: 'Attempting',
-          reenter: true,
-        },
+        SUBMIT: 'Attempting',
       },
     },
     Attempting: {

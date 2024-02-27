@@ -7,12 +7,22 @@ import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines
 
 // ---------------------------------- Tags ---------------------------------- //
 
-export type SignInVerificationTags = 'state:pending' | 'state:preparing' | 'state:attempting' | 'state:loading';
+export type SignInVerificationTags =
+  | 'state:attempting'
+  | 'state:choose-strategy'
+  | 'state:loading'
+  | 'state:pending'
+  | 'state:preparing';
 
 // ---------------------------------- Events ---------------------------------- //
 
 export type SignInVerificationSubmitEvent = { type: 'SUBMIT' };
-export type SignInVerificationEvents = ErrorActorEvent | SignInVerificationSubmitEvent;
+export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
+
+export type SignInVerificationEvents =
+  | ErrorActorEvent
+  | SignInVerificationSubmitEvent
+  | SignInVerificationFactorUpdateEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 

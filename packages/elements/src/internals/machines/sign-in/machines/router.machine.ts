@@ -129,7 +129,8 @@ export const SignInRouterMachine = setup({
         params: { strategy: 'saml' },
       }),
     },
-    PREV: '.Hist',
+    'NAVIGATE.PREVIOUS': '.Hist',
+    'NAVIGATE.START': '.Start',
     'ROUTE.REGISTER': {
       actions: enqueueActions(({ context, enqueue, event, self }) => {
         const { id, logic, input } = event;
@@ -194,6 +195,7 @@ export const SignInRouterMachine = setup({
     Start: {
       tags: 'route:start',
       on: {
+        'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
         NEXT: [
           {
             guard: 'isComplete',
@@ -203,13 +205,11 @@ export const SignInRouterMachine = setup({
             guard: 'statusNeedsFirstFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'FirstFactor',
-            reenter: true,
           },
           {
             guard: 'statusNeedsSecondFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
-            reenter: true,
           },
         ],
       },
@@ -217,6 +217,7 @@ export const SignInRouterMachine = setup({
     FirstFactor: {
       tags: 'route:first-factor',
       on: {
+        'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
         NEXT: [
           {
             guard: 'isComplete',
@@ -226,12 +227,34 @@ export const SignInRouterMachine = setup({
             guard: 'statusNeedsSecondFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
-            reenter: true,
           },
           {
             actions: ['logUnknownError', { type: 'navigateInternal', params: { path: '/' } }],
           },
         ],
+      },
+      initial: 'Idle',
+      states: {
+        Idle: {
+          on: {
+            'NAVIGATE.CHOOSE_STRATEGY': {
+              description: 'Send event to verification machine to update the current factor.',
+              actions: sendTo('firstFactor', ({ event }) => event),
+              target: 'ChoosingStrategy',
+            },
+          },
+        },
+        ChoosingStrategy: {
+          tags: ['route:choose-strategy'],
+          on: {
+            'NAVIGATE.PREVIOUS': 'Idle',
+            'STRATEGY.UPDATE': {
+              description: 'Send event to verification machine to update the current factor.',
+              actions: sendTo('firstFactor', ({ event }) => event),
+              target: 'Idle',
+            },
+          },
+        },
       },
     },
     SecondFactor: {
@@ -270,13 +293,11 @@ export const SignInRouterMachine = setup({
             guard: 'statusNeedsFirstFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'FirstFactor',
-            reenter: true,
           },
           {
             guard: 'statusNeedsSecondFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
-            reenter: true,
           },
         ],
       },
@@ -287,7 +308,6 @@ export const SignInRouterMachine = setup({
         NEXT: {
           target: 'Start',
           actions: 'resetError',
-          reenter: true,
         },
       },
     },
@@ -297,7 +317,6 @@ export const SignInRouterMachine = setup({
     Hist: {
       type: 'history',
       exit: 'resetError',
-      reenter: true,
     },
   },
 });

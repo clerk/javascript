@@ -1,6 +1,7 @@
 import type { SignInResource } from '@clerk/types';
 import type { AnyActorLogic } from 'xstate';
 
+import type { SignInVerificationFactorUpdateEvent } from '~/internals/machines/sign-in/types';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
@@ -10,6 +11,7 @@ import type {
   BaseRouterRedirectEvent,
   BaseRouterRouteRegisterEvent,
   BaseRouterRouteUnregisterEvent,
+  BaseRouterStartEvent,
   BaseRouterTransferEvent,
 } from '~/internals/machines/types';
 
@@ -22,6 +24,7 @@ export const SignInRouterRoutes = {
   callback: 'route:callback',
   error: 'route:error',
   forgotPassword: 'route:forgot-password',
+  chooseStrategy: 'route:choose-strategy',
 } as const;
 
 export type SignInRouterRoutes = keyof typeof SignInRouterRoutes;
@@ -40,7 +43,10 @@ export type SignInRouterSystemId = keyof typeof SignInRouterSystemId;
 // ---------------------------------- Events ---------------------------------- //
 
 export type SignInRouterNextEvent = BaseRouterNextEvent<SignInResource>;
+export type SignInRouterStartEvent = BaseRouterStartEvent;
 export type SignInRouterPrevEvent = BaseRouterPrevEvent;
+export type SignInRouterChooseStrategyEvent = { type: 'NAVIGATE.CHOOSE_STRATEGY' };
+export type SignInRouterForgotPasswordEvent = { type: 'NAVIGATE.FORGOT_PASSWORD' };
 export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
@@ -53,13 +59,20 @@ export type SignInRouterRouteUnregisterEvent = BaseRouterRouteUnregisterEvent<Si
 
 export type SignInRouterRouteEvents = SignInRouterRouteRegisterEvent | SignInRouterRouteUnregisterEvent;
 
+export type SignInRouterNavigationEvents =
+  | SignInRouterStartEvent
+  | SignInRouterChooseStrategyEvent
+  | SignInRouterForgotPasswordEvent
+  | SignInRouterPrevEvent;
+
 export type SignInRouterEvents =
   | SignInRouterNextEvent
-  | SignInRouterPrevEvent
+  | SignInRouterNavigationEvents
   | SignInRouterErrorEvent
   | SignInRouterTransferEvent
   | SignInRouterRouteEvents
-  | SignInRouterRedirectEvent;
+  | SignInRouterRedirectEvent
+  | SignInVerificationFactorUpdateEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 export interface SignInRouterInput extends BaseRouterInput {

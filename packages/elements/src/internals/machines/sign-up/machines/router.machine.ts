@@ -145,7 +145,8 @@ export const SignUpRouterMachine = setup({
         params: { strategy: 'saml' },
       }),
     },
-    PREV: '.Hist',
+    'NAVIGATE.PREVIOUS': '.Hist',
+    'NAVIGATE.START': '.Start',
     'ROUTE.REGISTER': {
       actions: enqueueActions(({ context, enqueue, event, self, system }) => {
         const { id, logic, input } = event;
@@ -210,13 +211,11 @@ export const SignUpRouterMachine = setup({
             guard: 'statusNeedsVerification',
             target: 'Verification',
             actions: { type: 'navigateInternal', params: { path: '/verify' } },
-            reenter: true,
           },
           {
             guard: 'statusNeedsContinue',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'Continue',
-            reenter: true,
           },
         ],
       },
@@ -233,7 +232,6 @@ export const SignUpRouterMachine = setup({
             guard: 'statusNeedsVerification',
             target: 'Verification',
             actions: { type: 'navigateInternal', params: { path: '/verify' } },
-            reenter: true,
           },
         ],
       },
@@ -267,7 +265,6 @@ export const SignUpRouterMachine = setup({
             guard: 'statusNeedsContinue',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'Continue',
-            reenter: true,
           },
         ],
       },

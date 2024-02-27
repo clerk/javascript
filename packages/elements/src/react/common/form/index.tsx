@@ -1,3 +1,4 @@
+import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
   FormControlProps as RadixFormControlProps,
@@ -32,7 +33,7 @@ import type { FieldDetails } from '~/internals/machines/form/form.types';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
-import type { FieldStates } from './types';
+import type { ClerkFieldId, FieldStates } from './types';
 
 /* -------------------------------------------------------------------------------------------------
  * Context
@@ -229,7 +230,10 @@ const FIELD_NAME = 'ClerkElementsField';
 const FIELD_INNER_NAME = 'ClerkElementsFieldInner';
 
 type FormFieldElement = React.ElementRef<typeof RadixField>;
-type FormFieldProps = RadixFormFieldProps & { alwaysShow?: boolean };
+type FormFieldProps = RadixFormFieldProps & {
+  alwaysShow?: boolean;
+  name: Autocomplete<ClerkFieldId>;
+};
 
 /**
  * A wrapper component used to associate its child elements with a specific form field. Automatically handles unique ID generation and associating labels with inputs.
@@ -237,7 +241,7 @@ type FormFieldProps = RadixFormFieldProps & { alwaysShow?: boolean };
  * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `email`, `password`, `phone`, `code`, and `identifier`.
  *
  * @example
- * <Field name="email">
+ * <Field name="emailAddress">
  *   <Label>Email</Label>
  *   <Input />
  * </Field>

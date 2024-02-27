@@ -4,7 +4,9 @@ import { SignInRouterCtx } from './context';
 
 export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export { SignInStep as Step } from './step';
-export { SignInGoBack as GoBack } from './go-back';
+export { SignInNavigate as Navigate } from './navigation';
+
+export { SignInChooseStrategy as ChooseStrategy, SignInStrategyOption as StrategyOption } from './choose-strategy';
 
 export {
   SignInSocialProvider as SocialProvider,

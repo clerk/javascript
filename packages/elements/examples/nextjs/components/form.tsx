@@ -35,8 +35,11 @@ function OTPInputSegment({ value, status }: any) {
 
 export const CustomField = React.forwardRef<
   typeof Input,
-  { alwaysShow?: boolean; name: string; label: string; required?: boolean; autoSubmit?: boolean }
->(function CustomField({ alwaysShow, name, label, required = false, autoSubmit = false }, forwardedRef) {
+  { alwaysShow?: boolean; name: string; label: string; required?: boolean; autoSubmit?: boolean; autoFocus?: boolean }
+>(function CustomField(
+  { alwaysShow, name, label, required = false, autoSubmit = false, autoFocus = false },
+  forwardedRef,
+) {
   const inputProps =
     name === 'code'
       ? {
@@ -44,11 +47,13 @@ export const CustomField = React.forwardRef<
           className: 'flex gap-3',
           required,
           autoSubmit,
+          autoFocus,
         }
       : {
           className: 'bg-tertiary rounded-sm px-2 py-1 border border-foreground data-[invalid]:border-red-500',
           ref: forwardedRef,
           required,
+          autoFocus,
         };
 
   return (
