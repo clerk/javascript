@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0-beta.26
+
+### Patch Changes
+
+- Always drop **clerk_db_jwt and **dev_session params from the URL by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`db18787c4`](https://github.com/clerk/javascript/commit/db18787c4d9fa8ee1306db9b65f3b3f5e2fe2dad)]:
+  - @clerk/shared@2.0.0-beta.16
+
 ## 5.0.0-beta.25
 
 ### Patch Changes

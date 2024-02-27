@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.16
+
+### Patch Changes
+
+- Always drop **clerk_db_jwt and **dev_session params from the URL by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.0.0-beta.15
 
 ### Patch Changes
