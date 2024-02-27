@@ -14,7 +14,6 @@ const cardContentStyles = (theme: InternalTheme) => ({
 const inputShadowStyles = (
   theme: InternalTheme,
   colors: { idle1: string; idle2: string; hover1: string; hover2: string; focus: string },
-  focusRing?: boolean,
 ) => {
   const idleShadow = [
     `0px 0px 0px 1px ${colors.idle1}`,
@@ -30,60 +29,42 @@ const inputShadowStyles = (
     '&:hover': {
       boxShadow: hoverShadow,
     },
-    '&:focus-within': focusRing
-      ? {
-          boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
-        }
-      : {},
+    '&:focus-within': {
+      boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
+    },
   };
 };
 
-const inputStyles = (theme: InternalTheme, focusRing: boolean = true) => ({
+const inputStyles = (theme: InternalTheme) => ({
   borderWidth: 0,
-  ...inputShadowStyles(
-    theme,
-    {
-      idle1: theme.colors.$neutralAlpha150,
-      idle2: theme.colors.$neutralAlpha100,
-      hover1: theme.colors.$neutralAlpha300,
-      hover2: theme.colors.$neutralAlpha150,
-      focus: theme.colors.$neutralAlpha150,
-    },
-    focusRing,
-  ),
-  '&[data-feedback="error"]': inputShadowStyles(
-    theme,
-    {
-      idle1: theme.colors.$dangerAlpha400,
-      idle2: theme.colors.$dangerAlpha200,
-      hover1: theme.colors.$dangerAlpha500,
-      hover2: theme.colors.$dangerAlpha200,
-      focus: theme.colors.$dangerAlpha200,
-    },
-    focusRing,
-  ),
-  '&[data-feedback="warning"]': inputShadowStyles(
-    theme,
-    {
-      idle1: theme.colors.$warningAlpha400,
-      idle2: theme.colors.$warningAlpha200,
-      hover1: theme.colors.$warningAlpha500,
-      hover2: theme.colors.$warningAlpha200,
-      focus: theme.colors.$warningAlpha200,
-    },
-    focusRing,
-  ),
-  '&[data-feedback="success"]': inputShadowStyles(
-    theme,
-    {
-      idle1: theme.colors.$successAlpha400,
-      idle2: theme.colors.$successAlpha200,
-      hover1: theme.colors.$successAlpha500,
-      hover2: theme.colors.$successAlpha200,
-      focus: theme.colors.$successAlpha200,
-    },
-    focusRing,
-  ),
+  ...inputShadowStyles(theme, {
+    idle1: theme.colors.$neutralAlpha150,
+    idle2: theme.colors.$neutralAlpha100,
+    hover1: theme.colors.$neutralAlpha300,
+    hover2: theme.colors.$neutralAlpha150,
+    focus: theme.colors.$neutralAlpha150,
+  }),
+  '&[data-feedback="error"]': inputShadowStyles(theme, {
+    idle1: theme.colors.$dangerAlpha400,
+    idle2: theme.colors.$dangerAlpha200,
+    hover1: theme.colors.$dangerAlpha500,
+    hover2: theme.colors.$dangerAlpha200,
+    focus: theme.colors.$dangerAlpha200,
+  }),
+  '&[data-feedback="warning"]': inputShadowStyles(theme, {
+    idle1: theme.colors.$warningAlpha400,
+    idle2: theme.colors.$warningAlpha200,
+    hover1: theme.colors.$warningAlpha500,
+    hover2: theme.colors.$warningAlpha200,
+    focus: theme.colors.$warningAlpha200,
+  }),
+  '&[data-feedback="success"]': inputShadowStyles(theme, {
+    idle1: theme.colors.$successAlpha400,
+    idle2: theme.colors.$successAlpha200,
+    hover1: theme.colors.$successAlpha500,
+    hover2: theme.colors.$successAlpha200,
+    focus: theme.colors.$successAlpha200,
+  }),
 });
 
 export const polishedAppearance: Appearance = {
@@ -161,7 +142,7 @@ export const polishedAppearance: Appearance = {
         },
       },
       tagInputContainer: {
-        ...inputStyles(theme, false),
+        ...inputStyles(theme),
       },
       tagPillContainer: {
         borderWidth: 0,
