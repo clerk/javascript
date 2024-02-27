@@ -4,6 +4,7 @@ import React, { forwardRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
+  CheckboxInput,
   descriptors,
   Flex,
   FormLabel,
@@ -212,7 +213,7 @@ const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
   const { placeholder, ...inputProps } = sanitizeInputProps(formField);
 
   return (
-    <Input
+    <CheckboxInput
       ref={ref}
       {...inputProps}
       elementDescriptor={descriptors.formFieldInput}
@@ -221,7 +222,6 @@ const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
       sx={t => ({
         width: 'fit-content',
         marginTop: t.space.$0x5,
-        boxShadow: 'none',
       })}
       type='checkbox'
     />

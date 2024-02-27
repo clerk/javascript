@@ -133,12 +133,6 @@ export const polishedAppearance: Appearance = {
       input: {
         '&[data-variant="default"]': {
           ...inputStyles(theme),
-          '&[type="radio"]': {
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: 'none',
-            },
-          },
         },
       },
       tagInputContainer: {

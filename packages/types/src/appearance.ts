@@ -135,6 +135,8 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
 export type ElementsConfig = {
   button: WithOptions;
   input: WithOptions;
+  checkboxInput: WithOptions;
+  radioInput: WithOptions;
   table: WithOptions;
 
   rootBox: WithOptions;
