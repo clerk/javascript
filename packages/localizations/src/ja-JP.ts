@@ -647,12 +647,12 @@ export const jaJP: LocalizationResource = {
       title: 'アカウント',
     },
     passwordPage: {
-      successMessage__set: 'パスワードが設定されました。',
-      successMessage__update: 'パスワードが更新されました。',
-      successMessage__signOutOfOtherSessions: '他のすべてのデバイスからサインアウトされました。',
       checkboxInfoText__signOutOfOtherSessions:
         '古いパスワードを使用している可能性のあるすべてのデバイスからサインアウトすることをお勧めします。',
       readonly: 'プロファイル情報はエンタープライズ接続によって提供されており、編集できません。',
+      successMessage__set: 'パスワードが設定されました。',
+      successMessage__signOutOfOtherSessions: '他のすべてのデバイスからサインアウトされました。',
+      successMessage__update: 'パスワードが更新されました。',
       title__set: 'パスワードの設定',
       title__update: 'パスワードの更新',
     },
@@ -729,8 +729,8 @@ export const jaJP: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'パスワードを変更する',
         primaryButton__setPassword: 'パスワードを設定する',
+        primaryButton__updatePassword: 'パスワードを変更する',
         title: 'パスワード',
       },
       phoneNumbersSection: {
@@ -746,8 +746,8 @@ export const jaJP: LocalizationResource = {
         title: 'プロフィール',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'ユーザー名の変更',
         primaryButton__setUsername: 'ユーザー名の設定',
+        primaryButton__updateUsername: 'ユーザー名の変更',
         title: 'ユーザー名',
       },
       web3WalletsSection: {
