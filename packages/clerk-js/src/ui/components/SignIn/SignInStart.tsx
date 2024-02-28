@@ -82,6 +82,7 @@ export function _SignInStart(): JSX.Element {
   const textIdentifierField = useFormControl('identifier', initialValues[identifierAttribute] || '', {
     ...currentIdentifier,
     isRequired: true,
+    transformer: value => value.trim(),
   });
 
   const phoneIdentifierField = useFormControl('identifier', initialValues['phone_number'] || '', {
