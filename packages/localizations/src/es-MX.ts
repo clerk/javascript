@@ -653,12 +653,12 @@ export const esMX: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Su contraseña ha sido establecida.',
-      successMessage__update: 'Tu contraseña ha sido actualizada.',
-      successMessage__signOutOfOtherSessions: 'Todos los demás dispositivos han cerrado sesión.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Su contraseña ha sido establecida.',
+      successMessage__signOutOfOtherSessions: 'Todos los demás dispositivos han cerrado sesión.',
+      successMessage__update: 'Tu contraseña ha sido actualizada.',
       title__set: 'Configurar la clave',
       title__update: 'Cambiar contraseña',
     },
@@ -735,8 +735,8 @@ export const esMX: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Cambiar contraseña',
         primaryButton__setPassword: 'Establecer contraseña ',
+        primaryButton__updatePassword: 'Cambiar contraseña',
         title: 'Contraseña',
       },
       phoneNumbersSection: {
@@ -752,8 +752,8 @@ export const esMX: LocalizationResource = {
         title: 'Perfil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Cambiar nombre de usuario',
         primaryButton__setUsername: 'Crear nombre de usuario',
+        primaryButton__updateUsername: 'Cambiar nombre de usuario',
         title: 'Nombre de usuario',
       },
       web3WalletsSection: {

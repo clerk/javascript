@@ -656,13 +656,13 @@ export const elGR: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Ο κωδικός πρόσβασής σας έχει οριστεί.',
-      successMessage__update: 'Ο κωδικός πρόσβασής σας έχει ενημερωθεί.',
-      successMessage__signOutOfOtherSessions: 'Όλες οι άλλες συνεδρίες έχουν αποσυνδεθεί.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Ο κωδικός πρόσβασής σας δεν μπορεί να επεξεργαστεί αυτήν τη στιγμή επειδή μπορείτε να συνδεθείτε μόνο μέσω της σύνδεσης με την επιχείρηση.',
+      successMessage__set: 'Ο κωδικός πρόσβασής σας έχει οριστεί.',
+      successMessage__signOutOfOtherSessions: 'Όλες οι άλλες συνεδρίες έχουν αποσυνδεθεί.',
+      successMessage__update: 'Ο κωδικός πρόσβασής σας έχει ενημερωθεί.',
       title__set: 'Ορισμός κωδικού πρόσβασης',
       title__update: 'Αλλαγή κωδικού πρόσβασης',
     },
@@ -740,8 +740,8 @@ export const elGR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Αλλαγή κωδικού πρόσβασης',
         primaryButton__setPassword: 'Ορισμός κωδικού πρόσβασης',
+        primaryButton__updatePassword: 'Αλλαγή κωδικού πρόσβασης',
         title: 'Κωδικός πρόσβασης',
       },
       phoneNumbersSection: {
@@ -757,8 +757,8 @@ export const elGR: LocalizationResource = {
         title: 'Προφίλ',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Αλλαγή ονόματος χρήστη',
         primaryButton__setUsername: 'Ορισμός ονόματος χρήστη',
+        primaryButton__updateUsername: 'Αλλαγή ονόματος χρήστη',
         title: 'Όνομα χρήστη',
       },
       web3WalletsSection: {

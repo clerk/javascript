@@ -649,12 +649,12 @@ export const daDK: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Din adgangskode er blevet indstillet.',
-      successMessage__update: 'Din adgangskode er blevet opdateret.',
-      successMessage__signOutOfOtherSessions: 'Alle andre enheder er blevet logget ud.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Din adgangskode er blevet indstillet.',
+      successMessage__signOutOfOtherSessions: 'Alle andre enheder er blevet logget ud.',
+      successMessage__update: 'Din adgangskode er blevet opdateret.',
       title__set: 'Sæt adgangskode',
       title__update: 'Skift kodeord',
     },
@@ -731,8 +731,8 @@ export const daDK: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Skift adgangskode',
         primaryButton__setPassword: 'Indtast adgangskode',
+        primaryButton__updatePassword: 'Skift adgangskode',
         title: 'Adgangskode',
       },
       phoneNumbersSection: {
@@ -748,8 +748,8 @@ export const daDK: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Skift brugernavn',
         primaryButton__setUsername: 'Sæt brugernavn',
+        primaryButton__updateUsername: 'Skift brugernavn',
         title: 'Brugernavn',
       },
       web3WalletsSection: {

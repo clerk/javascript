@@ -640,12 +640,12 @@ export const koKR: LocalizationResource = {
       title: '게정',
     },
     passwordPage: {
-      successMessage__set: '비밀번호가 설정되었습니다.',
-      successMessage__update: '비밀번호가 업데이트되었습니다.',
-      successMessage__signOutOfOtherSessions: '다른 모든 기기는 로그아웃되었습니다.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: '비밀번호가 설정되었습니다.',
+      successMessage__signOutOfOtherSessions: '다른 모든 기기는 로그아웃되었습니다.',
+      successMessage__update: '비밀번호가 업데이트되었습니다.',
       title__set: '비밀번호 설정',
       title__update: '비밀번호 변경',
     },
@@ -721,8 +721,8 @@ export const koKR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: '비밀번호 변경',
         primaryButton__setPassword: '비밀번호 설정',
+        primaryButton__updatePassword: '비밀번호 변경',
         title: '비밀번호',
       },
       phoneNumbersSection: {
@@ -738,8 +738,8 @@ export const koKR: LocalizationResource = {
         title: '프로필',
       },
       usernameSection: {
-        primaryButton__updateUsername: '사용자 이름 변경',
         primaryButton__setUsername: '사용자 이름 설정',
+        primaryButton__updateUsername: '사용자 이름 변경',
         title: '사용자 이름',
       },
       web3WalletsSection: {

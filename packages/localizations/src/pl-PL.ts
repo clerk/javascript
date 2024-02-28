@@ -651,12 +651,12 @@ export const plPL: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Twoje hasło zostało ustawione.',
-      successMessage__update: 'Twoje hasło zostało zaktualizowane.',
-      successMessage__signOutOfOtherSessions: 'Wylogowano z wszystkich innych urządzeń.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Twoje hasło zostało ustawione.',
+      successMessage__signOutOfOtherSessions: 'Wylogowano z wszystkich innych urządzeń.',
+      successMessage__update: 'Twoje hasło zostało zaktualizowane.',
       title__set: 'Ustaw hasło',
       title__update: 'Zmień hasło',
     },
@@ -733,8 +733,8 @@ export const plPL: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Zmień hasło',
         primaryButton__setPassword: 'Ustaw hasło',
+        primaryButton__updatePassword: 'Zmień hasło',
         title: 'Hasło',
       },
       phoneNumbersSection: {
@@ -750,8 +750,8 @@ export const plPL: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Zmień nazwę użytkownika',
         primaryButton__setUsername: 'Ustaw nazwę użytkownika',
+        primaryButton__updateUsername: 'Zmień nazwę użytkownika',
         title: 'Nazwa użytkownika',
       },
       web3WalletsSection: {

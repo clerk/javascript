@@ -651,12 +651,12 @@ export const nbNO: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Passordet ditt er satt.',
-      successMessage__update: 'Passordet ditt har blitt oppdatert.',
-      successMessage__signOutOfOtherSessions: 'Alle andre enheter har blitt logget ut.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Passordet ditt kan for øyeblikket ikke endres fordi du kun kan logge inn via bedriftstilkoblingen.',
+      successMessage__set: 'Passordet ditt er satt.',
+      successMessage__signOutOfOtherSessions: 'Alle andre enheter har blitt logget ut.',
+      successMessage__update: 'Passordet ditt har blitt oppdatert.',
       title__set: 'Sett passord',
       title__update: 'Endre passord',
     },
@@ -733,8 +733,8 @@ export const nbNO: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Endre passord',
         primaryButton__setPassword: 'Opprett passord',
+        primaryButton__updatePassword: 'Endre passord',
         title: 'Passord',
       },
       phoneNumbersSection: {
@@ -750,8 +750,8 @@ export const nbNO: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Endre brukernavn',
         primaryButton__setUsername: 'Angi brukernavn',
+        primaryButton__updateUsername: 'Endre brukernavn',
         title: 'Brukernavn',
       },
       web3WalletsSection: {

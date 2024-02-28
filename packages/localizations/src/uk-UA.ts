@@ -650,12 +650,12 @@ export const ukUA: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Ваш пароль встановлено.',
-      successMessage__update: 'Ваш пароль було оновлено.',
-      successMessage__signOutOfOtherSessions: 'Усі інші пристрої були виведені із системи.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Ваш пароль встановлено.',
+      successMessage__signOutOfOtherSessions: 'Усі інші пристрої були виведені із системи.',
+      successMessage__update: 'Ваш пароль було оновлено.',
       title__set: 'Встановити пароль',
       title__update: 'Змінити пароль',
     },
@@ -732,8 +732,8 @@ export const ukUA: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Змінити пароль',
         primaryButton__setPassword: 'Встановити пароль',
+        primaryButton__updatePassword: 'Змінити пароль',
         title: 'Пароль',
       },
       phoneNumbersSection: {
@@ -749,8 +749,8 @@ export const ukUA: LocalizationResource = {
         title: 'Профіль',
       },
       usernameSection: {
-        primaryButton__updateUsername: "Змінити ім'я користувача",
         primaryButton__setUsername: "Встановити ім'я користувача",
+        primaryButton__updateUsername: "Змінити ім'я користувача",
         title: "Ім'я користувача",
       },
       web3WalletsSection: {
