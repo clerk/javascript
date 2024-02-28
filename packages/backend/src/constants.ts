@@ -23,6 +23,11 @@ const Cookies = {
 const QueryParameters = {
   ClerkSynced: '__clerk_synced',
   ClerkRedirectUrl: '__clerk_redirect_url',
+  // use the reference to Cookies to indicate that it's the same value
+  DevBrowser: Cookies.DevBrowser,
+  Handshake: Cookies.Handshake,
+  HandshakeHelp: '__clerk_help',
+  LegacyDevBrowser: '__dev_session',
 } as const;
 
 const Headers = {

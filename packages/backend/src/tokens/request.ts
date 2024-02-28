@@ -74,16 +74,25 @@ export async function authenticateRequest(
     assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
   }
 
+  function removeDevBrowserFromURL(url: URL) {
+    const updatedURL = new URL(url);
+
+    updatedURL.searchParams.delete(constants.QueryParameters.DevBrowser);
+    // Remove legacy dev browser query param key to support local app with v5 using AP with v4
+    updatedURL.searchParams.delete(constants.QueryParameters.LegacyDevBrowser);
+
+    return updatedURL;
+  }
+
   function buildRedirectToHandshake() {
-    const redirectUrl = new URL(authenticateContext.clerkUrl);
-    redirectUrl.searchParams.delete('__clerk_db_jwt');
+    const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = pk.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
 
     if (pk?.instanceType === 'development' && authenticateContext.devBrowserToken) {
-      url.searchParams.append('__clerk_db_jwt', authenticateContext.devBrowserToken);
+      url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
     }
 
     return new Headers({ location: url.href });
@@ -101,15 +110,15 @@ export async function authenticateRequest(
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
       headers.append('Set-Cookie', x);
-      if (x.startsWith('__session=')) {
+      if (x.startsWith(`${constants.Cookies.Session}=`)) {
         sessionToken = x.split(';')[0].substring(10);
       }
     });
 
     if (instanceType === 'development') {
       const newUrl = new URL(authenticateContext.clerkUrl);
-      newUrl.searchParams.delete('__clerk_handshake');
-      newUrl.searchParams.delete('__clerk_help');
+      newUrl.searchParams.delete(constants.QueryParameters.Handshake);
+      newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
       headers.append('Location', newUrl.toString());
     }
 
@@ -255,7 +264,7 @@ ${error.getFullMessage()}`,
       constants.QueryParameters.ClerkRedirectUrl,
     );
     if (instanceType === 'development' && !authenticateContext.isSatellite && redirectUrl) {
-      // Dev MD sync from primary, redirect back to satellite w/ __clerk_db_jwt
+      // Dev MD sync from primary, redirect back to satellite w/ dev browser query param
       const redirectBackToSatelliteUrl = new URL(redirectUrl);
 
       if (authenticateContext.devBrowserToken) {
