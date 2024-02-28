@@ -21,6 +21,7 @@ matcher:
   - "signIn:\\s+{[\\s\\S]*?backupCodeMfa:\\s+{[\\s\\S]*?formSubtitle:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?headerSubtitle__account:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?headerSubtitle__security:"
+  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?usernameSection:\\s+{[\\s\\S]*?primaryButton__changeUsername:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?emailAddressesSection:\\s+{[\\s\\S]*?detailsTitle__primary:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?emailAddressesSection:\\s+{[\\s\\S]*?detailsSubtitle__primary:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?emailAddressesSection:\\s+{[\\s\\S]*?detailsTitle__nonPrimary:"
@@ -43,6 +44,7 @@ matcher:
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?actionLabel__conectionFailed:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?destructiveActionSubtitle:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?connectedAccountsSection:\\s+{[\\s\\S]*?destructiveActionAccordionSubtitle:"
+  - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?passwordSection:\\s+{[\\s\\S]*?primaryButton__changePassword:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?mfaSection:\\s+{[\\s\\S]*?phoneCode:\\s+{[\\s\\S]*?destructiveActionTitle:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?mfaSection:\\s+{[\\s\\S]*?phoneCode:\\s+{[\\s\\S]*?destructiveActionSubtitle:"
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?mfaSection:\\s+{[\\s\\S]*?phoneCode:\\s+{[\\s\\S]*?title__default:"
@@ -64,7 +66,13 @@ matcher:
   - "userProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?dangerSection:\\s+{[\\s\\S]*?deleteAccountDescription:"
   - "userProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?fileDropAreaTitle:"
   - "userProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?fileDropAreaAction:"
+  - "userProfile:\\s+{[\\s\\S]*?usernamePage:\\s+{[\\s\\S]*?title:"
   - "userProfile:\\s+{[\\s\\S]*?phoneNumberPage:\\s+{[\\s\\S]*?infoText__secondary:"
+  - "userProfile:\\s+{[\\s\\S]*?passwordPage:\\s+{[\\s\\S]*?title:"
+  - "userProfile:\\s+{[\\s\\S]*?passwordPage:\\s+{[\\s\\S]*?changePasswordTitle:"
+  - "userProfile:\\s+{[\\s\\S]*?passwordPage:\\s+{[\\s\\S]*?successMessage:"
+  - "userProfile:\\s+{[\\s\\S]*?passwordPage:\\s+{[\\s\\S]*?changePasswordSuccessMessage:"
+  - "userProfile:\\s+{[\\s\\S]*?passwordPage:\\s+{[\\s\\S]*?sessionsSignedOutSuccessMessage:"
   - "userProfile:\\s+{[\\s\\S]*?mfaPhoneCodePage:\\s+{[\\s\\S]*?successMessage:"
   - "organizationProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?headerTitle__settings:"
   - "organizationProfile:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?headerSubtitle__members:"
@@ -72,6 +80,7 @@ matcher:
   - "organizationProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?subtitle:"
   - "organizationProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?domainSection:\\s+{[\\s\\S]*?unverifiedDomain_menuAction__verify:"
   - "organizationProfile:\\s+{[\\s\\S]*?profilePage:\\s+{[\\s\\S]*?domainSection:\\s+{[\\s\\S]*?unverifiedDomain_menuAction__remove:"
+  - "organizationProfile:\\s+{[\\s\\S]*?verifiedDomainPage:\\s+{[\\s\\S]*?enrollmentTab:\\s+{[\\s\\S]*?formButton__save:"
   - "organizationProfile:\\s+{[\\s\\S]*?membersPage:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?headerTitle__active:"
   - "organizationProfile:\\s+{[\\s\\S]*?membersPage:\\s+{[\\s\\S]*?start:\\s+{[\\s\\S]*?headerTitle__invited:"
   - "organizationProfile:\\s+{[\\s\\S]*?membersPage:\\s+{[\\s\\S]*?invitationsTab:\\s+{[\\s\\S]*?manualInvitations:\\s+{[\\s\\S]*?headerTitle:"
@@ -103,6 +112,7 @@ const deletedKeys = [
   'signIn.backupCodeMfa.formSubtitle',
   'userProfile.start.headerSubtitle__account',
   'userProfile.start.headerSubtitle__security',
+  'userProfile.start.usernameSection.primaryButton__changeUsername',
   'userProfile.start.emailAddressesSection.detailsTitle__primary',
   'userProfile.start.emailAddressesSection.detailsSubtitle__primary',
   'userProfile.start.emailAddressesSection.detailsTitle__nonPrimary',
@@ -125,6 +135,7 @@ const deletedKeys = [
   'userProfile.start.connectedAccountsSection.actionLabel__conectionFailed',
   'userProfile.start.connectedAccountsSection.destructiveActionSubtitle',
   'userProfile.start.connectedAccountsSection.destructiveActionAccordionSubtitle',
+  'userProfile.start.passwordSection.primaryButton__changePassword',
   'userProfile.start.mfaSection.phoneCode.destructiveActionTitle',
   'userProfile.start.mfaSection.phoneCode.destructiveActionSubtitle',
   'userProfile.start.mfaSection.phoneCode.title__default',
@@ -146,7 +157,13 @@ const deletedKeys = [
   'userProfile.start.dangerSection.deleteAccountDescription',
   'userProfile.profilePage.fileDropAreaTitle',
   'userProfile.profilePage.fileDropAreaAction',
+  'userProfile.usernamePage.title',
   'userProfile.phoneNumberPage.infoText__secondary',
+  'userProfile.passwordPage.title',
+  'userProfile.passwordPage.changePasswordTitle',
+  'userProfile.passwordPage.successMessage',
+  'userProfile.passwordPage.changePasswordSuccessMessage',
+  'userProfile.passwordPage.sessionsSignedOutSuccessMessage',
   'userProfile.mfaPhoneCodePage.successMessage',
   'organizationProfile.start.headerTitle__settings',
   'organizationProfile.start.headerSubtitle__members',
@@ -154,6 +171,7 @@ const deletedKeys = [
   'organizationProfile.profilePage.subtitle',
   'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__verify',
   'organizationProfile.profilePage.domainSection.unverifiedDomain_menuAction__remove',
+  'organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save',
   'organizationProfile.membersPage.start.headerTitle__active',
   'organizationProfile.membersPage.start.headerTitle__invited',
   'organizationProfile.membersPage.invitationsTab.manualInvitations.headerTitle',

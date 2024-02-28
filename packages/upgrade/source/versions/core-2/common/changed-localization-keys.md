@@ -154,7 +154,7 @@ const changedValues = {
   },
   organizationProfile: {
     profilePage: {
-      title: 'Update Profile',
+      title: 'Update profile',
       dangerSection: {
         leaveOrganization: {
           actionDescription: "Type '{{organizationName}}' below to continue.",

@@ -32,7 +32,7 @@ const newValues = {
     start: {
       headerTitle__general: 'General',
       profileSection: {
-        primaryButton: 'Edit profile',
+        primaryButton: 'Update profile',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -82,14 +82,33 @@ const newValues = {
       security: 'Security',
       title: 'Account',
     },
+    passwordPage: {
+      checkboxInfoText__signOutOfOtherSessions:
+        'It is recommended to sign out of all other devices which may have used your old password.',
+      successMessage__set: 'Your password has been set.',
+      successMessage__signOutOfOtherSessions: 'All other devices have been signed out.',
+      successMessage__update: 'Your password has been updated.',
+      title__set: 'Set password',
+      title__update: 'Update password',
+    },
     phoneNumberPage: {
       verifySubtitle: 'Enter the verification code sent to {{identifier}}',
       verifyTitle: 'Verify phone number',
     },
     start: {
-      profileSection: {
-        primaryButton: 'Edit profile',
+      passwordSection: {
+        primaryButton__updatePassword: 'Update password',
       },
+      profileSection: {
+        primaryButton: 'Update profile',
+      },
+      usernameSection: {
+        primaryButton__updateUsername: 'Update username',
+      },
+    },
+    usernamePage: {
+      title__set: 'Set username',
+      title__update: 'Update username',
     },
   },
 };
