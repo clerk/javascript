@@ -517,7 +517,7 @@ export type Theme = {
    * import { dark } from "@clerk/themes";
    * appearance={{ baseTheme: dark }}
    */
-  baseTheme?: BaseTheme;
+  baseTheme?: BaseTheme | BaseTheme[];
   /**
    * Configuration options that affect the layout of the components, allowing
    * customizations that hard to implement with just CSS.
