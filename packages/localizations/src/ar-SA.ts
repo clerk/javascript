@@ -645,10 +645,10 @@ export const arSA: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
+      readonly: 'لا يمكن تعديل كلمة المرور لأنه لا يمكنك تسجيل الدخول إلى عن طريق حساب المؤسسة',
       successMessage__set: 'تم تعيين كلمة السر.',
       successMessage__signOutOfOtherSessions: 'تم تسجيل الخروج من جميع الأجهزة.',
       successMessage__update: 'تم تحديث كلمة السر',
-      readonly: 'لا يمكن تعديل كلمة المرور لأنه لا يمكنك تسجيل الدخول إلى عن طريق حساب المؤسسة',
       title__set: 'تعيين كلمة المرور',
       title__update: 'تغيير كلمة المرور',
     },
@@ -725,8 +725,8 @@ export const arSA: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'تغيير كلمة المرور',
         primaryButton__setPassword: 'تعيين كلمة المرور',
+        primaryButton__updatePassword: 'تغيير كلمة المرور',
         title: 'كلمة المرور',
       },
       phoneNumbersSection: {
@@ -742,8 +742,8 @@ export const arSA: LocalizationResource = {
         title: 'الملف الشخصي',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'تغيير اسم المستخدم',
         primaryButton__setUsername: 'تعيين اسم المستخدم',
+        primaryButton__updateUsername: 'تغيير اسم المستخدم',
         title: 'اسم المستخدم',
       },
       web3WalletsSection: {

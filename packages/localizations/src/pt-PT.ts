@@ -650,12 +650,12 @@ export const ptPT: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'A sua palavra-passe foi guardada.',
-      successMessage__update: 'A sua palavra-passe foi atualizada.',
-      successMessage__signOutOfOtherSessions: 'Todos os outros dispositivos foram desconectados.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'A sua palavra-passe não pode ser editada porque só pode fazer login por meio da conexão da empresa.',
+      successMessage__set: 'A sua palavra-passe foi guardada.',
+      successMessage__signOutOfOtherSessions: 'Todos os outros dispositivos foram desconectados.',
+      successMessage__update: 'A sua palavra-passe foi atualizada.',
       title__set: 'Defina a palavra-passe',
       title__update: 'Trocar palavra-passe',
     },
@@ -732,8 +732,8 @@ export const ptPT: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Trocar palavra-passe',
         primaryButton__setPassword: 'Definir palavra-passe',
+        primaryButton__updatePassword: 'Trocar palavra-passe',
         title: 'Palavra-passe',
       },
       phoneNumbersSection: {
@@ -749,8 +749,8 @@ export const ptPT: LocalizationResource = {
         title: 'Perfil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Trocar nome de utilizador',
         primaryButton__setUsername: 'Definir nome de utilizador',
+        primaryButton__updateUsername: 'Trocar nome de utilizador',
         title: 'Nome de utilizador',
       },
       web3WalletsSection: {

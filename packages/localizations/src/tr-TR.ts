@@ -650,12 +650,12 @@ export const trTR: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Şifreniz başarıyla değiştirildi.',
-      successMessage__update: 'Şifreniz günceellendi.',
-      successMessage__signOutOfOtherSessions: 'Diğer tüm cihazlardaki oturumlarınız sonlandırıldı.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Şifreniz başarıyla değiştirildi.',
+      successMessage__signOutOfOtherSessions: 'Diğer tüm cihazlardaki oturumlarınız sonlandırıldı.',
+      successMessage__update: 'Şifreniz günceellendi.',
       title__set: 'Şifreyi değiştir',
       title__update: 'Yeni şifre girin',
     },
@@ -732,8 +732,8 @@ export const trTR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Şifreyi değiştir',
         primaryButton__setPassword: 'Şifreyi güncelle',
+        primaryButton__updatePassword: 'Şifreyi değiştir',
         title: 'Şifre',
       },
       phoneNumbersSection: {
@@ -749,8 +749,8 @@ export const trTR: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Kullanıcı adını değiştir',
         primaryButton__setUsername: 'Güncelle',
+        primaryButton__updateUsername: 'Kullanıcı adını değiştir',
         title: 'Kullanıcı adı',
       },
       web3WalletsSection: {

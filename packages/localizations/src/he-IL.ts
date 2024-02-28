@@ -639,12 +639,12 @@ export const heIL: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'הסיסמה שלך הוגדרה.',
-      successMessage__update: 'הסיסמה שלך עודכנה.',
-      successMessage__signOutOfOtherSessions: 'כל המכשירים האחרים התנתקו.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'הסיסמה שלך הוגדרה.',
+      successMessage__signOutOfOtherSessions: 'כל המכשירים האחרים התנתקו.',
+      successMessage__update: 'הסיסמה שלך עודכנה.',
       title__set: 'הגדר סיסמה',
       title__update: 'שנה סיסמה',
     },
@@ -720,8 +720,8 @@ export const heIL: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'שנה סיסמה',
         primaryButton__setPassword: 'הגדר סיסמה',
+        primaryButton__updatePassword: 'שנה סיסמה',
         title: 'סיסמה',
       },
       phoneNumbersSection: {
@@ -737,8 +737,8 @@ export const heIL: LocalizationResource = {
         title: 'פרופיל',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'שנה שם משתמש',
         primaryButton__setUsername: 'הגדר שם משתמש',
+        primaryButton__updateUsername: 'שנה שם משתמש',
         title: 'שם משתמש',
       },
       web3WalletsSection: {

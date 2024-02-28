@@ -658,13 +658,13 @@ export const roRO: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Parola dvs. a fost setată.',
-      successMessage__update: 'Parola dvs. a fost actualizată.',
-      successMessage__signOutOfOtherSessions: 'Toate celelalte dispozitive au fost deconectate.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'În prezent, parola dvs. nu poate fi modificată, deoarece vă puteți conecta numai prin intermediul conexiunii întreprinderii.',
+      successMessage__set: 'Parola dvs. a fost setată.',
+      successMessage__signOutOfOtherSessions: 'Toate celelalte dispozitive au fost deconectate.',
+      successMessage__update: 'Parola dvs. a fost actualizată.',
       title__set: 'Setați parola',
       title__update: 'Modificați parola',
     },
@@ -742,8 +742,8 @@ export const roRO: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Modificați parola',
         primaryButton__setPassword: 'Setați parola',
+        primaryButton__updatePassword: 'Modificați parola',
         title: 'Parola',
       },
       phoneNumbersSection: {
@@ -759,8 +759,8 @@ export const roRO: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Schimbă numele de utilizator',
         primaryButton__setUsername: 'Setați numele de utilizator',
+        primaryButton__updateUsername: 'Schimbă numele de utilizator',
         title: 'Nume utilizator',
       },
       web3WalletsSection: {
