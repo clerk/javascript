@@ -49,14 +49,14 @@ describe('getDevBrowserJWTFromURL(url)', () => {
     replaceStateMock.mockReset();
   });
 
-  it('does not replaceState if the url does not contain a dev browser JWT', () => {
-    expect(extractDevBrowserJWTFromURL(new URL('/foo', DUMMY_URL_BASE))).toEqual('');
-    expect(replaceStateMock).not.toHaveBeenCalled();
-  });
-
-  it('does call replaceState if the url contains a dev browser JWT', () => {
+  it('it calls replaceState and clears the url if it contains any devBrowser related token', () => {
     expect(extractDevBrowserJWTFromURL(new URL('/foo?__clerk_db_jwt=token', DUMMY_URL_BASE))).toEqual('token');
     expect(replaceStateMock).toHaveBeenCalled();
+  });
+
+  it('it does not call replaceState if the clean url is the same as the current url', () => {
+    expect(extractDevBrowserJWTFromURL(new URL('/foo?__otherParam=hello', DUMMY_URL_BASE))).toEqual('');
+    expect(replaceStateMock).not.toHaveBeenCalled();
   });
 
   const testCases: Array<[string, string]> = [
