@@ -19,7 +19,13 @@ const appRouterTurbo = appRouter
   .setName('next-app-router-turbopack')
   .addScript('dev', 'npm run dev -- --turbo');
 
+const appRouterQuickstart = appRouter.
+  clone()
+  .setName('next-app-router-quickstart')
+  .useTemplate(templates['next-app-router-quickstart']);
+
 export const next = {
   appRouter,
   appRouterTurbo,
+  appRouterQuickstart
 } as const;

@@ -1,10 +1,28 @@
-export type EnvironmentConfig = ReturnType<typeof environmentConfig>;
+type EnvironmentVariables = {
+  public: Map<string, string>;
+  private: Map<string, string>;
+}
+
+export type EnvironmentConfig = {
+  get id(): string;
+  setId(newId: string): EnvironmentConfig;
+  setEnvVariable(type: keyof EnvironmentVariables, name: string, value: any): EnvironmentConfig;
+  removeEnvVariable(type: keyof EnvironmentVariables, name: string): EnvironmentConfig;
+  get publicVariables(): EnvironmentVariables['public'];
+  get privateVariables(): EnvironmentVariables['private'];
+  toJson(): { public: Record<string, string>; private: Record<string, string> };
+  fromJson(json: ReturnType<EnvironmentConfig['toJson']>): EnvironmentConfig;
+  clone(): EnvironmentConfig;
+}
 
 export const environmentConfig = () => {
   let id = '';
-  const envVars = { public: new Map<string, string>(), private: new Map<string, string>() };
+  const envVars: EnvironmentVariables = {
+    public: new Map<string, string>(),
+    private: new Map<string, string>()
+  };
 
-  const self = {
+  const self: EnvironmentConfig = {
     setId: (newId: string) => {
       id = newId;
       return self;
@@ -12,8 +30,12 @@ export const environmentConfig = () => {
     get id() {
       return id;
     },
-    setEnvVariable: (type: keyof typeof envVars, name: string, value: string) => {
+    setEnvVariable: (type, name, value) => {
       envVars[type].set(name, value);
+      return self;
+    },
+    removeEnvVariable: (type, name) => {
+      envVars[type].delete(name);
       return self;
     },
     get publicVariables() {
@@ -28,7 +50,7 @@ export const environmentConfig = () => {
         private: Object.fromEntries(envVars.private),
       };
     },
-    fromJson: (json: ReturnType<typeof self.toJson>) => {
+    fromJson: (json) => {
       Object.entries(json.public).forEach(([k, v]) => self.setEnvVariable('public', k, v));
       Object.entries(json.private).forEach(([k, v]) => self.setEnvVariable('private', k, v));
       return self;

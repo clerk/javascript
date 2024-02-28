@@ -51,8 +51,14 @@ const withCustomRoles = environmentConfig()
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
 
+
+const withEmailCodesQuickstart = withEmailCodes
+  .removeEnvVariable('public', 'CLERK_SIGN_IN_URL')
+  .removeEnvVariable('public', 'CLERK_SIGN_UP_URL')
+
 export const envs = {
   withEmailCodes,
   withEmailLinks,
   withCustomRoles,
+  withEmailCodesQuickstart,
 } as const;
