@@ -657,13 +657,13 @@ export const deDE: LocalizationResource = {
       title: 'Benutzerkonto',
     },
     passwordPage: {
-      successMessage__set: 'Ihr Passwort wurde festgelegt.',
-      successMessage__update: 'Dein Passwort wurde aktualisiert.',
-      successMessage__signOutOfOtherSessions: 'Alle anderen Geräte wurden abgemeldet.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Ihr Passwort kann derzeit nicht geändert werden, da Sie sich nur über die Enterprise-Verbindung anmelden können.',
+      successMessage__set: 'Ihr Passwort wurde festgelegt.',
+      successMessage__signOutOfOtherSessions: 'Alle anderen Geräte wurden abgemeldet.',
+      successMessage__update: 'Dein Passwort wurde aktualisiert.',
       title__set: 'Passwort festlegen',
       title__update: 'Passwort ändern',
     },
@@ -740,8 +740,8 @@ export const deDE: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Passwort ändern',
         primaryButton__setPassword: 'Passwort festlegen',
+        primaryButton__updatePassword: 'Passwort ändern',
         title: 'Passwort',
       },
       phoneNumbersSection: {
@@ -757,8 +757,8 @@ export const deDE: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Benutzernamen ändern',
         primaryButton__setUsername: 'Benutzernamen festlegen',
+        primaryButton__updateUsername: 'Benutzernamen ändern',
         title: 'Nutzername',
       },
       web3WalletsSection: {

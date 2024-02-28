@@ -650,12 +650,12 @@ export const viVN: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Mật khẩu của bạn đã được thiết lập.',
-      successMessage__update: 'Mật khẩu của bạn đã được cập nhật.',
-      successMessage__signOutOfOtherSessions: 'Tất cả các thiết bị khác đã được đăng xuất.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Hiện tại bạn không thể chỉnh sửa mật khẩu vì bạn chỉ có thể đăng nhập qua kết nối doanh nghiệp.',
+      successMessage__set: 'Mật khẩu của bạn đã được thiết lập.',
+      successMessage__signOutOfOtherSessions: 'Tất cả các thiết bị khác đã được đăng xuất.',
+      successMessage__update: 'Mật khẩu của bạn đã được cập nhật.',
       title__set: 'Thiết lập mật khẩu',
       title__update: 'Thay đổi mật khẩu',
     },
@@ -732,8 +732,8 @@ export const viVN: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Thay đổi mật khẩu',
         primaryButton__setPassword: 'Đặt mật khẩu',
+        primaryButton__updatePassword: 'Thay đổi mật khẩu',
         title: 'Mật khẩu',
       },
       phoneNumbersSection: {
@@ -749,8 +749,8 @@ export const viVN: LocalizationResource = {
         title: 'Hồ sơ',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Thay đổi tên người dùng',
         primaryButton__setUsername: 'Đặt tên người dùng',
+        primaryButton__updateUsername: 'Thay đổi tên người dùng',
         title: 'Tên người dùng',
       },
       web3WalletsSection: {

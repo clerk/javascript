@@ -648,12 +648,12 @@ export const csCZ: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Vaše heslo bylo nastaveno.',
-      successMessage__update: 'Vaše heslo bylo aktualizováno.',
-      successMessage__signOutOfOtherSessions: 'Všechna ostatní zařízení byla odhlášena.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Vaše heslo bylo nastaveno.',
+      successMessage__signOutOfOtherSessions: 'Všechna ostatní zařízení byla odhlášena.',
+      successMessage__update: 'Vaše heslo bylo aktualizováno.',
       title__set: 'Nastavit heslo',
       title__update: 'Změnit heslo',
     },
@@ -730,8 +730,8 @@ export const csCZ: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Změnit heslo',
         primaryButton__setPassword: 'Nastavit heslo',
+        primaryButton__updatePassword: 'Změnit heslo',
         title: 'Heslo',
       },
       phoneNumbersSection: {
@@ -747,8 +747,8 @@ export const csCZ: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Změnit uživatelské jméno',
         primaryButton__setUsername: 'Nastavit uživatelské jméno',
+        primaryButton__updateUsername: 'Změnit uživatelské jméno',
         title: 'Uživatelské jméno',
       },
       web3WalletsSection: {
@@ -759,8 +759,8 @@ export const csCZ: LocalizationResource = {
     },
     usernamePage: {
       successMessage: 'Vaše uživatelské jméno bylo aktualizováno.',
-      title__update: 'Aktualizovat uživatelské jméno',
       title__set: 'Aktualizovat uživatelské jméno',
+      title__update: 'Aktualizovat uživatelské jméno',
     },
     web3WalletPage: {
       removeResource: {

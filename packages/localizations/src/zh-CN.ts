@@ -635,12 +635,12 @@ export const zhCN: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: '您的密码已设置。',
-      successMessage__update: '您的密码已更新。',
-      successMessage__signOutOfOtherSessions: '所有其他设备已退出。',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: '您的密码已设置。',
+      successMessage__signOutOfOtherSessions: '所有其他设备已退出。',
+      successMessage__update: '您的密码已更新。',
       title__set: '设置密码',
       title__update: '更改密码',
     },
@@ -716,8 +716,8 @@ export const zhCN: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: '更改密码',
         primaryButton__setPassword: '设置密码',
+        primaryButton__updatePassword: '更改密码',
         title: '密码',
       },
       phoneNumbersSection: {
@@ -733,8 +733,8 @@ export const zhCN: LocalizationResource = {
         title: '个人资料',
       },
       usernameSection: {
-        primaryButton__updateUsername: '更改用户名',
         primaryButton__setUsername: '设置用户名',
+        primaryButton__updateUsername: '更改用户名',
         title: '用户名',
       },
       web3WalletsSection: {
