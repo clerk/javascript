@@ -62,7 +62,7 @@ export const jaJP: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomain: '組織ドメイン',
   formFieldInputPlaceholder__organizationDomainEmailAddress: '組織ドメインのメールアドレス',
   formFieldInputPlaceholder__organizationName: '組織名',
-  formFieldInputPlaceholder__organizationSlug: '組織スラグ',
+  formFieldInputPlaceholder__organizationSlug: 'my-organization',
   formFieldInputPlaceholder__password: 'パスワード',
   formFieldInputPlaceholder__phoneNumber: '電話番号',
   formFieldInputPlaceholder__username: 'ユーザー名',
@@ -251,7 +251,8 @@ export const jaJP: LocalizationResource = {
       formTitle: '検証コード',
       resendButton: 'コードを再送信',
       subtitle: 'ドメイン {{domainName}} はメールで検証する必要があります。',
-      subtitleVerificationCodeScreen: '{{emailAddress}} に検証コードが送信されました。コードを入力して続行してください。',
+      subtitleVerificationCodeScreen:
+        '{{emailAddress}} に検証コードが送信されました。コードを入力して続行してください。',
       title: 'ドメインを検証',
     },
   },
@@ -444,8 +445,10 @@ export const jaJP: LocalizationResource = {
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
   unstable__errors: {
-    captcha_invalid: 'セキュリティ検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートセンターに連絡した上でサポートを受けてください。',
-    captcha_unavailable: 'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
+    captcha_invalid:
+      'セキュリティ検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートセンターに連絡した上でサポートを受けてください。',
+    captcha_unavailable:
+      'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
     form_code_incorrect: 'フォームコードが正しくありません。',
     form_identifier_exists: '識別子が既に存在します。',
     form_identifier_not_found: '識別子が見つかりません。',
@@ -466,16 +469,6 @@ export const jaJP: LocalizationResource = {
     form_password_validation_failed: 'パスワードが間違っています',
     form_username_invalid_character: 'ユーザー名に無効な文字が含まれています。',
     form_username_invalid_length: 'ユーザー名の長さが無効です。',
-    form_username_not_found: 'ユーザー名が見つかりません。',
-    form_verification_code_invalid: '検証コードが無効です。',
-    form_verification_code_expired: '検証コードの有効期限が切れています。',
-    form_account_locked: 'アカウントがロックされています。',
-    form_account_not_verified: 'アカウントが未検証です。',
-    form_email_not_verified: 'メールが未検証です。',
-    form_phone_not_verified: '電話が未検証です。',
-    form_service_unavailable: 'サービスを利用できません。',
-    form_submit_error: '送信エラーが発生しました。',
-    form_unknown_error: '不明なエラーが発生しました。',
     identification_deletion_failed: '最後の識別情報は削除できません。',
     not_allowed_access: 'アクセスが許可されていません。',
     passwordComplexity: {
