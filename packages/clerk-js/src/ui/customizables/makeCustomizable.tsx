@@ -14,17 +14,16 @@ type Customizable<T = Record<never, never>> = T & {
 
 type CustomizablePrimitive<T> = React.FunctionComponent<Customizable<T>>;
 
-type MakeCustomizableOptions<P> = {
+type MakeCustomizableOptions = {
   defaultStyles?: ThemableCssProp;
   defaultDescriptor?: ElementDescriptor;
-  defaultProps?: P;
 };
 
 export const makeCustomizable = <P,>(
   Component: React.FunctionComponent<P>,
-  options?: MakeCustomizableOptions<P>,
+  options?: MakeCustomizableOptions,
 ): CustomizablePrimitive<P> => {
-  const { defaultStyles, defaultDescriptor, defaultProps } = options || {};
+  const { defaultStyles, defaultDescriptor } = options || {};
 
   const customizableComponent = React.forwardRef((props: Customizable<any>, ref) => {
     const { elementDescriptor, elementId, sx, className, ...restProps } = props;
@@ -33,13 +32,12 @@ export const makeCustomizable = <P,>(
       defaultDescriptor,
       ...(Array.isArray(elementDescriptor) ? elementDescriptor : [elementDescriptor]),
     ].filter(s => s);
-    const componentProps = { ...defaultProps, ...restProps };
 
     if (!descriptors.length) {
       return (
         <Component
           css={sx}
-          {...componentProps}
+          {...restProps}
           className={className}
           ref={ref}
         />
@@ -57,7 +55,7 @@ export const makeCustomizable = <P,>(
         css={generatedStyles.css}
         // always first for better readability in the DOM
         className={generatedClassname}
-        {...componentProps}
+        {...restProps}
         ref={ref}
       />
     );

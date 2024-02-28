@@ -104,3 +104,23 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
     />
   );
 });
+
+export const CheckboxInput = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  return (
+    <Input
+      {...props}
+      type='checkbox'
+      ref={ref}
+    />
+  );
+});
+
+export const RadioInput = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  return (
+    <Input
+      {...props}
+      type='radio'
+      ref={ref}
+    />
+  );
+});
