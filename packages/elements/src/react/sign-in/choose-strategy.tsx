@@ -54,8 +54,9 @@ export type SignInStrategyOptionProps = WithChildrenProp<{
 /**
  * By default, renders a button which will trigger a change in the chosen sign-in strategy. It **must** be used within a `<Step name='choose-strategy'>` component.
  *
- * @description This component will only render enabled options which are not the current strategy.
+ * @description This component will only render its contents if the chosen strategy is enabled (in the Clerk dashboard) and if it's not the current strategy.
  *
+ * @param name - Define a strategy to be used.
  * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
  *
  * @example

@@ -1,5 +1,29 @@
 # Change Log
 
+## 5.0.0-beta.24
+
+### Patch Changes
+
+- Updated dependencies [[`db18787c4`](https://github.com/clerk/javascript/commit/db18787c4d9fa8ee1306db9b65f3b3f5e2fe2dad)]:
+  - @clerk/shared@2.0.0-beta.16
+  - @clerk/backend@1.0.0-beta.24
+
+## 5.0.0-beta.23
+
+### Patch Changes
+
+- Updated dependencies [[`6eab66050`](https://github.com/clerk/javascript/commit/6eab66050608a1bc5cb9aca6a234b1fea16106e5)]:
+  - @clerk/shared@2.0.0-beta.15
+  - @clerk/backend@1.0.0-beta.23
+
+## 5.0.0-beta.22
+
+### Patch Changes
+
+- Updated dependencies [[`12f3c5c55`](https://github.com/clerk/javascript/commit/12f3c5c55580f93a81df27851fbc92ce1312107e)]:
+  - @clerk/shared@2.0.0-beta.14
+  - @clerk/backend@1.0.0-beta.22
+
 ## 5.0.0-beta.21
 
 ### Patch Changes

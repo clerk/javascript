@@ -26,7 +26,7 @@ export function setDevBrowserJWTInURL(url: URL, jwt: string): URL {
  */
 export function extractDevBrowserJWTFromURL(url: URL): string {
   const jwt = readDevBrowserJwtFromSearchParams(url);
-  if (jwt && typeof globalThis.history !== 'undefined') {
+  if (typeof globalThis.history !== 'undefined') {
     globalThis.history.replaceState(null, '', removeDevBrowserJwt(url));
   }
   return jwt;
@@ -37,7 +37,7 @@ const readDevBrowserJwtFromSearchParams = (url: URL) => {
 };
 
 const removeDevBrowserJwt = (url: URL) => {
-  return removeDevBrowserJwtFromURLSearchParams(removeLegacyDevBrowserJwtFromURLHash(new URL(url)));
+  return removeDevBrowserJwtFromURLSearchParams(removeLegacyDevBrowserJwt(url));
 };
 
 const removeDevBrowserJwtFromURLSearchParams = (_url: URL) => {
@@ -47,7 +47,8 @@ const removeDevBrowserJwtFromURLSearchParams = (_url: URL) => {
 };
 
 /**
- * Removes the __clerk_db_jwt JWT from the URL hash.
+ * Removes the __clerk_db_jwt JWT from the URL hash, as well as
+ * the legacy __dev_session JWT from the URL searchParams
  * We no longer need to use this value, however, we should remove it from the URL
  * Existing v4 apps will write the JWT to the hash and the search params in order to ensure
  * backwards compatibility with older v4 apps.
@@ -56,9 +57,11 @@ const removeDevBrowserJwtFromURLSearchParams = (_url: URL) => {
  * In this scenario, the AP@4 -> localhost@5 redirect will still have the JWT in the hash,
  * in which case we need to remove it.
  */
-const removeLegacyDevBrowserJwtFromURLHash = (_url: URL) => {
+const removeLegacyDevBrowserJwt = (_url: URL) => {
   const DEV_BROWSER_JWT_MARKER_REGEXP = /__clerk_db_jwt\[(.*)\]/;
+  const DEV_BROWSER_JWT_LEGACY_KEY = '__dev_session';
   const url = new URL(_url);
+  url.searchParams.delete(DEV_BROWSER_JWT_LEGACY_KEY);
   url.hash = url.hash.replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
   if (url.href.endsWith('#')) {
     url.hash = '';
