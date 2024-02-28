@@ -20,7 +20,7 @@ export type SignInNavigateProps = WithChildrenProp<{
 }>;
 
 /**
- * Renders a button which will navigate to a different step in the sign-in flow.
+ * Renders a button which will navigate to a different step in the sign-up flow.
  *
  * @param {SignUpNavigateElementKey} to - The step to navigate to.
  * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.

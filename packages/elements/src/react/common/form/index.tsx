@@ -110,10 +110,11 @@ const useFieldErrors = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
   };
 };
 
-const determineInputTypeFromName = (name: string) => {
-  if (name === 'password') return 'password' as const;
-  if (name === 'email') return 'email' as const;
-  if (name === 'phone') return 'tel' as const;
+const determineInputTypeFromName = (name: FormFieldProps['name']) => {
+  if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword')
+    return 'password' as const;
+  if (name === 'emailAddress') return 'email' as const;
+  if (name === 'phoneNumber') return 'tel' as const;
   if (name === 'code') return 'otp' as const;
 
   return 'text' as const;
@@ -238,7 +239,7 @@ type FormFieldProps = RadixFormFieldProps & {
 /**
  * A wrapper component used to associate its child elements with a specific form field. Automatically handles unique ID generation and associating labels with inputs.
  *
- * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `email`, `password`, `phone`, `code`, and `identifier`.
+ * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `emailAddress`, `password`, `phoneNumber`, and `code`.
  *
  * @example
  * <Field name="emailAddress">
