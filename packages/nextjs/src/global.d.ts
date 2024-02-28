@@ -1,7 +1,7 @@
 declare global {
   interface Window {
-    __unstable__onBeforeSetActive: () => void;
-    __unstable__onAfterSetActive: () => void;
+    __unstable__onBeforeSetActive: () => void | Promise<void>;
+    __unstable__onAfterSetActive: () => void | Promise<void>;
   }
 }
 

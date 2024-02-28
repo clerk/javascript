@@ -605,7 +605,7 @@ export default class Clerk implements ClerkInterface {
       );
     }
 
-    type SetActiveHook = () => void;
+    type SetActiveHook = () => void | Promise<void>;
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
         ? window.__unstable__onBeforeSetActive
@@ -640,7 +640,7 @@ export default class Clerk implements ClerkInterface {
       this.#broadcastSignOutEvent();
     }
 
-    onBeforeSetActive();
+    await onBeforeSetActive();
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
@@ -672,7 +672,7 @@ export default class Clerk implements ClerkInterface {
 
     this.#setAccessors(newSession);
     this.#emit();
-    onAfterSetActive();
+    await onAfterSetActive();
     this.#resetComponentsState();
   };
 

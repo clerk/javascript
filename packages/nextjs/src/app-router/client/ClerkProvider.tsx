@@ -7,6 +7,7 @@ import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsConte
 import { useSafeLayoutEffect } from '../../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { invalidateCacheAction } from './invalidateCacheAction';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 declare global {
@@ -23,14 +24,13 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   useSafeLayoutEffect(() => {
     window.__unstable__onBeforeSetActive = () => {
-      if (__unstable_invokeMiddlewareOnAuthStateChange) {
-        router.refresh();
-        router.push(window.location.href);
-      }
+      return invalidateCacheAction();
     };
 
     window.__unstable__onAfterSetActive = () => {
-      router.refresh();
+      if (__unstable_invokeMiddlewareOnAuthStateChange) {
+        return router.refresh();
+      }
     };
   }, []);
 
