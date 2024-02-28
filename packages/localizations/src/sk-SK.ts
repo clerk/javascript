@@ -649,12 +649,12 @@ export const skSK: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Vaše heslo bolo nastavené.',
-      successMessage__update: 'Vaše heslo bolo aktualizované.',
-      successMessage__signOutOfOtherSessions: 'Všetky ostatné zariadenia boli odhlásené.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Vaše heslo bolo nastavené.',
+      successMessage__signOutOfOtherSessions: 'Všetky ostatné zariadenia boli odhlásené.',
+      successMessage__update: 'Vaše heslo bolo aktualizované.',
       title__set: 'Nastaviť heslo',
       title__update: 'Zmeniť heslo',
     },
@@ -731,8 +731,8 @@ export const skSK: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Zmeniť heslo',
         primaryButton__setPassword: 'Nastaviť heslo',
+        primaryButton__updatePassword: 'Zmeniť heslo',
         title: 'Heslo',
       },
       phoneNumbersSection: {
@@ -748,8 +748,8 @@ export const skSK: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Zmeniť užívateľské meno',
         primaryButton__setUsername: 'Nastaviť užívateľské meno',
+        primaryButton__updateUsername: 'Zmeniť užívateľské meno',
         title: 'Užívateľské meno',
       },
       web3WalletsSection: {

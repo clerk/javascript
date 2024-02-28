@@ -648,12 +648,12 @@ export const svSE: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Ditt lösenord har angetts.',
-      successMessage__update: 'Ditt lösenord har uppdaterats.',
-      successMessage__signOutOfOtherSessions: 'Alla andra enheter har loggats ut.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Ditt lösenord har angetts.',
+      successMessage__signOutOfOtherSessions: 'Alla andra enheter har loggats ut.',
+      successMessage__update: 'Ditt lösenord har uppdaterats.',
       title__set: 'Ange lösenord',
       title__update: 'Byt lösenord',
     },
@@ -730,8 +730,8 @@ export const svSE: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Byt lösenord',
         primaryButton__setPassword: 'Ställ in lösenord',
+        primaryButton__updatePassword: 'Byt lösenord',
         title: 'Lösenord',
       },
       phoneNumbersSection: {
@@ -747,8 +747,8 @@ export const svSE: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Ändra användarnamn',
         primaryButton__setUsername: 'Sätt användarnamn',
+        primaryButton__updateUsername: 'Ändra användarnamn',
         title: 'Användarnamn',
       },
       web3WalletsSection: {

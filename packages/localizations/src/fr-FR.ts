@@ -654,12 +654,12 @@ export const frFR: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Votre mot de passe a été mis à jour.',
-      successMessage__update: 'Votre mot de passe a été mis à jour.',
-      successMessage__signOutOfOtherSessions: 'Tous les autres appareils ont été déconnectés.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Votre mot de passe a été mis à jour.',
+      successMessage__signOutOfOtherSessions: 'Tous les autres appareils ont été déconnectés.',
+      successMessage__update: 'Votre mot de passe a été mis à jour.',
       title__set: 'Mettre à jour le mot de passe',
       title__update: 'Changer le mot de passe',
     },
@@ -737,8 +737,8 @@ export const frFR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Changer le mot de passe',
         primaryButton__setPassword: 'Définir le mot de passe',
+        primaryButton__updatePassword: 'Changer le mot de passe',
         title: 'Mot de passe',
       },
       phoneNumbersSection: {
@@ -754,8 +754,8 @@ export const frFR: LocalizationResource = {
         title: 'Profil',
       },
       usernameSection: {
-        primaryButton__updateUsername: "Changer le nom d'utilisateur",
         primaryButton__setUsername: "Définir le nom d'utilisateur",
+        primaryButton__updateUsername: "Changer le nom d'utilisateur",
         title: "Nom d'utilisateur",
       },
       web3WalletsSection: {
