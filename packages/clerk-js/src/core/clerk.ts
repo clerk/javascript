@@ -1505,6 +1505,8 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
+    this.#clearHandshakeFromUrl();
+
     this.#handleImpersonationFab();
     return true;
   };
@@ -1689,5 +1691,18 @@ export default class Clerk implements ClerkInterface {
 
     await this.navigate(this.buildUrlWithAuth(redirectUrl));
     return true;
+  };
+
+  /**
+   * The handshake payload is transported in the URL in development. In cases where FAPI is returning the handshake payload, but Clerk is being used in a client-only application,
+   * we remove the handshake associated parameters as they are not necessary.
+   */
+  #clearHandshakeFromUrl = () => {
+    try {
+      removeClerkQueryParam('__clerk_handshake');
+      removeClerkQueryParam('__clerk_help');
+    } catch (_) {
+      // ignore
+    }
   };
 }
