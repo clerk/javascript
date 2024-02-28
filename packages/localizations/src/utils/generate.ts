@@ -9,6 +9,7 @@ import * as path from 'node:path';
 
 import * as fs from 'fs';
 
+import { thTH } from '..';
 import { arSA } from '../ar-SA';
 import { bgBG } from '../bg-BG';
 import { csCZ } from '../cs-CZ';
@@ -178,3 +179,4 @@ run(viVN, 'vi-VN');
 run(zhCN, 'zh-CN');
 run(zhTW, 'zh-TW');
 run(bgBG, 'bg-BG');
+run(thTH, 'th-TH');

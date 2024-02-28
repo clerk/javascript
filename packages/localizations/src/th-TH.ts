@@ -79,7 +79,8 @@ export const thTH: LocalizationResource = {
   formFieldLabel__organizationDomain: 'โดเมน',
   formFieldLabel__organizationDomainDeletePending: 'ลบคำเชิญและข้อเสนอที่รอดำเนินการ',
   formFieldLabel__organizationDomainEmailAddress: 'ที่อยู่อีเมลสำหรับการตรวจสอบ',
-  formFieldLabel__organizationDomainEmailAddressDescription: 'กรอกที่อยู่อีเมลภายใต้โดเมนนี้เพื่อรับรหัสและตรวจสอบโดเมน',
+  formFieldLabel__organizationDomainEmailAddressDescription:
+    'กรอกที่อยู่อีเมลภายใต้โดเมนนี้เพื่อรับรหัสและตรวจสอบโดเมน',
   formFieldLabel__organizationName: 'ชื่อ',
   formFieldLabel__organizationSlug: 'Slug',
   formFieldLabel__password: 'รหัสผ่าน',
@@ -111,11 +112,13 @@ export const thTH: LocalizationResource = {
     badge__manualInvitation: 'ไม่มีการลงทะเบียนอัตโนมัติ',
     badge__unverified: 'ยังไม่ได้ยืนยัน',
     createDomainPage: {
-      subtitle: 'เพิ่มโดเมนเพื่อยืนยัน ผู้ใช้ที่มีที่อยู่อีเมลในโดเมนนี้สามารถเข้าร่วมองค์กรโดยอัตโนมัติหรือขอเข้าร่วมได้',
+      subtitle:
+        'เพิ่มโดเมนเพื่อยืนยัน ผู้ใช้ที่มีที่อยู่อีเมลในโดเมนนี้สามารถเข้าร่วมองค์กรโดยอัตโนมัติหรือขอเข้าร่วมได้',
       title: 'เพิ่มโดเมน',
     },
     invitePage: {
-      detailsTitle__inviteFailed: 'ไม่สามารถส่งคำเชิญได้ มีคำเชิญที่กำลังรอดำเนินการสำหรับที่อยู่อีเมลต่อไปนี้: {{email_addresses}}',
+      detailsTitle__inviteFailed:
+        'ไม่สามารถส่งคำเชิญได้ มีคำเชิญที่กำลังรอดำเนินการสำหรับที่อยู่อีเมลต่อไปนี้: {{email_addresses}}',
       formButtonPrimary__continue: 'ส่งคำเชิญ',
       selectDropdown__role: 'เลือกบทบาท',
       subtitle: 'ใส่หรือวางที่อยู่อีเมลหนึ่งหรือมากกว่า แยกด้วยช่องว่างหรือเครื่องหมายจุลภาค',
@@ -134,7 +137,8 @@ export const thTH: LocalizationResource = {
       detailsTitle__emptyRow: 'ไม่มีสมาชิกที่แสดง',
       invitationsTab: {
         autoInvitations: {
-          headerSubtitle: 'เชิญผู้ใช้โดยเชื่อมต่อโดเมนอีเมลกับองค์กรของคุณ ทุกคนที่สมัครสมาชิกด้วยโดเมนอีเมลที่ตรงกันจะสามารถเข้าร่วมองค์กรได้ทุกเมื่อ',
+          headerSubtitle:
+            'เชิญผู้ใช้โดยเชื่อมต่อโดเมนอีเมลกับองค์กรของคุณ ทุกคนที่สมัครสมาชิกด้วยโดเมนอีเมลที่ตรงกันจะสามารถเข้าร่วมองค์กรได้ทุกเมื่อ',
           headerTitle: 'คำเชิญอัตโนมัติ',
           primaryButton: 'จัดการโดเมนที่ได้รับการยืนยัน',
         },
@@ -146,7 +150,8 @@ export const thTH: LocalizationResource = {
       },
       requestsTab: {
         autoSuggestions: {
-          headerSubtitle: 'ผู้ใช้ที่สมัครสมาชิกด้วยโดเมนอีเมลที่ตรงกัน จะสามารถเห็นข้อเสนอแนะในการขอเข้าร่วมองค์กรของคุณ',
+          headerSubtitle:
+            'ผู้ใช้ที่สมัครสมาชิกด้วยโดเมนอีเมลที่ตรงกัน จะสามารถเห็นข้อเสนอแนะในการขอเข้าร่วมองค์กรของคุณ',
           headerTitle: 'ข้อเสนอแนะอัตโนมัติ',
           primaryButton: 'จัดการโดเมนที่ได้รับการยืนยัน',
         },
@@ -219,9 +224,11 @@ export const thTH: LocalizationResource = {
         removeDomainTitle: 'ลบโดเมน',
       },
       enrollmentTab: {
-        automaticInvitationOption__description: 'ผู้ใช้จะได้รับเชิญโดยอัตโนมัติเมื่อสมัครสมาชิกและสามารถเข้าร่วมได้ทุกเมื่อ',
+        automaticInvitationOption__description:
+          'ผู้ใช้จะได้รับเชิญโดยอัตโนมัติเมื่อสมัครสมาชิกและสามารถเข้าร่วมได้ทุกเมื่อ',
         automaticInvitationOption__label: 'เชิญอัตโนมัติ',
-        automaticSuggestionOption__description: 'ผู้ใช้จะได้รับข้อเสนอแนะให้ขอเข้าร่วม แต่ต้องได้รับการอนุมัติจากผู้ดูแลระบบก่อนที่จะสามารถเข้าร่วมองค์กรได้',
+        automaticSuggestionOption__description:
+          'ผู้ใช้จะได้รับข้อเสนอแนะให้ขอเข้าร่วม แต่ต้องได้รับการอนุมัติจากผู้ดูแลระบบก่อนที่จะสามารถเข้าร่วมองค์กรได้',
         automaticSuggestionOption__label: 'ข้อเสนอแนะอัตโนมัติ',
         calloutInfoLabel: 'การเปลี่ยนโหมดการเข้าร่วมจะส่งผลเฉพาะผู้ใช้ใหม่เท่านั้น',
         calloutInvitationCountLabel: 'คำเชิญที่รอดำเนินการส่งไปยังผู้ใช้: {{count}}',
@@ -277,7 +284,8 @@ export const thTH: LocalizationResource = {
       blockButton__totp: 'ใช้แอปตัวตรวจสอบความถูกต้อง',
       getHelp: {
         blockButton__emailSupport: 'สนับสนุนทางอีเมล',
-        content: 'หากคุณพบปัญหาในการเข้าสู่ระบบบัญชีของคุณ โปรดอีเมลถึงเราและเราจะช่วยคุณเรียกคืนการเข้าถึงโดยเร็วที่สุด',
+        content:
+          'หากคุณพบปัญหาในการเข้าสู่ระบบบัญชีของคุณ โปรดอีเมลถึงเราและเราจะช่วยคุณเรียกคืนการเข้าถึงโดยเร็วที่สุด',
         title: 'ขอรับความช่วยเหลือ',
       },
       subtitle: 'มีปัญหาหรือ? คุณสามารถใช้วิธีใดวิธีหนึ่งนี้เพื่อเข้าสู่ระบบได้',
@@ -433,8 +441,10 @@ export const thTH: LocalizationResource = {
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
   unstable__errors: {
-    captcha_invalid: 'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบความปลอดภัยไม่ผ่าน กรุณารีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
-    captcha_unavailable: 'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบบอทไม่ผ่าน กรุณารีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
+    captcha_invalid:
+      'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบความปลอดภัยไม่ผ่าน กรุณารีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
+    captcha_unavailable:
+      'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบบอทไม่ผ่าน กรุณารีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_not_found: '',
@@ -449,7 +459,8 @@ export const thTH: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'รหัสผ่านของคุณไม่เพียงพอต่อความปลอดภัย',
     form_password_pwned: 'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของการรั่วไหลและไม่สามารถใช้ได้ กรุณาลองรหัสผ่านอื่นแทน',
-    form_password_size_in_bytes_exceeded: 'รหัสผ่านของคุณเกินจำนวนไบต์สูงสุดที่อนุญาต กรุณาลดความยาวหรือลบอักขระพิเศษบางตัว',
+    form_password_size_in_bytes_exceeded:
+      'รหัสผ่านของคุณเกินจำนวนไบต์สูงสุดที่อนุญาต กรุณาลดความยาวหรือลบอักขระพิเศษบางตัว',
     form_password_validation_failed: 'รหัสผ่านไม่ถูกต้อง',
     form_username_invalid_character: '',
     form_username_invalid_length: '',
@@ -520,8 +531,10 @@ export const thTH: LocalizationResource = {
       infoText1: 'จะเปิดใช้งานรหัสสำรองสำหรับบัญชีนี้',
       infoText2: 'เก็บรหัสสำรองไว้เป็นความลับและเก็บไว้อย่างปลอดภัย คุณอาจสร้างรหัสสำรองใหม่หากคุณสงสัยว่ามีการเปิดเผย',
       subtitle__codelist: 'เก็บไว้อย่างปลอดภัยและเก็บไว้เป็นความลับ',
-      successMessage: 'ตอนนี้ได้เปิดใช้งานรหัสสำรองแล้ว คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้ แต่ละรหัสสามารถใช้ได้เพียงครั้งเดียว',
-      successSubtitle: 'คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้',
+      successMessage:
+        'ตอนนี้ได้เปิดใช้งานรหัสสำรองแล้ว คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้ แต่ละรหัสสามารถใช้ได้เพียงครั้งเดียว',
+      successSubtitle:
+        'คุณสามารถใช้หนึ่งในรหัสเหล่านี้เพื่อเข้าสู่บัญชีของคุณหากคุณไม่สามารถเข้าถึงอุปกรณ์ตรวจสอบสิทธิ์ได้',
       title: 'เพิ่มการยืนยันรหัสสำรอง',
       title__codelist: 'รหัสสำรอง',
     },
@@ -588,10 +601,13 @@ export const thTH: LocalizationResource = {
         successMessage: 'การยืนยันสองขั้นตอนด้วยรหัส SMS ได้ถูกนำออกสำหรับ {{mfaPhoneCode}}',
         title: 'นำการยืนยันสองขั้นตอนออก',
       },
-      subtitle__availablePhoneNumbers: 'เลือกหมายเลขโทรศัพท์ที่มีอยู่เพื่อลงทะเบียนสำหรับการยืนยันสองขั้นตอนด้วยรหัส SMS หรือเพิ่มหมายเลขใหม่',
-      subtitle__unavailablePhoneNumbers: 'ไม่มีหมายเลขโทรศัพท์ที่สามารถใช้ลงทะเบียนสำหรับการยืนยันสองขั้นตอนด้วยรหัส SMS โปรดเพิ่มหมายเลขใหม่',
+      subtitle__availablePhoneNumbers:
+        'เลือกหมายเลขโทรศัพท์ที่มีอยู่เพื่อลงทะเบียนสำหรับการยืนยันสองขั้นตอนด้วยรหัส SMS หรือเพิ่มหมายเลขใหม่',
+      subtitle__unavailablePhoneNumbers:
+        'ไม่มีหมายเลขโทรศัพท์ที่สามารถใช้ลงทะเบียนสำหรับการยืนยันสองขั้นตอนด้วยรหัส SMS โปรดเพิ่มหมายเลขใหม่',
       successMessage1: 'เมื่อเข้าสู่ระบบ คุณจะต้องป้อนรหัสยืนยันที่ถูกส่งไปยังหมายเลขโทรศัพท์นี้เป็นขั้นตอนเพิ่มเติม',
-      successMessage2: 'บันทึกรหัสสำรองและเก็บไว้ในที่ปลอดภัย หากคุณสูญเสียการเข้าถึงอุปกรณ์การตรวจสอบของคุณ คุณสามารถใช้รหัสสำรองเพื่อเข้าสู่ระบบได้',
+      successMessage2:
+        'บันทึกรหัสสำรองและเก็บไว้ในที่ปลอดภัย หากคุณสูญเสียการเข้าถึงอุปกรณ์การตรวจสอบของคุณ คุณสามารถใช้รหัสสำรองเพื่อเข้าสู่ระบบได้',
       successTitle: 'เปิดใช้งานการยืนยันด้วยรหัส SMS',
       title: 'เพิ่มการยืนยันด้วยรหัส SMS',
     },
@@ -599,9 +615,11 @@ export const thTH: LocalizationResource = {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'สแกนคิวอาร์โค้ดแทน',
         buttonUnableToScan__nonPrimary: 'ไม่สามารถสแกนคิวอาร์โค้ด?',
-        infoText__ableToScan: 'ตั้งค่าวิธีการเข้าสู่ระบบใหม่ในแอปตัวตรวจสอบของคุณและสแกนคิวอาร์โค้ดต่อไปนี้เพื่อเชื่อมโยงกับบัญชีของคุณ',
+        infoText__ableToScan:
+          'ตั้งค่าวิธีการเข้าสู่ระบบใหม่ในแอปตัวตรวจสอบของคุณและสแกนคิวอาร์โค้ดต่อไปนี้เพื่อเชื่อมโยงกับบัญชีของคุณ',
         infoText__unableToScan: 'ตั้งค่าวิธีการเข้าสู่ระบบใหม่ในตัวตรวจสอบของคุณและป้อนคีย์ที่ให้ไว้ด้านล่าง',
-        inputLabel__unableToScan1: 'ตรวจสอบให้แน่ใจว่าเปิดใช้งานรหัสผ่านตามเวลาหรือรหัสผ่านครั้งเดียว จากนั้นจึงเชื่อมโยงบัญชีของคุณ',
+        inputLabel__unableToScan1:
+          'ตรวจสอบให้แน่ใจว่าเปิดใช้งานรหัสผ่านตามเวลาหรือรหัสผ่านครั้งเดียว จากนั้นจึงเชื่อมโยงบัญชีของคุณ',
         inputLabel__unableToScan2: 'หรือหากตัวตรวจสอบของคุณรองรับ TOTP URIs คุณยังสามารถคัดลอก URI ทั้งหมดได้',
       },
       removeResource: {
@@ -610,7 +628,8 @@ export const thTH: LocalizationResource = {
         successMessage: 'การยืนยันสองขั้นตอนผ่านแอปพลิเคชันตัวตรวจสอบได้ถูกนำออก',
         title: 'นำการยืนยันสองขั้นตอนออก',
       },
-      successMessage: 'การยืนยันสองขั้นตอนเปิดใช้งานแล้ว เมื่อลงชื่อเข้าใช้ คุณจะต้องป้อนรหัสยืนยันจากตัวตรวจสอบนี้เป็นขั้นตอนเพิ่มเติม',
+      successMessage:
+        'การยืนยันสองขั้นตอนเปิดใช้งานแล้ว เมื่อลงชื่อเข้าใช้ คุณจะต้องป้อนรหัสยืนยันจากตัวตรวจสอบนี้เป็นขั้นตอนเพิ่มเติม',
       title: 'เพิ่มแอปพลิเคชันตัวตรวจสอบ',
       verifySubtitle: 'ป้อนรหัสยืนยันที่สร้างโดยตัวตรวจสอบของคุณ',
       verifyTitle: 'รหัสยืนยัน',
@@ -623,11 +642,12 @@ export const thTH: LocalizationResource = {
       title: 'บัญชี',
     },
     passwordPage: {
-      successMessage__set: 'รหัสผ่านของคุณได้รับการตั้งค่า',
-      successMessage__update: 'รหัสผ่านของคุณได้รับการอัปเดต',
-      successMessage__signOutOfOtherSessions: 'อุปกรณ์อื่น ๆ ทั้งหมดได้ลงชื่อออก',
       checkboxInfoText__signOutOfOtherSessions: 'ขอแนะนำให้ลงชื่อออกจากอุปกรณ์อื่น ๆ ที่อาจใช้รหัสผ่านเก่าของคุณ',
-      readonly: 'คุณไม่สามารถแก้ไขรหัสผ่านได้ในขณะนี้เนื่องจากคุณสามารถลงชื่อเข้าใช้ได้ผ่านการเชื่อมต่อกับองค์กรเท่านั้น',
+      readonly:
+        'คุณไม่สามารถแก้ไขรหัสผ่านได้ในขณะนี้เนื่องจากคุณสามารถลงชื่อเข้าใช้ได้ผ่านการเชื่อมต่อกับองค์กรเท่านั้น',
+      successMessage__set: 'รหัสผ่านของคุณได้รับการตั้งค่า',
+      successMessage__signOutOfOtherSessions: 'อุปกรณ์อื่น ๆ ทั้งหมดได้ลงชื่อออก',
+      successMessage__update: 'รหัสผ่านของคุณได้รับการอัปเดต',
       title__set: 'ตั้งรหัสผ่าน',
       title__update: 'อัปเดตรหัสผ่าน',
     },
@@ -663,7 +683,8 @@ export const thTH: LocalizationResource = {
         actionLabel__reauthorize: 'อนุญาตตอนนี้',
         destructiveActionTitle: 'ลบ',
         primaryButton: 'เชื่อมต่อบัญชี',
-        subtitle__reauthorize: 'ขอบเขตที่ต้องการได้รับการอัปเดตและคุณอาจประสบปัญหาการใช้งานจำกัด กรุณาอนุญาตแอปพลิเคชันนี้อีกครั้งเพื่อหลีกเลี่ยงปัญหา',
+        subtitle__reauthorize:
+          'ขอบเขตที่ต้องการได้รับการอัปเดตและคุณอาจประสบปัญหาการใช้งานจำกัด กรุณาอนุญาตแอปพลิเคชันนี้อีกครั้งเพื่อหลีกเลี่ยงปัญหา',
         title: 'บัญชีที่เชื่อมต่อ',
       },
       dangerSection: {
@@ -702,8 +723,8 @@ export const thTH: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'อัปเดตรหัสผ่าน',
         primaryButton__setPassword: 'ตั้งรหัสผ่าน',
+        primaryButton__updatePassword: 'อัปเดตรหัสผ่าน',
         title: 'รหัสผ่าน',
       },
       phoneNumbersSection: {
@@ -719,8 +740,8 @@ export const thTH: LocalizationResource = {
         title: 'โปรไฟล์',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'อัปเดตชื่อผู้ใช้',
         primaryButton__setUsername: 'ตั้งชื่อผู้ใช้',
+        primaryButton__updateUsername: 'อัปเดตชื่อผู้ใช้',
         title: 'ชื่อผู้ใช้',
       },
       web3WalletsSection: {
