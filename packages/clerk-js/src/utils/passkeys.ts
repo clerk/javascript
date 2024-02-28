@@ -2,25 +2,27 @@ import { isValidBrowser } from '@clerk/shared/browser';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 
 function isWebAuthnSupported() {
-  return isValidBrowser() && typeof window.PublicKeyCredential === 'function';
+  return (
+    isValidBrowser() &&
+    // Check if `PublicKeyCredential` is a constructor
+    typeof window.PublicKeyCredential === 'function'
+  );
 }
 
 async function isWebAuthnAutofillSupported(): Promise<boolean> {
-  if (!isWebAuthnSupported() || typeof window?.PublicKeyCredential?.isConditionalMediationAvailable !== 'function') {
-    return new Promise(resolve => resolve(false));
+  try {
+    return isWebAuthnSupported() && window.PublicKeyCredential.isConditionalMediationAvailable();
+  } catch (e) {
+    return false;
   }
-
-  return PublicKeyCredential.isConditionalMediationAvailable();
 }
 
 async function isWebAuthnPlatformAuthenticatorSupported(): Promise<boolean> {
-  if (
-    !isWebAuthnSupported() ||
-    typeof window?.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable !== 'function'
-  ) {
-    return new Promise(resolve => resolve(false));
+  try {
+    return typeof window !== 'undefined' && window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  } catch (e) {
+    return false;
   }
-  return PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
 }
 
 class Base64Converter {
