@@ -1,6 +1,9 @@
 import { parseError } from '@clerk/shared/error';
 import type {
   ClerkAPIError,
+  PassKeyVerificationJSON,
+  PasskeyVerificationResource,
+  PublicKeyOptions,
   SignUpVerificationJSON,
   SignUpVerificationResource,
   SignUpVerificationsJSON,
@@ -11,6 +14,7 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { base64UrlToBuffer } from '../../utils/passkeys';
 import { BaseResource } from './internal';
 
 export class Verification extends BaseResource implements VerificationResource {
@@ -48,6 +52,41 @@ export class Verification extends BaseResource implements VerificationResource {
       this.attempts = data.attempts;
       this.expireAt = unixEpochToDate(data.expire_at);
       this.error = data.error ? parseError(data.error) : null;
+    }
+    return this;
+  }
+}
+
+export class PasskeyVerification extends Verification implements PasskeyVerificationResource {
+  publicKey: Omit<Required<PublicKeyCredentialCreationOptions>, 'extensions'> | null = null;
+
+  constructor(data: PassKeyVerificationJSON | null) {
+    super(data);
+    this.fromJSON(data);
+  }
+
+  /**
+   * Transform base64url encoded strings to ArrayBuffer
+   */
+  protected fromJSON(data: PassKeyVerificationJSON | null): this {
+    if (data?.publicKey) {
+      const userIdBuffer = base64UrlToBuffer(data.publicKey.user.id);
+      const challengeBuffer = base64UrlToBuffer(data.publicKey.challenge);
+
+      const excludeCredentialsWithBuffer = (data.publicKey.excludeCredentials || []).map(cred => ({
+        ...cred,
+        id: base64UrlToBuffer(cred.id),
+      }));
+
+      this.publicKey = {
+        ...data.publicKey,
+        excludeCredentials: excludeCredentialsWithBuffer,
+        challenge: challengeBuffer,
+        user: {
+          ...data.publicKey.user,
+          id: userIdBuffer,
+        },
+      } satisfies PublicKeyOptions;
     }
     return this;
   }

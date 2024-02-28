@@ -13,6 +13,10 @@ export interface VerificationResource extends ClerkResource {
   verifiedFromTheSameClient: () => boolean;
 }
 
+export interface PasskeyVerificationResource extends VerificationResource {
+  publicKey: Omit<Required<PublicKeyCredentialCreationOptions>, 'extensions'> | null;
+}
+
 export type VerificationStatus = 'unverified' | 'verified' | 'transferable' | 'failed' | 'expired';
 
 export interface CodeVerificationAttemptParam {

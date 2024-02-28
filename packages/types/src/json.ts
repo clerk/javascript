@@ -136,6 +136,17 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   backup_codes?: string[];
 }
 
+export interface PasskeyJSON extends ClerkResourceJSON {
+  object: 'passkey';
+  id: string;
+  credential_id: string | null;
+  name: string | null;
+  verification: PassKeyVerificationJSON | null;
+  last_used_at: number | null;
+  updated_at: number;
+  created_at: number;
+}
+
 export interface Web3WalletJSON extends ClerkResourceJSON {
   object: 'web3_wallet';
   id: string;
@@ -443,3 +454,42 @@ export interface DeletedObjectJSON {
 
 export type SignInFirstFactorJSON = CamelToSnake<SignInFirstFactor>;
 export type SignInSecondFactorJSON = CamelToSnake<SignInSecondFactor>;
+
+/**
+ * Types for WebAuthN passkeys
+ */
+
+type Base64UrlString = string;
+
+interface PublicKeyCredentialUserEntityJSON {
+  name: string;
+  displayName: string;
+  id: Base64UrlString;
+}
+
+export interface ExcludedCredentialJSON {
+  type: 'public-key';
+  id: Base64UrlString;
+  transports?: ('ble' | 'hybrid' | 'internal' | 'nfc' | 'usb')[];
+}
+
+interface AuthenticatorSelectionCriteriaJSON extends AuthenticatorSelectionCriteria {
+  requireResidentKey: boolean;
+  residentKey: 'discouraged' | 'preferred' | 'required';
+  userVerification: 'discouraged' | 'preferred' | 'required';
+}
+
+export interface PublicKeyCredentialCreationOptionsJSON {
+  rp: PublicKeyCredentialRpEntity;
+  user: PublicKeyCredentialUserEntityJSON;
+  challenge: Base64UrlString;
+  pubKeyCredParams: PublicKeyCredentialParameters[];
+  timeout: number;
+  excludeCredentials: ExcludedCredentialJSON[];
+  authenticatorSelection: AuthenticatorSelectionCriteriaJSON;
+  attestation: 'direct' | 'enterprise' | 'indirect' | 'none';
+}
+
+export interface PassKeyVerificationJSON extends VerificationJSON {
+  publicKey: PublicKeyCredentialCreationOptionsJSON | null;
+}
