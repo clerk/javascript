@@ -32,11 +32,17 @@ export const Image = makeCustomizable(sanitizeDomProps(makeResponsive(Primitives
 export const Alert = makeCustomizable(sanitizeDomProps(Primitives.Alert));
 export const AlertIcon = makeCustomizable(sanitizeDomProps(Primitives.AlertIcon));
 export const Input = makeCustomizable(sanitizeDomProps(Primitives.Input), { defaultDescriptor: descriptors.input });
-export const CheckboxInput = makeCustomizable(sanitizeDomProps(Primitives.CheckboxInput), {
+export const CheckboxInput = makeCustomizable(sanitizeDomProps(Primitives.Input), {
   defaultDescriptor: descriptors.checkbox,
+  defaultProps: {
+    type: 'checkbox',
+  },
 });
-export const RadioInput = makeCustomizable(sanitizeDomProps(Primitives.RadioInput), {
+export const RadioInput = makeCustomizable(sanitizeDomProps(Primitives.Input), {
   defaultDescriptor: descriptors.radio,
+  defaultProps: {
+    type: 'radio',
+  },
 });
 export const FormLabel = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormLabel)));
 export const FormErrorText = makeCustomizable(makeLocalizable(sanitizeDomProps(Primitives.FormErrorText)));
