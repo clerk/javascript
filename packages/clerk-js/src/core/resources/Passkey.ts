@@ -23,22 +23,18 @@ export class Passkey extends BaseResource implements PasskeyResource {
     this.fromJSON(data);
   }
 
-  private static async startRegistration() {
-    return await BaseResource._fetch({
-      path: `/me/passkeys`,
+  private static async prepareVerification() {
+    return BaseResource._fetch({
+      path: `/me/passkeys/prepare_verification`,
       method: 'POST',
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
 
-  private static async finishRegistration(publicKeyCredential: any) {
-    const headers = new Headers({
-      'Content-Type': 'application/json',
-    });
-    return await BaseResource._fetch({
-      path: `/me/passkeys/finalize`,
+  private static async attemptVerification(credential: any) {
+    return BaseResource._fetch({
+      path: `/me/passkeys/attempt_verification`,
       method: 'POST',
-      headers,
-      body: JSON.stringify(publicKeyCredential) as any,
+      body: { publicKeyCredential: JSON.stringify(credential) } as any,
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
 
@@ -67,7 +63,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
         code: 'passkeys_unsupported_platform_authenticator',
       });
     }
-    const { verification } = await this.startRegistration();
+    const { verification } = await this.prepareVerification();
 
     const publicKey = verification?.publicKey;
 
@@ -103,7 +99,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
       },
     };
 
-    return await this.finishRegistration(credential);
+    return this.attemptVerification(credential);
   }
 
   /**
