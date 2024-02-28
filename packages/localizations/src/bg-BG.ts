@@ -651,13 +651,13 @@ export const bgBG: LocalizationResource = {
       title: 'Профил',
     },
     passwordPage: {
-      successMessage__set: 'Паролата ви беше зададена.',
-      successMessage__update: 'Паролата ви беше обновена.',
-      successMessage__signOutOfOtherSessions: 'Всички други устройства бяха излезли.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Вашата парола в момента не може да бъде редактирана, тъй като можете да влизате само чрез корпоративна връзка.',
+      successMessage__set: 'Паролата ви беше зададена.',
+      successMessage__signOutOfOtherSessions: 'Всички други устройства бяха излезли.',
+      successMessage__update: 'Паролата ви беше обновена.',
       title__set: 'Задай парола',
       title__update: 'Промени паролата',
     },
@@ -734,8 +734,8 @@ export const bgBG: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Промени паролата',
         primaryButton__setPassword: 'Задай парола',
+        primaryButton__updatePassword: 'Промени паролата',
         title: 'Парола',
       },
       phoneNumbersSection: {
@@ -751,8 +751,8 @@ export const bgBG: LocalizationResource = {
         title: 'Профил',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Промени потребителското име',
         primaryButton__setUsername: 'Задай потребителско име',
+        primaryButton__updateUsername: 'Промени потребителското име',
         title: 'Потребителско име',
       },
       web3WalletsSection: {

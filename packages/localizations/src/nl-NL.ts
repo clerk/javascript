@@ -648,12 +648,12 @@ export const nlNL: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Je wachtwoord is ingesteld.',
-      successMessage__update: 'Your password has been updated.',
-      successMessage__signOutOfOtherSessions: 'All other devices have been signed out.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Je wachtwoord is ingesteld.',
+      successMessage__signOutOfOtherSessions: 'All other devices have been signed out.',
+      successMessage__update: 'Your password has been updated.',
       title__set: 'Stel wachtwoord in',
       title__update: 'Change password',
     },
@@ -729,8 +729,8 @@ export const nlNL: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Wachtwoord wijzigen',
         primaryButton__setPassword: 'Wachtwoord instellen',
+        primaryButton__updatePassword: 'Wachtwoord wijzigen',
         title: 'Wachtwoord',
       },
       phoneNumbersSection: {
@@ -746,8 +746,8 @@ export const nlNL: LocalizationResource = {
         title: 'Profiel',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Wijzig gebruikersnaam',
         primaryButton__setUsername: 'Stel gebruikersnaam in',
+        primaryButton__updateUsername: 'Wijzig gebruikersnaam',
         title: 'Gebruikersnaam',
       },
       web3WalletsSection: {

@@ -37,6 +37,10 @@ import { ukUA } from '../uk-UA';
 import { viVN } from '../vi-VN';
 import { zhCN } from '../zh-CN';
 import { zhTW } from '../zh-TW';
+import { enUS_v4 } from './enUS_v4';
+import { createObject, getCommonKeys, getKeys, getUniqueKeys, getValue, mergeObjects } from './utils';
+
+const SET_UNDEFINED_ON_THE_CHANGED_KEYS = false;
 
 const disclaimer = `
 /*
@@ -66,7 +70,7 @@ function alignKeys(source: any, target: any) {
       }
       alignKeys(source[key], target[key]);
     } else if (!Object.prototype.hasOwnProperty.call(target, key)) {
-      target[key] = source[key];
+      target[key] = undefined;
     }
   });
 
@@ -100,14 +104,45 @@ function sortObject(obj: any) {
   return sortedObj;
 }
 
+function enUSKeysWithChangedValues(enUS_v4: any, enUS_v5: any) {
+  const v4Keys = getKeys(enUS_v4);
+  const v5Keys = getKeys(enUS_v5);
+
+  const addedKeys = getUniqueKeys(v5Keys, v4Keys).map((key: any) => ({ key, value: undefined }));
+
+  const commonKeys = getCommonKeys(v4Keys, v5Keys);
+  const updatedKeys = commonKeys.reduce((acc: any, key: any) => {
+    const v4Value = getValue(enUS_v4, key);
+    const v5Value = getValue(enUS_v5, key);
+    if (v4Value !== v5Value) {
+      acc.push({ key, value: undefined });
+    }
+    return acc;
+  }, []);
+
+  const addedKeysObj = createObject(addedKeys);
+  const updatedKeysObj = createObject(updatedKeys);
+
+  return mergeObjects(addedKeysObj, updatedKeysObj);
+}
+
+const updatedEnUSKeys = enUSKeysWithChangedValues(enUS_v4, enUS);
+
 function run(langObj: any, name: string) {
   const target = langObj;
 
   alignKeys(enUS, target);
-  const sorted = sortObject(target);
+  let sorted = sortObject(target);
+
+  if (SET_UNDEFINED_ON_THE_CHANGED_KEYS && name !== 'en-US') {
+    sorted = mergeObjects(sorted, updatedEnUSKeys);
+  }
 
   // convert to JSON and write to text file in typescript format
-  const json = JSON.stringify(sorted, null, 2);
+  const json = JSON.stringify(sorted, (k, v) => (v === undefined ? '__$_cl_replaceable_undefined' : v), 2).replace(
+    /"__\$_cl_replaceable_undefined"/g,
+    'undefined',
+  );
   const disclaimerText = name !== 'en-US' ? disclaimer : '';
 
   const finalText = disclaimerText + initialText(name.replace('-', '')) + json + ' as const;';

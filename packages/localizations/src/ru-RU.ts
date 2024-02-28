@@ -654,12 +654,12 @@ export const ruRU: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Ваш пароль установлен.',
-      successMessage__update: 'Ваш пароль был обновлен.',
-      successMessage__signOutOfOtherSessions: 'Все другие устройства были выведены из системы.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      successMessage__set: 'Ваш пароль установлен.',
+      successMessage__signOutOfOtherSessions: 'Все другие устройства были выведены из системы.',
+      successMessage__update: 'Ваш пароль был обновлен.',
       title__set: 'Установить пароль',
       title__update: 'Изменить пароль',
     },
@@ -736,8 +736,8 @@ export const ruRU: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Изменить пароль',
         primaryButton__setPassword: 'Установить пароль',
+        primaryButton__updatePassword: 'Изменить пароль',
         title: 'Пароль',
       },
       phoneNumbersSection: {
@@ -753,8 +753,8 @@ export const ruRU: LocalizationResource = {
         title: 'Профиль',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Изменить имя пользователя',
         primaryButton__setUsername: 'Установить имя пользователя',
+        primaryButton__updateUsername: 'Изменить имя пользователя',
         title: 'Имя пользователя',
       },
       web3WalletsSection: {

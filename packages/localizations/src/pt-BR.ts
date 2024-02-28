@@ -652,13 +652,13 @@ export const ptBR: LocalizationResource = {
       title: 'Account',
     },
     passwordPage: {
-      successMessage__set: 'Sua senha foi salva.',
-      successMessage__update: 'Sua senha foi atualizada.',
-      successMessage__signOutOfOtherSessions: 'Todos os outros dispositivos foram desconectados.',
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
       readonly:
         'Sua senha atualmente não pode ser editada porque você só pode fazer login por meio da conexão da empresa.',
+      successMessage__set: 'Sua senha foi salva.',
+      successMessage__signOutOfOtherSessions: 'Todos os outros dispositivos foram desconectados.',
+      successMessage__update: 'Sua senha foi atualizada.',
       title__set: 'Defina a senha',
       title__update: 'Trocar senha',
     },
@@ -735,8 +735,8 @@ export const ptBR: LocalizationResource = {
         },
       },
       passwordSection: {
-        primaryButton__updatePassword: 'Trocar a senha',
         primaryButton__setPassword: 'Defina a senha',
+        primaryButton__updatePassword: 'Trocar a senha',
         title: 'Senha',
       },
       phoneNumbersSection: {
@@ -752,8 +752,8 @@ export const ptBR: LocalizationResource = {
         title: 'Perfil',
       },
       usernameSection: {
-        primaryButton__updateUsername: 'Trocar nome de usuário',
         primaryButton__setUsername: 'Definir nome de usuário',
+        primaryButton__updateUsername: 'Trocar nome de usuário',
         title: 'Nome de usuário',
       },
       web3WalletsSection: {
