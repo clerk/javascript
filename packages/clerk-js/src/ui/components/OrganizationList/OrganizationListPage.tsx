@@ -79,17 +79,17 @@ export const OrganizationListPage = withCardStateProvider(() => {
   );
 });
 
-const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const environment = useEnvironment();
-  const { navigateAfterSelectOrganization, skipInvitationScreen } = useOrganizationListContext();
-  const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
-  return (
-    <>
-      {!isCreateOrganizationFlow && (
-        <OrganizationListPageList onCreateOrganizationClick={() => setCreateOrganizationFlow(true)} />
-      )}
-
-      {isCreateOrganizationFlow && (
+export const OrgListCreateOrganizationPage = withCardStateProvider(
+  (props: {
+    setCreateOrganizationFlow: React.Dispatch<React.SetStateAction<boolean>>;
+    isCreateOrganizationFlow: boolean;
+    showListInitially: boolean;
+  }) => {
+    const { showListInitially, isCreateOrganizationFlow, setCreateOrganizationFlow } = props;
+    const environment = useEnvironment();
+    const { navigateAfterSelectOrganization, skipInvitationScreen } = useOrganizationListContext();
+    return (
+      <>
         <Box
           sx={t => ({
             padding: `${t.space.$none} ${t.space.$8}`,
@@ -112,12 +112,34 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
             }
           />
         </Box>
+      </>
+    );
+  },
+);
+
+const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
+  const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
+  return (
+    <>
+      {!isCreateOrganizationFlow && (
+        <OrganizationListPageList onCreateOrganizationClick={() => setCreateOrganizationFlow(true)} />
+      )}
+
+      {isCreateOrganizationFlow && (
+        <OrgListCreateOrganizationPage
+          {...{
+            isCreateOrganizationFlow,
+            setCreateOrganizationFlow,
+            showListInitially,
+          }}
+        />
       )}
     </>
   );
 };
 
-const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void }) => {
+const OrganizationListPageList = withCardStateProvider((props: { onCreateOrganizationClick: () => void }) => {
+  const card = useCardState();
   const environment = useEnvironment();
 
   const { ref, userMemberships, userSuggestions, userInvitations } = useCoreOrganizationListInView();
@@ -131,6 +153,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
   };
   return (
     <>
+      <CardAlert>{card.error}</CardAlert>
       <Header.Root
         sx={t => ({
           padding: `${t.space.$none} ${t.space.$8}`,
@@ -217,4 +240,4 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
       </Col>
     </>
   );
-};
+});
