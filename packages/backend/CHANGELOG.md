@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.0.0-beta.25
+
+### Patch Changes
+
+- Remove `__dev_session` legacy query param used to pass the Dev Browser token in previous major version. ([#2883](https://github.com/clerk/javascript/pull/2883)) by [@dimkl](https://github.com/dimkl)
+
+  This param will be visible only when using Account Portal with "Core 1" version.
+
+- Updated dependencies [[`1834a3ee4`](https://github.com/clerk/javascript/commit/1834a3ee496ea27b9f7ceeb32ec5361f9de8ee30)]:
+  - @clerk/shared@2.0.0-beta.17
+
 ## 1.0.0-beta.24
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.17
+
+### Patch Changes
+
+- fix(shared,clerk-js): Do not replace current URL if it does not contain a clerk token ([#2879](https://github.com/clerk/javascript/pull/2879)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.0.0-beta.16
 
 ### Patch Changes
