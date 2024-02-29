@@ -131,26 +131,12 @@ export const polishedAppearance: Appearance = {
         },
       },
       input: {
-        ...inputStyles(theme),
-        '&[type="radio"]': {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: 'none',
-          },
+        '&[data-variant="default"]': {
+          ...inputStyles(theme),
         },
       },
       tagInputContainer: {
         ...inputStyles(theme),
-        // remove the box shadow from the input inside the tag input container
-        '.cl-input': {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: 'none',
-          },
-          '&:focus': {
-            boxShadow: 'none',
-          },
-        },
       },
       tagPillContainer: {
         borderWidth: 0,
@@ -158,23 +144,6 @@ export const polishedAppearance: Appearance = {
       },
       phoneInputBox: {
         ...inputStyles(theme),
-        'div > input': {
-          boxShadow: 'unset',
-          '&[data-feedback]': {
-            '&:focus-within': {
-              boxShadow: 'unset',
-            },
-            '&:hover': {
-              boxShadow: 'unset',
-            },
-          },
-          '&:focus-within': {
-            boxShadow: 'unset',
-          },
-          '&:hover': {
-            boxShadow: 'unset',
-          },
-        },
       },
       selectSearchInput__countryCode: {
         boxShadow: 'none',
