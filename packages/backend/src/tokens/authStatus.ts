@@ -1,5 +1,6 @@
 import type { JwtPayload } from '@clerk/types';
 
+import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
@@ -105,7 +106,7 @@ export function signedOut(
   message = '',
   headers: Headers = new Headers(),
 ): SignedOutState {
-  return {
+  return withDebugHeaders({
     status: AuthStatus.SignedOut,
     reason,
     message,
@@ -121,7 +122,7 @@ export function signedOut(
     headers,
     toAuth: () => signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message }),
     token: null,
-  };
+  });
 }
 
 export function handshake(
@@ -130,7 +131,7 @@ export function handshake(
   message = '',
   headers: Headers,
 ): HandshakeState {
-  return {
+  return withDebugHeaders({
     status: AuthStatus.Handshake,
     reason,
     message,
@@ -146,5 +147,23 @@ export function handshake(
     headers,
     toAuth: () => null,
     token: null,
-  };
+  });
 }
+
+const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
+  const headers = new Headers(requestState.headers || {});
+
+  if (requestState.message) {
+    headers.set(constants.Headers.AuthMessage, requestState.message);
+  }
+  if (requestState.reason) {
+    headers.set(constants.Headers.AuthReason, requestState.reason);
+  }
+  if (requestState.status) {
+    headers.set(constants.Headers.AuthStatus, requestState.status);
+  }
+
+  requestState.headers = headers;
+
+  return requestState;
+};
