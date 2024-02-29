@@ -131,7 +131,7 @@ export class User extends BaseResource implements UserResource {
    * This method is experimental, avoid using this in production applications
    */
   __experimental__createPasskey = (): Promise<PasskeyResource> => {
-    return Passkey.create();
+    return Passkey.registerPasskey();
   };
 
   createPhoneNumber = (params: CreatePhoneNumberParams): Promise<PhoneNumberResource> => {

@@ -473,7 +473,7 @@ export interface ExcludedCredentialJSON {
   transports?: ('ble' | 'hybrid' | 'internal' | 'nfc' | 'usb')[];
 }
 
-interface AuthenticatorSelectionCriteriaJSON extends AuthenticatorSelectionCriteria {
+interface AuthenticatorSelectionCriteriaJSON {
   requireResidentKey: boolean;
   residentKey: 'discouraged' | 'preferred' | 'required';
   userVerification: 'discouraged' | 'preferred' | 'required';

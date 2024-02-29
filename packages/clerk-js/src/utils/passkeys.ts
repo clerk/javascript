@@ -1,5 +1,25 @@
 import { isValidBrowser } from '@clerk/shared/browser';
 import { ClerkRuntimeError } from '@clerk/shared/error';
+import type {
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
+} from '@clerk/types';
+
+type PublicKeyCredentialWithAuthenticatorAttestationResponse = Omit<PublicKeyCredential, 'response'> & {
+  response: AuthenticatorAttestationResponse;
+};
+
+type WebAuthnCreateCredentialReturn =
+  | {
+      publicKeyCredential: PublicKeyCredentialWithAuthenticatorAttestationResponse;
+      error: null;
+    }
+  | {
+      publicKeyCredential: null;
+      error: ClerkWebAuthnError | Error;
+    };
+
+type ClerkWebAuthnErrorCode = 'passkey_exists' | 'passkey_registration_cancelled' | 'passkey_credential_failed';
 
 function isWebAuthnSupported() {
   return (
@@ -11,7 +31,7 @@ function isWebAuthnSupported() {
 
 async function isWebAuthnAutofillSupported(): Promise<boolean> {
   try {
-    return isWebAuthnSupported() && window.PublicKeyCredential.isConditionalMediationAvailable();
+    return isWebAuthnSupported() && (await window.PublicKeyCredential.isConditionalMediationAvailable());
   } catch (e) {
     return false;
   }
@@ -19,7 +39,10 @@ async function isWebAuthnAutofillSupported(): Promise<boolean> {
 
 async function isWebAuthnPlatformAuthenticatorSupported(): Promise<boolean> {
   try {
-    return typeof window !== 'undefined' && window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    return (
+      typeof window !== 'undefined' &&
+      (await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())
+    );
   } catch (e) {
     return false;
   }
@@ -47,21 +70,108 @@ class Base64Converter {
   }
 }
 
+async function webAuthnCreateCredential(
+  publicKeyOptions: PublicKeyCredentialCreationOptionsWithoutExtensions,
+): Promise<WebAuthnCreateCredentialReturn> {
+  try {
+    // Manually setting types is necessary as typescript types are not correct. These type assertions are according to the spec.
+    const credential = (await navigator.credentials.create({
+      publicKey: publicKeyOptions,
+    })) as PublicKeyCredential | null;
+
+    if (!credential) {
+      return {
+        error: new ClerkWebAuthnError('Browser failed to create credential', { code: 'passkey_credential_failed' }),
+        publicKeyCredential: null,
+      };
+    }
+
+    // Manually setting types is necessary as typescript types are not correct. These type assertions are according to the spec.
+    const res = credential.response as AuthenticatorAttestationResponse;
+
+    return { publicKeyCredential: { ...credential, response: res }, error: null };
+  } catch (e) {
+    return { error: handlePublicKeyCreateError(e), publicKeyCredential: null };
+  }
+}
+
 /**
  * Map webauthn errors from `navigator.credentials.create()` to Clerk-js errors
  * @param error
  */
-function handlePublicKeyCreateError(error: Error): ClerkRuntimeError | Error {
+function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
   if (error.name === 'InvalidStateError') {
-    return new ClerkRuntimeError(error.message, { code: 'passkey_exists' });
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_exists' });
   } else if (error.name === 'NotAllowedError') {
-    return new ClerkRuntimeError(error.message, { code: 'passkey_registration_cancelled' });
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_registration_cancelled' });
   }
   return error;
 }
 
+function convertJSONToPublicKeyCreateOptions(jsonPublicKey: PublicKeyCredentialCreationOptionsJSON) {
+  const userIdBuffer = base64UrlToBuffer(jsonPublicKey.user.id);
+  const challengeBuffer = base64UrlToBuffer(jsonPublicKey.challenge);
+
+  const excludeCredentialsWithBuffer = (jsonPublicKey.excludeCredentials || []).map(cred => ({
+    ...cred,
+    id: base64UrlToBuffer(cred.id),
+  }));
+
+  return {
+    ...jsonPublicKey,
+    excludeCredentials: excludeCredentialsWithBuffer,
+    challenge: challengeBuffer,
+    user: {
+      ...jsonPublicKey.user,
+      id: userIdBuffer,
+    },
+  } as PublicKeyCredentialCreationOptionsWithoutExtensions;
+}
+
+function serializePublicKeyCredential(publicKeyCredential: PublicKeyCredentialWithAuthenticatorAttestationResponse) {
+  const response = publicKeyCredential.response;
+  return {
+    type: publicKeyCredential.type,
+    id: publicKeyCredential.id,
+    rawId: bufferToBase64Url(publicKeyCredential.rawId),
+    authenticatorAttachment: publicKeyCredential.authenticatorAttachment,
+    response: {
+      clientDataJSON: bufferToBase64Url(response.clientDataJSON),
+      attestationObject: bufferToBase64Url(response.attestationObject),
+      transports: response.getTransports(),
+    },
+  };
+}
+
 const bufferToBase64Url = Base64Converter.encode.bind(Base64Converter);
 const base64UrlToBuffer = Base64Converter.decode.bind(Base64Converter);
+
+/**
+ * Custom error class for representing Clerk runtime errors.
+ *
+ * @class ClerkRuntimeError
+ * @example
+ *   throw new ClerkRuntimeError('An error occurred', { code: 'password_invalid' });
+ */
+export class ClerkWebAuthnError extends ClerkRuntimeError {
+  /**
+   * A unique code identifying the error, used for localization
+   *
+   * @type {string}
+   * @memberof ClerkRuntimeError
+   */
+  code: ClerkWebAuthnErrorCode;
+
+  constructor(message: string, { code }: { code: ClerkWebAuthnErrorCode }) {
+    super(message, { code });
+
+    Object.setPrototypeOf(this, ClerkWebAuthnError.prototype);
+
+    this.code = code;
+    this.message = message;
+    this.clerkRuntimeError = true;
+  }
+}
 
 export {
   isWebAuthnPlatformAuthenticatorSupported,
@@ -70,4 +180,9 @@ export {
   base64UrlToBuffer,
   bufferToBase64Url,
   handlePublicKeyCreateError,
+  webAuthnCreateCredential,
+  convertJSONToPublicKeyCreateOptions,
+  serializePublicKeyCredential,
 };
+
+export type { PublicKeyCredentialWithAuthenticatorAttestationResponse };

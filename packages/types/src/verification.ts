@@ -13,8 +13,12 @@ export interface VerificationResource extends ClerkResource {
   verifiedFromTheSameClient: () => boolean;
 }
 
+export type PublicKeyCredentialCreationOptionsWithoutExtensions = Omit<
+  Required<PublicKeyCredentialCreationOptions>,
+  'extensions'
+>;
 export interface PasskeyVerificationResource extends VerificationResource {
-  publicKey: Omit<Required<PublicKeyCredentialCreationOptions>, 'extensions'> | null;
+  publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null;
 }
 
 export type VerificationStatus = 'unverified' | 'verified' | 'transferable' | 'failed' | 'expired';

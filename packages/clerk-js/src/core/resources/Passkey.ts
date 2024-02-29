@@ -1,10 +1,11 @@
 import type { PasskeyJSON, PasskeyResource, PasskeyVerificationResource } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import type { PublicKeyCredentialWithAuthenticatorAttestationResponse } from '../../utils/passkeys';
 import {
-  bufferToBase64Url,
-  handlePublicKeyCreateError,
   isWebAuthnPlatformAuthenticatorSupported,
+  serializePublicKeyCredential,
+  webAuthnCreateCredential,
 } from '../../utils/passkeys';
 import { BaseResource, ClerkRuntimeError, PasskeyVerification } from './internal';
 
@@ -23,18 +24,29 @@ export class Passkey extends BaseResource implements PasskeyResource {
     this.fromJSON(data);
   }
 
-  private static async prepareVerification() {
+  private static async create() {
     return BaseResource._fetch({
-      path: `/me/passkeys/prepare_verification`,
+      path: `/me/passkeys`,
       method: 'POST',
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
 
-  private static async attemptVerification(credential: any) {
+  private static async prepareVerification(passkeyId: string) {
     return BaseResource._fetch({
-      path: `/me/passkeys/attempt_verification`,
+      path: `/me/passkeys/${passkeyId}/prepare_verification`,
       method: 'POST',
-      body: { publicKeyCredential: JSON.stringify(credential) } as any,
+    }).then(res => new Passkey(res?.response as PasskeyJSON));
+  }
+
+  private static async attemptVerification(
+    passkeyId: string,
+    credential: PublicKeyCredentialWithAuthenticatorAttestationResponse,
+  ) {
+    const jsonPublicKeyCredential = serializePublicKeyCredential(credential);
+    return BaseResource._fetch({
+      path: `/me/passkeys/${passkeyId}/attempt_verification`,
+      method: 'POST',
+      body: { publicKeyCredential: JSON.stringify(jsonPublicKeyCredential) } as any,
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
 
@@ -48,7 +60,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
   /**
    * Developers should not be able to create a new Passkeys from an already instanced object
    */
-  static async create() {
+  static async registerPasskey() {
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
@@ -63,7 +75,10 @@ export class Passkey extends BaseResource implements PasskeyResource {
         code: 'passkeys_unsupported_platform_authenticator',
       });
     }
-    const { verification } = await this.prepareVerification();
+
+    const passkey = await this.create();
+
+    const { verification } = await this.prepareVerification(passkey.id);
 
     const publicKey = verification?.publicKey;
 
@@ -74,32 +89,13 @@ export class Passkey extends BaseResource implements PasskeyResource {
     }
 
     // Invoke the WebAuthn create() method.
-    const { cred, error } = await navigator.credentials
-      .create({
-        publicKey,
-      })
-      .then(v => ({ cred: v as PublicKeyCredential, error: null }))
-      .catch(e => ({ error: handlePublicKeyCreateError(e), cred: null }));
+    const { publicKeyCredential, error } = await webAuthnCreateCredential(publicKey);
 
-    if (!cred) {
+    if (!publicKeyCredential) {
       throw error;
     }
 
-    const response = cred.response as AuthenticatorAttestationResponse;
-
-    const credential = {
-      type: cred.type,
-      id: cred.id,
-      rawId: bufferToBase64Url(cred.rawId),
-      authenticatorAttachment: cred.authenticatorAttachment,
-      response: {
-        clientDataJSON: bufferToBase64Url(response.clientDataJSON),
-        attestationObject: bufferToBase64Url(response.attestationObject),
-        transports: response.getTransports(),
-      },
-    };
-
-    return this.attemptVerification(credential);
+    return this.attemptVerification(passkey.id, publicKeyCredential);
   }
 
   /**

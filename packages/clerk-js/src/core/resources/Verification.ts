@@ -3,7 +3,7 @@ import type {
   ClerkAPIError,
   PassKeyVerificationJSON,
   PasskeyVerificationResource,
-  PublicKeyOptions,
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
   SignUpVerificationResource,
   SignUpVerificationsJSON,
@@ -14,7 +14,7 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { base64UrlToBuffer } from '../../utils/passkeys';
+import { convertJSONToPublicKeyCreateOptions } from '../../utils/passkeys';
 import { BaseResource } from './internal';
 
 export class Verification extends BaseResource implements VerificationResource {
@@ -58,7 +58,7 @@ export class Verification extends BaseResource implements VerificationResource {
 }
 
 export class PasskeyVerification extends Verification implements PasskeyVerificationResource {
-  publicKey: Omit<Required<PublicKeyCredentialCreationOptions>, 'extensions'> | null = null;
+  publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null = null;
 
   constructor(data: PassKeyVerificationJSON | null) {
     super(data);
@@ -70,23 +70,7 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
    */
   protected fromJSON(data: PassKeyVerificationJSON | null): this {
     if (data?.publicKey) {
-      const userIdBuffer = base64UrlToBuffer(data.publicKey.user.id);
-      const challengeBuffer = base64UrlToBuffer(data.publicKey.challenge);
-
-      const excludeCredentialsWithBuffer = (data.publicKey.excludeCredentials || []).map(cred => ({
-        ...cred,
-        id: base64UrlToBuffer(cred.id),
-      }));
-
-      this.publicKey = {
-        ...data.publicKey,
-        excludeCredentials: excludeCredentialsWithBuffer,
-        challenge: challengeBuffer,
-        user: {
-          ...data.publicKey.user,
-          id: userIdBuffer,
-        },
-      } satisfies PublicKeyOptions;
+      this.publicKey = convertJSONToPublicKeyCreateOptions(data.publicKey);
     }
     return this;
   }
