@@ -3,7 +3,7 @@ import { createActor, createMachine } from 'xstate';
 
 import { catchHookError } from '~/utils/test-utils';
 
-import { ActiveTagsMode, useActiveTags } from './use-active-tags.hook';
+import { ActiveTagsMode, useActiveTags } from '../use-active-tags.hook';
 
 describe('useActiveTags', () => {
   const allTags = ['foo', 'bar'];

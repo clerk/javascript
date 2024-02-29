@@ -1,4 +1,4 @@
-import { matchStrategy } from './strategies';
+import { matchStrategy } from '../strategies';
 
 describe('matchStrategy', () => {
   it('should return false if either current or desired is undefined', () => {

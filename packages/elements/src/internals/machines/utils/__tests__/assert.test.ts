@@ -1,4 +1,4 @@
-import { assertActorEventDone, assertActorEventError, assertIsDefined } from './assert';
+import { assertActorEventDone, assertActorEventError, assertIsDefined } from '../assert';
 
 describe('assertIsDefined', () => {
   it('should throw an error if the value is undefined', () => {
