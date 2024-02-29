@@ -9,7 +9,6 @@ import * as path from 'node:path';
 
 import * as fs from 'fs';
 
-import { thTH } from '..';
 import { arSA } from '../ar-SA';
 import { bgBG } from '../bg-BG';
 import { csCZ } from '../cs-CZ';
@@ -33,6 +32,7 @@ import { roRO } from '../ro-RO';
 import { ruRU } from '../ru-RU';
 import { skSK } from '../sk-SK';
 import { svSE } from '../sv-SE';
+import { thTH } from '../th-TH';
 import { trTR } from '../tr-TR';
 import { ukUA } from '../uk-UA';
 import { viVN } from '../vi-VN';
