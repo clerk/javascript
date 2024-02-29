@@ -5,8 +5,11 @@ import type {
   PublicKeyCredentialCreationOptionsWithoutExtensions,
 } from '@clerk/types';
 
-type PublicKeyCredentialWithAuthenticatorAttestationResponse = Omit<PublicKeyCredential, 'response'> & {
-  response: AuthenticatorAttestationResponse;
+type PublicKeyCredentialWithAuthenticatorAttestationResponse = Omit<
+  PublicKeyCredential,
+  'response' | 'getClientExtensionResults'
+> & {
+  response: Omit<AuthenticatorAttestationResponse, 'getAuthenticatorData' | 'getPublicKey' | 'getPublicKeyAlgorithm'>;
 };
 
 type WebAuthnCreateCredentialReturn =
