@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.15
+
+### Patch Changes
+
+- Improve Japanese translations ([#2868](https://github.com/clerk/javascript/pull/2868)) by [@gunta](https://github.com/gunta)
+
 ## 2.0.0-beta.14
 
 ### Patch Changes

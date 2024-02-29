@@ -68,6 +68,7 @@ function _SignUpStart(): JSX.Element {
       type: 'text',
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
+      transformer: value => value.trim(),
     }),
     phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || initialValues.phoneNumber || '', {
       type: 'tel',
