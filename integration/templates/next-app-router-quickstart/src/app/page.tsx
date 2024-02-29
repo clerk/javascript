@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
 export default function Home() {
   return (
@@ -10,5 +10,5 @@ export default function Home() {
         <UserButton />
       </SignedIn>
     </header>
-  )
+  );
 }
