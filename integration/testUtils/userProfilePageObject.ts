@@ -27,6 +27,9 @@ export const createUserProfileComponentPageObject = (testArgs: TestArgs) => {
     typeEmailAddress: (value: string) => {
       return page.getByLabel(/Email address/i).fill(value);
     },
+    waitForUserProfileModal: () => {
+      return page.waitForSelector('.cl-modalContent > .cl-userProfile-root', { state: 'visible' });
+    },
   };
   return self;
 };
