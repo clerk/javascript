@@ -217,9 +217,9 @@ export default function App({
           </Text>
           <Text>
             Migrating from
-            <Text color='green'> v{fromVersion} </Text>
+            <Text color='green'> {fromVersion} </Text>
             to
-            <Text color='green'> v{toVersion}</Text>
+            <Text color='green'> {toVersion}</Text>
           </Text>
           <Text>
             Looking in the directory

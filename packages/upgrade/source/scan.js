@@ -29,7 +29,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarn
   // { sdkName: [{ title: 'x', matcher: /x/, slug: 'x', ... }] }
   useEffect(() => {
     setStatus(`Loading data for v${toVersion} migration`);
-    import(`./versions/v${toVersion}/index.js`).then(version => {
+    import(`./versions/${toVersion}/index.js`).then(version => {
       setMatchers(
         sdks.reduce((m, sdk) => {
           m[sdk] = version.default[sdk];

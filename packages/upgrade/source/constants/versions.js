@@ -1,4 +1,4 @@
 export default [
-  { label: 'v5', value: 5 },
-  { label: 'v4', value: 4 },
+  { label: 'Core 2', value: 'core-2' },
+  { label: 'Core 1', value: 'core-1' },
 ];

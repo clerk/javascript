@@ -26,8 +26,8 @@ const cli = meow(
   {
     importMeta: import.meta,
     flags: {
-      from: { type: 'string', default: '4' },
-      to: { type: 'string', default: '5' },
+      from: { type: 'string', default: 'core-1' },
+      to: { type: 'string', default: 'core-2' },
       sdk: { type: 'string', choices: sdks.map(i => i.value) },
       dir: { type: 'string' },
       ignore: { type: 'string', isMultiple: true },
@@ -48,5 +48,6 @@ render(
     noWarnings={cli.flags.noWarnings}
     disableTelemetry={cli.flags.disableTelemetry}
   />,
-  // { debug: true }, if having issues with errors being swallowed, uncomment this
+  // if having issues with errors being swallowed, uncomment this
+  // { debug: true }
 );
