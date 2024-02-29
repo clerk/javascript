@@ -1,7 +1,7 @@
 type EnvironmentVariables = {
   public: Map<string, string>;
   private: Map<string, string>;
-}
+};
 
 export type EnvironmentConfig = {
   get id(): string;
@@ -13,13 +13,13 @@ export type EnvironmentConfig = {
   toJson(): { public: Record<string, string>; private: Record<string, string> };
   fromJson(json: ReturnType<EnvironmentConfig['toJson']>): EnvironmentConfig;
   clone(): EnvironmentConfig;
-}
+};
 
 export const environmentConfig = () => {
   let id = '';
   const envVars: EnvironmentVariables = {
     public: new Map<string, string>(),
-    private: new Map<string, string>()
+    private: new Map<string, string>(),
   };
 
   const self: EnvironmentConfig = {
@@ -50,7 +50,7 @@ export const environmentConfig = () => {
         private: Object.fromEntries(envVars.private),
       };
     },
-    fromJson: (json) => {
+    fromJson: json => {
       Object.entries(json.public).forEach(([k, v]) => self.setEnvVariable('public', k, v));
       Object.entries(json.private).forEach(([k, v]) => self.setEnvVariable('private', k, v));
       return self;
