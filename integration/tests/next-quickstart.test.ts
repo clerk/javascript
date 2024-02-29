@@ -77,7 +77,35 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
     await u.po.userProfile.waitForUserProfileModal();
 
     await expect(u.page.getByText(/profile details/i)).toBeVisible();
+  });
 
-    await u.page.pause();
+  test('can sign out through user button', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToStart();
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+
+    await u.page.getByRole('button', { name: /Sign in/i }).click();
+
+    await u.po.signIn.waitForMounted();
+
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+
+    await u.page.waitForAppUrl('/');
+
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userButton.waitForMounted();
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    await u.po.userButton.toHaveVisibleMenuItems([/Sign out/i]);
+
+    await u.po.userButton.triggerSignOut();
+
+    await u.page.waitForAppUrl('/');
+
+    await u.po.expect.toBeSignedOut();
+    await expect(u.page.getByRole('button', { name: /Sign in/i })).toBeVisible();
   });
 });
