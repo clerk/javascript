@@ -17,7 +17,6 @@ export const OrganizationProfileAvatarUploader = (
         sx={t => ({
           textAlign: 'left',
           marginBottom: t.space.$2,
-          color: t.colors.$colorTextSecondary,
         })}
         localizationKey={localizationKeys('organizationProfile.start.profileSection.uploadAction__title')}
       />
