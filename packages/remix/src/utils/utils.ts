@@ -24,6 +24,10 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
   }
 }
 
+type CloudflareEnv = {
+  env: Record<string, string>;
+};
+
 /**
  *
  * Utility function to get env variables across Node and Edge runtimes.
@@ -32,6 +36,11 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
  * @returns string
  */
 export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string => {
+  // Remix + Cloudflare pages
+  if (typeof (context?.cloudflare as CloudflareEnv)?.env !== 'undefined') {
+    return (context?.cloudflare as CloudflareEnv).env[name] || '';
+  }
+
   // Node envs
   if (typeof process !== 'undefined') {
     return (process.env && process.env[name]) || '';
@@ -39,7 +48,7 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
 
   // Cloudflare pages
   if (typeof context !== 'undefined') {
-    const contextEnv = context?.env as Record<string, string>;
+    const contextEnv = (context as CloudflareEnv)?.env;
 
     return contextEnv[name] || (context[name] as string) || '';
   }
