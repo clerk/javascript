@@ -13,6 +13,8 @@ export default defineConfig({
     {
       name: 'setup',
       testMatch: /cleanup\.setup/,
+      // 5 minutes
+      timeout: 5 * 60 * 1000,
     },
   ],
 });

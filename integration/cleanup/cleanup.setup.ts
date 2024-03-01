@@ -22,10 +22,10 @@ setup('cleanup instances ', async () => {
     const { data: users } = await clerkClient.users.getUserList({
       orderBy: '-created_at',
       query: 'clerkcookie',
-      limit: 100,
+      limit: 150,
     });
 
-    const batches = batchElements(skipUsersThatWereCreatedToday(users), 5);
+    const batches = batchElements(skipUsersThatWereCreatedWithinTheLast10Minutes(users), 5);
     for (const batch of batches) {
       console.log(`Starting batch...`);
       await Promise.all(
@@ -43,10 +43,9 @@ setup('cleanup instances ', async () => {
   }
 });
 
-const skipUsersThatWereCreatedToday = (users: User[]): User[] => {
-  const today = new Date();
-  const todayString = today.toISOString().slice(0, 10);
-  return users.filter(user => new Date(user.createdAt).toISOString().slice(0, 10) !== todayString);
+const skipUsersThatWereCreatedWithinTheLast10Minutes = (users: User[]): User[] => {
+  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+  return users.filter(user => new Date(user.createdAt) < tenMinutesAgo);
 };
 
 function batchElements<T>(users: T[], batchSize = 5): T[][] {
