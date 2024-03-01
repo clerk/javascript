@@ -1,3 +1,5 @@
+import { withLeadingSlash, withoutTrailingSlash } from '@clerk/shared/url';
+
 export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up_url', 'redirect_url'];
 
 /**
@@ -48,8 +50,7 @@ export type ClerkRouter = {
  * Ensures the provided path has a leading slash and no trailing slash
  */
 function normalizePath(path: string) {
-  const pathNoTrailingSlash = path.replace(/\/$/, '');
-  return pathNoTrailingSlash.startsWith('/') ? pathNoTrailingSlash : `/${pathNoTrailingSlash}`;
+  return withoutTrailingSlash(withLeadingSlash(path));
 }
 
 /**
@@ -92,7 +93,7 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
   }
 
   function child(childBasePath: string) {
-    return createClerkRouter(router, `${normalizedBasePath}/${normalizePath(childBasePath)}`);
+    return createClerkRouter(router, `${normalizedBasePath}${normalizePath(childBasePath)}`);
   }
 
   function push(path: string) {

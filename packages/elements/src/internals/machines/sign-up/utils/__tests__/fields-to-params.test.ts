@@ -1,4 +1,4 @@
-import { fieldsToSignUpParams } from './fields-to-params';
+import { fieldsToSignUpParams } from '../fields-to-params';
 
 describe('fieldsToSignUpParams', () => {
   it('converts form fields to sign up params', () => {

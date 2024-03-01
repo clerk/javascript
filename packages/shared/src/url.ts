@@ -112,6 +112,43 @@ export function withTrailingSlash(input = '', respectQueryAndFragment?: boolean)
   return s0 + '/' + (s.length > 0 ? `?${s.join('?')}` : '') + fragment;
 }
 
+export function withoutTrailingSlash(input = '', respectQueryAndFragment?: boolean): string {
+  if (!respectQueryAndFragment) {
+    return (hasTrailingSlash(input) ? input.slice(0, -1) : input) || '/';
+  }
+  if (!hasTrailingSlash(input, true)) {
+    return input || '/';
+  }
+  let path = input;
+  let fragment = '';
+  const fragmentIndex = input.indexOf('#');
+  if (fragmentIndex >= 0) {
+    path = input.slice(0, fragmentIndex);
+    fragment = input.slice(fragmentIndex);
+  }
+  const [s0, ...s] = path.split('?');
+  return (s0.slice(0, -1) || '/') + (s.length > 0 ? `?${s.join('?')}` : '') + fragment;
+}
+
+export function hasLeadingSlash(input = ''): boolean {
+  return input.startsWith('/');
+}
+
+export function withoutLeadingSlash(input = ''): string {
+  return (hasLeadingSlash(input) ? input.slice(1) : input) || '/';
+}
+
+export function withLeadingSlash(input = ''): string {
+  return hasLeadingSlash(input) ? input : '/' + input;
+}
+
+export function cleanDoubleSlashes(input = ''): string {
+  return input
+    .split('://')
+    .map(string_ => string_.replace(/\/{2,}/g, '/'))
+    .join('://');
+}
+
 export function isNonEmptyURL(url: string) {
   return url && url !== '/';
 }
