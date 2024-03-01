@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.70.2
+
+### Patch Changes
+
+- Bug fix: Remove duplicate global errors in create organization flow of `<OrganizationList/>`. ([#2878](https://github.com/clerk/javascript/pull/2878)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove handshake-related query parameters on load of clerk-js. It's possible that these parameters will be returned from Clerk's API, but they are only applicable for SSR-compatible frameworks and so on the client they are unused. ([#2877](https://github.com/clerk/javascript/pull/2877)) by [@dimkl](https://github.com/dimkl)
+
 ## 4.70.1
 
 ### Patch Changes
