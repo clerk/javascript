@@ -5,6 +5,8 @@ import type { InternalTheme } from './foundations';
 const BORDER_SHADOW_LENGTH = '0px 0px 0px 1px';
 const BUTTON_SOLID_SHADOW = (color: string) =>
   `${BORDER_SHADOW_LENGTH} ${color}, 0px 1px 1px 0px rgba(255, 255, 255, 0.07) inset, 0px 2px 3px 0px rgba(34, 42, 53, 0.20), 0px 1px 1px 0px rgba(0, 0, 0, 0.24)`;
+const BUTTON_OUTLINE_SHADOW = (color: string) =>
+  `${BORDER_SHADOW_LENGTH} ${color}, 0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02)`;
 
 const cardContentStyles = (theme: InternalTheme) => ({
   borderWidth: 0,
@@ -111,7 +113,13 @@ export const polishedAppearance: Appearance = {
         },
         '&[data-variant="outline"]': {
           borderWidth: 0,
-          boxShadow: `0px 2px 3px -1px rgba(0, 0, 0, 0.08), 0px 1px 0px 0px rgba(0, 0, 0, 0.02), 0px 0px 0px 1px ${theme.colors.$neutralAlpha100}`,
+          boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
+          '&:focus': {
+            boxShadow: [
+              BUTTON_OUTLINE_SHADOW(theme.colors.$neutralAlpha100),
+              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$neutralAlpha200),
+            ].toString(),
+          },
         },
       },
       badge: {
