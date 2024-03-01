@@ -123,7 +123,6 @@ export function getResponseClerkState(requestState: RequestState, context: AppLo
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
     __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED', context)),
     __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG', context)),
-    __environment: getEnvVariable('NODE_ENV', context) || getEnvVariable('ENVIRONMENT', context),
   });
 
   const headers = observabilityHeadersFromRequestState(requestState);
