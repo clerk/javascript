@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.1.20
+
+### Patch Changes
+
+- Correctly get environment variables inside Cloudflare Pages by accessing `context.cloudflare` ([#2907](https://github.com/clerk/javascript/pull/2907)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 3.1.19
 
 ### Patch Changes
