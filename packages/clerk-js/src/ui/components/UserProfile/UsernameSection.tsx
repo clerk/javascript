@@ -32,7 +32,12 @@ export const UsernameSection = () => {
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.Item id='username'>
+          <ProfileSection.Item
+            id='username'
+            sx={{
+              paddingLeft: !user.username ? '0' : undefined,
+            }}
+          >
             {user.username && (
               <Text
                 truncate
