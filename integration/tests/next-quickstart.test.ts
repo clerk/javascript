@@ -107,6 +107,5 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
 
     await u.po.expect.toBeSignedOut();
     await expect(u.page.getByRole('button', { name: /Sign in/i })).toBeVisible();
-    await u.page.pause();
   });
 });
