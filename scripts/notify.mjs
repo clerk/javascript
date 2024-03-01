@@ -1,12 +1,12 @@
-import {fileURLToPath} from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import fs from 'fs-extra';
-import {globby as glob} from 'globby';
+import { globby as glob } from 'globby';
 
 const { GITHUB_REF = 'main' } = process.env;
 const baseUrl = new URL(`https://github.com/clerk/javascript/blob/${GITHUB_REF}/`);
 
-const getReleaseChannel = (version) => {
+const getReleaseChannel = version => {
   if (version?.includes('alpha')) {
     return 'Alpha';
   } else if (version?.includes('beta')) {
