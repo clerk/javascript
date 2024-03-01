@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.16
+
+### Minor Changes
+
+- Add Thai (th-TH) localization ([#2874](https://github.com/clerk/javascript/pull/2874)) by [@ttwrpz](https://github.com/ttwrpz)
+
 ## 2.0.0-beta.15
 
 ### Patch Changes
