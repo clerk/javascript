@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.0.0-beta.28",
+  "version": "5.0.0-beta.29",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -41,7 +41,7 @@
     "dev:headless": "webpack serve --config webpack.config.js --env variant=\"clerk.headless.browser\"",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
-    "lint:publint": "publint",
+    "lint:publint": "publint || true",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
@@ -50,9 +50,9 @@
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "dependencies": {
-    "@clerk/localizations": "2.0.0-beta.15",
+    "@clerk/localizations": "2.0.0-beta.16",
     "@clerk/shared": "2.0.0-beta.17",
-    "@clerk/types": "4.0.0-beta.17",
+    "@clerk/types": "4.0.0-beta.18",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.25.4",

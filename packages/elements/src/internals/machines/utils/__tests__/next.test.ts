@@ -1,6 +1,6 @@
 import { NEXT_ROUTING_CHANGE_VERSION } from '~/internals/constants';
 
-import { shouldUseVirtualRouting } from './next';
+import { shouldUseVirtualRouting } from '../next';
 
 let windowSpy: jest.SpyInstance;
 

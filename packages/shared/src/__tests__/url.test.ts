@@ -1,10 +1,13 @@
 import {
   addClerkPrefix,
+  cleanDoubleSlashes,
   getClerkJsMajorVersionOrTag,
   getScriptUrl,
   joinURL,
   parseSearchParams,
   stripScheme,
+  withoutTrailingSlash,
+  withTrailingSlash,
 } from '../url';
 
 describe('parseSearchParams(queryString)', () => {
@@ -131,5 +134,119 @@ describe('joinURL', () => {
   test('no arguments', () => {
     // @ts-expect-error - Tests
     expect(joinURL()).toBe('');
+  });
+});
+
+describe('withTrailingSlash, queryParams: false', () => {
+  const tests = {
+    '': '/',
+    bar: 'bar/',
+    'bar#abc': 'bar#abc/',
+    'bar/': 'bar/',
+    'foo?123': 'foo?123/',
+    'foo/?123': 'foo/?123/',
+    'foo/?123#abc': 'foo/?123#abc/',
+  };
+
+  for (const input in tests) {
+    test(input, () => {
+      expect(withTrailingSlash(input)).toBe(tests[input]);
+    });
+  }
+
+  test('falsy value', () => {
+    expect(withTrailingSlash()).toBe('/');
+  });
+});
+
+describe('withTrailingSlash, queryParams: true', () => {
+  const tests = {
+    '': '/',
+    bar: 'bar/',
+    'bar/': 'bar/',
+    'foo?123': 'foo/?123',
+    'foo/?123': 'foo/?123',
+    'foo?123#abc': 'foo/?123#abc',
+    '/#abc': '/#abc',
+    '#abc': '#abc',
+    '#': '#',
+  };
+
+  for (const input in tests) {
+    test(input, () => {
+      expect(withTrailingSlash(input, true)).toBe(tests[input]);
+    });
+  }
+
+  test('falsy value', () => {
+    expect(withTrailingSlash()).toBe('/');
+  });
+});
+
+describe('withoutTrailingSlash, queryParams: false', () => {
+  const tests = {
+    '': '/',
+    '/': '/',
+    bar: 'bar',
+    'bar#abc': 'bar#abc',
+    'bar/#abc': 'bar/#abc',
+    'foo?123': 'foo?123',
+    'foo/?123': 'foo/?123',
+    'foo/?123#abc': 'foo/?123#abc',
+  };
+
+  for (const input in tests) {
+    test(input, () => {
+      expect(withoutTrailingSlash(input)).toBe(tests[input]);
+    });
+  }
+
+  test('falsy value', () => {
+    expect(withoutTrailingSlash()).toBe('/');
+  });
+});
+
+describe('withoutTrailingSlash, queryParams: true', () => {
+  const tests = {
+    '': '/',
+    '/': '/',
+    bar: 'bar',
+    'bar/': 'bar',
+    'bar#abc': 'bar#abc',
+    'bar/#abc': 'bar#abc',
+    'foo?123': 'foo?123',
+    'foo/?123': 'foo?123',
+    'foo/?123#abc': 'foo?123#abc',
+    '/a/#abc': '/a#abc',
+    '/#abc': '/#abc',
+  };
+
+  for (const input in tests) {
+    test(input, () => {
+      expect(withoutTrailingSlash(input, true)).toBe(tests[input]);
+    });
+  }
+
+  test('falsy value', () => {
+    expect(withoutTrailingSlash()).toBe('/');
+  });
+});
+
+describe('cleanDoubleSlashes', () => {
+  const tests = {
+    '//foo//bar//': '/foo/bar/',
+    'http://foo.com//': 'http://foo.com/',
+    'http://foo.com/bar//foo/': 'http://foo.com/bar/foo/',
+    'http://example.com/analyze//http://localhost:3000//': 'http://example.com/analyze/http://localhost:3000/',
+  };
+
+  for (const input in tests) {
+    test(input, () => {
+      expect(cleanDoubleSlashes(input)).toBe(tests[input]);
+    });
+  }
+
+  test('no input', () => {
+    expect(cleanDoubleSlashes()).toBe('');
   });
 });

@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.0.0-beta.29
+
+### Patch Changes
+
+- Correctly get environment variables inside Cloudflare Pages by accessing `context.cloudflare` ([#2844](https://github.com/clerk/javascript/pull/2844)) by [@arjunyel](https://github.com/arjunyel)
+
+- Updated dependencies [[`18c0d015d`](https://github.com/clerk/javascript/commit/18c0d015d20493e14049fed73a5b6f732372a5cf)]:
+  - @clerk/clerk-react@5.0.0-beta.26
+
 ## 4.0.0-beta.28
 
 ### Patch Changes
