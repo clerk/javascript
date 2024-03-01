@@ -24,8 +24,15 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
   }
 }
 
-type CloudflareEnv = {
-  env: Record<string, string>;
+type CloudflareEnv = { env: Record<string, string> };
+
+// https://remix.run/blog/remix-vite-stable#cloudflare-pages-support
+const hasCloudflareProxyContext = (context: any): context is { cloudflare: CloudflareEnv } => {
+  return !!context?.cloudflare?.env;
+};
+
+const hasCloudflareContext = (context: any): context is CloudflareEnv => {
+  return !!context?.env;
 };
 
 /**
@@ -36,21 +43,25 @@ type CloudflareEnv = {
  * @returns string
  */
 export const getEnvVariable = (name: string, context: AppLoadContext | undefined): string => {
-  // Remix + Cloudflare pages
-  if (typeof (context?.cloudflare as CloudflareEnv)?.env !== 'undefined') {
-    return (context?.cloudflare as CloudflareEnv).env[name] || '';
-  }
-
   // Node envs
-  if (typeof process !== 'undefined') {
-    return (process.env && process.env[name]) || '';
+  if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
+    return process.env[name] as string;
   }
 
-  // Cloudflare pages
-  if (typeof context !== 'undefined') {
-    const contextEnv = (context as CloudflareEnv)?.env;
+  // Remix + Cloudflare pages
+  // if (typeof (context?.cloudflare as CloudflareEnv)?.env !== 'undefined') {
+  if (hasCloudflareProxyContext(context)) {
+    return context.cloudflare.env[name] || '';
+  }
 
-    return contextEnv[name] || (context[name] as string) || '';
+  // Cloudflare
+  if (hasCloudflareContext(context)) {
+    return context.env[name] || '';
+  }
+
+  // Check whether the value exists in the context object directly
+  if (context && typeof context[name] === 'string') {
+    return context[name] as string;
   }
 
   // Cloudflare workers
