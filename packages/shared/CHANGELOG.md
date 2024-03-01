@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.0.0-beta.18
+
+### Minor Changes
+
+- Add `withoutTrailingSlash()`, `hasLeadingSlash()`, `withoutLeadingSlash()`, `withLeadingSlash()`, and `cleanDoubleSlashes()` to `@clerk/shared/url`. ([#2896](https://github.com/clerk/javascript/pull/2896)) by [@LekoArts](https://github.com/LekoArts)
+
+### Patch Changes
+
+- Ensure that inside `isValidBrowser()` and `isBrowserOnline()` the existence of `window` is checked before trying to access `window.navigator` ([#2913](https://github.com/clerk/javascript/pull/2913)) by [@mario-jerkovic](https://github.com/mario-jerkovic)
+
 ## 2.0.0-beta.17
 
 ### Patch Changes

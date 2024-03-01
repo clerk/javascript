@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- Fix badge misalignment on members list when title is empty ([#2908](https://github.com/clerk/javascript/pull/2908)) by [@octoper](https://github.com/octoper)
+
+- Fix Custom Pages freeze error by using useMemo for when creating the custom pages ([#2897](https://github.com/clerk/javascript/pull/2897)) by [@desiprisg](https://github.com/desiprisg)
+
+- Add spacing between `Add domain` button and it's subtitle that's under the Verified Domains section in `<OrganizationProfile/>` component. ([#2910](https://github.com/clerk/javascript/pull/2910)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`e5c989a03`](https://github.com/clerk/javascript/commit/e5c989a035fa16413414c213febe16fcdbeef9b1), [`2ec9f6b09`](https://github.com/clerk/javascript/commit/2ec9f6b09f98ae276658d6dc705e16df0573d817)]:
+  - @clerk/shared@2.0.0-beta.18
+
 ## 5.0.0-beta.29
 
 ### Minor Changes
