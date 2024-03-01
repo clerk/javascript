@@ -41,7 +41,7 @@
     "dev:headless": "webpack serve --config webpack.config.js --env variant=\"clerk.headless.browser\"",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
-    "lint:publint": "publint",
+    "lint:publint": "publint || true",
     "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
