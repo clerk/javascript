@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.0.0-beta.28
+
+### Patch Changes
+
+- Fix the PhoneInput country ISO text color ([#2893](https://github.com/clerk/javascript/pull/2893)) by [@anagstef](https://github.com/anagstef)
+
+- Make useAwaitableNavigate handle navigations between pages reliably ([#2899](https://github.com/clerk/javascript/pull/2899)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Inputs will now trim usernames and email addresses since whitespace as a prefix or suffix is invalid in these fields. ([#2881](https://github.com/clerk/javascript/pull/2881)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`fe356eebd`](https://github.com/clerk/javascript/commit/fe356eebd8ff527133e0818cf664e7def577cccc)]:
+  - @clerk/types@4.0.0-beta.17
+
 ## 5.0.0-beta.27
 
 ### Patch Changes

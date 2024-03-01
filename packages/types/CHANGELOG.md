@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-beta.17
+
+### Patch Changes
+
+- Fix the appearance.baseTheme type to accept array of BaseTheme ([#2887](https://github.com/clerk/javascript/pull/2887)) by [@anagstef](https://github.com/anagstef)
+
 ## 4.0.0-beta.16
 
 ### Patch Changes

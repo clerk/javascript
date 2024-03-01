@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0-beta.28
+
+### Patch Changes
+
+- Make useAwaitableNavigate handle navigations between pages reliably ([#2899](https://github.com/clerk/javascript/pull/2899)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-beta.25
+
 ## 5.0.0-beta.27
 
 ### Patch Changes
