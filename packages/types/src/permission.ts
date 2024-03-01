@@ -1,8 +1,5 @@
 import type { ClerkResource } from './resource';
 
-/**
- * @experimental
- */
 export interface PermissionResource extends ClerkResource {
   id: string;
   key: string;

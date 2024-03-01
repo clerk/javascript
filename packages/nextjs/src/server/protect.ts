@@ -10,9 +10,7 @@ import { constants as nextConstants } from '../constants';
 type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: string };
 
 /**
- * @experimental
- * This function is experimental as it throws a Nextjs notFound error if user is not authenticated or authorized.
- * In the future we would investigate a way to throw a more appropriate error that clearly describes the not authorized of authenticated status.
+ * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
 export interface AuthProtect {
   (params?: CheckAuthorizationParamsWithCustomPermissions, options?: AuthProtectOptions): SignedInAuthObject;

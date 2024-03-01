@@ -42,9 +42,6 @@ export interface OrganizationResource extends ClerkResource {
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: GetMemberships;
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
-  /**
-   * @experimental
-   */
   getRoles: (params?: GetRolesParams) => Promise<ClerkPaginatedResponse<RoleResource>>;
   getDomains: (params?: GetDomainsParams) => Promise<ClerkPaginatedResponse<OrganizationDomainResource>>;
   getMembershipRequests: (
@@ -61,9 +58,6 @@ export interface OrganizationResource extends ClerkResource {
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
 }
 
-/**
- * @experimental
- */
 export type GetRolesParams = ClerkPaginationParams;
 
 export type GetMembersParams = ClerkPaginationParams<{
