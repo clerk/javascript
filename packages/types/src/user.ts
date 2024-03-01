@@ -94,7 +94,7 @@ export interface UserResource extends ClerkResource {
    * @experimental
    * This method is experimental, avoid using this in production applications
    */
-  __experimental__createPasskey: () => Promise<PasskeyResource>;
+  __experimental_createPasskey: () => Promise<PasskeyResource>;
   createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
   createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;
