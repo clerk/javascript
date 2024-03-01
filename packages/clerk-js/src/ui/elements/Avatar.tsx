@@ -40,9 +40,7 @@ export const Avatar = (props: AvatarProps) => {
         title={title}
         alt={title}
         src={imageUrl || ''}
-        width='100%'
-        height='100%'
-        sx={{ objectFit: 'cover' }}
+        sx={{ objectFit: 'cover', width: '100%', height: '100%' }}
         onError={() => setError(true)}
         size={imageFetchSize}
       />
@@ -51,6 +49,7 @@ export const Avatar = (props: AvatarProps) => {
   // TODO: Revise size handling. Do we need to be this dynamic or should we use the theme instead?
   return (
     <Flex
+      as='span'
       elementDescriptor={[boxElementDescriptor, descriptors.avatarBox]}
       sx={[
         t => ({
@@ -73,6 +72,7 @@ export const Avatar = (props: AvatarProps) => {
        * The ":after" selector is responsible for the border shimmer animation.
        */}
       <Box
+        as='span'
         sx={t => ({
           overflow: 'hidden',
           background: t.colors.$colorShimmer,
