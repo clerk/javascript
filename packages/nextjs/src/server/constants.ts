@@ -15,6 +15,7 @@ export const SIGN_UP_URL = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '';
 export const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
+  environment: process.env.NODE_ENV,
 };
 
 export const TELEMETRY_DISABLED = isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DISABLED);

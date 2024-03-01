@@ -47,7 +47,11 @@ import type {
 } from './types';
 import { isConstructor, loadClerkJsScript } from './utils';
 
-const SDK_METADATA = { name: PACKAGE_NAME, version: PACKAGE_VERSION };
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+  environment: process.env.NODE_ENV,
+};
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;

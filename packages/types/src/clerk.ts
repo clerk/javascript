@@ -25,6 +25,7 @@ export type InstanceType = 'production' | 'development';
 export type SDKMetadata = {
   name: string;
   version: string;
+  environment?: string;
 };
 
 export type ListenerCallback = (emission: Resources) => void;
