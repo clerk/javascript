@@ -2,7 +2,8 @@ name: Cleanup e2e instances
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 5,17 * * *'
+    # run every 6 hours on every weekday
+    - cron: "0 */6 * * 1-5"
 
 jobs:
   integration-tests:
