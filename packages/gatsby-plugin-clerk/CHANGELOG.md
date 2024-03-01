@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/backend@1.0.0-beta.26
+  - @clerk/clerk-react@5.0.0-beta.27
+  - @clerk/clerk-sdk-node@5.0.0-beta.27
+
 ## 5.0.0-beta.29
 
 ### Minor Changes
