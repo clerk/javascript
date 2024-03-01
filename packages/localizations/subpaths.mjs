@@ -31,6 +31,7 @@ export const subpathNames = [
   'zh-TW',
   'es-MX',
   'bg-BG',
+  'th-TH',
 ];
 
 export const subpathFoldersBarrel = [];

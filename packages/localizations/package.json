@@ -80,7 +80,8 @@
     "zh-CN",
     "zh-TW",
     "es-MX",
-    "bg-BG"
+    "bg-BG",
+    "th-TH"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
@@ -91,7 +92,7 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-beta.16",
+    "@clerk/types": "4.0.0-beta.17",
     "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "tsup": "*",

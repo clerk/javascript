@@ -1,27 +1,37 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useTransition } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useTransition } from 'react';
 
 import type { NextClerkProviderProps } from '../../types';
 
+declare global {
+  interface Window {
+    __clerk_internal_navPromisesBuffer: Array<() => void> | undefined;
+    __clerk_internal_navFun: NonNullable<NextClerkProviderProps['routerPush']>;
+  }
+}
+
 /**
  * Creates an "awaitable" navigation function that will do its best effort to wait for Next.js to finish its route transition.
- *
  * This is accomplished by wrapping the call to `router.push` in `startTransition()`, which should rely on React to coordinate the pending state. We key off of
  * `isPending` to flush the stored promises and ensure the navigates "resolve".
  */
 export const useAwaitableNavigate = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const clerkNavRef = useRef<NonNullable<NextClerkProviderProps['routerPush']>>();
-  const clerkNavPromiseBuffer = useRef<(() => void)[]>([]);
 
-  // Set the navigation function reference only once
-  if (!clerkNavRef.current) {
-    clerkNavRef.current = ((to, opts) => {
+  if (typeof window !== 'undefined') {
+    window.__clerk_internal_navFun = (to, opts) => {
       return new Promise<void>(res => {
-        clerkNavPromiseBuffer.current.push(res);
+        if (!window.__clerk_internal_navPromisesBuffer) {
+          // We need to use window to store the reference to the buffer,
+          // as ClerkProvider might be unmounted and remounted during navigations
+          // If we use a ref, it will be reset when ClerkProvider is unmounted
+          window.__clerk_internal_navPromisesBuffer = [];
+        }
+        window.__clerk_internal_navPromisesBuffer.push(res);
         startTransition(() => {
           // If the navigation is internal, we should use the history API to navigate
           // as this is the way to perform a shallow navigation in Next.js App Router
@@ -41,21 +51,28 @@ export const useAwaitableNavigate = () => {
           }
         });
       });
-    }) as NextClerkProviderProps['routerPush'];
+    };
   }
 
-  // Handle flushing the promise buffer when pending is false. If pending is false and there are promises in the buffer we should be able to safely flush them.
+  const flushPromises = () => {
+    window.__clerk_internal_navPromisesBuffer?.forEach(resolve => resolve());
+    window.__clerk_internal_navPromisesBuffer = [];
+  };
+
+  // Flush any pending promises on mount/unmount
   useEffect(() => {
-    if (isPending) {
-      return;
+    flushPromises();
+    return flushPromises;
+  }, []);
+
+  // Handle flushing the promise buffer when a navigation happens
+  useEffect(() => {
+    if (!isPending) {
+      flushPromises();
     }
+  }, [pathname, isPending]);
 
-    if (clerkNavPromiseBuffer?.current?.length) {
-      clerkNavPromiseBuffer.current.forEach(resolve => resolve());
-    }
-
-    clerkNavPromiseBuffer.current = [];
-  }, [isPending]);
-
-  return clerkNavRef.current;
+  return useCallback((to: string) => {
+    return window.__clerk_internal_navFun(to);
+  }, []);
 };

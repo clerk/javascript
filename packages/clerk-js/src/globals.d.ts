@@ -4,8 +4,8 @@ declare global {
   const __PKG_VERSION__: string;
 
   interface Window {
-    __unstable__onBeforeSetActive: () => void;
-    __unstable__onAfterSetActive: () => void;
+    __unstable__onBeforeSetActive: () => Promise<void> | void;
+    __unstable__onAfterSetActive: () => Promise<void> | void;
   }
 }
 
