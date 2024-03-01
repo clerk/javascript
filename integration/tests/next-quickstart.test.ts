@@ -71,7 +71,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
     await u.po.userButton.toggleTrigger();
     await u.po.userButton.waitForPopover();
 
-    await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out/i]);
+    await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
 
     await u.po.userButton.triggerManageAccount();
     await u.po.userProfile.waitForUserProfileModal();
@@ -99,7 +99,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
     await u.po.userButton.toggleTrigger();
     await u.po.userButton.waitForPopover();
 
-    await u.po.userButton.toHaveVisibleMenuItems([/Sign out/i]);
+    await u.po.userButton.toHaveVisibleMenuItems([/Sign out$/i]);
 
     await u.po.userButton.triggerSignOut();
 

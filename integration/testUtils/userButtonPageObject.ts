@@ -24,7 +24,7 @@ export const createUserButtonPageObject = (testArgs: TestArgs) => {
       }
     },
     triggerSignOut: () => {
-      return page.getByRole('menuitem', { name: /Sign out/i }).click();
+      return page.getByRole('menuitem', { name: /Sign out$/i }).click();
     },
     triggerManageAccount: () => {
       return page.getByRole('menuitem', { name: /Manage account/i }).click();
