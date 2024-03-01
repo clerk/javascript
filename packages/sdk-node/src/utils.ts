@@ -35,6 +35,7 @@ export const loadApiEnv = () => {
     sdkMetadata: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,
+      environment: process.env.NODE_ENV,
     },
   };
 };

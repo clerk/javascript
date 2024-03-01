@@ -225,12 +225,13 @@ export type UserProfileContextType = UserProfileCtx & {
 export const useUserProfileContext = (): UserProfileContextType => {
   const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as UserProfileCtx;
   const { queryParams } = useRouter();
+  const clerk = useClerk();
 
   if (componentName !== 'UserProfile') {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
-  const pages = createUserProfileCustomPages(customPages || []);
+  const pages = createUserProfileCustomPages(customPages || [], clerk);
 
   return {
     ...ctx,
@@ -447,12 +448,13 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
+  const clerk = useClerk();
 
   if (componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
-  const pages = createOrganizationProfileCustomPages(customPages || []);
+  const pages = createOrganizationProfileCustomPages(customPages || [], clerk);
 
   const navigateAfterLeaveOrganization = () =>
     navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);
