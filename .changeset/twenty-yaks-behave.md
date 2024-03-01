@@ -2,4 +2,4 @@
 '@clerk/remix': patch
 ---
 
-Fix getting env variables in Remix + Cloudflare Pages
+Correctly get environment variables inside Cloudflare Pages by accessing `context.cloudflare`
