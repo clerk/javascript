@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.0-beta.26
+
+### Minor Changes
+
+- Pass environment into `sdkMetadata` in order to detect if production clerk-js is used by other sdks in dev mode. When it is log dev warning from clerk-js. ([#2802](https://github.com/clerk/javascript/pull/2802)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.0.0-beta.25
 
 ### Patch Changes
