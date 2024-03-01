@@ -341,9 +341,6 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   total_pending_suggestions: number;
 }
 
-/**
- * @experimental
- */
 export interface RoleJSON extends ClerkResourceJSON {
   object: 'role';
   id: string;
@@ -355,9 +352,6 @@ export interface RoleJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-/**
- * @experimental
- */
 export interface PermissionJSON extends ClerkResourceJSON {
   object: 'permission';
   id: string;
