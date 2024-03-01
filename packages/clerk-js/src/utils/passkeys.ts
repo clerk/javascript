@@ -149,30 +149,15 @@ function serializePublicKeyCredential(publicKeyCredential: PublicKeyCredentialWi
 const bufferToBase64Url = Base64Converter.encode.bind(Base64Converter);
 const base64UrlToBuffer = Base64Converter.decode.bind(Base64Converter);
 
-/**
- * Custom error class for representing Clerk runtime errors.
- *
- * @class ClerkRuntimeError
- * @example
- *   throw new ClerkRuntimeError('An error occurred', { code: 'password_invalid' });
- */
 export class ClerkWebAuthnError extends ClerkRuntimeError {
   /**
    * A unique code identifying the error, used for localization
-   *
-   * @type {string}
-   * @memberof ClerkRuntimeError
    */
   code: ClerkWebAuthnErrorCode;
 
   constructor(message: string, { code }: { code: ClerkWebAuthnErrorCode }) {
     super(message, { code });
-
-    Object.setPrototypeOf(this, ClerkWebAuthnError.prototype);
-
     this.code = code;
-    this.message = message;
-    this.clerkRuntimeError = true;
   }
 }
 
