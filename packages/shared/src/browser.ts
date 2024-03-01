@@ -52,8 +52,8 @@ export function userAgentIsRobot(userAgent: string): boolean {
  * @returns {boolean}
  */
 export function isValidBrowser(): boolean {
-  const navigator = window?.navigator;
-  if (!inBrowser() || !navigator) {
+  const navigator = inBrowser() ? window?.navigator : null;
+  if (!navigator) {
     return false;
   }
   return !userAgentIsRobot(navigator?.userAgent) && !navigator?.webdriver;
@@ -64,8 +64,8 @@ export function isValidBrowser(): boolean {
  * @returns {boolean}
  */
 export function isBrowserOnline(): boolean {
-  const navigator = window?.navigator;
-  if (!inBrowser() || !navigator) {
+  const navigator = inBrowser() ? window?.navigator : null;
+  if (!navigator) {
     return false;
   }
 
