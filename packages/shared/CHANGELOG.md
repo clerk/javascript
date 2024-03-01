@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.3
+
+### Patch Changes
+
+- Ensure that inside `isValidBrowser()` and `isBrowserOnline()` the existence of `window` is checked before trying to access `window.navigator` by [@mario-jerkovic](https://github.com/mario-jerkovic)
+
 ## 1.3.2
 
 ### Patch Changes
