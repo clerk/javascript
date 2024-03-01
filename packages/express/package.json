@@ -1,0 +1,79 @@
+{
+  "name": "@clerk/express",
+  "version": "0.0.1",
+  "description": "Clerk server SDK for usage with Express",
+  "keywords": [
+    "clerk",
+    "sdk",
+    "express"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/express"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Clerk, Inc.",
+    "email": "support@clerk.com",
+    "url": "git+https://github.com/clerk/javascript.git"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsup",
+    "dev": "tsup --watch",
+    "dev:publish": "npm run dev -- --env.publish",
+    "publish:local": "npx yalc push --replace  --sig",
+    "clean": "rimraf ./dist",
+    "lint": "eslint src/",
+    "lint:publint": "publint",
+    "lint:attw": "attw --pack .",
+    "test": "jest",
+    "test:cache:clear": "jest --clearCache --useStderr",
+    "test:ci": "jest --maxWorkers=70%"
+  },
+  "dependencies": {
+    "@clerk/backend": "1.0.0-beta.25",
+    "@clerk/shared": "2.0.0-beta.17",
+    "camelcase-keys": "6.2.2",
+    "snakecase-keys": "3.2.1"
+  },
+  "devDependencies": {
+    "@clerk/types": "4.0.0-beta.18",
+    "@types/express": "4.17.14",
+    "@types/node": "^18.17.0",
+    "eslint-config-custom": "*",
+    "nock": "^13.0.7",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.5.0",
+    "tslib": "2.4.1",
+    "tsup": "*",
+    "typescript": "*"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

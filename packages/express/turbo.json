@@ -1,0 +1,28 @@
+{
+  "extends": ["//"],
+  "pipeline": {
+    "build": {
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "cjs/**",
+        "esm/**",
+        "src/**",
+        "scripts/**",
+        "tsconfig.json",
+        "tsconfig.declarations.json",
+        "tsup.config.ts",
+
+        "!**/**/*.test.*",
+        "!**/test/**",
+        "!**/tests/**",
+        "!**/__tests__/**",
+        "!**/__mocks__/**",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ]
+    }
+  }
+}
