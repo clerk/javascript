@@ -144,6 +144,7 @@ export class Clerk implements ClerkInterface {
   public static sdkMetadata: SDKMetadata = {
     name: __PKG_NAME__,
     version: __PKG_VERSION__,
+    environment: process.env.NODE_ENV || 'production',
   };
 
   public client: ClientResource | undefined;

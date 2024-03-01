@@ -1,6 +1,12 @@
 import type { CustomPage } from '@clerk/types';
 
-import { createOrganizationProfileCustomPages, createUserProfileCustomPages } from '../createCustomPages';
+import {
+  createOrganizationProfileCustomPages as cOPCP,
+  createUserProfileCustomPages as cUPCP,
+} from '../createCustomPages';
+
+const createUserProfileCustomPages = (arr: any) => cUPCP(arr, { sdkMetadata: { environment: 'test' } } as any);
+const createOrganizationProfileCustomPages = (arr: any) => cOPCP(arr, { sdkMetadata: { environment: 'test' } } as any);
 
 describe('createCustomPages', () => {
   describe('createUserProfileCustomPages', () => {

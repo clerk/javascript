@@ -9,6 +9,7 @@ export const JWT_KEY = process.env.CLERK_JWT_KEY || '';
 export const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
+  environment: process.env.NODE_ENV,
 };
 
 export const { Cookies, Headers } = constants;
