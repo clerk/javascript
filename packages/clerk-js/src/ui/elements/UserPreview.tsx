@@ -78,6 +78,8 @@ export const UserPreview = (props: UserPreviewProps) => {
   const mainIdentifierSize =
     mainIdentifierVariant || ({ xs: 'subtitle', sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size];
 
+  const previewTitle = localizedTitle || name || identifier;
+
   return (
     <Flex
       elementDescriptor={descriptors.userPreview}
@@ -143,13 +145,15 @@ export const UserPreview = (props: UserPreviewProps) => {
           variant={mainIdentifierSize}
           sx={[theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' }), mainIdentifierSx]}
         >
-          <Text
-            as='span'
-            truncate
-            sx={{ fontWeight: 'inherit' }}
-          >
-            {localizedTitle || name || identifier}
-          </Text>
+          {previewTitle && (
+            <Text
+              as='span'
+              truncate
+              sx={{ fontWeight: 'inherit' }}
+            >
+              {previewTitle}
+            </Text>
+          )}
 
           {badge}
         </Text>
