@@ -366,10 +366,10 @@ export const enUS_v4: any = {
         destructiveAction: 'Remove wallet',
       },
       dangerSection: {
-        title: 'Danger',
-        deleteAccountButton: 'Delete Account',
-        deleteAccountTitle: 'Delete Account',
-        deleteAccountDescription: 'Delete your account and all its associated data',
+        title: 'Peligro',
+        deleteAccountButton: 'Borrar cuenta',
+        deleteAccountTitle: 'Borrar cuenta',
+        deleteAccountDescription: 'Borra tu cuenta y todos sus datos asociados',
       },
     },
     profilePage: {

@@ -698,9 +698,11 @@ export const esES: LocalizationResource = {
         title: 'Cuentas conectadas',
       },
       dangerSection: {
-        deleteAccountButton: 'Delete Account',
-        title: 'Account termination',
-      },
+        title: 'Peligro',
+        deleteAccountButton: 'Eliminar cuenta',
+        deleteAccountTitle: 'Eliminar cuenta',
+        deleteAccountDescription: 'Eliminar tu cuenta y todos sus datos asociados',
+    },
       emailAddressesSection: {
         destructiveAction: 'Eliminar dirección de correo electrónico',
         detailsAction__nonPrimary: 'Establecer como primario',
