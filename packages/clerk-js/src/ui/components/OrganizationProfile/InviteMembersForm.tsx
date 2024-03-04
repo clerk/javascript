@@ -31,7 +31,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     },
   });
   const card = useCardState();
-  const { t, locale } = useLocalizations();
+  const { t, locale, translateError } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
 
   const validateUnsubmittedEmail = (value: string) => setIsValidUnsubmittedEmail(isEmail(value));
@@ -100,8 +100,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
             ),
           );
         } else if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_param_format_invalid') {
-          const message = err.errors[0]?.longMessage;
-          message && card.setError(message);
+          card.setError(translateError(err.errors[0]));
         } else {
           handleError(err, [], card.setError);
         }
