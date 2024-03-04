@@ -77,7 +77,7 @@ async function webAuthnCreateCredential(
   publicKeyOptions: PublicKeyCredentialCreationOptionsWithoutExtensions,
 ): Promise<WebAuthnCreateCredentialReturn> {
   try {
-    // Manually setting types is necessary as typescript types are not correct. These type assertions are according to the spec.
+    // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.
     const credential = (await navigator.credentials.create({
       publicKey: publicKeyOptions,
     })) as PublicKeyCredential | null;
@@ -89,7 +89,7 @@ async function webAuthnCreateCredential(
       };
     }
 
-    // Manually setting types is necessary as typescript types are not correct. These type assertions are according to the spec.
+    // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.
     const res = credential.response as AuthenticatorAttestationResponse;
 
     return { publicKeyCredential: { ...credential, response: res }, error: null };
@@ -151,7 +151,7 @@ const base64UrlToBuffer = Base64Converter.decode.bind(Base64Converter);
 
 export class ClerkWebAuthnError extends ClerkRuntimeError {
   /**
-   * A unique code identifying the error, used for localization
+   * A unique code identifying the error, can be used for localization.
    */
   code: ClerkWebAuthnErrorCode;
 

@@ -490,6 +490,7 @@ export interface PublicKeyCredentialCreationOptionsJSON {
   attestation: 'direct' | 'enterprise' | 'indirect' | 'none';
 }
 
+// TODO-PASSKEYS: Decide if we are keeping this
 // export interface PassKeyVerificationJSON extends VerificationJSON {
 //   publicKey: PublicKeyCredentialCreationOptionsJSON | null;
 // }
