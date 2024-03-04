@@ -1,6 +1,6 @@
 import type { PublishableKey } from '@clerk/types';
 
-import { DEV_OR_STAGING_SUFFIXES } from './constants';
+import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
 import { isomorphicAtob } from './isomorphicAtob';
 import { isomorphicBtoa } from './isomorphicBtoa';
 
@@ -17,9 +17,10 @@ const PUBLISHABLE_KEY_TEST_PREFIX = 'pk_test_';
 const PUBLISHABLE_FRONTEND_API_DEV_REGEX = /^(([a-z]+)-){2}([0-9]{1,2})\.clerk\.accounts([a-z.]*)(dev|com)$/i;
 
 export function buildPublishableKey(frontendApi: string): string {
-  const keyPrefix = PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi)
-    ? PUBLISHABLE_KEY_TEST_PREFIX
-    : PUBLISHABLE_KEY_LIVE_PREFIX;
+  const isDevKey =
+    PUBLISHABLE_FRONTEND_API_DEV_REGEX.test(frontendApi) ||
+    (frontendApi.startsWith('clerk.') && LEGACY_DEV_INSTANCE_SUFFIXES.some(s => frontendApi.endsWith(s)));
+  const keyPrefix = isDevKey ? PUBLISHABLE_KEY_TEST_PREFIX : PUBLISHABLE_KEY_LIVE_PREFIX;
   return `${keyPrefix}${isomorphicBtoa(`${frontendApi}$`)}`;
 }
 
