@@ -35,6 +35,7 @@ export const NotificationCountBadge = (props: NotificationCountBadgeProps) => {
     <Flex
       justify='center'
       align='center'
+      as='span'
       sx={[
         t => ({
           marginLeft: t.space.$1x5,

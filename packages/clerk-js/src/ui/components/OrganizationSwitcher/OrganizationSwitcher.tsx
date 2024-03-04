@@ -26,7 +26,7 @@ const _OrganizationSwitcher = withFloatingTree(() => {
           ref={reference}
           onClick={toggle}
           isOpen={isOpen}
-          aria-controls={switcherButtonMenuId}
+          aria-controls={isOpen ? switcherButtonMenuId : undefined}
         />
         <Popover
           nodeId={nodeId}

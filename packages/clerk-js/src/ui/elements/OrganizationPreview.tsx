@@ -52,6 +52,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
       elementId={descriptors.organizationPreview.setId(elementId)}
       gap={3}
       align='center'
+      as='span'
       sx={[{ minWidth: '0' }, sx]}
       {...rest}
     >
@@ -59,6 +60,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         elementDescriptor={descriptors.organizationPreviewAvatarContainer}
         elementId={descriptors.organizationPreviewAvatarContainer.setId(elementId)}
         justify='center'
+        as='span'
         sx={{ position: 'relative' }}
       >
         <OrganizationAvatar
@@ -76,12 +78,14 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
         elementId={descriptors.organizationPreviewTextContainer.setId(elementId)}
         direction='col'
         justify='center'
+        as='span'
         sx={{ minWidth: '0px', textAlign: 'left' }}
       >
         <Text
           elementDescriptor={descriptors.organizationPreviewMainIdentifier}
           elementId={descriptors.organizationPreviewMainIdentifier.setId(elementId)}
           variant={mainTextSize}
+          as='span'
           truncate
           sx={mainIdentifierSx}
         >
@@ -92,6 +96,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
             elementDescriptor={descriptors.organizationPreviewSecondaryIdentifier}
             elementId={descriptors.organizationPreviewSecondaryIdentifier.setId(elementId)}
             localizationKey={localizeCustomRole(membership?.role) || unlocalizedRoleLabel}
+            as='span'
             truncate
           />
         )}
