@@ -47,5 +47,39 @@ export default (QUnit: QUnit) => {
       const { data: verifiedPayload } = await verifyJwt(data, { key: pemEncodedPublicKey });
       assert.deepEqual(verifiedPayload, payload);
     });
+
+    test("respects the provided 'iat' claim value", async assert => {
+      // Pass a value for the 'iat' claim
+      const iat = 123;
+      const { data } = await signJwt(
+        {
+          ...payload,
+          iat,
+        },
+        signingJwks,
+        {
+          algorithm: mockJwtHeader.alg,
+          header: mockJwtHeader,
+        },
+      );
+      assertOk(assert, data);
+
+      const { data: verifiedPayload } = await verifyJwt(data, { key: publicJwks });
+      assert.equal(verifiedPayload.iat, iat);
+    });
+
+    test("falls back to the current date for the 'iat' claim", async assert => {
+      const now = Date.now();
+      const { data } = await signJwt(payload, signingJwks, {
+        algorithm: mockJwtHeader.alg,
+        header: mockJwtHeader,
+      });
+      assertOk(assert, data);
+
+      const { data: verifiedPayload } = await verifyJwt(data, { key: publicJwks });
+      console.log(Math.floor(now / 1000), verifiedPayload.iat);
+      // The 'iat' claim takes the current date. Allow for a small delta.
+      assert.ok(verifiedPayload.iat - Math.floor(now / 1000) < 0.5);
+    });
   });
 };

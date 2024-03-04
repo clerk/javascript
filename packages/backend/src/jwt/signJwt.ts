@@ -51,7 +51,7 @@ export async function signJwt(
   const header = options.header || { typ: 'JWT' };
 
   header.alg = options.algorithm;
-  payload.iat = Math.floor(Date.now() / 1000);
+  payload.iat = payload.iat || Math.floor(Date.now() / 1000);
 
   const encodedHeader = encodeJwtData(header);
   const encodedPayload = encodeJwtData(payload);
