@@ -37,7 +37,7 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-beta.18",
+    "@clerk/types": "4.0.0-beta.19",
     "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "typescript": "*"

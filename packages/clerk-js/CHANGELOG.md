@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.0.0-beta.31
+
+### Minor Changes
+
+- Experimental support for a user to register a passkey for their account. ([#2884](https://github.com/clerk/javascript/pull/2884)) by [@panteliselef](https://github.com/panteliselef)
+
+  Usage: `await clerk.user.__experimental__createPasskey()`
+
+### Patch Changes
+
+- Updated dependencies [[`fafa76fb6`](https://github.com/clerk/javascript/commit/fafa76fb66585b5836cc79985f8bdf1d1b4dca97)]:
+  - @clerk/types@4.0.0-beta.19
+
 ## 5.0.0-beta.30
 
 ### Patch Changes

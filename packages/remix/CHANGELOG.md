@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.0.0-beta.31
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-beta.28
+
 ## 4.0.0-beta.30
 
 ### Patch Changes

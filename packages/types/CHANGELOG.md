@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.0.0-beta.19
+
+### Minor Changes
+
+- Experimental support for a user to register a passkey for their account. ([#2884](https://github.com/clerk/javascript/pull/2884)) by [@panteliselef](https://github.com/panteliselef)
+
+  Usage: `await clerk.user.__experimental__createPasskey()`
+
 ## 4.0.0-beta.18
 
 ### Minor Changes
