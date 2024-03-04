@@ -1,8 +1,8 @@
 import { parseError } from '@clerk/shared/error';
 import type {
   ClerkAPIError,
-  PassKeyVerificationJSON,
   PasskeyVerificationResource,
+  PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
   SignUpVerificationResource,
@@ -60,7 +60,7 @@ export class Verification extends BaseResource implements VerificationResource {
 export class PasskeyVerification extends Verification implements PasskeyVerificationResource {
   publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null = null;
 
-  constructor(data: PassKeyVerificationJSON | null) {
+  constructor(data: VerificationJSON | null) {
     super(data);
     this.fromJSON(data);
   }
@@ -68,9 +68,11 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
   /**
    * Transform base64url encoded strings to ArrayBuffer
    */
-  protected fromJSON(data: PassKeyVerificationJSON | null): this {
-    if (data?.publicKey) {
-      this.publicKey = convertJSONToPublicKeyCreateOptions(data.publicKey);
+  protected fromJSON(data: VerificationJSON | null): this {
+    if (data?.nonce) {
+      this.publicKey = convertJSONToPublicKeyCreateOptions(
+        JSON.parse(data.nonce) as PublicKeyCredentialCreationOptionsJSON,
+      );
     }
     return this;
   }

@@ -141,7 +141,7 @@ export interface PasskeyJSON extends ClerkResourceJSON {
   id: string;
   credential_id: string | null;
   name: string | null;
-  verification: PassKeyVerificationJSON | null;
+  verification: VerificationJSON | null;
   last_used_at: number | null;
   updated_at: number;
   created_at: number;
@@ -490,6 +490,6 @@ export interface PublicKeyCredentialCreationOptionsJSON {
   attestation: 'direct' | 'enterprise' | 'indirect' | 'none';
 }
 
-export interface PassKeyVerificationJSON extends VerificationJSON {
-  publicKey: PublicKeyCredentialCreationOptionsJSON | null;
-}
+// export interface PassKeyVerificationJSON extends VerificationJSON {
+//   publicKey: PublicKeyCredentialCreationOptionsJSON | null;
+// }

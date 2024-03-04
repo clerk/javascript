@@ -31,13 +31,6 @@ export class Passkey extends BaseResource implements PasskeyResource {
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
 
-  private static async prepareVerification(passkeyId: string) {
-    return BaseResource._fetch({
-      path: `/me/passkeys/${passkeyId}/prepare_verification`,
-      method: 'POST',
-    }).then(res => new Passkey(res?.response as PasskeyJSON));
-  }
-
   private static async attemptVerification(
     passkeyId: string,
     credential: PublicKeyCredentialWithAuthenticatorAttestationResponse,
@@ -46,7 +39,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
     return BaseResource._fetch({
       path: `/me/passkeys/${passkeyId}/attempt_verification`,
       method: 'POST',
-      body: { publicKeyCredential: JSON.stringify(jsonPublicKeyCredential) } as any,
+      body: { strategy: 'passkey', publicKeyCredential: JSON.stringify(jsonPublicKeyCredential) } as any,
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
 
@@ -78,7 +71,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
     const passkey = await this.create();
 
-    const { verification } = await this.prepareVerification(passkey.id);
+    const { verification } = passkey;
 
     const publicKey = verification?.publicKey;
 
