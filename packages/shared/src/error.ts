@@ -139,7 +139,7 @@ export class ClerkRuntimeError extends Error {
   message: string;
 
   /**
-   * A unique code identifying the error, used for localization
+   * A unique code identifying the error, can be used for localization.
    *
    * @type {string}
    * @memberof ClerkRuntimeError

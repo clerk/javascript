@@ -15,6 +15,7 @@ import type {
   GetUserOrganizationSuggestionsParams,
   ImageResource,
   OrganizationMembershipResource,
+  PasskeyResource,
   PhoneNumberResource,
   RemoveUserPasswordParams,
   SamlAccountResource,
@@ -41,6 +42,7 @@ import {
   Image,
   OrganizationMembership,
   OrganizationSuggestion,
+  Passkey,
   PhoneNumber,
   SamlAccount,
   SessionWithActivities,
@@ -122,6 +124,14 @@ export class User extends BaseResource implements UserResource {
       },
       this.path() + '/email_addresses/',
     ).create();
+  };
+
+  /**
+   * @experimental
+   * This method is experimental, avoid using this in production applications
+   */
+  __experimental_createPasskey = (): Promise<PasskeyResource> => {
+    return Passkey.registerPasskey();
   };
 
   createPhoneNumber = (params: CreatePhoneNumberParams): Promise<PhoneNumberResource> => {
