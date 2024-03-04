@@ -40,7 +40,6 @@ export const EnterpriseAccountsSection = () => {
               />
               <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                 <Flex
-                  as={'span'}
                   gap={2}
                   center
                 >

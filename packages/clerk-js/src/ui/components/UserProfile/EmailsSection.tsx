@@ -52,10 +52,7 @@ export const EmailsSection = () => {
                 id='emailAddresses'
                 hoverable
               >
-                <Flex
-                  as='span'
-                  sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}
-                >
+                <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
                   <Text
                     sx={t => ({ color: t.colors.$colorText })}
                     truncate

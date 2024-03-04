@@ -75,6 +75,7 @@ export const TabsList = (props: TabsListProps) => {
     <Flex
       elementDescriptor={descriptors.tabListContainer}
       onKeyDown={onKeyDown}
+      role='tablist'
       sx={[
         t => ({
           borderBottomStyle: t.borderStyles.$solid,
