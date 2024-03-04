@@ -7,10 +7,7 @@ export { SignUpStep as Step } from './step';
 export { SignUpNavigate as Navigate } from './navigation';
 export { SignUpVerification as Verification } from './verifications';
 
-export {
-  SignUpSocialProvider as SocialProvider,
-  SignUpSocialProviderIcon as SocialProviderIcon,
-} from './social-providers';
+export { SignUpSocialProvider as SocialProvider } from './social-providers';
 
 /** @internal Internal use only */
 export const useSignUpActorRef_internal = SignUpRouterCtx.useActorRef;

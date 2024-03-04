@@ -3,7 +3,7 @@
 import type { OAuthProvider, Web3Provider } from '@clerk/types';
 
 import type { SocialProviderProps } from '~/react/common/third-party-providers/social-provider';
-import { SocialProvider, SocialProviderIcon } from '~/react/common/third-party-providers/social-provider';
+import { SocialProvider } from '~/react/common/third-party-providers/social-provider';
 import { useThirdPartyProvider } from '~/react/hooks';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
@@ -29,15 +29,3 @@ export function SignUpSocialProvider({ name, ...rest }: SignUpSocialProviderProp
     />
   );
 }
-
-/**
- * Renders the icon of the `<SocialProvider>` it is used within. Hence, it must be used within a `<SocialProvider>`.
- *
- * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
- *
- * @example
- * <SocialProvider name="google">
- *  <SocialProviderIcon />
- * </SocialProvider>
- */
-export const SignUpSocialProviderIcon = SocialProviderIcon;

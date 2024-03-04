@@ -8,10 +8,7 @@ export { SignInNavigate as Navigate } from './navigation';
 
 export { SignInChooseStrategy as ChooseStrategy, SignInStrategyOption as StrategyOption } from './choose-strategy';
 
-export {
-  SignInSocialProvider as SocialProvider,
-  SignInSocialProviderIcon as SocialProviderIcon,
-} from './social-providers';
+export { SignInSocialProvider as SocialProvider } from './social-providers';
 
 export {
   SignInFirstFactor as FirstFactor,

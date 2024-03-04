@@ -1,7 +1,8 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import { SignUp, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-up';
+import { Github, Google, Metamask } from '@clerk/elements/icons';
+import { SignUp, SocialProvider, Step, Verification } from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
@@ -17,25 +18,25 @@ export default function SignUpPage() {
             <div className='flex flex-col items-stretch justify-center gap-2'>
               <SocialProvider
                 name='github'
-                className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
+                className='relative flex items-center justify-center gap-4 text-white rounded bg-[#171717] [&>svg]:absolute [&>svg]:left-4 px-20 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon className='invert' />
+                <Github className='invert' />
                 Sign In with GitHub
               </SocialProvider>
 
               <SocialProvider
                 name='google'
-                className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
+                className='relative flex items-center justify-center gap-4 text-white rounded bg-[#333f61] [&>svg]:absolute [&>svg]:left-4 px-20 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon />
+                <Google />
                 Sign In with Google
               </SocialProvider>
 
               <SocialProvider
                 name='metamask'
-                className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
+                className='relative flex items-center justify-center gap-4 text-[#161616] rounded bg-white [&>svg]:absolute [&>svg]:left-4 px-20 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon />
+                <Metamask />
                 Sign In with Metamask
               </SocialProvider>
             </div>

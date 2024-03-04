@@ -1,38 +1,41 @@
 'use client';
 
 import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
-import {
-  Navigate,
-  SignIn,
-  SocialProvider,
-  SocialProviderIcon,
-  Step,
-  StrategyOption,
-  Verification,
-} from '@clerk/elements/sign-in';
+import { Github, Google, Metamask } from '@clerk/elements/icons';
+import { Navigate, SignIn, SocialProvider, Step, StrategyOption, Verification } from '@clerk/elements/sign-in';
 import Link from 'next/link';
 import { type ComponentProps, useState } from 'react';
 
 import { H1, H3, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
 
-function CustomSocialProvider({
-  children,
-  provider,
-}: {
-  children: string;
-  provider: ComponentProps<typeof SocialProvider>['name'];
-}) {
+function ActiveSocialProviders() {
   return (
-    <SocialProvider
-      name={provider}
-      className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
-    >
-      <SocialProviderIcon
-        className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
-      />
-      <span className='leading-loose'>{children}</span>
-    </SocialProvider>
+    <>
+      <SocialProvider
+        className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>svg]:absolute [&>svg]:left-4 [&>svg]:transition-all [&>svg]:duration-200 [&>svg]:opacity-80 [&svg]:hover:opacity-100 [&>svg]:grayscale [&>svg]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
+        name='github'
+      >
+        <Github className='invert' />
+        <span className='leading-loose'>Continue with GitHub</span>
+      </SocialProvider>
+
+      <SocialProvider
+        className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>svg]:absolute [&>svg]:left-4 [&>svg]:transition-all [&>svg]:duration-200 [&>svg]:opacity-80 [&svg]:hover:opacity-100 [&>svg]:grayscale [&>svg]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
+        name='google'
+      >
+        <Google />
+        <span className='leading-loose'>Continue with Google</span>
+      </SocialProvider>
+
+      <SocialProvider
+        className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>svg]:absolute [&>svg]:left-4 [&>svg]:transition-all [&>svg]:duration-200 [&>svg]:opacity-80 [&svg]:hover:opacity-100 [&>svg]:grayscale [&>svg]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
+        name='metamask'
+      >
+        <Metamask />
+        <span className='leading-loose'>Continue with Metamask</span>
+      </SocialProvider>
+    </>
   );
 }
 
@@ -84,9 +87,7 @@ export default function SignInPage() {
             <GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex flex-col gap-2 self-stretch'>
-              <CustomSocialProvider provider='github'>Continue with GitHub</CustomSocialProvider>
-              <CustomSocialProvider provider='google'>Continue with Google</CustomSocialProvider>
-              <CustomSocialProvider provider='metamask'>Continue with Metamask</CustomSocialProvider>
+              <ActiveSocialProviders />
             </div>
 
             {continueWithEmail ? (
@@ -113,11 +114,7 @@ export default function SignInPage() {
 
         <Step name='choose-strategy'>
           <div className='flex flex-col items-center  gap-6 w-96'>
-            <H3>CHOOSE STRATEGY:</H3>
-
-            <CustomSocialProvider provider='github'>Continue with GitHub</CustomSocialProvider>
-            <CustomSocialProvider provider='google'>Continue with Google</CustomSocialProvider>
-            <CustomSocialProvider provider='metamask'>Continue with Metamask</CustomSocialProvider>
+            <ActiveSocialProviders />
 
             <StrategyOption
               asChild

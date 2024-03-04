@@ -60,6 +60,7 @@
     "build:analyze": "tsup --metafile; open https://esbuild.github.io/analyze/",
     "build:declarations": "tsc -p tsconfig.json",
     "dev": "tsup --watch",
+    "icons:react": "npx @svgr/cli --template assets/icons/template.js  --typescript --ref --filename-case kebab  --icon 1.25em --ignore-existing --out-dir src/react/icons -- assets/icons ",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
