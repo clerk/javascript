@@ -41,7 +41,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     label: localizationKeys('formFieldLabel__emailAddresses'),
   });
 
-  const roleField = useFormControl('role', '', {
+  const roleField = useFormControl('role', 'basic_member', {
     label: localizationKeys('formFieldLabel__role'),
   });
 
