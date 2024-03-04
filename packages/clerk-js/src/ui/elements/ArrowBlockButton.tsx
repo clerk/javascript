@@ -103,6 +103,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
       )}
       <Flex
         gap={2}
+        as='span'
         sx={[
           {
             overflow: 'hidden',
