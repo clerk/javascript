@@ -99,6 +99,9 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
               }),
             ),
           );
+        } else if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_param_format_invalid') {
+          const message = err.errors[0]?.longMessage;
+          message && card.setError(message);
         } else {
           handleError(err, [], card.setError);
         }
