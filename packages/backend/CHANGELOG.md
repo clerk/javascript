@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.0.0-beta.27
+
+### Patch Changes
+
+- Updated dependencies [[`8350f73a6`](https://github.com/clerk/javascript/commit/8350f73a67f8980be78e3bd3343e772f5653d718)]:
+  - @clerk/shared@2.0.0-beta.19
+
 ## 1.0.0-beta.26
 
 ### Patch Changes
