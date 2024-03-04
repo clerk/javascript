@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.19
+
+### Patch Changes
+
+- Account for legacy frontendApi keys in buildPublishableKey by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.0.0-beta.18
 
 ### Minor Changes
