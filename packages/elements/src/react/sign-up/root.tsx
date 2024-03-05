@@ -1,28 +1,44 @@
 'use client';
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
-import { useActorRef } from '@xstate/react';
+import { useSelector } from '@xstate/react';
+import { useEffect } from 'react';
+import { createActor } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up/machines';
-import { useConsoleInspector } from '~/react/hooks';
+import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up/types';
+import { consoleInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 type SignUpFlowProviderProps = WithChildrenProp;
 
+const actor = createActor(SignUpRouterMachine, { inspect: consoleInspector });
+const ref = actor.start();
+
 function SignUpFlowProvider({ children }: SignUpFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
-  const inspector = useConsoleInspector();
+  const isReady = useSelector(ref, state => state.value !== 'Idle');
 
-  const ref = useActorRef(SignUpRouterMachine, {
-    input: { clerk, router, signInPath: SIGN_IN_DEFAULT_BASE_PATH },
-    inspect: inspector,
-  });
+  useEffect(() => {
+    if (!clerk || !router) return;
 
-  return <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider>;
+    const evt: SignUpRouterInitEvent = {
+      type: 'INIT',
+      clerk,
+      router,
+      signInPath: SIGN_IN_DEFAULT_BASE_PATH,
+    };
+
+    if (ref.getSnapshot().can(evt)) {
+      ref.send(evt);
+    }
+  }, [clerk, router]);
+
+  return isReady ? <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider> : null;
 }
 
 export type SignUpRootProps = WithChildrenProp<{ path?: string }>;

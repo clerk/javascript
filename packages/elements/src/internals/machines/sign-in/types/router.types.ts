@@ -51,6 +51,11 @@ export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
 
+export interface SignInRouterInitEvent extends BaseRouterInput {
+  type: 'INIT';
+  signUpPath?: string;
+}
+
 export type SignInRouterRouteRegisterEvent<TLogic extends AnyActorLogic = AnyActorLogic> = BaseRouterRouteRegisterEvent<
   SignInRouterSystemId,
   TLogic
@@ -66,6 +71,7 @@ export type SignInRouterNavigationEvents =
   | SignInRouterPrevEvent;
 
 export type SignInRouterEvents =
+  | SignInRouterInitEvent
   | SignInRouterNextEvent
   | SignInRouterNavigationEvents
   | SignInRouterErrorEvent
@@ -73,11 +79,6 @@ export type SignInRouterEvents =
   | SignInRouterRouteEvents
   | SignInRouterRedirectEvent
   | SignInVerificationFactorUpdateEvent;
-
-// ---------------------------------- Input ---------------------------------- //
-export interface SignInRouterInput extends BaseRouterInput {
-  signUpPath?: string;
-}
 
 // ---------------------------------- Context ---------------------------------- //
 
@@ -89,7 +90,6 @@ export interface SignInRouterContext extends BaseRouterContext {
 
 export interface SignInRouterSchema {
   context: SignInRouterContext;
-  input: SignInRouterInput;
   events: SignInRouterEvents;
   tags: SignInRouterTags;
 }

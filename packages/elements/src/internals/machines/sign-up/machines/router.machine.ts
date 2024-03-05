@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared';
 import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, sendTo, setup, spawnChild, stopChild } from 'xstate';
 
 import {
   SEARCH_PARAMS,
@@ -113,23 +113,9 @@ export const SignUpRouterMachine = setup({
   types: {} as SignUpRouterSchema,
 }).createMachine({
   id: SignUpRouterMachineId,
-  context: ({ input }) => ({
-    clerk: input.clerk,
-    router: input.router,
-    signInPath: input.signInPath || SIGN_IN_DEFAULT_BASE_PATH,
-  }),
-  invoke: {
-    id: ThirdPartyMachineId,
-    systemId: ThirdPartyMachineId,
-    src: 'thirdParty',
-    input: ({ context, self }) => ({
-      basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
-      environment: context.clerk.__unstable__environment,
-      flow: 'signUp',
-      parent: self,
-    }),
-  },
-  initial: 'Init',
+  // @ts-expect-error - Set in INIT event
+  context: {},
+  initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
       actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
@@ -167,7 +153,29 @@ export const SignUpRouterMachine = setup({
     },
   },
   states: {
+    Idle: {
+      on: {
+        INIT: {
+          actions: assign(({ event }) => ({
+            clerk: event.clerk,
+            router: event.router,
+            signInPath: event.signInPath || SIGN_IN_DEFAULT_BASE_PATH,
+          })),
+          target: 'Init',
+        },
+      },
+    },
     Init: {
+      entry: spawnChild('thirdParty', {
+        id: ThirdPartyMachineId,
+        systemId: ThirdPartyMachineId,
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
+          environment: context.clerk.__unstable__environment,
+          flow: 'signUp',
+          parent: self,
+        }),
+      }),
       always: [
         {
           guard: 'isLoggedIn',

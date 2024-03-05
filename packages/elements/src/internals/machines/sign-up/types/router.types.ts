@@ -46,6 +46,11 @@ export type SignUpRouterErrorEvent = BaseRouterErrorEvent;
 export type SignUpRouterTransferEvent = BaseRouterTransferEvent;
 export type SignUpRouterRedirectEvent = BaseRouterRedirectEvent;
 
+export interface SignUpRouterInitEvent extends BaseRouterInput {
+  type: 'INIT';
+  signInPath?: string;
+}
+
 export type SignUpRouterRouteRegisterEvent<TLogic extends AnyActorLogic = AnyActorLogic> = BaseRouterRouteRegisterEvent<
   SignUpRouterSystemId,
   TLogic
@@ -57,6 +62,7 @@ export type SignUpRouterRouteEvents = SignUpRouterRouteRegisterEvent | SignUpRou
 export type SignUpRouterNavigationEvents = SignUpRouterStartEvent | SignUpRouterPrevEvent;
 
 export type SignUpRouterEvents =
+  | SignUpRouterInitEvent
   | SignUpRouterNextEvent
   | SignUpRouterNavigationEvents
   | SignUpRouterErrorEvent
@@ -72,12 +78,6 @@ export const SignUpRouterDelays = {
 
 export type SignUpRouterDelays = keyof typeof SignUpRouterDelays;
 
-// ---------------------------------- Input ---------------------------------- //
-
-export interface SignUpRouterInput extends BaseRouterInput {
-  signInPath?: string;
-}
-
 // ---------------------------------- Context ---------------------------------- //
 
 export interface SignUpRouterContext extends BaseRouterContext {
@@ -88,7 +88,6 @@ export interface SignUpRouterContext extends BaseRouterContext {
 
 export interface SignUpRouterSchema {
   context: SignUpRouterContext;
-  input: SignUpRouterInput;
   events: SignUpRouterEvents;
   tags: SignUpRouterTags;
   delays: SignUpRouterDelays;
