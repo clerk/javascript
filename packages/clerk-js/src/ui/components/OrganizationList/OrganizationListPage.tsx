@@ -180,25 +180,25 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
               })}
 
             {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
+
+            <Action
+              elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
+              icon={Add}
+              label={localizationKeys('organizationList.action__createOrganization')}
+              onClick={handleCreateOrganizationClicked}
+              sx={t => ({
+                borderTopWidth: t.borderWidths.$normal,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$neutralAlpha100,
+                padding: `${t.space.$5} ${t.space.$5}`,
+              })}
+              iconSx={t => ({
+                width: t.sizes.$9,
+                height: t.sizes.$6,
+              })}
+            />
           </Actions>
         </PreviewListItems>
-
-        <Action
-          elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
-          icon={Add}
-          label={localizationKeys('organizationList.action__createOrganization')}
-          onClick={handleCreateOrganizationClicked}
-          sx={t => ({
-            borderTopWidth: t.borderWidths.$normal,
-            borderTopStyle: t.borderStyles.$solid,
-            borderTopColor: t.colors.$neutralAlpha100,
-            padding: `${t.space.$5} ${t.space.$5}`,
-          })}
-          iconSx={t => ({
-            width: t.sizes.$9,
-            height: t.sizes.$6,
-          })}
-        />
       </Col>
     </>
   );

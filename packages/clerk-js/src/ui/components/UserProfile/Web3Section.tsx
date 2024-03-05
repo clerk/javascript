@@ -57,7 +57,6 @@ export const Web3Section = withCardStateProvider(() => {
                         )}
                         <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                           <Flex
-                            as={'span'}
                             gap={2}
                             justify='start'
                           >

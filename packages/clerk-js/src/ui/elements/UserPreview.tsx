@@ -85,6 +85,7 @@ export const UserPreview = (props: UserPreviewProps) => {
       elementDescriptor={descriptors.userPreview}
       elementId={descriptors.userPreview.setId(elementId)}
       align='center'
+      as='span'
       sx={[t => ({ minWidth: '0px', width: 'fit-content', gap: t.space.$4 }), sx]}
       {...rest}
     >
@@ -95,6 +96,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             elementDescriptor={descriptors.userPreviewAvatarContainer}
             elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
             justify='center'
+            as='span'
             sx={{ position: 'relative' }}
           >
             <UserAvatar
@@ -114,6 +116,7 @@ export const UserPreview = (props: UserPreviewProps) => {
               <Flex
                 elementDescriptor={descriptors.userPreviewAvatarIcon}
                 sx={[{ position: 'absolute', left: 0, bottom: 0 }, iconSx]}
+                as='span'
               >
                 {icon}
               </Flex>
@@ -125,6 +128,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             elementDescriptor={descriptors.userPreviewAvatarContainer}
             elementId={descriptors.userPreviewAvatarContainer.setId(elementId)}
             justify='center'
+            as='span'
             sx={t => ({
               height: getAvatarSizes(t),
             })}
@@ -137,12 +141,14 @@ export const UserPreview = (props: UserPreviewProps) => {
         elementId={descriptors.userPreviewTextContainer.setId(elementId)}
         direction='col'
         justify='center'
+        as='span'
         sx={{ minWidth: '0px', textAlign: 'left' }}
       >
         <Text
           elementDescriptor={descriptors.userPreviewMainIdentifier}
           elementId={descriptors.userPreviewMainIdentifier.setId(elementId)}
           variant={mainIdentifierSize}
+          as='span'
           sx={[theme => ({ display: 'flex', gap: theme.sizes.$1, alignItems: 'center' }), mainIdentifierSx]}
         >
           {previewTitle && (
@@ -163,6 +169,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             elementDescriptor={descriptors.userPreviewSecondaryIdentifier}
             elementId={descriptors.userPreviewSecondaryIdentifier.setId(elementId)}
             truncate
+            as='span'
             localizationKey={subtitle || identifier}
           />
         )}

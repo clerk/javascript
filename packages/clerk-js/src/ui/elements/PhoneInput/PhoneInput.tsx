@@ -135,6 +135,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         >
           <Text
             colorScheme='primary'
+            as='span'
             sx={{
               textTransform: 'uppercase',
             }}

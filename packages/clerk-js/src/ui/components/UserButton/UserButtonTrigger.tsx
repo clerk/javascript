@@ -32,6 +32,7 @@ export const UserButtonTrigger = withAvatarShimmer(
           elementDescriptor={descriptors.userButtonBox}
           isOpen={props.isOpen}
           align='center'
+          as='span'
           gap={2}
         >
           <UserButtonTopLevelIdentifier showName={showName} />

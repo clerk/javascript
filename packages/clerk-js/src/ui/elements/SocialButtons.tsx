@@ -207,6 +207,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
       <Flex
         justify='center'
         align='center'
+        as='span'
         gap={3}
         sx={{
           width: '100%',
