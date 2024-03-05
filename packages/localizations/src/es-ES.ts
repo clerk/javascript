@@ -698,7 +698,7 @@ export const esES: LocalizationResource = {
         title: 'Cuentas conectadas',
       },
       dangerSection: {
-        title: 'Peligro',
+        title: 'Eliminar cuenta',
         deleteAccountButton: 'Eliminar cuenta',
       },
       emailAddressesSection: {
