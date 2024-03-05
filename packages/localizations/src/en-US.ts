@@ -687,8 +687,6 @@ export const enUS: LocalizationResource = {
       dangerSection: {
         deleteAccountButton: 'Delete account',
         title: 'Delete account',
-        deleteAccountTitle: 'Delete Account',
-        deleteAccountDescription: 'Delete your account and all its associated data',
       },
       emailAddressesSection: {
         destructiveAction: 'Remove email',

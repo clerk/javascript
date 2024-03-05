@@ -1,15 +1,5 @@
 ---
-'@clerk/localizations': minor
+'@clerk/localizations': patch
 ---
 
-updated localization for es-ES danger section 
-
-```
-      dangerSection: {
-        title: 'Peligro',
-        deleteAccountButton: 'Eliminar cuenta',
-        deleteAccountTitle: 'Eliminar cuenta',
-        deleteAccountDescription: 'Eliminar tu cuenta y todos sus datos asociados',
-    },
-
-```
+Update the danger section in the `es-ES` localization

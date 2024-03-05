@@ -700,8 +700,6 @@ export const esES: LocalizationResource = {
       dangerSection: {
         title: 'Peligro',
         deleteAccountButton: 'Eliminar cuenta',
-        deleteAccountTitle: 'Eliminar cuenta',
-        deleteAccountDescription: 'Eliminar tu cuenta y todos sus datos asociados',
       },
       emailAddressesSection: {
         destructiveAction: 'Eliminar dirección de correo electrónico',
