@@ -11,7 +11,8 @@ export type Attribute =
   | 'password'
   | 'web3_wallet'
   | 'authenticator_app'
-  | 'backup_code';
+  | 'backup_code'
+  | 'passkey';
 
 export type VerificationStrategy = 'email_link' | 'email_code' | 'phone_code' | 'totp' | 'backup_code';
 

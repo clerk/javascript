@@ -37,8 +37,8 @@ describe('OrganizationMembers', () => {
     expect(getByRole('heading', { name: /members/i })).toBeInTheDocument();
 
     // Tabs
-    expect(getByRole('tab', { name: 'Members' })).toBeInTheDocument();
-    expect(getByRole('tab', { name: 'Invitations' })).toBeInTheDocument();
+    expect(getByRole('tab', { name: /Members/i })).toBeInTheDocument();
+    expect(getByRole('tab', { name: /Invitations/i })).toBeInTheDocument();
   });
 
   it('shows requests if domains is turned on', async () => {
@@ -54,7 +54,7 @@ describe('OrganizationMembers', () => {
 
     await waitForLoadingCompleted(container);
 
-    expect(getByRole('tab', { name: 'Requests' })).toBeInTheDocument();
+    expect(getByRole('tab', { name: /Requests/i })).toBeInTheDocument();
   });
 
   it('shows an invite button inside invitations tab if the current user is an admin', async () => {
@@ -67,7 +67,7 @@ describe('OrganizationMembers', () => {
 
     const { getByRole, findByText } = render(<OrganizationMembers />, { wrapper });
 
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
+    await userEvent.click(getByRole('tab', { name: /Invitations/i }));
     expect(await findByText('Invited')).toBeInTheDocument();
     expect(getByRole('button', { name: 'Invite' })).toBeInTheDocument();
   });
@@ -87,9 +87,9 @@ describe('OrganizationMembers', () => {
 
     await waitForLoadingCompleted(container);
 
-    expect(queryByRole('tab', { name: 'Members' })).toBeInTheDocument();
-    expect(queryByRole('tab', { name: 'Invitations' })).not.toBeInTheDocument();
-    expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
+    expect(queryByRole('tab', { name: /Members/i })).toBeInTheDocument();
+    expect(queryByRole('tab', { name: /Invitations/i })).not.toBeInTheDocument();
+    expect(queryByRole('tab', { name: /Requests/i })).not.toBeInTheDocument();
   });
 
   it('does not show members tab or navbar route if user is lacking permissions', async () => {
@@ -378,7 +378,7 @@ describe('OrganizationMembers', () => {
     const { container, getByRole, getByText, findByText } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
+    await userEvent.click(getByRole('tab', { name: /Invitations/i }));
 
     expect(await findByText('admin1@clerk.com')).toBeInTheDocument();
     expect(getByText('Admin')).toBeInTheDocument();
@@ -432,7 +432,7 @@ describe('OrganizationMembers', () => {
     const { queryByText, getByRole } = render(<OrganizationMembers />, { wrapper });
 
     await waitFor(async () => {
-      await userEvent.click(getByRole('tab', { name: 'Requests' }));
+      await userEvent.click(getByRole('tab', { name: /Requests/i }));
     });
 
     expect(fixtures.clerk.organization?.getMembershipRequests).toHaveBeenCalledWith({

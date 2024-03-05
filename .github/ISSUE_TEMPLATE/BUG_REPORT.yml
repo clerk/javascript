@@ -32,12 +32,11 @@ body:
       label: Reproduction / Replay Link
       placeholder: "https://github.com/username/repository-name/"
       description: |
-        Link to a minimal reproduction (GitHub repository, CodeSandbox, StackBlitz, etc.) or a [Replay recording](https://www.replay.io/) or [Jam recording](https://jam.dev).
+        Link to a minimal reproduction (GitHub repository, CodeSandbox, StackBlitz, etc.).
 
-        **Do not link to your actual project**, but provide a minimal reproduction in a fresh project.
+        **Do not link to your actual project**, but provide a minimal reproduction in a fresh project. [How to create a minimal reproduction](https://clerkdev.notion.site/Creating-a-Minimal-Reproduction-0436afc4203f41aa9aa8700968aaef48?pvs=4)
 
-        Instructions:
-        - [How to create a minimal reproduction](https://clerkdev.notion.site/Creating-a-Minimal-Reproduction-0436afc4203f41aa9aa8700968aaef48?pvs=4)
+        Optionally you can attach a [Replay recording](https://www.replay.io/) or [Jam recording](https://jam.dev) to the minimal reproduction:
         - [How to record a Replay](https://docs.replay.io/getting-started/recording-your-first-replay)
         - [How to record a Jam](https://jam.dev/docs/get-started)
     validations:

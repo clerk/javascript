@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, sendTo, setup, stopChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, sendTo, setup, spawnChild, stopChild } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
@@ -97,23 +97,9 @@ export const SignInRouterMachine = setup({
   types: {} as SignInRouterSchema,
 }).createMachine({
   id: SignInRouterMachineId,
-  context: ({ input }) => ({
-    clerk: input.clerk,
-    router: input.router,
-    signUpPath: input.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
-  }),
-  invoke: {
-    id: ThirdPartyMachineId,
-    systemId: ThirdPartyMachineId,
-    src: 'thirdParty',
-    input: ({ context, self }) => ({
-      basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
-      environment: context.clerk.__unstable__environment,
-      flow: 'signIn',
-      parent: self,
-    }),
-  },
-  initial: 'Init',
+  // @ts-expect-error - Set in INIT event
+  context: {},
+  initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
       actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
@@ -151,7 +137,29 @@ export const SignInRouterMachine = setup({
     },
   },
   states: {
+    Idle: {
+      on: {
+        INIT: {
+          actions: assign(({ event }) => ({
+            clerk: event.clerk,
+            router: event.router,
+            signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
+          })),
+          target: 'Init',
+        },
+      },
+    },
     Init: {
+      entry: spawnChild('thirdParty', {
+        id: ThirdPartyMachineId,
+        systemId: ThirdPartyMachineId,
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
+          environment: context.clerk.__unstable__environment,
+          flow: 'signIn',
+          parent: self,
+        }),
+      }),
       always: [
         {
           guard: 'isLoggedInAndSingleSession',

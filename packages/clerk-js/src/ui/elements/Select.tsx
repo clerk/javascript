@@ -391,7 +391,12 @@ export const SelectButton = (
     show = selectedOption ? (
       buttonRenderOption(selectedOption)
     ) : (
-      <Text sx={t => ({ opacity: t.opacity.$inactive })}>{placeholder}</Text>
+      <Text
+        as='span'
+        sx={t => ({ opacity: t.opacity.$inactive })}
+      >
+        {placeholder}
+      </Text>
     );
   }
 

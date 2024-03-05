@@ -95,6 +95,7 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
         elementDescriptor={iconBoxElementDescriptor}
         elementId={iconBoxElementId}
         justify='center'
+        as='span'
       >
         {status.isLoading ? (
           <Spinner
@@ -208,6 +209,7 @@ export const Action = (props: ActionProps) => {
         elementDescriptor={iconBoxElementDescriptor}
         elementId={iconBoxElementId}
         justify='center'
+        as='span'
         sx={[t => ({ flex: `0 0 ${t.sizes.$9}`, gap: t.space.$2, alignItems: 'center' }), iconBoxSx]}
       >
         {status.isLoading ? (

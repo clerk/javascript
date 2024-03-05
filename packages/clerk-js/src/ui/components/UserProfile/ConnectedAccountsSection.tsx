@@ -75,7 +75,6 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                     />
                     <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                       <Flex
-                        as={'span'}
                         gap={2}
                         center
                       >

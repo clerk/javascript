@@ -1,5 +1,21 @@
 # Change Log
 
+## 5.0.0-beta.32
+
+### Patch Changes
+
+- Updated dependencies [[`8350f73a6`](https://github.com/clerk/javascript/commit/8350f73a67f8980be78e3bd3343e772f5653d718)]:
+  - @clerk/shared@2.0.0-beta.19
+  - @clerk/backend@1.0.0-beta.27
+  - @clerk/clerk-react@5.0.0-beta.29
+
+## 5.0.0-beta.31
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-beta.28
+
 ## 5.0.0-beta.30
 
 ### Patch Changes

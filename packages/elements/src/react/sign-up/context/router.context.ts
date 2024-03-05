@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/clerk-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { ActorRefFrom, AnyActorLogic, SnapshotFrom } from 'xstate';
 
 import { useFormStore } from '~/internals/machines/form/form.context';
@@ -15,6 +15,8 @@ export function useSignUpRouteRegistration<
   TLogic extends AnyActorLogic,
   TEvent extends SignUpRouterRouteRegisterEvent<TLogic>,
 >(id: TEvent['id'], logic: TLogic, input?: TEvent['input']): ActorRefFrom<TLogic> | undefined {
+  const isMounted = useRef(!process.env.NODE_ENV || process.env.NODE_ENV !== 'development');
+
   const clerk = useClerk();
   const routerRef = SignUpRouterCtx.useActorRef();
   const form = useFormStore();
@@ -22,8 +24,7 @@ export function useSignUpRouteRegistration<
   const ref = routerRef.system.get(id);
 
   useEffect(() => {
-    if (!!ref || !routerRef) {
-      console.log('routerRef', 'RETURN EARLY');
+    if ((!routerRef || ref) && isMounted.current) {
       return;
     }
 
@@ -34,7 +35,11 @@ export function useSignUpRouteRegistration<
       input: { clerk, form, ...input },
     });
 
+    isMounted.current = true;
+
     return () => {
+      if (isMounted.current) return;
+
       routerRef.send({
         type: 'ROUTE.UNREGISTER',
         id,

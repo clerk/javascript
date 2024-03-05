@@ -1,26 +1,40 @@
 'use client';
 
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
-import { useActorRef } from '@xstate/react';
+import { useEffect } from 'react';
+import { createActor } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
 import { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
-import { useConsoleInspector } from '~/react/hooks';
+import type { SignInRouterInitEvent } from '~/internals/machines/sign-in/types';
+import { consoleInspector } from '~/react/hooks';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 type SignInFlowProviderProps = WithChildrenProp;
 
+const actor = createActor(SignInRouterMachine, { inspect: consoleInspector });
+const ref = actor.start();
+
 function SignInFlowProvider({ children }: SignInFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
-  const inspector = useConsoleInspector();
 
-  const ref = useActorRef(SignInRouterMachine, {
-    input: { clerk, router, signUpPath: '/sign-up' },
-    inspect: inspector,
-  });
+  useEffect(() => {
+    if (!clerk || !router) return;
+
+    const evt: SignInRouterInitEvent = {
+      type: 'INIT',
+      clerk,
+      router,
+      signUpPath: SIGN_UP_DEFAULT_BASE_PATH,
+    };
+
+    if (ref.getSnapshot().can(evt)) {
+      ref.send(evt);
+    }
+  }, [clerk, router]);
 
   return <SignInRouterCtx.Provider actorRef={ref}>{children}</SignInRouterCtx.Provider>;
 }
