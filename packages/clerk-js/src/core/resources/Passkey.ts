@@ -1,4 +1,11 @@
-import type { PasskeyJSON, PasskeyResource, PasskeyVerificationResource } from '@clerk/types';
+import type {
+  DeletedObjectJSON,
+  DeletedObjectResource,
+  PasskeyJSON,
+  PasskeyResource,
+  PasskeyVerificationResource,
+  UpdatePasskeyParams,
+} from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import type { PublicKeyCredentialWithAuthenticatorAttestationResponse } from '../../utils/passkeys';
@@ -7,7 +14,7 @@ import {
   serializePublicKeyCredential,
   webAuthnCreateCredential,
 } from '../../utils/passkeys';
-import { BaseResource, ClerkRuntimeError, PasskeyVerification } from './internal';
+import { BaseResource, ClerkRuntimeError, DeletedObject, PasskeyVerification } from './internal';
 
 export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
@@ -42,13 +49,6 @@ export class Passkey extends BaseResource implements PasskeyResource {
       body: { strategy: 'passkey', publicKeyCredential: JSON.stringify(jsonPublicKeyCredential) } as any,
     }).then(res => new Passkey(res?.response as PasskeyJSON));
   }
-
-  /**
-   * TODO-PASSKEYS: Implement this later
-   *
-   * GET /v1/me/passkeys
-   */
-  static async get() {}
 
   /**
    * Developers should not be able to create a new Passkeys from an already instanced object
@@ -92,25 +92,26 @@ export class Passkey extends BaseResource implements PasskeyResource {
   }
 
   /**
-   * TODO-PASSKEYS: Implement this later
-   *
    * PATCH /v1/me/passkeys/{passkeyIdentificationID}
    */
-  update = (): Promise<PasskeyResource> => this._basePatch();
+  update = (params: UpdatePasskeyParams): Promise<PasskeyResource> =>
+    this._basePatch({
+      body: params,
+    });
 
   /**
-   * TODO-PASSKEYS: Implement this later
-   *
    * DELETE /v1/me/passkeys/{passkeyIdentificationID}
    */
-  destroy = (): Promise<void> => this._baseDelete();
+  delete = async (): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: `${this.path()}/${this.id}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
 
-  /**
-   * TODO-PASSKEYS: Implement this later
-   *
-   * GET /v1/me/passkeys/{passkeyIdentificationID}
-   */
-  reload = () => this._baseGet();
+    return new DeletedObject(json);
+  };
 
   protected fromJSON(data: PasskeyJSON | null): this {
     if (!data) {

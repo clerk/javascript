@@ -195,7 +195,7 @@ export interface UserJSON extends ClerkResourceJSON {
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
-
+  passkeys: PasskeyJSON[];
   saml_accounts: SamlAccountJSON[];
 
   organization_memberships: OrganizationMembershipJSON[];
