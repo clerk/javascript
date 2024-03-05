@@ -27,6 +27,7 @@ const _UserButton = withFloatingTree(() => {
         onClick={toggle}
         isOpen={isOpen}
         aria-controls={isOpen ? userButtonMenuId : undefined}
+        aria-expanded={isOpen}
       />
       <Popover
         nodeId={nodeId}
