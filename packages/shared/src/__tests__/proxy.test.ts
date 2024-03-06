@@ -1,4 +1,4 @@
-import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL } from '../proxy';
+import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl, proxyUrlToAbsoluteURL } from '../proxy.js';
 
 describe('isValidProxyUrl(key)', () => {
   it('returns true if the proxyUrl is valid', () => {

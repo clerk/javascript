@@ -1,5 +1,5 @@
-import type { ErrorThrowerOptions } from '../error';
-import { buildErrorThrower } from '../error';
+import type { ErrorThrowerOptions } from '../error.js';
+import { buildErrorThrower } from '../error.js';
 
 describe('ErrorThrower', () => {
   const errorThrower = buildErrorThrower({ packageName: '@clerk/test-package' });

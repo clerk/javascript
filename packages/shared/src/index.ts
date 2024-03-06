@@ -8,27 +8,27 @@
  * People should always use @clerk/shared/<name> instead
  */
 
-export * from './utils';
+export * from './utils/index.js';
 
-export { apiUrlFromPublishableKey } from './apiUrlFromPublishableKey';
-export * from './browser';
-export { callWithRetry } from './callWithRetry';
-export * from './color';
-export * from './constants';
-export * from './date';
-export * from './deprecated';
-export * from './error';
-export * from './file';
-export { handleValueOrFn } from './handleValueOrFn';
-export { isomorphicAtob } from './isomorphicAtob';
-export { isomorphicBtoa } from './isomorphicBtoa';
-export * from './keys';
-export { loadScript } from './loadScript';
-export { LocalStorageBroadcastChannel } from './localStorageBroadcastChannel';
-export * from './poller';
-export * from './proxy';
-export * from './underscore';
-export * from './url';
-export * from './object';
-export { createWorkerTimers } from './workerTimers';
-export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';
+export { apiUrlFromPublishableKey } from './apiUrlFromPublishableKey.js';
+export * from './browser.js';
+export { callWithRetry } from './callWithRetry.js';
+export * from './color.js';
+export * from './constants.js';
+export * from './date.js';
+export * from './deprecated.js';
+export * from './error.js';
+export * from './file.js';
+export { handleValueOrFn } from './handleValueOrFn.js';
+export { isomorphicAtob } from './isomorphicAtob.js';
+export { isomorphicBtoa } from './isomorphicBtoa.js';
+export * from './keys.js';
+export { loadScript } from './loadScript.js';
+export { LocalStorageBroadcastChannel } from './localStorageBroadcastChannel.js';
+export * from './poller.js';
+export * from './proxy.js';
+export * from './underscore.js';
+export * from './url.js';
+export * from './object.js';
+export { createWorkerTimers } from './workerTimers/index.js';
+export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser.js';

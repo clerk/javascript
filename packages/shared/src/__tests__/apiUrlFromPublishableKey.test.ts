@@ -1,4 +1,4 @@
-import { apiUrlFromPublishableKey } from '../apiUrlFromPublishableKey';
+import { apiUrlFromPublishableKey } from '../apiUrlFromPublishableKey.js';
 
 describe('apiUrlFromPublishableKey', () => {
   test('returns the prod api url when given a prod publishable key', async () => {

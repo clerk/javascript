@@ -6,7 +6,7 @@ import {
   isTruthy,
   titleize,
   toSentence,
-} from '../underscore';
+} from '../underscore.js';
 
 describe('toSentence', () => {
   it('returns a single item as-is', () => {

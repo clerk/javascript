@@ -1,4 +1,4 @@
-import type { TelemetryEventRaw } from '../types';
+import type { TelemetryEventRaw } from '../types.js';
 
 const EVENT_METHOD_CALLED = 'METHOD_CALLED' as const;
 

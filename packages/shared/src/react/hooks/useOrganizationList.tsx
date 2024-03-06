@@ -11,9 +11,9 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
-import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
-import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts.js';
+import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types.js';
+import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite.js';
 
 type UseOrganizationListParams = {
   userMemberships?: true | PaginatedHookConfig<GetUserOrganizationMembershipParams>;

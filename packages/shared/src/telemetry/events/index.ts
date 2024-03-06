@@ -1,2 +1,2 @@
-export * from './component-mounted';
-export * from './method-called';
+export * from './component-mounted.js';
+export * from './method-called.js';

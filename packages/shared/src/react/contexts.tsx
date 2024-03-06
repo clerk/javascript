@@ -10,8 +10,8 @@ import type {
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { SWRConfig } from './clerk-swr';
-import { createContextAndHook } from './hooks/createContextAndHook';
+import { SWRConfig } from './clerk-swr.js';
+import { createContextAndHook } from './hooks/createContextAndHook.js';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');

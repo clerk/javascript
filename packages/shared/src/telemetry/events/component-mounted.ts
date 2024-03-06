@@ -1,4 +1,4 @@
-import type { TelemetryEventRaw } from '../types';
+import type { TelemetryEventRaw } from '../types.js';
 
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED' as const;
 const EVENT_SAMPLING_RATE = 0.1;

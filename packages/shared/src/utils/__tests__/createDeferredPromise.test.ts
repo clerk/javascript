@@ -1,4 +1,4 @@
-import { createDeferredPromise } from '../createDeferredPromise';
+import { createDeferredPromise } from '../createDeferredPromise.js';
 
 describe('createDeferredPromise', () => {
   test('resolves with correct value', async () => {

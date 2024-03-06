@@ -1,4 +1,4 @@
-import { noop } from './noop';
+import { noop } from './noop.js';
 
 type Callback = (val?: any) => void;
 

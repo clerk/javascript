@@ -1,9 +1,9 @@
-export { assertContextExists, createContextAndHook } from './createContextAndHook';
-export { useOrganization } from './useOrganization';
-export { useOrganizationList } from './useOrganizationList';
-export { useSafeLayoutEffect } from './useSafeLayoutEffect';
-export { useSession } from './useSession';
-export { useSessionList } from './useSessionList';
-export { useUser } from './useUser';
-export { useClerk } from './useClerk';
-export { useDeepEqualMemo, isDeeplyEqual } from './useDeepEqualMemo';
+export { assertContextExists, createContextAndHook } from './createContextAndHook.js';
+export { useOrganization } from './useOrganization.js';
+export { useOrganizationList } from './useOrganizationList.js';
+export { useSafeLayoutEffect } from './useSafeLayoutEffect.js';
+export { useSession } from './useSession.js';
+export { useSessionList } from './useSessionList.js';
+export { useUser } from './useUser.js';
+export { useClerk } from './useClerk.js';
+export { useDeepEqualMemo, isDeeplyEqual } from './useDeepEqualMemo.js';

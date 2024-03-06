@@ -1,6 +1,6 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
-import { useAssertWrappedByClerkProvider, useSessionContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useSessionContext } from '../contexts.js';
 
 type UseSessionReturn =
   | { isLoaded: false; isSignedIn: undefined; session: undefined }

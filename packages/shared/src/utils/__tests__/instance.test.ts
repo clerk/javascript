@@ -1,4 +1,4 @@
-import { isStaging } from '../instance';
+import { isStaging } from '../instance.js';
 
 describe('isStaging', () => {
   it.each([

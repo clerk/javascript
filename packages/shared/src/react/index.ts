@@ -1,4 +1,4 @@
-export * from './hooks';
+export * from './hooks/index.js';
 
 export {
   ClerkInstanceContext,
@@ -12,4 +12,4 @@ export {
   useSessionContext,
   useUserContext,
   useAssertWrappedByClerkProvider,
-} from './contexts';
+} from './contexts.js';

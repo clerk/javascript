@@ -1,4 +1,6 @@
-import { inBrowser, isValidBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser';
+import { jest } from '@jest/globals';
+
+import { inBrowser, isValidBrowser, isValidBrowserOnline, userAgentIsRobot } from '../browser.js';
 
 describe('inBrowser()', () => {
   afterEach(() => {

@@ -1,8 +1,8 @@
 import type { PublishableKey } from '@clerk/types';
 
-import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
-import { isomorphicAtob } from './isomorphicAtob';
-import { isomorphicBtoa } from './isomorphicBtoa';
+import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants.js';
+import { isomorphicAtob } from './isomorphicAtob.js';
+import { isomorphicBtoa } from './isomorphicBtoa.js';
 
 type ParsePublishableKeyOptions = {
   fatal?: boolean;

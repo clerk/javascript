@@ -1,4 +1,4 @@
-import { handleValueOrFn } from '../handleValueOrFn';
+import { handleValueOrFn } from '../handleValueOrFn.js';
 
 const url = new URL('https://example.com');
 
@@ -12,7 +12,7 @@ describe('handleValueOrFn(opts)', () => {
     ['', ''],
     ['some-domain', 'some-domain'],
     ['clerk.com', 'clerk.com'],
-    [url => url.host, 'example.com'],
+    [(url: URL) => url.host, 'example.com'],
     [() => 'some-other-domain', 'some-other-domain'],
   ])('.handleValueOrFn(%s)', (key, expected) => {
     expect(handleValueOrFn(key, url)).toBe(expected);

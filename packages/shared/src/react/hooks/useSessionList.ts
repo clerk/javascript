@@ -1,6 +1,6 @@
 import type { SessionResource, SetActive } from '@clerk/types';
 
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts.js';
 
 type UseSessionListReturn =
   | {

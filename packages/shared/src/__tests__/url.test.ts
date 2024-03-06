@@ -8,7 +8,7 @@ import {
   stripScheme,
   withoutTrailingSlash,
   withTrailingSlash,
-} from '../url';
+} from '../url.js';
 
 describe('parseSearchParams(queryString)', () => {
   it('parses query string and returns a URLSearchParams object', () => {
@@ -146,11 +146,11 @@ describe('withTrailingSlash, queryParams: false', () => {
     'foo?123': 'foo?123/',
     'foo/?123': 'foo/?123/',
     'foo/?123#abc': 'foo/?123#abc/',
-  };
+  } as const;
 
   for (const input in tests) {
     test(input, () => {
-      expect(withTrailingSlash(input)).toBe(tests[input]);
+      expect(withTrailingSlash(input)).toBe(tests[input as keyof typeof tests]);
     });
   }
 
@@ -174,7 +174,7 @@ describe('withTrailingSlash, queryParams: true', () => {
 
   for (const input in tests) {
     test(input, () => {
-      expect(withTrailingSlash(input, true)).toBe(tests[input]);
+      expect(withTrailingSlash(input, true)).toBe(tests[input as keyof typeof tests]);
     });
   }
 
@@ -197,7 +197,7 @@ describe('withoutTrailingSlash, queryParams: false', () => {
 
   for (const input in tests) {
     test(input, () => {
-      expect(withoutTrailingSlash(input)).toBe(tests[input]);
+      expect(withoutTrailingSlash(input)).toBe(tests[input as keyof typeof tests]);
     });
   }
 
@@ -223,7 +223,7 @@ describe('withoutTrailingSlash, queryParams: true', () => {
 
   for (const input in tests) {
     test(input, () => {
-      expect(withoutTrailingSlash(input, true)).toBe(tests[input]);
+      expect(withoutTrailingSlash(input, true)).toBe(tests[input as keyof typeof tests]);
     });
   }
 
@@ -242,7 +242,7 @@ describe('cleanDoubleSlashes', () => {
 
   for (const input in tests) {
     test(input, () => {
-      expect(cleanDoubleSlashes(input)).toBe(tests[input]);
+      expect(cleanDoubleSlashes(input)).toBe(tests[input as keyof typeof tests]);
     });
   }
 

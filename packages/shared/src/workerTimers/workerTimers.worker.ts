@@ -1,4 +1,4 @@
-import type { WorkerTimerEvent, WorkerTimerId, WorkerTimerResponseEvent } from './workerTimers.types';
+import type { WorkerTimerEvent, WorkerTimerId, WorkerTimerResponseEvent } from './workerTimers.types.js';
 // This file is loaded as TEXT by esbuild during build
 // and fed into a blob so we can easily instantiate the web worker
 // look at the tsup.config.ts file for more details on the loader

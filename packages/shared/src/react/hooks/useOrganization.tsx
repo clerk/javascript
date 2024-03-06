@@ -16,9 +16,9 @@ import {
   useClerkInstanceContext,
   useOrganizationContext,
   useSessionContext,
-} from '../contexts';
-import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
-import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
+} from '../contexts.js';
+import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types.js';
+import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite.js';
 
 type UseOrganizationParams = {
   domains?: true | PaginatedHookConfig<GetDomainsParams>;

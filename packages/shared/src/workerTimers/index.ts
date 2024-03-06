@@ -1,1 +1,1 @@
-export { createWorkerTimers } from './createWorkerTimers';
+export { createWorkerTimers } from './createWorkerTimers.js';

@@ -1,4 +1,4 @@
-import { isDevelopmentEnvironment } from './runtimeEnvironment';
+import { isDevelopmentEnvironment } from './runtimeEnvironment.js';
 
 export const logErrorInDevMode = (message: string) => {
   if (isDevelopmentEnvironment()) {

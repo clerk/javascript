@@ -1,8 +1,12 @@
-const { name } = require('./package.json');
+import packageJson from './package.json' assert { type: 'json' };
 
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 const config = {
-  displayName: name.replace('@clerk', ''),
+  preset: 'ts-jest/presets/default-esm',
+  moduleNameMapper: {
+    '(.+)\\.js': '$1',
+  },
+  displayName: packageJson.name.replace('@clerk', ''),
   injectGlobals: true,
 
   testEnvironment: 'jsdom',
@@ -14,9 +18,6 @@ const config = {
   coverageDirectory: 'coverage',
 
   moduleDirectories: ['node_modules', '<rootDir>/src'],
-  transform: {
-    '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
-  },
 };
 
-module.exports = config;
+export default config;

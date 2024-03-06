@@ -2,14 +2,14 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useSWR, useSWRInfinite } from '../clerk-swr';
+import { useSWR, useSWRInfinite } from '../clerk-swr.js';
 import type {
   CacheSetter,
   PagesOrInfiniteConfig,
   PagesOrInfiniteOptions,
   PaginatedResources,
   ValueOrSetter,
-} from '../types';
+} from '../types.js';
 
 function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
   const keysSet = new Set(Object.keys(obj2));

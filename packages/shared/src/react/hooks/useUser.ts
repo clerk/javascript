@@ -1,6 +1,6 @@
 import type { UserResource } from '@clerk/types';
 
-import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts';
+import { useAssertWrappedByClerkProvider, useUserContext } from '../contexts.js';
 
 type UseUserReturn =
   | { isLoaded: false; isSignedIn: undefined; user: undefined }

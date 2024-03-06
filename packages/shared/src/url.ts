@@ -1,5 +1,5 @@
-import { CURRENT_DEV_INSTANCE_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
-import { isStaging } from './utils/instance';
+import { CURRENT_DEV_INSTANCE_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants.js';
+import { isStaging } from './utils/instance.js';
 
 export function parseSearchParams(queryString = ''): URLSearchParams {
   if (queryString.startsWith('?')) {

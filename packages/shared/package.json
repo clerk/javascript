@@ -9,40 +9,42 @@
   },
   "license": "MIT",
   "author": "Clerk",
+  "type": "module",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      },
-      "require": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       }
     },
     "./*": {
       "import": {
-        "types": "./dist/*.d.mts",
-        "default": "./dist/*.mjs"
-      },
-      "require": {
         "types": "./dist/*.d.ts",
         "default": "./dist/*.js"
+      },
+      "require": {
+        "types": "./dist/*.d.cts",
+        "default": "./dist/*.cjs"
       }
     },
     "./react": {
       "import": {
-        "types": "./dist/react/index.d.mts",
-        "default": "./dist/react/index.mjs"
-      },
-      "require": {
         "types": "./dist/react/index.d.ts",
         "default": "./dist/react/index.js"
+      },
+      "require": {
+        "types": "./dist/react/index.d.cts",
+        "default": "./dist/react/index.cjs"
       }
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "files": [
     "dist",
     "browser",
@@ -81,16 +83,16 @@
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
     "publish:local": "npx yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%",
-    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "test:cache:clear": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --clearCache --useStderr",
+    "test:ci": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --maxWorkers=70%",
+    "test:coverage": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.1",
     "std-env": "^3.7.0",
-    "swr": "2.2.0"
+    "swr": "2.2.5"
   },
   "devDependencies": {
     "@clerk/types": "4.0.0-beta.20",

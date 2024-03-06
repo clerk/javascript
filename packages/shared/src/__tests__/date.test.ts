@@ -1,5 +1,5 @@
-import type { RelativeDateCase } from '../date';
-import { addYears, dateTo12HourTime, differenceInCalendarDays, formatRelative } from '../date';
+import type { RelativeDateCase } from '../date.js';
+import { addYears, dateTo12HourTime, differenceInCalendarDays, formatRelative } from '../date.js';
 
 describe('date utils', () => {
   describe('dateTo12HourTime(date)', () => {

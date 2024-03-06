@@ -1,18 +1,19 @@
-jest.mock('../utils/runtimeEnvironment', () => {
+import { jest } from '@jest/globals';
+jest.unstable_mockModule('../utils/runtimeEnvironment.js', async () => {
   return {
     isTestEnvironment: jest.fn(() => false),
     isProductionEnvironment: jest.fn(() => false),
   };
 });
 
-import { deprecated, deprecatedObjectProperty, deprecatedProperty } from '../deprecated';
-import { isProductionEnvironment, isTestEnvironment } from '../utils/runtimeEnvironment';
+const { deprecated, deprecatedObjectProperty, deprecatedProperty } = await import('../deprecated.js');
+const { isProductionEnvironment, isTestEnvironment } = await import('../utils/runtimeEnvironment.js');
 
 describe('deprecated(fnName, warning)', () => {
-  let consoleWarnSpy;
+  let consoleWarnSpy: any;
 
   beforeEach(() => {
-    consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation();
+    consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
   });
   afterEach(() => {
     consoleWarnSpy.mockRestore();
@@ -20,7 +21,7 @@ describe('deprecated(fnName, warning)', () => {
 
   test('deprecate class method shows warning', () => {
     class Example {
-      getSomeMethod = (arg1?, arg2?) => {
+      getSomeMethod = (arg1?: any, arg2?: any) => {
         deprecated('getSomeMethod', 'Use `getSomeMethodElse` instead.');
         return `getSomeMethodValue:${arg1 || '-'}:${arg2 || '-'}`;
       };
@@ -179,10 +180,10 @@ describe('deprecated(fnName, warning)', () => {
 });
 
 describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
-  let consoleWarnSpy;
+  let consoleWarnSpy: any;
 
   beforeEach(() => {
-    consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation();
+    consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
   });
   afterEach(() => {
     consoleWarnSpy.mockRestore();
@@ -312,10 +313,10 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
 });
 
 describe('deprecatedObjectProperty(obj, propName, warning)', () => {
-  let consoleWarnSpy;
+  let consoleWarnSpy: any;
 
   beforeEach(() => {
-    consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation();
+    consoleWarnSpy = jest.spyOn(global.console, 'warn').mockImplementation(() => {});
   });
   afterEach(() => {
     consoleWarnSpy.mockRestore();

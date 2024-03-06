@@ -1,6 +1,8 @@
 import 'cross-fetch/polyfill';
 
-import { TelemetryCollector } from '../telemetry';
+import { jest } from '@jest/globals';
+
+import { TelemetryCollector } from '../telemetry.js';
 
 jest.useFakeTimers();
 

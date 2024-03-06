@@ -12,9 +12,9 @@
  */
 import type { InstanceType } from '@clerk/types';
 
-import { parsePublishableKey } from '../keys';
-import { isTruthy } from '../underscore';
-import type { TelemetryCollectorOptions, TelemetryEvent, TelemetryEventRaw } from './types';
+import { parsePublishableKey } from '../keys.js';
+import { isTruthy } from '../underscore.js';
+import type { TelemetryCollectorOptions, TelemetryEvent, TelemetryEventRaw } from './types.js';
 
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,

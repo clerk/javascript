@@ -1,4 +1,4 @@
-import { noop } from '../utils/noop';
+import { noop } from '../utils/noop.js';
 import type {
   WorkerClearTimeout,
   WorkerSetTimeout,
@@ -6,9 +6,9 @@ import type {
   WorkerTimerEvent,
   WorkerTimerId,
   WorkerTimerResponseEvent,
-} from './workerTimers.types';
+} from './workerTimers.types.js';
 // @ts-ignore
-import pollerWorkerSource from './workerTimers.worker';
+import pollerWorkerSource from './workerTimers.worker.js';
 
 const createWebWorker = (source: string, opts: ConstructorParameters<typeof Worker>[1] = {}): Worker | null => {
   if (typeof Worker === 'undefined') {

@@ -1,4 +1,6 @@
-import { LocalStorageBroadcastChannel } from '../localStorageBroadcastChannel';
+import { jest } from '@jest/globals';
+
+import { LocalStorageBroadcastChannel } from '../localStorageBroadcastChannel.js';
 
 const bcName = 'clerk';
 
@@ -8,11 +10,11 @@ describe('LocalStorageBroadcastChannel', () => {
     localStorageMock = (() => {
       const store: Record<string, any> = {};
       return {
-        setItem: jest.fn((key, value) => {
+        setItem: jest.fn((key: string, value: any) => {
           store[key] = value;
           window.dispatchEvent(new StorageEvent('storage', { key, newValue: value }));
         }),
-        removeItem: jest.fn(key => {
+        removeItem: jest.fn((key: string) => {
           store[key] = undefined;
           window.dispatchEvent(new Event('storage'));
         }),

@@ -1,6 +1,6 @@
-export * from './createDeferredPromise';
-export { isStaging } from './instance';
-export { logErrorInDevMode } from './logErrorInDevMode';
-export { noop } from './noop';
-export * from './runWithExponentialBackOff';
-export * from './runtimeEnvironment';
+export * from './createDeferredPromise.js';
+export { isStaging } from './instance.js';
+export { logErrorInDevMode } from './logErrorInDevMode.js';
+export { noop } from './noop.js';
+export * from './runWithExponentialBackOff.js';
+export * from './runtimeEnvironment.js';

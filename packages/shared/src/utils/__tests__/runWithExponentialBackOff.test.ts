@@ -1,4 +1,4 @@
-import { runWithExponentialBackOff } from '../runWithExponentialBackOff';
+import { runWithExponentialBackOff } from '../runWithExponentialBackOff.js';
 
 describe('runWithExponentialBackOff', () => {
   test('resolves with the result of the callback', async () => {

@@ -1,4 +1,4 @@
-import { createWorkerTimers } from './workerTimers';
+import { createWorkerTimers } from './workerTimers/index.js';
 
 export type PollerStop = () => void;
 export type PollerCallback = (stop: PollerStop) => Promise<unknown>;

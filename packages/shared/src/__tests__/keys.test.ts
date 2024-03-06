@@ -7,7 +7,7 @@ import {
   isProductionFromSecretKey,
   isPublishableKey,
   parsePublishableKey,
-} from '../keys';
+} from '../keys.js';
 
 describe('buildPublishableKey(frontendApi)', () => {
   const cases = [

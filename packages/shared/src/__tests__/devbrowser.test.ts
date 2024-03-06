@@ -1,4 +1,6 @@
-import { extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '../devBrowser';
+import { jest } from '@jest/globals';
+
+import { extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '../devBrowser.js';
 
 const DUMMY_URL_BASE = 'http://clerk-dummy';
 
