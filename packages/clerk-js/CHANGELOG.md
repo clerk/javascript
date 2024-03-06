@@ -1,5 +1,32 @@
 # Change Log
 
+## 5.0.0-beta.33
+
+### Minor Changes
+
+- Experimental support for reading, updating, and deleting a user's registered passkeys. ([#2926](https://github.com/clerk/javascript/pull/2926)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Get the user's passkeys
+    `clerk.user.__experimental__passkeys`
+  - Update the name of a passkey
+    `clerk.user.__experimental__passkeys?.[0].update({name:'work laptop passkey'})`
+  - Delete a passkey
+    `clerk.user.__experimental__passkeys?.[0].delete()`
+
+### Patch Changes
+
+- The organizationPreviewSecondaryIdentifier element will no longer be rendered empty inside the organization switcher's list. ([#2936](https://github.com/clerk/javascript/pull/2936)) by [@desiprisg](https://github.com/desiprisg)
+
+- Correct the HTML structure of the UI components to ensure validity ([#2894](https://github.com/clerk/javascript/pull/2894)) by [@anagstef](https://github.com/anagstef)
+
+- Show counter of members/invitations/requests even if it is 0. ([#2935](https://github.com/clerk/javascript/pull/2935)) by [@desiprisg](https://github.com/desiprisg)
+
+- Fix invite members to an Organization form to show error when invalid email addresses are submitted. ([#2928](https://github.com/clerk/javascript/pull/2928)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`178907ff6`](https://github.com/clerk/javascript/commit/178907ff69869169e065cff54f2bf4331ad3e493), [`008ac4217`](https://github.com/clerk/javascript/commit/008ac4217bc648085b3caba92a4524c31cc0925b)]:
+  - @clerk/localizations@2.0.0-beta.17
+  - @clerk/types@4.0.0-beta.20
+
 ## 5.0.0-beta.32
 
 ### Patch Changes

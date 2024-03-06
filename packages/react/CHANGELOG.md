@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- Introducing stricter types for custom pages for UserProfile and OrganizationProfile. ([#2939](https://github.com/clerk/javascript/pull/2939)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`008ac4217`](https://github.com/clerk/javascript/commit/008ac4217bc648085b3caba92a4524c31cc0925b)]:
+  - @clerk/types@4.0.0-beta.20
+
 ## 5.0.0-beta.29
 
 ### Patch Changes
