@@ -2,6 +2,7 @@
 
 import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
 import {
+  Loading,
   Navigate,
   SignIn,
   SocialProvider,
@@ -78,8 +79,16 @@ export default function SignInPage() {
             </Link>
           </p>
         </div>
+        <div>
+          <Loading scope='global'>
+            {({ isGlobalLoading }) => <span>Global: {JSON.stringify(isGlobalLoading, null, 2)} - </span>}
+          </Loading>
+        </div>
 
         <Step name='start'>
+          <Loading scope='start'>
+            {({ isLoading }) => <span>Start: {JSON.stringify(isLoading, null, 2)} - </span>}
+          </Loading>
           <div className='flex flex-col items-center  gap-12 w-96'>
             <GlobalError className='block text-red-400 font-mono' />
 
@@ -112,6 +121,9 @@ export default function SignInPage() {
         </Step>
 
         <Step name='choose-strategy'>
+          <Loading scope='choose-strategy'>
+            {({ isLoading }) => <span>ChooseStrategy: {JSON.stringify(isLoading, null, 2)} - </span>}
+          </Loading>
           <div className='flex flex-col items-center  gap-6 w-96'>
             <H3>CHOOSE STRATEGY:</H3>
 
@@ -157,6 +169,9 @@ export default function SignInPage() {
         </Step>
 
         <Step name='verifications'>
+          <Loading scope='verifications'>
+            {({ isLoading }) => <span>Verifications: {JSON.stringify(isLoading, null, 2)}</span>}
+          </Loading>
           <div className='flex gap-6 flex-col'>
             <GlobalError className='block text-red-400 font-mono' />
 
