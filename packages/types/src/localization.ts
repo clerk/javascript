@@ -47,6 +47,7 @@ type _LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
+  formFieldLabel__passkeyName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -319,6 +320,9 @@ type _LocalizationResource = {
         primaryButton__updatePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
       };
+      passkeysSection: {
+        title: LocalizationValue;
+      };
       mfaSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
@@ -388,6 +392,10 @@ type _LocalizationResource = {
         messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
       };
+    };
+    passkeyScreen: {
+      title__rename: LocalizationValue;
+      subtitle__rename: LocalizationValue;
     };
     phoneNumberPage: {
       title: LocalizationValue;
