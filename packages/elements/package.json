@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.1.19",
+  "version": "0.1.21",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -95,6 +95,12 @@
     "react-dom": ">=18"
   },
   "peerDependenciesMeta": {
+    "@clerk/clerk-react": {
+      "optional": true
+    },
+    "@clerk/shared": {
+      "optional": true
+    },
     "next": {
       "optional": true
     }
