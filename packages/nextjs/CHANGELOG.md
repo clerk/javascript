@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0-beta.33
+
+### Patch Changes
+
+- Using auth().protect inside clerkMiddleware will perform a redirection instead of throwing a not found error when internal navigation in pages router occurs and the user is unauthenticated. ([#2942](https://github.com/clerk/javascript/pull/2942)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`c86f73be3`](https://github.com/clerk/javascript/commit/c86f73be382d01ec5f0ff5922ad907f429e63a58)]:
+  - @clerk/clerk-react@5.0.0-beta.30
+
 ## 5.0.0-beta.32
 
 ### Patch Changes
