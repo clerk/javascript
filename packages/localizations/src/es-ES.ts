@@ -557,11 +557,11 @@ export const esES: LocalizationResource = {
       title: 'Agregar cuenta conectada',
     },
     deletePage: {
-      actionDescription: 'Type "Delete account" below to continue.',
-      confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
-      messageLine2: 'This action is permanent and irreversible.',
-      title: 'Delete account',
+      actionDescription: 'Escribe "Eliminar cuenta" a continuación para continuar.',
+      confirm: 'Eliminar cuenta',
+      messageLine1: '¿Estás seguro de que quieres eliminar tu cuenta?',
+      messageLine2: 'Esta acción es permanente e irreversible.',
+      title: 'Eliminar cuenta',
     },
     emailAddressPage: {
       emailCode: {
@@ -698,8 +698,8 @@ export const esES: LocalizationResource = {
         title: 'Cuentas conectadas',
       },
       dangerSection: {
-        deleteAccountButton: 'Delete Account',
-        title: 'Account termination',
+        title: 'Eliminar cuenta',
+        deleteAccountButton: 'Eliminar cuenta',
       },
       emailAddressesSection: {
         destructiveAction: 'Eliminar dirección de correo electrónico',

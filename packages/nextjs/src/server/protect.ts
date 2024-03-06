@@ -121,7 +121,8 @@ const isPageRequest = (req: Request): boolean => {
   return (
     req.headers.get(constants.Headers.SecFetchDest) === 'document' ||
     req.headers.get(constants.Headers.Accept)?.includes('text/html') ||
-    (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req))
+    (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req)) ||
+    !!req.headers.get(nextConstants.Headers.NextjsData)
   );
 };
 
