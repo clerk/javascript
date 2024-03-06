@@ -60,7 +60,6 @@ class Base64Converter {
   }
 
   static decode(base64url: string): ArrayBuffer {
-    // TODO-PASSKEYS: check if this can be replaced with Buffer.from(base64url, 'base64');
     const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
 
     const binaryString = atob(base64);

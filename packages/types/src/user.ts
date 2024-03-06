@@ -68,7 +68,11 @@ export interface UserResource extends ClerkResource {
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
-
+  /**
+   * @experimental
+   * This property is experimental, avoid using this in production applications
+   */
+  __experimental_passkeys: PasskeyResource[];
   samlAccounts: SamlAccountResource[];
 
   organizationMemberships: OrganizationMembershipResource[];

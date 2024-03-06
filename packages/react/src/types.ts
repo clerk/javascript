@@ -82,6 +82,7 @@ type ButtonProps = {
 };
 
 export type SignInButtonProps = ButtonProps;
+
 export interface SignUpButtonProps extends ButtonProps {
   unsafeMetadata?: SignUpUnsafeMetadata;
 }
@@ -91,11 +92,19 @@ export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'c
 export type RedirectToSignInProps = SignInRedirectOptions;
 export type RedirectToSignUpProps = SignUpRedirectOptions;
 
-export type UserProfilePageProps = {
-  url?: string;
-  label: string;
-  labelIcon?: React.ReactNode;
-};
+type PageProps<T extends string> =
+  | {
+      label: string;
+      url: string;
+      labelIcon: React.ReactNode;
+    }
+  | {
+      label: T;
+      url?: never;
+      labelIcon?: never;
+    };
+
+export type UserProfilePageProps = PageProps<'account' | 'security'>;
 
 export type UserProfileLinkProps = {
   url: string;
@@ -103,5 +112,5 @@ export type UserProfileLinkProps = {
   labelIcon: React.ReactNode;
 };
 
-export type OrganizationProfilePageProps = UserProfilePageProps;
+export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
 export type OrganizationProfileLinkProps = UserProfileLinkProps;
