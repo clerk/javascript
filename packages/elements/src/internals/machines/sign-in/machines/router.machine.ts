@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, sendTo, setup, spawnChild, stopChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup, spawnChild, stopChild } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
@@ -15,6 +15,12 @@ import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/thi
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
+
+/*
+{
+  loading: boolean | { route: SignInRoute; provider: SignInProvider, strategy: SignInStrategy };
+}
+*/
 
 const isCurrentPath =
   (path: `/${string}`) =>
@@ -102,12 +108,15 @@ export const SignInRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
-        type: 'REDIRECT',
-        params: {
-          strategy: event.strategy,
-        },
-      })),
+      actions: [
+        sendTo(ThirdPartyMachineId, ({ event }) => ({
+          type: 'REDIRECT',
+          params: {
+            strategy: event.strategy,
+          },
+        })),
+        raise(({ event }) => ({ ...event, type: 'LOADING' })),
+      ],
     },
     'AUTHENTICATE.SAML': {
       actions: sendTo(ThirdPartyMachineId, {
@@ -134,6 +143,9 @@ export const SignInRouterMachine = setup({
     },
     'ROUTE.UNREGISTER': {
       actions: stopChild(({ event }) => event.id),
+    },
+    LOADING: {
+      actions: enqueueActions(() => {}),
     },
   },
   states: {
