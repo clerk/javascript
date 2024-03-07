@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.5
+
+### Patch Changes
+
+- Release the latest beta changes of the `@clerk/themes` package ([#2947](https://github.com/clerk/javascript/pull/2947)) by [@anagstef](https://github.com/anagstef)
+
 ## 2.0.0-beta.4
 
 ### Patch Changes
