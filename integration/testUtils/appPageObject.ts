@@ -37,6 +37,9 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
     waitForClerkComponentMounted: async () => {
       return page.waitForSelector('.cl-rootBox', { state: 'attached' });
     },
+    waitForAppUrl: async (relativePath: string) => {
+      return page.waitForURL(new URL(relativePath, app.serverUrl).toString());
+    },
   };
   return Object.assign(appPage, helpers);
 };
