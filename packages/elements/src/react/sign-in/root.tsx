@@ -8,7 +8,7 @@ import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internal
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
 import { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in/types';
-import { consoleInspector } from '~/react/hooks';
+import { consoleInspector } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 

@@ -1,3 +1,3 @@
-import { createBrowserInspectorReactHook } from '~/react/utils/xstate';
+import { createBrowserInspectorReactHook } from '~/internals/utils/inspector';
 
 export const { useBrowserInspector } = createBrowserInspectorReactHook();
