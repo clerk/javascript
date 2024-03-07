@@ -77,10 +77,10 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@remix-run/react": "^2.0.0",
-    "@remix-run/server-runtime": "^2.0.0",
-    "@types/cookie": "^0.5.0",
-    "@types/node": "^16.11.55",
+    "@remix-run/react": "^2.8.0",
+    "@remix-run/server-runtime": "^2.8.0",
+    "@types/cookie": "^0.5.4",
+    "@types/node": "^16.18.87",
     "@types/react": "*",
     "@types/react-dom": "*",
     "typescript": "*"
