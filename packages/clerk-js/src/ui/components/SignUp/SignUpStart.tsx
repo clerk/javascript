@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
-import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
+import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
@@ -109,6 +109,8 @@ function _SignUpStart(): JSX.Element {
     signUp
       .create({ strategy: 'ticket', ticket: formState.ticket.value })
       .then(signUp => {
+        removeClerkQueryParam('__clerk_ticket');
+        removeClerkQueryParam('__clerk_invitation_token');
         formState.emailAddress.setValue(signUp.emailAddress || '');
         // In case we are in a Ticket flow and the sign up is not complete yet, update the state
         // to render properly the SignUp form with other available options to complete it (e.g. OAuth)

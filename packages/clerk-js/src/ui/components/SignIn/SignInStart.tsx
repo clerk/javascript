@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { getClerkQueryParam } from '../../../utils';
+import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
@@ -138,6 +138,7 @@ export function _SignInStart(): JSX.Element {
         ticket: organizationTicket,
       })
       .then(res => {
+        removeClerkQueryParam('__clerk_ticket');
         switch (res.status) {
           case 'needs_first_factor':
             return navigate('factor-one');

@@ -1,6 +1,8 @@
+import type { SignUpResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
 
-import { render, screen } from '../../../../testUtils';
+import { act, render, screen } from '../../../../testUtils';
+import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpStart } from '../SignUpStart';
 
@@ -200,6 +202,40 @@ describe('SignUpStart', () => {
       props.setProps({ initialValues: { username: 'foo' } });
       render(<SignUpStart />, { wrapper });
       screen.getByDisplayValue(/foo/i);
+    });
+  });
+
+  describe('ticket flow', () => {
+    it('calls the appropriate resource function upon detecting the ticket', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signUp.create.mockResolvedValueOnce({} as SignUpResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-up?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: jest.fn() },
+      });
+
+      await act(() =>
+        render(
+          <CardStateProvider>
+            <SignUpStart />
+          </CardStateProvider>,
+          { wrapper },
+        ),
+      );
+      expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' });
+
+      expect(window.history.replaceState).toHaveBeenCalledWith(
+        undefined,
+        '',
+        expect.not.stringContaining('__clerk_ticket'),
+      );
     });
   });
 });
