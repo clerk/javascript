@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.17
+
+### Patch Changes
+
+- Update the danger section in the `es-ES` localization ([#2924](https://github.com/clerk/javascript/pull/2924)) by [@souvik666](https://github.com/souvik666)
+
 ## 2.0.0-beta.16
 
 ### Minor Changes

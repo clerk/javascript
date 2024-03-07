@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.0.0-beta.20
+
+### Minor Changes
+
+- Experimental support for reading, updating, and deleting a user's registered passkeys. ([#2926](https://github.com/clerk/javascript/pull/2926)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Get the user's passkeys
+    `clerk.user.__experimental__passkeys`
+  - Update the name of a passkey
+    `clerk.user.__experimental__passkeys?.[0].update({name:'work laptop passkey'})`
+  - Delete a passkey
+    `clerk.user.__experimental__passkeys?.[0].delete()`
+
 ## 4.0.0-beta.19
 
 ### Minor Changes

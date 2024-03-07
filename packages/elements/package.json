@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -74,9 +74,9 @@
     "xstate": "^5.7.1"
   },
   "devDependencies": {
-    "@clerk/clerk-react": "5.0.0-beta.29",
+    "@clerk/clerk-react": "5.0.0-beta.30",
     "@clerk/shared": "2.0.0-beta.19",
-    "@clerk/types": "^4.0.0-beta.19",
+    "@clerk/types": "^4.0.0-beta.20",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
@@ -88,11 +88,19 @@
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
+    "@clerk/clerk-react": "^5.0.0-beta",
+    "@clerk/shared": "^2.0.0-beta",
     "next": "^13.0.4 || ^14.0.3",
     "react": ">=18",
     "react-dom": ">=18"
   },
   "peerDependenciesMeta": {
+    "@clerk/clerk-react": {
+      "optional": true
+    },
+    "@clerk/shared": {
+      "optional": true
+    },
     "next": {
       "optional": true
     }
