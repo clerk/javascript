@@ -64,7 +64,7 @@ export const injectRequestStateIntoResponse = async (
   requestState: RequestState,
   context: AppLoadContext,
 ) => {
-  const clone = response.clone();
+  const clone = new Response(response.body, response);
   const data = await clone.json();
 
   const { clerkState, headers } = getResponseClerkState(requestState, context);
