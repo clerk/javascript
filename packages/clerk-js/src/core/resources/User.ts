@@ -338,19 +338,7 @@ export class User extends BaseResource implements UserResource {
       ea => new ExternalAccount(ea, this.path() + '/external_accounts'),
     );
 
-    this.__experimental_passkeys = (
-      data.passkeys || [
-        {
-          object: 'passkey',
-          id: 'wdadwa',
-          name: 'Chrome on Mac',
-          created_at: Date.now(),
-          updated_at: Date.now(),
-          last_used_at: Date.now(),
-          verification: null,
-        },
-      ]
-    ).map(passkey => new Passkey(passkey));
+    this.__experimental_passkeys = (data.passkeys || []).map(passkey => new Passkey(passkey));
 
     this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
 
