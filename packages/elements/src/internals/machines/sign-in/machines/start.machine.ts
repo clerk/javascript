@@ -74,7 +74,19 @@ export const SignInStartMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: sendParent({ type: 'NEXT' }),
+          actions: [
+            sendParent({ type: 'NEXT' }),
+            sendParent(({ event }) => {
+              const signInResource = event.output;
+              const firstFactorStrategy = signInResource.firstFactorVerification.strategy;
+
+              return {
+                type: 'LOADING',
+                step: 'start',
+                strategy: firstFactorStrategy ? firstFactorStrategy : 'identifier',
+              };
+            }),
+          ],
         },
         onError: {
           actions: 'setFormErrors',

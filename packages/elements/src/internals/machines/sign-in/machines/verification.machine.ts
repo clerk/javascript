@@ -118,7 +118,22 @@ const SignInVerificationMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: sendParent(({ event }) => ({ type: 'NEXT', resource: event.output })),
+          actions: [
+            sendParent(({ event }) => ({ type: 'NEXT', resource: event.output })),
+            sendParent(({ event, context }) => {
+              console.log({ context, event });
+              const signInResource = event.output;
+              // When an attempt for the first factor is made, firstFactorStrategy will be defined. If an attempt for the second factor is made, both will be defined
+              const firstFactorStrategy = signInResource.firstFactorVerification.strategy;
+              const secondFactorStrategy = signInResource.secondFactorVerification.strategy;
+
+              return {
+                type: 'LOADING',
+                step: 'verifications',
+                strategy: secondFactorStrategy ? secondFactorStrategy : firstFactorStrategy,
+              };
+            }),
+          ],
         },
         onError: {
           actions: 'setFormErrors',

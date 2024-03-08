@@ -18,7 +18,7 @@ export type TSignInRouterMachine = typeof SignInRouterMachine;
 
 /*
 {
-  loading: boolean | { route: SignInRoute; provider: SignInProvider, strategy: SignInStrategy };
+  loading: boolean | { step: StepName; provider: SignInProvider, strategy: SignInStrategy };
 }
 */
 
@@ -115,14 +115,17 @@ export const SignInRouterMachine = setup({
             strategy: event.strategy,
           },
         })),
-        raise(({ event }) => ({ ...event, type: 'LOADING' })),
+        raise(({ event }) => ({ type: 'LOADING', strategy: 'oauth', provider: event.strategy })),
       ],
     },
     'AUTHENTICATE.SAML': {
-      actions: sendTo(ThirdPartyMachineId, {
-        type: 'REDIRECT',
-        params: { strategy: 'saml' },
-      }),
+      actions: [
+        sendTo(ThirdPartyMachineId, {
+          type: 'REDIRECT',
+          params: { strategy: 'saml' },
+        }),
+        raise(() => ({ type: 'LOADING', strategy: 'saml' })),
+      ],
     },
     'NAVIGATE.PREVIOUS': '.Hist',
     'NAVIGATE.START': '.Start',
@@ -145,7 +148,9 @@ export const SignInRouterMachine = setup({
       actions: stopChild(({ event }) => event.id),
     },
     LOADING: {
-      actions: enqueueActions(() => {}),
+      actions: enqueueActions(({ event, enqueue }) => {
+        enqueue(() => console.log(event));
+      }),
     },
   },
   states: {

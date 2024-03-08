@@ -1,11 +1,7 @@
-import { useEffect } from 'react';
-
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import { useActiveTags } from '~/react/hooks/use-active-tags.hook';
 import { SignInStartCtx } from '~/react/sign-in/start';
 import { SignInFirstFactorCtx, SignInSecondFactorCtx } from '~/react/sign-in/verifications';
-
-import { SignInRouterCtx } from './context';
 
 export type LoadingProps =
   | {
@@ -22,14 +18,17 @@ export function Loading({ children, scope }: LoadingProps) {
   let firstFactorLoading = false;
   let secondFactorLoading = false;
 
+  /*
   const ref = SignInRouterCtx.useActorRef();
 
+  
   useEffect(() => {
     ref.subscribe(() => {
       const snap = ref.getPersistedSnapshot();
       console.log('snapshot', snap);
     });
   }, [ref]);
+  */
 
   // SignInRouterCtx.useSelector((state) => state
 
