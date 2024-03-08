@@ -322,6 +322,8 @@ type _LocalizationResource = {
       };
       passkeysSection: {
         title: LocalizationValue;
+        menuAction__rename: LocalizationValue;
+        menuAction__destructive: LocalizationValue;
       };
       mfaSection: {
         title: LocalizationValue;

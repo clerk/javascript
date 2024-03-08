@@ -159,20 +159,15 @@ const PasskeyInfo = (props: PasskeyResource) => {
 
 const ActiveDeviceMenu = ({ revoke }: { revoke: () => Promise<any> }) => {
   const { open } = useActionContext();
-  // @ts-ignore
   const actions = (
     [
       {
-        // TODO-PASSKEYS: Trigger a action with a form to rename
-        // @ts-ignore
-        label: 'Rename',
+        label: localizationKeys('userProfile.start.passkeysSection.menuAction__rename'),
         onClick: () => open('rename'),
       },
 
-      // TODO-PASSKEYS: Test deletion
       {
-        // @ts-ignore
-        label: 'Remove',
+        label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
         isDestructive: true,
         onClick: revoke,
       },

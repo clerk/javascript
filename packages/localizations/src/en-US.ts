@@ -728,6 +728,8 @@ export const enUS: LocalizationResource = {
       },
       passkeysSection: {
         title: 'Passkeys',
+        menuAction__rename: 'Rename',
+        menuAction__destructive: 'Remove',
       },
       phoneNumbersSection: {
         destructiveAction: 'Remove phone number',
