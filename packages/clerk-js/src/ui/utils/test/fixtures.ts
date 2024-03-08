@@ -100,6 +100,7 @@ const attributes = Object.freeze(
     'password',
     'authenticator_app',
     'backup_code',
+    'passkey',
   ]),
 );
 
