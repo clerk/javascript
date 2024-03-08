@@ -161,7 +161,7 @@ const OrganizationDomainsSection = () => {
                 sx={t => ({
                   paddingLeft: t.space.$9,
                 })}
-                colorScheme='neutral'
+                colorScheme='secondary'
               />
             </Col>
           </Action.Trigger>

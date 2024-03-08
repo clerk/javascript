@@ -82,7 +82,7 @@ const InvitationRow = (props: {
       <Td>{invitation.createdAt.toLocaleDateString()}</Td>
       <Td>
         <Text
-          colorScheme={'neutral'}
+          colorScheme='secondary'
           localizationKey={localizeCustomRole(invitation.role) || unlocalizedRoleLabel}
         />
       </Td>

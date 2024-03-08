@@ -205,7 +205,7 @@ export const RoleSelect = (props: {
             {prefixLocalizationKey && (
               <Text
                 as='span'
-                colorScheme='neutral'
+                colorScheme='secondary'
                 localizationKey={prefixLocalizationKey}
               />
             )}
@@ -245,7 +245,7 @@ const RolesListItem = memo((props: RolesListItemProps) => {
       ]}
       {...rest}
     >
-      <Text colorScheme='neutral'>{option?.label}</Text>
+      <Text colorScheme='secondary'>{option?.label}</Text>
     </Flex>
   );
 });

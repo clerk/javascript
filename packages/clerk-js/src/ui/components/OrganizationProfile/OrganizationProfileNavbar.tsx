@@ -4,7 +4,7 @@ import React from 'react';
 import { useProtect } from '../../common';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
-import { Breadcrumbs, NavBar, NavbarContextProvider } from '../../elements';
+import { NavBar, NavbarContextProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
 
@@ -39,15 +39,5 @@ export const OrganizationProfileNavbar = (
       />
       {props.children}
     </NavbarContextProvider>
-  );
-};
-
-export const OrganizationProfileBreadcrumbs = (props: Pick<PropsOfComponent<typeof Breadcrumbs>, 'title'>) => {
-  const { pages } = useOrganizationProfileContext();
-  return (
-    <Breadcrumbs
-      {...props}
-      pageToRootNavbarRoute={pages.pageToRootNavbarRouteMap}
-    />
   );
 };

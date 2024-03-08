@@ -66,7 +66,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
             {displayFormat == 'uri' && (
               <>
                 <Text
-                  colorScheme='neutral'
+                  colorScheme='secondary'
                   localizationKey={localizationKeys(
                     'userProfile.mfaTOTPPage.authenticatorApp.inputLabel__unableToScan1',
                   )}
@@ -75,7 +75,7 @@ export const AddAuthenticatorApp = withCardStateProvider((props: AddAuthenticato
                 <ClipboardInput value={totp.secret} />
 
                 <Text
-                  colorScheme='neutral'
+                  colorScheme='secondary'
                   localizationKey={localizationKeys(
                     'userProfile.mfaTOTPPage.authenticatorApp.inputLabel__unableToScan2',
                   )}

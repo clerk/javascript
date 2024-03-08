@@ -43,7 +43,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
       <Form.Root onSubmit={deleteUser}>
         <Col gap={1}>
           <Text
-            colorScheme='neutral'
+            colorScheme='secondary'
             localizationKey={localizationKeys('userProfile.deletePage.messageLine1')}
           />
           <Text

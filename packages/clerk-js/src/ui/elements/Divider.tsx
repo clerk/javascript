@@ -19,7 +19,7 @@ export const Divider = (props: DividerProps) => {
         localizationKey={!dividerText ? localizationKeys('dividerText') : dividerText}
         elementDescriptor={descriptors.dividerText}
         variant='body'
-        colorScheme='neutral'
+        colorScheme='secondary'
         sx={t => ({ margin: `0 ${t.space.$4}` })}
       />
       <DividerLine />

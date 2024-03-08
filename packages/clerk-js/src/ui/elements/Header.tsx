@@ -55,7 +55,7 @@ const Subtitle = React.memo((props: PropsOfComponent<typeof Text>): JSX.Element 
     <Text
       elementDescriptor={descriptors.headerSubtitle}
       variant='body'
-      colorScheme='neutral'
+      colorScheme='secondary'
       sx={[
         {
           wordWrap: 'break-word',

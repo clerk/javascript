@@ -84,7 +84,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                         <Text
                           truncate
                           as='span'
-                          colorScheme='neutral'
+                          colorScheme='secondary'
                         >
                           {label ? `• ${label}` : ''}
                         </Text>

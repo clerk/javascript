@@ -46,7 +46,7 @@ export const InputGroup = forwardRef<
     >
       {groupPrefix && (
         <Text
-          colorScheme='neutral'
+          colorScheme='secondary'
           sx={textProps}
         >
           {groupPrefix}
@@ -72,7 +72,7 @@ export const InputGroup = forwardRef<
       />
       {groupSuffix && (
         <Text
-          colorScheme='neutral'
+          colorScheme='secondary'
           sx={textProps}
         >
           {groupSuffix}

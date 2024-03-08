@@ -36,7 +36,7 @@ export const CalloutWithAction = (props: PropsWithChildren<CalloutWithActionProp
         />
         <Col gap={4}>
           <Text
-            colorScheme='neutral'
+            colorScheme='secondary'
             sx={textSx}
             localizationKey={text}
           >

@@ -350,13 +350,6 @@ export type ElementsConfig = {
   formattedPhoneNumberFlag: WithOptions;
   formattedPhoneNumberText: WithOptions;
 
-  breadcrumbs: WithOptions;
-  breadcrumbsItems: WithOptions;
-  breadcrumbsItemBox: WithOptions<'currentPage'>;
-  breadcrumbsItem: WithOptions<'currentPage'>;
-  breadcrumbsItemIcon: WithOptions<'currentPage'>;
-  breadcrumbsItemDivider: WithOptions;
-
   scrollBox: WithOptions;
 
   navbar: WithOptions;
@@ -382,9 +375,6 @@ export type ElementsConfig = {
 
   invitationsSentIconBox: WithOptions;
   invitationsSentIcon: WithOptions;
-
-  accordionTriggerButton: WithOptions;
-  accordionContent: WithOptions;
 
   qrCodeRow: WithOptions;
   qrCodeContainer: WithOptions;
