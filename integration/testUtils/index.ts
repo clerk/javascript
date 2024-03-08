@@ -8,6 +8,7 @@ import { createOrganizationSwitcherComponentPageObject } from './organizationSwi
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
 import { createSignUpComponentPageObject } from './signUpPageObject';
+import { createUserButtonPageObject } from './userButtonPageObject';
 import { createUserProfileComponentPageObject } from './userProfilePageObject';
 import type { FakeOrganization, FakeUser } from './usersService';
 import { createUserService } from './usersService';
@@ -69,6 +70,7 @@ export const createTestUtils = <
     signIn: createSignInComponentPageObject(testArgs),
     userProfile: createUserProfileComponentPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
+    userButton: createUserButtonPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
   };
 
