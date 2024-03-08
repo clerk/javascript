@@ -105,7 +105,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
   delete = async (): Promise<DeletedObjectResource> => {
     const json = (
       await BaseResource._fetch<DeletedObjectJSON>({
-        path: `${this.path()}/${this.id}`,
+        path: this.path(),
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;

@@ -762,6 +762,10 @@ export const enUS: LocalizationResource = {
     passkeyScreen: {
       title__rename: 'Rename Passkey',
       subtitle__rename: 'You can change the passkey name to make it easier to find.',
+      removeResource: {
+        title: 'Remove passkey',
+        messageLine1: '{{name}} will be removed from this account.',
+      },
     },
     web3WalletPage: {
       removeResource: {

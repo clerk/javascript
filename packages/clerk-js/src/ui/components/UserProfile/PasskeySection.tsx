@@ -18,6 +18,18 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
 import { getRelativeToNowDateKey, handleError, useFormControl } from '../../utils';
+import { RemovePasskeyForm } from './RemoveResourceForm';
+
+const RemovePasskeyScreen = (props: PasskeyScreenProps) => {
+  const { close } = useActionContext();
+  return (
+    <RemovePasskeyForm
+      onSuccess={close}
+      onReset={close}
+      {...props}
+    />
+  );
+};
 
 type PasskeyScreenProps = { passkey: PasskeyResource };
 
@@ -97,9 +109,10 @@ export const PasskeySection = () => {
                 {...passkey}
               />
 
-              {/*// TODO-PASSKEYS: Implement*/}
               <Action.Open value='remove'>
-                <Action.Card variant='destructive'>{/*<RemoveEmailScreen emailId={email.id} />*/}</Action.Card>
+                <Action.Card variant='destructive'>
+                  <RemovePasskeyScreen passkey={passkey} />
+                </Action.Card>
               </Action.Open>
 
               <Action.Open value='rename'>
@@ -127,7 +140,7 @@ const PasskeyItem = (props: PasskeyResource) => {
       }}
     >
       <PasskeyInfo {...props} />
-      <ActiveDeviceMenu revoke={props.delete} />
+      <ActiveDeviceMenu />
     </ProfileSection.Item>
   );
 };
@@ -157,22 +170,20 @@ const PasskeyInfo = (props: PasskeyResource) => {
   );
 };
 
-const ActiveDeviceMenu = ({ revoke }: { revoke: () => Promise<any> }) => {
+const ActiveDeviceMenu = () => {
   const { open } = useActionContext();
-  const actions = (
-    [
-      {
-        label: localizationKeys('userProfile.start.passkeysSection.menuAction__rename'),
-        onClick: () => open('rename'),
-      },
 
-      {
-        label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
-        isDestructive: true,
-        onClick: revoke,
-      },
-    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
-  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
+  const actions = [
+    {
+      label: localizationKeys('userProfile.start.passkeysSection.menuAction__rename'),
+      onClick: () => open('rename'),
+    },
+    {
+      label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
+      isDestructive: true,
+      onClick: () => open('remove'),
+    },
+  ] satisfies PropsOfComponent<typeof ThreeDotsMenu>['actions'];
 
   return <ThreeDotsMenu actions={actions} />;
 };

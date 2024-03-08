@@ -398,6 +398,10 @@ type _LocalizationResource = {
     passkeyScreen: {
       title__rename: LocalizationValue;
       subtitle__rename: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+      };
     };
     phoneNumberPage: {
       title: LocalizationValue;
