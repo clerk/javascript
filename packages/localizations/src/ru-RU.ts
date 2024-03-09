@@ -700,8 +700,8 @@ export const ruRU: LocalizationResource = {
         title: 'Подключенные аккаунты',
       },
       dangerSection: {
-        deleteAccountButton: 'Delete Account',
-        title: 'Account termination',
+        deleteAccountButton: 'Удалить аккаунт',
+        title: 'Удаление учетной записи',
       },
       emailAddressesSection: {
         destructiveAction: 'Удалить адрес электронной почты',
