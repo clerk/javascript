@@ -209,8 +209,8 @@ export const RemovePasskeyForm = (props: RemovePasskeyFormProps) => {
 
   return (
     <RemoveResourceForm
-      title={localizationKeys('userProfile.passkeyScreen.removeResource.title')}
-      messageLine1={localizationKeys('userProfile.passkeyScreen.removeResource.messageLine1', {
+      title={localizationKeys('userProfile.__experimental_passkeyScreen.removeResource.title')}
+      messageLine1={localizationKeys('userProfile.__experimental_passkeyScreen.removeResource.messageLine1', {
         name: passkey.name,
       })}
       deleteResource={passkey.delete}

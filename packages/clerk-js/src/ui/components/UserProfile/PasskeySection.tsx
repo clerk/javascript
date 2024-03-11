@@ -51,7 +51,7 @@ export const UpdatePasskeyForm = withCardStateProvider((props: UpdatePasskeyForm
 
   const passkeyNameField = useFormControl('passkeyName', passkey.name || '', {
     type: 'text',
-    label: localizationKeys('formFieldLabel__passkeyName'),
+    label: localizationKeys('__experimental_formFieldLabel__passkeyName'),
     isRequired: true,
   });
 
@@ -67,8 +67,8 @@ export const UpdatePasskeyForm = withCardStateProvider((props: UpdatePasskeyForm
 
   return (
     <FormContainer
-      headerTitle={localizationKeys('userProfile.passkeyScreen.title__rename')}
-      headerSubtitle={localizationKeys('userProfile.passkeyScreen.subtitle__rename')}
+      headerTitle={localizationKeys('userProfile.__experimental_passkeyScreen.title__rename')}
+      headerSubtitle={localizationKeys('userProfile.__experimental_passkeyScreen.subtitle__rename')}
     >
       <Form.Root onSubmit={addEmail}>
         <Form.ControlRow elementId={passkeyNameField.id}>
@@ -96,7 +96,7 @@ export const PasskeySection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.passkeysSection.title')}
+      title={localizationKeys('userProfile.start.__experimental_passkeysSection.title')}
       centered={false}
       id='passkeys'
     >
@@ -175,11 +175,11 @@ const ActiveDeviceMenu = () => {
 
   const actions = [
     {
-      label: localizationKeys('userProfile.start.passkeysSection.menuAction__rename'),
+      label: localizationKeys('userProfile.start.__experimental_passkeysSection.menuAction__rename'),
       onClick: () => open('rename'),
     },
     {
-      label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
+      label: localizationKeys('userProfile.start.__experimental_passkeysSection.menuAction__destructive'),
       isDestructive: true,
       onClick: () => open('remove'),
     },

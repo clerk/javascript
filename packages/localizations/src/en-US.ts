@@ -76,7 +76,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__role: 'Role',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
   formFieldLabel__username: 'Username',
-  formFieldLabel__passkeyName: 'Name of passkey',
+  __experimental_formFieldLabel__passkeyName: 'Name of passkey',
   impersonationFab: {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
@@ -726,7 +726,7 @@ export const enUS: LocalizationResource = {
         primaryButton__updatePassword: 'Update password',
         title: 'Password',
       },
-      passkeysSection: {
+      __experimental_passkeysSection: {
         title: 'Passkeys',
         menuAction__rename: 'Rename',
         menuAction__destructive: 'Remove',
@@ -759,7 +759,7 @@ export const enUS: LocalizationResource = {
       title__set: 'Set username',
       title__update: 'Update username',
     },
-    passkeyScreen: {
+    __experimental_passkeyScreen: {
       title__rename: 'Rename Passkey',
       subtitle__rename: 'You can change the passkey name to make it easier to find.',
       removeResource: {
