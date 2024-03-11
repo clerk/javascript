@@ -1,9 +1,9 @@
 import { parseError } from '@clerk/shared/error';
 import type {
+  __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions,
   ClerkAPIError,
   PasskeyVerificationResource,
   PublicKeyCredentialCreationOptionsJSON,
-  PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
   SignUpVerificationResource,
   SignUpVerificationsJSON,
@@ -58,7 +58,7 @@ export class Verification extends BaseResource implements VerificationResource {
 }
 
 export class PasskeyVerification extends Verification implements PasskeyVerificationResource {
-  publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null = null;
+  publicKey: __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions | null = null;
 
   constructor(data: VerificationJSON | null) {
     super(data);

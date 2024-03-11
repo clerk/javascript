@@ -1,5 +1,6 @@
 import { ClerkRuntimeError, deepSnakeToCamel, Poller } from '@clerk/shared';
 import type {
+  __experimental_PasskeyFactor,
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
   AuthenticateWithRedirectParams,
@@ -7,8 +8,6 @@ import type {
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
-  PassKeyConfig,
-  PasskeyFactor,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -84,7 +83,9 @@ export class SignIn extends BaseResource implements SignInResource {
   prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
     let config;
     switch (factor.strategy) {
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       case 'passkey':
+        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
         config = {} as PassKeyConfig;
         break;
       case 'email_link':
@@ -129,8 +130,10 @@ export class SignIn extends BaseResource implements SignInResource {
   attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
     let config;
     switch (attemptFactor.strategy) {
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       case 'passkey':
         config = {
+          // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
           publicKeyCredential: serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential),
         };
         break;
@@ -258,7 +261,7 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithPasskey = async (): Promise<SignInResource> => {
+  public __experimental_authenticateWithPasskey = async (): Promise<SignInResource> => {
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
@@ -270,15 +273,21 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     if (!this.firstFactorVerification.nonce) {
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
     }
 
-    const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
+    // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+    const passKeyFactor = this.supportedFirstFactors.find(
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      f => f.strategy === 'passkey',
+    ) as __experimental_PasskeyFactor;
 
     if (!passKeyFactor) {
       clerkVerifyPasskeyCalledBeforeCreate();
     }
 
+    // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
     await this.prepareFirstFactor(passKeyFactor);
 
     const { nonce } = this.firstFactorVerification;
@@ -301,6 +310,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     return this.attemptFirstFactor({
       publicKeyCredential,
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       strategy: 'passkey',
     });
   };

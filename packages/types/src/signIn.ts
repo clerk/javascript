@@ -8,9 +8,6 @@ import type {
   EmailLinkFactor,
   OAuthConfig,
   OauthFactor,
-  PasskeyAttempt,
-  PassKeyConfig,
-  PasskeyFactor,
   PasswordAttempt,
   PasswordFactor,
   PhoneCodeAttempt,
@@ -52,7 +49,6 @@ import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
-  PasskeyStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
   ResetPasswordEmailCodeStrategy,
@@ -94,7 +90,7 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithMetamask: () => Promise<SignInResource>;
 
-  authenticateWithPasskey: () => Promise<SignInResource>;
+  __experimental_authenticateWithPasskey: () => Promise<SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
@@ -119,7 +115,8 @@ export type SignInFirstFactor =
   | EmailLinkFactor
   | PhoneCodeFactor
   | PasswordFactor
-  | PasskeyFactor
+  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
+  // | __experimental_PasskeyFactor
   | ResetPasswordPhoneCodeFactor
   | ResetPasswordEmailCodeFactor
   | Web3SignatureFactor
@@ -142,14 +139,16 @@ export type PrepareFirstFactorParams =
   | EmailLinkConfig
   | PhoneCodeConfig
   | Web3SignatureConfig
-  | PassKeyConfig
+  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
+  // | __experimental_PassKeyConfig
   | ResetPasswordPhoneCodeFactorConfig
   | ResetPasswordEmailCodeFactorConfig
   | OAuthConfig
   | SamlConfig;
 
 export type AttemptFirstFactorParams =
-  | PasskeyAttempt
+  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
+  // | __experimental_PasskeyAttempt
   | EmailCodeAttempt
   | PhoneCodeAttempt
   | PasswordAttempt
@@ -177,7 +176,8 @@ export type SignInCreateParams = (
       password: string;
       identifier: string;
     }
-  | { strategy: PasskeyStrategy }
+  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
+  // | { strategy: __experimental_PasskeyStrategy }
   | {
       strategy:
         | PhoneCodeStrategy
@@ -208,7 +208,8 @@ export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams
 }
 
 export type SignInStrategy =
-  | PasskeyStrategy
+  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
+  // | __experimental_PasskeyStrategy
   | PasswordStrategy
   | ResetPasswordPhoneCodeStrategy
   | ResetPasswordEmailCodeStrategy

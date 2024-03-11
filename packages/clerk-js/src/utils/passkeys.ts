@@ -1,12 +1,12 @@
 import { isValidBrowser } from '@clerk/shared/browser';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
+  __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions,
+  __experimental_PublicKeyCredentialRequestOptionsWithoutExtensions,
+  __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   PublicKeyCredentialCreationOptionsJSON,
-  PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsJSON,
-  PublicKeyCredentialRequestOptionsWithoutExtensions,
-  PublicKeyCredentialWithAuthenticatorAssertionResponse,
-  PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/types';
 
 type CredentialReturn<T> =
@@ -19,8 +19,10 @@ type CredentialReturn<T> =
       error: ClerkWebAuthnError | Error;
     };
 
-type WebAuthnCreateCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>;
-type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>;
+type WebAuthnCreateCredentialReturn =
+  CredentialReturn<__experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse>;
+type WebAuthnGetCredentialReturn =
+  CredentialReturn<__experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse>;
 
 type ClerkWebAuthnErrorCode =
   | 'passkey_exists'
@@ -77,7 +79,7 @@ class Base64Converter {
 }
 
 async function webAuthnCreateCredential(
-  publicKeyOptions: PublicKeyCredentialCreationOptionsWithoutExtensions,
+  publicKeyOptions: __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions,
 ): Promise<WebAuthnCreateCredentialReturn> {
   try {
     // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.
@@ -102,7 +104,7 @@ async function webAuthnGetCredential({
   publicKeyOptions,
   conditionalUI,
 }: {
-  publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+  publicKeyOptions: __experimental_PublicKeyCredentialRequestOptionsWithoutExtensions;
   conditionalUI: boolean;
 }): Promise<WebAuthnGetCredentialReturn> {
   try {
@@ -169,7 +171,7 @@ function convertJSONToPublicKeyCreateOptions(jsonPublicKey: PublicKeyCredentialC
       ...jsonPublicKey.user,
       id: userIdBuffer,
     },
-  } as PublicKeyCredentialCreationOptionsWithoutExtensions;
+  } as __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions;
 }
 
 function convertJSONToPublicKeyRequestOptions(jsonPublicKey: PublicKeyCredentialRequestOptionsJSON) {
@@ -184,7 +186,7 @@ function convertJSONToPublicKeyRequestOptions(jsonPublicKey: PublicKeyCredential
     ...jsonPublicKey,
     allowCredentials: allowCredentialsWithBuffer,
     challenge: challengeBuffer,
-  } as PublicKeyCredentialRequestOptionsWithoutExtensions;
+  } as __experimental_PublicKeyCredentialRequestOptionsWithoutExtensions;
 }
 
 function __serializePublicKeyCredential<T extends Omit<PublicKeyCredential, 'getClientExtensionResults'>>(pkc: T) {
@@ -196,7 +198,7 @@ function __serializePublicKeyCredential<T extends Omit<PublicKeyCredential, 'get
   };
 }
 
-function serializePublicKeyCredential(pkc: PublicKeyCredentialWithAuthenticatorAttestationResponse) {
+function serializePublicKeyCredential(pkc: __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse) {
   const response = pkc.response;
   return {
     ...__serializePublicKeyCredential(pkc),
@@ -208,7 +210,9 @@ function serializePublicKeyCredential(pkc: PublicKeyCredentialWithAuthenticatorA
   };
 }
 
-function serializePublicKeyCredentialAssertion(pkc: PublicKeyCredentialWithAuthenticatorAssertionResponse) {
+function serializePublicKeyCredentialAssertion(
+  pkc: __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse,
+) {
   const response = pkc.response;
   return {
     ...__serializePublicKeyCredential(pkc),
@@ -250,5 +254,3 @@ export {
   serializePublicKeyCredential,
   serializePublicKeyCredentialAssertion,
 };
-
-export type { PublicKeyCredentialWithAuthenticatorAttestationResponse };

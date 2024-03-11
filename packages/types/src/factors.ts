@@ -1,10 +1,10 @@
-import type { PublicKeyCredentialWithAuthenticatorAssertionResponse } from './passkey';
+import type { __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse } from './passkey';
 import type {
+  __experimental_PasskeyStrategy,
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
   OAuthStrategy,
-  PasskeyStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
   ResetPasswordEmailCodeStrategy,
@@ -46,8 +46,11 @@ export type PasswordFactor = {
   strategy: PasswordStrategy;
 };
 
-export type PasskeyFactor = {
-  strategy: PasskeyStrategy;
+/**
+ * @experimental
+ */
+export type __experimental_PasskeyFactor = {
+  strategy: __experimental_PasskeyStrategy;
 };
 
 export type OauthFactor = {
@@ -91,7 +94,10 @@ export type EmailLinkConfig = Omit<EmailLinkFactor, 'safeIdentifier'> & {
 };
 export type PhoneCodeConfig = Omit<PhoneCodeFactor, 'safeIdentifier'>;
 export type Web3SignatureConfig = Web3SignatureFactor;
-export type PassKeyConfig = PasskeyFactor;
+/**
+ * @experimental
+ */
+export type __experimental_PassKeyConfig = __experimental_PasskeyFactor;
 export type OAuthConfig = OauthFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
@@ -122,9 +128,12 @@ export type PasswordAttempt = {
   password: string;
 };
 
-export type PasskeyAttempt = {
-  strategy: PasskeyStrategy;
-  publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse;
+/**
+ * @experimental
+ */
+export type __experimental_PasskeyAttempt = {
+  strategy: __experimental_PasskeyStrategy;
+  publicKeyCredential: __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse;
 };
 
 export type Web3Attempt = {
