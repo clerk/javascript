@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.70.4
+
+### Patch Changes
+
+- Fix: Component breaks after internal navigation when custom links are present. ([#2966](https://github.com/clerk/javascript/pull/2966)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.70.3
 
 ### Patch Changes
