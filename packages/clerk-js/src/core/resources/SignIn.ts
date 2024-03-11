@@ -31,7 +31,6 @@ import type {
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {
-  bufferToBase64Url,
   convertJSONToPublicKeyRequestOptions,
   isWebAuthnAutofillSupported,
   isWebAuthnSupported,
@@ -300,26 +299,8 @@ export class SignIn extends BaseResource implements SignInResource {
       throw error;
     }
 
-    const { id, rawId, type } = publicKeyCredential;
-    const response = publicKeyCredential.response;
-
-    const credential = {
-      id,
-      rawId: bufferToBase64Url(rawId),
-      type,
-      // clientExtensionResults: publicKeyCredential.getClientExtensionResults(),
-      authenticatorAttachment: publicKeyCredential.authenticatorAttachment,
-      response: {
-        authenticatorData: bufferToBase64Url(response.authenticatorData),
-        clientDataJSON: bufferToBase64Url(response.clientDataJSON),
-        signature: bufferToBase64Url(response.signature),
-        userHandle: response.userHandle ? bufferToBase64Url(response.userHandle) : null,
-      },
-    };
-
     return this.attemptFirstFactor({
-      // @ts-ignore
-      credential,
+      publicKeyCredential,
       strategy: 'passkey',
     });
   };
