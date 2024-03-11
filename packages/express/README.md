@@ -40,6 +40,7 @@ the <a href="https://clerk.com/docs/reference/express/getting-started?utm_source
 ### Prerequisites
 
 - Node.js `>=18.17.0` or later
+- Express installed (follow their [Getting started](https://expressjs.com/en/starter/installing.html) guide)
 
 ## Installation
 

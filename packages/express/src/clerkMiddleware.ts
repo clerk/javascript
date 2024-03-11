@@ -19,6 +19,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): RequestHan
   const shouldInitializeClerkClient = Object.keys(options).length > 0;
   const clerkClient = shouldInitializeClerkClient ? createClerkClient(options) : defaultClerkClient;
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
     const requestState = await authenticateRequest({
       clerkClient,

@@ -1,12 +1,15 @@
 import type { RequestHandler } from 'express';
 
-import { middlewareRequired } from './errors';
-import { defaultHandler, isAuthInRequest } from './utils';
+import { getAuth } from './getAuth';
+import { defaultHandler } from './utils';
 
 /**
+ * Middleware to protect requests for user authenticated or authorized requests.
+ * An HTTP 401 status code is returned for unauthenticated requests and it can receive
+ * a RequestHandler argument to support authorization checks (as shown in the 2nd example).
+ *
  * @example
  * router.get('/path', protect(), getHandler)
- * 
  * @example
  * hasPermission = (request, response, next) => {
     const auth = getAuth(request);
@@ -17,13 +20,12 @@ import { defaultHandler, isAuthInRequest } from './utils';
     return next();
   }
  * router.get('/path', protect(hasPermission), getHandler)
+ *
+ * @throws {Error} `clerkMiddleware` is required to be set in the middleware chain before this util is used.
  */
 export const protect = (handler?: RequestHandler): RequestHandler[] => {
   const protectMiddleware: RequestHandler = (request, response, next) => {
-    if (!isAuthInRequest(request)) {
-      throw new Error(middlewareRequired);
-    }
-    if (!request.auth.userId) {
+    if (!getAuth(request).userId) {
       response.status(401).send('Unauthorized');
       return;
     }

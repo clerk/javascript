@@ -7,8 +7,7 @@ const createErrorMessage = (msg: string) => {
   `;
 };
 
-export const middlewareRequired =
-  createErrorMessage(`The "clerkMiddleware" should be registered before using the "getAuth".
+export const middlewareRequired = createErrorMessage(`The "clerkMiddleware" should be registered before using "getAuth".
 Example:
 
 import express from 'express';
