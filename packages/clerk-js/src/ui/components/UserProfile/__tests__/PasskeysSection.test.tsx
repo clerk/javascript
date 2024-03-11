@@ -1,4 +1,4 @@
-import type { PasskeyJSON } from '@clerk/types';
+import type { PasskeyJSON, PasskeyResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import { act } from '@testing-library/react';
 
@@ -8,10 +8,6 @@ import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { PasskeySection } from '../PasskeySection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
-
-const initConfig = createFixtures.config(f => {
-  f.withUser({ username: 'clerkUser' });
-});
 
 const passkeys = [
   {
@@ -54,7 +50,7 @@ describe('PasskeySection', () => {
 
   describe('Add passkey', () => {
     it('renders add passkey button', async () => {
-      const { wrapper } = await createFixtures(initConfig);
+      const { wrapper } = await createFixtures(withPasskeys);
 
       const { getByRole, userEvent } = render(
         <CardStateProvider>
@@ -66,7 +62,7 @@ describe('PasskeySection', () => {
     });
 
     it('create a new passkey', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
+      const { wrapper, fixtures } = await createFixtures(withPasskeys);
 
       fixtures.clerk.user?.__experimental_createPasskey.mockReturnValueOnce(Promise.resolve({} as any));
       const { getByRole, userEvent } = render(
@@ -78,6 +74,55 @@ describe('PasskeySection', () => {
 
       await userEvent.click(getByRole('button', { name: 'Add a passkey' }));
       expect(fixtures.clerk.user?.__experimental_createPasskey).toHaveBeenCalled();
+    });
+  });
+
+  describe('Update a passkey', () => {
+    it('Renders the update screen', async () => {
+      const { wrapper } = await createFixtures(withPasskeys);
+
+      const { getByText, userEvent, getByRole } = render(
+        <CardStateProvider>
+          <PasskeySection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const item = getByText(passkeys[0].name);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      await userEvent.click(getByRole('menuitem', { name: /rename/i }));
+      await waitFor(() => getByRole('heading', { name: /Rename passkey/i }));
+      getByText('You can change the passkey name to make it easier to find.');
+    });
+
+    it('update the name of a new passkey', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPasskeys);
+
+      fixtures.clerk.user?.__experimental_passkeys[0].update.mockResolvedValue({} as PasskeyResource);
+      const { getByRole, userEvent, getByText, getByLabelText } = render(
+        <CardStateProvider>
+          <PasskeySection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const item = getByText(passkeys[0].name);
+      const menuButton = getMenuItemFromText(item);
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      await userEvent.click(getByRole('menuitem', { name: /rename/i }));
+      await waitFor(() => getByLabelText(/Name of Passkey/i));
+      expect(getByRole('button', { name: /save$/i })).toHaveAttribute('disabled');
+      await userEvent.type(getByLabelText(/Name of Passkey/i), 'os');
+      expect(getByRole('button', { name: /save$/i })).not.toHaveAttribute('disabled');
+      await userEvent.click(getByRole('button', { name: /save$/i }));
+      expect(fixtures.clerk.user?.__experimental_passkeys[0].update).toHaveBeenCalledWith({ name: 'Chrome on Macos' });
     });
   });
 
@@ -135,26 +180,6 @@ describe('PasskeySection', () => {
     });
 
     describe('Form buttons', () => {
-      it('save button is not disabled by default', async () => {
-        const { wrapper } = await createFixtures(withPasskeys);
-        const { getByRole, userEvent, getByText } = render(
-          <CardStateProvider>
-            <PasskeySection />
-          </CardStateProvider>,
-          { wrapper },
-        );
-
-        const item = getByText(passkeys[0].name);
-        const menuButton = getMenuItemFromText(item);
-        await act(async () => {
-          await userEvent.click(menuButton!);
-        });
-
-        await userEvent.click(getByRole('menuitem', { name: /remove/i }));
-        await waitFor(() => getByRole('heading', { name: /remove passkey/i }));
-        expect(getByRole('button', { name: /remove$/i })).not.toHaveAttribute('disabled');
-      });
-
       it('hides screen when when pressing cancel', async () => {
         const { wrapper } = await createFixtures(withPasskeys);
         const { getByRole, userEvent, getByText, queryByRole } = render(
