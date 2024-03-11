@@ -1,4 +1,5 @@
 import type { ClerkAPIError } from './api';
+import type { PublicKeyCredentialCreationOptionsWithoutExtensions } from './passkey';
 import type { ClerkResource } from './resource';
 
 export interface VerificationResource extends ClerkResource {
@@ -13,10 +14,6 @@ export interface VerificationResource extends ClerkResource {
   verifiedFromTheSameClient: () => boolean;
 }
 
-export type PublicKeyCredentialCreationOptionsWithoutExtensions = Omit<
-  Required<PublicKeyCredentialCreationOptions>,
-  'extensions'
->;
 export interface PasskeyVerificationResource extends VerificationResource {
   publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null;
 }

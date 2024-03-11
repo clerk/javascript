@@ -1,4 +1,4 @@
-import { deepSnakeToCamel, Poller } from '@clerk/shared';
+import { ClerkRuntimeError, deepSnakeToCamel, Poller } from '@clerk/shared';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -7,6 +7,8 @@ import type {
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
+  PassKeyConfig,
+  PasskeyFactor,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -28,12 +30,21 @@ import type {
 } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import {
+  bufferToBase64Url,
+  convertJSONToPublicKeyRequestOptions,
+  isWebAuthnAutofillSupported,
+  isWebAuthnSupported,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential,
+} from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
+  clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
@@ -74,6 +85,9 @@ export class SignIn extends BaseResource implements SignInResource {
   prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
     let config;
     switch (factor.strategy) {
+      case 'passkey':
+        config = {} as PassKeyConfig;
+        break;
       case 'email_link':
         config = {
           emailAddressId: factor.emailAddressId,
@@ -113,9 +127,20 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  attemptFirstFactor = (params: AttemptFirstFactorParams): Promise<SignInResource> => {
+  attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
+    let config;
+    switch (attemptFactor.strategy) {
+      case 'passkey':
+        config = {
+          publicKeyCredential: serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential),
+        };
+        break;
+      default:
+        config = { ...attemptFactor };
+    }
+
     return this._basePost({
-      body: params,
+      body: { ...config, strategy: attemptFactor.strategy },
       action: 'attempt_first_factor',
     });
   };
@@ -231,6 +256,71 @@ export class SignIn extends BaseResource implements SignInResource {
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
+    });
+  };
+
+  public authenticateWithPasskey = async (): Promise<SignInResource> => {
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+    if (!isWebAuthnSupported()) {
+      throw new ClerkRuntimeError('Passkeys are not supported', {
+        code: 'passkeys_unsupported',
+      });
+    }
+
+    if (!this.firstFactorVerification.nonce) {
+      await this.create({ strategy: 'passkey' });
+    }
+
+    const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
+
+    if (!passKeyFactor) {
+      clerkVerifyPasskeyCalledBeforeCreate();
+    }
+
+    await this.prepareFirstFactor(passKeyFactor);
+
+    const { nonce } = this.firstFactorVerification;
+    const publicKey = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+    if (!publicKey) {
+      // TODO-PASSKEYS: Implement this later
+      throw 'Missing key';
+    }
+
+    // Invoke the WebAuthn get() method.
+    const { publicKeyCredential, error } = await webAuthnGetCredential({
+      publicKeyOptions: publicKey,
+      conditionalUI: await isWebAuthnAutofillSupported(),
+    });
+
+    if (!publicKeyCredential) {
+      throw error;
+    }
+
+    const { id, rawId, type } = publicKeyCredential;
+    const response = publicKeyCredential.response;
+
+    const credential = {
+      id,
+      rawId: bufferToBase64Url(rawId),
+      type,
+      // clientExtensionResults: publicKeyCredential.getClientExtensionResults(),
+      authenticatorAttachment: publicKeyCredential.authenticatorAttachment,
+      response: {
+        authenticatorData: bufferToBase64Url(response.authenticatorData),
+        clientDataJSON: bufferToBase64Url(response.clientDataJSON),
+        signature: bufferToBase64Url(response.signature),
+        userHandle: response.userHandle ? bufferToBase64Url(response.userHandle) : null,
+      },
+    };
+
+    return this.attemptFirstFactor({
+      // @ts-ignore
+      credential,
+      strategy: 'passkey',
     });
   };
 

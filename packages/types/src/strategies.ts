@@ -1,6 +1,7 @@
 import type { OAuthProvider } from './oauth';
 import type { Web3Provider } from './web3';
 
+export type PasskeyStrategy = 'passkey';
 export type PasswordStrategy = 'password';
 export type PhoneCodeStrategy = 'phone_code';
 export type EmailCodeStrategy = 'email_code';

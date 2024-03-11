@@ -3,18 +3,15 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
+  PublicKeyCredentialRequestOptionsJSON,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
+  PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/types';
 
-type PublicKeyCredentialWithAuthenticatorAttestationResponse = Omit<
-  PublicKeyCredential,
-  'response' | 'getClientExtensionResults'
-> & {
-  response: Omit<AuthenticatorAttestationResponse, 'getAuthenticatorData' | 'getPublicKey' | 'getPublicKeyAlgorithm'>;
-};
-
-type WebAuthnCreateCredentialReturn =
+type CredentialReturn<T> =
   | {
-      publicKeyCredential: PublicKeyCredentialWithAuthenticatorAttestationResponse;
+      publicKeyCredential: T;
       error: null;
     }
   | {
@@ -22,7 +19,14 @@ type WebAuthnCreateCredentialReturn =
       error: ClerkWebAuthnError | Error;
     };
 
-type ClerkWebAuthnErrorCode = 'passkey_exists' | 'passkey_registration_cancelled' | 'passkey_credential_failed';
+type WebAuthnCreateCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>;
+type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>;
+
+type ClerkWebAuthnErrorCode =
+  | 'passkey_exists'
+  | 'passkey_registration_cancelled'
+  | 'passkey_credential_create_failed'
+  | 'passkey_credential_get_failed';
 
 function isWebAuthnSupported() {
   return (
@@ -83,7 +87,7 @@ async function webAuthnCreateCredential(
 
     if (!credential) {
       return {
-        error: new ClerkWebAuthnError('Browser failed to create credential', { code: 'passkey_credential_failed' }),
+        error: new ClerkWebAuthnError('Browser failed to create credential', { code: 'passkey_credential_get_failed' }),
         publicKeyCredential: null,
       };
     }
@@ -91,6 +95,36 @@ async function webAuthnCreateCredential(
     return { publicKeyCredential: credential, error: null };
   } catch (e) {
     return { error: handlePublicKeyCreateError(e), publicKeyCredential: null };
+  }
+}
+
+async function webAuthnGetCredential({
+  publicKeyOptions,
+  conditionalUI,
+}: {
+  publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+  conditionalUI: boolean;
+}): Promise<WebAuthnGetCredentialReturn> {
+  try {
+    // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.
+    const credential = (await navigator.credentials.get({
+      publicKey: publicKeyOptions,
+      mediation: conditionalUI ? 'conditional' : 'optional',
+    })) as PublicKeyCredential | null;
+
+    if (!credential) {
+      return {
+        error: new ClerkWebAuthnError('Browser failed to get credential', { code: 'passkey_credential_get_failed' }),
+        publicKeyCredential: null,
+      };
+    }
+
+    // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.
+    const res = credential.response as AuthenticatorAssertionResponse;
+
+    return { publicKeyCredential: { ...credential, response: res }, error: null };
+  } catch (e) {
+    return { error: handlePublicKeyGetError(e), publicKeyCredential: null };
   }
 }
 
@@ -102,6 +136,17 @@ function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRun
   if (error.name === 'InvalidStateError') {
     return new ClerkWebAuthnError(error.message, { code: 'passkey_exists' });
   } else if (error.name === 'NotAllowedError') {
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_registration_cancelled' });
+  }
+  return error;
+}
+
+/**
+ * Map webauthn errors from `navigator.credentials.get()` to Clerk-js errors
+ * @param error
+ */
+function handlePublicKeyGetError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
+  if (error.name === 'NotAllowedError') {
     return new ClerkWebAuthnError(error.message, { code: 'passkey_registration_cancelled' });
   }
   return error;
@@ -127,17 +172,51 @@ function convertJSONToPublicKeyCreateOptions(jsonPublicKey: PublicKeyCredentialC
   } as PublicKeyCredentialCreationOptionsWithoutExtensions;
 }
 
-function serializePublicKeyCredential(publicKeyCredential: PublicKeyCredentialWithAuthenticatorAttestationResponse) {
-  const response = publicKeyCredential.response;
+function convertJSONToPublicKeyRequestOptions(jsonPublicKey: PublicKeyCredentialRequestOptionsJSON) {
+  const challengeBuffer = base64UrlToBuffer(jsonPublicKey.challenge);
+
+  const allowCredentialsWithBuffer = (jsonPublicKey.allowCredentials || []).map(cred => ({
+    ...cred,
+    id: base64UrlToBuffer(cred.id),
+  }));
+
   return {
-    type: publicKeyCredential.type,
-    id: publicKeyCredential.id,
-    rawId: bufferToBase64Url(publicKeyCredential.rawId),
-    authenticatorAttachment: publicKeyCredential.authenticatorAttachment,
+    ...jsonPublicKey,
+    allowCredentials: allowCredentialsWithBuffer,
+    challenge: challengeBuffer,
+  } as PublicKeyCredentialRequestOptionsWithoutExtensions;
+}
+
+function __serializePublicKeyCredential<T extends Omit<PublicKeyCredential, 'getClientExtensionResults'>>(pkc: T) {
+  return {
+    type: pkc.type,
+    id: pkc.id,
+    rawId: bufferToBase64Url(pkc.rawId),
+    authenticatorAttachment: pkc.authenticatorAttachment,
+  };
+}
+
+function serializePublicKeyCredential(pkc: PublicKeyCredentialWithAuthenticatorAttestationResponse) {
+  const response = pkc.response;
+  return {
+    ...__serializePublicKeyCredential(pkc),
     response: {
       clientDataJSON: bufferToBase64Url(response.clientDataJSON),
       attestationObject: bufferToBase64Url(response.attestationObject),
       transports: response.getTransports(),
+    },
+  };
+}
+
+function serializePublicKeyCredentialAssertion(pkc: PublicKeyCredentialWithAuthenticatorAssertionResponse) {
+  const response = pkc.response;
+  return {
+    ...__serializePublicKeyCredential(pkc),
+    response: {
+      clientDataJSON: bufferToBase64Url(response.clientDataJSON),
+      authenticatorData: bufferToBase64Url(response.authenticatorData),
+      signature: bufferToBase64Url(response.signature),
+      userHandle: response.userHandle ? bufferToBase64Url(response.userHandle) : null,
     },
   };
 }
@@ -165,8 +244,11 @@ export {
   bufferToBase64Url,
   handlePublicKeyCreateError,
   webAuthnCreateCredential,
+  webAuthnGetCredential,
   convertJSONToPublicKeyCreateOptions,
+  convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredential,
+  serializePublicKeyCredentialAssertion,
 };
 
 export type { PublicKeyCredentialWithAuthenticatorAttestationResponse };

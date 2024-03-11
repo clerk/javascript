@@ -20,3 +20,27 @@ export interface PasskeyResource extends ClerkResource {
   update: (params: UpdatePasskeyParams) => Promise<PasskeyResource>;
   delete: () => Promise<DeletedObjectResource>;
 }
+
+export type PublicKeyCredentialCreationOptionsWithoutExtensions = Omit<
+  Required<PublicKeyCredentialCreationOptions>,
+  'extensions'
+>;
+
+export type PublicKeyCredentialRequestOptionsWithoutExtensions = Omit<
+  Required<PublicKeyCredentialRequestOptions>,
+  'extensions'
+>;
+
+export type PublicKeyCredentialWithAuthenticatorAttestationResponse = Omit<
+  PublicKeyCredential,
+  'response' | 'getClientExtensionResults'
+> & {
+  response: Omit<AuthenticatorAttestationResponse, 'getAuthenticatorData' | 'getPublicKey' | 'getPublicKeyAlgorithm'>;
+};
+
+export type PublicKeyCredentialWithAuthenticatorAssertionResponse = Omit<
+  PublicKeyCredential,
+  'response' | 'getClientExtensionResults'
+> & {
+  response: AuthenticatorAssertionResponse;
+};

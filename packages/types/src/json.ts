@@ -461,7 +461,7 @@ interface PublicKeyCredentialUserEntityJSON {
   id: Base64UrlString;
 }
 
-export interface ExcludedCredentialJSON {
+interface PublicKeyCredentialDescriptorJSON {
   type: 'public-key';
   id: Base64UrlString;
   transports?: ('ble' | 'hybrid' | 'internal' | 'nfc' | 'usb')[];
@@ -479,9 +479,17 @@ export interface PublicKeyCredentialCreationOptionsJSON {
   challenge: Base64UrlString;
   pubKeyCredParams: PublicKeyCredentialParameters[];
   timeout: number;
-  excludeCredentials: ExcludedCredentialJSON[];
+  excludeCredentials: PublicKeyCredentialDescriptorJSON[];
   authenticatorSelection: AuthenticatorSelectionCriteriaJSON;
   attestation: 'direct' | 'enterprise' | 'indirect' | 'none';
+}
+
+export interface PublicKeyCredentialRequestOptionsJSON {
+  allowCredentials: PublicKeyCredentialDescriptorJSON[];
+  challenge: Base64UrlString;
+  rpId: string;
+  timeout: number;
+  userVerification: 'discouraged' | 'preferred' | 'required';
 }
 
 // TODO-PASSKEYS: Decide if we are keeping this
