@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-sdk-node",
-  "version": "5.0.0-beta.28",
+  "version": "5.0.0-beta.29",
   "description": "Clerk server SDK for usage with node",
   "keywords": [
     "clerk",
@@ -53,7 +53,7 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/backend": "1.0.0-beta.27",
+    "@clerk/backend": "1.0.0-beta.28",
     "@clerk/shared": "2.0.0-beta.19",
     "camelcase-keys": "6.2.2",
     "snakecase-keys": "3.2.1"
