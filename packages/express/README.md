@@ -32,8 +32,8 @@
 
 <!-- TODO(express): Update express/getting-started link or create page -->
 
-[Clerk](https://clerk.com?utm_source=github&utm_medium=express) is the easiest way to add authentication and user management to your Node.js application. To gain a better understanding of the Clerk Backend API and SDK, refer to
-the <a href="https://clerk.com/docs/reference/express/getting-started?utm_source=github&utm_medium=express" target="_blank">Node SDK</a> and <a href="https://clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
+[Clerk](https://clerk.com?utm_source=github&utm_medium=express) is the easiest way to add authentication and user management to your Node.js application. To gain a better understanding of the Express SDK and Clerk Backend API, refer to
+the <a href="https://clerk.com/docs/reference/express/getting-started?utm_source=github&utm_medium=express" target="_blank">Express SDK</a> and <a href="https://clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
 
 ## Getting started
 
