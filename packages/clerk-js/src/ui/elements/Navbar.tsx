@@ -118,6 +118,9 @@ export const NavBar = (props: NavBarProps) => {
 
   useEffect(() => {
     routes.every(route => {
+      if (route.external) {
+        return true;
+      }
       const isRoot = router.currentPath === router.fullPath && route.path === '/';
       const matchesPath = router.matches(route.path);
       if (isRoot || matchesPath) {
