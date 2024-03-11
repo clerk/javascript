@@ -1,6 +1,5 @@
 export * from './rootAuthLoader';
 export * from './getAuth';
-export { getClerkDebugHeaders } from './utils';
 
 /**
  * Re-export resource types from @clerk/backend

@@ -15,12 +15,7 @@ import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
-import {
-  decorateRequest,
-  decorateResponseWithObservabilityHeaders,
-  handleMultiDomainAndProxy,
-  setRequestHeadersOnNextResponse,
-} from './utils';
+import { decorateRequest, handleMultiDomainAndProxy, setRequestHeadersOnNextResponse } from './utils';
 
 const CONTROL_FLOW_ERROR = {
   FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
@@ -79,8 +74,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      const res = new Response(null, { status: 307, headers: requestState.headers });
-      return decorateResponseWithObservabilityHeaders(res, requestState);
+      return new Response(null, { status: 307, headers: requestState.headers });
     } else if (requestState.status === AuthStatus.Handshake) {
       throw new Error('Clerk: handshake status without redirect');
     }

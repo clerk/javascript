@@ -15,12 +15,7 @@ import { redirectToSignIn } from './redirectHelpers';
 import type { RouteMatcherParam } from './routeMatcher';
 import { createRouteMatcher } from './routeMatcher';
 import type { NextMiddlewareReturn } from './types';
-import {
-  apiEndpointUnauthorizedNextResponse,
-  decorateRequest,
-  decorateResponseWithObservabilityHeaders,
-  setRequestHeadersOnNextResponse,
-} from './utils';
+import { apiEndpointUnauthorizedNextResponse, decorateRequest, setRequestHeadersOnNextResponse } from './utils';
 
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
@@ -184,10 +179,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     const locationHeader = requestState.headers.get('location');
     if (locationHeader) {
       // triggering a handshake redirect
-      return decorateResponseWithObservabilityHeaders(
-        new Response(null, { status: 307, headers: requestState.headers }),
-        requestState,
-      );
+      return new Response(null, { status: 307, headers: requestState.headers });
     }
 
     if (requestState.status === AuthStatus.Handshake) {
