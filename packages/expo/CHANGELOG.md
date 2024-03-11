@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.0.0-beta.34
+
+### Patch Changes
+
+- Update `expo-auth-session` dependency from 5.0.2 to 5.4.0 and `expo-web-browser` from 12.3.2 to 12.8.2 ([#2938](https://github.com/clerk/javascript/pull/2938)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`141f09fdc`](https://github.com/clerk/javascript/commit/141f09fdc897f94f3fbcdf8d10442489307e032c), [`fe6215dea`](https://github.com/clerk/javascript/commit/fe6215deaf44d35a31f760283fc6cfa451845e98), [`5db6dbb90`](https://github.com/clerk/javascript/commit/5db6dbb90dc0e5a5836ad6279787525d66eefb02)]:
+  - @clerk/clerk-js@5.0.0-beta.34
+
 ## 1.0.0-beta.33
 
 ### Patch Changes
