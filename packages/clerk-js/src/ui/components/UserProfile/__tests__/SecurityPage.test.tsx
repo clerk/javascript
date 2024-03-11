@@ -85,7 +85,7 @@ describe('SecurityPage', () => {
     getByText(/^Last used:/);
   });
 
-  it.skip('shows the active devices of the user and has appropriate buttons', async () => {
+  it('shows the active devices of the user and has appropriate buttons', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withSocialProvider({ provider: 'google' });
       f.withUser({

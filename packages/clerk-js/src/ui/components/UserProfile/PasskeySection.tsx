@@ -78,7 +78,7 @@ export const UpdatePasskeyForm = withCardStateProvider((props: UpdatePasskeyForm
           />
         </Form.ControlRow>
         <FormButtons
-          submitLabel={localizationKeys('userProfile.formButtonPrimary__add')}
+          submitLabel={localizationKeys('userProfile.formButtonPrimary__save')}
           isDisabled={!canSubmit}
           onReset={onReset}
         />
