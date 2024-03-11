@@ -151,7 +151,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
-            card.setError(error.longMessage);
+            card.setError(error);
             break;
           default:
             // Error from server may be too much information for the end user, so set a generic error
