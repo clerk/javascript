@@ -76,6 +76,7 @@ export const enUS: LocalizationResource = {
   formFieldLabel__role: 'Role',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
   formFieldLabel__username: 'Username',
+  __experimental_formFieldLabel__passkeyName: 'Name of passkey',
   impersonationFab: {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
@@ -725,6 +726,11 @@ export const enUS: LocalizationResource = {
         primaryButton__updatePassword: 'Update password',
         title: 'Password',
       },
+      __experimental_passkeysSection: {
+        title: 'Passkeys',
+        menuAction__rename: 'Rename',
+        menuAction__destructive: 'Remove',
+      },
       phoneNumbersSection: {
         destructiveAction: 'Remove phone number',
         detailsAction__nonPrimary: 'Set as primary',
@@ -752,6 +758,14 @@ export const enUS: LocalizationResource = {
       successMessage: 'Your username has been updated.',
       title__set: 'Set username',
       title__update: 'Update username',
+    },
+    __experimental_passkeyScreen: {
+      title__rename: 'Rename Passkey',
+      subtitle__rename: 'You can change the passkey name to make it easier to find.',
+      removeResource: {
+        title: 'Remove passkey',
+        messageLine1: '{{name}} will be removed from this account.',
+      },
     },
     web3WalletPage: {
       removeResource: {

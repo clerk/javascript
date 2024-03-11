@@ -6,6 +6,7 @@ import { Card, Header, useCardState, withCardStateProvider } from '../../element
 import { ActiveDevicesSection } from './ActiveDevicesSection';
 import { DeleteSection } from './DeleteSection';
 import { MfaSection } from './MfaSection';
+import { PasskeySection } from './PasskeySection';
 import { PasswordSection } from './PasswordSection';
 import { getSecondFactors } from './utils';
 
@@ -14,6 +15,7 @@ export const SecurityPage = withCardStateProvider(() => {
   const card = useCardState();
   const { user } = useUser();
   const showPassword = instanceIsPasswordBased;
+  const showPasskey = attributes.passkey.enabled;
   const showMfa = getSecondFactors(attributes).length > 0;
   const showDelete = user?.deleteSelfEnabled;
 
@@ -35,6 +37,7 @@ export const SecurityPage = withCardStateProvider(() => {
         </Header.Root>
         <Card.Alert>{card.error}</Card.Alert>
         {showPassword && <PasswordSection />}
+        {showPasskey && <PasskeySection />}
         {showMfa && <MfaSection />}
         <ActiveDevicesSection />
         {showDelete && <DeleteSection />}

@@ -27,6 +27,7 @@ describe('SecurityPage', () => {
     await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
     expect(queryByText(/^password/i)).not.toBeInTheDocument();
     expect(queryByText(/^Two-step verification/i)).not.toBeInTheDocument();
+    expect(queryByText(/^passkeys/i)).not.toBeInTheDocument();
   });
 
   it('renders the Password section if instance is password based', async () => {
@@ -54,6 +55,34 @@ describe('SecurityPage', () => {
 
     const { getByText } = render(<SecurityPage />, { wrapper });
     await waitFor(() => getByText('Two-step verification'));
+  });
+
+  it('renders the Passkeys section if instance supports it', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        passkeys: [
+          {
+            object: 'passkey',
+            id: '1234',
+            name: 'Chrome on Mac',
+            created_at: Date.now(),
+            last_used_at: Date.now(),
+            verification: null,
+            updated_at: Date.now(),
+            credential_id: 'some_id',
+          },
+        ],
+      });
+      f.withPasskey();
+    });
+    fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
+
+    const { getByText } = render(<SecurityPage />, { wrapper });
+    await waitFor(() => getByText('Passkeys'));
+    getByText('Chrome on Mac');
+    getByText(/^Created:/);
+    getByText(/^Last used:/);
   });
 
   it('shows the active devices of the user and has appropriate buttons', async () => {
