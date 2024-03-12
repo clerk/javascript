@@ -5,8 +5,8 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
-test.describe('sign up and sign in with email code', () => {
-  const configs = [];
+test.describe('sign up and sign in with email code @generic', () => {
+  const configs = [appConfigs.next.appRouter, appConfigs.react.vite];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {
