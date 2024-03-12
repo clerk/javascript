@@ -8,8 +8,8 @@ export type FakeOrganization = ReturnType<ReturnType<Awaited<typeof createUserSe
 
 export const createUserService = (clerkClient: ReturnType<typeof Clerk>) => {
   const self = {
-    createFakeUser: () => {
-      const email = `clerkcookie+${hash()}@mailsac.com`;
+    createFakeUser: (testMode = false) => {
+      const email = testMode ? `${hash()}+clerk_test@example.com` : `clerkcookie+${hash()}@mailsac.com`;
       return {
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
