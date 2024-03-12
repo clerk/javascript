@@ -56,6 +56,39 @@ export type { VerifyTokenOptions } from './tokens/verify';
 export type { WebhookEvent, WebhookEventType } from './api/resources';
 
 /**
+ * JSON types
+ */
+export type {
+  ClerkResourceJSON,
+  TokenJSON,
+  AllowlistIdentifierJSON,
+  ClientJSON,
+  EmailJSON,
+  EmailAddressJSON,
+  ExternalAccountJSON,
+  IdentificationLinkJSON,
+  InvitationJSON,
+  OauthAccessTokenJSON,
+  OrganizationJSON,
+  OrganizationInvitationJSON,
+  PublicOrganizationDataJSON,
+  OrganizationMembershipJSON,
+  OrganizationMembershipPublicUserDataJSON,
+  PhoneNumberJSON,
+  RedirectUrlJSON,
+  SessionJSON,
+  SignInJSON,
+  SignInTokenJSON,
+  SignUpJSON,
+  SMSMessageJSON,
+  UserJSON,
+  VerificationJSON,
+  Web3WalletJSON,
+  DeletedObjectJSON,
+  PaginatedResponseJSON,
+} from './api/resources/JSON';
+
+/**
  * Resources
  */
 export type {
