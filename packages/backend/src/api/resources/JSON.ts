@@ -327,3 +327,31 @@ export interface PaginatedResponseJSON {
   data: object[];
   total_count?: number;
 }
+
+export interface SamlConnectionJSON extends ClerkResourceJSON {
+  name: string;
+  domain: string;
+  idp_entity_id: string;
+  idp_sso_url: string;
+  idp_certificate: string;
+  idp_metadata_url: string;
+  acs_url: string;
+  sp_entity_id: string;
+  sp_metadata_url: string;
+  active: boolean;
+  provider: string;
+  user_count: number;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+  created_at: number;
+  updated_at: number;
+  attribute_mapping: AttributeMappingJSON;
+}
+
+export interface AttributeMappingJSON extends ClerkResourceJSON {
+  user_id: string;
+  email_address: string;
+  first_name: string;
+  last_name: string;
+}
