@@ -1,4 +1,3 @@
-import { withOrganizationsEnabledGuard } from '../../common';
 import { withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
@@ -20,6 +19,4 @@ const _OrganizationList = () => {
 
 const AuthenticatedRoutes = withCoreUserGuard(OrganizationListPage);
 
-export const OrganizationList = withOrganizationsEnabledGuard(_OrganizationList, 'OrganizationList', {
-  mode: 'redirect',
-});
+export const OrganizationList = _OrganizationList;

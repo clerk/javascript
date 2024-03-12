@@ -24,7 +24,7 @@ const warnings = {
   cannotRenderAnyOrganizationComponent: createMessageForDisabledOrganizations,
   cannotOpenUserProfile:
     'The UserProfile modal cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
-  cannotOpenSignUpOrSignUp:
+  cannotOpenSignInOrSignUp:
     'The SignIn or SignUp modals do not render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, this is no-op.',
 };
 
