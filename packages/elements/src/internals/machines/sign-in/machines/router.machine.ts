@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup, spawnChild, stopChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, sendTo, setup, spawnChild, stopChild } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
@@ -115,7 +115,6 @@ export const SignInRouterMachine = setup({
             strategy: event.strategy,
           },
         })),
-        raise(({ event }) => ({ type: 'LOADING', strategy: 'oauth', provider: event.strategy })),
       ],
     },
     'AUTHENTICATE.SAML': {
@@ -124,7 +123,6 @@ export const SignInRouterMachine = setup({
           type: 'REDIRECT',
           params: { strategy: 'saml' },
         }),
-        raise(() => ({ type: 'LOADING', strategy: 'saml' })),
       ],
     },
     'NAVIGATE.PREVIOUS': '.Hist',
@@ -161,6 +159,9 @@ export const SignInRouterMachine = setup({
             clerk: event.clerk,
             router: event.router,
             signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
+            loading: {
+              value: false,
+            },
           })),
           target: 'Init',
         },

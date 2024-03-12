@@ -1,6 +1,6 @@
 import type { SignInResource } from '@clerk/types';
 import type { ActorRefFrom } from 'xstate';
-import { fromPromise, sendParent, sendTo, setup } from 'xstate';
+import { fromPromise, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
@@ -66,6 +66,7 @@ export const SignInStartMachine = setup({
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
+      entry: ({ context }) => context.parent.send({ type: 'LOADING', value: true, step: 'start' }),
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -75,17 +76,8 @@ export const SignInStartMachine = setup({
         }),
         onDone: {
           actions: [
-            sendParent({ type: 'NEXT' }),
-            sendParent(({ event }) => {
-              const signInResource = event.output;
-              const firstFactorStrategy = signInResource.firstFactorVerification.strategy;
-
-              return {
-                type: 'LOADING',
-                step: 'start',
-                strategy: firstFactorStrategy ? firstFactorStrategy : 'identifier',
-              };
-            }),
+            ({ context }) => context.parent.send({ type: 'NEXT' }),
+            ({ context }) => context.parent.send({ type: 'LOADING', value: false }),
           ],
         },
         onError: {

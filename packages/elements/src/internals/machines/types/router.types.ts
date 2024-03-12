@@ -13,7 +13,12 @@ export type BaseRouterPrevEvent = { type: 'NAVIGATE.PREVIOUS' };
 export type BaseRouterStartEvent = { type: 'NAVIGATE.START' };
 export type BaseRouterErrorEvent = { type: 'ERROR'; error: Error };
 export type BaseRouterTransferEvent = { type: 'TRANSFER' };
-export type BaseRouterLoadingEvent = { type: 'LOADING' };
+export type BaseRouterLoadingEvent = {
+  type: 'LOADING';
+  value: boolean;
+  step?: 'start' | 'verifications' | 'choose-strategy';
+  strategy?: OAuthStrategy;
+};
 
 export type BaseRouterRouteRegisterEvent<TSystemId extends string, TLogic extends AnyActorLogic = AnyActorLogic> = {
   type: 'ROUTE.REGISTER';

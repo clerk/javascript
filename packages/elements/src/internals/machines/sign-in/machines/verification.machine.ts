@@ -109,6 +109,12 @@ const SignInVerificationMachine = setup({
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
+      entry: sendParent(({ context }) => ({
+        type: 'LOADING',
+        value: true,
+        step: 'verifications',
+        strategy: context.currentFactor?.strategy,
+      })),
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -120,19 +126,7 @@ const SignInVerificationMachine = setup({
         onDone: {
           actions: [
             sendParent(({ event }) => ({ type: 'NEXT', resource: event.output })),
-            sendParent(({ event, context }) => {
-              console.log({ context, event });
-              const signInResource = event.output;
-              // When an attempt for the first factor is made, firstFactorStrategy will be defined. If an attempt for the second factor is made, both will be defined
-              const firstFactorStrategy = signInResource.firstFactorVerification.strategy;
-              const secondFactorStrategy = signInResource.secondFactorVerification.strategy;
-
-              return {
-                type: 'LOADING',
-                step: 'verifications',
-                strategy: secondFactorStrategy ? secondFactorStrategy : firstFactorStrategy,
-              };
-            }),
+            sendParent({ type: 'LOADING', value: false }),
           ],
         },
         onError: {

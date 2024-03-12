@@ -87,6 +87,7 @@ export type SignInRouterEvents =
 
 export interface SignInRouterContext extends BaseRouterContext {
   signUpPath: string;
+  loading: Omit<BaseRouterLoadingEvent, 'type'>;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

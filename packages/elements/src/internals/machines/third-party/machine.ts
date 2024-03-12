@@ -26,12 +26,15 @@ export const ThirdPartyMachine = setup({
         error: event.error,
       });
     },
-    assignActiveStrategy: assign({
-      activeStrategy: ({ event }) => {
-        assertEvent(event, 'REDIRECT');
-        return event.params.strategy;
-      },
-    }),
+    assignActiveStrategy: ({ event, context }) => {
+      assertEvent(event, 'REDIRECT');
+      assign({
+        activeStrategy: ({ event }) => {
+          return event.params.strategy;
+        },
+      });
+      context.parent.send({ type: 'LOADING', value: true, strategy: event.params.strategy });
+    },
     unassignActiveStrategy: assign({
       activeStrategy: null,
     }),
@@ -85,6 +88,9 @@ export const ThirdPartyMachine = setup({
             },
             parent: context.parent,
           };
+        },
+        onDone: {
+          actions: [({ context }) => context.parent.send({ type: 'LOADING', value: false })],
         },
         onError: {
           actions: 'reportError',
