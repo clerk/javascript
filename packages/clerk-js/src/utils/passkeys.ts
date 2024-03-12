@@ -79,7 +79,7 @@ async function webAuthnCreateCredential(
     // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.
     const credential = (await navigator.credentials.create({
       publicKey: publicKeyOptions,
-    })) as PublicKeyCredential | null;
+    })) as PublicKeyCredentialWithAuthenticatorAttestationResponse | null;
 
     if (!credential) {
       return {
@@ -88,10 +88,7 @@ async function webAuthnCreateCredential(
       };
     }
 
-    // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.
-    const res = credential.response as AuthenticatorAttestationResponse;
-
-    return { publicKeyCredential: { ...credential, response: res }, error: null };
+    return { publicKeyCredential: credential, error: null };
   } catch (e) {
     return { error: handlePublicKeyCreateError(e), publicKeyCredential: null };
   }
