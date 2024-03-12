@@ -10,7 +10,8 @@ import type {
   WithAuthProp,
 } from './types';
 
-/*
+export * from '@clerk/backend';
+/**
  * The order of these exports is important, as we want Clerk from clerk/sdk-node
  * to shadow the Clerk export from clerk/backend, because it needs to support
  * 2 additional apis: clerk.expressWithAuth, clerk.expressRequireAuth
