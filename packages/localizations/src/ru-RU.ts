@@ -375,8 +375,7 @@ export const ruRU: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Сбросить пароль',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Ваш пароль успешно изменен. Выполняется вход, подождите.',
       title: 'Сбросить пароль',
     },

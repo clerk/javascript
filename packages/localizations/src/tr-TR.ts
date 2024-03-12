@@ -371,8 +371,7 @@ export const trTR: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Şifremi sıfırla',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Şifreniz başarıyla sıfırlandı. Oturumunuz açılıyor...',
       title: 'Şifre sıfırlama',
     },

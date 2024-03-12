@@ -148,7 +148,7 @@ describe('ResetPassword', () => {
       } as SignInResource);
       const { userEvent } = render(<ResetPassword />, { wrapper });
 
-      expect(screen.queryByText(/account already exists/i)).toBeInTheDocument();
+      expect(screen.queryByText('For security reasons, it is required to reset your password.')).toBeInTheDocument();
       expect(screen.queryByRole('checkbox', { name: /sign out of all other devices/i })).not.toBeInTheDocument();
       await userEvent.type(screen.getByLabelText(/New password/i), 'testtest');
       await userEvent.type(screen.getByLabelText(/Confirm password/i), 'testtest');

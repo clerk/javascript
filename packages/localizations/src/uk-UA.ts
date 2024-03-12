@@ -371,8 +371,7 @@ export const ukUA: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Скинути пароль',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Ваш пароль успішно змінено. Виконується вхід, зачекайте.',
       title: 'Скинути пароль',
     },

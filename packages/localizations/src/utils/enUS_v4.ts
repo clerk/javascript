@@ -165,8 +165,7 @@ export const enUS_v4: any = {
       title: 'Reset Password',
       formButtonPrimary: 'Reset Password',
       successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
     },
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
