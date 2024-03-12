@@ -119,6 +119,7 @@ export interface InvitationJSON extends ClerkResourceJSON {
 }
 
 export interface OauthAccessTokenJSON {
+  external_account_id: string;
   object: typeof ObjectType.OauthAccessToken;
   token: string;
   provider: string;

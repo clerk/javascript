@@ -212,5 +212,40 @@ export default (QUnit: QUnit) => {
         }),
       );
     });
+
+    test('successfully retrieves user access tokens from backend API for a specific provider', async assert => {
+      const fakeResponse = [
+        {
+          external_account_id: 'eac_2dYS7stz9bgxQsSRvNqEAHhuxvW',
+          object: 'oauth_access_token',
+          token: '<token>',
+          provider: 'oauth_google',
+          public_metadata: {},
+          label: null,
+          scopes: ['email', 'profile'],
+        },
+      ];
+
+      fakeFetch = sinon.stub(runtime, 'fetch');
+      fakeFetch.onCall(0).returns(jsonOk(fakeResponse));
+
+      const response = await apiClient.users.getUserOauthAccessToken('user_deadbeef', 'oauth_google');
+
+      assert.equal(response[0].externalAccountId, 'eac_2dYS7stz9bgxQsSRvNqEAHhuxvW');
+      assert.equal(response[0].provider, 'oauth_google');
+      assert.equal(response[0].token, '<token>');
+      assert.deepEqual(response[0].scopes, ['email', 'profile']);
+
+      assert.ok(
+        fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef/oauth_access_tokens/oauth_google', {
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer deadbeef',
+            'Content-Type': 'application/json',
+            'User-Agent': '@clerk/backend@0.0.0-test',
+          },
+        }),
+      );
+    });
   });
 };
