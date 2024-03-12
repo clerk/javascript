@@ -134,7 +134,7 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'passkey':
         config = {
           // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-          publicKeyCredential: serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential),
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
         };
         break;
       default:
