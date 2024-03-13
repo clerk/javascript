@@ -54,9 +54,31 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
           instance => `${instance.file}:${instance.position.line}:${instance.position.column}`,
         );
 
+        const singleBorderStyle = {
+          topLeft: ' ',
+          top: '─',
+          topRight: ' ',
+          left: '',
+          bottomLeft: ' ',
+          bottom: '─',
+          bottomRight: ' ',
+          right: '',
+        };
+
+        const doubleBorderStyle = {
+          topLeft: ' ',
+          top: '═',
+          topRight: ' ',
+          left: '',
+          bottomLeft: ' ',
+          bottom: '═',
+          bottomRight: ' ',
+          right: '',
+        };
+
         memo.push(
           <Box
-            borderStyle={item.focused ? 'double' : 'single'}
+            borderStyle={item.focused ? doubleBorderStyle : singleBorderStyle}
             flexDirection='column'
             borderColor={item.focused ? 'blue' : 'white'}
             paddingX={1}
