@@ -62,8 +62,14 @@ const SignInVerificationMachine = setup({
         };
       },
     ),
-    sendToNext: ({ context }, { resource }: { resource: DoneActorEvent<SignInResource>["output"] }) => context.parent.send({ type: 'NEXT', resource }),
-    setLoading: ({ context }, { status }: { status: 'entry' | 'exit' }) => context.parent.send({ type: 'LOADING', value: status === 'entry' ? true : false, ...(status === 'entry' && { step: 'verifications', strategy: context.currentFactor?.strategy }) })
+    sendToNext: ({ context }, { resource }: { resource: DoneActorEvent<SignInResource>['output'] }) =>
+      context.parent.send({ type: 'NEXT', resource }),
+    setLoading: ({ context }, { status }: { status: 'entry' | 'exit' }) =>
+      context.parent.send({
+        type: 'LOADING',
+        value: status === 'entry' ? true : false,
+        ...(status === 'entry' && { step: 'verifications', strategy: context.currentFactor?.strategy }),
+      }),
   },
   types: {} as SignInVerificationSchema,
 }).createMachine({
@@ -114,7 +120,7 @@ const SignInVerificationMachine = setup({
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
-      entry:             {
+      entry: {
         type: 'setLoading',
         params: {
           status: 'entry',
@@ -141,11 +147,19 @@ const SignInVerificationMachine = setup({
               params: {
                 status: 'exit',
               },
-            }
+            },
           ],
         },
         onError: {
-          actions: 'setFormErrors',
+          actions: [
+            'setFormErrors',
+            {
+              type: 'setLoading',
+              params: {
+                status: 'exit',
+              },
+            },
+          ],
           target: 'Pending',
         },
       },

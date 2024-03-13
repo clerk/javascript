@@ -47,7 +47,12 @@ export const SignInStartMachine = setup({
       },
     ),
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
-    setLoading: ({ context }, { status }: { status: 'entry' | 'exit' }) => context.parent.send({ type: 'LOADING', value: status === 'entry' ? true : false, ...(status === 'entry' && { step: 'start' }) })
+    setLoading: ({ context }, { status }: { status: 'entry' | 'exit' }) =>
+      context.parent.send({
+        type: 'LOADING',
+        value: status === 'entry' ? true : false,
+        ...(status === 'entry' && { step: 'start' }),
+      }),
   },
   types: {} as SignInStartSchema,
 }).createMachine({
@@ -74,8 +79,8 @@ export const SignInStartMachine = setup({
       entry: {
         type: 'setLoading',
         params: {
-          status: 'entry'
-        }
+          status: 'entry',
+        },
       },
       invoke: {
         id: 'attempt',
@@ -90,13 +95,21 @@ export const SignInStartMachine = setup({
             {
               type: 'setLoading',
               params: {
-                status: 'exit'
-              }
+                status: 'exit',
+              },
             },
           ],
         },
         onError: {
-          actions: 'setFormErrors',
+          actions: [
+            'setFormErrors',
+            {
+              type: 'setLoading',
+              params: {
+                status: 'exit',
+              },
+            },
+          ],
           target: 'Pending',
         },
       },
