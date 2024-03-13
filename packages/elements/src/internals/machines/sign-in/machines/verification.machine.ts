@@ -11,8 +11,8 @@ import type {
   SignInSecondFactor,
   Web3Attempt,
 } from '@clerk/types';
-import type { ActorRefFrom } from 'xstate';
-import { assign, fromPromise, sendParent, sendTo, setup } from 'xstate';
+import type { ActorRefFrom, DoneActorEvent } from 'xstate';
+import { assign, fromPromise, sendTo, setup } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
@@ -62,6 +62,8 @@ const SignInVerificationMachine = setup({
         };
       },
     ),
+    sendToNext: ({ context }, { resource }: { resource: DoneActorEvent<SignInResource>["output"] }) => context.parent.send({ type: 'NEXT', resource }),
+    setLoading: ({ context }, { status }: { status: 'entry' | 'exit' }) => context.parent.send({ type: 'LOADING', value: status === 'entry' ? true : false, ...(status === 'entry' && { step: 'verifications', strategy: context.currentFactor?.strategy }) })
   },
   types: {} as SignInVerificationSchema,
 }).createMachine({
@@ -95,7 +97,10 @@ const SignInVerificationMachine = setup({
       description: 'Waiting for user input',
       on: {
         'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
-        SUBMIT: 'Attempting',
+        SUBMIT: {
+          target: 'Attempting',
+          reenter: true,
+        },
       },
     },
     ChooseStrategy: {
@@ -109,12 +114,12 @@ const SignInVerificationMachine = setup({
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
-      entry: sendParent(({ context }) => ({
-        type: 'LOADING',
-        value: true,
-        step: 'verifications',
-        strategy: context.currentFactor?.strategy,
-      })),
+      entry:             {
+        type: 'setLoading',
+        params: {
+          status: 'entry',
+        },
+      },
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -125,8 +130,18 @@ const SignInVerificationMachine = setup({
         }),
         onDone: {
           actions: [
-            sendParent(({ event }) => ({ type: 'NEXT', resource: event.output })),
-            sendParent({ type: 'LOADING', value: false }),
+            {
+              type: 'sendToNext',
+              params({ event }) {
+                return { resource: event.output };
+              },
+            },
+            {
+              type: 'setLoading',
+              params: {
+                status: 'exit',
+              },
+            }
           ],
         },
         onError: {

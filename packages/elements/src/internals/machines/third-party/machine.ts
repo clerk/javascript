@@ -38,6 +38,7 @@ export const ThirdPartyMachine = setup({
     unassignActiveStrategy: assign({
       activeStrategy: null,
     }),
+    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
   },
   types: {} as ThirdPartyMachineSchema,
 }).createMachine({
@@ -112,7 +113,7 @@ export const ThirdPartyMachine = setup({
       },
       on: {
         'CLERKJS.NAVIGATE.*': {
-          actions: sendParent({ type: 'NEXT' }),
+          actions: 'sendToNext',
         },
       },
     },

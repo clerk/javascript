@@ -16,12 +16,6 @@ import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
-/*
-{
-  loading: boolean | { step: StepName; provider: SignInProvider, strategy: SignInStrategy };
-}
-*/
-
 const isCurrentPath =
   (path: `/${string}`) =>
   ({ context }: { context: SignInRouterContext }, _params?: NonReducibleUnknown) =>
@@ -146,9 +140,13 @@ export const SignInRouterMachine = setup({
       actions: stopChild(({ event }) => event.id),
     },
     LOADING: {
-      actions: enqueueActions(({ event, enqueue }) => {
-        enqueue(() => console.log(event));
-      }),
+      actions: assign(({ event }) => ({
+        loading: {
+          value: event.value,
+          step: event.step,
+          strategy: event.strategy,
+        }
+      })),
     },
   },
   states: {

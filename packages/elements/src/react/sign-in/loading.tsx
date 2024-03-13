@@ -1,36 +1,34 @@
+import { useSelector } from "@xstate/react";
+import * as React from "react"
+import type { SnapshotFrom } from "xstate";
+
 import { ClerkElementsRuntimeError } from '~/internals/errors';
+import type { TSignInRouterMachine } from "~/internals/machines/sign-in/machines";
+import { matchLoadingScope } from "~/internals/machines/utils/loading";
 import { useActiveTags } from '~/react/hooks/use-active-tags.hook';
 import { SignInStartCtx } from '~/react/sign-in/start';
 import { SignInFirstFactorCtx, SignInSecondFactorCtx } from '~/react/sign-in/verifications';
 
-export type LoadingProps =
-  | {
-      scope: 'start' | 'verifications' | 'choose-strategy';
-      children: (isLoading: { isLoading: boolean }) => React.ReactNode;
-    }
-  | {
-      scope: 'global';
-      children: (isGlobalLoading: { isGlobalLoading: boolean }) => React.ReactNode;
-    };
+import { SignInRouterCtx } from "./context";
+
+const loadingSelector = (state: SnapshotFrom<TSignInRouterMachine>) => state.context.loading
+
+type LoadingScope = 'start' | 'verifications' | 'choose-strategy' | 'global';
+
+export type LoadingProps = {
+  scope: LoadingScope;
+  children: (isLoading: { isLoading: boolean }) => React.ReactNode;
+}
 
 export function Loading({ children, scope }: LoadingProps) {
   let startLoading = false;
   let firstFactorLoading = false;
   let secondFactorLoading = false;
 
-  /*
-  const ref = SignInRouterCtx.useActorRef();
+  const routerRef = SignInRouterCtx.useActorRef();
+  const loadingDetails = useSelector(routerRef, loadingSelector)
 
-  
-  useEffect(() => {
-    ref.subscribe(() => {
-      const snap = ref.getPersistedSnapshot();
-      console.log('snapshot', snap);
-    });
-  }, [ref]);
-  */
-
-  // SignInRouterCtx.useSelector((state) => state
+  const isScopeLoading = React.useCallback((scope: LoadingScope) => (scope ? matchLoadingScope(scope, loadingDetails) : false), [loadingDetails])
 
   const startRef = SignInStartCtx.useActorRef(true);
   if (startRef) {
@@ -57,7 +55,7 @@ export function Loading({ children, scope }: LoadingProps) {
     case 'choose-strategy':
       return children({ isLoading: firstFactorLoading });
     case 'global':
-      return children({ isGlobalLoading });
+      return children({ isLoading: isGlobalLoading });
     default:
       throw new ClerkElementsRuntimeError(
         `Invalid scope. Use 'start', 'verifications', 'choose-strategy', or 'global'.`,

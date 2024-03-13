@@ -1,6 +1,6 @@
 // ---------------------------------- Events ---------------------------------- //
 
-import type { ClerkResource, LoadedClerk, OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
+import type { ClerkResource, LoadedClerk, OAuthStrategy, SamlStrategy, SignInStrategy, Web3Strategy } from '@clerk/types';
 import type { AnyActorLogic, InputFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
@@ -17,7 +17,7 @@ export type BaseRouterLoadingEvent = {
   type: 'LOADING';
   value: boolean;
   step?: 'start' | 'verifications' | 'choose-strategy';
-  strategy?: OAuthStrategy;
+  strategy?: SignInStrategy;
 };
 
 export type BaseRouterRouteRegisterEvent<TSystemId extends string, TLogic extends AnyActorLogic = AnyActorLogic> = {

@@ -46,6 +46,8 @@ export const SignInStartMachine = setup({
         };
       },
     ),
+    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    setLoading: ({ context }, { status }: { status: 'entry' | 'exit' }) => context.parent.send({ type: 'LOADING', value: status === 'entry' ? true : false, ...(status === 'entry' && { step: 'start' }) })
   },
   types: {} as SignInStartSchema,
 }).createMachine({
@@ -61,12 +63,20 @@ export const SignInStartMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
-        SUBMIT: 'Attempting',
+        SUBMIT: {
+          target: 'Attempting',
+          reenter: true,
+        },
       },
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
-      entry: ({ context }) => context.parent.send({ type: 'LOADING', value: true, step: 'start' }),
+      entry: {
+        type: 'setLoading',
+        params: {
+          status: 'entry'
+        }
+      },
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -76,8 +86,13 @@ export const SignInStartMachine = setup({
         }),
         onDone: {
           actions: [
-            ({ context }) => context.parent.send({ type: 'NEXT' }),
-            ({ context }) => context.parent.send({ type: 'LOADING', value: false }),
+            'sendToNext',
+            {
+              type: 'setLoading',
+              params: {
+                status: 'exit'
+              }
+            },
           ],
         },
         onError: {
