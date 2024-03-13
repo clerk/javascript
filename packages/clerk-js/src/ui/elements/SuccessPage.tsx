@@ -37,7 +37,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
             <Text
               key={t.key}
               localizationKey={t}
-              colorScheme='neutral'
+              colorScheme='secondary'
               sx={t => ({
                 display: 'inline',
                 ':not(:last-of-type)': {
@@ -49,7 +49,7 @@ export const SuccessPage = (props: SuccessPageProps) => {
         ) : (
           <Text
             localizationKey={text}
-            colorScheme='neutral'
+            colorScheme='secondary'
           />
         )}
       </Col>

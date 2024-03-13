@@ -79,7 +79,7 @@ const RowInformation = (props: RowInfoProps) => {
         elementId={descriptors.paginationRowText?.setId('displaying')}
         sx={t => ({ opacity: t.opacity.$inactive })}
         localizationKey={localizationKeys('paginationRowText__displaying')}
-        colorScheme='neutral'
+        colorScheme='secondary'
       />{' '}
       <Text
         as='span'
@@ -117,7 +117,7 @@ const shouldShowDots = (currentPage: number, pageToShow: number, siblingCount: n
 
 const ThreeDots = () => (
   <Flex center>
-    <Text colorScheme='neutral'>...</Text>
+    <Text colorScheme='secondary'>...</Text>
   </Flex>
 );
 

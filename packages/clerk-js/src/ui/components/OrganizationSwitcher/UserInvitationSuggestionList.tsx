@@ -57,7 +57,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   if (props.status === 'accepted') {
     return (
       <Text
-        colorScheme='neutral'
+        colorScheme='secondary'
         localizationKey={localizationKeys('organizationSwitcher.suggestionsAcceptedLabel')}
       />
     );

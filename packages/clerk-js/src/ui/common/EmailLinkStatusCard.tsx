@@ -71,7 +71,7 @@ const StatusRow = (props: { status: VerificationStatus }) => {
           <StatusIcon status={props.status} />
           <Text
             elementDescriptor={descriptors.verificationLinkStatusText}
-            colorScheme='neutral'
+            colorScheme='secondary'
             localizationKey={localizationKeys('signIn.emailLink.unusedTab.title')}
           />
         </>

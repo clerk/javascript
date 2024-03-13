@@ -49,7 +49,7 @@ export const RadioLabel = (props: {
       {props.description && (
         <Text
           elementDescriptor={descriptors.formFieldRadioLabelDescription}
-          colorScheme='neutral'
+          colorScheme='secondary'
           localizationKey={props.description}
         />
       )}

@@ -33,7 +33,7 @@ export const CardActionText = (props: React.PropsWithChildren<any>): JSX.Element
       {...props}
       as='span'
       variant='body'
-      colorScheme='neutral'
+      colorScheme='secondary'
     />
   );
 };

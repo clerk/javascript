@@ -49,7 +49,7 @@ export const ErrorCard = (props: ErrorCardProps) => {
           >
             {props.message && (
               <Text
-                colorScheme='neutral'
+                colorScheme='secondary'
                 localizationKey={props.message}
               />
             )}

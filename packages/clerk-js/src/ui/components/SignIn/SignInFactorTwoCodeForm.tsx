@@ -109,7 +109,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       {isResettingPassword(signIn) && (
         <Text
           localizationKey={localizationKeys('signIn.resetPasswordMfa.detailsLabel')}
-          colorScheme='neutral'
+          colorScheme='secondary'
         />
       )}
     </VerificationCodeCard>

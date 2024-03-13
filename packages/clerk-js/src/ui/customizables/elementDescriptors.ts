@@ -225,13 +225,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formattedPhoneNumberFlag',
   'formattedPhoneNumberText',
 
-  'breadcrumbs',
-  'breadcrumbsItems',
-  'breadcrumbsItemBox',
-  'breadcrumbsItem',
-  'breadcrumbsItemIcon',
-  'breadcrumbsItemDivider',
-
   'scrollBox',
 
   'navbar',
@@ -258,9 +251,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'invitationsSentIconBox',
   'invitationsSentIcon',
 
-  'accordionTriggerButton',
-  'accordionContent',
-
   'qrCodeRow',
   'qrCodeContainer',
 
@@ -269,8 +259,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'buttonArrowIcon',
   'providerIcon',
   'spinner',
-  // Decide if we want to keep the keys as camel cased in HTML as well,
-  // if yes, refactor and remove the .map(camelize) method
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

@@ -52,7 +52,7 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
         <Text
           localizationKey={subtitle}
           variant='caption'
-          colorScheme='neutral'
+          colorScheme='secondary'
         />
       </Col>
       <Box

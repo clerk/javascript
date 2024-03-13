@@ -15,11 +15,11 @@ const { applyVariants, filterProps } = createVariants(theme => {
     variants: {
       variant: common.textVariants(theme),
       colorScheme: {
-        primary: { color: theme.colors.$colorText },
+        body: { color: theme.colors.$colorText },
         onPrimaryBg: { color: theme.colors.$colorTextOnPrimaryBackground },
         danger: { color: theme.colors.$danger500 },
         success: { color: theme.colors.$success500 },
-        neutral: { color: theme.colors.$colorTextSecondary },
+        secondary: { color: theme.colors.$colorTextSecondary },
         inherit: { color: 'inherit' },
       },
       truncate: {

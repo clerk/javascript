@@ -116,7 +116,7 @@ const AddMfa = (props: AddMfaProps) => {
             ? 'userProfile.mfaPhoneCodePage.subtitle__availablePhoneNumbers'
             : 'userProfile.mfaPhoneCodePage.subtitle__unavailablePhoneNumbers',
         )}
-        colorScheme='neutral'
+        colorScheme='secondary'
       />
       {availableMethods.length > 0 && (
         <Col gap={2}>
