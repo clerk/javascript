@@ -174,13 +174,13 @@ export function _SignInStart(): JSX.Element {
         ticket: organizationTicket,
       })
       .then(res => {
-        removeClerkQueryParam('__clerk_ticket');
         switch (res.status) {
           case 'needs_first_factor':
             return navigate('factor-one');
           case 'needs_second_factor':
             return navigate('factor-two');
           case 'complete':
+            removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
               session: res.createdSessionId,
               beforeEmit: navigateAfterSignIn,
