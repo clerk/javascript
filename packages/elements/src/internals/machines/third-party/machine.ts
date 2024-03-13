@@ -8,7 +8,7 @@ import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 import { handleRedirectCallback, redirect } from './actors';
 import type { ThirdPartyMachineSchema } from './types';
 
-export const ThirdPartyMachineId: string = 'ThirdParty';
+export const ThirdPartyMachineId = 'ThirdParty';
 
 export type TThirdPartyMachine = typeof ThirdPartyMachine;
 

@@ -1,6 +1,13 @@
 // ---------------------------------- Events ---------------------------------- //
 
-import type { ClerkResource, LoadedClerk, OAuthStrategy, SamlStrategy, SignInStrategy, Web3Strategy } from '@clerk/types';
+import type {
+  ClerkResource,
+  LoadedClerk,
+  OAuthStrategy,
+  SamlStrategy,
+  SignInStrategy,
+  Web3Strategy,
+} from '@clerk/types';
 import type { AnyActorLogic, InputFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
@@ -16,7 +23,7 @@ export type BaseRouterTransferEvent = { type: 'TRANSFER' };
 export type BaseRouterLoadingEvent = {
   type: 'LOADING';
   value: boolean;
-  step?: 'start' | 'verifications' | 'choose-strategy';
+  step?: 'start' | 'verifications';
   strategy?: SignInStrategy;
 };
 
