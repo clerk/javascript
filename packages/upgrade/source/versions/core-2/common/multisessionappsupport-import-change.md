@@ -1,6 +1,6 @@
 ---
 title: '`MultisessionAppSupport` import moved to `/internal`'
-matcher: "import\\s+{[\\s\\S]*?MutliSessionAppSupport[\\s\\S]*?from\\s+['\"]@clerk\\/clerk-react[\\s\\S]*?['\"]"
+matcher: "import\\s+{[\\s\\S]*?MutliSessionAppSupport[\\s\\S]*?from\\s+['\"]@clerk\\/clerk-react(?!\/internal)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 ---
 

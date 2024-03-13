@@ -49,5 +49,5 @@ render(
     disableTelemetry={cli.flags.disableTelemetry}
   />,
   // if having issues with errors being swallowed, uncomment this
-  // { debug: true }
+  // { debug: true },
 );

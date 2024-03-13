@@ -78,8 +78,8 @@ export default function App({
         <>
           <Text>
             <Text color='blue'>Hello friend!</Text> We're excited to help you upgrade Clerk
-            {fromVersion ? ` from v${fromVersion}` : ''}
-            {toVersion ? ` to v${toVersion}` : ''}. Before we get started, a couple questions...
+            {fromVersion ? ` from ${fromVersion}` : ''}
+            {toVersion ? ` to ${toVersion}` : ''}. Before we get started, a couple questions...
           </Text>
           <Newline />
         </>

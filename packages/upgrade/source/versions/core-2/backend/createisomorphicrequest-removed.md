@@ -1,6 +1,6 @@
 ---
 title: '`createIsomorphicRequest` import moved to `/internal`'
-matcher: "import\\s+{[\\s\\S]*?createIsomorphicRequest[\\s\\S]*?}\\s+from\\s+['\"]@clerk\/(backend)['\"]"
+matcher: "import\\s+{[\\s\\S]*?createIsomorphicRequest[\\s\\S]*?}\\s+from\\s+['\"]@clerk\/(backend)(?!\/internal)['\"]"
 replaceWithString: 'backend/internal'
 matcherFlags: 'm'
 category: 'import-paths'
