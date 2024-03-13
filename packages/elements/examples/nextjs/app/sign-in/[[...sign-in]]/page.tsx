@@ -81,9 +81,9 @@ export default function SignInPage() {
             </Link>
           </p>
         </div>
-        <div>
+        <div className='absolute top-4 right-4'>
           <Loading scope='global'>
-            {({ isLoading }) => <span>Global: {JSON.stringify(isLoading, null, 2)}</span>}
+            {({ isLoading }) => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}
           </Loading>
         </div>
 

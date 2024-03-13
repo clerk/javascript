@@ -44,7 +44,7 @@ export function Loading({ children, scope }: LoadingProps) {
   const isChooseStrategyLoading = isLoading && isChooseStrategyStep;
   const isStrategyLoading = isLoading && step === undefined && strategy !== undefined;
 
-  let returnValue = isLoading;
+  let returnValue: boolean;
 
   if (scope === 'global') {
     returnValue = isLoading;
