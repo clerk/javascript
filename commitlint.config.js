@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-env es6 */
 const glob = require('glob');
 const fs = require('fs');
 
