@@ -1,64 +1,65 @@
-import { useSelector } from "@xstate/react";
-import * as React from "react"
-import type { SnapshotFrom } from "xstate";
+import type { OAuthProvider, SamlStrategy, SignInStrategy } from '@clerk/types';
+import type * as React from 'react';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import type { TSignInRouterMachine } from "~/internals/machines/sign-in/machines";
-import { matchLoadingScope } from "~/internals/machines/utils/loading";
-import { useActiveTags } from '~/react/hooks/use-active-tags.hook';
-import { SignInStartCtx } from '~/react/sign-in/start';
-import { SignInFirstFactorCtx, SignInSecondFactorCtx } from '~/react/sign-in/verifications';
+import { ActiveTagsMode, useActiveTags } from '~/react/hooks/use-active-tags.hook';
 
-import { SignInRouterCtx } from "./context";
+import { useLoading } from '../hooks/use-loading.hook';
+import { SignInRouterCtx } from './context';
 
-const loadingSelector = (state: SnapshotFrom<TSignInRouterMachine>) => state.context.loading
+type Steps = 'start' | 'verifications' | 'choose-strategy';
+type Strategy = OAuthProvider | SamlStrategy | 'metamask';
+type LoadingScope = 'global' | `step:${Steps}` | `provider:${Strategy}`;
 
-type LoadingScope = 'start' | 'verifications' | 'choose-strategy' | 'global';
-
-export type LoadingProps = {
+type LoadingProps = {
   scope: LoadingScope;
   children: (isLoading: { isLoading: boolean }) => React.ReactNode;
+};
+
+function mapScopeToStrategy(scope: Extract<LoadingScope, `provider:${string}`>): SignInStrategy {
+  if (scope === 'provider:metamask') {
+    return 'web3_metamask_signature';
+  }
+
+  if (scope === 'provider:saml') {
+    return 'saml';
+  }
+
+  const scopeWithoutPrefix = scope.replace('provider:', '') as OAuthProvider;
+
+  return `oauth_${scopeWithoutPrefix}`;
 }
 
 export function Loading({ children, scope }: LoadingProps) {
-  let startLoading = false;
-  let firstFactorLoading = false;
-  let secondFactorLoading = false;
-
   const routerRef = SignInRouterCtx.useActorRef();
-  const loadingDetails = useSelector(routerRef, loadingSelector)
+  const [isLoading, { step, strategy }] = useLoading(routerRef);
+  const isChooseStrategyStep = useActiveTags(
+    routerRef,
+    ['route:first-factor', 'route:choose-strategy'],
+    ActiveTagsMode.all,
+  );
 
-  const isScopeLoading = React.useCallback((scope: LoadingScope) => (scope ? matchLoadingScope(scope, loadingDetails) : false), [loadingDetails])
+  const isStartLoading = isLoading && step === 'start';
+  const isVerificationsLoading = isLoading && step === 'verifications';
+  const isChooseStrategyLoading = isLoading && isChooseStrategyStep;
+  const isStrategyLoading = isLoading && step === undefined && strategy !== undefined;
 
-  const startRef = SignInStartCtx.useActorRef(true);
-  if (startRef) {
-    startLoading = useActiveTags(startRef, 'state:loading');
+  let returnValue = isLoading;
+
+  if (scope === 'global') {
+    returnValue = isLoading;
+  } else if (scope === 'step:start') {
+    returnValue = isStartLoading;
+  } else if (scope === 'step:verifications') {
+    returnValue = isVerificationsLoading;
+  } else if (scope === 'step:choose-strategy') {
+    returnValue = isChooseStrategyLoading;
+  } else if (scope.startsWith('provider:')) {
+    const computedStrategy = mapScopeToStrategy(scope);
+    returnValue = isStrategyLoading && strategy === computedStrategy;
+  } else {
+    throw new ClerkElementsRuntimeError(`Invalid scope used for <Loading>`);
   }
 
-  const firstFactorRef = SignInFirstFactorCtx.useActorRef(true);
-  if (firstFactorRef) {
-    firstFactorLoading = useActiveTags(firstFactorRef, 'state:loading');
-  }
-
-  const secondFactorRef = SignInSecondFactorCtx.useActorRef(true);
-  if (secondFactorRef) {
-    secondFactorLoading = useActiveTags(secondFactorRef, 'state:loading');
-  }
-
-  const isGlobalLoading = startLoading || firstFactorLoading || secondFactorLoading;
-
-  switch (scope) {
-    case 'start':
-      return children({ isLoading: startLoading });
-    case 'verifications':
-      return children({ isLoading: firstFactorLoading || secondFactorLoading });
-    case 'choose-strategy':
-      return children({ isLoading: firstFactorLoading });
-    case 'global':
-      return children({ isLoading: isGlobalLoading });
-    default:
-      throw new ClerkElementsRuntimeError(
-        `Invalid scope. Use 'start', 'verifications', 'choose-strategy', or 'global'.`,
-      );
-  }
+  return children({ isLoading: returnValue });
 }

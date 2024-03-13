@@ -32,7 +32,9 @@ function CustomSocialProvider({
       <SocialProviderIcon
         className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
       />
-      <span className='leading-loose'>{children}</span>
+      <Loading scope={`provider:${provider}`}>
+        {({ isLoading }) => <span className='leading-loose'>{isLoading ? 'Loading...' : children}</span>}
+      </Loading>
     </SocialProvider>
   );
 }
@@ -81,14 +83,11 @@ export default function SignInPage() {
         </div>
         <div>
           <Loading scope='global'>
-            {({ isGlobalLoading }) => <span>Global: {JSON.stringify(isGlobalLoading, null, 2)} - </span>}
+            {({ isLoading }) => <span>Global: {JSON.stringify(isLoading, null, 2)}</span>}
           </Loading>
         </div>
 
         <Step name='start'>
-          <Loading scope='start'>
-            {({ isLoading }) => <span>Start: {JSON.stringify(isLoading, null, 2)} - </span>}
-          </Loading>
           <div className='flex flex-col items-center  gap-12 w-96'>
             <GlobalError className='block text-red-400 font-mono' />
 
@@ -112,7 +111,11 @@ export default function SignInPage() {
                   <FieldError className='block text-red-400 font-mono w-full' />
                 </Field>
 
-                <CustomSubmit>Sign in with Email</CustomSubmit>
+                <CustomSubmit>
+                  <Loading scope='step:start'>
+                    {({ isLoading }) => (isLoading ? 'Loading...' : 'Sign in with Email')}
+                  </Loading>
+                </CustomSubmit>
               </>
             ) : (
               <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
@@ -121,9 +124,6 @@ export default function SignInPage() {
         </Step>
 
         <Step name='choose-strategy'>
-          <Loading scope='choose-strategy'>
-            {({ isLoading }) => <span>ChooseStrategy: {JSON.stringify(isLoading, null, 2)} - </span>}
-          </Loading>
           <div className='flex flex-col items-center  gap-6 w-96'>
             <H3>CHOOSE STRATEGY:</H3>
 
@@ -169,51 +169,52 @@ export default function SignInPage() {
         </Step>
 
         <Step name='verifications'>
-          <Loading scope='verifications'>
-            {({ isLoading }) => <span>Verifications: {JSON.stringify(isLoading, null, 2)}</span>}
+          <Loading scope='step:verifications'>
+            {({ isLoading }) => (
+              <div className='flex gap-6 flex-col'>
+                <GlobalError className='block text-red-400 font-mono' />
+
+                <Verification name='password'>
+                  <CustomField
+                    label='Password'
+                    name='password'
+                  />
+
+                  <CustomSubmit>{isLoading ? 'Loading...' : 'Verify'}</CustomSubmit>
+                </Verification>
+
+                <Verification name='email_code'>
+                  <CustomField
+                    // eslint-disable-next-line jsx-a11y/no-autofocus
+                    autoFocus
+                    autoSubmit
+                    label='Email Code'
+                    name='code'
+                  />
+
+                  <CustomSubmit>{isLoading ? 'Loading...' : 'Verify'}</CustomSubmit>
+                </Verification>
+
+                <Verification name='phone_code'>
+                  <CustomField
+                    // eslint-disable-next-line jsx-a11y/no-autofocus
+                    autoFocus
+                    autoSubmit
+                    label='Phone Code'
+                    name='code'
+                  />
+
+                  <CustomSubmit>{isLoading ? 'Loading...' : 'Verify'}</CustomSubmit>
+                </Verification>
+
+                <Verification name='reset_password_email_code'>
+                  <H3>Verify your email</H3>
+
+                  <P>Please check your email for a verification code...</P>
+                </Verification>
+              </div>
+            )}
           </Loading>
-          <div className='flex gap-6 flex-col'>
-            <GlobalError className='block text-red-400 font-mono' />
-
-            <Verification name='password'>
-              <CustomField
-                label='Password'
-                name='password'
-              />
-
-              <CustomSubmit>Verify</CustomSubmit>
-            </Verification>
-
-            <Verification name='email_code'>
-              <CustomField
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus
-                autoSubmit
-                label='Email Code'
-                name='code'
-              />
-
-              <CustomSubmit>Verify</CustomSubmit>
-            </Verification>
-
-            <Verification name='phone_code'>
-              <CustomField
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus
-                autoSubmit
-                label='Phone Code'
-                name='code'
-              />
-
-              <CustomSubmit>Verify</CustomSubmit>
-            </Verification>
-
-            <Verification name='reset_password_email_code'>
-              <H3>Verify your email</H3>
-
-              <P>Please check your email for a verification code...</P>
-            </Verification>
-          </div>
 
           <Navigate
             asChild
