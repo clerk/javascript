@@ -41,8 +41,6 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@types/node": "^18.17.0",
-    "eslint-config-custom": "*",
     "typescript": "*"
   },
   "peerDependencies": {
