@@ -13,6 +13,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     const u = createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser({
       fictionalEmail: true,
+      withPhoneNumber: true,
     });
     await u.services.users.createBapiUser(fakeUser);
   });
@@ -70,7 +71,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     const u = createTestUtils({ app, page, context });
     const fakeUserWithoutPassword = u.services.users.createFakeUser({
       fictionalEmail: true,
-      withoutPassword: true,
+      withPassword: false,
+      withPhoneNumber: true,
     });
     await u.services.users.createBapiUser(fakeUserWithoutPassword);
     await u.po.signIn.goTo();
@@ -79,6 +81,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();
     await u.po.expect.toBeSignedIn();
+
+    await fakeUserWithoutPassword.deleteIfExists();
   });
 
   test('access protected page @express', async ({ page, context }) => {

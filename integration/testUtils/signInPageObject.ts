@@ -39,7 +39,7 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
       return self.getIdentifierAction().getByRole('link', { name: /^use email/i });
     },
     useUsernameIdentified: () => {
-      return self.getIdentifierAction().getByRole('link', { name: /username/i });
+      return page.getByRole('link', { name: /username/i });
     },
     getGoToSignUp: () => {
       return page.getByRole('link', { name: /sign up/i });
