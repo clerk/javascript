@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.70.5
+
+### Patch Changes
+
+- Fix the OAuth errors coming from the server to use localizations ([#2973](https://github.com/clerk/javascript/pull/2973)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
 ## 4.70.4
 
 ### Patch Changes
