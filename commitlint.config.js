@@ -1,4 +1,4 @@
-/* eslint-env es6 */
+/* eslint-env es2021 */
 const glob = require('glob');
 const fs = require('fs');
 
