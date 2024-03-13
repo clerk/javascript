@@ -26,6 +26,21 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
       await expect(passField).toBeVisible();
       await passField.fill(val, { force: true });
     },
+    toogleIdentifier: async () => {
+      return self.getIdentifierAction().click();
+    },
+    getIdentifierAction: () => {
+      return page.locator('.cl-formFieldAction__identifier');
+    },
+    usePhoneNumberIdentifier: () => {
+      return page.getByRole('link', { name: /^use phone/i });
+    },
+    useEmailIdentifier: () => {
+      return self.getIdentifierAction().getByRole('link', { name: /^use email/i });
+    },
+    useUsernameIdentified: () => {
+      return self.getIdentifierAction().getByRole('link', { name: /username/i });
+    },
     getGoToSignUp: () => {
       return page.getByRole('link', { name: /sign up/i });
     },
