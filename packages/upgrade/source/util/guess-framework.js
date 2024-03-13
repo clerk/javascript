@@ -35,7 +35,7 @@ export default function guessFrameworks(dir, disableTelemetry) {
   }
 
   // if there is a package.json
-  const _uuid = md5(pkg);
+  const _uuid = md5(JSON.stringify(pkg));
 
   // no guessing if there are no deps
   if (!pkg.dependencies && !pkg.devDependencies) return { guesses: [], _uuid };
