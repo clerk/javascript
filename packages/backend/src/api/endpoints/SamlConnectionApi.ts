@@ -14,15 +14,15 @@ type CreateSamlConnectionParams = {
   name: string;
   provider: SamlIdpSlug;
   domain: string;
-  idp_entity_id?: string;
-  idp_sso_url?: string;
-  idp_certificate?: string;
-  idp_metadata_url?: string;
-  attribute_mapping?: {
-    email_address?: string;
-    first_name?: string;
-    last_name?: string;
-    user_id?: string;
+  idpEntityId?: string;
+  idpSsoUrl?: string;
+  idpCertificate?: string;
+  idpMetadataUrl?: string;
+  attributeMapping?: {
+    emailAddress?: string;
+    firstName?: string;
+    lastName?: string;
+    userId?: string;
   };
 };
 
@@ -30,20 +30,20 @@ type UpdateSamlConnectionParams = {
   name?: string;
   provider?: SamlIdpSlug;
   domain?: string;
-  idp_entity_id?: string;
-  idp_sso_url?: string;
-  idp_certificate?: string;
-  idp_metadata_url?: string;
-  attribute_mapping?: {
-    email_address?: string;
-    first_name?: string;
-    last_name?: string;
-    user_id?: string;
+  idpEntityId?: string;
+  idpSsoUrl?: string;
+  idpCertificate?: string;
+  idpMetadataUrl?: string;
+  attributeMapping?: {
+    emailAddress?: string;
+    firstName?: string;
+    lastName?: string;
+    userId?: string;
   };
   active?: boolean;
-  sync_user_attributes?: boolean;
-  allow_subdomains?: boolean;
-  allow_idp_initiated?: boolean;
+  syncUserAttributes?: boolean;
+  allowSubdomains?: boolean;
+  allowIdpInitiated?: boolean;
 };
 
 export class SamlConnectionAPI extends AbstractAPI {
