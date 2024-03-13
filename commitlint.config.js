@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-env es2021 */
 const glob = require('glob');
 const fs = require('fs');
 
@@ -17,6 +17,6 @@ module.exports = {
     'subject-case': [2, 'always', ['sentence-case']],
     'body-max-line-length': [1, 'always', '150'],
     'scope-empty': [2, 'never'],
-    'scope-enum': [2, 'always', [...getPackageNames(), 'repo', 'release', '*']],
+    'scope-enum': [2, 'always', [...getPackageNames(), 'repo', 'release', 'e2e', '*']],
   },
 };
