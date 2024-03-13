@@ -36,8 +36,11 @@
     "dev": "tsc -p tsconfig.build.json --watch",
     "lint": "eslint src/"
   },
-  "devDependencies": {
+  "dependencies": {
     "@clerk/types": "3.62.1",
+    "tslib": "2.4.1"
+  },
+  "devDependencies": {
     "typescript": "*"
   },
   "peerDependencies": {
