@@ -346,7 +346,7 @@ export const SectionSubHeader = (props: SectionHeaderProps) => {
     >
       <Text
         localizationKey={localizationKey}
-        colorScheme='neutral'
+        colorScheme='secondary'
         elementDescriptor={textElementDescriptor}
         elementId={textElementId}
       />

@@ -68,7 +68,14 @@ export type SignUpVerificationProps = WithChildrenProp<{ name: SignUpVerificatio
  * )
  */
 export function SignUpVerification({ children, name: tag }: SignUpVerificationProps) {
-  const ref = SignUpVerificationCtx.useActorRef();
+  const ref = SignUpVerificationCtx.useActorRef(true);
+
+  if (!ref) {
+    throw new Error(
+      '<SignUpVerification> used outside of <SignUp>. Did you mean to `import { Verification } from "@clerk/elements/sign-in"` instead?',
+    );
+  }
+
   const { active } = useActiveTags(ref, [
     `verification:${tag}`,
     `verification:category:${tag}`,

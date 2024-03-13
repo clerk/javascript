@@ -164,7 +164,7 @@ const NavbarContainer = (
           />
 
           <Text
-            colorScheme='neutral'
+            colorScheme='secondary'
             localizationKey={description}
           />
         </Col>

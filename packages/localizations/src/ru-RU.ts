@@ -561,11 +561,11 @@ export const ruRU: LocalizationResource = {
       title: 'Добавить подключенный аккаунт',
     },
     deletePage: {
-      actionDescription: 'Type "Delete account" below to continue.',
-      confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
-      messageLine2: 'This action is permanent and irreversible.',
-      title: 'Delete account',
+      actionDescription: 'Введите "Удалить аккаунт" ниже, чтобы продолжить.',
+      confirm: 'Удалить аккаунт',
+      messageLine1: 'Вы уверены, что хотите удалить свою учетную запись?',
+      messageLine2: 'Это действие является бессрочным и необратимым.',
+      title: 'Удалить аккаунт',
     },
     emailAddressPage: {
       emailCode: {
@@ -700,8 +700,8 @@ export const ruRU: LocalizationResource = {
         title: 'Подключенные аккаунты',
       },
       dangerSection: {
-        deleteAccountButton: 'Delete Account',
-        title: 'Account termination',
+        deleteAccountButton: 'Удалить аккаунт',
+        title: 'Удаление учетной записи',
       },
       emailAddressesSection: {
         destructiveAction: 'Удалить адрес электронной почты',

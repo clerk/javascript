@@ -18,24 +18,8 @@ export function clerkErrorPathRouterMissingPath(componentName: string): never {
   );
 }
 
-export function clerkErrorInvalidColor(name: string): never {
-  throw new Error(`${errorPrefix} You're using an invalid ${name} color. Change the ${name} color from the dashboard.`);
-}
-
 export function clerkCoreErrorContextProviderNotFound(providerName: string): never {
   throw new Error(`${errorPrefix} You must wrap your application in a <${providerName}> component.`);
-}
-
-export function clerkCoreErrorUserIsNotDefined(): never {
-  throw new Error(`${errorPrefix} User is undefined. Try wrapping your component with \`withUserGuard\``);
-}
-
-export function clerkCoreErrorSessionIsNotDefined(): never {
-  throw new Error(`${errorPrefix} Session is undefined. Try wrapping your component with \`withUserGuard\``);
-}
-
-export function clerkCoreErrorOrganizationIsNotDefined(): never {
-  throw new Error(`${errorPrefix} Organization is undefined. Try wrapping your component with \`withUserGuard\``);
 }
 
 export function clerkCoreErrorNoClerkSingleton(): never {

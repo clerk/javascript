@@ -139,11 +139,11 @@ const DeviceInfo = (props: { session: SessionWithActivitiesResource }) => {
             />
           )}
         </Flex>
-        <Text colorScheme='neutral'>{browser}</Text>
-        <Text colorScheme='neutral'>
+        <Text colorScheme='secondary'>{browser}</Text>
+        <Text colorScheme='secondary'>
           {ipAddress} ({location})
         </Text>
-        <Text colorScheme='neutral'>{t(getRelativeToNowDateKey(props.session.lastActiveAt))}</Text>
+        <Text colorScheme='secondary'>{t(getRelativeToNowDateKey(props.session.lastActiveAt))}</Text>
       </Col>
     </Flex>
   );

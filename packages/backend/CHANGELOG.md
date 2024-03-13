@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.0-beta.28
+
+### Minor Changes
+
+- Expose debug headers in response for handshake / signed-out states from SDKs using headers returned from `authenticateRequest()` ([#2898](https://github.com/clerk/javascript/pull/2898)) by [@dimkl](https://github.com/dimkl)
+
 ## 1.0.0-beta.27
 
 ### Patch Changes

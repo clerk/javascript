@@ -39,7 +39,7 @@ export const LinkButtonWithDescription = (props: LinkButtonWithTextDescriptionPr
         <Text
           localizationKey={subtitle}
           variant='caption'
-          colorScheme='neutral'
+          colorScheme='secondary'
         />
       </Col>
       {actionLabel && (

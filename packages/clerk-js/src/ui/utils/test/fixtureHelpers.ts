@@ -356,6 +356,21 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
+  const withPasskey = (opts?: Partial<UserSettingsJSON['attributes']['passkey']>) => {
+    us.attributes.passkey = {
+      ...emptyAttribute,
+      enabled: true,
+      required: false,
+      used_for_first_factor: true,
+      first_factors: [],
+      used_for_second_factor: false,
+      second_factors: [],
+      verifications: [],
+      verify_at_sign_up: false,
+      ...opts,
+    };
+  };
+
   const withUsername = (opts?: Partial<UserSettingsJSON['attributes']['username']>) => {
     us.attributes.username = {
       ...emptyAttribute,
@@ -458,5 +473,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withSaml,
     withBackupCode,
     withAuthenticatorApp,
+    withPasskey,
   };
 };

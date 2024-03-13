@@ -45,6 +45,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
       mockMethodsOf(m);
       mockMethodsOf(m.organization);
     });
+    session.user?.__experimental_passkeys.forEach(m => mockMethodsOf(m));
   });
   mockProp(clerk, 'navigate');
   mockProp(clerk, 'setActive');

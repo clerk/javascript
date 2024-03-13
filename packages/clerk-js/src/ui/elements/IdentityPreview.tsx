@@ -60,7 +60,7 @@ const IdentifierContainer = (props: React.PropsWithChildren) => {
   return (
     <Text
       elementDescriptor={descriptors.identityPreviewText}
-      colorScheme='neutral'
+      colorScheme='secondary'
       truncate
       {...props}
     />

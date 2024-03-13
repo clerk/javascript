@@ -159,7 +159,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
           <Col>
             <Text
               localizationKey={messageLine1}
-              colorScheme='neutral'
+              colorScheme='secondary'
             />
             <Text
               localizationKey={messageLine2}

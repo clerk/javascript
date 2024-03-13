@@ -134,7 +134,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           })}
         >
           <Text
-            colorScheme='primary'
+            colorScheme='body'
             as='span'
             sx={{
               textTransform: 'uppercase',
@@ -231,7 +231,7 @@ const CountryCodeListItem = memo((props: CountryCodeListItemProps) => {
       >
         {country.name}
       </Text>
-      <Text colorScheme='neutral'>+{country.code}</Text>
+      <Text colorScheme='secondary'>+{country.code}</Text>
     </Flex>
   );
 });

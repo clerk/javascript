@@ -11,6 +11,7 @@ import { unixEpochToDate } from '../../utils/date';
 import type { PublicKeyCredentialWithAuthenticatorAttestationResponse } from '../../utils/passkeys';
 import {
   isWebAuthnPlatformAuthenticatorSupported,
+  isWebAuthnSupported,
   serializePublicKeyCredential,
   webAuthnCreateCredential,
 } from '../../utils/passkeys';
@@ -58,14 +59,9 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
-
-    /**
-     * TODO-PASSKEYS: First simply check if webauthn is supported and check for this only when
-     * publicKey?.authenticatorSelection.authenticatorAttachment === 'platform'
-     */
-    if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
-      throw new ClerkRuntimeError('Platform authenticator is not supported', {
-        code: 'passkeys_unsupported_platform_authenticator',
+    if (!isWebAuthnSupported()) {
+      throw new ClerkRuntimeError('Passkeys are not supported', {
+        code: 'passkeys_unsupported',
       });
     }
 
@@ -75,10 +71,18 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
     const publicKey = verification?.publicKey;
 
-    // This should never occur such a fail-safe
+    // This should never occur, just a fail-safe
     if (!publicKey) {
       // TODO-PASSKEYS: Implement this later
       throw 'Missing key';
+    }
+
+    if (publicKey.authenticatorSelection?.authenticatorAttachment === 'platform') {
+      if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
+        throw new ClerkRuntimeError('Platform authenticator is not supported', {
+          code: 'passkeys_unsupported_platform_authenticator',
+        });
+      }
     }
 
     // Invoke the WebAuthn create() method.
@@ -105,7 +109,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
   delete = async (): Promise<DeletedObjectResource> => {
     const json = (
       await BaseResource._fetch<DeletedObjectJSON>({
-        path: `${this.path()}/${this.id}`,
+        path: this.path(),
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;

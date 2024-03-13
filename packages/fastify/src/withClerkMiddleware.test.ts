@@ -101,7 +101,12 @@ describe('withClerkMiddleware(options)', () => {
       status: 'handshake',
       reason: 'auth-reason',
       message: 'auth-message',
-      headers: new Headers({ location: 'https://fapi.example.com/v1/clients/handshake' }),
+      headers: new Headers({
+        location: 'https://fapi.example.com/v1/clients/handshake',
+        'x-clerk-auth-message': 'auth-message',
+        'x-clerk-auth-reason': 'auth-reason',
+        'x-clerk-auth-status': 'handshake',
+      }),
       toAuth: () => 'mockedAuth',
     });
     const fastify = Fastify();

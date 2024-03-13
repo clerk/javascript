@@ -8,7 +8,7 @@ body:
       value: |
         ## Welcome 👋🏻
 
-        Thank you for taking the time to report an issue with Clerk's JavaScript packages. Please fill out the information below to help us resolve your issue faster. If you have a question or need general help, please join our [Discord community](https://clerk.com/discord).
+        Thank you for taking the time to report an issue with Clerk's JavaScript packages. Please fill out the information below to help us resolve your issue faster. If you have a question or need general help, please join our [Discord community](https://clerk.com/discord). We triage GitHub issues weekly, so it may take a week or so to get a response. If you have a more urgent need, please reach out to [support](https://clerk.com/support).
   - type: checkboxes
     attributes:
       label: Preliminary Checks
@@ -29,16 +29,15 @@ body:
   - type: input
     id: reproduction-link
     attributes:
-      label: Reproduction / Replay Link
+      label: Reproduction
       placeholder: "https://github.com/username/repository-name/"
       description: |
         Link to a minimal reproduction (GitHub repository, CodeSandbox, StackBlitz, etc.).
 
         **Do not link to your actual project**, but provide a minimal reproduction in a fresh project. [How to create a minimal reproduction](https://clerkdev.notion.site/Creating-a-Minimal-Reproduction-0436afc4203f41aa9aa8700968aaef48?pvs=4)
 
-        Optionally you can attach a [Replay recording](https://www.replay.io/) or [Jam recording](https://jam.dev) to the minimal reproduction:
+        Optionally you can attach a [Replay recording](https://www.replay.io/) to the README of your minimal reproduction:
         - [How to record a Replay](https://docs.replay.io/getting-started/recording-your-first-replay)
-        - [How to record a Jam](https://jam.dev/docs/get-started)
     validations:
       required: true
   - type: input

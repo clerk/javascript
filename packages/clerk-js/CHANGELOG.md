@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.0.0-beta.34
+
+### Patch Changes
+
+- Fix the input box-shadow on iOS 16 devices ([#2946](https://github.com/clerk/javascript/pull/2946)) by [@anagstef](https://github.com/anagstef)
+
+- Fix the OAuth errors coming from the server to use localizations ([#2957](https://github.com/clerk/javascript/pull/2957)) by [@anagstef](https://github.com/anagstef)
+
+- Remove the `__clerk_ticket` and `__clerk_invitation_token` query params after they are consumed. ([#2949](https://github.com/clerk/javascript/pull/2949)) by [@desiprisg](https://github.com/desiprisg)
+
 ## 5.0.0-beta.33
 
 ### Minor Changes
