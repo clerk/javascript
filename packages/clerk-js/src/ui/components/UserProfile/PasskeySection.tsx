@@ -163,8 +163,8 @@ const PasskeyInfo = (props: PasskeyResource) => {
         gap={1}
       >
         <Text>{name}</Text>
-        <Text colorScheme='neutral'>Created: {t(getRelativeToNowDateKey(createdAt))}</Text>
-        {lastUsedAt && <Text colorScheme='neutral'>Last used: {t(getRelativeToNowDateKey(lastUsedAt))}</Text>}
+        <Text colorScheme='secondary'>Created: {t(getRelativeToNowDateKey(createdAt))}</Text>
+        {lastUsedAt && <Text colorScheme='secondary'>Last used: {t(getRelativeToNowDateKey(lastUsedAt))}</Text>}
       </Col>
     </Flex>
   );
