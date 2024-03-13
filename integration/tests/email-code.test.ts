@@ -20,7 +20,9 @@ test.describe('sign up and sign in with email code @generic', () => {
         await app.setup();
         await app.withEnv(appConfigs.envs.withEmailCodes);
         await app.dev();
-        fakeUser = createTestUtils({ app }).services.users.createFakeUser(true);
+        fakeUser = createTestUtils({ app }).services.users.createFakeUser({
+          fictionalEmail: true,
+        });
       });
 
       test.afterAll(async () => {
