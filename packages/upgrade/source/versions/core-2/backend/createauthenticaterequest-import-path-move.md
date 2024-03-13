@@ -1,6 +1,6 @@
 ---
 title: '`createAuthenticateRequest` import moved to `@clerk/backend/internal`'
-matcher: "import\\s+{[\\s\\S]*?createAuthenticateRequest[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)['\"]"
+matcher: "import\\s+{[^}]*?createAuthenticateRequest[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)['\"]"
 matcherFlags: 'm'
 replaceWithString: 'backend/internal'
 category: 'import-paths'

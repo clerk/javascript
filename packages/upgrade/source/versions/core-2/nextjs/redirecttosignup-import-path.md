@@ -1,6 +1,6 @@
 ---
 title: '`redirectToSignUp` import moved under `/server`'
-matcher: "import\\s+{[\\s\\S]*?[,\\s]redirectToSignUp[,\\s][\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)(?!\/server)[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?[,\\s]redirectToSignUp[,\\s][\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)(?!\/server)[\\s\\S]*?['\"]"
 category: 'top-level-imports'
 replaceWithString: 'nextjs/server'
 ---

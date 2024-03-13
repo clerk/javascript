@@ -1,6 +1,6 @@
 ---
 title: '`TokenVerificationErrorAction` import moved to `@clerk/backend/errors`'
-matcher: "import\\s+{[\\s\\S]*?TokenVerificationErrorAction[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)(?!\/errors)['\"]"
+matcher: "import\\s+{[^}]*?TokenVerificationErrorAction[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)(?!\/errors)['\"]"
 matcherFlags: 'm'
 replaceWithString: 'backend/errors'
 category: 'import-paths'

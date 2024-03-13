@@ -1,6 +1,6 @@
 ---
 title: '`isKnownError` import moved under `/errors`'
-matcher: "import\\s+{[\\s\\S]*?isKnownError[\\s\\S]*?from\\s+['\"]@clerk\\/(clerk-react)(?!\/errors)[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?isKnownError[\\s\\S]*?from\\s+['\"]@clerk\\/(clerk-react)(?!\/errors)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 category: 'error-imports'
 replaceWithString: 'clerk-react/errors'

@@ -1,6 +1,6 @@
 ---
 title: '`createEmail` import removed'
-matcher: "import\\s+{[\\s\\S]*?createEmail[\\s\\S]*?}\\s+from\\s+['\"]@clerk\/backend['\"]"
+matcher: "import\\s+{[^}]*?createEmail[\\s\\S]*?}\\s+from\\s+['\"]@clerk\/backend['\"]"
 matcherFlags: 'm'
 ---
 

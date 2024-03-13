@@ -1,6 +1,6 @@
 ---
 title: '`SignJWTError` import moved to `@clerk/backend/errors`'
-matcher: "import\\s+{[\\s\\S]*?SignJWTError[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)(?!\/errors)['\"]"
+matcher: "import\\s+{[^}]*?SignJWTError[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)(?!\/errors)['\"]"
 matcherFlags: 'm'
 replaceWithString: 'backend/errors'
 category: 'import-paths'

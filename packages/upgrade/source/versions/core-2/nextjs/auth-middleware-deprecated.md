@@ -1,6 +1,6 @@
 ---
 title: '`authMiddleware` deprecated'
-matcher: "import\\s+{[\\s\\S]*?authMiddleware[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?authMiddleware[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
 category: 'middleware'
 matcherFlags: 'm'
 warning: true

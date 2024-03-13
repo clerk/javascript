@@ -1,6 +1,6 @@
 ---
 title: '`Clerk` -> `createClerkClient`'
-matcher: "import\\s+{[\\s\\S]*?Clerk[\\s\\S]*?}\\s+from\\s+['\"]@clerk/backend['\"]"
+matcher: "import\\s+{[^}]*?Clerk[\\s\\S]*?}\\s+from\\s+['\"]@clerk/backend['\"]"
 matcherFlags: 'm'
 ---
 

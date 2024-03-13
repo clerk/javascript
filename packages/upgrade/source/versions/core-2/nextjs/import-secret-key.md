@@ -1,6 +1,6 @@
 ---
 title: '`SECRET_KEY` constant removed'
-matcher: "import\\s+{[\\s\\S]*?SECRET_KEY[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?SECRET_KEY[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
 category: 'deprecation-removal'
 matcherFlags: 'm'
 ---

@@ -1,6 +1,6 @@
 ---
 title: '`isEmailLinkError` import moved under `/errors`'
-matcher: "import\\s+{[\\s\\S]*?isEmailLinkError[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)(?!\/errors)[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?isEmailLinkError[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)(?!\/errors)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 category: 'top-level-imports'
 replaceWithString: 'nextjs/errors'

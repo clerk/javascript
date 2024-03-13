@@ -1,6 +1,6 @@
 ---
 title: '`MultiSessionAppSupport` import moved under `/internal`'
-matcher: "import\\s+{[\\s\\S]*?MultiSessionAppSupport[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)(?!\/internal)[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?MultiSessionAppSupport[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)(?!\/internal)[\\s\\S]*?['\"]"
 category: 'deprecation-removal'
 matcherFlags: 'm'
 replaceWithString: 'nextjs/internal'

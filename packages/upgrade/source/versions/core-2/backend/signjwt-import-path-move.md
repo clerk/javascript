@@ -1,6 +1,6 @@
 ---
 title: '`signJwt` import moved to `@clerk/backend/tokens`'
-matcher: "import\\s+{[\\s\\S]*?signJwt[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)(?!\/tokens)['\"]"
+matcher: "import\\s+{[^}]*?signJwt[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)(?!\/tokens)['\"]"
 matcherFlags: 'm'
 replaceWithString: 'backend/tokens'
 category: 'import-paths'

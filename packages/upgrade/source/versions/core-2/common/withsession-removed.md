@@ -1,6 +1,6 @@
 ---
 title: '`WithSession` component removed'
-matcher: "import\\s+{[\\s\\S]*?WithSession[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?WithSession[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
 category: 'hof-removal'
 matcherFlags: 'm'
 ---

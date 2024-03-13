@@ -1,6 +1,6 @@
 ---
 title: '`API_URL` constant removed'
-matcher: "import\\s+{[\\s\\S]*?API_URL[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?API_URL[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
 category: 'deprecation-removal'
 matcherFlags: 'm'
 ---

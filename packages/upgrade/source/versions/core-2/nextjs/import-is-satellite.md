@@ -1,6 +1,6 @@
 ---
 title: '`IS_SATELLITE` constant removed'
-matcher: "import\\s+{[\\s\\S]*?IS_SATELLITE[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?IS_SATELLITE[\\s\\S]*?from\\s+['\"]@clerk\\/nextjs[\\s\\S]*?['\"]"
 category: 'deprecation-removal'
 matcherFlags: 'm'
 ---

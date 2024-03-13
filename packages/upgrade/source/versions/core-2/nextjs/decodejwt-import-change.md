@@ -1,6 +1,6 @@
 ---
 title: '`decodeJwt` import moved under `/server`'
-matcher: "import\\s+{[\\s\\S]*?decodeJwt[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)(?!\/server)[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?decodeJwt[\\s\\S]*?from\\s+['\"]@clerk\\/(nextjs)(?!\/server)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 category: 'top-level-imports'
 replaceWithString: 'nextjs/server'

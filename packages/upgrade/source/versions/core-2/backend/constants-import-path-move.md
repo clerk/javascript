@@ -1,6 +1,6 @@
 ---
 title: '`constants` import moved to `@clerk/backend/internal`'
-matcher: "import\\s+{[\\s\\S]*?constants[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)(?!\/internal)['\"]"
+matcher: "import\\s+{[^}]*?constants[\\s\\S]*?}\\s+from\\s+['\"]@clerk\\/(backend)(?!\/internal)['\"]"
 matcherFlags: 'm'
 replaceWithString: 'backend/internal'
 category: 'import-paths'

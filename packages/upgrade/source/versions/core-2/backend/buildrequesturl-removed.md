@@ -1,6 +1,6 @@
 ---
 title: '`buildRequestUrl` import removed'
-matcher: "import\\s+{[\\s\\S]*?buildRequestUrl[\\s\\S]*?}\\s+from\\s+['\"]@clerk\/backend['\"]"
+matcher: "import\\s+{[^}]*?buildRequestUrl[\\s\\S]*?}\\s+from\\s+['\"]@clerk\/backend['\"]"
 matcherFlags: 'm'
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: '`isMetamaskError` import moved under `/errors`'
-matcher: "import\\s+{[\\s\\S]*?isMetamaskError[\\s\\S]*?from\\s+['\"]@clerk\\/(react)(?!\/errors)[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?isMetamaskError[\\s\\S]*?from\\s+['\"]@clerk\\/(react)(?!\/errors)[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 category: 'error-imports'
 replaceWithString: 'react/errors'

@@ -1,6 +1,6 @@
 ---
 title: '`Clerk` -> `{ createClerkClient }`'
-matcher: "import\\s+{[\\s\\S]*?[,\\s]Clerk[,\\s][\\s\\S]*?from\\s+['\"]@clerk\\/fastify[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?[,\\s]Clerk[,\\s][\\s\\S]*?from\\s+['\"]@clerk\\/fastify[\\s\\S]*?['\"]"
 matcherFlags: 'm'
 ---
 

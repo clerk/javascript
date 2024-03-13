@@ -1,6 +1,6 @@
 ---
 title: '`WithClerk` component removed'
-matcher: "import\\s+{[\\s\\S]*?WithClerk[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
+matcher: "import\\s+{[^}]*?WithClerk[\\s\\S]*?from\\s+['\"]@clerk\\/(?:nextjs|clerk-react)[\\s\\S]*?['\"]"
 category: 'hof-removal'
 matcherFlags: 'm'
 ---
