@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.7.10
+
+### Patch Changes
+
+- Add `tslib` and `@clerk/types` to dependencies ([#2987](https://github.com/clerk/javascript/pull/2987)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 1.7.9
 
 ### Patch Changes

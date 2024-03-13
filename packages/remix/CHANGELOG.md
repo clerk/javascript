@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.2.0
+
+### Minor Changes
+
+- Replace `response.clone()` with `new Response(response.body, response)` to avoid creating multiple branches of a single stream on Cloudflare workers ([issue reference](https://github.com/cloudflare/workers-sdk/issues/3259)). ([#2979](https://github.com/clerk/javascript/pull/2979)) by [@octoper](https://github.com/octoper)
+
 ## 3.1.21
 
 ### Patch Changes
