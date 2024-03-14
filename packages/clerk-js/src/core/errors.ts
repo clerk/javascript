@@ -58,6 +58,12 @@ export function clerkVerifyWeb3WalletCalledBeforeCreate(type: 'SignIn' | 'SignUp
   );
 }
 
+export function clerkVerifyPasskeyCalledBeforeCreate(): never {
+  throw new Error(
+    `${errorPrefix} You need to start a SignIn flow by calling SignIn.create({ strategy: 'passkey' }) first`,
+  );
+}
+
 export function clerkMissingOptionError(name = ''): never {
   throw new Error(`${errorPrefix} Missing '${name}' option`);
 }

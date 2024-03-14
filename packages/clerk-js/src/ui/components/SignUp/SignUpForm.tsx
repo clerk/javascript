@@ -74,6 +74,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
               {...formState.emailAddress.props}
               isRequired={fields.emailAddress!.required}
               isOptional={!fields.emailAddress!.required}
+              isDisabled={fields.emailAddress!.disabled}
               actionLabel={canToggleEmailPhone ? 'Use phone instead' : undefined}
               onActionClicked={canToggleEmailPhone ? () => handleEmailPhoneToggle('phoneNumber') : undefined}
             />

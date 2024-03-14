@@ -5,8 +5,8 @@ import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
-test.describe('sign up and sign in with email code', () => {
-  const configs = [];
+test.describe('sign up and sign in with email code @generic', () => {
+  const configs = [appConfigs.next.appRouter, appConfigs.react.vite];
 
   configs.forEach(config => {
     test.describe(`${config.name}`, () => {
@@ -20,7 +20,9 @@ test.describe('sign up and sign in with email code', () => {
         await app.setup();
         await app.withEnv(appConfigs.envs.withEmailCodes);
         await app.dev();
-        fakeUser = createTestUtils({ app }).services.users.createFakeUser();
+        fakeUser = createTestUtils({ app }).services.users.createFakeUser({
+          fictionalEmail: true,
+        });
       });
 
       test.afterAll(async () => {
@@ -32,7 +34,7 @@ test.describe('sign up and sign in with email code', () => {
         const u = createTestUtils({ app, page, context });
         await u.po.signUp.goTo();
         await u.po.signUp.signUpWithEmailAndPassword({ email: fakeUser.email, password: fakeUser.password });
-        await u.po.signUp.enterOtpCode(await u.services.email.getCodeForEmailAddress(fakeUser.email));
+        await u.po.signUp.enterOtpCode('424242');
         await u.po.expect.toBeSignedIn();
       });
 
@@ -43,7 +45,7 @@ test.describe('sign up and sign in with email code', () => {
         await u.po.signIn.continue();
         await u.po.signIn.getUseAnotherMethodLink().click();
         await u.po.signIn.getAltMethodsEmailCodeButton().click();
-        await u.po.signIn.enterOtpCode(await u.services.email.getCodeForEmailAddress(fakeUser.email));
+        await u.po.signIn.enterOtpCode('424242');
         await u.po.expect.toBeSignedIn();
       });
     });

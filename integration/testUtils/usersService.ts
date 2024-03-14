@@ -6,10 +6,19 @@ import { hash } from '../models/helpers';
 export type FakeUser = ReturnType<ReturnType<typeof createUserService>['createFakeUser']>;
 export type FakeOrganization = ReturnType<ReturnType<Awaited<typeof createUserService>>['createFakeOrganization']>;
 
+type FakeUserOptions = {
+  /**
+   * A fictional email is an email that contains +clerk_test and can always be verified using 424242 as the OTP. No email will be sent.
+   * https://clerk.com/docs/testing/test-emails-and-phones#email-addresses
+   **/
+  fictionalEmail: boolean;
+};
+
 export const createUserService = (clerkClient: ReturnType<typeof Clerk>) => {
   const self = {
-    createFakeUser: () => {
-      const email = `clerkcookie+${hash()}@mailsac.com`;
+    createFakeUser: (options?: FakeUserOptions) => {
+      const { fictionalEmail = false } = options || {};
+      const email = fictionalEmail ? `${hash()}+clerk_test@example.com` : `clerkcookie+${hash()}@mailsac.com`;
       return {
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
