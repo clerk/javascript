@@ -95,7 +95,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.expect.toBeSignedIn();
   });
 
-  test('reset password successfully', async ({ page, context }) => {
+  test('can reset password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const fakeUserWithPasword = u.services.users.createFakeUser({
       fictionalEmail: true,
