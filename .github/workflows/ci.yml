@@ -138,7 +138,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs', 'express', 'quickstart']
+        test-name: [ 'generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
 
     steps:
       - name: Checkout Repo
