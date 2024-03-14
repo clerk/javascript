@@ -31,7 +31,7 @@ import type {
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {
   convertJSONToPublicKeyRequestOptions,
-  // isWebAuthnAutofillSupported,
+  isWebAuthnAutofillSupported,
   isWebAuthnSupported,
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential,
@@ -267,7 +267,6 @@ export class SignIn extends BaseResource implements SignInResource {
     const defaultParams = { triggerAutofill: false };
     const { triggerAutofill } = { ...defaultParams, ...params };
 
-    // || (await isWebAuthnAutofillSupported())
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
@@ -304,10 +303,20 @@ export class SignIn extends BaseResource implements SignInResource {
       throw 'Missing key';
     }
 
+    let canUseConditionalUI = false;
+
+    if (triggerAutofill) {
+      /**
+       * If autofill is not supported gracefully handle the result, we don't need to throw.
+       * The caller should always check this before calling this method.
+       */
+      canUseConditionalUI = await isWebAuthnAutofillSupported();
+    }
+
     // Invoke the WebAuthn get() method.
     const { publicKeyCredential, error } = await webAuthnGetCredential({
       publicKeyOptions: publicKey,
-      conditionalUI: triggerAutofill,
+      conditionalUI: canUseConditionalUI,
     });
 
     if (!publicKeyCredential) {
