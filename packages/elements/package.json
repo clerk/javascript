@@ -84,7 +84,7 @@
     "eslint-config-custom": "*",
     "next": "^14.0.4",
     "tslib": "2.4.1",
-    "tsup": "^8.0.1",
+    "tsup": "*",
     "type-fest": "^4.9.0",
     "typescript": "^5.3.3"
   },
