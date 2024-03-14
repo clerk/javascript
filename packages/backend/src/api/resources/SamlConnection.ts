@@ -1,5 +1,4 @@
-import { AttributeMapping } from './AttributeMapping';
-import type { SamlConnectionJSON } from './JSON';
+import type { AttributeMappingJSON, SamlConnectionJSON } from './JSON';
 
 export class SamlConnection {
   constructor(
@@ -47,5 +46,18 @@ export class SamlConnection {
       data.updated_at,
       data.attribute_mapping && AttributeMapping.fromJSON(data.attribute_mapping),
     );
+  }
+}
+
+class AttributeMapping {
+  constructor(
+    readonly userId: string,
+    readonly emailAddress: string,
+    readonly firstName: string,
+    readonly lastName: string,
+  ) {}
+
+  static fromJSON(data: AttributeMappingJSON): AttributeMapping {
+    return new AttributeMapping(data.user_id, data.email_address, data.first_name, data.last_name);
   }
 }
