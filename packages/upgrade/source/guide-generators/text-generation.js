@@ -25,7 +25,9 @@ export function frontmatter(obj) {
 ${Object.keys(obj)
   .map(k => `${k}: "${obj[k]}"`)
   .join('\n')}
----`;
+---
+
+{/* WARNING: This is a generated file and should not be edited directly. To update its contents, see the "upgrade" package in the clerk/javascript repo. */}`;
 }
 
 // Renders a markdown file, partial-style - will read out of shared if not found in sdk dir

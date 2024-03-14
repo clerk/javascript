@@ -2,54 +2,9 @@
 
 User and customer feedback about `authMiddleware()` has been clear in that Middleware logic was a often friction point. As such, in v5 you will find a completely new Middleware helper called [`clerkMiddleware()`](/docs/references/nextjs/clerk-middleware) that should alleviate the issues folks had with `authMiddleware()`.
 
-Additionally, there are now new helpers that enable controlling auth on a _per-page and/or per-layout basis_ when using App Router. While you can still configure which routes are protected via Middleware, the page-based protection strategy is what is now recommended, as the co-location of auth protection configuration with the code for the pages themselves results in a superior developer experience that adds clarity as you navigate your codebase.
+The primary change from the previous `authMiddleware()` is that `clerkMiddleware()` does not protect any routes by default, instead requiring the developer to add routes they would like to be protected by auth. This is a substantial contrast to the previous `authMiddleware()`, which protected all routes by default, requiring the developer to add exceptions. The API was also substantially simplified, and it has become easier to combine with other Middleware helpers smoothly as well.
 
-#### Per-route auth config
-
-Sometimes, code speaks louder than words. Let's get right into an example:
-
-<Tabs type="auth-protect-layout-page" items={["Layout", "Page"]}>
-  <Tab>
-    ```ts filename="app/src/dashboard/layout.tsx"
-    import { auth } from '@clerk/nextjs/server'
-
-    export default async function DashboardLayout({ children }) {
-        auth().protect();
-        // 👆 This one line is all it takes - the layout and all its children
-        // will now redirect to your sign in page for un-authenticated users.
-
-        return <>{children}</>
-    }
-    ```
-
-  </Tab>
-  <Tab>
-    ```ts filename="app/src/dashboard/page.tsx"
-    import { auth } from '@clerk/nextjs/server'
-
-    export default async function DashboardPage() {
-        auth().protect();
-        // 👆 This one line is all it takes - the layout and all its children
-        // will now redirect to your sign in page for un-authenticated users.
-
-        return <p>This page is now protected!</p>
-    }
-    ```
-
-  </Tab>
-</Tabs>
-
-In this example, you add [`auth().protect()`](/docs/references/nextjs/auth#protect) to a layout and that layout and all of it's children will be gated by auth. The same logic can be applied for pages.
-
-For more details on route protection, check out the [route protection guide](/references/nextjs/route-protection).
-
-If you are using the pages router, per-route gating won't work. Instead, configure your auth gating via Middleware as described in the next section.
-
-#### Middleware auth config
-
-If you prefer to define your auth logic within the Middleware, you can still do this using the new `clerkMiddleware`. The primary change from the previous `authMiddleware()` is that `clerkMiddleware()` does not protect any routes by default, instead requiring the developer to add routes they would like to be protected by auth. This is a substantial contrast to the previous `authMiddleware()`, which protected all routes by default, requiring the developer to add exceptions. The API was also substantially simplified, and it has become easier to combine with other Middleware helpers smoothly as well.
-
-Here's an example that replicates the auth protection scheme above, but entirely inside the Middleware:
+Here's an example that demonstrates route protection based on both authentication and authorization:
 
 ```ts filename="middleware.ts"
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
@@ -74,7 +29,9 @@ A couple things to note here:
 
 - The `createRouteMatcher` helper makes it easy to define route groups that you can leverage inside the Middleware function and check in whichever order you'd like. Note that it can take an array of routes as well.
 - With `clerkMiddleware`, you're defining the routes you want **to be protected**, rather than the routes you don't want to be protected.
-- You are able to use the same `auth().protect()` helpers that you can use within layouts/pages here in the Middleware.
+- The [`auth().protect()`](https://clerk.com/docs/references/nextjs/auth#protect) helper is utilized heavily here, check out its docs for more info.
+
+See the [`clerkMiddleware()`](/docs/references/nextjs/clerk-middleware) docs for more information and detailed usage examples.
 
 #### Migrating to `clerkMiddleware()`
 
@@ -94,7 +51,7 @@ The most basic migration will be updating the import and changing out the defaul
   }
 ```
 
-Of course, in most cases you'll have a more complicated setup than this. You can find some examples below for how to migrate a few common use cases. Be sure to review the [`clerkMiddleware()` documentation](/docs/references/nextjs/clerk-middleware) and [route protection guide](/docs/references/nextjs/route-protection) if your specific use case is not mentioned.
+Of course, in most cases you'll have a more complicated setup than this. You can find some examples below for how to migrate a few common use cases. Be sure to review the [`clerkMiddleware()` documentation](/docs/references/nextjs/clerk-middleware) if your specific use case is not mentioned.
 
 <Accordion titles={["Protecting all routes except one or more public paths", "Protecting a single route path", "Combining with other Middlewares (like i18n)"]} heading="h4">
   <AccordionPanel>
