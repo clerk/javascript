@@ -31,7 +31,7 @@ import type {
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {
   convertJSONToPublicKeyRequestOptions,
-  isWebAuthnAutofillSupported,
+  // isWebAuthnAutofillSupported,
   isWebAuthnSupported,
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential,
@@ -261,7 +261,13 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public __experimental_authenticateWithPasskey = async (): Promise<SignInResource> => {
+  public __experimental_authenticateWithPasskey = async (params?: {
+    triggerAutofill?: boolean;
+  }): Promise<SignInResource> => {
+    const defaultParams = { triggerAutofill: false };
+    const { triggerAutofill } = { ...defaultParams, ...params };
+
+    // || (await isWebAuthnAutofillSupported())
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
@@ -301,7 +307,7 @@ export class SignIn extends BaseResource implements SignInResource {
     // Invoke the WebAuthn get() method.
     const { publicKeyCredential, error } = await webAuthnGetCredential({
       publicKeyOptions: publicKey,
-      conditionalUI: await isWebAuthnAutofillSupported(),
+      conditionalUI: triggerAutofill,
     });
 
     if (!publicKeyCredential) {
@@ -330,7 +336,14 @@ export class SignIn extends BaseResource implements SignInResource {
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
-      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[];
+      if (data.supported_first_factors) {
+        this.supportedFirstFactors = deepSnakeToCamel([
+          ...data.supported_first_factors,
+          {
+            strategy: 'passkey',
+          },
+        ]) as SignInFirstFactor[];
+      }
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[];
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);

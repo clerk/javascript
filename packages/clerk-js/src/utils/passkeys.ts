@@ -102,6 +102,33 @@ async function webAuthnCreateCredential(
   }
 }
 
+class WebAuthnAbortService {
+  private controller: AbortController | undefined;
+
+  private __abort() {
+    if (!this.controller) {
+      return;
+    }
+    const abortError = new Error();
+    abortError.name = 'AbortError';
+    this.controller.abort(abortError);
+  }
+
+  createAbortSignal() {
+    this.__abort();
+    const newController = new AbortController();
+    this.controller = newController;
+    return newController.signal;
+  }
+
+  abort() {
+    this.__abort();
+    this.controller = undefined;
+  }
+}
+
+const __internal_WebAuthnAbortService = new WebAuthnAbortService();
+
 async function webAuthnGetCredential({
   publicKeyOptions,
   conditionalUI,
@@ -114,6 +141,7 @@ async function webAuthnGetCredential({
     const credential = (await navigator.credentials.get({
       publicKey: publicKeyOptions,
       mediation: conditionalUI ? 'conditional' : 'optional',
+      signal: __internal_WebAuthnAbortService.createAbortSignal(),
     })) as __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse | null;
 
     if (!credential) {

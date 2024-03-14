@@ -11,6 +11,7 @@ import { AlternativeMethods } from './AlternativeMethods';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
+import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
@@ -112,6 +113,24 @@ export function _SignInFactorOne(): JSX.Element {
   }
 
   switch (currentFactor?.strategy) {
+    // @ts-ignore
+    case 'passkey':
+      return (
+        <SignInFactorOnePasskey
+          // factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          // onFactorPrepare={handleFactorPrepare}
+          onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
+            handleFactorPrepare();
+            setFactor(prev => ({
+              currentFactor: {
+                ...factor,
+              },
+              prevCurrentFactor: prev.currentFactor,
+            }));
+          }}
+          onShowAlternativeMethodsClick={toggleAllStrategies}
+        />
+      );
     case 'password':
       return (
         <SignInFactorOnePasswordCard

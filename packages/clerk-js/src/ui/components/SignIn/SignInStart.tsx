@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
+import { isWebAuthnAutofillSupported } from '../../../utils/passkeys';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
@@ -26,6 +27,43 @@ import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
+const useAutoFillPasskey = () => {
+  const { __experimental_authenticateWithPasskey } = useCoreSignIn();
+  const { setActive } = useClerk();
+  // const abortRef = useRef();
+  const [isSupported, setIsSupported] = useState(false);
+  useEffect(() => {
+    async function runAutofillPasskey() {
+      const _isSupported = await isWebAuthnAutofillSupported();
+      setIsSupported(_isSupported);
+      if (!_isSupported) {
+        return;
+      }
+
+      const res = await __experimental_authenticateWithPasskey({ triggerAutofill: true }).catch(() => {
+        console.log('FAILING FROM START');
+        return null;
+      });
+      if (res?.createdSessionId) {
+        await setActive({ session: res.createdSessionId });
+      }
+    }
+
+    runAutofillPasskey();
+
+    // return () => {
+    //   if (!abortRef.current) {
+    //     return;
+    //   }
+    //   abortRef.current.abort();
+    // };
+  }, []);
+
+  return {
+    isWebAuthnAutofillSupported: isSupported,
+  };
+};
+
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
   const clerk = useClerk();
@@ -40,6 +78,7 @@ export function _SignInStart(): JSX.Element {
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
   );
+  const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
@@ -318,6 +357,7 @@ export function _SignInStart(): JSX.Element {
                         onActionClicked={switchToNextIdentifier}
                         {...identifierFieldProps}
                         autoFocus={shouldAutofocus}
+                        autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
                       />
                     </Form.ControlRow>
                     <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
