@@ -28,6 +28,10 @@ import { buildRequest, handleError, isMobileDevice, useFormControl } from '../..
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
+// Mock values
+const instanceAllowAutofill = false;
+const instanceAllowButton = false;
+
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
@@ -43,7 +47,9 @@ const useAutoFillPasskey = () => {
       await authenticateWithPasskey({ triggerAutofill: true });
     }
 
-    runAutofillPasskey();
+    if (instanceAllowAutofill) {
+      runAutofillPasskey();
+    }
   }, []);
 
   return {
@@ -66,6 +72,7 @@ export function _SignInStart(): JSX.Element {
     [userSettings.enabledFirstFactorIdentifiers],
   );
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
@@ -353,9 +360,16 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
+            {instanceAllowButton && (
+              <Card.Action elementId={'usePasskey'}>
+                <Card.ActionLink
+                  localizationKey={'Use passkey instead'}
+                  onClick={authenticateWithPasskey}
+                />
+              </Card.Action>
+            )}
           </Col>
         </Card.Content>
-
         <Card.Footer>
           <Card.Action elementId='signIn'>
             <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />
