@@ -117,6 +117,37 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await fakeUserWithPasword.deleteIfExists();
   });
 
+  test('cant sign in with wrong password', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword('wrong-password');
+    await u.po.signIn.continue();
+    await expect(u.page.getByText(/^password is incorrect/i)).toBeVisible();
+
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('cant sign in with wrong password but can sign in with email', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword('wrong-password');
+    await u.po.signIn.continue();
+
+    await expect(u.page.getByText(/^password is incorrect/i)).toBeVisible();
+
+    await u.po.signIn.getUseAnotherMethodLink().click();
+    await u.po.signIn.getAltMethodsEmailCodeButton().click();
+    await u.po.signIn.enterTestOtpCode();
+
+    await u.po.expect.toBeSignedIn();
+  });
+
   test('access protected page @express', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
