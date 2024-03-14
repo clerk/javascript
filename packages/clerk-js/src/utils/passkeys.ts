@@ -89,7 +89,9 @@ async function webAuthnCreateCredential(
 
     if (!credential) {
       return {
-        error: new ClerkWebAuthnError('Browser failed to create credential', { code: 'passkey_credential_get_failed' }),
+        error: new ClerkWebAuthnError('Browser failed to create credential', {
+          code: 'passkey_credential_create_failed',
+        }),
         publicKeyCredential: null,
       };
     }
