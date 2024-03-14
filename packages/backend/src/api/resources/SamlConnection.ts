@@ -1,4 +1,4 @@
-import type { AttributeMapping } from './AttributeMapping';
+import { AttributeMapping } from './AttributeMapping';
 import type { SamlConnectionJSON } from './JSON';
 
 export class SamlConnection {
@@ -6,10 +6,11 @@ export class SamlConnection {
     readonly id: string,
     readonly name: string,
     readonly domain: string,
-    readonly idpEntityId: string,
-    readonly idpSsoUrl: string,
-    readonly idpCertificate: string,
-    readonly idpMetadataUrl: string,
+    readonly idpEntityId: string | null,
+    readonly idpSsoUrl: string | null,
+    readonly idpCertificate: string | null,
+    readonly idpMetadataUrl: string | null,
+    readonly idpMetadata: string | null,
     readonly acsUrl: string,
     readonly spEntityId: string,
     readonly spMetadataUrl: string,
@@ -21,7 +22,7 @@ export class SamlConnection {
     readonly allowIdpInitiated: boolean,
     readonly createdAt: number,
     readonly updatedAt: number,
-    readonly attributeMapping: AttributeMapping,
+    readonly attributeMapping: AttributeMapping | null,
   ) {}
   static fromJSON(data: SamlConnectionJSON): SamlConnection {
     return new SamlConnection(
@@ -32,6 +33,7 @@ export class SamlConnection {
       data.idp_sso_url,
       data.idp_certificate,
       data.idp_metadata_url,
+      data.idp_metadata,
       data.acs_url,
       data.sp_entity_id,
       data.sp_metadata_url,
@@ -43,7 +45,7 @@ export class SamlConnection {
       data.allow_idp_initiated,
       data.created_at,
       data.updated_at,
-      data.attribute_mapping,
+      data.attribute_mapping && AttributeMapping.fromJSON(data.attribute_mapping),
     );
   }
 }

@@ -335,6 +335,7 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   idp_sso_url: string;
   idp_certificate: string;
   idp_metadata_url: string;
+  idp_metadata: string;
   acs_url: string;
   sp_entity_id: string;
   sp_metadata_url: string;
@@ -346,10 +347,10 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   allow_idp_initiated: boolean;
   created_at: number;
   updated_at: number;
-  attribute_mapping: AttributeMappingJSON;
+  attribute_mapping: AttributeMappingJSON | null;
 }
 
-export interface AttributeMappingJSON extends ClerkResourceJSON {
+export interface AttributeMappingJSON {
   user_id: string;
   email_address: string;
   first_name: string;

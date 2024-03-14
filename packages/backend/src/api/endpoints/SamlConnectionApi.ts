@@ -18,6 +18,7 @@ type CreateSamlConnectionParams = {
   idpSsoUrl?: string;
   idpCertificate?: string;
   idpMetadataUrl?: string;
+  idpMetadata?: string;
   attributeMapping?: {
     emailAddress?: string;
     firstName?: string;
@@ -34,6 +35,7 @@ type UpdateSamlConnectionParams = {
   idpSsoUrl?: string;
   idpCertificate?: string;
   idpMetadataUrl?: string;
+  idpMetadata?: string;
   attributeMapping?: {
     emailAddress?: string;
     firstName?: string;
