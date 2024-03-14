@@ -30,7 +30,6 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 const useAutoFillPasskey = () => {
   const { __experimental_authenticateWithPasskey } = useCoreSignIn();
   const { setActive } = useClerk();
-  // const abortRef = useRef();
   const [isSupported, setIsSupported] = useState(false);
   useEffect(() => {
     async function runAutofillPasskey() {
@@ -40,23 +39,13 @@ const useAutoFillPasskey = () => {
         return;
       }
 
-      const res = await __experimental_authenticateWithPasskey({ triggerAutofill: true }).catch(() => {
-        console.log('FAILING FROM START');
-        return null;
-      });
+      const res = await __experimental_authenticateWithPasskey({ triggerAutofill: true }).catch(() => null);
       if (res?.createdSessionId) {
         await setActive({ session: res.createdSessionId });
       }
     }
 
     runAutofillPasskey();
-
-    // return () => {
-    //   if (!abortRef.current) {
-    //     return;
-    //   }
-    //   abortRef.current.abort();
-    // };
   }, []);
 
   return {

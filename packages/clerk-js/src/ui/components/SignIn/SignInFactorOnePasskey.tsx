@@ -38,7 +38,6 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
     return signIn
       .__experimental_authenticateWithPasskey()
       .then(res => {
-        console.log('Res');
         switch (res.status) {
           case 'complete':
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
@@ -49,8 +48,6 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
         }
       })
       .catch(err => {
-        console.log('FAILING FROM ONE ');
-
         if (isUserLockedError(err)) {
           // @ts-expect-error -- private method for the time being
           return clerk.__internal_navigateWithError('..', err.errors[0]);
@@ -59,8 +56,6 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
         handleError(err, [], card.setError);
       });
   };
-
-  console.log('WWWWW');
 
   if (showHavingTrouble) {
     return <HavingTrouble onBackLinkClick={toggleHavingTrouble} />;

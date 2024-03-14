@@ -117,17 +117,7 @@ export function _SignInFactorOne(): JSX.Element {
     case 'passkey':
       return (
         <SignInFactorOnePasskey
-          // factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
-          // onFactorPrepare={handleFactorPrepare}
-          onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
-            handleFactorPrepare();
-            setFactor(prev => ({
-              currentFactor: {
-                ...factor,
-              },
-              prevCurrentFactor: prev.currentFactor,
-            }));
-          }}
+          onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClick={toggleAllStrategies}
         />
       );

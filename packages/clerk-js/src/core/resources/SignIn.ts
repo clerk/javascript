@@ -336,6 +336,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
+      // TODO: Remove this mock
       if (data.supported_first_factors) {
         this.supportedFirstFactors = deepSnakeToCamel([
           ...data.supported_first_factors,
