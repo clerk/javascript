@@ -102,22 +102,18 @@ export const SignInRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: [
-        sendTo(ThirdPartyMachineId, ({ event }) => ({
-          type: 'REDIRECT',
-          params: {
-            strategy: event.strategy,
-          },
-        })),
-      ],
+      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+        type: 'REDIRECT',
+        params: {
+          strategy: event.strategy,
+        },
+      })),
     },
     'AUTHENTICATE.SAML': {
-      actions: [
-        sendTo(ThirdPartyMachineId, {
-          type: 'REDIRECT',
-          params: { strategy: 'saml' },
-        }),
-      ],
+      actions: sendTo(ThirdPartyMachineId, {
+        type: 'REDIRECT',
+        params: { strategy: 'saml' },
+      }),
     },
     'NAVIGATE.PREVIOUS': '.Hist',
     'NAVIGATE.START': '.Start',
@@ -145,7 +141,7 @@ export const SignInRouterMachine = setup({
           value: event.value,
           step: event.step,
           strategy: event.strategy,
-        }
+        },
       })),
     },
   },
