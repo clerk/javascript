@@ -8,6 +8,9 @@ export const common = ({ page }: TestArgs) => {
     setPassword: (val: string) => {
       return page.locator('input[name=password]').fill(val);
     },
+    setPasswordConfirmation: (val: string) => {
+      return page.locator('input[name=confirmPassword]').fill(val);
+    },
     enterOtpCode: async (code: string) => {
       await page.getByRole('textbox', { name: /digit 1/i }).click();
       await page.keyboard.type(code, { delay: 50 });

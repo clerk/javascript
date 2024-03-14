@@ -14,6 +14,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     fakeUser = u.services.users.createFakeUser({
       fictionalEmail: true,
       withPhoneNumber: true,
+      withUsername: true,
     });
     await u.services.users.createBapiUser(fakeUser);
   });
@@ -83,6 +84,37 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.expect.toBeSignedIn();
 
     await fakeUserWithoutPassword.deleteIfExists();
+  });
+
+  test('sign in with username and password', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.getIdentifierInput().fill(fakeUser.username);
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('reset password successfully', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    const fakeUserWithPasword = u.services.users.createFakeUser({
+      fictionalEmail: true,
+      withPassword: true,
+    });
+    await u.services.users.createBapiUser(fakeUserWithPasword);
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.getIdentifierInput().fill(fakeUserWithPasword.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.getForgotPassword().click();
+    await u.po.signIn.getResetPassword().click();
+    await u.po.signIn.enterTestOtpCode();
+    await u.po.signIn.setPassword(`${fakeUserWithPasword.password}_reset`);
+    await u.po.signIn.setPasswordConfirmation(`${fakeUserWithPasword.password}_reset`);
+    await u.po.signIn.getResetPassword().click();
+    await u.po.expect.toBeSignedIn();
+
+    await fakeUserWithPasword.deleteIfExists();
   });
 
   test('access protected page @express', async ({ page, context }) => {
