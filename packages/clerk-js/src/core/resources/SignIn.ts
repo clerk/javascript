@@ -277,23 +277,22 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    if (!this.firstFactorVerification.nonce) {
+    if (!this.firstFactorVerification.nonce && !this.id) {
       // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
-    }
-
-    // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-    const passKeyFactor = this.supportedFirstFactors.find(
+    } else {
       // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-      f => f.strategy === 'passkey',
-    ) as __experimental_PasskeyFactor;
+      const passKeyFactor = this.supportedFirstFactors.find(
+        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+        f => f.strategy === 'passkey',
+      ) as __experimental_PasskeyFactor;
 
-    if (!passKeyFactor) {
-      clerkVerifyPasskeyCalledBeforeCreate();
+      if (!passKeyFactor) {
+        clerkVerifyPasskeyCalledBeforeCreate();
+      }
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      await this.prepareFirstFactor(passKeyFactor);
     }
-
-    // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-    await this.prepareFirstFactor(passKeyFactor);
 
     const { nonce } = this.firstFactorVerification;
     const publicKey = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
