@@ -153,6 +153,9 @@ export const polishedAppearance: Appearance = {
       phoneInputBox: {
         ...inputStyles(theme),
       },
+      formInputGroup: {
+        ...inputStyles(theme),
+      },
       selectSearchInput__countryCode: {
         boxShadow: 'none',
         '&:focus': { boxShadow: 'none' },
