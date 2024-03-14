@@ -45,8 +45,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.instanceEnvironmentType = data.instance_environment_type;
     this.applicationName = data.application_name;
     this.theme = data.theme;
-    // TODO: Remove this mock
-    this.preferredSignInStrategy = 'passkey' || data.preferred_sign_in_strategy;
+    this.preferredSignInStrategy = data.preferred_sign_in_strategy;
     this.logoImageUrl = data.logo_image_url;
     this.faviconImageUrl = data.favicon_image_url;
     this.homeUrl = data.home_url;
