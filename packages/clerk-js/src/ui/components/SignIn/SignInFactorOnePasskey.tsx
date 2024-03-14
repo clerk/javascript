@@ -1,16 +1,12 @@
-import { isUserLockedError } from '@clerk/shared/error';
-import { useClerk } from '@clerk/shared/react';
 import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { Card, Form, Header, IdentityPreview, useCardState } from '../../elements';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
-import { handleError } from '../../utils';
 import { HavingTrouble } from './HavingTrouble';
+import { useHandleAuthenticateWithPasskey } from './shared';
 
 type SignInFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
@@ -20,41 +16,19 @@ type SignInFactorOnePasswordProps = {
 export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
   const { onShowAlternativeMethodsClick } = props;
   const card = useCardState();
-  const { setActive } = useClerk();
   const signIn = useCoreSignIn();
-  const { navigateAfterSignIn } = useSignInContext();
-  const supportEmail = useSupportEmail();
   const { navigate } = useRouter();
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
-  const clerk = useClerk();
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
 
   const goBack = () => {
     return navigate('../');
   };
 
-  const handleSubmit: React.FormEventHandler = async e => {
+  const handleSubmit: React.FormEventHandler = e => {
     e.preventDefault();
-    return signIn
-      .__experimental_authenticateWithPasskey()
-      .then(res => {
-        switch (res.status) {
-          case 'complete':
-            return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
-          case 'needs_second_factor':
-            return navigate('../factor-two');
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
-      })
-      .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
-        }
-
-        handleError(err, [], card.setError);
-      });
+    return authenticateWithPasskey();
   };
 
   if (showHavingTrouble) {

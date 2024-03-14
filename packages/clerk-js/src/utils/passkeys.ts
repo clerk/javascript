@@ -26,6 +26,7 @@ type WebAuthnGetCredentialReturn =
 
 type ClerkWebAuthnErrorCode =
   | 'passkey_exists'
+  | 'passkey_retrieval_cancelled'
   | 'passkey_registration_cancelled'
   | 'passkey_credential_create_failed'
   | 'passkey_credential_get_failed';
@@ -163,6 +164,7 @@ async function webAuthnGetCredential({
  */
 function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
   if (error.name === 'InvalidStateError') {
+    // Note: Firefox will throw 'NotAllowedError' when passkeys exists
     return new ClerkWebAuthnError(error.message, { code: 'passkey_exists' });
   } else if (error.name === 'NotAllowedError') {
     return new ClerkWebAuthnError(error.message, { code: 'passkey_registration_cancelled' });
@@ -176,7 +178,7 @@ function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRun
  */
 function handlePublicKeyGetError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
   if (error.name === 'NotAllowedError') {
-    return new ClerkWebAuthnError(error.message, { code: 'passkey_registration_cancelled' });
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_cancelled' });
   }
   return error;
 }

@@ -25,12 +25,13 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
+import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
 const useAutoFillPasskey = () => {
-  const { __experimental_authenticateWithPasskey } = useCoreSignIn();
-  const { setActive } = useClerk();
   const [isSupported, setIsSupported] = useState(false);
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
+
   useEffect(() => {
     async function runAutofillPasskey() {
       const _isSupported = await isWebAuthnAutofillSupported();
@@ -39,10 +40,7 @@ const useAutoFillPasskey = () => {
         return;
       }
 
-      const res = await __experimental_authenticateWithPasskey({ triggerAutofill: true }).catch(() => null);
-      if (res?.createdSessionId) {
-        await setActive({ session: res.createdSessionId });
-      }
+      await authenticateWithPasskey({ triggerAutofill: true });
     }
 
     runAutofillPasskey();
