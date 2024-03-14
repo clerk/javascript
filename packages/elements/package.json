@@ -106,6 +106,9 @@
       "optional": true
     }
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.9.6"
+  },
   "engines": {
     "node": ">=18.17.0"
   },
