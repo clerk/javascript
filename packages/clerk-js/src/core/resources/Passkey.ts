@@ -1,4 +1,5 @@
 import type {
+  __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   DeletedObjectJSON,
   DeletedObjectResource,
   PasskeyJSON,
@@ -8,7 +9,6 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import type { PublicKeyCredentialWithAuthenticatorAttestationResponse } from '../../utils/passkeys';
 import {
   isWebAuthnPlatformAuthenticatorSupported,
   isWebAuthnSupported,
@@ -41,7 +41,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
   private static async attemptVerification(
     passkeyId: string,
-    credential: PublicKeyCredentialWithAuthenticatorAttestationResponse,
+    credential: __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   ) {
     const jsonPublicKeyCredential = serializePublicKeyCredential(credential);
     return BaseResource._fetch({
