@@ -24,9 +24,10 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     // This is a workaround to prevent zooming on iOS when focusing an input
     [mqu.ios]: {
       fontSize: theme.fontSizes.$lg,
+      '&:not([type="checkbox"]):not([type="radio"])': {
+        WebkitAppearance: 'none',
+      },
     },
-    // This is a fix for iOS webkit on iOS below 16, where the input is not respecting the box-shadow
-    WebkitAppearance: 'none',
     ':autofill': {
       animationName: 'onAutoFillStart',
     },
