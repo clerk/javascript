@@ -25,7 +25,7 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     [mqu.ios]: {
       fontSize: theme.fontSizes.$lg,
       '&:not([type="checkbox"]):not([type="radio"])': {
-        appearance: 'none',
+        WebkitAppearance: 'none',
       },
     },
     ':autofill': {
