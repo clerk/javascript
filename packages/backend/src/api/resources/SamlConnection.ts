@@ -21,7 +21,7 @@ export class SamlConnection {
     readonly allowIdpInitiated: boolean,
     readonly createdAt: number,
     readonly updatedAt: number,
-    readonly attributeMapping: AttributeMapping | null,
+    readonly attributeMapping: AttributeMapping,
   ) {}
   static fromJSON(data: SamlConnectionJSON): SamlConnection {
     return new SamlConnection(
