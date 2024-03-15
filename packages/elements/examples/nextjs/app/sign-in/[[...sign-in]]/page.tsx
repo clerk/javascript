@@ -1,7 +1,17 @@
 'use client';
 
 import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
-import { Navigate, Provider, ProviderIcon, SignIn, Step, StrategyOption, Verification } from '@clerk/elements/sign-in';
+import {
+  Navigate,
+  Provider,
+  ProviderIcon,
+  SafeIdentifier,
+  Salutation,
+  SignIn,
+  Step,
+  StrategyOption,
+  Verification,
+} from '@clerk/elements/sign-in';
 import Link from 'next/link';
 import { type ComponentProps, useState } from 'react';
 
@@ -153,6 +163,10 @@ export default function SignInPage() {
             <GlobalError className='block text-red-400 font-mono' />
 
             <Verification name='password'>
+              <P className='text-sm'>
+                Welcome back <Salutation />!
+              </P>
+
               <CustomField
                 label='Password'
                 name='password'
@@ -162,6 +176,10 @@ export default function SignInPage() {
             </Verification>
 
             <Verification name='email_code'>
+              <P className='text-sm'>
+                Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
+              </P>
+
               <CustomField
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
@@ -174,6 +192,10 @@ export default function SignInPage() {
             </Verification>
 
             <Verification name='phone_code'>
+              <P className='text-sm'>
+                Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
+              </P>
+
               <CustomField
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
@@ -188,7 +210,9 @@ export default function SignInPage() {
             <Verification name='reset_password_email_code'>
               <H3>Verify your email</H3>
 
-              <P>Please check your email for a verification code...</P>
+              <P className='text-sm'>
+                Please check your <SafeIdentifier /> for a verification code...
+              </P>
             </Verification>
           </div>
 
