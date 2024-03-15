@@ -6,7 +6,7 @@ import { Button, Col, descriptors, Flex, Flow, localizationKeys } from '../../cu
 import { ArrowBlockButton, BackLink, Card, Divider, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
-import { ChatAltIcon, Email, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
+import { ChatAltIcon, Email, Fingerprint, LinkIcon, LockClosedIcon, RequestAuthIcon } from '../../icons';
 import { formatSafeIdentifier } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
@@ -157,6 +157,7 @@ export function getButtonIcon(factor: SignInFactor) {
     reset_password_email_code: RequestAuthIcon,
     reset_password_phone_code: RequestAuthIcon,
     password: LockClosedIcon,
+    passkey: Fingerprint,
   } as const;
 
   return icons[factor.strategy as keyof typeof icons];

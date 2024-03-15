@@ -2,8 +2,9 @@ import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { useCoreSignIn } from '../../contexts';
-import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
+import { descriptors, Flex, Flow, Icon, localizationKeys } from '../../customizables';
 import { Card, Form, Header, IdentityPreview, useCardState } from '../../elements';
+import { Fingerprint } from '../../icons';
 import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
 import { useHandleAuthenticateWithPasskey } from './shared';
@@ -40,8 +41,21 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={'Use your passkey to confirm its really you'} />
-            <Header.Subtitle localizationKey={'Your device will ask you for your fingerprint, face, or screen lock'} />
+            <Icon
+              elementDescriptor={descriptors.passkeyIcon}
+              icon={Fingerprint}
+              sx={t => ({
+                color: t.colors.$neutralAlpha500,
+                marginInline: 'auto',
+                paddingBottom: t.sizes.$1,
+                width: t.sizes.$12,
+                height: t.sizes.$12,
+              })}
+            />
+            <Header.Title localizationKey={'Use your passkey'} />
+            <Header.Subtitle
+              localizationKey={`Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.`}
+            />
             <IdentityPreview
               identifier={signIn.identifier}
               avatarUrl={signIn.userData.imageUrl}
