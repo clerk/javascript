@@ -73,6 +73,7 @@ export interface SignUpVerificationContext {
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignUpRouterMachine>;
+  loadingStep: 'verifications';
 }
 
 // ---------------------------------- Schema ---------------------------------- //

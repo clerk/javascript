@@ -138,7 +138,7 @@ export const SignInRouterMachine = setup({
     LOADING: {
       actions: assign(({ event }) => ({
         loading: {
-          value: event.value,
+          isLoading: event.isLoading,
           step: event.step,
           strategy: event.strategy,
         },
@@ -154,7 +154,7 @@ export const SignInRouterMachine = setup({
             router: event.router,
             signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
             loading: {
-              value: false,
+              isLoading: false,
             },
           })),
           target: 'Init',

@@ -2,10 +2,10 @@ import type { LoadedClerk } from '@clerk/types';
 import { assertEvent, assign, log, sendParent, setup } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 
-import type { BaseRouterLoadingEvent } from '../types';
 import { handleRedirectCallback, redirect } from './actors';
 import type { ThirdPartyMachineSchema } from './types';
 
@@ -39,20 +39,7 @@ export const ThirdPartyMachine = setup({
       activeStrategy: null,
     }),
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
-    setLoading: ({ context, event }, { status }: { status: 'entry' | 'exit' }) => {
-      const e = {
-        type: 'LOADING',
-        value: status === 'entry' ? true : false,
-      } as BaseRouterLoadingEvent;
-
-      if (status === 'entry') {
-        assertEvent(event, 'REDIRECT');
-
-        e['strategy'] = event.params.strategy;
-      }
-
-      context.parent.send(e);
-    },
+    sendToLoading,
   },
   types: {} as ThirdPartyMachineSchema,
 }).createMachine({
@@ -63,6 +50,7 @@ export const ThirdPartyMachine = setup({
     flow: input.flow,
     parent: input.parent,
     thirdPartyProviders: getEnabledThirdPartyProviders(input.environment),
+    loadingStep: 'strategy',
   }),
   initial: 'Idle',
   states: {
@@ -79,16 +67,8 @@ export const ThirdPartyMachine = setup({
     Redirecting: {
       description: 'Redirects to the third-party provider for authentication',
       tags: ['state:redirect', 'state:loading'],
-      entry: ['assignActiveStrategy', { type: 'setLoading', params: { status: 'entry' } }],
-      exit: [
-        'unassignActiveStrategy',
-        {
-          type: 'setLoading',
-          params: {
-            status: 'exit',
-          },
-        },
-      ],
+      entry: ['assignActiveStrategy', 'sendToLoading'],
+      exit: ['unassignActiveStrategy', 'sendToLoading'],
       invoke: {
         id: 'redirect',
         src: 'redirect',
@@ -113,15 +93,7 @@ export const ThirdPartyMachine = setup({
           };
         },
         onError: {
-          actions: [
-            'reportError',
-            {
-              type: 'setLoading',
-              params: {
-                status: 'exit',
-              },
-            },
-          ],
+          actions: 'reportError',
           target: 'Idle',
         },
       },

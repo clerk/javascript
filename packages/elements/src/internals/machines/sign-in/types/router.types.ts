@@ -51,7 +51,7 @@ export type SignInRouterForgotPasswordEvent = { type: 'NAVIGATE.FORGOT_PASSWORD'
 export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
-export type SignInRouterLoadingEvent = BaseRouterLoadingEvent;
+export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications'>;
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -85,7 +85,7 @@ export type SignInRouterEvents =
 
 // ---------------------------------- Context ---------------------------------- //
 
-export type SignInRouterLoadingContext = Omit<BaseRouterLoadingEvent, 'type'>;
+export type SignInRouterLoadingContext = Omit<SignInRouterLoadingEvent, 'type'>;
 
 export interface SignInRouterContext extends BaseRouterContext {
   signUpPath: string;

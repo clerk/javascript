@@ -4,6 +4,7 @@ import { fromPromise, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import { type TSignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
 import type { SignInStartSchema } from '~/internals/machines/sign-in/types';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
@@ -47,12 +48,7 @@ export const SignInStartMachine = setup({
       },
     ),
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
-    setLoading: ({ context }, { status }: { status: 'entry' | 'exit' }) =>
-      context.parent.send({
-        type: 'LOADING',
-        value: status === 'entry' ? true : false,
-        ...(status === 'entry' && { step: 'start' }),
-      }),
+    sendToLoading,
   },
   types: {} as SignInStartSchema,
 }).createMachine({
@@ -61,6 +57,7 @@ export const SignInStartMachine = setup({
     basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
     parent: input.parent,
     formRef: input.form,
+    loadingStep: 'start',
   }),
   initial: 'Pending',
   states: {
@@ -76,12 +73,7 @@ export const SignInStartMachine = setup({
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
-      entry: {
-        type: 'setLoading',
-        params: {
-          status: 'entry',
-        },
-      },
+      entry: 'sendToLoading',
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -90,26 +82,10 @@ export const SignInStartMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: [
-            'sendToNext',
-            {
-              type: 'setLoading',
-              params: {
-                status: 'exit',
-              },
-            },
-          ],
+          actions: ['sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: [
-            'setFormErrors',
-            {
-              type: 'setLoading',
-              params: {
-                status: 'exit',
-              },
-            },
-          ],
+          actions: ['setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },

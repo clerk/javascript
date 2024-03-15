@@ -16,6 +16,7 @@ import { assign, fromPromise, sendTo, setup } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import type { WithParams } from '~/internals/machines/shared.types';
 import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
 import type { SignInVerificationSchema } from '~/internals/machines/sign-in/types';
@@ -62,14 +63,9 @@ const SignInVerificationMachine = setup({
         };
       },
     ),
-    sendToNext: ({ context }, { resource }: { resource: DoneActorEvent<SignInResource>['output'] }) =>
-      context.parent.send({ type: 'NEXT', resource }),
-    setLoading: ({ context }, { status }: { status: 'entry' | 'exit' }) =>
-      context.parent.send({
-        type: 'LOADING',
-        value: status === 'entry' ? true : false,
-        ...(status === 'entry' && { step: 'verifications', strategy: context.currentFactor?.strategy }),
-      }),
+    sendToNext: ({ context, event }) =>
+      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
+    sendToLoading,
   },
   types: {} as SignInVerificationSchema,
 }).createMachine({
@@ -78,6 +74,7 @@ const SignInVerificationMachine = setup({
     currentFactor: null,
     formRef: input.form,
     parent: input.parent,
+    loadingStep: 'verifications',
   }),
   initial: 'Preparing',
   entry: 'determineStartingFactor',
@@ -120,12 +117,7 @@ const SignInVerificationMachine = setup({
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
-      entry: {
-        type: 'setLoading',
-        params: {
-          status: 'entry',
-        },
-      },
+      entry: 'sendToLoading',
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -135,31 +127,10 @@ const SignInVerificationMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: [
-            {
-              type: 'sendToNext',
-              params({ event }) {
-                return { resource: event.output };
-              },
-            },
-            {
-              type: 'setLoading',
-              params: {
-                status: 'exit',
-              },
-            },
-          ],
+          actions: ['sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: [
-            'setFormErrors',
-            {
-              type: 'setLoading',
-              params: {
-                status: 'exit',
-              },
-            },
-          ],
+          actions: ['setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },
