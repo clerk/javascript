@@ -26,6 +26,7 @@ type WebAuthnGetCredentialReturn =
 
 type ClerkWebAuthnErrorCode =
   | 'passkey_exists'
+  | 'passkey_retrieval_aborted'
   | 'passkey_retrieval_cancelled'
   | 'passkey_registration_cancelled'
   | 'passkey_credential_create_failed'
@@ -177,6 +178,10 @@ function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRun
  * @param error
  */
 function handlePublicKeyGetError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
+  if (error.name === 'AbortError') {
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_aborted' });
+  }
+
   if (error.name === 'NotAllowedError') {
     return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_cancelled' });
   }
@@ -282,4 +287,5 @@ export {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredential,
   serializePublicKeyCredentialAssertion,
+  __internal_WebAuthnAbortService,
 };
