@@ -6,7 +6,7 @@ exports[`module exports should not change unless explicitly set 1`] = `
   "clerkMiddleware",
   "createClerkClient",
   "getAuth",
-  "protect",
+  "requireAuth",
   "verifyToken",
 ]
 `;

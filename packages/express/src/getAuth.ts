@@ -13,7 +13,7 @@ import { isAuthInRequest } from './utils';
  */
 export const getAuth = (req: ExpressRequest): AuthObject => {
   if (!isAuthInRequest(req)) {
-    throw new Error(middlewareRequired);
+    throw new Error(middlewareRequired('getAuth'));
   }
 
   return req.auth;

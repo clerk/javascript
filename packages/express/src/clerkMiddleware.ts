@@ -3,8 +3,15 @@ import type { RequestHandler } from 'express';
 
 import { authenticateRequest, setResponseHeaders } from './authenticateRequest';
 import { clerkClient as defaultClerkClient } from './clerkClient';
+import { middlewareNotInvoked } from './errors';
 import type { ClerkMiddleware, ClerkMiddlewareOptions } from './types';
 import { defaultHandler } from './utils';
+
+const usedWithoutInvocation = (args: unknown[]) => {
+  return (
+    args.length === 3 && typeof args[0] === 'object' && typeof args[1] === 'object' && typeof args[2] === 'function'
+  );
+};
 
 const parseHandlerAndOptions = (args: unknown[]) => {
   return [
@@ -13,7 +20,7 @@ const parseHandlerAndOptions = (args: unknown[]) => {
   ] as [RequestHandler | undefined, ClerkMiddlewareOptions];
 };
 
-export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): RequestHandler[] => {
+export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [handler, options] = parseHandlerAndOptions(args);
 
   const shouldInitializeClerkClient = Object.keys(options).length > 0;
@@ -39,6 +46,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): RequestHan
 
     return next();
   };
+
+  if (usedWithoutInvocation(args)) {
+    throw new Error(middlewareNotInvoked);
+  }
 
   return [middleware, handler || defaultHandler];
 };

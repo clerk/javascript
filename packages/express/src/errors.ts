@@ -7,15 +7,20 @@ const createErrorMessage = (msg: string) => {
   `;
 };
 
-export const middlewareRequired = createErrorMessage(`The "clerkMiddleware" should be registered before using "getAuth".
+export const middlewareRequired = (fnName: string) =>
+  createErrorMessage(`The "clerkMiddleware" should be registered before using "${fnName}".
 Example:
 
 import express from 'express';
 import { clerkMiddleware } from '@clerk/express';
 
 const app = express();
-app.use(clerkMiddleware);
+app.use(clerkMiddleware());
 `);
+
+export const middlewareNotInvoked = createErrorMessage(
+  `The "clerkMiddleware" should be invoked. Use "clerkMiddleware()"`,
+);
 
 export const satelliteAndMissingProxyUrlAndDomain =
   'Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl';
