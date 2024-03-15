@@ -1,5 +1,4 @@
 import {
-  SignInNameSelector,
   SignInSafeIdentifierSelector,
   SignInSalutationSelector,
 } from '~/internals/machines/sign-in/selectors/sign-in.selectors';
@@ -12,8 +11,4 @@ export function SignInSafeIdentifier(): string {
 
 export function SignInSalutation(): string {
   return SignInRouterCtx.useSelector(SignInSalutationSelector);
-}
-
-export function SignInName(): string {
-  return SignInRouterCtx.useSelector(SignInNameSelector);
 }

@@ -14,11 +14,7 @@ export {
   SignInVerification as Verification,
 } from './verifications';
 
-export {
-  SignInName as Name,
-  SignInSafeIdentifier as SafeIdentifier,
-  SignInSalutation as Salutation,
-} from './identifiers';
+export { SignInSafeIdentifier as SafeIdentifier, SignInSalutation as Salutation } from './identifiers';
 
 export { useIsLoading_unstable } from './hooks/use-loading.hook';
 
