@@ -169,6 +169,11 @@ const createBaseUserSettings = (): UserSettingsJSON => {
     min_zxcvbn_strength: 0,
   } as UserSettingsJSON['password_settings'];
 
+  const passkeySettingsConfig = {
+    allow_autofill: false,
+    show_sign_in_button: false,
+  } as UserSettingsJSON['passkey_settings'];
+
   return {
     attributes: { ...attributeConfig },
     actions: { delete_self: false, create_organization: false },
@@ -193,6 +198,7 @@ const createBaseUserSettings = (): UserSettingsJSON => {
       },
     },
     password_settings: passwordSettingsConfig,
+    passkey_settings: passkeySettingsConfig,
   };
 };
 

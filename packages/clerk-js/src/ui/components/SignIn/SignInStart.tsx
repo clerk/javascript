@@ -28,13 +28,11 @@ import { buildRequest, handleError, isMobileDevice, useFormControl } from '../..
 import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
 
-// Mock values
-const instanceAllowAutofill = false;
-const instanceAllowButton = false;
-
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
+  const { userSettings } = useEnvironment();
+  const { passkeySettings } = userSettings;
 
   useEffect(() => {
     async function runAutofillPasskey() {
@@ -47,7 +45,7 @@ const useAutoFillPasskey = () => {
       await authenticateWithPasskey({ triggerAutofill: true });
     }
 
-    if (instanceAllowAutofill) {
+    if (passkeySettings.allow_autofill) {
       runAutofillPasskey();
     }
   }, []);
@@ -360,7 +358,7 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
-            {instanceAllowButton && (
+            {userSettings.passkeySettings.show_sign_in_button && (
               <Card.Action elementId={'usePasskey'}>
                 <Card.ActionLink
                   localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
