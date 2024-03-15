@@ -11,9 +11,9 @@ export type UseThirdPartyProviderReturn =
     })
   | null;
 
-export const SocialProviderContext = createContext<ThirdPartyProvider | null>(null);
+export const ProviderContext = createContext<ThirdPartyProvider | null>(null);
 export const useSocialProviderContext = () => {
-  const ctx = useContext(SocialProviderContext);
+  const ctx = useContext(ProviderContext);
 
   if (!ctx) {
     throw new Error('useSocialProviderContext must be used within SignInSocialProvider');
@@ -22,12 +22,12 @@ export const useSocialProviderContext = () => {
   return ctx;
 };
 
-export interface SocialProviderProps extends React.HTMLAttributes<HTMLButtonElement> {
+export interface ProviderProps extends React.HTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   provider: UseThirdPartyProviderReturn | undefined | null;
 }
 
-export function SocialProvider({ asChild, provider, ...rest }: SocialProviderProps) {
+export function Provider({ asChild, provider, ...rest }: ProviderProps) {
   if (!provider) {
     return null;
   }
@@ -36,21 +36,21 @@ export function SocialProvider({ asChild, provider, ...rest }: SocialProviderPro
   const defaultProps = asChild ? {} : { type: 'button' as const };
 
   return (
-    <SocialProviderContext.Provider value={provider}>
+    <ProviderContext.Provider value={provider}>
       <Comp
         onClick={provider.events.authenticate}
         {...defaultProps}
         {...rest}
       />
-    </SocialProviderContext.Provider>
+    </ProviderContext.Provider>
   );
 }
 
-export interface SocialProviderIconProps extends Omit<React.HTMLAttributes<HTMLImageElement>, 'src'> {
+export interface ProviderIconProps extends Omit<React.HTMLAttributes<HTMLImageElement>, 'src'> {
   asChild?: boolean;
 }
 
-export function SocialProviderIcon({ asChild, ...rest }: SocialProviderIconProps) {
+export function ProviderIcon({ asChild, ...rest }: ProviderIconProps) {
   const { iconUrl, name } = useSocialProviderContext();
 
   const Comp = asChild ? Slot : 'img';

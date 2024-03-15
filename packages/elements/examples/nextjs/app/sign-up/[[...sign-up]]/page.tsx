@@ -1,7 +1,7 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import { SignUp, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-up';
+import { Provider, ProviderIcon, SignUp, Step, Verification } from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
@@ -15,29 +15,29 @@ export default function SignUpPage() {
             <H1>Sign Up</H1>
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
-              <SocialProvider
+              <Provider
                 name='github'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon className='invert' />
+                <ProviderIcon className='invert' />
                 Sign In with GitHub
-              </SocialProvider>
+              </Provider>
 
-              <SocialProvider
+              <Provider
                 name='google'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon />
+                <ProviderIcon />
                 Sign In with Google
-              </SocialProvider>
+              </Provider>
 
-              <SocialProvider
+              <Provider
                 name='metamask'
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon />
+                <ProviderIcon />
                 Sign In with Metamask
-              </SocialProvider>
+              </Provider>
             </div>
 
             <Hr />
