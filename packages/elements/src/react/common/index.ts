@@ -11,3 +11,5 @@ export type {
   FormProps,
   FormSubmitProps,
 } from '~/react/common/form';
+
+export type { OTPInputSegmentStatus } from '~/react/common/form/otp';
