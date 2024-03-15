@@ -1,5 +1,5 @@
 import type { SignInResource } from '@clerk/types';
-import type { AnyActorLogic } from 'xstate';
+import type { AnyActorLogic, MachineSnapshot } from 'xstate';
 
 import type { SignInVerificationFactorUpdateEvent } from '~/internals/machines/sign-in/types';
 import type {
@@ -93,3 +93,18 @@ export interface SignInRouterSchema {
   events: SignInRouterEvents;
   tags: SignInRouterTags;
 }
+
+// ---------------------------------- Schema ---------------------------------- //
+
+export type SignInChildren = any; // TODO: Update
+export type SignInOuptut = any; // TODO: Update
+export type SignInStateValue = any; // TODO: Update
+
+export type SignInRouterSnapshot = MachineSnapshot<
+  SignInRouterContext,
+  SignInRouterEvents,
+  SignInChildren,
+  SignInStateValue,
+  SignInRouterTags,
+  SignInOuptut
+>;
