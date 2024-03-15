@@ -39,8 +39,6 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
   let step: BaseRouterLoadingStep | undefined;
   let strategy: SignInStrategy | undefined;
 
-  console.log('sendToLoadingEvent', event);
-
   // By default the loading state is set to `true` when this function is called
   // Only if these events are received, the loading state is set to `false`
   // Early return here to avoid unnecessary checks
