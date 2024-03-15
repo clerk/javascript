@@ -22,6 +22,7 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   spinnerElementDescriptor?: ElementDescriptor;
   spinnerElementId?: ElementId;
   textLocalizationKey?: LocalizationKey | string;
+  textVariant?: PropsOfComponent<typeof Text>['variant'];
 };
 
 export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockButtonProps>((props, ref) => {
@@ -43,6 +44,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
     textLocalizationKey,
     childrenSx,
     badge,
+    textVariant = 'buttonSmall',
     ...rest
   } = props;
 
@@ -116,7 +118,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
           elementId={textElementId}
           as='span'
           truncate
-          variant='buttonSmall'
+          variant={textVariant}
           localizationKey={textLocalizationKey}
         >
           {children}

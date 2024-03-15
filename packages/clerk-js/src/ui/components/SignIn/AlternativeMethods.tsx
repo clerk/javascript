@@ -88,6 +88,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                       textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
                       arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
                       key={i}
+                      textVariant='buttonLarge'
                       isDisabled={card.isLoading}
                       onClick={() => onFactorSelected(factor)}
                     />
