@@ -11,11 +11,12 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
+import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { errorThrower } from './errorThrower';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
-import { decorateRequest, handleMultiDomainAndProxy, setRequestHeadersOnNextResponse } from './utils';
+import { decorateRequest, handleMultiDomainAndProxy, redirectAdapter, setRequestHeadersOnNextResponse } from './utils';
 
 const CONTROL_FLOW_ERROR = {
   FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
@@ -37,6 +38,10 @@ type ClerkMiddlewareHandler = (
 ) => NextMiddlewareReturn;
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
+export type EnforcedClerkMiddlewareOptions = {
+  publishableKey: string;
+  secretKey: string;
+} & AuthenticateRequestOptions & { debug?: boolean };
 
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
@@ -63,13 +68,31 @@ interface ClerkMiddleware {
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, options] = parseHandlerAndOptions(args);
+  const publishableKey = options.publishableKey || PUBLISHABLE_KEY;
+  if (!publishableKey) {
+    errorThrower.throwMissingPublishableKeyError();
+  }
+  const secretKey = options.secretKey || SECRET_KEY;
+  if (!secretKey) {
+    errorThrower.throwMissingSecretKeyError();
+  }
+  const signInUrl = options.signInUrl || SIGN_IN_URL;
+  const signUpUrl = options.signUpUrl || SIGN_UP_URL;
+
+  const enforcedOptions: EnforcedClerkMiddlewareOptions = {
+    ...options,
+    publishableKey,
+    secretKey,
+    signInUrl,
+    signUpUrl,
+  };
 
   const nextMiddleware: NextMiddleware = async (request, event) => {
     const clerkRequest = createClerkRequest(request);
 
     const requestState = await clerkClient.authenticateRequest(
       clerkRequest,
-      createAuthenticateRequestOptions(clerkRequest, options),
+      createAuthenticateRequestOptions(clerkRequest, enforcedOptions),
     );
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
@@ -93,10 +116,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     }
 
     if (isRedirect(handlerResult)) {
-      return serverRedirectWithAuth(clerkRequest, handlerResult, options);
+      return serverRedirectWithAuth(clerkRequest, handlerResult, enforcedOptions);
     }
 
-    if (options.debug) {
+    if (enforcedOptions.debug) {
       setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
     }
 
@@ -138,17 +161,14 @@ const parseHandlerAndOptions = (args: unknown[]) => {
   ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
 };
 
-export const createAuthenticateRequestOptions = (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
+export const createAuthenticateRequestOptions = (
+  clerkRequest: ClerkRequest,
+  enforcedOptions: EnforcedClerkMiddlewareOptions,
+) => {
   return {
-    ...options,
-    secretKey: options.secretKey || SECRET_KEY,
-    publishableKey: options.publishableKey || PUBLISHABLE_KEY,
-    ...handleMultiDomainAndProxy(clerkRequest, options),
+    ...enforcedOptions,
+    ...handleMultiDomainAndProxy(clerkRequest, enforcedOptions),
   };
-};
-
-const redirectAdapter = (url: string | URL) => {
-  return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
 
 const createMiddlewareRedirectToSignIn = (
@@ -206,7 +226,7 @@ const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestStat
         baseUrl: clerkRequest.clerkUrl,
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
-        publishableKey: PUBLISHABLE_KEY,
+        publishableKey: requestState.publishableKey,
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:
       throw e;

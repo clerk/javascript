@@ -1,5 +1,5 @@
 import type { AuthenticateRequestOptions, AuthObject, ClerkRequest } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
@@ -9,13 +9,18 @@ import { isRedirect, mergeResponses, serverRedirectWithAuth, setHeader, stringif
 import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
 import { createAuthenticateRequestOptions } from './clerkMiddleware';
-import { SECRET_KEY } from './constants';
+import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
-import { redirectToSignIn } from './redirectHelpers';
+import { errorThrower } from './errorThrower';
 import type { RouteMatcherParam } from './routeMatcher';
 import { createRouteMatcher } from './routeMatcher';
 import type { NextMiddlewareReturn } from './types';
-import { apiEndpointUnauthorizedNextResponse, decorateRequest, setRequestHeadersOnNextResponse } from './utils';
+import {
+  apiEndpointUnauthorizedNextResponse,
+  decorateRequest,
+  redirectAdapter,
+  setRequestHeadersOnNextResponse,
+} from './utils';
 
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
@@ -104,6 +109,11 @@ type AuthMiddlewareParams = AuthenticateRequestOptions & {
   debug?: boolean;
 };
 
+type EnforcedAuthMiddlewareParams = {
+  publishableKey: string;
+  secretKey: string;
+} & AuthMiddlewareParams;
+
 export interface AuthMiddleware {
   (params?: AuthMiddlewareParams): NextMiddleware;
 }
@@ -115,12 +125,24 @@ export interface AuthMiddleware {
  */
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
-  const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...options } = params;
+  const publishableKey = params.publishableKey || PUBLISHABLE_KEY;
+  if (!publishableKey) {
+    errorThrower.throwMissingPublishableKeyError();
+  }
+  const secretKey = params.secretKey || SECRET_KEY;
+  if (!secretKey) {
+    errorThrower.throwMissingSecretKeyError();
+  }
+  const signInUrl = params.signInUrl || SIGN_IN_URL;
+  const signUpUrl = params.signUpUrl || SIGN_UP_URL;
+
+  const enforcedParams: EnforcedAuthMiddlewareParams = { ...params, publishableKey, secretKey, signInUrl, signUpUrl };
+  const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...enforcedOptions } = enforcedParams;
 
   const isIgnoredRoute = createRouteMatcher(ignoredRoutes || DEFAULT_IGNORED_ROUTES);
   const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
   const isApiRoute = createApiRoutes(apiRoutes);
-  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, params);
+  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, enforcedParams);
 
   clerkClient.telemetry.record(
     eventMethodCalled('authMiddleware', {
@@ -132,7 +154,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   );
 
   return withLogger('authMiddleware', logger => async (_req: NextRequest, evt: NextFetchEvent) => {
-    if (options.debug) {
+    if (enforcedOptions.debug) {
       logger.enable();
     }
     const clerkRequest = createClerkRequest(_req);
@@ -146,11 +168,11 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       clerkUrl: nextRequest.experimental_clerkUrl.href,
     });
 
-    logger.debug('Options debug', { ...options, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
+    logger.debug('Options debug', { ...enforcedOptions, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
 
     if (isIgnoredRoute(nextRequest)) {
       logger.debug({ isIgnoredRoute: true });
-      if (isDevelopmentFromSecretKey(options.secretKey || SECRET_KEY) && !params.ignoredRoutes) {
+      if (isDevelopmentFromSecretKey(enforcedParams.secretKey) && !enforcedParams.ignoredRoutes) {
         console.warn(
           receivedRequestForIgnoredRoute(
             nextRequest.experimental_clerkUrl.href,
@@ -173,7 +195,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     const requestState = await clerkClient.authenticateRequest(
       clerkRequest,
-      createAuthenticateRequestOptions(clerkRequest, options),
+      createAuthenticateRequestOptions(clerkRequest, enforcedOptions),
     );
 
     const locationHeader = requestState.headers.get('location');
@@ -198,10 +220,10 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
-      return serverRedirectWithAuth(clerkRequest, finalRes, options);
+      return serverRedirectWithAuth(clerkRequest, finalRes, enforcedOptions);
     }
 
-    if (options.debug) {
+    if (enforcedOptions.debug) {
       setRequestHeadersOnNextResponse(finalRes, nextRequest, { [constants.Headers.EnableDebug]: 'true' });
       logger.debug(`Added ${constants.Headers.EnableDebug} on request`);
     }
@@ -223,17 +245,25 @@ export { authMiddleware };
 const createDefaultAfterAuth = (
   isPublicRoute: ReturnType<typeof createRouteMatcher>,
   isApiRoute: ReturnType<typeof createApiRoutes>,
-  params: AuthMiddlewareParams,
+  enforcedParams: EnforcedAuthMiddlewareParams,
 ) => {
   return (auth: AuthObject, req: WithExperimentalClerkUrl<NextRequest>) => {
     if (!auth.userId && !isPublicRoute(req)) {
       if (isApiRoute(req)) {
-        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, true);
+        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, enforcedParams, true);
         return apiEndpointUnauthorizedNextResponse();
       } else {
-        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, false);
+        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, enforcedParams, false);
       }
-      return redirectToSignIn({ returnBackUrl: req.experimental_clerkUrl.href });
+      return createRedirect({
+        redirectAdapter,
+        signInUrl: enforcedParams.signInUrl,
+        signUpUrl: enforcedParams.signUpUrl,
+        publishableKey: enforcedParams.publishableKey,
+        // We're setting baseUrl to '' here as we want to keep the legacy behavior of
+        // the redirectToSignIn, redirectToSignUp helpers in the backend package.
+        baseUrl: '',
+      }).redirectToSignIn({ returnBackUrl: req.experimental_clerkUrl.href });
     }
     return NextResponse.next();
   };
@@ -305,13 +335,13 @@ const withNormalizedClerkUrl = (
   return Object.assign(nextRequest, { experimental_clerkUrl: res });
 };
 
-const informAboutProtectedRoute = (path: string, params: AuthMiddlewareParams, isApiRoute: boolean) => {
-  if (params.debug || isDevelopmentFromSecretKey(params.secretKey || SECRET_KEY)) {
+const informAboutProtectedRoute = (path: string, enforcedParams: EnforcedAuthMiddlewareParams, isApiRoute: boolean) => {
+  if (enforcedParams.debug || isDevelopmentFromSecretKey(enforcedParams.secretKey)) {
     console.warn(
       informAboutProtectedRouteInfo(
         path,
-        !!params.publicRoutes,
-        !!params.ignoredRoutes,
+        !!enforcedParams.publicRoutes,
+        !!enforcedParams.ignoredRoutes,
         isApiRoute,
         DEFAULT_IGNORED_ROUTES,
       ),
