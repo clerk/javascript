@@ -344,7 +344,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
-      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInSecondFactor[];
+      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[];
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[];
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
