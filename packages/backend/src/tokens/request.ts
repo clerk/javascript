@@ -218,14 +218,25 @@ ${error.getFullMessage()}`,
       } catch (error) {
         // If for some reason the handshake token is invalid or stale, we ignore it and continue trying to authenticate the request.
         // Worst case, the handshake will trigger again and return a refreshed token.
-        if (error instanceof TokenVerificationError && instanceType === 'development') {
-          if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
-            throw new Error(
-              `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`,
-            );
+        if (error instanceof TokenVerificationError) {
+          if (instanceType === 'development') {
+            if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
+              throw new Error(
+                `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`,
+              );
+            }
+
+            throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
           }
 
-          throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
+          if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
+            // Avoid infinite redirect loops due to incorrect secret-keys
+            return signedOut(
+              authenticateContext,
+              AuthErrorReason.UnexpectedError,
+              `Clerk: Handshake token verification failed with "${error.reason}"`,
+            );
+          }
         }
       }
     }
