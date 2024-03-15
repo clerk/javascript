@@ -19,6 +19,9 @@ const OUTSIDE: SelectionRange = [-1, -1];
 
 export const OTP_LENGTH_DEFAULT = 6;
 
+/**
+ * The status of a single segment element in the OTP input
+ */
 export type OTPInputSegmentStatus = 'none' | 'cursor' | 'selected';
 
 /**
