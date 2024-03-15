@@ -160,7 +160,7 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset pre exit && npx changeset publish --no-git-tag --tag e2e; fi
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset pre exit && npx changeset version && npx changeset publish --no-git-tag --tag e2e; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
