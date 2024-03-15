@@ -48,7 +48,7 @@ jobs:
         run: npm run test:integration:${{ matrix.test-name }}
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: 'latest'
+          E2E_CLERK_VERSION: 'e2e'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           E2E_NEXTJS_VERSION: 'canary'
