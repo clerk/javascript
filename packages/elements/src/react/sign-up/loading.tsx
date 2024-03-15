@@ -2,14 +2,13 @@ import type { OAuthProvider, SamlStrategy, SignInStrategy } from '@clerk/types';
 import type * as React from 'react';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import { ActiveTagsMode, useActiveTags } from '~/react/hooks/use-active-tags.hook';
 
 import { useLoading } from '../hooks/use-loading.hook';
-import { SignInRouterCtx } from './context';
-import type { SignInStep } from './step';
+import { SignUpRouterCtx } from './context';
+import type { SignUpStep } from './step';
 
 type Strategy = OAuthProvider | SamlStrategy | 'metamask';
-type LoadingScope = 'global' | `step:${SignInStep}` | `provider:${Strategy}`;
+type LoadingScope = 'global' | `step:${SignUpStep}` | `provider:${Strategy}`;
 
 type LoadingProps = {
   scope: LoadingScope;
@@ -31,17 +30,12 @@ function mapScopeToStrategy(scope: Extract<LoadingScope, `provider:${string}`>):
 }
 
 export function Loading({ children, scope }: LoadingProps) {
-  const routerRef = SignInRouterCtx.useActorRef();
+  const routerRef = SignUpRouterCtx.useActorRef();
   const [isLoading, { step, strategy }] = useLoading(routerRef);
-  const isChooseStrategyStep = useActiveTags(
-    routerRef,
-    ['route:first-factor', 'route:choose-strategy'],
-    ActiveTagsMode.all,
-  );
 
   const isStartLoading = isLoading && step === 'start';
   const isVerificationsLoading = isLoading && step === 'verifications';
-  const isChooseStrategyLoading = isLoading && isChooseStrategyStep;
+  const isContinueLoading = isLoading && step === 'continue';
   const isStrategyLoading = isLoading && step === undefined && strategy !== undefined;
 
   let returnValue: boolean;
@@ -52,8 +46,8 @@ export function Loading({ children, scope }: LoadingProps) {
     returnValue = isStartLoading;
   } else if (scope === 'step:verifications') {
     returnValue = isVerificationsLoading;
-  } else if (scope === 'step:choose-strategy') {
-    returnValue = isChooseStrategyLoading;
+  } else if (scope === 'step:continue') {
+    returnValue = isContinueLoading;
   } else if (scope.startsWith('provider:')) {
     const computedStrategy = mapScopeToStrategy(scope);
     returnValue = isStrategyLoading && strategy === computedStrategy;

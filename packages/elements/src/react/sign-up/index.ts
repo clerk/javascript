@@ -12,6 +12,8 @@ export {
   SignUpSocialProviderIcon as SocialProviderIcon,
 } from './social-providers';
 
+export { Loading } from './loading';
+
 /** @internal Internal use only */
 export const useSignUpActorRef_internal = SignUpRouterCtx.useActorRef;
 

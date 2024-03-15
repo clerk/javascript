@@ -1,33 +1,42 @@
 import { useSelector } from '@xstate/react';
-import type { AnyActorRef, SnapshotFrom } from 'xstate';
+import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
 import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines';
 import type { SignInRouterLoadingContext } from '~/internals/machines/sign-in/types';
+import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
+import type { SignUpRouterLoadingContext } from '~/internals/machines/sign-up/types';
 
-type TMachineSnapshot = SnapshotFrom<TSignInRouterMachine>;
-type TContext = SignInRouterLoadingContext;
+type ActorSignIn = ActorRefFrom<TSignInRouterMachine>;
+type ActorSignUp = ActorRefFrom<TSignUpRouterMachine>;
 
-type UseLoadingReturn = [boolean, { step: TContext['step']; strategy: TContext['strategy'] }];
+type LoadingContext<T> = T extends ActorSignIn ? SignInRouterLoadingContext : SignUpRouterLoadingContext;
+type UseLoadingReturn<T> = [
+  isLoading: boolean,
+  { step: LoadingContext<T>['step']; strategy: LoadingContext<T>['strategy'] },
+];
 
-const selectLoading = (snapshot: TMachineSnapshot) => snapshot?.context?.loading;
-const compareLoadingValue = (prev: TContext, next: TContext) => prev?.value === next?.value;
-
-// TODO: Restrict actor to only allow SignInRouterCtx or SignUpRouterCtx
+const selectLoading = <T extends SnapshotFrom<TSignInRouterMachine> | SnapshotFrom<TSignUpRouterMachine>>(
+  snapshot: T,
+) => snapshot?.context?.loading;
+const compareLoadingValue = <T extends SignInRouterLoadingContext | SignUpRouterLoadingContext>(prev: T, next: T) =>
+  prev?.isLoading === next?.isLoading;
 
 /**
  * Generic hook to check the loading state inside the context of a machine. Should only be used with `SignInRouterCtx` or `SignUpRouterCtx`.
+ *
+ * @param actor - The actor reference of the machine
  *
  * @example
  * const ref = SignInRouterCtx.useActorRef();
  *
  * useLoading(ref);
  */
-export function useLoading<TActor extends AnyActorRef>(actor: TActor): UseLoadingReturn {
-  const ctx = useSelector<TActor, TContext>(actor, selectLoading, compareLoadingValue);
+export function useLoading<TActor extends ActorSignIn | ActorSignUp>(actor: TActor): UseLoadingReturn<TActor> {
+  const loadingCtx = useSelector(actor, selectLoading, compareLoadingValue) as LoadingContext<TActor>;
 
-  if (!ctx) {
+  if (!loadingCtx) {
     return [false, { step: undefined, strategy: undefined }];
   }
 
-  return [ctx.value, { step: ctx.step, strategy: ctx.strategy }];
+  return [loadingCtx.isLoading, { step: loadingCtx.step, strategy: loadingCtx.strategy }];
 }
