@@ -350,7 +350,6 @@ export const enUS: LocalizationResource = {
     passkey: {
       title: 'Use your passkey',
       subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
-      // actionLink: 'Use another method',
     },
     phoneCode: {
       formTitle: 'Verification code',

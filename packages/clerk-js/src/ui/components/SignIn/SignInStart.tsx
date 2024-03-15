@@ -364,7 +364,7 @@ export function _SignInStart(): JSX.Element {
               <Card.Action elementId={'usePasskey'}>
                 <Card.ActionLink
                   localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                  onClick={authenticateWithPasskey}
+                  onClick={() => authenticateWithPasskey()}
                 />
               </Card.Action>
             )}
