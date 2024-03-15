@@ -27,14 +27,12 @@ export const ThirdPartyMachine = setup({
         error: event.error,
       });
     },
-    assignActiveStrategy: ({ event }) => {
-      assertEvent(event, 'REDIRECT');
-      assign({
-        activeStrategy: ({ event }) => {
-          return event.params.strategy;
-        },
-      });
-    },
+    assignActiveStrategy: assign({
+      activeStrategy: ({ event }) => {
+        assertEvent(event, 'REDIRECT');
+        return event.params.strategy;
+      },
+    }),
     unassignActiveStrategy: assign({
       activeStrategy: null,
     }),
