@@ -1,7 +1,7 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import { SignUp, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-up';
+import { Loading, SignUp, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
@@ -20,7 +20,9 @@ export default function SignUpPage() {
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
                 <SocialProviderIcon className='invert' />
-                Sign In with GitHub
+                <Loading scope='provider:github'>
+                  {({ isLoading }) => (isLoading ? 'Loading...' : 'Sign In with GitHub')}
+                </Loading>
               </SocialProvider>
 
               <SocialProvider
@@ -28,7 +30,9 @@ export default function SignUpPage() {
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
                 <SocialProviderIcon />
-                Sign In with Google
+                <Loading scope='provider:google'>
+                  {({ isLoading }) => (isLoading ? 'Loading...' : 'Sign In with Google')}
+                </Loading>
               </SocialProvider>
 
               <SocialProvider
@@ -36,7 +40,9 @@ export default function SignUpPage() {
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
                 <SocialProviderIcon />
-                Sign In with Metamask
+                <Loading scope='provider:metamask'>
+                  {({ isLoading }) => (isLoading ? 'Loading...' : 'Sign In with Metamask')}
+                </Loading>
               </SocialProvider>
             </div>
 
@@ -54,7 +60,9 @@ export default function SignUpPage() {
                 label='Phone Number'
                 name='phoneNumber'
               />
-              <CustomSubmit>Sign Up</CustomSubmit>
+              <CustomSubmit>
+                <Loading scope='step:start'>{({ isLoading }) => (isLoading ? 'Loading...' : 'Sign Up')}</Loading>
+              </CustomSubmit>
             </div>
           </div>
         </Step>
@@ -75,7 +83,9 @@ export default function SignUpPage() {
             name='phoneNumber'
           />
 
-          <CustomSubmit>Sign Up</CustomSubmit>
+          <CustomSubmit>
+            <Loading scope='step:continue'>{({ isLoading }) => (isLoading ? 'Loading...' : 'Sign Up')}</Loading>
+          </CustomSubmit>
         </Step>
 
         <Step name='verifications'>
@@ -89,7 +99,9 @@ export default function SignUpPage() {
               name='code'
             />
 
-            <CustomSubmit>Verify</CustomSubmit>
+            <CustomSubmit>
+              <Loading scope='step:verifications'>{({ isLoading }) => (isLoading ? 'Loading...' : 'Verify')}</Loading>
+            </CustomSubmit>
           </Verification>
 
           <Verification name='email_code'>
@@ -98,7 +110,9 @@ export default function SignUpPage() {
               name='code'
             />
 
-            <CustomSubmit>Verify</CustomSubmit>
+            <CustomSubmit>
+              <Loading scope='step:verifications'>{({ isLoading }) => (isLoading ? 'Loading...' : 'Verify')}</Loading>
+            </CustomSubmit>
           </Verification>
 
           <Verification name='email_link'>Please check your email for a link to verify your account.</Verification>
