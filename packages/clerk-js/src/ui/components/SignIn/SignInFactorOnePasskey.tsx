@@ -52,10 +52,8 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
                 height: t.sizes.$12,
               })}
             />
-            <Header.Title localizationKey={'Use your passkey'} />
-            <Header.Subtitle
-              localizationKey={`Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.`}
-            />
+            <Header.Title localizationKey={localizationKeys('signIn.passkey.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signIn.passkey.subtitle')} />
             <IdentityPreview
               identifier={signIn.identifier}
               avatarUrl={signIn.userData.imageUrl}
@@ -77,14 +75,15 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
             <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
               <Card.ActionLink
                 localizationKey={localizationKeys(
-                  onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+                  onShowAlternativeMethodsClick
+                    ? 'footerActionLink__useAnotherMethod'
+                    : 'signIn.alternativeMethods.actionLink',
                 )}
                 onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
               />
             </Card.Action>
           </Flex>
         </Card.Content>
-
         <Card.Footer />
       </Card.Root>
     </Flow.Part>

@@ -136,14 +136,13 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
       });
     case 'password':
       return localizationKeys('signIn.alternativeMethods.blockButton__password');
+    // @ts-ignore
+    case 'passkey':
+      return localizationKeys('signIn.alternativeMethods.blockButton__passkey');
     case 'reset_password_email_code':
       return localizationKeys('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword');
     case 'reset_password_phone_code':
       return localizationKeys('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword');
-    // @ts-ignore
-    case 'passkey':
-      // @ts-ignore
-      return 'Sign in with passkey';
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }
