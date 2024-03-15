@@ -19,6 +19,8 @@ const OUTSIDE: SelectionRange = [-1, -1];
 
 export const OTP_LENGTH_DEFAULT = 6;
 
+export type OTPInputSegmentStatus = 'none' | 'cursor' | 'selected';
+
 /**
  * If the render prop is provided, a custom segmented input will be rendered. Otherwise a standard input will be rendered.
  */
