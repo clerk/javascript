@@ -211,7 +211,7 @@ export default function SignInPage() {
               <H3>Verify your email</H3>
 
               <P className='text-sm'>
-                Please check your <SafeIdentifier /> for a verification code...
+                We've sent a verification code to <SafeIdentifier />.
               </P>
             </Verification>
           </div>
