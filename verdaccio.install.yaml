@@ -9,6 +9,7 @@ packages:
   '@clerk/*':
     access: $all
     publish: $all
+    proxy: npmjs
   '**':
     access: $all
     publish: $all
