@@ -13,7 +13,7 @@ type LoadingScope = 'global' | `step:${SignInStep}` | `provider:${Strategy}`;
 
 type LoadingProps = {
   scope: LoadingScope;
-  children: (isLoading: { isLoading: boolean }) => React.ReactNode;
+  children: (isLoading: boolean) => React.ReactNode;
 };
 
 function mapScopeToStrategy(scope: Extract<LoadingScope, `provider:${string}`>): SignInStrategy {
@@ -38,14 +38,14 @@ function mapScopeToStrategy(scope: Extract<LoadingScope, `provider:${string}`>):
  *
  * @example
  * <Loading scope="global">
- *  {({ isLoading }) => isLoading && <Spinner />}
+ *  {(isLoading) => isLoading && <Spinner />}
  * </Loading>
  *
  * @example
  * <Step name="start">
  *  <Submit>
  *    <Loading scope="step:start">
- *      {({ isLoading }) => isLoading ? "Loading..." : "Submit"}
+ *      {(isLoading) => isLoading ? "Loading..." : "Submit"}
  *    </Loading>
  *  </Submit>
  * </Step>
@@ -81,5 +81,5 @@ export function Loading({ children, scope }: LoadingProps) {
     throw new ClerkElementsRuntimeError(`Invalid scope used for <Loading>`);
   }
 
-  return children({ isLoading: returnValue });
+  return children(returnValue);
 }

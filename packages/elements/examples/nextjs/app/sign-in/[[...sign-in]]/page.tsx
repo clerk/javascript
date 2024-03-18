@@ -35,7 +35,7 @@ function CustomProvider({
         className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
       />
       <Loading scope={`provider:${provider}`}>
-        {({ isLoading }) => <span className='leading-loose'>{isLoading ? 'Loading...' : children}</span>}
+        {isLoading => <span className='leading-loose'>{isLoading ? 'Loading...' : children}</span>}
       </Loading>
     </Provider>
   );
@@ -84,9 +84,7 @@ export default function SignInPage() {
           </p>
         </div>
         <div className='absolute top-4 right-4'>
-          <Loading scope='global'>
-            {({ isLoading }) => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}
-          </Loading>
+          <Loading scope='global'>{isLoading => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}</Loading>
         </div>
 
         <Step name='start'>
@@ -114,9 +112,7 @@ export default function SignInPage() {
                 </Field>
 
                 <CustomSubmit>
-                  <Loading scope='step:start'>
-                    {({ isLoading }) => (isLoading ? 'Loading...' : 'Sign in with Email')}
-                  </Loading>
+                  <Loading scope='step:start'>{isLoading => (isLoading ? 'Loading...' : 'Sign in with Email')}</Loading>
                 </CustomSubmit>
               </>
             ) : (
@@ -172,7 +168,7 @@ export default function SignInPage() {
 
         <Step name='verifications'>
           <Loading scope='step:verifications'>
-            {({ isLoading }) => (
+            {isLoading => (
               <div className='flex gap-6 flex-col'>
                 <GlobalError className='block text-red-400 font-mono' />
 

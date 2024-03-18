@@ -55,7 +55,7 @@ export default function SignUpPage() {
                 name='phoneNumber'
               />
               <CustomSubmit>
-                <Loading scope='step:start'>{({ isLoading }) => (isLoading ? 'Loading...' : 'Sign Up')}</Loading>
+                <Loading scope='step:start'>{isLoading => (isLoading ? 'Loading...' : 'Sign Up')}</Loading>
               </CustomSubmit>
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function SignUpPage() {
           />
 
           <CustomSubmit>
-            <Loading scope='step:continue'>{({ isLoading }) => (isLoading ? 'Loading...' : 'Sign Up')}</Loading>
+            <Loading scope='step:continue'>{isLoading => (isLoading ? 'Loading...' : 'Sign Up')}</Loading>
           </CustomSubmit>
         </Step>
 
@@ -94,7 +94,7 @@ export default function SignUpPage() {
             />
 
             <CustomSubmit>
-              <Loading scope='step:verifications'>{({ isLoading }) => (isLoading ? 'Loading...' : 'Verify')}</Loading>
+              <Loading scope='step:verifications'>{isLoading => (isLoading ? 'Loading...' : 'Verify')}</Loading>
             </CustomSubmit>
           </Verification>
 
@@ -105,7 +105,7 @@ export default function SignUpPage() {
             />
 
             <CustomSubmit>
-              <Loading scope='step:verifications'>{({ isLoading }) => (isLoading ? 'Loading...' : 'Verify')}</Loading>
+              <Loading scope='step:verifications'>{isLoading => (isLoading ? 'Loading...' : 'Verify')}</Loading>
             </CustomSubmit>
           </Verification>
 
