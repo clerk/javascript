@@ -2,7 +2,7 @@
 
 import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
 import {
-  Navigate,
+  Action,
   Provider,
   ProviderIcon,
   SafeIdentifier,
@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { type ComponentProps, useState } from 'react';
 
 import { H1, H3, P } from '@/components/design';
-import { CustomField, CustomSubmit } from '@/components/form';
+import { CustomField } from '@/components/form';
 
 function CustomProvider({
   children,
@@ -59,6 +59,17 @@ function Button({ children, ...props }: ComponentProps<'button'>) {
     >
       {children}
     </button>
+  );
+}
+
+function CustomSubmit({ children }: ComponentProps<'button'>) {
+  return (
+    <Action
+      className='px-7 py-3 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,255,255)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(160,160,160)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'
+      submit
+    >
+      {children}
+    </Action>
   );
 }
 
@@ -149,12 +160,12 @@ export default function SignInPage() {
               <Button>Send a code to your email</Button>
             </StrategyOption>
 
-            <Navigate
+            <Action
               asChild
-              to='previous'
+              navigate='previous'
             >
               <TextButton>Go back</TextButton>
-            </Navigate>
+            </Action>
           </div>
         </Step>
 
@@ -211,17 +222,17 @@ export default function SignInPage() {
               <H3>Verify your email</H3>
 
               <P className='text-sm'>
-                We've sent a verification code to <SafeIdentifier />.
+                We&apos;ve sent a verification code to <SafeIdentifier />.
               </P>
             </Verification>
           </div>
 
-          <Navigate
+          <Action
             asChild
-            to='choose-strategy'
+            navigate='choose-strategy'
           >
             <TextButton>Use another method</TextButton>
-          </Navigate>
+          </Action>
         </Step>
       </div>
     </SignIn>
