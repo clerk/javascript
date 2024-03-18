@@ -14,7 +14,7 @@ const SignUpNavigationEventMap = {
 export type SignUpNavigateElementKey = keyof typeof SignUpNavigationEventMap;
 
 export type SignUpNavigateElement = React.ElementRef<'button'>;
-export type SignInNavigateProps = WithChildrenProp<{
+export type SignUpNavigateProps = WithChildrenProp<{
   asChild?: boolean;
   to: SignUpNavigateElementKey;
 }>;
@@ -30,7 +30,7 @@ export type SignInNavigateProps = WithChildrenProp<{
  *    Start over...
  * </Navigate>
  */
-export const SignUpNavigate = React.forwardRef<SignUpNavigateElement, SignInNavigateProps>(
+export const SignUpNavigate = React.forwardRef<SignUpNavigateElement, SignUpNavigateProps>(
   ({ asChild, to, ...rest }, forwardedRef) => {
     const actorRef = SignUpRouterCtx.useActorRef();
 
