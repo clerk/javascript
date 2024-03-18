@@ -7,7 +7,7 @@ import type { ActorRef, SnapshotFrom } from 'xstate';
 import type { SignInRouterEvents } from '~/internals/machines/sign-in/types';
 import type { SignUpRouterEvents } from '~/internals/machines/sign-up/types';
 import { type ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party/machine';
-import type { UseThirdPartyProviderReturn } from '~/react/common/third-party-providers/social-provider';
+import type { UseThirdPartyProviderReturn } from '~/react/common/providers';
 
 /**
  * Selects the clerk third-party provider

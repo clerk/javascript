@@ -1,7 +1,7 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import { Loading, SignUp, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-up';
+import { Loading, Provider, ProviderIcon, SignUp, Step, Verification } from '@clerk/elements/sign-up';
 
 import { H1, HR as Hr } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
@@ -15,35 +15,29 @@ export default function SignUpPage() {
             <H1>Sign Up</H1>
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
-              <SocialProvider
+              <Provider
                 name='github'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon className='invert' />
-                <Loading scope='provider:github'>
-                  {({ isLoading }) => (isLoading ? 'Loading...' : 'Sign In with GitHub')}
-                </Loading>
-              </SocialProvider>
+                <ProviderIcon className='invert' />
+                Sign In with GitHub
+              </Provider>
 
-              <SocialProvider
+              <Provider
                 name='google'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon />
-                <Loading scope='provider:google'>
-                  {({ isLoading }) => (isLoading ? 'Loading...' : 'Sign In with Google')}
-                </Loading>
-              </SocialProvider>
+                <ProviderIcon />
+                Sign In with Google
+              </Provider>
 
-              <SocialProvider
+              <Provider
                 name='metamask'
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon />
-                <Loading scope='provider:metamask'>
-                  {({ isLoading }) => (isLoading ? 'Loading...' : 'Sign In with Metamask')}
-                </Loading>
-              </SocialProvider>
+                <ProviderIcon />
+                Sign In with Metamask
+              </Provider>
             </div>
 
             <Hr />

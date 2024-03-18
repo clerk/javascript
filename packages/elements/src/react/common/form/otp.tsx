@@ -20,6 +20,11 @@ const OUTSIDE: SelectionRange = [-1, -1];
 export const OTP_LENGTH_DEFAULT = 6;
 
 /**
+ * The status of a single segment element in the OTP input
+ */
+export type OTPInputSegmentStatus = 'none' | 'cursor' | 'selected';
+
+/**
  * If the render prop is provided, a custom segmented input will be rendered. Otherwise a standard input will be rendered.
  */
 export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(function OTPInput(props, ref) {

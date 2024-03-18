@@ -1,6 +1,6 @@
 'use client';
 
-import type { FormSubmitProps } from '@clerk/elements/common';
+import type { FormSubmitProps, OTPInputSegmentStatus } from '@clerk/elements/common';
 import {
   Field as ElementsField,
   FieldError,
@@ -12,7 +12,7 @@ import {
 import clsx from 'clsx';
 import * as React from 'react';
 
-function OTPInputSegment({ value, status }: any) {
+function OTPInputSegment({ value, status }: { value: string; status: OTPInputSegmentStatus }) {
   return (
     <FieldState>
       {({ state }) => (

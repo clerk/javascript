@@ -4,9 +4,11 @@ import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/co
 import {
   Loading,
   Navigate,
+  Provider,
+  ProviderIcon,
+  SafeIdentifier,
+  Salutation,
   SignIn,
-  SocialProvider,
-  SocialProviderIcon,
   Step,
   StrategyOption,
   Verification,
@@ -17,25 +19,25 @@ import { type ComponentProps, useState } from 'react';
 import { H1, H3, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
 
-function CustomSocialProvider({
+function CustomProvider({
   children,
   provider,
 }: {
   children: string;
-  provider: ComponentProps<typeof SocialProvider>['name'];
+  provider: ComponentProps<typeof Provider>['name'];
 }) {
   return (
-    <SocialProvider
+    <Provider
       name={provider}
       className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
     >
-      <SocialProviderIcon
+      <ProviderIcon
         className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
       />
       <Loading scope={`provider:${provider}`}>
         {({ isLoading }) => <span className='leading-loose'>{isLoading ? 'Loading...' : children}</span>}
       </Loading>
-    </SocialProvider>
+    </Provider>
   );
 }
 
@@ -92,9 +94,9 @@ export default function SignInPage() {
             <GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex flex-col gap-2 self-stretch'>
-              <CustomSocialProvider provider='github'>Continue with GitHub</CustomSocialProvider>
-              <CustomSocialProvider provider='google'>Continue with Google</CustomSocialProvider>
-              <CustomSocialProvider provider='metamask'>Continue with Metamask</CustomSocialProvider>
+              <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+              <CustomProvider provider='google'>Continue with Google</CustomProvider>
+              <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
             </div>
 
             {continueWithEmail ? (
@@ -127,9 +129,9 @@ export default function SignInPage() {
           <div className='flex flex-col items-center  gap-6 w-96'>
             <H3>CHOOSE STRATEGY:</H3>
 
-            <CustomSocialProvider provider='github'>Continue with GitHub</CustomSocialProvider>
-            <CustomSocialProvider provider='google'>Continue with Google</CustomSocialProvider>
-            <CustomSocialProvider provider='metamask'>Continue with Metamask</CustomSocialProvider>
+            <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+            <CustomProvider provider='google'>Continue with Google</CustomProvider>
+            <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
             <StrategyOption
               asChild
@@ -175,6 +177,10 @@ export default function SignInPage() {
                 <GlobalError className='block text-red-400 font-mono' />
 
                 <Verification name='password'>
+                  <P className='text-sm'>
+                    Welcome back <Salutation />!
+                  </P>
+
                   <CustomField
                     label='Password'
                     name='password'
@@ -184,6 +190,10 @@ export default function SignInPage() {
                 </Verification>
 
                 <Verification name='email_code'>
+                  <P className='text-sm'>
+                    Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
+                  </P>
+
                   <CustomField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
@@ -196,6 +206,10 @@ export default function SignInPage() {
                 </Verification>
 
                 <Verification name='phone_code'>
+                  <P className='text-sm'>
+                    Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
+                  </P>
+
                   <CustomField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
@@ -210,7 +224,9 @@ export default function SignInPage() {
                 <Verification name='reset_password_email_code'>
                   <H3>Verify your email</H3>
 
-                  <P>Please check your email for a verification code...</P>
+                  <P className='text-sm'>
+                    We&apos;ve sent a verification code to <SafeIdentifier />.
+                  </P>
                 </Verification>
               </div>
             )}
