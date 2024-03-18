@@ -1,7 +1,7 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import { Action, Provider, ProviderIcon, SignUp, Step, Verification } from '@clerk/elements/sign-up';
+import { Action, Provider, ProviderIcon, SignUp, Step, Strategy } from '@clerk/elements/sign-up';
 import type { ComponentProps } from 'react';
 
 import { H1, HR as Hr } from '@/components/design';
@@ -95,25 +95,25 @@ export default function SignUpPage() {
 
           <GlobalError className='block text-red-400 font-mono' />
 
-          <Verification name='phone_code'>
+          <Strategy name='phone_code'>
             <CustomField
               label='SMS Code'
               name='code'
             />
 
             <CustomSubmit>Verify</CustomSubmit>
-          </Verification>
+          </Strategy>
 
-          <Verification name='email_code'>
+          <Strategy name='email_code'>
             <CustomField
               label='Email Code'
               name='code'
             />
 
             <CustomSubmit>Verify</CustomSubmit>
-          </Verification>
+          </Strategy>
 
-          <Verification name='email_link'>Please check your email for a link to verify your account.</Verification>
+          <Strategy name='email_link'>Please check your email for a link to verify your account.</Strategy>
         </Step>
       </div>
     </SignUp>

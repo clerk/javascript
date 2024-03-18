@@ -9,8 +9,8 @@ import {
   Salutation,
   SignIn,
   Step,
+  Strategy,
   StrategyOption,
-  Verification,
 } from '@clerk/elements/sign-in';
 import Link from 'next/link';
 import { type ComponentProps, useState } from 'react';
@@ -173,7 +173,7 @@ export default function SignInPage() {
           <div className='flex gap-6 flex-col'>
             <GlobalError className='block text-red-400 font-mono' />
 
-            <Verification name='password'>
+            <Strategy name='password'>
               <P className='text-sm'>
                 Welcome back <Salutation />!
               </P>
@@ -184,9 +184,9 @@ export default function SignInPage() {
               />
 
               <CustomSubmit>Verify</CustomSubmit>
-            </Verification>
+            </Strategy>
 
-            <Verification name='email_code'>
+            <Strategy name='email_code'>
               <P className='text-sm'>
                 Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
               </P>
@@ -200,9 +200,9 @@ export default function SignInPage() {
               />
 
               <CustomSubmit>Verify</CustomSubmit>
-            </Verification>
+            </Strategy>
 
-            <Verification name='phone_code'>
+            <Strategy name='phone_code'>
               <P className='text-sm'>
                 Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
               </P>
@@ -216,15 +216,15 @@ export default function SignInPage() {
               />
 
               <CustomSubmit>Verify</CustomSubmit>
-            </Verification>
+            </Strategy>
 
-            <Verification name='reset_password_email_code'>
+            <Strategy name='reset_password_email_code'>
               <H3>Verify your email</H3>
 
               <P className='text-sm'>
                 We&apos;ve sent a verification code to <SafeIdentifier />.
               </P>
-            </Verification>
+            </Strategy>
           </div>
 
           <Action

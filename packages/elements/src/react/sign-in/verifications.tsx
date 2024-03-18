@@ -42,9 +42,9 @@ function SignInStrategiesProvider({
   );
 }
 
-export type SignInVerificationProps = WithChildrenProp<{ name: SignInStrategyName }>;
+export type SignInStrategyProps = WithChildrenProp<{ name: SignInStrategyName }>;
 
-export function SignInVerification({ children, name }: SignInVerificationProps) {
+export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { active } = useStrategy(name);
   return active ? <>{children}</> : null; // eslint-disable-line react/jsx-no-useless-fragment
 }

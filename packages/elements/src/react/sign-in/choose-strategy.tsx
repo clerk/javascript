@@ -33,7 +33,6 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 
 // --------------------------------- COMPONENTS ---------------------------------
 
-export type SignInVerificationsProps = WithChildrenProp<{ preferred?: TSignInStrategy }>;
 export type SignInChooseStrategyProps = WithChildrenProp;
 
 export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
