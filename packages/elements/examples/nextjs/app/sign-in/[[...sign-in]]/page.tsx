@@ -18,6 +18,7 @@ import { type ComponentProps, useState } from 'react';
 
 import { H1, H3, P } from '@/components/design';
 import { CustomField, CustomSubmit } from '@/components/form';
+import { Spinner } from '@/components/spinner';
 
 function CustomProvider({
   children,
@@ -35,7 +36,17 @@ function CustomProvider({
         className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
       />
       <Loading scope={`provider:${provider}`}>
-        {isLoading => <span className='leading-loose'>{isLoading ? 'Loading...' : children}</span>}
+        {isLoading => (
+          <span className='leading-loose'>
+            {isLoading ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              children
+            )}
+          </span>
+        )}
       </Loading>
     </Provider>
   );
@@ -112,7 +123,17 @@ export default function SignInPage() {
                 </Field>
 
                 <CustomSubmit>
-                  <Loading scope='step:start'>{isLoading => (isLoading ? 'Loading...' : 'Sign in with Email')}</Loading>
+                  <Loading scope='step:start'>
+                    {isLoading =>
+                      isLoading ? (
+                        <>
+                          <Spinner /> Loading...
+                        </>
+                      ) : (
+                        'Sign in with Email'
+                      )
+                    }
+                  </Loading>
                 </CustomSubmit>
               </>
             ) : (
@@ -182,7 +203,15 @@ export default function SignInPage() {
                     name='password'
                   />
 
-                  <CustomSubmit>{isLoading ? 'Loading...' : 'Verify'}</CustomSubmit>
+                  <CustomSubmit>
+                    {isLoading ? (
+                      <>
+                        <Spinner /> Loading...
+                      </>
+                    ) : (
+                      'Verify'
+                    )}
+                  </CustomSubmit>
                 </Verification>
 
                 <Verification name='email_code'>
@@ -198,7 +227,15 @@ export default function SignInPage() {
                     name='code'
                   />
 
-                  <CustomSubmit>{isLoading ? 'Loading...' : 'Verify'}</CustomSubmit>
+                  <CustomSubmit>
+                    {isLoading ? (
+                      <>
+                        <Spinner /> Loading...
+                      </>
+                    ) : (
+                      'Verify'
+                    )}
+                  </CustomSubmit>
                 </Verification>
 
                 <Verification name='phone_code'>
@@ -214,7 +251,15 @@ export default function SignInPage() {
                     name='code'
                   />
 
-                  <CustomSubmit>{isLoading ? 'Loading...' : 'Verify'}</CustomSubmit>
+                  <CustomSubmit>
+                    {isLoading ? (
+                      <>
+                        <Spinner /> Loading...
+                      </>
+                    ) : (
+                      'Verify'
+                    )}
+                  </CustomSubmit>
                 </Verification>
 
                 <Verification name='reset_password_email_code'>
