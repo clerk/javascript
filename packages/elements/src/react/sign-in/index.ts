@@ -11,7 +11,7 @@ export { SignInProvider as Provider, SignInProviderIcon as ProviderIcon } from '
 export {
   SignInFirstFactor as FirstFactor,
   SignInSecondFactor as SecondFactor,
-  SignInVerification as Verification,
+  SignInStrategy as Strategy,
 } from './verifications';
 
 export { SignInSafeIdentifier as SafeIdentifier, SignInSalutation as Salutation } from './identifiers';
