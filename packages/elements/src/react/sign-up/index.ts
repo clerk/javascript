@@ -4,8 +4,8 @@ import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 export { SignUpRoot as SignUp, SignUpRoot as Root } from './root';
 export { SignUpStep as Step } from './step';
-export { SignUpNavigate as Navigate } from './navigation';
-export { SignUpVerification as Verification } from './verifications';
+export { SignUpAction as Action } from './action';
+export { SignUpStrategy as Strategy } from './verifications';
 export { SignUpProvider as Provider, SignUpProviderIcon as ProviderIcon } from './providers';
 
 export { Loading } from './loading';

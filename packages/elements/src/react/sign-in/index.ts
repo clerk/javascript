@@ -4,14 +4,14 @@ import { SignInRouterCtx } from './context';
 
 export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export { SignInStep as Step } from './step';
-export { SignInNavigate as Navigate } from './navigation';
+export { SignInAction as Action } from './action';
 export { SignInChooseStrategy as ChooseStrategy, SignInStrategyOption as StrategyOption } from './choose-strategy';
 export { SignInProvider as Provider, SignInProviderIcon as ProviderIcon } from './providers';
 
 export {
   SignInFirstFactor as FirstFactor,
   SignInSecondFactor as SecondFactor,
-  SignInVerification as Verification,
+  SignInStrategy as Strategy,
 } from './verifications';
 
 export { Loading } from './loading';

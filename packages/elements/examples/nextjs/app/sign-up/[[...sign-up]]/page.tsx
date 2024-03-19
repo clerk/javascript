@@ -1,11 +1,23 @@
 'use client';
 
 import { GlobalError } from '@clerk/elements/common';
-import { Loading, Provider, ProviderIcon, SignUp, Step, Verification } from '@clerk/elements/sign-up';
+import { Action, Loading, Provider, ProviderIcon, SignUp, Step, Strategy } from '@clerk/elements/sign-up';
+import type { ComponentProps } from 'react';
 
 import { H1, HR as Hr } from '@/components/design';
-import { CustomField, CustomSubmit } from '@/components/form';
+import { CustomField } from '@/components/form';
 import { Spinner } from '@/components/spinner';
+
+function CustomSubmit({ children }: ComponentProps<'button'>) {
+  return (
+    <Action
+      className='px-7 py-3 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,255,255)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(160,160,160)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'
+      submit
+    >
+      {children}
+    </Action>
+  );
+}
 
 export default function SignUpPage() {
   return (
@@ -108,7 +120,7 @@ export default function SignUpPage() {
 
           <GlobalError className='block text-red-400 font-mono' />
 
-          <Verification name='phone_code'>
+          <Strategy name='phone_code'>
             <CustomField
               label='SMS Code'
               name='code'
@@ -127,9 +139,9 @@ export default function SignUpPage() {
                 }
               </Loading>
             </CustomSubmit>
-          </Verification>
+          </Strategy>
 
-          <Verification name='email_code'>
+          <Strategy name='email_code'>
             <CustomField
               label='Email Code'
               name='code'
@@ -148,9 +160,9 @@ export default function SignUpPage() {
                 }
               </Loading>
             </CustomSubmit>
-          </Verification>
+          </Strategy>
 
-          <Verification name='email_link'>Please check your email for a link to verify your account.</Verification>
+          <Strategy name='email_link'>Please check your email for a link to verify your account.</Strategy>
         </Step>
       </div>
     </SignUp>
