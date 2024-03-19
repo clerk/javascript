@@ -150,11 +150,16 @@ type _LocalizationResource = {
       actionLink__use_phone: LocalizationValue;
       actionLink__use_username: LocalizationValue;
       actionLink__use_email_username: LocalizationValue;
+      actionLink__use_passkey: LocalizationValue;
     };
     password: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
+    };
+    passkey: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
     forgotPasswordAlternativeMethods: {
       title: LocalizationValue;
@@ -245,6 +250,7 @@ type _LocalizationResource = {
       blockButton__emailCode: LocalizationValue;
       blockButton__phoneCode: LocalizationValue;
       blockButton__password: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
       blockButton__totp: LocalizationValue;
       blockButton__backupCode: LocalizationValue;
       getHelp: {

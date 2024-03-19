@@ -172,6 +172,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'identityPreviewEditButton',
   'identityPreviewEditButtonIcon',
 
+  'passkeyIcon',
+
   'accountSwitcherActionButton',
   'accountSwitcherActionButtonIconBox',
   'accountSwitcherActionButtonIcon',

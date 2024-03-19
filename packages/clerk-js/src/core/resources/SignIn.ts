@@ -261,7 +261,11 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public __experimental_authenticateWithPasskey = async (): Promise<SignInResource> => {
+  public __experimental_authenticateWithPasskey = async (params?: {
+    flow?: 'autofill' | 'discoverable';
+  }): Promise<SignInResource> => {
+    const { flow } = params || {};
+
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
@@ -272,23 +276,22 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    if (!this.firstFactorVerification.nonce) {
+    if (flow === 'autofill' || flow === 'discoverable') {
       // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
-    }
-
-    // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-    const passKeyFactor = this.supportedFirstFactors.find(
+    } else {
       // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-      f => f.strategy === 'passkey',
-    ) as __experimental_PasskeyFactor;
+      const passKeyFactor = this.supportedFirstFactors.find(
+        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+        f => f.strategy === 'passkey',
+      ) as __experimental_PasskeyFactor;
 
-    if (!passKeyFactor) {
-      clerkVerifyPasskeyCalledBeforeCreate();
+      if (!passKeyFactor) {
+        clerkVerifyPasskeyCalledBeforeCreate();
+      }
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      await this.prepareFirstFactor(passKeyFactor);
     }
-
-    // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
-    await this.prepareFirstFactor(passKeyFactor);
 
     const { nonce } = this.firstFactorVerification;
     const publicKey = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
@@ -298,10 +301,20 @@ export class SignIn extends BaseResource implements SignInResource {
       throw 'Missing key';
     }
 
+    let canUseConditionalUI = false;
+
+    if (flow === 'autofill') {
+      /**
+       * If autofill is not supported gracefully handle the result, we don't need to throw.
+       * The caller should always check this before calling this method.
+       */
+      canUseConditionalUI = await isWebAuthnAutofillSupported();
+    }
+
     // Invoke the WebAuthn get() method.
     const { publicKeyCredential, error } = await webAuthnGetCredential({
       publicKeyOptions: publicKey,
-      conditionalUI: await isWebAuthnAutofillSupported(),
+      conditionalUI: canUseConditionalUI,
     });
 
     if (!publicKeyCredential) {
