@@ -112,3 +112,5 @@ export function Loading({ children, scope }: LoadingProps) {
 
   return children(returnValue);
 }
+
+Loading.displayName = 'SignUpLoading';
