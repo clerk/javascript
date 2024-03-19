@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
-import { isWebAuthnAutofillSupported } from '../../../utils/passkeys';
+import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '../../../utils/passkeys';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
@@ -42,7 +42,7 @@ const useAutoFillPasskey = () => {
         return;
       }
 
-      await authenticateWithPasskey({ triggerAutofill: true });
+      await authenticateWithPasskey({ flow: 'autofill' });
     }
 
     if (passkeySettings.allow_autofill) {
@@ -69,8 +69,13 @@ export function _SignInStart(): JSX.Element {
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
   );
+
+  /**
+   * Passkeys
+   */
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
+  const isWebSupported = isWebAuthnSupported();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
@@ -358,11 +363,11 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
-            {userSettings.passkeySettings.show_sign_in_button && (
+            {userSettings.passkeySettings.show_sign_in_button && isWebSupported && (
               <Card.Action elementId={'usePasskey'}>
                 <Card.ActionLink
                   localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                  onClick={() => authenticateWithPasskey()}
+                  onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
                 />
               </Card.Action>
             )}

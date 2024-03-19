@@ -262,10 +262,9 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public __experimental_authenticateWithPasskey = async (params?: {
-    triggerAutofill?: boolean;
+    flow?: 'autofill' | 'discoverable';
   }): Promise<SignInResource> => {
-    const defaultParams = { triggerAutofill: false };
-    const { triggerAutofill } = { ...defaultParams, ...params };
+    const { flow } = params || {};
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -277,7 +276,7 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    if (!this.firstFactorVerification.nonce && !this.id) {
+    if (flow === 'autofill' || flow === 'discoverable') {
       // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       await this.create({ strategy: 'passkey' });
     } else {
@@ -304,7 +303,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     let canUseConditionalUI = false;
 
-    if (triggerAutofill) {
+    if (flow === 'autofill') {
       /**
        * If autofill is not supported gracefully handle the result, we don't need to throw.
        * The caller should always check this before calling this method.
