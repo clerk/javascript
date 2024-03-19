@@ -63,7 +63,7 @@ const removeLegacyDevBrowserJwt = (_url: URL) => {
   const DEV_BROWSER_JWT_LEGACY_KEY = '__dev_session';
   const url = new URL(_url);
   url.searchParams.delete(DEV_BROWSER_JWT_LEGACY_KEY);
-  url.hash = url.hash.replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
+  url.hash = decodeURI(url.hash).replace(DEV_BROWSER_JWT_MARKER_REGEXP, '');
   if (url.href.endsWith('#')) {
     url.hash = '';
   }
