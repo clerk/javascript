@@ -3,4 +3,6 @@
 '@clerk/clerk-js': minor
 ---
 
-Navigate to reset-password from the password form if password_settings.enforce_on_sign_in is enabled and sign_in.needs_new_password is true.
+During sign in, navigate to the `reset-password` route if the user needs a new password. This happens when you enforce password usage during sign-in in your dashboard. Previously this case wasn't handled in the password form.
+
+The `signIn.resetPassword.requiredMessage` localization was updated to `'For security reasons, it is required to reset your password.'`.
