@@ -371,8 +371,7 @@ export const viVN: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Đặt lại mật khẩu',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Mật khẩu của bạn đã được thay đổi thành công. Đang đăng nhập, vui lòng chờ một chút.',
       title: 'Đặt lại mật khẩu',
     },

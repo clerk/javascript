@@ -371,8 +371,7 @@ export const ptBR: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Redefinir Senha',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Sua senha foi alterada com sucesso. Entrando, por favor aguarde um momento.',
       title: 'Redefinir Senha',
     },
