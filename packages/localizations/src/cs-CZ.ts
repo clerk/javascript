@@ -370,8 +370,7 @@ export const csCZ: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Obnovit heslo',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Vaše heslo bylo úspěšně změněno. Přihlašuji vás, prosím počkejte okamžik.',
       title: 'Obnovit heslo',
     },

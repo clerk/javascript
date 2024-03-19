@@ -368,8 +368,7 @@ export const zhCN: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: '重置密码',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: '您的密码已成功更改。正在为您登录，请稍等。',
       title: '重置密码',
     },

@@ -372,8 +372,7 @@ export const esES: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
       title: 'Set new password',
     },

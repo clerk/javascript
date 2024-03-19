@@ -371,8 +371,7 @@ export const ptPT: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Repor Palavra-passe',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'A sua palavra-passe foi alterada com sucesso. Entrando, por favor aguarde um momento.',
       title: 'Repor Palavra-passe',
     },
