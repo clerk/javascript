@@ -1,5 +1,6 @@
 ---
 '@clerk/clerk-js': minor
+'@clerk/localizations': minor
 '@clerk/types': minor
 ---
 
