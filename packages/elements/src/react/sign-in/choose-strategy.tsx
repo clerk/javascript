@@ -11,6 +11,7 @@ import { SignInRouterSystemId } from '~/internals/machines/sign-in/types';
 
 import { useActiveTags } from '../hooks';
 import { ActiveTagsMode } from '../hooks/use-active-tags.hook';
+import { createContextForDomValidation } from '../utils/create-context-for-dom-validation';
 import { SignInRouterCtx } from './context';
 
 // --------------------------------- HELPERS ---------------------------------
@@ -35,11 +36,13 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 
 export type SignInChooseStrategyProps = WithChildrenProp;
 
+export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
+
 export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:choose-strategy'], ActiveTagsMode.all);
 
-  return activeState ? children : null;
+  return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
 }
 
 const STRATEGY_OPTION_NAME = 'SignInStrategyOption';

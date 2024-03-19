@@ -28,16 +28,17 @@ function CustomProvider({
   provider: ComponentProps<typeof Provider>['name'];
 }) {
   return (
-    <Provider
-      name={provider}
-      className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
-    >
-      <ProviderIcon
-        className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
-      />
-      <Loading scope={`provider:${provider}`}>
-        {isLoading => (
-          <span className='leading-loose'>
+    <Loading scope={`provider:${provider}`}>
+      {isLoading => (
+        <Provider
+          name={provider}
+          className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
+          disabled={isLoading}
+        >
+          <ProviderIcon
+            className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
+          />
+          <span className='leading-loose inline-flex justify-center items-center'>
             {isLoading ? (
               <>
                 <Spinner /> Loading...
@@ -46,9 +47,9 @@ function CustomProvider({
               children
             )}
           </span>
-        )}
-      </Loading>
-    </Provider>
+        </Provider>
+      )}
+    </Loading>
   );
 }
 
@@ -106,7 +107,7 @@ export default function SignInPage() {
           </p>
         </div>
         <div className='absolute top-4 right-4'>
-          <Loading scope='global'>{isLoading => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}</Loading>
+          <Loading>{isLoading => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}</Loading>
         </div>
 
         <Step name='start'>
@@ -134,7 +135,7 @@ export default function SignInPage() {
                 </Field>
 
                 <CustomSubmit>
-                  <Loading scope='step:start'>
+                  <Loading>
                     {isLoading =>
                       isLoading ? (
                         <>
@@ -199,7 +200,7 @@ export default function SignInPage() {
         </Step>
 
         <Step name='verifications'>
-          <Loading scope='step:verifications'>
+          <Loading>
             {isLoading => (
               <div className='flex gap-6 flex-col'>
                 <GlobalError className='block text-red-400 font-mono' />

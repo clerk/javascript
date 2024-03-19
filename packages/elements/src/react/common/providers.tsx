@@ -22,7 +22,7 @@ export const useSocialProviderContext = () => {
   return ctx;
 };
 
-export interface ProviderProps extends React.HTMLAttributes<HTMLButtonElement> {
+export interface ProviderProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   provider: UseThirdPartyProviderReturn | undefined | null;
 }
