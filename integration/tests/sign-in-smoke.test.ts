@@ -37,7 +37,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
-      await u.page.pause();
     });
 
     test('access protected page @express', async ({ page, context }) => {
@@ -49,7 +48,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       expect(await u.page.locator("data-test-id='protected-api-response'").count()).toEqual(0);
       await u.page.goToRelative('/protected');
       await u.page.isVisible("data-test-id='protected-api-response'");
-      await u.page.pause();
     });
   },
 );
