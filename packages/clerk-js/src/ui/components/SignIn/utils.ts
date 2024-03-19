@@ -1,6 +1,7 @@
 import { titleize } from '@clerk/shared';
 import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
 
+import { isWebAuthnSupported } from '../../../utils/passkeys';
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 
@@ -55,6 +56,22 @@ const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
 };
 
+function determineStrategyWhenPasskeyIsPreferred(
+  factors: SignInFactor[],
+  identifier: string | null,
+): SignInFactor | null {
+  if (isWebAuthnSupported()) {
+    // @ts-ignore
+    const passkeyFactor = factors.find(({ strategy }) => strategy === 'passkey');
+
+    if (passkeyFactor) {
+      return passkeyFactor;
+    }
+  }
+
+  return determineStrategyWhenOTPIsPreferred(factors, identifier);
+}
+
 function determineStrategyWhenPasswordIsPreferred(
   factors: SignInFactor[],
   identifier: string | null,
@@ -90,10 +107,8 @@ export function determineStartingSignInFactor(
     return null;
   }
 
-  //TODO: Create proper function like `determineStrategyWhenOTPIsPreferred`
   if (preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Passkey) {
-    // @ts-ignore
-    return firstFactors.find(f => f.strategy === PREFERRED_SIGN_IN_STRATEGIES.Passkey);
+    return determineStrategyWhenPasskeyIsPreferred(firstFactors, identifier);
   }
   return preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Password
     ? determineStrategyWhenPasswordIsPreferred(firstFactors, identifier)
