@@ -36,10 +36,15 @@ function useHandleAuthenticateWithPasskey() {
           return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
       }
     } catch (err) {
+      const { flow } = args[0] || {};
       // In case of autofill, if retrieval of credentials is aborted just return to avoid updating state of unmounted components.
-      if (isClerkRuntimeError(err) && err.code === 'passkey_retrieval_aborted') {
-        return;
+      if (flow === 'autofill' && isClerkRuntimeError(err)) {
+        const skipActionCodes = ['passkey_retrieval_aborted', 'passkey_retrieval_cancelled'];
+        if (skipActionCodes.includes(err.name)) {
+          return;
+        }
       }
+
       if (isUserLockedError(err)) {
         // @ts-expect-error -- private method for the time being
         return clerk.__internal_navigateWithError('..', err.errors[0]);
