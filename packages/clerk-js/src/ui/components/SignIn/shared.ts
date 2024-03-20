@@ -40,7 +40,7 @@ function useHandleAuthenticateWithPasskey() {
       // In case of autofill, if retrieval of credentials is aborted just return to avoid updating state of unmounted components.
       if (flow === 'autofill' && isClerkRuntimeError(err)) {
         const skipActionCodes = ['passkey_retrieval_aborted', 'passkey_retrieval_cancelled'];
-        if (skipActionCodes.includes(err.name)) {
+        if (skipActionCodes.includes(err.code)) {
           return;
         }
       }
