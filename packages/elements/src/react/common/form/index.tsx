@@ -229,6 +229,7 @@ Form.displayName = FORM_NAME;
 
 const FIELD_NAME = 'ClerkElementsField';
 const FIELD_INNER_NAME = 'ClerkElementsFieldInner';
+const FIELD_STATE_NAME = 'ClerkElementsFieldState';
 
 type FormFieldElement = React.ElementRef<typeof RadixField>;
 type FormFieldProps = RadixFormFieldProps & {
@@ -289,21 +290,21 @@ FieldInner.displayName = FIELD_INNER_NAME;
  * @example
  * <Field name="email">
  *  <FieldState>
- *    {({ state }) => (
+ *    {(state) => (
  *      <pre>Field state: {state}</pre>
  *    )}
  *  </FieldState>
  * </Field>
  */
-function FieldState({ children }: { children: (state: { state: FieldStates }) => React.ReactNode }) {
+function FieldState({ children }: { children: (state: FieldStates) => React.ReactNode }) {
   const field = useFieldContext();
   const error = useFormSelector(fieldErrorsSelector(field?.name));
   const state = error ? ('invalid' as const) : ('valid' as const);
 
-  const fieldState = { state };
-
-  return children(fieldState);
+  return children(state);
 }
+
+FieldState.displayName = FIELD_STATE_NAME;
 
 /* -------------------------------------------------------------------------------------------------
  * Input
