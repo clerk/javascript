@@ -26,6 +26,8 @@ type WebAuthnGetCredentialReturn =
 
 type ClerkWebAuthnErrorCode =
   | 'passkey_exists'
+  | 'passkey_retrieval_aborted'
+  | 'passkey_retrieval_cancelled'
   | 'passkey_registration_cancelled'
   | 'passkey_credential_create_failed'
   | 'passkey_credential_get_failed';
@@ -102,6 +104,33 @@ async function webAuthnCreateCredential(
   }
 }
 
+class WebAuthnAbortService {
+  private controller: AbortController | undefined;
+
+  private __abort() {
+    if (!this.controller) {
+      return;
+    }
+    const abortError = new Error();
+    abortError.name = 'AbortError';
+    this.controller.abort(abortError);
+  }
+
+  createAbortSignal() {
+    this.__abort();
+    const newController = new AbortController();
+    this.controller = newController;
+    return newController.signal;
+  }
+
+  abort() {
+    this.__abort();
+    this.controller = undefined;
+  }
+}
+
+const __internal_WebAuthnAbortService = new WebAuthnAbortService();
+
 async function webAuthnGetCredential({
   publicKeyOptions,
   conditionalUI,
@@ -114,6 +143,7 @@ async function webAuthnGetCredential({
     const credential = (await navigator.credentials.get({
       publicKey: publicKeyOptions,
       mediation: conditionalUI ? 'conditional' : 'optional',
+      signal: __internal_WebAuthnAbortService.createAbortSignal(),
     })) as __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse | null;
 
     if (!credential) {
@@ -135,6 +165,7 @@ async function webAuthnGetCredential({
  */
 function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
   if (error.name === 'InvalidStateError') {
+    // Note: Firefox will throw 'NotAllowedError' when passkeys exists
     return new ClerkWebAuthnError(error.message, { code: 'passkey_exists' });
   } else if (error.name === 'NotAllowedError') {
     return new ClerkWebAuthnError(error.message, { code: 'passkey_registration_cancelled' });
@@ -147,8 +178,12 @@ function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRun
  * @param error
  */
 function handlePublicKeyGetError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
+  if (error.name === 'AbortError') {
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_aborted' });
+  }
+
   if (error.name === 'NotAllowedError') {
-    return new ClerkWebAuthnError(error.message, { code: 'passkey_registration_cancelled' });
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_cancelled' });
   }
   return error;
 }
@@ -252,4 +287,5 @@ export {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredential,
   serializePublicKeyCredentialAssertion,
+  __internal_WebAuthnAbortService,
 };

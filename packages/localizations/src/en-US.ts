@@ -271,6 +271,7 @@ export const enUS: LocalizationResource = {
       blockButton__emailCode: 'Email code to {{identifier}}',
       blockButton__emailLink: 'Email link to {{identifier}}',
       blockButton__password: 'Sign in with your password',
+      blockButton__passkey: 'Sign in with your passkey',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
       getHelp: {
@@ -346,6 +347,10 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the password associated with your account',
       title: 'Enter your password',
     },
+    passkey: {
+      title: 'Use your passkey',
+      subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+    },
     phoneCode: {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",
@@ -371,6 +376,7 @@ export const enUS: LocalizationResource = {
       actionLink: 'Sign up',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
+      actionLink__use_passkey: 'Use passkey instead',
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: 'Don’t have an account?',

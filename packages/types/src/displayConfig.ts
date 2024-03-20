@@ -1,7 +1,7 @@
 import type { DisplayThemeJSON } from './json';
 import type { ClerkResource } from './resource';
 
-export type PreferredSignInStrategy = 'password' | 'otp';
+export type PreferredSignInStrategy = 'passkey' | 'password' | 'otp';
 
 export interface DisplayConfigJSON {
   object: 'display_config';

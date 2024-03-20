@@ -296,6 +296,8 @@ export type ElementsConfig = {
   identityPreviewEditButton: WithOptions;
   identityPreviewEditButtonIcon: WithOptions;
 
+  passkeyIcon: WithOptions<'firstFactor'>;
+
   accountSwitcherActionButton: WithOptions<'addAccount' | 'signOutAll'>;
   accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
   accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
