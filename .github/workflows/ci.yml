@@ -140,13 +140,13 @@ jobs:
       matrix:
         test-name: [ 'generic', 'nextjs', 'express', 'quickstart', 'ap-flows' ]
         test-project: [ 'chrome', 'webkit' ]
-#        exclude:
-#          - test-name: 'quickstart'
-#            test-project: 'webkit'
-#          - test-name: 'nextjs'
-#            test-project: 'webkit'
-#          - test-name: 'express'
-#            test-project: 'webkit'
+        exclude:
+          - test-name: 'quickstart'
+            test-project: 'webkit'
+          - test-name: 'nextjs'
+            test-project: 'webkit'
+          - test-name: 'express'
+            test-project: 'webkit'
 
     steps:
       - name: Checkout Repo
