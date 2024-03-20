@@ -1,5 +1,3 @@
-'use client';
-
 import type { SignInFactor, SignInFirstFactor, SignInStrategy as TSignInStrategy } from '@clerk/types';
 import { Slot } from '@radix-ui/react-slot';
 import { useSelector } from '@xstate/react';

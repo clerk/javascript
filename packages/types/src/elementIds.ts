@@ -47,7 +47,7 @@ export type OrganizationPreviewId =
   | 'organizationSwitcherListedOrganization'
   | 'organizationSwitcherActiveOrganization';
 
-export type CardActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
+export type CardActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn' | 'usePasskey';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
 export type SelectId = 'countryCode' | 'role';

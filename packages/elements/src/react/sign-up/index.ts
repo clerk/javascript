@@ -1,4 +1,5 @@
-'use client';
+// Mark as a client-only package. This will error if you try to import it in a React Server Component.
+import 'client-only';
 
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 

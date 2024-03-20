@@ -15,5 +15,4 @@ export * from './RemoveResourceForm';
 export * from './PrintableComponent';
 export * from './NotificationCountBadge';
 export * from './RemoveResourceForm';
-export * from './withOrganizationsEnabledGuard';
 export * from './QRCode';

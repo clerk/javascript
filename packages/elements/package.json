@@ -72,6 +72,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@statelyai/inspect": "^0.1.0",
     "@xstate/react": "^4.1.0",
+    "client-only": "^0.0.1",
     "xstate": "^5.7.1"
   },
   "devDependencies": {
