@@ -283,6 +283,39 @@ describe('SignInStart', () => {
       );
       expect(fixtures.signIn.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' });
 
+      // don't remove the ticket quite yet
+      expect(window.history.replaceState).not.toHaveBeenCalledWith(
+        undefined,
+        '',
+        expect.not.stringContaining('__clerk_ticket'),
+      );
+    });
+
+    it('removes the query param upon completion', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.status = 'complete';
+      fixtures.signIn.create.mockResolvedValueOnce(fixtures.signIn as SignInResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-in?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: jest.fn() },
+      });
+
+      await act(() =>
+        render(
+          <CardStateProvider>
+            <SignInStart />
+          </CardStateProvider>,
+          { wrapper },
+        ),
+      );
+
       expect(window.history.replaceState).toHaveBeenCalledWith(
         undefined,
         '',
