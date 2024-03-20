@@ -1,6 +1,13 @@
 // ---------------------------------- Events ---------------------------------- //
 
-import type { ClerkResource, LoadedClerk, OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
+import type {
+  ClerkResource,
+  LoadedClerk,
+  OAuthStrategy,
+  SamlStrategy,
+  SignInStrategy,
+  Web3Strategy,
+} from '@clerk/types';
 import type { AnyActorLogic, InputFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
@@ -8,11 +15,23 @@ import type { ClerkRouter } from '~/react/router';
 
 // ---------------------------------- Events ---------------------------------- //
 
+export type BaseRouterLoadingStep = 'start' | 'verifications' | 'continue';
+
 export type BaseRouterNextEvent<T extends ClerkResource> = { type: 'NEXT'; resource?: T };
 export type BaseRouterPrevEvent = { type: 'NAVIGATE.PREVIOUS' };
 export type BaseRouterStartEvent = { type: 'NAVIGATE.START' };
 export type BaseRouterErrorEvent = { type: 'ERROR'; error: Error };
 export type BaseRouterTransferEvent = { type: 'TRANSFER' };
+export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
+  | {
+      step: TSteps | undefined;
+      strategy?: never;
+    }
+  | {
+      step?: never;
+      strategy: SignInStrategy | undefined;
+    }
+) & { type: 'LOADING'; isLoading: boolean };
 
 export type BaseRouterRouteRegisterEvent<TSystemId extends string, TLogic extends AnyActorLogic = AnyActorLogic> = {
   type: 'ROUTE.REGISTER';

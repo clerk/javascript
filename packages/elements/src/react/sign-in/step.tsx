@@ -4,7 +4,7 @@ import { SignInChooseStrategy, type SignInChooseStrategyProps } from './choose-s
 import { SignInStart, type SignInStartProps } from './start';
 import { SignInVerifications, type SignInVerificationsProps } from './verifications';
 
-type SignInStep = 'start' | 'verifications' | 'choose-strategy';
+export type SignInStep = 'start' | 'verifications' | 'choose-strategy';
 type StepWithProps<N extends SignInStep, T> = { name: N } & T;
 
 export type SignInStepProps =

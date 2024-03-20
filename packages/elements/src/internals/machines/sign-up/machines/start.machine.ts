@@ -1,9 +1,10 @@
 import type { SignUpResource } from '@clerk/types';
 import type { ActorRefFrom } from 'xstate';
-import { fromPromise, sendParent, sendTo, setup } from 'xstate';
+import { fromPromise, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 import type { SignUpStartSchema } from '~/internals/machines/sign-up/types';
 import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
@@ -35,6 +36,8 @@ export const SignUpStartMachine = setup({
         };
       },
     ),
+    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    sendToLoading,
   },
   types: {} as SignUpStartSchema,
 }).createMachine({
@@ -43,6 +46,7 @@ export const SignUpStartMachine = setup({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
     formRef: input.form,
     parent: input.parent,
+    loadingStep: 'start',
   }),
   initial: 'Pending',
   states: {
@@ -50,11 +54,15 @@ export const SignUpStartMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
-        SUBMIT: 'Attempting',
+        SUBMIT: {
+          target: 'Attempting',
+          reenter: true,
+        },
       },
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
       invoke: {
         id: 'attemptCreate',
         src: 'attempt',
@@ -63,10 +71,10 @@ export const SignUpStartMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: sendParent({ type: 'NEXT' }),
+          actions: ['sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: 'setFormErrors',
+          actions: ['setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },
