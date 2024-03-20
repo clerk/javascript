@@ -1,5 +1,3 @@
-'use client';
-
 import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import { useSelector } from '@xstate/react';
 import { useCallback } from 'react';

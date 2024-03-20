@@ -1,5 +1,3 @@
-'use client';
-
 import { SignUpContinueMachine, type TSignUpContinueMachine } from '~/internals/machines/sign-up/machines';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
