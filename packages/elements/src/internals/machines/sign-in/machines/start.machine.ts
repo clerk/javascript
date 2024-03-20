@@ -1,9 +1,10 @@
 import type { SignInResource } from '@clerk/types';
 import type { ActorRefFrom } from 'xstate';
-import { fromPromise, sendParent, sendTo, setup } from 'xstate';
+import { fromPromise, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import { type TSignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
 import type { SignInStartSchema } from '~/internals/machines/sign-in/types';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
@@ -46,6 +47,8 @@ export const SignInStartMachine = setup({
         };
       },
     ),
+    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    sendToLoading,
   },
   types: {} as SignInStartSchema,
 }).createMachine({
@@ -54,6 +57,7 @@ export const SignInStartMachine = setup({
     basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
     parent: input.parent,
     formRef: input.form,
+    loadingStep: 'start',
   }),
   initial: 'Pending',
   states: {
@@ -61,11 +65,15 @@ export const SignInStartMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
-        SUBMIT: 'Attempting',
+        SUBMIT: {
+          target: 'Attempting',
+          reenter: true,
+        },
       },
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -74,10 +82,10 @@ export const SignInStartMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: sendParent({ type: 'NEXT' }),
+          actions: ['sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: 'setFormErrors',
+          actions: ['setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },

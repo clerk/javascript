@@ -15,9 +15,8 @@ export {
   SignInStrategy as Strategy,
 } from './verifications';
 
+export { Loading } from './loading';
 export { SignInSafeIdentifier as SafeIdentifier, SignInSalutation as Salutation } from './identifiers';
-
-export { useIsLoading_unstable } from './hooks/use-loading.hook';
 
 /** @internal Internal use only */
 export const useSignInActorRef_internal = SignInRouterCtx.useActorRef;

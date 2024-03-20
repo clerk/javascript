@@ -4,7 +4,7 @@ import { SignUpContinue, type SignUpContinueProps } from './continue';
 import { SignUpStart, type SignUpStartProps } from './start';
 import { SignUpVerifications, type SignUpVerificationsProps } from './verifications';
 
-type SignUpStep = 'start' | 'continue' | 'verifications';
+export type SignUpStep = 'start' | 'continue' | 'verifications';
 type StepWithProps<N extends SignUpStep, T> = { name: N } & T;
 
 export type SignUpStepProps =

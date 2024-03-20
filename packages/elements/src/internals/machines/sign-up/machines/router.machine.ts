@@ -151,6 +151,15 @@ export const SignUpRouterMachine = setup({
     'ROUTE.UNREGISTER': {
       actions: stopChild(({ event }) => event.id),
     },
+    LOADING: {
+      actions: assign(({ event }) => ({
+        loading: {
+          isLoading: event.isLoading,
+          step: event.step,
+          strategy: event.strategy,
+        },
+      })),
+    },
   },
   states: {
     Idle: {
@@ -160,6 +169,9 @@ export const SignUpRouterMachine = setup({
             clerk: event.clerk,
             router: event.router,
             signInPath: event.signInPath || SIGN_IN_DEFAULT_BASE_PATH,
+            loading: {
+              isLoading: false,
+            },
           })),
           target: 'Init',
         },

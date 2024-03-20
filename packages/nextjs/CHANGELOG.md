@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.0.0-beta.35
+
+### Minor Changes
+
+- Bump minimum nextjs@13 version to `13.5.4` from `13.0.4` to resolve vulnerabilities. ([#2983](https://github.com/clerk/javascript/pull/2983)) by [@dimkl](https://github.com/dimkl)
+
+  ref: https://github.com/advisories/GHSA-c59h-r6p8-q9wc
+
+### Patch Changes
+
+- Updated dependencies [[`8c23651b8`](https://github.com/clerk/javascript/commit/8c23651b8c3ff1474057a7d62e3ddba939cb0b64), [`9272006e7`](https://github.com/clerk/javascript/commit/9272006e744fc906cfdee520d2dc6d7db141cc97), [`2671e7aa5`](https://github.com/clerk/javascript/commit/2671e7aa5081eb9ae38b92ee647f2e3fd824741f), [`66b283653`](https://github.com/clerk/javascript/commit/66b28365370bcbcdf4e51da39de58c7f8b1fc1b4)]:
+  - @clerk/backend@1.0.0-beta.29
+  - @clerk/clerk-react@5.0.0-beta.31
+
 ## 5.0.0-beta.34
 
 ### Minor Changes
