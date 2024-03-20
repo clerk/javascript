@@ -1,5 +1,53 @@
 # Change Log
 
+## 5.0.0-beta.35
+
+### Minor Changes
+
+- List passkeys under security in UserProfile. ([#2958](https://github.com/clerk/javascript/pull/2958)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Supports renaming a passkey.
+  - Supports deleting a passkey.
+
+- During sign in, navigate to the `reset-password` route if the user needs a new password. This happens when you enforce password usage during sign-in in your dashboard. Previously this case wasn't handled in the password form. ([#2984](https://github.com/clerk/javascript/pull/2984)) by [@yourtallness](https://github.com/yourtallness)
+
+  The `signIn.resetPassword.requiredMessage` localization was updated to `'For security reasons, it is required to reset your password.'`.
+
+- Throw an error in development when there is an invalid mount or modal open. This includes mounting a component when the resource is not available (i.e. `mountUserProfile()` when the user does not exist) as well as mounting a component without the feature being enabled via the clerk dashboard (i.e. `mountOrganizationProfile()` without having organizations enabled). ([#2976](https://github.com/clerk/javascript/pull/2976)) by [@desiprisg](https://github.com/desiprisg)
+
+- Experimental support for authenticating with a passkey. ([#2970](https://github.com/clerk/javascript/pull/2970)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example usage: `await signIn.authenticateWithPasskey()`.
+
+- Remove unused error helpers. ([#2978](https://github.com/clerk/javascript/pull/2978)) by [@panteliselef](https://github.com/panteliselef)
+
+  - clerkErrorInvalidColor()
+  - clerkCoreErrorUserIsNotDefined()
+  - clerkCoreErrorSessionIsNotDefined()
+  - clerkCoreErrorOrganizationIsNotDefined()
+
+- Remove the unused appearance keys for accordion and breadcrumb elements. ([#2956](https://github.com/clerk/javascript/pull/2956)) by [@desiprisg](https://github.com/desiprisg)
+
+- Allow users to authenticate with passkeys via the `<SignIn/>`. ([#3000](https://github.com/clerk/javascript/pull/3000)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix checkbox styling issues ([#2995](https://github.com/clerk/javascript/pull/2995)) by [@octoper](https://github.com/octoper)
+
+- Fix font size inconsistencies when selecting method to sign in. ([#2997](https://github.com/clerk/javascript/pull/2997)) by [@octoper](https://github.com/octoper)
+
+- Fix for input group components with prefix or suffix to match the rest of the design ([#2996](https://github.com/clerk/javascript/pull/2996)) by [@octoper](https://github.com/octoper)
+
+- Disable emailAdress field in SignUp if fields.emailAddress.disabled is true ([#2990](https://github.com/clerk/javascript/pull/2990)) by [@nikospapcom](https://github.com/nikospapcom)
+
+- Fix: fallback to other first factors when preferred strategy is passkey but the user has not registered a passkey yet. ([#3013](https://github.com/clerk/javascript/pull/3013)) by [@panteliselef](https://github.com/panteliselef)
+
+- Users will no longer see an error the SignIn component when they try to close popups due to passkey autofill. ([#3015](https://github.com/clerk/javascript/pull/3015)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`08118edfa`](https://github.com/clerk/javascript/commit/08118edfa7b885c8b9be9e17ae510481bf282686), [`0d0b1d89a`](https://github.com/clerk/javascript/commit/0d0b1d89a46d2418cb05a10940f4a399cbd8ffeb), [`13ed9ac54`](https://github.com/clerk/javascript/commit/13ed9ac54b6cf948560261ccf4471036eb02b4cd), [`31570f138`](https://github.com/clerk/javascript/commit/31570f13888530cf55556aad032a0028b5740193), [`4e31fca12`](https://github.com/clerk/javascript/commit/4e31fca122762a407d196d4eaffcdcc4cb34b39c), [`1f650f30a`](https://github.com/clerk/javascript/commit/1f650f30a97939817b7b2f3cc6283e22dc431523), [`663243220`](https://github.com/clerk/javascript/commit/6632432208aa6ca507f33fa9ab79abaa40431be6), [`1a0268509`](https://github.com/clerk/javascript/commit/1a02685095fe82ac8bb8f7b6d43b3f7b330c4bd5), [`ebf9be77f`](https://github.com/clerk/javascript/commit/ebf9be77f17f8880541de67f66879324f68cf6bd)]:
+  - @clerk/localizations@2.0.0-beta.18
+  - @clerk/types@4.0.0-beta.21
+
 ## 5.0.0-beta.34
 
 ### Patch Changes
