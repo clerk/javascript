@@ -1,5 +1,6 @@
 import {
   addClerkPrefix,
+  ClerkRuntimeError,
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
@@ -331,8 +332,12 @@ export class Clerk implements ClerkInterface {
 
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
-      console.info(warnings.cannotOpenSignUpOrSignUp);
+    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
+          code: 'cannot_render_single_session_enabled',
+        });
+      }
       return;
     }
     void this.#componentControls
@@ -347,8 +352,13 @@ export class Clerk implements ClerkInterface {
 
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotOpenSignUpOrSignUp);
+    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
+          code: 'cannot_render_single_session_enabled',
+        });
+      }
+      return;
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignUp' })
@@ -362,8 +372,13 @@ export class Clerk implements ClerkInterface {
 
   public openUserProfile = (props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (noUserExists(this) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotOpenUserProfile);
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
+          code: 'cannot_render_user_missing',
+        });
+      }
+      return;
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'UserProfile' })
@@ -378,11 +393,19 @@ export class Clerk implements ClerkInterface {
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'));
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
       return;
     }
-    if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
+    if (noOrganizationExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+          code: 'cannot_render_organization_missing',
+        });
+      }
       return;
     }
     void this.#componentControls
@@ -398,7 +421,11 @@ export class Clerk implements ClerkInterface {
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'));
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
       return;
     }
     void this.#componentControls
@@ -457,8 +484,12 @@ export class Clerk implements ClerkInterface {
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (noUserExists(this) && this.#instanceType === 'development') {
-      console.info(warnings.cannotRenderComponentWhenUserDoesNotExist);
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenUserDoesNotExist, {
+          code: 'cannot_render_user_missing',
+        });
+      }
       return;
     }
     void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls =>
@@ -485,11 +516,19 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'));
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
       return;
     }
-    if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
+    if (noOrganizationExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+          code: 'cannot_render_organization_missing',
+        });
+      }
       return;
     }
     void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>
@@ -516,7 +555,11 @@ export class Clerk implements ClerkInterface {
   public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'));
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
       return;
     }
     void this.#componentControls?.ensureMounted({ preloadHint: 'CreateOrganization' }).then(controls =>
@@ -543,7 +586,11 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'));
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
       return;
     }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
@@ -566,7 +613,11 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.#environment)) {
-      console.info(warnings.cannotRenderAnyOrganizationComponent('OrganizationList'));
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationList'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
       return;
     }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationList' }).then(controls =>

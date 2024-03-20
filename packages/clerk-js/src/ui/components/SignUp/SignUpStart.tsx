@@ -109,8 +109,6 @@ function _SignUpStart(): JSX.Element {
     signUp
       .create({ strategy: 'ticket', ticket: formState.ticket.value })
       .then(signUp => {
-        removeClerkQueryParam('__clerk_ticket');
-        removeClerkQueryParam('__clerk_invitation_token');
         formState.emailAddress.setValue(signUp.emailAddress || '');
         // In case we are in a Ticket flow and the sign up is not complete yet, update the state
         // to render properly the SignUp form with other available options to complete it (e.g. OAuth)
@@ -122,7 +120,11 @@ function _SignUpStart(): JSX.Element {
           signUp,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () => setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => {
+            removeClerkQueryParam('__clerk_ticket');
+            removeClerkQueryParam('__clerk_invitation_token');
+            return setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp });
+          },
           navigate,
         });
       })

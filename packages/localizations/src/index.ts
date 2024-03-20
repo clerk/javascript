@@ -28,3 +28,4 @@ export { roRO } from './ro-RO';
 export { esMX } from './es-MX';
 export { bgBG } from './bg-BG';
 export { thTH } from './th-TH';
+export { caES } from './ca-ES';
