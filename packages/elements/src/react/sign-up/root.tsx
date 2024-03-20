@@ -1,5 +1,3 @@
-'use client';
-
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import { useSelector } from '@xstate/react';
 import { useEffect } from 'react';

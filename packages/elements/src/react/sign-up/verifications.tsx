@@ -1,5 +1,3 @@
-'use client';
-
 import type { TSignUpVerificationMachine } from '~/internals/machines/sign-up/machines';
 import { SignUpVerificationMachine } from '~/internals/machines/sign-up/machines';
 import type { SignUpVerificationFriendlyTags, SignUpVerificationTags } from '~/internals/machines/sign-up/types';
