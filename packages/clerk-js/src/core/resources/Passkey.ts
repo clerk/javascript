@@ -10,12 +10,14 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import {
+  ClerkWebAuthnError,
   isWebAuthnPlatformAuthenticatorSupported,
   isWebAuthnSupported,
   serializePublicKeyCredential,
   webAuthnCreateCredential,
 } from '../../utils/passkeys';
-import { BaseResource, ClerkRuntimeError, DeletedObject, PasskeyVerification } from './internal';
+import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
+import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
 
 export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
@@ -60,8 +62,8 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * As a precaution we need to check if WebAuthn is supported.
      */
     if (!isWebAuthnSupported()) {
-      throw new ClerkRuntimeError('Passkeys are not supported', {
-        code: 'passkeys_unsupported',
+      throw new ClerkWebAuthnError('Passkeys are not supported in this device.', {
+        code: 'passkey_not_supported',
       });
     }
 
@@ -73,15 +75,17 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
     // This should never occur, just a fail-safe
     if (!publicKey) {
-      // TODO-PASSKEYS: Implement this later
-      throw 'Missing key';
+      clerkMissingWebAuthnPublicKeyOptions('create');
     }
 
     if (publicKey.authenticatorSelection?.authenticatorAttachment === 'platform') {
       if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
-        throw new ClerkRuntimeError('Platform authenticator is not supported', {
-          code: 'passkeys_unsupported_platform_authenticator',
-        });
+        throw new ClerkWebAuthnError(
+          'Registration requires a platform authenticator but the device does not support it.',
+          {
+            code: 'passkeys_pa_not_supported',
+          },
+        );
       }
     }
 

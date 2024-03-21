@@ -442,7 +442,11 @@ export const enUS: LocalizationResource = {
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+    passkey_not_supported: 'Passkeys are not supported in this device.',
+    passkeys_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
     passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
+    passkey_registration_cancelled: 'Passkey registration was cancelled or timed out.',
+    passkey_already_exists: 'A passkey is already registered with this device.',
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_not_found: '',

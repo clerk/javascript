@@ -114,8 +114,8 @@ export function clerkUnsupportedReloadMethod(className: string): never {
   throw new Error(`${errorPrefix} Calling ${className}.reload is not currently supported. Please contact support.`);
 }
 
-export function clerkMissingWebAuthnPublicKeyRequestOptions(): never {
+export function clerkMissingWebAuthnPublicKeyOptions(name: 'create' | 'get'): never {
   throw new Error(
-    `${errorPrefix} Missing publicKey. When calling 'navigator.credentials.create()' is it required to pass a publicKey object.`,
+    `${errorPrefix} Missing publicKey. When calling 'navigator.credentials.${name}()' is it required to pass a publicKey object.`,
   );
 }
