@@ -127,7 +127,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.signIn.continue();
     await expect(u.page.getByText(/^password is incorrect/i)).toBeVisible();
 
-    await u.po.expect.toBeSignedIn();
+    await u.po.expect.toBeSignedOut();
   });
 
   test('cant sign in with wrong password but can sign in with email', async ({ page, context }) => {
