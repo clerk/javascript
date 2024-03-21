@@ -8,7 +8,7 @@ import * as React from 'react';
 function OTPInputSegment({ value, status }: { value: string; status: OTPInputSegmentStatus }) {
   return (
     <FieldState>
-      {({ state }) => (
+      {state => (
         <span
           data-state={state}
           data-status={status}
@@ -64,7 +64,7 @@ export const CustomField = React.forwardRef<
       </div>
 
       <FieldError className='block text-red-400 font-mono' />
-      <FieldState>{({ state }) => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
+      <FieldState>{state => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
     </ElementsField>
   );
 });
