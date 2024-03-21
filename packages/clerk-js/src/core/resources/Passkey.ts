@@ -62,7 +62,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * As a precaution we need to check if WebAuthn is supported.
      */
     if (!isWebAuthnSupported()) {
-      throw new ClerkWebAuthnError('Passkeys are not supported in this device.', {
+      throw new ClerkWebAuthnError('Passkeys are not supported on this device.', {
         code: 'passkey_not_supported',
       });
     }
