@@ -40,7 +40,7 @@ function useHandleAuthenticateWithPasskey() {
 
       if (isClerkRuntimeError(err)) {
         // In any case if the call gets aborted we should skip showing an error. This prevents updating the state of unmounted components.
-        if (err.code === 'passkey_retrieval_aborted') {
+        if (err.code === 'passkey_operation_aborted') {
           return;
         }
         // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
