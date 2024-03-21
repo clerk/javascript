@@ -32,7 +32,7 @@ const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
   const { userSettings } = useEnvironment();
-  const { passkeySettings } = userSettings;
+  const { passkeySettings, attributes } = userSettings;
 
   useEffect(() => {
     async function runAutofillPasskey() {
@@ -45,7 +45,7 @@ const useAutoFillPasskey = () => {
       await authenticateWithPasskey({ flow: 'autofill' });
     }
 
-    if (passkeySettings.allow_autofill) {
+    if (passkeySettings.allow_autofill && attributes.passkey.enabled) {
       runAutofillPasskey();
     }
   }, []);
@@ -363,14 +363,16 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
-            {userSettings.passkeySettings.show_sign_in_button && isWebSupported && (
-              <Card.Action elementId={'usePasskey'}>
-                <Card.ActionLink
-                  localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
-                  onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
-                />
-              </Card.Action>
-            )}
+            {userSettings.attributes.passkey.enabled &&
+              userSettings.passkeySettings.show_sign_in_button &&
+              isWebSupported && (
+                <Card.Action elementId={'usePasskey'}>
+                  <Card.ActionLink
+                    localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
+                    onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+                  />
+                </Card.Action>
+              )}
           </Col>
         </Card.Content>
         <Card.Footer>
