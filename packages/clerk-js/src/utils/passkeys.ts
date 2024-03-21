@@ -29,6 +29,7 @@ type ClerkWebAuthnErrorCode =
   | 'passkey_retrieval_aborted'
   | 'passkey_retrieval_cancelled'
   | 'passkey_registration_cancelled'
+  | 'passkey_retrieval_invalid_rpID_or_domain'
   | 'passkey_credential_create_failed'
   | 'passkey_credential_get_failed';
 
@@ -155,7 +156,7 @@ async function webAuthnGetCredential({
 
     return { publicKeyCredential: credential, error: null };
   } catch (e) {
-    return { error: handlePublicKeyGetError(e), publicKeyCredential: null };
+    return { error: handlePublicKeyGetError(e, publicKeyOptions), publicKeyCredential: null };
   }
 }
 
@@ -184,6 +185,10 @@ function handlePublicKeyGetError(error: Error): ClerkWebAuthnError | ClerkRuntim
 
   if (error.name === 'NotAllowedError') {
     return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_cancelled' });
+  }
+
+  if (error.name === 'SecurityError') {
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_invalid_rpID_or_domain' });
   }
   return error;
 }

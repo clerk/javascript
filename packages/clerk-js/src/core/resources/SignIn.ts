@@ -41,6 +41,7 @@ import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
   clerkMissingOptionError,
+  clerkMissingWebAuthnPublicKeyRequestOptions,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
@@ -294,11 +295,10 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     const { nonce } = this.firstFactorVerification;
-    const publicKey = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+    const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
 
-    if (!publicKey) {
-      // TODO-PASSKEYS: Implement this later
-      throw 'Missing key';
+    if (!publicKeyOptions) {
+      clerkMissingWebAuthnPublicKeyRequestOptions();
     }
 
     let canUseConditionalUI = false;
@@ -311,9 +311,9 @@ export class SignIn extends BaseResource implements SignInResource {
       canUseConditionalUI = await isWebAuthnAutofillSupported();
     }
 
-    // Invoke the WebAuthn get() method.
+    // Invoke the navigator.create.get() method.
     const { publicKeyCredential, error } = await webAuthnGetCredential({
-      publicKeyOptions: publicKey,
+      publicKeyOptions,
       conditionalUI: canUseConditionalUI,
     });
 
