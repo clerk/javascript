@@ -47,7 +47,7 @@ export const esES: LocalizationResource = {
   formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Has olvidado tu contraseña?',
   formFieldError__matchingPasswords: 'Las contraseñas coinciden.',
-  formFieldError__notMatchingPasswords: "Las contraseñas no coinciden.",
+  formFieldError__notMatchingPasswords: 'Las contraseñas no coinciden.',
   formFieldError__verificationLinkExpired: 'El enlace de verificación ha expirado. Por favor solicite uno nuevo.',
   formFieldHintText__optional: 'Opcional',
   formFieldHintText__slug: 'Un slug es un ID legible que debe ser único. Es comúnmente usado en URLs.',
