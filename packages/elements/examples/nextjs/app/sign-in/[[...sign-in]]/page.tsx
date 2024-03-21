@@ -126,12 +126,18 @@ export default function SignInPage() {
                   className='flex flex-col gap-4 w-full'
                   name='identifier'
                 >
-                  <Label className='sr-only'>Email</Label>
-                  <Input
-                    className='bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded data-[invalid=true]:border-red-400 w-full placeholder-[rgb(100,100,100)] px-4 py-2'
-                    placeholder='Enter your email address'
-                  />
-                  <FieldError className='block text-red-400 font-mono w-full' />
+                  {fieldState => (
+                    <>
+                      <Label className='sr-only'>Email</Label>
+                      <Input
+                        className={`bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded w-full placeholder-[rgb(100,100,100)] px-4 py-2 ${
+                          fieldState === 'invalid' && 'border-red-500'
+                        }`}
+                        placeholder='Enter your email address'
+                      />
+                      <FieldError className='block text-red-400 font-mono w-full' />
+                    </>
+                  )}
                 </Field>
 
                 <CustomSubmit>
