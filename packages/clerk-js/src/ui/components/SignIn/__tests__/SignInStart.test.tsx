@@ -136,21 +136,23 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
     });
 
-    it('calls authenticateWithPasskey on clicking Passkey button', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEmailAddress();
-        f.withPasskey();
-        f.withPasskeySettings({
-          show_sign_in_button: true,
+    mockWebAuthn(() => {
+      it('calls authenticateWithPasskey on clicking Passkey button', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            show_sign_in_button: true,
+          });
         });
-      });
-      fixtures.signIn.__experimental_authenticateWithPasskey.mockResolvedValue({
-        status: 'complete',
-      } as SignInResource);
-      const { userEvent } = render(<SignInStart />, { wrapper });
-      await userEvent.click(screen.getByText('Use passkey instead'));
-      expect(fixtures.signIn.__experimental_authenticateWithPasskey).toHaveBeenCalledWith({
-        flow: 'discoverable',
+        fixtures.signIn.__experimental_authenticateWithPasskey.mockResolvedValue({
+          status: 'complete',
+        } as SignInResource);
+        const { userEvent } = render(<SignInStart />, { wrapper });
+        await userEvent.click(screen.getByText('Use passkey instead'));
+        expect(fixtures.signIn.__experimental_authenticateWithPasskey).toHaveBeenCalledWith({
+          flow: 'discoverable',
+        });
       });
     });
 

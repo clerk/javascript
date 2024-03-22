@@ -59,6 +59,10 @@ export const mockWebAuthn = (fn: () => void) => {
       publicKeyCredential.isConditionalMediationAvailable = () => Promise.resolve(true);
     });
 
+    afterAll(() => {
+      (window as any).PublicKeyCredential = undefined;
+    });
+
     fn();
   });
 };
