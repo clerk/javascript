@@ -16,3 +16,5 @@ export type {
 } from '~/react/common/form';
 
 export type { OTPInputSegmentStatus } from '~/react/common/form/otp';
+
+export { Loading } from '~/react/common/loading';

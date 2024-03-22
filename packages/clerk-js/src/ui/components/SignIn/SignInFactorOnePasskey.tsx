@@ -21,7 +21,8 @@ export const SignInFactorOnePasskey = (props: SignInFactorOnePasswordProps) => {
   const { navigate } = useRouter();
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
+  const onSecondFactor = () => navigate('../factor-two');
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
 
   const goBack = () => {
     return navigate('../');
