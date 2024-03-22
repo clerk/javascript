@@ -21,6 +21,7 @@ export function useAlternativeStrategies({ filterOutFactor }: { filterOutFactor:
     .filter(f => !f.strategy.startsWith('oauth_') && !(f.strategy === filterOutFactor?.strategy))
     .filter(factor => factorHasLocalStrategy(factor))
     // Only include passkey if the device supports it.
+    // @ts-ignore Types are not public yet.
     .filter(factor => (factor.strategy === 'passkey' ? isWebAuthnSupported() : true))
     .sort(allStrategiesButtonsComparator);
 

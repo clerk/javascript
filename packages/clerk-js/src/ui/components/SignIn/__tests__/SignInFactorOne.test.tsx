@@ -651,8 +651,6 @@ describe('SignInFactorOne', () => {
           await waitFor(() => {
             expect(fixtures.signIn.__experimental_authenticateWithPasskey).toHaveBeenCalled();
           });
-
-          // TODO: Handle alternative methods when passkey is not supported
         });
       });
     });
