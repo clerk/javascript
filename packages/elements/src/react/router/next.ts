@@ -5,9 +5,8 @@ import { NEXT_WINDOW_HISTORY_SUPPORT_VERSION } from '~/internals/constants';
 import type { ClerkHostRouter } from './router';
 
 /**
- * Framework specific router integrations
+ * Clerk router integration with Next.js's router.
  */
-
 export const useNextRouter = (): ClerkHostRouter => {
   const router = useRouter();
   const pathname = usePathname();
