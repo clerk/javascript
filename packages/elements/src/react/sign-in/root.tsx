@@ -55,6 +55,10 @@ export function SignInRoot({ children, path = SIGN_IN_DEFAULT_BASE_PATH }: SignI
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
 
+  useEffect(() => {
+    console.log('mounted');
+  }, []);
+
   return (
     <ClerkLoaded>
       <Router
