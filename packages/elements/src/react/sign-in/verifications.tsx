@@ -13,12 +13,13 @@ import {
 } from '~/internals/machines/sign-in/machines';
 import type { SignInStrategyName } from '~/internals/machines/sign-in/types';
 import { matchStrategy } from '~/internals/machines/utils/strategies';
+import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
 import { SignInRouterCtx, StrategiesContext, useSignInRouteRegistration, useStrategy } from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
-export type SignInVerificationsProps = WithChildrenProp<{ preferred?: ClerkSignInStrategy }>;
+export type SignInVerificationsProps = WithChildrenProp<{ preferred?: ClerkSignInStrategy }> & FormProps;
 
 export const SignInFirstFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInFirstFactorCtx');
 export const SignInSecondFactorCtx = createContextFromActorRef<TSignInSecondFactorMachine>('SignInSecondFactorCtx');
@@ -29,6 +30,7 @@ function SignInStrategiesProvider({
   children,
   preferred,
   actorRef,
+  ...props
 }: SignInVerificationsProps & { actorRef: ActorRefFrom<TSignInFirstFactorMachine> }) {
   const routerRef = SignInRouterCtx.useActorRef();
   const current = useSelector(actorRef, strategiesSelector);
@@ -37,7 +39,14 @@ function SignInStrategiesProvider({
 
   return (
     <StrategiesContext.Provider value={{ current: current, preferred, isActive }}>
-      {isChoosingAltStrategy ? null : <Form flowActor={actorRef}>{children}</Form>}
+      {isChoosingAltStrategy ? null : (
+        <Form
+          flowActor={actorRef}
+          {...props}
+        >
+          {children}
+        </Form>
+      )}
     </StrategiesContext.Provider>
   );
 }
