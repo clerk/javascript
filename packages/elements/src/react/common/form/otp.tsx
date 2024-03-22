@@ -12,7 +12,7 @@ export type OTPInputProps = Exclude<
   autoSubmit?: boolean;
 };
 
-type SelectionRange = readonly [start: number, end: number];
+type SelectionRange = readonly [start: number | null, end: number | null];
 const ZERO: SelectionRange = [0, 0];
 const OUTSIDE: SelectionRange = [-1, -1];
 
@@ -143,7 +143,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
         <style>{`
       input[data-otp-input-segmented]::selection {
         color: transparent;
-        background-color: none;
+        background-color: transparent;
       }
       `}</style>
         <RadixControl
@@ -182,18 +182,15 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           style={segmentWrapperStyle}
         >
           {Array.from({ length }).map((_, i) => {
+            const isHovered = isHovering && !isFocused();
+            const isCursor = selectionRange[0] === selectionRange[1] && selectionRange[0] === i;
+            const isSelected = selectionRange[0] <= i && selectionRange[1] > i;
+
             return (
               <React.Fragment key={`otp-segment-${i}`}>
                 {render({
                   value: String(props.value)[i] || '',
-                  status:
-                    isHovering && !isFocused()
-                      ? 'hovered'
-                      : selectionRange[0] === selectionRange[1] && selectionRange[0] === i
-                      ? 'cursor'
-                      : selectionRange[0] <= i && selectionRange[1] > i
-                      ? 'selected'
-                      : 'none',
+                  status: isHovered ? 'hovered' : isCursor ? 'cursor' : isSelected ? 'selected' : 'none',
                   index: i,
                 })}
               </React.Fragment>
