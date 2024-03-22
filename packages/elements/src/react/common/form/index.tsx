@@ -361,15 +361,17 @@ type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
  *   />
  * </Field>
  */
-const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>((props: FormInputProps, ref) => {
-  const field = useInput(props);
-  return (
-    <field.Element
-      ref={ref}
-      {...field.props}
-    />
-  );
-});
+const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+  (props: FormInputProps, forwardedRef) => {
+    const field = useInput(props);
+    return (
+      <field.Element
+        ref={forwardedRef}
+        {...field.props}
+      />
+    );
+  },
+);
 
 Input.displayName = INPUT_NAME;
 
