@@ -98,13 +98,34 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
     // This ensures we can access innerRef internally while still exposing it via the ref prop
     React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
 
-    // A layout effect is used here to avoid any perceived visual lag when changing the selection
+    /**
+     * A layout effect is used here to avoid any perceived visual lag when changing the selection
+     * This effect ensures that when deleting characters from the input the selection is updated
+     */
     React.useLayoutEffect(() => {
       if (document.activeElement !== innerRef.current) {
         return;
       }
       setSelectionRange(cur => selectionRangeUpdater(cur, innerRef));
     }, [props.value]);
+
+    /**
+     * Attach a selectionchange handler on the document during the capture phase to the selection range is updated
+     * immediately.
+     *
+     * One concrete example, if using onSelect on the input, the handler wouldn't fire when pressing cmd + left/right arrow.
+     */
+    React.useEffect(() => {
+      function onSelectionChange() {
+        if (!isFocused()) {
+          return;
+        }
+        setSelectionRange(cur => selectionRangeUpdater(cur, innerRef));
+      }
+
+      document.addEventListener('selectionchange', onSelectionChange, { capture: true });
+      return () => document.removeEventListener('selectionchange', onSelectionChange);
+    }, []);
 
     // Fire the requestSubmit callback when the input has the required length and autoSubmit is enabled
     React.useEffect(() => {
@@ -120,24 +141,33 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
       >
         {/* We can't target pseudo-elements with the style prop, so we inject a tag here */}
         <style>{`
-      input[data-otp-input]::selection {
+      input[data-otp-input-segmented]::selection {
         color: transparent;
         background-color: none;
       }
       `}</style>
         <RadixControl
+          data-otp-input-segmented
           ref={innerRef}
           {...rest}
+          onFocus={event => {
+            // Place the caret at the end of the current value
+            if (innerRef.current) {
+              const start = Math.min(innerRef.current.value.length, length - 1);
+              const end = innerRef.current.value.length;
+              innerRef.current.setSelectionRange(start, end);
+              setSelectionRange([start, end]);
+            }
+            rest?.onFocus?.(event);
+          }}
           onBlur={event => {
             setSelectionRange([-1, -1]);
             rest?.onBlur?.(event);
           }}
-          onSelect={event => {
-            setSelectionRange(cur => selectionRangeUpdater(cur, innerRef));
-            rest?.onSelect?.(event);
-          }}
           onMouseOver={event => {
-            setIsHovering(true);
+            if (!isFocused()) {
+              setIsHovering(true);
+            }
             props.onMouseOver?.(event);
           }}
           onMouseLeave={event => {
@@ -214,16 +244,23 @@ function selectionRangeUpdater(cur: SelectionRange, inputRef: React.RefObject<HT
 
 const wrapperStyle = {
   position: 'relative',
+  userSelect: 'none',
 } satisfies React.CSSProperties;
 
 const inputStyle = {
   display: 'block',
-  background: 'none',
-  outline: 'none',
+  background: 'transparent',
+  opacity: 1,
+  outline: 'transparent solid 0px',
   appearance: 'none',
   color: 'transparent',
   position: 'absolute',
   inset: 0,
+  caretColor: 'transparent',
+  border: '0 px solid transparent',
+  width: '100%',
+  height: '100%',
+  letterSpacing: '-1rem',
 } satisfies React.CSSProperties;
 
 const segmentWrapperStyle = {
