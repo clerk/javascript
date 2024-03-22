@@ -30,24 +30,17 @@ test.describe('sign up and sign in with email code @generic', () => {
         await app.teardown();
       });
 
+      // TODO: move to its own test suite
       test('sign up', async ({ page, context }) => {
         const u = createTestUtils({ app, page, context });
         await u.po.signUp.goTo();
         await u.po.signUp.signUpWithEmailAndPassword({ email: fakeUser.email, password: fakeUser.password });
-        await u.po.signUp.enterOtpCode('424242');
+        await u.po.signUp.enterTestOtpCode();
         await u.po.expect.toBeSignedIn();
       });
 
-      test('sign in', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
-        await u.po.signIn.goTo();
-        await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
-        await u.po.signIn.continue();
-        await u.po.signIn.getUseAnotherMethodLink().click();
-        await u.po.signIn.getAltMethodsEmailCodeButton().click();
-        await u.po.signIn.enterOtpCode('424242');
-        await u.po.expect.toBeSignedIn();
-      });
+      // TODO: remove
+      test.skip('sign in has been moved to sign in flow test suite, this will be removed', async () => {});
     });
   });
 });
