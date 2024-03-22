@@ -21,7 +21,7 @@ export const OTP_LENGTH_DEFAULT = 6;
 /**
  * The status of a single segment element in the OTP input
  */
-export type OTPInputSegmentStatus = 'none' | 'cursor' | 'selected';
+export type OTPInputSegmentStatus = 'none' | 'cursor' | 'selected' | 'hovered';
 
 /**
  * If the render prop is provided, a custom segmented input will be rendered. Otherwise a standard input will be rendered.
@@ -91,6 +91,9 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
 
     const innerRef = React.useRef<HTMLInputElement>(null);
     const [selectionRange, setSelectionRange] = React.useState<SelectionRange>(props.autoFocus ? ZERO : OUTSIDE);
+    const [isHovering, setIsHovering] = React.useState(false);
+
+    const isFocused = () => document.activeElement === innerRef.current;
 
     // This ensures we can access innerRef internally while still exposing it via the ref prop
     React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
@@ -133,6 +136,14 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
             setSelectionRange(cur => selectionRangeUpdater(cur, innerRef));
             rest?.onSelect?.(event);
           }}
+          onMouseOver={event => {
+            setIsHovering(true);
+            props.onMouseOver?.(event);
+          }}
+          onMouseLeave={event => {
+            setIsHovering(false);
+            props.onMouseLeave?.(event);
+          }}
           style={inputStyle}
         />
         <div
@@ -146,7 +157,9 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
                 {render({
                   value: String(props.value)[i] || '',
                   status:
-                    selectionRange[0] === selectionRange[1] && selectionRange[0] === i
+                    isHovering && !isFocused()
+                      ? 'hovered'
+                      : selectionRange[0] === selectionRange[1] && selectionRange[0] === i
                       ? 'cursor'
                       : selectionRange[0] <= i && selectionRange[1] > i
                       ? 'selected'
