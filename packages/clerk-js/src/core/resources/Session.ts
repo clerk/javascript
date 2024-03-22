@@ -160,11 +160,12 @@ export class Session extends BaseResource implements SessionResource {
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     if (cachedEntry) {
-      const cachedToken = await cachedEntry.tokenResolver.then(res => res);
+      const cachedToken = await cachedEntry.tokenResolver;
       if (!template) {
         eventBus.dispatch(events.TokenUpdate, { token: cachedToken });
       }
-      return cachedToken.getRawString();
+      // Return null when raw string is empty to indicate that there it's signed-out
+      return cachedToken.getRawString() || null;
     }
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     const tokenResolver = Token.create(path);
@@ -174,7 +175,8 @@ export class Session extends BaseResource implements SessionResource {
       if (!template) {
         eventBus.dispatch(events.TokenUpdate, { token });
       }
-      return token.getRawString();
+      // Return null when raw string is empty to indicate that there it's signed-out
+      return token.getRawString() || null;
     });
   }
 }

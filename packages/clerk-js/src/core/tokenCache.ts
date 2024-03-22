@@ -80,6 +80,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     entry.tokenResolver
       .then(newToken => {
+        if (!newToken.jwt) {
+          return deleteKey();
+        }
+
         const expiresAt = newToken.jwt.claims.exp;
         const issuedAt = newToken.jwt.claims.iat;
         const expiresIn: Seconds = expiresAt - issuedAt;
