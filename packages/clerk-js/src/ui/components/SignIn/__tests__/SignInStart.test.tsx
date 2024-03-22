@@ -1,7 +1,8 @@
 import type { SignInResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
+import { waitFor } from '@testing-library/react';
 
-import { act, fireEvent, render, screen } from '../../../../testUtils';
+import { act, fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignInStart } from '../SignInStart';
@@ -54,6 +55,44 @@ describe('SignInStart', () => {
       render(<SignInStart />, { wrapper });
       screen.getByText(/email address or username/i);
     });
+
+    mockWebAuthn(() => {
+      it('enables login with passkey via dedicated button', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: false,
+            show_sign_in_button: true,
+          });
+        });
+        render(<SignInStart />, { wrapper });
+        screen.getByText('Use passkey instead');
+      });
+
+      it('enables login with passkey via autofill', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: false,
+          });
+        });
+
+        fixtures.signIn.__experimental_authenticateWithPasskey.mockResolvedValue({
+          status: 'complete',
+        } as SignInResource);
+        render(<SignInStart />, { wrapper });
+        expect(screen.queryByText('Use passkey instead')).not.toBeInTheDocument();
+
+        await waitFor(() => {
+          expect(fixtures.signIn.__experimental_authenticateWithPasskey).toHaveBeenCalledWith({
+            flow: 'autofill',
+          });
+        });
+      });
+    });
   });
 
   describe('Social OAuth', () => {
@@ -95,6 +134,24 @@ describe('SignInStart', () => {
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
+    });
+
+    it('calls authenticateWithPasskey on clicking Passkey button', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPasskey();
+        f.withPasskeySettings({
+          show_sign_in_button: true,
+        });
+      });
+      fixtures.signIn.__experimental_authenticateWithPasskey.mockResolvedValue({
+        status: 'complete',
+      } as SignInResource);
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.click(screen.getByText('Use passkey instead'));
+      expect(fixtures.signIn.__experimental_authenticateWithPasskey).toHaveBeenCalledWith({
+        flow: 'discoverable',
+      });
     });
 
     it('navigates to /factor-one page when user clicks on Continue button and create needs a first factor', async () => {

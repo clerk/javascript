@@ -362,11 +362,18 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
       enabled: true,
       required: false,
       used_for_first_factor: true,
-      first_factors: [],
+      first_factors: ['passkey'],
       used_for_second_factor: false,
       second_factors: [],
-      verifications: [],
+      verifications: ['passkey'],
       verify_at_sign_up: false,
+      ...opts,
+    };
+  };
+
+  const withPasskeySettings = (opts?: Partial<UserSettingsJSON['passkey_settings']>) => {
+    us.passkey_settings = {
+      ...us.passkey_settings,
       ...opts,
     };
   };
@@ -474,5 +481,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withBackupCode,
     withAuthenticatorApp,
     withPasskey,
+    withPasskeySettings,
   };
 };

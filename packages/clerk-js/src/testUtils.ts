@@ -50,6 +50,19 @@ export const mockNativeRuntime = (fn: () => void) => {
   });
 };
 
+export const mockWebAuthn = (fn: () => void) => {
+  describe('with WebAuthn', () => {
+    beforeAll(() => {
+      const publicKeyCredential: any = () => {};
+      (window as any).PublicKeyCredential = publicKeyCredential;
+      publicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable = () => Promise.resolve(true);
+      publicKeyCredential.isConditionalMediationAvailable = () => Promise.resolve(true);
+    });
+
+    fn();
+  });
+};
+
 export * from './ui/utils/test/runFakeTimers';
 export * from './ui/utils/test/createFixtures';
 // eslint-disable-next-line import/export
