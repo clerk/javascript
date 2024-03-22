@@ -18,6 +18,7 @@ Before you begin writing tests, you should already have:
 - Access to Clerk's 1Password
 - Access to the **Integration testing** organization on Clerk (it owns the Clerk instances used in the tests)
 - Chromium installed. Run `npx playwright install chromium`.
+- WebKit installed. Run `npx playwright install webkit`.
 
 ## Initial setup
 

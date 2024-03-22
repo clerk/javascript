@@ -71,7 +71,7 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
   // Check that the __session cookie is set
   expect(!!__session).toBeTruthy();
 
-  await expect(u.page.getByRole('button', { name: /Open user button/i })).toBeVisible();
+  expect(await u.po.userButton.waitForMounted()).not.toBeUndefined();
 
   // cleanup the search params after consuming the dev browser jwt
   const finalURL = new URL(u.page.url());
@@ -137,7 +137,7 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
   // Check that the __session cookie is set
   expect(!!__session).toBeTruthy();
 
-  await expect(u.page.getByRole('button', { name: /Open user button/i })).toBeVisible();
+  expect(await u.po.userButton.waitForMounted()).not.toBeUndefined();
 
   // cleanup the search params after consuming the dev browser jwt
   const finalURL = new URL(u.page.url());
@@ -175,5 +175,5 @@ export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
   await u.po.expect.toBeSignedIn();
   await u.po.userButton.waitForMounted();
 
-  await expect(u.page.getByRole('button', { name: /Open user button/i })).toBeVisible();
+  expect(await u.po.userButton.waitForMounted()).not.toBeUndefined();
 };

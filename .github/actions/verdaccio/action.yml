@@ -28,7 +28,7 @@ runs:
       shell: bash
       run: npm set registry ${{ inputs.registry }}
 
-    - name: Run Verdaccio to publish
+    - name: Run Verdaccio (using publish config)
       shell: bash
       run: |
         nohup ./node_modules/.bin/verdaccio --config ./verdaccio.publish.yaml & echo "VERDACCIO_PID=$!" >> $GITHUB_ENV
@@ -44,7 +44,7 @@ runs:
       shell: bash
       run: kill -9 $VERDACCIO_PID
 
-    - name: Run Verdaccio to install
+    - name: Run Verdaccio (using install config)
       shell: bash
       run: |
         nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml & sleep 5
