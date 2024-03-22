@@ -4,7 +4,7 @@ export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 export const SIGN_IN_DEFAULT_BASE_PATH = '/sign-in';
 export const SIGN_UP_DEFAULT_BASE_PATH = '/sign-up';
 
-export const NEXT_ROUTING_CHANGE_VERSION = '14.1.0';
+export const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
 
 export const SEARCH_PARAMS = {
   createdSession: '__clerk_created_session',
