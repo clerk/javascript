@@ -67,7 +67,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
         withUsername = false,
       } = options || {};
       const randomHash = hash();
-      const email = fictionalEmail ? `${randomHash}+clerk_test@clerkcoo.com` : `clerkcookie+${randomHash}@mailsac.com`;
+      const email = fictionalEmail ? `${randomHash}+clerk_test@clerkcook.ie` : `clerkcookie+${randomHash}@mailsac.com`;
 
       return {
         firstName: faker.person.firstName(),

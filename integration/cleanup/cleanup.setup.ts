@@ -21,7 +21,7 @@ setup('cleanup instances ', async () => {
     const clerkClient = createClerkClient({ secretKey: entry!.secretKey, apiUrl: entry?.apiUrl });
     const { data: users } = await clerkClient.users.getUserList({
       orderBy: '-created_at',
-      query: 'clerkcoo',
+      query: 'clerkcook',
       limit: 150,
     });
 
