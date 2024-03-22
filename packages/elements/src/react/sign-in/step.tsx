@@ -10,8 +10,8 @@ export const SIGN_IN_STEPS = {
   'choose-strategy': 'choose-strategy',
 } as const;
 
-export type SignInStep = (typeof SIGN_IN_STEPS)[keyof typeof SIGN_IN_STEPS];
-type StepWithProps<N extends SignInStep, T> = { name: N } & T;
+export type TSignInStep = (typeof SIGN_IN_STEPS)[keyof typeof SIGN_IN_STEPS];
+type StepWithProps<N extends TSignInStep, T> = { name: N } & T;
 
 export type SignInStepProps =
   | StepWithProps<'start', SignInStartProps>

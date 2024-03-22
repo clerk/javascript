@@ -8,24 +8,24 @@ import { useLoading } from '~/react/hooks/use-loading.hook';
 import { SignInChooseStrategyCtx } from '~/react/sign-in/choose-strategy';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 import { SignInStartCtx } from '~/react/sign-in/start';
-import { SIGN_IN_STEPS, type SignInStep } from '~/react/sign-in/step';
+import { SIGN_IN_STEPS, type TSignInStep } from '~/react/sign-in/step';
 import { SignInFirstFactorCtx, SignInSecondFactorCtx } from '~/react/sign-in/verifications';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 import { SignUpContinueCtx } from '~/react/sign-up/continue';
 import { SignUpStartCtx } from '~/react/sign-up/start';
-import { SIGN_UP_STEPS, type SignUpStep } from '~/react/sign-up/step';
+import { SIGN_UP_STEPS, type TSignUpStep } from '~/react/sign-up/step';
 import { SignUpVerificationCtx } from '~/react/sign-up/verifications';
 import { mapScopeToStrategy } from '~/react/utils/map-scope-to-strategy';
 
 type Strategy = OAuthProvider | SamlStrategy | 'metamask';
-type LoadingScope<T extends SignInStep | SignUpStep> = 'global' | `step:${T}` | `provider:${Strategy}` | undefined;
+type LoadingScope<T extends TSignInStep | TSignUpStep> = 'global' | `step:${T}` | `provider:${Strategy}` | undefined;
 
 type LoadingProps = {
-  scope?: LoadingScope<SignInStep | SignUpStep>;
+  scope?: LoadingScope<TSignInStep | TSignUpStep>;
   children: (isLoading: boolean) => React.ReactNode;
 };
 
-function isSignInScope(scope: LoadingScope<SignInStep | SignUpStep>): scope is LoadingScope<SignInStep> {
+function isSignInScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is LoadingScope<TSignInStep> {
   if (!scope) return true;
 
   if (scope.startsWith('step:')) {
@@ -35,7 +35,7 @@ function isSignInScope(scope: LoadingScope<SignInStep | SignUpStep>): scope is L
   return true;
 }
 
-function isSignUpScope(scope: LoadingScope<SignInStep | SignUpStep>): scope is LoadingScope<SignUpStep> {
+function isSignUpScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is LoadingScope<TSignUpStep> {
   if (!scope) return true;
 
   if (scope.startsWith('step:')) {
@@ -122,7 +122,7 @@ export function Loading({ children, scope }: LoadingProps) {
 }
 
 type SignInLoadingProps = {
-  scope?: LoadingScope<SignInStep>;
+  scope?: LoadingScope<TSignInStep>;
   children: (isLoading: boolean) => React.ReactNode;
   routerRef: ActorSignIn;
 };
@@ -130,7 +130,7 @@ type SignInLoadingProps = {
 function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
   const [isLoading, { step: loadingStep, strategy }] = useLoading(routerRef);
 
-  let computedScope: LoadingScope<SignInStep>;
+  let computedScope: LoadingScope<TSignInStep>;
 
   // Figure out if the component is inside a `<Step>` component
   const startCtx = SignInStartCtx.useActorRef(true);
@@ -142,7 +142,7 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
   if (scope) {
     computedScope = scope;
   } else {
-    let inferredScope: LoadingScope<SignInStep>;
+    let inferredScope: LoadingScope<TSignInStep>;
 
     if (startCtx) {
       inferredScope = 'step:start';
@@ -189,7 +189,7 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
 }
 
 type SignUpLoadingProps = {
-  scope?: LoadingScope<SignUpStep>;
+  scope?: LoadingScope<TSignUpStep>;
   children: (isLoading: boolean) => React.ReactNode;
   routerRef: ActorSignUp;
 };
@@ -197,7 +197,7 @@ type SignUpLoadingProps = {
 function SignUpLoading({ children, scope, routerRef }: SignUpLoadingProps) {
   const [isLoading, { step: loadingStep, strategy }] = useLoading(routerRef);
 
-  let computedScope: LoadingScope<SignUpStep>;
+  let computedScope: LoadingScope<TSignUpStep>;
 
   // Figure out if the component is inside a `<Step>` component
   const startCtx = SignUpStartCtx.useActorRef(true);
@@ -207,7 +207,7 @@ function SignUpLoading({ children, scope, routerRef }: SignUpLoadingProps) {
   if (scope) {
     computedScope = scope;
   } else {
-    let inferredScope: LoadingScope<SignUpStep>;
+    let inferredScope: LoadingScope<TSignUpStep>;
 
     if (startCtx) {
       inferredScope = `step:start`;

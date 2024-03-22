@@ -10,8 +10,8 @@ export const SIGN_UP_STEPS = {
   verifications: 'verifications',
 } as const;
 
-export type SignUpStep = (typeof SIGN_UP_STEPS)[keyof typeof SIGN_UP_STEPS];
-type StepWithProps<N extends SignUpStep, T> = { name: N } & T;
+export type TSignUpStep = (typeof SIGN_UP_STEPS)[keyof typeof SIGN_UP_STEPS];
+type StepWithProps<N extends TSignUpStep, T> = { name: N } & T;
 
 export type SignUpStepProps =
   | StepWithProps<'start', SignUpStartProps>
