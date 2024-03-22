@@ -2,13 +2,14 @@ import type { LoadedClerk } from '@clerk/types';
 import { assertEvent, assign, log, sendParent, setup } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 
 import { handleRedirectCallback, redirect } from './actors';
 import type { ThirdPartyMachineSchema } from './types';
 
-export const ThirdPartyMachineId: string = 'ThirdParty';
+export const ThirdPartyMachineId = 'ThirdParty';
 
 export type TThirdPartyMachine = typeof ThirdPartyMachine;
 
@@ -35,6 +36,8 @@ export const ThirdPartyMachine = setup({
     unassignActiveStrategy: assign({
       activeStrategy: null,
     }),
+    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    sendToLoading,
   },
   types: {} as ThirdPartyMachineSchema,
 }).createMachine({
@@ -45,6 +48,7 @@ export const ThirdPartyMachine = setup({
     flow: input.flow,
     parent: input.parent,
     thirdPartyProviders: getEnabledThirdPartyProviders(input.environment),
+    loadingStep: 'strategy',
   }),
   initial: 'Idle',
   states: {
@@ -61,8 +65,8 @@ export const ThirdPartyMachine = setup({
     Redirecting: {
       description: 'Redirects to the third-party provider for authentication',
       tags: ['state:redirect', 'state:loading'],
-      entry: 'assignActiveStrategy',
-      exit: 'unassignActiveStrategy',
+      entry: ['assignActiveStrategy', 'sendToLoading'],
+      exit: ['unassignActiveStrategy', 'sendToLoading'],
       invoke: {
         id: 'redirect',
         src: 'redirect',
@@ -106,7 +110,7 @@ export const ThirdPartyMachine = setup({
       },
       on: {
         'CLERKJS.NAVIGATE.*': {
-          actions: sendParent({ type: 'NEXT' }),
+          actions: 'sendToNext',
         },
       },
     },

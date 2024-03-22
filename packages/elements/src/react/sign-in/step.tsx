@@ -4,8 +4,14 @@ import { SignInChooseStrategy, type SignInChooseStrategyProps } from './choose-s
 import { SignInStart, type SignInStartProps } from './start';
 import { SignInVerifications, type SignInVerificationsProps } from './verifications';
 
-type SignInStep = 'start' | 'verifications' | 'choose-strategy';
-type StepWithProps<N extends SignInStep, T> = { name: N } & T;
+export const SIGN_IN_STEPS = {
+  start: 'start',
+  verifications: 'verifications',
+  'choose-strategy': 'choose-strategy',
+} as const;
+
+export type TSignInStep = (typeof SIGN_IN_STEPS)[keyof typeof SIGN_IN_STEPS];
+type StepWithProps<N extends TSignInStep, T> = { name: N } & T;
 
 export type SignInStepProps =
   | StepWithProps<'start', SignInStartProps>
@@ -39,11 +45,11 @@ export type SignInStepProps =
  */
 export function SignInStep(props: SignInStepProps) {
   switch (props.name) {
-    case 'start':
+    case SIGN_IN_STEPS.start:
       return <SignInStart {...props} />;
-    case 'verifications':
+    case SIGN_IN_STEPS.verifications:
       return <SignInVerifications {...props} />;
-    case 'choose-strategy':
+    case SIGN_IN_STEPS['choose-strategy']:
       return <SignInChooseStrategy {...props} />;
     default:
       throw new ClerkElementsRuntimeError(`Invalid step name. Use 'start', 'verifications', or 'choose-strategy'.`);

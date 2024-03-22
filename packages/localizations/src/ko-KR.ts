@@ -368,8 +368,7 @@ export const koKR: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: '비밀번호 재설정',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: '비밀번호가 성공적으로 변경되었습니다. 로그인하는 중입니다. 잠시만 기다려주세요.',
       title: '비밀번호 재설정',
     },

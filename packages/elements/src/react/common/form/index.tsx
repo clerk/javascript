@@ -229,22 +229,33 @@ Form.displayName = FORM_NAME;
 
 const FIELD_NAME = 'ClerkElementsField';
 const FIELD_INNER_NAME = 'ClerkElementsFieldInner';
+const FIELD_STATE_NAME = 'ClerkElementsFieldState';
 
 type FormFieldElement = React.ElementRef<typeof RadixField>;
-type FormFieldProps = RadixFormFieldProps & {
-  alwaysShow?: boolean;
+type FormFieldProps = Omit<RadixFormFieldProps, 'children'> & {
   name: Autocomplete<ClerkFieldId>;
+  alwaysShow?: boolean;
+  children: React.ReactNode | ((state: FieldStates) => React.ReactNode);
 };
 
 /**
  * A wrapper component used to associate its child elements with a specific form field. Automatically handles unique ID generation and associating labels with inputs.
  *
  * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `emailAddress`, `password`, `phoneNumber`, and `code`.
+ * @param alwaysShow - Optional. When `true`, the field will always be rendered, regardless of its state. By default, a field is hidden if it's optional or if it's a filled-out required field.
+ * @param {Function} children - A render prop function that receives `state` as an argument. `state` will be either `'valid'` or `'invalid'`.
  *
  * @example
  * <Field name="emailAddress">
  *   <Label>Email</Label>
  *   <Input />
+ * </Field>
+ *
+ * @example
+ * <Field name="emailAddress">
+ *  {(fieldState) => (
+ *    <span>{fieldState === "invalid" ? "Error" : "All fine!"}</span>
+ *  )}
  * </Field>
  */
 const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, ...rest }, forwardedRef) => {
@@ -267,14 +278,19 @@ const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, 
 });
 
 const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
-  const field = useField({ name: props.name });
+  const { children, ...rest } = props;
+  const field = useField({ name: rest.name });
+  const error = useFormSelector(fieldErrorsSelector(rest.name));
+  const state = error ? ('invalid' as const) : ('valid' as const);
 
   return (
     <RadixField
       {...field.props}
-      {...props}
+      {...rest}
       ref={forwardedRef}
-    />
+    >
+      {typeof children === 'function' ? children(state) : children}
+    </RadixField>
   );
 });
 
@@ -289,21 +305,21 @@ FieldInner.displayName = FIELD_INNER_NAME;
  * @example
  * <Field name="email">
  *  <FieldState>
- *    {({ state }) => (
+ *    {(state) => (
  *      <pre>Field state: {state}</pre>
  *    )}
  *  </FieldState>
  * </Field>
  */
-function FieldState({ children }: { children: (state: { state: FieldStates }) => React.ReactNode }) {
+function FieldState({ children }: { children: (state: FieldStates) => React.ReactNode }) {
   const field = useFieldContext();
   const error = useFormSelector(fieldErrorsSelector(field?.name));
   const state = error ? ('invalid' as const) : ('valid' as const);
 
-  const fieldState = { state };
-
-  return children(fieldState);
+  return children(state);
 }
+
+FieldState.displayName = FIELD_STATE_NAME;
 
 /* -------------------------------------------------------------------------------------------------
  * Input
@@ -345,10 +361,17 @@ type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
  *   />
  * </Field>
  */
-const Input = (props: FormInputProps) => {
-  const field = useInput(props);
-  return <field.Element {...field.props} />;
-};
+const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+  (props: FormInputProps, forwardedRef) => {
+    const field = useInput(props);
+    return (
+      <field.Element
+        ref={forwardedRef}
+        {...field.props}
+      />
+    );
+  },
+);
 
 Input.displayName = INPUT_NAME;
 

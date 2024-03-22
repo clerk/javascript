@@ -368,8 +368,7 @@ export const heIL: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'אפס סיסמה',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'הסיסמה שלך שונתה בהצלחה. מחבר אותך, אנא המתן רגע.',
       title: 'אפס סיסמה',
     },

@@ -1,5 +1,3 @@
-'use client';
-
 import type { OAuthProvider, Web3Provider } from '@clerk/types';
 
 import type { ProviderProps } from '~/react/common/providers';

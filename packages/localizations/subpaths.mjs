@@ -14,6 +14,7 @@ export const subpathNames = [
   'it-IT',
   'ja-JP',
   'ko-KR',
+  'mn-MN',
   'nb-NO',
   'nl-NL',
   'nl-BE',
@@ -32,6 +33,7 @@ export const subpathNames = [
   'es-MX',
   'bg-BG',
   'th-TH',
+  'ca-ES',
 ];
 
 export const subpathFoldersBarrel = [];

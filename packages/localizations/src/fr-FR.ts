@@ -372,8 +372,7 @@ export const frFR: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Réinitialiser',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage:
         'Votre mot de passe a été modifié avec succès. Nous vous reconnectons, veuillez patienter un instant.',
       title: 'Réinitialiser le mot de passe',

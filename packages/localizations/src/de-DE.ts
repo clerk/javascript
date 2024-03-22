@@ -753,7 +753,7 @@ export const deDE: LocalizationResource = {
         title: 'Telefonnummern',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'Profil bearbeiten',
         title: 'Profil',
       },
       usernameSection: {

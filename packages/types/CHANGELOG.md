@@ -1,5 +1,22 @@
 # Change Log
 
+## 4.0.0-beta.21
+
+### Minor Changes
+
+- List passkeys under security in UserProfile. ([#2958](https://github.com/clerk/javascript/pull/2958)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Supports renaming a passkey.
+  - Supports deleting a passkey.
+
+- Experimental support for authenticating with a passkey. ([#2970](https://github.com/clerk/javascript/pull/2970)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example usage: `await signIn.authenticateWithPasskey()`.
+
+- Remove the unused appearance keys for accordion and breadcrumb elements. ([#2956](https://github.com/clerk/javascript/pull/2956)) by [@desiprisg](https://github.com/desiprisg)
+
+- Allow users to authenticate with passkeys via the `<SignIn/>`. ([#3000](https://github.com/clerk/javascript/pull/3000)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.0.0-beta.20
 
 ### Minor Changes

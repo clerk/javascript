@@ -27,6 +27,7 @@ export interface ThirdPartyMachineContext {
   flow: Flow;
   thirdPartyProviders: EnabledThirdPartyProviders;
   parent: AnyActorRef; // TODO: Fix circular dependency
+  loadingStep: 'strategy';
 }
 
 // ================= Input ================= //

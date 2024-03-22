@@ -1,5 +1,3 @@
-'use client';
-
 import type { SignInFactor, SignInFirstFactor, SignInStrategy as TSignInStrategy } from '@clerk/types';
 import { Slot } from '@radix-ui/react-slot';
 import { useSelector } from '@xstate/react';
@@ -11,6 +9,7 @@ import { SignInRouterSystemId } from '~/internals/machines/sign-in/types';
 
 import { useActiveTags } from '../hooks';
 import { ActiveTagsMode } from '../hooks/use-active-tags.hook';
+import { createContextForDomValidation } from '../utils/create-context-for-dom-validation';
 import { SignInRouterCtx } from './context';
 
 // --------------------------------- HELPERS ---------------------------------
@@ -33,14 +32,15 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 
 // --------------------------------- COMPONENTS ---------------------------------
 
-export type SignInVerificationsProps = WithChildrenProp<{ preferred?: TSignInStrategy }>;
 export type SignInChooseStrategyProps = WithChildrenProp;
+
+export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
 
 export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:choose-strategy'], ActiveTagsMode.all);
 
-  return activeState ? children : null;
+  return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
 }
 
 const STRATEGY_OPTION_NAME = 'SignInStrategyOption';

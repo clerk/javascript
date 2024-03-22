@@ -2,7 +2,6 @@ import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/types';
 import React from 'react';
 
-import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
 import { NavbarMenuButtonRow, ProfileCard, withCardStateProvider } from '../../elements';
@@ -47,13 +46,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   );
 });
 
-export const OrganizationProfile = withOrganizationsEnabledGuard(
-  withCardStateProvider(_OrganizationProfile),
-  'OrganizationProfile',
-  {
-    mode: 'redirect',
-  },
-);
+export const OrganizationProfile = withCardStateProvider(_OrganizationProfile);
 
 export const OrganizationProfileModal = (props: OrganizationProfileModalProps): JSX.Element => {
   const organizationProfileProps: OrganizationProfileCtx = {

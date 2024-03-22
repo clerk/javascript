@@ -14,9 +14,11 @@ import { and, assign, enqueueActions, fromCallback, fromPromise, raise, sendPare
 
 import { MAGIC_LINK_VERIFY_PATH_ROUTE, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 import type {
   SignUpVerificationContext,
+  SignUpVerificationEmailLinkFailedEvent,
   SignUpVerificationEvents,
   SignUpVerificationSchema,
 } from '~/internals/machines/sign-up/types';
@@ -139,6 +141,7 @@ export const SignUpVerificationMachine = setup({
         };
       },
     ),
+    sendToLoading,
   },
   guards: {
     isComplete: ({ context }) => context.resource.status === 'complete',
@@ -173,6 +176,7 @@ export const SignUpVerificationMachine = setup({
     resource: input.parent.getSnapshot().context.clerk.client.signUp,
     formRef: input.form,
     parent: input.parent,
+    loadingStep: 'verifications',
   }),
   on: {
     NEXT: [
@@ -233,7 +237,10 @@ export const SignUpVerificationMachine = setup({
         },
         'EMAIL_LINK.FAILED': {
           actions: [
-            { type: 'setFormErrors', params: ({ event }) => ({ error: event.error }) },
+            {
+              type: 'setFormErrors',
+              params: ({ event }: { event: SignUpVerificationEmailLinkFailedEvent }) => ({ error: event.error }),
+            },
             assign({ resource: ({ event }) => event.resource }),
           ],
           target: '.Pending',
@@ -334,11 +341,15 @@ export const SignUpVerificationMachine = setup({
         Pending: {
           tags: ['state:pending'],
           on: {
-            SUBMIT: 'Attempting',
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
           },
         },
         Attempting: {
           tags: ['state:attempting', 'state:loading'],
+          entry: 'sendToLoading',
           invoke: {
             id: 'attemptEmailAddressCodeVerification',
             src: 'attempt',
@@ -350,10 +361,10 @@ export const SignUpVerificationMachine = setup({
               },
             }),
             onDone: {
-              actions: raise(({ event }) => ({ type: 'NEXT', resource: event.output })),
+              actions: [raise(({ event }) => ({ type: 'NEXT', resource: event.output })), 'sendToLoading'],
             },
             onError: {
-              actions: 'setFormErrors',
+              actions: ['setFormErrors', 'sendToLoading'],
               target: 'Pending',
             },
           },
@@ -397,11 +408,15 @@ export const SignUpVerificationMachine = setup({
         Pending: {
           tags: ['state:pending'],
           on: {
-            SUBMIT: 'Attempting',
+            SUBMIT: {
+              target: 'Attempting',
+              reenter: true,
+            },
           },
         },
         Attempting: {
           tags: ['state:attempting', 'state:loading'],
+          entry: 'sendToLoading',
           invoke: {
             id: 'attemptPhoneNumberVerification',
             src: 'attempt',
@@ -413,10 +428,10 @@ export const SignUpVerificationMachine = setup({
               },
             }),
             onDone: {
-              actions: raise(({ event }) => ({ type: 'NEXT', resource: event.output })),
+              actions: [raise(({ event }) => ({ type: 'NEXT', resource: event.output })), 'sendToLoading'],
             },
             onError: {
-              actions: 'setFormErrors',
+              actions: ['setFormErrors', 'sendToLoading'],
               target: 'Pending',
             },
           },

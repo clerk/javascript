@@ -40,6 +40,7 @@ export interface SignUpStartContext {
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignUpRouterMachine>;
+  loadingStep: 'start';
 }
 
 // ---------------------------------- Schema ---------------------------------- //

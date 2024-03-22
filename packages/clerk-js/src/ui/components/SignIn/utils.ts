@@ -1,6 +1,7 @@
 import { titleize } from '@clerk/shared';
 import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
 
+import { isWebAuthnSupported } from '../../../utils/passkeys';
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 
@@ -55,10 +56,26 @@ const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
 };
 
+function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
+  if (isWebAuthnSupported()) {
+    // @ts-ignore
+    const passkeyFactor = factors.find(({ strategy }) => strategy === 'passkey');
+
+    if (passkeyFactor) {
+      return passkeyFactor;
+    }
+  }
+  return null;
+}
+
 function determineStrategyWhenPasswordIsPreferred(
   factors: SignInFactor[],
   identifier: string | null,
 ): SignInFactor | null {
+  const passkeyFactor = findPasskeyStrategy(factors);
+  if (passkeyFactor) {
+    return passkeyFactor;
+  }
   const selected = factors.sort(passwordPrefFactorComparator)[0];
   if (selected.strategy === 'password') {
     return selected;
@@ -67,6 +84,10 @@ function determineStrategyWhenPasswordIsPreferred(
 }
 
 function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier: string | null): SignInFactor | null {
+  const passkeyFactor = findPasskeyStrategy(factors);
+  if (passkeyFactor) {
+    return passkeyFactor;
+  }
   const sortedBasedOnPrefFactor = factors.sort(otpPrefFactorComparator);
   const forIdentifier = sortedBasedOnPrefFactor.find(factorForIdentifier(identifier));
   if (forIdentifier) {
@@ -103,7 +124,8 @@ export function determineSalutation(signIn: Partial<SignInResource>): string {
   return titleize(signIn.userData?.firstName) || titleize(signIn.userData?.lastName) || signIn?.identifier || '';
 }
 
-const localStrategies: SignInStrategy[] = ['email_code', 'password', 'phone_code', 'email_link'];
+// @ts-ignore
+const localStrategies: SignInStrategy[] = ['passkey', 'email_code', 'password', 'phone_code', 'email_link'];
 
 export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {
   if (!factor) {
