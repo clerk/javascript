@@ -4,7 +4,13 @@ import { SignUpContinue, type SignUpContinueProps } from './continue';
 import { SignUpStart, type SignUpStartProps } from './start';
 import { SignUpVerifications, type SignUpVerificationsProps } from './verifications';
 
-export type SignUpStep = 'start' | 'continue' | 'verifications';
+export const SIGN_UP_STEPS = {
+  start: 'start',
+  continue: 'continue',
+  verifications: 'verifications',
+} as const;
+
+export type SignUpStep = (typeof SIGN_UP_STEPS)[keyof typeof SIGN_UP_STEPS];
 type StepWithProps<N extends SignUpStep, T> = { name: N } & T;
 
 export type SignUpStepProps =
@@ -34,11 +40,11 @@ export type SignUpStepProps =
  */
 export function SignUpStep(props: SignUpStepProps) {
   switch (props.name) {
-    case 'start':
+    case SIGN_UP_STEPS.start:
       return <SignUpStart {...props} />;
-    case 'continue':
+    case SIGN_UP_STEPS.continue:
       return <SignUpContinue {...props} />;
-    case 'verifications':
+    case SIGN_UP_STEPS.verifications:
       return <SignUpVerifications {...props} />;
     default:
       throw new ClerkElementsRuntimeError(`Invalid step name. Use 'start', 'continue', or 'verifications'.`);
