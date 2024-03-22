@@ -56,10 +56,7 @@ const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
 };
 
-function determineStrategyWhenPasskeyIsPreferred(
-  factors: SignInFactor[],
-  identifier: string | null,
-): SignInFactor | null {
+function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
   if (isWebAuthnSupported()) {
     // @ts-ignore
     const passkeyFactor = factors.find(({ strategy }) => strategy === 'passkey');
@@ -68,14 +65,17 @@ function determineStrategyWhenPasskeyIsPreferred(
       return passkeyFactor;
     }
   }
-
-  return determineStrategyWhenOTPIsPreferred(factors, identifier);
+  return null;
 }
 
 function determineStrategyWhenPasswordIsPreferred(
   factors: SignInFactor[],
   identifier: string | null,
 ): SignInFactor | null {
+  const passkeyFactor = findPasskeyStrategy(factors);
+  if (passkeyFactor) {
+    return passkeyFactor;
+  }
   const selected = factors.sort(passwordPrefFactorComparator)[0];
   if (selected.strategy === 'password') {
     return selected;
@@ -84,6 +84,10 @@ function determineStrategyWhenPasswordIsPreferred(
 }
 
 function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier: string | null): SignInFactor | null {
+  const passkeyFactor = findPasskeyStrategy(factors);
+  if (passkeyFactor) {
+    return passkeyFactor;
+  }
   const sortedBasedOnPrefFactor = factors.sort(otpPrefFactorComparator);
   const forIdentifier = sortedBasedOnPrefFactor.find(factorForIdentifier(identifier));
   if (forIdentifier) {
@@ -107,9 +111,6 @@ export function determineStartingSignInFactor(
     return null;
   }
 
-  if (preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Passkey) {
-    return determineStrategyWhenPasskeyIsPreferred(firstFactors, identifier);
-  }
   return preferredSignInStrategy === PREFERRED_SIGN_IN_STRATEGIES.Password
     ? determineStrategyWhenPasswordIsPreferred(firstFactors, identifier)
     : determineStrategyWhenOTPIsPreferred(firstFactors, identifier);
