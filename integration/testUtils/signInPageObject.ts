@@ -26,8 +26,23 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
       await expect(passField).toBeVisible();
       await passField.fill(val, { force: true });
     },
+    usePhoneNumberIdentifier: () => {
+      return page.getByRole('link', { name: /^use phone/i });
+    },
+    useEmailIdentifier: () => {
+      return page.getByRole('link', { name: /^use email/i });
+    },
+    useUsernameIdentifier: () => {
+      return page.getByRole('link', { name: /^username$/i });
+    },
+    getForgotPassword: () => {
+      return page.getByRole('link', { name: /forgot password/i });
+    },
     getGoToSignUp: () => {
       return page.getByRole('link', { name: /sign up/i });
+    },
+    getResetPassword: () => {
+      return page.getByRole('button', { name: /(reset password|reset your password)/i });
     },
     getUseAnotherMethodLink: () => {
       return page.getByRole('link', { name: /use another method/i });
