@@ -184,7 +184,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           {Array.from({ length }).map((_, i) => {
             const isHovered = isHovering && !isFocused();
             const isCursor = selectionRange[0] === selectionRange[1] && selectionRange[0] === i;
-            const isSelected = selectionRange[0] <= i && selectionRange[1] > i;
+            const isSelected = (selectionRange[0] ?? -1) <= i && (selectionRange[1] ?? -1) > i;
 
             return (
               <React.Fragment key={`otp-segment-${i}`}>
