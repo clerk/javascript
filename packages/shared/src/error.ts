@@ -67,6 +67,10 @@ export function isUserLockedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'user_locked';
 }
 
+export function isPasswordPwnedError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_pwned';
+}
+
 export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
   return data.length > 0 ? data.map(parseError) : [];
 }
