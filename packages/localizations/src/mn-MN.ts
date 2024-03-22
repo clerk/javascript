@@ -35,10 +35,11 @@ export const mnMN: LocalizationResource = {
   formButtonPrimary__verify: 'Баталгаажуулах',
   formFieldAction__forgotPassword: 'Нууц үгээ мартсан?',
   formFieldError__matchingPasswords: 'Нууц үг таарч байна.',
-  formFieldError__notMatchingPasswords: "Нууц үг таарахгүй байна.",
+  formFieldError__notMatchingPasswords: 'Нууц үг таарахгүй байна.',
   formFieldError__verificationLinkExpired: 'Баталгаажуулах холбоосын хугацаа дууссан. Шинэ холбоос хүсэлт гаргана уу.',
   formFieldHintText__optional: 'Сонголтоор',
-  formFieldHintText__slug: 'Slug нь хүн унших боломжтой ID бөгөөд өвөрмөц байх ёстой. Энэ нь ихэвчлэн URL-д ашиглагддаг.',
+  formFieldHintText__slug:
+    'Slug нь хүн унших боломжтой ID бөгөөд өвөрмөц байх ёстой. Энэ нь ихэвчлэн URL-д ашиглагддаг.',
   formFieldInputPlaceholder__backupCode: 'Нөөц код',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Бүртгэл устгах',
   formFieldInputPlaceholder__emailAddress: 'Имэйл хаяг',
@@ -238,9 +239,10 @@ export const mnMN: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'Таны имэйл хаяг руу илгээсэн баталгаажуулах кодыг оруулна уу',
       formTitle: 'Баталгаажуулах код',
-      resendButton: "Код хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: '{{domainName}} домайныг имэйлээр баталгаажуулах шаардлагатай.',
-      subtitleVerificationCodeScreen: 'Баталгаажуулах кодыг {{emailAddress}} руу илгээсэн. Үргэлжлүүлэхийн тулд кодыг оруулна уу.',
+      subtitleVerificationCodeScreen:
+        'Баталгаажуулах кодыг {{emailAddress}} руу илгээсэн. Үргэлжлүүлэхийн тулд кодыг оруулна уу.',
       title: 'Домэйн баталгаажуулах',
     },
   },
@@ -289,7 +291,7 @@ export const mnMN: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'Баталгаажуулах код',
-      resendButton: "Код хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
       title: 'Имэйлээ шалгана уу',
     },
@@ -308,7 +310,7 @@ export const mnMN: LocalizationResource = {
         subtitle: 'Таныг удахгүй дахин чиглүүлэх болно',
         title: 'Нэвтэрч байна...',
       },
-      resendButton: "Холбоос хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Холбоос хүлээж аваагүй юу? Дахин илгээх',
       subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
       title: 'Имэйлээ шалгана уу',
       unusedTab: {
@@ -326,7 +328,7 @@ export const mnMN: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'Нууц үг шинэчлэх код',
-      resendButton: "Код хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: 'нууц үгээ шинэчлэхийн тулд',
       subtitle_email: 'Эхлээд таны имэйл ID руу илгээсэн кодыг оруулна уу',
       subtitle_phone: 'Эхлээд утсандаа илгээсэн кодыг оруулна уу',
@@ -338,7 +340,7 @@ export const mnMN: LocalizationResource = {
       title: 'Нууц үгээ мартсан?',
     },
     noAvailableMethods: {
-      message: "Нэвтрэхийг үргэлжлүүлэх боломжгүй. Баталгаажуулах хүчин зүйл алга.",
+      message: 'Нэвтрэхийг үргэлжлүүлэх боломжгүй. Баталгаажуулах хүчин зүйл алга.',
       subtitle: 'Алдаа гарлаа',
       title: 'Нэвтрэх боломжгүй',
     },
@@ -349,17 +351,18 @@ export const mnMN: LocalizationResource = {
     },
     passkey: {
       title: 'Passkey ашиглана уу',
-      subtitle: "Passkey-ээ ашигласнаар таныг мөн болохыг баталгаажуулна. Таны төхөөрөмж хурууны хээ, нүүр эсвэл дэлгэцийн түгжээг асууж магадгүй.",
+      subtitle:
+        'Passkey-ээ ашигласнаар таныг мөн болохыг баталгаажуулна. Таны төхөөрөмж хурууны хээ, нүүр эсвэл дэлгэцийн түгжээг асууж магадгүй.',
     },
     phoneCode: {
       formTitle: 'Баталгаажуулах код',
-      resendButton: "Код хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
       title: 'Утсаа шалгана уу',
     },
     phoneCodeMfa: {
       formTitle: 'Баталгаажуулах код',
-      resendButton: "Код хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: 'Үргэлжлүүлэхийн тулд утсандаа илгээсэн баталгаажуулах кодыг оруулна уу',
       title: 'Утсаа шалгана уу',
     },
@@ -400,7 +403,7 @@ export const mnMN: LocalizationResource = {
     emailCode: {
       formSubtitle: 'Таны имэйл хаяг руу илгээсэн баталгаажуулах кодыг оруулна уу',
       formTitle: 'Баталгаажуулах код',
-      resendButton: "Код хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: 'Таны имэйл рүү илгээсэн баталгаажуулах кодыг оруулна уу',
       title: 'Имэйлээ баталгаажуулна уу',
     },
@@ -410,7 +413,7 @@ export const mnMN: LocalizationResource = {
       loading: {
         title: 'Бүртгүүлж байна...',
       },
-      resendButton: "Холбоос хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Холбоос хүлээж аваагүй юу? Дахин илгээх',
       subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
       title: 'Имэйлээ баталгаажуулна уу',
       verified: {
@@ -425,7 +428,7 @@ export const mnMN: LocalizationResource = {
     phoneCode: {
       formSubtitle: 'Таны утасны дугаар руу илгээсэн баталгаажуулах кодыг оруулна уу',
       formTitle: 'Баталгаажуулах код',
-      resendButton: "Код хүлээж аваагүй юу? Дахин илгээх",
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
       subtitle: 'Таны утсанд илгээсэн баталгаажуулах кодыг оруулна уу',
       title: 'Утсаар баталгаажуулах',
     },
@@ -563,14 +566,14 @@ export const mnMN: LocalizationResource = {
         formHint: 'Баталгаажуулах код агуулсан имэйлийг энэ имэйл хаяг руу илгээх болно.',
         formSubtitle: '{{identifier}} руу илгээсэн баталгаажуулах кодыг илгээх',
         formTitle: 'Verification code',
-        resendButton: "Код хүлээж аваагүй юу? Дахин илгээх",
+        resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
         successMessage: 'Таны бүртгэлд {{identifier}} имэйл нэмэгдлээ.',
       },
       emailLink: {
         formHint: 'Баталгаажуулах холбоос бүхий имэйлийг энэ имэйл хаяг руу илгээх болно.',
         formSubtitle: '{{identifier}}руу илгээсэн имэйл дэх баталгаажуулах холбоос дээр дарна уу.',
         formTitle: 'Баталгаажуулах холбоос',
-        resendButton: "Холбоос хүлээж аваагүй юу? Дахин илгээх",
+        resendButton: 'Холбоос хүлээж аваагүй юу? Дахин илгээх',
         successMessage: 'Таны бүртгэлд {{identifier}} имэйл нэмэгдлээ.',
       },
       removeResource: {

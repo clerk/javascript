@@ -165,7 +165,7 @@ run(heIL, 'he-IL');
 run(itIT, 'it-IT');
 run(jaJP, 'ja-JP');
 run(koKR, 'ko-KR');
-run(mnMN, 'mn-MN')
+run(mnMN, 'mn-MN');
 run(nbNO, 'nb-NO');
 run(nlNL, 'nl-NL');
 run(plPL, 'pl-PL');
