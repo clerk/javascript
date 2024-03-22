@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Terug',
   badge__default: 'Standaard',
   badge__otherImpersonatorDevice: 'Ander immitatie apparaat',
@@ -282,6 +283,7 @@ export const nlNL: LocalizationResource = {
       blockButton__backupCode: 'Gebruik een backupcode',
       blockButton__emailCode: 'Verzend code naar {{identifier}}',
       blockButton__emailLink: 'Verzend link naar {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Inloggen met je wachtwoord',
       blockButton__phoneCode: 'Verzend code naar {{identifier}}',
       blockButton__totp: 'Gebruik je authenticator app',
@@ -352,10 +354,17 @@ export const nlNL: LocalizationResource = {
       subtitle: 'Er heeft zich een fout voorgedaan',
       title: 'Inloggen onmogelijk',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Gebruik een andere methode',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Vul je wachtwoord in',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verificatie code',
@@ -382,6 +391,7 @@ export const nlNL: LocalizationResource = {
       actionLink: 'Registreren',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: 'Geen account?',
@@ -461,6 +471,7 @@ export const nlNL: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned: '',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -468,6 +479,11 @@ export const nlNL: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -525,6 +541,14 @@ export const nlNL: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -679,6 +703,11 @@ export const nlNL: LocalizationResource = {
       title: 'Profiel bijwerken',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Log uit op apparaat',
         title: 'Actieve apparaten',

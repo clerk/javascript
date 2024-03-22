@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Назад',
   badge__default: 'По-умолчанию',
   badge__otherImpersonatorDevice: 'Другое устройство',
@@ -285,6 +286,7 @@ export const ruRU: LocalizationResource = {
       blockButton__backupCode: 'Используйте код восстановления',
       blockButton__emailCode: 'Отправить код на {{identifier}}',
       blockButton__emailLink: 'Отправить ссылку на {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Войти с паролем',
       blockButton__phoneCode: 'Отправить код на {{identifier}}',
       blockButton__totp: 'Используйте аутентификатор',
@@ -356,10 +358,17 @@ export const ruRU: LocalizationResource = {
       subtitle: 'Произошла ошибка',
       title: 'Невозможно войти',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Использовать другой метод',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Введите пароль',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Верификационный код',
@@ -386,6 +395,7 @@ export const ruRU: LocalizationResource = {
       actionLink: 'Зарегистрироваться',
       actionLink__use_email: 'Использовать почту',
       actionLink__use_email_username: 'Использовать почту или имя пользователя',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Использовать номер телефона',
       actionLink__use_username: 'Использовать имя пользователя',
       actionText: 'Нет аккаунта?',
@@ -465,6 +475,7 @@ export const ruRU: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Ваш пароль недостаточно надежный.',
     form_password_pwned: 'Этот пароль был взломан и не может быть использован, попробуйте другой пароль.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ваш пароль превышает максимально допустимое количество байтов, сократите его или удалите некоторые специальные символы.',
     form_password_validation_failed: 'Неверный пароль',
@@ -472,6 +483,11 @@ export const ruRU: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'менее {{length}} символов',
       minimumLength: '{{length}} или более символов',
@@ -529,6 +545,14 @@ export const ruRU: LocalizationResource = {
     action__signOutAll: 'Выйти из всех аккаунтов',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопировано!',
       actionLabel__copy: 'Копировать все',
@@ -685,6 +709,11 @@ export const ruRU: LocalizationResource = {
       title: 'Обновить профиль',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Выйти из устройства',
         title: 'Активные устройства',

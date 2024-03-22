@@ -58,6 +58,8 @@ export function _SignInFactorOne(): JSX.Element {
 
   const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
 
+  const [isPasswordPwned, setIsPasswordPwned] = React.useState(false);
+
   React.useEffect(() => {
     // Handle the case where a user lands on alternative methods screen,
     // clicks a social button but then navigates back to sign in.
@@ -98,6 +100,7 @@ export function _SignInFactorOne(): JSX.Element {
     return (
       <AlternativeMethods
         asForgotPassword={showForgotPasswordStrategies}
+        isPasswordPwned={isPasswordPwned}
         onBackLinkClick={canGoBack ? toggle : undefined}
         onFactorSelected={f => {
           selectFactor(f);
@@ -135,6 +138,10 @@ export function _SignInFactorOne(): JSX.Element {
           }}
           onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
+          onPasswordPwned={() => {
+            setIsPasswordPwned(true);
+            toggleForgotPasswordStrategies();
+          }}
         />
       );
     case 'email_code':

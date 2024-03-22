@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Πίσω',
   badge__default: 'Προεπιλογή',
   badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
@@ -282,6 +283,7 @@ export const elGR: LocalizationResource = {
       blockButton__backupCode: 'Χρήση ενός εφεδρικού κωδικού',
       blockButton__emailCode: 'Αποστολή κωδικού με email στο {{identifier}}',
       blockButton__emailLink: 'Αποστολή συνδέσμου στο {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Σύνδεση με τον κωδικό πρόσβασής σας',
       blockButton__phoneCode: 'Αποστολή κωδικού SMS στο {{identifier}}',
       blockButton__totp: 'Χρήση της εφαρμογής αυθεντικοποίησης',
@@ -353,10 +355,17 @@ export const elGR: LocalizationResource = {
       subtitle: 'Προέκυψε σφάλμα',
       title: 'Δεν είναι δυνατή η σύνδεση',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Χρήση άλλης μεθόδου',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Εισαγωγή κωδικού πρόσβασης',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Κωδικός επαλήθευσης',
@@ -384,6 +393,7 @@ export const elGR: LocalizationResource = {
       actionLink: 'Εγγραφή',
       actionLink__use_email: 'Χρήση email',
       actionLink__use_email_username: 'Χρήση email ή ονόματος χρήστη',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Χρήση τηλεφώνου',
       actionLink__use_username: 'Χρήση ονόματος χρήστη',
       actionText: 'Δεν έχετε λογαριασμό;',
@@ -464,6 +474,7 @@ export const elGR: LocalizationResource = {
     form_password_not_strong_enough: 'Ο κωδικός πρόσβασής σας δεν είναι αρκετά ισχυρός.',
     form_password_pwned:
       'Αυτός ο κωδικός πρόσβασης έχει διαρρεύσει online στο παρελθόν και δεν μπορεί να χρησιμοποιηθεί. Δοκιμάστε έναν άλλο κωδικό πρόσβασης αντί για αυτόν.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ο κωδικός πρόσβασής σας έχει υπερβεί το μέγιστο αριθμό bytes που επιτρέπεται. Παρακαλούμε, συντομεύστε τον ή αφαιρέστε μερικούς ειδικούς χαρακτήρες.',
     form_password_validation_failed: 'Λανθασμένος κωδικός',
@@ -471,6 +482,11 @@ export const elGR: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Δεν μπορείτε να διαγράψετε το τελευταίο στοιχείο ταυτοποιησής σας.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'λιγότερους από {{length}} χαρακτήρες',
       minimumLength: '{{length}} ή περισσότερους χαρακτήρες',
@@ -531,6 +547,14 @@ export const elGR: LocalizationResource = {
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Αντιγράφηκαν!',
       actionLabel__copy: 'Αντιγραφή όλων',
@@ -690,6 +714,11 @@ export const elGR: LocalizationResource = {
       title: 'Ενημέρωση προφίλ',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Αποσύνδεση από τη συσκευή',
         title: 'Ενεργές συσκευές',

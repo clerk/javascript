@@ -17,6 +17,7 @@ export type AlternativeMethodsProps = {
   onFactorSelected: (factor: SignInFactor) => void;
   currentFactor: SignInFactor | undefined | null;
   asForgotPassword?: boolean;
+  isPasswordPwned?: boolean;
 };
 
 export type AlternativeMethodListProps = AlternativeMethodsProps & { onHavingTroubleClick: React.MouseEventHandler };
@@ -28,23 +29,31 @@ export const AlternativeMethods = (props: AlternativeMethodsProps) => {
 };
 
 const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
-  const { onBackLinkClick, onHavingTroubleClick, onFactorSelected, asForgotPassword = false } = props;
+  const {
+    onBackLinkClick,
+    onHavingTroubleClick,
+    onFactorSelected,
+    asForgotPassword = false,
+    isPasswordPwned = false,
+  } = props;
   const card = useCardState();
   const resetPasswordFactor = useResetPasswordFactor();
   const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: props?.currentFactor,
   });
 
+  const cardTitleKey = asForgotPassword
+    ? isPasswordPwned
+      ? 'signIn.passwordPwned.title'
+      : 'signIn.forgotPasswordAlternativeMethods.title'
+    : 'signIn.alternativeMethods.title';
+
   return (
     <Flow.Part part={asForgotPassword ? 'forgotPasswordMethods' : 'alternativeMethods'}>
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title
-              localizationKey={localizationKeys(
-                asForgotPassword ? 'signIn.forgotPasswordAlternativeMethods.title' : 'signIn.alternativeMethods.title',
-              )}
-            />
+            <Header.Title localizationKey={localizationKeys(cardTitleKey)} />
             {!asForgotPassword && (
               <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
             )}
@@ -61,7 +70,10 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                 localizationKey={getButtonLabel(resetPasswordFactor)}
                 elementDescriptor={descriptors.alternativeMethodsBlockButton}
                 isDisabled={card.isLoading}
-                onClick={() => onFactorSelected(resetPasswordFactor)}
+                onClick={() => {
+                  card.setError(undefined);
+                  onFactorSelected(resetPasswordFactor);
+                }}
               />
             )}
             {asForgotPassword && hasAnyStrategy && (
@@ -90,7 +102,10 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                       key={i}
                       textVariant='buttonLarge'
                       isDisabled={card.isLoading}
-                      onClick={() => onFactorSelected(factor)}
+                      onClick={() => {
+                        card.setError(undefined);
+                        onFactorSelected(factor);
+                      }}
                     />
                   ))}
                 </Flex>
@@ -99,7 +114,10 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                 <BackLink
                   boxElementDescriptor={descriptors.backRow}
                   linkElementDescriptor={descriptors.backLink}
-                  onClick={onBackLinkClick}
+                  onClick={e => {
+                    card.setError(undefined);
+                    onBackLinkClick(e);
+                  }}
                 />
               )}
             </Col>

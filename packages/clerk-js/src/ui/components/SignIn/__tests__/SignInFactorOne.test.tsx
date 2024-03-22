@@ -227,6 +227,98 @@ describe('SignInFactorOne', () => {
           });
         });
       });
+
+      it('Prompts the user to reset their password via email if it has been pwned', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportPassword: true,
+            supportEmailCode: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'form_password_pwned',
+          long_message:
+            'Password has been found in an online data breach. For account safety, please reset your password.',
+          message: 'Password has been found in an online data breach. For account safety, please reset your password.',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText('Password'), '123456');
+          await userEvent.click(screen.getByText('Continue'));
+
+          await waitFor(() => {
+            screen.getByText('Password compromised');
+            screen.getByText(
+              'This password has been found as part of a breach and can not be used, please reset your password.',
+            );
+            screen.getByText('Or, sign in with another method');
+          });
+
+          await userEvent.click(screen.getByText('Reset your password'));
+          screen.getByText('First, enter the code sent to your email ID');
+        });
+      });
+
+      it('Prompts the user to reset their password via phone if it has been pwned', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithPhoneNumber({
+            supportPassword: true,
+            supportPhoneCode: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'form_password_pwned',
+          long_message:
+            'Password has been found in an online data breach. For account safety, please reset your password.',
+          message: 'Password has been found in an online data breach. For account safety, please reset your password.',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText('Password'), '123456');
+          await userEvent.click(screen.getByText('Continue'));
+
+          await waitFor(() => {
+            screen.getByText('Password compromised');
+            screen.getByText(
+              'This password has been found as part of a breach and can not be used, please reset your password.',
+            );
+            screen.getByText('Or, sign in with another method');
+          });
+
+          await userEvent.click(screen.getByText('Reset your password'));
+          screen.getByText('First, enter the code sent to your phone');
+        });
+      });
     });
 
     describe('Forgot Password', () => {

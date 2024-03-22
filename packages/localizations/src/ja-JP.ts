@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: '戻る',
   badge__default: 'デフォルト',
   badge__otherImpersonatorDevice: '他の模倣者デバイス',
@@ -282,6 +283,7 @@ export const jaJP: LocalizationResource = {
       blockButton__backupCode: 'バックアップコードを使用する',
       blockButton__emailCode: '{{identifier}}にメールコードを送信',
       blockButton__emailLink: '{{identifier}}にメールリンクを送信',
+      blockButton__passkey: undefined,
       blockButton__password: 'パスワードでサインインする',
       blockButton__phoneCode: '{{identifier}}にSMSコードを送信',
       blockButton__totp: '認証アプリを使用する',
@@ -353,10 +355,17 @@ export const jaJP: LocalizationResource = {
       subtitle: 'エラーが発生しました',
       title: 'サインインできません',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '別の方法を使用',
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'パスワードを入力',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: '検証コード',
@@ -384,6 +393,7 @@ export const jaJP: LocalizationResource = {
       actionLink: 'サインアップ',
       actionLink__use_email: 'メールアドレスを使用',
       actionLink__use_email_username: 'メールアドレスまたはユーザー名を使用',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: '電話番号を使用',
       actionLink__use_username: 'ユーザー名を使用',
       actionText: 'アカウントをお持ちでないですか？',
@@ -464,6 +474,7 @@ export const jaJP: LocalizationResource = {
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_pwned:
       'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'パスワードのバイト数が上限を超えています。短くするか、一部の特殊文字を削除してください。',
     form_password_validation_failed: 'パスワードが間違っています',
@@ -471,6 +482,11 @@ export const jaJP: LocalizationResource = {
     form_username_invalid_length: 'ユーザー名の長さが無効です。',
     identification_deletion_failed: '最後の識別情報は削除できません。',
     not_allowed_access: 'アクセスが許可されていません。',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}}文字未満',
       minimumLength: '{{length}}文字以上',
@@ -528,6 +544,14 @@ export const jaJP: LocalizationResource = {
     action__signOutAll: '全てのアカウントからサインアウト',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'コピー済み！',
       actionLabel__copy: 'すべてコピー',
@@ -679,6 +703,11 @@ export const jaJP: LocalizationResource = {
       title: 'プロフィールの更新',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'デバイスからサインアウト',
         title: 'アクティブなデバイス',
