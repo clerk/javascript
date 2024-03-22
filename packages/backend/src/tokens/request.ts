@@ -41,6 +41,21 @@ function assertSignInUrlFormatAndOrigin(_signInUrl: string, origin: string) {
 }
 
 /**
+ * Detect multiple session cookies, which isn't supported and can lead to unexpected behavior.
+ */
+function assertSingleSessionCookie(request: Request) {
+  const rawCookies = request.headers.get('cookie');
+
+  const cookies = rawCookies?.split(';').map(x => x.split('=')[0]) || [];
+
+  if (cookies.filter(x => x === constants.Cookies.Session).length > 1) {
+    throw new Error(
+      `Clerk: Multiple session cookies detected. This is not supported. Clear your cookies and try again.`,
+    );
+  }
+}
+
+/**
  * Currently, a request is only eligible for a handshake if we can say it's *probably* a request for a document, not a fetch or some other exotic request.
  * This heuristic should give us a reliable enough signal for browsers that support `Sec-Fetch-Dest` and for those that don't.
  */
@@ -65,6 +80,7 @@ export async function authenticateRequest(
 ): Promise<RequestState> {
   const authenticateContext = createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
+  assertSingleSessionCookie(request);
 
   if (authenticateContext.isSatellite) {
     assertSignInUrlExists(authenticateContext.signInUrl, authenticateContext.secretKey);
