@@ -1,22 +1,23 @@
 import type { Response } from 'express';
 
-import { clerkClient } from '@clerk/clerk-sdk-node';
-import { Router } from 'express';
+import { getAuth, requireAuth } from '@clerk/express';
+import { Router, Request as ExpressRequest } from 'express';
 
 const router = Router();
 
-router.use((...args)=>clerkClient.expressRequireAuth()(...args));
+router.use(requireAuth);
 
-router.get('/me', async (req, reply: Response) => {
-  return reply.json({ auth: req.auth });
+router.get('/me', async (req: ExpressRequest, reply: Response) => {
+  return reply.json({ auth: getAuth(req) });
 });
 
 router.get('/private', async (req, reply: Response) => {
-  if (!req.auth.userId) {
+  const auth = getAuth(req);
+  if (!auth.userId) {
     return reply.status(403).end();
   }
 
-  return reply.json({ hello: 'world', auth: req.auth });
+  return reply.json({ hello: 'world', auth });
 });
 
 export const privateRoutes = router;
