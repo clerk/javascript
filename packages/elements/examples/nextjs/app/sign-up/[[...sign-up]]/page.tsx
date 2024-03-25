@@ -1,7 +1,7 @@
 'use client';
 
-import { GlobalError } from '@clerk/elements/common';
-import { Action, Loading, Provider, ProviderIcon, SignUp, Step, Strategy } from '@clerk/elements/sign-up';
+import { GlobalError, Loading } from '@clerk/elements/common';
+import { Action, Provider, ProviderIcon, SignUp, Step, Strategy } from '@clerk/elements/sign-up';
 import type { ComponentProps } from 'react';
 
 import { H1, HR as Hr } from '@/components/design';

@@ -66,13 +66,11 @@ export default function Page() {
       .commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
-    await app.build();
+    await app.dev();
 
     const m = createTestUtils({ app });
     fakeUser = m.services.users.createFakeUser();
     await m.services.users.createBapiUser(fakeUser);
-
-    await app.serve();
   });
 
   test.afterAll(async () => {

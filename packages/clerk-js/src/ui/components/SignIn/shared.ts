@@ -7,13 +7,11 @@ import { __internal_WebAuthnAbortService } from '../../../utils/passkeys';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
-function useHandleAuthenticateWithPasskey() {
+function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
   const card = useCardState();
   const { setActive } = useClerk();
-  const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const { navigateAfterSignIn } = useSignInContext();
   const { __experimental_authenticateWithPasskey } = useCoreSignIn();
@@ -31,7 +29,7 @@ function useHandleAuthenticateWithPasskey() {
         case 'complete':
           return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
         case 'needs_second_factor':
-          return navigate('../factor-two');
+          return onSecondFactor();
         default:
           return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
       }

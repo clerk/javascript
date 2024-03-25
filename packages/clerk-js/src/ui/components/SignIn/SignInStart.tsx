@@ -30,7 +30,9 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
+  const { navigate } = useRouter();
+  const onSecondFactor = () => navigate('factor-two');
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
   const { userSettings } = useEnvironment();
   const { passkeySettings, attributes } = userSettings;
 
@@ -74,7 +76,8 @@ export function _SignInStart(): JSX.Element {
    * Passkeys
    */
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
-  const authenticateWithPasskey = useHandleAuthenticateWithPasskey();
+  const onSecondFactor = () => navigate('factor-two');
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
   const isWebSupported = isWebAuthnSupported();
 
   const onlyPhoneNumberInitialValueExists =

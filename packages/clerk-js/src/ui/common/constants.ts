@@ -72,7 +72,6 @@ export const getIdentifierControlDisplayValues = (
 };
 
 export const PREFERRED_SIGN_IN_STRATEGIES = Object.freeze({
-  Passkey: 'passkey',
   Password: 'password',
   OTP: 'otp',
 });
