@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "1.0.0-beta.35",
+  "version": "1.0.0-beta.36",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -42,7 +42,7 @@
   "dependencies": {
     "@clerk/backend": "1.0.0-beta.29",
     "@clerk/shared": "2.0.0-beta.19",
-    "@clerk/types": "4.0.0-beta.21",
+    "@clerk/types": "4.0.0-beta.22",
     "cookies": "0.8.0"
   },
   "devDependencies": {
