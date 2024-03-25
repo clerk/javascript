@@ -603,7 +603,7 @@ describe('SignInFactorOne', () => {
     });
 
     describe('Passkey', () => {
-      it('shows an next available factor because webauthn is not supported', async () => {
+      it('shows the next available factor because webauthn is not supported', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
@@ -617,7 +617,7 @@ describe('SignInFactorOne', () => {
       });
 
       mockWebAuthn(() => {
-        it('shows an passkey factor one UI', async () => {
+        it('shows a passkey factor one screen', async () => {
           const { wrapper } = await createFixtures(f => {
             f.withEmailAddress();
             f.withPassword();
@@ -633,7 +633,7 @@ describe('SignInFactorOne', () => {
           screen.getByText('hello@clerk.com');
         });
 
-        it('shows an passkey factor one UI', async () => {
+        it('call appropriate method from passkey factor one screen', async () => {
           const { wrapper, fixtures } = await createFixtures(f => {
             f.withEmailAddress();
             f.withPassword();
@@ -739,7 +739,7 @@ describe('SignInFactorOne', () => {
     });
 
     mockWebAuthn(() => {
-      it('should skip passkey alternative method when webauthn is not supported', async () => {
+      it('should not skip passkey alternative method when webauthn is supported', async () => {
         const email = 'test@clerk.com';
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
