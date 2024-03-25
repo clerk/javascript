@@ -87,7 +87,13 @@ const OTPInputStandard = React.forwardRef<HTMLInputElement, Omit<OTPInputProps, 
  */
 const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPInputProps, 'render'>> & OTPInputProps>(
   function OTPInput(props, ref) {
-    const { className, render, length = OTP_LENGTH_DEFAULT, autoSubmit = false, ...rest } = props;
+    const {
+      className: userProvidedClassName,
+      render,
+      length = OTP_LENGTH_DEFAULT,
+      autoSubmit = false,
+      ...rest
+    } = props;
 
     const innerRef = React.useRef<HTMLInputElement>(null);
     const [selectionRange, setSelectionRange] = React.useState<SelectionRange>(props.autoFocus ? ZERO : OUTSIDE);
@@ -177,7 +183,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           style={inputStyle}
         />
         <div
-          className={className}
+          className={userProvidedClassName}
           aria-hidden
           style={segmentWrapperStyle}
         >
@@ -228,7 +234,7 @@ function selectionRangeUpdater(cur: SelectionRange, inputRef: React.RefObject<HT
     if (updated[0] > 0 && cur[0] === updated[0] && cur[1] === updated[0] + 1) {
       updated = [updated[0] - 1, updated[1], 'backward'];
     } else if (typeof inputRef.current?.value[updated[0]] !== 'undefined') {
-      updated = [updated[0], updated[1] + 1, 'forward'];
+      updated = [updated[0], updated[1] + 1, 'backward'];
     } else if (updated[0] >= OTP_LENGTH_DEFAULT) {
       updated = [updated[0] - 1, updated[1], 'backward'];
     }
