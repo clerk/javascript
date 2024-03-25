@@ -10,6 +10,7 @@ export type OTPInputProps = Exclude<
   render?: (props: { value: string; status: OTPInputSegmentStatus; index: number }) => React.ReactNode;
   length?: number;
   autoSubmit?: boolean;
+  passwordManagerOffset?: number;
 };
 
 type SelectionRange = readonly [start: number | null, end: number | null];
@@ -17,6 +18,7 @@ const ZERO: SelectionRange = [0, 0];
 const OUTSIDE: SelectionRange = [-1, -1];
 
 export const OTP_LENGTH_DEFAULT = 6;
+const PASSWORD_MANAGER_OFFSET_DEFAULT = 40;
 
 /**
  * The status of a single segment element in the OTP input
@@ -92,6 +94,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
       render,
       length = OTP_LENGTH_DEFAULT,
       autoSubmit = false,
+      passwordManagerOffset = PASSWORD_MANAGER_OFFSET_DEFAULT,
       ...rest
     } = props;
 
@@ -180,7 +183,10 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
             setIsHovering(false);
             props.onMouseLeave?.(event);
           }}
-          style={inputStyle}
+          style={{
+            ...inputStyle,
+            width: `calc(100% + 1ch + ${passwordManagerOffset}px)`,
+          }}
         />
         <div
           className={userProvidedClassName}
@@ -261,7 +267,7 @@ const inputStyle = {
   inset: 0,
   caretColor: 'transparent',
   border: '0 px solid transparent',
-  width: '100%',
+  // width is handled inline
   height: '100%',
   letterSpacing: '-1rem',
 } satisfies React.CSSProperties;
