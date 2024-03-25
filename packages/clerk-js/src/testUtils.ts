@@ -52,15 +52,17 @@ export const mockNativeRuntime = (fn: () => void) => {
 
 export const mockWebAuthn = (fn: () => void) => {
   describe('with WebAuthn', () => {
+    let originalPublicKeyCredential: any;
     beforeAll(() => {
+      originalPublicKeyCredential = global.PublicKeyCredential;
       const publicKeyCredential: any = () => {};
-      (window as any).PublicKeyCredential = publicKeyCredential;
+      global.PublicKeyCredential = publicKeyCredential;
       publicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable = () => Promise.resolve(true);
       publicKeyCredential.isConditionalMediationAvailable = () => Promise.resolve(true);
     });
 
     afterAll(() => {
-      (window as any).PublicKeyCredential = undefined;
+      global.PublicKeyCredential = originalPublicKeyCredential;
     });
 
     fn();
