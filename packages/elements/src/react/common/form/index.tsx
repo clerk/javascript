@@ -120,11 +120,16 @@ const determineInputTypeFromName = (name: FormFieldProps['name']) => {
   return 'text' as const;
 };
 
-const useInput = ({ name: inputName, value: initialValue, type: inputType, ...passthroughProps }: FormInputProps) => {
+const useInput = ({
+  name: inputName,
+  value: initialValue,
+  type: inputType,
+  onChange: onChangeProp,
+  ...passthroughProps
+}: FormInputProps) => {
   // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
-  const onChangeProp = passthroughProps?.onChange;
 
   const ref = useFormStore();
   const value = useFormSelector(fieldValueSelector(name));

@@ -1,5 +1,45 @@
 # Change Log
 
+## 5.0.0-beta.36
+
+### Minor Changes
+
+- Improved error handling for registration and retrieval of passkeys. ([#3025](https://github.com/clerk/javascript/pull/3025)) by [@panteliselef](https://github.com/panteliselef)
+
+  ClerkRuntimeError codes introduced:
+
+  - `passkey_not_supported`
+  - `passkeys_pa_not_supported`
+  - `passkey_invalid_rpID_or_domain`
+  - `passkey_already_exists`
+  - `passkey_operation_aborted`
+  - `passkey_retrieval_cancelled`
+  - `passkey_retrieval_failed`
+  - `passkey_registration_cancelled`
+  - `passkey_registration_failed`
+
+  Example usage:
+
+  ```ts
+  try {
+    await __experimental_authenticateWithPasskey(...args);
+  }catch (e) {
+    if (isClerkRuntimeError(e)) {
+        if (err.code === 'passkey_operation_aborted') {
+            ...
+        }
+    }
+  }
+
+
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`78ed58da4`](https://github.com/clerk/javascript/commit/78ed58da4b75a6324edb884b55b5c573b121e750), [`afec17953`](https://github.com/clerk/javascript/commit/afec17953d1ae4ba39ee73e4383757694375524d), [`75d6bf9ad`](https://github.com/clerk/javascript/commit/75d6bf9ade57f1b4d8d68d070fd4c20c0a40d066)]:
+  - @clerk/localizations@2.0.0-beta.19
+  - @clerk/types@4.0.0-beta.22
+
 ## 5.0.0-beta.35
 
 ### Minor Changes

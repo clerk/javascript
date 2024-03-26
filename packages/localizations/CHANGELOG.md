@@ -1,5 +1,45 @@
 # Change Log
 
+## 2.0.0-beta.19
+
+### Minor Changes
+
+- Improved error handling for registration and retrieval of passkeys. ([#3025](https://github.com/clerk/javascript/pull/3025)) by [@panteliselef](https://github.com/panteliselef)
+
+  ClerkRuntimeError codes introduced:
+
+  - `passkey_not_supported`
+  - `passkeys_pa_not_supported`
+  - `passkey_invalid_rpID_or_domain`
+  - `passkey_already_exists`
+  - `passkey_operation_aborted`
+  - `passkey_retrieval_cancelled`
+  - `passkey_retrieval_failed`
+  - `passkey_registration_cancelled`
+  - `passkey_registration_failed`
+
+  Example usage:
+
+  ```ts
+  try {
+    await __experimental_authenticateWithPasskey(...args);
+  }catch (e) {
+    if (isClerkRuntimeError(e)) {
+        if (err.code === 'passkey_operation_aborted') {
+            ...
+        }
+    }
+  }
+
+
+  ```
+
+### Patch Changes
+
+- Translate EN strings to ES in es-ES.ts ([#3020](https://github.com/clerk/javascript/pull/3020)) by [@pauloconde](https://github.com/pauloconde)
+
+- Added Mongolian (mn-MN) localizations ([#3024](https://github.com/clerk/javascript/pull/3024)) by [@TsPuujee](https://github.com/TsPuujee)
+
 ## 2.0.0-beta.18
 
 ### Minor Changes
