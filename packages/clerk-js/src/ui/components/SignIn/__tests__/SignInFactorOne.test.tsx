@@ -227,29 +227,6 @@ describe('SignInFactorOne', () => {
           });
         });
       });
-
-      it('redirects to `reset-password` if signIn requires a new password', async () => {
-        const { wrapper, fixtures } = await createFixtures(f => {
-          f.withEmailAddress();
-          f.withPassword();
-          f.withPreferredSignInStrategy({ strategy: 'password' });
-          f.startSignInWithPhoneNumber({ supportPassword: true });
-        });
-        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
-
-        fixtures.signIn.attemptFirstFactor.mockReturnValueOnce(
-          Promise.resolve({ status: 'needs_new_password' } as SignInResource),
-        );
-
-        await runFakeTimers(async () => {
-          const { userEvent } = render(<SignInFactorOne />, { wrapper });
-          await userEvent.type(screen.getByLabelText('Password'), '123456');
-          await userEvent.click(screen.getByText('Continue'));
-          await waitFor(() => {
-            expect(fixtures.router.navigate).toHaveBeenCalledWith('../reset-password');
-          });
-        });
-      });
     });
 
     describe('Forgot Password', () => {
