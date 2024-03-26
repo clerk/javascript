@@ -67,14 +67,16 @@ export const createUserService = (clerkClient: ClerkClient) => {
         withUsername = false,
       } = options || {};
       const randomHash = hash();
-      const email = fictionalEmail ? `${randomHash}+clerk_test@clerkcook.ie` : `clerkcookie+${randomHash}@mailsac.com`;
+      const email = fictionalEmail
+        ? `${randomHash}+clerk_test@clerkcookie.com`
+        : `clerkcookie+${randomHash}@mailsac.com`;
 
       return {
         firstName: faker.person.firstName(),
         lastName: faker.person.lastName(),
         email,
         username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
-        password: withPassword ? `${email}${email}` : undefined,
+        password: withPassword ? `${email}${randomHash}` : undefined,
         // this generates a random fictional number that can be verified
         // using the 424242 code. Allowing 10^5 combinations should be enough
         // entropy for e2e purposes

@@ -109,8 +109,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.signIn.getForgotPassword().click();
     await u.po.signIn.getResetPassword().click();
     await u.po.signIn.enterTestOtpCode();
-    await u.po.signIn.setPassword('password_reset');
-    await u.po.signIn.setPasswordConfirmation('password_reset');
+    await u.po.signIn.setPassword(`${fakeUserWithPasword.password}_reset`);
+    await u.po.signIn.setPasswordConfirmation(`${fakeUserWithPasword.password}_reset`);
     await u.po.signIn.getResetPassword().click();
     await u.po.expect.toBeSignedIn();
 
