@@ -4,7 +4,7 @@ import { describe, it, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { act, render, screen } from '../../../../testUtils';
+import { act, mockWebAuthn, render, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignInFactorOne } from '../SignInFactorOne';
@@ -601,6 +601,59 @@ describe('SignInFactorOne', () => {
         });
       });
     });
+
+    describe('Passkey', () => {
+      it('shows the next available factor because webauthn is not supported', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPasskey();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        render(<SignInFactorOne />, { wrapper });
+        screen.getByText('Check your email');
+      });
+
+      mockWebAuthn(() => {
+        it('shows a passkey factor one screen', async () => {
+          const { wrapper } = await createFixtures(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.withPasskey();
+            f.withPreferredSignInStrategy({ strategy: 'otp' });
+            f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true });
+          });
+          render(<SignInFactorOne />, { wrapper });
+          screen.getByText('Use your passkey');
+          screen.getByText(
+            "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+          );
+          screen.getByText('hello@clerk.com');
+        });
+
+        it('call appropriate method from passkey factor one screen', async () => {
+          const { wrapper, fixtures } = await createFixtures(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.withPasskey();
+            f.withPreferredSignInStrategy({ strategy: 'otp' });
+            f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true });
+          });
+          fixtures.signIn.__experimental_authenticateWithPasskey.mockResolvedValue({
+            status: 'complete',
+          } as SignInResource);
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+          await userEvent.click(screen.getByText('Continue'));
+
+          await waitFor(() => {
+            expect(fixtures.signIn.__experimental_authenticateWithPasskey).toHaveBeenCalled();
+          });
+        });
+      });
+    });
   });
 
   describe('Use another method', () => {
@@ -665,6 +718,43 @@ describe('SignInFactorOne', () => {
       screen.getByText(`Sign in with your password`);
       const deactivatedMethod = screen.queryByText(`Send link to ${email}`);
       expect(deactivatedMethod).not.toBeInTheDocument();
+    });
+
+    it('should skip passkey alternative method when webauthn is not supported', async () => {
+      const email = 'test@clerk.com';
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPasskey();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true, identifier: email });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      await userEvent.click(screen.getByText('Sign in with your password'));
+      await userEvent.click(screen.getByText('Use another method'));
+      const deactivatedMethod = screen.queryByText(`Sign in with your passkey`);
+      expect(deactivatedMethod).not.toBeInTheDocument();
+    });
+
+    mockWebAuthn(() => {
+      it('should not skip passkey alternative method when webauthn is supported', async () => {
+        const email = 'test@clerk.com';
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPasskey();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true, identifier: email });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(screen.getByText('Use another method'));
+        screen.getByText(`Sign in with your passkey`);
+      });
     });
 
     it('should list enabled first factor methods without the current one', async () => {
