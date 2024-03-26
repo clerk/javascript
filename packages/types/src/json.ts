@@ -490,8 +490,3 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   timeout: number;
   userVerification: 'discouraged' | 'preferred' | 'required';
 }
-
-// TODO-PASSKEYS: Decide if we are keeping this
-// export interface PassKeyVerificationJSON extends VerificationJSON {
-//   publicKey: PublicKeyCredentialCreationOptionsJSON | null;
-// }
