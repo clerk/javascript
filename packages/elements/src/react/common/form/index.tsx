@@ -35,6 +35,11 @@ import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
 import type { ClerkFieldId, FieldStates } from './types';
 
+const FIELD_STATES = {
+  valid: 'valid',
+  invalid: 'invalid',
+} as const;
+
 /* -------------------------------------------------------------------------------------------------
  * Context
  * -----------------------------------------------------------------------------------------------*/
@@ -51,7 +56,7 @@ const useFieldContext = () => React.useContext(FieldContext);
  */
 const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
   const error = useFormSelector(globalErrorsSelector);
-  const validity = error ? 'invalid' : 'valid';
+  const validity = error ? FIELD_STATES.invalid : FIELD_STATES.valid;
 
   // Register the onSubmit handler for form submission
   // TODO: merge user-provided submit handler
@@ -79,7 +84,7 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 
   const shouldBeHidden = false; // TODO: Implement clerk-js utils
   const hasError = Boolean(error);
-  const validity = hasError ? 'invalid' : 'valid';
+  const validity = hasError ? FIELD_STATES.invalid : FIELD_STATES.valid;
 
   return {
     hasValue,
@@ -100,7 +105,7 @@ const useGlobalErrors = () => {
 };
 
 /**
- * Provides field-error/message-specific props based on the field's type/state
+ * Get the field-specific errors, if they exist
  */
 const useFieldErrors = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
   const errors = useFormSelector(fieldErrorsSelector(name));
@@ -285,8 +290,8 @@ const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, 
 const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
   const { children, ...rest } = props;
   const field = useField({ name: rest.name });
-  const error = useFormSelector(fieldErrorsSelector(rest.name));
-  const state = error ? ('invalid' as const) : ('valid' as const);
+  const { errors } = useFieldErrors({ name: rest.name });
+  const state = errors ? FIELD_STATES.invalid : FIELD_STATES.valid;
 
   return (
     <RadixField
@@ -318,8 +323,8 @@ FieldInner.displayName = FIELD_INNER_NAME;
  */
 function FieldState({ children }: { children: (state: FieldStates) => React.ReactNode }) {
   const field = useFieldContext();
-  const error = useFormSelector(fieldErrorsSelector(field?.name));
-  const state = error ? ('invalid' as const) : ('valid' as const);
+  const { errors } = useFieldErrors({ name: field?.name });
+  const state = errors ? FIELD_STATES.invalid : FIELD_STATES.valid;
 
   return children(state);
 }
