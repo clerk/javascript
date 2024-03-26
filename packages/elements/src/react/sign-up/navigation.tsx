@@ -12,10 +12,11 @@ const SignUpNavigationEventMap = {
 export type SignUpNavigateElementKey = keyof typeof SignUpNavigationEventMap;
 
 export type SignUpNavigateElement = React.ElementRef<'button'>;
-export type SignUpNavigateProps = WithChildrenProp<{
+export type SignUpNavigateProps = {
   asChild?: boolean;
   to: SignUpNavigateElementKey;
-}>;
+  children: React.ReactNode;
+};
 
 /**
  * Renders a button which will navigate to a different step in the sign-up flow.

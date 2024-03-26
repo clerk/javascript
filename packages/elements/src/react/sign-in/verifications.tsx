@@ -17,7 +17,7 @@ import { useActiveTags } from '~/react/hooks';
 import { SignInRouterCtx, StrategiesContext, useSignInRouteRegistration, useStrategy } from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
-export type SignInVerificationsProps = WithChildrenProp<{ preferred?: ClerkSignInStrategy }> & FormProps;
+export type SignInVerificationsProps = { preferred?: ClerkSignInStrategy; children: React.ReactNode } & FormProps;
 
 export const SignInFirstFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInFirstFactorCtx');
 export const SignInSecondFactorCtx = createContextFromActorRef<TSignInSecondFactorMachine>('SignInSecondFactorCtx');
@@ -49,7 +49,7 @@ function SignInStrategiesProvider({
   );
 }
 
-export type SignInStrategyProps = WithChildrenProp<{ name: SignInStrategyName }>;
+export type SignInStrategyProps = { name: SignInStrategyName; children: React.ReactNode };
 
 export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { active } = useStrategy(name);

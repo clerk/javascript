@@ -32,7 +32,9 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 
 // --------------------------------- COMPONENTS ---------------------------------
 
-export type SignInChooseStrategyProps = WithChildrenProp;
+export type SignInChooseStrategyProps = {
+  children: React.ReactNode;
+};
 
 export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
 
@@ -46,10 +48,11 @@ export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
 const STRATEGY_OPTION_NAME = 'SignInStrategyOption';
 
 export type SignInStrategyOptionElement = React.ElementRef<'button'>;
-export type SignInStrategyOptionProps = WithChildrenProp<{
+export type SignInStrategyOptionProps = {
   asChild?: boolean;
   name: Exclude<SignInFirstFactor['strategy'], `oauth_${string}` | 'saml'>;
-}>;
+  children: React.ReactNode;
+};
 
 /**
  * By default, renders a button which will trigger a change in the chosen sign-in strategy. It **must** be used within a `<Step name='choose-strategy'>` component.
