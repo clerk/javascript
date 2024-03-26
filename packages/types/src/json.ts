@@ -139,7 +139,6 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
 export interface PasskeyJSON extends ClerkResourceJSON {
   object: 'passkey';
   id: string;
-  credential_id: string | null;
   name: string | null;
   verification: VerificationJSON | null;
   last_used_at: number | null;
