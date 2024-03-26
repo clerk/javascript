@@ -16,10 +16,24 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
     signUpWithOauth: (provider: string) => {
       return page.getByRole('button', { name: new RegExp(`continue with ${provider}`, 'gi') });
     },
-    signUpWithEmailAndPassword: async (opts: { email: string; password: string }) => {
-      await self.getEmailAddressInput().fill(opts.email);
+    signUp: async (opts: { email?: string; password: string; username?: string; phoneNumber?: string }) => {
+      if (opts.email) {
+        await self.getEmailAddressInput().fill(opts.email);
+      }
+
+      if (opts.username) {
+        await self.getUsernameInput().fill(opts.username);
+      }
+
+      if (opts.phoneNumber) {
+        await self.getPhoneNumberInput().fill(opts.phoneNumber);
+      }
+
       await self.setPassword(opts.password);
       await self.continue();
+    },
+    signUpWithEmailAndPassword: async (opts: { email: string; password: string }) => {
+      await self.signUp({ email: opts.email, password: opts.password });
     },
     waitForEmailVerificationScreen: async () => {
       await page.waitForURL(/verify/);
