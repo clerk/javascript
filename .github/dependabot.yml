@@ -37,35 +37,6 @@ updates:
           - "*"
 
   # This configuration will:
-  # - Check for updates monthly on Monday at 12:00 UTC
-  # - Create one pull request at a time
-  # - Ignore updates for the `@clerk/*` packages
-  # - Commit changes with the prefix `chore(repo)` and include the scope
-  # - Group all updates into one category:
-  #   - `Dependency updates [Core 1]` for major, minor, and patch updates
-  - package-ecosystem: "npm"
-    target-branch: "release/v4"
-    directory: "/"
-    versioning-strategy: "increase"
-    open-pull-requests-limit: 1
-    ignore:
-      - dependency-name: "@clerk/*"
-    schedule:
-      interval: "monthly"
-      day: "monday"
-      time: "12:00"
-      timezone: "Etc/UTC"
-    commit-message:
-      prefix: "chore(repo)"
-      include: "scope"
-    groups:
-      "Dependency updates [Core 1]":
-        update-types:
-          - "major"
-          - "minor"
-          - "patch"
-
-  # This configuration will:
   # - Check for updates weekly on Wednesday at 12:00 UTC
   # - Create one pull request at a time
   # - Commit changes with the prefix `chore(repo)` and include the scope
@@ -74,7 +45,7 @@ updates:
     open-pull-requests-limit: 1
     schedule:
       interval: "weekly"
-      day: "wednesday"
+      day: "monday"
       time: "12:00"
       timezone: "Etc/UTC"
     commit-message:
