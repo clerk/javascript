@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.20
+
+### Patch Changes
+
+- Fix issue when clearing the hash DB JWT in Webkit ([#2998](https://github.com/clerk/javascript/pull/2998)) by [@anagstef](https://github.com/anagstef)
+
 ## 2.0.0-beta.19
 
 ### Patch Changes
