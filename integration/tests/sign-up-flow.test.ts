@@ -1,36 +1,22 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
-import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in flow @generic @nextjs', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up flow @generic @nextjs', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
-  let fakeUser: FakeUser;
-
-  test.beforeAll(() => {
-    const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({
-      fictionalEmail: true,
-      withPhoneNumber: true,
-      withUsername: true,
-    });
-  });
-
   test.afterAll(async () => {
-    await fakeUser.deleteIfExists();
     await app.teardown();
-  });
-
-  test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.signOut();
-    await u.page.context().clearCookies();
   });
 
   test('sign up with email and password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
+    const fakeUser = u.services.users.createFakeUser({
+      fictionalEmail: true,
+      withPhoneNumber: true,
+      withUsername: true,
+    });
     await u.po.signUp.goTo();
     await u.po.signUp.signUpWithEmailAndPassword({
       email: fakeUser.email,
@@ -38,5 +24,26 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     });
     await u.po.signUp.enterTestOtpCode();
     await u.po.expect.toBeSignedIn();
+    await fakeUser.deleteIfExists();
+  });
+
+  test('cant sign up with weak password', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    const fakeUser = u.services.users.createFakeUser({
+      fictionalEmail: true,
+      withPhoneNumber: true,
+      withUsername: true,
+    });
+    await u.po.signUp.goTo();
+    await u.po.signUp.signUpWithEmailAndPassword({
+      email: fakeUser.email,
+      password: '123456789',
+    });
+
+    await expect(u.page.locator('[id=error-password]')).toBeVisible();
+
+    await u.po.expect.toBeSignedOut();
+
+    await fakeUser.deleteIfExists();
   });
 });
