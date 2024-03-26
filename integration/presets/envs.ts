@@ -55,9 +55,39 @@ const withEmailCodesQuickstart = withEmailCodes
   .removeEnvVariable('public', 'CLERK_SIGN_IN_URL')
   .removeEnvVariable('public', 'CLERK_SIGN_UP_URL');
 
+const withAPCore1ClerkLatest = environmentConfig()
+  .setId('withAPCore1ClerkLatest')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-codes'].sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk)
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+
+const withAPCore1ClerkV4 = environmentConfig()
+  .setId('withAPCore1ClerkV4')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-codes'].sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk);
+
+const withAPCore2ClerkLatest = environmentConfig()
+  .setId('withAPCore2ClerkLatest')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['core-2-all-enabled'].sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['core-2-all-enabled'].pk)
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+
+const withAPCore2ClerkV4 = environmentConfig()
+  .setId('withAPCore2ClerkV4')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['core-2-all-enabled'].sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['core-2-all-enabled'].pk);
+
 export const envs = {
   withEmailCodes,
   withEmailLinks,
   withCustomRoles,
   withEmailCodesQuickstart,
+  withAPCore1ClerkLatest,
+  withAPCore1ClerkV4,
+  withAPCore2ClerkLatest,
+  withAPCore2ClerkV4,
 } as const;

@@ -28,13 +28,25 @@ runs:
       shell: bash
       run: npm set registry ${{ inputs.registry }}
 
-    - name: Run Verdaccio
+    - name: Run Verdaccio (using publish config)
       shell: bash
       run: |
-        nohup ./node_modules/.bin/verdaccio --config ./verdaccio.yaml & sleep 5
+        nohup ./node_modules/.bin/verdaccio --config ./verdaccio.publish.yaml & echo "VERDACCIO_PID=$!" >> $GITHUB_ENV
+        sleep 5
         ./node_modules/.bin/npm-cli-adduser -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
         ./node_modules/.bin/npm-cli-login -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
 
     - name: Publish to Verdaccio
       shell: bash
       run: ${{ inputs.publish-cmd }}
+
+    - name: Stop Verdaccio
+      shell: bash
+      run: kill -9 $VERDACCIO_PID
+
+    - name: Run Verdaccio (using install config)
+      shell: bash
+      run: |
+        nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml & sleep 5
+        ./node_modules/.bin/npm-cli-adduser -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
+        ./node_modules/.bin/npm-cli-login -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}

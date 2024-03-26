@@ -2,7 +2,16 @@ storage: ./.verdaccio/storage
 auth:
   htpasswd:
     file: ./.verdaccio/htpasswd
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
 packages:
+  '@clerk/*':
+    access: $all
+    publish: $all
+  'gatsby-plugin-clerk':
+    access: $all
+    publish: $all
   '**':
     access: $all
     publish: $all
