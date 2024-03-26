@@ -24,8 +24,30 @@ const appRouterQuickstart = appRouter
   .setName('next-app-router-quickstart')
   .useTemplate(templates['next-app-router-quickstart']);
 
+const appRouterAPWithClerkNextLatest = appRouterQuickstart.clone().setName('next-app-router-ap-clerk-next-latest');
+
+const appRouterAPWithClerkNextV4 = appRouterQuickstart
+  .clone()
+  .setName('next-app-router-ap-clerk-next-v4')
+  .addDependency('@clerk/nextjs', '4')
+  .addFile(
+    'src/middleware.ts',
+    () => `import { authMiddleware } from '@clerk/nextjs';
+
+    export default authMiddleware({
+      publicRoutes: ['/']
+    });
+
+    export const config = {
+      matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+    };
+    `,
+  );
+
 export const next = {
   appRouter,
   appRouterTurbo,
   appRouterQuickstart,
+  appRouterAPWithClerkNextLatest,
+  appRouterAPWithClerkNextV4,
 } as const;

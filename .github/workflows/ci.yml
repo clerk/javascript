@@ -138,7 +138,8 @@ jobs:
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs', 'express', 'quickstart']
+        test-name: [ 'generic', 'nextjs', 'express', 'quickstart', 'ap-flows' ]
+        test-project: [ 'chrome' ]
 
     steps:
       - name: Checkout Repo
@@ -171,7 +172,7 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
-        run: npm run test:integration:${{ matrix.test-name }}
+        run: npm run test:integration:${{ matrix.test-name }} -- --project=${{ matrix.test-project }}
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
