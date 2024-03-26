@@ -7,7 +7,7 @@ export function createContextForDomValidation(displayName: string) {
   const ReactContext = React.createContext(false);
   const OriginalProvider = ReactContext.Provider;
 
-  function Provider({ children }: WithChildrenProp) {
+  function Provider({ children }: { children: React.ReactNode }) {
     return React.createElement(
       OriginalProvider,
       {
