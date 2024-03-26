@@ -120,11 +120,16 @@ const determineInputTypeFromName = (name: FormFieldProps['name']) => {
   return 'text' as const;
 };
 
-const useInput = ({ name: inputName, value: initialValue, type: inputType, ...passthroughProps }: FormInputProps) => {
+const useInput = ({
+  name: inputName,
+  value: initialValue,
+  type: inputType,
+  onChange: onChangeProp,
+  ...passthroughProps
+}: FormInputProps) => {
   // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
-  const onChangeProp = passthroughProps?.onChange;
 
   const ref = useFormStore();
   const value = useFormSelector(fieldValueSelector(name));
@@ -361,10 +366,17 @@ type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
  *   />
  * </Field>
  */
-const Input = (props: FormInputProps) => {
-  const field = useInput(props);
-  return <field.Element {...field.props} />;
-};
+const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+  (props: FormInputProps, forwardedRef) => {
+    const field = useInput(props);
+    return (
+      <field.Element
+        ref={forwardedRef}
+        {...field.props}
+      />
+    );
+  },
+);
 
 Input.displayName = INPUT_NAME;
 

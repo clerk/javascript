@@ -35,10 +35,14 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
       }
     } catch (err) {
       const { flow } = args[0] || {};
-      // In case of autofill, if retrieval of credentials is aborted just return to avoid updating state of unmounted components.
-      if (flow === 'autofill' && isClerkRuntimeError(err)) {
-        const skipActionCodes = ['passkey_retrieval_aborted', 'passkey_retrieval_cancelled'];
-        if (skipActionCodes.includes(err.code)) {
+
+      if (isClerkRuntimeError(err)) {
+        // In any case if the call gets aborted we should skip showing an error. This prevents updating the state of unmounted components.
+        if (err.code === 'passkey_operation_aborted') {
+          return;
+        }
+        // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
+        if (flow === 'autofill' && err.code === 'passkey_retrieval_cancelled') {
           return;
         }
       }

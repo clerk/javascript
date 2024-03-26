@@ -1,4 +1,4 @@
-import { NEXT_ROUTING_CHANGE_VERSION } from '~/internals/constants';
+import { NEXT_WINDOW_HISTORY_SUPPORT_VERSION } from '~/internals/constants';
 
 import { shouldUseVirtualRouting } from '../next';
 
@@ -23,17 +23,17 @@ describe('shouldUseVirtualRouting', () => {
 
     expect(shouldUseVirtualRouting()).toBe(false);
   });
-  it('should return true if version is lower than NEXT_ROUTING_CHANGE_VERSION', () => {
+  it('should return true if version is lower than NEXT_WINDOW_HISTORY_SUPPORT_VERSION', () => {
     windowSpy.mockReturnValue({ next: { version: '14.0.0' } });
 
     expect(shouldUseVirtualRouting()).toBe(true);
   });
   it('should return false if version is NEXT_ROUTING_CHANGE_VERSION', () => {
-    windowSpy.mockReturnValue({ next: { version: NEXT_ROUTING_CHANGE_VERSION } });
+    windowSpy.mockReturnValue({ next: { version: NEXT_WINDOW_HISTORY_SUPPORT_VERSION } });
 
     expect(shouldUseVirtualRouting()).toBe(false);
   });
-  it('should return false if version is higher than NEXT_ROUTING_CHANGE_VERSION', () => {
+  it('should return false if version is higher than NEXT_WINDOW_HISTORY_SUPPORT_VERSION', () => {
     windowSpy.mockReturnValue({ next: { version: '14.6.0' } });
 
     expect(shouldUseVirtualRouting()).toBe(false);

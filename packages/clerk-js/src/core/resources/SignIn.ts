@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, deepSnakeToCamel, Poller } from '@clerk/shared';
+import { deepSnakeToCamel, Poller } from '@clerk/shared';
 import type {
   __experimental_PasskeyFactor,
   AttemptFirstFactorParams,
@@ -30,6 +30,7 @@ import type {
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
 import {
+  ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
   isWebAuthnAutofillSupported,
   isWebAuthnSupported,
@@ -41,6 +42,7 @@ import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
   clerkMissingOptionError,
+  clerkMissingWebAuthnPublicKeyOptions,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
@@ -271,8 +273,8 @@ export class SignIn extends BaseResource implements SignInResource {
      * As a precaution we need to check if WebAuthn is supported.
      */
     if (!isWebAuthnSupported()) {
-      throw new ClerkRuntimeError('Passkeys are not supported', {
-        code: 'passkeys_unsupported',
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
       });
     }
 
@@ -294,11 +296,10 @@ export class SignIn extends BaseResource implements SignInResource {
     }
 
     const { nonce } = this.firstFactorVerification;
-    const publicKey = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+    const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
 
-    if (!publicKey) {
-      // TODO-PASSKEYS: Implement this later
-      throw 'Missing key';
+    if (!publicKeyOptions) {
+      clerkMissingWebAuthnPublicKeyOptions('get');
     }
 
     let canUseConditionalUI = false;
@@ -311,9 +312,9 @@ export class SignIn extends BaseResource implements SignInResource {
       canUseConditionalUI = await isWebAuthnAutofillSupported();
     }
 
-    // Invoke the WebAuthn get() method.
+    // Invoke the navigator.create.get() method.
     const { publicKeyCredential, error } = await webAuthnGetCredential({
-      publicKeyOptions: publicKey,
+      publicKeyOptions,
       conditionalUI: canUseConditionalUI,
     });
 

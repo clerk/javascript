@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.0.0-beta.36
+
+### Patch Changes
+
+- Updated dependencies [[`afec17953`](https://github.com/clerk/javascript/commit/afec17953d1ae4ba39ee73e4383757694375524d)]:
+  - @clerk/clerk-js@5.0.0-beta.36
+  - @clerk/clerk-react@5.0.0-beta.32
+
 ## 1.0.0-beta.35
 
 ### Patch Changes

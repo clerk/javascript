@@ -25,12 +25,18 @@ type WebAuthnGetCredentialReturn =
   CredentialReturn<__experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse>;
 
 type ClerkWebAuthnErrorCode =
-  | 'passkey_exists'
-  | 'passkey_retrieval_aborted'
+  // Generic
+  | 'passkey_not_supported'
+  | 'passkeys_pa_not_supported'
+  | 'passkey_invalid_rpID_or_domain'
+  | 'passkey_already_exists'
+  | 'passkey_operation_aborted'
+  // Retrieval
   | 'passkey_retrieval_cancelled'
+  | 'passkey_retrieval_failed'
+  // Registration
   | 'passkey_registration_cancelled'
-  | 'passkey_credential_create_failed'
-  | 'passkey_credential_get_failed';
+  | 'passkey_registration_failed';
 
 function isWebAuthnSupported() {
   return (
@@ -92,7 +98,7 @@ async function webAuthnCreateCredential(
     if (!credential) {
       return {
         error: new ClerkWebAuthnError('Browser failed to create credential', {
-          code: 'passkey_credential_create_failed',
+          code: 'passkey_registration_failed',
         }),
         publicKeyCredential: null,
       };
@@ -148,7 +154,7 @@ async function webAuthnGetCredential({
 
     if (!credential) {
       return {
-        error: new ClerkWebAuthnError('Browser failed to get credential', { code: 'passkey_credential_get_failed' }),
+        error: new ClerkWebAuthnError('Browser failed to get credential', { code: 'passkey_retrieval_failed' }),
         publicKeyCredential: null,
       };
     }
@@ -159,6 +165,16 @@ async function webAuthnGetCredential({
   }
 }
 
+function handlePublicKeyError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
+  if (error.name === 'AbortError') {
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_operation_aborted' });
+  }
+  if (error.name === 'SecurityError') {
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_invalid_rpID_or_domain' });
+  }
+  return error;
+}
+
 /**
  * Map webauthn errors from `navigator.credentials.create()` to Clerk-js errors
  * @param error
@@ -166,11 +182,12 @@ async function webAuthnGetCredential({
 function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
   if (error.name === 'InvalidStateError') {
     // Note: Firefox will throw 'NotAllowedError' when passkeys exists
-    return new ClerkWebAuthnError(error.message, { code: 'passkey_exists' });
-  } else if (error.name === 'NotAllowedError') {
+    return new ClerkWebAuthnError(error.message, { code: 'passkey_already_exists' });
+  }
+  if (error.name === 'NotAllowedError') {
     return new ClerkWebAuthnError(error.message, { code: 'passkey_registration_cancelled' });
   }
-  return error;
+  return handlePublicKeyError(error);
 }
 
 /**
@@ -178,14 +195,10 @@ function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRun
  * @param error
  */
 function handlePublicKeyGetError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
-  if (error.name === 'AbortError') {
-    return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_aborted' });
-  }
-
   if (error.name === 'NotAllowedError') {
     return new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_cancelled' });
   }
-  return error;
+  return handlePublicKeyError(error);
 }
 
 function convertJSONToPublicKeyCreateOptions(jsonPublicKey: PublicKeyCredentialCreationOptionsJSON) {

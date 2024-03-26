@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0-beta.36
+
+### Patch Changes
+
+- Adds telemetry event to clerkMiddleware initialization, passes publishableKey to `createClerkClient()` internally. ([#3042](https://github.com/clerk/javascript/pull/3042)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-beta.32
+
 ## 5.0.0-beta.35
 
 ### Minor Changes
