@@ -1,6 +1,15 @@
 import { common } from './commonPageObject';
 import type { TestArgs } from './signInPageObject';
 
+type SignUpFormInputs = {
+  email?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  phoneNumber?: string;
+};
+
 export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
   const { page } = testArgs;
 
@@ -16,7 +25,11 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
     signUpWithOauth: (provider: string) => {
       return page.getByRole('button', { name: new RegExp(`continue with ${provider}`, 'gi') });
     },
-    signUp: async (opts: { email?: string; password: string; username?: string; phoneNumber?: string }) => {
+    signUp: async (opts: SignUpFormInputs) => {
+      if (opts.email) {
+        await self.getEmailAddressInput().fill(opts.email);
+      }
+
       if (opts.email) {
         await self.getEmailAddressInput().fill(opts.email);
       }
@@ -29,10 +42,12 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
         await self.getPhoneNumberInput().fill(opts.phoneNumber);
       }
 
-      await self.setPassword(opts.password);
+      if (opts.password) {
+        await self.getPasswordInput().fill(opts.password);
+      }
       await self.continue();
     },
-    signUpWithEmailAndPassword: async (opts: { email: string; password: string }) => {
+    signUpWithEmailAndPassword: async (opts: Pick<SignUpFormInputs, 'email' | 'password'>) => {
       await self.signUp({ email: opts.email, password: opts.password });
     },
     waitForEmailVerificationScreen: async () => {
