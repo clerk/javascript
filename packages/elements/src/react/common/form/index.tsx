@@ -33,12 +33,7 @@ import type { FieldDetails } from '~/internals/machines/form/form.types';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
-import type { ClerkFieldId, FieldStates } from './types';
-
-const FIELD_STATES = {
-  valid: 'valid',
-  invalid: 'invalid',
-} as const;
+import { type ClerkFieldId, FIELD_STATES, type FieldStates } from './types';
 
 /* -------------------------------------------------------------------------------------------------
  * Context
@@ -50,51 +45,6 @@ const useFieldContext = () => React.useContext(FieldContext);
 /* -------------------------------------------------------------------------------------------------
  * Hooks
  * -----------------------------------------------------------------------------------------------*/
-
-/**
- * Provides the form submission handler along with the form's validity via a data attribute
- */
-const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
-  const error = useFormSelector(globalErrorsSelector);
-  const validity = error ? FIELD_STATES.invalid : FIELD_STATES.valid;
-
-  // Register the onSubmit handler for form submission
-  // TODO: merge user-provided submit handler
-  const onSubmit = React.useCallback(
-    (event: React.FormEvent<Element>) => {
-      event.preventDefault();
-      if (flowActor) {
-        flowActor.send({ type: 'SUBMIT' });
-      }
-    },
-    [flowActor],
-  );
-
-  return {
-    props: {
-      [`data-${validity}`]: true,
-      onSubmit,
-    },
-  };
-};
-
-const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
-  const hasValue = useFormSelector(fieldHasValueSelector(name));
-  const error = useFormSelector(fieldErrorsSelector(name));
-
-  const shouldBeHidden = false; // TODO: Implement clerk-js utils
-  const hasError = Boolean(error);
-  const validity = hasError ? FIELD_STATES.invalid : FIELD_STATES.valid;
-
-  return {
-    hasValue,
-    props: {
-      [`data-${validity}`]: true,
-      'data-hidden': shouldBeHidden ? true : undefined,
-      serverInvalid: hasError,
-    },
-  };
-};
 
 const useGlobalErrors = () => {
   const errors = useFormSelector(globalErrorsSelector);
@@ -123,6 +73,78 @@ const determineInputTypeFromName = (name: FormFieldProps['name']) => {
   if (name === 'code') return 'otp' as const;
 
   return 'text' as const;
+};
+
+/**
+ * Given a field name, determine the current state of the field
+ */
+const useFieldState = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const { errors } = useFieldErrors({ name });
+  const hasValue = useFormSelector(fieldHasValueSelector(name));
+
+  /**
+   * If hasValue is false and errors is undefined, the state should be idle
+   * If hasValue is true and errors is undefined or empty, the state should be valid
+   * If errors is not empty, the state should be invalid
+   */
+  let state: FieldStates = FIELD_STATES.idle;
+
+  if (!hasValue && typeof errors === 'undefined') {
+    state = FIELD_STATES.idle;
+  } else if (hasValue && (typeof errors === 'undefined' || errors.length === 0)) {
+    state = FIELD_STATES.valid;
+  } else if (errors && errors.length > 0) {
+    state = FIELD_STATES.invalid;
+  }
+
+  return {
+    state,
+  };
+};
+
+/**
+ * Provides the form submission handler along with the form's validity via a data attribute
+ */
+const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
+  const error = useFormSelector(globalErrorsSelector);
+  const validity = error.length > 0 ? FIELD_STATES.invalid : FIELD_STATES.valid;
+
+  // Register the onSubmit handler for form submission
+  // TODO: merge user-provided submit handler
+  const onSubmit = React.useCallback(
+    (event: React.FormEvent<Element>) => {
+      event.preventDefault();
+      if (flowActor) {
+        flowActor.send({ type: 'SUBMIT' });
+      }
+    },
+    [flowActor],
+  );
+
+  return {
+    props: {
+      [`data-${validity}`]: true,
+      onSubmit,
+    },
+  };
+};
+
+const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const hasValue = useFormSelector(fieldHasValueSelector(name));
+  const { errors } = useFieldErrors({ name });
+
+  const shouldBeHidden = false; // TODO: Implement clerk-js utils
+  const hasError = errors ? errors.length > 0 : false;
+  const validity = hasError ? FIELD_STATES.invalid : FIELD_STATES.valid;
+
+  return {
+    hasValue,
+    props: {
+      [`data-${validity}`]: true,
+      'data-hidden': shouldBeHidden ? true : undefined,
+      serverInvalid: hasError,
+    },
+  };
 };
 
 const useInput = ({
@@ -290,8 +312,7 @@ const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, 
 const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
   const { children, ...rest } = props;
   const field = useField({ name: rest.name });
-  const { errors } = useFieldErrors({ name: rest.name });
-  const state = errors ? FIELD_STATES.invalid : FIELD_STATES.valid;
+  const { state } = useFieldState({ name: rest.name });
 
   return (
     <RadixField
@@ -323,8 +344,7 @@ FieldInner.displayName = FIELD_INNER_NAME;
  */
 function FieldState({ children }: { children: (state: FieldStates) => React.ReactNode }) {
   const field = useFieldContext();
-  const { errors } = useFieldErrors({ name: field?.name });
-  const state = errors ? FIELD_STATES.invalid : FIELD_STATES.valid;
+  const { state } = useFieldState({ name: field?.name });
 
   return children(state);
 }
