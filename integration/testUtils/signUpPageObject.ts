@@ -26,8 +26,12 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
       return page.getByRole('button', { name: new RegExp(`continue with ${provider}`, 'gi') });
     },
     signUp: async (opts: SignUpFormInputs) => {
-      if (opts.email) {
-        await self.getEmailAddressInput().fill(opts.email);
+      if (opts.firstName) {
+        await self.getFirstNameInput().fill(opts.lastName);
+      }
+
+      if (opts.lastName) {
+        await self.getLastNameInput().fill(opts.firstName);
       }
 
       if (opts.email) {
