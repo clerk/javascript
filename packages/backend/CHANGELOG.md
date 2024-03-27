@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.0-beta.31
+
+### Patch Changes
+
+- Fix typo in `jwk-remote-missing` error message ([#3057](https://github.com/clerk/javascript/pull/3057)) by [@dimkl](https://github.com/dimkl)
+
 ## 1.0.0-beta.30
 
 ### Patch Changes
