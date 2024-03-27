@@ -69,6 +69,7 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
    * Transform base64url encoded strings to ArrayBuffer
    */
   protected fromJSON(data: VerificationJSON | null): this {
+    super.fromJSON(data);
     if (data?.nonce) {
       this.publicKey = convertJSONToPublicKeyCreateOptions(
         JSON.parse(data.nonce) as PublicKeyCredentialCreationOptionsJSON,

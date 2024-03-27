@@ -22,7 +22,6 @@ import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
 export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
   pathRoot = '/me/passkeys';
-  credentialId: string | null = null;
   verification: PasskeyVerificationResource | null = null;
   name: string | null = null;
   lastUsedAt: Date | null = null;
@@ -127,7 +126,6 @@ export class Passkey extends BaseResource implements PasskeyResource {
     }
 
     this.id = data.id;
-    this.credentialId = data.credential_id;
     this.name = data.name;
     this.lastUsedAt = data.last_used_at ? unixEpochToDate(data.last_used_at) : null;
     this.createdAt = unixEpochToDate(data.created_at);
