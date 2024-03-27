@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.0-beta.38
+
+### Patch Changes
+
+- We are rolling back support for password complexity / strength checks during sign-in. Feature will be limited to HIBP for now. Hence, the password form need not expect a sign_in status of `needs_new_password`. ([#3050](https://github.com/clerk/javascript/pull/3050)) by [@yourtallness](https://github.com/yourtallness)
+
 ## 5.0.0-beta.37
 
 ### Patch Changes
