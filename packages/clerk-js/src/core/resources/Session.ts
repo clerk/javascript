@@ -15,8 +15,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
-import { PublicUserData } from './internal';
-import { BaseResource, Token, User } from './internal';
+import { BaseResource, PublicUserData, Token, User } from './internal';
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -146,7 +145,6 @@ export class Session extends BaseResource implements SessionResource {
       tokenResolver,
     });
     return tokenResolver.then(token => {
-      eventBus.dispatch(events.TokenUpdate, { token });
       return token.getRawString();
     });
   };
