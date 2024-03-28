@@ -217,12 +217,21 @@ const useInput = ({
   const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
-      if (!name) return;
+      if (!name || initialValue) return;
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
       if (isPasswordType) validatePassword(event.target.value);
     },
-    [ref, name, onChangeProp, isPasswordType],
+    [ref, name, onChangeProp, initialValue, isPasswordType],
   );
+
+  React.useEffect(() => {
+    if (!initialValue || !name) return;
+    ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
+  }, [name, ref, initialValue]);
+
+  if (!name) {
+    throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
+  }
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;

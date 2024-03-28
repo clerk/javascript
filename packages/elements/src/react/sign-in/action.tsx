@@ -10,9 +10,10 @@ export type SignInActionProps = { asChild?: boolean } & (
       navigate: SignInNavigateProps['to'];
       resend?: never;
       submit?: never;
+      className?: string;
     } & Omit<SignInNavigateProps, 'to'>)
   | ({ navigate?: never; resend?: never; submit: true } & FormSubmitProps)
-  | { navigate?: never; resend: true; submit: never }
+  | { navigate?: never; resend: true; submit: never; className?: string }
 );
 
 /**

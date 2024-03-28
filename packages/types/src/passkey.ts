@@ -10,7 +10,6 @@ export type UpdatePasskeyParams = Partial<SnakeToCamel<UpdatePasskeyJSON>>;
 
 export interface PasskeyResource extends ClerkResource {
   id: string;
-  credentialId: string | null;
   name: string | null;
   verification: PasskeyVerificationResource | null;
   lastUsedAt: Date | null;

@@ -176,7 +176,7 @@ export default (QUnit: QUnit) => {
             action: 'Contact support@clerk.com',
           });
           assert.propContains(err, {
-            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid are available: ${mockRsaJwkKid}, local`,
+            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${mockRsaJwkKid}, local`,
           });
         } else {
           // This should never be reached. If it does, the suite should fail
