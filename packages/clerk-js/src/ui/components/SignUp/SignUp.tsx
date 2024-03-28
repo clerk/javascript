@@ -40,6 +40,8 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='sso-callback'>
           <SignUpSSOCallback
+            signUpUrl={signUpContext.signUpUrl}
+            signInUrl={signUpContext.signInUrl}
             afterSignUpUrl={signUpContext.afterSignUpUrl}
             afterSignInUrl={signUpContext.afterSignInUrl}
             redirectUrl={signUpContext.redirectUrl}

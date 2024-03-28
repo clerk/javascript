@@ -91,7 +91,9 @@ export const useSignUpContext = (): SignUpContextType => {
     displayConfig: displayConfig,
   });
 
-  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
+  let signUpUrl =
+    (ctx.routing === 'path' ? ctx.path : undefined) ||
+    pickRedirectionProp('signUpUrl', { options, displayConfig }, false);
   if (authQs && ctx.routing !== 'virtual') {
     signUpUrl += `#/?${authQs}`;
   }
@@ -175,7 +177,9 @@ export const useSignInContext = (): SignInContextType => {
     signUpUrl += `#/?${authQs}`;
   }
 
-  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
+  let signInUrl =
+    (ctx.routing === 'path' ? ctx.path : undefined) ||
+    pickRedirectionProp('signInUrl', { options, displayConfig }, false);
   if (authQs && ctx.routing !== 'virtual') {
     signInUrl += `#/?${authQs}`;
   }

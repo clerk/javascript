@@ -1019,9 +1019,9 @@ export class Clerk implements ClerkInterface {
 
     const makeNavigate = (to: string) => () => navigate(to);
 
-    const navigateToSignIn = makeNavigate(displayConfig.signInUrl);
+    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig.signInUrl);
 
-    const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
+    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig.signUpUrl);
 
     const navigateToFactorOne = makeNavigate(
       params.firstFactorUrl ||

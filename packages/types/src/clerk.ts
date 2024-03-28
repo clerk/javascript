@@ -452,6 +452,14 @@ export interface Clerk {
 
 export type HandleOAuthCallbackParams = AfterActionURLs & {
   /**
+   * Full URL or path where the SignIn component is mounted.
+   */
+  signInUrl?: string;
+  /**
+   * Full URL or path where the SignUp component is mounted.
+   */
+  signUpUrl?: string;
+  /**
    * Full URL or path to navigate after successful sign in
    * or sign up.
    *
