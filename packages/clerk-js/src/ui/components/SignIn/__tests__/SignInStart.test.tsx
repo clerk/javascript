@@ -199,7 +199,7 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
         strategy: 'saml',
-        redirectUrl: 'http://localhost/sso-callback?redirect_url=http%3A%2F%2Flocalhost%2F',
+        redirectUrl: 'http://localhost/#/sso-callback?redirect_url=http%3A%2F%2Flocalhost%2F',
         redirectUrlComplete: '/',
       });
     });
