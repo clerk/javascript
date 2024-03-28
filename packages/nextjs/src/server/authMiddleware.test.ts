@@ -10,6 +10,15 @@ const authenticateRequestMock = jest.fn().mockResolvedValue({
   headers: new Headers(),
 });
 
+// Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
+// This mock SHOULD exist before the imports
+jest.mock('./constants', () => {
+  return {
+    PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
+    SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
+  };
+});
+
 jest.mock('./clerkClient', () => {
   return {
     clerkClient: {
@@ -19,20 +28,7 @@ jest.mock('./clerkClient', () => {
   };
 });
 
-const mockRedirectToSignIn = jest.fn().mockImplementation(() => {
-  const res = NextResponse.redirect(
-    'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
-  );
-  return setHeader(res, 'x-clerk-redirect-to', 'true');
-});
-
-jest.mock('./redirectHelpers', () => {
-  return {
-    redirectToSignIn: mockRedirectToSignIn,
-  };
-});
-
-import { paths, setHeader } from '../utils';
+import { paths } from '../utils';
 import { authMiddleware, DEFAULT_CONFIG_MATCHER, DEFAULT_IGNORED_ROUTES } from './authMiddleware';
 // used to assert the mock
 import { clerkClient } from './clerkClient';
@@ -48,15 +44,6 @@ beforeAll(() => {
 });
 afterAll(() => {
   global.console.warn = consoleWarn;
-});
-
-// Removing this mock will cause the authMiddleware tests to fail due to missing publishable key
-// This mock SHOULD exist before the imports
-jest.mock('./constants', () => {
-  return {
-    PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
-    SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
-  };
 });
 
 type MockRequestParams = {
@@ -449,19 +436,12 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
   });
 
   it('does NOT append the Dev Browser JWT if x-clerk-redirect-to header is not set', async () => {
-    mockRedirectToSignIn.mockReturnValueOnce(
-      NextResponse.redirect(
-        'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
-      ),
-    );
     const resp = await authMiddleware({
-      beforeAuth: () => NextResponse.next(),
+      beforeAuth: () => NextResponse.redirect('https://google.com/'),
     })(mockRequest({ url: '/protected', appendDevBrowserCookie: true }), {} as NextFetchEvent);
 
     expect(resp?.status).toEqual(307);
-    expect(resp?.headers.get('location')).toEqual(
-      'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
-    );
+    expect(resp?.headers.get('location')).toEqual('https://google.com/');
     expect(clerkClient.authenticateRequest).toBeCalled();
   });
 });

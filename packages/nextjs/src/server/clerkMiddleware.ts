@@ -12,11 +12,18 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
+import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { errorThrower } from './errorThrower';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
-import { decorateRequest, handleMultiDomainAndProxy, setRequestHeadersOnNextResponse } from './utils';
+import {
+  assertKey,
+  decorateRequest,
+  handleMultiDomainAndProxy,
+  redirectAdapter,
+  setRequestHeadersOnNextResponse,
+} from './utils';
 
 const CONTROL_FLOW_ERROR = {
   FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
@@ -63,7 +70,21 @@ interface ClerkMiddleware {
 
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
-  const [handler, options] = parseHandlerAndOptions(args);
+  const [handler, params] = parseHandlerAndOptions(args);
+  const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
+    errorThrower.throwMissingPublishableKeyError(),
+  );
+  const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
+  const signInUrl = params.signInUrl || SIGN_IN_URL;
+  const signUpUrl = params.signUpUrl || SIGN_UP_URL;
+
+  const options = {
+    ...params,
+    publishableKey,
+    secretKey,
+    signInUrl,
+    signUpUrl,
+  };
 
   clerkClient.telemetry.record(
     eventMethodCalled('clerkMiddleware', {
@@ -150,14 +171,8 @@ const parseHandlerAndOptions = (args: unknown[]) => {
 export const createAuthenticateRequestOptions = (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
   return {
     ...options,
-    secretKey: options.secretKey || SECRET_KEY,
-    publishableKey: options.publishableKey || PUBLISHABLE_KEY,
     ...handleMultiDomainAndProxy(clerkRequest, options),
   };
-};
-
-const redirectAdapter = (url: string | URL) => {
-  return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
 
 const createMiddlewareRedirectToSignIn = (
@@ -215,7 +230,7 @@ const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestStat
         baseUrl: clerkRequest.clerkUrl,
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
-        publishableKey: PUBLISHABLE_KEY,
+        publishableKey: requestState.publishableKey,
       }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
     default:
       throw e;

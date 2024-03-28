@@ -194,3 +194,15 @@ export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: Auth
     signInUrl,
   };
 };
+
+export const redirectAdapter = (url: string | URL) => {
+  return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
+};
+
+export function assertKey(key: string, onError: () => never): string {
+  if (!key) {
+    onError();
+  }
+
+  return key;
+}
