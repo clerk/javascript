@@ -68,8 +68,10 @@ export class SessionCookieService {
   }
 
   private updateSessionCookie(token: TokenResource | string | undefined | null) {
-    if (token) {
-      return setSessionCookie(typeof token === 'string' ? token : token.getRawString());
+    const rawToken = typeof token === 'string' ? token : token?.getRawString();
+
+    if (rawToken) {
+      return setSessionCookie(rawToken);
     }
     return removeSessionCookie();
   }

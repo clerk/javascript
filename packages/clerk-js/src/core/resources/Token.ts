@@ -6,7 +6,7 @@ import { BaseResource } from './internal';
 export class Token extends BaseResource implements TokenResource {
   pathRoot = 'tokens';
 
-  jwt: JWT;
+  jwt?: JWT;
 
   static async create(path: string, body: any = {}): Promise<TokenResource> {
     const json = (await BaseResource._fetch<TokenJSON>({
@@ -18,18 +18,20 @@ export class Token extends BaseResource implements TokenResource {
     return new Token(json, path);
   }
 
-  constructor(data: TokenJSON, pathRoot?: string) {
+  constructor(data: TokenJSON | null, pathRoot?: string) {
     super();
 
     if (pathRoot) {
       this.pathRoot = pathRoot;
     }
 
-    this.jwt = decode(data.jwt);
+    if (data?.jwt) {
+      this.jwt = decode(data.jwt);
+    }
   }
 
   getRawString = (): string => {
-    return this.jwt?.claims.__raw;
+    return this.jwt?.claims.__raw || '';
   };
 
   protected fromJSON(data: TokenJSON | null): this {
