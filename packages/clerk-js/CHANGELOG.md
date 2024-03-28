@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.0-beta.39
+
+### Patch Changes
+
+- Correct chunk loading logic in `clerk.headless.browser` variant ([#3062](https://github.com/clerk/javascript/pull/3062)) by [@LekoArts](https://github.com/LekoArts)
+
+- Update token refresh mechanism to handle network failures without raising an error ([#3035](https://github.com/clerk/javascript/pull/3035)) by [@dimkl](https://github.com/dimkl)
+
 ## 5.0.0-beta.38
 
 ### Patch Changes
