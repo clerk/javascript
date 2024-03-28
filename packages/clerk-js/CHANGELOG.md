@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.70.6
+
+### Patch Changes
+
+- Fix setting session cookie with Legacy integration token. ([#3066](https://github.com/clerk/javascript/pull/3066)) by [@dimkl](https://github.com/dimkl)
+
+- Correct chunk loading logic in `clerk.headless.browser` variant ([#3063](https://github.com/clerk/javascript/pull/3063)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
 ## 4.70.5
 
 ### Patch Changes
