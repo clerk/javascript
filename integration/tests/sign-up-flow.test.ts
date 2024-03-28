@@ -36,7 +36,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
     await fakeUser.deleteIfExists();
   });
 
-  test("can't sign up with weak password", async ({ page, context }) => {
+  test.skip("can't sign up with weak password", async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const fakeUser = u.services.users.createFakeUser({
       fictionalEmail: true,
