@@ -24,6 +24,12 @@ export const common = ({ page }: TestArgs) => {
     getEmailAddressInput: () => {
       return page.locator('input[name=emailAddress]');
     },
+    getPhoneNumberInput: () => {
+      return page.locator('input[name=phoneNumber]');
+    },
+    getUsernameInput: () => {
+      return page.locator('input[name=username]');
+    },
     getPasswordInput: () => {
       return page.locator('input[name=password]');
     },
