@@ -199,11 +199,9 @@ export const redirectAdapter = (url: string | URL) => {
   return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
 
-export function assertKey(key: string, onError: () => void): string {
+export function assertKey(key: string, onError: () => never): string {
   if (!key) {
     onError();
-    //following error won't be thrown if you throw on the onError() function
-    throw new Error('Key is not valid');
   }
 
   return key;
