@@ -3,4 +3,4 @@
 '@clerk/shared': minor
 ---
 
-Fix: allow manually passed publishable/secret key to middleware.
+Allow manually passing a publishable/secret key pair to the `authMiddleware` and `clerkMiddleware` helpers.

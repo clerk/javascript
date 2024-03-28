@@ -17,6 +17,7 @@ import { createRouteMatcher } from './routeMatcher';
 import type { NextMiddlewareReturn } from './types';
 import {
   apiEndpointUnauthorizedNextResponse,
+  assertKey,
   decorateRequest,
   redirectAdapter,
   setRequestHeadersOnNextResponse,
@@ -109,11 +110,6 @@ type AuthMiddlewareParams = AuthenticateRequestOptions & {
   debug?: boolean;
 };
 
-type EnforcedAuthMiddlewareParams = {
-  publishableKey: string;
-  secretKey: string;
-} & AuthMiddlewareParams;
-
 export interface AuthMiddleware {
   (params?: AuthMiddlewareParams): NextMiddleware;
 }
@@ -125,36 +121,31 @@ export interface AuthMiddleware {
  */
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
-  const publishableKey = params.publishableKey || PUBLISHABLE_KEY;
-  if (!publishableKey) {
-    errorThrower.throwMissingPublishableKeyError();
-  }
-  const secretKey = params.secretKey || SECRET_KEY;
-  if (!secretKey) {
-    errorThrower.throwMissingSecretKeyError();
-  }
+  const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
+    errorThrower.throwMissingPublishableKeyError(),
+  );
+  const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingPublishableKeyError());
   const signInUrl = params.signInUrl || SIGN_IN_URL;
   const signUpUrl = params.signUpUrl || SIGN_UP_URL;
 
-  const enforcedParams: EnforcedAuthMiddlewareParams = { ...params, publishableKey, secretKey, signInUrl, signUpUrl };
-  const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...enforcedOptions } = enforcedParams;
+  const options = { ...params, publishableKey, secretKey, signInUrl, signUpUrl };
 
-  const isIgnoredRoute = createRouteMatcher(ignoredRoutes || DEFAULT_IGNORED_ROUTES);
-  const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
-  const isApiRoute = createApiRoutes(apiRoutes);
-  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, enforcedParams);
+  const isIgnoredRoute = createRouteMatcher(options.ignoredRoutes || DEFAULT_IGNORED_ROUTES);
+  const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(options.publicRoutes));
+  const isApiRoute = createApiRoutes(options.apiRoutes);
+  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, options);
 
   clerkClient.telemetry.record(
     eventMethodCalled('authMiddleware', {
-      publicRoutes: Boolean(publicRoutes),
-      ignoredRoutes: Boolean(ignoredRoutes),
-      beforeAuth: Boolean(beforeAuth),
-      afterAuth: Boolean(afterAuth),
+      publicRoutes: Boolean(options.publicRoutes),
+      ignoredRoutes: Boolean(options.ignoredRoutes),
+      beforeAuth: Boolean(options.beforeAuth),
+      afterAuth: Boolean(options.afterAuth),
     }),
   );
 
   return withLogger('authMiddleware', logger => async (_req: NextRequest, evt: NextFetchEvent) => {
-    if (enforcedOptions.debug) {
+    if (options.debug) {
       logger.enable();
     }
     const clerkRequest = createClerkRequest(_req);
@@ -168,11 +159,11 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       clerkUrl: nextRequest.experimental_clerkUrl.href,
     });
 
-    logger.debug('Options debug', { ...enforcedOptions, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
+    logger.debug('Options debug', { ...options, beforeAuth: !!options.beforeAuth, afterAuth: !!options.afterAuth });
 
     if (isIgnoredRoute(nextRequest)) {
       logger.debug({ isIgnoredRoute: true });
-      if (isDevelopmentFromSecretKey(enforcedParams.secretKey) && !enforcedParams.ignoredRoutes) {
+      if (isDevelopmentFromSecretKey(options.secretKey) && !options.ignoredRoutes) {
         console.warn(
           receivedRequestForIgnoredRoute(
             nextRequest.experimental_clerkUrl.href,
@@ -183,7 +174,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return setHeader(NextResponse.next(), constants.Headers.AuthReason, 'ignored-route');
     }
 
-    const beforeAuthRes = await (beforeAuth && beforeAuth(nextRequest, evt));
+    const beforeAuthRes = await (options.beforeAuth && options.beforeAuth(nextRequest, evt));
 
     if (beforeAuthRes === false) {
       logger.debug('Before auth returned false, skipping');
@@ -195,7 +186,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
 
     const requestState = await clerkClient.authenticateRequest(
       clerkRequest,
-      createAuthenticateRequestOptions(clerkRequest, enforcedOptions),
+      createAuthenticateRequestOptions(clerkRequest, options),
     );
 
     const locationHeader = requestState.headers.get('location');
@@ -214,16 +205,16 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     });
 
     logger.debug(() => ({ auth: JSON.stringify(auth), debug: auth.debug() }));
-    const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, nextRequest, evt);
+    const afterAuthRes = await (options.afterAuth || defaultAfterAuth)(auth, nextRequest, evt);
     const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
     logger.debug(() => ({ mergedHeaders: stringifyHeaders(finalRes.headers) }));
 
     if (isRedirect(finalRes)) {
       logger.debug('Final response is redirect, following redirect');
-      return serverRedirectWithAuth(clerkRequest, finalRes, enforcedOptions);
+      return serverRedirectWithAuth(clerkRequest, finalRes, options);
     }
 
-    if (enforcedOptions.debug) {
+    if (options.debug) {
       setRequestHeadersOnNextResponse(finalRes, nextRequest, { [constants.Headers.EnableDebug]: 'true' });
       logger.debug(`Added ${constants.Headers.EnableDebug} on request`);
     }
@@ -245,21 +236,21 @@ export { authMiddleware };
 const createDefaultAfterAuth = (
   isPublicRoute: ReturnType<typeof createRouteMatcher>,
   isApiRoute: ReturnType<typeof createApiRoutes>,
-  enforcedParams: EnforcedAuthMiddlewareParams,
+  options: { signInUrl: string; signUpUrl: string; publishableKey: string; secretKey: string },
 ) => {
   return (auth: AuthObject, req: WithExperimentalClerkUrl<NextRequest>) => {
     if (!auth.userId && !isPublicRoute(req)) {
       if (isApiRoute(req)) {
-        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, enforcedParams, true);
+        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, options, true);
         return apiEndpointUnauthorizedNextResponse();
       } else {
-        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, enforcedParams, false);
+        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, options, false);
       }
       return createRedirect({
         redirectAdapter,
-        signInUrl: enforcedParams.signInUrl,
-        signUpUrl: enforcedParams.signUpUrl,
-        publishableKey: enforcedParams.publishableKey,
+        signInUrl: options.signInUrl,
+        signUpUrl: options.signUpUrl,
+        publishableKey: options.publishableKey,
         // We're setting baseUrl to '' here as we want to keep the legacy behavior of
         // the redirectToSignIn, redirectToSignUp helpers in the backend package.
         baseUrl: '',
@@ -335,13 +326,17 @@ const withNormalizedClerkUrl = (
   return Object.assign(nextRequest, { experimental_clerkUrl: res });
 };
 
-const informAboutProtectedRoute = (path: string, enforcedParams: EnforcedAuthMiddlewareParams, isApiRoute: boolean) => {
-  if (enforcedParams.debug || isDevelopmentFromSecretKey(enforcedParams.secretKey)) {
+const informAboutProtectedRoute = (
+  path: string,
+  options: AuthMiddlewareParams & { secretKey: string },
+  isApiRoute: boolean,
+) => {
+  if (options.debug || isDevelopmentFromSecretKey(options.secretKey)) {
     console.warn(
       informAboutProtectedRouteInfo(
         path,
-        !!enforcedParams.publicRoutes,
-        !!enforcedParams.ignoredRoutes,
+        !!options.publicRoutes,
+        !!options.ignoredRoutes,
         isApiRoute,
         DEFAULT_IGNORED_ROUTES,
       ),
