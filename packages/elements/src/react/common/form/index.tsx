@@ -25,11 +25,13 @@ import {
   fieldErrorsSelector,
   fieldHasValueSelector,
   fieldValueSelector,
+  fieldWarningsSelector,
   globalErrorsSelector,
   useFormSelector,
   useFormStore,
 } from '~/internals/machines/form/form.context';
 import type { FieldDetails } from '~/internals/machines/form/form.types';
+import { usePassword } from '~/react/hooks/use-password.hook';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
@@ -65,6 +67,17 @@ const useFieldErrors = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
   };
 };
 
+/**
+ * Get the field-specific warnings, if they exist
+ */
+const useFieldWarnings = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const warnings = useFormSelector(fieldWarningsSelector(name));
+
+  return {
+    warnings,
+  };
+};
+
 const determineInputTypeFromName = (name: FormFieldProps['name']) => {
   if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword')
     return 'password' as const;
@@ -80,7 +93,11 @@ const determineInputTypeFromName = (name: FormFieldProps['name']) => {
  */
 const useFieldState = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
   const { errors } = useFieldErrors({ name });
+  const { warnings } = useFieldWarnings({ name });
   const hasValue = useFormSelector(fieldHasValueSelector(name));
+
+  console.log('warnings', warnings);
+  console.log('errors', errors);
 
   /**
    * If hasValue is false and errors is undefined, the state should be idle
@@ -158,9 +175,34 @@ const useInput = ({
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
 
+  if (!name) {
+    throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
+  }
+
+  // Single state to track all validations of usePassword
+  const [pwdValidation, setPwdValidation] = React.useState({
+    success: '',
+    error: '',
+    warning: '',
+    info: '',
+    hasPassedComplexity: false,
+  });
+
   const ref = useFormStore();
+  const { validatePassword } = usePassword({
+    onValidationComplexity: hasPassed => setPwdValidation({ ...pwdValidation, hasPassedComplexity: hasPassed }),
+    onValidationSuccess: () => setPwdValidation({ ...pwdValidation, success: 'Password is strong' }),
+    onValidationError: error => setPwdValidation({ ...pwdValidation, error: error ?? '' }),
+    onValidationWarning: warning => setPwdValidation({ ...pwdValidation, warning }),
+    onValidationInfo: info => setPwdValidation({ ...pwdValidation, info }),
+  });
   const value = useFormSelector(fieldValueSelector(name));
   const hasValue = Boolean(value);
+  const type = inputType ?? determineInputTypeFromName(name);
+  const isPasswordType = type === 'password';
+  const isOtpType = type === 'otp';
+
+  console.log('pwdValidation', pwdValidation);
 
   // Register the field in the machine context
   React.useEffect(() => {
@@ -177,19 +219,15 @@ const useInput = ({
       onChangeProp?.(event);
       if (!name) return;
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
+      if (isPasswordType) validatePassword(event.target.value);
     },
-    [ref, name, onChangeProp],
+    [ref, name, onChangeProp, isPasswordType],
   );
-
-  if (!name) {
-    throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
-  }
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;
-  const type = inputType ?? determineInputTypeFromName(name);
 
-  const Element = type === 'otp' ? OTPInput : RadixControl;
+  const Element = isOtpType ? OTPInput : RadixControl;
 
   let props = {};
   if (inputType === 'otp') {

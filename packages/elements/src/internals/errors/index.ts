@@ -55,3 +55,24 @@ export class ClerkElementsFieldError extends ClerkElementsErrorBase {
 
   matchFn = () => true;
 }
+
+export class ClerkElementsFieldWarning extends ClerkElementsErrorBase {
+  static fromAPIError(error: ClerkAPIError) {
+    return new ClerkElementsFieldWarning(error.code, error.longMessage || error.message);
+  }
+
+  constructor(code: string, message: string) {
+    super(code, message);
+    this.name = 'ClerkElementsFieldWarning';
+  }
+
+  get validityState() {
+    return this.code;
+  }
+
+  get forceMatch() {
+    return true;
+  }
+
+  matchFn = () => true;
+}
