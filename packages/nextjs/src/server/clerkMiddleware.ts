@@ -16,7 +16,13 @@ import { errorThrower } from './errorThrower';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
-import { decorateRequest, handleMultiDomainAndProxy, redirectAdapter, setRequestHeadersOnNextResponse } from './utils';
+import {
+  assertKey,
+  decorateRequest,
+  handleMultiDomainAndProxy,
+  redirectAdapter,
+  setRequestHeadersOnNextResponse,
+} from './utils';
 
 const CONTROL_FLOW_ERROR = {
   FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
@@ -38,10 +44,6 @@ type ClerkMiddlewareHandler = (
 ) => NextMiddlewareReturn;
 
 export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
-export type EnforcedClerkMiddlewareOptions = {
-  publishableKey: string;
-  secretKey: string;
-} & AuthenticateRequestOptions & { debug?: boolean };
 
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
@@ -67,20 +69,16 @@ interface ClerkMiddleware {
 
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
-  const [handler, options] = parseHandlerAndOptions(args);
-  const publishableKey = options.publishableKey || PUBLISHABLE_KEY;
-  if (!publishableKey) {
-    errorThrower.throwMissingPublishableKeyError();
-  }
-  const secretKey = options.secretKey || SECRET_KEY;
-  if (!secretKey) {
-    errorThrower.throwMissingSecretKeyError();
-  }
-  const signInUrl = options.signInUrl || SIGN_IN_URL;
-  const signUpUrl = options.signUpUrl || SIGN_UP_URL;
+  const [handler, params] = parseHandlerAndOptions(args);
+  const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
+    errorThrower.throwMissingPublishableKeyError(),
+  );
+  const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
+  const signInUrl = params.signInUrl || SIGN_IN_URL;
+  const signUpUrl = params.signUpUrl || SIGN_UP_URL;
 
-  const enforcedOptions: EnforcedClerkMiddlewareOptions = {
-    ...options,
+  const options = {
+    ...params,
     publishableKey,
     secretKey,
     signInUrl,
@@ -92,7 +90,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const requestState = await clerkClient.authenticateRequest(
       clerkRequest,
-      createAuthenticateRequestOptions(clerkRequest, enforcedOptions),
+      createAuthenticateRequestOptions(clerkRequest, options),
     );
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
@@ -116,10 +114,10 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     }
 
     if (isRedirect(handlerResult)) {
-      return serverRedirectWithAuth(clerkRequest, handlerResult, enforcedOptions);
+      return serverRedirectWithAuth(clerkRequest, handlerResult, options);
     }
 
-    if (enforcedOptions.debug) {
+    if (options.debug) {
       setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
     }
 
@@ -161,13 +159,10 @@ const parseHandlerAndOptions = (args: unknown[]) => {
   ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
 };
 
-export const createAuthenticateRequestOptions = (
-  clerkRequest: ClerkRequest,
-  enforcedOptions: EnforcedClerkMiddlewareOptions,
-) => {
+export const createAuthenticateRequestOptions = (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
   return {
-    ...enforcedOptions,
-    ...handleMultiDomainAndProxy(clerkRequest, enforcedOptions),
+    ...options,
+    ...handleMultiDomainAndProxy(clerkRequest, options),
   };
 };
 
