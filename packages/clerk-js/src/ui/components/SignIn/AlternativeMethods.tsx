@@ -12,12 +12,13 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
 
+type AlternativeMethodsMode = 'forgot' | 'pwned' | 'default';
+
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
   onFactorSelected: (factor: SignInFactor) => void;
   currentFactor: SignInFactor | undefined | null;
-  asForgotPassword?: boolean;
-  isPasswordPwned?: boolean;
+  mode?: AlternativeMethodsMode;
 };
 
 export type AlternativeMethodListProps = AlternativeMethodsProps & { onHavingTroubleClick: React.MouseEventHandler };
@@ -29,34 +30,24 @@ export const AlternativeMethods = (props: AlternativeMethodsProps) => {
 };
 
 const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
-  const {
-    onBackLinkClick,
-    onHavingTroubleClick,
-    onFactorSelected,
-    asForgotPassword = false,
-    isPasswordPwned = false,
-  } = props;
+  const { onBackLinkClick, onHavingTroubleClick, onFactorSelected, mode = 'default' } = props;
   const card = useCardState();
   const resetPasswordFactor = useResetPasswordFactor();
   const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: props?.currentFactor,
   });
 
-  const cardTitleKey = asForgotPassword
-    ? isPasswordPwned
-      ? 'signIn.passwordPwned.title'
-      : 'signIn.forgotPasswordAlternativeMethods.title'
-    : 'signIn.alternativeMethods.title';
+  const flowPart = determineFlowPart(mode);
+  const cardTitleKey = determineTitle(mode);
+  const isReset = determineIsReset(mode);
 
   return (
-    <Flow.Part part={asForgotPassword ? 'forgotPasswordMethods' : 'alternativeMethods'}>
+    <Flow.Part part={flowPart}>
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys(cardTitleKey)} />
-            {!asForgotPassword && (
-              <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
-            )}
+            <Header.Title localizationKey={cardTitleKey} />
+            {!isReset && <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />}
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
@@ -65,7 +56,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
             elementDescriptor={descriptors.main}
             gap={6}
           >
-            {asForgotPassword && resetPasswordFactor && (
+            {isReset && resetPasswordFactor && (
               <Button
                 localizationKey={getButtonLabel(resetPasswordFactor)}
                 elementDescriptor={descriptors.alternativeMethodsBlockButton}
@@ -76,7 +67,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                 }}
               />
             )}
-            {asForgotPassword && hasAnyStrategy && (
+            {isReset && hasAnyStrategy && (
               <Divider
                 dividerText={localizationKeys('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}
               />
@@ -114,10 +105,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                 <BackLink
                   boxElementDescriptor={descriptors.backRow}
                   linkElementDescriptor={descriptors.backLink}
-                  onClick={e => {
-                    card.setError(undefined);
-                    onBackLinkClick(e);
-                  }}
+                  onClick={onBackLinkClick}
                 />
               )}
             </Col>
@@ -178,4 +166,36 @@ export function getButtonIcon(factor: SignInFactor) {
   } as const;
 
   return icons[factor.strategy as keyof typeof icons];
+}
+
+function determineFlowPart(mode: AlternativeMethodsMode) {
+  switch (mode) {
+    case 'forgot':
+      return 'forgotPasswordMethods';
+    case 'pwned':
+      return 'passwordPwnedMethods';
+    default:
+      return 'alternativeMethods';
+  }
+}
+
+function determineTitle(mode: AlternativeMethodsMode): LocalizationKey {
+  switch (mode) {
+    case 'forgot':
+      return localizationKeys('signIn.forgotPasswordAlternativeMethods.title');
+    case 'pwned':
+      return localizationKeys('signIn.passwordPwned.title');
+    default:
+      return localizationKeys('signIn.alternativeMethods.title');
+  }
+}
+
+function determineIsReset(mode: AlternativeMethodsMode): boolean {
+  switch (mode) {
+    case 'forgot':
+    case 'pwned':
+      return true;
+    default:
+      return false;
+  }
 }
