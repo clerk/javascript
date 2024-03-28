@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Tilbake',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annen imitators enhet',
@@ -282,6 +283,7 @@ export const nbNO: LocalizationResource = {
       blockButton__backupCode: 'Bruk en sikkerhetskopi-kode',
       blockButton__emailCode: 'Send e-postkode til {{identifier}}',
       blockButton__emailLink: 'Send lenke til {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Logg inn med passordet ditt',
       blockButton__phoneCode: 'Send SMS-kode til {{identifier}}',
       blockButton__totp: 'Bruk autentiseringsappen din',
@@ -353,10 +355,17 @@ export const nbNO: LocalizationResource = {
       subtitle: 'En feil oppstod',
       title: 'Kan ikke logge inn',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Bruk en annen metode',
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Skriv inn passordet ditt',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifiseringskode',
@@ -384,6 +393,7 @@ export const nbNO: LocalizationResource = {
       actionLink: 'Opprett konto',
       actionLink__use_email: 'Bruk e-post',
       actionLink__use_email_username: 'Bruk e-post eller brukernavn',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Bruk telefon',
       actionLink__use_username: 'Bruk brukernavn',
       actionText: 'Ingen konto?',
@@ -464,6 +474,7 @@ export const nbNO: LocalizationResource = {
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
     form_password_pwned:
       'Dette passordet er funnet som en del av et datainnbrudd og kan ikke brukes. Vennligst prøv et annet passord.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Passordet ditt har overskredet maksimalt antall byte tillatt. Vennligst forkort det eller fjern noen spesialtegn.',
     form_password_validation_failed: 'Feil passord',
@@ -471,6 +482,11 @@ export const nbNO: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'mindre enn {{length}} tegn',
       minimumLength: '{{length}} eller flere tegn',
@@ -528,6 +544,14 @@ export const nbNO: LocalizationResource = {
     action__signOutAll: 'Logg ut av alle kontoer',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopier alle',
@@ -684,6 +708,11 @@ export const nbNO: LocalizationResource = {
       title: 'Oppdater profil',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Logg ut fra enhet',
         title: 'Aktive enheter',

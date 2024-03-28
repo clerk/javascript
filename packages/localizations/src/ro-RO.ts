@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Înapoi',
   badge__default: 'Implicit',
   badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
@@ -284,6 +285,7 @@ export const roRO: LocalizationResource = {
       blockButton__backupCode: 'Utilizați un cod de rezervă',
       blockButton__emailCode: 'Codul de e-mail către {{identifier}}',
       blockButton__emailLink: 'Trimiteți un link prin e-mail către {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Conectați-vă cu parola dvs',
       blockButton__phoneCode: 'Trimiteți codul SMS la {{identifier}}',
       blockButton__totp: 'Utilizați aplicația de autentificare',
@@ -355,10 +357,17 @@ export const roRO: LocalizationResource = {
       subtitle: 'S-a produs o eroare',
       title: 'Nu se poate autentifica',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utilizați o altă metodă',
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Introduceți parola dvs',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Cod de verificare',
@@ -386,6 +395,7 @@ export const roRO: LocalizationResource = {
       actionLink: 'Înscrieți-vă',
       actionLink__use_email: 'Utilizați e-mailul',
       actionLink__use_email_username: 'Utilizați e-mail sau nume de utilizator',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Utilizați telefonul',
       actionLink__use_username: 'Utilizați numele de utilizator',
       actionText: 'Nu aveți cont?',
@@ -466,6 +476,7 @@ export const roRO: LocalizationResource = {
     form_password_not_strong_enough: 'Parola dvs. nu este suficient de puternică.',
     form_password_pwned:
       'Această parolă a fost descoperită ca parte a unei încălcări și nu poate fi utilizată, vă rugăm să încercați o altă parolă.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Parola dvs. a depășit numărul maxim de octeți permis, vă rugăm să o scurtați sau să eliminați unele caractere speciale.',
     form_password_validation_failed: 'Parolă incorectă',
@@ -473,6 +484,11 @@ export const roRO: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Nu vă puteți șterge ultima identificare.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'mai puțin de {{length}} caractere',
       minimumLength: '{{length}} sau mai multe caractere',
@@ -532,6 +548,14 @@ export const roRO: LocalizationResource = {
     action__signOutAll: 'Deconectați-vă din toate conturile',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copiați toate',
@@ -692,6 +716,11 @@ export const roRO: LocalizationResource = {
       title: 'Actualizarea profilului',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Deconectați-vă de la dispozitiv',
         title: 'Dispozitive active',

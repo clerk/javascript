@@ -3,7 +3,7 @@ import React from 'react';
 
 import { withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
-import { ErrorCard, LoadingCard, withCardStateProvider } from '../../elements';
+import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
@@ -36,6 +36,7 @@ export function _SignInFactorOne(): JSX.Element {
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
+  const card = useCardState();
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
@@ -57,6 +58,8 @@ export function _SignInFactorOne(): JSX.Element {
   const resetPasswordFactor = useResetPasswordFactor();
 
   const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
+
+  const [isPasswordPwned, setIsPasswordPwned] = React.useState(false);
 
   React.useEffect(() => {
     // Handle the case where a user lands on alternative methods screen,
@@ -94,11 +97,18 @@ export function _SignInFactorOne(): JSX.Element {
     const canGoBack = factorHasLocalStrategy(currentFactor);
 
     const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
+    const backHandler = () => {
+      card.setError(undefined);
+      setIsPasswordPwned(false);
+      toggle?.();
+    };
+
+    const mode = showForgotPasswordStrategies ? (isPasswordPwned ? 'pwned' : 'forgot') : 'default';
 
     return (
       <AlternativeMethods
-        asForgotPassword={showForgotPasswordStrategies}
-        onBackLinkClick={canGoBack ? toggle : undefined}
+        mode={mode}
+        onBackLinkClick={canGoBack ? backHandler : undefined}
         onFactorSelected={f => {
           selectFactor(f);
           toggle?.();
@@ -135,6 +145,10 @@ export function _SignInFactorOne(): JSX.Element {
           }}
           onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
+          onPasswordPwned={() => {
+            setIsPasswordPwned(true);
+            toggleForgotPasswordStrategies();
+          }}
         />
       );
     case 'email_code':
