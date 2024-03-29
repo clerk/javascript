@@ -284,6 +284,14 @@ export class User extends BaseResource implements UserResource {
     return new DeletedObject(json);
   };
 
+  getAvailablePlans = async () => {};
+
+  getCurrentPlan = async () => {};
+
+  createBillingPortalSession = async () => {};
+
+  changeBillingPlan = async () => {};
+
   get verifiedExternalAccounts() {
     return this.externalAccounts.filter(externalAccount => externalAccount.verification?.status == 'verified');
   }
