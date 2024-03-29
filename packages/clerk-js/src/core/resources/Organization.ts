@@ -1,5 +1,7 @@
 import type {
   AddMemberParams,
+  BillingPlanJSON,
+  BillingPlanResource,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   CreateOrganizationParams,
@@ -27,6 +29,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
+import { BillingPlan } from './Billing';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -193,6 +196,25 @@ export class Organization extends BaseResource implements OrganizationResource {
       return {
         total_count,
         data: requests.map(request => new OrganizationInvitation(request)),
+      };
+    });
+  };
+
+  getActivePlans = async (): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
+    return await BaseResource._fetch(
+      {
+        path: `/organizations/${this.id}/billing/available_plans`,
+        method: 'GET',
+      },
+      {
+        forceUpdateClient: true,
+      },
+    ).then(res => {
+      const { data: requests, total_count } = res?.response as unknown as ClerkPaginatedResponse<BillingPlanJSON>;
+
+      return {
+        total_count,
+        data: requests.map(request => new BillingPlan(request)),
       };
     });
   };
