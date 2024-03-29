@@ -28,23 +28,27 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
-    const requestState = await authenticateRequest({
-      clerkClient,
-      request,
-      options,
-    });
+    try {
+      const requestState = await authenticateRequest({
+        clerkClient,
+        request,
+        options,
+      });
 
-    const err = setResponseHeaders(requestState, response);
-    if (err || response.writableEnded) {
-      if (err) {
-        next(err);
+      const err = setResponseHeaders(requestState, response);
+      if (err || response.writableEnded) {
+        if (err) {
+          next(err);
+        }
+        return;
       }
-      return;
+
+      Object.assign(request, { auth: requestState.toAuth() });
+
+      return next();
+    } catch (err) {
+      next(err);
     }
-
-    Object.assign(request, { auth: requestState.toAuth() });
-
-    return next();
   };
 
   if (usedWithoutInvocation(args)) {

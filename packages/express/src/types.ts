@@ -14,7 +14,12 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: bool
 export interface ClerkMiddleware {
   /**
    * @example
-   * app.use(clerkMiddleware((request, response, next) => { ... }, options));
+   * const handler = (request, response, next) => {
+   *   ...;
+   *   // if next is not called the request will be terminated or hung.
+   *   return next();
+   * }
+   * app.use(clerkMiddleware(handler, options));
    */
   (handler: RequestHandler, options?: ClerkMiddlewareOptions): RequestHandler[];
   /**
