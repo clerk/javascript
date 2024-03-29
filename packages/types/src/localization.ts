@@ -157,6 +157,9 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    passwordPwned: {
+      title: LocalizationValue;
+    };
     passkey: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -729,6 +732,7 @@ type UnstableErrors = WithParamName<{
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
   form_password_pwned: LocalizationValue;
+  form_password_pwned__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;

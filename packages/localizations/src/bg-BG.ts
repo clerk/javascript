@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Назад',
   badge__default: 'По подразбиране',
   badge__otherImpersonatorDevice: 'Друго устройство за имитация',
@@ -282,6 +283,7 @@ export const bgBG: LocalizationResource = {
       blockButton__backupCode: 'Използвай резервен код',
       blockButton__emailCode: 'Изпрати код по имейл до {{identifier}}',
       blockButton__emailLink: 'Изпрати линк по имейл до {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Влез с парола',
       blockButton__phoneCode: 'Изпрати SMS код до {{identifier}}',
       blockButton__totp: 'Използвай приложение за удостоверяване',
@@ -353,10 +355,17 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Възникна грешка',
       title: 'Неуспешно влизане',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Използвайте друг метод',
       subtitle: 'Въведете паролата, свързана с вашия акаунт',
       title: 'Въведете вашата парола',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Код за потвърждение',
@@ -383,6 +392,7 @@ export const bgBG: LocalizationResource = {
       actionLink: 'Регистрирайте се',
       actionLink__use_email: 'Използвайте имейл',
       actionLink__use_email_username: 'Използвайте имейл или потребителско име',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Използвайте телефон',
       actionLink__use_username: 'Използвайте потребителско име',
       actionText: 'Нямате акаунт?',
@@ -463,6 +473,7 @@ export const bgBG: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Вашата парола не е достатъчно сигурна.',
     form_password_pwned: 'Тази парола е част от изтекли данни и не може да се използва. Моля, опитайте с друга парола.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Паролата ви надвиши максималния брой байтове, позволен, моля, я скратете или премахнете някои специални знаци.',
     form_password_validation_failed: 'Неправилна парола',
@@ -470,6 +481,11 @@ export const bgBG: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Не можете да изтриете последната си идентификация.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'по-малко от {{length}} символа',
       minimumLength: '{{length}} или повече символа',
@@ -527,6 +543,14 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',
@@ -684,6 +708,11 @@ export const bgBG: LocalizationResource = {
       title: 'Актуализиране на профила',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Излез от устройството',
         title: 'Активни устройства',
