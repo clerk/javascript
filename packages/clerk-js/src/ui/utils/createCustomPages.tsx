@@ -15,7 +15,7 @@ export type CustomPageContent = {
 };
 
 type ProfileReorderItem = {
-  label: 'account' | 'security' | 'members' | 'general';
+  label: 'account' | 'security' | 'members' | 'general' | 'billing';
 };
 
 type ProfileCustomPage = {
@@ -255,7 +255,7 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       name: localizationKeys('userProfile.navbar.billing'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
       icon: TickShield,
-      path: 'Billing',
+      path: 'billing',
     },
   ];
 
