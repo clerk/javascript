@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_fastify)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://beta.clerk.com/docs?utm_source=github&utm_medium=clerk_fastify)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/fastify/CHANGELOG.md)
@@ -31,11 +31,11 @@
 ## Overview
 
 [Clerk](https://clerk.com?utm_source=github&utm_medium=clerk_fastify) is the easiest way to add authentication and user management to your Fastify application. To gain a better understanding of the Clerk Backend API and SDK, refer to
-the <a href="https://clerk.com/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_fastify" target="_blank">Node SDK</a> and <a href="https://clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
+the <a href="https://beta.clerk.com/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_fastify" target="_blank">Node SDK</a> and <a href="https://beta.clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
 
 ## Getting Started
 
-To use this plugin you should first create a Clerk application and retrieve a `Secret Key` and a `Publishable Key` for you application (see [here](https://clerk.com/docs/reference/node/getting-started#set-c-l-e-r-k-s-e-c-r-e-t-key)) to be used as environment variables `CLERK_PUBLISHABLE_KEY` & `CLERK_SECRET_KEY`.
+To use this plugin you should first create a Clerk application and retrieve a `Secret Key` and a `Publishable Key` for you application (see [here](https://beta.clerk.com/docs/reference/node/getting-started#set-c-l-e-r-k-s-e-c-r-e-t-key)) to be used as environment variables `CLERK_PUBLISHABLE_KEY` & `CLERK_SECRET_KEY`.
 
 ### Prerequisites
 

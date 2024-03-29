@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_chrome_extension)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://beta.clerk.com/docs?utm_source=github&utm_medium=clerk_chrome_extension)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/chrome-extension/CHANGELOG.md)
@@ -31,7 +31,7 @@
 ## Overview
 
 [Clerk](https://clerk.com?utm_source=github&utm_medium=clerk_chrome_extension) is the easiest way to add authentication and user management to your chrome extension. To gain a better understanding of the Clerk React SDK and [Frontend API](https://reference.clerk.com/reference/frontend-api-reference), refer to
-the <a href="https://clerk.com/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_chrome_extension" target="_blank">Node SDK</a> and <a href="https://clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
+the <a href="https://beta.clerk.com/docs/reference/node/getting-started?utm_source=github&utm_medium=clerk_chrome_extension" target="_blank">Node SDK</a> and <a href="https://beta.clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
 
 ## Getting Started
 
