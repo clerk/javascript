@@ -2,11 +2,12 @@ import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
+import { OrganizationBilling } from './OrganizationBilling';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 
 export const OrganizationProfileRoutes = () => {
-  const { pages, isMembersPageRoot, isGeneralPageRoot } = useOrganizationProfileContext();
+  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot } = useOrganizationProfileContext();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
     const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
@@ -45,6 +46,20 @@ export const OrganizationProfileRoutes = () => {
                 redirectTo={isGeneralPageRoot ? '../' : './organization-general'}
               >
                 <OrganizationMembers />
+              </Protect>
+            </Route>
+          </Switch>
+        </Route>
+        <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
+          <Switch>
+            <Route index>
+              <Protect
+                condition={has =>
+                  has({ permission: 'org:sys_memberships:read' }) || has({ permission: 'org:sys_memberships:manage' })
+                }
+                redirectTo={isGeneralPageRoot ? '../' : './organization-general'}
+              >
+                <OrganizationBilling />
               </Protect>
             </Route>
           </Switch>
