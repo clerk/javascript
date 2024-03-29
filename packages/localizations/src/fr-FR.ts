@@ -462,6 +462,7 @@ export const frFR: LocalizationResource = {
     form_code_incorrect: 'Code incorrect',
     form_identifier_exists: 'Cet identifiant existe déjà. Veuillez en renseigner un différent.',
     form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Identifiant introuvable',
     form_param_format_invalid: 'Le format est invalide',

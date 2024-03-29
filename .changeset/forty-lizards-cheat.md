@@ -7,3 +7,4 @@ Adds translation keys to be able to customize error messages when an identifier 
 
 - form_identifier_exists__email_address
 - form_identifier_exists__username
+- form_identifier_exists__phone_number

@@ -465,6 +465,7 @@ export const deDE: LocalizationResource = {
     form_code_incorrect: '',
     form_identifier_exists: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine Andere.',
     form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',

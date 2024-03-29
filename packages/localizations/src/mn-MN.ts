@@ -463,6 +463,7 @@ export const mnMN: LocalizationResource = {
     form_code_incorrect: 'Маягтын код буруу байна',
     form_identifier_exists: 'Тодорхойлогч аль хэдийн байна.',
     form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Тодорхойлогч олдсонгүй.',
     form_param_format_invalid: 'Параметрийн формат буруу.',

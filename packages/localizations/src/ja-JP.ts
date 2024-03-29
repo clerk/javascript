@@ -462,6 +462,7 @@ export const jaJP: LocalizationResource = {
     form_code_incorrect: 'フォームコードが正しくありません。',
     form_identifier_exists: '識別子が既に存在します。',
     form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '識別子が見つかりません。',
     form_param_format_invalid: 'パラメータ形式が無効です。',
