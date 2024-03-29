@@ -662,6 +662,7 @@ export const enUS: LocalizationResource = {
       account: 'Profile',
       description: 'Manage your account info.',
       security: 'Security',
+      billing: 'Billing',
       title: 'Account',
     },
     passwordPage: {

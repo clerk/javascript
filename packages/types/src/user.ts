@@ -1,4 +1,5 @@
 import type { BackupCodeResource } from './backupCode';
+import type { BillingPlanResource } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { ExternalAccountResource } from './externalAccount';
@@ -172,3 +173,5 @@ export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;
+
+export type GetAvailablePlansResource = () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;

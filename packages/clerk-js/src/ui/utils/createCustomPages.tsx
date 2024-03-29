@@ -251,6 +251,12 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       icon: TickShield,
       path: 'security',
     },
+    {
+      name: localizationKeys('userProfile.navbar.billing'),
+      id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
+      icon: TickShield,
+      path: 'Billing',
+    },
   ];
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
