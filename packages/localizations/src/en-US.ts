@@ -162,6 +162,7 @@ export const enUS: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
+      billing: 'Billing',
     },
     profilePage: {
       dangerSection: {
