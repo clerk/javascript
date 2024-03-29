@@ -4,15 +4,20 @@ import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
 
 export class BillingPlan extends BaseResource implements BillingPlanResource {
-  id: string;
-  name: string;
-  description: string | null;
-  key: string;
-  customerType: CustomerType;
-  priceInCents: number;
-  features: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  id!: string;
+  name!: string;
+  description!: string | null;
+  key!: string;
+  customerType!: CustomerType;
+  priceInCents!: number;
+  features!: string[];
+  createdAt!: Date;
+  updatedAt!: Date;
+
+  constructor(data: BillingPlanJSON) {
+    super();
+    this.fromJSON(data);
+  }
 
   protected fromJSON(data: BillingPlanJSON): this {
     if (!data) {
