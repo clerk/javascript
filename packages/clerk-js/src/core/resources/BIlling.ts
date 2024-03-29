@@ -1,4 +1,4 @@
-import type { BillingPlanResource, CustomerType } from '@clerk/types';
+import type { BillingPlanJSON, BillingPlanResource, CustomerType } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
@@ -6,7 +6,7 @@ import { BaseResource } from './internal';
 export class BillingPlan extends BaseResource implements BillingPlanResource {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   key: string;
   customerType: CustomerType;
   priceInCents: number;
@@ -14,7 +14,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   createdAt: Date;
   updatedAt: Date;
 
-  protected fromJSON(data: any): this {
+  protected fromJSON(data: BillingPlanJSON): this {
     if (!data) {
       return this;
     }

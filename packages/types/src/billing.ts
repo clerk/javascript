@@ -5,10 +5,10 @@ import type { ClerkResource } from './resource';
 export interface BillingPlanResource extends ClerkResource {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   key: string;
   customerType: CustomerType;
-  price_in_cents: number;
+  priceInCents: number;
   features: string[];
   createdAt: Date;
   updatedAt: Date;

@@ -497,10 +497,10 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   id: string;
   name: string;
   key: string;
-  customerType: CustomerType;
+  customer_type: CustomerType;
   description: string | null;
-  priceInCents: number;
+  price_in_cents: number;
   features: string[];
-  createdAt: number;
-  updatedAt: number;
+  created_at: number;
+  updated_at: number;
 }
