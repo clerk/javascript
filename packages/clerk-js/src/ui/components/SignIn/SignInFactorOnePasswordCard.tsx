@@ -1,4 +1,4 @@
-import { isUserLockedError } from '@clerk/shared/error';
+import { isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
@@ -17,6 +17,7 @@ type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
   onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
+  onPasswordPwned?: () => void;
 };
 
 const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
@@ -45,7 +46,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
 };
 
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
-  const { onShowAlternativeMethodsClick } = props;
+  const { onShowAlternativeMethodsClick, onPasswordPwned } = props;
   const card = useCardState();
   const { setActive } = useClerk();
   const signIn = useCoreSignIn();
@@ -71,8 +72,6 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
           case 'needs_second_factor':
             return navigate('../factor-two');
-          case 'needs_new_password':
-            return navigate('../reset-password');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
@@ -81,6 +80,12 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
         if (isUserLockedError(err)) {
           // @ts-expect-error -- private method for the time being
           return clerk.__internal_navigateWithError('..', err.errors[0]);
+        }
+
+        if (isPasswordPwnedError(err) && onPasswordPwned) {
+          card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
+          onPasswordPwned();
+          return;
         }
 
         handleError(err, [passwordControl], card.setError);

@@ -139,7 +139,6 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
 export interface PasskeyJSON extends ClerkResourceJSON {
   object: 'passkey';
   id: string;
-  credential_id: string | null;
   name: string | null;
   verification: VerificationJSON | null;
   last_used_at: number | null;
@@ -491,8 +490,3 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   timeout: number;
   userVerification: 'discouraged' | 'preferred' | 'required';
 }
-
-// TODO-PASSKEYS: Decide if we are keeping this
-// export interface PassKeyVerificationJSON extends VerificationJSON {
-//   publicKey: PublicKeyCredentialCreationOptionsJSON | null;
-// }

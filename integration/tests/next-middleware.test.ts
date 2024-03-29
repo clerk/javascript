@@ -9,6 +9,7 @@ test.describe('next middleware @nextjs', () => {
   let app: Application;
 
   test.beforeAll(async () => {
+    const cookieExpires = new Date().getTime() + 60 * 60 * 24;
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
@@ -23,17 +24,25 @@ export default authMiddleware({
     response.cookies.set({
       name: "first",
       value: "123456789",
+      sameSite: "Lax",
       path: "/",
-      sameSite: "none",
-      secure: true,
+      domain: 'localhost',
+      secure: false,
+      expires: ${cookieExpires}
     });
     response.cookies.set("second", "987654321", {
-      sameSite: "none",
-      secure: true,
+      sameSite: "Lax",
+      secure: false,
+      path: "/",
+      domain: 'localhost',
+      expires: ${cookieExpires}
     });
     response.cookies.set("third", "foobar", {
-      sameSite: "none",
-      secure: true,
+      sameSite: "Lax",
+      secure: false,
+      path: "/",
+      domain: 'localhost',
+      expires: ${cookieExpires}
     });
     return response;
   },

@@ -6,6 +6,7 @@ import {
   DOMAIN,
   IS_SATELLITE,
   PROXY_URL,
+  PUBLISHABLE_KEY,
   SDK_METADATA,
   SECRET_KEY,
   TELEMETRY_DEBUG,
@@ -14,6 +15,7 @@ import {
 
 const clerkClient = createClerkClient({
   secretKey: SECRET_KEY,
+  publishableKey: PUBLISHABLE_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
   userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,

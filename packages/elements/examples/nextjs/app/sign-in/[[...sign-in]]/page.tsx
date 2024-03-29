@@ -1,9 +1,8 @@
 'use client';
 
-import { Field, FieldError, GlobalError, Input, Label } from '@clerk/elements/common';
+import { Field, FieldError, GlobalError, Input, Label, Loading } from '@clerk/elements/common';
 import {
   Action,
-  Loading,
   Provider,
   ProviderIcon,
   SafeIdentifier,

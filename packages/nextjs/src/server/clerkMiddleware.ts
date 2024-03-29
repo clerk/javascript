@@ -6,6 +6,7 @@ import type {
   RequestState,
 } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -84,6 +85,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     signInUrl,
     signUpUrl,
   };
+
+  clerkClient.telemetry.record(
+    eventMethodCalled('clerkMiddleware', {
+      handler: Boolean(handler),
+      satellite: Boolean(options.isSatellite),
+      proxy: Boolean(options.proxyUrl),
+    }),
+  );
 
   const nextMiddleware: NextMiddleware = async (request, event) => {
     const clerkRequest = createClerkRequest(request);

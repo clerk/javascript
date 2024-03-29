@@ -1,13 +1,44 @@
 import type { SessionJSON } from '@clerk/types';
 
 import { eventBus } from '../events';
-import { clerkMock, createUser } from '../test/fixtures';
+import { createFapiClient } from '../fapiClient';
+import { clerkMock, createUser, mockDevClerkInstance, mockJwt, mockNetworkFailedFetch } from '../test/fixtures';
 import { BaseResource, Session } from './internal';
 
-export const mockJwt =
-  'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FjY291bnRzLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsImV4cCI6MTY2NjY0ODMxMCwiaWF0IjoxNjY2NjQ4MjUwLCJpc3MiOiJodHRwczovL2NsZXJrLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsIm5iZiI6MTY2NjY0ODI0MCwic2lkIjoic2Vzc18yR2JEQjRlbk5kQ2E1dlMxenBDM1h6Zzl0SzkiLCJzdWIiOiJ1c2VyXzJHSXBYT0VwVnlKdzUxcmtabjlLbW5jNlN4ciJ9.n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
-
 describe('Session', () => {
+  describe('creating new session', () => {
+    let dispatchSpy;
+
+    beforeEach(() => {
+      dispatchSpy = jest.spyOn(eventBus, 'dispatch');
+      BaseResource.clerk = clerkMock() as any;
+    });
+
+    afterEach(() => {
+      dispatchSpy?.mockRestore();
+      BaseResource.clerk = null as any;
+      // @ts-ignore
+      global.fetch?.mockClear();
+    });
+
+    it('dispatches token:update event on initilization with lastActiveToken', () => {
+      new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'activeOrganization',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(dispatchSpy).toBeCalledTimes(1);
+      expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
+    });
+  });
+
   describe('getToken()', () => {
     let dispatchSpy;
 
@@ -39,21 +70,44 @@ describe('Session', () => {
       expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
     });
 
-    it('dispatches token:update event on initilization with lastActiveToken', () => {
-      new Session({
-        status: 'active',
-        id: 'session_1',
-        object: 'session',
-        user: createUser({}),
-        last_active_organization_id: 'activeOrganization',
-        last_active_token: { object: 'token', jwt: mockJwt },
-        actor: null,
-        created_at: new Date().getTime(),
-        updated_at: new Date().getTime(),
-      } as SessionJSON);
+    describe('with offline browser and network failure', () => {
+      let warnSpy;
+      beforeEach(() => {
+        Object.defineProperty(window.navigator, 'onLine', {
+          writable: true,
+          value: false,
+        });
+        warnSpy = jest.spyOn(console, 'warn').mockReturnValue();
+      });
 
-      expect(dispatchSpy).toBeCalledTimes(1);
-      expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
+      afterEach(() => {
+        Object.defineProperty(window.navigator, 'onLine', {
+          writable: true,
+          value: true,
+        });
+        warnSpy.mockRestore();
+      });
+
+      it('returns null', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: 'activeOrganization',
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockNetworkFailedFetch();
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(mockDevClerkInstance) } as any;
+
+        const token = await session.getToken();
+
+        expect(dispatchSpy).toBeCalledTimes(1);
+        expect(token).toEqual(null);
+      });
     });
   });
 

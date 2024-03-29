@@ -7,13 +7,11 @@ import { __internal_WebAuthnAbortService } from '../../../utils/passkeys';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 
-function useHandleAuthenticateWithPasskey() {
+function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
   const card = useCardState();
   const { setActive } = useClerk();
-  const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const { navigateAfterSignIn } = useSignInContext();
   const { __experimental_authenticateWithPasskey } = useCoreSignIn();
@@ -31,16 +29,20 @@ function useHandleAuthenticateWithPasskey() {
         case 'complete':
           return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
         case 'needs_second_factor':
-          return navigate('../factor-two');
+          return onSecondFactor();
         default:
           return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
       }
     } catch (err) {
       const { flow } = args[0] || {};
-      // In case of autofill, if retrieval of credentials is aborted just return to avoid updating state of unmounted components.
-      if (flow === 'autofill' && isClerkRuntimeError(err)) {
-        const skipActionCodes = ['passkey_retrieval_aborted', 'passkey_retrieval_cancelled'];
-        if (skipActionCodes.includes(err.code)) {
+
+      if (isClerkRuntimeError(err)) {
+        // In any case if the call gets aborted we should skip showing an error. This prevents updating the state of unmounted components.
+        if (err.code === 'passkey_operation_aborted') {
+          return;
+        }
+        // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
+        if (flow === 'autofill' && err.code === 'passkey_retrieval_cancelled') {
           return;
         }
       }

@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.0.0-beta.33
+
+### Patch Changes
+
+- Updated dependencies [[`8350109ab`](https://github.com/clerk/javascript/commit/8350109ab85909e0457199da1db0c9787d94001e)]:
+  - @clerk/shared@2.0.0-beta.20
+
+## 5.0.0-beta.32
+
+### Patch Changes
+
+- Updated dependencies [[`afec17953`](https://github.com/clerk/javascript/commit/afec17953d1ae4ba39ee73e4383757694375524d)]:
+  - @clerk/types@4.0.0-beta.22
+
 ## 5.0.0-beta.31
 
 ### Patch Changes

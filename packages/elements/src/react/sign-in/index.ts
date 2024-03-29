@@ -15,7 +15,6 @@ export {
   SignInStrategy as Strategy,
 } from './verifications';
 
-export { Loading } from './loading';
 export { SignInSafeIdentifier as SafeIdentifier, SignInSalutation as Salutation } from './identifiers';
 
 /** @internal Internal use only */

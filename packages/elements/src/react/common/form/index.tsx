@@ -120,11 +120,16 @@ const determineInputTypeFromName = (name: FormFieldProps['name']) => {
   return 'text' as const;
 };
 
-const useInput = ({ name: inputName, value: initialValue, type: inputType, ...passthroughProps }: FormInputProps) => {
+const useInput = ({
+  name: inputName,
+  value: initialValue,
+  type: inputType,
+  onChange: onChangeProp,
+  ...passthroughProps
+}: FormInputProps) => {
   // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
-  const onChangeProp = passthroughProps?.onChange;
 
   const ref = useFormStore();
   const value = useFormSelector(fieldValueSelector(name));
@@ -143,11 +148,16 @@ const useInput = ({ name: inputName, value: initialValue, type: inputType, ...pa
   const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
-      if (!name) return;
+      if (!name || initialValue) return;
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
     },
-    [ref, name, onChangeProp],
+    [ref, name, onChangeProp, initialValue],
   );
+
+  React.useEffect(() => {
+    if (!initialValue || !name) return;
+    ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
+  }, [name, ref, initialValue]);
 
   if (!name) {
     throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
@@ -361,10 +371,17 @@ type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
  *   />
  * </Field>
  */
-const Input = (props: FormInputProps) => {
-  const field = useInput(props);
-  return <field.Element {...field.props} />;
-};
+const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+  (props: FormInputProps, forwardedRef) => {
+    const field = useInput(props);
+    return (
+      <field.Element
+        ref={forwardedRef}
+        {...field.props}
+      />
+    );
+  },
+);
 
 Input.displayName = INPUT_NAME;
 

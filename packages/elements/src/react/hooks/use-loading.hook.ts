@@ -6,8 +6,8 @@ import type { SignInRouterLoadingContext } from '~/internals/machines/sign-in/ty
 import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 import type { SignUpRouterLoadingContext } from '~/internals/machines/sign-up/types';
 
-type ActorSignIn = ActorRefFrom<TSignInRouterMachine>;
-type ActorSignUp = ActorRefFrom<TSignUpRouterMachine>;
+export type ActorSignIn = ActorRefFrom<TSignInRouterMachine>;
+export type ActorSignUp = ActorRefFrom<TSignUpRouterMachine>;
 
 type LoadingContext<T> = T extends ActorSignIn ? SignInRouterLoadingContext : SignUpRouterLoadingContext;
 type UseLoadingReturn<T> = [

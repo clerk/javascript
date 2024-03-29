@@ -51,7 +51,7 @@ function SignUpVerifyInner(props: SignUpVerificationsProps) {
   );
 }
 
-export type SignUpStrategyProps = WithChildrenProp<{ name: SignUpVerificationFriendlyTags }>;
+export type SignUpStrategyProps = { name: SignUpVerificationFriendlyTags; children: React.ReactNode };
 
 /**
  * Conditionally renders its children based on the currently active verification method (e.g. password, email code, etc.).

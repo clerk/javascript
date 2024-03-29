@@ -10,7 +10,9 @@ import { consoleInspector } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
-type SignInFlowProviderProps = WithChildrenProp;
+type SignInFlowProviderProps = {
+  children: React.ReactNode;
+};
 
 const actor = createActor(SignInRouterMachine, { inspect: consoleInspector });
 const ref = actor.start();
@@ -37,7 +39,7 @@ function SignInFlowProvider({ children }: SignInFlowProviderProps) {
   return <SignInRouterCtx.Provider actorRef={ref}>{children}</SignInRouterCtx.Provider>;
 }
 
-export type SignInRootProps = SignInFlowProviderProps & { path?: string };
+export type SignInRootProps = { path?: string; children: React.ReactNode };
 
 /**
  * Root component for the sign-in flow. It sets up providers and state management for its children.
