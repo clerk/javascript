@@ -91,6 +91,9 @@ export const useSignUpContext = (): SignUpContextType => {
     displayConfig: displayConfig,
   });
 
+  // The `ctx` object here refers to the SignUp component's props.
+  // SignUp's own options won't have a `signUpUrl` property, so we have to get the value
+  // from the `path` prop instead, when the routing is set to 'path'.
   let signUpUrl =
     (ctx.routing === 'path' ? ctx.path : undefined) ||
     pickRedirectionProp('signUpUrl', { options, displayConfig }, false);
@@ -177,6 +180,9 @@ export const useSignInContext = (): SignInContextType => {
     signUpUrl += `#/?${authQs}`;
   }
 
+  // The `ctx` object here refers to the SignIn component's props.
+  // SignIn's own options won't have a `signInUrl` property, so we have to get the value
+  // from the `path` prop instead, when the routing is set to 'path'.
   let signInUrl =
     (ctx.routing === 'path' ? ctx.path : undefined) ||
     pickRedirectionProp('signInUrl', { options, displayConfig }, false);
