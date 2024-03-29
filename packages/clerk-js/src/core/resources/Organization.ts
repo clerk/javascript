@@ -200,7 +200,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     });
   };
 
-  getActivePlans = async (): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
+  getAvailablePlans = async (): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
     return await BaseResource._fetch(
       {
         path: `/organizations/${this.id}/billing/available_plans`,
