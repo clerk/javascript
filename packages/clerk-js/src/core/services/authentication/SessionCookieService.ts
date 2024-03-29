@@ -1,5 +1,5 @@
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
-import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
+import type { Clerk, EnvironmentResource, SessionResource } from '@clerk/types';
 
 import type { CookieHandler } from '../../../utils';
 import { createCookieHandler, inBrowser } from '../../../utils';
@@ -71,12 +71,16 @@ export class SessionCookieService {
     return this.clerk.session?.getToken();
   }
 
-  private setSessionCookie(token: TokenResource | string) {
-    this.cookies.setSessionCookie(typeof token === 'string' ? token : token.getRawString());
+  private setSessionCookie(token: string) {
+    this.cookies.setSessionCookie(token);
   }
 
-  private updateSessionCookie(token: TokenResource | string | undefined | null) {
-    return token ? this.setSessionCookie(token) : this.removeSessionCookie();
+  private updateSessionCookie(token: string | undefined | null) {
+    if (token) {
+      return this.setSessionCookie(token);
+    }
+
+    return this.removeSessionCookie();
   }
 
   private removeSessionCookie() {
