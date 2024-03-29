@@ -251,3 +251,34 @@ export const clerkMock = () => {
     }),
   };
 };
+
+type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>;
+};
+
+export const mockFetch = (ok = true, status = 200, responsePayload = {}) => {
+  // @ts-ignore
+  global.fetch = jest.fn(() => {
+    return Promise.resolve<RecursivePartial<Response>>({
+      status,
+      statusText: status.toString(),
+      ok,
+      json: () => Promise.resolve(responsePayload),
+    });
+  });
+};
+
+export const mockNetworkFailedFetch = () => {
+  // @ts-ignore
+  global.fetch = jest.fn(() => {
+    return Promise.reject(new TypeError('Failed to fetch'));
+  });
+};
+
+export const mockDevClerkInstance = {
+  frontendApi: 'clerk.example.com',
+  instanceType: 'development',
+  isSatellite: false,
+  version: 'test-0.0.0',
+  domain: '',
+};

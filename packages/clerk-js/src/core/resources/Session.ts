@@ -130,11 +130,11 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   // Can be removed once `integration_firebase` are no longer supported
-  #handleLegacyIntegrationToken = async (options: GetTokenOptions): Promise<string> => {
+  #handleLegacyIntegrationToken = async (options: GetTokenOptions): Promise<string | null> => {
     const { template, leewayInSeconds } = options;
     const cachedEntry = SessionTokenCache.get({ tokenId: this.user!.id, audience: template }, leewayInSeconds);
     if (cachedEntry) {
-      return cachedEntry.tokenResolver.then(res => res.getRawString());
+      return cachedEntry.tokenResolver.then(token => this.#getRawToken(token));
     }
     const tokenResolver = Token.create(this.user!.pathRoot + '/tokens', {
       service: this.#removeLegacyIntegrationPrefix(template),
@@ -144,10 +144,15 @@ export class Session extends BaseResource implements SessionResource {
       audience: template,
       tokenResolver,
     });
-    return tokenResolver.then(token => {
-      return token.getRawString();
-    });
+    return tokenResolver.then(token => this.#getRawToken(token));
   };
+
+  /**
+   * Return null when raw string is empty to indicate that it's signed-out
+   */
+  #getRawToken(tokenResolver: TokenResource): string | null {
+    return tokenResolver.getRawString() || null;
+  }
 
   protected fromJSON(data: SessionJSON | null): this {
     if (!data) {
@@ -192,11 +197,11 @@ export class Session extends BaseResource implements SessionResource {
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     if (cachedEntry) {
-      const cachedToken = await cachedEntry.tokenResolver.then(res => res);
+      const cachedToken = await cachedEntry.tokenResolver;
       if (!template) {
         eventBus.dispatch(events.TokenUpdate, { token: cachedToken });
       }
-      return cachedToken.getRawString();
+      return this.#getRawToken(cachedToken);
     }
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     const tokenResolver = Token.create(path);
@@ -206,7 +211,7 @@ export class Session extends BaseResource implements SessionResource {
       if (!template) {
         eventBus.dispatch(events.TokenUpdate, { token });
       }
-      return token.getRawString();
+      return this.#getRawToken(token);
     });
   }
 }
