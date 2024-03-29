@@ -47,6 +47,10 @@ type _LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
+  /**
+   * @experimental
+   */
+  __experimental_formFieldLabel__passkeyName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -146,11 +150,19 @@ type _LocalizationResource = {
       actionLink__use_phone: LocalizationValue;
       actionLink__use_username: LocalizationValue;
       actionLink__use_email_username: LocalizationValue;
+      actionLink__use_passkey: LocalizationValue;
     };
     password: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
+    };
+    passwordPwned: {
+      title: LocalizationValue;
+    };
+    passkey: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
     forgotPasswordAlternativeMethods: {
       title: LocalizationValue;
@@ -241,6 +253,7 @@ type _LocalizationResource = {
       blockButton__emailCode: LocalizationValue;
       blockButton__phoneCode: LocalizationValue;
       blockButton__password: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
       blockButton__totp: LocalizationValue;
       blockButton__backupCode: LocalizationValue;
       getHelp: {
@@ -319,6 +332,14 @@ type _LocalizationResource = {
         primaryButton__updatePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
       };
+      /**
+       * @experimental
+       */
+      __experimental_passkeysSection: {
+        title: LocalizationValue;
+        menuAction__rename: LocalizationValue;
+        menuAction__destructive: LocalizationValue;
+      };
       mfaSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
@@ -387,6 +408,17 @@ type _LocalizationResource = {
         messageLine1: LocalizationValue;
         messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
+      };
+    };
+    /**
+     * @experimental
+     */
+    __experimental_passkeyScreen: {
+      title__rename: LocalizationValue;
+      subtitle__rename: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
       };
     };
     phoneNumberPage: {
@@ -694,7 +726,13 @@ type UnstableErrors = WithParamName<{
   form_identifier_not_found: LocalizationValue;
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
+  passkey_not_supported: LocalizationValue;
+  passkeys_pa_not_supported: LocalizationValue;
+  passkey_retrieval_cancelled: LocalizationValue;
+  passkey_registration_cancelled: LocalizationValue;
+  passkey_already_exists: LocalizationValue;
   form_password_pwned: LocalizationValue;
+  form_password_pwned__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;

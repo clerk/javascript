@@ -139,7 +139,6 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
 export interface PasskeyJSON extends ClerkResourceJSON {
   object: 'passkey';
   id: string;
-  credential_id: string | null;
   name: string | null;
   verification: VerificationJSON | null;
   last_used_at: number | null;
@@ -461,7 +460,7 @@ interface PublicKeyCredentialUserEntityJSON {
   id: Base64UrlString;
 }
 
-export interface ExcludedCredentialJSON {
+interface PublicKeyCredentialDescriptorJSON {
   type: 'public-key';
   id: Base64UrlString;
   transports?: ('ble' | 'hybrid' | 'internal' | 'nfc' | 'usb')[];
@@ -479,12 +478,15 @@ export interface PublicKeyCredentialCreationOptionsJSON {
   challenge: Base64UrlString;
   pubKeyCredParams: PublicKeyCredentialParameters[];
   timeout: number;
-  excludeCredentials: ExcludedCredentialJSON[];
+  excludeCredentials: PublicKeyCredentialDescriptorJSON[];
   authenticatorSelection: AuthenticatorSelectionCriteriaJSON;
   attestation: 'direct' | 'enterprise' | 'indirect' | 'none';
 }
 
-// TODO-PASSKEYS: Decide if we are keeping this
-// export interface PassKeyVerificationJSON extends VerificationJSON {
-//   publicKey: PublicKeyCredentialCreationOptionsJSON | null;
-// }
+export interface PublicKeyCredentialRequestOptionsJSON {
+  allowCredentials: PublicKeyCredentialDescriptorJSON[];
+  challenge: Base64UrlString;
+  rpId: string;
+  timeout: number;
+  userVerification: 'discouraged' | 'preferred' | 'required';
+}

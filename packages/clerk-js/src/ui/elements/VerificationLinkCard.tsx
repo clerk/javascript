@@ -87,7 +87,7 @@ export const VerificationLink = (props: VerificationLinkProps) => {
           <Text
             localizationKey={props.formSubtitle}
             elementDescriptor={descriptors.formHeaderSubtitle}
-            colorScheme='neutral'
+            colorScheme='secondary'
           />
         )}
         {props.children}

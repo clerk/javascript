@@ -6,6 +6,7 @@ import type {
   RequestState,
 } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -15,12 +16,7 @@ import { PUBLISHABLE_KEY, SECRET_KEY } from './constants';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
 import type { NextMiddlewareEvtParam, NextMiddlewareRequestParam, NextMiddlewareReturn } from './types';
-import {
-  decorateRequest,
-  decorateResponseWithObservabilityHeaders,
-  handleMultiDomainAndProxy,
-  setRequestHeadersOnNextResponse,
-} from './utils';
+import { decorateRequest, handleMultiDomainAndProxy, setRequestHeadersOnNextResponse } from './utils';
 
 const CONTROL_FLOW_ERROR = {
   FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
@@ -69,6 +65,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, options] = parseHandlerAndOptions(args);
 
+  clerkClient.telemetry.record(
+    eventMethodCalled('clerkMiddleware', {
+      handler: Boolean(handler),
+      satellite: Boolean(options.isSatellite),
+      proxy: Boolean(options.proxyUrl),
+    }),
+  );
+
   const nextMiddleware: NextMiddleware = async (request, event) => {
     const clerkRequest = createClerkRequest(request);
 
@@ -79,8 +83,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
-      const res = new Response(null, { status: 307, headers: requestState.headers });
-      return decorateResponseWithObservabilityHeaders(res, requestState);
+      return new Response(null, { status: 307, headers: requestState.headers });
     } else if (requestState.status === AuthStatus.Handshake) {
       throw new Error('Clerk: handshake status without redirect');
     }

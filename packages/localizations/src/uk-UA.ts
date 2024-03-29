@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Назад',
   badge__default: 'За замовчуванням',
   badge__otherImpersonatorDevice: 'Інший пристрій-двійник',
@@ -281,6 +282,7 @@ export const ukUA: LocalizationResource = {
       blockButton__backupCode: 'Використовуйте код відновлення',
       blockButton__emailCode: 'Надіслати код на {{identifier}}',
       blockButton__emailLink: 'Надіслати посилання на {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Увійти з паролем',
       blockButton__phoneCode: 'Надіслати код на {{identifier}}',
       blockButton__totp: 'Використовуйте аутентифікатор',
@@ -352,10 +354,17 @@ export const ukUA: LocalizationResource = {
       subtitle: 'Виникла помилка',
       title: 'Не вдалося увійти',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Використати інший метод',
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Введіть пароль',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Код підтвердження',
@@ -371,8 +380,7 @@ export const ukUA: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Скинути пароль',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Ваш пароль успішно змінено. Виконується вхід, зачекайте.',
       title: 'Скинути пароль',
     },
@@ -383,6 +391,7 @@ export const ukUA: LocalizationResource = {
       actionLink: 'Зареєструватися',
       actionLink__use_email: 'Використовувати пошту',
       actionLink__use_email_username: "Використовувати пошту або ім'я користувача",
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Використовувати номер телефону',
       actionLink__use_username: "Використовувати ім'я користувача",
       actionText: 'Немає акаунта?',
@@ -462,6 +471,7 @@ export const ukUA: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Ваш пароль недостатньо надійний.',
     form_password_pwned: 'Цей пароль було зламано і його не можна використовувати, спробуйте інший пароль.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перевищує максимально допустиму кількість байтів, скоротіть його або видаліть деякі спеціальні символи.',
     form_password_validation_failed: 'Невірний пароль',
@@ -469,6 +479,11 @@ export const ukUA: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'менше {{length}} символів',
       minimumLength: '{{length}} або більше символів',
@@ -526,6 +541,14 @@ export const ukUA: LocalizationResource = {
     action__signOutAll: 'Вийти з усіх акаунтів',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Скопійовано!',
       actionLabel__copy: 'Копіювати все',
@@ -682,6 +705,11 @@ export const ukUA: LocalizationResource = {
       title: 'Оновити профіль',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Вийти з пристрою',
         title: 'Активні пристрої',

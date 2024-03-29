@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Retour',
   badge__default: 'Défaut',
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
@@ -282,6 +283,7 @@ export const frFR: LocalizationResource = {
       blockButton__backupCode: 'Utiliser un code de récupération',
       blockButton__emailCode: 'Envoyer le code à {{identifier}}',
       blockButton__emailLink: 'Envoyer le lien à {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Connectez-vous avec votre mot de passe',
       blockButton__phoneCode: 'Envoyer le code à {{identifier}}',
       blockButton__totp: "Utilisez votre application d'authentification",
@@ -353,10 +355,17 @@ export const frFR: LocalizationResource = {
       subtitle: "Une erreur s'est produite",
       title: 'Impossible de se connecter',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utiliser une autre méthode',
       subtitle: 'pour continuer à {{applicationName}}',
       title: 'Tapez votre mot de passe',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Code de vérification',
@@ -372,8 +381,7 @@ export const frFR: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Réinitialiser',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage:
         'Votre mot de passe a été modifié avec succès. Nous vous reconnectons, veuillez patienter un instant.',
       title: 'Réinitialiser le mot de passe',
@@ -385,6 +393,7 @@ export const frFR: LocalizationResource = {
       actionLink: "S'inscrire",
       actionLink__use_email: 'Utiliser e-mail',
       actionLink__use_email_username: "Utiliser l'e-mail ou le nom d'utilisateur",
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Utiliser téléphone',
       actionLink__use_username: "Utiliser le nom d'utilisateur",
       actionText: "Vous n'avez pas encore de compte ?",
@@ -465,6 +474,7 @@ export const frFR: LocalizationResource = {
     form_password_not_strong_enough: "Votre mot de passe n'est pas assez fort.",
     form_password_pwned:
       'Ce mot de passe a été compromis et ne peut pas être utilisé. Veuillez essayer un autre mot de passe à la place.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       "Votre mot de passe a dépassé le nombre maximum d'octets autorisés. Veuillez le raccourcir ou supprimer certains caractères spéciaux.",
     form_password_validation_failed: 'Mot de passe incorrect',
@@ -472,6 +482,11 @@ export const frFR: LocalizationResource = {
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
     not_allowed_access: 'Accès non autorisé',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'moins de {{length}} caractères',
       minimumLength: '{{length}} caractères ou plus',
@@ -530,6 +545,14 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copié !',
       actionLabel__copy: 'Copier tous les codes',
@@ -687,6 +710,11 @@ export const frFR: LocalizationResource = {
       title: 'Mettre à jour le profil',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: "Se déconnecter de l'appareil",
         title: 'Appareils actifs',

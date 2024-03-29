@@ -42,11 +42,16 @@ export const InputGroup = forwardRef<
         position: 'relative',
         zIndex: 1,
         ...common.borderVariants(theme).normal,
+        ':focus-within': {
+          ...common.borderVariants(theme, {
+            focusRignt: true,
+          }).normal['&:focus'],
+        },
       })}
     >
       {groupPrefix && (
         <Text
-          colorScheme='neutral'
+          colorScheme='secondary'
           sx={textProps}
         >
           {groupPrefix}
@@ -56,23 +61,17 @@ export const InputGroup = forwardRef<
         maxLength={25}
         sx={[
           {
-            boxShadow: 'none',
-            borderWidth: 0,
-            ':hover:not(:focus)': {
-              borderWidth: 0,
-              boxShadow: 'none',
-            },
-            height: '100%',
             ...inputBorder,
           },
           sx,
         ]}
+        variant='unstyled'
         ref={ref}
         {...rest}
       />
       {groupSuffix && (
         <Text
-          colorScheme='neutral'
+          colorScheme='secondary'
           sx={textProps}
         >
           {groupSuffix}

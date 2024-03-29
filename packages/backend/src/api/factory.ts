@@ -7,6 +7,7 @@ import {
   OrganizationAPI,
   PhoneNumberAPI,
   RedirectUrlAPI,
+  SamlConnectionAPI,
   SessionAPI,
   SignInTokenAPI,
   UserAPI,
@@ -32,5 +33,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     signInTokens: new SignInTokenAPI(request),
     users: new UserAPI(request),
     domains: new DomainAPI(request),
+    samlConnections: new SamlConnectionAPI(request),
   };
 }

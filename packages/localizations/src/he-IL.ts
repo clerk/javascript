@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'חזור',
   badge__default: 'ברירת מחדל',
   badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
@@ -279,6 +280,7 @@ export const heIL: LocalizationResource = {
       blockButton__backupCode: 'השתמש בקוד גיבוי',
       blockButton__emailCode: 'שלח קוד באימייל ל-{{identifier}}',
       blockButton__emailLink: 'שלח קישור באימייל ל-{{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'התחבר עם הסיסמה שלך',
       blockButton__phoneCode: 'שלח קוד SMS ל-{{identifier}}',
       blockButton__totp: 'השתמש באפליקציית האימות שלך',
@@ -349,10 +351,17 @@ export const heIL: LocalizationResource = {
       subtitle: 'An error occurred',
       title: 'Cannot sign in',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'השתמש בשיטה אחרת',
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'הכנס את סיסמתך',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'קוד אימות',
@@ -368,8 +377,7 @@ export const heIL: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'אפס סיסמה',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'הסיסמה שלך שונתה בהצלחה. מחבר אותך, אנא המתן רגע.',
       title: 'אפס סיסמה',
     },
@@ -380,6 +388,7 @@ export const heIL: LocalizationResource = {
       actionLink: 'הרשמה',
       actionLink__use_email: 'השתמש בדוא"ל',
       actionLink__use_email_username: 'השתמש בדוא"ל או שם משתמש',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'השתמש בטלפון',
       actionLink__use_username: 'השתמש בשם משתמש',
       actionText: 'אין לך חשבון?',
@@ -459,6 +468,7 @@ export const heIL: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'הסיסמה שלך אינה מספיק חזקה.',
     form_password_pwned: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'הסיסמה שלך חורגת ממספר הבייטים המרבי המותר, נסה לקצר אותה או להסיר כמה תווים מיוחדים.',
     form_password_validation_failed: 'סיסמה שגויה',
@@ -466,6 +476,11 @@ export const heIL: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'פחות מ-{{length}} תווים',
       minimumLength: '{{length}} תווים או יותר',
@@ -523,6 +538,14 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'הועתק!',
       actionLabel__copy: 'העתק הכל',
@@ -671,6 +694,11 @@ export const heIL: LocalizationResource = {
       title: 'עדכן פרופיל',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'התנתק מהמכשיר',
         title: 'מכשירים פעילים',

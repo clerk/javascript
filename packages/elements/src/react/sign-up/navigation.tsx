@@ -1,5 +1,3 @@
-'use client';
-
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 
@@ -14,10 +12,11 @@ const SignUpNavigationEventMap = {
 export type SignUpNavigateElementKey = keyof typeof SignUpNavigationEventMap;
 
 export type SignUpNavigateElement = React.ElementRef<'button'>;
-export type SignInNavigateProps = WithChildrenProp<{
+export type SignUpNavigateProps = {
   asChild?: boolean;
   to: SignUpNavigateElementKey;
-}>;
+  children: React.ReactNode;
+};
 
 /**
  * Renders a button which will navigate to a different step in the sign-up flow.
@@ -30,7 +29,7 @@ export type SignInNavigateProps = WithChildrenProp<{
  *    Start over...
  * </Navigate>
  */
-export const SignUpNavigate = React.forwardRef<SignUpNavigateElement, SignInNavigateProps>(
+export const SignUpNavigate = React.forwardRef<SignUpNavigateElement, SignUpNavigateProps>(
   ({ asChild, to, ...rest }, forwardedRef) => {
     const actorRef = SignUpRouterCtx.useActorRef();
 

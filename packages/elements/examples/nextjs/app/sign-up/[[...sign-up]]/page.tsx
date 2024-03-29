@@ -1,10 +1,23 @@
 'use client';
 
-import { GlobalError } from '@clerk/elements/common';
-import { SignUp, SocialProvider, SocialProviderIcon, Step, Verification } from '@clerk/elements/sign-up';
+import { GlobalError, Loading } from '@clerk/elements/common';
+import { Action, Provider, ProviderIcon, SignUp, Step, Strategy } from '@clerk/elements/sign-up';
+import type { ComponentProps } from 'react';
 
 import { H1, HR as Hr } from '@/components/design';
-import { CustomField, CustomSubmit } from '@/components/form';
+import { CustomField } from '@/components/form';
+import { Spinner } from '@/components/spinner';
+
+function CustomSubmit({ children }: ComponentProps<'button'>) {
+  return (
+    <Action
+      className='inline-flex px-7 py-3 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,255,255)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(160,160,160)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'
+      submit
+    >
+      {children}
+    </Action>
+  );
+}
 
 export default function SignUpPage() {
   return (
@@ -15,29 +28,29 @@ export default function SignUpPage() {
             <H1>Sign Up</H1>
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
-              <SocialProvider
+              <Provider
                 name='github'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon className='invert' />
+                <ProviderIcon className='invert' />
                 Sign In with GitHub
-              </SocialProvider>
+              </Provider>
 
-              <SocialProvider
+              <Provider
                 name='google'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon />
+                <ProviderIcon />
                 Sign In with Google
-              </SocialProvider>
+              </Provider>
 
-              <SocialProvider
+              <Provider
                 name='metamask'
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <SocialProviderIcon />
+                <ProviderIcon />
                 Sign In with Metamask
-              </SocialProvider>
+              </Provider>
             </div>
 
             <Hr />
@@ -54,7 +67,19 @@ export default function SignUpPage() {
                 label='Phone Number'
                 name='phoneNumber'
               />
-              <CustomSubmit>Sign Up</CustomSubmit>
+              <CustomSubmit>
+                <Loading>
+                  {isLoading =>
+                    isLoading ? (
+                      <>
+                        <Spinner /> Loading...
+                      </>
+                    ) : (
+                      'Sign Up'
+                    )
+                  }
+                </Loading>
+              </CustomSubmit>
             </div>
           </div>
         </Step>
@@ -75,7 +100,19 @@ export default function SignUpPage() {
             name='phoneNumber'
           />
 
-          <CustomSubmit>Sign Up</CustomSubmit>
+          <CustomSubmit>
+            <Loading>
+              {isLoading =>
+                isLoading ? (
+                  <>
+                    <Spinner /> Loading...
+                  </>
+                ) : (
+                  'Sign Up'
+                )
+              }
+            </Loading>
+          </CustomSubmit>
         </Step>
 
         <Step name='verifications'>
@@ -83,25 +120,49 @@ export default function SignUpPage() {
 
           <GlobalError className='block text-red-400 font-mono' />
 
-          <Verification name='phone_code'>
+          <Strategy name='phone_code'>
             <CustomField
               label='SMS Code'
               name='code'
             />
 
-            <CustomSubmit>Verify</CustomSubmit>
-          </Verification>
+            <CustomSubmit>
+              <Loading>
+                {isLoading =>
+                  isLoading ? (
+                    <>
+                      <Spinner /> Loading...
+                    </>
+                  ) : (
+                    'Verify'
+                  )
+                }
+              </Loading>
+            </CustomSubmit>
+          </Strategy>
 
-          <Verification name='email_code'>
+          <Strategy name='email_code'>
             <CustomField
               label='Email Code'
               name='code'
             />
 
-            <CustomSubmit>Verify</CustomSubmit>
-          </Verification>
+            <CustomSubmit>
+              <Loading>
+                {isLoading =>
+                  isLoading ? (
+                    <>
+                      <Spinner /> Loading...
+                    </>
+                  ) : (
+                    'Verify'
+                  )
+                }
+              </Loading>
+            </CustomSubmit>
+          </Strategy>
 
-          <Verification name='email_link'>Please check your email for a link to verify your account.</Verification>
+          <Strategy name='email_link'>Please check your email for a link to verify your account.</Strategy>
         </Step>
       </div>
     </SignUp>

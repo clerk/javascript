@@ -2,6 +2,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  __experimental_formFieldLabel__passkeyName: 'Name of passkey',
   backButton: 'Back',
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
@@ -269,6 +270,7 @@ export const enUS: LocalizationResource = {
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
       blockButton__emailLink: 'Email link to {{identifier}}',
+      blockButton__passkey: 'Sign in with your passkey',
       blockButton__password: 'Sign in with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
@@ -340,10 +342,17 @@ export const enUS: LocalizationResource = {
       subtitle: 'An error occurred',
       title: 'Cannot sign in',
     },
+    passkey: {
+      subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+      title: 'Use your passkey',
+    },
     password: {
       actionLink: 'Use another method',
       subtitle: 'Enter the password associated with your account',
       title: 'Enter your password',
+    },
+    passwordPwned: {
+      title: 'Password compromised',
     },
     phoneCode: {
       formTitle: 'Verification code',
@@ -359,8 +368,7 @@ export const enUS: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
       title: 'Set new password',
     },
@@ -371,6 +379,7 @@ export const enUS: LocalizationResource = {
       actionLink: 'Sign up',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
+      actionLink__use_passkey: 'Use passkey instead',
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: 'Don’t have an account?',
@@ -451,6 +460,8 @@ export const enUS: LocalizationResource = {
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
+    form_password_pwned__sign_in:
+      'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -458,6 +469,11 @@ export const enUS: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: 'A passkey is already registered with this device.',
+    passkey_not_supported: 'Passkeys are not supported on this device.',
+    passkey_registration_cancelled: 'Passkey registration was cancelled or timed out.',
+    passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
+    passkeys_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} or more characters',
@@ -515,6 +531,14 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: '{{name}} will be removed from this account.',
+        title: 'Remove passkey',
+      },
+      subtitle__rename: 'You can change the passkey name to make it easier to find.',
+      title__rename: 'Rename Passkey',
+    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -671,6 +695,11 @@ export const enUS: LocalizationResource = {
       title: 'Update profile',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: 'Remove',
+        menuAction__rename: 'Rename',
+        title: 'Passkeys',
+      },
       activeDevicesSection: {
         destructiveAction: 'Sign out of device',
         title: 'Active devices',

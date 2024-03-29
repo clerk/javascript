@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: '돌아가기',
   badge__default: '기본값',
   badge__otherImpersonatorDevice: '기타 사칭 장치',
@@ -279,6 +280,7 @@ export const koKR: LocalizationResource = {
       blockButton__backupCode: '백업 코드 사용하기',
       blockButton__emailCode: '{{identifier}}로 이메일 코드 보내기',
       blockButton__emailLink: '{{identifier}}로 이메일 링크 보내기',
+      blockButton__passkey: undefined,
       blockButton__password: '비밀번호로 로그인',
       blockButton__phoneCode: '{{identifier}}로 SMS 코드 보내기',
       blockButton__totp: '인증 앱 사용하기',
@@ -349,10 +351,17 @@ export const koKR: LocalizationResource = {
       subtitle: '오류가 발생했습니다',
       title: '로그인할 수 없습니다',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '다른 방법 사용하기',
       subtitle: '계정에 등록된 비밀번호를 입력해 주세요',
       title: '비밀번호를 입력하세요',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: '인증 코드',
@@ -368,8 +377,7 @@ export const koKR: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: '비밀번호 재설정',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: '비밀번호가 성공적으로 변경되었습니다. 로그인하는 중입니다. 잠시만 기다려주세요.',
       title: '비밀번호 재설정',
     },
@@ -380,6 +388,7 @@ export const koKR: LocalizationResource = {
       actionLink: '회원가입',
       actionLink__use_email: '이메일 사용하기',
       actionLink__use_email_username: '이메일 또는 사용자 이름 사용하기',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: '휴대폰 번호 사용하기',
       actionLink__use_username: '사용자 이름 사용하기',
       actionText: '계정이 없으신가요?',
@@ -459,6 +468,7 @@ export const koKR: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: '비밀번호가 충분히 안전하지 않습니다.',
     form_password_pwned: '이 비밀번호는 유출사항이 발견되어 사용할 수 없으므로 대신 다른 비밀번호를 사용해 보세요.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       '비밀번호가 허용되는 최대 바이트 수를 초과했습니다. 비밀번호를 줄이거나 일부 특수 문자를 제거해 주세요.',
     form_password_validation_failed: '잘못된 비밀번호',
@@ -466,6 +476,11 @@ export const koKR: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} 보다 짧은 문자열',
       minimumLength: '{{length}} 또는 그 이상의 문자열',
@@ -523,6 +538,14 @@ export const koKR: LocalizationResource = {
     action__signOutAll: '모든 계정에서 로그아웃',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '복사 완료!',
       actionLabel__copy: '전체 복사',
@@ -672,6 +695,11 @@ export const koKR: LocalizationResource = {
       title: '프로필 업데이트',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: '이 장치에서 로그아웃',
         title: '활성화된 장치',

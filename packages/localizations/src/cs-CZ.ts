@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Zpět',
   badge__default: 'Výchozí',
   badge__otherImpersonatorDevice: 'Jiné zařízení představitele',
@@ -280,6 +281,7 @@ export const csCZ: LocalizationResource = {
       blockButton__backupCode: 'Použít záložní kód',
       blockButton__emailCode: 'Odeslat ověřovací kód na email {{identifier}}',
       blockButton__emailLink: 'Odeslat odkaz na email {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Přihlásit se pomocí hesla',
       blockButton__phoneCode: 'Poslat SMS kód na telefonní číslo {{identifier}}',
       blockButton__totp: 'Použít autentizační aplikaci',
@@ -351,10 +353,17 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Došlo k chybě',
       title: 'Nelze se přihlásit',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Použít jinou metodu',
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Zadejte své heslo',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Ověřovací kód',
@@ -370,8 +379,7 @@ export const csCZ: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Obnovit heslo',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Vaše heslo bylo úspěšně změněno. Přihlašuji vás, prosím počkejte okamžik.',
       title: 'Obnovit heslo',
     },
@@ -382,6 +390,7 @@ export const csCZ: LocalizationResource = {
       actionLink: 'Registrovat se',
       actionLink__use_email: 'Použít email',
       actionLink__use_email_username: 'Použít email nebo uživatelské jméno',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Použít telefon',
       actionLink__use_username: 'Použít uživatelské jméno',
       actionText: 'Nemáte účet?',
@@ -461,6 +470,7 @@ export const csCZ: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
     form_password_pwned: 'Toto heslo bylo nalezeno v rámci uniku dat a nemůže být použito, prosím zvolte jiné heslo.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Vaše heslo překročilo maximální povolený počet bytů, prosím zkrátit ho nebo odstranit některé speciální znaky.',
     form_password_validation_failed: 'Nesprávné heslo',
@@ -468,6 +478,11 @@ export const csCZ: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'méně než {{length}} znaků',
       minimumLength: '{{length}} nebo více znaků',
@@ -525,6 +540,14 @@ export const csCZ: LocalizationResource = {
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Zkopírováno!',
       actionLabel__copy: 'Zkopírovat vše',
@@ -680,6 +703,11 @@ export const csCZ: LocalizationResource = {
       title: 'Aktualizovat profil',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Odhlásit se z zařízení',
         title: 'Aktivní zařízení',

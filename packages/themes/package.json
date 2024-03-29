@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "2.0.0-beta.5",
+  "version": "2.0.0-beta.7",
   "description": "Themes for the Clerk auth components",
   "keywords": [
     "react",
@@ -36,8 +36,11 @@
     "dev": "tsc -p tsconfig.build.json --watch",
     "lint": "eslint src/"
   },
+  "dependencies": {
+    "@clerk/types": "4.0.0-beta.22",
+    "tslib": "2.4.1"
+  },
   "devDependencies": {
-    "@clerk/types": "4.0.0-beta.20",
     "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "typescript": "*"

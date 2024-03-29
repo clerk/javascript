@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Atrás',
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
@@ -44,15 +45,15 @@ export const esES: LocalizationResource = {
   footerPageLink__privacy: 'Privacidad',
   footerPageLink__terms: 'Términos',
   formButtonPrimary: 'Continuar',
-  formButtonPrimary__verify: 'Verify',
+  formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Has olvidado tu contraseña?',
-  formFieldError__matchingPasswords: 'Passwords match.',
-  formFieldError__notMatchingPasswords: "Passwords don't match.",
-  formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
+  formFieldError__matchingPasswords: 'Las contraseñas coinciden.',
+  formFieldError__notMatchingPasswords: 'Las contraseñas no coinciden.',
+  formFieldError__verificationLinkExpired: 'El enlace de verificación ha expirado. Por favor solicite uno nuevo.',
   formFieldHintText__optional: 'Opcional',
-  formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldHintText__slug: 'Un slug es un ID legible que debe ser único. Es comúnmente usado en URLs.',
   formFieldInputPlaceholder__backupCode: '',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddress_username: '',
   formFieldInputPlaceholder__emailAddresses:
@@ -66,9 +67,9 @@ export const esES: LocalizationResource = {
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
+  formFieldLabel__automaticInvitations: 'Activar invitaciones automáticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',
-  formFieldLabel__confirmDeletion: 'Confirmation',
+  formFieldLabel__confirmDeletion: 'Confirmación',
   formFieldLabel__confirmPassword: 'Confirme la contraseña',
   formFieldLabel__currentPassword: 'Contraseña actual',
   formFieldLabel__emailAddress: 'Correo electrónico',
@@ -77,11 +78,11 @@ export const esES: LocalizationResource = {
   formFieldLabel__firstName: 'Nombre',
   formFieldLabel__lastName: 'Apellidos',
   formFieldLabel__newPassword: 'Nueva contraseña',
-  formFieldLabel__organizationDomain: 'Domain',
-  formFieldLabel__organizationDomainDeletePending: 'Delete pending invitations and suggestions',
-  formFieldLabel__organizationDomainEmailAddress: 'Verification email address',
+  formFieldLabel__organizationDomain: 'Dominio',
+  formFieldLabel__organizationDomainDeletePending: 'Borrar invitaciones y sugerencias pendientes',
+  formFieldLabel__organizationDomainEmailAddress: 'Correo de verificación',
   formFieldLabel__organizationDomainEmailAddressDescription:
-    'Enter an email address under this domain to receive a code and verify this domain.',
+    'Ingrese una dirección de correo electrónico bajo este dominio para recibir un código y verificarlo.',
   formFieldLabel__organizationName: 'Nombre de la Organización',
   formFieldLabel__organizationSlug: 'Slug',
   formFieldLabel__password: 'Contraseña',
@@ -97,31 +98,31 @@ export const esES: LocalizationResource = {
   membershipRole__basicMember: 'Miembro',
   membershipRole__guestMember: 'Invitado',
   organizationList: {
-    action__createOrganization: 'Create organization',
+    action__createOrganization: 'Crear organización',
     action__invitationAccept: 'Join',
-    action__suggestionsAccept: 'Request to join',
-    createOrganization: 'Create Organization',
-    invitationAcceptedLabel: 'Joined',
+    action__suggestionsAccept: 'Solicitud a unirse',
+    createOrganization: 'Crear Organización',
+    invitationAcceptedLabel: 'Unido',
     subtitle: 'to continue to {{applicationName}}',
-    suggestionsAcceptedLabel: 'Pending approval',
+    suggestionsAcceptedLabel: 'Aprobación pendiente',
     title: 'Choose an account',
-    titleWithoutPersonal: 'Choose an organization',
+    titleWithoutPersonal: 'Escoja una organización',
   },
   organizationProfile: {
-    badge__automaticInvitation: 'Automatic invitations',
-    badge__automaticSuggestion: 'Automatic suggestions',
-    badge__manualInvitation: 'No automatic enrollment',
-    badge__unverified: 'Unverified',
+    badge__automaticInvitation: 'Invitaciones automáticas',
+    badge__automaticSuggestion: 'Sugerencias automáticas',
+    badge__manualInvitation: 'Sin inscripción automática',
+    badge__unverified: 'No verificado',
     createDomainPage: {
       subtitle:
-        'Add the domain to verify. Users with email addresses at this domain can join the organization automatically or request to join.',
-      title: 'Add domain',
+        'Agregue el dominio para verificar. Los usuarios con direcciones de correo electrónico en este dominio pueden unirse a la organización automáticamente o solicitar unirse.',
+      title: 'Agregar dominio',
     },
     invitePage: {
       detailsTitle__inviteFailed:
         'No se pudieron enviar las invitaciones. Solucione lo siguiente y vuelva a intentarlo:',
       formButtonPrimary__continue: 'Enviar invitaciones',
-      selectDropdown__role: 'Select role',
+      selectDropdown__role: 'Seleccionar rol',
       subtitle: 'Invitar nuevos miembros a esta organización',
       successMessage: 'Invitaciones enviadas con éxito',
       title: 'Invitar miembros',
@@ -139,11 +140,11 @@ export const esES: LocalizationResource = {
       invitationsTab: {
         autoInvitations: {
           headerSubtitle:
-            'Invite users by connecting an email domain with your organization. Anyone who signs up with a matching email domain will be able to join the organization anytime.',
-          headerTitle: 'Automatic invitations',
-          primaryButton: 'Manage verified domains',
+            'Invite a usuarios conectando un dominio de correo electrónico con su organización. Cualquiera que se registre con un dominio de correo electrónico coincidente podrá unirse a la organización en cualquier momento.',
+          headerTitle: 'Invitaciones automáticas',
+          primaryButton: 'Gestionar dominios verificados',
         },
-        table__emptyRow: 'No invitations to display',
+        table__emptyRow: 'Sin invitaciones para mostrar',
       },
       invitedMembersTab: {
         menuAction__revoke: 'Revocar invitación',
@@ -152,26 +153,26 @@ export const esES: LocalizationResource = {
       requestsTab: {
         autoSuggestions: {
           headerSubtitle:
-            'Users who sign up with a matching email domain, will be able to see a suggestion to request to join your organization.',
-          headerTitle: 'Automatic suggestions',
-          primaryButton: 'Manage verified domains',
+            'Los usuarios que se registren con un dominio de correo electrónico coincidente podrán ver una sugerencia para solicitar unirse a su organización.',
+          headerTitle: 'Sugerencias automáticas',
+          primaryButton: 'Gestionar dominios verificados',
         },
-        menuAction__approve: 'Approve',
-        menuAction__reject: 'Reject',
-        tableHeader__requested: 'Requested access',
-        table__emptyRow: 'No requests to display',
+        menuAction__approve: 'Aprobar',
+        menuAction__reject: 'Rechazar',
+        tableHeader__requested: 'Acceso solicitado',
+        table__emptyRow: 'Sin solicitudes para mostrar',
       },
       start: {
-        headerTitle__invitations: 'Invitations',
-        headerTitle__members: 'Members',
-        headerTitle__requests: 'Requests',
+        headerTitle__invitations: 'Invitaciones',
+        headerTitle__members: 'Miembros',
+        headerTitle__requests: 'Solicitudes',
       },
     },
     navbar: {
-      description: 'Manage your organization.',
+      description: 'Gestione su organización.',
       general: 'General',
-      members: 'Members',
-      title: 'Organization',
+      members: 'Miembros',
+      title: 'Organización',
     },
     profilePage: {
       dangerSection: {
@@ -282,6 +283,7 @@ export const esES: LocalizationResource = {
       blockButton__backupCode: 'Usa un código de respaldo',
       blockButton__emailCode: 'Enviar código a{{identifier}}',
       blockButton__emailLink: 'Enviar enlace a{{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Entra con tu contraseña',
       blockButton__phoneCode: 'Enviar código a{{identifier}}',
       blockButton__totp: 'Usa tu aplicación de autenticación',
@@ -353,10 +355,17 @@ export const esES: LocalizationResource = {
       subtitle: 'Ocurrió un error',
       title: 'No puedo iniciar sesión',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Use otro método',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Introduzca su contraseña',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificación',
@@ -372,8 +381,7 @@ export const esES: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
       title: 'Set new password',
     },
@@ -384,6 +392,7 @@ export const esES: LocalizationResource = {
       actionLink: 'Regístrese',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: '¿No tiene cuenta?',
@@ -463,6 +472,7 @@ export const esES: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned: '',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -470,6 +480,11 @@ export const esES: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -527,6 +542,14 @@ export const esES: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -684,6 +707,11 @@ export const esES: LocalizationResource = {
       title: 'Actualizar Cuenta',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Cerrar sesión en el dispositivo',
         title: 'Dispositivos activos',
@@ -698,8 +726,8 @@ export const esES: LocalizationResource = {
         title: 'Cuentas conectadas',
       },
       dangerSection: {
-        title: 'Eliminar cuenta',
         deleteAccountButton: 'Eliminar cuenta',
+        title: 'Eliminar cuenta',
       },
       emailAddressesSection: {
         destructiveAction: 'Eliminar dirección de correo electrónico',

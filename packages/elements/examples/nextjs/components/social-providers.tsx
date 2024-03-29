@@ -1,6 +1,6 @@
 'use client';
 
-import { SocialProviderIcon as ClerkElementsSocialProviderIcon } from '@clerk/elements/common';
+import { ProviderIcon as ClerkElementsProviderIcon } from '@clerk/elements/common';
 import Image from 'next/image';
 import type { ComponentProps } from 'react';
 
@@ -8,8 +8,8 @@ import type { ComponentProps } from 'react';
  * Helper component for easily circumventing Next's typing
  * which requires `src`. It's being passed by the parent component.
  */
-export const SocialProviderIcon = (props: ComponentProps<typeof ClerkElementsSocialProviderIcon>) => (
-  <ClerkElementsSocialProviderIcon
+export const SocialProviderIcon = (props: ComponentProps<typeof ClerkElementsProviderIcon>) => (
+  <ClerkElementsProviderIcon
     {...props}
     asChild
   >
@@ -18,5 +18,5 @@ export const SocialProviderIcon = (props: ComponentProps<typeof ClerkElementsSoc
       height={24}
       width={24}
     />
-  </ClerkElementsSocialProviderIcon>
+  </ClerkElementsProviderIcon>
 );

@@ -1,4 +1,4 @@
-import { NEXT_ROUTING_CHANGE_VERSION } from '~/internals/constants';
+import { NEXT_WINDOW_HISTORY_SUPPORT_VERSION } from '~/internals/constants';
 
 export function shouldUseVirtualRouting() {
   if (typeof window === 'undefined') {
@@ -9,5 +9,5 @@ export function shouldUseVirtualRouting() {
     return false;
   }
 
-  return window.next.version < NEXT_ROUTING_CHANGE_VERSION;
+  return window.next.version < NEXT_WINDOW_HISTORY_SUPPORT_VERSION;
 }

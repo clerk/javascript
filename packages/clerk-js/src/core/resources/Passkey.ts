@@ -1,4 +1,5 @@
 import type {
+  __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   DeletedObjectJSON,
   DeletedObjectResource,
   PasskeyJSON,
@@ -8,18 +9,19 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import type { PublicKeyCredentialWithAuthenticatorAttestationResponse } from '../../utils/passkeys';
 import {
+  ClerkWebAuthnError,
   isWebAuthnPlatformAuthenticatorSupported,
+  isWebAuthnSupported,
   serializePublicKeyCredential,
   webAuthnCreateCredential,
 } from '../../utils/passkeys';
-import { BaseResource, ClerkRuntimeError, DeletedObject, PasskeyVerification } from './internal';
+import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
+import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
 
 export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;
   pathRoot = '/me/passkeys';
-  credentialId: string | null = null;
   verification: PasskeyVerificationResource | null = null;
   name: string | null = null;
   lastUsedAt: Date | null = null;
@@ -40,7 +42,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
   private static async attemptVerification(
     passkeyId: string,
-    credential: PublicKeyCredentialWithAuthenticatorAttestationResponse,
+    credential: __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   ) {
     const jsonPublicKeyCredential = serializePublicKeyCredential(credential);
     return BaseResource._fetch({
@@ -58,14 +60,9 @@ export class Passkey extends BaseResource implements PasskeyResource {
      * The UI should always prevent from this method being called if WebAuthn is not supported.
      * As a precaution we need to check if WebAuthn is supported.
      */
-
-    /**
-     * TODO-PASSKEYS: First simply check if webauthn is supported and check for this only when
-     * publicKey?.authenticatorSelection.authenticatorAttachment === 'platform'
-     */
-    if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
-      throw new ClerkRuntimeError('Platform authenticator is not supported', {
-        code: 'passkeys_unsupported_platform_authenticator',
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported on this device.', {
+        code: 'passkey_not_supported',
       });
     }
 
@@ -75,10 +72,20 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
     const publicKey = verification?.publicKey;
 
-    // This should never occur such a fail-safe
+    // This should never occur, just a fail-safe
     if (!publicKey) {
-      // TODO-PASSKEYS: Implement this later
-      throw 'Missing key';
+      clerkMissingWebAuthnPublicKeyOptions('create');
+    }
+
+    if (publicKey.authenticatorSelection?.authenticatorAttachment === 'platform') {
+      if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
+        throw new ClerkWebAuthnError(
+          'Registration requires a platform authenticator but the device does not support it.',
+          {
+            code: 'passkeys_pa_not_supported',
+          },
+        );
+      }
     }
 
     // Invoke the WebAuthn create() method.
@@ -105,7 +112,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
   delete = async (): Promise<DeletedObjectResource> => {
     const json = (
       await BaseResource._fetch<DeletedObjectJSON>({
-        path: `${this.path()}/${this.id}`,
+        path: this.path(),
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;
@@ -119,7 +126,6 @@ export class Passkey extends BaseResource implements PasskeyResource {
     }
 
     this.id = data.id;
-    this.credentialId = data.credential_id;
     this.name = data.name;
     this.lastUsedAt = data.last_used_at ? unixEpochToDate(data.last_used_at) : null;
     this.createdAt = unixEpochToDate(data.created_at);

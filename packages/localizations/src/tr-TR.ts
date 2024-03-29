@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Geri',
   badge__default: 'Varsayılan',
   badge__otherImpersonatorDevice: 'Farklı bir kılıkçı cihazı',
@@ -281,6 +282,7 @@ export const trTR: LocalizationResource = {
       blockButton__backupCode: 'Yedekleme kodu kullan',
       blockButton__emailCode: '{{identifier}} adresine doğrulama kodu gönder',
       blockButton__emailLink: '{{identifier}} adresine doğrulama bağlantısı gönder',
+      blockButton__passkey: undefined,
       blockButton__password: 'Şifreyle giriş yap',
       blockButton__phoneCode: '{{identifier}} numarasına doğrulama kodu gönder',
       blockButton__totp: 'Authenticator uygulaması kullan',
@@ -352,10 +354,17 @@ export const trTR: LocalizationResource = {
       subtitle: 'Bir hata oluştu',
       title: 'Giriş yapılamıyor',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Başka bir yöntem kullan',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Şifrenizi girin',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Doğrulama kodu',
@@ -371,8 +380,7 @@ export const trTR: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Şifremi sıfırla',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Şifreniz başarıyla sıfırlandı. Oturumunuz açılıyor...',
       title: 'Şifre sıfırlama',
     },
@@ -383,6 +391,7 @@ export const trTR: LocalizationResource = {
       actionLink: 'Kayıt ol',
       actionLink__use_email: 'E-posta kullan',
       actionLink__use_email_username: 'E-posta veya kullanıcı adı kullan',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Telefon kullan',
       actionLink__use_username: 'Kullanıcı adı kullan',
       actionText: 'Hesabınız yok mu?',
@@ -463,6 +472,7 @@ export const trTR: LocalizationResource = {
     form_password_not_strong_enough: 'Şifreniz fazla zayıf',
     form_password_pwned:
       'Bu şifre bir veri saldırısında ele geçirildiği için kullanılamaz. Lütfen başka bir şifre deneyin.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Şifrenize ayrılan depolama alanını aştınız. Lütfen daha kısa bir şifre deneyin.',
     form_password_validation_failed: 'Geçersiz şifre',
@@ -470,6 +480,11 @@ export const trTR: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} karakterden kısa olmalı',
       minimumLength: '{{length}} veya daha fazla karakter içermeli',
@@ -527,6 +542,14 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopyalandı!',
       actionLabel__copy: 'Hepsini kopayala',
@@ -682,6 +705,11 @@ export const trTR: LocalizationResource = {
       title: 'Profili güncelle',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Cihaz oturumunu sonlandır',
         title: 'Aktif cihazlar',

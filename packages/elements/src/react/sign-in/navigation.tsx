@@ -1,5 +1,3 @@
-'use client';
-
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 
@@ -16,10 +14,11 @@ const SignInNavigationEventMap = {
 export type SignInNavigateElementKey = keyof typeof SignInNavigationEventMap;
 
 export type SignInNavigateElement = React.ElementRef<'button'>;
-export type SignInNavigateProps = WithChildrenProp<{
+export type SignInNavigateProps = {
   asChild?: boolean;
   to: SignInNavigateElementKey;
-}>;
+  children: React.ReactNode;
+};
 
 /**
  * Renders a button which will navigate to a different step in the sign-in flow.

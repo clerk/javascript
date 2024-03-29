@@ -31,40 +31,12 @@ export function assertValidHandlerResult(val: any, error?: string): asserts val 
   }
 }
 
-const observabilityHeadersFromRequestState = (requestState: RequestState): Headers => {
-  const headers = {} as Record<string, string>;
-
-  if (requestState.message) {
-    headers[constants.Headers.AuthMessage] = requestState.message;
-  }
-  if (requestState.reason) {
-    headers[constants.Headers.AuthReason] = requestState.reason;
-  }
-  if (requestState.status) {
-    headers[constants.Headers.AuthStatus] = requestState.status;
-  }
-
-  return new Headers(headers);
-};
-
-/**
- * Retrieve Clerk auth headers. Should be used only for debugging and not in production.
- * @internal
- */
-export const getClerkDebugHeaders = (headers: Headers) => {
-  return {
-    [constants.Headers.AuthMessage]: headers.get(constants.Headers.AuthMessage),
-    [constants.Headers.AuthReason]: headers.get(constants.Headers.AuthReason),
-    [constants.Headers.AuthStatus]: headers.get(constants.Headers.AuthStatus),
-  };
-};
-
 export const injectRequestStateIntoResponse = async (
   response: Response,
   requestState: RequestState,
   context: AppLoadContext,
 ) => {
-  const clone = response.clone();
+  const clone = new Response(response.body, response);
   const data = await clone.json();
 
   const { clerkState, headers } = getResponseClerkState(requestState, context);
@@ -125,11 +97,9 @@ export function getResponseClerkState(requestState: RequestState, context: AppLo
     __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG', context)),
   });
 
-  const headers = observabilityHeadersFromRequestState(requestState);
-
   return {
     clerkState,
-    headers,
+    headers: requestState.headers,
   };
 }
 

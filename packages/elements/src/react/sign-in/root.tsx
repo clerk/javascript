@@ -1,5 +1,3 @@
-'use client';
-
 import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { createActor } from 'xstate';
@@ -8,11 +6,13 @@ import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internal
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
 import { SignInRouterMachine } from '~/internals/machines/sign-in/machines';
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in/types';
-import { consoleInspector } from '~/react/hooks';
+import { consoleInspector } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
-type SignInFlowProviderProps = WithChildrenProp;
+type SignInFlowProviderProps = {
+  children: React.ReactNode;
+};
 
 const actor = createActor(SignInRouterMachine, { inspect: consoleInspector });
 const ref = actor.start();
@@ -39,7 +39,7 @@ function SignInFlowProvider({ children }: SignInFlowProviderProps) {
   return <SignInRouterCtx.Provider actorRef={ref}>{children}</SignInRouterCtx.Provider>;
 }
 
-export type SignInRootProps = SignInFlowProviderProps & { path?: string };
+export type SignInRootProps = { path?: string; children: React.ReactNode };
 
 /**
  * Root component for the sign-in flow. It sets up providers and state management for its children.

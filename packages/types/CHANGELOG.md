@@ -1,5 +1,56 @@
 # Change Log
 
+## 4.0.0-beta.22
+
+### Minor Changes
+
+- Improved error handling for registration and retrieval of passkeys. ([#3025](https://github.com/clerk/javascript/pull/3025)) by [@panteliselef](https://github.com/panteliselef)
+
+  ClerkRuntimeError codes introduced:
+
+  - `passkey_not_supported`
+  - `passkeys_pa_not_supported`
+  - `passkey_invalid_rpID_or_domain`
+  - `passkey_already_exists`
+  - `passkey_operation_aborted`
+  - `passkey_retrieval_cancelled`
+  - `passkey_retrieval_failed`
+  - `passkey_registration_cancelled`
+  - `passkey_registration_failed`
+
+  Example usage:
+
+  ```ts
+  try {
+    await __experimental_authenticateWithPasskey(...args);
+  }catch (e) {
+    if (isClerkRuntimeError(e)) {
+        if (err.code === 'passkey_operation_aborted') {
+            ...
+        }
+    }
+  }
+
+
+  ```
+
+## 4.0.0-beta.21
+
+### Minor Changes
+
+- List passkeys under security in UserProfile. ([#2958](https://github.com/clerk/javascript/pull/2958)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Supports renaming a passkey.
+  - Supports deleting a passkey.
+
+- Experimental support for authenticating with a passkey. ([#2970](https://github.com/clerk/javascript/pull/2970)) by [@panteliselef](https://github.com/panteliselef)
+
+  Example usage: `await signIn.authenticateWithPasskey()`.
+
+- Remove the unused appearance keys for accordion and breadcrumb elements. ([#2956](https://github.com/clerk/javascript/pull/2956)) by [@desiprisg](https://github.com/desiprisg)
+
+- Allow users to authenticate with passkeys via the `<SignIn/>`. ([#3000](https://github.com/clerk/javascript/pull/3000)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.0.0-beta.20
 
 ### Minor Changes

@@ -57,6 +57,8 @@ jobs:
         with:
           commit: "chore(repo): Version packages"
           publish: npm run release
+          # Workaround for https://github.com/changesets/changesets/issues/421
+          version: npm run version
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

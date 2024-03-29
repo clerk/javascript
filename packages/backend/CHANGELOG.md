@@ -1,5 +1,45 @@
 # Change Log
 
+## 1.0.0-beta.31
+
+### Patch Changes
+
+- Fix typo in `jwk-remote-missing` error message ([#3057](https://github.com/clerk/javascript/pull/3057)) by [@dimkl](https://github.com/dimkl)
+
+## 1.0.0-beta.30
+
+### Patch Changes
+
+- Updated dependencies [[`8350109ab`](https://github.com/clerk/javascript/commit/8350109ab85909e0457199da1db0c9787d94001e)]:
+  - @clerk/shared@2.0.0-beta.20
+
+## 1.0.0-beta.29
+
+### Minor Changes
+
+- Add `external_account_id` to OAuth access token response ([#2982](https://github.com/clerk/javascript/pull/2982)) by [@kostaspt](https://github.com/kostaspt)
+
+### Patch Changes
+
+- Introduce `clerkClient.samlConnections` to expose `getSamlConnectionList`, `createSamlConnection`, `getSamlConnection`, `updateSamlConnection` and `deleteSamlConnection` endpoints. Introduce `SamlConnection` resource for BAPI. ([#2980](https://github.com/clerk/javascript/pull/2980)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+  Example:
+
+  ```
+  import { clerkClient } from '@clerk/nextjs/server';
+  const samlConnection = await clerkClient.samlConnections.getSamlConnectionList();
+  ```
+
+- Export the JSON types for clerk resources. ([#2965](https://github.com/clerk/javascript/pull/2965)) by [@desiprisg](https://github.com/desiprisg)
+
+- Fix infinite redirect loops for production instances with incorrect secret keys' ([#2994](https://github.com/clerk/javascript/pull/2994)) by [@dimkl](https://github.com/dimkl)
+
+## 1.0.0-beta.28
+
+### Minor Changes
+
+- Expose debug headers in response for handshake / signed-out states from SDKs using headers returned from `authenticateRequest()` ([#2898](https://github.com/clerk/javascript/pull/2898)) by [@dimkl](https://github.com/dimkl)
+
 ## 1.0.0-beta.27
 
 ### Patch Changes

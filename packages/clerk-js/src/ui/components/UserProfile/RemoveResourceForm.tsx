@@ -1,4 +1,5 @@
 import { useUser } from '@clerk/shared/react';
+import type { PasskeyResource } from '@clerk/types';
 import React from 'react';
 
 import { RemoveResourceForm } from '../../common';
@@ -195,6 +196,24 @@ export const RemoveMfaTOTPForm = (props: RemoveMfaTOTPFormProps) => {
       messageLine2={localizationKeys('userProfile.mfaTOTPPage.removeResource.messageLine2')}
       successMessage={localizationKeys('userProfile.mfaTOTPPage.removeResource.successMessage')}
       deleteResource={user.disableTOTP}
+      onSuccess={onSuccess}
+      onReset={onReset}
+    />
+  );
+};
+
+type RemovePasskeyFormProps = FormProps & { passkey: PasskeyResource };
+
+export const RemovePasskeyForm = (props: RemovePasskeyFormProps) => {
+  const { onSuccess, onReset, passkey } = props;
+
+  return (
+    <RemoveResourceForm
+      title={localizationKeys('userProfile.__experimental_passkeyScreen.removeResource.title')}
+      messageLine1={localizationKeys('userProfile.__experimental_passkeyScreen.removeResource.messageLine1', {
+        name: passkey.name,
+      })}
+      deleteResource={passkey.delete}
       onSuccess={onSuccess}
       onReset={onReset}
     />

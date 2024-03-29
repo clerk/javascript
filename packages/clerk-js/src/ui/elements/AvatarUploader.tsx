@@ -118,7 +118,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
             )}
           </Flex>
           <Text
-            colorScheme='neutral'
+            colorScheme='secondary'
             sx={t => ({ fontSize: t.fontSizes.$sm })}
             localizationKey={localizationKeys('userProfile.profilePage.fileDropAreaHint')}
           />

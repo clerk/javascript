@@ -1,5 +1,38 @@
 # Change Log
 
+## 5.0.0-beta.32
+
+### Patch Changes
+
+- Updated dependencies [[`988a299c0`](https://github.com/clerk/javascript/commit/988a299c0abf708e905592c29e394f8e4d79968e)]:
+  - @clerk/backend@1.0.0-beta.31
+
+## 5.0.0-beta.31
+
+### Patch Changes
+
+- Updated dependencies [[`8350109ab`](https://github.com/clerk/javascript/commit/8350109ab85909e0457199da1db0c9787d94001e)]:
+  - @clerk/shared@2.0.0-beta.20
+  - @clerk/backend@1.0.0-beta.30
+
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- Updated dependencies [[`8c23651b8`](https://github.com/clerk/javascript/commit/8c23651b8c3ff1474057a7d62e3ddba939cb0b64), [`9272006e7`](https://github.com/clerk/javascript/commit/9272006e744fc906cfdee520d2dc6d7db141cc97), [`2671e7aa5`](https://github.com/clerk/javascript/commit/2671e7aa5081eb9ae38b92ee647f2e3fd824741f), [`66b283653`](https://github.com/clerk/javascript/commit/66b28365370bcbcdf4e51da39de58c7f8b1fc1b4)]:
+  - @clerk/backend@1.0.0-beta.29
+
+## 5.0.0-beta.29
+
+### Minor Changes
+
+- Expose debug headers in response for handshake / signed-out states from SDKs using headers returned from `authenticateRequest()` ([#2898](https://github.com/clerk/javascript/pull/2898)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Updated dependencies [[`2964f8a47`](https://github.com/clerk/javascript/commit/2964f8a47e473fa8457a27104adb4d008613a0e3)]:
+  - @clerk/backend@1.0.0-beta.28
+
 ## 5.0.0-beta.28
 
 ### Patch Changes

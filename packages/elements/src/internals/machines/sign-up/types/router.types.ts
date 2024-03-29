@@ -5,6 +5,7 @@ import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
   BaseRouterInput,
+  BaseRouterLoadingEvent,
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
   BaseRouterRedirectEvent,
@@ -45,6 +46,7 @@ export type SignUpRouterPrevEvent = BaseRouterPrevEvent;
 export type SignUpRouterErrorEvent = BaseRouterErrorEvent;
 export type SignUpRouterTransferEvent = BaseRouterTransferEvent;
 export type SignUpRouterRedirectEvent = BaseRouterRedirectEvent;
+export type SignUpRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'continue'>;
 
 export interface SignUpRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -68,7 +70,8 @@ export type SignUpRouterEvents =
   | SignUpRouterErrorEvent
   | SignUpRouterTransferEvent
   | SignUpRouterRedirectEvent
-  | SignUpRouterRouteEvents;
+  | SignUpRouterRouteEvents
+  | SignUpRouterLoadingEvent;
 
 // ---------------------------------- Delays ---------------------------------- //
 
@@ -80,8 +83,11 @@ export type SignUpRouterDelays = keyof typeof SignUpRouterDelays;
 
 // ---------------------------------- Context ---------------------------------- //
 
+export type SignUpRouterLoadingContext = Omit<SignUpRouterLoadingEvent, 'type'>;
+
 export interface SignUpRouterContext extends BaseRouterContext {
   signInPath: string;
+  loading: SignUpRouterLoadingContext;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

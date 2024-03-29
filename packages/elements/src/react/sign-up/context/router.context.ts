@@ -9,7 +9,7 @@ import { createContextFromActorRef } from '~/react/utils/create-context-from-act
 
 export type SnapshotState = SnapshotFrom<TSignUpRouterMachine>;
 
-export const SignUpRouterCtx = createContextFromActorRef<TSignUpRouterMachine>('SignInRouterCtx');
+export const SignUpRouterCtx = createContextFromActorRef<TSignUpRouterMachine>('SignUpRouterCtx');
 
 export function useSignUpRouteRegistration<
   TLogic extends AnyActorLogic,

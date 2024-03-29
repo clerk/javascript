@@ -81,7 +81,7 @@ export const AddPhone = (props: AddPhoneProps) => {
       >
         <Text
           localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')}
-          colorScheme='neutral'
+          colorScheme='secondary'
         />
         <Form.ControlRow elementId={phoneField.id}>
           <Form.PhoneInput

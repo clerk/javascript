@@ -25,6 +25,9 @@ export default function Page() {
                 <div
                   className={clsx(
                     'relative flex h-14 w-12 items-center justify-center rounded-md bg-neutral-900 shadow-[0_10px_19px_4px_theme(colors.black/16%),_0_-10px_16px_-4px_theme(colors.white/4%),_0_0_0_1px_theme(colors.white/1%),_0_1px_0_0_theme(colors.white/2%)]',
+                    (status === 'cursor' || status === 'selected') &&
+                      'border border-sky-400 shadow-[0_0_8px_2px_theme(colors.sky.400/30%)]',
+                    status === 'hovered' && 'border border-sky-700 shadow-[0_0_8px_2px_theme(colors.sky.700/30%)]',
                   )}
                 >
                   <AnimatePresence>
@@ -41,13 +44,13 @@ export default function Page() {
                     {value}
                   </AnimatePresence>
 
-                  {(status === 'cursor' || status === 'selected') && (
+                  {/* {(status === 'cursor' || status === 'selected') && (
                     <motion.div
                       layoutId='tab-trigger-underline'
                       transition={{ duration: 0.2, type: 'spring', damping: 20, stiffness: 200 }}
                       className='absolute inset-0 border border-sky-400 shadow-[0_0_8px_2px_theme(colors.sky.400/30%)] z-10 rounded-[inherit] bg-sky-400/10'
                     />
-                  )}
+                  )} */}
                 </div>
               )}
             />

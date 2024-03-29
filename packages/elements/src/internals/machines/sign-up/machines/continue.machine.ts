@@ -1,10 +1,11 @@
 import { snakeToCamel } from '@clerk/shared';
 import type { SignUpResource } from '@clerk/types';
-import type { ActorRefFrom } from 'xstate';
-import { fromPromise, sendParent, setup } from 'xstate';
+import type { ActorRefFrom, DoneActorEvent } from 'xstate';
+import { fromPromise, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormDefaultValues, FormFields } from '~/internals/machines/form/form.types';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
 import type { SignUpContinueSchema } from '~/internals/machines/sign-up/types';
 import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
@@ -56,6 +57,9 @@ export const SignUpContinueMachine = setup({
       });
     },
     unmarkFormAsProgressive: ({ context }) => context.formRef.send({ type: 'UNMARK_AS_PROGRESSIVE' }),
+    sendToNext: ({ context, event }) =>
+      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignUpResource>).output }),
+    sendToLoading,
   },
   types: {} as SignUpContinueSchema,
 }).createMachine({
@@ -64,6 +68,7 @@ export const SignUpContinueMachine = setup({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
     formRef: input.form,
     parent: input.parent,
+    loadingStep: 'continue',
   }),
   entry: 'markFormAsProgressive',
   onDone: {
@@ -75,11 +80,15 @@ export const SignUpContinueMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
-        SUBMIT: 'Attempting',
+        SUBMIT: {
+          target: 'Attempting',
+          reenter: true,
+        },
       },
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -88,10 +97,10 @@ export const SignUpContinueMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: sendParent(({ event }) => ({ type: 'NEXT', resource: event.output })),
+          actions: ['sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: 'setFormErrors',
+          actions: ['setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },

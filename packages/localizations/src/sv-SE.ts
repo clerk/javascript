@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Tillbaka',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
@@ -281,6 +282,7 @@ export const svSE: LocalizationResource = {
       blockButton__backupCode: 'Använd en reservkod',
       blockButton__emailCode: 'Skicka kod till {{identifier}}',
       blockButton__emailLink: 'Skicka länk till {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Logga in med ditt lösenord',
       blockButton__phoneCode: 'Skicka kod till {{identifier}}',
       blockButton__totp: 'Använd din autentiseringsapp',
@@ -352,10 +354,17 @@ export const svSE: LocalizationResource = {
       subtitle: 'Ett fel inträffade',
       title: 'Kan inte logga in',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Använd en annan metod',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Ange ditt lösenord',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifieringskod',
@@ -371,8 +380,7 @@ export const svSE: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Reset Password',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: 'Your password was successfully changed. Signing you in, please wait a moment.',
       title: 'Set new password',
     },
@@ -383,6 +391,7 @@ export const svSE: LocalizationResource = {
       actionLink: 'Skapa konto',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: 'Har du inget konto?',
@@ -462,6 +471,7 @@ export const svSE: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned: '',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -469,6 +479,11 @@ export const svSE: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -526,6 +541,14 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopierat!',
       actionLabel__copy: 'Kopiera alla',
@@ -680,6 +703,11 @@ export const svSE: LocalizationResource = {
       title: 'Uppdatera profil',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Logga ut från enhet',
         title: 'Aktiva enheter',

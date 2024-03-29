@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
-import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
+import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
@@ -120,7 +120,11 @@ function _SignUpStart(): JSX.Element {
           signUp,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () => setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => {
+            removeClerkQueryParam('__clerk_ticket');
+            removeClerkQueryParam('__clerk_invitation_token');
+            return setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp });
+          },
           navigate,
         });
       })
@@ -151,7 +155,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
-            card.setError(error.longMessage);
+            card.setError(error);
             break;
           default:
             // Error from server may be too much information for the end user, so set a generic error

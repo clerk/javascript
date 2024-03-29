@@ -1,11 +1,12 @@
 import type { SignInResource } from '@clerk/types';
-import type { AnyActorLogic } from 'xstate';
+import type { AnyActorLogic, MachineSnapshot } from 'xstate';
 
 import type { SignInVerificationFactorUpdateEvent } from '~/internals/machines/sign-in/types';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
   BaseRouterInput,
+  BaseRouterLoadingEvent,
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
   BaseRouterRedirectEvent,
@@ -50,6 +51,7 @@ export type SignInRouterForgotPasswordEvent = { type: 'NAVIGATE.FORGOT_PASSWORD'
 export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
+export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications'>;
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -78,12 +80,16 @@ export type SignInRouterEvents =
   | SignInRouterTransferEvent
   | SignInRouterRouteEvents
   | SignInRouterRedirectEvent
-  | SignInVerificationFactorUpdateEvent;
+  | SignInVerificationFactorUpdateEvent
+  | SignInRouterLoadingEvent;
 
 // ---------------------------------- Context ---------------------------------- //
 
+export type SignInRouterLoadingContext = Omit<SignInRouterLoadingEvent, 'type'>;
+
 export interface SignInRouterContext extends BaseRouterContext {
   signUpPath: string;
+  loading: SignInRouterLoadingContext;
 }
 
 // ---------------------------------- Schema ---------------------------------- //
@@ -93,3 +99,18 @@ export interface SignInRouterSchema {
   events: SignInRouterEvents;
   tags: SignInRouterTags;
 }
+
+// ---------------------------------- Schema ---------------------------------- //
+
+export type SignInChildren = any; // TODO: Update
+export type SignInOuptut = any; // TODO: Update
+export type SignInStateValue = any; // TODO: Update
+
+export type SignInRouterSnapshot = MachineSnapshot<
+  SignInRouterContext,
+  SignInRouterEvents,
+  SignInChildren,
+  SignInStateValue,
+  SignInRouterTags,
+  SignInOuptut
+>;

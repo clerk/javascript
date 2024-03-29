@@ -4,7 +4,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { getClerkQueryParam } from '../../../utils';
+import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
+import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '../../../utils/passkeys';
 import type { SignInStartIdentifier } from '../../common';
 import { getIdentifierControlDisplayValues, groupIdentifiers, withRedirectToAfterSignIn } from '../../common';
 import { buildSSOCallbackURL } from '../../common/redirects';
@@ -24,7 +25,37 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import type { FormControlState } from '../../utils';
 import { buildRequest, handleError, isMobileDevice, useFormControl } from '../../utils';
+import { useHandleAuthenticateWithPasskey } from './shared';
 import { SignInSocialButtons } from './SignInSocialButtons';
+
+const useAutoFillPasskey = () => {
+  const [isSupported, setIsSupported] = useState(false);
+  const { navigate } = useRouter();
+  const onSecondFactor = () => navigate('factor-two');
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
+  const { userSettings } = useEnvironment();
+  const { passkeySettings, attributes } = userSettings;
+
+  useEffect(() => {
+    async function runAutofillPasskey() {
+      const _isSupported = await isWebAuthnAutofillSupported();
+      setIsSupported(_isSupported);
+      if (!_isSupported) {
+        return;
+      }
+
+      await authenticateWithPasskey({ flow: 'autofill' });
+    }
+
+    if (passkeySettings.allow_autofill && attributes.passkey.enabled) {
+      runAutofillPasskey();
+    }
+  }, []);
+
+  return {
+    isWebAuthnAutofillSupported: isSupported,
+  };
+};
 
 export function _SignInStart(): JSX.Element {
   const card = useCardState();
@@ -40,6 +71,14 @@ export function _SignInStart(): JSX.Element {
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
   );
+
+  /**
+   * Passkeys
+   */
+  const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
+  const onSecondFactor = () => navigate('factor-two');
+  const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor);
+  const isWebSupported = isWebAuthnSupported();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
@@ -144,6 +183,7 @@ export function _SignInStart(): JSX.Element {
           case 'needs_second_factor':
             return navigate('factor-two');
           case 'complete':
+            removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
               session: res.createdSessionId,
               beforeEmit: navigateAfterSignIn,
@@ -174,7 +214,7 @@ export function _SignInStart(): JSX.Element {
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
-            card.setError(error.longMessage);
+            card.setError(error);
             break;
           default:
             // Error from server may be too much information for the end user, so set a generic error
@@ -317,6 +357,7 @@ export function _SignInStart(): JSX.Element {
                         onActionClicked={switchToNextIdentifier}
                         {...identifierFieldProps}
                         autoFocus={shouldAutofocus}
+                        autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
                       />
                     </Form.ControlRow>
                     <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />
@@ -325,9 +366,18 @@ export function _SignInStart(): JSX.Element {
                 </Form.Root>
               ) : null}
             </SocialButtonsReversibleContainerWithDivider>
+            {userSettings.attributes.passkey.enabled &&
+              userSettings.passkeySettings.show_sign_in_button &&
+              isWebSupported && (
+                <Card.Action elementId={'usePasskey'}>
+                  <Card.ActionLink
+                    localizationKey={localizationKeys('signIn.start.actionLink__use_passkey')}
+                    onClick={() => authenticateWithPasskey({ flow: 'discoverable' })}
+                  />
+                </Card.Action>
+              )}
           </Col>
         </Card.Content>
-
         <Card.Footer>
           <Card.Action elementId='signIn'>
             <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />

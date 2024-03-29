@@ -194,10 +194,3 @@ export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: Auth
     signInUrl,
   };
 };
-
-export const decorateResponseWithObservabilityHeaders = (res: Response, requestState: RequestState): Response => {
-  requestState.message && res.headers.set(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
-  requestState.reason && res.headers.set(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
-  requestState.status && res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
-  return res;
-};

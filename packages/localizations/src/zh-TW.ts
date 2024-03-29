@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: '返回',
   badge__default: '默認',
   badge__otherImpersonatorDevice: '其他模擬器設備',
@@ -279,6 +280,7 @@ export const zhTW: LocalizationResource = {
       blockButton__backupCode: '使用備用代碼',
       blockButton__emailCode: '電子郵件驗證碼到 {{identifier}}',
       blockButton__emailLink: '電子郵件連結到 {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: '使用您的密碼登錄',
       blockButton__phoneCode: '發送簡訊代碼到 {{identifier}}',
       blockButton__totp: '使用您的驗證應用程式',
@@ -349,10 +351,17 @@ export const zhTW: LocalizationResource = {
       subtitle: '出現錯誤',
       title: '無法登錄',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '使用其他方法',
       subtitle: '繼續使用 {{applicationName}}',
       title: '輸入您的密碼',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: '驗證碼',
@@ -368,8 +377,7 @@ export const zhTW: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: '重設密碼',
-      requiredMessage:
-        'An account already exists with an unverified email address. Please reset your password for security.',
+      requiredMessage: 'For security reasons, it is required to reset your password.',
       successMessage: '您的密碼已成功更改。正在為您登錄，請稍等。',
       title: '重設密碼',
     },
@@ -380,6 +388,7 @@ export const zhTW: LocalizationResource = {
       actionLink: '註冊',
       actionLink__use_email: '使用電子郵件',
       actionLink__use_email_username: '使用電子郵件或使用者名稱',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: '使用電話',
       actionLink__use_username: '使用使用者名稱',
       actionText: '還沒有帳戶？',
@@ -458,12 +467,18 @@ export const zhTW: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: '您的密碼強度不夠。',
     form_password_pwned: '這個密碼在數據洩露中被發現，不能使用，請換一個密碼試試。',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: '您的密碼超過了允許的最大位元組數，請縮短它或去掉一些特殊字元。',
     form_password_validation_failed: '密碼錯誤',
     form_username_invalid_character: '',
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '少於{{length}}個字元',
       minimumLength: '{{length}}個或更多字元',
@@ -521,6 +536,14 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已複製！',
       actionLabel__copy: '複製全部',
@@ -667,6 +690,11 @@ export const zhTW: LocalizationResource = {
       title: '更新個人資料',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: '退出設備',
         title: '活動設備',

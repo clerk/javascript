@@ -1,9 +1,9 @@
 import { parseError } from '@clerk/shared/error';
 import type {
+  __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions,
   ClerkAPIError,
   PasskeyVerificationResource,
   PublicKeyCredentialCreationOptionsJSON,
-  PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
   SignUpVerificationResource,
   SignUpVerificationsJSON,
@@ -58,7 +58,7 @@ export class Verification extends BaseResource implements VerificationResource {
 }
 
 export class PasskeyVerification extends Verification implements PasskeyVerificationResource {
-  publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null = null;
+  publicKey: __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions | null = null;
 
   constructor(data: VerificationJSON | null) {
     super(data);
@@ -69,6 +69,7 @@ export class PasskeyVerification extends Verification implements PasskeyVerifica
    * Transform base64url encoded strings to ArrayBuffer
    */
   protected fromJSON(data: VerificationJSON | null): this {
+    super.fromJSON(data);
     if (data?.nonce) {
       this.publicKey = convertJSONToPublicKeyCreateOptions(
         JSON.parse(data.nonce) as PublicKeyCredentialCreationOptionsJSON,

@@ -7,6 +7,7 @@ const makeSortingOrderMap = <T extends string>(arr: T[]): Record<T, number> =>
   }, {} as Record<T, number>);
 
 const STRATEGY_SORT_ORDER_PASSWORD_PREF = makeSortingOrderMap([
+  'passkey',
   'password',
   'email_link',
   'email_code',
@@ -17,6 +18,7 @@ const STRATEGY_SORT_ORDER_OTP_PREF = makeSortingOrderMap([
   'email_link',
   'email_code',
   'phone_code',
+  'passkey',
   'password',
 ] as SignInStrategy[]);
 
@@ -24,6 +26,7 @@ const STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS = makeSortingOrderMap([
   'email_link',
   'email_code',
   'phone_code',
+  'passkey',
   'password',
 ] as SignInStrategy[]);
 

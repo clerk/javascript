@@ -9,6 +9,7 @@ import cryptoKeysTest from './dist/jwt/__tests__/cryptoKeys.test.js';
 import signJwtTest from './dist/jwt/__tests__/signJwt.test.js';
 import verifyJwtTest from './dist/jwt/__tests__/verifyJwt.test.js';
 import authObjectsTest from './dist/tokens/__tests__/authObjects.test.js';
+import authStatusTest from './dist/tokens/__tests__/authStatus.test.js';
 import clerkRequestTest from './dist/tokens/__tests__/clerkRequest.test.js';
 import tokenFactoryTest from './dist/tokens/__tests__/factory.test.js';
 import keysTest from './dist/tokens/__tests__/keys.test.js';
@@ -19,6 +20,7 @@ import pathTest from './dist/util/__tests__/path.test.js';
 // Add them to the suite array
 const suites = [
   authObjectsTest,
+  authStatusTest,
   cryptoKeysTest,
   exportsTest,
   factoryTest,

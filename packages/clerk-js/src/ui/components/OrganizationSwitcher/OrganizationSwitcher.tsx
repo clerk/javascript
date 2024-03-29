@@ -1,6 +1,5 @@
 import { useId } from 'react';
 
-import { withOrganizationsEnabledGuard } from '../../common';
 import { AcceptedInvitationsProvider, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
@@ -46,8 +45,4 @@ const _OrganizationSwitcher = withFloatingTree(() => {
   );
 });
 
-export const OrganizationSwitcher = withOrganizationsEnabledGuard(
-  withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher)),
-  'OrganizationSwitcher',
-  { mode: 'hide' },
-);
+export const OrganizationSwitcher = withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher));

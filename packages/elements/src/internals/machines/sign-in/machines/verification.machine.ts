@@ -11,11 +11,12 @@ import type {
   SignInSecondFactor,
   Web3Attempt,
 } from '@clerk/types';
-import type { ActorRefFrom } from 'xstate';
-import { assign, fromPromise, sendParent, sendTo, setup } from 'xstate';
+import type { ActorRefFrom, DoneActorEvent } from 'xstate';
+import { assign, fromPromise, sendTo, setup } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
+import { sendToLoading } from '~/internals/machines/shared.actions';
 import type { WithParams } from '~/internals/machines/shared.types';
 import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
 import type { SignInVerificationSchema } from '~/internals/machines/sign-in/types';
@@ -62,6 +63,9 @@ const SignInVerificationMachine = setup({
         };
       },
     ),
+    sendToNext: ({ context, event }) =>
+      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
+    sendToLoading,
   },
   types: {} as SignInVerificationSchema,
 }).createMachine({
@@ -70,6 +74,7 @@ const SignInVerificationMachine = setup({
     currentFactor: null,
     formRef: input.form,
     parent: input.parent,
+    loadingStep: 'verifications',
   }),
   initial: 'Preparing',
   entry: 'determineStartingFactor',
@@ -95,7 +100,10 @@ const SignInVerificationMachine = setup({
       description: 'Waiting for user input',
       on: {
         'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
-        SUBMIT: 'Attempting',
+        SUBMIT: {
+          target: 'Attempting',
+          reenter: true,
+        },
       },
     },
     ChooseStrategy: {
@@ -109,6 +117,7 @@ const SignInVerificationMachine = setup({
     },
     Attempting: {
       tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
       invoke: {
         id: 'attempt',
         src: 'attempt',
@@ -118,10 +127,10 @@ const SignInVerificationMachine = setup({
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
-          actions: sendParent(({ event }) => ({ type: 'NEXT', resource: event.output })),
+          actions: ['sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: 'setFormErrors',
+          actions: ['setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },
