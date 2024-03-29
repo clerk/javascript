@@ -289,6 +289,12 @@ const getOrganizationProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
       icon: Users,
       path: 'organization-members',
     },
+    {
+      name: localizationKeys('organizationProfile.navbar.billing'),
+      id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING,
+      icon: TickShield,
+      path: 'organization-billing',
+    },
   ];
 
   const pageToRootNavbarRouteMap: Record<string, NavbarRoute> = {
