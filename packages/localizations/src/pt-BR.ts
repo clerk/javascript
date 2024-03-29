@@ -460,6 +460,7 @@ export const ptBR: LocalizationResource = {
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_exists__email_address: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser um endereço de e-mail válido.',

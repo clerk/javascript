@@ -462,6 +462,7 @@ export const bgBG: LocalizationResource = {
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_exists__email_address: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Имейл адресът трябва да бъде във валиден имейл адрес.',
