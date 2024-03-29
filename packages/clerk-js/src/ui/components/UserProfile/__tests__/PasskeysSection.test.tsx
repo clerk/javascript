@@ -18,7 +18,6 @@ const passkeys = [
     last_used_at: Date.now(),
     verification: null,
     updated_at: Date.now(),
-    credential_id: 'some_id',
   },
 ] satisfies PasskeyJSON[];
 
