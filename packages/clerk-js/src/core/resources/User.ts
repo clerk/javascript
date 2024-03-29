@@ -10,6 +10,7 @@ import type {
   EmailAddressResource,
   ExternalAccountJSON,
   ExternalAccountResource,
+  GetAvailablePlansResource,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -290,7 +291,16 @@ export class User extends BaseResource implements UserResource {
     return new DeletedObject(json);
   };
 
-  getAvailablePlans = async () => {};
+  getAvailablePlans = async (): Promise<GetAvailablePlansResource> => {
+    const json = (
+      await BaseResource._fetch({
+        path: `${this.path()}/billing/available_plans`,
+        method: 'GET',
+      })
+    )?.response as unknown as GetAvailablePlansResource;
+
+    return json;
+  };
 
   getCurrentPlan = async () => {};
 

@@ -489,3 +489,18 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   timeout: number;
   userVerification: 'discouraged' | 'preferred' | 'required';
 }
+
+export type CustomerType = 'user' | 'organization';
+
+export interface BillingPlanJSON extends ClerkResourceJSON {
+  object: string;
+  id: string;
+  name: string;
+  key: string;
+  customerType: CustomerType;
+  description: string | null;
+  priceInCents: number;
+  features: string[];
+  createdAt: number;
+  updatedAt: number;
+}
