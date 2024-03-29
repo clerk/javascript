@@ -142,7 +142,7 @@ const typescriptLoaderDev = () => {
 };
 
 /** @type { () => (import('webpack').Configuration) } */
-const commonForProd = ({ variant }) => {
+const commonForProd = () => {
   return {
     devtool: undefined,
     module: {
@@ -155,9 +155,6 @@ const commonForProd = ({ variant }) => {
       globalObject: 'globalThis',
     },
     plugins: [
-      new webpack.DefinePlugin({
-        __IS_BROWSER__: variant !== variants.clerkHeadless,
-      }),
       // new webpack.optimize.LimitChunkCountPlugin({
       //   maxChunks: 5,
       // }),
@@ -184,16 +181,12 @@ const entryForVariant = variant => {
 
 /** @type { () => (import('webpack').Configuration)[] } */
 const prodConfig = ({ mode }) => {
-  const clerkBrowser = merge(
-    entryForVariant(variants.clerkBrowser),
-    common({ mode }),
-    commonForProd({ variant: variants.clerkBrowser }),
-  );
+  const clerkBrowser = merge(entryForVariant(variants.clerkBrowser), common({ mode }), commonForProd());
 
   const clerkHeadless = merge(
     entryForVariant(variants.clerkHeadless),
     common({ mode }),
-    commonForProd({ variant: variants.clerkHeadless }),
+    commonForProd(),
     // Disable chunking for the headless variant, since it's meant to be used in a non-browser environment and
     // attempting to load chunks causes issues due to usage of a dynamic publicPath. We generally are only concerned with
     // chunking in our browser bundles.
@@ -205,38 +198,43 @@ const prodConfig = ({ mode }) => {
         splitChunks: false,
       },
     },
+    {
+      // We need to define __IS_NATIVE__ to true for the headless variant
+      // so that the Clerk JS SDK knows it's running in a non-browser environment
+      // and can disable browser-specific features
+      plugins: [
+        new webpack.DefinePlugin({
+          __IS_NATIVE__: true,
+        }),
+      ],
+    },
     // externalsForHeadless(),
   );
 
   const clerkHeadlessBrowser = merge(
     entryForVariant(variants.clerkHeadlessBrowser),
     common({ mode }),
-    commonForProd({ variant: variants.clerkHeadlessBrowser }),
+    commonForProd(),
     // externalsForHeadless(),
   );
 
-  const clerkEsm = merge(
-    entryForVariant(variants.clerk),
-    common({ mode }),
-    commonForProd({ variant: variants.clerk }),
-    {
-      experiments: {
-        outputModule: true,
-      },
-      output: {
-        filename: '[name].mjs',
-        libraryTarget: 'module',
-      },
-      plugins: [
-        // Include the lazy chunks in the bundle as well
-        // so that the final bundle can be imported and bundled again
-        // by a different bundler, eg the webpack instance used by react-scripts
-        new webpack.optimize.LimitChunkCountPlugin({
-          maxChunks: 1,
-        }),
-      ],
+  const clerkEsm = merge(entryForVariant(variants.clerk), common({ mode }), commonForProd(), {
+    experiments: {
+      outputModule: true,
     },
-  );
+    output: {
+      filename: '[name].mjs',
+      libraryTarget: 'module',
+    },
+    plugins: [
+      // Include the lazy chunks in the bundle as well
+      // so that the final bundle can be imported and bundled again
+      // by a different bundler, eg the webpack instance used by react-scripts
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1,
+      }),
+    ],
+  });
 
   const clerkCjs = merge(clerkEsm, {
     output: {

@@ -23,12 +23,12 @@ export const loadZxcvbn = () => {
 const loadLib = () => {
   let core;
   let languageCommon;
-  if (__IS_BROWSER__) {
-    core = import('@zxcvbn-ts/core');
-    languageCommon = import('@zxcvbn-ts/language-common');
-  } else {
+  if (__IS_NATIVE__) {
     core = require('@zxcvbn-ts/core');
     languageCommon = require('@zxcvbn-ts/language-common');
+  } else {
+    core = import('@zxcvbn-ts/core');
+    languageCommon = import('@zxcvbn-ts/language-common');
   }
   return Promise.all([core, languageCommon]);
 };

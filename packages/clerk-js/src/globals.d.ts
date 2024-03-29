@@ -2,7 +2,7 @@ declare global {
   const __DEV__: boolean;
   const __PKG_NAME__: string;
   const __PKG_VERSION__: string;
-  const __IS_BROWSER__: boolean;
+  const __IS_NATIVE__: boolean;
 
   interface Window {
     __unstable__onBeforeSetActive: () => Promise<void> | void;
