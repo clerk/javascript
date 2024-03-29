@@ -36,7 +36,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
     await fakeUser.deleteIfExists();
   });
 
-  test.skip("can't sign up with weak password", async ({ page, context }) => {
+  test("can't sign up with weak password", async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     const fakeUser = u.services.users.createFakeUser({
       fictionalEmail: true,
@@ -50,7 +50,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
     // Fill in sign up form
     await u.po.signUp.signUpWithEmailAndPassword({
       email: fakeUser.email,
-      password: '123456789',
+      password: '12345',
     });
 
     // Check if password error is visible
