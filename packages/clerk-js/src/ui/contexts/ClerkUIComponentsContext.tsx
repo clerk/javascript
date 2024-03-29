@@ -91,7 +91,12 @@ export const useSignUpContext = (): SignUpContextType => {
     displayConfig: displayConfig,
   });
 
-  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
+  // The `ctx` object here refers to the SignUp component's props.
+  // SignUp's own options won't have a `signUpUrl` property, so we have to get the value
+  // from the `path` prop instead, when the routing is set to 'path'.
+  let signUpUrl =
+    (ctx.routing === 'path' ? ctx.path : undefined) ||
+    pickRedirectionProp('signUpUrl', { options, displayConfig }, false);
   if (authQs && ctx.routing !== 'virtual') {
     signUpUrl += `#/?${authQs}`;
   }
@@ -175,7 +180,12 @@ export const useSignInContext = (): SignInContextType => {
     signUpUrl += `#/?${authQs}`;
   }
 
-  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
+  // The `ctx` object here refers to the SignIn component's props.
+  // SignIn's own options won't have a `signInUrl` property, so we have to get the value
+  // from the `path` prop instead, when the routing is set to 'path'.
+  let signInUrl =
+    (ctx.routing === 'path' ? ctx.path : undefined) ||
+    pickRedirectionProp('signInUrl', { options, displayConfig }, false);
   if (authQs && ctx.routing !== 'virtual') {
     signInUrl += `#/?${authQs}`;
   }
