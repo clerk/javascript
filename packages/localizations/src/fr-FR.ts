@@ -461,6 +461,7 @@ export const frFR: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: 'Code incorrect',
     form_identifier_exists: 'Cet identifiant existe déjà. Veuillez en renseigner un différent.',
+    form_identifier_exists__email_address: undefined,
     form_identifier_not_found: 'Identifiant introuvable',
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",

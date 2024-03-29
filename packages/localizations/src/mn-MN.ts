@@ -462,6 +462,7 @@ export const mnMN: LocalizationResource = {
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     form_code_incorrect: 'Маягтын код буруу байна',
     form_identifier_exists: 'Тодорхойлогч аль хэдийн байна.',
+    form_identifier_exists__email_address: undefined,
     form_identifier_not_found: 'Тодорхойлогч олдсонгүй.',
     form_param_format_invalid: 'Параметрийн формат буруу.',
     form_param_format_invalid__email_address: 'Имэйл хаяг нь хүчинтэй имэйл хаяг байх ёстой.',
