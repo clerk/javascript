@@ -73,6 +73,10 @@ export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
   return data.length > 0 ? data.map(parseError) : [];
 }
 
+export function isPasswordPwnedError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_pwned';
+}
+
 export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
   return {
     code: error.code,

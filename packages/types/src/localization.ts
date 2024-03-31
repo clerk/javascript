@@ -174,6 +174,9 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    passwordPwned: {
+      title: LocalizationValue;
+    };
     forgotPasswordAlternativeMethods: {
       title: LocalizationValue;
       label__alternativeMethods: LocalizationValue;
@@ -760,6 +763,7 @@ type UnstableErrors = WithParamName<{
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
   form_password_pwned: LocalizationValue;
+  form_password_pwned__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;

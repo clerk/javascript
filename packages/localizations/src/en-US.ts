@@ -149,6 +149,9 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       actionLink: 'Use another method',
     },
+    passwordPwned: {
+      title: 'Password compromised',
+    },
     forgotPasswordAlternativeMethods: {
       title: 'Forgot Password?',
       label__alternativeMethods: 'Or, sign in with another method.',
@@ -722,6 +725,8 @@ export const enUS: LocalizationResource = {
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
+    form_password_pwned__sign_in:
+      'This password has been found as part of a breach and can not be used, please reset your password.',
     form_username_invalid_length: '',
     form_username_invalid_character: '',
     form_param_format_invalid: '',
