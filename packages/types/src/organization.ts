@@ -1,9 +1,9 @@
 import type {
   BillingPlanResource,
-  BillingPortalSessionResource,
   ChangePlanParams,
   CheckoutSessionResource,
-  CreateBillingPortalSessionParams,
+  CreatePortalSessionParams,
+  PortalSessionResource,
 } from './billing';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
@@ -65,7 +65,7 @@ export interface OrganizationResource extends ClerkResource {
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
   getAvailablePlans: () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
   getCurrentPlan: () => Promise<BillingPlanResource>;
-  createBillingPortalSession: (params: CreateBillingPortalSessionParams) => Promise<BillingPortalSessionResource>;
+  createPortalSession: (params: CreatePortalSessionParams) => Promise<PortalSessionResource>;
   changePlan: (params: ChangePlanParams) => Promise<CheckoutSessionResource>;
 }
 
