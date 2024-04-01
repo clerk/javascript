@@ -18,7 +18,7 @@ export interface BillingPortalSessionResource extends ClerkResource {
 }
 
 export type CreateBillingPortalSessionParams = {
-  redirectUrl: string;
+  return_url: string;
 };
 
 export interface CheckoutSessionResource extends ClerkResource {
