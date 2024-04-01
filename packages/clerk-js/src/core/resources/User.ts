@@ -3,7 +3,9 @@ import type {
   BackupCodeResource,
   BillingPlanJSON,
   BillingPlanResource,
+  BillingPortalSessionResource,
   ClerkPaginatedResponse,
+  CreateBillingPortalSessionParams,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
   CreatePhoneNumberParams,
@@ -309,10 +311,27 @@ export class User extends BaseResource implements UserResource {
         method: 'GET',
       })
     )?.response as unknown as BillingPlanJSON;
+
     return new BillingPlan(json);
   };
 
-  createBillingPortalSession = async () => {};
+  createBillingPortalSession = async (
+    params: CreateBillingPortalSessionParams,
+  ): Promise<BillingPortalSessionResource> => {
+    const { redirectUrl } = params || {};
+
+    const json = (
+      await BaseResource._fetch({
+        path: `${this.path()}/billing/current`,
+        method: 'POST',
+        body: {
+          redirect_url: redirectUrl,
+        } as any,
+      })
+    )?.response as unknown as { redirect_url: string };
+
+    return (window.location.href = json.redirect_url);
+  };
 
   changeBillingPlan = async () => {};
 
