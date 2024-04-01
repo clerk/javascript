@@ -103,7 +103,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                 {(error || reauthorizationRequired) && (
                   <Text
                     colorScheme='danger'
-                    sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$10}` })}
+                    sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$8x5}` })}
                     localizationKey={errorMessage}
                   />
                 )}

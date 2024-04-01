@@ -4,7 +4,6 @@ import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import { mqu } from '../../styledSystem';
 import { PasswordForm } from './PasswordForm';
 
 const PasswordScreen = () => {
@@ -28,19 +27,21 @@ export const PasswordSection = () => {
 
   return (
     <ProfileSection.Root
+      centered={false}
       title={localizationKeys('userProfile.start.passwordSection.title')}
       id='password'
-      sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
     >
       <Action.Root>
         <Action.Closed value='edit'>
           <ProfileSection.Item
             id='password'
-            sx={{
+            sx={t => ({
               paddingLeft: !passwordEnabled ? '0' : undefined,
-            }}
+              paddingTop: t.space.$0x25,
+              paddingBottom: t.space.$0x25,
+            })}
           >
-            {passwordEnabled && <Text sx={t => ({ fontSize: t.fontSizes.$xl })}>••••••••••</Text>}
+            {passwordEnabled && <Text variant='h2'>••••••••••</Text>}
 
             <Action.Trigger value='edit'>
               <ProfileSection.Button
