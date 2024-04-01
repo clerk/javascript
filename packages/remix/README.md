@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_remix)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://beta.clerk.com/docs?utm_source=github&utm_medium=clerk_remix)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/remix/CHANGELOG.md)
@@ -117,7 +117,7 @@ export default function Index() {
 }
 ```
 
-_For further details and examples, please refer to our [Documentation](https://clerk.com/docs/quickstarts/remix?utm_source=github&utm_medium=clerk_remix)._
+_For further details and examples, please refer to our [Documentation](https://beta.clerk.com/docs/quickstarts/remix?utm_source=github&utm_medium=clerk_remix)._
 
 ## Support
 
