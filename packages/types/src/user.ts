@@ -123,6 +123,7 @@ export interface UserResource extends ClerkResource {
   disableTOTP: () => Promise<DeletedObjectResource>;
   createBackupCode: () => Promise<BackupCodeResource>;
   getAvailablePlans: () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
+  getCurrentPlan: () => Promise<BillingPlanResource>;
 
   get verifiedExternalAccounts(): ExternalAccountResource[];
 
