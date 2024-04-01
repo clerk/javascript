@@ -216,7 +216,7 @@ export class Organization extends BaseResource implements OrganizationResource {
 
   getCurrentPlan = async (): Promise<BillingPlanResource> => {
     const json = (
-      await BaseResource._fetch<OrganizationDomainJSON>({
+      await BaseResource._fetch<BillingPlanJSON>({
         path: `/organizations/${this.id}/billing/current`,
         method: 'GET',
       })
