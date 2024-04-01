@@ -1,4 +1,5 @@
 export * from './AuthConfig';
+export * from './Billing';
 export * from './Client';
 export * from './DeletedObject';
 export * from './DisplayConfig';

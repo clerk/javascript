@@ -1,6 +1,9 @@
 import type {
   BackupCodeJSON,
   BackupCodeResource,
+  BillingPlanJSON,
+  BillingPlanResource,
+  ClerkPaginatedResponse,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
   CreatePhoneNumberParams,
@@ -10,7 +13,6 @@ import type {
   EmailAddressResource,
   ExternalAccountJSON,
   ExternalAccountResource,
-  GetAvailablePlansResource,
   GetOrganizationMemberships,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
@@ -35,6 +37,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { BackupCode } from './BackupCode';
+import { BillingPlan } from './Billing';
 import {
   BaseResource,
   DeletedObject,
@@ -291,15 +294,18 @@ export class User extends BaseResource implements UserResource {
     return new DeletedObject(json);
   };
 
-  getAvailablePlans = async (): Promise<GetAvailablePlansResource> => {
-    const json = (
-      await BaseResource._fetch({
-        path: `${this.path()}/billing/available_plans`,
-        method: 'GET',
-      })
-    )?.response as unknown as GetAvailablePlansResource;
+  getAvailablePlans = async (): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
+    return await BaseResource._fetch({
+      path: `${this.path()}/billing/available_plans`,
+      method: 'GET',
+    }).then(res => {
+      const { data: requests, total_count } = res?.response as unknown as ClerkPaginatedResponse<BillingPlanJSON>;
 
-    return json;
+      return {
+        total_count,
+        data: requests.map(request => new BillingPlan(request)),
+      };
+    });
   };
 
   getCurrentPlan = async () => {};
