@@ -302,7 +302,15 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
-  getCurrentPlan = async () => {};
+  getCurrentPlan = async (): Promise<BillingPlanResource> => {
+    const json = (
+      await BaseResource._fetch({
+        path: `${this.path()}/billing/current`,
+        method: 'GET',
+      })
+    )?.response as unknown as BillingPlanJSON;
+    return new BillingPlan(json);
+  };
 
   createBillingPortalSession = async () => {};
 
