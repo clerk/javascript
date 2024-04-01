@@ -305,11 +305,11 @@ export class User extends BaseResource implements UserResource {
       path: `${this.path()}/billing/available_plans`,
       method: 'GET',
     }).then(res => {
-      const { data: requests, total_count } = res?.response as unknown as ClerkPaginatedResponse<BillingPlanJSON>;
+      const { data: plans, total_count } = res?.response as unknown as ClerkPaginatedResponse<BillingPlanJSON>;
 
       return {
         total_count,
-        data: requests.map(request => new BillingPlan(request)),
+        data: plans.map(plan => new BillingPlan(plan)),
       };
     });
   };
