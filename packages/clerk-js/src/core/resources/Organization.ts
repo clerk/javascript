@@ -32,7 +32,6 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import type { ChangePlanParams } from './../../../../types/src/billing';
 import { BillingPlan, BillingPortalSession } from './Billing';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
@@ -244,22 +243,6 @@ export class Organization extends BaseResource implements OrganizationResource {
     )?.response as unknown as BillingPortalSessionJSON;
 
     return new BillingPortalSession(json);
-  };
-
-  changePlan = async (params: ChangePlanParams): Promise<BillingPlanResource> => {
-    const { planKey } = params || {};
-
-    const json = (
-      await BaseResource._fetch({
-        path: `/organizations/${this.id}/billing/change_plan`,
-        method: 'POST',
-        body: {
-          plan_key: planKey,
-        } as any,
-      })
-    )?.response as unknown as BillingPlanJSON;
-
-    return new BillingPlan(json);
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {

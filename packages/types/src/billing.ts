@@ -1,5 +1,4 @@
-import type { CustomerType } from 'json';
-
+import type { CustomerType } from './json';
 import type { ClerkResource } from './resource';
 
 export interface BillingPlanResource extends ClerkResource {
@@ -19,9 +18,5 @@ export interface BillingPortalSessionResource extends ClerkResource {
 }
 
 export type CreateBillingPortalSessionParams = {
-  redirectUrl?: string;
-};
-
-export type ChangePlanParams = {
-  planKey?: string;
+  redirectUrl: string;
 };
