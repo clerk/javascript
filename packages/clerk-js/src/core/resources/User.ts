@@ -5,6 +5,9 @@ import type {
   BillingPlanResource,
   BillingPortalSessionJSON,
   BillingPortalSessionResource,
+  ChangePlanParams,
+  CheckoutSessionJSON,
+  CheckoutSessionResource,
   ClerkPaginatedResponse,
   CreateBillingPortalSessionParams,
   CreateEmailAddressParams,
@@ -40,7 +43,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { BackupCode } from './BackupCode';
-import { BillingPlan, BillingPortalSession } from './Billing';
+import { BillingPlan, BillingPortalSession, CheckoutSession } from './Billing';
 import {
   BaseResource,
   DeletedObject,
@@ -334,7 +337,21 @@ export class User extends BaseResource implements UserResource {
     return new BillingPortalSession(json);
   };
 
-  changeBillingPlan = async () => {};
+  changePlan = async (params: ChangePlanParams): Promise<CheckoutSessionResource> => {
+    const { planKey } = params || {};
+
+    const json = (
+      await BaseResource._fetch({
+        path: `${this.path()}/billing/change_plan`,
+        method: 'POST',
+        body: {
+          plan_key: planKey,
+        } as any,
+      })
+    )?.response as unknown as CheckoutSessionJSON;
+
+    return new CheckoutSession(json);
+  };
 
   get verifiedExternalAccounts() {
     return this.externalAccounts.filter(externalAccount => externalAccount.verification?.status == 'verified');

@@ -509,3 +509,8 @@ export interface BillingPortalSessionJSON extends ClerkResourceJSON {
   object: string;
   redirect_url: string;
 }
+
+export interface CheckoutSessionJSON extends ClerkResourceJSON {
+  object: string;
+  redirect_url: string;
+}
