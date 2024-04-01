@@ -1,5 +1,5 @@
 import type { BackupCodeResource } from './backupCode';
-import type { BillingPlanResource, BillingPortalSessionResource } from './billing';
+import type { BillingPlanResource, BillingPortalSessionResource, CreateBillingPortalSessionParams } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { ExternalAccountResource } from './externalAccount';
@@ -124,7 +124,7 @@ export interface UserResource extends ClerkResource {
   createBackupCode: () => Promise<BackupCodeResource>;
   getAvailablePlans: () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
   getCurrentPlan: () => Promise<BillingPlanResource>;
-  createBillingPortalSession: () => Promise<BillingPortalSessionResource>;
+  createBillingPortalSession: (params: CreateBillingPortalSessionParams) => Promise<BillingPortalSessionResource>;
 
   get verifiedExternalAccounts(): ExternalAccountResource[];
 
