@@ -506,7 +506,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface BillingPortalSessionJSON extends ClerkResourceJSON {
+export interface PortalSessionJSON extends ClerkResourceJSON {
   object: string;
   redirect_url: string;
 }
