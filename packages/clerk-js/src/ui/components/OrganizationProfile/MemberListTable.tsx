@@ -197,7 +197,7 @@ export const RoleSelect = (props: {
         }
         isDisabled={isDisabled}
       >
-        {(selectedRole?.label || selectedRole?.value) && (
+        {selectedRole?.label || selectedRole?.value ? (
           <Flex
             as='span'
             gap={1}
@@ -211,11 +211,17 @@ export const RoleSelect = (props: {
             )}
             <Text
               as='span'
-              sx={t => ({ color: t.colors.$colorText })}
+              colorScheme='body'
             >
               {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
             </Text>
           </Flex>
+        ) : (
+          <Text
+            as='span'
+            localizationKey={localizationKeys('organizationProfile.invitePage.selectDropdown__role')}
+            colorScheme='body'
+          />
         )}
       </SelectButton>
       <SelectOptionList sx={optionListSx} />
