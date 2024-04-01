@@ -138,10 +138,9 @@ const ProfileSectionItem = (props: ProfileSectionItemProps) => {
           justifyContent: 'space-between',
           width: '100%',
           alignItems: 'center',
-          padding: `${t.space.$2} ${t.space.$3} ${t.space.$1x5} ${t.space.$2x5}`,
+          padding: `${t.space.$1} ${t.space.$1} ${t.space.$1} ${t.space.$2x5}`,
           gap: t.space.$2,
           ...(hoverable && {
-            padding: `${t.space.$1} ${t.space.$1} ${t.space.$1} ${t.space.$2x5}`,
             borderRadius: t.radii.$lg,
             ':hover': { backgroundColor: t.colors.$neutralAlpha50 },
           }),
@@ -166,7 +165,6 @@ const ProfileSectionButton = (props: ProfileSectionButtonProps) => {
       elementDescriptor={descriptors.profileSectionPrimaryButton}
       elementId={descriptors.profileSectionPrimaryButton.setId(id)}
       variant='ghost'
-      textVariant='buttonSmall'
       sx={[
         t => ({
           whiteSpace: 'nowrap',
