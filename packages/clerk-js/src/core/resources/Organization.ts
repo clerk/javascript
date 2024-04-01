@@ -237,7 +237,7 @@ export class Organization extends BaseResource implements OrganizationResource {
 
     const json = (
       await BaseResource._fetch({
-        path: `/organizations/${this.id}/billing/start_billing_portal_session`,
+        path: `/organizations/${this.id}/billing/start_portal_session`,
         method: 'POST',
         body: {
           return_url: return_url,

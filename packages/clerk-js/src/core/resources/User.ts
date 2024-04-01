@@ -326,7 +326,7 @@ export class User extends BaseResource implements UserResource {
 
     const json = (
       await BaseResource._fetch({
-        path: `${this.path()}/billing/current`,
+        path: `${this.path()}/billing/start_portal_session`,
         method: 'POST',
         body: {
           return_url: return_url,
