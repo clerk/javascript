@@ -118,6 +118,7 @@ export interface UserResource extends ClerkResource {
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
   createBackupCode: () => Promise<BackupCodeResource>;
+  getAvailablePlans: () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
 
   get verifiedExternalAccounts(): ExternalAccountResource[];
 
@@ -173,5 +174,3 @@ export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;
-
-export type GetAvailablePlansResource = () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
