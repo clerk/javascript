@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.0.0-beta.23
+
+### Minor Changes
+
+- Support for prompting a user to reset their password if it is found to be compromised during sign-in. ([#3034](https://github.com/clerk/javascript/pull/3034)) by [@yourtallness](https://github.com/yourtallness)
+
+### Patch Changes
+
+- Adds translation keys to be able to customize error messages when an identifier already exists: ([#3073](https://github.com/clerk/javascript/pull/3073)) by [@octoper](https://github.com/octoper)
+
+  - form_identifier_exists\_\_email_address
+  - form_identifier_exists\_\_username
+  - form_identifier_exists\_\_phone_number
+
+- Return to localhost when SSO callback fails on SignIn or SignUp ([#2955](https://github.com/clerk/javascript/pull/2955)) by [@anagstef](https://github.com/anagstef)
+
 ## 4.0.0-beta.22
 
 ### Minor Changes

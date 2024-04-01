@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.0.0-beta.8
+
+### Patch Changes
+
+- Updated dependencies [[`fc3ffd880`](https://github.com/clerk/javascript/commit/fc3ffd88064a09ab98877dfba119150390f9296e), [`840636a14`](https://github.com/clerk/javascript/commit/840636a14537d4f6b810832e7662518ef4bd4500), [`f540e9843`](https://github.com/clerk/javascript/commit/f540e98435c86298415552537e33164471298a5c)]:
+  - @clerk/types@4.0.0-beta.23
+
 ## 2.0.0-beta.7
 
 ### Patch Changes

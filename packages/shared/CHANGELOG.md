@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.0.0-beta.21
+
+### Minor Changes
+
+- Support for prompting a user to reset their password if it is found to be compromised during sign-in. ([#3034](https://github.com/clerk/javascript/pull/3034)) by [@yourtallness](https://github.com/yourtallness)
+
+- Allow manually passing a publishable/secret key pair to the `authMiddleware` and `clerkMiddleware` helpers. ([#3001](https://github.com/clerk/javascript/pull/3001)) by [@desiprisg](https://github.com/desiprisg)
+
 ## 2.0.0-beta.20
 
 ### Patch Changes
