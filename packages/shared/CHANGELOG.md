@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.4.0
+
+### Minor Changes
+
+- Support for prompting a user to reset their password if it is found to be compromised during sign-in. ([#3075](https://github.com/clerk/javascript/pull/3075)) by [@yourtallness](https://github.com/yourtallness)
+
 ## 1.3.3
 
 ### Patch Changes
