@@ -2,15 +2,13 @@ import type {
   AddMemberParams,
   BillingPlanJSON,
   BillingPlanResource,
-  BillingPortalSessionJSON,
-  BillingPortalSessionResource,
   ChangePlanParams,
   CheckoutSessionJSON,
   CheckoutSessionResource,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
-  CreateBillingPortalSessionParams,
   CreateOrganizationParams,
+  CreatePortalSessionParams,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
@@ -27,6 +25,8 @@ import type {
   OrganizationMembershipRequestJSON,
   OrganizationMembershipRequestResource,
   OrganizationResource,
+  PortalSessionJSON,
+  PortalSessionResource,
   RoleJSON,
   SetOrganizationLogoParams,
   UpdateMembershipParams,
@@ -35,7 +35,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { BillingPlan, BillingPortalSession, CheckoutSession } from './Billing';
+import { BillingPlan, CheckoutSession, PortalSession } from './Billing';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -230,9 +230,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     return new BillingPlan(json);
   };
 
-  createBillingPortalSession = async (
-    params: CreateBillingPortalSessionParams,
-  ): Promise<BillingPortalSessionResource> => {
+  createPortalSession = async (params: CreatePortalSessionParams): Promise<PortalSessionResource> => {
     const { return_url } = params || {};
 
     const json = (
@@ -243,9 +241,9 @@ export class Organization extends BaseResource implements OrganizationResource {
           return_url: return_url,
         } as any,
       })
-    )?.response as unknown as BillingPortalSessionJSON;
+    )?.response as unknown as PortalSessionJSON;
 
-    return new BillingPortalSession(json);
+    return new PortalSession(json);
   };
 
   changePlan = async (params: ChangePlanParams): Promise<CheckoutSessionResource> => {

@@ -13,11 +13,11 @@ export interface BillingPlanResource extends ClerkResource {
   updatedAt: Date;
 }
 
-export interface BillingPortalSessionResource extends ClerkResource {
+export interface PortalSessionResource extends ClerkResource {
   redirectUrl: string;
 }
 
-export type CreateBillingPortalSessionParams = {
+export type CreatePortalSessionParams = {
   return_url: string;
 };
 
