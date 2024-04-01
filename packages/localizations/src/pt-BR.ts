@@ -456,7 +456,7 @@ export const ptBR: LocalizationResource = {
     captcha_invalid:
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
-      'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualiza a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
+      'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_exists__email_address: 'E-mail já está em uso. Por favor, tente outro.',
