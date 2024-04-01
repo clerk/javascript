@@ -3,16 +3,14 @@ import type {
   BackupCodeResource,
   BillingPlanJSON,
   BillingPlanResource,
-  BillingPortalSessionJSON,
-  BillingPortalSessionResource,
   ChangePlanParams,
   CheckoutSessionJSON,
   CheckoutSessionResource,
   ClerkPaginatedResponse,
-  CreateBillingPortalSessionParams,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
   CreatePhoneNumberParams,
+  CreatePortalSessionParams,
   CreateWeb3WalletParams,
   DeletedObjectJSON,
   DeletedObjectResource,
@@ -26,6 +24,8 @@ import type {
   OrganizationMembershipResource,
   PasskeyResource,
   PhoneNumberResource,
+  PortalSessionJSON,
+  PortalSessionResource,
   RemoveUserPasswordParams,
   SamlAccountResource,
   SetProfileImageParams,
@@ -43,7 +43,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { BackupCode } from './BackupCode';
-import { BillingPlan, BillingPortalSession, CheckoutSession } from './Billing';
+import { BillingPlan, CheckoutSession, PortalSession } from './Billing';
 import {
   BaseResource,
   DeletedObject,
@@ -325,9 +325,7 @@ export class User extends BaseResource implements UserResource {
     return new BillingPlan(json);
   };
 
-  createBillingPortalSession = async (
-    params: CreateBillingPortalSessionParams,
-  ): Promise<BillingPortalSessionResource> => {
+  createPortalSession = async (params: CreatePortalSessionParams): Promise<PortalSessionResource> => {
     const { return_url } = params || {};
 
     const json = (
@@ -338,9 +336,9 @@ export class User extends BaseResource implements UserResource {
           return_url: return_url,
         } as any,
       })
-    )?.response as unknown as BillingPortalSessionJSON;
+    )?.response as unknown as PortalSessionJSON;
 
-    return new BillingPortalSession(json);
+    return new PortalSession(json);
   };
 
   changePlan = async (params: ChangePlanParams): Promise<CheckoutSessionResource> => {
