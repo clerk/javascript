@@ -175,3 +175,7 @@ export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;
+
+export type CreateBillingPortalSessionParams = {
+  redirectUrl?: string;
+};
