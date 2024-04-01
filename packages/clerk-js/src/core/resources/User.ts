@@ -3,7 +3,6 @@ import type {
   BackupCodeResource,
   BillingPlanJSON,
   BillingPlanResource,
-  BillingPortalSessionResource,
   ClerkPaginatedResponse,
   CreateBillingPortalSessionParams,
   CreateEmailAddressParams,
@@ -321,9 +320,7 @@ export class User extends BaseResource implements UserResource {
     return new BillingPlan(json);
   };
 
-  createBillingPortalSession = async (
-    params: CreateBillingPortalSessionParams,
-  ): Promise<BillingPortalSessionResource> => {
+  createBillingPortalSession = async (params: CreateBillingPortalSessionParams): Promise<any> => {
     const { redirectUrl } = params || {};
 
     const json = (
