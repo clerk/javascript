@@ -322,14 +322,14 @@ export class User extends BaseResource implements UserResource {
   createBillingPortalSession = async (
     params: CreateBillingPortalSessionParams,
   ): Promise<BillingPortalSessionResource> => {
-    const { redirectUrl } = params || {};
+    const { return_url } = params || {};
 
     const json = (
       await BaseResource._fetch({
         path: `${this.path()}/billing/current`,
         method: 'POST',
         body: {
-          redirect_url: redirectUrl,
+          return_url: return_url,
         } as any,
       })
     )?.response as unknown as BillingPortalSessionJSON;

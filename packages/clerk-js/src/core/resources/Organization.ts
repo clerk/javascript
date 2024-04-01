@@ -233,14 +233,14 @@ export class Organization extends BaseResource implements OrganizationResource {
   createBillingPortalSession = async (
     params: CreateBillingPortalSessionParams,
   ): Promise<BillingPortalSessionResource> => {
-    const { redirectUrl } = params || {};
+    const { return_url } = params || {};
 
     const json = (
       await BaseResource._fetch({
         path: `/organizations/${this.id}/billing/start_billing_portal_session`,
         method: 'POST',
         body: {
-          redirect_url: redirectUrl,
+          return_url: return_url,
         } as any,
       })
     )?.response as unknown as BillingPortalSessionJSON;
