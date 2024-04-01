@@ -1,4 +1,4 @@
-import type { BillingPlanJSON, BillingPlanResource, CustomerType } from '@clerk/types';
+import type { BillingPlanJSON, BillingPlanResource, BillingPortalSessionJSON, CustomerType } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
@@ -33,6 +33,21 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
     this.features = data.features;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
+
+    return this;
+  }
+}
+
+export class BillingPortalSession extends BaseResource {
+  redirectUrl!: string;
+
+  constructor(data: BillingPortalSessionJSON) {
+    super();
+    this.fromJSON(data);
+  }
+
+  protected fromJSON(data: BillingPortalSessionJSON): this {
+    this.redirectUrl = data.redirect_url;
 
     return this;
   }
