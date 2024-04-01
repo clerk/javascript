@@ -58,6 +58,7 @@ export interface OrganizationResource extends ClerkResource {
   destroy: () => Promise<void>;
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
   getAvailablePlans: () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
+  getCurrentPlan: () => Promise<BillingPlanResource>;
 }
 
 export type GetRolesParams = ClerkPaginationParams;
