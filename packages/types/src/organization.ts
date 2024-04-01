@@ -1,5 +1,4 @@
-import type { BillingPlanResource } from 'billing';
-
+import type { BillingPlanResource } from './billing';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
