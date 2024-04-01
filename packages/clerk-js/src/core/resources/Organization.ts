@@ -2,8 +2,11 @@ import type {
   AddMemberParams,
   BillingPlanJSON,
   BillingPlanResource,
+  BillingPortalSessionJSON,
+  BillingPortalSessionResource,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
+  CreateBillingPortalSessionParams,
   CreateOrganizationParams,
   GetDomainsParams,
   GetInvitationsParams,
@@ -29,7 +32,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { BillingPlan } from './Billing';
+import { BillingPlan, BillingPortalSession } from './BIlling';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -222,6 +225,24 @@ export class Organization extends BaseResource implements OrganizationResource {
       })
     )?.response as unknown as BillingPlanJSON;
     return new BillingPlan(json);
+  };
+
+  createBillingPortalSession = async (
+    params: CreateBillingPortalSessionParams,
+  ): Promise<BillingPortalSessionResource> => {
+    const { redirectUrl } = params || {};
+
+    const json = (
+      await BaseResource._fetch({
+        path: `${this.path()}/billing/current`,
+        method: 'POST',
+        body: {
+          redirect_url: redirectUrl,
+        } as any,
+      })
+    )?.response as unknown as BillingPortalSessionJSON;
+
+    return new BillingPortalSession(json);
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {
