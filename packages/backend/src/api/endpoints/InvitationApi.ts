@@ -1,3 +1,5 @@
+import type { ClerkPaginationRequest } from '@clerk/types';
+
 import { joinPaths } from '../../util/path';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { Invitation } from '../resources/Invitation';
@@ -13,7 +15,7 @@ type CreateParams = {
   ignoreExisting?: boolean;
 };
 
-type GetInvitationListParams = {
+type GetInvitationListParams = ClerkPaginationRequest<{
   /**
    * Filters invitations based on their status(accepted, pending, revoked).
    *
@@ -26,7 +28,7 @@ type GetInvitationListParams = {
    *
    */
   status?: 'accepted' | 'pending' | 'revoked';
-};
+}>;
 
 export class InvitationAPI extends AbstractAPI {
   public async getInvitationList(params: GetInvitationListParams = {}) {

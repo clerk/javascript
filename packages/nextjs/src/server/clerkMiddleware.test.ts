@@ -5,9 +5,11 @@ import { describe, expect } from '@jest/globals';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
 
+const publishableKey = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
 const authenticateRequestMock = jest.fn().mockResolvedValue({
   toAuth: () => ({}),
   headers: new Headers(),
+  publishableKey,
 });
 
 jest.mock('./clerkClient', () => {
@@ -170,6 +172,7 @@ describe('authenticateRequest & handshake', () => {
   it('returns 307 and starts the handshake flow for handshake requestState status', async () => {
     const mockLocationUrl = 'https://example.com';
     authenticateRequestMock.mockResolvedValueOnce({
+      publishableKey,
       status: AuthStatus.Handshake,
       headers: new Headers({ Location: mockLocationUrl }),
     });
@@ -293,6 +296,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
         toAuth: () => ({ userId: null }),
@@ -315,6 +319,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedIn,
         headers: new Headers(),
         toAuth: () => ({ userId: 'user-id' }),
@@ -337,6 +342,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
         toAuth: () => ({ userId: null }),
@@ -359,6 +365,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedIn,
         headers: new Headers(),
         toAuth: () => ({ userId: 'user-id', has: () => false }),
@@ -381,6 +388,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
         toAuth: () => ({ userId: null }),
@@ -404,6 +412,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedIn,
         headers: new Headers(),
         toAuth: () => ({ userId: 'user-id', has: () => false }),
@@ -435,6 +444,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
         toAuth: () => ({ userId: null }),
@@ -457,6 +467,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
         toAuth: () => ({ userId: null }),
@@ -483,6 +494,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
         status: AuthStatus.SignedOut,
         headers: new Headers(),
         toAuth: () => ({ userId: 'userId', has: () => false }),
@@ -515,6 +527,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     });
 
     authenticateRequestMock.mockResolvedValueOnce({
+      publishableKey,
       status: AuthStatus.SignedOut,
       headers: new Headers(),
       toAuth: () => ({ userId: null }),
@@ -539,6 +552,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     });
 
     authenticateRequestMock.mockResolvedValueOnce({
+      publishableKey,
       status: AuthStatus.SignedOut,
       headers: new Headers(),
       toAuth: () => ({ userId: null }),
@@ -562,6 +576,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     });
 
     authenticateRequestMock.mockResolvedValueOnce({
+      publishableKey,
       status: AuthStatus.SignedOut,
       headers: new Headers(),
       toAuth: () => ({ userId: null }),
