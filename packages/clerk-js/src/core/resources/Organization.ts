@@ -201,15 +201,10 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   getAvailablePlans = async (): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
-    return await BaseResource._fetch(
-      {
-        path: `/organizations/${this.id}/billing/available_plans`,
-        method: 'GET',
-      },
-      {
-        forceUpdateClient: true,
-      },
-    ).then(res => {
+    return await BaseResource._fetch({
+      path: `/organizations/${this.id}/billing/available_plans`,
+      method: 'GET',
+    }).then(res => {
       const { data: requests, total_count } = res?.response as unknown as ClerkPaginatedResponse<BillingPlanJSON>;
 
       return {
@@ -217,6 +212,16 @@ export class Organization extends BaseResource implements OrganizationResource {
         data: requests.map(request => new BillingPlan(request)),
       };
     });
+  };
+
+  getCurrentPlan = async (): Promise<BillingPlanResource> => {
+    const json = (
+      await BaseResource._fetch<OrganizationDomainJSON>({
+        path: `/organizations/${this.id}/billing/current`,
+        method: 'GET',
+      })
+    )?.response as unknown as BillingPlanJSON;
+    return new BillingPlan(json);
   };
 
   addMember = async ({ userId, role }: AddMemberParams) => {
