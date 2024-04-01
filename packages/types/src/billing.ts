@@ -21,3 +21,7 @@ export interface BillingPortalSessionResource extends ClerkResource {
 export type CreateBillingPortalSessionParams = {
   redirectUrl?: string;
 };
+
+export type ChangePlanParams = {
+  planKey?: string;
+};
