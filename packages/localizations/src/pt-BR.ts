@@ -271,10 +271,10 @@ export const ptBR: LocalizationResource = {
   paginationRowText__of: 'de',
   signIn: {
     accountSwitcher: {
-      action__addAccount: 'Add account',
-      action__signOutAll: 'Sign out of all accounts',
-      subtitle: 'Select the account with which you wish to continue.',
-      title: 'Choose an account',
+      action__addAccount: 'Adicionar conta',
+      action__signOutAll: 'Sair de todas as contas',
+      subtitle: 'Selecione a conta com a qual gostaria de continuar.',
+      title: 'Escolha uma conta.',
     },
     alternativeMethods: {
       actionLink: 'Ajuda',
