@@ -3,6 +3,8 @@ import type {
   BackupCodeResource,
   BillingPlanJSON,
   BillingPlanResource,
+  BillingPortalSessionJSON,
+  BillingPortalSessionResource,
   ClerkPaginatedResponse,
   CreateBillingPortalSessionParams,
   CreateEmailAddressParams,
@@ -38,7 +40,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { BackupCode } from './BackupCode';
-import { BillingPlan } from './Billing';
+import { BillingPlan, BillingPortalSession } from './Billing';
 import {
   BaseResource,
   DeletedObject,
@@ -314,7 +316,9 @@ export class User extends BaseResource implements UserResource {
     return new BillingPlan(json);
   };
 
-  createBillingPortalSession = async (params: CreateBillingPortalSessionParams): Promise<any> => {
+  createBillingPortalSession = async (
+    params: CreateBillingPortalSessionParams,
+  ): Promise<BillingPortalSessionResource> => {
     const { redirectUrl } = params || {};
 
     const json = (
@@ -325,9 +329,9 @@ export class User extends BaseResource implements UserResource {
           redirect_url: redirectUrl,
         } as any,
       })
-    )?.response as unknown as { redirect_url: string };
+    )?.response as unknown as BillingPortalSessionJSON;
 
-    return (window.location.href = json.redirect_url);
+    return new BillingPortalSession(json);
   };
 
   changeBillingPlan = async () => {};
