@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.63.0
+
+### Minor Changes
+
+- Support for prompting a user to reset their password if it is found to be compromised during sign-in. ([#3075](https://github.com/clerk/javascript/pull/3075)) by [@yourtallness](https://github.com/yourtallness)
+
+### Patch Changes
+
+- Update token refresh mechanism to handle network failures without raising an error ([#3068](https://github.com/clerk/javascript/pull/3068)) by [@dimkl](https://github.com/dimkl)
+
 ## 3.62.1
 
 ### Patch Changes
