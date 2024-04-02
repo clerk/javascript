@@ -1,6 +1,7 @@
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Header, withCardStateProvider } from '../../elements';
 import { CurrentPlanSection } from './CurrentPlanSection';
+import { PaymentMethodSection } from './PaymentMethodSection';
 
 export const BillingPage = withCardStateProvider(() => {
   return (
@@ -21,6 +22,7 @@ export const BillingPage = withCardStateProvider(() => {
         </Header.Root>
 
         <CurrentPlanSection />
+        <PaymentMethodSection />
       </Col>
     </Col>
   );
