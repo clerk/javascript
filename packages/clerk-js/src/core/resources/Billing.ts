@@ -2,8 +2,10 @@ import type {
   BillingPlanJSON,
   BillingPlanResource,
   CheckoutSessionJSON,
+  CheckoutSessionResource,
   CustomerType,
   PortalSessionJSON,
+  PortalSessionResource,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
@@ -44,7 +46,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   }
 }
 
-export class PortalSession extends BaseResource {
+export class PortalSession extends BaseResource implements PortalSessionResource {
   redirectUrl!: string;
 
   constructor(data: PortalSessionJSON) {
@@ -59,7 +61,7 @@ export class PortalSession extends BaseResource {
   }
 }
 
-export class CheckoutSession extends BaseResource {
+export class CheckoutSession extends BaseResource implements CheckoutSessionResource {
   redirectUrl!: string;
 
   constructor(data: CheckoutSessionJSON) {
