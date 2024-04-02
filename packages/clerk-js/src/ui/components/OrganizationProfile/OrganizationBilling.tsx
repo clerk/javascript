@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { BillingPlanResource } from '@clerk/types';
 
-import { Badge, Button, Col, Flex, Grid, Icon, Text } from '../../customizables';
+import { Badge, Box, Button, Col, Flex, Grid, Icon, Text } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 
@@ -58,10 +58,11 @@ const ChangePlanButton = ({ planKey }: { planKey: string }) => {
 
   return (
     <Button
+      size='xs'
       onClick={void handleChangePlan}
-      variant='roundWrapper'
+      variant='outline'
     >
-      Change to this button
+      Change to this plan
     </Button>
   );
 };
@@ -111,7 +112,7 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
             </Flex>
           </Col>
 
-          <Flex>
+          <Box>
             {params.isCurrentPlan ? (
               <Badge
                 colorScheme='success'
@@ -122,7 +123,7 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
             ) : (
               <ChangePlanButton planKey={params.planKey} />
             )}
-          </Flex>
+          </Box>
         </Flex>
         {params.features.length > 0 && <DividerLine />}
         {params.features.length > 0 && (
@@ -150,8 +151,11 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
 export const OrganizationBilling = () => {
   const { organization } = useOrganization();
 
-  const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(organization?.getAvailablePlans, {});
-  const { data: currentPlan, isLoading: isLoadingCurrentPlan } = useFetch(organization?.getCurrentPlan, {});
+  const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(
+    organization?.getAvailablePlans,
+    'availablePlans',
+  );
+  const { data: currentPlan, isLoading: isLoadingCurrentPlan } = useFetch(organization?.getCurrentPlan, 'currentPlan');
 
   if (isLoadingAvailablePlans || isLoadingCurrentPlan) {
     return <div>Loading</div>;
