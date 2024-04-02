@@ -48,10 +48,11 @@ export const ptBR: LocalizationResource = {
   formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Esqueceu a senha?',
   formFieldError__matchingPasswords: 'Senhas conferem.',
-  formFieldError__notMatchingPasswords: "Senhas não conferem.",
+  formFieldError__notMatchingPasswords: 'Senhas não conferem.',
   formFieldError__verificationLinkExpired: 'O link de verificação expirou. Por favor solicite um novo link.',
   formFieldHintText__optional: 'Opcional',
-  formFieldHintText__slug: 'Um rótulo é um identificador legível por humanos que deve ser único. É comumente usado em URLs.',
+  formFieldHintText__slug:
+    'Um rótulo é um identificador legível por humanos que deve ser único. É comumente usado em URLs.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Excluir conta',
   formFieldInputPlaceholder__emailAddress: '',
@@ -355,7 +356,8 @@ export const ptBR: LocalizationResource = {
       title: 'Não foi possível fazer login',
     },
     passkey: {
-      subtitle: 'Usar sua chave de acesso confirma a sua identidade. Seu dispositivo pode solicitar sua impressão digital, reconhecimento facial ou PIN.',
+      subtitle:
+        'Usar sua chave de acesso confirma a sua identidade. Seu dispositivo pode solicitar sua impressão digital, reconhecimento facial ou PIN.',
       title: 'Use sua chave de acesso.',
     },
     password: {
@@ -473,8 +475,7 @@ export const ptBR: LocalizationResource = {
     form_password_incorrect: 'Senha incorreta.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
-    form_password_pwned:
-      'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
+    form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
     form_password_pwned__sign_in: 'Esta senha foi compromeditda, por favor redefina sua senha.',
     form_password_size_in_bytes_exceeded:
       'Sua senha excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
