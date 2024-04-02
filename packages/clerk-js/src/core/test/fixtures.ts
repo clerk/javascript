@@ -204,9 +204,7 @@ export const createSignIn = (signInParams: Partial<SignInJSON> = {}, user: Parti
     identifier: signInParams.identifier,
     object: 'sign_in',
     second_factor_verification: signInParams.second_factor_verification,
-    supported_external_accounts: signInParams.supported_external_accounts,
     supported_first_factors: signInParams.supported_first_factors,
-    supported_identifiers: signInParams.supported_identifiers,
     supported_second_factors: signInParams.supported_second_factors,
     user_data: {
       first_name: user.first_name,
@@ -235,7 +233,6 @@ export const createSignUp = (signUpParams: Partial<SignUpJSON> = {}) => {
     optional_fields: signUpParams.optional_fields,
     phone_number: signUpParams.phone_number,
     required_fields: signUpParams.required_fields,
-    supported_external_accounts: signUpParams.supported_external_accounts,
     unsafe_metadata: signUpParams.unsafe_metadata,
     unverified_fields: signUpParams.unverified_fields,
     username: signUpParams.username,
