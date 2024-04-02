@@ -736,6 +736,7 @@ export const enUS: LocalizationResource = {
       },
       headerTitle__account: 'Profile details',
       headerTitle__security: 'Security',
+      headerTitle__billing: 'Plan & Billing',
       mfaSection: {
         backupCodes: {
           actionLabel__regenerate: 'Regenerate',
@@ -781,6 +782,10 @@ export const enUS: LocalizationResource = {
         destructiveAction: 'Remove wallet',
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
+      },
+      currentPlanSection: {
+        title: 'Current plan',
+        primaryButton: 'Manage plan',
       },
     },
     usernamePage: {

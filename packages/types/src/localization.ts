@@ -292,6 +292,7 @@ type _LocalizationResource = {
     start: {
       headerTitle__account: LocalizationValue;
       headerTitle__security: LocalizationValue;
+      headerTitle__billing: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
