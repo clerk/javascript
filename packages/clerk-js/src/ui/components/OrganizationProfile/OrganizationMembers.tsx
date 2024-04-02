@@ -32,7 +32,7 @@ export const OrganizationMembers = withCardStateProvider(() => {
   const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
     invitations: canManageMemberships || undefined,
-    memberships: canManageMemberships || undefined,
+    memberships: canReadMemberships || undefined,
   });
 
   // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
