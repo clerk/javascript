@@ -18,7 +18,7 @@ export interface PortalSessionResource extends ClerkResource {
 }
 
 export type CreatePortalSessionParams = {
-  return_url: string;
+  returnUrl: string;
 };
 
 export interface CheckoutSessionResource extends ClerkResource {
