@@ -1,8 +1,9 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { BillingPlanResource } from '@clerk/types';
 
-import { Badge, Box, Col, Flex, Text } from '../../customizables';
+import { Badge, Box, Col, Flex, Grid, Icon, Text } from '../../customizables';
 import { useFetch } from '../../hooks';
+import { Check } from '../../icons';
 
 const DividerLine = () => {
   return (
@@ -16,6 +17,28 @@ const DividerLine = () => {
   );
 };
 
+const Feature = ({ name }: { name: string }) => {
+  return (
+    <Flex
+      align='center'
+      gap={2}
+    >
+      <Icon
+        size='xs'
+        icon={Check}
+      />
+      <Text
+        sx={t => ({
+          color: '#5E5F6E',
+          fontSize: t.fontSizes.$md,
+        })}
+      >
+        {name}
+      </Text>
+    </Flex>
+  );
+};
+
 type OrganizationPlanProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'>;
 
 export const OrganizationPlan = (params: OrganizationPlanProps) => {
@@ -24,7 +47,7 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
       sx={{
         backgroundColor: '#FAFAFB',
         width: '37.25rem',
-        height: '11.25rem',
+        maxHeight: '11.25rem',
         borderRadius: '0.5rem',
         boxShadow: '0px 0px 0px 1px #EEEEF0',
       }}
@@ -64,7 +87,24 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
             </Badge>
           </Flex>
         </Flex>
-        <DividerLine />
+        {params.features.length > 0 && <DividerLine />}
+        {params.features.length > 0 && (
+          <Grid
+            sx={{
+              padding: '1rem 0',
+              gridTemplateColumns: 'repeat(2,1fr)',
+              gridTemplateRows: 'repeat(3,1fr)',
+              rowGap: '0.5rem',
+            }}
+          >
+            {params.features.map((feature: string) => (
+              <Feature
+                key={feature}
+                name={feature}
+              />
+            ))}
+          </Grid>
+        )}
       </Col>
     </Col>
   );
@@ -90,14 +130,14 @@ export const OrganizationBilling = () => {
         key={id}
         name={name}
         features={features}
-        priceInCents={priceInCents}
+        priceInCents={priceInCents / 100}
       />
     );
   });
 
   return (
     <Col
-      sx={{ marginTop: '10px' }}
+      sx={{ marginTop: '20px' }}
       gap={4}
     >
       {plan}
