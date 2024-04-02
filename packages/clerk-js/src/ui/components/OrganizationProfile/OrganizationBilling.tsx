@@ -1,19 +1,24 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { BillingPlanResource } from '@clerk/types';
 
-import { Badge, Box, Col, Flex, Grid, Icon, Text } from '../../customizables';
+import { Badge, Button, Col, Flex, Grid, Icon, Text } from '../../customizables';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 
 const DividerLine = () => {
   return (
-    <Box
-      sx={t => ({
-        width: '100%',
-        height: '1px',
-        backgroundColor: t.colors.$neutralAlpha100,
-      })}
-    />
+    <svg
+      width='556'
+      height='2'
+      viewBox='0 0 556 2'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
+      <path
+        d='M0 1H556'
+        stroke='#EEEEF0'
+      />
+    </svg>
   );
 };
 
@@ -39,13 +44,38 @@ const Feature = ({ name }: { name: string }) => {
   );
 };
 
-type OrganizationPlanProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'>;
+const ChangePlanButton = ({ planKey }: { planKey: string }) => {
+  const { organization } = useOrganization();
+
+  const handleChangePlan = async () => {
+    try {
+      const response = await organization?.changePlan({ planKey });
+      console.log(response);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  return (
+    <Button
+      onClick={void handleChangePlan}
+      variant='roundWrapper'
+    >
+      Change to this button
+    </Button>
+  );
+};
+
+type OrganizationPlanProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'> & {
+  isCurrentPlan: boolean;
+  planKey: string;
+};
 
 export const OrganizationPlan = (params: OrganizationPlanProps) => {
   return (
     <Col
       sx={{
-        backgroundColor: '#FAFAFB',
+        backgroundColor: params.isCurrentPlan ? '#FAFAFB' : 'white',
         width: '37.25rem',
         maxHeight: '11.25rem',
         borderRadius: '0.5rem',
@@ -63,9 +93,12 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
           }}
           justify='between'
         >
-          <Col gap={1}>
+          <Col gap={2}>
             <Text variant='subtitle'>{params.name}</Text>
-            <Flex gap={1}>
+            <Flex
+              gap={1}
+              align='center'
+            >
               <Text sx={t => ({ fontWeight: t.fontWeights.$semibold, fontSize: t.fontSizes.$lg })}>
                 ${params.priceInCents}
               </Text>
@@ -79,12 +112,16 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
           </Col>
 
           <Flex>
-            <Badge
-              colorScheme='success'
-              sx={{ alignSelf: 'flex-start' }}
-            >
-              Current plan
-            </Badge>
+            {params.isCurrentPlan ? (
+              <Badge
+                colorScheme='success'
+                sx={{ alignSelf: 'flex-start' }}
+              >
+                Current plan
+              </Badge>
+            ) : (
+              <ChangePlanButton planKey={params.planKey} />
+            )}
           </Flex>
         </Flex>
         {params.features.length > 0 && <DividerLine />}
@@ -113,20 +150,22 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
 export const OrganizationBilling = () => {
   const { organization } = useOrganization();
 
-  const { data, isLoading } = useFetch(organization?.getAvailablePlans, {});
-  console.log(data, isLoading);
+  const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(organization?.getAvailablePlans, {});
+  const { data: currentPlan, isLoading: isLoadingCurrentPlan } = useFetch(organization?.getCurrentPlan, {});
 
-  if (isLoading) {
+  if (isLoadingAvailablePlans || isLoadingCurrentPlan) {
     return <div>Loading</div>;
   }
 
-  if ((data?.data.length || 0) < 1) {
+  if ((availablePlans?.data.length || 0) < 1) {
     return <>No data</>;
   }
 
-  const plan = data?.data.map(({ name, id, features, priceInCents }) => {
+  const plan = availablePlans?.data.map(({ name, id, features, priceInCents, key }) => {
     return (
       <OrganizationPlan
+        isCurrentPlan={currentPlan?.key === key}
+        planKey={key}
         key={id}
         name={name}
         features={features}
