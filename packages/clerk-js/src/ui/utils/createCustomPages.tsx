@@ -3,7 +3,7 @@ import type { CustomPage, LoadedClerk } from '@clerk/types';
 import { isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements';
-import { Organization, TickShield, User, Users } from '../icons';
+import { Dollar, Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
@@ -254,7 +254,7 @@ const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
     {
       name: localizationKeys('userProfile.navbar.billing'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.BILLING,
-      icon: TickShield,
+      icon: Dollar,
       path: 'billing',
     },
   ];
@@ -292,7 +292,7 @@ const getOrganizationProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
     {
       name: localizationKeys('organizationProfile.navbar.billing'),
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING,
-      icon: TickShield,
+      icon: Dollar,
       path: 'organization-billing',
     },
   ];
