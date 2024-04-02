@@ -23,8 +23,8 @@ const loadLib = async () => {
   let core;
   let languageCommon;
   if (__IS_NATIVE__) {
-    core = await require('@zxcvbn-ts/core');
-    languageCommon = await require('@zxcvbn-ts/language-common');
+    core = require('@zxcvbn-ts/core');
+    languageCommon = require('@zxcvbn-ts/language-common');
   } else {
     core = await import('@zxcvbn-ts/core');
     languageCommon = await import('@zxcvbn-ts/language-common');
