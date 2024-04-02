@@ -326,14 +326,14 @@ export class User extends BaseResource implements UserResource {
   };
 
   createPortalSession = async (params: CreatePortalSessionParams): Promise<PortalSessionResource> => {
-    const { return_url } = params || {};
+    const { returnUrl } = params || {};
 
     const json = (
       await BaseResource._fetch({
         path: `${this.path()}/billing/start_portal_session`,
         method: 'POST',
         body: {
-          return_url: return_url,
+          return_url: returnUrl,
         } as any,
       })
     )?.response as unknown as PortalSessionJSON;
