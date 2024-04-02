@@ -787,6 +787,9 @@ export const enUS: LocalizationResource = {
         title: 'Current plan',
         primaryButton: 'Manage plan',
       },
+      paymentMethodSection: {
+        title: 'Payment method',
+      },
     },
     usernamePage: {
       successMessage: 'Your username has been updated.',
