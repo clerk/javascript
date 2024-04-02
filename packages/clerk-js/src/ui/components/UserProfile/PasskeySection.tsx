@@ -102,9 +102,9 @@ export const PasskeySection = () => {
     >
       <ProfileSection.ItemList id='passkeys'>
         {user.__experimental_passkeys.map(passkey => (
-          <Action.Root key={passkey.id}>
+          <Action.Root key={[passkey.id, passkey.name].join('_')}>
             <PasskeyItem
-              key={passkey.id}
+              key={[passkey.id, passkey.name].join('_')}
               {...passkey}
             />
 
