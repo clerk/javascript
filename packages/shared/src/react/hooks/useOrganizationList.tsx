@@ -92,10 +92,7 @@ type UseOrganizationList = <T extends UseOrganizationListParams>(
       >;
     };
 
-const __unstable__revalidationParams = {
-  __unstable__dependencyRevalidation: true,
-  __unstable__defaultRevalidateOnEvents: ['organization:deleted', 'organization:created', 'user:membership_deleted'],
-};
+const eventsForMembersRevalidation = ['organization:deleted', 'organization:created', 'user:membership_deleted'];
 
 export const useOrganizationList: UseOrganizationList = params => {
   const { userMemberships, userInvitations, userSuggestions } = params || {};
@@ -105,7 +102,6 @@ export const useOrganizationList: UseOrganizationList = params => {
     pageSize: 10,
     keepPreviousData: false,
     infinite: false,
-    ...__unstable__revalidationParams,
   });
 
   const userInvitationsSafeValues = useWithSafeValues(userInvitations, {
@@ -114,7 +110,6 @@ export const useOrganizationList: UseOrganizationList = params => {
     status: 'pending',
     keepPreviousData: false,
     infinite: false,
-    ...__unstable__revalidationParams,
   });
 
   const userSuggestionsSafeValues = useWithSafeValues(userSuggestions, {
@@ -123,7 +118,6 @@ export const useOrganizationList: UseOrganizationList = params => {
     status: 'pending',
     keepPreviousData: false,
     infinite: false,
-    ...__unstable__revalidationParams,
   });
 
   const clerk = useClerkInstanceContext();
@@ -170,8 +164,7 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
       enabled: !!userMembershipsParams,
-      __unstable__dependencyRevalidation: (userMembershipsSafeValues as any).__unstable__dependencyRevalidation,
-      __unstable__defaultRevalidateOnEvents: (userMembershipsSafeValues as any).__unstable__defaultRevalidateOnEvents,
+      __unstable__defaultRevalidateOnEvents: eventsForMembersRevalidation,
     },
     {
       type: 'userMemberships',
@@ -191,8 +184,6 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userInvitationsSafeValues.keepPreviousData,
       infinite: userInvitationsSafeValues.infinite,
       enabled: !!userInvitationsParams,
-      __unstable__dependencyRevalidation: (userInvitationsSafeValues as any).__unstable__dependencyRevalidation,
-      __unstable__defaultRevalidateOnEvents: (userInvitationsSafeValues as any).__unstable__defaultRevalidateOnEvents,
     },
     {
       type: 'userInvitations',
@@ -212,8 +203,6 @@ export const useOrganizationList: UseOrganizationList = params => {
       keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
       infinite: userSuggestionsSafeValues.infinite,
       enabled: !!userSuggestionsParams,
-      __unstable__dependencyRevalidation: (userSuggestionsSafeValues as any).__unstable__dependencyRevalidation,
-      __unstable__defaultRevalidateOnEvents: (userSuggestionsSafeValues as any).__unstable__defaultRevalidateOnEvents,
     },
     {
       type: 'userSuggestions',

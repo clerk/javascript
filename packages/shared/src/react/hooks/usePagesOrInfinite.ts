@@ -72,7 +72,6 @@ type DefaultOptions = {
    */
   enabled?: boolean;
 
-  __unstable__dependencyRevalidation?: boolean;
   __unstable__defaultRevalidateOnEvents?: string[];
 };
 
@@ -107,7 +106,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   const enabled = options.enabled ?? true;
   const triggerInfinite = options.infinite ?? false;
   const keepPreviousData = options.keepPreviousData ?? false;
-  const __unstable__dependencyRevalidation = options.__unstable__dependencyRevalidation ?? true;
+  const __unstable__dependencyRevalidation = typeof options.__unstable__defaultRevalidateOnEvents !== 'undefined';
   const __unstable__defaultRevalidateOnEvents = options.__unstable__defaultRevalidateOnEvents || [];
 
   const pagesCacheKey = {
