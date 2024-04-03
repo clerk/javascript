@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.71.1
+
+### Patch Changes
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3101](https://github.com/clerk/javascript/pull/3101)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`3e3f11601`](https://github.com/clerk/javascript/commit/3e3f116017b5440789a16cb1aae813e813d43ba2)]:
+  - @clerk/localizations@1.28.0
+
 ## 4.71.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.28.0
+
+### Minor Changes
+
+- Export the zh-TW localization ([#3095](https://github.com/clerk/javascript/pull/3095)) by [@anagstef](https://github.com/anagstef)
+
 ## 1.27.0
 
 ### Minor Changes
