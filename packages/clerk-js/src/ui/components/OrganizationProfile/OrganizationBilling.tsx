@@ -59,7 +59,7 @@ const ChangePlanButton = ({ planKey }: { planKey: string }) => {
   return (
     <Button
       size='xs'
-      onClick={void handleChangePlan}
+      onClick={handleChangePlan}
       variant='outline'
     >
       Change to this plan
