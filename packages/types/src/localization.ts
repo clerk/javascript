@@ -373,6 +373,13 @@ type _LocalizationResource = {
         title: LocalizationValue;
         deleteAccountButton: LocalizationValue;
       };
+      currentPlanSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+      };
+      paymentMethodSection: {
+        title: LocalizationValue;
+      };
     };
     profilePage: {
       title: LocalizationValue;
