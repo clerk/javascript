@@ -5,7 +5,7 @@ import { getAuth } from './getAuth';
 import { isAuthInRequest } from './utils';
 
 /**
- * Middleware to requireAuth requests for user authenticated or authorized requests.
+ * Middleware to require auth requests for user authenticated or authorized requests.
  * An HTTP 401 status code is returned for unauthenticated requests.
  *
  * @example
