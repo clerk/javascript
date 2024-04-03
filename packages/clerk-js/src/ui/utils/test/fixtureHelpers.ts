@@ -6,6 +6,7 @@ import type {
   ExternalAccountJSON,
   OAuthProvider,
   OrganizationEnrollmentMode,
+  OrganizationSettingsJSON,
   PhoneNumberJSON,
   PublicUserDataJSON,
   SamlAccountJSON,
@@ -292,7 +293,15 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
     os.domains.enabled = true;
     os.domains.enrollment_modes = modes || ['automatic_invitation', 'automatic_invitation', 'manual_invitation'];
   };
-  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains };
+
+  const withOrganizationBilling = (opts?: Partial<OrganizationSettingsJSON['billing']>) => {
+    os.billing = {
+      enabled: true,
+      ...opts,
+    };
+  };
+
+  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains, withOrganizationBilling };
 };
 
 const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
@@ -468,6 +477,13 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
+  const withBilling = (opts?: Partial<UserSettingsJSON['billing']>) => {
+    us.billing = {
+      enabled: true,
+      ...opts,
+    };
+  };
+
   // TODO: Add the rest, consult pkg/generate/auth_config.go
 
   return {
@@ -485,5 +501,6 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     withAuthenticatorApp,
     withPasskey,
     withPasskeySettings,
+    withBilling,
   };
 };
