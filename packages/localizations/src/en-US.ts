@@ -160,7 +160,7 @@ export const enUS: LocalizationResource = {
       general: 'General',
       members: 'Members',
       title: 'Organization',
-      billing: 'Billing',
+      billing: 'Plan & Billing',
     },
     profilePage: {
       dangerSection: {
@@ -663,7 +663,7 @@ export const enUS: LocalizationResource = {
       account: 'Profile',
       description: 'Manage your account info.',
       security: 'Security',
-      billing: 'Billing',
+      billing: 'Plan & Billing',
       title: 'Account',
     },
     passwordPage: {
