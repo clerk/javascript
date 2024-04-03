@@ -807,6 +807,7 @@ export const enUS: LocalizationResource = {
       paymentIntervalMonthly: 'Per month',
       action__changePlan: 'Change Plan',
       badge__currentPlan: 'Current Plan',
+      action__goToPlanAndBilling: 'Plan & Billing',
     },
   },
 } as const;

@@ -724,6 +724,7 @@ type _LocalizationResource = {
       headerTitle: LocalizationValue;
       paymentIntervalMonthly: LocalizationValue;
       action__changePlan: LocalizationValue;
+      action__goToPlanAndBilling: LocalizationValue;
       badge__currentPlan: LocalizationValue;
     };
   };

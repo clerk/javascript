@@ -16,22 +16,17 @@ import {
 } from '../../customizables';
 import { Header } from '../../elements';
 import { useFetch } from '../../hooks';
-import { Check } from '../../icons';
+import { ArrowLeftIcon, Check } from '../../icons';
 
 const DividerLine = () => {
   return (
-    <svg
-      width='556'
-      height='2'
-      viewBox='0 0 556 2'
-      fill='none'
-      xmlns='http://www.w3.org/2000/svg'
-    >
-      <path
-        d='M0 1H556'
-        stroke='#EEEEF0'
-      />
-    </svg>
+    <Box
+      elementDescriptor={descriptors.dividerLine}
+      sx={t => ({
+        height: '1px',
+        backgroundColor: t.colors.$neutralAlpha100,
+      })}
+    />
   );
 };
 
@@ -40,6 +35,7 @@ const Feature = ({ name }: { name: string }) => {
     <Flex
       align='center'
       gap={2}
+      sx={t => ({ color: t.colors.$primary400 })}
     >
       <Icon
         size='xs'
@@ -47,7 +43,7 @@ const Feature = ({ name }: { name: string }) => {
       />
       <Text
         sx={t => ({
-          color: '#5E5F6E',
+          color: t.colors.$primary400,
           fontSize: t.fontSizes.$md,
         })}
       >
@@ -81,6 +77,29 @@ const ChangePlanButton = ({ planKey }: { planKey: string }) => {
   );
 };
 
+const GoToPlanAndBilling = () => {
+  return (
+    <Flex
+      sx={t => ({ marginBottom: t.space.$4, color: t.colors.$colorTextSecondary })}
+      align='center'
+      gap={1}
+    >
+      <Icon
+        size='sm'
+        icon={ArrowLeftIcon}
+      />
+      <Text
+        sx={t => ({
+          color: t.colors.$colorTextSecondary,
+          fontSize: t.fontSizes.$sm,
+          fontWeight: t.fontWeights.$medium,
+        })}
+        localizationKey={localizationKeys('billing.managePlanScreen.action__goToPlanAndBilling')}
+      />
+    </Flex>
+  );
+};
+
 type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'> & {
   isCurrentPlan: boolean;
   planKey: string;
@@ -89,13 +108,13 @@ type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features' |
 export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
   return (
     <Col
-      sx={{
-        backgroundColor: params.isCurrentPlan ? '#FAFAFB' : 'white',
+      sx={t => ({
+        backgroundColor: params.isCurrentPlan ? t.colors.$neutralAlpha25 : 'white',
         width: '37.25rem',
         maxHeight: '11.25rem',
         borderRadius: '0.5rem',
-        boxShadow: '0px 0px 0px 1px #EEEEF0',
-      }}
+        boxShadow: `0px 0px 0px 1px ${t.colors.$neutralAlpha100}`,
+      })}
     >
       <Col
         sx={{
@@ -211,6 +230,7 @@ const ManagePlanScreen = () => {
 
   return (
     <Col>
+      <GoToPlanAndBilling />
       <Header.Root>
         <Header.Title
           localizationKey={localizationKeys('billing.managePlanScreen.headerTitle')}
