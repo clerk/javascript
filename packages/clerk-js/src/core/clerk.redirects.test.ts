@@ -128,50 +128,50 @@ describe('Clerk singleton - Redirects', () => {
 
       it('redirects to signInUrl', async () => {
         await clerkForProductionInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
 
         await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
+        expect(mockNavigate.mock.calls[1][0]).toBe('/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
       });
 
       it('redirects to signUpUrl', async () => {
         await clerkForProductionInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
 
         await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
-        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
+        expect(mockNavigate.mock.calls[1][0]).toBe('/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F');
       });
 
       it('redirects to userProfileUrl', async () => {
         await clerkForProductionInstance.redirectToUserProfile();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/user-profile');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/user-profile');
 
         await clerkForDevelopmentInstance.redirectToUserProfile();
-        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/user-profile');
+        expect(mockNavigate.mock.calls[1][0]).toBe('/user-profile');
       });
 
       it('redirects to home', async () => {
         await clerkForProductionInstance.redirectToHome();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/home');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/home');
 
         await clerkForDevelopmentInstance.redirectToHome();
-        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/home');
+        expect(mockNavigate.mock.calls[1][0]).toBe('/home');
       });
 
       it('redirects to create organization', async () => {
         await clerkForProductionInstance.redirectToCreateOrganization();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/create-organization');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/create-organization');
 
         await clerkForDevelopmentInstance.redirectToCreateOrganization();
-        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/create-organization');
+        expect(mockNavigate.mock.calls[1][0]).toBe('/create-organization');
       });
 
       it('redirects to organization profile', async () => {
         await clerkForProductionInstance.redirectToOrganizationProfile();
-        expect(mockNavigate).toHaveBeenNthCalledWith(1, '/organization-profile');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/organization-profile');
 
         await clerkForDevelopmentInstance.redirectToOrganizationProfile();
-        expect(mockNavigate).toHaveBeenNthCalledWith(2, '/organization-profile');
+        expect(mockNavigate.mock.calls[1][0]).toBe('/organization-profile');
       });
     });
 

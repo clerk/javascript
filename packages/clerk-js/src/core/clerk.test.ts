@@ -529,7 +529,7 @@ describe('Clerk singleton', () => {
       const res = sut.navigate(toUrl);
       expect(res.then).toBeDefined();
       expect(mockHref).not.toHaveBeenCalled();
-      expect(mockNavigate).toHaveBeenCalledWith('/path#hash');
+      expect(mockNavigate.mock.calls[0][0]).toBe('/path#hash');
     });
   });
 
@@ -660,7 +660,7 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/continue');
       });
     });
 
@@ -881,7 +881,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-two');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/factor-two');
       });
     });
 
@@ -926,7 +926,7 @@ describe('Clerk singleton', () => {
       });
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/custom-2fa');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-2fa');
       });
     });
 
@@ -983,7 +983,7 @@ describe('Clerk singleton', () => {
       });
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/custom-sign-in');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-sign-in');
       });
     });
 
@@ -1041,7 +1041,7 @@ describe('Clerk singleton', () => {
       } as any);
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/custom-sign-in');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-sign-in');
       });
     });
 
@@ -1091,7 +1091,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up');
       });
     });
 
@@ -1141,7 +1141,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up');
       });
     });
 
@@ -1185,7 +1185,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/continue');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/continue');
       });
     });
 
@@ -1234,7 +1234,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/verify-email-address');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/verify-email-address');
       });
     });
 
@@ -1268,7 +1268,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-one');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/factor-one');
       });
     });
 
@@ -1318,7 +1318,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/factor-one');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/factor-one');
       });
     });
 
@@ -1379,7 +1379,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-up');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up');
       });
     });
 
@@ -1432,7 +1432,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-in');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in');
       });
     });
 
@@ -1472,7 +1472,7 @@ describe('Clerk singleton', () => {
       await sut.handleRedirectCallback();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/reset-password');
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/reset-password');
       });
     });
   });
@@ -1544,7 +1544,7 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith(redirectUrl);
+        expect(mockNavigate.mock.calls[0][0]).toBe(redirectUrl);
       });
     });
 
@@ -1608,7 +1608,7 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith(redirectUrl);
+        expect(mockNavigate.mock.calls[0][0]).toBe(redirectUrl);
       });
     });
 
@@ -1805,7 +1805,7 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith(redirectUrl);
+        expect(mockNavigate.mock.calls[0][0]).toBe(redirectUrl);
       });
     });
 
@@ -1869,7 +1869,7 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith(redirectUrl);
+        expect(mockNavigate.mock.calls[0][0]).toBe(redirectUrl);
       });
     });
 
