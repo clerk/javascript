@@ -213,10 +213,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     };
   };
 
-  const FormInfoComponent: Record<
-    FeedbackType,
-    typeof FormErrorText | typeof FormInfoText | typeof FormSuccessText | typeof FormWarningText
-  > = {
+  const FormInfoComponent: Record<FeedbackType, typeof FormErrorText> = {
     error: FormErrorText,
     info: FormInfoText,
     success: FormSuccessText,
