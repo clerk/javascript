@@ -28,3 +28,7 @@ export interface CheckoutSessionResource extends ClerkResource {
 export type ChangePlanParams = {
   planKey: string;
 };
+
+export type BillingData = {
+  enabled: boolean;
+};
