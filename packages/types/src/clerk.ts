@@ -521,16 +521,47 @@ export type HandleOAuthCallbackParams = {
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
+export interface NavigateOptions {
+  metadata?: RouterMetadata;
+}
+
+/**
+ * Internal is a navigation type that affects the component
+ *
+ */
+type NavigationType =
+  /**
+   * Internal navigations affect the components and alter the
+   * part of the URL that comes after the `path` passed to the component.
+   * eg  <SignIn path='sign-in'>
+   * going from /sign-in to /sign-in/factor-one is an internal navigation
+   */
+  | 'internal'
+  /**
+   * Internal navigations affect the components and alter the
+   * part of the URL that comes before the `path` passed to the component.
+   * eg  <SignIn path='sign-in'>
+   * going from /sign-in to / is an external navigation
+   */
+  | 'external'
+  /**
+   * Window navigations are navigations towards a different origin
+   * and are not handled by the Clerk component or the host app router.
+   */
+  | 'window';
+
+type RouterMetadata = { routing?: RoutingStrategy; navigationType?: NavigationType };
+
 // TODO: Make sure Isomorphic Clerk navigate can work with the correct type:
 // (to: string) => Promise<unknown>
-export type CustomNavigation = (to: string) => Promise<unknown> | void;
+export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
 
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
 export interface ClerkOptions {
   appearance?: Appearance;
   localization?: LocalizationResource;
-  navigate?: (to: string) => Promise<unknown> | unknown;
+  navigate?: (to: string, metadata?: { __internal_metadata?: RouterMetadata }) => Promise<unknown> | void;
   polling?: boolean;
   selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
   /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
