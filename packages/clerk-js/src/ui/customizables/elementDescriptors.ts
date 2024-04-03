@@ -261,6 +261,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'buttonArrowIcon',
   'providerIcon',
   'spinner',
+
+  'billingPlanCard',
+  'billingChangePlanAction',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

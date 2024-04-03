@@ -14,6 +14,8 @@ export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'feat
 export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
   return (
     <Col
+      elementDescriptor={descriptors.billingPlanCard}
+      elementId={descriptors.billingPlanCard.setId(params.planKey)}
       sx={t => ({
         backgroundColor: params.isCurrentPlan ? t.colors.$neutralAlpha25 : 'white',
         width: '37.25rem',
@@ -155,6 +157,7 @@ export const ChangePlanButton = ({ action }: { action: () => Promise<void> }) =>
 
   return (
     <Button
+      elementDescriptor={descriptors.billingChangePlanAction}
       isLoading={isLoading}
       onClick={handleActionClicked}
       variant='outline'
