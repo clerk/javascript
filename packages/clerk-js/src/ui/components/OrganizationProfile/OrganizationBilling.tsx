@@ -1,49 +1,22 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { BillingPlanResource } from '@clerk/types';
 
-import { Badge, Box, Button, Col, Flex, Grid, Icon, localizationKeys, Text } from '../../customizables';
+import {
+  Badge,
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Grid,
+  Icon,
+  localizationKeys,
+  Spinner,
+  Text,
+} from '../../customizables';
 import { Header } from '../../elements';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
-
-const DividerLine = () => {
-  return (
-    <svg
-      width='556'
-      height='2'
-      viewBox='0 0 556 2'
-      fill='none'
-      xmlns='http://www.w3.org/2000/svg'
-    >
-      <path
-        d='M0 1H556'
-        stroke='#EEEEF0'
-      />
-    </svg>
-  );
-};
-
-const Feature = ({ name }: { name: string }) => {
-  return (
-    <Flex
-      align='center'
-      gap={2}
-    >
-      <Icon
-        size='xs'
-        icon={Check}
-      />
-      <Text
-        sx={t => ({
-          color: '#5E5F6E',
-          fontSize: t.fontSizes.$md,
-        })}
-      >
-        {name}
-      </Text>
-    </Flex>
-  );
-};
 
 const ChangePlanButton = ({ planKey }: { planKey: string }) => {
   const { organization } = useOrganization();
@@ -68,12 +41,12 @@ const ChangePlanButton = ({ planKey }: { planKey: string }) => {
   );
 };
 
-type OrganizationPlanProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'> & {
+type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'> & {
   isCurrentPlan: boolean;
   planKey: string;
 };
 
-export const OrganizationPlan = (params: OrganizationPlanProps) => {
+export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
   return (
     <Col
       sx={{
@@ -149,9 +122,8 @@ export const OrganizationPlan = (params: OrganizationPlanProps) => {
   );
 };
 
-export const OrganizationBilling = () => {
+const ManagePlanScreen = () => {
   const { organization } = useOrganization();
-
   const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(
     organization?.getAvailablePlans,
     'availablePlans',
@@ -159,16 +131,36 @@ export const OrganizationBilling = () => {
   const { data: currentPlan, isLoading: isLoadingCurrentPlan } = useFetch(organization?.getCurrentPlan, 'currentPlan');
 
   if (isLoadingAvailablePlans || isLoadingCurrentPlan) {
-    return <div>Loading</div>;
-  }
-
-  if ((availablePlans?.data.length || 0) < 1) {
-    return <>No data</>;
+    return (
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+        }}
+      >
+        <Box
+          sx={{
+            margin: 'auto',
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translateY(-50%) translateX(-50%)',
+          }}
+        >
+          <Spinner
+            size='sm'
+            colorScheme='primary'
+            elementDescriptor={descriptors.spinner}
+          />
+        </Box>
+      </Box>
+    );
   }
 
   const plan = availablePlans?.data.map(({ name, id, features, priceInCents, key }) => {
     return (
-      <OrganizationPlan
+      <OrganizationPlanCard
         isCurrentPlan={currentPlan?.key === key}
         planKey={key}
         key={id}
@@ -191,4 +183,47 @@ export const OrganizationBilling = () => {
       <Col sx={t => ({ gap: t.space.$4 })}>{plan}</Col>
     </Col>
   );
+};
+
+const DividerLine = () => {
+  return (
+    <svg
+      width='556'
+      height='2'
+      viewBox='0 0 556 2'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
+      <path
+        d='M0 1H556'
+        stroke='#EEEEF0'
+      />
+    </svg>
+  );
+};
+
+const Feature = ({ name }: { name: string }) => {
+  return (
+    <Flex
+      align='center'
+      gap={2}
+    >
+      <Icon
+        size='xs'
+        icon={Check}
+      />
+      <Text
+        sx={t => ({
+          color: '#5E5F6E',
+          fontSize: t.fontSizes.$md,
+        })}
+      >
+        {name}
+      </Text>
+    </Flex>
+  );
+};
+
+export const OrganizationBilling = () => {
+  return <ManagePlanScreen />;
 };
