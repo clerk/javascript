@@ -76,9 +76,8 @@ const ChangePlanButton = ({ planKey }: { planKey: string }) => {
       size='xs'
       onClick={handleChangePlan}
       variant='outline'
-    >
-      Change to this plan
-    </Button>
+      localizationKey={localizationKeys('billing.managePlanScreen.action__changePlan')}
+    />
   );
 };
 
@@ -121,9 +120,8 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
               <Text
                 variant='body'
                 sx={t => ({ color: t.colors.$colorTextSecondary })}
-              >
-                per month
-              </Text>
+                localizationKey={localizationKeys('billing.managePlanScreen.paymentIntervalMonthly')}
+              />
             </Flex>
           </Col>
 
@@ -132,9 +130,8 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
               <Badge
                 colorScheme='success'
                 sx={{ alignSelf: 'flex-start' }}
-              >
-                Current plan
-              </Badge>
+                localizationKey={localizationKeys('billing.managePlanScreen.badge__currentPlan')}
+              />
             ) : (
               <ChangePlanButton planKey={params.planKey} />
             )}
@@ -216,7 +213,7 @@ const ManagePlanScreen = () => {
     <Col>
       <Header.Root>
         <Header.Title
-          localizationKey={localizationKeys('organizationProfile.start.headerTitle__managePlan')}
+          localizationKey={localizationKeys('billing.managePlanScreen.headerTitle')}
           sx={t => ({ marginBottom: t.space.$4 })}
           textVariant='h2'
         />
