@@ -111,7 +111,9 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
         width: '37.25rem',
         maxHeight: '11.25rem',
         borderRadius: '0.5rem',
-        boxShadow: `0px 0px 0px 1px ${t.colors.$neutralAlpha100}`,
+        boxShadow: params.isCurrentPlan
+          ? `0px 0px 0px 1px ${t.colors.$neutralAlpha100}`
+          : '0px 0px 0px 1px rgba(25, 28, 33, 0.06), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 2px 0px rgba(0, 0, 0, 0.08);',
       })}
     >
       <Col
@@ -157,7 +159,10 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
             {params.isCurrentPlan ? (
               <Badge
                 colorScheme='success'
-                sx={{ alignSelf: 'flex-start' }}
+                sx={t => ({
+                  alignSelf: 'flex-start',
+                  background: t.colors.$success50,
+                })}
                 localizationKey={localizationKeys('billing.managePlanScreen.badge__currentPlan')}
               />
             ) : (
