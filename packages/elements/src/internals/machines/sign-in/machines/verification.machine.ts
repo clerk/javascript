@@ -40,7 +40,7 @@ export type AttemptFirstFactorInput = { parent: Parent; fields: FormFields; curr
 export type AttemptSecondFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInSecondFactor | null };
 
 export const SignInVerificationMachineId = 'SignInVerification';
-export const RETRIABLE_COUNTDOWN_DEFAULT = 5;
+export const RESENDABLE_COUNTDOWN_DEFAULT = 60;
 
 const SignInVerificationMachine = setup({
   actors: {
@@ -55,13 +55,13 @@ const SignInVerificationMachine = setup({
     determineStartingFactor: () => {
       throw new ClerkElementsRuntimeError('Action `determineStartingFactor` must be overridden');
     },
-    retriableCountdownTick: assign(({ context }) => ({
-      retriable: context.retriableCountdown === 0,
-      retriableCountdown: context.retriableCountdown > 0 ? context.retriableCountdown - 1 : context.retriableCountdown,
+    resendableTick: assign(({ context }) => ({
+      resendable: context.resendableAfter === 0,
+      resendableAfter: context.resendableAfter > 0 ? context.resendableAfter - 1 : context.resendableAfter,
     })),
-    retriableCountdownReset: assign({
-      retriable: false,
-      retriableCountdown: RETRIABLE_COUNTDOWN_DEFAULT,
+    resendableReset: assign({
+      resendable: false,
+      resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
     }),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
@@ -78,10 +78,10 @@ const SignInVerificationMachine = setup({
     sendToLoading,
   },
   guards: {
-    isRetriable: ({ context }) => context.retriable || context.retriableCountdown === 0,
+    isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
   },
   delays: {
-    retriableTimeout: SignInVerificationDelays.retriableTimeout,
+    resendableTimeout: SignInVerificationDelays.resendableTimeout,
   },
   types: {} as SignInVerificationSchema,
 }).createMachine({
@@ -91,8 +91,8 @@ const SignInVerificationMachine = setup({
     formRef: input.form,
     loadingStep: 'verifications',
     parent: input.parent,
-    retriable: false,
-    retriableCountdown: RETRIABLE_COUNTDOWN_DEFAULT,
+    resendable: false,
+    resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
   }),
   initial: 'Preparing',
   entry: 'determineStartingFactor',
@@ -107,7 +107,7 @@ const SignInVerificationMachine = setup({
           params: context.currentFactor as SignInFirstFactor | null,
         }),
         onDone: {
-          actions: 'retriableCountdownReset',
+          actions: 'resendableReset',
           target: 'Pending',
         },
         onError: {
@@ -124,30 +124,30 @@ const SignInVerificationMachine = setup({
         RETRY: 'Preparing',
         SUBMIT: 'Attempting',
       },
-      initial: 'NotRetriable',
+      initial: 'NotResendable',
       states: {
-        Retriable: {
+        Resendable: {
           description: 'Waiting for user to retry',
         },
-        NotRetriable: {
+        NotResendable: {
           description: 'Handle countdowns',
           on: {
             RETRY: {
-              actions: log(({ context }) => `Not retriable; Try again in ${context.retriableCountdown}s`),
+              actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
             },
           },
           after: {
-            retriableTimeout: [
+            resendableTimeout: [
               {
                 description: 'Set as retriable if countdown is 0',
-                guard: 'isRetriable',
-                actions: 'retriableCountdownTick',
-                target: 'Retriable',
+                guard: 'isResendable',
+                actions: 'resendableTick',
+                target: 'Resendable',
               },
               {
                 description: 'Continue countdown if not retriable',
-                actions: 'retriableCountdownTick',
-                target: 'NotRetriable',
+                actions: 'resendableTick',
+                target: 'NotResendable',
                 reenter: true,
               },
             ],

@@ -41,14 +41,14 @@ export interface SignInVerificationContext {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignInRouterMachine>;
   loadingStep: 'verifications';
-  retriable: boolean;
-  retriableCountdown: number;
+  resendable: boolean;
+  resendableAfter: number;
 }
 
 // ---------------------------------- Delays ---------------------------------- //
 
 export const SignInVerificationDelays = {
-  retriableTimeout: 1_000, // 1 second
+  resendableTimeout: 1_000, // 1 second
 } as const;
 
 export type SignInVerificationDelays = keyof typeof SignInVerificationDelays;

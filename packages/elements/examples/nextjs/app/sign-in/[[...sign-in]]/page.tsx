@@ -5,7 +5,7 @@ import {
   Action,
   Provider,
   ProviderIcon,
-  Retriable,
+  Resendable,
   SafeIdentifier,
   Salutation,
   SignIn,
@@ -88,22 +88,22 @@ function CustomSubmit({ children }: ComponentProps<'button'>) {
   );
 }
 
-function Resend() {
+function CustomResendable() {
   return (
-    <Retriable>
-      {({ retryAfter, retriable }) => (
+    <Resendable>
+      {({ resendable, resendableAfter }) => (
         <P className='text-sm'>
           Didn&apos;t recieve a code?{' '}
-          {retriable ? (
+          {resendable ? (
             <Action resend>
               <strong className='text-blue-400'>Retry Now</strong>
             </Action>
           ) : (
-            <>Retry in {retryAfter} seconds.</>
+            <>Retry in {resendableAfter} seconds.</>
           )}
         </P>
       )}
-    </Retriable>
+    </Resendable>
   );
 }
 
@@ -256,7 +256,7 @@ export default function SignInPage() {
                     Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
                   </P>
 
-                  <Resend />
+                  <CustomResendable />
 
                   <CustomField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -282,7 +282,7 @@ export default function SignInPage() {
                     Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
                   </P>
 
-                  <Resend />
+                  <CustomResendable />
 
                   <CustomField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -310,7 +310,7 @@ export default function SignInPage() {
                     We&apos;ve sent a verification code to <SafeIdentifier />.
                   </P>
 
-                  <Resend />
+                  <CustomResendable />
                 </Strategy>
               </div>
             )}

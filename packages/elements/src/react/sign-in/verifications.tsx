@@ -148,37 +148,37 @@ export function SignInSecondFactorInner(props: SignInVerificationsProps) {
   ) : null;
 }
 
-export type SignInVerificationRetriableRenderProps = {
-  retriable: boolean;
-  retryAfter: number;
+export type SignInVerificationResendableRenderProps = {
+  resendable: boolean;
+  resendableAfter: number;
 };
 
-export type SignInVerificationRetriableProps = {
-  children: (props: SignInVerificationRetriableRenderProps) => React.ReactNode;
+export type SignInVerificationResendableProps = {
+  children: (props: SignInVerificationResendableRenderProps) => React.ReactNode;
 };
 
 /**
  * Component to expose the UI retry details for verifications.
  *
  * @example
- * <Retriable>({({ retriable, retryAfter }) => (<>...</>)}</Retriable>
+ * <Resendable>({({ resendable, resendAfter }) => (<>...</>)}</Resendable>
  */
-export function SignInVerificationRetriable({ children }: SignInVerificationRetriableProps) {
+export function SignInVerificationResendable({ children }: SignInVerificationResendableProps) {
   const firstFactorRef = SignInFirstFactorCtx.useActorRef(true);
   const secondFactorRef = SignInSecondFactorCtx.useActorRef(true);
   const ref = firstFactorRef || secondFactorRef;
 
   if (!ref) {
-    throw new ClerkElementsRuntimeError('The <Retriable> component must be used within <Step name="verifications">.');
+    throw new ClerkElementsRuntimeError('The <Resendable> component must be used within <Step name="verifications">.');
   }
 
-  const renderProps: SignInVerificationRetriableRenderProps = useSelector(
+  const renderProps: SignInVerificationResendableRenderProps = useSelector(
     ref,
     state => ({
-      retryAfter: state.context.retriableCountdown,
-      retriable: state.context.retriable,
+      resendable: state.context.resendable,
+      resendableAfter: state.context.resendableAfter,
     }),
-    (a, b) => a.retryAfter === b.retryAfter && a.retriable === b.retriable,
+    (a, b) => a.resendableAfter === b.resendableAfter && a.resendable === b.resendable,
   );
 
   if (!renderProps) {
