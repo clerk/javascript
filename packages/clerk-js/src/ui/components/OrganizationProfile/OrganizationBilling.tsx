@@ -36,7 +36,7 @@ const Feature = ({ name }: { name: string }) => {
     <Flex
       align='center'
       gap={2}
-      sx={t => ({ color: t.colors.$primary300 })}
+      sx={t => ({ color: t.colors.$colorTextSecondary })}
     >
       <Icon
         size='xs'
@@ -44,7 +44,7 @@ const Feature = ({ name }: { name: string }) => {
       />
       <Text
         sx={t => ({
-          color: t.colors.$primary300,
+          color: t.colors.$colorTextSecondary,
           fontSize: t.fontSizes.$md,
         })}
       >
@@ -71,7 +71,7 @@ const ChangePlanButton = ({ action }: { action: () => Promise<void> }) => {
       isLoading={isLoading}
       onClick={handleActionClicked}
       variant='outline'
-      sx={t => ({ color: t.colors.$neutralAlpha850 })}
+      sx={t => ({ color: t.colors.$colorText })}
       localizationKey={localizationKeys('billing.managePlanScreen.action__changePlan')}
     />
   );
@@ -82,10 +82,10 @@ const GoToPlanAndBilling = () => {
     <Box sx={t => ({ marginBottom: t.space.$4 })}>
       <IconButton
         sx={t => ({
-          color: t.colors.$primary300,
+          color: t.colors.$colorTextSecondary,
           padding: 0,
           '&:hover': {
-            color: t.colors.$primary400,
+            color: t.colors.$colorTextSecondary,
           },
         })}
         variant='unstyled'
@@ -129,7 +129,7 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
         >
           <Col gap={1}>
             <Text
-              sx={t => ({ color: t.colors.$neutralAlpha800 })}
+              sx={t => ({ color: t.colors.$colorText })}
               variant='subtitle'
             >
               {params.name}
@@ -140,7 +140,7 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
             >
               <Text
                 sx={t => ({
-                  color: t.colors.$neutralAlpha800,
+                  color: t.colors.$colorText,
                   fontWeight: t.fontWeights.$semibold,
                   fontSize: t.fontSizes.$lg,
                 })}
