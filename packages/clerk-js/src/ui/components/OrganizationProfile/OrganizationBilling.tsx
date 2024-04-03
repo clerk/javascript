@@ -18,14 +18,55 @@ import { Header } from '../../elements';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 
+const DividerLine = () => {
+  return (
+    <svg
+      width='556'
+      height='2'
+      viewBox='0 0 556 2'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
+      <path
+        d='M0 1H556'
+        stroke='#EEEEF0'
+      />
+    </svg>
+  );
+};
+
+const Feature = ({ name }: { name: string }) => {
+  return (
+    <Flex
+      align='center'
+      gap={2}
+    >
+      <Icon
+        size='xs'
+        icon={Check}
+      />
+      <Text
+        sx={t => ({
+          color: '#5E5F6E',
+          fontSize: t.fontSizes.$md,
+        })}
+      >
+        {name}
+      </Text>
+    </Flex>
+  );
+};
+
 const ChangePlanButton = ({ planKey }: { planKey: string }) => {
   const { organization } = useOrganization();
 
   const handleChangePlan = async () => {
     try {
       const response = await organization?.changePlan({ planKey });
+      //TODO Handle action after success response
       console.log(response);
     } catch (e) {
+      //TODO Show error message if exists
       console.log(e);
     }
   };
@@ -182,45 +223,6 @@ const ManagePlanScreen = () => {
       </Header.Root>
       <Col sx={t => ({ gap: t.space.$4 })}>{plan}</Col>
     </Col>
-  );
-};
-
-const DividerLine = () => {
-  return (
-    <svg
-      width='556'
-      height='2'
-      viewBox='0 0 556 2'
-      fill='none'
-      xmlns='http://www.w3.org/2000/svg'
-    >
-      <path
-        d='M0 1H556'
-        stroke='#EEEEF0'
-      />
-    </svg>
-  );
-};
-
-const Feature = ({ name }: { name: string }) => {
-  return (
-    <Flex
-      align='center'
-      gap={2}
-    >
-      <Icon
-        size='xs'
-        icon={Check}
-      />
-      <Text
-        sx={t => ({
-          color: '#5E5F6E',
-          fontSize: t.fontSizes.$md,
-        })}
-      >
-        {name}
-      </Text>
-    </Flex>
   );
 };
 
