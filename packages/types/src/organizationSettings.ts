@@ -1,3 +1,4 @@
+import type { BillingData } from './billing';
 import type { ClerkResourceJSON } from './json';
 import type { OrganizationEnrollmentMode } from './organizationDomain';
 import type { ClerkResource } from './resource';
@@ -10,6 +11,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   actions: {
     admin_delete: boolean;
   };
+  billing: BillingData;
   domains: {
     enabled: boolean;
     enrollment_modes: OrganizationEnrollmentMode[];
@@ -22,6 +24,7 @@ export interface OrganizationSettingsResource extends ClerkResource {
   actions: {
     adminDelete: boolean;
   };
+  billing: BillingData;
   domains: {
     enabled: boolean;
     enrollmentModes: OrganizationEnrollmentMode[];
