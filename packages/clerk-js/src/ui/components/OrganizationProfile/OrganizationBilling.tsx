@@ -1,5 +1,6 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { BillingPlanResource } from '@clerk/types';
+import React from 'react';
 
 import {
   Badge,
@@ -53,23 +54,22 @@ const Feature = ({ name }: { name: string }) => {
   );
 };
 
-const ChangePlanButton = ({ planKey }: { planKey: string }) => {
-  const { organization } = useOrganization();
+const ChangePlanButton = ({ action }: { action: () => Promise<void> }) => {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  const handleChangePlan = async () => {
+  const handleActionClicked = async () => {
     try {
-      const response = await organization?.changePlan({ planKey });
-      //TODO Handle action after success response
-      console.log(response);
-    } catch (e) {
-      //TODO Show error message if exists
-      console.log(e);
+      setIsLoading(true);
+      await action();
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <Button
-      onClick={handleChangePlan}
+      isLoading={isLoading}
+      onClick={handleActionClicked}
       variant='outline'
       sx={t => ({ color: t.colors.$neutralAlpha850 })}
       localizationKey={localizationKeys('billing.managePlanScreen.action__changePlan')}
@@ -100,6 +100,7 @@ const GoToPlanAndBilling = () => {
 type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'> & {
   isCurrentPlan: boolean;
   planKey: string;
+  changePlanAction: React.ReactNode;
 };
 
 export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
@@ -170,7 +171,7 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
               justify='center'
               align='center'
             >
-              <ChangePlanButton planKey={params.planKey} />
+              {params.changePlanAction}
             </Flex>
           )}
         </Flex>
@@ -197,7 +198,23 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
   );
 };
 
-const ManagePlanScreen = () => {
+const ManagePlanScreen = ({ plans }: { plans: React.ReactNode }) => {
+  return (
+    <Col>
+      <GoToPlanAndBilling />
+      <Header.Root>
+        <Header.Title
+          localizationKey={localizationKeys('billing.managePlanScreen.headerTitle')}
+          sx={t => ({ marginBottom: t.space.$4 })}
+          textVariant='h2'
+        />
+      </Header.Root>
+      <Col sx={t => ({ gap: t.space.$4 })}>{plans}</Col>
+    </Col>
+  );
+};
+
+export const OrganizationBilling = () => {
   const { organization } = useOrganization();
   const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(
     organization?.getAvailablePlans,
@@ -233,7 +250,18 @@ const ManagePlanScreen = () => {
     );
   }
 
-  const plan = availablePlans?.data.map(({ name, id, features, priceInCents, key }) => {
+  const handleChangePlan = async (planKey: string) => {
+    try {
+      const response = await organization?.changePlan({ planKey });
+      //TODO Handle action after success response
+      console.log(response);
+    } catch (e) {
+      //TODO Show error message if exists
+      console.log(e);
+    }
+  };
+
+  const plans = availablePlans?.data.map(({ name, id, features, priceInCents, key }) => {
     return (
       <OrganizationPlanCard
         isCurrentPlan={currentPlan?.key === key}
@@ -242,25 +270,10 @@ const ManagePlanScreen = () => {
         name={name}
         features={features}
         priceInCents={priceInCents / 100}
+        changePlanAction={<ChangePlanButton action={() => handleChangePlan(key)} />}
       />
     );
   });
 
-  return (
-    <Col>
-      <GoToPlanAndBilling />
-      <Header.Root>
-        <Header.Title
-          localizationKey={localizationKeys('billing.managePlanScreen.headerTitle')}
-          sx={t => ({ marginBottom: t.space.$4 })}
-          textVariant='h2'
-        />
-      </Header.Root>
-      <Col sx={t => ({ gap: t.space.$4 })}>{plan}</Col>
-    </Col>
-  );
-};
-
-export const OrganizationBilling = () => {
-  return <ManagePlanScreen />;
+  return <ManagePlanScreen plans={plans} />;
 };
