@@ -28,9 +28,17 @@ function OTPInputSegment({ value, status }: { value: string; status: OTPInputSeg
 
 export const CustomField = React.forwardRef<
   typeof Input,
-  { alwaysShow?: boolean; name: string; label: string; required?: boolean; autoSubmit?: boolean; autoFocus?: boolean }
+  {
+    alwaysShow?: boolean;
+    name: string;
+    label: string;
+    required?: boolean;
+    autoSubmit?: boolean;
+    autoFocus?: boolean;
+    validatePassword?: boolean;
+  }
 >(function CustomField(
-  { alwaysShow, name, label, required = false, autoSubmit = false, autoFocus = false },
+  { alwaysShow, name, label, required = false, autoSubmit = false, autoFocus = false, validatePassword = false },
   forwardedRef,
 ) {
   const inputProps =
@@ -59,12 +67,23 @@ export const CustomField = React.forwardRef<
         <Label>{label}</Label>
         <Input
           name={name}
+          validatePassword={validatePassword}
           {...inputProps}
         />
       </div>
 
       <FieldError className='block text-red-400 font-mono' />
-      <FieldState>{state => <pre className='opacity-60 text-xs'>Field state: {state}</pre>}</FieldState>
+      <FieldState>
+        {({ state, passwordValidationKeys, message }) => (
+          <div>
+            <pre className='opacity-60 text-xs'>Field state: {state}</pre>
+            <pre className='opacity-60 text-xs'>Field msg: {message}</pre>
+            {name === 'password' ? (
+              <pre className='opacity-60 text-xs'>Pwd Keys: {passwordValidationKeys?.join(', ')}</pre>
+            ) : null}
+          </div>
+        )}
+      </FieldState>
     </ElementsField>
   );
 });

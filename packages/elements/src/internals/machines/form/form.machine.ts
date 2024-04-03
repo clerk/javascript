@@ -36,9 +36,14 @@ export type FormMachineEvents =
   | { type: 'ERRORS.SET'; error: any }
   | { type: 'ERRORS.CLEAR' }
   | {
-      type: 'WARNINGS.SET';
-      field: Pick<FieldDetails, 'name' | 'warnings'>;
-    };
+      type: 'FIELD.FEEDBACK.SET';
+      field: Pick<FieldDetails, 'name' | 'feedback'>;
+    }
+  | {
+      type: 'FIELD.FEEDBACK.CLEAR';
+      field: Pick<FieldDetails, 'name'>;
+    }
+  | { type: 'FIELD.FEEDBACK.CLEAR.ALL' };
 
 type FormMachineTypes = {
   events: FormMachineEvents;
@@ -54,23 +59,13 @@ export const FormMachine = setup({
     setGlobalErrors: assign({
       errors: (_, params: { errors: ClerkElementsError[] }) => [...params.errors],
     }),
-    setFieldErrors: assign({
-      fields: ({ context }, params: Pick<FieldDetails, 'name' | 'errors'>) => {
+    setFieldFeedback: assign({
+      fields: ({ context }, params: Pick<FieldDetails, 'name' | 'feedback'>) => {
         if (!params.name) throw new Error('Field name is required');
-        if (context.fields.has(params.name)) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          context.fields.get(params.name)!.errors = params.errors;
-        }
 
-        return context.fields;
-      },
-    }),
-    setFieldWarnings: assign({
-      fields: ({ context }, params: Pick<FieldDetails, 'name' | 'warnings'>) => {
-        if (!params.name) throw new Error('Field name is required');
         if (context.fields.has(params.name)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          context.fields.get(params.name)!.warnings = params.warnings;
+          context.fields.get(params.name)!.feedback = params.feedback;
         }
 
         return context.fields;
@@ -115,10 +110,13 @@ export const FormMachine = setup({
 
           for (const field in fields) {
             enqueue({
-              type: 'setFieldErrors',
+              type: 'setFieldFeedback',
               params: {
                 name: field,
-                errors: fields[field],
+                feedback: {
+                  type: 'error',
+                  message: fields[field][0],
+                },
               },
             });
           }
@@ -129,17 +127,6 @@ export const FormMachine = setup({
       actions: assign({
         errors: () => [],
       }),
-    },
-    'WARNINGS.SET': {
-      actions: {
-        type: 'setFieldWarnings',
-        params({ event }) {
-          return {
-            name: event.field.name,
-            warnings: event.field.warnings,
-          };
-        },
-      },
     },
     'FIELD.ADD': {
       actions: assign({
@@ -173,6 +160,38 @@ export const FormMachine = setup({
           if (!event.field.name) throw new Error('Field name is required');
 
           context.fields.delete(event.field.name);
+          return context.fields;
+        },
+      }),
+    },
+    'FIELD.FEEDBACK.SET': {
+      actions: [
+        {
+          type: 'setFieldFeedback',
+          params: ({ event }) => event.field,
+        },
+      ],
+    },
+    'FIELD.FEEDBACK.CLEAR': {
+      actions: assign({
+        fields: ({ context, event }) => {
+          if (!event.field.name) throw new Error('Field name is required');
+          if (context.fields.has(event.field.name)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            context.fields.get(event.field.name)!.feedback = undefined;
+          }
+
+          return context.fields;
+        },
+      }),
+    },
+    'FIELD.FEEDBACK.CLEAR.ALL': {
+      actions: assign({
+        fields: ({ context }) => {
+          context.fields.forEach(field => {
+            field.feedback = undefined;
+          });
+
           return context.fields;
         },
       }),

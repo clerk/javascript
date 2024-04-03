@@ -22,7 +22,7 @@ function CustomSubmit({ children }: ComponentProps<'button'>) {
 export default function SignUpPage() {
   return (
     <SignUp>
-      <div className='m-auto w-max text-sm'>
+      <div className='m-auto text-sm'>
         <Step name='start'>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>Sign Up</H1>
@@ -57,10 +57,16 @@ export default function SignUpPage() {
 
             <GlobalError className='block text-red-400 font-mono' />
 
-            <div className='flex gap-6 flex-col'>
+            <div className='flex gap-6 flex-col w-96'>
               <CustomField
                 label='Email'
                 name='emailAddress'
+              />
+
+              <CustomField
+                label='Password'
+                name='password'
+                validatePassword
               />
 
               <CustomField
