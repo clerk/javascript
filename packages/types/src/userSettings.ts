@@ -1,3 +1,4 @@
+import type { BillingData } from './billing';
 import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
 import type { OAuthStrategy, Web3Strategy } from './strategies';
@@ -95,6 +96,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   object: never;
   attributes: AttributesJSON;
   actions: Actions;
+  billing: BillingData;
   social: OAuthProviders;
 
   saml: SamlSettings;
@@ -113,6 +115,7 @@ export interface UserSettingsResource extends ClerkResource {
 
   attributes: Attributes;
   actions: Actions;
+  billing: BillingData;
   signIn: SignInData;
   signUp: SignUpData;
   passwordSettings: PasswordSettingsData;

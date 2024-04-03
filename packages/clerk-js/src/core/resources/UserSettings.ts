@@ -1,5 +1,6 @@
 import type {
   Attributes,
+  BillingData,
   OAuthProviders,
   OAuthStrategy,
   PasskeySettingsData,
@@ -33,6 +34,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
 
   attributes!: Attributes;
   actions!: Actions;
+  billing!: BillingData;
   signIn!: SignInData;
   signUp!: SignUpData;
   passwordSettings!: PasswordSettingsData;
@@ -71,6 +73,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }]),
     ) as Attributes;
     this.actions = data.actions;
+    this.billing = data.billing;
     this.signIn = data.sign_in;
     this.signUp = data.sign_up;
     this.passwordSettings = {
