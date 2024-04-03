@@ -805,7 +805,7 @@ export const enUS: LocalizationResource = {
     managePlanScreen: {
       headerTitle: 'Manage Plan',
       paymentIntervalMonthly: 'per month',
-      action__changePlan: 'Change Plan',
+      action__changePlan: 'Change to this plan',
       badge__currentPlan: 'Current Plan',
       action__goToPlanAndBilling: 'Plan & Billing',
     },

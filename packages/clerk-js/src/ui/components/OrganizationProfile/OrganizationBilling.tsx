@@ -69,7 +69,6 @@ const ChangePlanButton = ({ planKey }: { planKey: string }) => {
 
   return (
     <Button
-      size='xs'
       onClick={handleChangePlan}
       variant='outline'
       sx={t => ({ color: t.colors.$neutralAlpha850 })}
@@ -155,8 +154,8 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
             </Flex>
           </Col>
 
-          <Box>
-            {params.isCurrentPlan ? (
+          {params.isCurrentPlan ? (
+            <Box>
               <Badge
                 colorScheme='success'
                 sx={t => ({
@@ -164,11 +163,16 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
                   background: t.colors.$success50,
                 })}
                 localizationKey={localizationKeys('billing.managePlanScreen.badge__currentPlan')}
-              />
-            ) : (
+              />{' '}
+            </Box>
+          ) : (
+            <Flex
+              justify='center'
+              align='center'
+            >
               <ChangePlanButton planKey={params.planKey} />
-            )}
-          </Box>
+            </Flex>
+          )}
         </Flex>
         {params.features.length > 0 && <DividerLine />}
         {params.features.length > 0 && (
