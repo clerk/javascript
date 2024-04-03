@@ -67,8 +67,8 @@ describe('MfaPage', () => {
     it('renders the "enabled" page upon clicking the button', async () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
 
-      //@ts-expect-error
-      fixtures.clerk.user?.phoneNumbers[0].setReservedForSecondFactor = jest
+      // @ts-ignore
+      fixtures.clerk.user!.phoneNumbers[0].setReservedForSecondFactor = jest
         .fn()
         .mockResolvedValue({} as PhoneNumberResource);
       const { userEvent } = render(<MfaPage />, { wrapper });

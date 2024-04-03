@@ -6,6 +6,7 @@ const { merge } = require('webpack-merge');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const TerserPlugin = require('terser-webpack-plugin');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -151,6 +152,23 @@ const commonForProd = () => {
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
+    },
+    optimization: {
+      minimize: true,
+      minimizer: [
+        compiler => {
+          new TerserPlugin({
+            terserOptions: {
+              compress: {
+                passes: 2,
+              },
+              mangle: {
+                safari10: true,
+              },
+            },
+          }).apply(compiler);
+        },
+      ],
     },
     plugins: [
       // new webpack.optimize.LimitChunkCountPlugin({

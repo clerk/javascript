@@ -44,7 +44,7 @@ describe('RemoveMfaPhoneCodePage', () => {
 
       fixtures.router.params.id = 'id';
       //@ts-expect-error
-      fixtures.clerk.user?.phoneNumbers[0].setReservedForSecondFactor = jest.fn().mockResolvedValue({});
+      fixtures.clerk.user!.phoneNumbers[0].setReservedForSecondFactor = jest.fn().mockResolvedValue({});
       const { userEvent } = render(<RemoveMfaPhoneCodePage />, { wrapper });
 
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));
