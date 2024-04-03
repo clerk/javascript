@@ -1,4 +1,3 @@
-import type { CustomPage } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 import React from 'react';
 
@@ -71,5 +70,34 @@ describe('OrganizationProfile', () => {
     const { queryByText } = render(<OrganizationProfile />, { wrapper });
     expect(queryByText('Members')).not.toBeInTheDocument();
     expect(queryByText('General')).toBeInTheDocument();
+  });
+
+  it('navbar includes plan & billing button', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationBilling({
+        enabled: true,
+      });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+    });
+
+    const { getByText } = render(<OrganizationProfile />, { wrapper });
+    expect(getByText('General')).toBeDefined();
+    expect(getByText('Members')).toBeDefined();
+  });
+
+  it('navbar not includes plan & billing button', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationBilling({
+        enabled: false,
+      });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+    });
+
+    const { queryByText } = render(<OrganizationProfile />, { wrapper });
+    expect(queryByText('General')).toBeDefined();
+    expect(queryByText('Members')).toBeDefined();
+    expect(queryByText('Plan & Billing')).not.toBeInTheDocument();
   });
 });
