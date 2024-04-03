@@ -1,9 +1,18 @@
-import { Col, descriptors, localizationKeys } from '../../customizables';
+import { useUser } from '@clerk/shared/react';
+
+import { Button, Col, descriptors, localizationKeys } from '../../customizables';
 import { Header, withCardStateProvider } from '../../elements';
 import { CurrentPlanSection } from './CurrentPlanSection';
 import { PaymentMethodSection } from './PaymentMethodSection';
 
 export const BillingPage = withCardStateProvider(() => {
+  const { user } = useUser();
+
+  const handleStartPortalSession = async () => {
+    const res = await user?.createPortalSession({ returnUrl: window.location.href });
+    window.location.href = res?.redirectUrl || '';
+  };
+
   return (
     <Col
       elementDescriptor={descriptors.page}
@@ -20,6 +29,13 @@ export const BillingPage = withCardStateProvider(() => {
             textVariant='h2'
           />
         </Header.Root>
+
+        <Button
+          variant='outline'
+          onClick={handleStartPortalSession}
+        >
+          Manage billing info
+        </Button>
 
         <CurrentPlanSection />
         <PaymentMethodSection />
