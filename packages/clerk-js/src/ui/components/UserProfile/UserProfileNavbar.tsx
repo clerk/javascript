@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { USER_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useEnvironment, useUserProfileContext } from '../../contexts';
 import { NavBar, NavbarContextProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
@@ -11,7 +12,7 @@ export const UserProfileNavbar = (
   const { pages } = useUserProfileContext();
   const { billing } = useEnvironment().userSettings;
 
-  const routes = pages.routes.filter(r => !(r.id === 'billing' && !billing?.enabled));
+  const routes = pages.routes.filter(r => !(r.id === USER_PROFILE_NAVBAR_ROUTE_ID.BILLING && !billing?.enabled));
 
   return (
     <NavbarContextProvider>

@@ -22,13 +22,12 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_memberships:manage' }),
   );
 
-  const routes = pages.routes
-    .filter(
-      r =>
-        r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS ||
-        (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS && allowMembersRoute),
-    )
-    .filter(r => !(r.id === 'billing' && !billing?.enabled));
+  const routes = pages.routes.filter(
+    r =>
+      (r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS ||
+        (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS && allowMembersRoute)) &&
+      !(r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && !billing?.enabled),
+  );
 
   if (!organization) {
     return null;

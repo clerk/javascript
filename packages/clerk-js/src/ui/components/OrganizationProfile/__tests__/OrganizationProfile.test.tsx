@@ -84,6 +84,20 @@ describe('OrganizationProfile', () => {
     const { getByText } = render(<OrganizationProfile />, { wrapper });
     expect(getByText('General')).toBeDefined();
     expect(getByText('Members')).toBeDefined();
-    expect(getByText('Plan & Billing')).toBeDefined();
+  });
+
+  it('navbar not includes plan & billing button', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationBilling({
+        enabled: false,
+      });
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+    });
+
+    const { queryByText } = render(<OrganizationProfile />, { wrapper });
+    expect(queryByText('General')).toBeDefined();
+    expect(queryByText('Members')).toBeDefined();
+    expect(queryByText('Plan & Billing')).not.toBeInTheDocument();
   });
 });
