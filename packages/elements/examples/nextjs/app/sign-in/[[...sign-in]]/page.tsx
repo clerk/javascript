@@ -5,6 +5,7 @@ import {
   Action,
   Provider,
   ProviderIcon,
+  Retriable,
   SafeIdentifier,
   Salutation,
   SignIn,
@@ -84,6 +85,25 @@ function CustomSubmit({ children }: ComponentProps<'button'>) {
     >
       {children}
     </Action>
+  );
+}
+
+function Resend() {
+  return (
+    <Retriable>
+      {({ retryAfter, retriable }) => (
+        <P className='text-sm'>
+          Didn&apos;t recieve a code?{' '}
+          {retriable ? (
+            <Action resend>
+              <strong className='text-blue-400'>Retry Now</strong>
+            </Action>
+          ) : (
+            <>Retry in {retryAfter} seconds.</>
+          )}
+        </P>
+      )}
+    </Retriable>
   );
 }
 
@@ -236,6 +256,8 @@ export default function SignInPage() {
                     Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
                   </P>
 
+                  <Resend />
+
                   <CustomField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
@@ -259,6 +281,8 @@ export default function SignInPage() {
                   <P className='text-sm'>
                     Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
                   </P>
+
+                  <Resend />
 
                   <CustomField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -285,6 +309,8 @@ export default function SignInPage() {
                   <P className='text-sm'>
                     We&apos;ve sent a verification code to <SafeIdentifier />.
                   </P>
+
+                  <Resend />
                 </Strategy>
               </div>
             )}

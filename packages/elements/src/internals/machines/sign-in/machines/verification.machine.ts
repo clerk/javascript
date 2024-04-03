@@ -12,7 +12,7 @@ import type {
   Web3Attempt,
 } from '@clerk/types';
 import type { ActorRefFrom, DoneActorEvent } from 'xstate';
-import { assign, fromPromise, sendTo, setup } from 'xstate';
+import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form/form.types';
@@ -20,6 +20,7 @@ import { sendToLoading } from '~/internals/machines/shared.actions';
 import type { WithParams } from '~/internals/machines/shared.types';
 import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
 import type { SignInVerificationSchema } from '~/internals/machines/sign-in/types';
+import { SignInVerificationDelays } from '~/internals/machines/sign-in/types';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
 
@@ -39,6 +40,7 @@ export type AttemptFirstFactorInput = { parent: Parent; fields: FormFields; curr
 export type AttemptSecondFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInSecondFactor | null };
 
 export const SignInVerificationMachineId = 'SignInVerification';
+export const RETRIABLE_COUNTDOWN_DEFAULT = 5;
 
 const SignInVerificationMachine = setup({
   actors: {
@@ -53,6 +55,14 @@ const SignInVerificationMachine = setup({
     determineStartingFactor: () => {
       throw new ClerkElementsRuntimeError('Action `determineStartingFactor` must be overridden');
     },
+    retriableCountdownTick: assign(({ context }) => ({
+      retriable: context.retriableCountdown === 0,
+      retriableCountdown: context.retriableCountdown > 0 ? context.retriableCountdown - 1 : context.retriableCountdown,
+    })),
+    retriableCountdownReset: assign({
+      retriable: false,
+      retriableCountdown: RETRIABLE_COUNTDOWN_DEFAULT,
+    }),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -67,14 +77,22 @@ const SignInVerificationMachine = setup({
       context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
     sendToLoading,
   },
+  guards: {
+    isRetriable: ({ context }) => context.retriable || context.retriableCountdown === 0,
+  },
+  delays: {
+    retriableTimeout: SignInVerificationDelays.retriableTimeout,
+  },
   types: {} as SignInVerificationSchema,
 }).createMachine({
   id: SignInVerificationMachineId,
   context: ({ input }) => ({
     currentFactor: null,
     formRef: input.form,
-    parent: input.parent,
     loadingStep: 'verifications',
+    parent: input.parent,
+    retriable: false,
+    retriableCountdown: RETRIABLE_COUNTDOWN_DEFAULT,
   }),
   initial: 'Preparing',
   entry: 'determineStartingFactor',
@@ -88,7 +106,10 @@ const SignInVerificationMachine = setup({
           parent: context.parent,
           params: context.currentFactor as SignInFirstFactor | null,
         }),
-        onDone: 'Pending',
+        onDone: {
+          actions: 'retriableCountdownReset',
+          target: 'Pending',
+        },
         onError: {
           actions: 'setFormErrors',
           target: 'Pending',
@@ -100,9 +121,37 @@ const SignInVerificationMachine = setup({
       description: 'Waiting for user input',
       on: {
         'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
-        SUBMIT: {
-          target: 'Attempting',
-          reenter: true,
+        RETRY: 'Preparing',
+        SUBMIT: 'Attempting',
+      },
+      initial: 'NotRetriable',
+      states: {
+        Retriable: {
+          description: 'Waiting for user to retry',
+        },
+        NotRetriable: {
+          description: 'Handle countdowns',
+          on: {
+            RETRY: {
+              actions: log(({ context }) => `Not retriable; Try again in ${context.retriableCountdown}s`),
+            },
+          },
+          after: {
+            retriableTimeout: [
+              {
+                description: 'Set as retriable if countdown is 0',
+                guard: 'isRetriable',
+                actions: 'retriableCountdownTick',
+                target: 'Retriable',
+              },
+              {
+                description: 'Continue countdown if not retriable',
+                actions: 'retriableCountdownTick',
+                target: 'NotRetriable',
+                reenter: true,
+              },
+            ],
+          },
         },
       },
     },

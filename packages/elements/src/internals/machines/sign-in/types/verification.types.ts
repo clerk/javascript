@@ -18,11 +18,13 @@ export type SignInVerificationTags =
 
 export type SignInVerificationSubmitEvent = { type: 'SUBMIT' };
 export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
+export type SignInVerificationRetryEvent = { type: 'RETRY' };
 
 export type SignInVerificationEvents =
   | ErrorActorEvent
   | SignInVerificationSubmitEvent
-  | SignInVerificationFactorUpdateEvent;
+  | SignInVerificationFactorUpdateEvent
+  | SignInVerificationRetryEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 
@@ -39,13 +41,24 @@ export interface SignInVerificationContext {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignInRouterMachine>;
   loadingStep: 'verifications';
+  retriable: boolean;
+  retriableCountdown: number;
 }
+
+// ---------------------------------- Delays ---------------------------------- //
+
+export const SignInVerificationDelays = {
+  retriableTimeout: 1_000, // 1 second
+} as const;
+
+export type SignInVerificationDelays = keyof typeof SignInVerificationDelays;
 
 // ---------------------------------- Schema ---------------------------------- //
 
 export interface SignInVerificationSchema {
   context: SignInVerificationContext;
   input: SignInVerificationInput;
+  delays: SignInVerificationDelays;
   events: SignInVerificationEvents;
   tags: SignInVerificationTags;
 }

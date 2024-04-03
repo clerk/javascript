@@ -3,6 +3,7 @@ import { useSelector } from '@xstate/react';
 import { useCallback } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import {
   SignInFirstFactorMachine,
   SignInSecondFactorMachine,
@@ -51,11 +52,25 @@ function SignInStrategiesProvider({
 
 export type SignInStrategyProps = { name: SignInStrategyName; children: React.ReactNode };
 
+/**
+ * Generic component to handle both first and second factor verifications.
+ *
+ * @example
+ * <Step name="verifications">
+ *   <Strategy name="password">...<Strategy />
+ * </Step>
+ */
 export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { active } = useStrategy(name);
   return active ? <>{children}</> : null; // eslint-disable-line react/jsx-no-useless-fragment
 }
 
+/**
+ * Generic component to handle both first and second factor verifications.
+ *
+ * @example
+ * <Step name="verifications">...</Step>
+ */
 export function SignInVerifications(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const { activeTags: activeRoutes } = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
@@ -71,6 +86,13 @@ export function SignInVerifications(props: SignInVerificationsProps) {
   return null;
 }
 
+/**
+ * Component to handle specifically first factor verifications.
+ * Generally, you should use the <SignInVerifications> component instead via <Step name="verifications">.
+ *
+ * @example
+ * <FirstFactor>...</FirstFactor>
+ */
 export function SignInFirstFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:first-factor');
@@ -78,6 +100,13 @@ export function SignInFirstFactor(props: SignInVerificationsProps) {
   return activeState ? <SignInFirstFactorInner {...props} /> : null;
 }
 
+/**
+ * Component to handle specifically second factor verifications.
+ * Generally, you should use the <SignInVerifications> component instead via <Step name="verifications">.
+ *
+ * @example
+ * <SecondFactor>...</SecondFactor>
+ */
 export function SignInSecondFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:second-factor');
@@ -117,4 +146,44 @@ export function SignInSecondFactorInner(props: SignInVerificationsProps) {
       />
     </SignInSecondFactorCtx.Provider>
   ) : null;
+}
+
+export type SignInVerificationRetriableRenderProps = {
+  retriable: boolean;
+  retryAfter: number;
+};
+
+export type SignInVerificationRetriableProps = {
+  children: (props: SignInVerificationRetriableRenderProps) => React.ReactNode;
+};
+
+/**
+ * Component to expose the UI retry details for verifications.
+ *
+ * @example
+ * <Retriable>({({ retriable, retryAfter }) => (<>...</>)}</Retriable>
+ */
+export function SignInVerificationRetriable({ children }: SignInVerificationRetriableProps) {
+  const firstFactorRef = SignInFirstFactorCtx.useActorRef(true);
+  const secondFactorRef = SignInSecondFactorCtx.useActorRef(true);
+  const ref = firstFactorRef || secondFactorRef;
+
+  if (!ref) {
+    throw new ClerkElementsRuntimeError('The <Retriable> component must be used within <Step name="verifications">.');
+  }
+
+  const renderProps: SignInVerificationRetriableRenderProps = useSelector(
+    ref,
+    state => ({
+      retryAfter: state.context.retriableCountdown,
+      retriable: state.context.retriable,
+    }),
+    (a, b) => a.retryAfter === b.retryAfter && a.retriable === b.retriable,
+  );
+
+  if (!renderProps) {
+    return null;
+  }
+
+  return children(renderProps);
 }
