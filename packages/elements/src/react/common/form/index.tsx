@@ -550,12 +550,12 @@ const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
     }
 
     const child = typeof children === 'function' ? children(error) : children;
-    const forceMatch = code ? error.code === code : true;
+    // const forceMatch = code ? error.code === code : undefined; // TODO: Re-add when Radix Form is updated
 
     return (
       <RadixFormMessage
         data-error-code={error.code}
-        forceMatch={forceMatch}
+        // forceMatch={forceMatch}
         {...rest}
         ref={forwardedRef}
       >
