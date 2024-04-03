@@ -14,7 +14,7 @@ import {
   Spinner,
   Text,
 } from '../../customizables';
-import { Header } from '../../elements';
+import { Header, IconButton } from '../../elements';
 import { useFetch } from '../../hooks';
 import { ArrowLeftIcon, Check } from '../../icons';
 
@@ -35,7 +35,7 @@ const Feature = ({ name }: { name: string }) => {
     <Flex
       align='center'
       gap={2}
-      sx={t => ({ color: t.colors.$primary400 })}
+      sx={t => ({ color: t.colors.$primary300 })}
     >
       <Icon
         size='xs'
@@ -43,7 +43,7 @@ const Feature = ({ name }: { name: string }) => {
       />
       <Text
         sx={t => ({
-          color: t.colors.$primary400,
+          color: t.colors.$primary300,
           fontSize: t.fontSizes.$md,
         })}
       >
@@ -72,6 +72,7 @@ const ChangePlanButton = ({ planKey }: { planKey: string }) => {
       size='xs'
       onClick={handleChangePlan}
       variant='outline'
+      sx={t => ({ color: t.colors.$neutralAlpha850 })}
       localizationKey={localizationKeys('billing.managePlanScreen.action__changePlan')}
     />
   );
@@ -79,24 +80,21 @@ const ChangePlanButton = ({ planKey }: { planKey: string }) => {
 
 const GoToPlanAndBilling = () => {
   return (
-    <Flex
-      sx={t => ({ marginBottom: t.space.$4, color: t.colors.$colorTextSecondary })}
-      align='center'
-      gap={1}
-    >
-      <Icon
-        size='sm'
-        icon={ArrowLeftIcon}
-      />
-      <Text
+    <Box sx={t => ({ marginBottom: t.space.$4 })}>
+      <IconButton
         sx={t => ({
-          color: t.colors.$colorTextSecondary,
-          fontSize: t.fontSizes.$sm,
-          fontWeight: t.fontWeights.$medium,
+          color: t.colors.$primary300,
+          padding: 0,
+          '&:hover': {
+            color: t.colors.$primary400,
+          },
         })}
+        variant='unstyled'
+        aria-label='Go to plan and billing'
+        icon={ArrowLeftIcon}
         localizationKey={localizationKeys('billing.managePlanScreen.action__goToPlanAndBilling')}
       />
-    </Flex>
+    </Box>
   );
 };
 
@@ -127,13 +125,24 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
           }}
           justify='between'
         >
-          <Col gap={2}>
-            <Text variant='subtitle'>{params.name}</Text>
+          <Col gap={1}>
+            <Text
+              sx={t => ({ color: t.colors.$neutralAlpha800 })}
+              variant='subtitle'
+            >
+              {params.name}
+            </Text>
             <Flex
               gap={1}
               align='center'
             >
-              <Text sx={t => ({ fontWeight: t.fontWeights.$semibold, fontSize: t.fontSizes.$lg })}>
+              <Text
+                sx={t => ({
+                  color: t.colors.$neutralAlpha800,
+                  fontWeight: t.fontWeights.$semibold,
+                  fontSize: t.fontSizes.$lg,
+                })}
+              >
                 ${params.priceInCents}
               </Text>
               <Text
