@@ -802,4 +802,12 @@ export const enUS: LocalizationResource = {
       title: 'Add web3 wallet',
     },
   },
+  billing: {
+    managePlanScreen: {
+      headerTitle: 'Manage Plan',
+      paymentIntervalMonthly: 'Per month',
+      action__changePlan: 'Change Plan',
+      badge__currentPlan: 'Current Plan',
+    },
+  },
 } as const;

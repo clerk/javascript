@@ -719,6 +719,14 @@ type _LocalizationResource = {
     next6Days: LocalizationValue;
     numeric: LocalizationValue;
   };
+  billing: {
+    managePlanScreen: {
+      headerTitle: LocalizationValue;
+      paymentIntervalMonthly: LocalizationValue;
+      action__changePlan: LocalizationValue;
+      badge__currentPlan: LocalizationValue;
+    };
+  };
 };
 
 type WithParamName<T> = T &
