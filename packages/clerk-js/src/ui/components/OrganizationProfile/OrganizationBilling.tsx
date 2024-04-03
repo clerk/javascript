@@ -1,7 +1,8 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { BillingPlanResource } from '@clerk/types';
 
-import { Badge, Box, Button, Col, Flex, Grid, Icon, Text } from '../../customizables';
+import { Badge, Box, Button, Col, Flex, Grid, Icon, localizationKeys, Text } from '../../customizables';
+import { Header } from '../../elements';
 import { useFetch } from '../../hooks';
 import { Check } from '../../icons';
 
@@ -179,11 +180,15 @@ export const OrganizationBilling = () => {
   });
 
   return (
-    <Col
-      sx={{ marginTop: '20px' }}
-      gap={4}
-    >
-      {plan}
+    <Col>
+      <Header.Root>
+        <Header.Title
+          localizationKey={localizationKeys('organizationProfile.start.headerTitle__managePlan')}
+          sx={t => ({ marginBottom: t.space.$4 })}
+          textVariant='h2'
+        />
+      </Header.Root>
+      <Col sx={t => ({ gap: t.space.$4 })}>{plan}</Col>
     </Col>
   );
 };

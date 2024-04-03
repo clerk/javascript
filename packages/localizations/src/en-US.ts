@@ -202,6 +202,7 @@ export const enUS: LocalizationResource = {
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
+      headerTitle__managePlan: 'Manage plan',
       profileSection: {
         primaryButton: 'Update profile',
         title: 'Organization Profile',
