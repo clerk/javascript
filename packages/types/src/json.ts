@@ -491,6 +491,12 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   userVerification: 'discouraged' | 'preferred' | 'required';
 }
 
+export type CustomerType = 'user' | 'organization';
+
+type BillingCycle = {
+  start_date: number;
+  end_date: number;
+};
 export interface BillingPlanJSON extends ClerkResourceJSON {
   object: 'billing_plan';
   id: string;
@@ -499,6 +505,7 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   description: string | null;
   price_in_cents: number;
   features: string[];
+  billing_cycle: BillingCycle;
   created_at: number;
   updated_at: number;
 }

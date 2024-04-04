@@ -1,4 +1,5 @@
 import type {
+  BillingCycle,
   BillingPlanJSON,
   BillingPlanResource,
   CheckoutSessionJSON,
@@ -17,6 +18,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   key!: string;
   priceInCents!: number;
   features!: string[];
+  billingCycle!: BillingCycle;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -36,6 +38,10 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
     this.key = data.key;
     this.priceInCents = data.price_in_cents;
     this.features = data.features;
+    this.billingCycle = {
+      startDate: unixEpochToDate(data.billing_cycle.start_date),
+      endDate: unixEpochToDate(data.billing_cycle.end_date),
+    };
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
 

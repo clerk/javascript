@@ -1,5 +1,9 @@
 import type { ClerkResource } from './resource';
 
+export type BillingCycle = {
+  startDate: Date;
+  endDate: Date;
+};
 export interface BillingPlanResource extends ClerkResource {
   id: string;
   name: string;
@@ -7,6 +11,7 @@ export interface BillingPlanResource extends ClerkResource {
   key: string;
   priceInCents: number;
   features: string[];
+  billingCycle: BillingCycle;
   createdAt: Date;
   updatedAt: Date;
 }

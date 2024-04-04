@@ -1,13 +1,14 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Box, localizationKeys, Text } from '../../customizables';
+import { Box, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { FullHeightLoader, ProfileSection } from '../../elements';
 import { useFetch } from '../../hooks';
 import { mqu } from '../../styledSystem';
-import { centsToUnit } from '../../utils';
+import { centsToUnit, getRelativeToNowDateKey } from '../../utils';
 
 export const CurrentPlanSection = () => {
   const { user } = useUser();
+  const { t } = useLocalizations();
   const { data: currentPlan, isLoading } = useFetch(user?.getCurrentPlan, 'user-current-plan');
 
   if (!user) {
@@ -46,7 +47,7 @@ export const CurrentPlanSection = () => {
               colorScheme='secondary'
               sx={t => ({ fontSize: t.fontSizes.$sm })}
             >
-              Renews on 28 April 2024
+              Renews on {t(getRelativeToNowDateKey(currentPlan.billingCycle.endDate))}
             </Text>
           </Box>
           <ProfileSection.Button
