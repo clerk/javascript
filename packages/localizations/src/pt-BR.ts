@@ -343,7 +343,7 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para redefinir sua senha',
       subtitle_email: 'Primeiro, digite o código enviado para seu email',
       subtitle_phone: 'Primeiro, digite o código enviado para seu telefone',
-      title: 'Reset password',
+      title: 'Resetar senha',
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: 'Redefinir sua senha',
@@ -382,7 +382,7 @@ export const ptBR: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Redefinir Senha',
-      requiredMessage: 'Por rasões de segurança, é necessário redefinir sua senha.',
+      requiredMessage: 'Por razões de segurança, é necessário redefinir sua senha.',
       successMessage: 'Sua senha foi alterada com sucesso. Entrando, por favor aguarde um momento.',
       title: 'Redefinir Senha',
     },
@@ -699,8 +699,8 @@ export const ptBR: LocalizationResource = {
       },
       successMessage: '{{identifier}} foi adicionado na sua conta.',
       title: 'Adicionar telefone',
-      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
-      verifyTitle: 'Verify phone number',
+      verifySubtitle: 'Insira o código de verificação enviado para {{identifier}}',
+      verifyTitle: 'Verificar número de telefone',
     },
     profilePage: {
       fileDropAreaHint: 'Carregue uma imagem JPG, PNG, GIF ou WEBP menor que 10 MB',
