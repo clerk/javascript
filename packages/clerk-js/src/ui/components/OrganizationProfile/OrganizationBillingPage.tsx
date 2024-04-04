@@ -7,13 +7,11 @@ import { Card, FullHeightLoader, Header, useCardState, withCardStateProvider } f
 import { useFetch } from '../../hooks';
 import { handleError } from '../../utils';
 
-export const OrganizationBillingPage = withCardStateProvider(() => {
-  const [isLoadingPortalSession, setIsLoadingPortalSession] = React.useState(false);
+const StartPortalSessionButton = () => {
   const { organization } = useOrganization();
-  const { t } = useLocalizations();
+  const [isLoadingPortalSession, setIsLoadingPortalSession] = React.useState(false);
   const card = useCardState();
-
-  const { data: currentPlan, isLoading } = useFetch(organization?.getCurrentPlan, 'organization-current-plan');
+  const { t } = useLocalizations();
 
   const handleStartPortalSession = async () => {
     setIsLoadingPortalSession(true);
@@ -26,6 +24,24 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
       setIsLoadingPortalSession(false);
     }
   };
+
+  return (
+    <Button
+      variant='outline'
+      sx={t => ({ color: t.colors.$colorText })}
+      onClick={handleStartPortalSession}
+      isLoading={isLoadingPortalSession}
+    >
+      {t(localizationKeys('billing.start.action__manageBillingInfo'))}
+    </Button>
+  );
+};
+
+export const OrganizationBillingPage = withCardStateProvider(() => {
+  const { organization } = useOrganization();
+  const card = useCardState();
+
+  const { data: currentPlan, isLoading } = useFetch(organization?.getCurrentPlan, 'organization-current-plan');
 
   return (
     <Col
@@ -47,14 +63,7 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
             </Header.Root>
           </Col>
           <Col>
-            <Button
-              variant='outline'
-              sx={t => ({ color: t.colors.$colorText })}
-              onClick={handleStartPortalSession}
-              isLoading={isLoadingPortalSession}
-            >
-              {t(localizationKeys('billing.start.action__manageBillingInfo'))}
-            </Button>
+            <StartPortalSessionButton />
           </Col>
         </Flex>
 
@@ -65,11 +74,7 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
         ) : (
           <>
             <CurrentPlanSection currentPlan={currentPlan} />
-            <PaymentMethodSection
-              currentPlan={currentPlan}
-              onClickStartPortalSession={handleStartPortalSession}
-              isLoading={isLoadingPortalSession}
-            />
+            <PaymentMethodSection currentPlan={currentPlan} />
           </>
         )}
       </Col>
