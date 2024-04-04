@@ -63,6 +63,15 @@ export interface SignOut {
   (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
 }
 
+export type SetSession = (
+  session: ActiveSessionResource | string | null,
+  beforeEmit?: BeforeEmitCallback,
+) => Promise<void>;
+
+interface ClerkMap<K, V> extends Map<K, V> {
+  name: string;
+}
+
 /**
  * Main Clerk SDK object.
  */
@@ -71,6 +80,8 @@ export interface Clerk {
    * Clerk SDK version number.
    */
   version: string | undefined;
+
+  cache: ClerkMap<string, unknown>;
 
   /**
    * If present, contains information about the SDK that the host application is using.
@@ -562,6 +573,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
     signInUrl?: string;
     signUpUrl?: string;
     allowedRedirectOrigins?: Array<string | RegExp>;
+    //@ts-ignore
+    cache?: ClerkMap<any, any>;
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
      * Telemetry options
