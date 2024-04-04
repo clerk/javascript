@@ -44,6 +44,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
       startDate: unixEpochToDate(data.billing_cycle.start_date),
       endDate: unixEpochToDate(data.billing_cycle.end_date),
     };
+<<<<<<< HEAD
     this.paymentMethod = data.payment_method && {
       type: data.payment_method.type,
       id: data.payment_method.id,
@@ -55,6 +56,8 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
         expYear: data.payment_method.card.exp_year,
       },
     };
+=======
+>>>>>>> 6cb291c69 (chore(clerk-js): Add billingCycle types to currentPlan)
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
 
