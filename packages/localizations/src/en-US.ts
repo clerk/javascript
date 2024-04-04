@@ -205,6 +205,7 @@ export const enUS: LocalizationResource = {
     start: {
       headerTitle__general: 'General',
       headerTitle__members: 'Members',
+      headerTitle__managePlan: 'Manage plan',
       profileSection: {
         primaryButton: 'Update profile',
         title: 'Organization Profile',
@@ -819,9 +820,10 @@ export const enUS: LocalizationResource = {
   billing: {
     managePlanScreen: {
       headerTitle: 'Manage Plan',
-      paymentIntervalMonthly: 'Per month',
-      action__changePlan: 'Change Plan',
+      paymentIntervalMonthly: 'per month',
+      action__changePlan: 'Change to this plan',
       badge__currentPlan: 'Current Plan',
+      action__goToPlanAndBilling: 'Plan & Billing',
     },
   },
 } as const;
