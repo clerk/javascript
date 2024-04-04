@@ -154,6 +154,7 @@ export class Clerk implements ClerkInterface {
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry?: TelemetryCollector;
+  public testingToken?: string;
 
   protected internal_last_error: ClerkAPIError | null = null;
 
@@ -278,6 +279,10 @@ export class Clerk implements ClerkInterface {
 
     if (this.#options.sdkMetadata) {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
+    }
+
+    if (this.#options.testingToken) {
+      this.testingToken = this.#options.testingToken;
     }
 
     if (this.#options.telemetry !== false) {

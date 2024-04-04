@@ -14,6 +14,7 @@ export type FapiRequestInit = RequestInit & {
   rotatingTokenNonce?: string;
   pathPrefix?: string;
   url?: URL;
+  testingToken?: string;
 };
 
 type FapiQueryStringParameters = {
@@ -92,12 +93,23 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     return true;
   }
 
-  function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
+  function buildQueryString({
+    method,
+    path,
+    sessionId,
+    search,
+    rotatingTokenNonce,
+    testingToken,
+  }: FapiRequestInit): string {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
 
     if (clerkInstance.version) {
       searchParams.append('_clerk_js_version', clerkInstance.version);
+    }
+
+    if (testingToken) {
+      searchParams.append('testing_token', testingToken);
     }
 
     if (rotatingTokenNonce) {

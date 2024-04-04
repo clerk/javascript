@@ -74,6 +74,8 @@ export interface Clerk {
 
   frontendApi: string;
 
+  testingToken?: string;
+
   /** Clerk Publishable Key string. */
   publishableKey: string;
 
@@ -551,6 +553,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
         };
 
     sdkMetadata?: SDKMetadata;
+    testingToken?: string;
   };
 
 export interface NavigateOptions {

@@ -35,7 +35,10 @@ export abstract class BaseResource {
     let fapiResponse: FapiResponse<J>;
 
     try {
-      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit);
+      fapiResponse = await BaseResource.fapiClient.request<J>({
+        ...requestInit,
+        testingToken: this.clerk.testingToken,
+      });
     } catch (e) {
       if (!isValidBrowserOnline()) {
         console.warn(e);
