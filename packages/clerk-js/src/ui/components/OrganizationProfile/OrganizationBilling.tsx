@@ -47,8 +47,9 @@ export const OrganizationBilling = () => {
         successReturnURL: window.location.href,
         cancelReturnURL: window.location.href,
       });
-      //TODO Handle action after success response
-      console.log(response);
+      if (response) {
+        window.location.href = response?.redirectUrl;
+      }
     } catch (e) {
       //TODO Show error message if exists
       console.log(e);
