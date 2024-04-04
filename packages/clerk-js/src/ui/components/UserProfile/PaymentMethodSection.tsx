@@ -5,7 +5,7 @@ import { ProfileSection } from '../../elements';
 import { mqu } from '../../styledSystem';
 
 export const PaymentMethodSection = ({ currentPlan }: { currentPlan?: BillingPlanResource | null }) => {
-  if (!currentPlan || !currentPlan.paymentMethod) {
+  if (!currentPlan) {
     return null;
   }
 
@@ -17,12 +17,16 @@ export const PaymentMethodSection = ({ currentPlan }: { currentPlan?: BillingPla
       sx={{ [mqu.md]: { alignItems: 'flex-start' } }}
     >
       <ProfileSection.Item id='currentPlan'>
-        <Flex sx={{ flexDirection: 'column' }}>
-          <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
-          <Text sx={t => ({ color: t.colors.$colorTextSecondary, fontSize: t.fontSizes.$sm })}>
-            Expires {currentPlan.paymentMethod.card.expMonth}/{currentPlan.paymentMethod.card.expYear}
-          </Text>
-        </Flex>
+        {currentPlan.paymentMethod ? (
+          <Flex sx={{ flexDirection: 'column' }}>
+            <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
+            <Text sx={t => ({ color: t.colors.$colorTextSecondary, fontSize: t.fontSizes.$sm })}>
+              Expires {currentPlan.paymentMethod.card.expMonth}/{currentPlan.paymentMethod.card.expYear}
+            </Text>
+          </Flex>
+        ) : (
+          <Text>Add payment method</Text>
+        )}
       </ProfileSection.Item>
     </ProfileSection.Root>
   );
