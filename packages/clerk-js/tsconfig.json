@@ -16,7 +16,7 @@
     "resolveJsonModule": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ES2020",
+    "target": "ES2019",
     "useUnknownInCatchVariables": false,
     "declaration": false,
     "jsx": "react-jsx",
