@@ -1,18 +1,18 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganization } from '@clerk/shared/react';
 
 import { CurrentPlanSection, PaymentMethodSection } from '../../common';
 import { Button, Col, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
 import { FullHeightLoader, Header, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 
-export const BillingPage = withCardStateProvider(() => {
-  const { user } = useUser();
+export const OrganizationBillingPage = withCardStateProvider(() => {
+  const { organization } = useOrganization();
   const { t } = useLocalizations();
 
-  const { data: currentPlan, isLoading } = useFetch(user?.getCurrentPlan, 'user-current-plan');
+  const { data: currentPlan, isLoading } = useFetch(organization?.getCurrentPlan, 'organization-current-plan');
 
   const handleStartPortalSession = async () => {
-    const res = await user?.createPortalSession({ returnUrl: window.location.href });
+    const res = await organization?.createPortalSession({ returnUrl: window.location.href });
     window.location.href = res?.redirectUrl || '';
   };
 

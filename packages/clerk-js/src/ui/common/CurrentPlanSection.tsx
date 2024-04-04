@@ -1,9 +1,9 @@
 import type { BillingPlanResource } from '@clerk/types';
 
-import { Box, localizationKeys, Text, useLocalizations } from '../../customizables';
-import { ProfileSection } from '../../elements';
-import { mqu } from '../../styledSystem';
-import { centsToUnit, getRelativeToNowDateKey } from '../../utils';
+import { Box, localizationKeys, Text, useLocalizations } from '../customizables';
+import { ProfileSection } from '../elements';
+import { mqu } from '../styledSystem';
+import { centsToUnit, getRelativeToNowDateKey } from '../utils';
 
 export const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanResource | null }) => {
   const { t } = useLocalizations();

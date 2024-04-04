@@ -1,18 +1,16 @@
-import { useUser } from '@clerk/shared/react';
 import type { BillingPlanResource } from '@clerk/types';
 
-import { Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
-import { ProfileSection } from '../../elements';
-import { mqu } from '../../styledSystem';
+import { Flex, localizationKeys, Text, useLocalizations } from '../customizables';
+import { ProfileSection } from '../elements';
+import { mqu } from '../styledSystem';
 
-export const PaymentMethodSection = ({ currentPlan }: { currentPlan?: BillingPlanResource | null }) => {
-  const { user } = useUser();
+type PaymentMethodSectionProps = {
+  currentPlan?: BillingPlanResource | null;
+  onClickStartPortalSession: () => void;
+};
+
+export const PaymentMethodSection = ({ currentPlan, onClickStartPortalSession }: PaymentMethodSectionProps) => {
   const { t } = useLocalizations();
-
-  const handleStartPortalSession = async () => {
-    const res = await user?.createPortalSession({ returnUrl: window.location.href });
-    window.location.href = res?.redirectUrl || '';
-  };
 
   if (!currentPlan) {
     return null;
@@ -38,7 +36,7 @@ export const PaymentMethodSection = ({ currentPlan }: { currentPlan?: BillingPla
           <ProfileSection.ArrowButton
             id='paymentMethod'
             localizationKey={localizationKeys('billing.paymentMethodSection.primaryButton')}
-            onClick={handleStartPortalSession}
+            onClick={onClickStartPortalSession}
           />
         )}
       </ProfileSection.Item>
