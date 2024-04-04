@@ -61,7 +61,7 @@ export const Billing = () => {
 };
 
 Billing.Root = (params: BillingProviderProps) => {
-  const [currentPage, setCurrentPage] = React.useState<BillingPages>('manageBillingPlan');
+  const [currentPage, setCurrentPage] = React.useState<BillingPages>('planAndBilling');
 
   const goToPlanAndBilling = () => {
     setCurrentPage('planAndBilling');
