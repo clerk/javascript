@@ -136,6 +136,13 @@ const defaultOptions: ClerkOptions = {
   signUpForceRedirectUrl: undefined,
 };
 
+class ClerkMap extends Map {
+  name = 'clerk-map';
+
+  constructor() {
+    super();
+  }
+}
 export class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
 
@@ -156,6 +163,7 @@ export class Clerk implements ClerkInterface {
   protected internal_last_error: ClerkAPIError | null = null;
 
   #publishableKey: string = '';
+  #cache = new ClerkMap();
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService: SessionCookieService | null = null;
@@ -178,6 +186,10 @@ export class Clerk implements ClerkInterface {
 
   get version(): string {
     return Clerk.version;
+  }
+
+  get cache(): ClerkMap {
+    return this.#cache;
   }
 
   set sdkMetadata(metadata: SDKMetadata) {
@@ -293,6 +305,8 @@ export class Clerk implements ClerkInterface {
       this.#options.allowedRedirectOrigins,
       this.frontendApi,
     );
+
+    this.#cache = this.#options.cache ?? this.#cache;
 
     if (this.#options.standardBrowser) {
       this.#loaded = await this.#loadInStandardBrowser();

@@ -137,6 +137,16 @@ type IsomorphicLoadedClerk = Without<
   client: ClientResource | undefined;
 };
 
+class ClerkMap extends Map {
+  name = 'clerk-react';
+
+  constructor() {
+    super();
+  }
+}
+
+const cache = new ClerkMap();
+
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly mode: 'browser' | 'server';
   private readonly options: IsomorphicClerkOptions;
@@ -169,6 +179,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get loaded(): boolean {
     return this.#loaded;
+  }
+
+  // @ts-ignore
+  get cache(): ClerkMap {
+    console.log('this.clerkjs', this.clerkjs?.cache);
+    return cache;
+    // if (this.clerkjs) {
+    //   return this.clerkjs.cache;
+    // } else {
+    //   return null;
+    // }
   }
 
   static #instance: IsomorphicClerk | null | undefined;
@@ -379,13 +400,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
             domain: this.domain,
           } as any);
 
-          await c.load(this.options);
+          await c.load({ ...this.options, cache });
         } else {
           // Otherwise use the instantiated Clerk object
           c = this.Clerk;
 
           if (!c.loaded) {
-            await c.load(this.options);
+            await c.load({ ...this.options, cache });
           }
         }
 
@@ -405,7 +426,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
 
-        await global.Clerk.load(this.options);
+        await global.Clerk.load({ ...this.options, cache });
       }
 
       if (global.Clerk?.loaded) {

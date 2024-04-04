@@ -80,7 +80,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       lastCreatedOrganizationRef.current = organization;
       await setActive({ organization });
 
-      void userMemberships.revalidate?.();
+      await userMemberships.revalidate?.();
 
       if (props.skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
         return completeFlow();

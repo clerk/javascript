@@ -139,7 +139,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     {
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
-      enabled: !!userMembershipsParams,
+      enabled: !!userMembershipsParams && !!user?.id,
     },
     {
       type: 'userMemberships',
@@ -158,7 +158,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     {
       keepPreviousData: userInvitationsSafeValues.keepPreviousData,
       infinite: userInvitationsSafeValues.infinite,
-      enabled: !!userInvitationsParams,
+      enabled: !!userInvitationsParams && !!user?.id,
     },
     {
       type: 'userInvitations',
@@ -177,7 +177,7 @@ export const useOrganizationList: UseOrganizationList = params => {
     {
       keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
       infinite: userSuggestionsSafeValues.infinite,
-      enabled: !!userSuggestionsParams,
+      enabled: !!userSuggestionsParams && !!user?.id,
     },
     {
       type: 'userSuggestions',

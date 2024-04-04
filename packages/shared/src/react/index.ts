@@ -13,3 +13,5 @@ export {
   useUserContext,
   useAssertWrappedByClerkProvider,
 } from './contexts';
+
+export * from './clerk-swr';
