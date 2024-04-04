@@ -12,9 +12,10 @@ describe('createCustomPages', () => {
   describe('createUserProfileCustomPages', () => {
     it('should return the default pages if no custom pages are passed', () => {
       const { routes, contents } = createUserProfileCustomPages([]);
-      expect(routes.length).toEqual(2);
+      expect(routes.length).toEqual(3);
       expect(routes[0].id).toEqual('account');
       expect(routes[1].id).toEqual('security');
+      expect(routes[2].id).toEqual('billing');
       expect(contents.length).toEqual(0);
     });
 
@@ -38,11 +39,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].id).toEqual('account');
       expect(routes[1].id).toEqual('security');
-      expect(routes[2].name).toEqual('Custom1');
-      expect(routes[3].name).toEqual('Custom2');
+      expect(routes[2].id).toEqual('billing');
+      expect(routes[3].name).toEqual('Custom1');
+      expect(routes[4].name).toEqual('Custom2');
       expect(contents.length).toEqual(2);
       expect(contents[0].url).toEqual('custom1');
       expect(contents[1].url).toEqual('custom2');
@@ -60,6 +62,7 @@ describe('createCustomPages', () => {
         },
         { label: 'account' },
         { label: 'security' },
+        { label: 'billing' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -70,11 +73,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].name).toEqual('Custom1');
       expect(routes[1].id).toEqual('account');
       expect(routes[2].id).toEqual('security');
-      expect(routes[3].name).toEqual('Custom2');
+      expect(routes[3].id).toEqual('billing');
+      expect(routes[4].name).toEqual('Custom2');
       expect(contents.length).toEqual(2);
       expect(contents[0].url).toEqual('custom1');
       expect(contents[1].url).toEqual('custom2');
@@ -104,11 +108,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
-      expect(routes[0].name).toEqual('Custom1');
-      expect(routes[1].id).toEqual('account');
-      expect(routes[2].id).toEqual('security');
-      expect(routes[3].name).toEqual('Custom2');
+      expect(routes.length).toEqual(5);
+      expect(routes[0].id).toEqual('billing');
+      expect(routes[1].name).toEqual('Custom1');
+      expect(routes[2].id).toEqual('account');
+      expect(routes[3].id).toEqual('security');
+      expect(routes[4].name).toEqual('Custom2');
     });
 
     it('sets the path of the first page to be the root (/)', () => {
@@ -123,6 +128,7 @@ describe('createCustomPages', () => {
         },
         { label: 'account' },
         { label: 'security' },
+        { label: 'billing' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -133,16 +139,18 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('account');
       expect(routes[2].path).toEqual('security');
-      expect(routes[3].path).toEqual('custom2');
+      expect(routes[3].path).toEqual('billing');
+      expect(routes[4].path).toEqual('custom2');
     });
 
     it('sets the path of both account and security pages to root (/) if account is first', () => {
       const customPages: CustomPage[] = [
         { label: 'account' },
+        { label: 'billing' },
         {
           label: 'Custom1',
           url: 'custom1',
@@ -162,14 +170,46 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
-      expect(routes[1].path).toEqual('custom1');
-      expect(routes[2].path).toEqual('security');
-      expect(routes[3].path).toEqual('custom2');
+      expect(routes[1].path).toEqual('billing');
+      expect(routes[2].path).toEqual('custom1');
+      expect(routes[3].path).toEqual('security');
+      expect(routes[4].path).toEqual('custom2');
     });
 
     it('sets the path of both account and security pages to root (/) if security is first', () => {
+      const customPages: CustomPage[] = [
+        { label: 'security' },
+        { label: 'billing' },
+        {
+          label: 'Custom1',
+          url: 'custom1',
+          mount: () => undefined,
+          unmount: () => undefined,
+          mountIcon: () => undefined,
+          unmountIcon: () => undefined,
+        },
+        { label: 'account' },
+        {
+          label: 'Custom2',
+          url: 'custom2',
+          mount: () => undefined,
+          unmount: () => undefined,
+          mountIcon: () => undefined,
+          unmountIcon: () => undefined,
+        },
+      ];
+      const { routes } = createUserProfileCustomPages(customPages);
+      expect(routes.length).toEqual(5);
+      expect(routes[0].path).toEqual('/');
+      expect(routes[1].path).toEqual('billing');
+      expect(routes[2].path).toEqual('custom1');
+      expect(routes[3].path).toEqual('account');
+      expect(routes[4].path).toEqual('custom2');
+    });
+
+    it('sets the path of both account and security pages to root (/) if billing is first', () => {
       const customPages: CustomPage[] = [
         { label: 'security' },
         {
@@ -191,11 +231,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
-      expect(routes[1].path).toEqual('custom1');
-      expect(routes[2].path).toEqual('account');
-      expect(routes[3].path).toEqual('custom2');
+      expect(routes[1].path).toEqual('security');
+      expect(routes[2].path).toEqual('custom1');
+      expect(routes[3].path).toEqual('account');
+      expect(routes[4].path).toEqual('custom2');
     });
 
     it('throws if the first item in the navbar is an external link', () => {
@@ -208,6 +249,7 @@ describe('createCustomPages', () => {
         },
         { label: 'account' },
         { label: 'security' },
+        { label: 'billing' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -238,11 +280,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].id).toEqual('account');
       expect(routes[1].id).toEqual('security');
-      expect(routes[2].name).toEqual('Custom1');
-      expect(routes[3].name).toEqual('Link1');
+      expect(routes[2].id).toEqual('billing');
+      expect(routes[3].name).toEqual('Custom1');
+      expect(routes[4].name).toEqual('Link1');
       expect(contents.length).toEqual(1);
       expect(contents[0].url).toEqual('custom1');
     });
@@ -269,10 +312,10 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(5);
-      expect(routes[2].path).toEqual('https://www.fullurl.com');
-      expect(routes[3].path).toEqual('/url-with-slash');
-      expect(routes[4].path).toEqual('/url-without-slash');
+      expect(routes.length).toEqual(6);
+      expect(routes[3].path).toEqual('https://www.fullurl.com');
+      expect(routes[4].path).toEqual('/url-with-slash');
+      expect(routes[5].path).toEqual('/url-without-slash');
     });
 
     it('sanitizes the path for custom pages', () => {
@@ -295,9 +338,9 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createUserProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
-      expect(routes[2].path).toEqual('url-with-slash');
-      expect(routes[3].path).toEqual('url-without-slash');
+      expect(routes.length).toEqual(5);
+      expect(routes[3].path).toEqual('url-with-slash');
+      expect(routes[4].path).toEqual('url-without-slash');
     });
 
     it('throws when a custom page has an absolute URL', () => {
@@ -318,9 +361,10 @@ describe('createCustomPages', () => {
   describe('createOrganizationProfileCustomPages', () => {
     it('should return the default pages if no custom pages are passed', () => {
       const { routes, contents } = createOrganizationProfileCustomPages([]);
-      expect(routes.length).toEqual(2);
+      expect(routes.length).toEqual(3);
       expect(routes[0].id).toEqual('general');
       expect(routes[1].id).toEqual('members');
+      expect(routes[2].id).toEqual('billing');
       expect(contents.length).toEqual(0);
     });
 
@@ -344,11 +388,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].id).toEqual('general');
       expect(routes[1].id).toEqual('members');
-      expect(routes[2].name).toEqual('Custom1');
-      expect(routes[3].name).toEqual('Custom2');
+      expect(routes[2].id).toEqual('billing');
+      expect(routes[3].name).toEqual('Custom1');
+      expect(routes[4].name).toEqual('Custom2');
       expect(contents.length).toEqual(2);
       expect(contents[0].url).toEqual('custom1');
       expect(contents[1].url).toEqual('custom2');
@@ -366,6 +411,7 @@ describe('createCustomPages', () => {
         },
         { label: 'general' },
         { label: 'members' },
+        { label: 'billing' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -376,11 +422,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].name).toEqual('Custom1');
       expect(routes[1].id).toEqual('general');
       expect(routes[2].id).toEqual('members');
-      expect(routes[3].name).toEqual('Custom2');
+      expect(routes[3].id).toEqual('billing');
+      expect(routes[4].name).toEqual('Custom2');
       expect(contents.length).toEqual(2);
       expect(contents[0].url).toEqual('custom1');
       expect(contents[1].url).toEqual('custom2');
@@ -399,6 +446,7 @@ describe('createCustomPages', () => {
         { label: 'general' },
         { label: 'members' },
         { label: 'Aaaaaa' },
+        { label: 'billing' },
         { label: 'members', mount: () => undefined },
         {
           label: 'Custom2',
@@ -410,11 +458,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].name).toEqual('Custom1');
       expect(routes[1].id).toEqual('general');
       expect(routes[2].id).toEqual('members');
-      expect(routes[3].name).toEqual('Custom2');
+      expect(routes[3].id).toEqual('billing');
+      expect(routes[4].name).toEqual('Custom2');
     });
 
     it('sets the path of the first page to be the root (/)', () => {
@@ -429,6 +478,7 @@ describe('createCustomPages', () => {
         },
         { label: 'general' },
         { label: 'members' },
+        { label: 'billing' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -439,11 +489,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('organization-general');
       expect(routes[2].path).toEqual('organization-members');
-      expect(routes[3].path).toEqual('custom2');
+      expect(routes[3].path).toEqual('organization-billing');
+      expect(routes[4].path).toEqual('custom2');
     });
 
     it('sets the path of members pages to root (/) if it is first', () => {
@@ -467,17 +518,19 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
-      expect(routes[1].path).toEqual('custom1');
-      expect(routes[2].path).toEqual('organization-general');
-      expect(routes[3].path).toEqual('custom2');
+      expect(routes[1].path).toEqual('organization-billing');
+      expect(routes[2].path).toEqual('custom1');
+      expect(routes[3].path).toEqual('organization-general');
+      expect(routes[4].path).toEqual('custom2');
     });
 
     it('sets the path of settings pages to root (/) if it is first', () => {
       const customPages: CustomPage[] = [
         { label: 'general' },
         { label: 'members' },
+        { label: 'billing' },
 
         {
           label: 'Custom1',
@@ -497,10 +550,11 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].path).toEqual('/');
       expect(routes[1].path).toEqual('organization-members');
-      expect(routes[3].path).toEqual('custom2');
+      expect(routes[2].path).toEqual('organization-billing');
+      expect(routes[4].path).toEqual('custom2');
     });
 
     it('throws if the first item in the navbar is an external link', () => {
@@ -513,6 +567,7 @@ describe('createCustomPages', () => {
         },
         { label: 'general' },
         { label: 'members' },
+        { label: 'billing' },
         {
           label: 'Custom2',
           url: 'custom2',
@@ -543,11 +598,12 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes, contents } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
+      expect(routes.length).toEqual(5);
       expect(routes[0].id).toEqual('general');
       expect(routes[1].id).toEqual('members');
-      expect(routes[2].name).toEqual('Custom1');
-      expect(routes[3].name).toEqual('Link1');
+      expect(routes[2].id).toEqual('billing');
+      expect(routes[3].name).toEqual('Custom1');
+      expect(routes[4].name).toEqual('Link1');
       expect(contents.length).toEqual(1);
       expect(contents[0].url).toEqual('custom1');
     });
@@ -574,10 +630,10 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(5);
-      expect(routes[2].path).toEqual('https://www.fullurl.com');
-      expect(routes[3].path).toEqual('/url-with-slash');
-      expect(routes[4].path).toEqual('/url-without-slash');
+      expect(routes.length).toEqual(6);
+      expect(routes[3].path).toEqual('https://www.fullurl.com');
+      expect(routes[4].path).toEqual('/url-with-slash');
+      expect(routes[5].path).toEqual('/url-without-slash');
     });
 
     it('sanitizes the path for custom pages', () => {
@@ -600,9 +656,9 @@ describe('createCustomPages', () => {
         },
       ];
       const { routes } = createOrganizationProfileCustomPages(customPages);
-      expect(routes.length).toEqual(4);
-      expect(routes[2].path).toEqual('url-with-slash');
-      expect(routes[3].path).toEqual('url-without-slash');
+      expect(routes.length).toEqual(5);
+      expect(routes[3].path).toEqual('url-with-slash');
+      expect(routes[4].path).toEqual('url-without-slash');
     });
 
     it('throws when a custom page has an absolute URL', () => {
