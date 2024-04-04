@@ -3,7 +3,7 @@ import type { Request as ExpressRequest, RequestHandler } from 'express';
 
 import type { ExpressRequestWithAuth } from './types';
 
-export const isAuthInRequest = (req: ExpressRequest): req is ExpressRequestWithAuth => {
+export const requestHasAuthObject = (req: ExpressRequest): req is ExpressRequestWithAuth => {
   return 'auth' in req;
 };
 

@@ -2,7 +2,7 @@ import type { RequestHandler } from 'express';
 
 import { middlewareRequired } from './errors';
 import { getAuth } from './getAuth';
-import { isAuthInRequest } from './utils';
+import { requestHasAuthObject } from './utils';
 
 /**
  * Middleware to require auth requests for user authenticated or authorized requests.
@@ -26,7 +26,7 @@ import { isAuthInRequest } from './utils';
  * @throws {Error} `clerkMiddleware` is required to be set in the middleware chain before this util is used.
  */
 export const requireAuth: RequestHandler = (request, response, next) => {
-  if (!isAuthInRequest(request)) {
+  if (!requestHasAuthObject(request)) {
     throw new Error(middlewareRequired('requireAuth'));
   }
 
