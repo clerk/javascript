@@ -490,14 +490,11 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   userVerification: 'discouraged' | 'preferred' | 'required';
 }
 
-export type CustomerType = 'user' | 'organization';
-
 export interface BillingPlanJSON extends ClerkResourceJSON {
-  object: string;
+  object: 'billing_plan';
   id: string;
   name: string;
   key: string;
-  customer_type: CustomerType;
   description: string | null;
   price_in_cents: number;
   features: string[];
@@ -506,11 +503,11 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
 }
 
 export interface PortalSessionJSON extends ClerkResourceJSON {
-  object: string;
+  object: 'portal_session';
   redirect_url: string;
 }
 
 export interface CheckoutSessionJSON extends ClerkResourceJSON {
-  object: string;
+  object: 'checkout_session';
   redirect_url: string;
 }
