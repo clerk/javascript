@@ -728,6 +728,7 @@ type _LocalizationResource = {
     numeric: LocalizationValue;
   };
   billing: {
+<<<<<<< HEAD
     start: {
       headerTitle__billing: LocalizationValue;
       action__manageBillingInfo: LocalizationValue;
@@ -744,6 +745,9 @@ type _LocalizationResource = {
       primaryButton: LocalizationValue;
       primaryButton__manageBillingInfo: LocalizationValue;
     };
+=======
+    manageBillingInfo: LocalizationValue;
+>>>>>>> e70fc1e5b (chore(clerk-js): Align Manage Billing Info in top right)
     managePlanScreen: {
       headerTitle: LocalizationValue;
       paymentIntervalMonthly: LocalizationValue;
