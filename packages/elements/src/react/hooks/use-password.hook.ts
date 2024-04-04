@@ -17,9 +17,6 @@ type UsePasswordCallbacks = {
   onValidationComplexity?: (b: boolean) => void;
 };
 
-/**
- * TODO
- */
 export const usePassword = (callbacks?: UsePasswordCallbacks) => {
   const clerk = useClerk();
   const passwordSettings = clerk.__unstable__environment?.userSettings.passwordSettings as PasswordSettingsData;

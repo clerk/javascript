@@ -4,15 +4,24 @@ import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-tex
 
 export type FormDefaultValues = Map<string, FieldDetails['value']>;
 
-// TODO: Add type guard so that type: "error" is messages?: ClerkElementsFieldError[]
+interface FeedbackBase {
+  passwordValidationKeys?: Array<ErrorMessagesKey>;
+}
+
+export interface FeedbackErrorType extends FeedbackBase {
+  type: Extract<FieldStates, 'error'>;
+  message: ClerkElementsFieldError;
+}
+
+export interface FeedbackOtherType extends FeedbackBase {
+  type: Exclude<FieldStates, 'idle' | 'error'>;
+  message: string;
+}
+
 export type FieldDetails = {
   name?: string;
   value?: string | readonly string[] | number;
-  feedback?: {
-    type: Exclude<FieldStates, 'idle'>;
-    message: string | ClerkElementsFieldError;
-    passwordValidationKeys?: Array<ErrorMessagesKey>;
-  };
+  feedback?: FeedbackErrorType | FeedbackOtherType;
 };
 
 export type FormFields = Map<string, FieldDetails>;
