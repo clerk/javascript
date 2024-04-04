@@ -1,4 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
+import { SWRConfig } from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
 import React from 'react';
 
@@ -43,6 +44,7 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
 
   const derivedState = deriveState(clerkLoaded, state, initialState);
   const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerkLoaded]);
+  const clerkCache = React.useMemo(() => ({ provider: () => clerk.cache }), []);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
   const {
@@ -76,18 +78,20 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   }, [orgId, organization, lastOrganizationInvitation, lastOrganizationMember]);
 
   return (
-    // @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk
-    <IsomorphicClerkContext.Provider value={clerkCtx}>
-      <ClientContext.Provider value={clientCtx}>
-        <SessionContext.Provider value={sessionCtx}>
-          <OrganizationProvider {...organizationCtx.value}>
-            <AuthContext.Provider value={authCtx}>
-              <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
-            </AuthContext.Provider>
-          </OrganizationProvider>
-        </SessionContext.Provider>
-      </ClientContext.Provider>
-    </IsomorphicClerkContext.Provider>
+    <SWRConfig value={clerkCache}>
+      {/* @ts-expect-error */}
+      <IsomorphicClerkContext.Provider value={clerkCtx}>
+        <ClientContext.Provider value={clientCtx}>
+          <SessionContext.Provider value={sessionCtx}>
+            <OrganizationProvider {...organizationCtx.value}>
+              <AuthContext.Provider value={authCtx}>
+                <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
+              </AuthContext.Provider>
+            </OrganizationProvider>
+          </SessionContext.Provider>
+        </ClientContext.Provider>
+      </IsomorphicClerkContext.Provider>
+    </SWRConfig>
   );
 }
 

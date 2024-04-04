@@ -33,10 +33,10 @@ const useLeaveWithRevalidations = (leavePromise: (() => Promise<any>) | undefine
       .runAsync(async () => {
         await leavePromise?.();
       })
-      .then(() => {
-        void userMemberships.revalidate?.();
-        void userInvitations.revalidate?.();
-        void navigateAfterLeaveOrganization();
+      .then(async () => {
+        await userMemberships.revalidate?.();
+        await userInvitations.revalidate?.();
+        await navigateAfterLeaveOrganization();
       });
 };
 

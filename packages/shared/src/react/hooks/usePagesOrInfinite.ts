@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useSWR, useSWRInfinite } from '../clerk-swr';
+import { useSWR, useSWRConfig, useSWRInfinite } from '../clerk-swr';
 import type { CacheSetter, PaginatedResources, ValueOrSetter } from '../types';
 
 function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
@@ -90,8 +90,17 @@ type UsePagesOrInfinite = <
   cacheKeys: CacheKeys,
 ) => PaginatedResources<ExtractData<FetcherReturnData>, TOptions['infinite']>;
 
+const cachingSWROptions = {
+  dedupingInterval: 1000 * 60,
+  focusThrottleInterval: 1000 * 60 * 2,
+} satisfies Parameters<typeof useSWR>[2];
+
 export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
+  const { cache, ...extraConfig } = useSWRConfig();
+  // @ts-ignore
+  // console.log('Cache', cache.name);
+  // console.log('Extras', extraConfig);
 
   // Cache initialPage and initialPageSize until unmount
   const initialPageRef = useRef(params.initialPage ?? 1);
@@ -122,7 +131,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
       // @ts-ignore
       return fetcher?.(requestParams);
     },
-    { keepPreviousData },
+    { keepPreviousData, ...cachingSWROptions },
   );
 
   const {
@@ -139,6 +148,13 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
         return null;
       }
 
+      console.log({
+        ...params,
+        ...cacheKeys,
+        initialPage: initialPageRef.current + pageIndex,
+        pageSize: pageSizeRef.current,
+      });
+
       return {
         ...params,
         ...cacheKeys,
@@ -152,6 +168,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
       // @ts-ignore
       return fetcher?.(requestParams);
     },
+    cachingSWROptions,
   );
 
   const page = useMemo(() => {
@@ -173,6 +190,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   );
 
   const data = useMemo(() => {
+    console.log('Data', swrInfiniteData, swrData);
     if (triggerInfinite) {
       return swrInfiniteData?.map(a => a?.data).flat() ?? [];
     }

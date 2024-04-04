@@ -144,6 +144,14 @@ const defaultOptions: ClerkOptions = {
   isInterstitial: false,
 };
 
+class ClerkMap extends Map {
+  name = 'clerk-map';
+
+  constructor() {
+    super();
+  }
+}
+
 export default class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
 
@@ -163,6 +171,7 @@ export default class Clerk implements ClerkInterface {
 
   protected internal_last_error: ClerkAPIError | null = null;
 
+  #cache = new ClerkMap();
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService: SessionCookieService | null = null;
@@ -188,6 +197,10 @@ export default class Clerk implements ClerkInterface {
 
   get version(): string {
     return Clerk.version;
+  }
+
+  get cache(): ClerkMap {
+    return this.#cache;
   }
 
   set sdkMetadata(metadata: SDKMetadata) {
@@ -329,6 +342,8 @@ export default class Clerk implements ClerkInterface {
       ...defaultOptions,
       ...options,
     };
+
+    this.#cache = this.#options.cache ?? this.#cache;
 
     if (this.#options.standardBrowser) {
       this.#isReady = await this.#loadInStandardBrowser();

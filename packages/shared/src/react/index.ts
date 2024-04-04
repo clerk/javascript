@@ -13,3 +13,5 @@ export {
   useSessionContext,
   useUserContext,
 } from './contexts';
+
+export * from './clerk-swr';
