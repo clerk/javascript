@@ -25,6 +25,7 @@ type FlowMetadata = {
     | 'emailLinkStatus'
     | 'alternativeMethods'
     | 'forgotPasswordMethods'
+    | 'passwordPwnedMethods'
     | 'havingTrouble'
     | 'ssoCallback'
     | 'popover'

@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Quay lại',
   badge__default: 'Mặc định',
   badge__otherImpersonatorDevice: 'Thiết bị nhân danh khác',
@@ -281,6 +282,7 @@ export const viVN: LocalizationResource = {
       blockButton__backupCode: 'Sử dụng mã sao lưu',
       blockButton__emailCode: 'Gửi mã qua email cho {{identifier}}',
       blockButton__emailLink: 'Gửi liên kết qua email cho {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Đăng nhập bằng mật khẩu của bạn',
       blockButton__phoneCode: 'Gửi mã SMS cho {{identifier}}',
       blockButton__totp: 'Sử dụng ứng dụng xác thực của bạn',
@@ -352,10 +354,17 @@ export const viVN: LocalizationResource = {
       subtitle: 'Đã xảy ra lỗi',
       title: 'Không thể đăng nhập',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Sử dụng phương pháp khác',
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Nhập mật khẩu của bạn',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Mã xác nhận',
@@ -382,6 +391,7 @@ export const viVN: LocalizationResource = {
       actionLink: 'Đăng ký',
       actionLink__use_email: 'Sử dụng email',
       actionLink__use_email_username: 'Sử dụng email hoặc tên đăng nhập',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Sử dụng số điện thoại',
       actionLink__use_username: 'Sử dụng tên đăng nhập',
       actionText: 'Chưa có tài khoản?',
@@ -449,6 +459,9 @@ export const viVN: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Địa chỉ email phải là một địa chỉ email hợp lệ',
@@ -462,6 +475,7 @@ export const viVN: LocalizationResource = {
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
     form_password_pwned:
       'Mật khẩu này đã được phát hiện trong một cuộc tấn công và không thể sử dụng, vui lòng thử mật khẩu khác.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Mật khẩu của bạn đã vượt quá số byte tối đa cho phép, vui lòng rút ngắn hoặc loại bỏ một số ký tự đặc biệt.',
     form_password_validation_failed: 'Mật khẩu không đúng',
@@ -469,6 +483,11 @@ export const viVN: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Bạn không thể xóa thông tin nhận dạng cuối cùng của bạn.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'ít hơn {{length}} ký tự',
       minimumLength: '{{length}} hoặc nhiều ký tự',
@@ -526,6 +545,14 @@ export const viVN: LocalizationResource = {
     action__signOutAll: 'Đăng xuất khỏi tất cả các tài khoản',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Đã sao chép!',
       actionLabel__copy: 'Sao chép tất cả',
@@ -681,6 +708,11 @@ export const viVN: LocalizationResource = {
       title: 'Cập nhật hồ sơ',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Đăng xuất khỏi thiết bị',
         title: 'Thiết bị hoạt động',

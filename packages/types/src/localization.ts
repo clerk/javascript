@@ -157,6 +157,9 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    passwordPwned: {
+      title: LocalizationValue;
+    };
     passkey: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -729,6 +732,7 @@ type UnstableErrors = WithParamName<{
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
   form_password_pwned: LocalizationValue;
+  form_password_pwned__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;
@@ -740,6 +744,9 @@ type UnstableErrors = WithParamName<{
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;
+  form_identifier_exists__email_address: LocalizationValue;
+  form_identifier_exists__username: LocalizationValue;
+  form_identifier_exists__phone_number: LocalizationValue;
   form_password_not_strong_enough: LocalizationValue;
   form_password_size_in_bytes_exceeded: LocalizationValue;
   passwordComplexity: {

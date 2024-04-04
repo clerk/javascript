@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Indietro',
   badge__default: 'Predefinito',
   badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
@@ -281,6 +282,7 @@ export const itIT: LocalizationResource = {
       blockButton__backupCode: 'Usa in codice di backup',
       blockButton__emailCode: 'Invia codice a {{identifier}}',
       blockButton__emailLink: 'Invia link a {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Accedi con la tua password',
       blockButton__phoneCode: 'Invia codice a {{identifier}}',
       blockButton__totp: 'Usa la tua app di autenticazione',
@@ -352,10 +354,17 @@ export const itIT: LocalizationResource = {
       subtitle: 'Si é verificato un errore',
       title: 'Impossibile accedere',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Usa un altro metodo',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Inserisci la tua password',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Codice di verifica',
@@ -382,6 +391,7 @@ export const itIT: LocalizationResource = {
       actionLink: 'Registrati',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: 'Non hai un account?',
@@ -449,6 +459,9 @@ export const itIT: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -461,6 +474,7 @@ export const itIT: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned: '',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -468,6 +482,11 @@ export const itIT: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -525,6 +544,14 @@ export const itIT: LocalizationResource = {
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiati!',
       actionLabel__copy: 'Copia tutti',
@@ -681,6 +708,11 @@ export const itIT: LocalizationResource = {
       title: 'Aggiorna profilo',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Disconnetti dal dispositivo',
         title: 'Dispositivi attivi',

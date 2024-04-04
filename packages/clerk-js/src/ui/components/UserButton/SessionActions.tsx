@@ -1,5 +1,7 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
+import type { ThemableCssProp } from '~ui/styledSystem/types';
+
 import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
@@ -172,6 +174,7 @@ type SignOutAllActionsProps = {
   iconElementDescriptor?: ElementDescriptor;
   iconElementId?: ElementId;
   label?: LocalizationKey;
+  sx?: ThemableCssProp;
 };
 
 export const SignOutAllActions = (props: SignOutAllActionsProps) => {
@@ -184,13 +187,17 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
     iconElementDescriptor,
     iconElementId,
     label,
+    sx,
   } = props;
   return (
     <Actions
       role='menu'
-      sx={t => ({
-        padding: t.space.$2,
-      })}
+      sx={[
+        t => ({
+          padding: t.space.$2,
+        }),
+        sx,
+      ]}
     >
       <Action
         elementDescriptor={elementDescriptor || descriptors.userButtonPopoverActionButton}

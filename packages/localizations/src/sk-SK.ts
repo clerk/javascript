@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Späť',
   badge__default: 'Predvolené',
   badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
@@ -281,6 +282,7 @@ export const skSK: LocalizationResource = {
       blockButton__backupCode: 'Použiť záložný kód',
       blockButton__emailCode: 'Odoslať overovací kód na email {{identifier}}',
       blockButton__emailLink: 'Odoslať odkaz na email {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Prihlásiť sa pomocou hesla',
       blockButton__phoneCode: 'Poslať SMS kód na telefónne číslo {{identifier}}',
       blockButton__totp: 'Použiť autentifikačnú aplikáciu',
@@ -352,10 +354,17 @@ export const skSK: LocalizationResource = {
       subtitle: 'Došlo k chybe',
       title: 'Nie je možné sa prihlásiť',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Použiť inú metódu',
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Zadajte svoje heslo',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Overovací kód',
@@ -382,6 +391,7 @@ export const skSK: LocalizationResource = {
       actionLink: 'Registrovať sa',
       actionLink__use_email: 'Použiť email',
       actionLink__use_email_username: 'Použiť email alebo užívateľské meno',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Použiť telefón',
       actionLink__use_username: 'Použiť užívateľské meno',
       actionText: 'Nemáte účet?',
@@ -449,6 +459,9 @@ export const skSK: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -461,6 +474,7 @@ export const skSK: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Vaše heslo nie je dostatočne silné.',
     form_password_pwned: 'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Vaše heslo prekročilo maximálny povolený počet bytov, prosím skráťte ho alebo odstráňte niektoré špeciálne znaky.',
     form_password_validation_failed: 'Nesprávne heslo',
@@ -468,6 +482,11 @@ export const skSK: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'menej ako {{length}} znakov',
       minimumLength: '{{length}} alebo viac znakov',
@@ -525,6 +544,14 @@ export const skSK: LocalizationResource = {
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Skopírované!',
       actionLabel__copy: 'Kopírovať všetko',
@@ -680,6 +707,11 @@ export const skSK: LocalizationResource = {
       title: 'Aktualizovať profil',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Odhlásiť sa zo zariadenia',
         title: 'Aktívne zariadenia',

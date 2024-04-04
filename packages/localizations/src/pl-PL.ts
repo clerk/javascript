@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Powrót',
   badge__default: 'Domyślny',
   badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
@@ -281,6 +282,7 @@ export const plPL: LocalizationResource = {
       blockButton__backupCode: 'Użyj kodu zapasowego',
       blockButton__emailCode: 'Wyślij kod do {{identifier}}',
       blockButton__emailLink: 'Wyślij link do {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Zaloguj się za pomocą hasła',
       blockButton__phoneCode: 'Wyślij kod do {{identifier}}',
       blockButton__totp: 'Użyj aplikacji uwierzytelniającej',
@@ -352,10 +354,17 @@ export const plPL: LocalizationResource = {
       subtitle: 'Wystąpił błąd',
       title: 'Nie można się zalogować',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Użyj innego sposobu',
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Wprowadź swoje hasło',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Kod weryfikacyjny',
@@ -382,6 +391,7 @@ export const plPL: LocalizationResource = {
       actionLink: 'Zarejestruj się',
       actionLink__use_email: 'Użyj adresu e-mail',
       actionLink__use_email_username: 'Użyj adresu e-mail lub nazwy użytkownika',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Użyj numeru telefonu',
       actionLink__use_username: 'Użyj nazwy użytkownika',
       actionText: 'Nie masz konta?',
@@ -449,6 +459,9 @@ export const plPL: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -461,6 +474,7 @@ export const plPL: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned: '',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Podane hasło jest nieprawidłowe',
@@ -468,6 +482,11 @@ export const plPL: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'mniej niż {{length}} znaków',
       minimumLength: '{{length}} lub więcej znaków',
@@ -525,6 +544,14 @@ export const plPL: LocalizationResource = {
     action__signOutAll: 'Wyloguj ze wszystkich kont',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Skopiowane!',
       actionLabel__copy: 'Skopiuj wszystkie',
@@ -682,6 +709,11 @@ export const plPL: LocalizationResource = {
       title: 'Edytuj profil',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Wyloguj z urządzenia',
         title: 'Aktywne urządzenia',

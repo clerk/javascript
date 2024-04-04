@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Tilbage',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: '',
@@ -281,6 +282,7 @@ export const daDK: LocalizationResource = {
       blockButton__backupCode: 'Brug en backup-kode',
       blockButton__emailCode: 'Send kode til {{identifier}}',
       blockButton__emailLink: 'Send link til {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Log ind med din adgangskode',
       blockButton__phoneCode: 'Send kode til {{identifier}}',
       blockButton__totp: 'Brug din godkendelsesapp',
@@ -352,10 +354,17 @@ export const daDK: LocalizationResource = {
       subtitle: 'En fejl opstod',
       title: 'Kan ikke logge ind',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Brug en anden metode',
       subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Indtast din adgangskode',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Bekræftelseskode',
@@ -382,6 +391,7 @@ export const daDK: LocalizationResource = {
       actionLink: 'Tilmeld dig',
       actionLink__use_email: 'Brug email',
       actionLink__use_email_username: 'Brug email eller brugernavn',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Brug telefon',
       actionLink__use_username: 'Brug brugenravn',
       actionText: 'Ingen konto?',
@@ -449,6 +459,9 @@ export const daDK: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -461,6 +474,7 @@ export const daDK: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned: '',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -468,6 +482,11 @@ export const daDK: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} or more characters',
@@ -525,6 +544,14 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopieret!',
       actionLabel__copy: 'Kopier alle',
@@ -680,6 +707,11 @@ export const daDK: LocalizationResource = {
       title: '',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Log ud af enhed',
         title: 'Aktive enheder',

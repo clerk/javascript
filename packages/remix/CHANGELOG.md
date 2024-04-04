@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.0.0-beta.39
+
+### Patch Changes
+
+- Updated dependencies [[`fc3ffd880`](https://github.com/clerk/javascript/commit/fc3ffd88064a09ab98877dfba119150390f9296e), [`1fd2eff38`](https://github.com/clerk/javascript/commit/1fd2eff38dc71e45d2ff95a5b6e5a99cca53c6e7), [`987994909`](https://github.com/clerk/javascript/commit/987994909b7c462cc2b785f75afe4d621f5c960d), [`1bea9c200`](https://github.com/clerk/javascript/commit/1bea9c20090abdde962c7da1a859933e1cd51660)]:
+  - @clerk/shared@2.0.0-beta.21
+  - @clerk/backend@1.0.0-beta.32
+  - @clerk/clerk-react@5.0.0-beta.34
+
 ## 4.0.0-beta.38
 
 ### Patch Changes

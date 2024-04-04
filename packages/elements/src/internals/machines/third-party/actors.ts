@@ -88,6 +88,8 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
         secondFactorUrl: ClerkJSNavigationEvent.signIn,
         verifyEmailAddressUrl: ClerkJSNavigationEvent.verification,
         verifyPhoneNumberUrl: ClerkJSNavigationEvent.verification,
+        signUpUrl: ClerkJSNavigationEvent.signUp,
+        signInUrl: ClerkJSNavigationEvent.signIn,
       } satisfies Required<HandleOAuthCallbackParams>,
       customNavigate,
     );

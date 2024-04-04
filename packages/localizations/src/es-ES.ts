@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Atrás',
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
@@ -282,6 +283,7 @@ export const esES: LocalizationResource = {
       blockButton__backupCode: 'Usa un código de respaldo',
       blockButton__emailCode: 'Enviar código a{{identifier}}',
       blockButton__emailLink: 'Enviar enlace a{{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Entra con tu contraseña',
       blockButton__phoneCode: 'Enviar código a{{identifier}}',
       blockButton__totp: 'Usa tu aplicación de autenticación',
@@ -353,10 +355,17 @@ export const esES: LocalizationResource = {
       subtitle: 'Ocurrió un error',
       title: 'No puedo iniciar sesión',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Use otro método',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Introduzca su contraseña',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificación',
@@ -383,6 +392,7 @@ export const esES: LocalizationResource = {
       actionLink: 'Regístrese',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: '¿No tiene cuenta?',
@@ -450,6 +460,9 @@ export const esES: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -462,6 +475,7 @@ export const esES: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned: '',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -469,6 +483,11 @@ export const esES: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -526,6 +545,14 @@ export const esES: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -683,6 +710,11 @@ export const esES: LocalizationResource = {
       title: 'Actualizar Cuenta',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Cerrar sesión en el dispositivo',
         title: 'Dispositivos activos',
@@ -697,8 +729,8 @@ export const esES: LocalizationResource = {
         title: 'Cuentas conectadas',
       },
       dangerSection: {
-        title: 'Eliminar cuenta',
         deleteAccountButton: 'Eliminar cuenta',
+        title: 'Eliminar cuenta',
       },
       emailAddressesSection: {
         destructiveAction: 'Eliminar dirección de correo electrónico',

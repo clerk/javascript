@@ -722,16 +722,16 @@ export class Clerk implements ClerkInterface {
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
     //   automatic reloading when reloading shouldn't be happening.
-    const beforeUnloadTracker = createBeforeUnloadTracker();
+    const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
     if (beforeEmit) {
-      beforeUnloadTracker.startTracking();
+      beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
       await beforeEmit(newSession);
-      beforeUnloadTracker.stopTracking();
+      beforeUnloadTracker?.stopTracking();
     }
 
     //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
-    if (beforeUnloadTracker.isUnloading()) {
+    if (beforeUnloadTracker?.isUnloading()) {
       return;
     }
 
@@ -1019,9 +1019,9 @@ export class Clerk implements ClerkInterface {
 
     const makeNavigate = (to: string) => () => navigate(to);
 
-    const navigateToSignIn = makeNavigate(displayConfig.signInUrl);
+    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig.signInUrl);
 
-    const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
+    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig.signUpUrl);
 
     const navigateToFactorOne = makeNavigate(
       params.firstFactorUrl ||

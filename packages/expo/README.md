@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_expo)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://beta.clerk.com/docs?utm_source=github&utm_medium=clerk_expo)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/expo/CHANGELOG.md)
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
 
 ```
 
-_The section above covers the basic setup. For further details and examples, please refer to our [Clerk Expo Documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_expo)._
+_The section above covers the basic setup. For further details and examples, please refer to our [Clerk Expo Documentation](https://beta.clerk.com/docs?utm_source=github&utm_medium=clerk_expo)._
 
 ## Support
 

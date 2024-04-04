@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.0.0-beta.32
+
+### Patch Changes
+
+- Add support for `scrypt_werkzeug` in `UserAPI` `PasswordHasher`. ([#3060](https://github.com/clerk/javascript/pull/3060)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Add missing pagination params types for `clerkClient.invitations.getInvitationList()` ([#3079](https://github.com/clerk/javascript/pull/3079)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`fc3ffd880`](https://github.com/clerk/javascript/commit/fc3ffd88064a09ab98877dfba119150390f9296e), [`1fd2eff38`](https://github.com/clerk/javascript/commit/1fd2eff38dc71e45d2ff95a5b6e5a99cca53c6e7)]:
+  - @clerk/shared@2.0.0-beta.21
+
 ## 1.0.0-beta.31
 
 ### Patch Changes

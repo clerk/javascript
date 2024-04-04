@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'กลับ',
   badge__default: 'ค่าเริ่มต้น',
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
@@ -279,6 +280,7 @@ export const thTH: LocalizationResource = {
       blockButton__backupCode: 'ใช้รหัสสำรอง',
       blockButton__emailCode: 'ส่งรหัสไปที่อีเมล {{identifier}}',
       blockButton__emailLink: 'ส่งลิงก์ไปที่อีเมล {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'เข้าสู่ระบบด้วยรหัสผ่านของคุณ',
       blockButton__phoneCode: 'ส่งรหัส SMS ไปยัง {{identifier}}',
       blockButton__totp: 'ใช้แอปตัวตรวจสอบความถูกต้อง',
@@ -350,10 +352,17 @@ export const thTH: LocalizationResource = {
       subtitle: 'เกิดข้อผิดพลาด',
       title: 'ไม่สามารถเข้าสู่ระบบได้',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'ใช้วิธีอื่น',
       subtitle: 'ใส่รหัสผ่านที่เชื่อมโยงกับบัญชีของคุณ',
       title: 'ใส่รหัสผ่านของคุณ',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'รหัสการตรวจสอบ',
@@ -380,6 +389,7 @@ export const thTH: LocalizationResource = {
       actionLink: 'สมัครสมาชิก',
       actionLink__use_email: 'ใช้อีเมล',
       actionLink__use_email_username: 'ใช้อีเมลหรือชื่อผู้ใช้',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'ใช้โทรศัพท์',
       actionLink__use_username: 'ใช้ชื่อผู้ใช้',
       actionText: 'ไม่มีบัญชีหรือ?',
@@ -447,6 +457,9 @@ export const thTH: LocalizationResource = {
       'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบบอทไม่ผ่าน กรุณารีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'ที่อยู่อีเมลต้องเป็นที่อยู่อีเมลที่ถูกต้อง',
@@ -459,6 +472,7 @@ export const thTH: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'รหัสผ่านของคุณไม่เพียงพอต่อความปลอดภัย',
     form_password_pwned: 'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของการรั่วไหลและไม่สามารถใช้ได้ กรุณาลองรหัสผ่านอื่นแทน',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'รหัสผ่านของคุณเกินจำนวนไบต์สูงสุดที่อนุญาต กรุณาลดความยาวหรือลบอักขระพิเศษบางตัว',
     form_password_validation_failed: 'รหัสผ่านไม่ถูกต้อง',
@@ -466,6 +480,11 @@ export const thTH: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'คุณไม่สามารถลบรูปแบบการยืนยันตัวตนสุดท้ายของคุณได้',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'น้อยกว่า {{length}} ตัวอักษร',
       minimumLength: '{{length}} ตัวอักษรหรือมากกว่า',
@@ -523,6 +542,14 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -674,6 +701,11 @@ export const thTH: LocalizationResource = {
       title: 'อัปเดตโปรไฟล์',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'ลงชื่อออกจากอุปกรณ์',
         title: 'อุปกรณ์ที่ใช้งานอยู่',

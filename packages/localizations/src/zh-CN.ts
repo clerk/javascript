@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: '返回',
   badge__default: '默认',
   badge__otherImpersonatorDevice: '其他模拟器设备',
@@ -279,6 +280,7 @@ export const zhCN: LocalizationResource = {
       blockButton__backupCode: '使用备用代码',
       blockButton__emailCode: '电子邮件验证码到 {{identifier}}',
       blockButton__emailLink: '电子邮件链接到 {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: '使用您的密码登录',
       blockButton__phoneCode: '发送短信代码到 {{identifier}}',
       blockButton__totp: '使用您的验证应用程序',
@@ -349,10 +351,17 @@ export const zhCN: LocalizationResource = {
       subtitle: '出现错误',
       title: '无法登录',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '使用其他方法',
       subtitle: '继续使用 {{applicationName}}',
       title: '输入您的密码',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: '验证码',
@@ -379,6 +388,7 @@ export const zhCN: LocalizationResource = {
       actionLink: '注册',
       actionLink__use_email: '使用电子邮件',
       actionLink__use_email_username: '使用电子邮件或用户名',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: '使用电话',
       actionLink__use_username: '使用用户名',
       actionText: '还没有账户？',
@@ -445,6 +455,9 @@ export const zhCN: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -457,12 +470,18 @@ export const zhCN: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: '您的密码强度不够。',
     form_password_pwned: '这个密码在数据泄露中被发现，不能使用，请换一个密码试试。',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: '您的密码超过了允许的最大字节数，请缩短它或去掉一些特殊字符。',
     form_password_validation_failed: '密码错误',
     form_username_invalid_character: '',
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '少于{{length}}个字符',
       minimumLength: '{{length}}个或更多字符',
@@ -520,6 +539,14 @@ export const zhCN: LocalizationResource = {
     action__signOutAll: '退出所有账户',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: '已复制！',
       actionLabel__copy: '复制全部',
@@ -666,6 +693,11 @@ export const zhCN: LocalizationResource = {
       title: '更新个人资料',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: '退出设备',
         title: '活动设备',

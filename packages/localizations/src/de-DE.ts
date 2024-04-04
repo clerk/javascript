@@ -14,6 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
+  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Zurück',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
@@ -285,6 +286,7 @@ export const deDE: LocalizationResource = {
       blockButton__backupCode: 'Verwenden Sie einen Backup-Code',
       blockButton__emailCode: 'Code an {{identifier}} senden',
       blockButton__emailLink: 'Link senden an {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Melden Sie sich mit Ihrem Passwort an',
       blockButton__phoneCode: 'Code an {{identifier}} senden',
       blockButton__totp: 'Verwenden Sie Ihre Authentifizierungs-App',
@@ -356,10 +358,17 @@ export const deDE: LocalizationResource = {
       subtitle: 'Ein Fehler ist aufgetreten',
       title: 'Anmeldung nicht möglich',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Verwenden Sie eine andere Methode',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Geben Sie Ihr Passwort ein',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Bestätigungscode',
@@ -387,6 +396,7 @@ export const deDE: LocalizationResource = {
       actionLink: 'Anmelden',
       actionLink__use_email: 'E-mail nutzen',
       actionLink__use_email_username: 'E-mail oder Benutzernamen nutzen',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Mobiltelefon nutzen',
       actionLink__use_username: 'Benutzername nutzen',
       actionText: 'Kein Account?',
@@ -454,6 +464,9 @@ export const deDE: LocalizationResource = {
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
     form_code_incorrect: '',
     form_identifier_exists: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine Andere.',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
@@ -467,6 +480,7 @@ export const deDE: LocalizationResource = {
     form_password_not_strong_enough: 'Passwort nicht stark genug',
     form_password_pwned:
       'Das gewählte Passwort wurde durch eine Datenpanne im Internet offengelegt. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Das Passwort hat die maximale Anzahl an Bytes überschritten. Bitte kürzen oder Sonderzeichen entfernen.',
     form_password_validation_failed: 'Falsches Passwort',
@@ -474,6 +488,11 @@ export const deDE: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: '',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
+    passkeys_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'weniger als {{length}} Zeichen lang sein',
       minimumLength: 'mindestens {{length}} Zeichen lang sein',
@@ -532,6 +551,14 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
+    __experimental_passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopiere alle',
@@ -690,6 +717,11 @@ export const deDE: LocalizationResource = {
       title: 'Profil aktualisieren',
     },
     start: {
+      __experimental_passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       activeDevicesSection: {
         destructiveAction: 'Vom Gerät abmelden',
         title: 'Aktive Geräte',

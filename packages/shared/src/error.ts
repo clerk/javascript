@@ -67,6 +67,10 @@ export function isUserLockedError(err: any) {
   return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'user_locked';
 }
 
+export function isPasswordPwnedError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_pwned';
+}
+
 export function parseErrors(data: ClerkAPIErrorJSON[] = []): ClerkAPIError[] {
   return data.length > 0 ? data.map(parseError) : [];
 }
@@ -190,6 +194,7 @@ const DefaultMessages = Object.freeze({
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
   InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key={{key}})`,
   MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
+  MissingSecretKeyErrorMessage: `Missing secretKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
   MissingClerkProvider: `{{source}} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
 });
 
@@ -214,6 +219,8 @@ export interface ErrorThrower {
   throwInvalidProxyUrl(params: { url?: string }): never;
 
   throwMissingPublishableKeyError(): never;
+
+  throwMissingSecretKeyError(): never;
 
   throwMissingClerkProviderError(params: { source?: string }): never;
 
@@ -267,6 +274,10 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     throwMissingPublishableKeyError(): never {
       throw new Error(buildMessage(messages.MissingPublishableKeyErrorMessage));
+    },
+
+    throwMissingSecretKeyError(): never {
+      throw new Error(buildMessage(messages.MissingSecretKeyErrorMessage));
     },
 
     throwMissingClerkProviderError(params: { source?: string }): never {
