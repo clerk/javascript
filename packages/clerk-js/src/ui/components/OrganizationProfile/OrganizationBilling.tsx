@@ -65,5 +65,5 @@ export const OrganizationBilling = () => {
     );
   });
 
-  return <ManagePlanScreen plans={plans} />;
+  return <ManagePlanScreen>{plans}</ManagePlanScreen>;
 };

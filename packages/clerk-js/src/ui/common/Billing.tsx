@@ -187,7 +187,7 @@ const GoToPlanAndBilling = () => {
   );
 };
 
-export const ManagePlanScreen = ({ plans }: { plans: React.ReactNode }) => {
+export const ManagePlanScreen = ({ children }: { children: React.ReactNode }) => {
   return (
     <Col>
       <GoToPlanAndBilling />
@@ -198,7 +198,7 @@ export const ManagePlanScreen = ({ plans }: { plans: React.ReactNode }) => {
           textVariant='h2'
         />
       </Header.Root>
-      <Col sx={t => ({ gap: t.space.$4 })}>{plans}</Col>
+      <Col sx={t => ({ gap: t.space.$4 })}>{children}</Col>
     </Col>
   );
 };
