@@ -21,7 +21,7 @@ import {
   Text,
   useLocalizations,
 } from '../customizables';
-import { Card, FullHeightLoader, Header, IconButton, useCardState } from '../elements';
+import { Card, Header, IconButton, useCardState } from '../elements';
 import { ArrowLeftIcon, Check } from '../icons';
 import { handleError } from '../utils';
 import { CurrentPlanSection } from './CurrentPlanSection';
@@ -362,14 +362,8 @@ const PlanAndBillingScreen = () => {
 
         <Card.Alert>{card.error}</Card.Alert>
 
-        {isLoading ? (
-          <FullHeightLoader />
-        ) : (
-          <>
-            <CurrentPlanSection currentPlan={currentPlan} />
-            <PaymentMethodSection currentPlan={currentPlan} />
-          </>
-        )}
+        <CurrentPlanSection currentPlan={currentPlan} />
+        <PaymentMethodSection currentPlan={currentPlan} />
       </Col>
     </Col>
   );

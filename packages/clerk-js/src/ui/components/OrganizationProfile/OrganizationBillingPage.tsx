@@ -6,11 +6,15 @@ import { useFetch } from '../../hooks';
 
 export const OrganizationBillingPage = () => {
   const { organization } = useOrganization();
+
   const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(
     organization?.getAvailablePlans,
-    'availablePlans',
+    'organization-available-plans',
   );
-  const { data: currentPlan, isLoading: isLoadingCurrentPlan } = useFetch(organization?.getCurrentPlan, 'currentPlan');
+  const { data: currentPlan, isLoading: isLoadingCurrentPlan } = useFetch(
+    organization?.getCurrentPlan,
+    'organization-currentPlan',
+  );
 
   if (isLoadingCurrentPlan || isLoadingAvailablePlans || !organization) {
     return <FullHeightLoader />;
