@@ -25,6 +25,8 @@ export interface CheckoutSessionResource extends ClerkResource {
 
 export type ChangePlanParams = {
   planKey: string;
+  successReturnURL: string;
+  cancelReturnURL: string;
 };
 
 export type BillingData = {
