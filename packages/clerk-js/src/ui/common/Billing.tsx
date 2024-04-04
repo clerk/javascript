@@ -1,14 +1,86 @@
-import type { BillingPlanResource } from '@clerk/types';
+import { createContextAndHook } from '@clerk/shared/react';
+import type {
+  BillingPlanResource,
+  ChangePlanParams,
+  CheckoutSessionResource,
+  CreatePortalSessionParams,
+  PortalSessionResource,
+} from '@clerk/types';
 import React from 'react';
 
-import { Badge, Box, Button, Col, descriptors, Flex, Grid, Icon, localizationKeys, Text } from '../customizables';
-import { Header, IconButton } from '../elements';
+import {
+  Badge,
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Grid,
+  Icon,
+  localizationKeys,
+  Text,
+  useLocalizations,
+} from '../customizables';
+import { Card, FullHeightLoader, Header, IconButton, useCardState } from '../elements';
 import { ArrowLeftIcon, Check } from '../icons';
+import { handleError } from '../utils';
+import { CurrentPlanSection } from './CurrentPlanSection';
+import { PaymentMethodSection } from './PaymentMethodSection';
+
+type BillingProviderValue = {
+  availablePlans: BillingPlanResource[];
+  currentPlan: BillingPlanResource;
+  createPortalSession: (params: CreatePortalSessionParams) => Promise<PortalSessionResource>;
+  changePlan: (params: ChangePlanParams) => Promise<CheckoutSessionResource>;
+  currentPage: BillingPages;
+  goToPlanAndBilling: () => void;
+  goToManageBillingPlan: () => void;
+};
+
+type BillingProviderProps = Omit<
+  BillingProviderValue,
+  'goToPlanAndBilling' | 'goToManageBillingPlan' | 'currentPage'
+> & { children: React.ReactNode };
+
+type BillingPages = 'planAndBilling' | 'manageBillingPlan';
+
+export const [BillingContext, useBillingContext, _] = createContextAndHook<BillingProviderValue>('BillingContext');
+
+export const Billing = () => {
+  const { currentPage } = useBillingContext();
+
+  if (currentPage === 'planAndBilling') {
+    return <PlanAndBillingScreen />;
+  }
+
+  if (currentPage === 'manageBillingPlan') {
+    return <ManagePlanScreen />;
+  }
+
+  return <div />;
+};
+
+Billing.Root = (params: BillingProviderProps) => {
+  const [currentPage, setCurrentPage] = React.useState<BillingPages>('manageBillingPlan');
+
+  const goToPlanAndBilling = () => {
+    setCurrentPage('planAndBilling');
+  };
+
+  const goToManageBillingPlan = () => {
+    setCurrentPage('manageBillingPlan');
+  };
+
+  return (
+    <BillingContext.Provider value={{ value: { ...params, currentPage, goToPlanAndBilling, goToManageBillingPlan } }}>
+      {params.children}
+    </BillingContext.Provider>
+  );
+};
 
 export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'> & {
   isCurrentPlan: boolean;
   planKey: string;
-  changePlanAction: React.ReactNode;
 };
 
 export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
@@ -81,7 +153,7 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
               justify='center'
               align='center'
             >
-              {params.changePlanAction}
+              <ChangePlanButton planKey={params.planKey} />
             </Flex>
           )}
         </Flex>
@@ -143,13 +215,24 @@ const Feature = ({ name }: { name: string }) => {
   );
 };
 
-export const ChangePlanButton = ({ action }: { action: () => Promise<void> }) => {
+export const ChangePlanButton = ({ planKey }: { planKey: string }) => {
+  const { changePlan } = useBillingContext();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  const handleActionClicked = async () => {
+  const handleChangePlan = async () => {
     try {
       setIsLoading(true);
-      await action();
+      const response = await changePlan({
+        planKey,
+        successReturnURL: window.location.href,
+        cancelReturnURL: window.location.href,
+      });
+      if (response) {
+        window.location.href = response?.redirectUrl;
+      }
+    } catch (e) {
+      //TODO Show error message if exists
+      console.log(e);
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +241,7 @@ export const ChangePlanButton = ({ action }: { action: () => Promise<void> }) =>
   return (
     <Button
       isLoading={isLoading}
-      onClick={handleActionClicked}
+      onClick={handleChangePlan}
       variant='outline'
       sx={t => ({ color: t.colors.$colorText })}
       localizationKey={localizationKeys('billing.managePlanScreen.action__changePlan')}
@@ -186,7 +269,22 @@ const GoToPlanAndBilling = () => {
   );
 };
 
-export const ManagePlanScreen = ({ children }: { children: React.ReactNode }) => {
+export const ManagePlanScreen = () => {
+  const { availablePlans, currentPlan } = useBillingContext();
+
+  const plans = availablePlans.map(({ name, id, features, priceInCents, key }) => {
+    return (
+      <OrganizationPlanCard
+        isCurrentPlan={currentPlan?.key === key}
+        planKey={key}
+        key={id}
+        name={name}
+        features={features}
+        priceInCents={priceInCents / 100}
+      />
+    );
+  });
+
   return (
     <Col gap={4}>
       <GoToPlanAndBilling />
@@ -198,7 +296,80 @@ export const ManagePlanScreen = ({ children }: { children: React.ReactNode }) =>
             textVariant='h2'
           />
         </Header.Root>
-        <Col sx={t => ({ gap: t.space.$4 })}>{children}</Col>
+        <Col sx={t => ({ gap: t.space.$4 })}>{plans}</Col>
+      </Col>
+    </Col>
+  );
+};
+
+const StartPortalSessionButton = () => {
+  const { createPortalSession } = useBillingContext();
+  const [isLoadingPortalSession, setIsLoadingPortalSession] = React.useState(false);
+  const card = useCardState();
+  const { t } = useLocalizations();
+
+  const handleStartPortalSession = async () => {
+    setIsLoadingPortalSession(true);
+    try {
+      const res = await createPortalSession({ returnUrl: window.location.href });
+      window.location.href = res?.redirectUrl || '';
+    } catch (e) {
+      handleError(e, [], card.setError);
+    } finally {
+      setIsLoadingPortalSession(false);
+    }
+  };
+
+  return (
+    <Button
+      variant='outline'
+      sx={t => ({ color: t.colors.$colorText })}
+      onClick={handleStartPortalSession}
+      isLoading={isLoadingPortalSession}
+    >
+      {t(localizationKeys('billing.start.action__manageBillingInfo'))}
+    </Button>
+  );
+};
+
+const PlanAndBillingScreen = () => {
+  const card = useCardState();
+  const { currentPlan } = useBillingContext();
+
+  return (
+    <Col
+      elementDescriptor={descriptors.page}
+      sx={t => ({ gap: t.space.$8, color: t.colors.$colorText })}
+    >
+      <Col
+        elementDescriptor={descriptors.profilePage}
+        elementId={descriptors.profilePage.setId('billing')}
+      >
+        <Flex justify='between'>
+          <Col>
+            <Header.Root>
+              <Header.Title
+                localizationKey={localizationKeys('billing.start.headerTitle__billing')}
+                sx={t => ({ marginBottom: t.space.$4 })}
+                textVariant='h2'
+              />
+            </Header.Root>
+          </Col>
+          <Col>
+            <StartPortalSessionButton />
+          </Col>
+        </Flex>
+
+        <Card.Alert>{card.error}</Card.Alert>
+
+        {isLoading ? (
+          <FullHeightLoader />
+        ) : (
+          <>
+            <CurrentPlanSection currentPlan={currentPlan} />
+            <PaymentMethodSection currentPlan={currentPlan} />
+          </>
+        )}
       </Col>
     </Col>
   );

@@ -1,63 +1,33 @@
 import { useOrganization } from '@clerk/shared/react';
-import React from 'react';
 
-import { CurrentPlanSection, PaymentMethodSection } from '../../common';
-import { Col, descriptors, localizationKeys } from '../../customizables';
-import { Card, FullHeightLoader, Header, useCardState, withCardStateProvider } from '../../elements';
+import { Billing } from '../../common';
+import { FullHeightLoader } from '../../elements';
 import { useFetch } from '../../hooks';
-import { handleError } from '../../utils';
 
-export const OrganizationBillingPage = withCardStateProvider(() => {
-  const [isLoadingPortalSession, setIsLoadingPortalSession] = React.useState(false);
+export const OrganizationBillingPage = () => {
   const { organization } = useOrganization();
-  const card = useCardState();
+  const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(
+    organization?.getAvailablePlans,
+    'availablePlans',
+  );
+  const { data: currentPlan, isLoading: isLoadingCurrentPlan } = useFetch(organization?.getCurrentPlan, 'currentPlan');
 
-  const { data: currentPlan, isLoading } = useFetch(organization?.getCurrentPlan, 'organization-current-plan');
+  if (isLoadingCurrentPlan || isLoadingAvailablePlans || !organization) {
+    return <FullHeightLoader />;
+  }
 
-  const handleStartPortalSession = async () => {
-    setIsLoadingPortalSession(true);
-    try {
-      const res = await organization?.createPortalSession({ returnUrl: window.location.href });
-      window.location.href = res?.redirectUrl || '';
-    } catch (e) {
-      handleError(e, [], card.setError);
-    } finally {
-      setIsLoadingPortalSession(false);
-    }
-  };
+  if (!currentPlan) {
+    return null;
+  }
 
   return (
-    <Col
-      elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8, color: t.colors.$colorText })}
+    <Billing.Root
+      createPortalSession={organization?.createPortalSession}
+      changePlan={organization?.changePlan}
+      currentPlan={currentPlan}
+      availablePlans={availablePlans?.data || []}
     >
-      <Col
-        elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('billing')}
-      >
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys('billing.start.headerTitle__billing')}
-            sx={t => ({ marginBottom: t.space.$4 })}
-            textVariant='h2'
-          />
-        </Header.Root>
-
-        <Card.Alert>{card.error}</Card.Alert>
-
-        {isLoading ? (
-          <FullHeightLoader />
-        ) : (
-          <>
-            <CurrentPlanSection currentPlan={currentPlan} />
-            <PaymentMethodSection
-              currentPlan={currentPlan}
-              onClickManageBilling={handleStartPortalSession}
-              isLoadingPortalSession={isLoadingPortalSession}
-            />
-          </>
-        )}
-      </Col>
-    </Col>
+      <Billing />
+    </Billing.Root>
   );
-});
+};

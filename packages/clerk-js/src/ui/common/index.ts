@@ -18,3 +18,4 @@ export * from './RemoveResourceForm';
 export * from './QRCode';
 export * from './CurrentPlanSection';
 export * from './PaymentMethodSection';
+export * from './Billing';
