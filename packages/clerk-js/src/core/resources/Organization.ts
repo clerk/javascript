@@ -247,7 +247,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   };
 
   changePlan = async (params: ChangePlanParams): Promise<CheckoutSessionResource> => {
-    const { planKey } = params || {};
+    const { planKey, successReturnURL, cancelReturnURL } = params || {};
 
     const json = (
       await BaseResource._fetch({
@@ -255,6 +255,8 @@ export class Organization extends BaseResource implements OrganizationResource {
         method: 'POST',
         body: {
           plan_key: planKey,
+          success_return_url: successReturnURL,
+          cancel_return_url: cancelReturnURL,
         } as any,
       })
     )?.response as unknown as CheckoutSessionJSON;
