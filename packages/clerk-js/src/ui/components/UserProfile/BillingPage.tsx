@@ -45,8 +45,6 @@ export const BillingPage = withCardStateProvider(() => {
 
         <Card.Alert>{card.error}</Card.Alert>
 
-        <Card.Alert>{card.error}</Card.Alert>
-
         {isLoading ? (
           <FullHeightLoader />
         ) : (
