@@ -1,12 +1,11 @@
 import { useOrganization } from '@clerk/shared/react';
 
 import { Billing } from '../../common';
-import { FullHeightLoader } from '../../elements';
+import { FullHeightLoader, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 
-export const OrganizationBillingPage = () => {
+export const OrganizationBillingPage = withCardStateProvider(() => {
   const { organization } = useOrganization();
-
   const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(
     organization?.getAvailablePlans,
     'organization-available-plans',
@@ -34,4 +33,4 @@ export const OrganizationBillingPage = () => {
       <Billing />
     </Billing.Root>
   );
-};
+});
