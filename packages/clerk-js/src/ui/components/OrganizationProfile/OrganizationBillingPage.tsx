@@ -1,19 +1,30 @@
 import { useOrganization } from '@clerk/shared/react';
+import React from 'react';
 
 import { CurrentPlanSection, PaymentMethodSection } from '../../common';
 import { Button, Col, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
-import { FullHeightLoader, Header, withCardStateProvider } from '../../elements';
+import { Card, FullHeightLoader, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
+import { handleError } from '../../utils';
 
 export const OrganizationBillingPage = withCardStateProvider(() => {
+  const [isLoadingPortalSession, setIsLoadingPortalSession] = React.useState(false);
   const { organization } = useOrganization();
   const { t } = useLocalizations();
+  const card = useCardState();
 
   const { data: currentPlan, isLoading } = useFetch(organization?.getCurrentPlan, 'organization-current-plan');
 
   const handleStartPortalSession = async () => {
-    const res = await organization?.createPortalSession({ returnUrl: window.location.href });
-    window.location.href = res?.redirectUrl || '';
+    setIsLoadingPortalSession(true);
+    try {
+      const res = await organization?.createPortalSession({ returnUrl: window.location.href });
+      window.location.href = res?.redirectUrl || '';
+    } catch (e) {
+      handleError(e, [], card.setError);
+    } finally {
+      setIsLoadingPortalSession(false);
+    }
   };
 
   return (
@@ -40,11 +51,14 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
               variant='outline'
               sx={t => ({ color: t.colors.$colorText })}
               onClick={handleStartPortalSession}
+              isLoading={isLoadingPortalSession}
             >
-              {t(localizationKeys('billing.manageBillingInfo'))}
+              {t(localizationKeys('billing.start.action__manageBillingInfo'))}
             </Button>
           </Col>
         </Flex>
+
+        <Card.Alert>{card.error}</Card.Alert>
 
         {isLoading ? (
           <FullHeightLoader />
@@ -54,6 +68,7 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
             <PaymentMethodSection
               currentPlan={currentPlan}
               onClickStartPortalSession={handleStartPortalSession}
+              isLoading={isLoadingPortalSession}
             />
           </>
         )}

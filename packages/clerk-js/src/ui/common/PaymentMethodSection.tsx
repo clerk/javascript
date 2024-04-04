@@ -6,10 +6,15 @@ import { mqu } from '../styledSystem';
 
 type PaymentMethodSectionProps = {
   currentPlan?: BillingPlanResource | null;
+  isLoading: boolean;
   onClickStartPortalSession: () => void;
 };
 
-export const PaymentMethodSection = ({ currentPlan, onClickStartPortalSession }: PaymentMethodSectionProps) => {
+export const PaymentMethodSection = ({
+  currentPlan,
+  isLoading,
+  onClickStartPortalSession,
+}: PaymentMethodSectionProps) => {
   const { t } = useLocalizations();
 
   if (!currentPlan) {
@@ -37,6 +42,7 @@ export const PaymentMethodSection = ({ currentPlan, onClickStartPortalSession }:
             id='paymentMethod'
             localizationKey={localizationKeys('billing.paymentMethodSection.primaryButton')}
             onClick={onClickStartPortalSession}
+            isLoading={isLoading}
           />
         )}
       </ProfileSection.Item>

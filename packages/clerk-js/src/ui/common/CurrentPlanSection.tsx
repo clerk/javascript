@@ -34,14 +34,15 @@ export const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanR
               colorScheme='secondary'
               sx={t => ({ fontSize: t.fontSizes.$md })}
             >
-              per month
+              {t(localizationKeys('billing.currentPlanSection.perMonth'))}
             </Text>
           </Text>
           <Text
             colorScheme='secondary'
             sx={t => ({ fontSize: t.fontSizes.$sm })}
           >
-            Renews on {t(getRelativeToNowDateKey(currentPlan.billingCycle?.endDate))}
+            {t(localizationKeys('billing.currentPlanSection.renewsOn'))}{' '}
+            {t(getRelativeToNowDateKey(currentPlan.billingCycle?.endDate))}
           </Text>
         </Box>
         <ProfileSection.Button

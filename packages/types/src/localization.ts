@@ -722,11 +722,13 @@ type _LocalizationResource = {
   billing: {
     start: {
       headerTitle__billing: LocalizationValue;
+      action__manageBillingInfo: LocalizationValue;
     };
-    manageBillingInfo: LocalizationValue;
     currentPlanSection: {
       title: LocalizationValue;
       primaryButton: LocalizationValue;
+      perMonth: LocalizationValue;
+      renewsOn: LocalizationValue;
     };
     paymentMethodSection: {
       title: LocalizationValue;
