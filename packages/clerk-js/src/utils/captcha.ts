@@ -35,6 +35,14 @@ interface RenderOptions {
    * @param errorCode string
    */
   'error-callback'?: (errorCode: string) => void;
+  /**
+   * Appearance controls when the widget is visible.
+   * It can be always (default), execute, or interaction-only.
+   * Refer to Appearance Modes for more information:
+   * https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#appearance-modes
+   * @default 'always'
+   */
+  appearance?: 'always' | 'execute' | 'interaction-only';
 }
 
 interface Turnstile {
@@ -50,7 +58,7 @@ declare global {
   }
 }
 
-const WIDGET_CLASSNAME = 'clerk-captcha';
+export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
 
 export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300', '600'];
@@ -75,9 +83,14 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
   let captchaToken = '',
     id = '';
 
-  const div = document.createElement('div');
-  div.classList.add(WIDGET_CLASSNAME);
-  document.body.appendChild(div);
+  const widgetDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
+  if (widgetDiv) {
+    widgetDiv.style.display = 'block';
+  } else {
+    throw {
+      captchaError: 'Element to render the captcha not found',
+    };
+  }
 
   const captcha = await loadCaptcha(scriptUrl);
   let retries = 0;
@@ -86,8 +99,9 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
   const handleCaptchaTokenGeneration = (): Promise<[string, string]> => {
     return new Promise((resolve, reject) => {
       try {
-        const id = captcha.render(`.${WIDGET_CLASSNAME}`, {
+        const id = captcha.render(`#${CAPTCHA_ELEMENT_ID}`, {
           sitekey,
+          appearance: 'interaction-only',
           retry: 'never',
           'refresh-expired': 'auto',
           callback: function (token: string) {
@@ -133,8 +147,9 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
       captchaError: e,
     };
   } finally {
-    // After challenge has run remove node element attached
-    document.body.removeChild(div);
+    if (widgetDiv) {
+      widgetDiv.style.display = 'none';
+    }
   }
 
   return captchaToken;
