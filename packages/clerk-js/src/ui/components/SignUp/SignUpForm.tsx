@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Col, localizationKeys, useAppearance } from '../../customizables';
+import { CAPTCHA_ELEMENT_ID } from '../../../utils';
+import { Box, Col, localizationKeys, useAppearance } from '../../customizables';
 import { Form } from '../../elements';
 import { mqu } from '../../styledSystem';
 import type { FormControlState } from '../../utils';
@@ -101,10 +102,16 @@ export const SignUpForm = (props: SignUpFormProps) => {
           </Form.ControlRow>
         )}
       </Col>
-      <Form.SubmitButton
-        hasArrow
-        localizationKey={localizationKeys('formButtonPrimary')}
-      />
+      <Col center>
+        <Box
+          id={CAPTCHA_ELEMENT_ID}
+          sx={t => ({ display: 'none', marginBottom: t.space.$6 })}
+        />
+        <Form.SubmitButton
+          hasArrow
+          localizationKey={localizationKeys('formButtonPrimary')}
+        />
+      </Col>
     </Form.Root>
   );
 };
