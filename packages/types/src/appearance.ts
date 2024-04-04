@@ -387,6 +387,8 @@ export type ElementsConfig = {
   buttonArrowIcon: WithOptions;
   providerIcon: WithOptions<OAuthProvider | Web3Provider>;
   spinner: WithOptions;
+
+  billingPlanCard: WithOptions<string>;
 };
 
 export type Elements = {
