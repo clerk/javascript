@@ -168,7 +168,7 @@ export const ChangePlanButton = ({ action }: { action: () => Promise<void> }) =>
 
 const GoToPlanAndBilling = () => {
   return (
-    <Box sx={t => ({ marginBottom: t.space.$4 })}>
+    <Box>
       <IconButton
         sx={t => ({
           color: t.colors.$colorTextSecondary,
@@ -188,16 +188,18 @@ const GoToPlanAndBilling = () => {
 
 export const ManagePlanScreen = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Col>
+    <Col gap={4}>
       <GoToPlanAndBilling />
-      <Header.Root>
-        <Header.Title
-          localizationKey={localizationKeys('billing.managePlanScreen.headerTitle')}
-          sx={t => ({ marginBottom: t.space.$4 })}
-          textVariant='h2'
-        />
-      </Header.Root>
-      <Col sx={t => ({ gap: t.space.$4 })}>{children}</Col>
+      <Col>
+        <Header.Root>
+          <Header.Title
+            localizationKey={localizationKeys('billing.managePlanScreen.headerTitle')}
+            sx={t => ({ marginBottom: t.space.$4 })}
+            textVariant='h2'
+          />
+        </Header.Root>
+        <Col sx={t => ({ gap: t.space.$4 })}>{children}</Col>
+      </Col>
     </Col>
   );
 };
