@@ -4,6 +4,19 @@ export type BillingCycle = {
   startDate: Date;
   endDate: Date;
 };
+
+export type PaymentMethod = {
+  type: string;
+  id: string;
+  createdAt: Date;
+  card: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+  };
+};
+
 export interface BillingPlanResource extends ClerkResource {
   id: string;
   name: string;
@@ -12,6 +25,7 @@ export interface BillingPlanResource extends ClerkResource {
   priceInCents: number;
   features: string[];
   billingCycle: BillingCycle;
+  paymentMethod: PaymentMethod;
   createdAt: Date;
   updatedAt: Date;
 }

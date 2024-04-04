@@ -1,13 +1,16 @@
 import { useUser } from '@clerk/shared/react';
 
 import { Button, Col, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
-import { Header, withCardStateProvider } from '../../elements';
+import { FullHeightLoader, Header, withCardStateProvider } from '../../elements';
+import { useFetch } from '../../hooks';
 import { CurrentPlanSection } from './CurrentPlanSection';
 import { PaymentMethodSection } from './PaymentMethodSection';
 
 export const BillingPage = withCardStateProvider(() => {
   const { user } = useUser();
   const { t } = useLocalizations();
+
+  const { data: currentPlan, isLoading } = useFetch(user?.getCurrentPlan, 'user-current-plan');
 
   const handleStartPortalSession = async () => {
     const res = await user?.createPortalSession({ returnUrl: window.location.href });
@@ -44,8 +47,14 @@ export const BillingPage = withCardStateProvider(() => {
           </Col>
         </Flex>
 
-        <CurrentPlanSection />
-        <PaymentMethodSection />
+        {isLoading ? (
+          <FullHeightLoader />
+        ) : (
+          <>
+            <CurrentPlanSection currentPlan={currentPlan} />
+            <PaymentMethodSection currentPlan={currentPlan} />
+          </>
+        )}
       </Col>
     </Col>
   );
