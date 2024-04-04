@@ -292,7 +292,6 @@ type _LocalizationResource = {
     start: {
       headerTitle__account: LocalizationValue;
       headerTitle__security: LocalizationValue;
-      headerTitle__billing: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
@@ -372,13 +371,6 @@ type _LocalizationResource = {
       dangerSection: {
         title: LocalizationValue;
         deleteAccountButton: LocalizationValue;
-      };
-      currentPlanSection: {
-        title: LocalizationValue;
-        primaryButton: LocalizationValue;
-      };
-      paymentMethodSection: {
-        title: LocalizationValue;
       };
     };
     profilePage: {
@@ -728,7 +720,6 @@ type _LocalizationResource = {
     numeric: LocalizationValue;
   };
   billing: {
-<<<<<<< HEAD
     start: {
       headerTitle__billing: LocalizationValue;
       action__manageBillingInfo: LocalizationValue;
@@ -745,9 +736,6 @@ type _LocalizationResource = {
       primaryButton: LocalizationValue;
       primaryButton__manageBillingInfo: LocalizationValue;
     };
-=======
-    manageBillingInfo: LocalizationValue;
->>>>>>> e70fc1e5b (chore(clerk-js): Align Manage Billing Info in top right)
     managePlanScreen: {
       headerTitle: LocalizationValue;
       paymentIntervalMonthly: LocalizationValue;

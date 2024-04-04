@@ -14,7 +14,7 @@ export const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanR
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.currentPlanSection.title')}
+      title={localizationKeys('billing.currentPlanSection.title')}
       id='currentPlan'
       centered={false}
       sx={{ [mqu.md]: { alignItems: 'flex-start' } }}
@@ -46,7 +46,7 @@ export const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanR
         </Box>
         <ProfileSection.Button
           id='currentPlan'
-          localizationKey={localizationKeys('userProfile.start.currentPlanSection.primaryButton')}
+          localizationKey={localizationKeys('billing.currentPlanSection.primaryButton')}
         />
       </ProfileSection.Item>
     </ProfileSection.Root>

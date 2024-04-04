@@ -736,7 +736,6 @@ export const enUS: LocalizationResource = {
       },
       headerTitle__account: 'Profile details',
       headerTitle__security: 'Security',
-      headerTitle__billing: 'Plan & Billing',
       mfaSection: {
         backupCodes: {
           actionLabel__regenerate: 'Regenerate',
@@ -783,13 +782,6 @@ export const enUS: LocalizationResource = {
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
       },
-      currentPlanSection: {
-        title: 'Current plan',
-        primaryButton: 'Manage plan',
-      },
-      paymentMethodSection: {
-        title: 'Payment method',
-      },
     },
     usernamePage: {
       successMessage: 'Your username has been updated.',
@@ -810,7 +802,6 @@ export const enUS: LocalizationResource = {
     },
   },
   billing: {
-<<<<<<< HEAD
     start: {
       headerTitle__billing: 'Plan & Billing',
       action__manageBillingInfo: 'Manage billing info',
@@ -827,9 +818,6 @@ export const enUS: LocalizationResource = {
       primaryButton: 'Add payment method',
       primaryButton__manageBillingInfo: 'Manage billing info',
     },
-=======
-    manageBillingInfo: 'Manage billing info',
->>>>>>> e70fc1e5b (chore(clerk-js): Align Manage Billing Info in top right)
     managePlanScreen: {
       headerTitle: 'Manage Plan',
       paymentIntervalMonthly: 'per month',
