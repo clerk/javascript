@@ -157,7 +157,6 @@ export const ChangePlanButton = ({ action }: { action: () => Promise<void> }) =>
 
   return (
     <Button
-      elementDescriptor={descriptors.billingChangePlanAction}
       isLoading={isLoading}
       onClick={handleActionClicked}
       variant='outline'
