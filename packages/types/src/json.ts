@@ -518,8 +518,8 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   description: string | null;
   price_in_cents: number;
   features: string[];
-  billing_cycle: BillingCycle | null;
-  payment_method: PaymentMethod;
+  billing_cycle: BillingCycle;
+  payment_method: PaymentMethod | null;
   created_at: number;
   updated_at: number;
 }
