@@ -1,12 +1,13 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Button, Col, descriptors, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
 import { Header, withCardStateProvider } from '../../elements';
 import { CurrentPlanSection } from './CurrentPlanSection';
 import { PaymentMethodSection } from './PaymentMethodSection';
 
 export const BillingPage = withCardStateProvider(() => {
   const { user } = useUser();
+  const { t } = useLocalizations();
 
   const handleStartPortalSession = async () => {
     const res = await user?.createPortalSession({ returnUrl: window.location.href });
@@ -22,20 +23,26 @@ export const BillingPage = withCardStateProvider(() => {
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('billing')}
       >
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys('userProfile.start.headerTitle__billing')}
-            sx={t => ({ marginBottom: t.space.$4 })}
-            textVariant='h2'
-          />
-        </Header.Root>
-
-        <Button
-          variant='outline'
-          onClick={handleStartPortalSession}
-        >
-          Manage billing info
-        </Button>
+        <Flex justify='between'>
+          <Col>
+            <Header.Root>
+              <Header.Title
+                localizationKey={localizationKeys('userProfile.start.headerTitle__billing')}
+                sx={t => ({ marginBottom: t.space.$4 })}
+                textVariant='h2'
+              />
+            </Header.Root>
+          </Col>
+          <Col>
+            <Button
+              variant='outline'
+              sx={t => ({ color: t.colors.$colorText })}
+              onClick={handleStartPortalSession}
+            >
+              {t(localizationKeys('billing.manageBillingInfo'))}
+            </Button>
+          </Col>
+        </Flex>
 
         <CurrentPlanSection />
         <PaymentMethodSection />

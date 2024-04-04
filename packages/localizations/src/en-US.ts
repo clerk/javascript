@@ -810,6 +810,7 @@ export const enUS: LocalizationResource = {
     },
   },
   billing: {
+    manageBillingInfo: 'Manage billing info',
     managePlanScreen: {
       headerTitle: 'Manage Plan',
       paymentIntervalMonthly: 'per month',

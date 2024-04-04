@@ -728,6 +728,7 @@ type _LocalizationResource = {
     numeric: LocalizationValue;
   };
   billing: {
+    manageBillingInfo: LocalizationValue;
     managePlanScreen: {
       headerTitle: LocalizationValue;
       paymentIntervalMonthly: LocalizationValue;
