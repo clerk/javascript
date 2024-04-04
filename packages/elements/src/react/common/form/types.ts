@@ -29,3 +29,10 @@ export const FIELD_STATES = {
 } as const;
 
 export type FieldStates = (typeof FIELD_STATES)[keyof typeof FIELD_STATES];
+
+export const FIELD_VALIDITY = {
+  valid: 'valid',
+  invalid: 'invalid',
+} as const;
+
+export type FieldValidity = (typeof FIELD_VALIDITY)[keyof typeof FIELD_VALIDITY];

@@ -69,10 +69,6 @@ export default function SignUpPage() {
                 validatePassword
               />
 
-              <CustomField
-                label='Phone Number'
-                name='phoneNumber'
-              />
               <CustomSubmit>
                 <Loading>
                   {isLoading =>
@@ -94,11 +90,6 @@ export default function SignUpPage() {
           <H1>Please enter additional information:</H1>
 
           <GlobalError className='block text-red-400 font-mono' />
-
-          <CustomField
-            label='Password'
-            name='password'
-          />
 
           <CustomField
             alwaysShow
