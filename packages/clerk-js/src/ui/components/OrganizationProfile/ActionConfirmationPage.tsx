@@ -1,9 +1,5 @@
 import { useWizard, Wizard } from '../../common';
-import {
-  useCoreOrganization,
-  useCoreUser,
-  useOrganizationProfileContext,
-} from '../../contexts';
+import { useCoreOrganization, useCoreUser, useOrganizationProfileContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { localizationKeys, Text } from '../../customizables';
 import {
@@ -34,7 +30,7 @@ export const LeaveOrganizationPage = () => {
   const { organization } = useCoreOrganization();
   const user = useCoreUser();
 
-  const leaveOrg = useLeaveWithNavigation(() => user!.leaveOrganization(organization!.id));
+  const leaveOrg = useLeaveWithNavigation(() => user.leaveOrganization(organization!.id));
 
   if (!organization || !user) {
     return null;
