@@ -53,6 +53,10 @@ export type SetSession = (
   beforeEmit?: BeforeEmitCallback,
 ) => Promise<void>;
 
+interface ClerkMap<K, V> extends Map<K, V> {
+  name: string;
+}
+
 /**
  * Main Clerk SDK object.
  */
@@ -61,6 +65,8 @@ export interface Clerk {
    * Clerk SDK version number.
    */
   version: string | undefined;
+
+  cache: ClerkMap<string, unknown>;
 
   /**
    * If present, contains information about the SDK that the host application is using.
@@ -543,7 +549,8 @@ export interface ClerkOptions {
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
   allowedRedirectOrigins?: Array<string | RegExp>;
-
+  //@ts-ignore
+  cache?: ClerkMap<any, any>;
   /**
    * Indicates that clerk.js is will be loaded from interstitial
    * Defaults to false
