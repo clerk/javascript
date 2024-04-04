@@ -736,7 +736,6 @@ export const enUS: LocalizationResource = {
       },
       headerTitle__account: 'Profile details',
       headerTitle__security: 'Security',
-      headerTitle__billing: 'Plan & Billing',
       mfaSection: {
         backupCodes: {
           actionLabel__regenerate: 'Regenerate',
@@ -783,13 +782,6 @@ export const enUS: LocalizationResource = {
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
       },
-      currentPlanSection: {
-        title: 'Current plan',
-        primaryButton: 'Manage plan',
-      },
-      paymentMethodSection: {
-        title: 'Payment method',
-      },
     },
     usernamePage: {
       successMessage: 'Your username has been updated.',
@@ -810,7 +802,19 @@ export const enUS: LocalizationResource = {
     },
   },
   billing: {
+    start: {
+      headerTitle__billing: 'Plan & Billing',
+    },
     manageBillingInfo: 'Manage billing info',
+    currentPlanSection: {
+      title: 'Current plan',
+      primaryButton: 'Manage plan',
+    },
+    paymentMethodSection: {
+      title: 'Payment method',
+      expires: 'Expires',
+      primaryButton: 'Add payment method',
+    },
     managePlanScreen: {
       headerTitle: 'Manage Plan',
       paymentIntervalMonthly: 'per month',

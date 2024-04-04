@@ -292,7 +292,6 @@ type _LocalizationResource = {
     start: {
       headerTitle__account: LocalizationValue;
       headerTitle__security: LocalizationValue;
-      headerTitle__billing: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
@@ -372,13 +371,6 @@ type _LocalizationResource = {
       dangerSection: {
         title: LocalizationValue;
         deleteAccountButton: LocalizationValue;
-      };
-      currentPlanSection: {
-        title: LocalizationValue;
-        primaryButton: LocalizationValue;
-      };
-      paymentMethodSection: {
-        title: LocalizationValue;
       };
     };
     profilePage: {
@@ -728,7 +720,19 @@ type _LocalizationResource = {
     numeric: LocalizationValue;
   };
   billing: {
+    start: {
+      headerTitle__billing: LocalizationValue;
+    };
     manageBillingInfo: LocalizationValue;
+    currentPlanSection: {
+      title: LocalizationValue;
+      primaryButton: LocalizationValue;
+    };
+    paymentMethodSection: {
+      title: LocalizationValue;
+      expires: LocalizationValue;
+      primaryButton: LocalizationValue;
+    };
     managePlanScreen: {
       headerTitle: LocalizationValue;
       paymentIntervalMonthly: LocalizationValue;

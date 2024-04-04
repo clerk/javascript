@@ -30,7 +30,7 @@ export const BillingPage = withCardStateProvider(() => {
           <Col>
             <Header.Root>
               <Header.Title
-                localizationKey={localizationKeys('userProfile.start.headerTitle__billing')}
+                localizationKey={localizationKeys('billing.start.headerTitle__billing')}
                 sx={t => ({ marginBottom: t.space.$4 })}
                 textVariant='h2'
               />
