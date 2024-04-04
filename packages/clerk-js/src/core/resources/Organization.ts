@@ -256,7 +256,7 @@ export class Organization extends BaseResource implements OrganizationResource {
         body: {
           plan_key: planKey,
           success_return_url: successReturnURL,
-          cancelReturnURL: cancelReturnURL,
+          cancel_return_url: cancelReturnURL,
         } as any,
       })
     )?.response as unknown as CheckoutSessionJSON;

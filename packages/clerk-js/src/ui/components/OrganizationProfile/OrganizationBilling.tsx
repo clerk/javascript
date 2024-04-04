@@ -42,7 +42,11 @@ export const OrganizationBilling = () => {
 
   const handleChangePlan = async (planKey: string) => {
     try {
-      const response = await organization?.changePlan({ planKey });
+      const response = await organization?.changePlan({
+        planKey,
+        successReturnURL: window.location.href,
+        cancelReturnURL: window.location.href,
+      });
       //TODO Handle action after success response
       console.log(response);
     } catch (e) {

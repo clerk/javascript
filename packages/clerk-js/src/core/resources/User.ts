@@ -345,7 +345,7 @@ export class User extends BaseResource implements UserResource {
         body: {
           plan_key: planKey,
           success_return_url: successReturnURL,
-          cancelReturnURL: cancelReturnURL,
+          cancel_return_url: cancelReturnURL,
         } as any,
       })
     )?.response as unknown as CheckoutSessionJSON;
