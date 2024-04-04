@@ -8,9 +8,13 @@ OrganizationMembership {
   "organization": Organization {
     "addMember": [Function],
     "adminDeleteEnabled": true,
+    "changePlan": [Function],
     "createDomain": [Function],
+    "createPortalSession": [Function],
     "createdAt": 1970-01-01T00:00:12.345Z,
     "destroy": [Function],
+    "getAvailablePlans": [Function],
+    "getCurrentPlan": [Function],
     "getDomain": [Function],
     "getDomains": [Function],
     "getInvitations": [Function],
