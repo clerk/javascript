@@ -4,9 +4,11 @@ import { Box, localizationKeys, Text, useLocalizations } from '../customizables'
 import { ProfileSection } from '../elements';
 import { mqu } from '../styledSystem';
 import { centsToUnit, getRelativeToNowDateKey } from '../utils';
+import { useBillingContext } from './Billing';
 
 export const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanResource | null }) => {
   const { t, locale } = useLocalizations();
+  const { goToManageBillingPlan } = useBillingContext();
 
   if (!currentPlan) {
     return null;
@@ -46,6 +48,7 @@ export const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanR
           </Text>
         </Box>
         <ProfileSection.Button
+          onClick={goToManageBillingPlan}
           id='currentPlan'
           localizationKey={localizationKeys('billing.currentPlanSection.primaryButton')}
         />

@@ -250,9 +250,11 @@ export const ChangePlanButton = ({ planKey }: { planKey: string }) => {
 };
 
 const GoToPlanAndBilling = () => {
+  const { goToPlanAndBilling } = useBillingContext();
   return (
     <Box>
       <IconButton
+        onClick={goToPlanAndBilling}
         sx={t => ({
           color: t.colors.$colorTextSecondary,
           padding: 0,
