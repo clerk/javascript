@@ -25,7 +25,7 @@ export interface BillingPlanResource extends ClerkResource {
   priceInCents: number;
   features: string[];
   billingCycle: BillingCycle;
-  paymentMethod: PaymentMethod;
+  paymentMethod: PaymentMethod | null;
   createdAt: Date;
   updatedAt: Date;
 }

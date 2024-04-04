@@ -20,7 +20,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   priceInCents!: number;
   features!: string[];
   billingCycle!: BillingCycle;
-  paymentMethod!: PaymentMethod;
+  paymentMethod!: PaymentMethod | null;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -44,7 +44,7 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
       startDate: unixEpochToDate(data.billing_cycle.start_date),
       endDate: unixEpochToDate(data.billing_cycle.end_date),
     };
-    this.paymentMethod = {
+    this.paymentMethod = data.payment_method && {
       type: data.payment_method.type,
       id: data.payment_method.id,
       createdAt: unixEpochToDate(data.payment_method.created_at),
