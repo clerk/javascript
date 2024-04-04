@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "0.38.4",
+  "version": "0.38.5",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -55,7 +55,7 @@
     "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
   },
   "dependencies": {
-    "@clerk/shared": "1.4.0",
+    "@clerk/shared": "1.4.1",
     "@clerk/types": "3.63.0",
     "@peculiar/webcrypto": "1.4.1",
     "@types/node": "16.18.6",

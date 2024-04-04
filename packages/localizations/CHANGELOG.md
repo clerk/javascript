@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.28.1
+
+### Patch Changes
+
+- Enable support for older browsers starting with Safari 12 by switching the compilation target to es2019 for all client-side SDKs ([#3113](https://github.com/clerk/javascript/pull/3113)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.28.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -69,9 +69,9 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/backend": "0.38.4",
-    "@clerk/clerk-react": "4.30.8",
-    "@clerk/shared": "1.4.0",
+    "@clerk/backend": "0.38.5",
+    "@clerk/clerk-react": "4.30.9",
+    "@clerk/shared": "1.4.1",
     "@clerk/types": "3.63.0",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
