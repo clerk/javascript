@@ -825,6 +825,7 @@ export const enUS: LocalizationResource = {
     currentPlanSection: {
       title: 'Current plan',
       primaryButton: 'Manage plan',
+      primaryButton__upgrade: 'Upgrade',
       perMonth: 'per month',
       renewsOn: 'Renews on',
     },
