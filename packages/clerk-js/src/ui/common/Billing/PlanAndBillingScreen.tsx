@@ -63,7 +63,10 @@ export const PaymentMethodSection = () => {
         {currentPlan.paymentMethod ? (
           <>
             <Box>
-              <Flex gap={1}>
+              <Flex
+                gap={1}
+                align='center'
+              >
                 <CardIcon cardType={currentPlan.paymentMethod.card.brand} />
                 <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
               </Flex>
