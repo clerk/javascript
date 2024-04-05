@@ -816,6 +816,7 @@ export const enUS: LocalizationResource = {
       title: 'Payment method',
       expires: 'Expires',
       primaryButton: 'Add payment method',
+      primaryButton__manageBillingInfo: 'Manage billing info',
     },
     managePlanScreen: {
       headerTitle: 'Manage Plan',

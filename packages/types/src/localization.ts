@@ -734,6 +734,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       expires: LocalizationValue;
       primaryButton: LocalizationValue;
+      primaryButton__manageBillingInfo: LocalizationValue;
     };
     managePlanScreen: {
       headerTitle: LocalizationValue;

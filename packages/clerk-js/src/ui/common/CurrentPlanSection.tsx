@@ -6,7 +6,7 @@ import { mqu } from '../styledSystem';
 import { centsToUnit, getRelativeToNowDateKey } from '../utils';
 
 export const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanResource | null }) => {
-  const { t } = useLocalizations();
+  const { t, locale } = useLocalizations();
 
   if (!currentPlan) {
     return null;
@@ -28,7 +28,7 @@ export const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanR
             {currentPlan.name}
           </Text>
           <Text sx={t => ({ fontWeight: t.fontWeights.$semibold, fontSize: t.fontSizes.$lg })}>
-            {centsToUnit(currentPlan.priceInCents)}{' '}
+            {centsToUnit({ cents: currentPlan.priceInCents, locale })}{' '}
             <Text
               as='span'
               colorScheme='secondary'

@@ -1,14 +1,20 @@
 import type { BillingPlanResource } from '@clerk/types';
 
-import { Flex, localizationKeys, Text, useLocalizations } from '../customizables';
+import { Box, localizationKeys, Text, useLocalizations } from '../customizables';
 import { ProfileSection } from '../elements';
 import { mqu } from '../styledSystem';
 
 type PaymentMethodSectionProps = {
   currentPlan?: BillingPlanResource | null;
+  isLoadingPortalSession: boolean;
+  onClickManageBilling: () => void;
 };
 
-export const PaymentMethodSection = ({ currentPlan }: PaymentMethodSectionProps) => {
+export const PaymentMethodSection = ({
+  currentPlan,
+  isLoadingPortalSession,
+  onClickManageBilling,
+}: PaymentMethodSectionProps) => {
   const { t } = useLocalizations();
 
   if (!currentPlan) {
@@ -24,13 +30,21 @@ export const PaymentMethodSection = ({ currentPlan }: PaymentMethodSectionProps)
     >
       <ProfileSection.Item id='paymentMethod'>
         {currentPlan.paymentMethod ? (
-          <Flex sx={{ flexDirection: 'column' }}>
-            <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
-            <Text sx={t => ({ color: t.colors.$colorTextSecondary, fontSize: t.fontSizes.$sm })}>
-              {t(localizationKeys('billing.paymentMethodSection.expires'))} {currentPlan.paymentMethod.card.expMonth}/
-              {currentPlan.paymentMethod.card.expYear}
-            </Text>
-          </Flex>
+          <>
+            <Box>
+              <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
+              <Text sx={t => ({ color: t.colors.$colorTextSecondary, fontSize: t.fontSizes.$sm })}>
+                {t(localizationKeys('billing.paymentMethodSection.expires'))} {currentPlan.paymentMethod.card.expMonth}/
+                {currentPlan.paymentMethod.card.expYear}
+              </Text>
+            </Box>
+            <ProfileSection.Button
+              id='paymentMethod'
+              localizationKey={localizationKeys('billing.paymentMethodSection.primaryButton__manageBillingInfo')}
+              onClick={onClickManageBilling}
+              isLoading={isLoadingPortalSession}
+            />
+          </>
         ) : (
           <ProfileSection.ArrowButton
             id='paymentMethod'
