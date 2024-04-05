@@ -802,6 +802,22 @@ export const enUS: LocalizationResource = {
     },
   },
   billing: {
+    start: {
+      headerTitle__billing: 'Plan & Billing',
+      action__manageBillingInfo: 'Manage billing info',
+    },
+    currentPlanSection: {
+      title: 'Current plan',
+      primaryButton: 'Manage plan',
+      perMonth: 'per month',
+      renewsOn: 'Renews on',
+    },
+    paymentMethodSection: {
+      title: 'Payment method',
+      expires: 'Expires',
+      primaryButton: 'Add payment method',
+      primaryButton__manageBillingInfo: 'Manage billing info',
+    },
     managePlanScreen: {
       headerTitle: 'Manage Plan',
       paymentIntervalMonthly: 'per month',
