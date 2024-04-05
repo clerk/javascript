@@ -841,6 +841,8 @@ export const enUS: LocalizationResource = {
       action__changePlan: 'Change to this plan',
       badge__currentPlan: 'Current Plan',
       action__goToPlanAndBilling: 'Plan & Billing',
+      action__showAll: 'Show all',
+      action__showLess: 'Show less',
     },
   },
 } as const;
