@@ -84,6 +84,7 @@ export const arSA: LocalizationResource = {
     'أدخل البريد الإلكتروني الخاص بالنطاق للحصول على  الرمز والتحقق من النطاق',
   formFieldLabel__organizationName: 'اسم المنظمة',
   formFieldLabel__organizationSlug: 'رابط المنظمة',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'كلمة المرور',
   formFieldLabel__phoneNumber: 'رقم الجوال',
   formFieldLabel__role: 'دور',
@@ -669,6 +670,14 @@ export const arSA: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -755,6 +764,11 @@ export const arSA: LocalizationResource = {
           destructiveActionTitle: 'حذف',
           headerTitle: 'تطبيق المصادقة',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'تعيين كلمة المرور',

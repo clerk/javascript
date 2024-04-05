@@ -84,6 +84,7 @@ export const thTH: LocalizationResource = {
     'กรอกที่อยู่อีเมลภายใต้โดเมนนี้เพื่อรับรหัสและตรวจสอบโดเมน',
   formFieldLabel__organizationName: 'ชื่อ',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'รหัสผ่าน',
   formFieldLabel__phoneNumber: 'หมายเลขโทรศัพท์',
   formFieldLabel__role: 'บทบาท',
@@ -668,6 +669,14 @@ export const thTH: LocalizationResource = {
       security: 'ความปลอดภัย',
       title: 'บัญชี',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions: 'ขอแนะนำให้ลงชื่อออกจากอุปกรณ์อื่น ๆ ที่อาจใช้รหัสผ่านเก่าของคุณ',
       readonly:
@@ -753,6 +762,11 @@ export const thTH: LocalizationResource = {
           destructiveActionTitle: 'ลบ',
           headerTitle: 'แอปพลิเคชันตัวตรวจสอบ',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'ตั้งรหัสผ่าน',

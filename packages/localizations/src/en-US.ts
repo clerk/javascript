@@ -3,7 +3,6 @@ import type { LocalizationResource } from '@clerk/types';
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   __experimental_formFieldLabel__passkeyName: 'Name of passkey',
-  formFieldLabel__passkeyName: 'Name of passkey',
   backButton: 'Back',
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
@@ -73,6 +72,7 @@ export const enUS: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Name',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: 'Name of passkey',
   formFieldLabel__password: 'Password',
   formFieldLabel__phoneNumber: 'Phone number',
   formFieldLabel__role: 'Role',
@@ -543,14 +543,6 @@ export const enUS: LocalizationResource = {
       subtitle__rename: 'You can change the passkey name to make it easier to find.',
       title__rename: 'Rename Passkey',
     },
-    passkeyScreen: {
-      removeResource: {
-        messageLine1: '{{name}} will be removed from this account.',
-        title: 'Remove passkey',
-      },
-      subtitle__rename: 'You can change the passkey name to make it easier to find.',
-      title__rename: 'Rename Passkey',
-    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -673,6 +665,14 @@ export const enUS: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: '{{name}} will be removed from this account.',
+        title: 'Remove passkey',
+      },
+      subtitle__rename: 'You can change the passkey name to make it easier to find.',
+      title__rename: 'Rename Passkey',
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -708,11 +708,6 @@ export const enUS: LocalizationResource = {
     },
     start: {
       __experimental_passkeysSection: {
-        menuAction__destructive: 'Remove',
-        menuAction__rename: 'Rename',
-        title: 'Passkeys',
-      },
-      passkeysSection: {
         menuAction__destructive: 'Remove',
         menuAction__rename: 'Rename',
         title: 'Passkeys',
@@ -765,6 +760,11 @@ export const enUS: LocalizationResource = {
           destructiveActionTitle: 'Remove',
           headerTitle: 'Authenticator application',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: 'Remove',
+        menuAction__rename: 'Rename',
+        title: 'Passkeys',
       },
       passwordSection: {
         primaryButton__setPassword: 'Set password',

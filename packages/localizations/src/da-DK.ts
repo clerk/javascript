@@ -85,6 +85,7 @@ export const daDK: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Organisationens navn',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Adgangskode',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__role: 'Rolle',
@@ -674,6 +675,14 @@ export const daDK: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -760,6 +769,11 @@ export const daDK: LocalizationResource = {
           destructiveActionTitle: 'Fjern',
           headerTitle: 'Autentificeringsprogram',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Indtast adgangskode',

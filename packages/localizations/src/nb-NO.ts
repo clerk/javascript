@@ -85,6 +85,7 @@ export const nbNO: LocalizationResource = {
     'Oppgi en e-postadresse under dette domenet for å motta en kode og verifisere domenet.',
   formFieldLabel__organizationName: 'Organisasjonsnavn',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Passord',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__role: 'Rolle',
@@ -678,6 +679,14 @@ export const nbNO: LocalizationResource = {
       security: 'Sikkerhet',
       title: 'Konto',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Det er anbefalt å logge ut av alle de andre enhetene dine som kan ha brukt ditt gamle passord.',
@@ -764,6 +773,11 @@ export const nbNO: LocalizationResource = {
           destructiveActionTitle: 'Fjern',
           headerTitle: 'Autentiseringsapplikasjon',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Opprett passord',
