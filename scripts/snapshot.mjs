@@ -19,6 +19,7 @@ const snapshot = `---
 '@clerk/remix': patch
 '@clerk/types': patch
 '@clerk/clerk-expo': patch
+'@clerk/express': patch
 ---
 
 Snapshot release
