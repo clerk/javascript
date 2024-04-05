@@ -12,6 +12,9 @@ clerk-js:
 elements:
   - packages/elements/**
 
+express:
+  - packages/express/**
+
 expo:
   - packages/expo/**
 
