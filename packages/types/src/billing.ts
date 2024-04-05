@@ -1,5 +1,22 @@
 import type { ClerkResource } from './resource';
 
+export type BillingCycle = {
+  startDate: Date;
+  endDate: Date;
+};
+
+export type PaymentMethod = {
+  type: string;
+  id: string;
+  createdAt: Date;
+  card: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+  };
+};
+
 export interface BillingPlanResource extends ClerkResource {
   id: string;
   name: string;
@@ -7,6 +24,8 @@ export interface BillingPlanResource extends ClerkResource {
   key: string;
   priceInCents: number;
   features: string[];
+  billingCycle: BillingCycle;
+  paymentMethod: PaymentMethod | null;
   createdAt: Date;
   updatedAt: Date;
 }

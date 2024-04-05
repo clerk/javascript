@@ -1,8 +1,10 @@
 import type {
+  BillingCycle,
   BillingPlanJSON,
   BillingPlanResource,
   CheckoutSessionJSON,
   CheckoutSessionResource,
+  PaymentMethod,
   PortalSessionJSON,
   PortalSessionResource,
 } from '@clerk/types';
@@ -17,6 +19,8 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   key!: string;
   priceInCents!: number;
   features!: string[];
+  billingCycle!: BillingCycle;
+  paymentMethod!: PaymentMethod | null;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -36,6 +40,21 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
     this.key = data.key;
     this.priceInCents = data.price_in_cents;
     this.features = data.features;
+    this.billingCycle = {
+      startDate: unixEpochToDate(data.billing_cycle.start_date),
+      endDate: unixEpochToDate(data.billing_cycle.end_date),
+    };
+    this.paymentMethod = data.payment_method && {
+      type: data.payment_method.type,
+      id: data.payment_method.id,
+      createdAt: unixEpochToDate(data.payment_method.created_at),
+      card: {
+        brand: data.payment_method.card.brand,
+        last4: data.payment_method.card.last4,
+        expMonth: data.payment_method.card.exp_month,
+        expYear: data.payment_method.card.exp_year,
+      },
+    };
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
 
