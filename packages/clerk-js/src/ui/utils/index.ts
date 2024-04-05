@@ -24,3 +24,4 @@ export * from './createCustomPages';
 export * from './ExternalElementMounter';
 export * from './colorOptionToHslaScale';
 export * from './currency';
+export * from './formatCardDate';

@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Box, Col, descriptors, localizationKeys, Text, useLocalizations } from '../../customizables';
+import { Box, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { Card, Header, ProfileSection, useCardState } from '../../elements';
+import { DefaultCard, VisaCard } from '../../icons';
 import { mqu } from '../../styledSystem';
-import { centsToUnit, getRelativeToNowDateKey, handleError } from '../../utils';
+import { centsToUnit, formatCardDate, getRelativeToNowDateKey, handleError } from '../../utils';
 import { useBillingContext } from './BillingProvider';
 
 const ManagePaymentMethodButton = () => {
@@ -33,14 +34,24 @@ const ManagePaymentMethodButton = () => {
   );
 };
 
+const CardIcon = ({ cardType }: { cardType: string }) => {
+  const icon = cardType === 'visa' ? VisaCard : DefaultCard;
+
+  return (
+    <Icon
+      icon={icon}
+      sx={t => ({ width: t.sizes.$6 })}
+    />
+  );
+};
+
 export const PaymentMethodSection = () => {
-  const { t } = useLocalizations();
+  const { t, locale } = useLocalizations();
   const { currentPlan } = useBillingContext();
 
   if (!currentPlan) {
     return null;
   }
-
   return (
     <ProfileSection.Root
       title={localizationKeys('billing.paymentMethodSection.title')}
@@ -52,11 +63,23 @@ export const PaymentMethodSection = () => {
         {currentPlan.paymentMethod ? (
           <>
             <Box>
-              <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
-              <Text sx={t => ({ color: t.colors.$colorTextSecondary, fontSize: t.fontSizes.$sm })}>
-                {t(localizationKeys('billing.paymentMethodSection.expires'))} {currentPlan.paymentMethod.card.expMonth}/
-                {currentPlan.paymentMethod.card.expYear}
-              </Text>
+              <Flex
+                gap={1}
+                align='center'
+              >
+                <CardIcon cardType={currentPlan.paymentMethod.card.brand} />
+                <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
+              </Flex>
+              <Box sx={t => ({ paddingLeft: t.sizes.$7 })}>
+                <Text sx={t => ({ color: t.colors.$colorTextSecondary, fontSize: t.fontSizes.$sm })}>
+                  {t(localizationKeys('billing.paymentMethodSection.expires'))}{' '}
+                  {formatCardDate({
+                    expMonth: currentPlan.paymentMethod.card.expMonth,
+                    expYear: currentPlan.paymentMethod.card.expYear,
+                    locale,
+                  })}
+                </Text>
+              </Box>
             </Box>
             <ManagePaymentMethodButton />
           </>
@@ -115,7 +138,11 @@ const CurrentPlanSection = () => {
         <ProfileSection.Button
           onClick={goToManageBillingPlan}
           id='currentPlan'
-          localizationKey={localizationKeys('billing.currentPlanSection.primaryButton')}
+          localizationKey={
+            currentPlan.priceInCents
+              ? localizationKeys('billing.currentPlanSection.primaryButton')
+              : localizationKeys('billing.currentPlanSection.primaryButton__upgrade')
+          }
         />
       </ProfileSection.Item>
     </ProfileSection.Root>
