@@ -2,7 +2,7 @@ import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
-import { OrganizationBilling } from './OrganizationBilling';
+import { OrganizationBillingPage } from './OrganizationBillingPage';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 
@@ -55,7 +55,7 @@ export const OrganizationProfileRoutes = () => {
             <Switch>
               <Route index>
                 {/* TODO-BILLING: Wrap OrganizationBilling with Protect and pass the new organization permissions */}
-                <OrganizationBilling />
+                <OrganizationBillingPage />
               </Route>
             </Switch>
           </Route>
