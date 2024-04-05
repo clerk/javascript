@@ -61,7 +61,9 @@ export class User extends BaseResource implements UserResource {
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
+  // TODO-PASSKEY: Remove in the next minor
   __experimental_passkeys: PasskeyResource[] = [];
+  passkeys: PasskeyResource[] = [];
 
   samlAccounts: SamlAccountResource[] = [];
 
@@ -132,6 +134,10 @@ export class User extends BaseResource implements UserResource {
    * This method is experimental, avoid using this in production applications
    */
   __experimental_createPasskey = (): Promise<PasskeyResource> => {
+    return Passkey.registerPasskey();
+  };
+
+  createPasskey = (): Promise<PasskeyResource> => {
     return Passkey.registerPasskey();
   };
 
@@ -339,6 +345,7 @@ export class User extends BaseResource implements UserResource {
     );
 
     this.__experimental_passkeys = (data.passkeys || []).map(passkey => new Passkey(passkey));
+    this.passkeys = (data.passkeys || []).map(passkey => new Passkey(passkey));
 
     this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
 

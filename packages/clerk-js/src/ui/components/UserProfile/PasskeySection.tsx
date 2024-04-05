@@ -67,8 +67,8 @@ export const UpdatePasskeyForm = withCardStateProvider((props: UpdatePasskeyForm
 
   return (
     <FormContainer
-      headerTitle={localizationKeys('userProfile.__experimental_passkeyScreen.title__rename')}
-      headerSubtitle={localizationKeys('userProfile.__experimental_passkeyScreen.subtitle__rename')}
+      headerTitle={localizationKeys('userProfile.passkeyScreen.title__rename')}
+      headerSubtitle={localizationKeys('userProfile.passkeyScreen.subtitle__rename')}
     >
       <Form.Root onSubmit={addEmail}>
         <Form.ControlRow elementId={passkeyNameField.id}>
@@ -96,12 +96,12 @@ export const PasskeySection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.__experimental_passkeysSection.title')}
+      title={localizationKeys('userProfile.start.passkeysSection.title')}
       centered={false}
       id='passkeys'
     >
       <ProfileSection.ItemList id='passkeys'>
-        {user.__experimental_passkeys.map(passkey => (
+        {user.passkeys.map(passkey => (
           <Action.Root key={passkey.id}>
             <PasskeyItem
               key={passkey.id}
@@ -173,11 +173,11 @@ const ActiveDeviceMenu = () => {
 
   const actions = [
     {
-      label: localizationKeys('userProfile.start.__experimental_passkeysSection.menuAction__rename'),
+      label: localizationKeys('userProfile.start.passkeysSection.menuAction__rename'),
       onClick: () => open('rename'),
     },
     {
-      label: localizationKeys('userProfile.start.__experimental_passkeysSection.menuAction__destructive'),
+      label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
       isDestructive: true,
       onClick: () => open('remove'),
     },
@@ -194,7 +194,7 @@ const AddPasskeyButton = () => {
 
   const handleCreatePasskey = async () => {
     try {
-      await user?.__experimental_createPasskey();
+      await user?.createPasskey();
     } catch (e) {
       handleError(e, [], card.setError);
     }
