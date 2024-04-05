@@ -24,6 +24,24 @@ export default (QUnit: QUnit) => {
         const req = createClerkRequest(oldReq);
         assert.equal((await req.json())['a'], data.a);
       });
+
+      it('retains the url', assert => {
+        const oldReq = new Request('http://localhost:3000');
+        const req = createClerkRequest(oldReq);
+        assert.equal(req.url, oldReq.url);
+      });
+
+      it('retains the referrer', assert => {
+        const oldReq = new Request('http://localhost:3000', { referrer: 'http://localhost:3000' });
+        const req = createClerkRequest(oldReq);
+        assert.equal(req.referrer, oldReq.referrer);
+      });
+
+      it('retains the referrerPolicy', assert => {
+        const oldReq = new Request('http://localhost:3000', { referrerPolicy: 'no-referrer' });
+        const req = createClerkRequest(oldReq);
+        assert.equal(req.referrerPolicy, oldReq.referrerPolicy);
+      });
     });
 
     module('cookies', () => {
