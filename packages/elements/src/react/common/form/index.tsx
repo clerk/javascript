@@ -222,7 +222,7 @@ const useInput = ({
   const type = inputType ?? determineInputTypeFromName(name);
   let shouldValidatePassword = false;
 
-  if (type === 'password') {
+  if (type === 'password' || type === 'text') {
     shouldValidatePassword = Boolean((passthroughProps as PasswordInputProps).validatePassword);
   }
 

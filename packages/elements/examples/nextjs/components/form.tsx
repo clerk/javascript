@@ -41,6 +41,8 @@ export const CustomField = React.forwardRef<
   { alwaysShow, name, label, required = false, autoSubmit = false, autoFocus = false, validatePassword = false },
   forwardedRef,
 ) {
+  const [hidden, setHidden] = React.useState(true);
+
   const inputProps =
     name === 'code'
       ? {
@@ -68,8 +70,15 @@ export const CustomField = React.forwardRef<
         <Input
           name={name}
           validatePassword={validatePassword}
+          {...(name === 'password' ? { type: hidden ? 'password' : 'text' } : {})}
           {...inputProps}
         />
+        {name === 'password' ? (
+          <button
+            type='button'
+            onClick={() => setHidden(s => !s)}
+          >{`${hidden ? 'Show' : 'Hide'}`}</button>
+        ) : null}
       </div>
 
       <FieldError className='block text-red-400 font-mono' />
