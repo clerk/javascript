@@ -4,6 +4,7 @@ import type {
   ChangePlanParams,
   CheckoutSessionResource,
   CreatePortalSessionParams,
+  CurrentBillingPlanResource,
   PortalSessionResource,
 } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
@@ -129,7 +130,7 @@ export interface UserResource extends ClerkResource {
   disableTOTP: () => Promise<DeletedObjectResource>;
   createBackupCode: () => Promise<BackupCodeResource>;
   getAvailablePlans: () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
-  getCurrentPlan: () => Promise<BillingPlanResource>;
+  getCurrentPlan: () => Promise<CurrentBillingPlanResource>;
   createPortalSession: (params: CreatePortalSessionParams) => Promise<PortalSessionResource>;
   changePlan: (params: ChangePlanParams) => Promise<CheckoutSessionResource>;
 
