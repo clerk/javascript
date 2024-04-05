@@ -40,8 +40,6 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
     this.key = data.key;
     this.priceInCents = data.price_in_cents;
     this.features = data.features;
-    // TODO We need to create a separate resource for current billing
-    // as the current setup is breaking the available plans
     this.billingCycle = {
       startDate: unixEpochToDate(data.billing_cycle.start_date),
       endDate: unixEpochToDate(data.billing_cycle.end_date),
