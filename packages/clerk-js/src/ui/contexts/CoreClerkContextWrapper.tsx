@@ -1,3 +1,4 @@
+import { SWRConfig } from '@clerk/shared/react';
 import type { Clerk, LoadedClerk, Resources } from '@clerk/types';
 import React from 'react';
 
@@ -49,17 +50,20 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
   );
 
   return (
-    <CoreClerkContext.Provider value={clerkCtx}>
-      <CoreClientContext.Provider value={clientCtx}>
-        <CoreSessionContext.Provider value={sessionCtx}>
-          <CoreOrganizationProvider
-            {...organizationCtx.value}
-            swrConfig={props.swrConfig}
-          >
-            <CoreUserContext.Provider value={userCtx}>{props.children}</CoreUserContext.Provider>
-          </CoreOrganizationProvider>
-        </CoreSessionContext.Provider>
-      </CoreClientContext.Provider>
-    </CoreClerkContext.Provider>
+    // @ts-ignore
+    <SWRConfig value={{ provider: () => clerk.cache }}>
+      <CoreClerkContext.Provider value={clerkCtx}>
+        <CoreClientContext.Provider value={clientCtx}>
+          <CoreSessionContext.Provider value={sessionCtx}>
+            <CoreOrganizationProvider
+              {...organizationCtx.value}
+              swrConfig={props.swrConfig}
+            >
+              <CoreUserContext.Provider value={userCtx}>{props.children}</CoreUserContext.Provider>
+            </CoreOrganizationProvider>
+          </CoreSessionContext.Provider>
+        </CoreClientContext.Provider>
+      </CoreClerkContext.Provider>
+    </SWRConfig>
   );
 }

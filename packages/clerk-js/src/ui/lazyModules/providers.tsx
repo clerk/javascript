@@ -1,4 +1,4 @@
-import type { Appearance, LoadedClerk } from '@clerk/types';
+import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements';
@@ -6,7 +6,6 @@ import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
-const SWRConfig = lazy(() => import('@clerk/shared/react').then(m => ({ default: m.SWRConfig })));
 const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
 const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
 const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
@@ -21,14 +20,11 @@ type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any
 
 export const LazyProviders = (props: LazyProvidersProps) => {
   return (
-    // @ts-expect-error
-    <SWRConfig value={{ provider: () => (props.clerk as LoadedClerk).cache }}>
-      <CoreClerkContextWrapper clerk={props.clerk}>
-        <EnvironmentProvider value={props.environment}>
-          <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
-        </EnvironmentProvider>
-      </CoreClerkContextWrapper>
-    </SWRConfig>
+    <CoreClerkContextWrapper clerk={props.clerk}>
+      <EnvironmentProvider value={props.environment}>
+        <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
+      </EnvironmentProvider>
+    </CoreClerkContextWrapper>
   );
 };
 

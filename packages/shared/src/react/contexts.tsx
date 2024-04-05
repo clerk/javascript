@@ -13,7 +13,6 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { deprecated } from '../deprecated';
-import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './hooks/createContextAndHook';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
@@ -48,27 +47,19 @@ const OrganizationProvider = ({
   organization,
   lastOrganizationMember,
   lastOrganizationInvitation,
-  swrConfig,
-}: PropsWithChildren<
-  OrganizationContextProps & {
-    // Exporting inferred types  directly from SWR will result in error while building declarations
-    swrConfig?: any;
-  }
->) => {
+}: PropsWithChildren<OrganizationContextProps>) => {
   return (
-    <SWRConfig value={swrConfig}>
-      <OrganizationContextInternal.Provider
-        value={{
-          value: {
-            organization,
-            lastOrganizationMember,
-            lastOrganizationInvitation,
-          },
-        }}
-      >
-        {children}
-      </OrganizationContextInternal.Provider>
-    </SWRConfig>
+    <OrganizationContextInternal.Provider
+      value={{
+        value: {
+          organization,
+          lastOrganizationMember,
+          lastOrganizationInvitation,
+        },
+      }}
+    >
+      {children}
+    </OrganizationContextInternal.Provider>
   );
 };
 

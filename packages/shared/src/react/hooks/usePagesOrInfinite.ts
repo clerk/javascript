@@ -148,13 +148,6 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
         return null;
       }
 
-      console.log({
-        ...params,
-        ...cacheKeys,
-        initialPage: initialPageRef.current + pageIndex,
-        pageSize: pageSizeRef.current,
-      });
-
       return {
         ...params,
         ...cacheKeys,
@@ -190,7 +183,6 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, options,
   );
 
   const data = useMemo(() => {
-    console.log('Data', swrInfiniteData, swrData);
     if (triggerInfinite) {
       return swrInfiniteData?.map(a => a?.data).flat() ?? [];
     }
