@@ -3,6 +3,7 @@ import type {
   ChangePlanParams,
   CheckoutSessionResource,
   CreatePortalSessionParams,
+  CurrentBillingPlanResource,
   PortalSessionResource,
 } from './billing';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
@@ -64,7 +65,7 @@ export interface OrganizationResource extends ClerkResource {
   destroy: () => Promise<void>;
   setLogo: (params: SetOrganizationLogoParams) => Promise<OrganizationResource>;
   getAvailablePlans: () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
-  getCurrentPlan: () => Promise<BillingPlanResource>;
+  getCurrentPlan: () => Promise<CurrentBillingPlanResource>;
   createPortalSession: (params: CreatePortalSessionParams) => Promise<PortalSessionResource>;
   changePlan: (params: ChangePlanParams) => Promise<CheckoutSessionResource>;
 }
