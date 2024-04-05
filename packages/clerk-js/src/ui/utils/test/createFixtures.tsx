@@ -25,13 +25,28 @@ const createInitialStateConfigParam = (baseEnvironment: EnvironmentJSON, baseCli
 type FParam = ReturnType<typeof createInitialStateConfigParam>;
 type ConfigFn = (f: FParam) => void;
 
+class ClerkMap extends Map {
+  name = 'clerk-test-map';
+
+  constructor() {
+    super();
+  }
+}
+
 export const bindCreateFixtures = (
   componentName: Parameters<typeof unboundCreateFixtures>[0],
   mockOpts?: {
     router?: Parameters<typeof mockRouteContextValue>[0];
   },
 ) => {
-  return { createFixtures: unboundCreateFixtures(componentName, mockOpts) };
+  const cache = new ClerkMap();
+
+  return {
+    createFixtures: unboundCreateFixtures(componentName, mockOpts, cache),
+    clearCache: () => {
+      cache.clear();
+    },
+  };
 };
 
 const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>['componentName']>(
@@ -39,6 +54,7 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
   mockOpts?: {
     router?: Parameters<typeof mockRouteContextValue>[0];
   },
+  cache?: Map<any, any>,
 ) => {
   const createFixtures = async (...configFns: ConfigFn[]) => {
     const baseEnvironment = createBaseEnvironmentJSON();
@@ -60,7 +76,10 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
     // Use a FAPI value for local production instances to avoid triggering the devInit flow during testing
     const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
     const tempClerk = new ClerkCtor(productionPublishableKey);
-    await tempClerk.load();
+    await tempClerk.load({
+      // @ts-ignore
+      cache,
+    });
     const clerkMock = mockClerkMethods(tempClerk as LoadedClerk);
     const optionsMock = {} as ClerkOptions;
     const routerMock = mockRouteContextValue(mockOpts?.router || {});
@@ -85,6 +104,7 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
       const { children } = props;
       return (
         <CoreClerkContextWrapper
+          // @ts-ignore
           clerk={clerkMock}
           // Clear swr cache
           swrConfig={{ provider: () => new Map() }}

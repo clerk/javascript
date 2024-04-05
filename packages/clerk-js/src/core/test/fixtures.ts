@@ -130,7 +130,7 @@ export const createExternalAccount = (params?: Partial<ExternalAccountJSON>): Ex
 export const createUser = (params: WithUserParams): UserJSON => {
   const res = {
     object: 'user',
-    id: params.id,
+    id: params.id || 'test_user',
     primary_email_address_id: '',
     primary_phone_number_id: '',
     primary_web3_wallet_id: '',

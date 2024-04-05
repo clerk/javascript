@@ -7,9 +7,12 @@ import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { LeaveOrganizationForm } from '../ActionConfirmationPage';
 
-const { createFixtures } = bindCreateFixtures('OrganizationProfile');
+const { createFixtures, clearCache } = bindCreateFixtures('OrganizationProfile');
 
 describe('LeaveOrganizationPage', () => {
+  beforeEach(() => {
+    clearCache();
+  });
   it('unable to leave the organization when confirmation has not passed', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();

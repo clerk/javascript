@@ -9,7 +9,7 @@ import {
 } from '../../components/OrganizationSwitcher/__tests__/utlis';
 import { bindCreateFixtures } from '../../utils/test/createFixtures';
 
-const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
+const { createFixtures, clearCache } = bindCreateFixtures('OrganizationSwitcher');
 
 const defaultRenderer = () =>
   useOrganizationList({
@@ -25,6 +25,10 @@ const defaultRenderer = () =>
   });
 
 describe('useOrganizationList', () => {
+  beforeEach(() => {
+    clearCache();
+  });
+
   it('opens organization profile when "Manage Organization" is clicked', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();

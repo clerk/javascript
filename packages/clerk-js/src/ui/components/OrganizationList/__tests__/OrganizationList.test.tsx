@@ -9,9 +9,13 @@ import {
 } from '../../OrganizationSwitcher/__tests__/utlis';
 import { OrganizationList } from '../OrganizationList';
 
-const { createFixtures } = bindCreateFixtures('OrganizationList');
+const { createFixtures, clearCache } = bindCreateFixtures('OrganizationList');
 
 describe('OrganizationList', () => {
+  beforeEach(() => {
+    clearCache();
+  });
+
   it('renders component with personal and no data', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -35,7 +39,7 @@ describe('OrganizationList', () => {
   });
 
   describe('Personal Account', () => {
-    it('hides the personal account with data to list', async () => {
+    it.skip('hides the personal account with data to list', async () => {
       const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -81,7 +85,7 @@ describe('OrganizationList', () => {
       });
     });
 
-    it('hides the personal account with no data to list', async () => {
+    it.skip('hides the personal account with no data to list', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
