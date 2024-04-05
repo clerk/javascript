@@ -32,12 +32,12 @@ function SignInStrategiesProvider({
 }: SignInVerificationsProps & { actorRef: ActorRefFrom<TSignInFirstFactorMachine> }) {
   const routerRef = SignInRouterCtx.useActorRef();
   const current = useSelector(actorRef, strategiesSelector);
-  const isChoosingAltStrategy = useActiveTags(routerRef, 'route:choose-strategy');
+  const isChoosingAltStrategy = useActiveTags(routerRef, ['route:choose-strategy', 'route:forgot-password']);
   const isActive = useCallback((name: string) => (current ? matchStrategy(current, name) : false), [current]);
 
   return (
     <StrategiesContext.Provider value={{ current: current, preferred, isActive }}>
-      {isChoosingAltStrategy ? null : (
+      {isChoosingAltStrategy.active ? null : (
         <Form
           flowActor={actorRef}
           {...props}

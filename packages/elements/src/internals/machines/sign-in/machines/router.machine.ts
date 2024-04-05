@@ -220,7 +220,6 @@ export const SignInRouterMachine = setup({
     Start: {
       tags: 'route:start',
       on: {
-        'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
         NEXT: [
           {
             guard: 'isComplete',
@@ -242,7 +241,6 @@ export const SignInRouterMachine = setup({
     FirstFactor: {
       tags: 'route:first-factor',
       on: {
-        'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
         NEXT: [
           {
             guard: 'isComplete',
@@ -257,11 +255,21 @@ export const SignInRouterMachine = setup({
             actions: ['logUnknownError', { type: 'navigateInternal', params: { path: '/' } }],
           },
         ],
+        'STRATEGY.UPDATE': {
+          description: 'Send event to verification machine to update the current factor.',
+          actions: sendTo('firstFactor', ({ event }) => event),
+          target: '.Idle',
+        },
       },
       initial: 'Idle',
       states: {
         Idle: {
           on: {
+            'NAVIGATE.FORGOT_PASSWORD': {
+              description: 'Send event to verification machine to update the current factor.',
+              actions: sendTo('firstFactor', ({ event }) => event),
+              target: 'ForgotPassword',
+            },
             'NAVIGATE.CHOOSE_STRATEGY': {
               description: 'Send event to verification machine to update the current factor.',
               actions: sendTo('firstFactor', ({ event }) => event),
@@ -273,11 +281,12 @@ export const SignInRouterMachine = setup({
           tags: ['route:choose-strategy'],
           on: {
             'NAVIGATE.PREVIOUS': 'Idle',
-            'STRATEGY.UPDATE': {
-              description: 'Send event to verification machine to update the current factor.',
-              actions: sendTo('firstFactor', ({ event }) => event),
-              target: 'Idle',
-            },
+          },
+        },
+        ForgotPassword: {
+          tags: ['route:forgot-password'],
+          on: {
+            'NAVIGATE.PREVIOUS': 'Idle',
           },
         },
       },
@@ -335,9 +344,6 @@ export const SignInRouterMachine = setup({
           actions: 'resetError',
         },
       },
-    },
-    ForgotPassword: {
-      tags: 'route:forgot-password',
     },
     Hist: {
       type: 'history',

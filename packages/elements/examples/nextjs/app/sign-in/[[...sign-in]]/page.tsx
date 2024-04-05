@@ -10,7 +10,7 @@ import {
   SignIn,
   Step,
   Strategy,
-  StrategyOption,
+  SupportedStrategy,
 } from '@clerk/elements/sign-in';
 import Link from 'next/link';
 import { type ComponentProps, useState } from 'react';
@@ -76,13 +76,13 @@ function Button({ children, ...props }: ComponentProps<'button'>) {
   );
 }
 
-function CustomSubmit({ children }: ComponentProps<'button'>) {
+function CustomSubmit({ children }: { children: string }) {
   return (
     <Action
       className='inline-flex px-7 py-3 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,255,255)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(160,160,160)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'
       submit
     >
-      {children}
+      <Loading>{isLoading => (isLoading ? <Spinner /> : children)}</Loading>
     </Action>
   );
 }
@@ -184,6 +184,7 @@ export default function SignInPage() {
             </Link>
           </p>
         </div>
+
         <div className='absolute top-4 right-4'>
           <Loading>{isLoading => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}</Loading>
         </div>
@@ -218,19 +219,7 @@ export default function SignInPage() {
                   )}
                 </Field>
 
-                <CustomSubmit>
-                  <Loading>
-                    {isLoading =>
-                      isLoading ? (
-                        <>
-                          <Spinner /> Loading...
-                        </>
-                      ) : (
-                        'Sign in with Email'
-                      )
-                    }
-                  </Loading>
-                </CustomSubmit>
+                <CustomSubmit>Sign in with Email</CustomSubmit>
               </>
             ) : (
               <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
@@ -239,40 +228,66 @@ export default function SignInPage() {
         </Step>
 
         <Step name='choose-strategy'>
-          <div className='flex flex-col items-center  gap-6 w-96'>
+          <div className='flex flex-col items-center gap-6 w-96'>
             <H3>CHOOSE STRATEGY:</H3>
 
             <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
             <CustomProvider provider='google'>Continue with Google</CustomProvider>
             <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
-            <StrategyOption
-              asChild
-              name='reset_password_email_code'
-            >
-              <Button>Reset Password</Button>
-            </StrategyOption>
-
-            <StrategyOption
+            <SupportedStrategy
               asChild
               name='password'
             >
               <Button>Password</Button>
-            </StrategyOption>
+            </SupportedStrategy>
 
-            <StrategyOption
+            <SupportedStrategy
               asChild
               name='phone_code'
             >
               <Button>Send a code to your phone</Button>
-            </StrategyOption>
+            </SupportedStrategy>
 
-            <StrategyOption
+            <SupportedStrategy
               asChild
               name='email_code'
             >
               <Button>Send a code to your email</Button>
-            </StrategyOption>
+            </SupportedStrategy>
+
+            <Action
+              asChild
+              navigate='previous'
+            >
+              <TextButton>Go back</TextButton>
+            </Action>
+          </div>
+        </Step>
+
+        <Step name='forgot-password'>
+          <div className='flex flex-col items-center gap-6 w-96'>
+            <H3>FORGOT PASSWORD:</H3>
+
+            <SupportedStrategy
+              asChild
+              name='reset_password_email_code'
+            >
+              <Button>Reset your password via Email</Button>
+            </SupportedStrategy>
+
+            <SupportedStrategy
+              asChild
+              name='reset_password_phone_code'
+            >
+              <Button>Reset your password via Phone</Button>
+            </SupportedStrategy>
+
+            <p>Or</p>
+
+            <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+            <CustomProvider provider='google'>Continue with Google</CustomProvider>
+            <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
             <Action
               asChild
@@ -284,96 +299,105 @@ export default function SignInPage() {
         </Step>
 
         <Step name='verifications'>
-          <Loading>
-            {isLoading => (
-              <div className='flex gap-6 flex-col'>
-                <GlobalError className='block text-red-400 font-mono' />
+          <div className='flex gap-6 flex-col'>
+            <GlobalError className='block text-red-400 font-mono' />
 
-                <Strategy name='password'>
-                  <P className='text-sm'>
-                    Welcome back <Salutation />!
-                  </P>
+            <Strategy name='password'>
+              <P className='text-sm'>
+                Welcome back <Salutation />!
+              </P>
 
-                  <CustomField
-                    label='Password'
-                    name='password'
-                  />
+              <CustomField
+                label='Password'
+                name='password'
+              />
 
-                  <CustomSubmit>
-                    {isLoading ? (
-                      <>
-                        <Spinner /> Loading...
-                      </>
-                    ) : (
-                      'Verify'
-                    )}
-                  </CustomSubmit>
-                </Strategy>
+              <CustomSubmit>Verify</CustomSubmit>
 
-                <Strategy name='email_code'>
-                  <P className='text-sm'>
-                    Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
-                  </P>
+              <Action
+                asChild
+                navigate='forgot-password'
+              >
+                <TextButton>Forgot Password</TextButton>
+              </Action>
+            </Strategy>
 
-                  <CustomResendable />
+            <Strategy name='email_code'>
+              <P className='text-sm'>
+                Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
+              </P>
 
-                  <CustomField
-                    // eslint-disable-next-line jsx-a11y/no-autofocus
-                    autoFocus
-                    autoSubmit
-                    label='Email Code'
-                    name='code'
-                  />
+              <CustomResendable />
 
-                  <CustomSubmit>
-                    {isLoading ? (
-                      <>
-                        <Spinner /> Loading...
-                      </>
-                    ) : (
-                      'Verify'
-                    )}
-                  </CustomSubmit>
-                </Strategy>
+              <CustomField
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                autoSubmit
+                label='Email Code'
+                name='code'
+              />
 
-                <Strategy name='phone_code'>
-                  <P className='text-sm'>
-                    Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
-                  </P>
+              <CustomSubmit>Verify</CustomSubmit>
+            </Strategy>
 
-                  <CustomResendable />
+            <Strategy name='phone_code'>
+              <P className='text-sm'>
+                Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
+              </P>
 
-                  <CustomField
-                    // eslint-disable-next-line jsx-a11y/no-autofocus
-                    autoFocus
-                    autoSubmit
-                    label='Phone Code'
-                    name='code'
-                  />
+              <CustomResendable />
 
-                  <CustomSubmit>
-                    {isLoading ? (
-                      <>
-                        <Spinner /> Loading...
-                      </>
-                    ) : (
-                      'Verify'
-                    )}
-                  </CustomSubmit>
-                </Strategy>
+              <CustomField
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                autoSubmit
+                label='Phone Code'
+                name='code'
+              />
 
-                <Strategy name='reset_password_email_code'>
-                  <H3>Verify your email</H3>
+              <CustomSubmit>Verify</CustomSubmit>
+            </Strategy>
 
-                  <P className='text-sm'>
-                    We&apos;ve sent a verification code to <SafeIdentifier />.
-                  </P>
+            <Strategy name='reset_password_email_code'>
+              <H3>Verify your email</H3>
 
-                  <CustomResendable />
-                </Strategy>
-              </div>
-            )}
-          </Loading>
+              <P className='text-sm'>
+                We&apos;ve sent a verification code to <SafeIdentifier />
+              </P>
+
+              <CustomField
+                label='New Password'
+                name='password'
+              />
+
+              <CustomField
+                label='Code'
+                name='code'
+              />
+
+              <CustomSubmit>Change Password</CustomSubmit>
+            </Strategy>
+
+            <Strategy name='reset_password_phone_code'>
+              <H3>Verify your email</H3>
+
+              <P className='text-sm'>
+                We&apos;ve sent a verification code to <SafeIdentifier />
+              </P>
+
+              <CustomField
+                label='New Password'
+                name='password'
+              />
+
+              <CustomField
+                label='Code'
+                name='code'
+              />
+
+              <CustomSubmit>Change Password</CustomSubmit>
+            </Strategy>
+          </div>
 
           <Action
             asChild

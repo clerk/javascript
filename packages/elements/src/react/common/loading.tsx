@@ -2,7 +2,6 @@ import type { OAuthProvider, SamlStrategy } from '@clerk/types';
 import * as React from 'react';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import { ActiveTagsMode, useActiveTags } from '~/react/hooks/use-active-tags.hook';
 import type { ActorSignIn, ActorSignUp } from '~/react/hooks/use-loading.hook';
 import { useLoading } from '~/react/hooks/use-loading.hook';
 import { SignInChooseStrategyCtx } from '~/react/sign-in/choose-strategy';
@@ -157,15 +156,14 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
     computedScope = inferredScope;
   }
 
-  const isChooseStrategyStep = useActiveTags(
-    routerRef,
-    ['route:first-factor', 'route:choose-strategy'],
-    ActiveTagsMode.all,
-  );
+  const snapshot = routerRef.getSnapshot();
+  const isFirstFactor = snapshot.hasTag('route:first-factor');
+
   // Determine loading states based on the step
   const isStartLoading = isLoading && loadingStep === 'start';
   const isVerificationsLoading = isLoading && loadingStep === 'verifications';
-  const isChooseStrategyLoading = isLoading && isChooseStrategyStep;
+  const isChooseStrategyLoading = isLoading && isFirstFactor && snapshot.hasTag('route:choose-strategy');
+  const isForgotPasswordLoading = isFirstFactor && snapshot.hasTag('route:forgot-password');
   const isStrategyLoading = isLoading && loadingStep === undefined && strategy !== undefined;
 
   let returnValue: boolean;
@@ -178,6 +176,8 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
     returnValue = isVerificationsLoading;
   } else if (computedScope === 'step:choose-strategy') {
     returnValue = isChooseStrategyLoading;
+  } else if (computedScope === 'step:forgot-password') {
+    returnValue = isForgotPasswordLoading;
   } else if (computedScope.startsWith('provider:')) {
     const computedStrategy = mapScopeToStrategy(computedScope);
     returnValue = isStrategyLoading && strategy === computedStrategy;
