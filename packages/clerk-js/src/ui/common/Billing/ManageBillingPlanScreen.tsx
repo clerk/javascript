@@ -198,21 +198,20 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
                   sx={t => ({ padding: 0, color: t.colors.$colorTextSecondary })}
                   variant='unstyled'
                 >
-                  <Flex gap={1}>
-                    <Text
-                      sx={t => ({
-                        fontWeight: t.fontWeights.$normal,
-                        color: t.colors.$colorTextSecondary,
-                      })}
-                      localizationKey={
-                        showAllFeatures
-                          ? localizationKeys('billing.managePlanScreen.action__showLess')
-                          : localizationKeys('billing.managePlanScreen.action__showAll')
-                      }
-                    />
+                  <Text
+                    as='span'
+                    sx={t => ({
+                      fontWeight: t.fontWeights.$normal,
+                      color: t.colors.$colorTextSecondary,
+                    })}
+                    localizationKey={
+                      showAllFeatures
+                        ? localizationKeys('billing.managePlanScreen.action__showLess')
+                        : localizationKeys('billing.managePlanScreen.action__showAll')
+                    }
+                  />
 
-                    <Icon icon={ChevronDown} />
-                  </Flex>
+                  <Icon icon={ChevronDown} />
                 </SimpleButton>
               </Box>
             )}
