@@ -12,7 +12,6 @@ import { assertClerkSingletonExists } from './utils';
 type CoreClerkContextWrapperProps = {
   clerk: Clerk;
   children: React.ReactNode;
-  swrConfig?: any;
 };
 
 type CoreClerkContextProviderState = Resources;
@@ -55,10 +54,7 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
       <CoreClerkContext.Provider value={clerkCtx}>
         <CoreClientContext.Provider value={clientCtx}>
           <CoreSessionContext.Provider value={sessionCtx}>
-            <CoreOrganizationProvider
-              {...organizationCtx.value}
-              swrConfig={props.swrConfig}
-            >
+            <CoreOrganizationProvider {...organizationCtx.value}>
               <CoreUserContext.Provider value={userCtx}>{props.children}</CoreUserContext.Provider>
             </CoreOrganizationProvider>
           </CoreSessionContext.Provider>
