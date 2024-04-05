@@ -2,13 +2,15 @@ import type { BillingPlanResource } from '@clerk/types';
 import React from 'react';
 
 import { Badge, Box, Button, Col, descriptors, Flex, Grid, Icon, localizationKeys, Text } from '../../customizables';
-import { Header, IconButton } from '../../elements';
+import { Card, Header, IconButton, useCardState } from '../../elements';
 import { ArrowLeftIcon, Check } from '../../icons';
+import { centsToUnit, handleError } from '../../utils';
 import { useBillingContext } from './BillingProvider';
 
 export const ChangePlanButton = ({ planKey }: { planKey: string }) => {
   const { changePlan } = useBillingContext();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const card = useCardState();
 
   const handleChangePlan = async () => {
     try {
@@ -22,8 +24,7 @@ export const ChangePlanButton = ({ planKey }: { planKey: string }) => {
         window.location.href = response?.redirectUrl;
       }
     } catch (e) {
-      //TODO Show error message if exists
-      console.log(e);
+      handleError(e, [], card.setError);
     } finally {
       setIsLoading(false);
     }
@@ -201,6 +202,7 @@ const GoToPlanAndBilling = () => {
 
 export const ManagePlanScreen = () => {
   const { availablePlans, currentPlan } = useBillingContext();
+  const card = useCardState();
 
   const plans = availablePlans.map(({ name, id, features, priceInCents, key }) => {
     return (
@@ -210,7 +212,7 @@ export const ManagePlanScreen = () => {
         key={id}
         name={name}
         features={features}
-        priceInCents={priceInCents / 100}
+        priceInCents={centsToUnit(priceInCents)}
       />
     );
   });
@@ -226,6 +228,9 @@ export const ManagePlanScreen = () => {
             textVariant='h2'
           />
         </Header.Root>
+
+        <Card.Alert>{card.error}</Card.Alert>
+
         <Col sx={t => ({ gap: t.space.$4 })}>{plans}</Col>
       </Col>
     </Col>
