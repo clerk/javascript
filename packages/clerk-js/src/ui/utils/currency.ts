@@ -3,26 +3,32 @@ interface CurrencyFormatOptions {
   minimumFractionDigits?: number;
   maximumFractionDigits?: number;
   style?: string;
-  locale: string;
 }
 
-export function formatCurrency({ value, options }: { value: number; options?: CurrencyFormatOptions }): string {
+export function formatCurrency({
+  value,
+  options,
+  locale = 'en-US',
+}: {
+  value: number;
+  options?: CurrencyFormatOptions;
+  locale: string;
+}): string {
   const defaultOptions: CurrencyFormatOptions = {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
     style: 'currency',
     currency: 'USD',
-    locale: 'en-US',
   };
 
   const mergedOptions = { ...defaultOptions, ...options };
-  const formatter = new Intl.NumberFormat('en-US', mergedOptions);
+  const formatter = new Intl.NumberFormat(locale, mergedOptions);
   return formatter.format(value);
 }
 
 export function centsToUnit({ cents, locale }: { cents: number; locale: string }) {
   const unitValue = cents / 100;
-  return formatCurrency({ value: unitValue, options: { locale } });
+  return formatCurrency({ value: unitValue, locale });
 }
 
 export function unitToCents({ unitValue }: { unitValue: number }) {
