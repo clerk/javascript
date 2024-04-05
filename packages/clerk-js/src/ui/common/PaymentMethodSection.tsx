@@ -1,11 +1,11 @@
-import type { BillingPlanResource } from '@clerk/types';
+import type { CurrentBillingPlanResource } from '@clerk/types';
 
 import { Box, localizationKeys, Text, useLocalizations } from '../customizables';
 import { ProfileSection } from '../elements';
 import { mqu } from '../styledSystem';
 
 type PaymentMethodSectionProps = {
-  currentPlan?: BillingPlanResource | null;
+  currentPlan?: CurrentBillingPlanResource | null;
   isLoadingPortalSession: boolean;
   onClickManageBilling: () => void;
 };
