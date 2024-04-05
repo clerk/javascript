@@ -4,6 +4,28 @@ export default (QUnit: QUnit) => {
   const { module, test: it } = QUnit;
 
   module('createClerkRequest', () => {
+    module('instantiating a request', () => {
+      it('retains the headers', assert => {
+        const oldReq = new Request('http://localhost:3000', { headers: new Headers({ a: '1', b: '2' }) });
+        const req = createClerkRequest(oldReq);
+        assert.equal(req.headers.get('a'), oldReq.headers.get('a'));
+        assert.equal(req.headers.get('b'), oldReq.headers.get('b'));
+      });
+
+      it('retains the method', assert => {
+        const oldReq = new Request('http://localhost:3000', { method: 'POST' });
+        const req = createClerkRequest(oldReq);
+        assert.equal(req.method, oldReq.method);
+      });
+
+      it('retains the body', async assert => {
+        const data = { a: '1' };
+        const oldReq = new Request('http://localhost:3000', { method: 'POST', body: JSON.stringify(data) });
+        const req = createClerkRequest(oldReq);
+        assert.equal((await req.json())['a'], data.a);
+      });
+    });
+
     module('cookies', () => {
       it('should parse and return cookies', assert => {
         const req = createClerkRequest(

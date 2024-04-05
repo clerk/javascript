@@ -8,10 +8,22 @@ class ClerkRequest extends Request {
   readonly clerkUrl: ClerkUrl;
   readonly cookies: Map<string, string>;
 
-  public constructor(req: ClerkRequest | Request) {
-    super(req, req);
-    this.clerkUrl = this.deriveUrlFromHeaders(req);
-    this.cookies = this.parseCookies(req);
+  public constructor(input: ClerkRequest | Request | RequestInfo, init?: RequestInit) {
+    // The usual way to duplicate a request object is to
+    // pass the original request object to the Request constructor
+    // both as the `input` and `init` parameters, eg: super(req, req)
+    // However, this fails in certain environments like Vercel Edge Runtime
+    // when a framework like Remix polyfills the global Request object.
+    // This happens because `undici` performs the following instanceof check
+    // which, instead of testing against the global Request object, tests against
+    // the Request class defined in the same file (local Request class).
+    // For more details, please refer to:
+    // https://github.com/nodejs/undici/issues/2155
+    // https://github.com/nodejs/undici/blob/7153a1c78d51840bbe16576ce353e481c3934701/lib/fetch/request.js#L854
+    const url = typeof input !== 'string' && 'url' in input ? input.url : String(input);
+    super(url, init || typeof input === 'string' ? undefined : input);
+    this.clerkUrl = this.deriveUrlFromHeaders(this);
+    this.cookies = this.parseCookies(this);
   }
 
   public decorateWithClerkUrl = <R extends object>(req: R): WithClerkUrl<R> => {
