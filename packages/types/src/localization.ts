@@ -744,6 +744,8 @@ type _LocalizationResource = {
       action__changePlan: LocalizationValue;
       action__goToPlanAndBilling: LocalizationValue;
       badge__currentPlan: LocalizationValue;
+      action__showAll: LocalizationValue;
+      action__showLess: LocalizationValue;
     };
   };
 };
