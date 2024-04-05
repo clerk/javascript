@@ -6,9 +6,12 @@ import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../OrganizationSwitcher';
 import { createFakeUserOrganizationInvitation, createFakeUserOrganizationSuggestion } from './utlis';
 
-const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
+const { createFixtures, clearCache } = bindCreateFixtures('OrganizationSwitcher');
 
 describe('OrganizationSwitcher', () => {
+  beforeEach(() => {
+    clearCache();
+  });
   it('renders component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -19,6 +22,9 @@ describe('OrganizationSwitcher', () => {
   });
 
   describe('Personal Workspace', () => {
+    beforeEach(() => {
+      clearCache();
+    });
     it('shows the personal workspace when enabled', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
@@ -43,6 +49,9 @@ describe('OrganizationSwitcher', () => {
   });
 
   describe('OrganizationSwitcherTrigger', () => {
+    beforeEach(() => {
+      clearCache();
+    });
     it('shows the counter for pending suggestions and invitations', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
@@ -118,6 +127,9 @@ describe('OrganizationSwitcher', () => {
   });
 
   describe('OrganizationSwitcherPopover', () => {
+    beforeEach(() => {
+      clearCache();
+    });
     it('opens the organization switcher popover when clicked', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
@@ -213,6 +225,7 @@ describe('OrganizationSwitcher', () => {
     });
 
     it('displays a list of user invitations', async () => {
+      clearCache();
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -221,6 +234,8 @@ describe('OrganizationSwitcher', () => {
           create_organization_enabled: false,
         });
       });
+
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
       fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
         Promise.resolve({
@@ -265,6 +280,8 @@ describe('OrganizationSwitcher', () => {
           create_organization_enabled: false,
         });
       });
+
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
       fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
         Promise.resolve({

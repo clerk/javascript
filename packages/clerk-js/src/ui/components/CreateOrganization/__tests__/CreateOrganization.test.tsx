@@ -184,7 +184,9 @@ describe('CreateOrganization', () => {
       await userEvent.type(getByLabelText(/Organization name/i), 'new org');
       await userEvent.click(getByRole('button', { name: /create organization/i }));
 
-      expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/${createdOrg.id}`);
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/${createdOrg.id}`);
+      });
     });
 
     it('constructs afterCreateOrganizationUrl from `:slug` ', async () => {
@@ -208,7 +210,9 @@ describe('CreateOrganization', () => {
       await userEvent.type(getByLabelText(/Organization name/i), 'new org');
       await userEvent.click(getByRole('button', { name: /create organization/i }));
 
-      expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/${createdOrg.slug}`);
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/${createdOrg.slug}`);
+      });
     });
   });
 });

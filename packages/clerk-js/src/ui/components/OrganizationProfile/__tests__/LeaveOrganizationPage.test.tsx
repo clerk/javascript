@@ -1,14 +1,17 @@
 import type { DeletedObjectResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
 
-import { act, render } from '../../../../testUtils';
+import { act, render, waitFor } from '../../../../testUtils';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { LeaveOrganizationPage } from '../ActionConfirmationPage';
 
-const { createFixtures } = bindCreateFixtures('OrganizationProfile');
+const { createFixtures, clearCache } = bindCreateFixtures('OrganizationProfile');
 
 describe('LeaveOrganizationPage', () => {
+  beforeEach(() => {
+    clearCache();
+  });
   it('unable to leave the organization when confirmation has not passed', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
@@ -50,10 +53,12 @@ describe('LeaveOrganizationPage', () => {
       { wrapper },
     );
 
-    await userEvent.type(getByLabelText(/Confirmation/i), 'Org1');
-
-    act(async () => {
+    await act(async () => {
+      await userEvent.type(getByLabelText(/Confirmation/i), 'Org1');
       await userEvent.click(getByRole('button', { name: 'Leave organization' }));
+    });
+
+    await waitFor(async () => {
       expect(fixtures.clerk.user?.leaveOrganization).toHaveBeenCalledWith('Org1');
     });
   });
