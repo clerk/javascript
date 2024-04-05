@@ -1,14 +1,97 @@
 import type { BillingPlanResource } from '@clerk/types';
 import React from 'react';
 
-import { Badge, Box, Button, Col, descriptors, Flex, Grid, Icon, localizationKeys, Text } from '../customizables';
-import { Header, IconButton } from '../elements';
-import { ArrowLeftIcon, Check } from '../icons';
+import {
+  Badge,
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Grid,
+  Icon,
+  localizationKeys,
+  Text,
+  useLocalizations,
+} from '../../customizables';
+import { Card, Header, IconButton, useCardState } from '../../elements';
+import { ArrowLeftIcon, Check } from '../../icons';
+import { centsToUnit, handleError } from '../../utils';
+import { useBillingContext } from './BillingProvider';
 
-export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'> & {
+export const ChangePlanButton = ({ planKey }: { planKey: string }) => {
+  const { changePlan } = useBillingContext();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const card = useCardState();
+
+  const handleChangePlan = async () => {
+    try {
+      setIsLoading(true);
+      const response = await changePlan({
+        planKey,
+        successReturnURL: window.location.href,
+        cancelReturnURL: window.location.href,
+      });
+      if (response) {
+        window.location.href = response?.redirectUrl;
+      }
+    } catch (e) {
+      handleError(e, [], card.setError);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      isLoading={isLoading}
+      onClick={handleChangePlan}
+      variant='outline'
+      sx={t => ({ color: t.colors.$colorText })}
+      localizationKey={localizationKeys('billing.managePlanScreen.action__changePlan')}
+    />
+  );
+};
+
+const DividerLine = () => {
+  return (
+    <Box
+      elementDescriptor={descriptors.dividerLine}
+      sx={t => ({
+        height: '1px',
+        backgroundColor: t.colors.$neutralAlpha100,
+      })}
+    />
+  );
+};
+
+const Feature = ({ name }: { name: string }) => {
+  return (
+    <Flex
+      align='center'
+      gap={2}
+      sx={t => ({ color: t.colors.$colorTextSecondary })}
+    >
+      <Icon
+        size='xs'
+        icon={Check}
+      />
+      <Text
+        sx={t => ({
+          color: t.colors.$colorTextSecondary,
+          fontSize: t.fontSizes.$md,
+        })}
+      >
+        {name}
+      </Text>
+    </Flex>
+  );
+};
+
+export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features'> & {
   isCurrentPlan: boolean;
   planKey: string;
-  changePlanAction: React.ReactNode;
+  price: string;
 };
 
 export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
@@ -55,7 +138,7 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
                   fontSize: t.fontSizes.$lg,
                 })}
               >
-                ${params.priceInCents}
+                {params.price}
               </Text>
               <Text
                 variant='body'
@@ -81,7 +164,7 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
               justify='center'
               align='center'
             >
-              {params.changePlanAction}
+              <ChangePlanButton planKey={params.planKey} />
             </Flex>
           )}
         </Flex>
@@ -108,68 +191,12 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
   );
 };
 
-const DividerLine = () => {
-  return (
-    <Box
-      elementDescriptor={descriptors.dividerLine}
-      sx={t => ({
-        height: '1px',
-        backgroundColor: t.colors.$neutralAlpha100,
-      })}
-    />
-  );
-};
-
-const Feature = ({ name }: { name: string }) => {
-  return (
-    <Flex
-      align='center'
-      gap={2}
-      sx={t => ({ color: t.colors.$colorTextSecondary })}
-    >
-      <Icon
-        size='xs'
-        icon={Check}
-      />
-      <Text
-        sx={t => ({
-          color: t.colors.$colorTextSecondary,
-          fontSize: t.fontSizes.$md,
-        })}
-      >
-        {name}
-      </Text>
-    </Flex>
-  );
-};
-
-export const ChangePlanButton = ({ action }: { action: () => Promise<void> }) => {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
-  const handleActionClicked = async () => {
-    try {
-      setIsLoading(true);
-      await action();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <Button
-      isLoading={isLoading}
-      onClick={handleActionClicked}
-      variant='outline'
-      sx={t => ({ color: t.colors.$colorText })}
-      localizationKey={localizationKeys('billing.managePlanScreen.action__changePlan')}
-    />
-  );
-};
-
 const GoToPlanAndBilling = () => {
+  const { goToPlanAndBilling } = useBillingContext();
   return (
     <Box>
       <IconButton
+        onClick={goToPlanAndBilling}
         sx={t => ({
           color: t.colors.$colorTextSecondary,
           padding: 0,
@@ -186,7 +213,24 @@ const GoToPlanAndBilling = () => {
   );
 };
 
-export const ManagePlanScreen = ({ children }: { children: React.ReactNode }) => {
+export const ManagePlanScreen = () => {
+  const { availablePlans, currentPlan } = useBillingContext();
+  const card = useCardState();
+  const { locale } = useLocalizations();
+
+  const plans = availablePlans.map(({ name, id, features, priceInCents, key }) => {
+    return (
+      <OrganizationPlanCard
+        isCurrentPlan={currentPlan?.key === key}
+        planKey={key}
+        key={id}
+        name={name}
+        features={features}
+        price={centsToUnit({ cents: priceInCents, locale })}
+      />
+    );
+  });
+
   return (
     <Col gap={4}>
       <GoToPlanAndBilling />
@@ -198,7 +242,10 @@ export const ManagePlanScreen = ({ children }: { children: React.ReactNode }) =>
             textVariant='h2'
           />
         </Header.Root>
-        <Col sx={t => ({ gap: t.space.$4 })}>{children}</Col>
+
+        <Card.Alert>{card.error}</Card.Alert>
+
+        <Col sx={t => ({ gap: t.space.$4 })}>{plans}</Col>
       </Col>
     </Col>
   );
