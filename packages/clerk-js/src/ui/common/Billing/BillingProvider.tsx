@@ -4,13 +4,14 @@ import type {
   ChangePlanParams,
   CheckoutSessionResource,
   CreatePortalSessionParams,
+  CurrentBillingPlanResource,
   PortalSessionResource,
 } from '@clerk/types';
 import React from 'react';
 
 type BillingProviderValue = {
   availablePlans: BillingPlanResource[];
-  currentPlan: BillingPlanResource;
+  currentPlan: CurrentBillingPlanResource;
   createPortalSession: (params: CreatePortalSessionParams) => Promise<PortalSessionResource>;
   changePlan: (params: ChangePlanParams) => Promise<CheckoutSessionResource>;
   currentPage: BillingPages;

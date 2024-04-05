@@ -1,7 +1,19 @@
 import type { BillingPlanResource } from '@clerk/types';
 import React from 'react';
 
-import { Badge, Box, Button, Col, descriptors, Flex, Grid, Icon, localizationKeys, Text } from '../../customizables';
+import {
+  Badge,
+  Box,
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  Grid,
+  Icon,
+  localizationKeys,
+  Text,
+  useLocalizations,
+} from '../../customizables';
 import { Card, Header, IconButton, useCardState } from '../../elements';
 import { ArrowLeftIcon, Check } from '../../icons';
 import { centsToUnit, handleError } from '../../utils';
@@ -76,9 +88,10 @@ const Feature = ({ name }: { name: string }) => {
   );
 };
 
-export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features' | 'priceInCents'> & {
+export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features'> & {
   isCurrentPlan: boolean;
   planKey: string;
+  price: string;
 };
 
 export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
@@ -125,7 +138,7 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
                   fontSize: t.fontSizes.$lg,
                 })}
               >
-                ${params.priceInCents}
+                {params.price}
               </Text>
               <Text
                 variant='body'
@@ -203,6 +216,7 @@ const GoToPlanAndBilling = () => {
 export const ManagePlanScreen = () => {
   const { availablePlans, currentPlan } = useBillingContext();
   const card = useCardState();
+  const { locale } = useLocalizations();
 
   const plans = availablePlans.map(({ name, id, features, priceInCents, key }) => {
     return (
@@ -212,7 +226,7 @@ export const ManagePlanScreen = () => {
         key={id}
         name={name}
         features={features}
-        priceInCents={centsToUnit(priceInCents)}
+        price={centsToUnit({ cents: priceInCents, locale })}
       />
     );
   });

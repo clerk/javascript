@@ -1,4 +1,3 @@
-import type { BillingPlanResource } from '@clerk/types';
 import React from 'react';
 
 import { Box, Col, descriptors, localizationKeys, Text, useLocalizations } from '../../customizables';
@@ -34,12 +33,9 @@ const ManagePaymentMethodButton = () => {
   );
 };
 
-type PaymentMethodSectionProps = {
-  currentPlan?: BillingPlanResource | null;
-};
-
-export const PaymentMethodSection = ({ currentPlan }: PaymentMethodSectionProps) => {
+export const PaymentMethodSection = () => {
   const { t } = useLocalizations();
+  const { currentPlan } = useBillingContext();
 
   if (!currentPlan) {
     return null;
@@ -75,9 +71,9 @@ export const PaymentMethodSection = ({ currentPlan }: PaymentMethodSectionProps)
   );
 };
 
-const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanResource | null }) => {
+const CurrentPlanSection = () => {
   const { t, locale } = useLocalizations();
-  const { goToManageBillingPlan } = useBillingContext();
+  const { goToManageBillingPlan, currentPlan } = useBillingContext();
 
   if (!currentPlan) {
     return null;
@@ -128,7 +124,6 @@ const CurrentPlanSection = ({ currentPlan }: { currentPlan?: BillingPlanResource
 
 export const PlanAndBillingScreen = () => {
   const card = useCardState();
-  const { currentPlan } = useBillingContext();
 
   return (
     <Col
@@ -149,8 +144,8 @@ export const PlanAndBillingScreen = () => {
 
         <Card.Alert>{card.error}</Card.Alert>
 
-        <CurrentPlanSection currentPlan={currentPlan} />
-        <PaymentMethodSection currentPlan={currentPlan} />
+        <CurrentPlanSection />
+        <PaymentMethodSection />
       </Col>
     </Col>
   );
