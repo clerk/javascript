@@ -727,6 +727,7 @@ type _LocalizationResource = {
     currentPlanSection: {
       title: LocalizationValue;
       primaryButton: LocalizationValue;
+      primaryButton__upgrade: LocalizationValue;
       perMonth: LocalizationValue;
       renewsOn: LocalizationValue;
     };
