@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
 import { CurrentPlanSection, PaymentMethodSection } from '../../common';
@@ -7,17 +7,17 @@ import { Card, FullHeightLoader, Header, useCardState, withCardStateProvider } f
 import { useFetch } from '../../hooks';
 import { handleError } from '../../utils';
 
-export const BillingPage = withCardStateProvider(() => {
+export const OrganizationBillingPage = withCardStateProvider(() => {
   const [isLoadingPortalSession, setIsLoadingPortalSession] = React.useState(false);
-  const { user } = useUser();
+  const { organization } = useOrganization();
   const card = useCardState();
 
-  const { data: currentPlan, isLoading } = useFetch(user?.getCurrentPlan, 'user-current-plan');
+  const { data: currentPlan, isLoading } = useFetch(organization?.getCurrentPlan, 'organization-current-plan');
 
   const handleStartPortalSession = async () => {
     setIsLoadingPortalSession(true);
     try {
-      const res = await user?.createPortalSession({ returnUrl: window.location.href });
+      const res = await organization?.createPortalSession({ returnUrl: window.location.href });
       window.location.href = res?.redirectUrl || '';
     } catch (e) {
       handleError(e, [], card.setError);

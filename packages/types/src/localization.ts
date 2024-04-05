@@ -739,6 +739,22 @@ type _LocalizationResource = {
     numeric: LocalizationValue;
   };
   billing: {
+    start: {
+      headerTitle__billing: LocalizationValue;
+      action__manageBillingInfo: LocalizationValue;
+    };
+    currentPlanSection: {
+      title: LocalizationValue;
+      primaryButton: LocalizationValue;
+      perMonth: LocalizationValue;
+      renewsOn: LocalizationValue;
+    };
+    paymentMethodSection: {
+      title: LocalizationValue;
+      expires: LocalizationValue;
+      primaryButton: LocalizationValue;
+      primaryButton__manageBillingInfo: LocalizationValue;
+    };
     managePlanScreen: {
       headerTitle: LocalizationValue;
       paymentIntervalMonthly: LocalizationValue;
