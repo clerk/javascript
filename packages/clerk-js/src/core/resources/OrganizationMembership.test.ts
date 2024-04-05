@@ -8,6 +8,7 @@ describe('OrganizationMembership', () => {
       created_at: 12345,
       updated_at: 5678,
       role: 'admin',
+      permissions: [],
       organization: {
         id: 'test_org_id',
         image_url:

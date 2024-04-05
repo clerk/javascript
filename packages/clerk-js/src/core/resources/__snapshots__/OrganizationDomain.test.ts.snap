@@ -11,8 +11,8 @@ OrganizationDomain {
   "organizationId": "test_org_id",
   "pathRoot": "",
   "prepareAffiliationVerification": [Function],
-  "totalPendingInvitations": undefined,
-  "totalPendingSuggestions": undefined,
+  "totalPendingInvitations": 0,
+  "totalPendingSuggestions": 0,
   "updateEnrollmentMode": [Function],
   "verification": null,
 }
@@ -29,8 +29,8 @@ OrganizationDomain {
   "organizationId": "test_org_id",
   "pathRoot": "",
   "prepareAffiliationVerification": [Function],
-  "totalPendingInvitations": undefined,
-  "totalPendingSuggestions": undefined,
+  "totalPendingInvitations": 0,
+  "totalPendingSuggestions": 0,
   "updateEnrollmentMode": [Function],
   "verification": {
     "attempts": 1,
