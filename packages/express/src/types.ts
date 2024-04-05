@@ -5,7 +5,10 @@ import type { Request as ExpressRequest, RequestHandler } from 'express';
 
 export type ExpressRequestWithAuth = ExpressRequest & { auth: AuthObject };
 
-export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
+export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
+  debug?: boolean;
+  clerkClient?: ClerkClient;
+};
 
 /**
  * Middleware for Express that handles authentication and authorization with Clerk.
@@ -25,6 +28,10 @@ export interface ClerkMiddleware {
   /**
    * @example
    * app.use(clerkMiddleware(options));
+   *
+   * @example
+   * const clerkClient = createClerkClient({ ... });
+   * app.use(clerkMiddleware({ clerkClient }));
    *
    * @example
    * app.use(clerkMiddleware());

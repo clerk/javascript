@@ -1,4 +1,3 @@
-import { createClerkClient } from '@clerk/backend';
 import type { RequestHandler } from 'express';
 
 import { authenticateRequest, setResponseHeaders } from './authenticateRequest';
@@ -23,8 +22,7 @@ const parseHandlerAndOptions = (args: unknown[]) => {
 export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
   const [handler, options] = parseHandlerAndOptions(args);
 
-  const shouldInitializeClerkClient = Object.keys(options).length > 0;
-  const clerkClient = shouldInitializeClerkClient ? createClerkClient(options) : defaultClerkClient;
+  const clerkClient = options.clerkClient || defaultClerkClient;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const middleware: RequestHandler = async (request, response, next) => {
