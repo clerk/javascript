@@ -74,13 +74,11 @@ export const CustomField = React.forwardRef<
 
       <FieldError className='block text-red-400 font-mono' />
       <FieldState>
-        {({ state, passwordValidationKeys, message }) => (
+        {({ state, codes, message }) => (
           <div>
             <pre className='opacity-60 text-xs'>Field state: {state}</pre>
             <pre className='opacity-60 text-xs'>Field msg: {message}</pre>
-            {name === 'password' ? (
-              <pre className='opacity-60 text-xs'>Pwd Keys: {passwordValidationKeys?.join(', ')}</pre>
-            ) : null}
+            {name === 'password' ? <pre className='opacity-60 text-xs'>Pwd Keys: {codes?.join(', ')}</pre> : null}
           </div>
         )}
       </FieldState>

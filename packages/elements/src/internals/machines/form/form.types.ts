@@ -5,7 +5,7 @@ import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-tex
 export type FormDefaultValues = Map<string, FieldDetails['value']>;
 
 interface FeedbackBase {
-  passwordValidationKeys?: Array<ErrorMessagesKey>;
+  codes?: Array<ErrorMessagesKey>;
 }
 
 export interface FeedbackErrorType extends FeedbackBase {

@@ -118,8 +118,8 @@ const useFieldState = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
  * Provides the form submission handler along with the form's validity via a data attribute
  */
 const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
-  const error = useFormSelector(globalErrorsSelector);
-  const validity = error.length > 0 ? FIELD_VALIDITY.invalid : FIELD_VALIDITY.valid;
+  const { errors } = useGlobalErrors();
+  const validity = errors.length > 0 ? FIELD_VALIDITY.invalid : FIELD_VALIDITY.valid;
 
   // Register the onSubmit handler for form submission
   // TODO: merge user-provided submit handler
@@ -171,6 +171,7 @@ const useInput = ({
   // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
+  const { state: fieldState } = useFieldState({ name });
 
   if (!name) {
     throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
@@ -196,7 +197,7 @@ const useInput = ({
             feedback: {
               type: 'error',
               message: new ClerkElementsFieldError('password-validation-error', error),
-              passwordValidationKeys: keys,
+              codes: keys,
             },
           },
         });
@@ -205,13 +206,13 @@ const useInput = ({
     onValidationWarning: (warning, keys) =>
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'warning', message: warning, passwordValidationKeys: keys } },
+        field: { name, feedback: { type: 'warning', message: warning, codes: keys } },
       }),
     onValidationInfo: (info, keys) => {
       // TODO: If input is not focused, make this info an error
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'info', message: info, passwordValidationKeys: keys } },
+        field: { name, feedback: { type: 'info', message: info, codes: keys } },
       });
     },
   });
@@ -315,6 +316,7 @@ const useInput = ({
       onFocus,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
+      'data-state': fieldState,
       ...props,
       ...rest,
     },
@@ -361,7 +363,7 @@ type FormFieldElement = React.ElementRef<typeof RadixField>;
 type FormFieldProps = Omit<RadixFormFieldProps, 'children'> & {
   name: Autocomplete<ClerkFieldId>;
   alwaysShow?: boolean;
-  children: React.ReactNode | ((state: Extract<FieldStates, 'error' | 'success'>) => React.ReactNode);
+  children: React.ReactNode | ((state: FieldStates) => React.ReactNode);
 };
 
 /**
@@ -369,7 +371,7 @@ type FormFieldProps = Omit<RadixFormFieldProps, 'children'> & {
  *
  * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `emailAddress`, `password`, `phoneNumber`, and `code`.
  * @param alwaysShow - Optional. When `true`, the field will always be rendered, regardless of its state. By default, a field is hidden if it's optional or if it's a filled-out required field.
- * @param {Function} children - A render prop function that receives `state` as an argument. `state` is a union of `"success" | "error"`.
+ * @param {Function} children - A render prop function that receives `state` as an argument. `state` is a union of `"success" | "error" | "idle" | "warning" | "info"`.
  *
  * @example
  * <Field name="emailAddress">
@@ -380,7 +382,8 @@ type FormFieldProps = Omit<RadixFormFieldProps, 'children'> & {
  * @example
  * <Field name="emailAddress">
  *  {(fieldState) => (
- *    <span>{fieldState === "error" ? "Error" : "All fine!"}</span>
+ *    <Label>Email</Label>
+ *    <Input className={`text-${fieldState}`} />
  *  )}
  * </Field>
  */
@@ -407,7 +410,6 @@ const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, fo
   const { children, ...rest } = props;
   const field = useField({ name: rest.name });
   const { state: fieldState } = useFieldState({ name: rest.name });
-  const state = fieldState === 'error' ? FIELD_STATES.error : FIELD_STATES.success;
 
   return (
     <RadixField
@@ -415,7 +417,7 @@ const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, fo
       {...rest}
       ref={forwardedRef}
     >
-      {typeof children === 'function' ? children(state) : children}
+      {typeof children === 'function' ? children(fieldState) : children}
     </RadixField>
   );
 });
@@ -427,14 +429,14 @@ type FieldStateRenderFn = {
   children: (state: {
     state: FieldStates;
     message: string | undefined;
-    passwordValidationKeys: ErrorMessagesKey[] | undefined;
+    codes: ErrorMessagesKey[] | undefined;
   }) => React.ReactNode;
 };
 
 /**
  * Programmatically access the state of the wrapping `<Field>`. Useful for implementing animations when direct access to the value is necessary.
  *
- * @param {Function} children - A render prop function that receives `state`, `message`, and `passwordValidationKeys` as an argument. `state` will is a union of `"success" | "error" | "idle" | "warning" | "info"`. `message` will be the corresponding message, e.g. error message. `passwordValidationKeys` will be an array of keys that were used to generate the password validation messages. This prop is only available when the field is of type `password` and has `validatePassword` set to `true`.
+ * @param {Function} children - A render prop function that receives `state`, `message`, and `codes` as an argument. `state` will is a union of `"success" | "error" | "idle" | "warning" | "info"`. `message` will be the corresponding message, e.g. error message. `codes` will be an array of keys that were used to generate the password validation messages. This prop is only available when the field is of type `password` and has `validatePassword` set to `true`.
  *
  * @example
  *
@@ -442,7 +444,7 @@ type FieldStateRenderFn = {
  *  <Label>Email</Label>
  *  <FieldState>
  *    {({ state }) => (
- *      <Input className={state === 'error' ? 'text-red' : 'text-green'} />
+ *      <Input className={`text-${state}`} />
  *    )}
  *  </FieldState>
  * </Field>
@@ -452,10 +454,10 @@ type FieldStateRenderFn = {
  *  <Label>Password</Label>
  *  <Input validatePassword />
  *  <FieldState>
- *    {({ state, message, passwordValidationKeys }) => (
+ *    {({ state, message, codes }) => (
  *      <pre>Field state: {state}</pre>
  *      <pre>Field msg: {message}</pre>
- *      <pre>Pwd keys: {passwordValidationKeys.join(', ')}</pre>
+ *      <pre>Pwd keys: {codes.join(', ')}</pre>
  *    )}
  *  </FieldState>
  * </Field>
@@ -466,9 +468,9 @@ function FieldState({ children }: FieldStateRenderFn) {
   const { state } = useFieldState({ name: field?.name });
 
   const message = feedback?.message instanceof ClerkElementsFieldError ? feedback.message.message : feedback?.message;
-  const passwordValidationKeys = feedback?.passwordValidationKeys;
+  const codes = feedback?.codes;
 
-  const fieldState = { state, message, passwordValidationKeys };
+  const fieldState = { state, message, codes };
 
   return children(fieldState);
 }
