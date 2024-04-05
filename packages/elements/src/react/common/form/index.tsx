@@ -337,7 +337,10 @@ FieldState.displayName = FIELD_STATE_NAME;
 
 const INPUT_NAME = 'ClerkElementsInput';
 
-type FormInputProps = RadixFormControlProps | ({ type: 'otp'; asChild: never } & OTPInputProps);
+type FormInputProps =
+  | RadixFormControlProps
+  | ({ type: 'otp'; render: any } & Omit<OTPInputProps, 'asChild'>)
+  | ({ type: 'otp'; render?: undefined } & OTPInputProps);
 
 /**
  * Renders an `<input />` element within Clerk's flow. Passes all props to the underlying input element. The `<input />` element will have two data properties: `data-valid` and `data-invalid`. An input is invalid if it has an associated error.
