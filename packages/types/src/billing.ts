@@ -17,7 +17,7 @@ export type PaymentMethod = {
   };
 };
 
-export interface BillingPlanResource extends ClerkResource {
+export interface CurrentBillingPlanResource extends ClerkResource {
   id: string;
   name: string;
   description: string | null;
@@ -26,6 +26,17 @@ export interface BillingPlanResource extends ClerkResource {
   features: string[];
   billingCycle: BillingCycle;
   paymentMethod: PaymentMethod | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface BillingPlanResource extends ClerkResource {
+  id: string;
+  name: string;
+  description: string | null;
+  key: string;
+  priceInCents: number;
+  features: string[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -12,6 +12,8 @@ import type {
   CreatePhoneNumberParams,
   CreatePortalSessionParams,
   CreateWeb3WalletParams,
+  CurrentBillingPlanJSON,
+  CurrentBillingPlanResource,
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
@@ -43,7 +45,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { BackupCode } from './BackupCode';
-import { BillingPlan, CheckoutSession, PortalSession } from './Billing';
+import { BillingPlan, CheckoutSession, CurrentBillingPlan, PortalSession } from './Billing';
 import {
   BaseResource,
   DeletedObject,
@@ -308,15 +310,15 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
-  getCurrentPlan = async (): Promise<BillingPlanResource> => {
+  getCurrentPlan = async (): Promise<CurrentBillingPlanResource> => {
     const json = (
       await BaseResource._fetch({
         path: `${this.path()}/billing/current`,
         method: 'GET',
       })
-    )?.response as unknown as BillingPlanJSON;
+    )?.response as unknown as CurrentBillingPlanJSON;
 
-    return new BillingPlan(json);
+    return new CurrentBillingPlan(json);
   };
 
   createPortalSession = async (params: CreatePortalSessionParams): Promise<PortalSessionResource> => {

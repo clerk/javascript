@@ -510,8 +510,8 @@ type PaymentMethod = {
   };
 };
 
-export interface BillingPlanJSON extends ClerkResourceJSON {
-  object: 'billing_plan';
+export interface CurrentBillingPlanJSON extends ClerkResourceJSON {
+  object: 'current_billing_plan';
   id: string;
   name: string;
   key: string;
@@ -520,6 +520,18 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   features: string[];
   billing_cycle: BillingCycle;
   payment_method: PaymentMethod | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface BillingPlanJSON extends ClerkResourceJSON {
+  object: 'billing_plan';
+  id: string;
+  name: string;
+  key: string;
+  description: string | null;
+  price_in_cents: number;
+  features: string[];
   created_at: number;
   updated_at: number;
 }

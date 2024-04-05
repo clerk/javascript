@@ -4,6 +4,8 @@ import type {
   BillingPlanResource,
   CheckoutSessionJSON,
   CheckoutSessionResource,
+  CurrentBillingPlanJSON,
+  CurrentBillingPlanResource,
   PaymentMethod,
   PortalSessionJSON,
   PortalSessionResource,
@@ -19,8 +21,6 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   key!: string;
   priceInCents!: number;
   features!: string[];
-  billingCycle!: BillingCycle;
-  paymentMethod!: PaymentMethod | null;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -30,6 +30,41 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   }
 
   protected fromJSON(data: BillingPlanJSON): this {
+    if (!data) {
+      return this;
+    }
+
+    this.id = data.id;
+    this.name = data.name;
+    this.description = data.description;
+    this.key = data.key;
+    this.priceInCents = data.price_in_cents;
+    this.features = data.features;
+    this.createdAt = unixEpochToDate(data.created_at);
+    this.updatedAt = unixEpochToDate(data.updated_at);
+
+    return this;
+  }
+}
+
+export class CurrentBillingPlan extends BaseResource implements CurrentBillingPlanResource {
+  id!: string;
+  name!: string;
+  description!: string | null;
+  key!: string;
+  priceInCents!: number;
+  features!: string[];
+  billingCycle!: BillingCycle;
+  paymentMethod!: PaymentMethod | null;
+  createdAt!: Date;
+  updatedAt!: Date;
+
+  constructor(data: CurrentBillingPlanJSON) {
+    super();
+    this.fromJSON(data);
+  }
+
+  protected fromJSON(data: CurrentBillingPlanJSON): this {
     if (!data) {
       return this;
     }

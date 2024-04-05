@@ -9,6 +9,8 @@ import type {
   ClerkResourceReloadParams,
   CreateOrganizationParams,
   CreatePortalSessionParams,
+  CurrentBillingPlanJSON,
+  CurrentBillingPlanResource,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
@@ -35,7 +37,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { BillingPlan, CheckoutSession, PortalSession } from './Billing';
+import { BillingPlan, CheckoutSession, CurrentBillingPlan, PortalSession } from './Billing';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -220,14 +222,14 @@ export class Organization extends BaseResource implements OrganizationResource {
     });
   };
 
-  getCurrentPlan = async (): Promise<BillingPlanResource> => {
+  getCurrentPlan = async (): Promise<CurrentBillingPlanResource> => {
     const json = (
-      await BaseResource._fetch<BillingPlanJSON>({
+      await BaseResource._fetch<CurrentBillingPlanJSON>({
         path: `/organizations/${this.id}/billing/current`,
         method: 'GET',
       })
-    )?.response as unknown as BillingPlanJSON;
-    return new BillingPlan(json);
+    )?.response as unknown as CurrentBillingPlanJSON;
+    return new CurrentBillingPlan(json);
   };
 
   createPortalSession = async (params: CreatePortalSessionParams): Promise<PortalSessionResource> => {
