@@ -21,6 +21,7 @@ import * as React from 'react';
 import type { SetRequired, Simplify } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
+import type { ClerkElementsError } from '~/internals/errors';
 import { ClerkElementsFieldError } from '~/internals/errors';
 import {
   fieldFeedbackSelector,
@@ -242,7 +243,7 @@ const useInput = ({
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
       if (shouldValidatePassword) validatePassword(event.target.value);
     },
-    [ref, name, onChangeProp, initialValue, shouldValidatePassword],
+    [ref, name, onChangeProp, initialValue, shouldValidatePassword, validatePassword],
   );
 
   const onBlur = React.useCallback(
@@ -250,7 +251,7 @@ const useInput = ({
       onBlurProp?.(event);
       if (shouldValidatePassword) validatePassword(event.target.value);
     },
-    [onBlurProp, shouldValidatePassword],
+    [onBlurProp, shouldValidatePassword, validatePassword],
   );
 
   const onFocus = React.useCallback(
@@ -258,7 +259,7 @@ const useInput = ({
       onFocusProp?.(event);
       if (shouldValidatePassword) validatePassword(event.target.value);
     },
-    [onFocusProp, shouldValidatePassword],
+    [onFocusProp, shouldValidatePassword, validatePassword],
   );
 
   React.useEffect(() => {
@@ -583,7 +584,7 @@ Submit.displayName = SUBMIT_NAME;
 const GLOBAL_ERROR_NAME = 'ClerkElementsGlobalError';
 const FIELD_ERROR_NAME = 'ClerkElementsFieldError';
 
-type FormErrorRenderProps = Pick<ClerkElementsFieldError, 'code' | 'message'>;
+type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
 
 type FormErrorPropsRenderFn = {
   asChild?: never;
