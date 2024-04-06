@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.0.0-beta.24
+
+### Minor Changes
+
+- Deprecate `supported_identifiers` and remove `supported_external_accounts`. ([#3089](https://github.com/clerk/javascript/pull/3089)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.0.0-beta.23
 
 ### Minor Changes
