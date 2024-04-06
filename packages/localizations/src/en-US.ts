@@ -2,6 +2,8 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  maintenanceMode:
+    "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   __experimental_formFieldLabel__passkeyName: 'Name of passkey',
   backButton: 'Back',
   badge__default: 'Default',
