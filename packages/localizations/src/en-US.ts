@@ -14,6 +14,8 @@ const commonTexts = {
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  maintenanceMode:
+    "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   dividerText: 'or',
   formFieldLabel__emailAddress: 'Email address',

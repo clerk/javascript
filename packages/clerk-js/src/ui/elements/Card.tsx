@@ -1,11 +1,20 @@
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
-import { descriptors, Flex, generateFlowPartClassname, Icon, useAppearance } from '../customizables';
+import {
+  descriptors,
+  Flex,
+  generateFlowPartClassname,
+  Icon,
+  localizationKeys,
+  useAppearance,
+  useLocalizations,
+} from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { Close } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { mqu } from '../styledSystem';
+import { CardAlert } from './Alert';
 import { ApplicationLogo } from './ApplicationLogo';
 import { useFlowMetadata } from './contexts';
 import { IconButton } from './IconButton';
@@ -22,6 +31,8 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
   const appearance = useAppearance();
   const flowMetadata = useFlowMetadata();
   const { branded } = useEnvironment().displayConfig;
+  const { maintenanceMode } = useEnvironment();
+  const { t } = useLocalizations();
 
   return (
     <>
@@ -58,6 +69,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>((props, ref) => 
         ]}
         ref={ref}
       >
+        {maintenanceMode && <CardAlert variant='warning'>{t(localizationKeys('maintenanceMode'))}</CardAlert>}
         {appearance.parsedLayout.logoPlacement === 'inside' && <ApplicationLogo sx={insideAppLogoSx} />}
         {children}
         {branded && <PoweredByClerkTag />}

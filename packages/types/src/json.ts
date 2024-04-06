@@ -60,6 +60,7 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;
+  maintenance_mode: boolean;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {

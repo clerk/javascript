@@ -4,6 +4,7 @@ import type { LocalizationKey } from '../customizables';
 import { Alert as AlertCust, AlertIcon, Col, descriptors, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations } from '../styledSystem';
+import { colors } from '../utils';
 
 type _AlertProps = {
   variant?: 'danger' | 'warning';
@@ -24,7 +25,14 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
     <AlertCust
       elementDescriptor={descriptors.alert}
       elementId={descriptors.alert.setId(variant)}
+      align='start'
       {...rest}
+      sx={[
+        t => ({
+          backgroundColor: variant === 'warning' ? colors.makeTransparent(t.colors.$warning500, 0.94) : undefined,
+        }),
+        rest.sx,
+      ]}
     >
       <AlertIcon
         elementId={descriptors.alert.setId(variant)}
@@ -41,9 +49,10 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
         <Text
           elementDescriptor={descriptors.alertText}
           elementId={descriptors.alert.setId(variant)}
-          colorScheme='neutral'
+          colorScheme={variant === 'danger' ? 'neutral' : 'warning'}
           variant='smallRegular'
           localizationKey={title}
+          sx={{ textAlign: 'left' }}
         >
           {children}
         </Text>

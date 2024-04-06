@@ -752,6 +752,7 @@ type _LocalizationResource = {
     next6Days: LocalizationValue;
     numeric: LocalizationValue;
   };
+  maintenanceMode: LocalizationValue;
 };
 
 type WithParamName<T> = T &
