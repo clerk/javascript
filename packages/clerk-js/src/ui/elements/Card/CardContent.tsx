@@ -11,7 +11,7 @@ import {
 } from '../../customizables';
 import { Close } from '../../icons';
 import { type PropsOfComponent } from '../../styledSystem';
-import { useFlowMetadata } from '../contexts';
+import { useCardState, useFlowMetadata } from '../contexts';
 import { IconButton } from '../IconButton';
 import { useUnsafeModalContext } from '../Modal';
 import { CardAlert } from './CardAlert';
@@ -22,6 +22,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
   const flowMetadata = useFlowMetadata();
   const { toggle } = useUnsafeModalContext();
   const { maintenanceMode } = useEnvironment();
+  const card = useCardState();
   const { t } = useLocalizations();
 
   return (
@@ -74,7 +75,9 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           })}
         />
       )}
-      {(maintenanceMode || true) && <CardAlert variant={'warning'}>{t(localizationKeys('maintenanceMode'))}</CardAlert>}
+      {maintenanceMode && !card.error && (
+        <CardAlert variant={'warning'}>{t(localizationKeys('maintenanceMode'))}</CardAlert>
+      )}
       {children}
     </Flex>
   );
