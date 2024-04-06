@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.28.2
+
+### Patch Changes
+
+- Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the `maintenanceMode` localization key. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`222acd810`](https://github.com/clerk/javascript/commit/222acd8103ed6f26641a46ef2a5b96c4aef4ebbc)]:
+  - @clerk/types@3.63.1
+
 ## 1.28.1
 
 ### Patch Changes
