@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.71.4
+
+### Patch Changes
+
+- Hide maintenance banner when card has global error by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.71.3
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "0.20.15",
+  "version": "0.20.16",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -39,7 +39,7 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/clerk-js": "4.71.3",
+    "@clerk/clerk-js": "4.71.4",
     "@clerk/clerk-react": "4.30.10",
     "@clerk/shared": "1.4.1",
     "base-64": "1.0.0",
