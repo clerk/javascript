@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.0-beta.41
+
+### Patch Changes
+
+- Hide maintenance banner when card has global error by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.0.0-beta.40
 
 ### Minor Changes
