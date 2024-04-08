@@ -21,10 +21,28 @@ jobs:
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_CLERK_PROD_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_JS_PREVIEW_PROJECT_ID }}
+
     permissions:
       contents: write
       pull-requests: write
+
     steps:
+      - name: Limit action to Clerk members
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
+          script: |
+            const isMember = await github.rest.orgs.checkMembershipForUser({
+              org: 'clerk',
+              username: context.actor
+            });
+            if (!isMember) {
+              core.setFailed(`@${actor} is not a member of the Clerk organization`);
+            }
+
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
