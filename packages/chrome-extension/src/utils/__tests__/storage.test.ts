@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 
-import { BrowserStorageCache, MemoryStorageCache } from './storage';
+import { BrowserStorageCache, MemoryStorageCache } from '../storage';
 
 describe('StorageCache', () => {
   const KEY = 'foo';

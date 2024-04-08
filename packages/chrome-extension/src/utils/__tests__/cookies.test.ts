@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 
-import { getClientCookie } from './cookies';
+import { getClientCookie } from '../cookies';
 
 type RequiredCookieOpts = 'domain' | 'name' | 'value';
 type CreateCookieOpts<T extends keyof browser.Cookies.Cookie> = Pick<browser.Cookies.Cookie, T> &

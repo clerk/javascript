@@ -1,8 +1,8 @@
 import browser, { type Manifest } from 'webextension-polyfill';
 
-import { missingManifestKeyError, missingValidManifestHostPermission } from './errors';
-import type { ValidatedManifest } from './manifest';
-import { getValidPossibleManifestHosts, validateHostPermissionExistence, validateManifest } from './manifest';
+import { missingManifestKeyError, missingValidManifestHostPermission } from '../errors';
+import type { ValidatedManifest } from '../manifest';
+import { getValidPossibleManifestHosts, validateHostPermissionExistence, validateManifest } from '../manifest';
 
 const validClerkManifest = {
   permissions: ['cookies', 'storage'],
