@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
+import { CAPTCHA_ELEMENT_ID } from '../../../utils';
 import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToHomeSingleSessionGuard } from '../../common';
 import { useCoreClerk, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
-import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
+import { Box, descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
   CardAlert,
@@ -272,6 +273,12 @@ function _SignUpStart(): JSX.Element {
               />
             )}
           </SocialButtonsReversibleContainerWithDivider>
+          {!shouldShowForm && (
+            <Box
+              id={CAPTCHA_ELEMENT_ID}
+              sx={t => ({ display: 'none', marginBottom: t.space.$6 })}
+            />
+          )}
         </Flex>
         <Footer.Root>
           <Footer.Action elementId='signUp'>
