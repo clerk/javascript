@@ -130,26 +130,31 @@
     },
     "//#test:integration:ap-flows": {
       "dependsOn": ["^@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputMode": "new-only"
     },
     "//#test:integration:generic": {
       "dependsOn": ["^@clerk/clerk-react#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputMode": "new-only"
     },
     "//#test:integration:express": {
       "dependsOn": ["^@clerk/clerk-sdk-node#build", "^@clerk/clerk-react#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputMode": "new-only"
     },
     "//#test:integration:nextjs": {
       "dependsOn": ["^@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputMode": "new-only"
     },
     "//#test:integration:quickstart": {
       "dependsOn": ["^@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputMode": "new-only"
     }
