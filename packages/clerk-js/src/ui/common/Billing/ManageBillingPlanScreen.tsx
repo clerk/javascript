@@ -11,12 +11,11 @@ import {
   Grid,
   Icon,
   localizationKeys,
-  SimpleButton,
   Text,
   useLocalizations,
 } from '../../customizables';
 import { Card, Header, IconButton, useCardState } from '../../elements';
-import { ArrowLeftIcon, Check, ChevronDown } from '../../icons';
+import { ArrowLeftIcon, Check, ChevronDown, Information } from '../../icons';
 import { centsToUnit, handleError } from '../../utils';
 import { useBillingContext } from './BillingProvider';
 
@@ -89,7 +88,7 @@ const Feature = ({ name }: { name: string }) => {
   );
 };
 
-export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features'> & {
+export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'features' | 'description'> & {
   isCurrentPlan: boolean;
   planKey: string;
   price: string;
@@ -104,119 +103,119 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
       elementDescriptor={descriptors.billingPlanCard}
       elementId={descriptors.billingPlanCard.setId(params.planKey)}
       sx={t => ({
-        backgroundColor: params.isCurrentPlan ? t.colors.$neutralAlpha25 : 'white',
-        width: '37.25rem',
-        borderRadius: '0.5rem',
-        boxShadow: params.isCurrentPlan
-          ? `0px 0px 0px 1px ${t.colors.$neutralAlpha100}`
-          : '0px 0px 0px 1px rgba(25, 28, 33, 0.06), 0px 1px 2px 0px rgba(25, 28, 33, 0.12), 0px 0px 2px 0px rgba(0, 0, 0, 0.08);',
+        backgroundColor: params.isCurrentPlan ? t.colors.$neutralAlpha25 : t.colors.$colorBackground,
+        borderRadius: t.radii.$lg,
       })}
     >
       <Col
-        sx={{
-          padding: '0rem 1.25rem',
-        }}
+        sx={t => ({
+          padding: `${t.space.$4} ${t.space.$5}`,
+        })}
       >
         <Flex
-          sx={{
-            padding: '1rem 0rem',
-          }}
-          justify='between'
+          direction='col'
+          gap={4}
         >
-          <Col gap={1}>
-            <Text
-              sx={t => ({ color: t.colors.$colorText })}
-              variant='subtitle'
-            >
-              {params.name}
-            </Text>
-            <Flex
-              gap={1}
-              align='center'
-            >
+          <Flex justify='between'>
+            <Col gap={1}>
               <Text
+                sx={t => ({ color: t.colors.$colorText })}
+                variant='subtitle'
+              >
+                {params.name}
+              </Text>
+              <Flex
+                gap={1}
+                align='center'
+              >
+                <Text
+                  sx={t => ({
+                    fontWeight: t.fontWeights.$semibold,
+                    fontSize: t.fontSizes.$lg,
+                  })}
+                >
+                  {params.price}
+                </Text>
+                <Text
+                  variant='body'
+                  sx={t => ({ color: t.colors.$colorTextSecondary })}
+                  localizationKey={localizationKeys('billing.managePlanScreen.paymentIntervalMonthly')}
+                />
+              </Flex>
+            </Col>
+
+            {params.isCurrentPlan ? (
+              <Box>
+                <Badge
+                  colorScheme='success'
+                  sx={t => ({
+                    alignSelf: 'flex-start',
+                    background: t.colors.$success50,
+                  })}
+                  localizationKey={localizationKeys('billing.managePlanScreen.badge__currentPlan')}
+                />{' '}
+              </Box>
+            ) : (
+              <Flex
+                justify='center'
+                align='center'
+              >
+                <ChangePlanButton planKey={params.planKey} />
+              </Flex>
+            )}
+          </Flex>
+
+          {features.length > 0 && <DividerLine />}
+          {params.description && <Text colorScheme='secondary'>{params.description}</Text>}
+          {features.length > 0 && (
+            <Col gap={2}>
+              <Grid
                 sx={t => ({
-                  color: t.colors.$colorText,
-                  fontWeight: t.fontWeights.$semibold,
-                  fontSize: t.fontSizes.$lg,
+                  gridTemplateColumns: 'repeat(2,1fr)',
+                  rowGap: t.space.$2,
                 })}
               >
-                {params.price}
-              </Text>
-              <Text
-                variant='body'
-                sx={t => ({ color: t.colors.$colorTextSecondary })}
-                localizationKey={localizationKeys('billing.managePlanScreen.paymentIntervalMonthly')}
-              />
-            </Flex>
-          </Col>
+                {features.map((feature: string) => (
+                  <Feature
+                    key={feature}
+                    name={feature}
+                  />
+                ))}
+              </Grid>
 
-          {params.isCurrentPlan ? (
-            <Box>
-              <Badge
-                colorScheme='success'
-                sx={t => ({
-                  alignSelf: 'flex-start',
-                  background: t.colors.$success50,
-                })}
-                localizationKey={localizationKeys('billing.managePlanScreen.badge__currentPlan')}
-              />{' '}
-            </Box>
-          ) : (
-            <Flex
-              justify='center'
-              align='center'
-            >
-              <ChangePlanButton planKey={params.planKey} />
-            </Flex>
+              {features.length > 5 && (
+                <Box>
+                  <Button
+                    onClick={() => setShowAllFeatures(value => !value)}
+                    sx={t => ({ padding: `0 ${t.space.$2}`, color: t.colors.$colorTextSecondary })}
+                    variant='ghost'
+                  >
+                    <Text
+                      as='span'
+                      sx={t => ({
+                        fontWeight: t.fontWeights.$normal,
+                        color: t.colors.$colorTextSecondary,
+                      })}
+                      localizationKey={
+                        showAllFeatures
+                          ? localizationKeys('billing.managePlanScreen.action__showLess')
+                          : localizationKeys('billing.managePlanScreen.action__showAll')
+                      }
+                    />
+
+                    <Icon
+                      icon={ChevronDown}
+                      sx={t => ({
+                        transform: showAllFeatures ? 'rotate(180deg)' : 'rotate(0)',
+                        marginLeft: t.space.$1,
+                      })}
+                    />
+                  </Button>
+                </Box>
+              )}
+            </Col>
           )}
         </Flex>
-        {features.length > 0 && <DividerLine />}
-        {features.length > 0 && (
-          <Col
-            sx={{ padding: '1rem 0' }}
-            gap={2}
-          >
-            <Grid
-              sx={{
-                gridTemplateColumns: 'repeat(2,1fr)',
-                rowGap: '0.5rem',
-              }}
-            >
-              {features.map((feature: string) => (
-                <Feature
-                  key={feature}
-                  name={feature}
-                />
-              ))}
-            </Grid>
-
-            {features.length > 5 && (
-              <Box>
-                <SimpleButton
-                  onClick={() => setShowAllFeatures(value => !value)}
-                  sx={t => ({ padding: 0, color: t.colors.$colorTextSecondary })}
-                  variant='unstyled'
-                >
-                  <Text
-                    as='span'
-                    sx={t => ({
-                      fontWeight: t.fontWeights.$normal,
-                      color: t.colors.$colorTextSecondary,
-                    })}
-                    localizationKey={
-                      showAllFeatures
-                        ? localizationKeys('billing.managePlanScreen.action__showLess')
-                        : localizationKeys('billing.managePlanScreen.action__showAll')
-                    }
-                  />
-
-                  <Icon icon={ChevronDown} />
-                </SimpleButton>
-              </Box>
-            )}
-          </Col>
-        )}
       </Col>
     </Col>
   );
@@ -237,7 +236,12 @@ const GoToPlanAndBilling = () => {
         })}
         variant='unstyled'
         aria-label='Go to plan and billing'
-        icon={ArrowLeftIcon}
+        icon={
+          <Icon
+            icon={ArrowLeftIcon}
+            sx={t => ({ marginRight: t.space.$2 })}
+          />
+        }
         localizationKey={localizationKeys('billing.managePlanScreen.action__goToPlanAndBilling')}
       />
     </Box>
@@ -249,7 +253,7 @@ export const ManagePlanScreen = () => {
   const card = useCardState();
   const { locale } = useLocalizations();
 
-  const plans = availablePlans.map(({ name, id, features, priceInCents, key }) => {
+  const plans = availablePlans.map(({ name, id, features, priceInCents, key, description }) => {
     return (
       <OrganizationPlanCard
         isCurrentPlan={currentPlan?.key === key}
@@ -257,6 +261,7 @@ export const ManagePlanScreen = () => {
         key={id}
         name={name}
         features={features}
+        description={description}
         price={centsToUnit({ cents: priceInCents, locale })}
       />
     );
@@ -266,13 +271,33 @@ export const ManagePlanScreen = () => {
     <Col gap={4}>
       <GoToPlanAndBilling />
       <Col>
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys('billing.managePlanScreen.headerTitle')}
-            sx={t => ({ marginBottom: t.space.$4 })}
-            textVariant='h2'
-          />
-        </Header.Root>
+        <Flex justify='between'>
+          <Col>
+            <Header.Root>
+              <Header.Title
+                localizationKey={localizationKeys('billing.managePlanScreen.headerTitle')}
+                sx={t => ({ marginBottom: t.space.$4 })}
+                textVariant='h2'
+              />
+            </Header.Root>
+          </Col>
+          <Col>
+            <Flex align='center'>
+              <Icon
+                icon={Information}
+                sx={t => ({ marginRight: t.space.$1, color: t.colors.$neutralAlpha300 })}
+              />
+              <Text
+                colorScheme='secondary'
+                as='span'
+                sx={t => ({
+                  fontSize: t.fontSizes.$xs,
+                })}
+                localizationKey={localizationKeys('billing.managePlanScreen.headerInformationText')}
+              />
+            </Flex>
+          </Col>
+        </Flex>
 
         <Card.Alert>{card.error}</Card.Alert>
 

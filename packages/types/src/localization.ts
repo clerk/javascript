@@ -740,6 +740,7 @@ type _LocalizationResource = {
     };
     managePlanScreen: {
       headerTitle: LocalizationValue;
+      headerInformationText: LocalizationValue;
       paymentIntervalMonthly: LocalizationValue;
       action__changePlan: LocalizationValue;
       action__goToPlanAndBilling: LocalizationValue;

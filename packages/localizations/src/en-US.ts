@@ -823,6 +823,7 @@ export const enUS: LocalizationResource = {
     },
     managePlanScreen: {
       headerTitle: 'Manage Plan',
+      headerInformationText: 'All prices are in US Dollars.',
       paymentIntervalMonthly: 'per month',
       action__changePlan: 'Change to this plan',
       badge__currentPlan: 'Current Plan',

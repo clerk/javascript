@@ -28,6 +28,7 @@ export { default as EyeSlash } from './eye-slash.svg';
 export { default as Eye } from './eye.svg';
 export { default as Folder } from './folder.svg';
 export { default as InformationCircle } from './information-circle.svg';
+export { default as Information } from './information.svg';
 export { default as LinkIcon } from './link.svg';
 export { default as LockClosedIcon } from './lock-closed.svg';
 export { default as LogoMark } from './logo-mark-new.svg';
