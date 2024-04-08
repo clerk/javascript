@@ -205,9 +205,10 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
 
                     <Icon
                       icon={ChevronDown}
-                      sx={{
+                      sx={t => ({
                         transform: showAllFeatures ? 'rotate(180deg)' : 'rotate(0)',
-                      }}
+                        marginLeft: t.space.$1,
+                      })}
                     />
                   </Button>
                 </Box>
