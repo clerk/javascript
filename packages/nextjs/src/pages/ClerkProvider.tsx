@@ -2,7 +2,8 @@ import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
 import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 import { useRouter } from 'next/router';
-import React from 'react';
+import NextjsScript from 'next/script';
+import React, { type ScriptHTMLAttributes } from 'react';
 
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
 import { useSafeLayoutEffect } from '../client-boundary/useSafeLayoutEffect';
@@ -10,6 +11,15 @@ import type { NextClerkProviderProps } from '../types';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
+
+function CustomNextjsScript(props: ScriptHTMLAttributes<HTMLScriptElement>) {
+  return (
+    <NextjsScript
+      strategy='beforeInteractive'
+      {...props}
+    />
+  );
+}
 
 export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
@@ -44,6 +54,7 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
       <ReactClerkProvider
         {...mergedProps}
         initialState={initialState}
+        ScriptComponent={CustomNextjsScript}
       >
         {children}
       </ReactClerkProvider>

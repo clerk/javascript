@@ -22,6 +22,20 @@ export const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
     errorThrower.throwMissingPublishableKeyError();
   }
 
+  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
+
+  if (existingScript) {
+    return new Promise((resolve, reject) => {
+      existingScript.addEventListener('load', () => {
+        resolve(existingScript);
+      });
+
+      existingScript.addEventListener('error', () => {
+        reject(FAILED_TO_LOAD_ERROR);
+      });
+    });
+  }
+
   return loadScript(clerkJsScriptUrl(opts), {
     async: true,
     crossOrigin: 'anonymous',
@@ -31,7 +45,7 @@ export const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
   });
 };
 
-const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
+export const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {

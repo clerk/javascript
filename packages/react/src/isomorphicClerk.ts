@@ -348,6 +348,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return;
     }
 
+    performance.mark('clerkjs:load:start');
+
     // Store frontendAPI value on window as a fallback. This value can be used as a
     // fallback during ClerkJS hot loading in case ClerkJS fails to find the
     // "data-clerk-frontend-api" attribute on its script tag.
@@ -404,6 +406,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
         await global.Clerk.load(this.options);
       }
+
+      performance.mark('clerkjs:load:end');
+      console.log(performance.measure('clerkjs:load', 'clerkjs:load:start', 'clerkjs:load:end').duration);
 
       if (global.Clerk?.loaded) {
         return this.hydrateClerkJS(global.Clerk);

@@ -1,10 +1,11 @@
 import { ClientContext, OrganizationProvider, SessionContext, UserContext } from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
-import React from 'react';
+import React, { type ScriptHTMLAttributes } from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
 import { deriveState } from '../utils/deriveState';
+import { clerkJsScriptUrl } from '../utils/loadClerkJsScript';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 
@@ -12,12 +13,13 @@ type ClerkContextProvider = {
   isomorphicClerkOptions: IsomorphicClerkOptions;
   initialState: InitialState | undefined;
   children: React.ReactNode;
+  ScriptComponent?: React.FunctionComponent<ScriptHTMLAttributes<HTMLScriptElement>>;
 };
 
 export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element | null {
-  const { isomorphicClerkOptions, initialState, children } = props;
+  const { isomorphicClerkOptions, initialState, children, ScriptComponent } = props;
   const { isomorphicClerk: clerk, loaded: clerkLoaded } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
@@ -52,18 +54,51 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   }, [orgId, organization]);
 
   return (
-    // @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk
-    <IsomorphicClerkContext.Provider value={clerkCtx}>
-      <ClientContext.Provider value={clientCtx}>
-        <SessionContext.Provider value={sessionCtx}>
-          <OrganizationProvider {...organizationCtx.value}>
-            <AuthContext.Provider value={authCtx}>
-              <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
-            </AuthContext.Provider>
-          </OrganizationProvider>
-        </SessionContext.Provider>
-      </ClientContext.Provider>
-    </IsomorphicClerkContext.Provider>
+    <>
+      <InlineClerkScript
+        options={isomorphicClerkOptions}
+        ScriptComponent={ScriptComponent}
+      />
+      {/*// @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk*/}
+      <IsomorphicClerkContext.Provider value={clerkCtx}>
+        <ClientContext.Provider value={clientCtx}>
+          <SessionContext.Provider value={sessionCtx}>
+            <OrganizationProvider {...organizationCtx.value}>
+              <AuthContext.Provider value={authCtx}>
+                <UserContext.Provider value={userCtx}>{children}</UserContext.Provider>
+              </AuthContext.Provider>
+            </OrganizationProvider>
+          </SessionContext.Provider>
+        </ClientContext.Provider>
+      </IsomorphicClerkContext.Provider>
+    </>
+  );
+}
+
+function InlineClerkScript({
+  options,
+  ScriptComponent,
+}: {
+  options: IsomorphicClerkOptions;
+  ScriptComponent?: ClerkContextProvider['ScriptComponent'];
+}) {
+  const scriptUrl = clerkJsScriptUrl(options as any);
+
+  /**
+   * Supporting a plain `script` tag is not optimal
+   * - It will be placed inside `body` instead of `head`
+   * - For CSR application it has the same effect as calling `loadClerkJS`
+   */
+  const ScriptTag = ScriptComponent || 'script';
+
+  return (
+    <ScriptTag
+      src={scriptUrl}
+      data-clerk-js-script
+      async
+      crossOrigin='anonymous'
+      data-clerk-publishable-key={options.publishableKey}
+    />
   );
 }
 

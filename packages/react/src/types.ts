@@ -11,6 +11,7 @@ import type {
   SignUpRedirectOptions,
   Without,
 } from '@clerk/types';
+import type { ScriptHTMLAttributes } from 'react';
 import type React from 'react';
 
 declare global {
@@ -34,6 +35,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
 export type ClerkProviderProps = IsomorphicClerkOptions & {
   children: React.ReactNode;
   initialState?: InitialState;
+  ScriptComponent?: React.FunctionComponent<ScriptHTMLAttributes<HTMLScriptElement>>;
 };
 
 export interface BrowserClerkConstructor {
