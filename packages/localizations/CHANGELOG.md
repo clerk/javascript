@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.0.0-beta.21
+
+### Patch Changes
+
+- Improve ptBR localizations ([#3083](https://github.com/clerk/javascript/pull/3083)) by [@GustavoOS](https://github.com/GustavoOS)
+
+- Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix typos from pt-BR localization ([#3106](https://github.com/clerk/javascript/pull/3106)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Added Thai translation keys for pwned password, form identifier, passkey ([#3128](https://github.com/clerk/javascript/pull/3128)) by [@ttwrpz](https://github.com/ttwrpz)
+
+  Change Thai translation keys for Authenticator related to match the context
+
 ## 2.0.0-beta.20
 
 ### Minor Changes

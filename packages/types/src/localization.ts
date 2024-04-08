@@ -15,6 +15,7 @@ export type LocalizationResource = DeepPartial<_LocalizationResource>;
 
 type _LocalizationResource = {
   locale: string;
+  maintenanceMode: LocalizationValue;
   /**
    * @experimental
    * Add role keys and their localized value

@@ -1,4 +1,4 @@
-import { ExclamationCircle, ExclamationTriangle } from '../icons';
+import { ExclamationTriangle } from '../icons';
 import type { StyleVariants } from '../styledSystem';
 import { createVariants } from '../styledSystem';
 
@@ -24,7 +24,7 @@ export type AlertIconProps = OwnProps & StyleVariants<typeof applyVariants>;
 
 export const AlertIcon = (props: AlertIconProps): JSX.Element => {
   const { variant, ...rest } = props;
-  const Icon = variant === 'warning' ? ExclamationCircle : ExclamationTriangle;
+  const Icon = ExclamationTriangle;
   return (
     <Icon
       {...filterProps(rest)}
