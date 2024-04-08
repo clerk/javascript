@@ -74,6 +74,7 @@ export const enUS: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Name',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: 'Name of passkey',
   formFieldLabel__password: 'Password',
   formFieldLabel__phoneNumber: 'Phone number',
   formFieldLabel__role: 'Role',
@@ -666,6 +667,14 @@ export const enUS: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: '{{name}} will be removed from this account.',
+        title: 'Remove passkey',
+      },
+      subtitle__rename: 'You can change the passkey name to make it easier to find.',
+      title__rename: 'Rename Passkey',
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -753,6 +762,11 @@ export const enUS: LocalizationResource = {
           destructiveActionTitle: 'Remove',
           headerTitle: 'Authenticator application',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: 'Remove',
+        menuAction__rename: 'Rename',
+        title: 'Passkeys',
       },
       passwordSection: {
         primaryButton__setPassword: 'Set password',

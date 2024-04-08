@@ -68,11 +68,13 @@ export interface UserResource extends ClerkResource {
   phoneNumbers: PhoneNumberResource[];
   web3Wallets: Web3WalletResource[];
   externalAccounts: ExternalAccountResource[];
+  // TODO-PASSKEY: Remove in the next minor
   /**
    * @experimental
    * This property is experimental, avoid using this in production applications
    */
   __experimental_passkeys: PasskeyResource[];
+  passkeys: PasskeyResource[];
   samlAccounts: SamlAccountResource[];
 
   organizationMemberships: OrganizationMembershipResource[];
@@ -94,11 +96,13 @@ export interface UserResource extends ClerkResource {
   removePassword: (params: RemoveUserPasswordParams) => Promise<UserResource>;
   createEmailAddress: (params: CreateEmailAddressParams) => Promise<EmailAddressResource>;
 
+  // TODO-PASSKEY: Remove in the next minor
   /**
    * @experimental
    * This method is experimental, avoid using this in production applications
    */
   __experimental_createPasskey: () => Promise<PasskeyResource>;
+  createPasskey: () => Promise<PasskeyResource>;
   createPhoneNumber: (params: CreatePhoneNumberParams) => Promise<PhoneNumberResource>;
   createWeb3Wallet: (params: CreateWeb3WalletParams) => Promise<Web3WalletResource>;
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;

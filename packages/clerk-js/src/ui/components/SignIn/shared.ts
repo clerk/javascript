@@ -14,7 +14,7 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   const { setActive } = useClerk();
   const supportEmail = useSupportEmail();
   const { navigateAfterSignIn } = useSignInContext();
-  const { __experimental_authenticateWithPasskey } = useCoreSignIn();
+  const { authenticateWithPasskey } = useCoreSignIn();
 
   useEffect(() => {
     return () => {
@@ -22,9 +22,9 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
     };
   }, []);
 
-  return useCallback(async (...args: Parameters<typeof __experimental_authenticateWithPasskey>) => {
+  return useCallback(async (...args: Parameters<typeof authenticateWithPasskey>) => {
     try {
-      const res = await __experimental_authenticateWithPasskey(...args);
+      const res = await authenticateWithPasskey(...args);
       switch (res.status) {
         case 'complete':
           return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });

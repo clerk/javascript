@@ -85,6 +85,7 @@ export const viVN: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Tên tổ chức',
   formFieldLabel__organizationSlug: 'Đường dẫn rút gọn',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Mật khẩu',
   formFieldLabel__phoneNumber: 'Số điện thoại',
   formFieldLabel__role: 'Vai trò',
@@ -675,6 +676,14 @@ export const viVN: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -761,6 +770,11 @@ export const viVN: LocalizationResource = {
           destructiveActionTitle: 'Xóa',
           headerTitle: 'Ứng dụng xác thực',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Đặt mật khẩu',

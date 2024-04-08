@@ -86,6 +86,7 @@ export const roRO: LocalizationResource = {
     'Introduceți o adresă de e-mail sub acest domeniu pentru a primi un cod și pentru a verifica acest domeniu.',
   formFieldLabel__organizationName: 'Numele organizației',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Parola',
   formFieldLabel__phoneNumber: 'Număr de telefon',
   formFieldLabel__role: 'Rol',
@@ -684,6 +685,14 @@ export const roRO: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -772,6 +781,11 @@ export const roRO: LocalizationResource = {
           destructiveActionTitle: 'Eliminați',
           headerTitle: 'Aplicația Authenticator',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Setați parola',

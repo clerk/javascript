@@ -63,7 +63,7 @@ describe('PasskeySection', () => {
     it('create a new passkey', async () => {
       const { wrapper, fixtures } = await createFixtures(withPasskeys);
 
-      fixtures.clerk.user?.__experimental_createPasskey.mockReturnValueOnce(Promise.resolve({} as any));
+      fixtures.clerk.user?.createPasskey.mockReturnValueOnce(Promise.resolve({} as any));
       const { getByRole, userEvent } = render(
         <CardStateProvider>
           <PasskeySection />
@@ -72,7 +72,7 @@ describe('PasskeySection', () => {
       );
 
       await userEvent.click(getByRole('button', { name: 'Add a passkey' }));
-      expect(fixtures.clerk.user?.__experimental_createPasskey).toHaveBeenCalled();
+      expect(fixtures.clerk.user?.createPasskey).toHaveBeenCalled();
     });
   });
 
@@ -101,7 +101,7 @@ describe('PasskeySection', () => {
     it('update the name of a new passkey', async () => {
       const { wrapper, fixtures } = await createFixtures(withPasskeys);
 
-      fixtures.clerk.user?.__experimental_passkeys[0].update.mockResolvedValue({} as PasskeyResource);
+      fixtures.clerk.user?.passkeys[0].update.mockResolvedValue({} as PasskeyResource);
       const { getByRole, userEvent, getByText, getByLabelText } = render(
         <CardStateProvider>
           <PasskeySection />
@@ -121,7 +121,7 @@ describe('PasskeySection', () => {
       await userEvent.type(getByLabelText(/Name of Passkey/i), 'os');
       expect(getByRole('button', { name: /save$/i })).not.toHaveAttribute('disabled');
       await userEvent.click(getByRole('button', { name: /save$/i }));
-      expect(fixtures.clerk.user?.__experimental_passkeys[0].update).toHaveBeenCalledWith({ name: 'Chrome on Macos' });
+      expect(fixtures.clerk.user?.passkeys[0].update).toHaveBeenCalledWith({ name: 'Chrome on Macos' });
     });
   });
 
@@ -157,7 +157,7 @@ describe('PasskeySection', () => {
         { wrapper },
       );
 
-      fixtures.clerk.user?.__experimental_passkeys[0].delete.mockResolvedValue({
+      fixtures.clerk.user?.passkeys[0].delete.mockResolvedValue({
         object: 'passkey',
         deleted: true,
       });
@@ -173,7 +173,7 @@ describe('PasskeySection', () => {
       await waitFor(() => getByRole('heading', { name: /remove passkey/i }));
 
       await userEvent.click(getByRole('button', { name: /remove/i }));
-      expect(fixtures.clerk.user?.__experimental_passkeys[0].delete).toHaveBeenCalled();
+      expect(fixtures.clerk.user?.passkeys[0].delete).toHaveBeenCalled();
 
       await waitFor(() => expect(queryByRole('heading', { name: /remove passkey/i })).not.toBeInTheDocument());
     });

@@ -1,10 +1,10 @@
 import type {
-  __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   DeletedObjectJSON,
   DeletedObjectResource,
   PasskeyJSON,
   PasskeyResource,
   PasskeyVerificationResource,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
   UpdatePasskeyParams,
 } from '@clerk/types';
 
@@ -42,7 +42,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
   private static async attemptVerification(
     passkeyId: string,
-    credential: __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
+    credential: PublicKeyCredentialWithAuthenticatorAttestationResponse,
   ) {
     const jsonPublicKeyCredential = serializePublicKeyCredential(credential);
     return BaseResource._fetch({
