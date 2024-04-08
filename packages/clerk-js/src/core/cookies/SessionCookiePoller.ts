@@ -1,6 +1,6 @@
 import { createWorkerTimers } from '@clerk/shared';
 
-import { SafeLock } from '../../../utils';
+import { SafeLock } from './safeLock';
 
 const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
 const INTERVAL_IN_MS = 5 * 1000;

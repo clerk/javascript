@@ -3,7 +3,7 @@ import { parseErrors } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON } from '@clerk/types';
 
 import { isDevOrStagingUrl } from '../utils';
-import { getDevBrowserCookie, removeDevBrowserCookie, setDevBrowserCookie } from '../utils/cookies/devBrowser';
+import { getDevBrowserCookie, removeDevBrowserCookie, setDevBrowserCookie } from './cookies/devBrowser';
 import { clerkErrorDevInitFailed } from './errors';
 import type { FapiClient } from './fapiClient';
 

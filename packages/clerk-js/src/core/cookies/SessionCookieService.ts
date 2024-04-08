@@ -1,16 +1,17 @@
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
-import { inBrowser } from '../../../utils';
-import { setClientUatCookie } from '../../../utils/cookies/clientUat';
-import { removeSessionCookie, setSessionCookie } from '../../../utils/cookies/session';
-import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
-import { eventBus, events } from '../../events';
+import { inBrowser } from '../../utils';
+import { clerkCoreErrorTokenRefreshFailed } from '../errors';
+import { eventBus, events } from '../events';
+import { setClientUatCookie } from './clientUat';
+import { removeSessionCookie, setSessionCookie } from './session';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
 export class SessionCookieService {
   private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
+  private publishableKey: string;
 
   constructor(private clerk: Clerk) {
     // set cookie on token update
@@ -20,6 +21,7 @@ export class SessionCookieService {
 
     this.refreshTokenOnVisibilityChange();
     this.startPollingForToken();
+    this.publishableKey = clerk.publishableKey;
   }
 
   public setEnvironment(environment: EnvironmentResource) {

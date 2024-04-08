@@ -85,9 +85,10 @@ import {
   toURL,
   windowNavigate,
 } from '../utils';
-import { getClientUatCookie } from '../utils/cookies/clientUat';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
+import { getClientUatCookie } from './cookies/clientUat';
+import { SessionCookieService } from './cookies/SessionCookieService';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
 import {
@@ -110,7 +111,6 @@ import {
   Environment,
   Organization,
 } from './resources/internal';
-import { SessionCookieService } from './services';
 import { warnings } from './warnings';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };

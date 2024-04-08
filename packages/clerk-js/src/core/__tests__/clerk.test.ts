@@ -3,11 +3,11 @@ import { waitFor } from '@testing-library/dom';
 
 import { mockNativeRuntime } from '../../testUtils';
 import { Clerk } from '../clerk';
+import { SessionCookieService } from '../cookies/SessionCookieService';
 import type { DevBrowser } from '../devBrowser';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, EmailLinkErrorCode, Environment, SignIn, SignUp } from '../resources/internal';
-import { SessionCookieService } from '../services';
 import { mockJwt } from '../test/fixtures';
 
 const mockClientFetch = jest.fn();
