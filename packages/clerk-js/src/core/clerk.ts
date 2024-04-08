@@ -87,7 +87,7 @@ import {
 } from '../utils';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
-import { getClientUatCookie } from './cookies/clientUat';
+import { createClientUatCookie } from './cookies/clientUat';
 import { SessionCookieService } from './cookies/SessionCookieService';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
@@ -1336,7 +1336,8 @@ export class Clerk implements ClerkInterface {
       return false;
     }
 
-    return getClientUatCookie() <= 0;
+    const clientUatCookieHandler = createClientUatCookie(this.publishableKey);
+    return clientUatCookieHandler.get() <= 0;
   };
 
   #shouldRedirectToSatellite = (): boolean => {
@@ -1398,6 +1399,7 @@ export class Clerk implements ClerkInterface {
      * Multi-domain SSO needs this handler to be initiated
      */
     this.#devBrowser = createDevBrowser({
+      publishableKey: this.publishableKey,
       frontendApi: this.frontendApi,
       fapiClient: this.#fapiClient,
     });

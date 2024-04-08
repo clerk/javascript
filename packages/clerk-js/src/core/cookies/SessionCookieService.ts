@@ -4,14 +4,17 @@ import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from 
 import { inBrowser } from '../../utils';
 import { clerkCoreErrorTokenRefreshFailed } from '../errors';
 import { eventBus, events } from '../events';
-import { setClientUatCookie } from './clientUat';
-import { removeSessionCookie, setSessionCookie } from './session';
+import type { ClientUatCookieHandler } from './clientUat';
+import { createClientUatCookie } from './clientUat';
+import type { SessionCookieHandler } from './session';
+import { createSessionCookie } from './session';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
 export class SessionCookieService {
   private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
-  private publishableKey: string;
+  private clientUatCookieHandler: ClientUatCookieHandler;
+  private sessionCookieHandler: SessionCookieHandler;
 
   constructor(private clerk: Clerk) {
     // set cookie on token update
@@ -21,7 +24,9 @@ export class SessionCookieService {
 
     this.refreshTokenOnVisibilityChange();
     this.startPollingForToken();
-    this.publishableKey = clerk.publishableKey;
+
+    this.clientUatCookieHandler = createClientUatCookie(clerk.publishableKey);
+    this.sessionCookieHandler = createSessionCookie(clerk.publishableKey);
   }
 
   public setEnvironment(environment: EnvironmentResource) {
@@ -73,14 +78,14 @@ export class SessionCookieService {
     const rawToken = typeof token === 'string' ? token : token?.getRawString();
 
     if (rawToken) {
-      return setSessionCookie(rawToken);
+      return this.sessionCookieHandler.set(rawToken);
     }
-    return removeSessionCookie();
+    return this.sessionCookieHandler.remove();
   }
 
   private setClientUatCookieForDevelopmentInstances() {
     if (this.environment && this.environment.isDevelopmentOrStaging() && this.inCustomDevelopmentDomain()) {
-      setClientUatCookie(this.clerk.client);
+      this.clientUatCookieHandler.set(this.clerk.client);
     }
   }
 

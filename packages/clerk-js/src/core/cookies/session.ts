@@ -5,23 +5,44 @@ import { inCrossOriginIframe } from '../../utils';
 
 const SESSION_COOKIE_NAME = '__session';
 
+export type SessionCookieHandler = {
+  set: (token: string) => void;
+  remove: () => void;
+};
+
 /**
  *
  * This is a short-lived JS cookie used to store the current user JWT.
  *
  */
-export const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
+export const createSessionCookie = (publishableKey: string, legacy = true): SessionCookieHandler => {
+  const suffix = publishableKey.split('_').pop();
+  const legacySessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
+  const multipleAppsSessionCookie = createCookieHandler(`${SESSION_COOKIE_NAME}_${suffix}`);
 
-export const removeSessionCookie = () => sessionCookie.remove();
+  const sessionCookie = legacy ? legacySessionCookie : multipleAppsSessionCookie;
 
-export const setSessionCookie = (token: string) => {
-  const expires = addYears(Date.now(), 1);
-  const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
-  const secure = window.location.protocol === 'https:';
+  const remove = () => {
+    legacySessionCookie.remove();
+    sessionCookie.remove();
+  };
 
-  return sessionCookie.set(token, {
-    expires,
-    sameSite,
-    secure,
-  });
+  const set = (token: string) => {
+    legacySessionCookie.remove();
+
+    const expires = addYears(Date.now(), 1);
+    const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
+    const secure = window.location.protocol === 'https:';
+
+    return sessionCookie.set(token, {
+      expires,
+      sameSite,
+      secure,
+    });
+  };
+
+  return {
+    set,
+    remove,
+  };
 };

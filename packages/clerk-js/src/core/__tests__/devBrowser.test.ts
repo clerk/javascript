@@ -46,6 +46,7 @@ describe('Thrown errors', () => {
     const mockFapiClient = mockCreateFapiClient() as FapiClient;
 
     const devBrowserHandler = createDevBrowser({
+      publishableKey: 'pk_test_d2hpdGUta29hbGEtNDIuY2xlcmsuYWNjb3VudHMuZGV2JA',
       frontendApi: 'white-koala-42.clerk.accounts.dev',
       fapiClient: mockFapiClient,
     });
