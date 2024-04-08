@@ -285,7 +285,7 @@ export const ManagePlanScreen = () => {
             <Flex align='center'>
               <Icon
                 icon={Information}
-                sx={t => ({ marginRight: t.space.$2, color: t.colors.$neutralAlpha300 })}
+                sx={t => ({ marginRight: t.space.$1, color: t.colors.$neutralAlpha300 })}
               />
               <Text
                 colorScheme='secondary'
