@@ -55,7 +55,8 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: '删除帐户',
   formFieldInputPlaceholder__emailAddress: '',
-  formFieldInputPlaceholder__emailAddress_username: '',formFieldInputPlaceholder__emailAddresses: '输入或粘贴一个或多个电子邮件地址，用空格或逗号分隔',
+  formFieldInputPlaceholder__emailAddress_username: '',
+  formFieldInputPlaceholder__emailAddresses: '输入或粘贴一个或多个电子邮件地址，用空格或逗号分隔',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__organizationDomain: '',
@@ -79,8 +80,7 @@ export const zhCN: LocalizationResource = {
   formFieldLabel__organizationDomain: '域名',
   formFieldLabel__organizationDomainDeletePending: '删除待处理的邀请和建议',
   formFieldLabel__organizationDomainEmailAddress: '验证邮箱地址',
-  formFieldLabel__organizationDomainEmailAddressDescription:
-    '输入此域名下的一个邮箱地址以接收验证码并验证此域名。',
+  formFieldLabel__organizationDomainEmailAddressDescription: '输入此域名下的一个邮箱地址以接收验证码并验证此域名。',
   formFieldLabel__organizationName: '组织名称',
   formFieldLabel__organizationSlug: 'URL 简称',
   formFieldLabel__passkeyName: undefined,
@@ -113,8 +113,7 @@ export const zhCN: LocalizationResource = {
     badge__manualInvitation: '无自动注册',
     badge__unverified: '未验证',
     createDomainPage: {
-      subtitle:
-        '添加域名以进行验证。具有此域名电子邮件地址的用户可以自动加入组织或请求加入。',
+      subtitle: '添加域名以进行验证。具有此域名电子邮件地址的用户可以自动加入组织或请求加入。',
       title: '添加域名',
     },
     invitePage: {
@@ -150,8 +149,7 @@ export const zhCN: LocalizationResource = {
       },
       requestsTab: {
         autoSuggestions: {
-          headerSubtitle:
-            '使用匹配电子邮件域名注册的用户将能够看到请求加入您组织的建议。',
+          headerSubtitle: '使用匹配电子邮件域名注册的用户将能够看到请求加入您组织的建议。',
           headerTitle: '自动建议',
           primaryButton: '管理已验证域名',
         },
@@ -195,8 +193,7 @@ export const zhCN: LocalizationResource = {
         menuAction__remove: '删除',
         menuAction__verify: '验证',
         primaryButton: '添加域名',
-        subtitle:
-          '允许用户根据已验证的电子邮件域名自动加入组织或请求加入。',
+        subtitle: '允许用户根据已验证的电子邮件域名自动加入组织或请求加入。',
         title: '已验证域名',
       },
       successMessage: '组织已更新。',
@@ -225,11 +222,9 @@ export const zhCN: LocalizationResource = {
         removeDomainTitle: '删除域名',
       },
       enrollmentTab: {
-        automaticInvitationOption__description:
-          '用户在注册时会自动收到加入组织的邀请，并且可以随时加入。',
+        automaticInvitationOption__description: '用户在注册时会自动收到加入组织的邀请，并且可以随时加入。',
         automaticInvitationOption__label: '自动邀请',
-        automaticSuggestionOption__description:
-          '用户会收到请求加入的建议，但在加入组织之前必须得到管理员的批准。',
+        automaticSuggestionOption__description: '用户会收到请求加入的建议，但在加入组织之前必须得到管理员的批准。',
         automaticSuggestionOption__label: '自动建议',
         calloutInfoLabel: '更改注册模式只会影响新用户。',
         calloutInvitationCountLabel: '已发送给用户的待处理邀请：{{count}}',
@@ -248,7 +243,7 @@ export const zhCN: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: '输入发送到您邮箱地址的验证码',
       formTitle: '验证码',
-      resendButton: "未收到验证码？重新发送",
+      resendButton: '未收到验证码？重新发送',
       subtitle: '域名 {{domainName}} 需要通过电子邮件进行验证。',
       subtitleVerificationCodeScreen: '验证码已发送到 {{emailAddress}}。输入验证码以继续。',
       title: '验证域名',
