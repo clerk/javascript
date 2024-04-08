@@ -16,7 +16,7 @@ jobs:
   preview:
     if: ${{ startsWith(github.event.comment.body, '!preview') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_CLERK_PROD_ORG_ID }}
@@ -25,22 +25,6 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Limit action to Clerk members
-        uses: actions/github-script@v6
-        with:
-          result-encoding: string
-          retries: 3
-          retry-exempt-status-codes: 400,401
-          github-token: ${{ secrets.CLERK_COOKIE_PAT }}
-          script: |
-            const isMember = await github.rest.orgs.checkMembershipForUser({
-              org: 'clerk',
-              username: context.actor
-            });
-            if (!isMember) {
-              core.setFailed(`@${actor} is not a member of the Clerk organization`);
-            }
-
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
@@ -53,7 +37,7 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          registry-url: "https://registry.npmjs.org"
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Build packages
         run: npx turbo build $TURBO_ARGS
