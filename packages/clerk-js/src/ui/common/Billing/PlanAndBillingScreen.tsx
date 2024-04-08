@@ -127,13 +127,15 @@ const CurrentPlanSection = () => {
               {t(localizationKeys('billing.currentPlanSection.perMonth'))}
             </Text>
           </Text>
-          <Text
-            colorScheme='secondary'
-            sx={t => ({ fontSize: t.fontSizes.$sm })}
-          >
-            {t(localizationKeys('billing.currentPlanSection.renewsOn'))}{' '}
-            {t(getRelativeToNowDateKey(currentPlan.billingCycle?.endDate))}
-          </Text>
+          {currentPlan.billingCycle && (
+            <Text
+              colorScheme='secondary'
+              sx={t => ({ fontSize: t.fontSizes.$sm })}
+            >
+              {t(localizationKeys('billing.currentPlanSection.renewsOn'))}{' '}
+              {t(getRelativeToNowDateKey(currentPlan.billingCycle?.endDate))}
+            </Text>
+          )}
         </Box>
         <ProfileSection.Button
           onClick={goToManageBillingPlan}
