@@ -54,7 +54,7 @@ export class CurrentBillingPlan extends BaseResource implements CurrentBillingPl
   key!: string;
   priceInCents!: number;
   features!: string[];
-  billingCycle!: BillingCycle;
+  billingCycle!: BillingCycle | null;
   paymentMethod!: PaymentMethod | null;
   createdAt!: Date;
   updatedAt!: Date;
@@ -75,7 +75,7 @@ export class CurrentBillingPlan extends BaseResource implements CurrentBillingPl
     this.key = data.key;
     this.priceInCents = data.price_in_cents;
     this.features = data.features;
-    this.billingCycle = {
+    this.billingCycle = data.billing_cycle && {
       startDate: unixEpochToDate(data.billing_cycle.start_date),
       endDate: unixEpochToDate(data.billing_cycle.end_date),
     };
