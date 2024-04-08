@@ -128,8 +128,8 @@
       "dependsOn": [],
       "outputs": []
     },
-    "//#test:integration:express": {
-      "dependsOn": ["^@clerk/clerk-sdk-node#build", "^@clerk/clerk-react#build"],
+    "//#test:integration:ap-flows": {
+      "dependsOn": ["^@clerk/nextjs#build"],
       "inputs": ["integration/**"],
       "outputMode": "new-only"
     },
@@ -138,7 +138,17 @@
       "inputs": ["integration/**"],
       "outputMode": "new-only"
     },
+    "//#test:integration:express": {
+      "dependsOn": ["^@clerk/clerk-sdk-node#build", "^@clerk/clerk-react#build"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
     "//#test:integration:nextjs": {
+      "dependsOn": ["^@clerk/nextjs#build"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
+    "//#test:integration:quickstart": {
       "dependsOn": ["^@clerk/nextjs#build"],
       "inputs": ["integration/**"],
       "outputMode": "new-only"
