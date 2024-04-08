@@ -39,6 +39,11 @@ class AuthenticateContext {
   }
 
   public constructor(private clerkRequest: ClerkRequest, options: AuthenticateRequestOptions) {
+    // Even though the options are assigned to this later in this function
+    // we set the publishableKey here because it is being used in cookies/headers/handshake-values
+    // as part of getMultipleAppsCookie
+    this.publishableKey = options.publishableKey;
+
     this.initHeaderValues();
     this.initCookieValues();
     this.initHandshakeValues();
@@ -48,34 +53,48 @@ class AuthenticateContext {
 
   private initHandshakeValues() {
     this.devBrowserToken =
-      this.clerkRequest.clerkUrl.searchParams.get(constants.Cookies.DevBrowser) ||
-      this.clerkRequest.cookies.get(constants.Cookies.DevBrowser);
+      this.getQueryParam(constants.Cookies.DevBrowser) || this.getMultipleAppsCookie(constants.Cookies.DevBrowser);
     this.handshakeToken =
-      this.clerkRequest.clerkUrl.searchParams.get(constants.Cookies.Handshake) ||
-      this.clerkRequest.cookies.get(constants.Cookies.Handshake);
+      this.getQueryParam(constants.Cookies.Handshake) || this.getCookie(constants.Cookies.Handshake);
   }
 
   private initHeaderValues() {
-    const get = (name: string) => this.clerkRequest.headers.get(name) || undefined;
-    this.sessionTokenInHeader = this.stripAuthorizationHeader(get(constants.Headers.Authorization));
-    this.origin = get(constants.Headers.Origin);
-    this.host = get(constants.Headers.Host);
-    this.forwardedHost = get(constants.Headers.ForwardedHost);
-    this.forwardedProto = get(constants.Headers.CloudFrontForwardedProto) || get(constants.Headers.ForwardedProto);
-    this.referrer = get(constants.Headers.Referrer);
-    this.userAgent = get(constants.Headers.UserAgent);
-    this.secFetchDest = get(constants.Headers.SecFetchDest);
-    this.accept = get(constants.Headers.Accept);
+    this.sessionTokenInHeader = this.stripAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
+    this.origin = this.getHeader(constants.Headers.Origin);
+    this.host = this.getHeader(constants.Headers.Host);
+    this.forwardedHost = this.getHeader(constants.Headers.ForwardedHost);
+    this.forwardedProto =
+      this.getHeader(constants.Headers.CloudFrontForwardedProto) || this.getHeader(constants.Headers.ForwardedProto);
+    this.referrer = this.getHeader(constants.Headers.Referrer);
+    this.userAgent = this.getHeader(constants.Headers.UserAgent);
+    this.secFetchDest = this.getHeader(constants.Headers.SecFetchDest);
+    this.accept = this.getHeader(constants.Headers.Accept);
   }
 
   private initCookieValues() {
-    const get = (name: string) => this.clerkRequest.cookies.get(name) || undefined;
-    this.sessionTokenInCookie = get(constants.Cookies.Session);
-    this.clientUat = Number.parseInt(get(constants.Cookies.ClientUat) || '') || 0;
+    this.sessionTokenInCookie = this.getMultipleAppsCookie(constants.Cookies.Session);
+    this.clientUat = Number.parseInt(this.getMultipleAppsCookie(constants.Cookies.ClientUat) || '') || 0;
   }
 
   private stripAuthorizationHeader(authValue: string | undefined | null): string | undefined {
     return authValue?.replace('Bearer ', '');
+  }
+
+  private getQueryParam(name: string) {
+    return this.clerkRequest.clerkUrl.searchParams.get(name);
+  }
+
+  private getHeader(name: string) {
+    return this.clerkRequest.headers.get(name) || undefined;
+  }
+
+  private getCookie(name: string) {
+    return this.clerkRequest.cookies.get(name) || undefined;
+  }
+
+  private getMultipleAppsCookie(cookieName: string) {
+    const suffix = this.publishableKey?.split('_').pop();
+    return this.getCookie(`${cookieName}_${suffix}`) || this.getCookie(cookieName) || undefined;
   }
 }
 
