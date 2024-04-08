@@ -37,7 +37,6 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  RedirectOptions,
   Resources,
   SDKMetadata,
   SetActiveParams,
@@ -59,7 +58,6 @@ import type {
 
 import type { MountComponentRenderer } from '../ui/Components';
 import {
-  appendAsQueryParams,
   buildURL,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
@@ -77,17 +75,16 @@ import {
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
-  pickRedirectionProp,
   removeClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
   stripOrigin,
-  stripSameOrigin,
-  toURL,
   windowNavigate,
 } from '../utils';
+import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { getClientUatCookie } from '../utils/cookies/clientUat';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { RedirectUrls } from '../utils/redirectUrls';
 import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
@@ -133,9 +130,11 @@ const defaultOptions: ClerkOptions = {
   isSatellite: false,
   signInUrl: undefined,
   signUpUrl: undefined,
-  afterSignInUrl: undefined,
-  afterSignUpUrl: undefined,
   afterSignOutUrl: undefined,
+  signInFallbackRedirectUrl: undefined,
+  signUpFallbackRedirectUrl: undefined,
+  signInForceRedirectUrl: undefined,
+  signUpForceRedirectUrl: undefined,
 };
 
 export class Clerk implements ClerkInterface {
@@ -275,6 +274,8 @@ export class Clerk implements ClerkInterface {
       ...defaultOptions,
       ...options,
     };
+
+    assertNoLegacyProp(this.#options);
 
     if (this.#options.sdkMetadata) {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
@@ -827,11 +828,17 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildSignInUrl(options?: SignInRedirectOptions): string {
-    return this.#buildUrl('signInUrl', options);
+    return this.#buildUrl('signInUrl', {
+      ...options?.initialValues,
+      redirect_url: options?.redirectUrl || window.location.href,
+    });
   }
 
   public buildSignUpUrl(options?: SignUpRedirectOptions): string {
-    return this.#buildUrl('signUpUrl', options);
+    return this.#buildUrl('signUpUrl', {
+      ...options?.initialValues,
+      redirect_url: options?.redirectUrl || window.location.href,
+    });
   }
 
   public buildUserProfileUrl(): string {
@@ -849,19 +856,11 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildAfterSignInUrl(): string {
-    if (!this.#options.afterSignInUrl) {
-      return '/';
-    }
-
-    return this.buildUrlWithAuth(this.#options.afterSignInUrl);
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignInUrl());
   }
 
   public buildAfterSignUpUrl(): string {
-    if (!this.#options.afterSignUpUrl) {
-      return '/';
-    }
-
-    return this.buildUrlWithAuth(this.#options.afterSignUpUrl);
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignUpUrl());
   }
 
   public buildAfterSignOutUrl(): string {
@@ -1062,9 +1061,9 @@ export class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
-    const navigateAfterSignIn = makeNavigate(params.afterSignInUrl || params.redirectUrl || '/');
-
-    const navigateAfterSignUp = makeNavigate(params.afterSignUpUrl || params.redirectUrl || '/');
+    const redirectUrls = new RedirectUrls(this.#options, params);
+    const navigateAfterSignIn = makeNavigate(redirectUrls.getAfterSignInUrl());
+    const navigateAfterSignUp = makeNavigate(redirectUrls.getAfterSignUpUrl());
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||
@@ -1090,7 +1089,6 @@ export class Clerk implements ClerkInterface {
 
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
-
     if (userExistsButNeedsToSignIn) {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
@@ -1644,31 +1642,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  #buildUrl = (key: 'signInUrl' | 'signUpUrl', options?: SignInRedirectOptions | SignUpRedirectOptions): string => {
-    if (!this.loaded || !this.#environment || !this.#environment.displayConfig) {
+  #buildUrl = (key: 'signInUrl' | 'signUpUrl', params?: Record<string, string>): string => {
+    if (!key || !this.loaded || !this.#environment || !this.#environment.displayConfig) {
       return '';
     }
-
-    const signInOrUpUrl = pickRedirectionProp(
-      key,
-      { options: this.#options, displayConfig: this.#environment.displayConfig },
-      false,
-    );
-
-    const urls: RedirectOptions = {
-      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
-      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-
-    (Object.keys(urls) as Array<keyof typeof urls>).forEach(function (key) {
-      const url = urls[key];
-      if (url) {
-        urls[key] = stripSameOrigin(toURL(url), toURL(signInOrUpUrl));
-      }
-    });
-
-    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, { ...urls, ...options?.initialValues }));
+    const signInOrUpUrl = this.#options[key] || this.#environment.displayConfig[key];
+    const redirectUrls = new RedirectUrls(this.#options, params);
+    return this.buildUrlWithAuth(redirectUrls.appendPreservedPropsToUrl(signInOrUpUrl, params));
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {

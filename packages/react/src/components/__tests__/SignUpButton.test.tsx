@@ -48,33 +48,33 @@ describe('<SignUpButton/>', () => {
     });
   });
 
-  it('handles redirectUrl prop', async () => {
-    render(<SignUpButton redirectUrl={url} />);
+  it('handles forceRedirectUrl prop', async () => {
+    render(<SignUpButton forceRedirectUrl={url} />);
     const btn = screen.getByText('Sign up');
     userEvent.click(btn);
     await waitFor(() => {
-      expect(mockRedirectToSignUp).toHaveBeenCalledWith({ redirectUrl: url });
+      expect(mockRedirectToSignUp).toHaveBeenCalledWith({ forceRedirectUrl: url });
     });
   });
 
-  it('handles afterSignUpUrl prop', async () => {
-    render(<SignUpButton afterSignUpUrl={url} />);
+  it('handles forceRedirectUrl prop', async () => {
+    render(<SignUpButton forceRedirectUrl={url} />);
     const btn = screen.getByText('Sign up');
     userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalledWith({
-        afterSignUpUrl: url,
+        forceRedirectUrl: url,
       });
     });
   });
 
-  it('handles afterSignUpUrl prop', async () => {
-    render(<SignUpButton afterSignUpUrl={url} />);
+  it('handles forceRedirectUrl prop', async () => {
+    render(<SignUpButton forceRedirectUrl={url} />);
     const btn = screen.getByText('Sign up');
     userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalledWith({
-        afterSignUpUrl: url,
+        forceRedirectUrl: url,
       });
     });
   });

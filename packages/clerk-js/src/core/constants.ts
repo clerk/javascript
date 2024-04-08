@@ -1,4 +1,11 @@
-export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up_url', 'redirect_url'];
+// TODO: Do we still have a use for this or can we simply preserve all params?
+export const PRESERVED_QUERYSTRING_PARAMS = [
+  'redirect_url',
+  'sign_in_force_redirect_url',
+  'sign_in_fallback_redirect_url',
+  'sign_up_force_redirect_url',
+  'sign_up_fallback_redirect_url',
+];
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
 export const CLERK_SYNCED = '__clerk_synced';

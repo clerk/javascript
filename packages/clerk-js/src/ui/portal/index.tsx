@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { PRESERVED_QUERYSTRING_PARAMS } from '../../core/constants';
 import { clerkErrorPathRouterMissingPath } from '../../core/errors';
 import { buildVirtualRouterUrl } from '../../utils';
-import { normalizeRoutingOptions } from '../../utils/authPropHelpers';
+import { normalizeRoutingOptions } from '../../utils/normalizeRoutingOptions';
 import { ComponentContext } from '../contexts';
 import { HashRouter, PathRouter, VirtualRouter } from '../router';
 import type { AvailableComponentCtx } from '../types';
