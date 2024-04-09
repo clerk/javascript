@@ -16,21 +16,19 @@ jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
     runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     env:
       TURBO_SUMMARIZE: false
 
     steps:
       - name: Checkout Repo
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           show-progress: false
 
       - name: Setup
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         id: config
         uses: ./.github/actions/init
         with:
@@ -44,7 +42,6 @@ jobs:
         shell: bash
 
       - name: Require Changeset
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         if: ${{ !(github.event_name == 'merge_group') }}
         run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
@@ -53,28 +50,22 @@ jobs:
         shell: bash
 
       - name: Check Formatting
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run format:check
 
       - name: Build Packages
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npx turbo build $TURBO_ARGS --only
 
       - name: Lint packages using publint
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npx turbo lint:publint $TURBO_ARGS --only
 
       - name: Lint types using attw
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!elements --filter=!backend --only
 
       - name: Lint types using attw [Errors Allowed]
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --filter=elements --continue --only
-        continue-on-error: true  # TODO: Remove this when all related errors are fixed
+        continue-on-error: true # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npx turbo lint $TURBO_ARGS --only -- --quiet
 
       - name: Upload Turbo Summary
@@ -90,14 +81,14 @@ jobs:
     name: Unit Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     env:
       TURBO_SUMMARIZE: false
 
     strategy:
       matrix:
-        node-version: [ 18, 20 ]
+        node-version: [18, 20]
 
     steps:
       - name: Checkout Repo
@@ -134,12 +125,12 @@ jobs:
     name: Integration Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_MEDIUM }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs', 'express', 'quickstart', 'ap-flows' ]
-        test-project: [ 'chrome' ]
+        test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
+        test-project: ['chrome']
 
     steps:
       - name: Checkout Repo
