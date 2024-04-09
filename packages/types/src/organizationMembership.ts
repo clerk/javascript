@@ -1,21 +1,8 @@
+import type { CustomPermissionKey, CustomPlanKey, CustomRoleKey, Placeholder } from './authorization';
 import type { OrganizationResource } from './organization';
 import type { ClerkResource } from './resource';
 import type { PublicUserData } from './session';
 import type { Autocomplete } from './utils';
-
-interface Base {
-  permission: string;
-  role: string;
-}
-
-interface Placeholder {
-  permission: unknown;
-  role: unknown;
-}
-
-declare global {
-  interface ClerkAuthorization {}
-}
 
 declare global {
   /**
@@ -44,26 +31,18 @@ export interface OrganizationMembershipResource extends ClerkResource {
   publicMetadata: OrganizationMembershipPublicMetadata;
   publicUserData: PublicUserData;
   role: OrganizationCustomRoleKey;
+  orgPlan?: CustomPlanKey;
   createdAt: Date;
   updatedAt: Date;
   destroy: () => Promise<OrganizationMembershipResource>;
   update: (updateParams: UpdateOrganizationMembershipParams) => Promise<OrganizationMembershipResource>;
 }
 
-export type OrganizationCustomPermissionKey = ClerkAuthorization extends Placeholder
-  ? ClerkAuthorization['permission'] extends string
-    ? ClerkAuthorization['permission']
-    : Base['permission']
-  : Base['permission'];
-
+export type OrganizationCustomPermissionKey = CustomPermissionKey;
 /**
  * OrganizationCustomRoleKey will be string unless the developer has provided their own types through `ClerkAuthorization`
  */
-export type OrganizationCustomRoleKey = ClerkAuthorization extends Placeholder
-  ? ClerkAuthorization['role'] extends string
-    ? ClerkAuthorization['role']
-    : Base['role']
-  : Base['role'];
+export type OrganizationCustomRoleKey = CustomRoleKey;
 
 export type OrganizationSystemPermissionKey =
   | 'org:sys_domains:manage'

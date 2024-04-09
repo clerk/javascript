@@ -52,7 +52,7 @@ export function Protect(props: ProtectProps): React.JSX.Element | null {
     return unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (restAuthorizedParams.role || restAuthorizedParams.permission || restAuthorizedParams.plan) {
     if (has(restAuthorizedParams)) {
       return authorized;
     }
