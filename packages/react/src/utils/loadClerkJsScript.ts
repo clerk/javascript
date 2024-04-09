@@ -15,7 +15,7 @@ type LoadClerkJsScriptOptions = Omit<IsomorphicClerkOptions, 'proxyUrl' | 'domai
   domain: string;
 };
 
-export const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
+const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
   const { publishableKey } = opts;
 
   if (!publishableKey) {
@@ -45,7 +45,7 @@ export const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
   });
 };
 
-export const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
+const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
@@ -66,17 +66,30 @@ export const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 
+const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
+  const obj: Record<string, string> = {};
+
+  if (options.publishableKey) {
+    obj['data-clerk-publishable-key'] = options.publishableKey;
+  }
+
+  if (options.proxyUrl) {
+    obj['data-clerk-proxy-url'] = options.proxyUrl;
+  }
+
+  if (options.domain) {
+    obj['data-clerk-clerk-domain'] = options.domain;
+  }
+
+  return obj;
+};
+
 const applyClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => (script: HTMLScriptElement) => {
-  const { publishableKey, proxyUrl, domain } = options;
-  if (publishableKey) {
-    script.setAttribute('data-clerk-publishable-key', publishableKey);
-  }
-
-  if (proxyUrl) {
-    script.setAttribute('data-clerk-proxy-url', proxyUrl);
-  }
-
-  if (domain) {
-    script.setAttribute('data-clerk-domain', domain);
+  const attributes = buildClerkJsScriptAttributes(options);
+  for (const attribute in attributes) {
+    script.setAttribute(attribute, attributes[attribute]);
   }
 };
+
+export { loadClerkJsScript, buildClerkJsScriptAttributes, clerkJsScriptUrl };
+export type { LoadClerkJsScriptOptions };

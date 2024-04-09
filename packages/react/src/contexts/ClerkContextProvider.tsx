@@ -5,7 +5,8 @@ import React, { type ScriptHTMLAttributes } from 'react';
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
 import { deriveState } from '../utils/deriveState';
-import { clerkJsScriptUrl } from '../utils/loadClerkJsScript';
+import type { LoadClerkJsScriptOptions } from '../utils/loadClerkJsScript';
+import { buildClerkJsScriptAttributes, clerkJsScriptUrl } from '../utils/loadClerkJsScript';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 
@@ -56,7 +57,11 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
   return (
     <>
       <InlineClerkScript
-        options={isomorphicClerkOptions}
+        options={{
+          ...isomorphicClerkOptions,
+          domain: clerk?.domain,
+          proxyUrl: clerk?.proxyUrl,
+        }}
         ScriptComponent={ScriptComponent}
       />
       {/*// @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk*/}
@@ -79,20 +84,17 @@ function InlineClerkScript({
   options,
   ScriptComponent: ScriptTag,
 }: {
-  options: IsomorphicClerkOptions;
+  options: LoadClerkJsScriptOptions;
   ScriptComponent?: ClerkContextProvider['ScriptComponent'];
 }) {
   if (!ScriptTag) {
+    /**
+     * When a ScriptTag component is not provided, simply render nothing and let the default mechanism of IsomorphicClerk take over.
+     */
     return null;
   }
 
-  const scriptUrl = clerkJsScriptUrl(options as any);
-
-  /**
-   * Supporting a plain `script` tag is not optimal
-   * - It will be placed inside `body` instead of `head`
-   * - For CSR application it has the same effect as calling `loadClerkJS`
-   */
+  const scriptUrl = clerkJsScriptUrl(options);
 
   return (
     <ScriptTag
@@ -100,7 +102,7 @@ function InlineClerkScript({
       data-clerk-js-script
       async
       crossOrigin='anonymous'
-      data-clerk-publishable-key={options.publishableKey}
+      {...buildClerkJsScriptAttributes(options)}
     />
   );
 }
