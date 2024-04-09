@@ -3,13 +3,15 @@ import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 import { useRouter } from 'next/router';
 import NextjsScript from 'next/script';
-import React, { type ScriptHTMLAttributes } from 'react';
+import type { ScriptHTMLAttributes } from 'react';
+import React from 'react';
 
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
 import { useSafeLayoutEffect } from '../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../types';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
+
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 
 function CustomNextjsScript(props: ScriptHTMLAttributes<HTMLScriptElement>) {

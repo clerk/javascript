@@ -77,11 +77,15 @@ export function ClerkContextProvider(props: ClerkContextProvider): JSX.Element |
 
 function InlineClerkScript({
   options,
-  ScriptComponent,
+  ScriptComponent: ScriptTag,
 }: {
   options: IsomorphicClerkOptions;
   ScriptComponent?: ClerkContextProvider['ScriptComponent'];
 }) {
+  if (!ScriptTag) {
+    return null;
+  }
+
   const scriptUrl = clerkJsScriptUrl(options as any);
 
   /**
@@ -89,7 +93,6 @@ function InlineClerkScript({
    * - It will be placed inside `body` instead of `head`
    * - For CSR application it has the same effect as calling `loadClerkJS`
    */
-  const ScriptTag = ScriptComponent || 'script';
 
   return (
     <ScriptTag
