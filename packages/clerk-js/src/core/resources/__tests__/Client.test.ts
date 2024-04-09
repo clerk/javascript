@@ -1,7 +1,7 @@
 import type { ClientJSON } from '@clerk/types';
 
-import { createSession, createSignIn, createSignUp, createUser } from '../test/fixtures';
-import { BaseResource, Client } from './internal';
+import { createSession, createSignIn, createSignUp, createUser } from '../../test/fixtures';
+import { BaseResource, Client } from '../internal';
 
 describe('Client Singleton', () => {
   it('destroy', async () => {

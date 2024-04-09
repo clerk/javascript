@@ -1,7 +1,7 @@
 import type { UserJSON } from '@clerk/types';
 
-import { BaseResource } from './internal';
-import { User } from './User';
+import { BaseResource } from '../internal';
+import { User } from '../User';
 
 describe('User', () => {
   it('creates an external account', async () => {

@@ -1,4 +1,4 @@
-import { OrganizationMembershipRequest } from './internal';
+import { OrganizationMembershipRequest } from '../internal';
 
 describe('OrganizationMembership', () => {
   it('has the same initial properties', () => {

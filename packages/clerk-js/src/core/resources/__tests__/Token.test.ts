@@ -1,7 +1,7 @@
-import { createFapiClient } from '../fapiClient';
-import { mockDevClerkInstance, mockFetch, mockNetworkFailedFetch } from '../test/fixtures';
-import { BaseResource } from './internal';
-import { Token } from './Token';
+import { createFapiClient } from '../../fapiClient';
+import { mockDevClerkInstance, mockFetch, mockNetworkFailedFetch } from '../../test/fixtures';
+import { BaseResource } from '../internal';
+import { Token } from '../Token';
 
 describe('Token', () => {
   describe('create', () => {

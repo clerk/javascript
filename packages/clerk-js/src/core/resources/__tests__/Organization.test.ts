@@ -1,4 +1,4 @@
-import { Organization } from './internal';
+import { Organization } from '../internal';
 
 describe('Organization', () => {
   it('has the same initial properties', () => {

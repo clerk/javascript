@@ -1,9 +1,9 @@
 import type { SessionJSON } from '@clerk/types';
 
-import { eventBus } from '../events';
-import { createFapiClient } from '../fapiClient';
-import { clerkMock, createUser, mockDevClerkInstance, mockJwt, mockNetworkFailedFetch } from '../test/fixtures';
-import { BaseResource, Session } from './internal';
+import { eventBus } from '../../events';
+import { createFapiClient } from '../../fapiClient';
+import { clerkMock, createUser, mockDevClerkInstance, mockJwt, mockNetworkFailedFetch } from '../../test/fixtures';
+import { BaseResource, Session } from '../internal';
 
 describe('Session', () => {
   describe('creating new session', () => {

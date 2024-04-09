@@ -1,6 +1,6 @@
 import type { Clerk } from '@clerk/types';
 
-import { createFapiClient } from './fapiClient';
+import { createFapiClient } from '../fapiClient';
 
 const mockedClerkInstance = {
   frontendApi: 'clerk.example.com',

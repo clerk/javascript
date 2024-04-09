@@ -1,4 +1,4 @@
-import { formatSafeIdentifier } from './formatSafeIdentifier';
+import { formatSafeIdentifier } from '../formatSafeIdentifier';
 
 describe('formatSafeIdentifier', () => {
   const cases = [

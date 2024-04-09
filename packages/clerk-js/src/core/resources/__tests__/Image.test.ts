@@ -1,5 +1,5 @@
-import { Image } from './Image';
-import { BaseResource } from './internal';
+import { Image } from '../Image';
+import { BaseResource } from '../internal';
 
 describe('Image', () => {
   it('.create returns the newly created image', async () => {
