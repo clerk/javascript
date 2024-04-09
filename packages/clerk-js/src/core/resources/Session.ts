@@ -87,17 +87,21 @@ export class Session extends BaseResource implements SessionResource {
 
     // Based on FAPI this should never happen, but we handle it anyway
     if (!activeMembership) {
-      return false;
+      return this.user.plan === params.plan;
     }
 
     const activeOrganizationPermissions = activeMembership.permissions;
     const activeOrganizationRole = activeMembership.role;
+    const activeOrganizationPlan = activeMembership.orgPlan;
 
     if (params.permission) {
       return activeOrganizationPermissions.includes(params.permission);
     }
     if (params.role) {
       return activeOrganizationRole === params.role;
+    }
+    if (params.plan) {
+      return activeOrganizationPlan === params.plan;
     }
 
     return false;

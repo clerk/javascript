@@ -1,5 +1,10 @@
 import { useSession } from '@clerk/shared/react';
-import type { CheckAuthorization, OrganizationCustomRoleKey, OrganizationPermissionKey } from '@clerk/types';
+import type {
+  CheckAuthorization,
+  CustomPlanKey,
+  OrganizationCustomRoleKey,
+  OrganizationPermissionKey,
+} from '@clerk/types';
 import type { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import React, { useEffect } from 'react';
 
@@ -13,16 +18,25 @@ type ProtectProps = PropsWithChildren<
         condition?: never;
         role: OrganizationCustomRoleKey;
         permission?: never;
+        plan?: never;
       }
     | {
         condition?: never;
         role?: never;
         permission: OrganizationPermissionKey;
+        plan?: never;
       }
     | {
         condition: (has: CheckAuthorization) => boolean;
         role?: never;
         permission?: never;
+        plan?: never;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        permission?: never;
+        plan: CustomPlanKey;
       }
   ) & {
     fallback?: ReactNode;
