@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import Fastify from 'fastify';
 
-import { clerkPlugin, getAuth } from './index';
+import { clerkPlugin, getAuth } from '../index';
 
 const authenticateRequestMock = jest.fn();
 

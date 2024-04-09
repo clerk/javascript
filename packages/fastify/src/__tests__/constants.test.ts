@@ -12,7 +12,7 @@ process.env.CLERK_SECRET_KEY = 'CLERK_SECRET_KEY';
 process.env.CLERK_PUBLISHABLE_KEY = 'CLERK_PUBLISHABLE_KEY';
 process.env.CLERK_JWT_KEY = 'CLERK_JWT_KEY';
 
-import * as constants from './constants';
+import * as constants from '../constants';
 
 describe('constants', () => {
   afterEach(() => {

@@ -1,6 +1,6 @@
 import type { FastifyRequest } from 'fastify';
 
-import { getAuth } from './getAuth';
+import { getAuth } from '../getAuth';
 
 describe('getAuth(req)', () => {
   test('returns req.auth', () => {

@@ -9,7 +9,7 @@ jest.mock('@clerk/backend', () => {
   };
 });
 
-import { clerkClient } from './clerkClient';
+import { clerkClient } from '../clerkClient';
 
 describe('clerk', () => {
   afterAll(() => {

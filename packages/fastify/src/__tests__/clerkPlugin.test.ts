@@ -1,12 +1,12 @@
-jest.mock('./withClerkMiddleware', () => {
+jest.mock('../withClerkMiddleware', () => {
   return {
     withClerkMiddleware: () => 'withClerkMiddlewareMocked',
   };
 });
 
-import { clerkPlugin } from './clerkPlugin';
-import { createFastifyInstanceMock } from './test/utils';
-import type { ALLOWED_HOOKS } from './types';
+import { clerkPlugin } from '../clerkPlugin';
+import { createFastifyInstanceMock } from '../test/utils';
+import type { ALLOWED_HOOKS } from '../types';
 
 describe('clerkPlugin()', () => {
   test('adds withClerkMiddleware as preHandler by default', () => {

@@ -1,4 +1,4 @@
-import * as publicExports from './index';
+import * as publicExports from '../index';
 
 describe('/api public exports', () => {
   it('should not include a breaking change', () => {
