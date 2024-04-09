@@ -59,6 +59,7 @@ declare global {
 }
 
 export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
+export const CAPTCHA_INVISIBLE_CLASSNAME = 'clerk-invisible-captcha';
 
 export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300', '600'];
@@ -78,18 +79,33 @@ export async function loadCaptcha(url: string) {
   return window.turnstile;
 }
 
-export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptUrl: string }) => {
-  const { siteKey: sitekey, scriptUrl } = captchaOptions;
+export const getCaptchaToken = async (captchaOptions: {
+  siteKey: string;
+  scriptUrl: string;
+  widgetType: string | null;
+}) => {
+  const { siteKey: sitekey, scriptUrl, widgetType } = captchaOptions;
   let captchaToken = '',
     id = '';
+  const invisibleWidget = !widgetType || widgetType === 'invisible';
 
-  const widgetDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
-  if (widgetDiv) {
-    widgetDiv.style.display = 'block';
+  let widgetDiv: HTMLElement | null = null;
+
+  if (invisibleWidget) {
+    const div = document.createElement('div');
+    div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
+    document.body.appendChild(div);
+    widgetDiv = div;
   } else {
-    throw {
-      captchaError: 'Element to render the captcha not found',
-    };
+    const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
+    if (visibleDiv) {
+      visibleDiv.style.display = 'block';
+      widgetDiv = visibleDiv;
+    } else {
+      throw {
+        captchaError: 'Element to render the captcha not found',
+      };
+    }
   }
 
   const captcha = await loadCaptcha(scriptUrl);
@@ -99,7 +115,7 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
   const handleCaptchaTokenGeneration = (): Promise<[string, string]> => {
     return new Promise((resolve, reject) => {
       try {
-        const id = captcha.render(`#${CAPTCHA_ELEMENT_ID}`, {
+        const id = captcha.render(invisibleWidget ? `.${CAPTCHA_INVISIBLE_CLASSNAME}` : `#${CAPTCHA_ELEMENT_ID}`, {
           sitekey,
           appearance: 'interaction-only',
           retry: 'never',
@@ -147,7 +163,9 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
       captchaError: e,
     };
   } finally {
-    if (widgetDiv) {
+    if (invisibleWidget) {
+      document.body.removeChild(widgetDiv);
+    } else {
       widgetDiv.style.display = 'none';
     }
   }

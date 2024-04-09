@@ -6,6 +6,7 @@ export const retrieveCaptchaInfo = (clerk: Clerk) => {
   const fapiClient = createFapiClient(clerk);
   return {
     captchaSiteKey: _environment ? _environment.displayConfig.captchaPublicKey : null,
+    captchaWidgetType: _environment ? _environment.displayConfig.captchaWidgetType : null,
     canUseCaptcha: _environment
       ? _environment.userSettings.signUp.captcha_enabled &&
         clerk.isStandardBrowser &&
