@@ -1,6 +1,7 @@
 import type {
   ActJWTClaim,
   CheckAuthorizationWithCustomPermissions,
+  CustomPlanKey,
   GetToken,
   OrganizationCustomRoleKey,
   SignOut,
@@ -58,7 +59,7 @@ type UseAuthReturn =
       orgRole: null;
       orgSlug: null;
       orgPlan: null;
-      plan: string | undefined;
+      plan: CustomPlanKey | undefined;
       has: CheckAuthorizationWithoutOrgOrUser;
       signOut: SignOut;
       getToken: GetToken;
@@ -72,8 +73,8 @@ type UseAuthReturn =
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;
-      orgPlan: string | undefined;
-      plan: string | undefined;
+      orgPlan: CustomPlanKey | undefined;
+      plan: CustomPlanKey | undefined;
       has: CheckAuthorizationWithCustomPermissions;
       signOut: SignOut;
       getToken: GetToken;
