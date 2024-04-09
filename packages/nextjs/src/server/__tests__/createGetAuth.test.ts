@@ -1,7 +1,7 @@
 import { AuthStatus, constants } from '@clerk/backend/internal';
 import { NextRequest } from 'next/server';
 
-import { createGetAuth, getAuth } from './createGetAuth';
+import { createGetAuth, getAuth } from '../createGetAuth';
 
 // { alg: 'HS256' }.{ sub: 'user-id' }.sig
 const mockToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLWlkIn0.0u5CllULtDVD9DUUmUMdJLbBCSNcnv4j3hCaPz4dNr8';

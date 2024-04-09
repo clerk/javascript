@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { mergeResponses } from './response';
+import { mergeResponses } from '../response';
 
 describe('mergeResponses', function () {
   it('should fail unless one response is passed', function () {

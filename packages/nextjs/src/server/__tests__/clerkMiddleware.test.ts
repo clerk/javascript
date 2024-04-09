@@ -12,7 +12,7 @@ const authenticateRequestMock = jest.fn().mockResolvedValue({
   publishableKey,
 });
 
-jest.mock('./clerkClient', () => {
+jest.mock('../clerkClient', () => {
   return {
     clerkClient: {
       authenticateRequest: authenticateRequestMock,
@@ -22,9 +22,9 @@ jest.mock('./clerkClient', () => {
 });
 
 // used to assert the mock
-import { clerkClient } from './clerkClient';
-import { clerkMiddleware } from './clerkMiddleware';
-import { createRouteMatcher } from './routeMatcher';
+import { clerkClient } from '../clerkClient';
+import { clerkMiddleware } from '../clerkMiddleware';
+import { createRouteMatcher } from '../routeMatcher';
 
 /**
  * Disable console warnings about config matchers
@@ -40,7 +40,7 @@ afterAll(() => {
 
 // Removing this mock will cause the clerkMiddleware tests to fail due to missing publishable key
 // This mock SHOULD exist before the imports
-jest.mock('./constants', () => {
+jest.mock('../constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',

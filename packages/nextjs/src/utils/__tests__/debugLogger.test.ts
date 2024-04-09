@@ -1,6 +1,6 @@
 import { expectTypeOf } from 'expect-type';
 
-import { withLogger } from './debugLogger';
+import { withLogger } from '../debugLogger';
 
 describe('withLogger', () => {
   let logger: any;
