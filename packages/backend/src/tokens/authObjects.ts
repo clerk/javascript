@@ -1,6 +1,7 @@
 import type {
   ActClaim,
   CheckAuthorizationWithCustomPermissions,
+  CustomPlanKey,
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -30,9 +31,11 @@ export type SignedInAuthObject = {
   sessionId: string;
   actor: ActClaim | undefined;
   userId: string;
+  plan: CustomPlanKey | undefined;
   orgId: string | undefined;
   orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
+  orgPlan: CustomPlanKey | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
@@ -47,10 +50,12 @@ export type SignedOutAuthObject = {
   sessionId: null;
   actor: null;
   userId: null;
+  plan: null;
   orgId: null;
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
+  orgPlan: null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -80,11 +85,13 @@ export function signedInAuthObject(
   const {
     act: actor,
     sid: sessionId,
+    plan,
     org_id: orgId,
     org_role: orgRole,
     org_slug: orgSlug,
     org_permissions: orgPermissions,
     sub: userId,
+    org_plan: orgPlan,
   } = sessionClaims;
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
@@ -98,12 +105,14 @@ export function signedInAuthObject(
     sessionClaims,
     sessionId,
     userId,
+    plan,
     orgId,
     orgRole,
     orgSlug,
+    orgPlan,
     orgPermissions,
     getToken,
-    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
+    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId, plan, orgPlan }),
     debug: createDebug({ ...authenticateContext }),
   };
 }
@@ -116,10 +125,12 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     sessionClaims: null,
     sessionId: null,
     userId: null,
+    plan: null,
     actor: null,
     orgId: null,
     orgRole: null,
     orgSlug: null,
+    orgPlan: null,
     orgPermissions: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
@@ -167,26 +178,35 @@ const createHasAuthorization = (options: {
   orgId: string | undefined;
   orgRole: string | undefined;
   orgPermissions: string[] | undefined;
+  orgPlan: string | undefined;
+  plan: string | undefined;
 }): CheckAuthorizationWithCustomPermissions => {
-  const { orgId, orgRole, userId, orgPermissions } = options;
+  const { orgId, orgRole, userId, orgPermissions, orgPlan, plan } = options;
 
   return params => {
-    if (!params?.permission && !params?.role) {
+    if (!params?.permission && !params?.role && !params.plan) {
       throw new Error(
-        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
+        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key or a plan key to be passed. Example usage: `has({permission: "org:posts:edit"})`',
       );
     }
 
-    if (!orgId || !userId || !orgRole || !orgPermissions) {
+    if (!orgId && !userId) {
       return false;
     }
 
     if (params.permission) {
+      if (!orgPermissions) {
+        return false;
+      }
       return orgPermissions.includes(params.permission);
     }
 
     if (params.role) {
       return orgRole === params.role;
+    }
+
+    if (params.plan) {
+      return orgPlan === params.plan || plan === params.plan;
     }
 
     return false;

@@ -1,3 +1,4 @@
+export { CustomPlanKey } from './authorization';
 export * from './api';
 export * from './appearance';
 export * from './elementIds';

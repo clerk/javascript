@@ -1,5 +1,6 @@
 import type {
   CheckAuthorizationWithCustomPermissions,
+  CustomPlanKey,
   HandleOAuthCallbackParams,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
@@ -60,21 +61,31 @@ export type ProtectProps = React.PropsWithChildren<
         condition?: never;
         role: OrganizationCustomRoleKey;
         permission?: never;
+        plan?: never;
       }
     | {
         condition?: never;
         role?: never;
+        plan?: never;
         permission: OrganizationCustomPermissionKey;
+      }
+    | {
+        condition?: never;
+        role?: never;
+        plan: CustomPlanKey;
+        permission?: never;
       }
     | {
         condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
         role?: never;
         permission?: never;
+        plan?: never;
       }
     | {
         condition?: never;
         role?: never;
         permission?: never;
+        plan?: never;
       }
   ) & {
     fallback?: React.ReactNode;
@@ -126,7 +137,7 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
     return unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (restAuthorizedParams.role || restAuthorizedParams.permission || restAuthorizedParams.plan) {
     if (has(restAuthorizedParams)) {
       return authorized;
     }

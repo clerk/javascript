@@ -14,6 +14,7 @@ import type {
   CreateWeb3WalletParams,
   CurrentBillingPlanJSON,
   CurrentBillingPlanResource,
+  CustomPlanKey,
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
@@ -69,6 +70,7 @@ export class User extends BaseResource implements UserResource {
   id = '';
   externalId: string | null = null;
   username: string | null = null;
+  plan: CustomPlanKey | undefined;
   emailAddresses: EmailAddressResource[] = [];
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
@@ -434,6 +436,10 @@ export class User extends BaseResource implements UserResource {
 
     if (data.last_sign_in_at) {
       this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);
+    }
+
+    if (data.plan) {
+      this.plan = data.plan;
     }
 
     this.updatedAt = unixEpochToDate(data.updated_at);

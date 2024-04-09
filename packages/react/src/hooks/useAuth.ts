@@ -1,6 +1,7 @@
 import type {
   ActJWTClaim,
   CheckAuthorizationWithCustomPermissions,
+  CustomPlanKey,
   GetToken,
   OrganizationCustomRoleKey,
   SignOut,
@@ -27,6 +28,8 @@ type UseAuthReturn =
       orgId: undefined;
       orgRole: undefined;
       orgSlug: undefined;
+      orgPlan: undefined;
+      plan: undefined;
       has: CheckAuthorizationSignedOut;
       signOut: SignOut;
       getToken: GetToken;
@@ -40,6 +43,8 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
+      orgPlan: null;
+      plan: null;
       has: CheckAuthorizationWithoutOrgOrUser;
       signOut: SignOut;
       getToken: GetToken;
@@ -53,6 +58,8 @@ type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
+      orgPlan: null;
+      plan: CustomPlanKey | undefined;
       has: CheckAuthorizationWithoutOrgOrUser;
       signOut: SignOut;
       getToken: GetToken;
@@ -66,6 +73,8 @@ type UseAuthReturn =
       orgId: string;
       orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;
+      orgPlan: CustomPlanKey | undefined;
+      plan: CustomPlanKey | undefined;
       has: CheckAuthorizationWithCustomPermissions;
       signOut: SignOut;
       getToken: GetToken;
@@ -112,7 +121,7 @@ type UseAuth = () => UseAuthReturn;
 export const useAuth: UseAuth = () => {
   useAssertWrappedByClerkProvider('useAuth');
 
-  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions } = useAuthContext();
+  const { sessionId, userId, actor, orgId, orgRole, orgSlug, orgPermissions, orgPlan, plan } = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext();
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -120,15 +129,18 @@ export const useAuth: UseAuth = () => {
 
   const has = useCallback(
     (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
-      if (!params?.permission && !params?.role) {
+      if (!params?.permission && !params?.role && !params.plan) {
         errorThrower.throw(useAuthHasRequiresRoleOrPermission);
       }
 
-      if (!orgId || !userId || !orgRole || !orgPermissions) {
+      if (!orgId && !userId) {
         return false;
       }
 
       if (params.permission) {
+        if (!orgPermissions) {
+          return false;
+        }
         return orgPermissions.includes(params.permission);
       }
 
@@ -136,9 +148,12 @@ export const useAuth: UseAuth = () => {
         return orgRole === params.role;
       }
 
+      if (params.plan) {
+        return orgPlan === params.plan || plan === params.plan;
+      }
       return false;
     },
-    [orgId, orgRole, userId, orgPermissions],
+    [orgId, orgRole, userId, orgPermissions, plan, orgPlan],
   );
 
   if (sessionId === undefined && userId === undefined) {
@@ -152,6 +167,8 @@ export const useAuth: UseAuth = () => {
       orgRole: undefined,
       orgSlug: undefined,
       has: undefined,
+      orgPlan: undefined,
+      plan: undefined,
       signOut,
       getToken,
     };
@@ -167,6 +184,8 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
+      orgPlan: null,
+      plan: null,
       has: () => false,
       signOut,
       getToken,
@@ -183,6 +202,8 @@ export const useAuth: UseAuth = () => {
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
+      plan: plan || undefined,
+      orgPlan: orgPlan || undefined,
       has,
       signOut,
       getToken,
@@ -199,6 +220,8 @@ export const useAuth: UseAuth = () => {
       orgId: null,
       orgRole: null,
       orgSlug: null,
+      plan: plan || undefined,
+      orgPlan: null,
       has: () => false,
       signOut,
       getToken,

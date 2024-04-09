@@ -1,3 +1,4 @@
+import type { CustomPlanKey } from './authorization';
 import type { ActClaim, JwtPayload } from './jwtv2';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
@@ -15,9 +16,11 @@ export type InitialState = Serializable<{
   actor: ActClaim | undefined;
   userId: string | undefined;
   user: UserResource | undefined;
+  plan: CustomPlanKey | undefined;
   orgId: string | undefined;
   orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
+  orgPlan: CustomPlanKey | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   organization: OrganizationResource | undefined;
 }>;
