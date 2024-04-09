@@ -2,6 +2,7 @@
  * Currently representing API DTOs in their JSON form.
  */
 
+import type { CustomPlanKey } from './authorization';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { ActJWTClaim } from './jwt';
 import type { OAuthProvider } from './oauth';
@@ -189,6 +190,7 @@ export interface UserJSON extends ClerkResourceJSON {
   image_url: string;
   has_image: boolean;
   username: string;
+  plan: CustomPlanKey | undefined;
   email_addresses: EmailAddressJSON[];
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
@@ -313,6 +315,7 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
+  org_plan: CustomPlanKey | undefined;
   created_at: number;
   updated_at: number;
 }

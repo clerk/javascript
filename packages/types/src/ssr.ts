@@ -15,9 +15,11 @@ export type InitialState = Serializable<{
   actor: ActClaim | undefined;
   userId: string | undefined;
   user: UserResource | undefined;
+  plan: string | undefined;
   orgId: string | undefined;
   orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
+  orgPlan: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   organization: OrganizationResource | undefined;
 }>;
