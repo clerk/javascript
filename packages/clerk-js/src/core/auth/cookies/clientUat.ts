@@ -2,7 +2,7 @@ import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
 import type { ClientResource } from '@clerk/types';
 
-import { inCrossOriginIframe } from '../../utils';
+import { inCrossOriginIframe } from '../../../utils';
 
 const CLIENT_UAT_COOKIE_NAME = '__client_uat';
 

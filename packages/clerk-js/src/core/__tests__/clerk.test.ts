@@ -2,9 +2,9 @@ import type { ActiveSessionResource, SignInJSON, SignUpJSON, TokenResource } fro
 import { waitFor } from '@testing-library/dom';
 
 import { mockNativeRuntime } from '../../testUtils';
+import type { DevBrowser } from '../auth/devBrowser';
+import { SessionCookieService } from '../auth/SessionCookieService';
 import { Clerk } from '../clerk';
-import { SessionCookieService } from '../cookies/SessionCookieService';
-import type { DevBrowser } from '../devBrowser';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, EmailLinkErrorCode, Environment, SignIn, SignUp } from '../resources/internal';

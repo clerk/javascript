@@ -2,7 +2,7 @@ import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
 import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
 
-import { inCrossOriginIframe } from '../../utils';
+import { inCrossOriginIframe } from '../../../utils';
 
 export type DevBrowserCookieHandler = {
   set: (jwt: string) => void;
