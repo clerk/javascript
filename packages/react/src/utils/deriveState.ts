@@ -18,18 +18,21 @@ export const deriveState = (clerkLoaded: boolean, state: Resources, initialState
 const deriveFromSsrInitialState = (initialState: InitialState) => {
   const userId = initialState.userId;
   const user = initialState.user as UserResource;
+  const plan = initialState.plan;
   const sessionId = initialState.sessionId;
   const session = initialState.session as ActiveSessionResource;
   const organization = initialState.organization as OrganizationResource;
   const orgId = initialState.orgId;
   const orgRole = initialState.orgRole as OrganizationCustomRoleKey;
   const orgPermissions = initialState.orgPermissions as OrganizationCustomPermissionKey[];
+  const orgPlan = initialState.orgPlan;
   const orgSlug = initialState.orgSlug;
   const actor = initialState.actor;
 
   return {
     userId,
     user,
+    plan,
     sessionId,
     session,
     organization,
@@ -38,12 +41,14 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
     orgPermissions,
     orgSlug,
     actor,
+    orgPlan,
   };
 };
 
 const deriveFromClientSideState = (state: Resources) => {
   const userId: string | null | undefined = state.user ? state.user.id : state.user;
   const user = state.user;
+  const plan = state.user ? state.user.plan : state.user;
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;
   const session = state.session;
   const actor = session?.actor;
@@ -55,10 +60,12 @@ const deriveFromClientSideState = (state: Resources) => {
     : organization;
   const orgPermissions = membership ? membership.permissions : membership;
   const orgRole = membership ? membership.role : membership;
+  const orgPlan = membership ? membership.orgPlan : membership;
 
   return {
     userId,
     user,
+    plan,
     sessionId,
     session,
     organization,
@@ -67,5 +74,6 @@ const deriveFromClientSideState = (state: Resources) => {
     orgSlug,
     orgPermissions,
     actor,
+    orgPlan,
   };
 };

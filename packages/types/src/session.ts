@@ -1,3 +1,4 @@
+import type { CustomPlanKey } from './authorization';
 import type { ActJWTClaim } from './jwt';
 import type {
   OrganizationCustomPermissionKey,
@@ -17,10 +18,17 @@ export type CheckAuthorizationParamsWithCustomPermissions =
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
+      plan?: never;
     }
   | {
       role?: never;
+      plan?: never;
       permission: OrganizationCustomPermissionKey;
+    }
+  | {
+      plan: CustomPlanKey;
+      role?: never;
+      permission?: never;
     };
 
 export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
@@ -29,10 +37,17 @@ type CheckAuthorizationParams =
   | {
       role: OrganizationCustomRoleKey;
       permission?: never;
+      plan?: never;
     }
   | {
       role?: never;
+      plan?: never;
       permission: OrganizationPermissionKey;
+    }
+  | {
+      plan: CustomPlanKey;
+      role?: never;
+      permission?: never;
     };
 
 export interface SessionResource extends ClerkResource {

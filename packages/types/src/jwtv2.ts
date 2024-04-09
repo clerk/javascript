@@ -82,6 +82,11 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   act?: ActClaim;
 
   /**
+   * Active user plan
+   */
+  plan?: string;
+
+  /**
    * Active organization id.
    */
   org_id?: string;
@@ -100,6 +105,11 @@ export interface JwtPayload extends CustomJwtSessionClaims {
    * Active organization role
    */
   org_permissions?: OrganizationCustomPermissionKey[];
+
+  /**
+   * Active organization plan
+   */
+  org_plan?: string;
 
   /**
    * Any other JWT Claim Set member.

@@ -1,3 +1,4 @@
+import type { CustomPlanKey } from './authorization';
 import type { BackupCodeResource } from './backupCode';
 import type {
   BillingPlanResource,
@@ -67,6 +68,7 @@ export interface UserResource extends ClerkResource {
   primaryWeb3WalletId: string | null;
   primaryWeb3Wallet: Web3WalletResource | null;
   username: string | null;
+  plan: CustomPlanKey | undefined;
   fullName: string | null;
   firstName: string | null;
   lastName: string | null;
