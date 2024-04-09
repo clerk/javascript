@@ -21,7 +21,7 @@ export class SessionCookieService {
   private sessionCookie: SessionCookieHandler;
   private devBrowser: DevBrowser;
 
-  constructor(private clerk: Clerk, fapiClient: FapiClient) {
+  constructor(private clerk: Clerk, fapiClient: FapiClient, multipleAppsSameDomainEnabled = false) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
       this.updateSessionCookie(token?.getRawString());
@@ -31,13 +31,18 @@ export class SessionCookieService {
     this.refreshTokenOnVisibilityChange();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie(clerk.publishableKey);
-    this.sessionCookie = createSessionCookie(clerk.publishableKey);
-    this.devBrowser = createDevBrowser({
-      publishableKey: clerk.publishableKey,
-      frontendApi: clerk.frontendApi,
-      fapiClient,
-    });
+    this.clientUat = createClientUatCookie(clerk.publishableKey, multipleAppsSameDomainEnabled);
+    this.sessionCookie = createSessionCookie(clerk.publishableKey, multipleAppsSameDomainEnabled);
+    this.devBrowser = createDevBrowser(
+      {
+        publishableKey: clerk.publishableKey,
+        frontendApi: clerk.frontendApi,
+        fapiClient,
+      },
+      multipleAppsSameDomainEnabled,
+    );
+
+    this.migrateCookieValues();
   }
 
   public setEnvironment(environment: EnvironmentResource) {
@@ -69,6 +74,12 @@ export class SessionCookieService {
     }
 
     return setDevBrowserJWTInURL(url, devBrowserJwt);
+  }
+
+  private migrateCookieValues() {
+    this.clientUat.migrate();
+    this.sessionCookie.migrate();
+    this.devBrowser.migrate();
   }
 
   private startPollingForToken() {

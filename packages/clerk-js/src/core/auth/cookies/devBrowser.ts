@@ -8,21 +8,20 @@ export type DevBrowserCookieHandler = {
   set: (jwt: string) => void;
   get: () => string | undefined;
   remove: () => void;
+  migrate: () => void;
 };
 
-export const createDevBrowserCookie = (publishableKey: string, legacy = true): DevBrowserCookieHandler => {
+export const createDevBrowserCookie = (publishableKey: string, withSuffix = false): DevBrowserCookieHandler => {
   const suffix = publishableKey.split('_').pop();
 
-  const legacyDevBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
-  const multipleAppsDevBrowserCookie = createCookieHandler(`${DEV_BROWSER_JWT_KEY}_${suffix}`);
+  const devBrowserCookieLegacy = createCookieHandler(DEV_BROWSER_JWT_KEY);
+  const devBrowserCookieWithSuffix = createCookieHandler(`${DEV_BROWSER_JWT_KEY}_${suffix}`);
 
-  const devBrowserCookie = legacy ? legacyDevBrowserCookie : multipleAppsDevBrowserCookie;
+  const devBrowserCookie = withSuffix ? devBrowserCookieWithSuffix : devBrowserCookieLegacy;
 
   const get = () => devBrowserCookie.get();
 
   const set = (jwt: string) => {
-    legacyDevBrowserCookie.remove();
-
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
     const secure = window.location.protocol === 'https:';
@@ -34,8 +33,18 @@ export const createDevBrowserCookie = (publishableKey: string, legacy = true): D
     });
   };
 
+  const migrate = () => {
+    if (!withSuffix || devBrowserCookieWithSuffix.get()) return;
+
+    const legacyValue = devBrowserCookieLegacy.get();
+    if (!legacyValue) return;
+
+    devBrowserCookieWithSuffix.set(legacyValue);
+    devBrowserCookieLegacy.remove();
+  };
+
   const remove = () => {
-    legacyDevBrowserCookie.remove();
+    devBrowserCookieLegacy.remove();
     devBrowserCookie.remove();
   };
 
@@ -43,5 +52,6 @@ export const createDevBrowserCookie = (publishableKey: string, legacy = true): D
     get,
     set,
     remove,
+    migrate,
   };
 };

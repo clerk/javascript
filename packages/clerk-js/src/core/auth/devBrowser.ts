@@ -17,6 +17,8 @@ export interface DevBrowser {
   setDevBrowserJWT(jwt: string): void;
 
   removeDevBrowserJWT(): void;
+
+  migrate(): void;
 }
 
 export type CreateDevBrowserOptions = {
@@ -25,8 +27,11 @@ export type CreateDevBrowserOptions = {
   fapiClient: FapiClient;
 };
 
-export function createDevBrowser({ publishableKey, frontendApi, fapiClient }: CreateDevBrowserOptions): DevBrowser {
-  const devBrowserCookie = createDevBrowserCookie(publishableKey);
+export function createDevBrowser(
+  { publishableKey, frontendApi, fapiClient }: CreateDevBrowserOptions,
+  withSuffix = false,
+): DevBrowser {
+  const devBrowserCookie = createDevBrowserCookie(publishableKey, withSuffix);
 
   function getDevBrowserJWT() {
     return devBrowserCookie.get();
@@ -99,11 +104,16 @@ export function createDevBrowser({ publishableKey, frontendApi, fapiClient }: Cr
     setDevBrowserJWT(data?.token);
   }
 
+  function migrate() {
+    devBrowserCookie.migrate();
+  }
+
   return {
     clear,
     setup,
     getDevBrowserJWT,
     setDevBrowserJWT,
     removeDevBrowserJWT,
+    migrate,
   };
 }

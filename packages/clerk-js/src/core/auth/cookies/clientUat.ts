@@ -9,22 +9,21 @@ const CLIENT_UAT_COOKIE_NAME = '__client_uat';
 export type ClientUatCookieHandler = {
   set: (client: ClientResource | undefined) => void;
   get: () => number;
+  migrate: () => void;
 };
 
-export const createClientUatCookie = (publishableKey: string, legacy = true): ClientUatCookieHandler => {
+export const createClientUatCookie = (publishableKey: string, withSuffix = false): ClientUatCookieHandler => {
   const suffix = publishableKey.split('_').pop();
-  const legacyClientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
-  const multipleAppsSessionCookie = createCookieHandler(`${CLIENT_UAT_COOKIE_NAME}_${suffix}`);
+  const clientUatCookieLegacy = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
+  const clientUatCookieWithSuffix = createCookieHandler(`${CLIENT_UAT_COOKIE_NAME}_${suffix}`);
 
-  const clientUatCookie = legacy ? legacyClientUatCookie : multipleAppsSessionCookie;
+  const clientUatCookie = withSuffix ? clientUatCookieWithSuffix : clientUatCookieLegacy;
 
   const get = (): number => {
     return parseInt(clientUatCookie.get() || '0', 10);
   };
 
   const set = (client: ClientResource | undefined) => {
-    legacyClientUatCookie.remove();
-
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Strict';
     const secure = window.location.protocol === 'https:';
@@ -44,8 +43,19 @@ export const createClientUatCookie = (publishableKey: string, legacy = true): Cl
     });
   };
 
+  const migrate = () => {
+    if (!withSuffix || clientUatCookieWithSuffix.get()) return;
+
+    const legacyValue = clientUatCookieLegacy.get();
+    if (!legacyValue) return;
+
+    clientUatCookieWithSuffix.set(legacyValue);
+    clientUatCookieLegacy.remove();
+  };
+
   return {
     set,
     get,
+    migrate,
   };
 };

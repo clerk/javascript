@@ -19,6 +19,7 @@ jest.mock('../resources/Environment');
 // Because Jest, don't ask me why...
 jest.mock('../devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
+    migrate: jest.fn(),
     clear: jest.fn(),
     setup: jest.fn(),
     getDevBrowserJWT: jest.fn(() => 'deadbeef'),
