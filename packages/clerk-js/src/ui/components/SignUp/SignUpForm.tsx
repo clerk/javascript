@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { CAPTCHA_ELEMENT_ID } from '../../../utils';
-import { Box, Col, localizationKeys, useAppearance } from '../../customizables';
+import { Col, localizationKeys, useAppearance } from '../../customizables';
 import { Form } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import { mqu } from '../../styledSystem';
 import type { FormControlState } from '../../utils';
 import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
@@ -103,10 +103,7 @@ export const SignUpForm = (props: SignUpFormProps) => {
         )}
       </Col>
       <Col center>
-        <Box
-          id={CAPTCHA_ELEMENT_ID}
-          sx={t => ({ display: 'none', marginBottom: t.space.$6 })}
-        />
+        <CaptchaElement />
         <Form.SubmitButton
           hasArrow
           localizationKey={localizationKeys('formButtonPrimary')}
