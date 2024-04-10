@@ -1,27 +1,25 @@
 import { useSession } from '@clerk/shared/react';
-import type { CheckAuthorization, OrganizationCustomRoleKey, OrganizationPermissionKey } from '@clerk/types';
+import type { CheckAuthorizationFn, OrganizationPermissionKey } from '@clerk/types';
 import type { ComponentType, PropsWithChildren, ReactNode } from 'react';
 import React, { useEffect } from 'react';
 
 import { useRouter } from '../router';
 
-type ProtectParams = Parameters<CheckAuthorization>[0] | ((has: CheckAuthorization) => boolean);
+type CheckAuthorizationInternalParams = {
+  permission: OrganizationPermissionKey;
+};
+
+type CheckAuthorizationInternal = CheckAuthorizationFn<CheckAuthorizationInternalParams>;
+type ProtectParams = Parameters<CheckAuthorizationInternal>[0] | ((has: CheckAuthorizationInternal) => boolean);
 
 type ProtectProps = PropsWithChildren<
   (
     | {
         condition?: never;
-        role: OrganizationCustomRoleKey;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
         permission: OrganizationPermissionKey;
       }
     | {
-        condition: (has: CheckAuthorization) => boolean;
-        role?: never;
+        condition: (has: CheckAuthorizationInternal) => boolean;
         permission?: never;
       }
   ) & {
