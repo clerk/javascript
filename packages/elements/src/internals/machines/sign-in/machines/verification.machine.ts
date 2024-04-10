@@ -62,7 +62,6 @@ const SignInVerificationMachine = setup({
       }
 
       if (
-        process.env.NODE_ENV === 'development' &&
         !clerk.client.signIn.supportedFirstFactors.every(factor =>
           context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
         )
@@ -78,7 +77,10 @@ const SignInVerificationMachine = setup({
         );
       }
 
-      if (!context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)) {
+      if (
+        process.env.NODE_ENV === 'development' &&
+        !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
+      ) {
         throw new ClerkElementsRuntimeError(
           `Your sign-in/up attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. For more information, visit the documentation: <link>`,
         );
