@@ -84,6 +84,7 @@ export const bgBG: LocalizationResource = {
     'Въведете имейл адрес под този домейн, за да получите код и да потвърдите домейна.',
   formFieldLabel__organizationName: 'Име',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Парола',
   formFieldLabel__phoneNumber: 'Телефонен номер',
   formFieldLabel__role: 'Роля',
@@ -677,6 +678,14 @@ export const bgBG: LocalizationResource = {
       security: 'Security',
       title: 'Профил',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -764,6 +773,11 @@ export const bgBG: LocalizationResource = {
           destructiveActionTitle: 'Премахни',
           headerTitle: 'Приложение за удостоверяване',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Задай парола',

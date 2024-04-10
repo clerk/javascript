@@ -14,7 +14,7 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
-  __experimental_formFieldLabel__passkeyName: undefined,
+  __experimental_formFieldLabel__passkeyName: 'ชื่อพาสคีย์',
   backButton: 'กลับ',
   badge__default: 'ค่าเริ่มต้น',
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
@@ -84,6 +84,7 @@ export const thTH: LocalizationResource = {
     'กรอกที่อยู่อีเมลภายใต้โดเมนนี้เพื่อรับรหัสและตรวจสอบโดเมน',
   formFieldLabel__organizationName: 'ชื่อ',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'รหัสผ่าน',
   formFieldLabel__phoneNumber: 'หมายเลขโทรศัพท์',
   formFieldLabel__role: 'บทบาท',
@@ -280,10 +281,10 @@ export const thTH: LocalizationResource = {
       blockButton__backupCode: 'ใช้รหัสสำรอง',
       blockButton__emailCode: 'ส่งรหัสไปที่อีเมล {{identifier}}',
       blockButton__emailLink: 'ส่งลิงก์ไปที่อีเมล {{identifier}}',
-      blockButton__passkey: undefined,
+      blockButton__passkey: 'ลงชื่อเข้าใช้ด้วยพาสคีย์ของคุณ',
       blockButton__password: 'เข้าสู่ระบบด้วยรหัสผ่านของคุณ',
       blockButton__phoneCode: 'ส่งรหัส SMS ไปยัง {{identifier}}',
-      blockButton__totp: 'ใช้แอปตัวตรวจสอบความถูกต้อง',
+      blockButton__totp: 'ใช้แอปยืนยันตัวตน',
       getHelp: {
         blockButton__emailSupport: 'สนับสนุนทางอีเมล',
         content:
@@ -353,8 +354,8 @@ export const thTH: LocalizationResource = {
       title: 'ไม่สามารถเข้าสู่ระบบได้',
     },
     passkey: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'การใช้พาสคีย์ของคุณเพื่อยืนยันว่าเป็นคุณ อุปกรณ์ของคุณอาจขอลายนิ้วมือ ใบหน้า หรือการล็อกหน้าจอ',
+      title: 'ใช้พาสคีย์ของคุณ',
     },
     password: {
       actionLink: 'ใช้วิธีอื่น',
@@ -362,7 +363,7 @@ export const thTH: LocalizationResource = {
       title: 'ใส่รหัสผ่านของคุณ',
     },
     passwordPwned: {
-      title: undefined,
+      title: 'รหัสผ่านเคยถูกโจรกรรม',
     },
     phoneCode: {
       formTitle: 'รหัสการตรวจสอบ',
@@ -389,7 +390,7 @@ export const thTH: LocalizationResource = {
       actionLink: 'สมัครสมาชิก',
       actionLink__use_email: 'ใช้อีเมล',
       actionLink__use_email_username: 'ใช้อีเมลหรือชื่อผู้ใช้',
-      actionLink__use_passkey: undefined,
+      actionLink__use_passkey: 'ใช้พาสคีย์แทน',
       actionLink__use_phone: 'ใช้โทรศัพท์',
       actionLink__use_username: 'ใช้ชื่อผู้ใช้',
       actionText: 'ไม่มีบัญชีหรือ?',
@@ -398,7 +399,7 @@ export const thTH: LocalizationResource = {
     },
     totpMfa: {
       formTitle: 'รหัสการตรวจสอบ',
-      subtitle: 'เพื่อดำเนินการต่อ กรุณาใส่รหัสการตรวจสอบที่สร้างโดยแอปตัวตรวจสอบของคุณ',
+      subtitle: 'เพื่อดำเนินการต่อ กรุณาใส่รหัสการตรวจสอบที่สร้างโดยแอปยืนยันตัวตนของคุณ',
       title: 'การตรวจสอบสองขั้นตอน',
     },
   },
@@ -457,9 +458,9 @@ export const thTH: LocalizationResource = {
       'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบบอทไม่ผ่าน กรุณารีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
     form_code_incorrect: '',
     form_identifier_exists: '',
-    form_identifier_exists__email_address: undefined,
-    form_identifier_exists__phone_number: undefined,
-    form_identifier_exists__username: undefined,
+    form_identifier_exists__email_address: 'ที่อยู่อีเมลนี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
+    form_identifier_exists__phone_number: 'เบอร์โทรศัพท์นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
+    form_identifier_exists__username: 'ชื่อผู้ใช้นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'ที่อยู่อีเมลต้องเป็นที่อยู่อีเมลที่ถูกต้อง',
@@ -471,8 +472,10 @@ export const thTH: LocalizationResource = {
     form_password_incorrect: '',
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'รหัสผ่านของคุณไม่เพียงพอต่อความปลอดภัย',
-    form_password_pwned: 'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของการรั่วไหลและไม่สามารถใช้ได้ กรุณาลองรหัสผ่านอื่นแทน',
-    form_password_pwned__sign_in: undefined,
+    form_password_pwned:
+      'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของข้อมูลที่รั่วไหลและไม่สามารถใช้ได้ กรุณาลองรหัสผ่านอื่นแทน',
+    form_password_pwned__sign_in:
+      'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของข้อมูลที่รั่วไหลและไม่สามารถใช้งานได้ โปรดรีเซ็ตรหัสผ่านของคุณ',
     form_password_size_in_bytes_exceeded:
       'รหัสผ่านของคุณเกินจำนวนไบต์สูงสุดที่อนุญาต กรุณาลดความยาวหรือลบอักขระพิเศษบางตัว',
     form_password_validation_failed: 'รหัสผ่านไม่ถูกต้อง',
@@ -480,11 +483,11 @@ export const thTH: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'คุณไม่สามารถลบรูปแบบการยืนยันตัวตนสุดท้ายของคุณได้',
     not_allowed_access: '',
-    passkey_already_exists: undefined,
-    passkey_not_supported: undefined,
-    passkey_registration_cancelled: undefined,
-    passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_already_exists: 'พาสคีย์ถูกลงทะเบียนกับอุปกรณ์นี้แล้ว',
+    passkey_not_supported: 'อุปกรณ์นี้ไม่รองรับพาสคีย์',
+    passkey_registration_cancelled: 'การลงทะเบียนพาสคีย์ถูกยกเลิกหรือหมดเวลา',
+    passkey_retrieval_cancelled: 'การยืนยันพาสคีย์ถูกยกเลิกหรือหมดเวลา',
+    passkeys_pa_not_supported: 'การลงทะเบียนต้องใช้ระบบยืนยันตัวตนของแพลตฟอร์ม แต่อุปกรณ์ไม่รองรับ',
     passwordComplexity: {
       maximumLength: 'น้อยกว่า {{length}} ตัวอักษร',
       minimumLength: '{{length}} ตัวอักษรหรือมากกว่า',
@@ -544,11 +547,11 @@ export const thTH: LocalizationResource = {
   userProfile: {
     __experimental_passkeyScreen: {
       removeResource: {
-        messageLine1: undefined,
-        title: undefined,
+        messageLine1: '{{name}} จะถูกลบออกจากบัญชีนี้',
+        title: 'ลบพาสคีย์',
       },
-      subtitle__rename: undefined,
-      title__rename: undefined,
+      subtitle__rename: 'คุณสามารถเปลี่ยนชื่อพาสคีย์เพื่อให้ค้นหาได้ง่ายขึ้น',
+      title__rename: 'เปลี่ยนชื่อพาสคีย์',
     },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
@@ -643,22 +646,22 @@ export const thTH: LocalizationResource = {
         buttonAbleToScan__nonPrimary: 'สแกนคิวอาร์โค้ดแทน',
         buttonUnableToScan__nonPrimary: 'ไม่สามารถสแกนคิวอาร์โค้ด?',
         infoText__ableToScan:
-          'ตั้งค่าวิธีการเข้าสู่ระบบใหม่ในแอปตัวตรวจสอบของคุณและสแกนคิวอาร์โค้ดต่อไปนี้เพื่อเชื่อมโยงกับบัญชีของคุณ',
+          'ตั้งค่าวิธีการเข้าสู่ระบบใหม่ในแอปยืนยันตัวตนของคุณและสแกนคิวอาร์โค้ดต่อไปนี้เพื่อเชื่อมโยงกับบัญชีของคุณ',
         infoText__unableToScan: 'ตั้งค่าวิธีการเข้าสู่ระบบใหม่ในตัวตรวจสอบของคุณและป้อนคีย์ที่ให้ไว้ด้านล่าง',
         inputLabel__unableToScan1:
           'ตรวจสอบให้แน่ใจว่าเปิดใช้งานรหัสผ่านตามเวลาหรือรหัสผ่านครั้งเดียว จากนั้นจึงเชื่อมโยงบัญชีของคุณ',
         inputLabel__unableToScan2: 'หรือหากตัวตรวจสอบของคุณรองรับ TOTP URIs คุณยังสามารถคัดลอก URI ทั้งหมดได้',
       },
       removeResource: {
-        messageLine1: 'ไม่จำเป็นต้องใช้รหัสยืนยันจากตัวตรวจสอบนี้เมื่อลงชื่อเข้าใช้อีกต่อไป',
+        messageLine1: 'ไม่จำเป็นต้องใช้รหัสยืนยันจากระบบยืนยันตัวตนนี้เมื่อลงชื่อเข้าใช้อีกต่อไป',
         messageLine2: 'บัญชีของคุณอาจไม่ปลอดภัยเท่าที่ควร คุณแน่ใจหรือว่าต้องการดำเนินการต่อ?',
-        successMessage: 'การยืนยันสองขั้นตอนผ่านแอปพลิเคชันตัวตรวจสอบได้ถูกนำออก',
+        successMessage: 'การยืนยันสองขั้นตอนผ่านแอปพลิเคชันยืนยันตัวตนได้ถูกนำออก',
         title: 'นำการยืนยันสองขั้นตอนออก',
       },
       successMessage:
-        'การยืนยันสองขั้นตอนเปิดใช้งานแล้ว เมื่อลงชื่อเข้าใช้ คุณจะต้องป้อนรหัสยืนยันจากตัวตรวจสอบนี้เป็นขั้นตอนเพิ่มเติม',
-      title: 'เพิ่มแอปพลิเคชันตัวตรวจสอบ',
-      verifySubtitle: 'ป้อนรหัสยืนยันที่สร้างโดยตัวตรวจสอบของคุณ',
+        'การยืนยันสองขั้นตอนเปิดใช้งานแล้ว เมื่อลงชื่อเข้าใช้ คุณจะต้องป้อนรหัสยืนยันจากระบบยืนยันตัวตนนี้เป็นขั้นตอนเพิ่มเติม',
+      title: 'เพิ่มแอปพลิเคชันยืนยันตัวตน',
+      verifySubtitle: 'ป้อนรหัสยืนยันที่สร้างโดยระบบยืนยันตัวตนของคุณ',
       verifyTitle: 'รหัสยืนยัน',
     },
     mobileButton__menu: 'เมนู',
@@ -667,6 +670,14 @@ export const thTH: LocalizationResource = {
       description: 'จัดการข้อมูลบัญชีของคุณ',
       security: 'ความปลอดภัย',
       title: 'บัญชี',
+    },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions: 'ขอแนะนำให้ลงชื่อออกจากอุปกรณ์อื่น ๆ ที่อาจใช้รหัสผ่านเก่าของคุณ',
@@ -702,9 +713,9 @@ export const thTH: LocalizationResource = {
     },
     start: {
       __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
+        menuAction__destructive: 'ลบ',
+        menuAction__rename: 'เปลี่ยนชื่อ',
+        title: 'พาสคีย์',
       },
       activeDevicesSection: {
         destructiveAction: 'ลงชื่อออกจากอุปกรณ์',
@@ -751,8 +762,13 @@ export const thTH: LocalizationResource = {
         title: 'การยืนยันสองขั้นตอน',
         totp: {
           destructiveActionTitle: 'ลบ',
-          headerTitle: 'แอปพลิเคชันตัวตรวจสอบ',
+          headerTitle: 'แอปพลิเคชันยืนยันตัวตน',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'ตั้งรหัสผ่าน',

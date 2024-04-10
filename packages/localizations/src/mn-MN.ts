@@ -85,6 +85,7 @@ export const mnMN: LocalizationResource = {
     'Код хүлээн авч, энэ домэйныг баталгаажуулахын тулд энэ домайн доор имэйл хаягаа оруулна уу.',
   formFieldLabel__organizationName: 'Байгууллагын нэр',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Нууц үг',
   formFieldLabel__phoneNumber: 'Утасны дугаар',
   formFieldLabel__role: 'Үүрэг',
@@ -678,6 +679,14 @@ export const mnMN: LocalizationResource = {
       security: 'Аюулгүй байдал',
       title: 'Бүртгэл',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Таны хуучин нууц үгийг ашигласан бусад бүх төхөөрөмжөөс гарахыг зөвлөж байна.',
@@ -765,6 +774,11 @@ export const mnMN: LocalizationResource = {
           destructiveActionTitle: 'Устгах',
           headerTitle: 'Authenticator програм',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Нууц үг тохируулах',

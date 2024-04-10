@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "2.0.0-beta.20",
+  "version": "2.0.0-beta.22",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -94,7 +94,7 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-beta.23",
+    "@clerk/types": "4.0.0-beta.25",
     "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "tsup": "*",

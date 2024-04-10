@@ -17,6 +17,8 @@ describe('OrganizationDomain', () => {
       affiliation_email_address: 'some@clerk.com',
       created_at: 12345,
       updated_at: 5678,
+      total_pending_invitations: 0,
+      total_pending_suggestions: 0,
     });
 
     expect(organization).toMatchSnapshot();
@@ -33,6 +35,8 @@ describe('OrganizationDomain', () => {
       affiliation_email_address: null,
       created_at: 12345,
       updated_at: 5678,
+      total_pending_invitations: 0,
+      total_pending_suggestions: 0,
     });
 
     expect(organization).toMatchSnapshot();

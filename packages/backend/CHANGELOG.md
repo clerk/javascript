@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.0.0-beta.33
+
+### Major Changes
+
+- Rename property `members_count` to `membersCount` for `Organization` resource ([#3094](https://github.com/clerk/javascript/pull/3094)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Resolve Vercel edge-runtime "TypeError: Failed to parse URL" when `@clerk/remix` is used ([#3129](https://github.com/clerk/javascript/pull/3129)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.0.0-beta.32
 
 ### Patch Changes
