@@ -111,7 +111,7 @@ describe('Session', () => {
     });
   });
 
-  describe('isAuthorized()', () => {
+  describe('checkAuthorization()', () => {
     it('user with permission to delete the organization should be able to delete the  organization', async () => {
       const session = new Session({
         status: 'active',
@@ -148,6 +148,68 @@ describe('Session', () => {
       } as SessionJSON);
 
       const isAuthorized = await session.checkAuthorization({ permission: 'org:sys_profile:delete' });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with no permissions should not be able to delete the  organization', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({
+          organization_memberships: [{ name: 'Org1', id: 'org1', permissions: [] }],
+        }),
+        last_active_organization_id: 'org1',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const isAuthorized = await session.checkAuthorization({ permission: 'org:sys_profile:delete' });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with no plan should not be authorized', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({
+          plan: undefined,
+          organization_memberships: [{ name: 'Org1', id: 'org1' }],
+        }),
+        last_active_organization_id: 'org1',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const isAuthorized = await session.checkAuthorization({ plan: 'user:pro' });
+
+      expect(isAuthorized).toBe(false);
+    });
+
+    it('user with plan should be authorized', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({
+          plan: 'user:pro',
+          organization_memberships: [{ name: 'Org1', id: 'org1' }],
+        }),
+        last_active_organization_id: 'org1',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const isAuthorized = await session.checkAuthorization({ plan: 'user:pro' });
 
       expect(isAuthorized).toBe(false);
     });
