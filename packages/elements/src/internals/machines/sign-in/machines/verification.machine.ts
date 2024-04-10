@@ -82,7 +82,7 @@ const SignInVerificationMachine = setup({
         !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
       ) {
         throw new ClerkElementsRuntimeError(
-          `Your sign-in/up attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. For more information, visit the documentation: <link>`,
+          `Your sign-in attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. For more information, visit the documentation: <link>`,
         );
       }
     },
