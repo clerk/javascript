@@ -14,7 +14,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
-import { Card, Header, IconButton, useCardState } from '../../elements';
+import { Animated, Card, Header, IconButton, useCardState } from '../../elements';
 import { ArrowLeftIcon, Check, ChevronDown, Information } from '../../icons';
 import { centsToUnit, handleError } from '../../utils';
 import { useBillingContext } from './BillingProvider';
@@ -96,7 +96,9 @@ export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'feat
 
 export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
   const [showAllFeatures, setShowAllFeatures] = React.useState(false);
-  const features = showAllFeatures ? params.features : params.features.slice(0, 6);
+
+  const extendedFeatures = params.features.slice(6);
+  const initialFeatures = params.features.slice(0, 6);
 
   return (
     <Col
@@ -165,55 +167,73 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
             )}
           </Flex>
 
-          {features.length > 0 && <DividerLine />}
+          {initialFeatures.length > 0 && <DividerLine />}
           {params.description && <Text colorScheme='secondary'>{params.description}</Text>}
-          {features.length > 0 && (
-            <Col gap={2}>
-              <Grid
-                sx={t => ({
-                  gridTemplateColumns: 'repeat(2,1fr)',
-                  rowGap: t.space.$2,
-                })}
-              >
-                {features.map((feature: string) => (
-                  <Feature
-                    key={feature}
-                    name={feature}
-                  />
-                ))}
-              </Grid>
+          {initialFeatures.length > 0 && (
+            <Animated asChild>
+              <Col gap={2}>
+                <Grid
+                  sx={t => ({
+                    gridTemplateColumns: 'repeat(2,1fr)',
+                    rowGap: t.space.$2,
+                  })}
+                >
+                  {initialFeatures.map((feature: string) => (
+                    <Feature
+                      key={feature}
+                      name={feature}
+                    />
+                  ))}
+                </Grid>
 
-              {features.length > 5 && (
-                <Box>
-                  <Button
-                    onClick={() => setShowAllFeatures(value => !value)}
-                    sx={t => ({ padding: `0 ${t.space.$2}`, color: t.colors.$colorTextSecondary })}
-                    variant='ghost'
+                {showAllFeatures && (
+                  <Grid
+                    sx={t => ({
+                      gridTemplateColumns: 'repeat(2,1fr)',
+                      rowGap: t.space.$2,
+                    })}
                   >
-                    <Text
-                      as='span'
-                      sx={t => ({
-                        fontWeight: t.fontWeights.$normal,
-                        color: t.colors.$colorTextSecondary,
-                      })}
-                      localizationKey={
-                        showAllFeatures
-                          ? localizationKeys('billing.managePlanScreen.action__showLess')
-                          : localizationKeys('billing.managePlanScreen.action__showAll')
-                      }
-                    />
+                    {extendedFeatures.map((feature: string) => (
+                      <Feature
+                        key={feature}
+                        name={feature}
+                      />
+                    ))}
+                  </Grid>
+                )}
 
-                    <Icon
-                      icon={ChevronDown}
-                      sx={t => ({
-                        transform: showAllFeatures ? 'rotate(180deg)' : 'rotate(0)',
-                        marginLeft: t.space.$1,
-                      })}
-                    />
-                  </Button>
-                </Box>
-              )}
-            </Col>
+                {initialFeatures.length > 5 && (
+                  <Box>
+                    <Button
+                      onClick={() => setShowAllFeatures(value => !value)}
+                      sx={t => ({ padding: `0 ${t.space.$2}`, color: t.colors.$colorTextSecondary })}
+                      variant='ghost'
+                    >
+                      <Text
+                        as='span'
+                        sx={t => ({
+                          fontWeight: t.fontWeights.$normal,
+                          color: t.colors.$colorTextSecondary,
+                        })}
+                        localizationKey={
+                          showAllFeatures
+                            ? localizationKeys('billing.managePlanScreen.action__showLess')
+                            : localizationKeys('billing.managePlanScreen.action__showAll')
+                        }
+                      />
+
+                      <Icon
+                        icon={ChevronDown}
+                        sx={t => ({
+                          transform: showAllFeatures ? 'rotate(180deg)' : 'rotate(0)',
+                          marginLeft: t.space.$1,
+                        })}
+                      />
+                    </Button>
+                  </Box>
+                )}
+              </Col>
+            </Animated>
           )}
         </Flex>
       </Col>
@@ -298,9 +318,7 @@ export const ManagePlanScreen = () => {
             </Flex>
           </Col>
         </Flex>
-
         <Card.Alert>{card.error}</Card.Alert>
-
         <Col sx={t => ({ gap: t.space.$4 })}>{plans}</Col>
       </Col>
     </Col>
