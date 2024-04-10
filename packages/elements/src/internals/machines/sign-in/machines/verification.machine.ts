@@ -78,6 +78,25 @@ const SignInVerificationMachine = setup({
       }
 
       if (
+        clerk.client.signIn.supportedSecondFactors &&
+        !clerk.client.signIn.supportedSecondFactors.every(factor =>
+          context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
+        )
+      ) {
+        console.warn(
+          `Clerk: Your instance is configured to support these 2FA strategies: ${[
+            ...clerk.client.signIn.supportedSecondFactors,
+          ]
+            .map(f => f.strategy)
+            .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
+            .map(s => s)
+            .join(
+              ', ',
+            )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+        );
+      }
+
+      if (
         process.env.NODE_ENV === 'development' &&
         !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
       ) {
