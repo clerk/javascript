@@ -77,27 +77,31 @@ export class Session extends BaseResource implements SessionResource {
 
   checkAuthorization: CheckAuthorization = params => {
     // if there is no active organization user can not be authorized
-    if (!this.lastActiveOrganizationId || !this.user) {
+    if (!this.lastActiveOrganizationId && !this.user) {
       return false;
     }
 
     // loop through organizationMemberships from client piggybacking
-    const orgMemberships = this.user.organizationMemberships || [];
+    const orgMemberships = this.user?.organizationMemberships || [];
     const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
 
-    // Based on FAPI this should never happen, but we handle it anyway
-    if (!activeMembership) {
-      return false;
-    }
-
-    const activeOrganizationPermissions = activeMembership.permissions;
-    const activeOrganizationRole = activeMembership.role;
+    // TODO-BILLING: Update this type
+    // @ts-expect-error TBD
+    const activeOrganizationPlan = activeMembership?.organization.plan;
+    const activeOrganizationPermissions = activeMembership?.permissions || [];
+    const activeOrganizationRole = activeMembership?.role;
+    const activeUserPlan = this.user?.plan;
 
     if (params.permission) {
       return activeOrganizationPermissions.includes(params.permission);
     }
+
     if (params.role) {
       return activeOrganizationRole === params.role;
+    }
+
+    if (params.plan) {
+      return activeUserPlan === params.plan || activeOrganizationPlan === params.plan;
     }
 
     return false;
