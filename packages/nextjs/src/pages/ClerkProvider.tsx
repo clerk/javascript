@@ -33,7 +33,11 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
 
   const navigate = (to: string) => push(to);
   const replaceNavigate = (to: string) => replace(to);
-  const mergedProps = mergeNextClerkPropsWithEnv({ ...props, routerPush: navigate, routerReplace: replaceNavigate });
+  const mergedProps = mergeNextClerkPropsWithEnv({
+    ...props,
+    routerPush: navigate,
+    routerReplace: replaceNavigate,
+  });
   // ClerkProvider automatically injects __clerk_ssr_state
   // getAuth returns a user-facing authServerSideProps that hides __clerk_ssr_state
   // @ts-expect-error initialState is hidden from the types as it's a private prop

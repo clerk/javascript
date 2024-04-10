@@ -22,5 +22,6 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
     sdkMetadata: SDK_METADATA,
+    multipleAppsSameDomain: true,
   };
 };

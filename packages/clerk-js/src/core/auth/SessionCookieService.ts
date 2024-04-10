@@ -1,8 +1,7 @@
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
-import type { Clerk, EnvironmentResource, TokenResource } from '@clerk/types';
+import type { Clerk, EnvironmentResource } from '@clerk/types';
 
-import { inBrowser } from '../../utils';
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
@@ -14,6 +13,8 @@ import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
+// TODO: make SessionCookieService singleton since it handles updating cookies using a poller
+// and we need to avoid updating them concurrently.
 export class SessionCookieService {
   private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
@@ -24,7 +25,7 @@ export class SessionCookieService {
   constructor(private clerk: Clerk, fapiClient: FapiClient, multipleAppsSameDomainEnabled = false) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
-      this.updateSessionCookie(token?.getRawString());
+      this.updateSessionCookie(token && token.getRawString());
       this.setClientUatCookieForDevelopmentInstances();
     });
 
@@ -90,10 +91,6 @@ export class SessionCookieService {
   }
 
   private refreshTokenOnVisibilityChange() {
-    if (!inBrowser()) {
-      return;
-    }
-
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         void this.refreshSessionToken();
@@ -102,28 +99,19 @@ export class SessionCookieService {
   }
 
   private async refreshSessionToken(): Promise<void> {
-    if (!inBrowser()) {
-      return;
-    }
-
     if (!this.clerk.session) {
       return;
     }
 
     try {
-      this.updateSessionCookie(await this.clerk.session?.getToken());
+      await this.clerk.session.getToken();
     } catch (e) {
       return this.handleGetTokenError(e);
     }
   }
 
-  private updateSessionCookie(token: TokenResource | string | undefined | null) {
-    const rawToken = typeof token === 'string' ? token : token?.getRawString();
-
-    if (rawToken) {
-      return this.sessionCookie.set(rawToken);
-    }
-    return this.sessionCookie.remove();
+  private updateSessionCookie(token: string | null) {
+    return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
   }
 
   private setClientUatCookieForDevelopmentInstances() {

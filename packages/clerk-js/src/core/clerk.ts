@@ -1394,7 +1394,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    this.#authService = new SessionCookieService(this, this.#fapiClient);
+    this.#authService = new SessionCookieService(this, this.#fapiClient, this.#options.multipleAppsSameDomain);
 
     /**
      * 1. Create the devBrowser.

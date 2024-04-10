@@ -60,6 +60,7 @@ export function createDevBrowser(
       if (devBrowserJWT && request?.url) {
         request.url = setDevBrowserJWTInURL(request.url, devBrowserJWT);
       }
+      request.url?.searchParams.append('_multiple_apps_same_domain', withSuffix.toString());
     });
 
     fapiClient.onAfterResponse((_, response) => {

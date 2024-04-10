@@ -551,6 +551,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
         };
 
     sdkMetadata?: SDKMetadata;
+    multipleAppsSameDomain?: boolean;
   };
 
 export interface NavigateOptions {
