@@ -1,4 +1,4 @@
-import { OneTap } from '@clerk/nextjs';
+import { SignedOut, __experimental_OneTap } from '@clerk/nextjs';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -19,7 +19,9 @@ const Home: NextPage = () => {
         />
       </Head>
 
-      <OneTap routing='virtual' />
+      <SignedOut>
+        <__experimental_OneTap />
+      </SignedOut>
 
       <main className={styles.main}>
         <h1 className={styles.title}>Clerk x Nextjs</h1>

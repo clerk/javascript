@@ -6,7 +6,6 @@ import type {
   ClerkOptions,
   CreateOrganizationProps,
   EnvironmentResource,
-  OneTapProps,
   OrganizationProfileProps,
   SignInProps,
   SignUpProps,
@@ -23,7 +22,6 @@ import type { ClerkComponentName } from './lazyModules/components';
 import {
   CreateOrganizationModal,
   ImpersonationFab,
-  OneTapModal,
   OrganizationProfileModal,
   preloadComponent,
   SignInModal,
@@ -54,13 +52,11 @@ export type ComponentControls = {
     node?: HTMLDivElement;
     props?: unknown;
   }) => void;
-  openModal: <T extends 'oneTap' | 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization'>(
+  openModal: <T extends 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization'>(
     modal: T,
     props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
   ) => void;
-  closeModal: (
-    modal: 'oneTap' | 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization',
-  ) => void;
+  closeModal: (modal: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization') => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
 };
@@ -82,7 +78,6 @@ interface ComponentsProps {
 interface ComponentsState {
   appearance: Appearance | undefined;
   options: ClerkOptions | undefined;
-  oneTapModal: null | OneTapProps;
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
@@ -158,7 +153,6 @@ const Components = (props: ComponentsProps) => {
   const [state, setState] = React.useState<ComponentsState>({
     appearance: props.options.appearance,
     options: props.options,
-    oneTapModal: null,
     signInModal: null,
     signUpModal: null,
     userProfileModal: null,
@@ -167,15 +161,8 @@ const Components = (props: ComponentsProps) => {
     nodes: new Map(),
     impersonationFab: false,
   });
-  const {
-    oneTapModal,
-    signInModal,
-    signUpModal,
-    userProfileModal,
-    organizationProfileModal,
-    createOrganizationModal,
-    nodes,
-  } = state;
+  const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
+    state;
 
   const { urlStateParam, clearUrlStateParam, decodedRedirectParams } = useClerkModalStateParams();
 
@@ -189,18 +176,9 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.mountComponent = params => {
       const { node, name, props, appearanceKey } = params;
-
-      let _node = node;
-      if (!_node) {
-        const customElement = document.createElement('div');
-        customElement.id = 'some-id';
-        document.body.appendChild(customElement);
-        _node = customElement;
-      }
-
-      assertDOMElement(_node);
+      assertDOMElement(node);
       setState(s => {
-        s.nodes.set(_node, { key: `p${++portalCt}`, name, props, appearanceKey });
+        s.nodes.set(node, { key: `p${++portalCt}`, name, props, appearanceKey });
         return { ...s, nodes };
       });
     };
@@ -240,21 +218,6 @@ const Components = (props: ComponentsProps) => {
 
     props.onComponentsMounted();
   }, []);
-
-  const mountedOneTapModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'oneTap'}
-      // componentAppearance={oneTapModal?.appearance}
-      flowName={'oneTap'}
-      onClose={() => componentsControls.closeModal('oneTap')}
-      onExternalNavigate={() => componentsControls.closeModal('oneTap')}
-      startPath={buildVirtualRouterUrl({ base: '/one-tap', path: urlStateParam?.path })}
-      componentName={'OneTapModal'}
-    >
-      <OneTapModal {...oneTapModal} />
-    </LazyModalRenderer>
-  );
 
   const mountedSignInModal = (
     <LazyModalRenderer
@@ -360,7 +323,6 @@ const Components = (props: ComponentsProps) => {
           );
         })}
 
-        {oneTapModal && mountedOneTapModal}
         {signInModal && mountedSignInModal}
         {signUpModal && mountedSignUpModal}
         {userProfileModal && mountedUserProfileModal}

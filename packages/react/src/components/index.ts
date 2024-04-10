@@ -7,7 +7,7 @@ export {
   OrganizationProfile,
   CreateOrganization,
   OrganizationList,
-  OneTap,
+  __experimental_OneTap,
 } from './uiComponents';
 
 export {

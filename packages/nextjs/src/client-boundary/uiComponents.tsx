@@ -27,7 +27,7 @@ export {
   SignOutButton,
   SignUpButton,
   UserButton,
-  OneTap,
+  __experimental_OneTap,
 } from '@clerk/clerk-react';
 
 // The assignment of UserProfile with BaseUserProfile props is used

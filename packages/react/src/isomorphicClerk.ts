@@ -95,7 +95,7 @@ type IsomorphicLoadedClerk = Without<
   | 'mountSignUp'
   | 'mountSignIn'
   | 'mountUserProfile'
-  | 'mountOneTap'
+  | '__experimental_mountOneTap'
   | 'client'
 > & {
   // TODO: Align return type and parms
@@ -131,7 +131,7 @@ type IsomorphicLoadedClerk = Without<
   mountOrganizationProfile: (node: HTMLDivElement, props: OrganizationProfileProps) => void;
   mountCreateOrganization: (node: HTMLDivElement, props: CreateOrganizationProps) => void;
   mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
-  mountOneTap: (node: HTMLDivElement, props: OneTapProps) => void;
+  __experimental_mountOneTap: (node: HTMLDivElement, props: OneTapProps) => void;
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
   client: ClientResource | undefined;
@@ -142,7 +142,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
-  private preopenOneTap?: null | OneTapProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -451,10 +450,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountMethodCalls.forEach(cb => cb());
 
-    if (this.preopenOneTap !== null) {
-      clerkjs.openOneTap(this.preopenOneTap);
-    }
-
     if (this.preopenSignIn !== null) {
       clerkjs.openSignIn(this.preopenSignIn);
     }
@@ -599,22 +594,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  openOneTap = (props?: OneTapProps): void => {
-    if (this.clerkjs && this.#loaded) {
-      this.clerkjs.openOneTap(props);
-    } else {
-      this.preopenOneTap = props;
-    }
-  };
-
-  closeOneTap = (): void => {
-    if (this.clerkjs && this.#loaded) {
-      this.clerkjs.closeOneTap();
-    } else {
-      this.preopenOneTap = null;
-    }
-  };
-
   openUserProfile = (props?: UserProfileProps): void => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.openUserProfile(props);
@@ -695,19 +674,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountOneTap = (node: HTMLDivElement, props: OneTapProps): void => {
+  __experimental_mountOneTap = (props: OneTapProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.mountOneTap(node, props);
-    } else {
-      this.premountSignInNodes.set(node, props);
+      this.clerkjs.__experimental_mountOneTap(props);
     }
   };
 
-  unmountOneTap = (node: HTMLDivElement): void => {
+  __experimental_unmountOneTap = (): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.unmountOneTap(node);
-    } else {
-      this.premountSignInNodes.delete(node);
+      this.clerkjs.__experimental_unmountOneTap();
     }
   };
 

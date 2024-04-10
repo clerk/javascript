@@ -31,9 +31,6 @@ export class Portal<CtxType extends AvailableComponentCtx> extends React.PureCom
     );
 
     if (componentName === 'OneTap') {
-      console.log('virtual for node', node);
-      console.log(normalizedProps.routing);
-
       return ReactDOM.createPortal(
         <VirtualRouter startPath={buildVirtualRouterUrl({ base: '/one-tap', path: '' })}>{el}</VirtualRouter>,
         node,

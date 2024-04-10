@@ -1,48 +1,31 @@
-import { loadScript } from '@clerk/shared';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { useClerk } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 import { useEffect } from 'react';
 
-import { clerkFailedToLoadThirdPartyScript, clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useEnvironment } from '../../contexts';
+import { clerkInvalidFAPIResponse } from '../../../core/errors';
+import type { GISCredentialResponse } from '../../../utils/one-tap';
+import { loadGIS } from '../../../utils/one-tap';
+import { useEnvironment, useGoogleOneTapContext } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Card, useCardState, withCardStateProvider } from '../../elements';
 import { CardAlert } from '../../elements/Card/CardAlert';
+import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { useRouter } from '../../router';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 
 const clientID = '466181446725-jqurtjvbts42erq1cjjf197ruevg19th.apps.googleusercontent.com';
 
-declare global {
-  export interface Window {
-    google: any;
-  }
-}
-
-export async function loadGIDS() {
-  if (!window.google) {
-    try {
-      await loadScript('https://accounts.google.com/gsi/client', { defer: true });
-      console.log('loading');
-    } catch (_) {
-      // Rethrow with specific message
-      clerkFailedToLoadThirdPartyScript('Cloudflare Turnstile');
-    }
-  }
-  return window.google;
-}
-
 function _OneTapStart(): JSX.Element {
   const clerk = useClerk();
+  const { user } = useUser();
   const environment = useEnvironment();
 
-  const router = useRouter();
   const supportEmail = useSupportEmail();
   const card = useCardState();
+  const ctx = useGoogleOneTapContext();
 
-  async function oneTapCallback(response: any) {
+  async function oneTapCallback(response: GISCredentialResponse) {
     try {
       const res = await clerk.client.signIn
         .create({
@@ -51,6 +34,7 @@ function _OneTapStart(): JSX.Element {
           googleOneTapToken: response.credential,
         })
         .catch(err => {
+          // throw err;
           if (isClerkAPIResponseError(err) && err.errors[0].code === 'resource_not_found') {
             // if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
             return clerk.client.signUp.create({
@@ -68,9 +52,6 @@ function _OneTapStart(): JSX.Element {
             session: res.createdSessionId,
           });
           break;
-        case 'missing_requirements':
-          await router.navigate('psu');
-          break;
         default:
           console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
           break;
@@ -80,59 +61,59 @@ function _OneTapStart(): JSX.Element {
     }
   }
 
-  const initializeGSI = () => {
-    // @ts-ignore
-    const environmentClientID = environment.displayConfig.googleOneTapClientID;
-    console.log('environmentClientID', environmentClientID);
-
-    // @ts-ignore
-    if (window.google) {
+  /**
+   * Prevent GIS from initializing multiple times
+   */
+  const { data: google } = useFetch(user?.id ? undefined : loadGIS, 'google-identity-services-script', {
+    onSuccess(google) {
       // @ts-ignore
-      window.google.accounts.id.initialize({
+      const environmentClientID = environment.displayConfig.googleOneTapClientID;
+
+      google.accounts.id.initialize({
         client_id: environmentClientID || clientID,
         callback: oneTapCallback,
-        // prompt_parent_id: 'one-tap',
         itp_support: true,
-        // auto_select: true,
+        cancel_on_tap_outside: ctx.cancelOnTapOutside,
+        auto_select: false,
         use_fedcm_for_prompt: true,
       });
 
-      // @ts-ignore
-      window.google.accounts.id.prompt();
-    }
-  };
+      google.accounts.id.prompt();
+    },
+  });
 
   useEffect(() => {
-    // const script = document.createElement('script');
-    // script.src = 'https://accounts.google.com/gsi/client';
-    // script.onload = initializeGSI;
-    // script.async = true;
-    // document.querySelector('body').appendChild(script);
-    loadGIDS().then(initializeGSI);
-
+    if (google && !user?.id) {
+      google.accounts.id.prompt();
+    }
     return () => {
-      // @ts-ignore
-      window.google.accounts.id.cancel();
+      if (google) {
+        google.accounts.id.cancel();
+      }
     };
   }, []);
 
   return (
     <Flow.Part part='start'>
-      <Card.Root
-        id={'one-tap'}
-        sx={t => ({
-          animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
-          zIndex: t.zIndices.$modal,
-          overflow: 'auto',
-          width: 'fit-content',
-          height: 'fit-content',
-          position: 'fixed',
-          right: 0,
-          top: 0,
-        })}
-      >
-        <CardAlert>{card.error}</CardAlert>
-      </Card.Root>
+      {card.error && (
+        <Card.Root
+          id={'one-tap'}
+          sx={t => ({
+            animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
+            zIndex: t.zIndices.$modal,
+            overflow: 'auto',
+            width: 'fit-content',
+            height: 'fit-content',
+            position: 'fixed',
+            right: 0,
+            top: 0,
+          })}
+        >
+          <Card.Content>
+            <CardAlert>{card.error}</CardAlert>
+          </Card.Content>
+        </Card.Root>
+      )}
     </Flow.Part>
   );
 }
