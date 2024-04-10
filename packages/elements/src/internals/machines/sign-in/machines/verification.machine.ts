@@ -67,7 +67,7 @@ const SignInVerificationMachine = setup({
         )
       ) {
         console.warn(
-          `Clerk: Your instance is configured to support strategies: ${clerk.client.signIn.supportedFirstFactors
+          `Clerk: Your instance is configured to support these strategies: ${clerk.client.signIn.supportedFirstFactors
             .map(f => f.strategy)
             .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
             .map(s => s)
