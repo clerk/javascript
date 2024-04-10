@@ -90,6 +90,7 @@ export async function authenticateRequest(
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
+    url.searchParams.append('_multiple_apps_same_domain', 'true');
 
     if (pk?.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
@@ -110,7 +111,7 @@ export async function authenticateRequest(
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
       headers.append('Set-Cookie', x);
-      if (x.startsWith(`${constants.Cookies.Session}=`)) {
+      if (x.startsWith(`${constants.Cookies.Session}`)) {
         sessionToken = x.split(';')[0].substring(10);
       }
     });
