@@ -54,7 +54,7 @@ const SignInVerificationMachine = setup({
     determineStartingFactor: () => {
       throw new ClerkElementsRuntimeError('Action `determineStartingFactor` must be overridden');
     },
-    validateConfiguredStrategies: ({ context }) => {
+    validateRegisteredStrategies: ({ context }) => {
       const clerk = context.parent.getSnapshot().context.clerk;
 
       if (clerk.__unstable__environment?.isProduction()) {
@@ -175,7 +175,7 @@ const SignInVerificationMachine = setup({
       },
       after: {
         3000: {
-          actions: 'validateConfiguredStrategies',
+          actions: 'validateRegisteredStrategies',
         },
       },
     },
