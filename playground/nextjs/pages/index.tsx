@@ -1,3 +1,4 @@
+import { OneTap } from '@clerk/nextjs';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -17,6 +18,8 @@ const Home: NextPage = () => {
           href='/favicon.ico'
         />
       </Head>
+
+      <OneTap routing='virtual' />
 
       <main className={styles.main}>
         <h1 className={styles.title}>Clerk x Nextjs</h1>

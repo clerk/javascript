@@ -2,6 +2,7 @@ import { logErrorInDevMode, without } from '@clerk/shared';
 import { isDeeplyEqual } from '@clerk/shared/react';
 import type {
   CreateOrganizationProps,
+  OneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -274,3 +275,14 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
     />
   );
 }, 'OrganizationList');
+
+export const OneTap = withClerk(({ clerk, ...props }: WithClerkProp<OneTapProps>) => {
+  return (
+    <Portal
+      mount={clerk.mountOneTap}
+      unmount={clerk.unmountOneTap}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'OneTap');

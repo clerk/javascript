@@ -4,9 +4,10 @@ import ReactDOM from 'react-dom';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../../core/constants';
 import { clerkErrorPathRouterMissingPath } from '../../core/errors';
+import { buildVirtualRouterUrl } from '../../utils';
 import { normalizeRoutingOptions } from '../../utils/authPropHelpers';
 import { ComponentContext } from '../contexts';
-import { HashRouter, PathRouter } from '../router';
+import { HashRouter, PathRouter, VirtualRouter } from '../router';
 import type { AvailableComponentCtx } from '../types';
 
 type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType, 'componentName'>> = {
@@ -28,6 +29,16 @@ export class Portal<CtxType extends AvailableComponentCtx> extends React.PureCom
         </Suspense>
       </ComponentContext.Provider>
     );
+
+    if (componentName === 'OneTap') {
+      console.log('virtual for node', node);
+      console.log(normalizedProps.routing);
+
+      return ReactDOM.createPortal(
+        <VirtualRouter startPath={buildVirtualRouterUrl({ base: '/one-tap', path: '' })}>{el}</VirtualRouter>,
+        node,
+      );
+    }
 
     if (normalizedProps?.routing === 'path') {
       if (!normalizedProps?.path) {

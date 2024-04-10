@@ -30,6 +30,7 @@ export {
   SignUpButton,
   UserButton,
   UserProfile,
+  OneTap,
 } from './client-boundary/uiComponents';
 
 /**

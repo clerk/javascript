@@ -32,6 +32,7 @@ import type {
   InstanceType,
   ListenerCallback,
   NavigateOptions,
+  OneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -349,6 +350,26 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
+  public openOneTap = (props?: OneTapProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
+          code: 'cannot_render_single_session_enabled',
+        });
+      }
+      return;
+    }
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'OneTap' })
+      .then(controls => controls.openModal('oneTap', props || {}));
+  };
+
+  public closeOneTap = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('oneTap'));
+  };
+
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment)) {
@@ -451,6 +472,28 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
+  public mountOneTap = (node: HTMLDivElement, props?: SignInProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted({ preloadHint: 'OneTap' }).then(controls =>
+      controls.mountComponent({
+        name: 'OneTap',
+        appearanceKey: 'oneTap',
+        node,
+        props,
+      }),
+    );
+    // this.telemetry?.record(eventComponentMounted('OneTap', props));
+  };
+
+  public unmountOneTap = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

@@ -123,6 +123,13 @@ export interface Clerk {
    */
   closeSignIn: () => void;
 
+  openOneTap: (props?: OneTapProps) => void;
+
+  /**
+   * Closes the Clerk SignIn modal.
+   */
+  closeOneTap: () => void;
+
   /**
    * Opens the Clerk SignUp component in a modal.
    * @param props Optional props that will be passed to the SignUp component.
@@ -181,6 +188,21 @@ export interface Clerk {
    * @param targetNode Target node to unmount the SignIn component from.
    */
   unmountSignIn: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a sign in flow component at the target element.
+   * @param targetNode Target node to mount the SignIn component.
+   * @param signInProps sign in configuration parameters.
+   */
+  mountOneTap: (targetNode: HTMLDivElement, signInProps?: SignInProps) => void;
+
+  /**
+   * Unmount a sign in flow component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the SignIn component from.
+   */
+  unmountOneTap: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a sign up flow component at the target element.
@@ -700,6 +722,12 @@ export type SignInProps = RoutingOptions & {
 } & RedirectOptions;
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
+
+export type OneTapProps = RoutingOptions & {
+  cancelOnTapOutside?: boolean;
+  appearance?: SignInTheme;
+};
+export type OneTapModalProps = WithoutRouting<OneTapProps>;
 
 export type SignUpProps = RoutingOptions & {
   /**
