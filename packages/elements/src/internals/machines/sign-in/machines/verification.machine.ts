@@ -6,6 +6,7 @@ import type {
   PrepareFirstFactorParams,
   ResetPasswordEmailCodeAttempt,
   ResetPasswordPhoneCodeAttempt,
+  SignInFactor,
   SignInFirstFactor,
   SignInResource,
   SignInSecondFactor,
@@ -53,6 +54,30 @@ const SignInVerificationMachine = setup({
     determineStartingFactor: () => {
       throw new ClerkElementsRuntimeError('Action `determineStartingFactor` must be overridden');
     },
+    handleMissingStrategy: ({ context }) => {
+      console.log(context);
+      const clerk = context.parent.getSnapshot().context.clerk;
+      if (
+        clerk.__unstable__environment?.isProduction() ||
+        !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
+      ) {
+        return;
+      }
+
+      const msg = `Your current step is rendering strategies: ${[...context.registeredStrategies]
+        .map(s => s)
+        .join(', ')}, but is currently missing: <Strategy name="${
+        context.currentFactor?.strategy
+      }">. Before deploying your app, make sure to render a <Strategy name="${
+        context.currentFactor?.strategy
+      }"> component.`;
+
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(msg);
+      } else {
+        throw new ClerkElementsRuntimeError(msg);
+      }
+    },
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -75,9 +100,25 @@ const SignInVerificationMachine = setup({
     formRef: input.form,
     parent: input.parent,
     loadingStep: 'verifications',
+    registeredStrategies: new Set<SignInFactor>(),
   }),
   initial: 'Preparing',
   entry: 'determineStartingFactor',
+  on: {
+    'STRATEGY.REGISTER': {
+      actions: assign({
+        registeredStrategies: ({ context, event }) => context.registeredStrategies.add(event.factor),
+      }),
+    },
+    'STRATEGY.UNREGISTER': {
+      actions: assign({
+        registeredStrategies: ({ context, event }) => {
+          context.registeredStrategies.delete(event.factor);
+          return context.registeredStrategies;
+        },
+      }),
+    },
+  },
   states: {
     Preparing: {
       tags: ['state:preparing', 'state:loading'],
@@ -103,6 +144,11 @@ const SignInVerificationMachine = setup({
         SUBMIT: {
           target: 'Attempting',
           reenter: true,
+        },
+      },
+      after: {
+        3000: {
+          actions: 'handleMissingStrategy',
         },
       },
     },
