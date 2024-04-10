@@ -8,7 +8,7 @@ import { withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
 
 function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
-  const { initialState, children, ScriptComponent, ...restIsomorphicClerkOptions } = props;
+  const { initialState, children, ...restIsomorphicClerkOptions } = props;
   const { publishableKey = '', Clerk: userInitialisedClerk } = restIsomorphicClerkOptions;
 
   if (!userInitialisedClerk) {
@@ -21,7 +21,6 @@ function ClerkProviderBase(props: ClerkProviderProps): JSX.Element {
 
   return (
     <ClerkContextProvider
-      ScriptComponent={ScriptComponent}
       initialState={initialState}
       isomorphicClerkOptions={restIsomorphicClerkOptions}
     >

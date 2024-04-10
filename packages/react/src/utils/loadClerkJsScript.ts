@@ -11,8 +11,8 @@ import { versionSelector } from './versionSelector';
 const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
 
 type LoadClerkJsScriptOptions = Omit<IsomorphicClerkOptions, 'proxyUrl' | 'domain'> & {
-  proxyUrl: string;
-  domain: string;
+  proxyUrl?: string;
+  domain?: string;
 };
 
 const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {

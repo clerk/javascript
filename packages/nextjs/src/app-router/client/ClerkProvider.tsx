@@ -1,12 +1,12 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouter } from 'next/navigation';
-import type { ScriptHTMLAttributes } from 'react';
 import React, { useEffect, useTransition } from 'react';
 
 import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
 import { useSafeLayoutEffect } from '../../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../../types';
+import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
@@ -16,14 +16,6 @@ declare global {
     __clerk_nav: (to: string) => Promise<void>;
     __clerk_internal_invalidateCachePromise: () => void | undefined;
   }
-}
-
-/**
- * Nextjs App Router will automatically move inline scripts inside `<head/>`
- * Using the `nextjs/script` with the `beforeInteractive` strategy will throw an error because our custom script will be mounted outside the `html` tag.
- */
-function CustomNextjsScript(props: ScriptHTMLAttributes<HTMLScriptElement>) {
-  return <script {...props} />;
 }
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
@@ -82,10 +74,8 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
-      <ReactClerkProvider
-        {...mergedProps}
-        ScriptComponent={CustomNextjsScript}
-      >
+      <ReactClerkProvider {...mergedProps}>
+        <ClerkJSScript router='app' />
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
