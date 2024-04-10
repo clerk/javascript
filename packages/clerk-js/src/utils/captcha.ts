@@ -1,4 +1,5 @@
 import { loadScript } from '@clerk/shared/loadScript';
+import type { CaptchaWidgetType } from '@clerk/types';
 
 import { clerkFailedToLoadThirdPartyScript } from '../core/errors';
 
@@ -82,7 +83,7 @@ export async function loadCaptcha(url: string) {
 export const getCaptchaToken = async (captchaOptions: {
   siteKey: string;
   scriptUrl: string;
-  widgetType: string | null;
+  widgetType: CaptchaWidgetType;
 }) => {
   const { siteKey: sitekey, scriptUrl, widgetType } = captchaOptions;
   let captchaToken = '',
@@ -117,7 +118,7 @@ export const getCaptchaToken = async (captchaOptions: {
       try {
         const id = captcha.render(invisibleWidget ? `.${CAPTCHA_INVISIBLE_CLASSNAME}` : `#${CAPTCHA_ELEMENT_ID}`, {
           sitekey,
-          appearance: 'interaction-only',
+          appearance: widgetType === 'always_visible' ? 'always' : 'interaction-only',
           retry: 'never',
           'refresh-expired': 'auto',
           callback: function (token: string) {

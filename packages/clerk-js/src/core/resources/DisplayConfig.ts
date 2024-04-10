@@ -1,4 +1,10 @@
-import type { DisplayConfigJSON, DisplayConfigResource, DisplayThemeJSON, PreferredSignInStrategy } from '@clerk/types';
+import type {
+  CaptchaWidgetType,
+  DisplayConfigJSON,
+  DisplayConfigResource,
+  DisplayThemeJSON,
+  PreferredSignInStrategy,
+} from '@clerk/types';
 
 import { BaseResource } from './internal';
 
@@ -14,7 +20,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   backendHost!: string;
   branded!: boolean;
   captchaPublicKey: string | null = null;
-  captchaWidgetType: string | null = null;
+  captchaWidgetType: CaptchaWidgetType = null;
   homeUrl!: string;
   instanceEnvironmentType!: string;
   faviconImageUrl!: string;
