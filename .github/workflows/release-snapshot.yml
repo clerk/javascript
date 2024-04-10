@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Limit action to Clerk members
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           result-encoding: string
           retries: 3
@@ -52,7 +52,7 @@ jobs:
 
       - name: Extract snapshot name
         id: extract-snapshot-name
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const match = context.payload.comment.body.match(/!snapshot (.*)/)
@@ -81,7 +81,7 @@ jobs:
       - name: Package info
         if: steps.version-packages.outputs.success == '1'
         id: package-info
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require("fs");
