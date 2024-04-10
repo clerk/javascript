@@ -95,10 +95,6 @@ SignInResend.displayName = SIGN_IN_RESEND_NAME;
 
 const SIGN_IN_ACTION_NAME = 'SignInAction';
 
-export function Test() {
-  return <SignInResend fallback={({ resendableAfter }) => <p>Resendable in: {resendableAfter}s</p>}>Foo</SignInResend>;
-}
-
 /**
  * Perform various actions during the sign-in process. This component is used to navigate between steps, submit the form, or resend a verification codes.
  *
