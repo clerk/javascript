@@ -150,6 +150,7 @@ export const createUser = (params: WithUserParams): UserJSON => {
     last_sign_in_at: null,
     updated_at: new Date().getTime(),
     created_at: new Date().getTime(),
+    plan: undefined,
     ...params,
     email_addresses: (params.email_addresses || []).map(e =>
       typeof e === 'string' ? createEmail({ email_address: e }) : createEmail(e),
