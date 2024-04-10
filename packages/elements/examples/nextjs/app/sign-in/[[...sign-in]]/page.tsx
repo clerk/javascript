@@ -5,7 +5,6 @@ import {
   Action,
   Provider,
   ProviderIcon,
-  Resendable,
   SafeIdentifier,
   Salutation,
   SignIn,
@@ -88,22 +87,18 @@ function CustomSubmit({ children }: ComponentProps<'button'>) {
   );
 }
 
+function ResendableFallback({ resendableAfter }: { resendableAfter: number }) {
+  return <P className='text-sm'>Didn&apos;t recieve a code? Retry in {resendableAfter} seconds.</P>;
+}
+
 function CustomResendable() {
   return (
-    <Resendable>
-      {({ resendable, resendableAfter }) => (
-        <P className='text-sm'>
-          Didn&apos;t recieve a code?{' '}
-          {resendable ? (
-            <Action resend>
-              <strong className='text-blue-400'>Retry Now</strong>
-            </Action>
-          ) : (
-            <>Retry in {resendableAfter} seconds.</>
-          )}
-        </P>
-      )}
-    </Resendable>
+    <Action
+      fallback={ResendableFallback}
+      resend
+    >
+      Didn&apos;t recieve a code? <strong className='text-blue-400'>Retry Now</strong>
+    </Action>
   );
 }
 

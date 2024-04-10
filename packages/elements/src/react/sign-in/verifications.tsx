@@ -3,7 +3,6 @@ import { useSelector } from '@xstate/react';
 import { useCallback } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
-import { ClerkElementsRuntimeError } from '~/internals/errors';
 import {
   SignInFirstFactorMachine,
   SignInSecondFactorMachine,
@@ -156,34 +155,3 @@ export type SignInVerificationResendableRenderProps = {
 export type SignInVerificationResendableProps = {
   children: (props: SignInVerificationResendableRenderProps) => React.ReactNode;
 };
-
-/**
- * Component to expose the UI retry details for verifications.
- *
- * @example
- * <Resendable>({({ resendable, resendAfter }) => (<>...</>)}</Resendable>
- */
-export function SignInVerificationResendable({ children }: SignInVerificationResendableProps) {
-  const firstFactorRef = SignInFirstFactorCtx.useActorRef(true);
-  const secondFactorRef = SignInSecondFactorCtx.useActorRef(true);
-  const ref = firstFactorRef || secondFactorRef;
-
-  if (!ref) {
-    throw new ClerkElementsRuntimeError('The <Resendable> component must be used within <Step name="verifications">.');
-  }
-
-  const renderProps: SignInVerificationResendableRenderProps = useSelector(
-    ref,
-    state => ({
-      resendable: state.context.resendable,
-      resendableAfter: state.context.resendableAfter,
-    }),
-    (a, b) => a.resendableAfter === b.resendableAfter && a.resendable === b.resendable,
-  );
-
-  if (!renderProps) {
-    return null;
-  }
-
-  return children(renderProps);
-}

@@ -13,7 +13,6 @@ export {
   SignInFirstFactor as FirstFactor,
   SignInSecondFactor as SecondFactor,
   SignInStrategy as Strategy,
-  SignInVerificationResendable as Resendable,
 } from './verifications';
 
 export { SignInSafeIdentifier as SafeIdentifier, SignInSalutation as Salutation } from './identifiers';
