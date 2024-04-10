@@ -85,6 +85,7 @@ export const ruRU: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Название организации',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Пароль',
   formFieldLabel__phoneNumber: 'Номер телефона',
   formFieldLabel__role: 'Роль',
@@ -679,6 +680,14 @@ export const ruRU: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -765,6 +774,11 @@ export const ruRU: LocalizationResource = {
           destructiveActionTitle: 'Удалить',
           headerTitle: 'Приложение аутентификации',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Установить пароль',

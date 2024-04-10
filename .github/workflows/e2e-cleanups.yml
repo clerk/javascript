@@ -3,13 +3,13 @@ on:
   workflow_dispatch:
   schedule:
     # run every 6 hours on every weekday
-    - cron: "0 */6 * * 1-5"
+    - cron: '0 */6 * * 1-5'
 
 jobs:
   integration-tests:
     name: Cleanup e2e instances
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     steps:
       - name: Checkout Repo

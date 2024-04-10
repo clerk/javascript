@@ -1,13 +1,15 @@
 import { deepSnakeToCamel, Poller } from '@clerk/shared';
 import type {
-  __experimental_PasskeyFactor,
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
+  AuthenticateWithPasskeyParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
+  PassKeyConfig,
+  PasskeyFactor,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -85,9 +87,7 @@ export class SignIn extends BaseResource implements SignInResource {
   prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
     let config;
     switch (factor.strategy) {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       case 'passkey':
-        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
         config = {} as PassKeyConfig;
         break;
       case 'email_link':
@@ -132,10 +132,8 @@ export class SignIn extends BaseResource implements SignInResource {
   attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
     let config;
     switch (attemptFactor.strategy) {
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       case 'passkey':
         config = {
-          // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
           publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
         };
         break;
@@ -263,9 +261,7 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public __experimental_authenticateWithPasskey = async (params?: {
-    flow?: 'autofill' | 'discoverable';
-  }): Promise<SignInResource> => {
+  public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
     const { flow } = params || {};
 
     /**
@@ -286,7 +282,7 @@ export class SignIn extends BaseResource implements SignInResource {
       const passKeyFactor = this.supportedFirstFactors.find(
         // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
         f => f.strategy === 'passkey',
-      ) as __experimental_PasskeyFactor;
+      ) as PasskeyFactor;
 
       if (!passKeyFactor) {
         clerkVerifyPasskeyCalledBeforeCreate();
@@ -324,9 +320,15 @@ export class SignIn extends BaseResource implements SignInResource {
 
     return this.attemptFirstFactor({
       publicKeyCredential,
-      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
       strategy: 'passkey',
     });
+  };
+
+  // TODO-PASSKEYS: Remove in the next minor
+  public __experimental_authenticateWithPasskey = async (params?: {
+    flow?: 'autofill' | 'discoverable';
+  }): Promise<SignInResource> => {
+    return this.authenticateWithPasskey(params);
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {

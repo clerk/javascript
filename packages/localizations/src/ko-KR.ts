@@ -85,6 +85,7 @@ export const koKR: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: '이름',
   formFieldLabel__organizationSlug: '슬러그',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: '비밀번호',
   formFieldLabel__phoneNumber: '휴대폰 번호',
   formFieldLabel__role: '역할',
@@ -665,6 +666,14 @@ export const koKR: LocalizationResource = {
       security: 'Security',
       title: '게정',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -750,6 +759,11 @@ export const koKR: LocalizationResource = {
           destructiveActionTitle: '제거',
           headerTitle: '인증 애플리케이션',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: '비밀번호 설정',

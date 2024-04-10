@@ -1,12 +1,12 @@
 import { isValidBrowser } from '@clerk/shared/browser';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
-  __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions,
-  __experimental_PublicKeyCredentialRequestOptionsWithoutExtensions,
-  __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse,
-  __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsJSON,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
+  PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/types';
 
 type CredentialReturn<T> =
@@ -19,10 +19,8 @@ type CredentialReturn<T> =
       error: ClerkWebAuthnError | Error;
     };
 
-type WebAuthnCreateCredentialReturn =
-  CredentialReturn<__experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse>;
-type WebAuthnGetCredentialReturn =
-  CredentialReturn<__experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse>;
+type WebAuthnCreateCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>;
+type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>;
 
 type ClerkWebAuthnErrorCode =
   // Generic
@@ -87,13 +85,13 @@ class Base64Converter {
 }
 
 async function webAuthnCreateCredential(
-  publicKeyOptions: __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions,
+  publicKeyOptions: PublicKeyCredentialCreationOptionsWithoutExtensions,
 ): Promise<WebAuthnCreateCredentialReturn> {
   try {
     // Typescript types are not aligned with the spec. These type assertions are required to comply with the spec.
     const credential = (await navigator.credentials.create({
       publicKey: publicKeyOptions,
-    })) as __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse | null;
+    })) as PublicKeyCredentialWithAuthenticatorAttestationResponse | null;
 
     if (!credential) {
       return {
@@ -141,7 +139,7 @@ async function webAuthnGetCredential({
   publicKeyOptions,
   conditionalUI,
 }: {
-  publicKeyOptions: __experimental_PublicKeyCredentialRequestOptionsWithoutExtensions;
+  publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
   conditionalUI: boolean;
 }): Promise<WebAuthnGetCredentialReturn> {
   try {
@@ -150,7 +148,7 @@ async function webAuthnGetCredential({
       publicKey: publicKeyOptions,
       mediation: conditionalUI ? 'conditional' : 'optional',
       signal: __internal_WebAuthnAbortService.createAbortSignal(),
-    })) as __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse | null;
+    })) as PublicKeyCredentialWithAuthenticatorAssertionResponse | null;
 
     if (!credential) {
       return {
@@ -218,7 +216,7 @@ function convertJSONToPublicKeyCreateOptions(jsonPublicKey: PublicKeyCredentialC
       ...jsonPublicKey.user,
       id: userIdBuffer,
     },
-  } as __experimental_PublicKeyCredentialCreationOptionsWithoutExtensions;
+  } as PublicKeyCredentialCreationOptionsWithoutExtensions;
 }
 
 function convertJSONToPublicKeyRequestOptions(jsonPublicKey: PublicKeyCredentialRequestOptionsJSON) {
@@ -233,7 +231,7 @@ function convertJSONToPublicKeyRequestOptions(jsonPublicKey: PublicKeyCredential
     ...jsonPublicKey,
     allowCredentials: allowCredentialsWithBuffer,
     challenge: challengeBuffer,
-  } as __experimental_PublicKeyCredentialRequestOptionsWithoutExtensions;
+  } as PublicKeyCredentialRequestOptionsWithoutExtensions;
 }
 
 function __serializePublicKeyCredential<T extends Omit<PublicKeyCredential, 'getClientExtensionResults'>>(pkc: T) {
@@ -245,7 +243,7 @@ function __serializePublicKeyCredential<T extends Omit<PublicKeyCredential, 'get
   };
 }
 
-function serializePublicKeyCredential(pkc: __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse) {
+function serializePublicKeyCredential(pkc: PublicKeyCredentialWithAuthenticatorAttestationResponse) {
   const response = pkc.response;
   return {
     ...__serializePublicKeyCredential(pkc),
@@ -257,9 +255,7 @@ function serializePublicKeyCredential(pkc: __experimental_PublicKeyCredentialWit
   };
 }
 
-function serializePublicKeyCredentialAssertion(
-  pkc: __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse,
-) {
+function serializePublicKeyCredentialAssertion(pkc: PublicKeyCredentialWithAuthenticatorAssertionResponse) {
   const response = pkc.response;
   return {
     ...__serializePublicKeyCredential(pkc),

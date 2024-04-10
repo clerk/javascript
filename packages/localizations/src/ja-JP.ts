@@ -85,6 +85,7 @@ export const jaJP: LocalizationResource = {
     'このドメインを確認するためのコードを受け取るメールアドレスを入力してください。',
   formFieldLabel__organizationName: '組織名',
   formFieldLabel__organizationSlug: 'スラグURL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'パスワード',
   formFieldLabel__phoneNumber: '電話番号',
   formFieldLabel__role: '役割',
@@ -673,6 +674,14 @@ export const jaJP: LocalizationResource = {
       security: 'セキュリティ',
       title: 'アカウント',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         '古いパスワードを使用している可能性のあるすべてのデバイスからサインアウトすることをお勧めします。',
@@ -759,6 +768,11 @@ export const jaJP: LocalizationResource = {
           destructiveActionTitle: '削除',
           headerTitle: '認証アプリケーション',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'パスワードを設定する',
