@@ -54,28 +54,34 @@ const SignInVerificationMachine = setup({
     determineStartingFactor: () => {
       throw new ClerkElementsRuntimeError('Action `determineStartingFactor` must be overridden');
     },
-    handleMissingStrategy: ({ context }) => {
-      console.log(context);
+    validateConfiguredStrategies: ({ context }) => {
       const clerk = context.parent.getSnapshot().context.clerk;
-      if (
-        clerk.__unstable__environment?.isProduction() ||
-        !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
-      ) {
+
+      if (clerk.__unstable__environment?.isProduction()) {
         return;
       }
 
-      const msg = `Your current step is rendering strategies: ${[...context.registeredStrategies]
-        .map(s => s)
-        .join(', ')}, but is currently missing: <Strategy name="${
-        context.currentFactor?.strategy
-      }">. Before deploying your app, make sure to render a <Strategy name="${
-        context.currentFactor?.strategy
-      }"> component.`;
+      if (
+        process.env.NODE_ENV === 'development' &&
+        !clerk.client.signIn.supportedFirstFactors.every(factor =>
+          context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
+        )
+      ) {
+        console.warn(
+          `Clerk: Your instance is configured to support strategies: ${clerk.client.signIn.supportedFirstFactors
+            .map(f => f.strategy)
+            .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
+            .map(s => s)
+            .join(
+              ', ',
+            )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: <link>`,
+        );
+      }
 
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(msg);
-      } else {
-        throw new ClerkElementsRuntimeError(msg);
+      if (!context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)) {
+        throw new ClerkElementsRuntimeError(
+          `Your sign-in/up attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. For more information, visit the documentation: <link>`,
+        );
       }
     },
     setFormErrors: sendTo(
@@ -148,7 +154,7 @@ const SignInVerificationMachine = setup({
       },
       after: {
         3000: {
-          actions: 'handleMissingStrategy',
+          actions: 'validateConfiguredStrategies',
         },
       },
     },
