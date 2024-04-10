@@ -87,7 +87,7 @@ export class Session extends BaseResource implements SessionResource {
 
     // TODO-BILLING: Update this type
     // @ts-expect-error TBD
-    const activeOrganizationPlan = activeMembership.organization.plan;
+    const activeOrganizationPlan = activeMembership?.organization.plan;
     const activeOrganizationPermissions = activeMembership?.permissions || [];
     const activeOrganizationRole = activeMembership?.role;
     const activeUserPlan = this.user?.plan;
