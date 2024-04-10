@@ -55,7 +55,7 @@ class AuthenticateContext {
     this.devBrowserToken =
       this.getQueryParam(constants.Cookies.DevBrowser) || this.getMultipleAppsCookie(constants.Cookies.DevBrowser);
     this.handshakeToken =
-      this.getQueryParam(constants.Cookies.Handshake) || this.getCookie(constants.Cookies.Handshake);
+      this.getQueryParam(constants.Cookies.Handshake) || this.getMultipleAppsCookie(constants.Cookies.Handshake);
   }
 
   private initHeaderValues() {
