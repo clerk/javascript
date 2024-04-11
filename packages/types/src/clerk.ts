@@ -182,8 +182,8 @@ export interface Clerk {
    * @param targetNode Target node to mount the SignIn component.
    * @param signInProps sign in configuration parameters.
    */
-  __experimental_mountOneTap: (oneTapProps?: OneTapProps) => void;
-  __experimental_unmountOneTap: () => void;
+  __experimental_mountGoogleOneTap: (oneTapProps?: OneTapProps) => void;
+  __experimental_unmountGoogleOneTap: () => void;
 
   /**
    * Mounts a sign up flow component at the target element.

@@ -14,6 +14,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 
+// TODO-ONETAP: Grab this from environment
 const clientID = '466181446725-jqurtjvbts42erq1cjjf197ruevg19th.apps.googleusercontent.com';
 
 function _OneTapStart(): JSX.Element {
@@ -29,6 +30,7 @@ function _OneTapStart(): JSX.Element {
     try {
       const res = await clerk.client.signIn
         .create({
+          // TODO-ONETAP: Add new types when feature is ready for public beta
           // @ts-expect-error
           strategy: 'google_one_tap',
           googleOneTapToken: response.credential,
@@ -38,6 +40,7 @@ function _OneTapStart(): JSX.Element {
           if (isClerkAPIResponseError(err) && err.errors[0].code === 'resource_not_found') {
             // if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
             return clerk.client.signUp.create({
+              // TODO-ONETAP: Add new types when feature is ready for public beta
               // @ts-expect-error
               strategy: 'google_one_tap',
               googleOneTapToken: response.credential,
@@ -52,12 +55,18 @@ function _OneTapStart(): JSX.Element {
             session: res.createdSessionId,
           });
           break;
+        // TODO-ONETAP: Add a new case in order to handle the `missing_requirements` status and the PSU flow
         default:
-          console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
+          clerkInvalidFAPIResponse(res.status, supportEmail);
           break;
       }
     } catch (err) {
-      handleError(err, [], card.setError);
+      try {
+        handleError(err, [], card.setError);
+      } catch (e) {
+        // In any other case simply log, this component is experimental and this flow is not handled on purpose
+        console.error(e);
+      }
     }
   }
 
@@ -66,6 +75,7 @@ function _OneTapStart(): JSX.Element {
    */
   const { data: google } = useFetch(user?.id ? undefined : loadGIS, 'google-identity-services-script', {
     onSuccess(google) {
+      // TODO-ONETAP: Implement this
       // @ts-ignore
       const environmentClientID = environment.displayConfig.googleOneTapClientID;
 
@@ -95,6 +105,7 @@ function _OneTapStart(): JSX.Element {
 
   return (
     <Flow.Part part='start'>
+      {/*// TODO-ONETAP: Improve error UI, currently there is no pattern for this case*/}
       {card.error && (
         <Card.Root
           id={'one-tap'}

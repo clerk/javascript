@@ -461,7 +461,7 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public __experimental_mountOneTap = (props?: OneTapProps): void => {
+  public __experimental_mountGoogleOneTap = (props?: OneTapProps): void => {
     this.assertComponentsReady(this.#componentControls);
 
     if (!this.#oneTapNode) {
@@ -478,10 +478,11 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    // this.telemetry?.record(eventComponentMounted('OneTap', props));
+    // TODO-ONETAP: Enable telemetry one feature is ready for public beta
+    // this.telemetry?.record(eventComponentMounted('GoogleOneTap', props));
   };
 
-  public __experimental_unmountOneTap = (): void => {
+  public __experimental_unmountGoogleOneTap = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
