@@ -31,8 +31,7 @@ type FlowMetadata = {
     | 'ssoCallback'
     | 'popover'
     | 'complete'
-    | 'accountSwitcher'
-    | 'psu';
+    | 'accountSwitcher';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');
