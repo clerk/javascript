@@ -1,5 +1,5 @@
-import { ClerkLoaded, useClerk } from '@clerk/clerk-react';
-import { useEffect } from 'react';
+import { ClerkLoaded, ClerkLoading, useClerk } from '@clerk/clerk-react';
+import React, { useEffect } from 'react';
 import { createActor } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
@@ -9,6 +9,8 @@ import type { SignInRouterInitEvent } from '~/internals/machines/sign-in/types';
 import { consoleInspector } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
+
+import { Form } from '../common/form';
 
 type SignInFlowProviderProps = {
   children: React.ReactNode;
@@ -23,6 +25,11 @@ function SignInFlowProvider({ children }: SignInFlowProviderProps) {
 
   useEffect(() => {
     if (!clerk || !router) return;
+
+    // @ts-expect-error -- This is actually an IsomorphicClerk instance
+    clerk.addOnLoaded(() => {
+      ref.send({ type: 'SET_CLERK', clerk });
+    });
 
     const evt: SignInRouterInitEvent = {
       type: 'INIT',
@@ -39,7 +46,16 @@ function SignInFlowProvider({ children }: SignInFlowProviderProps) {
   return <SignInRouterCtx.Provider actorRef={ref}>{children}</SignInRouterCtx.Provider>;
 }
 
-export type SignInRootProps = { path?: string; children: React.ReactNode };
+export type SignInRootProps = {
+  /**
+   * The base path for your sign in route. Defaults to `/sign-in`.
+   *
+   * TODO: re-use usePathnameWithoutCatchAll from the next SDK
+   */
+  path?: string;
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+};
 
 /**
  * Root component for the sign-in flow. It sets up providers and state management for its children.
@@ -53,20 +69,27 @@ export type SignInRootProps = { path?: string; children: React.ReactNode };
  *  </SignIn>
  * )
  */
-export function SignInRoot({ children, path = SIGN_IN_DEFAULT_BASE_PATH }: SignInRootProps): JSX.Element | null {
+export function SignInRoot({
+  children,
+  path = SIGN_IN_DEFAULT_BASE_PATH,
+  fallback = null,
+}: SignInRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
 
   return (
-    <ClerkLoaded>
-      <Router
-        basePath={path}
-        router={router}
-      >
-        <FormStoreProvider>
-          <SignInFlowProvider>{children}</SignInFlowProvider>
-        </FormStoreProvider>
-      </Router>
-    </ClerkLoaded>
+    <Router
+      basePath={path}
+      router={router}
+    >
+      <FormStoreProvider>
+        <SignInFlowProvider>
+          <ClerkLoading>
+            <Form>{fallback}</Form>
+          </ClerkLoading>
+          <ClerkLoaded>{children}</ClerkLoaded>
+        </SignInFlowProvider>
+      </FormStoreProvider>
+    </Router>
   );
 }

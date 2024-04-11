@@ -67,7 +67,7 @@ export const SignInRouterMachine = setup({
   guards: {
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signIn.status === null && context.clerk.client.lastActiveSessionId),
-    hasResource: ({ context }) => Boolean(context.clerk.client.signIn.status),
+    hasResource: ({ context }) => Boolean(context.clerk?.client?.signIn?.status),
 
     isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode']),
     isActivePathRoot: isCurrentPath('/'),
@@ -144,6 +144,11 @@ export const SignInRouterMachine = setup({
         },
       })),
     },
+    SET_CLERK: {
+      actions: assign(({ event }) => ({
+        clerk: event.clerk,
+      })),
+    },
   },
   states: {
     Idle: {
@@ -167,7 +172,6 @@ export const SignInRouterMachine = setup({
         systemId: ThirdPartyMachineId,
         input: ({ context, self }) => ({
           basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
-          environment: context.clerk.__unstable__environment,
           flow: 'signIn',
           parent: self,
         }),
