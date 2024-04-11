@@ -17,7 +17,7 @@ export type SignInActionProps = { asChild?: boolean } & FormSubmitProps &
         submit?: never;
       } & Omit<SignInNavigateProps, 'to'>)
     | { navigate?: never; resend?: never; submit: true }
-    | { navigate?: never; resend: true; submit?: never }
+    | ({ navigate?: never; resend: true; submit?: never } & SignInResendProps)
   );
 
 export type SignInActionCompProps = React.ForwardRefExoticComponent<
