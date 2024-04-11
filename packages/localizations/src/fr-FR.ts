@@ -490,7 +490,7 @@ export const frFR: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'moins de {{length}} caractères',
       minimumLength: '{{length}} caractères ou plus',

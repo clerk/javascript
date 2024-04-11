@@ -82,7 +82,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
         throw new ClerkWebAuthnError(
           'Registration requires a platform authenticator but the device does not support it.',
           {
-            code: 'passkeys_pa_not_supported',
+            code: 'passkey_pa_not_supported',
           },
         );
       }

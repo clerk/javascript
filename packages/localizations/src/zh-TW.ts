@@ -482,7 +482,7 @@ export const zhTW: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '少於{{length}}個字元',
       minimumLength: '{{length}}個或更多字元',
