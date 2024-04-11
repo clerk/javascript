@@ -91,7 +91,71 @@ export default function SignInPage() {
   const [continueWithEmail, setContinueWithEmail] = useState(false);
 
   return (
-    <SignIn>
+    <SignIn
+      fallback={
+        <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
+          <div className='text-center'>
+            <H1>Sign In</H1>
+            <p className='text-base text-zinc-400'>
+              Don&apos;t have an account?{' '}
+              <Link
+                href='/sign-up'
+                className='no-underline hover:underline'
+              >
+                Sign Up
+              </Link>
+            </p>
+          </div>
+          <div className='flex flex-col items-center  gap-12 w-96'>
+            <GlobalError className='block text-red-400 font-mono' />
+
+            <div className='flex flex-col gap-2 self-stretch'>
+              <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+              <CustomProvider provider='google'>Continue with Google</CustomProvider>
+              <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
+            </div>
+
+            {continueWithEmail ? (
+              <>
+                <Field
+                  className='flex flex-col gap-4 w-full'
+                  name='identifier'
+                >
+                  {fieldState => (
+                    <>
+                      <Label className='sr-only'>Email</Label>
+                      <Input
+                        className={`bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded w-full placeholder-[rgb(100,100,100)] px-4 py-2 ${
+                          fieldState === 'invalid' && 'border-red-500'
+                        }`}
+                        placeholder='Enter your email address'
+                      />
+                      <FieldError className='block text-red-400 font-mono w-full' />
+                    </>
+                  )}
+                </Field>
+
+                <CustomSubmit>
+                  <Loading>
+                    {isLoading =>
+                      isLoading ? (
+                        <>
+                          <Spinner /> Loading...
+                        </>
+                      ) : (
+                        'Sign in with Email'
+                      )
+                    }
+                  </Loading>
+                </CustomSubmit>
+              </>
+            ) : (
+              <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
+            )}
+          </div>
+        </div>
+      }
+    >
       <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
         <div className='text-center'>
           <H1>Sign In</H1>
