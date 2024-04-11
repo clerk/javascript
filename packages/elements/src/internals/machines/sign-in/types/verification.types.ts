@@ -18,11 +18,15 @@ export type SignInVerificationTags =
 
 export type SignInVerificationSubmitEvent = { type: 'SUBMIT' };
 export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
+export type SignInVerificationStrategyRegisterEvent = { type: 'STRATEGY.REGISTER'; factor: SignInFactor };
+export type SignInVerificationStrategyUnregisterEvent = { type: 'STRATEGY.UNREGISTER'; factor: SignInFactor };
 
 export type SignInVerificationEvents =
   | ErrorActorEvent
   | SignInVerificationSubmitEvent
-  | SignInVerificationFactorUpdateEvent;
+  | SignInVerificationFactorUpdateEvent
+  | SignInVerificationStrategyRegisterEvent
+  | SignInVerificationStrategyUnregisterEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 
@@ -39,6 +43,7 @@ export interface SignInVerificationContext {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignInRouterMachine>;
   loadingStep: 'verifications';
+  registeredStrategies: Set<SignInFactor>;
 }
 
 // ---------------------------------- Schema ---------------------------------- //
