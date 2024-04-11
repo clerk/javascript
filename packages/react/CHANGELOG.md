@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.0.0-beta.37
+
+### Patch Changes
+
+- Updated dependencies [[`0699fa496`](https://github.com/clerk/javascript/commit/0699fa49693dc7a8d3de8ba053c4f16a5c8431d0)]:
+  - @clerk/types@4.0.0-beta.26
+
 ## 5.0.0-beta.36
 
 ### Patch Changes
