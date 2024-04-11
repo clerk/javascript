@@ -19,7 +19,6 @@ export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({
 
 export const SignInModal = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignInModal })));
 export const OneTap = lazy(() => componentImportPaths.OneTap().then(module => ({ default: module.OneTap })));
-export const OneTapModal = lazy(() => componentImportPaths.OneTap().then(module => ({ default: module.OneTapModal })));
 
 export const SignUp = lazy(() => componentImportPaths.SignUp().then(module => ({ default: module.SignUp })));
 
@@ -81,7 +80,6 @@ export const ClerkComponents = {
   OrganizationProfileModal,
   CreateOrganizationModal,
   OneTap,
-  OneTapModal,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

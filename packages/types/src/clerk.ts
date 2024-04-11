@@ -704,12 +704,11 @@ export type SignInProps = RoutingOptions & {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-export type OneTapProps = RoutingOptions & {
+export type OneTapProps = {
   cancelOnTapOutside?: boolean;
   autoSelect?: boolean;
   appearance?: SignInTheme;
 };
-export type OneTapModalProps = WithoutRouting<OneTapProps>;
 
 export type SignUpProps = RoutingOptions & {
   /**
