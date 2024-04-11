@@ -711,7 +711,6 @@ export type SignInModalProps = WithoutRouting<SignInProps>;
 
 export type OneTapProps = {
   cancelOnTapOutside?: boolean;
-  autoSelect?: boolean;
   appearance?: SignInTheme;
 };
 

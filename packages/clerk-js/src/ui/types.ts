@@ -76,7 +76,6 @@ export type OrganizationListCtx = OrganizationListProps & {
 
 export type OneTapCtx = OneTapProps & {
   componentName: 'OneTap';
-  mode?: ComponentMode;
 };
 
 export type AvailableComponentCtx =
