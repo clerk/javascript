@@ -119,6 +119,11 @@ export interface Clerk {
   openSignIn: (props?: SignInProps) => void;
 
   /**
+   * Closes the Clerk SignIn modal.
+   */
+  closeSignIn: () => void;
+
+  /**
    * Opens the Clerk SignUp component in a modal.
    * @param props Optional props that will be passed to the SignUp component.
    */
