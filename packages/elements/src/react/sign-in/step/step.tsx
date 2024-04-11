@@ -1,14 +1,16 @@
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 
-import { SignInChooseStrategy, type SignInChooseStrategyProps, SignInForgotPassword } from './choose-strategy';
-import { SignInStart, type SignInStartProps } from './start';
-import { SignInVerifications, type SignInVerificationsProps } from './verifications';
+import { SignInChooseStrategy, type SignInChooseStrategyProps, SignInForgotPassword } from '../choose-strategy';
+import { SignInStart, type SignInStartProps } from '../start';
+import { SignInVerifications, type SignInVerificationsProps } from '../verifications';
+import { SignInResetPassword, type SignInResetPasswordProps } from './reset-password';
 
 export const SIGN_IN_STEPS = {
   start: 'start',
   verifications: 'verifications',
   'choose-strategy': 'choose-strategy',
   'forgot-password': 'forgot-password',
+  'reset-password': 'reset-password',
 } as const;
 
 export type TSignInStep = (typeof SIGN_IN_STEPS)[keyof typeof SIGN_IN_STEPS];
@@ -17,7 +19,8 @@ type StepWithProps<N extends TSignInStep, T> = { name: N } & T;
 export type SignInStepProps =
   | StepWithProps<'start', SignInStartProps>
   | StepWithProps<'verifications', SignInVerificationsProps>
-  | StepWithProps<'choose-strategy' | 'forgot-password', SignInChooseStrategyProps>;
+  | StepWithProps<'choose-strategy' | 'forgot-password', SignInChooseStrategyProps>
+  | StepWithProps<'reset-password', SignInResetPasswordProps>;
 
 /**
  * Render different steps of the sign-in flow. Initially the `'start'` step is rendered. Once a sign-in attempt has been created, `'verifications'` will be displayed. If during that verification step the user decides to choose a different method of signing in or verifying, the `'choose-strategy'` step will be displayed.
@@ -59,6 +62,8 @@ export function SignInStep(props: SignInStepProps) {
       return <SignInChooseStrategy {...props} />;
     case SIGN_IN_STEPS['forgot-password']:
       return <SignInForgotPassword {...props} />;
+    case SIGN_IN_STEPS['reset-password']:
+      return <SignInResetPassword {...props} />;
     default:
       throw new ClerkElementsRuntimeError(`Invalid step name. Use: ${Object.keys(SIGN_IN_STEPS).join(',')}.`);
   }

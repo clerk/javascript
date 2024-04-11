@@ -34,7 +34,6 @@ export const SignInRouterMachine = setup({
     thirdParty: ThirdPartyMachine,
   },
   actions: {
-    logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
       if (!force && shouldUseVirtualRouting()) return;
@@ -212,6 +211,11 @@ export const SignInRouterMachine = setup({
           target: 'SecondFactor',
         },
         {
+          guard: 'needsNewPassword',
+          actions: { type: 'navigateInternal', params: { force: true, path: '/reset-password' } },
+          target: 'ResetPassword',
+        },
+        {
           actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
           target: 'Start',
         },
@@ -235,6 +239,11 @@ export const SignInRouterMachine = setup({
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
           },
+          {
+            guard: 'statusNeedsNewPassword',
+            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            target: 'ResetPassword',
+          },
         ],
       },
     },
@@ -252,7 +261,9 @@ export const SignInRouterMachine = setup({
             target: 'SecondFactor',
           },
           {
-            actions: ['logUnknownError', { type: 'navigateInternal', params: { path: '/' } }],
+            guard: 'statusNeedsNewPassword',
+            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            target: 'ResetPassword',
           },
         ],
         'STRATEGY.UPDATE': {
@@ -300,7 +311,30 @@ export const SignInRouterMachine = setup({
             actions: 'setActive',
           },
           {
-            actions: ['logUnknownError', { type: 'navigateInternal', params: { path: '/' } }],
+            guard: 'statusNeedsNewPassword',
+            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            target: 'ResetPassword',
+          },
+        ],
+      },
+    },
+    ResetPassword: {
+      tags: 'route:reset-password',
+      on: {
+        NEXT: [
+          {
+            guard: 'isComplete',
+            actions: 'setActive',
+          },
+          {
+            guard: 'statusNeedsFirstFactor',
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            target: 'FirstFactor',
+          },
+          {
+            guard: 'statusNeedsSecondFactor',
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            target: 'SecondFactor',
           },
         ],
       },
@@ -332,6 +366,11 @@ export const SignInRouterMachine = setup({
             guard: 'statusNeedsSecondFactor',
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
+          },
+          {
+            guard: 'statusNeedsNewPassword',
+            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            target: 'ResetPassword',
           },
         ],
       },

@@ -164,6 +164,7 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
   const isVerificationsLoading = isLoading && loadingStep === 'verifications';
   const isChooseStrategyLoading = isLoading && isFirstFactor && snapshot.hasTag('route:choose-strategy');
   const isForgotPasswordLoading = isFirstFactor && snapshot.hasTag('route:forgot-password');
+  const isResetPasswordLoading = isFirstFactor && snapshot.hasTag('route:reset-password');
   const isStrategyLoading = isLoading && loadingStep === undefined && strategy !== undefined;
 
   let returnValue: boolean;
@@ -178,6 +179,8 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
     returnValue = isChooseStrategyLoading;
   } else if (computedScope === 'step:forgot-password') {
     returnValue = isForgotPasswordLoading;
+  } else if (computedScope === 'step:reset-password') {
+    returnValue = isResetPasswordLoading;
   } else if (computedScope.startsWith('provider:')) {
     const computedStrategy = mapScopeToStrategy(computedScope);
     returnValue = isStrategyLoading && strategy === computedStrategy;

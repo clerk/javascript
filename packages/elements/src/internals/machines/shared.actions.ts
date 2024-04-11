@@ -1,6 +1,8 @@
 import type { SignInStrategy } from '@clerk/types';
 
 import type {
+  SignInResetPasswordContext,
+  SignInResetPasswordEvents,
   SignInStartContext,
   SignInStartEvents,
   SignInVerificationContext,
@@ -21,6 +23,7 @@ type SendToLoadingProps = {
   context:
     | SignInStartContext
     | SignInVerificationContext
+    | SignInResetPasswordContext
     | ThirdPartyMachineContext
     | SignUpStartContext
     | SignUpContinueContext
@@ -28,6 +31,7 @@ type SendToLoadingProps = {
   event:
     | SignInStartEvents
     | SignInVerificationEvents
+    | SignInResetPasswordEvents
     | ThirdPartyMachineEvent
     | SignUpStartRedirectEvent
     | SignUpContinueEvents

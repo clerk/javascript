@@ -366,36 +366,26 @@ export default function SignInPage() {
               </P>
 
               <CustomField
-                label='New Password'
-                name='password'
-              />
-
-              <CustomField
                 label='Code'
                 name='code'
               />
 
-              <CustomSubmit>Change Password</CustomSubmit>
+              <CustomSubmit>Continue</CustomSubmit>
             </Strategy>
 
             <Strategy name='reset_password_phone_code'>
-              <H3>Verify your email</H3>
+              <H3>Verify your phone number</H3>
 
               <P className='text-sm'>
                 We&apos;ve sent a verification code to <SafeIdentifier />
               </P>
 
               <CustomField
-                label='New Password'
-                name='password'
-              />
-
-              <CustomField
                 label='Code'
                 name='code'
               />
 
-              <CustomSubmit>Change Password</CustomSubmit>
+              <CustomSubmit>Continue</CustomSubmit>
             </Strategy>
           </div>
 
@@ -405,6 +395,20 @@ export default function SignInPage() {
           >
             <TextButton>Use another method</TextButton>
           </Action>
+        </Step>
+
+        <Step name='reset-password'>
+          <div className='flex flex-col items-center gap-6 w-96'>
+            <H3>Reset your password</H3>
+
+            <P className='text-sm'>Please reset your password to continue:</P>
+
+            <CustomField
+              label='New Password'
+              name='password'
+            />
+            <CustomSubmit>Update Password</CustomSubmit>
+          </div>
         </Step>
       </div>
     </SignIn>

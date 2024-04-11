@@ -304,7 +304,6 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         case 'reset_password_phone_code':
         case 'reset_password_email_code': {
           assertIsDefined(code);
-          assertIsDefined(password);
 
           attemptParams = {
             strategy,
