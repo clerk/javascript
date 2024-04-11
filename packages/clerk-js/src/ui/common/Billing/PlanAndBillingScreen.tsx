@@ -1,3 +1,4 @@
+import type { CurrentBillingPlanResource } from '@clerk/types';
 import React from 'react';
 
 import { Box, Col, descriptors, Flex, Icon, localizationKeys, Text, useLocalizations } from '../../customizables';
@@ -7,7 +8,7 @@ import { mqu } from '../../styledSystem';
 import { centsToUnit, formatCardDate, getRelativeToNowDateKey, handleError } from '../../utils';
 import { useBillingContext } from './BillingProvider';
 
-const ManagePaymentMethodButton = () => {
+const ManagePaymentMethodButton = ({ currentPlan }: { currentPlan: CurrentBillingPlanResource }) => {
   const { createPortalSession } = useBillingContext();
   const [isLoadingPortalSession, setIsLoadingPortalSession] = React.useState(false);
   const card = useCardState();
@@ -24,10 +25,17 @@ const ManagePaymentMethodButton = () => {
     }
   };
 
-  return (
+  return currentPlan.paymentMethod ? (
     <ProfileSection.Button
       id='paymentMethod'
       localizationKey={localizationKeys('billing.paymentMethodSection.primaryButton__manageBillingInfo')}
+      onClick={handleStartPortalSession}
+      isLoading={isLoadingPortalSession}
+    />
+  ) : (
+    <ProfileSection.ArrowButton
+      id='paymentMethod'
+      localizationKey={localizationKeys('billing.paymentMethodSection.primaryButton')}
       onClick={handleStartPortalSession}
       isLoading={isLoadingPortalSession}
     />
@@ -52,6 +60,7 @@ export const PaymentMethodSection = () => {
   if (!currentPlan) {
     return null;
   }
+
   return (
     <ProfileSection.Root
       title={localizationKeys('billing.paymentMethodSection.title')}
@@ -60,35 +69,28 @@ export const PaymentMethodSection = () => {
       sx={{ [mqu.md]: { alignItems: 'flex-start' } }}
     >
       <ProfileSection.Item id='paymentMethod'>
-        {currentPlan.paymentMethod ? (
-          <>
-            <Box>
-              <Flex
-                gap={1}
-                align='center'
-              >
-                <CardIcon cardType={currentPlan.paymentMethod.card.brand} />
-                <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
-              </Flex>
-              <Box sx={t => ({ paddingLeft: t.sizes.$7 })}>
-                <Text sx={t => ({ color: t.colors.$colorTextSecondary, fontSize: t.fontSizes.$sm })}>
-                  {t(localizationKeys('billing.paymentMethodSection.expires'))}{' '}
-                  {formatCardDate({
-                    expMonth: currentPlan.paymentMethod.card.expMonth,
-                    expYear: currentPlan.paymentMethod.card.expYear,
-                    locale,
-                  })}
-                </Text>
-              </Box>
+        {currentPlan.paymentMethod && (
+          <Box>
+            <Flex
+              gap={1}
+              align='center'
+            >
+              <CardIcon cardType={currentPlan.paymentMethod.card.brand} />
+              <Text>•••• {currentPlan.paymentMethod.card.last4}</Text>
+            </Flex>
+            <Box sx={t => ({ paddingLeft: t.sizes.$7 })}>
+              <Text sx={t => ({ color: t.colors.$colorTextSecondary, fontSize: t.fontSizes.$sm })}>
+                {t(localizationKeys('billing.paymentMethodSection.expires'))}{' '}
+                {formatCardDate({
+                  expMonth: currentPlan.paymentMethod.card.expMonth,
+                  expYear: currentPlan.paymentMethod.card.expYear,
+                  locale,
+                })}
+              </Text>
             </Box>
-            <ManagePaymentMethodButton />
-          </>
-        ) : (
-          <ProfileSection.ArrowButton
-            id='paymentMethod'
-            localizationKey={localizationKeys('billing.paymentMethodSection.primaryButton')}
-          />
+          </Box>
         )}
+        <ManagePaymentMethodButton currentPlan={currentPlan} />
       </ProfileSection.Item>
     </ProfileSection.Root>
   );
