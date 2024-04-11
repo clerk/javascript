@@ -8,7 +8,7 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
   const { organization } = useOrganization();
   const { data: availablePlans, isLoading: isLoadingAvailablePlans } = useFetch(
     organization?.getAvailablePlans,
-    `organization-available-plans-${organization?.id}`,
+    `organization-available-plans`,
   );
   const { data: currentPlan, isLoading: isLoadingCurrentPlan } = useFetch(
     organization?.getCurrentPlan,

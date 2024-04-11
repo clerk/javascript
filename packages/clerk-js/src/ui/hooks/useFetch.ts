@@ -77,6 +77,7 @@ export const useFetch = <K, T>(
   const cached = useSyncExternalStore(subscribeCache, getCache);
 
   useEffect(() => {
+    fetcherRef.current = fetcher; // Only update fetcher when params change
     const fetcherMissing = !fetcherRef.current;
     const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < staleTime;
     const isRequestOnGoing = getCache()?.isValidating;
