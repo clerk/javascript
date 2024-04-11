@@ -6,6 +6,7 @@ import type {
   PrepareFirstFactorParams,
   ResetPasswordEmailCodeAttempt,
   ResetPasswordPhoneCodeAttempt,
+  SignInFactor,
   SignInFirstFactor,
   SignInResource,
   SignInSecondFactor,
@@ -63,6 +64,57 @@ const SignInVerificationMachine = setup({
       resendable: false,
       resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
     }),
+    validateRegisteredStrategies: ({ context }) => {
+      const clerk = context.parent.getSnapshot().context.clerk;
+
+      if (clerk.__unstable__environment?.isProduction()) {
+        return;
+      }
+
+      if (
+        !clerk.client.signIn.supportedFirstFactors.every(factor =>
+          context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
+        )
+      ) {
+        console.warn(
+          `Clerk: Your instance is configured to support these strategies: ${clerk.client.signIn.supportedFirstFactors
+            .map(f => f.strategy)
+            .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
+            .map(s => s)
+            .join(
+              ', ',
+            )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+        );
+      }
+
+      if (
+        clerk.client.signIn.supportedSecondFactors &&
+        !clerk.client.signIn.supportedSecondFactors.every(factor =>
+          context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
+        )
+      ) {
+        console.warn(
+          `Clerk: Your instance is configured to support these 2FA strategies: ${[
+            ...clerk.client.signIn.supportedSecondFactors,
+          ]
+            .map(f => f.strategy)
+            .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
+            .map(s => s)
+            .join(
+              ', ',
+            )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+        );
+      }
+
+      if (
+        process.env.NODE_ENV === 'development' &&
+        !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
+      ) {
+        throw new ClerkElementsRuntimeError(
+          `Your sign-in attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+        );
+      }
+    },
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -91,11 +143,27 @@ const SignInVerificationMachine = setup({
     formRef: input.form,
     loadingStep: 'verifications',
     parent: input.parent,
+    registeredStrategies: new Set<SignInFactor>(),
     resendable: false,
     resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
   }),
   initial: 'Preparing',
   entry: 'determineStartingFactor',
+  on: {
+    'STRATEGY.REGISTER': {
+      actions: assign({
+        registeredStrategies: ({ context, event }) => context.registeredStrategies.add(event.factor),
+      }),
+    },
+    'STRATEGY.UNREGISTER': {
+      actions: assign({
+        registeredStrategies: ({ context, event }) => {
+          context.registeredStrategies.delete(event.factor);
+          return context.registeredStrategies;
+        },
+      }),
+    },
+  },
   states: {
     Preparing: {
       tags: ['state:preparing', 'state:loading'],
@@ -152,6 +220,11 @@ const SignInVerificationMachine = setup({
               },
             ],
           },
+        },
+      },
+      after: {
+        3000: {
+          actions: 'validateRegisteredStrategies',
         },
       },
     },

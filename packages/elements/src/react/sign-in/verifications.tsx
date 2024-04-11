@@ -1,6 +1,6 @@
-import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
+import type { SignInFactor, SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import { useSelector } from '@xstate/react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
 import {
@@ -51,6 +51,13 @@ function SignInStrategiesProvider({
 
 export type SignInStrategyProps = { name: SignInStrategyName; children: React.ReactNode };
 
+function useFactorCtx() {
+  const firstFactorRef = SignInFirstFactorCtx.useActorRef(true);
+  const secondFactorRef = SignInSecondFactorCtx.useActorRef(true);
+
+  return firstFactorRef || secondFactorRef;
+}
+
 /**
  * Generic component to handle both first and second factor verifications.
  *
@@ -61,7 +68,21 @@ export type SignInStrategyProps = { name: SignInStrategyName; children: React.Re
  */
 export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { active } = useStrategy(name);
-  return active ? <>{children}</> : null; // eslint-disable-line react/jsx-no-useless-fragment
+  const factorCtx = useFactorCtx();
+
+  useEffect(() => {
+    if (factorCtx) {
+      factorCtx.send({ type: 'STRATEGY.REGISTER', factor: name as unknown as SignInFactor });
+    }
+
+    return () => {
+      if (factorCtx) {
+        factorCtx.send({ type: 'STRATEGY.UNREGISTER', factor: name as unknown as SignInFactor });
+      }
+    };
+  }, [factorCtx, name]);
+
+  return active ? children : null;
 }
 
 /**
