@@ -1,4 +1,4 @@
-import { authMiddleware } from '@clerk/nextjs';
+import { authMiddleware } from '@clerk/nextjs/server';
 import { NextMiddleware, NextResponse } from 'next/server';
 
 const clerkMiddleware = authMiddleware()

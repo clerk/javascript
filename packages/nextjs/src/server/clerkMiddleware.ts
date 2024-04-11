@@ -130,7 +130,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
     }
 
-    decorateRequest(clerkRequest, handlerResult, requestState);
+    decorateRequest(clerkRequest, handlerResult, requestState, options.secretKey);
 
     // TODO @nikos: we need to make this more generic
     // and move the logic in clerk/backend

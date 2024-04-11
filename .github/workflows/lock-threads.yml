@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   action:
-    timeout-minutes: ${{  fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
+    timeout-minutes: 3
     runs-on: ${{ vars.RUNNER_NORMAL }}
     steps:
       - uses: actions/stale@v9

@@ -6,7 +6,7 @@ import { withLogger } from '../utils/debugLogger';
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';
 import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
-import { getAuthKeyFromRequest, getCookie, getHeader } from './utils';
+import { assertTokenSignature, getAuthKeyFromRequest, getCookie, getHeader } from './utils';
 
 export const createGetAuth = ({
   noAuthStatusMessage,
@@ -25,6 +25,7 @@ export const createGetAuth = ({
       // Then, we don't have to re-verify the JWT here,
       // we can just strip out the claims manually.
       const authToken = getAuthKeyFromRequest(req, 'AuthToken');
+      const authSignature = getAuthKeyFromRequest(req, 'AuthSignature');
       const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
       const authReason = getAuthKeyFromRequest(req, 'AuthReason');
       const authStatus = getAuthKeyFromRequest(req, 'AuthStatus') as AuthStatus;
@@ -46,6 +47,8 @@ export const createGetAuth = ({
       logger.debug('Options debug', options);
 
       if (authStatus === AuthStatus.SignedIn) {
+        assertTokenSignature(authToken as string, options.secretKey, authSignature);
+
         const jwt = decodeJwt(authToken as string);
 
         logger.debug('JWT debug', jwt.raw.text);
