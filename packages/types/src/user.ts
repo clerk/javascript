@@ -190,3 +190,5 @@ export type GetUserOrganizationMembershipParams = ClerkPaginationParams;
 export type GetOrganizationMemberships = (
   params?: GetUserOrganizationMembershipParams,
 ) => Promise<ClerkPaginatedResponse<OrganizationMembershipResource>>;
+
+export type GetAvailablePlansResource = () => Promise<ClerkPaginatedResponse<BillingPlanResource>>;
