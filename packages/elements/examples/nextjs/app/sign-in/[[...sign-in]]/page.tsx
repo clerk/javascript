@@ -87,6 +87,21 @@ function CustomSubmit({ children }: ComponentProps<'button'>) {
   );
 }
 
+function ResendableFallback({ resendableAfter }: { resendableAfter: number }) {
+  return <P className='text-sm'>Didn&apos;t recieve a code? Retry in {resendableAfter} seconds.</P>;
+}
+
+function CustomResendable() {
+  return (
+    <Action
+      fallback={ResendableFallback}
+      resend
+    >
+      Didn&apos;t recieve a code? <strong className='text-blue-400'>Retry Now</strong>
+    </Action>
+  );
+}
+
 export default function SignInPage() {
   const [continueWithEmail, setContinueWithEmail] = useState(false);
 
@@ -236,6 +251,8 @@ export default function SignInPage() {
                     Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
                   </P>
 
+                  <CustomResendable />
+
                   <CustomField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
@@ -259,6 +276,8 @@ export default function SignInPage() {
                   <P className='text-sm'>
                     Welcome back! We&apos;ve sent a temporary code to <SafeIdentifier />
                   </P>
+
+                  <CustomResendable />
 
                   <CustomField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -285,6 +304,8 @@ export default function SignInPage() {
                   <P className='text-sm'>
                     We&apos;ve sent a verification code to <SafeIdentifier />.
                   </P>
+
+                  <CustomResendable />
                 </Strategy>
               </div>
             )}

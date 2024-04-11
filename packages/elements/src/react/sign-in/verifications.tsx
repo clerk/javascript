@@ -58,6 +58,14 @@ function useFactorCtx() {
   return firstFactorRef || secondFactorRef;
 }
 
+/**
+ * Generic component to handle both first and second factor verifications.
+ *
+ * @example
+ * <Step name="verifications">
+ *   <Strategy name="password">...<Strategy />
+ * </Step>
+ */
 export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { active } = useStrategy(name);
   const factorCtx = useFactorCtx();
@@ -77,6 +85,12 @@ export function SignInStrategy({ children, name }: SignInStrategyProps) {
   return active ? children : null;
 }
 
+/**
+ * Generic component to handle both first and second factor verifications.
+ *
+ * @example
+ * <Step name="verifications">...</Step>
+ */
 export function SignInVerifications(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const { activeTags: activeRoutes } = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
@@ -92,6 +106,13 @@ export function SignInVerifications(props: SignInVerificationsProps) {
   return null;
 }
 
+/**
+ * Component to handle specifically first factor verifications.
+ * Generally, you should use the <SignInVerifications> component instead via <Step name="verifications">.
+ *
+ * @example
+ * <FirstFactor>...</FirstFactor>
+ */
 export function SignInFirstFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:first-factor');
@@ -99,6 +120,13 @@ export function SignInFirstFactor(props: SignInVerificationsProps) {
   return activeState ? <SignInFirstFactorInner {...props} /> : null;
 }
 
+/**
+ * Component to handle specifically second factor verifications.
+ * Generally, you should use the <SignInVerifications> component instead via <Step name="verifications">.
+ *
+ * @example
+ * <SecondFactor>...</SecondFactor>
+ */
 export function SignInSecondFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:second-factor');
@@ -139,3 +167,12 @@ export function SignInSecondFactorInner(props: SignInVerificationsProps) {
     </SignInSecondFactorCtx.Provider>
   ) : null;
 }
+
+export type SignInVerificationResendableRenderProps = {
+  resendable: boolean;
+  resendableAfter: number;
+};
+
+export type SignInVerificationResendableProps = {
+  children: (props: SignInVerificationResendableRenderProps) => React.ReactNode;
+};
