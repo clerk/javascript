@@ -25,7 +25,7 @@ type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthe
 type ClerkWebAuthnErrorCode =
   // Generic
   | 'passkey_not_supported'
-  | 'passkeys_pa_not_supported'
+  | 'passkey_pa_not_supported'
   | 'passkey_invalid_rpID_or_domain'
   | 'passkey_already_exists'
   | 'passkey_operation_aborted'

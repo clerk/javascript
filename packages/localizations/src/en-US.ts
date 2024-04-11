@@ -479,7 +479,7 @@ export const enUS: LocalizationResource = {
     passkey_not_supported: 'Passkeys are not supported on this device.',
     passkey_registration_cancelled: 'Passkey registration was cancelled or timed out.',
     passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
-    passkeys_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
+    passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} or more characters',

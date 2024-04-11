@@ -484,7 +484,7 @@ export const koKR: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} 보다 짧은 문자열',
       minimumLength: '{{length}} 또는 그 이상의 문자열',
