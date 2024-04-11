@@ -26,7 +26,7 @@ export type SignInVerificationEvents =
   | ErrorActorEvent
   | SignInVerificationSubmitEvent
   | SignInVerificationFactorUpdateEvent
-  | SignInVerificationRetryEvent;
+  | SignInVerificationRetryEvent
   | SignInVerificationStrategyRegisterEvent
   | SignInVerificationStrategyUnregisterEvent;
 
