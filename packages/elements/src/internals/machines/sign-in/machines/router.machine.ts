@@ -144,7 +144,7 @@ export const SignInRouterMachine = setup({
         },
       })),
     },
-    SET_CLERK: {
+    'CLERK.SET': {
       actions: assign(({ event }) => ({
         clerk: event.clerk,
       })),

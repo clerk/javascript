@@ -28,7 +28,7 @@ function SignInFlowProvider({ children }: SignInFlowProviderProps) {
 
     // @ts-expect-error -- This is actually an IsomorphicClerk instance
     clerk.addOnLoaded(() => {
-      ref.send({ type: 'SET_CLERK', clerk });
+      ref.send({ type: 'CLERK.SET', clerk });
     });
 
     const evt: SignInRouterInitEvent = {
