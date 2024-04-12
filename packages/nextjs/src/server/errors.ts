@@ -95,3 +95,5 @@ ${[apiRoutesText, publicRoutesText, ignoredRoutesText, afterAuthText]
 For additional information about middleware, please visit https://clerk.com/docs/nextjs/middleware
 (This log only appears in development mode, or if \`debug: true\` is passed to authMiddleware)`;
 };
+
+export const authSignatureInvalid = `Clerk: Unable to verify request, this usually means the Clerk middleware did not run. Ensure Clerk's middleware is properly integrated and matches the current route. For more information, see: https://clerk.com/docs/nextjs/middleware. (code=auth_signature_invalid)`;

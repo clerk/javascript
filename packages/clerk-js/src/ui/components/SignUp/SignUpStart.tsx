@@ -13,6 +13,7 @@ import {
   SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
 } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
@@ -277,6 +278,7 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
+            {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>
 

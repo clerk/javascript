@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.0.0-beta.42
+
+### Minor Changes
+
+- Implement token signature verification when passing verified token from Next.js middleware to the application origin. ([#3121](https://github.com/clerk/javascript/pull/3121)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Updated dependencies [[`ecb60da48`](https://github.com/clerk/javascript/commit/ecb60da48029b9cb2d17ab9b0a73cb92bc5c924b)]:
+  - @clerk/backend@1.0.0-beta.34
+  - @clerk/clerk-react@5.0.0-beta.37
+
+## 5.0.0-beta.41
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-beta.36
+
 ## 5.0.0-beta.40
 
 ### Patch Changes

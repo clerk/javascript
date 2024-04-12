@@ -765,7 +765,7 @@ describe('SignInFactorOne', () => {
             f.withPreferredSignInStrategy({ strategy: 'otp' });
             f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true });
           });
-          fixtures.signIn.__experimental_authenticateWithPasskey.mockResolvedValue({
+          fixtures.signIn.authenticateWithPasskey.mockResolvedValue({
             status: 'complete',
           } as SignInResource);
           const { userEvent } = render(<SignInFactorOne />, { wrapper });
@@ -773,7 +773,7 @@ describe('SignInFactorOne', () => {
           await userEvent.click(screen.getByText('Continue'));
 
           await waitFor(() => {
-            expect(fixtures.signIn.__experimental_authenticateWithPasskey).toHaveBeenCalled();
+            expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalled();
           });
         });
       });

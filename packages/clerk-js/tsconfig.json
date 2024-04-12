@@ -20,10 +20,7 @@
     "useUnknownInCatchVariables": false,
     "declaration": false,
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
-    "paths": {
-      "~ui/*": ["./ui/*"]
-    }
+    "jsxImportSource": "@emotion/react"
   },
   "include": [
     "src/index.ts",

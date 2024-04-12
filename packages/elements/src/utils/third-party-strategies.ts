@@ -35,7 +35,7 @@ export interface EnabledThirdPartyProviders {
 
 const oauthStrategies = OAUTH_PROVIDERS.map(p => p.strategy);
 
-const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries(
+export const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries(
   [...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.provider, { iconUrl: iconImageUrl(p.provider), name: p.name, strategy: p.strategy }];
   }),

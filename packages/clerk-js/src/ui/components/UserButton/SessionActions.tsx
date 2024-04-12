@@ -1,12 +1,11 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
-import type { ThemableCssProp } from '~ui/styledSystem/types';
-
 import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action, Actions, PreviewButton, SmallAction, SmallActions, UserPreview } from '../../elements';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
+import type { ThemableCssProp } from '../../styledSystem';
 
 type SingleSessionActionsProps = {
   handleManageAccountClicked: () => Promise<unknown> | void;

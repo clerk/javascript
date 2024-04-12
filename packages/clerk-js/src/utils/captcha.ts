@@ -1,4 +1,5 @@
 import { loadScript } from '@clerk/shared/loadScript';
+import type { CaptchaWidgetType } from '@clerk/types';
 
 import { clerkFailedToLoadThirdPartyScript } from '../core/errors';
 
@@ -35,6 +36,14 @@ interface RenderOptions {
    * @param errorCode string
    */
   'error-callback'?: (errorCode: string) => void;
+  /**
+   * Appearance controls when the widget is visible.
+   * It can be always (default), execute, or interaction-only.
+   * Refer to Appearance Modes for more information:
+   * https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/#appearance-modes
+   * @default 'always'
+   */
+  appearance?: 'always' | 'execute' | 'interaction-only';
 }
 
 interface Turnstile {
@@ -50,7 +59,8 @@ declare global {
   }
 }
 
-const WIDGET_CLASSNAME = 'clerk-captcha';
+export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
+export const CAPTCHA_INVISIBLE_CLASSNAME = 'clerk-invisible-captcha';
 
 export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300', '600'];
@@ -70,14 +80,34 @@ export async function loadCaptcha(url: string) {
   return window.turnstile;
 }
 
-export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptUrl: string }) => {
-  const { siteKey: sitekey, scriptUrl } = captchaOptions;
+export const getCaptchaToken = async (captchaOptions: {
+  siteKey: string;
+  scriptUrl: string;
+  widgetType: CaptchaWidgetType;
+}) => {
+  const { siteKey: sitekey, scriptUrl, widgetType } = captchaOptions;
   let captchaToken = '',
     id = '';
+  const invisibleWidget = !widgetType || widgetType === 'invisible';
 
-  const div = document.createElement('div');
-  div.classList.add(WIDGET_CLASSNAME);
-  document.body.appendChild(div);
+  let widgetDiv: HTMLElement | null = null;
+
+  if (invisibleWidget) {
+    const div = document.createElement('div');
+    div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
+    document.body.appendChild(div);
+    widgetDiv = div;
+  } else {
+    const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
+    if (visibleDiv) {
+      visibleDiv.style.display = 'block';
+      widgetDiv = visibleDiv;
+    } else {
+      throw {
+        captchaError: 'Element to render the captcha not found',
+      };
+    }
+  }
 
   const captcha = await loadCaptcha(scriptUrl);
   let retries = 0;
@@ -86,8 +116,9 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
   const handleCaptchaTokenGeneration = (): Promise<[string, string]> => {
     return new Promise((resolve, reject) => {
       try {
-        const id = captcha.render(`.${WIDGET_CLASSNAME}`, {
+        const id = captcha.render(invisibleWidget ? `.${CAPTCHA_INVISIBLE_CLASSNAME}` : `#${CAPTCHA_ELEMENT_ID}`, {
           sitekey,
+          appearance: widgetType === 'always_visible' ? 'always' : 'interaction-only',
           retry: 'never',
           'refresh-expired': 'auto',
           callback: function (token: string) {
@@ -133,8 +164,11 @@ export const getCaptchaToken = async (captchaOptions: { siteKey: string; scriptU
       captchaError: e,
     };
   } finally {
-    // After challenge has run remove node element attached
-    document.body.removeChild(div);
+    if (invisibleWidget) {
+      document.body.removeChild(widgetDiv);
+    } else {
+      widgetDiv.style.display = 'none';
+    }
   }
 
   return captchaToken;

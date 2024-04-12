@@ -1,6 +1,6 @@
-import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
+import type { SignInFactor, SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import { useSelector } from '@xstate/react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
 import {
@@ -51,11 +51,46 @@ function SignInStrategiesProvider({
 
 export type SignInStrategyProps = { name: SignInStrategyName; children: React.ReactNode };
 
-export function SignInStrategy({ children, name }: SignInStrategyProps) {
-  const { active } = useStrategy(name);
-  return active ? <>{children}</> : null; // eslint-disable-line react/jsx-no-useless-fragment
+function useFactorCtx() {
+  const firstFactorRef = SignInFirstFactorCtx.useActorRef(true);
+  const secondFactorRef = SignInSecondFactorCtx.useActorRef(true);
+
+  return firstFactorRef || secondFactorRef;
 }
 
+/**
+ * Generic component to handle both first and second factor verifications.
+ *
+ * @example
+ * <Step name="verifications">
+ *   <Strategy name="password">...<Strategy />
+ * </Step>
+ */
+export function SignInStrategy({ children, name }: SignInStrategyProps) {
+  const { active } = useStrategy(name);
+  const factorCtx = useFactorCtx();
+
+  useEffect(() => {
+    if (factorCtx) {
+      factorCtx.send({ type: 'STRATEGY.REGISTER', factor: name as unknown as SignInFactor });
+    }
+
+    return () => {
+      if (factorCtx) {
+        factorCtx.send({ type: 'STRATEGY.UNREGISTER', factor: name as unknown as SignInFactor });
+      }
+    };
+  }, [factorCtx, name]);
+
+  return active ? children : null;
+}
+
+/**
+ * Generic component to handle both first and second factor verifications.
+ *
+ * @example
+ * <Step name="verifications">...</Step>
+ */
 export function SignInVerifications(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const { activeTags: activeRoutes } = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
@@ -71,6 +106,13 @@ export function SignInVerifications(props: SignInVerificationsProps) {
   return null;
 }
 
+/**
+ * Component to handle specifically first factor verifications.
+ * Generally, you should use the <SignInVerifications> component instead via <Step name="verifications">.
+ *
+ * @example
+ * <FirstFactor>...</FirstFactor>
+ */
 export function SignInFirstFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:first-factor');
@@ -78,6 +120,13 @@ export function SignInFirstFactor(props: SignInVerificationsProps) {
   return activeState ? <SignInFirstFactorInner {...props} /> : null;
 }
 
+/**
+ * Component to handle specifically second factor verifications.
+ * Generally, you should use the <SignInVerifications> component instead via <Step name="verifications">.
+ *
+ * @example
+ * <SecondFactor>...</SecondFactor>
+ */
 export function SignInSecondFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, 'route:second-factor');
@@ -118,3 +167,12 @@ export function SignInSecondFactorInner(props: SignInVerificationsProps) {
     </SignInSecondFactorCtx.Provider>
   ) : null;
 }
+
+export type SignInVerificationResendableRenderProps = {
+  resendable: boolean;
+  resendableAfter: number;
+};
+
+export type SignInVerificationResendableProps = {
+  children: (props: SignInVerificationResendableRenderProps) => React.ReactNode;
+};

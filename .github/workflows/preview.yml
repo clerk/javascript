@@ -16,17 +16,19 @@ jobs:
   preview:
     if: ${{ startsWith(github.event.comment.body, '!preview') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_CLERK_PROD_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_JS_PREVIEW_PROJECT_ID }}
+
     permissions:
       contents: write
       pull-requests: write
+
     steps:
       - name: Limit action to Clerk members
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           result-encoding: string
           retries: 3
@@ -53,7 +55,7 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          registry-url: "https://registry.npmjs.org"
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Build packages
         run: npx turbo build $TURBO_ARGS

@@ -84,6 +84,7 @@ export const heIL: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'שם הארגון',
   formFieldLabel__organizationSlug: 'כתובת URL של הארגון',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'סיסמה',
   formFieldLabel__phoneNumber: 'מספר טלפון',
   formFieldLabel__role: 'תפקיד',
@@ -483,7 +484,7 @@ export const heIL: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'פחות מ-{{length}} תווים',
       minimumLength: '{{length}} תווים או יותר',
@@ -664,6 +665,14 @@ export const heIL: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -749,6 +758,11 @@ export const heIL: LocalizationResource = {
           destructiveActionTitle: 'הסר',
           headerTitle: 'אפליקציית מאמת',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'הגדר סיסמה',

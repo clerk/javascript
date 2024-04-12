@@ -85,6 +85,7 @@ export const trTR: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Organizasyon adı',
   formFieldLabel__organizationSlug: "Organizasyon slug'ı",
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Şifre',
   formFieldLabel__phoneNumber: 'Telefon numarası',
   formFieldLabel__role: 'Rol',
@@ -487,7 +488,7 @@ export const trTR: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} karakterden kısa olmalı',
       minimumLength: '{{length}} veya daha fazla karakter içermeli',
@@ -675,6 +676,14 @@ export const trTR: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -761,6 +770,11 @@ export const trTR: LocalizationResource = {
           destructiveActionTitle: 'Kaldır',
           headerTitle: 'Authenticator uygulaması',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Şifreyi güncelle',

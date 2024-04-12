@@ -3,12 +3,13 @@ import { constants } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
+import hmacSHA1 from 'crypto-js/hmac-sha1';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
-import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import { authSignatureInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { RequestLike } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
@@ -108,7 +109,12 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
 };
 
 // Auth result will be set as both a query param & header when applicable
-export function decorateRequest(req: ClerkRequest, res: Response, requestState: RequestState): Response {
+export function decorateRequest(
+  req: ClerkRequest,
+  res: Response,
+  requestState: RequestState,
+  secretKey: string,
+): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
   if (!res) {
@@ -145,6 +151,7 @@ export function decorateRequest(req: ClerkRequest, res: Response, requestState: 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
       [constants.Headers.AuthToken]: token || '',
+      [constants.Headers.AuthSignature]: token ? createTokenSignature(token, secretKey) : '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
@@ -205,4 +212,25 @@ export function assertKey(key: string, onError: () => never): string {
   }
 
   return key;
+}
+
+/**
+ * Compute a cryptographic signature from a session token and provided secret key. Used to validate that the token has not been modified when transferring between middleware and the Next.js origin.
+ */
+function createTokenSignature(token: string, key: string): string {
+  return hmacSHA1(token, key).toString();
+}
+
+/**
+ * Assert that the provided token generates a matching signature.
+ */
+export function assertTokenSignature(token: string, key: string, signature?: string | null) {
+  if (!signature) {
+    throw new Error(authSignatureInvalid);
+  }
+
+  const expectedSignature = createTokenSignature(token, key);
+  if (expectedSignature !== signature) {
+    throw new Error(authSignatureInvalid);
+  }
 }

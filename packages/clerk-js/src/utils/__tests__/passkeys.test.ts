@@ -1,8 +1,8 @@
 import type {
-  type __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse,
-  type __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialRequestOptionsJSON,
+  PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/types';
 
 import {
@@ -89,7 +89,7 @@ describe('Passkey utils', () => {
     });
 
     it('serializePublicKeyCredential()', () => {
-      const publicKeyCredential: __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse = {
+      const publicKeyCredential: PublicKeyCredentialWithAuthenticatorAttestationResponse = {
         type: 'public-key',
         id: 'credentialId_123',
         rawId: new Uint8Array([99, 114, 101, 100, 101, 110, 116, 105, 97, 108, 73, 100, 95, 49, 50, 51]),
@@ -113,7 +113,7 @@ describe('Passkey utils', () => {
     });
 
     it('serializePublicKeyCredentialAssertion()', () => {
-      const publicKeyCredential: __experimental_PublicKeyCredentialWithAuthenticatorAssertionResponse = {
+      const publicKeyCredential: PublicKeyCredentialWithAuthenticatorAssertionResponse = {
         type: 'public-key',
         id: 'credentialId_123',
         rawId: new Uint8Array([99, 114, 101, 100, 101, 110, 116, 105, 97, 108, 73, 100, 95, 49, 50, 51]),

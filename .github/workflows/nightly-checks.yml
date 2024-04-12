@@ -8,11 +8,11 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     strategy:
       matrix:
-        test-name: [ 'nextjs' ]
+        test-name: ['nextjs']
 
     steps:
       - name: Checkout Repo

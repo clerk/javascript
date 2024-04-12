@@ -1,5 +1,20 @@
 # Change Log
 
+## 1.0.0-beta.42
+
+### Patch Changes
+
+- Updated dependencies [[`ecb60da48`](https://github.com/clerk/javascript/commit/ecb60da48029b9cb2d17ab9b0a73cb92bc5c924b), [`0699fa496`](https://github.com/clerk/javascript/commit/0699fa49693dc7a8d3de8ba053c4f16a5c8431d0)]:
+  - @clerk/backend@1.0.0-beta.34
+  - @clerk/types@4.0.0-beta.26
+
+## 1.0.0-beta.41
+
+### Patch Changes
+
+- Updated dependencies [[`2352149f6`](https://github.com/clerk/javascript/commit/2352149f6ba9708095146a3087538faf2d4f161f)]:
+  - @clerk/types@4.0.0-beta.25
+
 ## 1.0.0-beta.40
 
 ### Patch Changes

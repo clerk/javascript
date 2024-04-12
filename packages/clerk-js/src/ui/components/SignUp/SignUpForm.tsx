@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Col, localizationKeys, useAppearance } from '../../customizables';
 import { Form } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import { mqu } from '../../styledSystem';
 import type { FormControlState } from '../../utils';
 import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
@@ -101,10 +102,13 @@ export const SignUpForm = (props: SignUpFormProps) => {
           </Form.ControlRow>
         )}
       </Col>
-      <Form.SubmitButton
-        hasArrow
-        localizationKey={localizationKeys('formButtonPrimary')}
-      />
+      <Col center>
+        <CaptchaElement />
+        <Form.SubmitButton
+          hasArrow
+          localizationKey={localizationKeys('formButtonPrimary')}
+        />
+      </Col>
     </Form.Root>
   );
 };

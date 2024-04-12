@@ -87,6 +87,7 @@ export const deDE: LocalizationResource = {
     'Geben Sie eine E-Mail-Adresse dieser Domain ein, um einen Code zu erhalten und diese Domain zu verifizieren.',
   formFieldLabel__organizationName: 'Organisationsname',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Passwort',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__role: 'Rolle',
@@ -492,7 +493,7 @@ export const deDE: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'weniger als {{length}} Zeichen lang sein',
       minimumLength: 'mindestens {{length}} Zeichen lang sein',
@@ -683,6 +684,14 @@ export const deDE: LocalizationResource = {
       security: 'Sicherheit',
       title: 'Benutzerkonto',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -770,6 +779,11 @@ export const deDE: LocalizationResource = {
           destructiveActionTitle: 'Entfernen',
           headerTitle: 'Authentifizierungs-App',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Passwort festlegen',
