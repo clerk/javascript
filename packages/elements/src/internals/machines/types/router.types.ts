@@ -57,6 +57,7 @@ export type BaseRouterRedirectEvent =
 export interface BaseRouterInput {
   clerk: LoadedClerk;
   router?: ClerkRouter;
+  exampleMode?: boolean;
 }
 
 // ---------------------------------- Context ---------------------------------- //
@@ -65,4 +66,5 @@ export interface BaseRouterContext {
   clerk: LoadedClerk;
   error?: ClerkElementsError;
   router?: ClerkRouter;
+  exampleMode?: boolean;
 }

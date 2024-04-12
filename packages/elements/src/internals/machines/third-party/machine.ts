@@ -1,5 +1,5 @@
 import type { LoadedClerk } from '@clerk/types';
-import { assertEvent, assign, log, sendParent, setup } from 'xstate';
+import { assertEvent, assign, log, not, sendParent, setup } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { sendToLoading } from '~/internals/machines/shared.actions';
@@ -38,6 +38,9 @@ export const ThirdPartyMachine = setup({
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
     sendToLoading,
   },
+  guards: {
+    isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
+  },
   types: {} as ThirdPartyMachineSchema,
 }).createMachine({
   id: ThirdPartyMachineId,
@@ -55,6 +58,7 @@ export const ThirdPartyMachine = setup({
       on: {
         CALLBACK: 'HandlingCallback',
         REDIRECT: {
+          guard: not('isExampleMode'),
           target: 'Redirecting',
           reenter: true,
         },

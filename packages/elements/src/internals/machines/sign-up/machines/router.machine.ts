@@ -23,7 +23,7 @@ import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 const isCurrentPath =
   (path: `/${string}`) =>
   ({ context }: { context: SignUpRouterContext }, _params?: NonReducibleUnknown) =>
-    context.router?.match(path) ?? true;
+    context.router?.match(path) ?? false;
 
 const needsStatus =
   (status: SignUpStatus) =>
@@ -42,6 +42,7 @@ export const SignUpRouterMachine = setup({
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
       if (!force && shouldUseVirtualRouting()) return;
+      if (context.exampleMode) return;
 
       const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;
@@ -95,6 +96,7 @@ export const SignUpRouterMachine = setup({
     isStatusMissingRequirements: needsStatus('missing_requirements'),
 
     isLoggedIn: or(['isStatusComplete', ({ context }) => Boolean(context.clerk.user)]),
+    isExampleMode: ({ context }) => Boolean(context.exampleMode),
     isMissingRequiredFields: and(['isStatusMissingRequirements', 'areFieldsMissing']),
     isMissingRequiredUnverifiedFields: and(['isStatusMissingRequirements', 'areFieldsUnverified']),
 
@@ -160,11 +162,6 @@ export const SignUpRouterMachine = setup({
         },
       })),
     },
-    'CLERK.SET': {
-      actions: assign(({ event }) => ({
-        clerk: event.clerk,
-      })),
-    },
   },
   states: {
     Idle: {
@@ -177,9 +174,8 @@ export const SignUpRouterMachine = setup({
             loading: {
               isLoading: false,
             },
+            exampleMode: event.exampleMode,
           })),
-        },
-        'CLERK.SET': {
           target: 'Init',
         },
       },
@@ -197,7 +193,7 @@ export const SignUpRouterMachine = setup({
       }),
       always: [
         {
-          guard: 'isLoggedIn',
+          guard: and(['isLoggedIn', not('isExampleMode')]),
           actions: [
             log('Already logged in'),
             {
