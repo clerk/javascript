@@ -5,27 +5,24 @@ import { useEffect } from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import type { GISCredentialResponse } from '../../../utils/one-tap';
 import { loadGIS } from '../../../utils/one-tap';
-import { useEnvironment, useGoogleOneTapContext } from '../../contexts';
-import { Flow } from '../../customizables';
-import { Card, useCardState, withCardStateProvider } from '../../elements';
-import { CardAlert } from '../../elements/Card/CardAlert';
+import { useCoreSignIn, useCoreSignUp, useEnvironment, useGoogleOneTapContext } from '../../contexts';
+import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { animations } from '../../styledSystem';
-import { handleError } from '../../utils';
 
-function _OneTapStart(): JSX.Element {
+function _OneTapStart(): JSX.Element | null {
   const clerk = useClerk();
+  const signIn = useCoreSignIn();
+  const signUp = useCoreSignUp();
   const { user } = useUser();
   const environment = useEnvironment();
 
   const supportEmail = useSupportEmail();
-  const card = useCardState();
   const ctx = useGoogleOneTapContext();
 
   async function oneTapCallback(response: GISCredentialResponse) {
     try {
-      const res = await clerk.client.signIn
+      const res = await signIn
         .create({
           // TODO-ONETAP: Add new types when feature is ready for public beta
           // @ts-expect-error
@@ -34,7 +31,7 @@ function _OneTapStart(): JSX.Element {
         })
         .catch(err => {
           if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
-            return clerk.client.signUp.create({
+            return signUp.create({
               // TODO-ONETAP: Add new types when feature is ready for public beta
               // @ts-expect-error
               strategy: 'google_one_tap',
@@ -56,12 +53,11 @@ function _OneTapStart(): JSX.Element {
           break;
       }
     } catch (err) {
-      try {
-        handleError(err, [], card.setError);
-      } catch (e) {
-        // In any other case simply log, this component is experimental and this flow is not handled on purpose
-        console.error(e);
-      }
+      /**
+       * Currently it is not possible to display an error in the UI.
+       * As a fallback we simply open the SignIn modal for the user to sign in.
+       */
+      clerk.openSignIn();
     }
   }
 
@@ -95,32 +91,9 @@ function _OneTapStart(): JSX.Element {
         google.accounts.id.cancel();
       }
     };
-  }, []);
+  }, [google, user?.id]);
 
-  return (
-    <Flow.Part part='start'>
-      {/*// TODO-ONETAP: Improve error UI, currently there is no pattern for this case*/}
-      {card.error && (
-        <Card.Root
-          id={'one-tap'}
-          sx={t => ({
-            animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
-            zIndex: t.zIndices.$modal,
-            overflow: 'auto',
-            width: 'fit-content',
-            height: 'fit-content',
-            position: 'fixed',
-            right: 0,
-            top: 0,
-          })}
-        >
-          <Card.Content>
-            <CardAlert>{card.error}</CardAlert>
-          </Card.Content>
-        </Card.Root>
-      )}
-    </Flow.Part>
-  );
+  return null;
 }
 
 export const OneTapStart = withCardStateProvider(_OneTapStart);
