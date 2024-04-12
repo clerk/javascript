@@ -11,6 +11,7 @@ import type {
   CreatePortalSessionParams,
   CurrentBillingPlanJSON,
   CurrentBillingPlanResource,
+  CustomPlanKey,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
@@ -58,6 +59,7 @@ export class Organization extends BaseResource implements OrganizationResource {
   membersCount = 0;
   pendingInvitationsCount = 0;
   maxAllowedMemberships!: number;
+  plan: CustomPlanKey | undefined;
 
   constructor(data: OrganizationJSON) {
     super();
@@ -346,6 +348,7 @@ export class Organization extends BaseResource implements OrganizationResource {
     this.adminDeleteEnabled = data.admin_delete_enabled;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
+    this.plan = data.plan;
     return this;
   }
 

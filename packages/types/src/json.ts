@@ -190,7 +190,7 @@ export interface UserJSON extends ClerkResourceJSON {
   image_url: string;
   has_image: boolean;
   username: string;
-  plan: CustomPlanKey | undefined;
+  plan?: CustomPlanKey;
   email_addresses: EmailAddressJSON[];
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
@@ -305,6 +305,7 @@ export interface OrganizationJSON extends ClerkResourceJSON {
   pending_invitations_count: number;
   admin_delete_enabled: boolean;
   max_allowed_memberships: number;
+  plan?: CustomPlanKey;
 }
 
 export interface OrganizationMembershipJSON extends ClerkResourceJSON {
@@ -315,7 +316,6 @@ export interface OrganizationMembershipJSON extends ClerkResourceJSON {
   public_metadata: OrganizationMembershipPublicMetadata;
   public_user_data: PublicUserDataJSON;
   role: OrganizationCustomRoleKey;
-  org_plan: CustomPlanKey | undefined;
   created_at: number;
   updated_at: number;
 }

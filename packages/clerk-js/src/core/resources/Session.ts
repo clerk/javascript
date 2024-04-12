@@ -85,8 +85,6 @@ export class Session extends BaseResource implements SessionResource {
     const orgMemberships = this.user?.organizationMemberships || [];
     const activeMembership = orgMemberships.find(mem => mem.organization.id === this.lastActiveOrganizationId);
 
-    // TODO-BILLING: Update this type
-    // @ts-expect-error TBD
     const activeOrganizationPlan = activeMembership?.organization.plan;
     const activeOrganizationPermissions = activeMembership?.permissions || [];
     const activeOrganizationRole = activeMembership?.role;
