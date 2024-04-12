@@ -22,10 +22,19 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_memberships:manage' }),
   );
 
+  const allowBillingRoute = useProtect(
+    has =>
+      has({
+        permission: 'org:sys_billing:read',
+      }) || has({ permission: 'org:sys_billing:manage' }),
+  );
+
   const routes = pages.routes.filter(
     r =>
       (r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS ||
         (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS && allowMembersRoute)) &&
+      (r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING ||
+        (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && allowBillingRoute)) &&
       !(r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && !billing?.enabled),
   );
 
