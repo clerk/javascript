@@ -50,7 +50,9 @@ export type OrganizationSystemPermissionKey =
   | 'org:sys_profile:delete'
   | 'org:sys_memberships:read'
   | 'org:sys_memberships:manage'
-  | 'org:sys_domains:read';
+  | 'org:sys_domains:read'
+  | 'org:sys_billing:read'
+  | 'org:sys_billing:manage';
 
 /**
  * OrganizationPermissionKey is a combination of system and custom permissions.

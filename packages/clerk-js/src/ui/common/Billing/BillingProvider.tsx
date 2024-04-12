@@ -17,6 +17,7 @@ type BillingProviderValue = {
   currentPage: BillingPages;
   goToPlanAndBilling: () => void;
   goToManageBillingPlan: () => void;
+  checkPermissions?: boolean;
 };
 
 type BillingProviderProps = Omit<
