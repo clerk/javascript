@@ -11,6 +11,7 @@ import type {
   BaseRouterRedirectEvent,
   BaseRouterRouteRegisterEvent,
   BaseRouterRouteUnregisterEvent,
+  BaseRouterSetClerkEvent,
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
 } from '~/internals/machines/types';
@@ -47,6 +48,7 @@ export type SignUpRouterErrorEvent = BaseRouterErrorEvent;
 export type SignUpRouterTransferEvent = BaseRouterTransferEvent;
 export type SignUpRouterRedirectEvent = BaseRouterRedirectEvent;
 export type SignUpRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'continue'>;
+export type SignUpRouterSetClerkEvent = BaseRouterSetClerkEvent;
 
 export interface SignUpRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -71,7 +73,8 @@ export type SignUpRouterEvents =
   | SignUpRouterTransferEvent
   | SignUpRouterRedirectEvent
   | SignUpRouterRouteEvents
-  | SignUpRouterLoadingEvent;
+  | SignUpRouterLoadingEvent
+  | SignUpRouterSetClerkEvent;
 
 // ---------------------------------- Delays ---------------------------------- //
 

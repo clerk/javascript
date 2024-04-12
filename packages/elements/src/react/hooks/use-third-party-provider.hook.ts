@@ -1,19 +1,28 @@
+import { useClerk } from '@clerk/clerk-react';
 import type { OAuthProvider, Web3Provider } from '@clerk/types';
-import { useSelector } from '@xstate/react';
 import type React from 'react';
 import { useCallback } from 'react';
-import type { ActorRef, SnapshotFrom } from 'xstate';
+import type { ActorRef } from 'xstate';
 
 import type { SignInRouterEvents } from '~/internals/machines/sign-in/types';
 import type { SignUpRouterEvents } from '~/internals/machines/sign-up/types';
-import { type ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party/machine';
 import type { UseThirdPartyProviderReturn } from '~/react/common/providers';
+import {
+  getEnabledThirdPartyProviders,
+  isAuthenticatableOauthStrategy,
+  providerToDisplayData,
+} from '~/utils/third-party-strategies';
 
-/**
- * Selects the clerk third-party provider
- */
-const selector = (provider: OAuthProvider | Web3Provider) => (state: SnapshotFrom<typeof ThirdPartyMachine>) =>
-  state?.context.thirdPartyProviders.providerToDisplayData[provider];
+const useIsProviderEnabled = (provider: OAuthProvider | Web3Provider): boolean | null => {
+  const clerk = useClerk();
+
+  // null indicates we don't know for sure
+  if (!clerk.loaded) return null;
+
+  const data = getEnabledThirdPartyProviders(clerk.__unstable__environment);
+
+  return isAuthenticatableOauthStrategy(provider, data.authenticatableOauthStrategies);
+};
 
 export const useThirdPartyProvider = <
   TActor extends ActorRef<any, SignInRouterEvents> | ActorRef<any, SignUpRouterEvents>,
@@ -21,11 +30,12 @@ export const useThirdPartyProvider = <
   ref: TActor,
   provider: OAuthProvider | Web3Provider,
 ): UseThirdPartyProviderReturn => {
-  const details = useSelector(ref.system.get(ThirdPartyMachineId), selector(provider));
+  const isProviderEnabled = useIsProviderEnabled(provider);
+  const details = providerToDisplayData[provider];
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {
-      if (!details) return;
+      if (!isProviderEnabled) return;
 
       event.preventDefault();
 
@@ -35,14 +45,13 @@ export const useThirdPartyProvider = <
 
       return ref.send({ type: 'AUTHENTICATE.OAUTH', strategy: `oauth_${provider}` });
     },
-    [provider, details, ref],
+    [provider, isProviderEnabled, ref],
   );
 
-  if (!details) {
+  if (isProviderEnabled === false) {
     console.error(
       `Please ensure that ${provider} is enabled for your project. Go to your Clerk dashboard and navigate to "User & Authentication" > "Social Connections" to enable it.`,
     );
-    return null;
   }
 
   return {

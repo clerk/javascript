@@ -4,7 +4,6 @@ import { assertEvent, assign, log, sendParent, setup } from 'xstate';
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { sendToLoading } from '~/internals/machines/shared.actions';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
-import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 
 import { handleRedirectCallback, redirect } from './actors';
 import type { ThirdPartyMachineSchema } from './types';
@@ -47,7 +46,6 @@ export const ThirdPartyMachine = setup({
     basePath: input.basePath,
     flow: input.flow,
     parent: input.parent,
-    thirdPartyProviders: getEnabledThirdPartyProviders(input.environment),
     loadingStep: 'strategy',
   }),
   initial: 'Idle',

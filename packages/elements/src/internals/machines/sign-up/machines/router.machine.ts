@@ -28,7 +28,7 @@ const isCurrentPath =
 const needsStatus =
   (status: SignUpStatus) =>
   ({ context, event }: { context: SignUpRouterContext; event?: SignUpRouterEvents }, _?: NonReducibleUnknown) =>
-    (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk.client.signUp.status === status;
+    (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk?.client?.signUp?.status === status;
 
 export const SignUpRouterMachineId = 'SignUpRouter';
 export type TSignUpRouterMachine = typeof SignUpRouterMachine;
@@ -68,8 +68,8 @@ export const SignUpRouterMachine = setup({
     transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl()),
   },
   guards: {
-    areFieldsMissing: ({ context }) => context.clerk.client.signUp.missingFields.length > 0,
-    areFieldsUnverified: ({ context }) => context.clerk.client.signUp.unverifiedFields.length > 0,
+    areFieldsMissing: ({ context }) => context.clerk?.client?.signUp?.missingFields?.length > 0,
+    areFieldsUnverified: ({ context }) => context.clerk?.client?.signUp?.unverifiedFields?.length > 0,
 
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signUp.status === null && context.clerk.client.lastActiveSessionId),
@@ -85,11 +85,11 @@ export const SignUpRouterMachine = setup({
     isStatusAbandoned: needsStatus('abandoned'),
     isStatusComplete: ({ context, event }) => {
       const resource = (event as SignUpRouterNextEvent)?.resource;
-      const signUp = context.clerk.client.signUp;
+      const signUp = context.clerk?.client?.signUp;
 
       return (
         (resource?.status === 'complete' && Boolean(resource?.createdSessionId)) ||
-        (signUp.status === 'complete' && Boolean(signUp.createdSessionId))
+        (signUp?.status === 'complete' && Boolean(signUp?.createdSessionId))
       );
     },
     isStatusMissingRequirements: needsStatus('missing_requirements'),
@@ -158,6 +158,11 @@ export const SignUpRouterMachine = setup({
           step: event.step,
           strategy: event.strategy,
         },
+      })),
+    },
+    'CLERK.SET': {
+      actions: assign(({ event }) => ({
+        clerk: event.clerk,
       })),
     },
   },
