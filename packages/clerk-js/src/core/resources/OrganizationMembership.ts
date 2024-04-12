@@ -1,7 +1,6 @@
 import type {
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
-  CustomPlanKey,
   GetUserOrganizationMembershipParams,
   OrganizationCustomRoleKey,
   OrganizationMembershipJSON,
@@ -21,7 +20,6 @@ export class OrganizationMembership extends BaseResource implements Organization
   organization!: Organization;
   permissions: OrganizationPermissionKey[] = [];
   role!: OrganizationCustomRoleKey;
-  orgPlan: CustomPlanKey | undefined;
   createdAt!: Date;
   updatedAt!: Date;
 
@@ -78,9 +76,6 @@ export class OrganizationMembership extends BaseResource implements Organization
     this.role = data.role;
     this.createdAt = unixEpochToDate(data.created_at);
     this.updatedAt = unixEpochToDate(data.updated_at);
-    if (data.org_plan) {
-      this.orgPlan = data.org_plan;
-    }
     return this;
   }
 
