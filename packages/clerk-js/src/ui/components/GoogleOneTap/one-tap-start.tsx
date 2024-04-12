@@ -70,7 +70,7 @@ function _OneTapStart(): JSX.Element | null {
   const { data: google } = useFetch(shouldLoadGIS ? undefined : loadGIS, 'google-identity-services-script', {
     onSuccess(google) {
       google.accounts.id.initialize({
-        client_id: environmentClientID,
+        client_id: environmentClientID!,
         callback: oneTapCallback,
         itp_support: true,
         cancel_on_tap_outside: ctx.cancelOnTapOutside,
