@@ -29,6 +29,7 @@ export const OrganizationBillingPage = withCardStateProvider(() => {
       changePlan={organization?.changePlan}
       currentPlan={currentPlan}
       availablePlans={availablePlans?.data || []}
+      checkPermissions
     >
       <Billing />
     </Billing.Root>

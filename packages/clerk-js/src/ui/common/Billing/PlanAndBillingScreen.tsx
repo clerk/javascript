@@ -99,7 +99,7 @@ export const PaymentMethodSection = () => {
 
 const CurrentPlanSection = () => {
   const { t, locale } = useLocalizations();
-  const { goToManageBillingPlan, currentPlan } = useBillingContext();
+  const { goToManageBillingPlan, currentPlan, checkPermissions } = useBillingContext();
 
   if (!currentPlan) {
     return null;
@@ -140,7 +140,19 @@ const CurrentPlanSection = () => {
             </Text>
           )}
         </Box>
-        <Protect permission='org:sys_billing:manage'>
+        {checkPermissions ? (
+          <Protect permission='org:sys_billing:manage'>
+            <ProfileSection.Button
+              onClick={goToManageBillingPlan}
+              id='currentPlan'
+              localizationKey={
+                currentPlan.priceInCents
+                  ? localizationKeys('billing.currentPlanSection.primaryButton')
+                  : localizationKeys('billing.currentPlanSection.primaryButton__upgrade')
+              }
+            />
+          </Protect>
+        ) : (
           <ProfileSection.Button
             onClick={goToManageBillingPlan}
             id='currentPlan'
@@ -150,13 +162,14 @@ const CurrentPlanSection = () => {
                 : localizationKeys('billing.currentPlanSection.primaryButton__upgrade')
             }
           />
-        </Protect>
+        )}
       </ProfileSection.Item>
     </ProfileSection.Root>
   );
 };
 
 export const PlanAndBillingScreen = () => {
+  const { checkPermissions } = useBillingContext();
   const card = useCardState();
 
   return (
@@ -179,9 +192,13 @@ export const PlanAndBillingScreen = () => {
         <Card.Alert>{card.error}</Card.Alert>
 
         <CurrentPlanSection />
-        <Protect permission='org:sys_billing:manage'>
+        {checkPermissions ? (
+          <Protect permission='org:sys_billing:manage'>
+            <PaymentMethodSection />
+          </Protect>
+        ) : (
           <PaymentMethodSection />
-        </Protect>
+        )}
       </Col>
     </Col>
   );
