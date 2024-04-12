@@ -60,7 +60,7 @@ const deriveFromClientSideState = (state: Resources) => {
     : organization;
   const orgPermissions = membership ? membership.permissions : membership;
   const orgRole = membership ? membership.role : membership;
-  const orgPlan = membership ? membership.orgPlan : membership;
+  const orgPlan = membership ? membership.organization.plan : membership;
 
   return {
     userId,

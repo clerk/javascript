@@ -1,3 +1,4 @@
+import type { CustomPlanKey } from './authorization';
 import type {
   BillingPlanResource,
   ChangePlanParams,
@@ -47,6 +48,7 @@ export interface OrganizationResource extends ClerkResource {
   maxAllowedMemberships: number;
   createdAt: Date;
   updatedAt: Date;
+  plan: CustomPlanKey | undefined;
   update: (params: UpdateOrganizationParams) => Promise<OrganizationResource>;
   getMemberships: GetMemberships;
   getInvitations: (params?: GetInvitationsParams) => Promise<ClerkPaginatedResponse<OrganizationInvitationResource>>;
