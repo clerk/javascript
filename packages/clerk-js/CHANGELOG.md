@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.0.0-beta.44
+
+### Patch Changes
+
+- Bug Fix: When authenticating with a passkey and user was looked out an error was thrown for accessing an undefined variable ([#3172](https://github.com/clerk/javascript/pull/3172)) by [@panteliselef](https://github.com/panteliselef)
+
+- Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes. ([#3173](https://github.com/clerk/javascript/pull/3173)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`94519aa33`](https://github.com/clerk/javascript/commit/94519aa33774c8d6e557ce47a00974ad7b194c5d)]:
+  - @clerk/localizations@2.0.0-beta.23
+  - @clerk/types@4.0.0-beta.27
+
 ## 5.0.0-beta.43
 
 ### Minor Changes
