@@ -746,7 +746,7 @@ type UnstableErrors = WithParamName<{
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
   passkey_not_supported: LocalizationValue;
-  passkeys_pa_not_supported: LocalizationValue;
+  passkey_pa_not_supported: LocalizationValue;
   passkey_retrieval_cancelled: LocalizationValue;
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;

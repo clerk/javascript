@@ -489,7 +489,7 @@ export const ptBR: LocalizationResource = {
     passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
     passkey_registration_cancelled: 'Registro de chave de acesso cancelado ou expirado.',
     passkey_retrieval_cancelled: 'Verificação de chave de acesso cancelada ou expirada.',
-    passkeys_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
+    passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
     passwordComplexity: {
       maximumLength: 'menos de {{length}} caracteres',
       minimumLength: '{{length}} ou mais caracteres',

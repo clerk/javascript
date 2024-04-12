@@ -487,7 +487,7 @@ export const thTH: LocalizationResource = {
     passkey_not_supported: 'อุปกรณ์นี้ไม่รองรับพาสคีย์',
     passkey_registration_cancelled: 'การลงทะเบียนพาสคีย์ถูกยกเลิกหรือหมดเวลา',
     passkey_retrieval_cancelled: 'การยืนยันพาสคีย์ถูกยกเลิกหรือหมดเวลา',
-    passkeys_pa_not_supported: 'การลงทะเบียนต้องใช้ระบบยืนยันตัวตนของแพลตฟอร์ม แต่อุปกรณ์ไม่รองรับ',
+    passkey_pa_not_supported: 'การลงทะเบียนต้องใช้ระบบยืนยันตัวตนของแพลตฟอร์ม แต่อุปกรณ์ไม่รองรับ',
     passwordComplexity: {
       maximumLength: 'น้อยกว่า {{length}} ตัวอักษร',
       minimumLength: '{{length}} ตัวอักษรหรือมากกว่า',

@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.0-beta.43
+
+### Minor Changes
+
+- Add support for different CAPTCHA widget types ([#3154](https://github.com/clerk/javascript/pull/3154)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Updated dependencies [[`0699fa496`](https://github.com/clerk/javascript/commit/0699fa49693dc7a8d3de8ba053c4f16a5c8431d0)]:
+  - @clerk/types@4.0.0-beta.26
+
 ## 5.0.0-beta.42
 
 ### Minor Changes
