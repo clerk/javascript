@@ -6,6 +6,7 @@ import { Card, Header, ProfileSection, useCardState } from '../../elements';
 import { DefaultCard, VisaCard } from '../../icons';
 import { mqu } from '../../styledSystem';
 import { centsToUnit, formatCardDate, getRelativeToNowDateKey, handleError } from '../../utils';
+import { Protect } from '../Gate';
 import { useBillingContext } from './BillingProvider';
 
 const ManagePaymentMethodButton = ({ currentPlan }: { currentPlan: CurrentBillingPlanResource }) => {
@@ -139,15 +140,17 @@ const CurrentPlanSection = () => {
             </Text>
           )}
         </Box>
-        <ProfileSection.Button
-          onClick={goToManageBillingPlan}
-          id='currentPlan'
-          localizationKey={
-            currentPlan.priceInCents
-              ? localizationKeys('billing.currentPlanSection.primaryButton')
-              : localizationKeys('billing.currentPlanSection.primaryButton__upgrade')
-          }
-        />
+        <Protect permission='org:sys_billing:manage'>
+          <ProfileSection.Button
+            onClick={goToManageBillingPlan}
+            id='currentPlan'
+            localizationKey={
+              currentPlan.priceInCents
+                ? localizationKeys('billing.currentPlanSection.primaryButton')
+                : localizationKeys('billing.currentPlanSection.primaryButton__upgrade')
+            }
+          />
+        </Protect>
       </ProfileSection.Item>
     </ProfileSection.Root>
   );
@@ -176,7 +179,9 @@ export const PlanAndBillingScreen = () => {
         <Card.Alert>{card.error}</Card.Alert>
 
         <CurrentPlanSection />
-        <PaymentMethodSection />
+        <Protect permission='org:sys_billing:manage'>
+          <PaymentMethodSection />
+        </Protect>
       </Col>
     </Col>
   );

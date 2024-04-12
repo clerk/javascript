@@ -54,8 +54,14 @@ export const OrganizationProfileRoutes = () => {
           <Route path={isBillingPageRoot ? undefined : 'organization-billing'}>
             <Switch>
               <Route index>
-                {/* TODO-BILLING: Wrap OrganizationBilling with Protect and pass the new organization permissions */}
-                <OrganizationBillingPage />
+                <Protect
+                  condition={has =>
+                    has({ permission: 'org:sys_billing:read' }) || has({ permission: 'org:sys_billing:manage' })
+                  }
+                  redirectTo={isGeneralPageRoot ? '../' : './organization-general'}
+                >
+                  <OrganizationBillingPage />
+                </Protect>
               </Route>
             </Switch>
           </Route>
