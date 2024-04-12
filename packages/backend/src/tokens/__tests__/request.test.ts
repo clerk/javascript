@@ -9,6 +9,9 @@ import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from 
 import { authenticateRequest } from '../request';
 import type { AuthenticateRequestOptions } from '../types';
 
+const PK_TEST = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
+const PK_LIVE = 'pk_live_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
+
 function assertSignedOut(
   assert,
   requestState: RequestState,
@@ -21,7 +24,6 @@ function assertSignedOut(
   },
 ) {
   assert.propContains(requestState, {
-    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedOut,
     isSignedIn: false,
@@ -61,7 +63,6 @@ function assertHandshake(
   },
 ) {
   assert.propContains(requestState, {
-    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.Handshake,
     isSignedIn: false,
@@ -99,7 +100,6 @@ function assertSignedIn(
   },
 ) {
   assert.propContains(requestState, {
-    publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     proxyUrl: '',
     status: AuthStatus.SignedIn,
     isSignedIn: true,
@@ -132,7 +132,7 @@ export default (QUnit: QUnit) => {
       secretKey: 'deadbeef',
       apiUrl: 'https://api.clerk.test',
       apiVersion: 'v1',
-      publishableKey: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
+      publishableKey: PK_TEST,
       proxyUrl: '',
       skipJwksCache: true,
       isSatellite: false,
@@ -300,6 +300,7 @@ export default (QUnit: QUnit) => {
           { __client_uat: '0' },
         ),
         mockOptions({
+          publishableKey: PK_LIVE,
           secretKey: 'deadbeef',
           isSatellite: true,
           signInUrl: 'https://primary.dev/sign-in',
@@ -361,6 +362,7 @@ export default (QUnit: QUnit) => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies(),
         mockOptions({
+          publishableKey: 'pk_live_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
           secretKey: 'live_deadbeef',
         }),
       );
@@ -371,7 +373,7 @@ export default (QUnit: QUnit) => {
       assertSignedOutToAuth(assert, requestState);
     });
 
-    test('cookieToken: returns handshake when no clientUat in development [5y]', async assert => {
+    test('cookieToken: returns handshake when no dev browser in development', async assert => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies({}, { __session: mockJwt }),
         mockOptions({
@@ -379,7 +381,33 @@ export default (QUnit: QUnit) => {
         }),
       );
 
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.DevBrowserMissing });
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('cookieToken: returns handshake when no clientUat in development [5y]', async assert => {
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies({}, { __clerk_db_jwt: 'deadbeef', __session: mockJwt }),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+        }),
+      );
+
       assertHandshake(assert, requestState, { reason: AuthErrorReason.SessionTokenWithoutClientUAT });
+      assert.equal(requestState.message, '');
+      assert.strictEqual(requestState.toAuth(), null);
+    });
+
+    test('cookieToken: returns handshake when no cookies in development [5y]', async assert => {
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies({}),
+        mockOptions({
+          secretKey: 'test_deadbeef',
+        }),
+      );
+
+      assertHandshake(assert, requestState, { reason: AuthErrorReason.DevBrowserMissing });
       assert.equal(requestState.message, '');
       assert.strictEqual(requestState.toAuth(), null);
     });
@@ -394,7 +422,7 @@ export default (QUnit: QUnit) => {
             // this is not a typo, it's intentional to be `referer` to match HTTP header key
             referer: 'https://clerk.com',
           },
-          { __client_uat: '12345', __session: mockJwt },
+          { __clerk_db_jwt: 'deadbeef', __client_uat: '12345', __session: mockJwt },
         ),
         mockOptions({
           secretKey: 'pk_test_deadbeef',
@@ -415,7 +443,7 @@ export default (QUnit: QUnit) => {
     test('cookieToken: returns handshake when clientUat > 0 and no cookieToken [8y]', async assert => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies({}, { __client_uat: '12345' }),
-        mockOptions({ secretKey: 'deadbeef' }),
+        mockOptions({ secretKey: 'deadbeef', publishableKey: PK_LIVE }),
       );
 
       assertHandshake(assert, requestState, { reason: AuthErrorReason.ClientUATWithoutSessionToken });
@@ -424,7 +452,10 @@ export default (QUnit: QUnit) => {
     });
 
     test('cookieToken: returns signed out when clientUat = 0 and no cookieToken [9y]', async assert => {
-      const requestState = await authenticateRequest(mockRequestWithCookies({}, { __client_uat: '0' }), mockOptions());
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies({}, { __client_uat: '0' }),
+        mockOptions({ publishableKey: PK_LIVE }),
+      );
 
       assertSignedOut(assert, requestState, {
         reason: AuthErrorReason.SessionTokenAndUATMissing,
@@ -437,6 +468,7 @@ export default (QUnit: QUnit) => {
         mockRequestWithCookies(
           {},
           {
+            __clerk_db_jwt: 'deadbeef',
             __client_uat: `${mockJwtPayload.iat + 10}`,
             __session: mockJwt,
           },
@@ -454,6 +486,7 @@ export default (QUnit: QUnit) => {
         mockRequestWithCookies(
           {},
           {
+            __clerk_db_jwt: 'deadbeef',
             __client_uat: `${mockJwtPayload.iat - 10}`,
             __session: mockMalformedJwt,
           },
@@ -475,6 +508,7 @@ export default (QUnit: QUnit) => {
         mockRequestWithCookies(
           {},
           {
+            __clerk_db_jwt: 'deadbeef',
             __client_uat: `${mockJwtPayload.iat - 10}`,
             __session: mockJwt,
           },
@@ -501,6 +535,7 @@ export default (QUnit: QUnit) => {
         mockRequestWithCookies(
           {},
           {
+            __clerk_db_jwt: 'deadbeef',
             __client_uat: `${mockJwtPayload.iat - 10}`,
             __session: mockJwt,
           },
@@ -522,7 +557,7 @@ export default (QUnit: QUnit) => {
           },
           { __client_uat: `12345`, __session: mockJwt },
         ),
-        mockOptions({ secretKey: 'test_deadbeef' }),
+        mockOptions({ secretKey: 'test_deadbeef', publishableKey: PK_LIVE }),
       );
 
       assertSignedIn(assert, requestState);
