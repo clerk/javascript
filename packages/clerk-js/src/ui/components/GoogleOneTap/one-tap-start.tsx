@@ -14,9 +14,6 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { animations } from '../../styledSystem';
 import { handleError } from '../../utils';
 
-// TODO-ONETAP: Grab this from environment
-const clientID = '466181446725-jqurtjvbts42erq1cjjf197ruevg19th.apps.googleusercontent.com';
-
 function _OneTapStart(): JSX.Element {
   const clerk = useClerk();
   const { user } = useUser();
@@ -36,9 +33,7 @@ function _OneTapStart(): JSX.Element {
           googleOneTapToken: response.credential,
         })
         .catch(err => {
-          // throw err;
-          if (isClerkAPIResponseError(err) && err.errors[0].code === 'resource_not_found') {
-            // if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
+          if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
             return clerk.client.signUp.create({
               // TODO-ONETAP: Add new types when feature is ready for public beta
               // @ts-expect-error
@@ -70,17 +65,16 @@ function _OneTapStart(): JSX.Element {
     }
   }
 
+  const environmentClientID = environment.displayConfig.googleOneTapClientId;
+  const shouldLoadGIS = user?.id && environmentClientID;
+
   /**
    * Prevent GIS from initializing multiple times
    */
-  const { data: google } = useFetch(user?.id ? undefined : loadGIS, 'google-identity-services-script', {
+  const { data: google } = useFetch(shouldLoadGIS ? undefined : loadGIS, 'google-identity-services-script', {
     onSuccess(google) {
-      // TODO-ONETAP: Implement this
-      // @ts-ignore
-      const environmentClientID = environment.displayConfig.googleOneTapClientID;
-
       google.accounts.id.initialize({
-        client_id: environmentClientID || clientID,
+        client_id: environmentClientID,
         callback: oneTapCallback,
         itp_support: true,
         cancel_on_tap_outside: ctx.cancelOnTapOutside,
