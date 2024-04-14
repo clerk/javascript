@@ -11,6 +11,7 @@ import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
+import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
@@ -48,7 +49,7 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & { debug?: bool
 
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
- * For more details, please refer to the docs: https://clerk.com/docs/references/nextjs/clerkMiddleware
+ * For more details, please refer to the docs: https://beta.clerk.com/docs/references/nextjs/clerk-middleware
  */
 interface ClerkMiddleware {
   /**
@@ -68,9 +69,13 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
-export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
+export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', logger => (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
+  if (params.debug) {
+    logger.enable();
+  }
+
   const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
     errorThrower.throwMissingPublishableKeyError(),
   );
@@ -96,11 +101,19 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
   const nextMiddleware: NextMiddleware = async (request, event) => {
     const clerkRequest = createClerkRequest(request);
+    logger.debug('options', options);
+    logger.debug('url', () => clerkRequest.toJSON());
 
     const requestState = await clerkClient.authenticateRequest(
       clerkRequest,
       createAuthenticateRequestOptions(clerkRequest, options),
     );
+
+    logger.debug('requestState', () => ({
+      status: requestState.status,
+      headers: JSON.stringify(Object.fromEntries(requestState.headers)),
+      reason: requestState.reason,
+    }));
 
     const locationHeader = requestState.headers.get(constants.Headers.Location);
     if (locationHeader) {
@@ -110,6 +123,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     }
 
     const authObject = requestState.toAuth();
+    logger.debug('auth', () => ({ auth: authObject, debug: authObject.debug() }));
 
     const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
     const protect = createMiddlewareProtect(clerkRequest, authObject, redirectToSignIn);
@@ -123,6 +137,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     }
 
     if (isRedirect(handlerResult)) {
+      logger.debug('handlerResult is redirect');
       return serverRedirectWithAuth(clerkRequest, handlerResult, options);
     }
 
@@ -152,7 +167,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   // Otherwise, return a middleware that can be called with a request and event
   // eg, export default clerkMiddleware(auth => { ... });
   return nextMiddleware;
-};
+});
 
 const parseRequestAndEvent = (args: unknown[]) => {
   return [args[0] instanceof Request ? args[0] : undefined, args[0] instanceof Request ? args[1] : undefined] as [

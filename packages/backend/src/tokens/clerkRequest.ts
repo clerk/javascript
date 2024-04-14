@@ -1,7 +1,7 @@
 import { parse as parseCookies } from 'cookie';
 
 import { constants } from '../constants';
-import type { ClerkUrl, WithClerkUrl } from './clerkUrl';
+import type { ClerkUrl } from './clerkUrl';
 import { createClerkUrl } from './clerkUrl';
 
 class ClerkRequest extends Request {
@@ -26,9 +26,15 @@ class ClerkRequest extends Request {
     this.cookies = this.parseCookies(this);
   }
 
-  public decorateWithClerkUrl = <R extends object>(req: R): WithClerkUrl<R> => {
-    return Object.assign(req, { clerkUrl: this.clerkUrl });
-  };
+  public toJSON() {
+    return {
+      url: this.clerkUrl.href,
+      method: this.method,
+      headers: JSON.stringify(Object.fromEntries(this.headers)),
+      clerkUrl: this.clerkUrl.toString(),
+      cookies: JSON.stringify(Object.fromEntries(this.cookies)),
+    };
+  }
 
   /**
    * Used to fix request.url using the x-forwarded-* headers
