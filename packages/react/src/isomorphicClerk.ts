@@ -674,15 +674,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_mountGoogleOneTap = (props: OneTapProps): void => {
+  __experimental_mountGoogleOneTap = (node: HTMLDivElement, props: OneTapProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_mountGoogleOneTap(props);
+      this.clerkjs.__experimental_mountGoogleOneTap(node, props);
     }
   };
 
-  __experimental_unmountGoogleOneTap = (): void => {
+  __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_unmountGoogleOneTap();
+      this.clerkjs.__experimental_unmountGoogleOneTap(node);
     }
   };
 

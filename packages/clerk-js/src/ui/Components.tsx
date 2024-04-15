@@ -319,6 +319,7 @@ const Components = (props: ComponentsProps) => {
               componentAppearance={component.props?.appearance}
               componentName={component.name}
               componentProps={component.props}
+              mountAtBodyRoot={component.name === 'OneTap'}
             />
           );
         })}

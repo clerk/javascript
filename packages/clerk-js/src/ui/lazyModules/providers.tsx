@@ -37,6 +37,7 @@ type AppearanceProviderProps = {
 type LazyComponentRendererProps = React.PropsWithChildren<
   {
     node: PortalProps['node'];
+    mountAtBodyRoot: PortalProps['mountAtBodyRoot'];
     componentName: any;
     componentProps: any;
   } & AppearanceProviderProps
@@ -56,6 +57,7 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
         component={ClerkComponents[props.componentName as ClerkComponentName]}
         props={props.componentProps}
         componentName={props.componentName}
+        mountAtBodyRoot={props.mountAtBodyRoot}
       />
     </AppearanceProvider>
   );

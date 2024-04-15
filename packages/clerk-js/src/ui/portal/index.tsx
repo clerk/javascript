@@ -15,10 +15,23 @@ type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType
   component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
   // Aligning this with props attributes of ComponentControls
   props?: PropsType & RoutingOptions;
+  mountAtBodyRoot?: boolean;
 } & Pick<CtxType, 'componentName'>;
 
 export class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
-  render(): React.ReactPortal {
+  private elRef = document.createElement('div');
+  componentDidMount() {
+    if (this.props.mountAtBodyRoot) {
+      document.body.appendChild(this.elRef);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.mountAtBodyRoot) {
+      document.body.removeChild(this.elRef);
+    }
+  }
+  render() {
     const { props, component, componentName, node } = this.props;
     const normalizedProps = { ...props, ...normalizeRoutingOptions({ routing: props?.routing, path: props?.path }) };
 
@@ -33,7 +46,7 @@ export class Portal<CtxType extends AvailableComponentCtx> extends React.PureCom
     if (componentName === 'OneTap') {
       return ReactDOM.createPortal(
         <VirtualRouter startPath={buildVirtualRouterUrl({ base: '/one-tap', path: '' })}>{el}</VirtualRouter>,
-        node,
+        this.elRef,
       );
     }
 

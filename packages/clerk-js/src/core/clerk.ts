@@ -158,7 +158,6 @@ export class Clerk implements ClerkInterface {
   protected internal_last_error: ClerkAPIError | null = null;
 
   #publishableKey: string = '';
-  #oneTapNode: HTMLDivElement | null = null;
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService: SessionCookieService | null = null;
@@ -461,20 +460,15 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public __experimental_mountGoogleOneTap = (props?: OneTapProps): void => {
+  public __experimental_mountGoogleOneTap = (node: HTMLDivElement, props?: OneTapProps): void => {
     this.assertComponentsReady(this.#componentControls);
 
-    if (!this.#oneTapNode) {
-      const customElement = document.createElement('div');
-      customElement.id = 'some-id';
-      document.body.appendChild(customElement);
-      this.#oneTapNode = customElement;
-    }
+    console.log('mounting GTap');
     void this.#componentControls.ensureMounted({ preloadHint: 'OneTap' }).then(controls =>
       controls.mountComponent({
         name: 'OneTap',
         appearanceKey: 'oneTap',
-        node: this.#oneTapNode!,
+        node,
         props,
       }),
     );
@@ -482,11 +476,12 @@ export class Clerk implements ClerkInterface {
     // this.telemetry?.record(eventComponentMounted('GoogleOneTap', props));
   };
 
-  public __experimental_unmountGoogleOneTap = (): void => {
+  public __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
+    console.log('unmounting GTap');
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
-        node: this.#oneTapNode!,
+        node,
       }),
     );
   };
