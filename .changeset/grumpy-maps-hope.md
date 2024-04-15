@@ -7,4 +7,4 @@
 
 Introduce experimental support for Google One Tap
 - React Component `<__experimental_GoogleOneTap/>`
-- JS `clerk.__experimental_mountGoogleOneTap(props)`
+- JS `clerk.__experimental_mountGoogleOneTap(node,props)`
