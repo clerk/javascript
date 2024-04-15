@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.0-beta.35
+
+### Patch Changes
+
+- Trigger the handshake when no dev browser token exists in development. ([#3175](https://github.com/clerk/javascript/pull/3175)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 1.0.0-beta.34
 
 ### Minor Changes

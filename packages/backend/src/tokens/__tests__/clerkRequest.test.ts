@@ -152,5 +152,17 @@ export default (QUnit: QUnit) => {
         assert.equal(createClerkRequest(req).clerkUrl.toString(), 'https://example.com/path?foo=bar');
       });
     });
+
+    module('toJSON', () => {
+      it('returns data as a JSON object', assert => {
+        const req = createClerkRequest(new Request('http://localhost:3000'));
+        const json = req.toJSON();
+        assert.equal(json.url, 'http://localhost:3000/');
+        assert.equal(json.method, 'GET');
+        assert.equal(json.headers, '{}');
+        assert.equal(json.clerkUrl, 'http://localhost:3000/');
+        assert.equal(json.cookies, '{}');
+      });
+    });
   });
 };
