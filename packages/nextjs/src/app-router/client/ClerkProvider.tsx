@@ -6,6 +6,7 @@ import React, { useEffect, useTransition } from 'react';
 import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
 import { useSafeLayoutEffect } from '../../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../../types';
+import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
@@ -73,7 +74,10 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
-      <ReactClerkProvider {...mergedProps}>{children}</ReactClerkProvider>
+      <ReactClerkProvider {...mergedProps}>
+        <ClerkJSScript router='app' />
+        {children}
+      </ReactClerkProvider>
     </ClerkNextOptionsProvider>
   );
 };
