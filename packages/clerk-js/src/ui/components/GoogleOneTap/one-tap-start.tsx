@@ -45,12 +45,12 @@ function _OneTapStart(): JSX.Element | null {
   }
 
   const environmentClientID = environment.displayConfig.googleOneTapClientId;
-  const shouldLoadGIS = user?.id && environmentClientID;
+  const shouldLoadGIS = !user?.id && !!environmentClientID;
 
   /**
    * Prevent GIS from initializing multiple times
    */
-  const { data: google } = useFetch(shouldLoadGIS ? undefined : loadGIS, 'google-identity-services-script', {
+  const { data: google } = useFetch(shouldLoadGIS ? loadGIS : undefined, 'google-identity-services-script', {
     onSuccess(google) {
       google.accounts.id.initialize({
         client_id: environmentClientID!,
