@@ -84,6 +84,13 @@ export async function loadCaptcha(url: string) {
   return window.turnstile;
 }
 
+/*
+ * How this function works:
+ * The widgetType is either 'invisible' or 'smart'.
+ * - If the widgetType is 'invisible', the captcha widget is rendered in a hidden div at the bottom of the body.
+ * - If the widgetType is 'smart', the captcha widget is rendered in a div with the id 'clerk-captcha'. If the div does
+ *  not exist, the invisibleSiteKey is used as a fallback and the widget is rendered in a hidden div at the bottom of the body.
+ */
 export const getCaptchaToken = async (captchaOptions: {
   siteKey: string;
   scriptUrl: string;
