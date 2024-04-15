@@ -47,6 +47,7 @@ import type {
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
+import type { SignUpResource } from './signUp';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
@@ -101,6 +102,13 @@ export interface SignInResource extends ClerkResource {
   __experimental_authenticateWithPasskey: (params?: { flow?: 'autofill' | 'discoverable' }) => Promise<SignInResource>;
 
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
+
+  /**
+   * @experimental
+   */
+  __experimental_authenticateWithGoogleOneTap: (
+    params: __experimental_AuthenticateWithGoogleOneTapParams,
+  ) => Promise<SignInResource | SignUpResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
@@ -211,6 +219,10 @@ export type ResetPasswordParams = {
 
 export type AuthenticateWithPasskeyParams = {
   flow?: 'autofill' | 'discoverable';
+};
+
+export type __experimental_AuthenticateWithGoogleOneTapParams = {
+  token: string;
 };
 
 export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams {
