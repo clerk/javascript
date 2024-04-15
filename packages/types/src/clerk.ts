@@ -598,6 +598,8 @@ type RouterFn = (to: string, metadata?: { __internal_metadata?: RouterMetadata }
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
 
+export type WithModalProps<T> = T & { startPath?: string };
+
 export type SignInInitialValues = {
   emailAddress?: string;
   phoneNumber?: string;
@@ -699,7 +701,7 @@ export type SignInProps = RoutingOptions & {
   initialValues?: SignInInitialValues;
 } & RedirectOptions;
 
-export type SignInModalProps = WithoutRouting<SignInProps>;
+export type SignInModalProps = WithModalProps<WithoutRouting<SignInProps>>;
 
 export type SignUpProps = RoutingOptions & {
   /**
@@ -724,7 +726,7 @@ export type SignUpProps = RoutingOptions & {
   initialValues?: SignUpInitialValues;
 } & RedirectOptions;
 
-export type SignUpModalProps = WithoutRouting<SignUpProps>;
+export type SignUpModalProps = WithModalProps<WithoutRouting<SignUpProps>>;
 
 export type UserProfileProps = RoutingOptions & {
   /**
@@ -744,7 +746,7 @@ export type UserProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
 };
 
-export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
+export type UserProfileModalProps = WithModalProps<WithoutRouting<UserProfileProps>>;
 
 export type OrganizationProfileProps = RoutingOptions & {
   /**
@@ -764,7 +766,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
 };
 
-export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
+export type OrganizationProfileModalProps = WithModalProps<WithoutRouting<OrganizationProfileProps>>;
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**

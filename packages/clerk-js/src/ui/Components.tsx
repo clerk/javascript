@@ -4,11 +4,14 @@ import type {
   Appearance,
   Clerk,
   ClerkOptions,
-  CreateOrganizationProps,
+  CreateOrganizationModalProps,
   EnvironmentResource,
-  OrganizationProfileProps,
+  OrganizationProfileModalProps,
+  SignInModalProps,
   SignInProps,
+  SignUpModalProps,
   SignUpProps,
+  UserProfileModalProps,
   UserProfileProps,
 } from '@clerk/types';
 import React, { Suspense } from 'react';
@@ -78,11 +81,11 @@ interface ComponentsProps {
 interface ComponentsState {
   appearance: Appearance | undefined;
   options: ClerkOptions | undefined;
-  signInModal: null | SignInProps;
-  signUpModal: null | SignUpProps;
-  userProfileModal: null | UserProfileProps;
-  organizationProfileModal: null | OrganizationProfileProps;
-  createOrganizationModal: null | CreateOrganizationProps;
+  signInModal: null | SignInModalProps;
+  signUpModal: null | SignUpModalProps;
+  userProfileModal: null | UserProfileModalProps;
+  organizationProfileModal: null | OrganizationProfileModalProps;
+  createOrganizationModal: null | CreateOrganizationModalProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
 }
@@ -228,7 +231,7 @@ const Components = (props: ComponentsProps) => {
       flowName={'signIn'}
       onClose={() => componentsControls.closeModal('signIn')}
       onExternalNavigate={() => componentsControls.closeModal('signIn')}
-      startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path })}
+      startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path || signInModal?.startPath })}
       componentName={'SignInModal'}
     >
       <SignInModal {...signInModal} />
@@ -244,7 +247,7 @@ const Components = (props: ComponentsProps) => {
       flowName={'signUp'}
       onClose={() => componentsControls.closeModal('signUp')}
       onExternalNavigate={() => componentsControls.closeModal('signUp')}
-      startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
+      startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path || signUpModal?.startPath })}
       componentName={'SignUpModal'}
     >
       <SignInModal {...signUpModal} />
@@ -260,7 +263,7 @@ const Components = (props: ComponentsProps) => {
       flowName={'userProfile'}
       onClose={() => componentsControls.closeModal('userProfile')}
       onExternalNavigate={() => componentsControls.closeModal('userProfile')}
-      startPath={buildVirtualRouterUrl({ base: '/user', path: urlStateParam?.path })}
+      startPath={buildVirtualRouterUrl({ base: '/user', path: urlStateParam?.path || userProfileModal?.startPath })}
       componentName={'SignUpModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
@@ -277,7 +280,10 @@ const Components = (props: ComponentsProps) => {
       flowName={'organizationProfile'}
       onClose={() => componentsControls.closeModal('organizationProfile')}
       onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
-      startPath={buildVirtualRouterUrl({ base: '/organizationProfile', path: urlStateParam?.path })}
+      startPath={buildVirtualRouterUrl({
+        base: '/organizationProfile',
+        path: urlStateParam?.path || organizationProfileModal?.startPath,
+      })}
       componentName={'OrganizationProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
