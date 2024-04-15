@@ -19,7 +19,11 @@ export class Organization {
     readonly privateMetadata: OrganizationPrivateMetadata = {},
     readonly maxAllowedMemberships: number,
     readonly adminDeleteEnabled: boolean,
+    /**
+     * @deprecated  Use `membersCount` instead.
+     */
     readonly members_count?: number,
+    readonly membersCount?: number,
   ) {}
 
   static fromJSON(data: OrganizationJSON): Organization {
@@ -38,8 +42,10 @@ export class Organization {
       data.max_allowed_memberships,
       data.admin_delete_enabled,
       data.members_count,
+      data.members_count,
     );
   }
 }
 
 deprecatedProperty(Organization, 'logoUrl', 'Use `imageUrl` instead.');
+deprecatedProperty(Organization, 'members_count', 'Use `membersCount` instead.');
