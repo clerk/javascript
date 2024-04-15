@@ -22,6 +22,16 @@ type MetadataParams<TPublic = OrganizationPublicMetadata, TPrivate = Organizatio
 type GetOrganizationListParams = ClerkPaginationRequest<{
   includeMembersCount?: boolean;
   query?: string;
+  orderBy?:
+    | 'name'
+    | '+name'
+    | '-name'
+    | 'created_at'
+    | '+created_at'
+    | '-created_at'
+    | 'members_count'
+    | '+members_count'
+    | '-members_count';
 }>;
 
 type CreateParams = {

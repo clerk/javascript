@@ -162,6 +162,8 @@ export const SignInRouterMachine = setup({
               isLoading: false,
             },
           })),
+        },
+        'CLERK.SET': {
           target: 'Init',
         },
       },
