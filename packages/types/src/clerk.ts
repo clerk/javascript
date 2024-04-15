@@ -183,11 +183,19 @@ export interface Clerk {
   unmountSignIn: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Mounts a sign in flow component at the target element.
-   * @param targetNode Target node to mount the SignIn component.
-   * @param signInProps sign in configuration parameters.
+   * Mounts a Google one tap flow component at the target element.
+   * @experimental
+   * @param targetNode Target node to mount the GoogleOneTap component.
+   * @param oneTapProps sign in configuration parameters.
    */
   __experimental_mountGoogleOneTap: (targetNode: HTMLDivElement, oneTapProps?: OneTapProps) => void;
+
+  /**
+   * Unmount a Google one tap flow component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   * @experimental
+   * @param targetNode Target node to unmount the SignIn component from.
+   */
   __experimental_unmountGoogleOneTap: (targetNode: HTMLDivElement) => void;
 
   /**
