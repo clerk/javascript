@@ -279,7 +279,7 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
 export const __experimental_GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<OneTapProps>) => {
   return (
     <Portal
-      mount={(_: HTMLDivElement, props: any) => clerk.__experimental_mountGoogleOneTap(props)}
+      mount={clerk.__experimental_mountGoogleOneTap}
       unmount={clerk.__experimental_unmountGoogleOneTap}
       updateProps={(clerk as any).__unstable__updateProps}
       props={props}

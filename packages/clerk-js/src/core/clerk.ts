@@ -463,7 +463,6 @@ export class Clerk implements ClerkInterface {
   public __experimental_mountGoogleOneTap = (node: HTMLDivElement, props?: OneTapProps): void => {
     this.assertComponentsReady(this.#componentControls);
 
-    console.log('mounting GTap');
     void this.#componentControls.ensureMounted({ preloadHint: 'OneTap' }).then(controls =>
       controls.mountComponent({
         name: 'OneTap',
@@ -478,7 +477,6 @@ export class Clerk implements ClerkInterface {
 
   public __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
-    console.log('unmounting GTap');
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
         node,

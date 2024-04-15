@@ -15,19 +15,18 @@ type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType
   component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
   // Aligning this with props attributes of ComponentControls
   props?: PropsType & RoutingOptions;
-  mountAtBodyRoot?: boolean;
 } & Pick<CtxType, 'componentName'>;
 
 export class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
   private elRef = document.createElement('div');
   componentDidMount() {
-    if (this.props.mountAtBodyRoot) {
+    if (this.props.componentName === 'OneTap') {
       document.body.appendChild(this.elRef);
     }
   }
 
   componentWillUnmount() {
-    if (this.props.mountAtBodyRoot) {
+    if (this.props.componentName === 'OneTap') {
       document.body.removeChild(this.elRef);
     }
   }
