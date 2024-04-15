@@ -132,9 +132,7 @@ export const MfaSection = () => {
             </Action.Root>
           )}
 
-          {secondFactorsAvailableToAdd.length > 0 && (
-            <MfaAddMenu secondFactorsAvailableToAdd={secondFactorsAvailableToAdd} />
-          )}
+          <MfaAddMenu secondFactorsAvailableToAdd={secondFactorsAvailableToAdd} />
         </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
@@ -241,28 +239,30 @@ const MfaAddMenu = (props: MfaAddMenuProps) => {
 
   return (
     <>
-      <Action.Closed value='multi-factor'>
-        <ProfileSection.ActionMenu
-          id='mfa'
-          triggerLocalizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
-        >
-          {strategies.map(
-            method =>
-              method && (
-                <ProfileSection.ActionMenuItem
-                  key={method.key}
-                  id={method.key}
-                  localizationKey={method.text}
-                  leftIcon={method.icon}
-                  onClick={() => {
-                    setSelectedStrategy(method.key);
-                    open('multi-factor');
-                  }}
-                />
-              ),
-          )}
-        </ProfileSection.ActionMenu>
-      </Action.Closed>
+      {secondFactorsAvailableToAdd.length > 0 && (
+        <Action.Closed value='multi-factor'>
+          <ProfileSection.ActionMenu
+            id='mfa'
+            triggerLocalizationKey={localizationKeys('userProfile.start.mfaSection.primaryButton')}
+          >
+            {strategies.map(
+              method =>
+                method && (
+                  <ProfileSection.ActionMenuItem
+                    key={method.key}
+                    id={method.key}
+                    localizationKey={method.text}
+                    leftIcon={method.icon}
+                    onClick={() => {
+                      setSelectedStrategy(method.key);
+                      open('multi-factor');
+                    }}
+                  />
+                ),
+            )}
+          </ProfileSection.ActionMenu>
+        </Action.Closed>
+      )}
       <Action.Open value='multi-factor'>
         <Action.Card>{selectedStrategy && <MfaScreen selectedStrategy={selectedStrategy} />}</Action.Card>
       </Action.Open>
