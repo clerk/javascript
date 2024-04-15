@@ -80,8 +80,13 @@ const CardFooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
 
 export const CardFooterLinks = React.memo((): JSX.Element | null => {
   const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+  const { termsUrl, privacyPolicyUrl, helpUrl } = useEnvironment().displayConfig;
 
-  if (!helpPageUrl && !privacyPageUrl && !termsPageUrl) return null;
+  const resolvedTermsUrl = termsPageUrl || termsUrl;
+  const resolvedPrivacyPolicyUrl = privacyPageUrl || privacyPolicyUrl;
+  const resolvedHelpUrl = helpPageUrl || helpUrl;
+
+  if (!resolvedTermsUrl && !resolvedPrivacyPolicyUrl && !resolvedHelpUrl) return null;
 
   return (
     <Flex
@@ -99,7 +104,7 @@ export const CardFooterLinks = React.memo((): JSX.Element | null => {
           localizationKey={localizationKeys('footerPageLink__help')}
           elementId={descriptors.footerPagesLink.setId('help')}
           isExternal
-          href={helpPageUrl}
+          href={resolvedHelpUrl}
         />
       )}
       {privacyPageUrl && (
@@ -107,7 +112,7 @@ export const CardFooterLinks = React.memo((): JSX.Element | null => {
           localizationKey={localizationKeys('footerPageLink__privacy')}
           elementId={descriptors.footerPagesLink.setId('privacy')}
           isExternal
-          href={privacyPageUrl}
+          href={resolvedPrivacyPolicyUrl}
         />
       )}
       {termsPageUrl && (
@@ -115,7 +120,7 @@ export const CardFooterLinks = React.memo((): JSX.Element | null => {
           localizationKey={localizationKeys('footerPageLink__terms')}
           elementId={descriptors.footerPagesLink.setId('terms')}
           isExternal
-          href={termsPageUrl}
+          href={resolvedTermsUrl}
         />
       )}
     </Flex>

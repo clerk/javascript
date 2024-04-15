@@ -29,6 +29,9 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   signInUrl!: string;
   signUpUrl!: string;
   supportEmail!: string;
+  termsUrl!: string;
+  privacyPolicyUrl!: string;
+  helpUrl!: string;
   theme!: DisplayThemeJSON;
   userProfileUrl!: string;
   clerkJSVersion?: string;
@@ -68,6 +71,9 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.captchaPublicKey = data.captcha_public_key;
     this.captchaWidgetType = data.captcha_widget_type;
     this.supportEmail = data.support_email || '';
+    this.termsUrl = data.terms_url || '';
+    this.privacyPolicyUrl = data.privacy_policy_url || '';
+    this.helpUrl = data.help_url || '';
     this.clerkJSVersion = data.clerk_js_version;
     this.organizationProfileUrl = data.organization_profile_url;
     this.createOrganizationUrl = data.create_organization_url;

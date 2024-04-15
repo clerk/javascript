@@ -57,7 +57,13 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
   const { sx, children, ...rest } = props;
   const { branded } = useEnvironment().displayConfig;
   const { privacyPageUrl, termsPageUrl, helpPageUrl } = useAppearance().parsedLayout;
-  const shouldShowTagOrLinks = branded || privacyPageUrl || termsPageUrl || helpPageUrl;
+  const { termsUrl, privacyPolicyUrl, helpUrl } = useEnvironment().displayConfig;
+
+  const resolvedTermsUrl = termsPageUrl || termsUrl;
+  const resolvedPrivacyPolicyUrl = privacyPageUrl || privacyPolicyUrl;
+  const resolvedHelpUrl = helpPageUrl || helpUrl;
+
+  const shouldShowTagOrLinks = branded || resolvedPrivacyPolicyUrl || resolvedTermsUrl || resolvedHelpUrl;
 
   return (
     <Col

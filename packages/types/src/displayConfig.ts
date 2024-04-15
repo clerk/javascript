@@ -23,7 +23,10 @@ export interface DisplayConfigJSON {
   preferred_sign_in_strategy: PreferredSignInStrategy;
   sign_in_url: string;
   sign_up_url: string;
-  support_email: string;
+  support_email: string | null;
+  terms_url: string | null;
+  privacy_policy_url: string | null;
+  help_url: string | null;
   theme: DisplayThemeJSON;
   user_profile_url: string;
   clerk_js_version?: string;
@@ -53,6 +56,9 @@ export interface DisplayConfigResource extends ClerkResource {
   signInUrl: string;
   signUpUrl: string;
   supportEmail: string;
+  termsUrl: string;
+  privacyPolicyUrl: string;
+  helpUrl: string;
   theme: DisplayThemeJSON;
   userProfileUrl: string;
   clerkJSVersion?: string;
