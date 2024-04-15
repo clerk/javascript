@@ -35,9 +35,11 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
       src={scriptUrl}
       data-clerk-js-script
       async
+      // `nextjs/script` will add defer by default and does not get removed when we async is true
+      defer={props.router === 'pages' ? false : undefined}
       crossOrigin='anonymous'
+      strategy={props.router === 'pages' ? 'beforeInteractive' : undefined}
       {...buildClerkJsScriptAttributes(options)}
-      {...(props.router === 'pages' ? { strategy: 'beforeInteractive' } : {})}
     />
   );
 }
