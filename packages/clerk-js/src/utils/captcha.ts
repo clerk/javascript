@@ -37,6 +37,10 @@ interface RenderOptions {
    */
   'error-callback'?: (errorCode: string) => void;
   /**
+   * A JavaScript callback invoked when a given client/browser is not supported by the widget.
+   */
+  'unsupported-callback'?: () => boolean;
+  /**
    * Appearance controls when the widget is visible.
    * It can be always (default), execute, or interaction-only.
    * Refer to Appearance Modes for more information:
@@ -84,28 +88,35 @@ export const getCaptchaToken = async (captchaOptions: {
   siteKey: string;
   scriptUrl: string;
   widgetType: CaptchaWidgetType;
+  invisibleSiteKey: string;
 }) => {
   const { siteKey: sitekey, scriptUrl, widgetType } = captchaOptions;
   let captchaToken = '',
     id = '';
-  const invisibleWidget = !widgetType || widgetType === 'invisible';
+  let invisibleWidget = !widgetType || widgetType === 'invisible';
 
   let widgetDiv: HTMLElement | null = null;
 
-  if (invisibleWidget) {
+  const createInvisibleDOMElement = () => {
     const div = document.createElement('div');
     div.classList.add(CAPTCHA_INVISIBLE_CLASSNAME);
     document.body.appendChild(div);
-    widgetDiv = div;
+    return div;
+  };
+
+  if (invisibleWidget) {
+    widgetDiv = createInvisibleDOMElement();
   } else {
     const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
     if (visibleDiv) {
       visibleDiv.style.display = 'block';
       widgetDiv = visibleDiv;
     } else {
-      throw {
-        captchaError: 'Element to render the captcha not found',
-      };
+      console.error(
+        'Captcha DOM element not found. Using invisible captcha widget. Learm more in the docs here: test.link',
+      );
+      widgetDiv = createInvisibleDOMElement();
+      invisibleWidget = true;
     }
   }
 
@@ -118,7 +129,7 @@ export const getCaptchaToken = async (captchaOptions: {
       try {
         const id = captcha.render(invisibleWidget ? `.${CAPTCHA_INVISIBLE_CLASSNAME}` : `#${CAPTCHA_ELEMENT_ID}`, {
           sitekey,
-          appearance: widgetType === 'always_visible' ? 'always' : 'interaction-only',
+          appearance: 'interaction-only',
           retry: 'never',
           'refresh-expired': 'auto',
           callback: function (token: string) {
@@ -138,6 +149,10 @@ export const getCaptchaToken = async (captchaOptions: {
               return;
             }
             reject([errorCodes.join(','), id]);
+          },
+          'unsupported-callback': function () {
+            reject(['This browser is unsupported by the CAPTCHA.', id]);
+            return true;
           },
         });
       } catch (e) {
@@ -171,5 +186,5 @@ export const getCaptchaToken = async (captchaOptions: {
     }
   }
 
-  return captchaToken;
+  return { captchaToken, captchaWidgetTypeUsed: invisibleWidget ? 'invisible' : 'smart' };
 };
