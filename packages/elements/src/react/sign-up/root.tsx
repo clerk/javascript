@@ -15,12 +15,13 @@ import { Form } from '../common/form';
 
 type SignUpFlowProviderProps = {
   children: React.ReactNode;
+  exampleMode?: boolean;
 };
 
 const actor = createActor(SignUpRouterMachine, { inspect: consoleInspector });
 const ref = actor.start();
 
-function SignUpFlowProvider({ children }: SignUpFlowProviderProps) {
+function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
   const isReady = useSelector(ref, state => state.value !== 'Idle');
@@ -30,25 +31,29 @@ function SignUpFlowProvider({ children }: SignUpFlowProviderProps) {
 
     // @ts-expect-error -- This is actually an IsomorphicClerk instance
     clerk.addOnLoaded(() => {
-      ref.send({ type: 'CLERK.SET', clerk });
+      const evt: SignUpRouterInitEvent = {
+        type: 'INIT',
+        clerk,
+        router,
+        signInPath: SIGN_IN_DEFAULT_BASE_PATH,
+        exampleMode,
+      };
+
+      if (ref.getSnapshot().can(evt)) {
+        ref.send(evt);
+      }
     });
-
-    const evt: SignUpRouterInitEvent = {
-      type: 'INIT',
-      clerk,
-      router,
-      signInPath: SIGN_IN_DEFAULT_BASE_PATH,
-    };
-
-    if (ref.getSnapshot().can(evt)) {
-      ref.send(evt);
-    }
-  }, [clerk, router]);
+  }, [clerk, router, exampleMode]);
 
   return isReady ? <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider> : null;
 }
 
-export type SignUpRootProps = { path?: string; children: React.ReactNode; fallback?: React.ReactNode };
+export type SignUpRootProps = {
+  path?: string;
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+  exampleMode?: boolean;
+};
 
 /**
  * Root component for the sign-up flow. It sets up providers and state management for its children.
@@ -66,6 +71,7 @@ export function SignUpRoot({
   children,
   path = SIGN_UP_DEFAULT_BASE_PATH,
   fallback = null,
+  exampleMode,
 }: SignUpRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
@@ -76,7 +82,7 @@ export function SignUpRoot({
       router={router}
     >
       <FormStoreProvider>
-        <SignUpFlowProvider>
+        <SignUpFlowProvider exampleMode={exampleMode}>
           <ClerkLoading>
             <Form>{fallback}</Form>
           </ClerkLoading>

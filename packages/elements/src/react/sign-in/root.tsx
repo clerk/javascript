@@ -14,12 +14,13 @@ import { Form } from '../common/form';
 
 type SignInFlowProviderProps = {
   children: React.ReactNode;
+  exampleMode?: boolean;
 };
 
 const actor = createActor(SignInRouterMachine, { inspect: consoleInspector });
 const ref = actor.start();
 
-function SignInFlowProvider({ children }: SignInFlowProviderProps) {
+function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
 
@@ -28,20 +29,19 @@ function SignInFlowProvider({ children }: SignInFlowProviderProps) {
 
     // @ts-expect-error -- This is actually an IsomorphicClerk instance
     clerk.addOnLoaded(() => {
-      ref.send({ type: 'CLERK.SET', clerk });
+      const evt: SignInRouterInitEvent = {
+        type: 'INIT',
+        clerk,
+        router,
+        signUpPath: SIGN_UP_DEFAULT_BASE_PATH,
+        exampleMode,
+      };
+
+      if (ref.getSnapshot().can(evt)) {
+        ref.send(evt);
+      }
     });
-
-    const evt: SignInRouterInitEvent = {
-      type: 'INIT',
-      clerk,
-      router,
-      signUpPath: SIGN_UP_DEFAULT_BASE_PATH,
-    };
-
-    if (ref.getSnapshot().can(evt)) {
-      ref.send(evt);
-    }
-  }, [clerk, router]);
+  }, [clerk, router, exampleMode]);
 
   return <SignInRouterCtx.Provider actorRef={ref}>{children}</SignInRouterCtx.Provider>;
 }
@@ -55,6 +55,7 @@ export type SignInRootProps = {
   path?: string;
   children: React.ReactNode;
   fallback?: React.ReactNode;
+  exampleMode?: boolean;
 };
 
 /**
@@ -73,6 +74,7 @@ export function SignInRoot({
   children,
   path = SIGN_IN_DEFAULT_BASE_PATH,
   fallback = null,
+  exampleMode,
 }: SignInRootProps): JSX.Element | null {
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
@@ -83,7 +85,7 @@ export function SignInRoot({
       router={router}
     >
       <FormStoreProvider>
-        <SignInFlowProvider>
+        <SignInFlowProvider exampleMode={exampleMode}>
           <ClerkLoading>
             <Form>{fallback}</Form>
           </ClerkLoading>
