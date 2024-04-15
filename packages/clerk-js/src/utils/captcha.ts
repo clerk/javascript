@@ -112,9 +112,7 @@ export const getCaptchaToken = async (captchaOptions: {
       visibleDiv.style.display = 'block';
       widgetDiv = visibleDiv;
     } else {
-      console.error(
-        'Captcha DOM element not found. Using invisible captcha widget. Learm more in the docs here: test.link',
-      );
+      console.error('Captcha DOM element not found. Using invisible captcha widget.');
       widgetDiv = createInvisibleDOMElement();
       invisibleWidget = true;
     }
@@ -151,7 +149,7 @@ export const getCaptchaToken = async (captchaOptions: {
             reject([errorCodes.join(','), id]);
           },
           'unsupported-callback': function () {
-            reject(['This browser is unsupported by the CAPTCHA.', id]);
+            reject(['This browser is not supported by the CAPTCHA.', id]);
             return true;
           },
         });
