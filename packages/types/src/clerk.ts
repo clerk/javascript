@@ -690,7 +690,6 @@ export type OneTapProps = {
   appearance?: SignInTheme;
 };
 
-
 export type SignUpProps = {
   /*
    * Page routing strategy
