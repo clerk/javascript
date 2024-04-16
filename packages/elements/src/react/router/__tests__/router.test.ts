@@ -5,6 +5,7 @@ describe('createClerkRouter', () => {
     pathname: jest.fn(),
     searchParams: jest.fn(),
     push: jest.fn(),
+    shallowPush: jest.fn(),
     replace: jest.fn(),
   };
 
