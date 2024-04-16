@@ -174,6 +174,7 @@ type SignOutAllActionsProps = {
   iconElementId?: ElementId;
   label?: LocalizationKey;
   sx?: ThemableCssProp;
+  actionSx?: ThemableCssProp;
 };
 
 export const SignOutAllActions = (props: SignOutAllActionsProps) => {
@@ -187,6 +188,7 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
     iconElementId,
     label,
     sx,
+    actionSx,
   } = props;
   return (
     <Actions
@@ -210,12 +212,15 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
         onClick={handleSignOutAllClicked}
         variant='ghost'
         colorScheme='neutral'
-        sx={t => ({
-          backgroundColor: t.colors.$transparent,
-          padding: `${t.space.$2} ${t.space.$3}`,
-          borderBottomWidth: 0,
-          borderRadius: t.radii.$lg,
-        })}
+        sx={[
+          t => ({
+            backgroundColor: t.colors.$transparent,
+            padding: `${t.space.$2} ${t.space.$3}`,
+            borderBottomWidth: 0,
+            borderRadius: t.radii.$lg,
+          }),
+          actionSx,
+        ]}
         spinnerSize='md'
       />
     </Actions>
