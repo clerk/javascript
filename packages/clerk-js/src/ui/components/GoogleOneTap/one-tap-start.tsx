@@ -66,6 +66,7 @@ function _OneTapStart(): JSX.Element | null {
     },
   });
 
+  // Trigger only on mount/unmount. Above we handle the logic for the initial fetch + initialization
   useEffect(() => {
     if (google && !user?.id) {
       google.accounts.id.prompt();
@@ -75,7 +76,7 @@ function _OneTapStart(): JSX.Element | null {
         google.accounts.id.cancel();
       }
     };
-  }, [google, user?.id]);
+  }, [user?.id]);
 
   return null;
 }
