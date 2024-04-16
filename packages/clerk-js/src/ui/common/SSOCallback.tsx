@@ -4,6 +4,7 @@ import React from 'react';
 
 import { Flow } from '../customizables';
 import { Card, LoadingCardContainer, useCardState, withCardStateProvider } from '../elements';
+import { CaptchaElement } from '../elements/CaptchaElement';
 import { useRouter } from '../router';
 import { handleError } from '../utils';
 
@@ -36,6 +37,7 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
         <Card.Content>
           <Card.Alert>{card.error}</Card.Alert>
           <LoadingCardContainer />
+          <CaptchaElement />
         </Card.Content>
         <Card.Footer />
       </Card.Root>
