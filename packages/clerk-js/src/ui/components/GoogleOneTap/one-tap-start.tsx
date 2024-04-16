@@ -1,9 +1,10 @@
+import { useUserContext } from '@clerk/shared/react';
 import { useEffect } from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import type { GISCredentialResponse } from '../../../utils/one-tap';
 import { loadGIS } from '../../../utils/one-tap';
-import { useCoreClerk, useCoreSignIn, useCoreUser, useEnvironment, useGoogleOneTapContext } from '../../contexts';
+import { useCoreClerk, useCoreSignIn, useEnvironment, useGoogleOneTapContext } from '../../contexts';
 import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -11,7 +12,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 function _OneTapStart(): JSX.Element | null {
   const clerk = useCoreClerk();
   const signIn = useCoreSignIn();
-  const user = useCoreUser();
+  const user = useUserContext();
   const environment = useEnvironment();
 
   const supportEmail = useSupportEmail();
