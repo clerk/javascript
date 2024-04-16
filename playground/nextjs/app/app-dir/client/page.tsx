@@ -1,5 +1,5 @@
 'use client';
-import { SignedIn, SignedOut } from '@clerk/nextjs/app-beta/client';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
 
 export default function Page() {
   return (
