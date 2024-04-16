@@ -8,6 +8,7 @@ export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up
 export type ClerkHostRouter = {
   push: (path: string) => void;
   replace: (path: string) => void;
+  shallowPush: (path: string) => void;
   pathname: () => string;
   searchParams: () => URLSearchParams;
 };
@@ -36,6 +37,10 @@ export type ClerkRouter = {
    * Navigates to the provided path via a history replace
    */
   replace: ClerkHostRouter['replace'];
+  /**
+   * If supported by the host router, navigates to the provided path without triggering a full navigation
+   */
+  shallowPush: ClerkHostRouter['shallowPush'];
   /**
    * Returns the current pathname (including the base path)
    */
@@ -106,11 +111,17 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     return router.replace(destinationUrl);
   }
 
+  function shallowPush(path: string) {
+    const destinationUrl = makeDestinationUrlWithPreservedQueryParameters(path);
+    return router.shallowPush(destinationUrl);
+  }
+
   return {
     child,
     match,
     push,
     replace,
+    shallowPush,
     pathname: router.pathname,
     searchParams: router.searchParams,
     basePath: normalizedBasePath,

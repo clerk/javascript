@@ -43,7 +43,7 @@ export const SignInRouterMachine = setup({
       const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;
 
-      context.router.push(resolvedPath);
+      context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     setActive({ context, event }, params?: { useLastActiveSession?: boolean }) {
