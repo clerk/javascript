@@ -28,7 +28,7 @@ export const ActiveDevicesSection = () => {
         {isLoading ? (
           <FullHeightLoader />
         ) : (
-          sessions?.sort(currentSessionFirst(session!.id)).map(sa => (
+          sessions?.sort(currentSessionFirst(session.id)).map(sa => (
             <DeviceItem
               key={sa.id}
               session={sa}
@@ -56,7 +56,6 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       id='activeDevices'
       elementDescriptor={descriptors.activeDeviceListItem}
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
-      hoverable
       sx={{
         alignItems: 'flex-start',
       }}
