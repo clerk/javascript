@@ -97,10 +97,11 @@ export const getCaptchaToken = async (captchaOptions: {
   widgetType: CaptchaWidgetType;
   invisibleSiteKey: string;
 }) => {
-  const { siteKey: sitekey, scriptUrl, widgetType } = captchaOptions;
+  const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = captchaOptions;
   let captchaToken = '',
     id = '';
   let invisibleWidget = !widgetType || widgetType === 'invisible';
+  let turnstileSiteKey = siteKey;
 
   let widgetDiv: HTMLElement | null = null;
 
@@ -122,6 +123,7 @@ export const getCaptchaToken = async (captchaOptions: {
       console.error('Captcha DOM element not found. Using invisible captcha widget.');
       widgetDiv = createInvisibleDOMElement();
       invisibleWidget = true;
+      turnstileSiteKey = invisibleSiteKey;
     }
   }
 
@@ -133,7 +135,7 @@ export const getCaptchaToken = async (captchaOptions: {
     return new Promise((resolve, reject) => {
       try {
         const id = captcha.render(invisibleWidget ? `.${CAPTCHA_INVISIBLE_CLASSNAME}` : `#${CAPTCHA_ELEMENT_ID}`, {
-          sitekey,
+          sitekey: turnstileSiteKey,
           appearance: 'interaction-only',
           retry: 'never',
           'refresh-expired': 'auto',
