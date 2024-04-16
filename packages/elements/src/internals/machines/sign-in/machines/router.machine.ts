@@ -18,13 +18,14 @@ export type TSignInRouterMachine = typeof SignInRouterMachine;
 
 const isCurrentPath =
   (path: `/${string}`) =>
-  ({ context }: { context: SignInRouterContext }, _params?: NonReducibleUnknown) =>
-    context.router?.match(path) ?? true;
+  ({ context }: { context: SignInRouterContext }, _params?: NonReducibleUnknown) => {
+    return context.router?.match(path) ?? false;
+  };
 
 const needsStatus =
   (status: SignInStatus) =>
   ({ context, event }: { context: SignInRouterContext; event?: SignInRouterEvents }, _?: NonReducibleUnknown) =>
-    (event as SignInRouterNextEvent)?.resource?.status === status || context.clerk.client.signIn.status === status;
+    (event as SignInRouterNextEvent)?.resource?.status === status || context.clerk?.client.signIn.status === status;
 
 export const SignInRouterMachineId = 'SignInRouter';
 
@@ -37,6 +38,7 @@ export const SignInRouterMachine = setup({
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
       if (!force && shouldUseVirtualRouting()) return;
+      if (context.exampleMode) return;
 
       const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;
@@ -45,6 +47,8 @@ export const SignInRouterMachine = setup({
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     setActive({ context, event }, params?: { useLastActiveSession?: boolean }) {
+      if (context.exampleMode) return;
+
       const session =
         (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
         ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn).createdSessionId;
@@ -67,9 +71,9 @@ export const SignInRouterMachine = setup({
   guards: {
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signIn.status === null && context.clerk.client.lastActiveSessionId),
-    hasResource: ({ context }) => Boolean(context.clerk.client.signIn.status),
+    hasResource: ({ context }) => Boolean(context.clerk?.client?.signIn?.status),
 
-    isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode']),
+    isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', not('isExampleMode')]),
     isActivePathRoot: isCurrentPath('/'),
     isComplete: ({ context, event }) => {
       const resource = (event as SignInRouterNextEvent)?.resource;
@@ -80,8 +84,9 @@ export const SignInRouterMachine = setup({
         (signIn.status === 'complete' && Boolean(signIn.createdSessionId))
       );
     },
-    isLoggedIn: ({ context }) => Boolean(context.clerk.user),
-    isSingleSessionMode: ({ context }) => Boolean(context.clerk.__unstable__environment?.authConfig.singleSessionMode),
+    isLoggedIn: ({ context }) => Boolean(context.clerk?.user),
+    isSingleSessionMode: ({ context }) => Boolean(context.clerk?.__unstable__environment?.authConfig.singleSessionMode),
+    isExampleMode: ({ context }) => Boolean(context.exampleMode),
 
     needsStart: or([not('hasResource'), 'statusNeedsIdentifier', isCurrentPath('/')]),
     needsFirstFactor: and(['statusNeedsFirstFactor', isCurrentPath('/continue')]),
@@ -153,6 +158,7 @@ export const SignInRouterMachine = setup({
             clerk: event.clerk,
             router: event.router,
             signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
+            exampleMode: event.exampleMode,
             loading: {
               isLoading: false,
             },
@@ -167,7 +173,6 @@ export const SignInRouterMachine = setup({
         systemId: ThirdPartyMachineId,
         input: ({ context, self }) => ({
           basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
-          environment: context.clerk.__unstable__environment,
           flow: 'signIn',
           parent: self,
         }),

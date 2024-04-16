@@ -1,4 +1,3 @@
-
 name: Setup Action
 description: Checkout, setup node and dependencies
 inputs:
@@ -41,7 +40,7 @@ inputs:
     default: ''
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Configure Turborepo
       id: turbo
@@ -98,7 +97,7 @@ runs:
         registry-url: ${{ inputs.registry-url }}
 
     - name: Install NPM Dependencies
-      run: npm ci --audit=false --fund=false --prefer-offline
+      run: mkdir node_modules && npm ci --audit=false --fund=false --prefer-offline
       shell: bash
 
     - name: Get Playwright Version

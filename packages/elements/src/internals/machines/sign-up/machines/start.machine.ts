@@ -1,6 +1,6 @@
 import type { SignUpResource } from '@clerk/types';
 import type { ActorRefFrom } from 'xstate';
-import { fromPromise, sendTo, setup } from 'xstate';
+import { fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
@@ -39,6 +39,9 @@ export const SignUpStartMachine = setup({
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
     sendToLoading,
   },
+  guards: {
+    isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
+  },
   types: {} as SignUpStartSchema,
 }).createMachine({
   id: SignUpStartMachineId,
@@ -55,6 +58,7 @@ export const SignUpStartMachine = setup({
       description: 'Waiting for user input',
       on: {
         SUBMIT: {
+          guard: not('isExampleMode'),
           target: 'Attempting',
           reenter: true,
         },

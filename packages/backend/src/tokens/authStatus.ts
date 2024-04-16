@@ -58,6 +58,7 @@ export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
 
 export const AuthErrorReason = {
   ClientUATWithoutSessionToken: 'client-uat-but-no-session-token',
+  DevBrowserMissing: 'dev-browser-missing',
   DevBrowserSync: 'dev-browser-sync',
   PrimaryRespondsToSyncing: 'primary-responds-to-syncing',
   SatelliteCookieNeedsSyncing: 'satellite-needs-syncing',

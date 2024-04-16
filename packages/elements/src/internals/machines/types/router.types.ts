@@ -45,6 +45,7 @@ export type BaseRouterRouteUnregisterEvent<T extends string> = { type: 'ROUTE.UN
 export type BaseRouterRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
 export type BaseRouterRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };
 export type BaseRouterRedirectWeb3Event = { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy };
+export type BaseRouterSetClerkEvent = { type: 'CLERK.SET'; clerk: LoadedClerk };
 
 export type BaseRouterRedirectEvent =
   | BaseRouterRedirectOauthEvent
@@ -56,6 +57,7 @@ export type BaseRouterRedirectEvent =
 export interface BaseRouterInput {
   clerk: LoadedClerk;
   router?: ClerkRouter;
+  exampleMode?: boolean;
 }
 
 // ---------------------------------- Context ---------------------------------- //
@@ -64,4 +66,5 @@ export interface BaseRouterContext {
   clerk: LoadedClerk;
   error?: ClerkElementsError;
   router?: ClerkRouter;
+  exampleMode?: boolean;
 }

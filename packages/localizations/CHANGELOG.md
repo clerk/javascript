@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.23
+
+### Patch Changes
+
+- Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes. ([#3173](https://github.com/clerk/javascript/pull/3173)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 2.0.0-beta.22
 
 ### Minor Changes

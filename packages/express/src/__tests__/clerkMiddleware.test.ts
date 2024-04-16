@@ -27,7 +27,10 @@ describe('clerkMiddleware', () => {
     it('works if secretKey is passed as parameter', async () => {
       const options = { secretKey: 'sk_test_....' };
 
-      const response = await runMiddleware(clerkMiddleware(options)).expect(200, 'Hello world!');
+      const response = await runMiddleware(clerkMiddleware(options), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
+        200,
+        'Hello world!',
+      );
 
       assertSignedOutDebugHeaders(response);
     });
@@ -54,7 +57,10 @@ describe('clerkMiddleware', () => {
     it('works if publishableKey is passed as parameter', async () => {
       const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k' };
 
-      const response = await runMiddleware(clerkMiddleware(options)).expect(200, 'Hello world!');
+      const response = await runMiddleware(clerkMiddleware(options), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
+        200,
+        'Hello world!',
+      );
 
       assertSignedOutDebugHeaders(response);
     });
@@ -63,7 +69,10 @@ describe('clerkMiddleware', () => {
   it.todo('supports usage without invocation: app.use(clerkMiddleware)');
 
   it('supports usage without parameters: app.use(clerkMiddleware())', async () => {
-    const response = await runMiddleware(clerkMiddleware()).expect(200, 'Hello world!');
+    const response = await runMiddleware(clerkMiddleware(), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
+      200,
+      'Hello world!',
+    );
 
     assertSignedOutDebugHeaders(response);
   });
@@ -71,7 +80,10 @@ describe('clerkMiddleware', () => {
   it('supports usage with parameters: app.use(clerkMiddleware(options))', async () => {
     const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k' };
 
-    const response = await runMiddleware(clerkMiddleware(options)).expect(200, 'Hello world!');
+    const response = await runMiddleware(clerkMiddleware(options), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
+      200,
+      'Hello world!',
+    );
 
     assertSignedOutDebugHeaders(response);
   });
@@ -82,7 +94,10 @@ describe('clerkMiddleware', () => {
       return next();
     };
 
-    const response = await runMiddleware(clerkMiddleware(handler)).expect(200, 'Hello world!');
+    const response = await runMiddleware(clerkMiddleware(handler), { Cookie: '__clerk_db_jwt=deadbeef;' }).expect(
+      200,
+      'Hello world!',
+    );
 
     expect(response.header).toHaveProperty('x-clerk-auth-custom', 'custom-value');
     assertSignedOutDebugHeaders(response);
@@ -95,7 +110,9 @@ describe('clerkMiddleware', () => {
     };
     const options = { publishableKey: 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k' };
 
-    const response = await runMiddleware(clerkMiddleware(handler, options)).expect(200, 'Hello world!');
+    const response = await runMiddleware(clerkMiddleware(handler, options), {
+      Cookie: '__clerk_db_jwt=deadbeef;',
+    }).expect(200, 'Hello world!');
 
     expect(response.header).toHaveProperty('x-clerk-auth-custom', 'custom-value');
     assertSignedOutDebugHeaders(response);
