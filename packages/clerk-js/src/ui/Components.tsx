@@ -176,7 +176,6 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.mountComponent = params => {
       const { node, name, props, appearanceKey } = params;
-
       assertDOMElement(node);
       setState(s => {
         s.nodes.set(node, { key: `p${++portalCt}`, name, props, appearanceKey });

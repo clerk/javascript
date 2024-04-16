@@ -1,6 +1,7 @@
 import { logErrorInDevMode } from '@clerk/shared';
 import type {
   CreateOrganizationProps,
+  OneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -268,3 +269,14 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
     />
   );
 }, 'OrganizationList');
+
+export const __experimental_GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<OneTapProps>) => {
+  return (
+    <Portal
+      mount={clerk.__experimental_mountGoogleOneTap}
+      unmount={clerk.__experimental_unmountGoogleOneTap}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'OneTap');

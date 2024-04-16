@@ -17,6 +17,7 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   OrganizationList,
+  __experimental_GoogleOneTap,
 } from '@clerk/clerk-react';
 
 export const SignIn = (props: SignInProps) => {
