@@ -3,4 +3,4 @@
 '@clerk/types': minor
 ---
 
-Add support for different CAPTCHA widget types
+Add support for different Bot Protection widget types
