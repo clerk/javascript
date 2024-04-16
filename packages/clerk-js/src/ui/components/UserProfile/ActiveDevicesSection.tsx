@@ -56,7 +56,6 @@ const DeviceItem = ({ session }: { session: SessionWithActivitiesResource }) => 
       id='activeDevices'
       elementDescriptor={descriptors.activeDeviceListItem}
       elementId={isCurrent ? descriptors.activeDeviceListItem.setId('current') : undefined}
-      hoverable
       sx={{
         alignItems: 'flex-start',
       }}
