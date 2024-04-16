@@ -53,6 +53,7 @@ function _OneTapStart(): JSX.Element | null {
     onSuccess(google) {
       google.accounts.id.initialize({
         client_id: environmentClientID!,
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         callback: oneTapCallback,
         itp_support: true,
         cancel_on_tap_outside: ctx.cancelOnTapOutside,
