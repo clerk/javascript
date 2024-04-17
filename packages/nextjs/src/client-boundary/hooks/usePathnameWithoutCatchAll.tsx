@@ -1,13 +1,11 @@
-import { useRouter } from 'next/compat/router';
 import React from 'react';
 
-export const usePathnameWithoutWithCatchAll = () => {
+import { usePagesRouter } from './usePagesRouter';
+
+export const usePathnameWithoutCatchAll = () => {
   const pathRef = React.useRef<string>();
-  // The compat version of useRouter returns null instead of throwing an error
-  // when used inside app router instead of pages router
-  // we use it to detect if the component is used inside pages or app router
-  // so we can use the correct algorithm to get the path
-  const pagesRouter = useRouter();
+
+  const { pagesRouter } = usePagesRouter();
 
   if (pagesRouter) {
     if (pathRef.current) {
