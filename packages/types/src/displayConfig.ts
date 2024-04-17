@@ -32,6 +32,7 @@ export interface DisplayConfigJSON {
   create_organization_url: string;
   after_leave_organization_url: string;
   after_create_organization_url: string;
+  google_one_tap_client_id?: string;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -63,4 +64,5 @@ export interface DisplayConfigResource extends ClerkResource {
   createOrganizationUrl: string;
   afterLeaveOrganizationUrl: string;
   afterCreateOrganizationUrl: string;
+  googleOneTapClientId?: string;
 }

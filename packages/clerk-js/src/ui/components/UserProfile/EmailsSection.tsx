@@ -48,10 +48,7 @@ export const EmailsSection = () => {
         <ProfileSection.ItemList id='emailAddresses'>
           {sortIdentificationBasedOnVerification(user?.emailAddresses, user?.primaryEmailAddressId).map(email => (
             <Action.Root key={email.emailAddress}>
-              <ProfileSection.Item
-                id='emailAddresses'
-                hoverable
-              >
+              <ProfileSection.Item id='emailAddresses'>
                 <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
                   <Text
                     sx={t => ({ color: t.colors.$colorText })}

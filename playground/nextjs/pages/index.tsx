@@ -1,3 +1,4 @@
+import { SignedOut, __experimental_GoogleOneTap } from '@clerk/nextjs';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -17,6 +18,10 @@ const Home: NextPage = () => {
           href='/favicon.ico'
         />
       </Head>
+
+      <SignedOut>
+        <__experimental_GoogleOneTap />
+      </SignedOut>
 
       <main className={styles.main}>
         <h1 className={styles.title}>Clerk x Nextjs</h1>

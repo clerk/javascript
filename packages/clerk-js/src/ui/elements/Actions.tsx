@@ -195,7 +195,7 @@ export const Action = (props: ActionProps) => {
         t => ({
           flex: '1',
           borderRadius: 0,
-          gap: t.space.$3,
+          gap: t.space.$4,
           justifyContent: 'flex-start',
         }),
         sx,
