@@ -5,14 +5,15 @@ import { and, assign, enqueueActions, not, or, sendTo, setup, stopChild } from '
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
+import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
+import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
+
 import type {
   SignInRouterContext,
   SignInRouterEvents,
   SignInRouterNextEvent,
   SignInRouterSchema,
-} from '~/internals/machines/sign-in/types';
-import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party/machine';
-import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
+} from './router.types';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 

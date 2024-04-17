@@ -4,12 +4,13 @@ import type { ActorRefFrom, DoneActorEvent } from 'xstate';
 import { fromPromise, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
-import type { FormDefaultValues, FormFields } from '~/internals/machines/form/form.types';
-import { sendToLoading } from '~/internals/machines/shared.actions';
-import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
-import type { SignUpContinueSchema } from '~/internals/machines/sign-up/types';
+import type { FormDefaultValues, FormFields } from '~/internals/machines/form';
+import { sendToLoading } from '~/internals/machines/shared';
 import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
+
+import type { SignUpContinueSchema } from './continue.types';
+import type { TSignUpRouterMachine } from './router.machine';
 
 export type TSignUpContinueMachine = typeof SignUpContinueMachine;
 

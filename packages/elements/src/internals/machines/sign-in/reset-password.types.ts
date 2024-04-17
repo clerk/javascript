@@ -1,8 +1,9 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
-import type { FormMachine } from '~/internals/machines/form/form.machine';
-import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines';
+import type { FormMachine } from '~/internals/machines/form';
+
+import type { TSignInRouterMachine } from './router.machine';
 
 // ---------------------------------- Tags ---------------------------------- //
 

@@ -3,13 +3,9 @@ import { useSelector } from '@xstate/react';
 import { useCallback, useEffect } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
-import {
-  SignInFirstFactorMachine,
-  SignInSecondFactorMachine,
-  type TSignInFirstFactorMachine,
-  type TSignInSecondFactorMachine,
-} from '~/internals/machines/sign-in/machines';
-import type { SignInStrategyName } from '~/internals/machines/sign-in/types';
+import type { SignInStrategyName } from '~/internals/machines/shared';
+import type { TSignInFirstFactorMachine, TSignInSecondFactorMachine } from '~/internals/machines/sign-in';
+import { SignInFirstFactorMachine, SignInSecondFactorMachine } from '~/internals/machines/sign-in';
 import { matchStrategy } from '~/internals/machines/utils/strategies';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';

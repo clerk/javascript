@@ -7,7 +7,7 @@ import type {
   SignInStartEvents,
   SignInVerificationContext,
   SignInVerificationEvents,
-} from './sign-in/types';
+} from '~/internals/machines/sign-in';
 import type {
   SignUpContinueContext,
   SignUpContinueEvents,
@@ -15,9 +15,9 @@ import type {
   SignUpStartRedirectEvent,
   SignUpVerificationContext,
   SignUpVerificationEvents,
-} from './sign-up/types';
-import type { ThirdPartyMachineContext, ThirdPartyMachineEvent } from './third-party/types';
-import type { BaseRouterLoadingStep } from './types';
+} from '~/internals/machines/sign-up';
+import type { ThirdPartyMachineContext, ThirdPartyMachineEvent } from '~/internals/machines/third-party';
+import type { BaseRouterLoadingStep } from '~/internals/machines/types';
 
 type SendToLoadingProps = {
   context:

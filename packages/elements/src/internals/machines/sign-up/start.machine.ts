@@ -1,40 +1,30 @@
-import type { SignInResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/types';
 import type { ActorRefFrom } from 'xstate';
 import { fromPromise, not, sendTo, setup } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
-import type { FormFields } from '~/internals/machines/form/form.types';
-import { sendToLoading } from '~/internals/machines/shared.actions';
-import { type TSignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
-import type { SignInStartSchema } from '~/internals/machines/sign-in/types';
+import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import type { FormFields } from '~/internals/machines/form';
+import { sendToLoading } from '~/internals/machines/shared';
+import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
+import { ThirdPartyMachine } from '~/internals/machines/third-party';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-export type TSignInStartMachine = typeof SignInStartMachine;
+import type { TSignUpRouterMachine } from './router.machine';
+import type { SignUpStartSchema } from './start.types';
 
-export const SignInStartMachineId = 'SignInStart';
+export type TSignUpStartMachine = typeof SignUpStartMachine;
 
-export const SignInStartMachine = setup({
+export const SignUpStartMachineId = 'SignUpStart';
+
+export const SignUpStartMachine = setup({
   actors: {
-    attempt: fromPromise<SignInResource, { parent: ActorRefFrom<TSignInRouterMachine>; fields: FormFields }>(
+    attempt: fromPromise<SignUpResource, { parent: ActorRefFrom<TSignUpRouterMachine>; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
-        const clerk = parent.getSnapshot().context.clerk;
-
-        const password = fields.get('password');
-        const identifier = fields.get('identifier');
-
-        const passwordParams = password?.value
-          ? {
-              password: password.value,
-              strategy: 'password',
-            }
-          : {};
-
-        return clerk.client.signIn.create({
-          identifier: (identifier?.value as string) || '',
-          ...passwordParams,
-        });
+        const params = fieldsToSignUpParams(fields);
+        return parent.getSnapshot().context.clerk.client.signUp.create(params);
       },
     ),
+    thirdParty: ThirdPartyMachine,
   },
   actions: {
     setFormErrors: sendTo(
@@ -53,13 +43,13 @@ export const SignInStartMachine = setup({
   guards: {
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
   },
-  types: {} as SignInStartSchema,
+  types: {} as SignUpStartSchema,
 }).createMachine({
-  id: SignInStartMachineId,
+  id: SignUpStartMachineId,
   context: ({ input }) => ({
-    basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
-    parent: input.parent,
+    basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
     formRef: input.form,
+    parent: input.parent,
     loadingStep: 'start',
   }),
   initial: 'Pending',
@@ -79,7 +69,7 @@ export const SignInStartMachine = setup({
       tags: ['state:attempting', 'state:loading'],
       entry: 'sendToLoading',
       invoke: {
-        id: 'attempt',
+        id: 'attemptCreate',
         src: 'attempt',
         input: ({ context }) => ({
           parent: context.parent,

@@ -1,8 +1,11 @@
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 
-import { SignUpContinue, type SignUpContinueProps } from './continue';
-import { SignUpStart, type SignUpStartProps } from './start';
-import { SignUpVerifications, type SignUpVerificationsProps } from './verifications';
+import type { SignUpContinueProps } from './continue';
+import { SignUpContinue } from './continue';
+import type { SignUpStartProps } from './start';
+import { SignUpStart } from './start';
+import type { SignUpVerificationsProps } from './verifications';
+import { SignUpVerifications } from './verifications';
 
 export const SIGN_UP_STEPS = {
   start: 'start',

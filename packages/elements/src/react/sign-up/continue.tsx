@@ -1,4 +1,5 @@
-import { SignUpContinueMachine, type TSignUpContinueMachine } from '~/internals/machines/sign-up/machines';
+import type { TSignUpContinueMachine } from '~/internals/machines/sign-up';
+import { SignUpContinueMachine } from '~/internals/machines/sign-up';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';

@@ -1,5 +1,5 @@
-import type { TSignInStartMachine } from '~/internals/machines/sign-in/machines';
-import { SignInStartMachine } from '~/internals/machines/sign-in/machines';
+import type { TSignInStartMachine } from '~/internals/machines/sign-in';
+import { SignInStartMachine } from '~/internals/machines/sign-in';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';

@@ -1,42 +1,43 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
-import type { FormMachine } from '~/internals/machines/form/form.machine';
-import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines';
+import type { FormMachine } from '~/internals/machines/form';
+
+import type { TSignUpRouterMachine } from './router.machine';
 
 // ---------------------------------- Tags ---------------------------------- //
 
-export type SignInStartTags = 'state:pending' | 'state:attempting' | 'state:loading';
+export type SignUpContinueTags = 'state:pending' | 'state:attempting' | 'state:loading';
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignInStartSubmitEvent = { type: 'SUBMIT' };
+export type SignUpContinueSubmitEvent = { type: 'SUBMIT' };
 
-export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent;
+export type SignUpContinueEvents = ErrorActorEvent | SignUpContinueSubmitEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 
-export type SignInStartInput = {
+export type SignUpContinueInput = {
   basePath?: string;
   form: ActorRefFrom<typeof FormMachine>;
-  parent: ActorRefFrom<TSignInRouterMachine>;
+  parent: ActorRefFrom<TSignUpRouterMachine>;
 };
 
 // ---------------------------------- Context ---------------------------------- //
 
-export interface SignInStartContext {
+export interface SignUpContinueContext {
   basePath: string;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
-  parent: ActorRefFrom<TSignInRouterMachine>;
-  loadingStep: 'start';
+  parent: ActorRefFrom<TSignUpRouterMachine>;
+  loadingStep: 'continue';
 }
 
 // ---------------------------------- Schema ---------------------------------- //
 
-export interface SignInStartSchema {
-  context: SignInStartContext;
-  input: SignInStartInput;
-  events: SignInStartEvents;
-  tags: SignInStartTags;
+export interface SignUpContinueSchema {
+  context: SignUpContinueContext;
+  input: SignUpContinueInput;
+  events: SignUpContinueEvents;
+  tags: SignUpContinueTags;
 }

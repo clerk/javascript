@@ -10,7 +10,7 @@ import { fromCallback, fromPromise } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import type { WithParams, WithUnsafeMetadata } from '~/internals/machines/shared.types';
+import type { WithParams, WithUnsafeMetadata } from '~/internals/machines/shared';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 
 type OptionalRedirectParams = 'redirectUrl' | 'redirectUrlComplete';
