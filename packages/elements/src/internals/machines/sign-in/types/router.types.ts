@@ -54,7 +54,7 @@ export type SignInRouterForgotPasswordEvent = { type: 'NAVIGATE.FORGOT_PASSWORD'
 export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
-export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications'>;
+export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'reset-password'>;
 export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
 

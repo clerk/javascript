@@ -80,6 +80,16 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
       step,
       strategy,
     });
+  } else if (context.loadingStep === 'reset-password') {
+    step = 'reset-password';
+    strategy = undefined;
+
+    return context.parent.send({
+      type: 'LOADING',
+      isLoading: true,
+      step,
+      strategy,
+    });
   } else {
     step = context.loadingStep;
     strategy = undefined;
