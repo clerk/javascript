@@ -274,7 +274,7 @@ export const SignInRouterMachine = setup({
           },
         ],
         'STRATEGY.UPDATE': {
-          description: 'Send event to verification machine to update the current factor.',
+          description: 'Send event to verification machine to update the current strategy.',
           actions: sendTo('firstFactor', ({ event }) => event),
           target: '.Idle',
         },
@@ -284,12 +284,12 @@ export const SignInRouterMachine = setup({
         Idle: {
           on: {
             'NAVIGATE.FORGOT_PASSWORD': {
-              description: 'Send event to verification machine to update the current factor.',
+              description: 'Navigate to forgot password screen.',
               actions: sendTo('firstFactor', ({ event }) => event),
               target: 'ForgotPassword',
             },
             'NAVIGATE.CHOOSE_STRATEGY': {
-              description: 'Send event to verification machine to update the current factor.',
+              description: 'Navigate to choose strategy screen.',
               actions: sendTo('firstFactor', ({ event }) => event),
               target: 'ChoosingStrategy',
             },
