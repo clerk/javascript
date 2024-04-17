@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.0.0-beta.24
+
+### Minor Changes
+
+- Add hu-HU localization ([#3190](https://github.com/clerk/javascript/pull/3190)) by [@ezkomoly](https://github.com/ezkomoly)
+
+### Patch Changes
+
+- Fix Hungarian language subpath exports ([#3206](https://github.com/clerk/javascript/pull/3206)) by [@anagstef](https://github.com/anagstef)
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.0.0-beta.23
 
 ### Patch Changes
