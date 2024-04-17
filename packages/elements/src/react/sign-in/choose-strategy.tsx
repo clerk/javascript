@@ -45,10 +45,17 @@ export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
   return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
 }
 
-const STRATEGY_OPTION_NAME = 'SignInStrategyOption';
+export function SignInForgotPassword({ children }: SignInChooseStrategyProps) {
+  const routerRef = SignInRouterCtx.useActorRef();
+  const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:forgot-password'], ActiveTagsMode.all);
 
-export type SignInStrategyOptionElement = React.ElementRef<'button'>;
-export type SignInStrategyOptionProps = {
+  return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
+}
+
+const SUPPORTED_STRATEGY_NAME = 'SignInSupportedStrategy';
+
+export type SignInSupportedStrategyElement = React.ElementRef<'button'>;
+export type SignInSupportedStrategyProps = {
   asChild?: boolean;
   name: Exclude<SignInFirstFactor['strategy'], `oauth_${string}` | 'saml'>;
   children: React.ReactNode;
@@ -64,12 +71,12 @@ export type SignInStrategyOptionProps = {
  *
  * @example
  * <Step name='choose-strategy'>
- *   <StrategyOption name='password'>
+ *   <SupportedStrategy name='password'>
  *     Sign in with password
- *   </StrategyOption>
+ *   </SupportedStrategy>
  * </Step
  */
-export const SignInStrategyOption = React.forwardRef<SignInStrategyOptionElement, SignInStrategyOptionProps>(
+export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyElement, SignInSupportedStrategyProps>(
   ({ asChild, children, name, ...rest }, forwardedRef) => {
     const routerRef = SignInRouterCtx.useActorRef();
     const snapshot = routerRef.getSnapshot();
@@ -106,4 +113,4 @@ export const SignInStrategyOption = React.forwardRef<SignInStrategyOptionElement
   },
 );
 
-SignInStrategyOption.displayName = STRATEGY_OPTION_NAME;
+SignInSupportedStrategy.displayName = SUPPORTED_STRATEGY_NAME;

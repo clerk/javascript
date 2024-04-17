@@ -26,6 +26,7 @@ export const SignInRouterRoutes = {
   callback: 'route:callback',
   error: 'route:error',
   forgotPassword: 'route:forgot-password',
+  resetPassword: 'route:reset-password',
   chooseStrategy: 'route:choose-strategy',
 } as const;
 
@@ -38,6 +39,7 @@ export const SignInRouterSystemId = {
   start: 'start',
   firstFactor: 'firstFactor',
   secondFactor: 'secondFactor',
+  resetPassword: 'resetPassword',
 } as const;
 
 export type SignInRouterSystemId = keyof typeof SignInRouterSystemId;
@@ -52,8 +54,9 @@ export type SignInRouterForgotPasswordEvent = { type: 'NAVIGATE.FORGOT_PASSWORD'
 export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
-export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications'>;
+export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'reset-password'>;
 export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
+export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -84,7 +87,8 @@ export type SignInRouterEvents =
   | SignInRouterRedirectEvent
   | SignInVerificationFactorUpdateEvent
   | SignInRouterLoadingEvent
-  | BaseRouterSetClerkEvent;
+  | SignInRouterSetClerkEvent
+  | SignInRouterSubmitEvent;
 
 // ---------------------------------- Context ---------------------------------- //
 

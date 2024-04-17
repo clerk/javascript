@@ -1,7 +1,7 @@
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 
-import { SignInRouterCtx } from './context';
+import { SignInRouterCtx } from '~/react/sign-in/context';
 
 const SIGN_IN_NAVIGATE_NAME = 'SignInNavigate';
 const SignInNavigationEventMap = {

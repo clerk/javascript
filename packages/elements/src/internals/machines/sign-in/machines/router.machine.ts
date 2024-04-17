@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, sendTo, setup, spawnChild, stopChild } from 'xstate';
+import { and, assign, enqueueActions, not, or, sendTo, setup, stopChild } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
@@ -34,7 +34,6 @@ export const SignInRouterMachine = setup({
     thirdParty: ThirdPartyMachine,
   },
   actions: {
-    logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
       if (!force && shouldUseVirtualRouting()) return;
@@ -46,12 +45,14 @@ export const SignInRouterMachine = setup({
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
-    setActive({ context, event }, params?: { useLastActiveSession?: boolean }) {
+    setActive({ context, event }) {
       if (context.exampleMode) return;
 
-      const session =
-        (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
-        ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn).createdSessionId;
+      const lastActiveSessionId = context.clerk.client.lastActiveSessionId;
+      const createdSessionId = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn)
+        .createdSessionId;
+
+      const session = createdSessionId || lastActiveSessionId || null;
 
       const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignInUrl());
       void context.clerk.setActive({ session, beforeEmit });
@@ -158,7 +159,7 @@ export const SignInRouterMachine = setup({
             clerk: event.clerk,
             router: event.router,
             signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
-            exampleMode: event.exampleMode,
+            exampleMode: event.exampleMode || false,
             loading: {
               isLoading: false,
             },
@@ -168,33 +169,36 @@ export const SignInRouterMachine = setup({
       },
     },
     Init: {
-      entry: spawnChild('thirdParty', {
-        id: ThirdPartyMachineId,
-        systemId: ThirdPartyMachineId,
-        input: ({ context, self }) => ({
-          basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
-          flow: 'signIn',
-          parent: self,
-        }),
+      entry: enqueueActions(({ enqueue, self }) => {
+        if (!self.getSnapshot().children[ThirdPartyMachineId]) {
+          enqueue.spawnChild('thirdParty', {
+            id: ThirdPartyMachineId,
+            systemId: ThirdPartyMachineId,
+            input: ({ context, self }) => ({
+              basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
+              flow: 'signIn',
+              parent: self,
+            }),
+          });
+        }
       }),
       always: [
         {
+          guard: 'needsCallback',
+          target: 'Callback',
+        },
+        {
           guard: 'isLoggedInAndSingleSession',
           actions: [
-            log('Already logged in'),
+            () => console.warn('logged-in-single-session-mode'),
             {
               type: 'setError',
               params: {
                 error: new ClerkElementsError('logged-in-single-session-mode', 'You are already logged in.'),
               },
             },
-            { type: 'navigateExternal', params: { path: '/' } },
           ],
-          target: 'Error',
-        },
-        {
-          guard: 'needsCallback',
-          target: 'Callback',
+          target: 'Start',
         },
         {
           guard: 'needsStart',
@@ -212,6 +216,11 @@ export const SignInRouterMachine = setup({
           target: 'SecondFactor',
         },
         {
+          guard: 'needsNewPassword',
+          actions: { type: 'navigateInternal', params: { force: true, path: '/reset-password' } },
+          target: 'ResetPassword',
+        },
+        {
           actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
           target: 'Start',
         },
@@ -220,11 +229,111 @@ export const SignInRouterMachine = setup({
     Start: {
       tags: 'route:start',
       on: {
-        'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
         NEXT: [
           {
             guard: 'isComplete',
             actions: 'setActive',
+            target: 'Start',
+          },
+          {
+            guard: 'statusNeedsFirstFactor',
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            target: 'FirstFactor',
+          },
+          {
+            guard: 'statusNeedsSecondFactor',
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            target: 'SecondFactor',
+          },
+          {
+            guard: 'statusNeedsNewPassword',
+            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            target: 'ResetPassword',
+          },
+        ],
+      },
+    },
+    FirstFactor: {
+      tags: 'route:first-factor',
+      on: {
+        NEXT: [
+          {
+            guard: 'isComplete',
+            actions: 'setActive',
+            target: 'Start',
+          },
+          {
+            guard: 'statusNeedsSecondFactor',
+            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            target: 'SecondFactor',
+          },
+          {
+            guard: 'statusNeedsNewPassword',
+            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            target: 'ResetPassword',
+          },
+        ],
+        'STRATEGY.UPDATE': {
+          description: 'Send event to verification machine to update the current strategy.',
+          actions: sendTo('firstFactor', ({ event }) => event),
+          target: '.Idle',
+        },
+      },
+      initial: 'Idle',
+      states: {
+        Idle: {
+          on: {
+            'NAVIGATE.FORGOT_PASSWORD': {
+              description: 'Navigate to forgot password screen.',
+              actions: sendTo('firstFactor', ({ event }) => event),
+              target: 'ForgotPassword',
+            },
+            'NAVIGATE.CHOOSE_STRATEGY': {
+              description: 'Navigate to choose strategy screen.',
+              actions: sendTo('firstFactor', ({ event }) => event),
+              target: 'ChoosingStrategy',
+            },
+          },
+        },
+        ChoosingStrategy: {
+          tags: ['route:choose-strategy'],
+          on: {
+            'NAVIGATE.PREVIOUS': 'Idle',
+          },
+        },
+        ForgotPassword: {
+          tags: ['route:forgot-password'],
+          on: {
+            'NAVIGATE.PREVIOUS': 'Idle',
+          },
+        },
+      },
+    },
+    SecondFactor: {
+      tags: 'route:second-factor',
+      on: {
+        NEXT: [
+          {
+            guard: 'isComplete',
+            actions: 'setActive',
+            target: 'Start',
+          },
+          {
+            guard: 'statusNeedsNewPassword',
+            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            target: 'ResetPassword',
+          },
+        ],
+      },
+    },
+    ResetPassword: {
+      tags: 'route:reset-password',
+      on: {
+        NEXT: [
+          {
+            guard: 'isComplete',
+            actions: 'setActive',
+            target: 'Start',
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -239,76 +348,15 @@ export const SignInRouterMachine = setup({
         ],
       },
     },
-    FirstFactor: {
-      tags: 'route:first-factor',
-      on: {
-        'NAVIGATE.FORGOT_PASSWORD': 'ForgotPassword',
-        NEXT: [
-          {
-            guard: 'isComplete',
-            actions: 'setActive',
-          },
-          {
-            guard: 'statusNeedsSecondFactor',
-            actions: { type: 'navigateInternal', params: { path: '/continue' } },
-            target: 'SecondFactor',
-          },
-          {
-            actions: ['logUnknownError', { type: 'navigateInternal', params: { path: '/' } }],
-          },
-        ],
-      },
-      initial: 'Idle',
-      states: {
-        Idle: {
-          on: {
-            'NAVIGATE.CHOOSE_STRATEGY': {
-              description: 'Send event to verification machine to update the current factor.',
-              actions: sendTo('firstFactor', ({ event }) => event),
-              target: 'ChoosingStrategy',
-            },
-          },
-        },
-        ChoosingStrategy: {
-          tags: ['route:choose-strategy'],
-          on: {
-            'NAVIGATE.PREVIOUS': 'Idle',
-            'STRATEGY.UPDATE': {
-              description: 'Send event to verification machine to update the current factor.',
-              actions: sendTo('firstFactor', ({ event }) => event),
-              target: 'Idle',
-            },
-          },
-        },
-      },
-    },
-    SecondFactor: {
-      tags: 'route:second-factor',
-      on: {
-        NEXT: [
-          {
-            guard: 'isComplete',
-            actions: 'setActive',
-          },
-          {
-            actions: ['logUnknownError', { type: 'navigateInternal', params: { path: '/' } }],
-          },
-        ],
-      },
-    },
     Callback: {
       tags: 'route:callback',
       entry: sendTo(ThirdPartyMachineId, { type: 'CALLBACK' }),
       on: {
         NEXT: [
           {
-            guard: 'isComplete',
+            guard: or(['isComplete', 'hasAuthenticatedViaClerkJS']),
             actions: 'setActive',
-          },
-          {
-            description: 'Handle a case where the user has already been authenticated via ClerkJS',
-            guard: 'hasAuthenticatedViaClerkJS',
-            actions: { type: 'setActive', params: { useLastActiveSession: true } },
+            target: 'Start',
           },
           {
             guard: 'statusNeedsIdentifier',
@@ -324,6 +372,11 @@ export const SignInRouterMachine = setup({
             actions: { type: 'navigateInternal', params: { path: '/continue' } },
             target: 'SecondFactor',
           },
+          {
+            guard: 'statusNeedsNewPassword',
+            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            target: 'ResetPassword',
+          },
         ],
       },
     },
@@ -335,9 +388,6 @@ export const SignInRouterMachine = setup({
           actions: 'resetError',
         },
       },
-    },
-    ForgotPassword: {
-      tags: 'route:forgot-password',
     },
     Hist: {
       type: 'history',

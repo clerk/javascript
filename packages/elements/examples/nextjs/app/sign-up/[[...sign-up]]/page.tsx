@@ -154,15 +154,6 @@ export default function SignUpPage() {
             label='Password'
             name='password'
           />
-          <CustomField
-            alwaysShow
-            label='Phone Number'
-            name='phoneNumber'
-          />
-          <CustomField
-            label='Username'
-            name='username'
-          />
 
           <CustomSubmit>
             <Loading>
