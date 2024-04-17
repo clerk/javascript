@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.0-beta.22
+
+### Patch Changes
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 2.0.0-beta.21
 
 ### Minor Changes

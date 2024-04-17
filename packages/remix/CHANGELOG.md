@@ -1,5 +1,16 @@
 # Change Log
 
+## 4.0.0-beta.44
+
+### Patch Changes
+
+- Automatically infer the path for where the component is mounted. ([#3104](https://github.com/clerk/javascript/pull/3104)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`f98e480b1`](https://github.com/clerk/javascript/commit/f98e480b1a9e41f5370efcd53aa6887af2ad6816), [`142ded732`](https://github.com/clerk/javascript/commit/142ded73265b776789b65404d96b6c91cfe15e98), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5), [`e6fc58ae4`](https://github.com/clerk/javascript/commit/e6fc58ae4df5091eff00ba0d9045ce5ff0fff538)]:
+  - @clerk/clerk-react@5.0.0-beta.39
+  - @clerk/backend@1.0.0-beta.36
+  - @clerk/shared@2.0.0-beta.22
+
 ## 4.0.0-beta.43
 
 ### Patch Changes
