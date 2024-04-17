@@ -686,4 +686,8 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<CreateOrganization />` component
    */
   createOrganization?: T;
+  /**
+   * Theme overrides that only apply to the `<CreateOrganization />` component
+   */
+  oneTap?: T;
 };

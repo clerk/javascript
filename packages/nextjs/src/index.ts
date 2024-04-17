@@ -31,6 +31,7 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   OrganizationList,
+  __experimental_GoogleOneTap,
 } from './client-boundary/uiComponents';
 
 /**

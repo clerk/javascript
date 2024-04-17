@@ -33,6 +33,7 @@ import type {
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
+  OneTapProps,
   OrganizationInvitationResource,
   OrganizationListProps,
   OrganizationMembershipResource,
@@ -448,6 +449,30 @@ export default class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
+  public __experimental_mountGoogleOneTap = (node: HTMLDivElement, props?: OneTapProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'OneTap' }).then(controls =>
+      controls.mountComponent({
+        name: 'OneTap',
+        appearanceKey: 'oneTap',
+        node,
+        props,
+      }),
+    );
+    // TODO-ONETAP: Enable telemetry one feature is ready for public beta
+    // this.telemetry?.record(eventComponentMounted('GoogleOneTap', props));
+  };
+
+  public __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

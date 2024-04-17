@@ -12,6 +12,7 @@ import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
   CreateOrganizationCtx,
+  OneTapCtx,
   OrganizationListCtx,
   OrganizationProfileCtx,
   OrganizationSwitcherCtx,
@@ -485,6 +486,19 @@ export const useCreateOrganizationContext = () => {
     ...ctx,
     skipInvitationScreen: ctx.skipInvitationScreen || false,
     navigateAfterCreateOrganization,
+    componentName,
+  };
+};
+
+export const useGoogleOneTapContext = () => {
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OneTapCtx;
+
+  if (componentName !== 'OneTap') {
+    throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
+  }
+
+  return {
+    ...ctx,
     componentName,
   };
 };

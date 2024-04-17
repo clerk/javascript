@@ -16,6 +16,7 @@ import type {
   InstanceType,
   ListenerCallback,
   LoadedClerk,
+  OneTapProps,
   OrganizationListProps,
   OrganizationMembershipResource,
   OrganizationProfileProps,
@@ -90,6 +91,7 @@ type IsomorphicLoadedClerk = Omit<
   | 'mountSignUp'
   | 'mountSignIn'
   | 'mountUserProfile'
+  | '__experimental_mountGoogleOneTap'
   | 'client'
   | 'getOrganizationMemberships'
 > & {
@@ -131,6 +133,7 @@ type IsomorphicLoadedClerk = Omit<
   mountOrganizationProfile: (node: HTMLDivElement, props: OrganizationProfileProps) => void;
   mountCreateOrganization: (node: HTMLDivElement, props: CreateOrganizationProps) => void;
   mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
+  __experimental_mountGoogleOneTap: (node: HTMLDivElement, props: OneTapProps) => void;
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
   client: ClientResource | undefined;
@@ -652,6 +655,18 @@ export default class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountSignIn(node);
     } else {
       this.premountSignInNodes.delete(node);
+    }
+  };
+
+  __experimental_mountGoogleOneTap = (node: HTMLDivElement, props: OneTapProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__experimental_mountGoogleOneTap(node, props);
+    }
+  };
+
+  __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__experimental_unmountGoogleOneTap(node);
     }
   };
 
