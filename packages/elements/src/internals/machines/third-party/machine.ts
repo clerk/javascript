@@ -113,6 +113,7 @@ export const ThirdPartyMachine = setup({
       on: {
         'CLERKJS.NAVIGATE.*': {
           actions: 'sendToNext',
+          target: 'Idle',
         },
       },
     },
