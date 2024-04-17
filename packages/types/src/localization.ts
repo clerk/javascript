@@ -179,6 +179,7 @@ type _LocalizationResource = {
       subtitle_phone: LocalizationValue;
       formTitle: LocalizationValue;
       resendButton: LocalizationValue;
+      formSubtitle_email: LocalizationValue;
     };
     resetPassword: {
       title: LocalizationValue;
@@ -293,7 +294,9 @@ type _LocalizationResource = {
     };
     start: {
       headerTitle__account: LocalizationValue;
+      headerSubtitle__account: LocalizationValue;
       headerTitle__security: LocalizationValue;
+      headerSubtitle__security: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
@@ -310,6 +313,12 @@ type _LocalizationResource = {
         detailsAction__nonPrimary: LocalizationValue;
         detailsAction__unverified: LocalizationValue;
         destructiveAction: LocalizationValue;
+        detailsSubtitle__primary: LocalizationValue;
+        detailsTitle__primary: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
+        detailsTitle__nonPrimary: LocalizationValue;
+        detailsSubtitle__nonPrimary: LocalizationValue;
       };
       phoneNumbersSection: {
         title: LocalizationValue;
@@ -318,6 +327,12 @@ type _LocalizationResource = {
         detailsAction__nonPrimary: LocalizationValue;
         detailsAction__unverified: LocalizationValue;
         destructiveAction: LocalizationValue;
+        detailsTitle__primary: LocalizationValue;
+        detailsSubtitle__primary: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
+        detailsTitle__unverified: LocalizationValue;
+        detailsSubtitle__unverified: LocalizationValue;
       };
       connectedAccountsSection: {
         title: LocalizationValue;
@@ -326,6 +341,8 @@ type _LocalizationResource = {
         actionLabel__reauthorize: LocalizationValue;
         subtitle__reauthorize: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
+        destructiveActionAccordionSubtitle: LocalizationValue;
       };
       enterpriseAccountsSection: {
         title: LocalizationValue;
@@ -334,6 +351,7 @@ type _LocalizationResource = {
         title: LocalizationValue;
         primaryButton__updatePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
+        primaryButton__changePassword: LocalizationValue;
       };
       // TODO-PASSKEYS: Remove in the next minor
       /**
@@ -370,6 +388,10 @@ type _LocalizationResource = {
       activeDevicesSection: {
         title: LocalizationValue;
         destructiveAction: LocalizationValue;
+        detailsTitle: LocalizationValue;
+        detailsSubtitle: LocalizationValue;
+        destructiveActionTitle: LocalizationValue;
+        destructiveActionSubtitle: LocalizationValue;
       };
       web3WalletsSection: {
         title: LocalizationValue;
@@ -379,6 +401,8 @@ type _LocalizationResource = {
       dangerSection: {
         title: LocalizationValue;
         deleteAccountButton: LocalizationValue;
+        deleteAccountDescription: LocalizationValue;
+        deleteAccountTitle: LocalizationValue;
       };
     };
     profilePage: {
@@ -479,10 +503,12 @@ type _LocalizationResource = {
       };
     };
     passwordPage: {
+      changePasswordTitle: LocalizationValue;
       successMessage__set: LocalizationValue;
       successMessage__update: LocalizationValue;
       successMessage__signOutOfOtherSessions: LocalizationValue;
       checkboxInfoText__signOutOfOtherSessions: LocalizationValue;
+      changePasswordSuccessMessage: LocalizationValue;
       readonly: LocalizationValue;
       title__set: LocalizationValue;
       title__update: LocalizationValue;

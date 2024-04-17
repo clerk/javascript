@@ -283,8 +283,8 @@ export const huHU: LocalizationResource = {
       actionLink: 'Segítség kérése',
       actionText: 'Nincs ezekből egyik sem ?',
       blockButton__backupCode: 'Tartalék kód használata',
-      blockButton__emailCode: 'Email kód a {{identifier}}-nak/nek',
-      blockButton__emailLink: 'Email link a {{identifier}}-nak/nek',
+      blockButton__emailCode: 'Email kód a(z) {{identifier}} címre',
+      blockButton__emailLink: 'Email link a(z) {{identifier}} címre',
       blockButton__passkey: 'Bejelentkezés passkey-vel',
       blockButton__password: 'Bejelentkezés jelszóval',
       blockButton__phoneCode: 'SMS kód {{identifier}}-nak/nek',
@@ -346,6 +346,7 @@ export const huHU: LocalizationResource = {
       subtitle_email: 'Először, írd be a kódot amit emailben kaptál',
       subtitle_phone: 'Először, írd be a kódot amit a telefonodra kaptál',
       title: 'Jelszó visszaállítás',
+      formSubtitle_email: 'Írd be a kódot, amit az email címedre küldtünk',
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: 'Állítsd vissza a jelszavad',
@@ -451,11 +452,11 @@ export const huHU: LocalizationResource = {
     start: {
       actionLink: 'Bejelentkezés',
       actionText: 'Van már fiókod?',
-      subtitle: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
-      title: 'Fiók létrehozása',
+      title: 'Hozz létre egy fiókot',
+      subtitle: 'hogy folytathasd a {{applicationName}} használatát',
     },
   },
-  socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
+  socialButtonsBlockButton: 'Folytatás {{provider|titleize}} fiókkal',
   unstable__errors: {
     captcha_invalid:
       'Biztonsági okokból a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
@@ -466,7 +467,7 @@ export const huHU: LocalizationResource = {
     form_identifier_exists__email_address: 'Ez az email cím már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
-    form_identifier_not_found: '',
+    form_identifier_not_found: 'Ezt a felhasználót nem találtuk',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Az email címnek érvényes email címnek kell lennie.',
     form_param_format_invalid__phone_number: 'A telefonszámnak érvényes telefonszámnak kell lennie.',
@@ -474,7 +475,7 @@ export const huHU: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'A vezetéknév nem lehet hosszabb, mint 256 karakter.',
     form_param_max_length_exceeded__name: 'A név nem lehet hosszabb mint 256 karakter.',
     form_param_nil: '',
-    form_password_incorrect: '',
+    form_password_incorrect: 'Hibás jelszó. Kérlek próbálkozz újra, vagy próbálj más módon bejelentkezni',
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'A jelszó nem elég erős',
     form_password_pwned:
@@ -494,13 +495,13 @@ export const huHU: LocalizationResource = {
     passkey_retrieval_cancelled: 'Passkey visszaigazolás megszakadt vagy lejárt.',
     passkey_pa_not_supported: 'A regisztrációhoz egy platform hitelesítő kell, de ez az eszköz ezt nem támogatja.',
     passwordComplexity: {
-      maximumLength: 'kevesebb mint {{length}} karaktert',
-      minimumLength: '{{length}} vagy több karaktert',
-      requireLowercase: 'egy kisbetűt',
-      requireNumbers: 'egy számot',
-      requireSpecialCharacter: 'egy speciális karaktert',
-      requireUppercase: 'egy nagybetű',
-      sentencePrefix: 'A jelszavadnak tartalmaznia kell',
+      maximumLength: 'jelszó nem lehet hosszabb, mint {{length}} karakter',
+      minimumLength: 'jelszó nem lehet rövidebb, mint {{length}} karakter',
+      requireLowercase: 'jelszónak legalább egy kisbetűt tartalmaznia kell',
+      requireNumbers: 'jelszónak legalább egy számot tartalmaznia kell',
+      requireSpecialCharacter: 'jelszónak legalább egy speciális karaktert tartalmaznia kell',
+      requireUppercase: 'jelszónak legalább egy nagybetűt tartalmaznia kell',
+      sentencePrefix: 'A',
     },
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
     zxcvbn: {
@@ -589,7 +590,7 @@ export const huHU: LocalizationResource = {
       title: 'Kapcsolt fiók hozzáadása',
     },
     deletePage: {
-      actionDescription: 'Írd be, hogy "Delete account" a folytatáshoz.',
+      actionDescription: 'Írd be, hogy "Fiók törlése" a folytatáshoz.',
       confirm: 'Fiók törlése',
       messageLine1: 'Biztos vagy benne, hogy törölni szeretnéd a fiókod?',
       messageLine2: 'Ez a művelet végleges és visszafordíthatatlan.',
@@ -699,6 +700,8 @@ export const huHU: LocalizationResource = {
       successMessage__update: 'A jelszavad frissítésre került.',
       title__set: 'Jelszó beállítása',
       title__update: 'Jelszó frissítése',
+      changePasswordTitle: 'Jelszó megváltoztatása',
+      changePasswordSuccessMessage: 'A jelszavad sikeresen megváltoztattad. Minden más eszköz ki lett jelentkeztetve.',
     },
     phoneNumberPage: {
       infoText:
@@ -730,8 +733,12 @@ export const huHU: LocalizationResource = {
         title: 'Passkey-k',
       },
       activeDevicesSection: {
-        destructiveAction: 'Kijelentkezés az eszközről',
+        destructiveAction: 'Munkamenet megszüntetése',
         title: 'Aktív eszközök',
+        detailsTitle: 'Jelenlegi eszköz',
+        detailsSubtitle: 'Jelenleg ezt az eszközt használod',
+        destructiveActionTitle: 'Kijelentkeztetés',
+        destructiveActionSubtitle: 'Szüntesd meg a jelenlegi munkamenetet ezen az eszközön',
       },
       connectedAccountsSection: {
         actionLabel__connectionFailed: 'Próbáld újra',
@@ -741,9 +748,13 @@ export const huHU: LocalizationResource = {
         subtitle__reauthorize:
           'A szükséges hatáskörök megváltozták, előfordulhat, hogy limitált funkcionalitást tapasztalhatsz. Kérlek, újra engedélyezd az alkalmazást, hogy elkerüld a hibákat.',
         title: 'Kapcsolt fiókok',
+        destructiveActionSubtitle: 'Töröld ki ezt a kapcsolt fiókot a fiókodból.',
+        destructiveActionAccordionSubtitle: 'Kapcsolt fiók eltávolítása',
       },
       dangerSection: {
         deleteAccountButton: 'Fiók törlése',
+        deleteAccountDescription: 'Töröld ki a fiókod és minden hozzátartozó adatot.',
+        deleteAccountTitle: 'Fiók törlése',
         title: 'Fiók törlése',
       },
       emailAddressesSection: {
@@ -753,12 +764,21 @@ export const huHU: LocalizationResource = {
         detailsAction__unverified: 'Visszaigazolás',
         primaryButton: 'Email cím hozzáadása',
         title: 'Email címek',
+        detailsSubtitle__primary: 'Ez az email cím az elsődleges címed.',
+        detailsTitle__primary: 'Elsődleges email cím',
+        destructiveActionTitle: 'Eltávolítás',
+        destructiveActionSubtitle: 'Töröld ki ezt az email címet, és távolítsd el a fiókodból.',
+        detailsTitle__nonPrimary: 'Beállítás elsődleges email címként',
+        detailsSubtitle__nonPrimary:
+          'Állítsd be ezt az email címet elsődlegesként, hogy erre kapd a fiókoddal kapcsolatos üzeneteket',
       },
       enterpriseAccountsSection: {
         title: 'Vállalati fiókok',
       },
       headerTitle__account: 'Profil adatok',
+      headerSubtitle__account: 'Fiók adatok kezelése',
       headerTitle__security: 'Biztonság',
+      headerSubtitle__security: 'Biztonsági beállítások',
       mfaSection: {
         backupCodes: {
           actionLabel__regenerate: 'Újra generálás',
@@ -787,6 +807,7 @@ export const huHU: LocalizationResource = {
         primaryButton__setPassword: 'Jelszó beállítása',
         primaryButton__updatePassword: 'Jelszó frissítése',
         title: 'Jelszó',
+        primaryButton__changePassword: 'Jelszó megváltoztatása',
       },
       phoneNumbersSection: {
         destructiveAction: 'Teleofnszám eltávolítása',
@@ -795,6 +816,13 @@ export const huHU: LocalizationResource = {
         detailsAction__unverified: 'Teleofnszám visszaigazolása',
         primaryButton: 'Telefonszám hozzáadása',
         title: 'Telefonszámok',
+        detailsTitle__primary: 'Elsődleges telefonszám',
+        detailsSubtitle__primary: 'Ez az elsődleges telefonszámod',
+        destructiveActionTitle: 'Eltávolítás',
+        destructiveActionSubtitle: 'Töröld ki ezt a telefonszámot, és távolítsd el a fiókodból',
+        detailsTitle__unverified: 'Telefonszám visszaigazolása',
+        detailsSubtitle__unverified:
+          'Fejezd be a telefonszámod visszaigazolását, hogy minden funkciót kihasználhass ezzel a számmal',
       },
       profileSection: {
         primaryButton: 'Profil frissítése',
