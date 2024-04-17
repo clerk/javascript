@@ -203,6 +203,7 @@ ${error.getFullMessage()}`,
   async function authenticateRequestWithTokenInCookie() {
     const hasActiveClient = authenticateContext.clientUat;
     const hasSessionToken = !!authenticateContext.sessionTokenInCookie;
+    const hasDevBrowserToken = !!authenticateContext.devBrowserToken;
 
     const isRequestEligibleForMultiDomainSync =
       authenticateContext.isSatellite &&
@@ -292,6 +293,10 @@ ${error.getFullMessage()}`,
     /**
      * End multi-domain sync flows
      */
+
+    if (instanceType === 'development' && !hasDevBrowserToken) {
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserMissing, '');
+    }
 
     if (!hasActiveClient && !hasSessionToken) {
       return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing, '');

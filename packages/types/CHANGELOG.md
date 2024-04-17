@@ -1,5 +1,80 @@
 # Change Log
 
+## 4.0.0-beta.28
+
+### Minor Changes
+
+- Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+### Patch Changes
+
+- Fallback to invisible CAPTCHA if the element to render to is not found in the DOM ([#3191](https://github.com/clerk/javascript/pull/3191)) by [@anagstef](https://github.com/anagstef)
+
+## 4.0.0-beta.27
+
+### Patch Changes
+
+- Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes. ([#3173](https://github.com/clerk/javascript/pull/3173)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.0.0-beta.26
+
+### Minor Changes
+
+- Add support for different CAPTCHA widget types ([#3154](https://github.com/clerk/javascript/pull/3154)) by [@anagstef](https://github.com/anagstef)
+
+## 4.0.0-beta.25
+
+### Minor Changes
+
+- Move passkey related apis to stable: ([#3134](https://github.com/clerk/javascript/pull/3134)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Register passkey for a user
+    Usage: `await clerk.user.createPasskey()`
+  - Authenticate with passkey
+    Usage: `await clerk.client.signIn.authenticateWithPasskey()`
+    ```ts
+    try {
+      await clerk.client.signIn.authenticateWithPasskey(...args);
+    }catch (e) {
+      if (isClerkRuntimeError(e)) {
+          if (err.code === 'passkey_operation_aborted') {
+              ...
+          }
+      }
+    }
+    ```
+  - ClerkRuntimeError codes introduced:
+
+    - `passkey_not_supported`
+    - `passkeys_pa_not_supported`
+    - `passkey_invalid_rpID_or_domain`
+    - `passkey_already_exists`
+    - `passkey_operation_aborted`
+    - `passkey_retrieval_cancelled`
+    - `passkey_retrieval_failed`
+    - `passkey_registration_cancelled`
+    - `passkey_registration_failed`
+
+  - Get the user's passkeys
+    `clerk.user.passkeys`
+  - Update the name of a passkey
+    `clerk.user.passkeys?.[0].update({name:'Company issued passkey'})`
+  - Delete a passkey
+    `clerk.user.passkeys?.[0].delete()`
+
+## 4.0.0-beta.24
+
+### Minor Changes
+
+- Deprecate `supported_identifiers` and remove `supported_external_accounts`. ([#3089](https://github.com/clerk/javascript/pull/3089)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.0.0-beta.23
 
 ### Minor Changes

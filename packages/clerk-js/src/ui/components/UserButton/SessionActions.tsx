@@ -1,12 +1,11 @@
 import type { ActiveSessionResource } from '@clerk/types';
 
-import type { ThemableCssProp } from '~ui/styledSystem/types';
-
 import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
 import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action, Actions, PreviewButton, SmallAction, SmallActions, UserPreview } from '../../elements';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
+import type { ThemableCssProp } from '../../styledSystem';
 
 type SingleSessionActionsProps = {
   handleManageAccountClicked: () => Promise<unknown> | void;
@@ -175,6 +174,7 @@ type SignOutAllActionsProps = {
   iconElementId?: ElementId;
   label?: LocalizationKey;
   sx?: ThemableCssProp;
+  actionSx?: ThemableCssProp;
 };
 
 export const SignOutAllActions = (props: SignOutAllActionsProps) => {
@@ -188,6 +188,7 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
     iconElementId,
     label,
     sx,
+    actionSx,
   } = props;
   return (
     <Actions
@@ -211,12 +212,15 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
         onClick={handleSignOutAllClicked}
         variant='ghost'
         colorScheme='neutral'
-        sx={t => ({
-          backgroundColor: t.colors.$transparent,
-          padding: `${t.space.$2} ${t.space.$3}`,
-          borderBottomWidth: 0,
-          borderRadius: t.radii.$lg,
-        })}
+        sx={[
+          t => ({
+            backgroundColor: t.colors.$transparent,
+            padding: `${t.space.$2} ${t.space.$3}`,
+            borderBottomWidth: 0,
+            borderRadius: t.radii.$lg,
+          }),
+          actionSx,
+        ]}
         spinnerSize='md'
       />
     </Actions>

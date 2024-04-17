@@ -1,5 +1,77 @@
 # Change Log
 
+## 2.0.0-beta.24
+
+### Minor Changes
+
+- Add hu-HU localization ([#3190](https://github.com/clerk/javascript/pull/3190)) by [@ezkomoly](https://github.com/ezkomoly)
+
+### Patch Changes
+
+- Fix Hungarian language subpath exports ([#3206](https://github.com/clerk/javascript/pull/3206)) by [@anagstef](https://github.com/anagstef)
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 2.0.0-beta.23
+
+### Patch Changes
+
+- Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes. ([#3173](https://github.com/clerk/javascript/pull/3173)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.0.0-beta.22
+
+### Minor Changes
+
+- Move passkey related apis to stable: ([#3134](https://github.com/clerk/javascript/pull/3134)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Register passkey for a user
+    Usage: `await clerk.user.createPasskey()`
+  - Authenticate with passkey
+    Usage: `await clerk.client.signIn.authenticateWithPasskey()`
+    ```ts
+    try {
+      await clerk.client.signIn.authenticateWithPasskey(...args);
+    }catch (e) {
+      if (isClerkRuntimeError(e)) {
+          if (err.code === 'passkey_operation_aborted') {
+              ...
+          }
+      }
+    }
+    ```
+  - ClerkRuntimeError codes introduced:
+
+    - `passkey_not_supported`
+    - `passkeys_pa_not_supported`
+    - `passkey_invalid_rpID_or_domain`
+    - `passkey_already_exists`
+    - `passkey_operation_aborted`
+    - `passkey_retrieval_cancelled`
+    - `passkey_retrieval_failed`
+    - `passkey_registration_cancelled`
+    - `passkey_registration_failed`
+
+  - Get the user's passkeys
+    `clerk.user.passkeys`
+  - Update the name of a passkey
+    `clerk.user.passkeys?.[0].update({name:'Company issued passkey'})`
+  - Delete a passkey
+    `clerk.user.passkeys?.[0].delete()`
+
+## 2.0.0-beta.21
+
+### Patch Changes
+
+- Improve ptBR localizations ([#3083](https://github.com/clerk/javascript/pull/3083)) by [@GustavoOS](https://github.com/GustavoOS)
+
+- Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix typos from pt-BR localization ([#3106](https://github.com/clerk/javascript/pull/3106)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Added Thai translation keys for pwned password, form identifier, passkey ([#3128](https://github.com/clerk/javascript/pull/3128)) by [@ttwrpz](https://github.com/ttwrpz)
+
+  Change Thai translation keys for Authenticator related to match the context
+
 ## 2.0.0-beta.20
 
 ### Minor Changes

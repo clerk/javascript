@@ -23,12 +23,12 @@ import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 const isCurrentPath =
   (path: `/${string}`) =>
   ({ context }: { context: SignUpRouterContext }, _params?: NonReducibleUnknown) =>
-    context.router?.match(path) ?? true;
+    context.router?.match(path) ?? false;
 
 const needsStatus =
   (status: SignUpStatus) =>
   ({ context, event }: { context: SignUpRouterContext; event?: SignUpRouterEvents }, _?: NonReducibleUnknown) =>
-    (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk.client.signUp.status === status;
+    (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk?.client?.signUp?.status === status;
 
 export const SignUpRouterMachineId = 'SignUpRouter';
 export type TSignUpRouterMachine = typeof SignUpRouterMachine;
@@ -42,11 +42,12 @@ export const SignUpRouterMachine = setup({
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
       if (!force && shouldUseVirtualRouting()) return;
+      if (context.exampleMode) return;
 
       const resolvedPath = joinURL(context.router.basePath, path);
       if (resolvedPath === context.router.pathname()) return;
 
-      context.router.push(resolvedPath);
+      context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     setActive({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) {
@@ -68,8 +69,8 @@ export const SignUpRouterMachine = setup({
     transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl()),
   },
   guards: {
-    areFieldsMissing: ({ context }) => context.clerk.client.signUp.missingFields.length > 0,
-    areFieldsUnverified: ({ context }) => context.clerk.client.signUp.unverifiedFields.length > 0,
+    areFieldsMissing: ({ context }) => context.clerk?.client?.signUp?.missingFields?.length > 0,
+    areFieldsUnverified: ({ context }) => context.clerk?.client?.signUp?.unverifiedFields?.length > 0,
 
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signUp.status === null && context.clerk.client.lastActiveSessionId),
@@ -85,16 +86,17 @@ export const SignUpRouterMachine = setup({
     isStatusAbandoned: needsStatus('abandoned'),
     isStatusComplete: ({ context, event }) => {
       const resource = (event as SignUpRouterNextEvent)?.resource;
-      const signUp = context.clerk.client.signUp;
+      const signUp = context.clerk?.client?.signUp;
 
       return (
         (resource?.status === 'complete' && Boolean(resource?.createdSessionId)) ||
-        (signUp.status === 'complete' && Boolean(signUp.createdSessionId))
+        (signUp?.status === 'complete' && Boolean(signUp?.createdSessionId))
       );
     },
     isStatusMissingRequirements: needsStatus('missing_requirements'),
 
     isLoggedIn: or(['isStatusComplete', ({ context }) => Boolean(context.clerk.user)]),
+    isExampleMode: ({ context }) => Boolean(context.exampleMode),
     isMissingRequiredFields: and(['isStatusMissingRequirements', 'areFieldsMissing']),
     isMissingRequiredUnverifiedFields: and(['isStatusMissingRequirements', 'areFieldsUnverified']),
 
@@ -172,6 +174,7 @@ export const SignUpRouterMachine = setup({
             loading: {
               isLoading: false,
             },
+            exampleMode: event.exampleMode,
           })),
           target: 'Init',
         },
@@ -190,7 +193,7 @@ export const SignUpRouterMachine = setup({
       }),
       always: [
         {
-          guard: 'isLoggedIn',
+          guard: and(['isLoggedIn', not('isExampleMode')]),
           actions: [
             log('Already logged in'),
             {

@@ -1,10 +1,9 @@
 import type { LoadedClerk } from '@clerk/types';
-import { assertEvent, assign, log, sendParent, setup } from 'xstate';
+import { assertEvent, assign, log, not, sendParent, setup } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { sendToLoading } from '~/internals/machines/shared.actions';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
-import { getEnabledThirdPartyProviders } from '~/utils/third-party-strategies';
 
 import { handleRedirectCallback, redirect } from './actors';
 import type { ThirdPartyMachineSchema } from './types';
@@ -39,6 +38,9 @@ export const ThirdPartyMachine = setup({
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
     sendToLoading,
   },
+  guards: {
+    isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
+  },
   types: {} as ThirdPartyMachineSchema,
 }).createMachine({
   id: ThirdPartyMachineId,
@@ -47,7 +49,6 @@ export const ThirdPartyMachine = setup({
     basePath: input.basePath,
     flow: input.flow,
     parent: input.parent,
-    thirdPartyProviders: getEnabledThirdPartyProviders(input.environment),
     loadingStep: 'strategy',
   }),
   initial: 'Idle',
@@ -57,6 +58,7 @@ export const ThirdPartyMachine = setup({
       on: {
         CALLBACK: 'HandlingCallback',
         REDIRECT: {
+          guard: not('isExampleMode'),
           target: 'Redirecting',
           reenter: true,
         },

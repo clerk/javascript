@@ -130,9 +130,9 @@ describe('SignUpStart', () => {
         f.withSocialProvider({ provider: 'google' });
       });
 
-      render(<SignUpStart />, { wrapper });
+      const { container } = render(<SignUpStart />, { wrapper });
       screen.getByText(/Continue with/i);
-      screen.getByText(/or/i);
+      expect(container.querySelector('.cl-dividerText')?.textContent?.includes('or')).toBeTruthy();
     });
   });
 

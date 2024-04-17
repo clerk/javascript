@@ -84,6 +84,7 @@ export const zhTW: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: '組織名稱',
   formFieldLabel__organizationSlug: 'URL 簡稱',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: '密碼',
   formFieldLabel__phoneNumber: '電話號碼',
   formFieldLabel__role: '角色',
@@ -481,7 +482,7 @@ export const zhTW: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '少於{{length}}個字元',
       minimumLength: '{{length}}個或更多字元',
@@ -660,6 +661,14 @@ export const zhTW: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -745,6 +754,11 @@ export const zhTW: LocalizationResource = {
           destructiveActionTitle: '移除',
           headerTitle: '驗證器應用程式',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: '設置密碼',

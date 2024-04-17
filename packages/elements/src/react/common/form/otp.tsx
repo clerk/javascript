@@ -78,7 +78,7 @@ const OTPInputStandard = React.forwardRef<HTMLInputElement, Omit<OTPInputProps, 
     <RadixControl
       ref={innerRef}
       {...rest}
-      data-input-otp-standard
+      data-otp-input-standard
     />
   );
 });

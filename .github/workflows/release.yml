@@ -16,7 +16,7 @@ jobs:
     name: Release
     if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     permissions:
       contents: write
@@ -55,7 +55,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: "chore(repo): Version packages"
+          commit: 'chore(repo): Version packages'
           publish: npm run release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: npm run version
@@ -67,7 +67,7 @@ jobs:
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           result-encoding: string
           retries: 3
@@ -116,7 +116,7 @@ jobs:
 
     strategy:
       matrix:
-        version: [ 20 ] # NOTE: 18 is cached in the main release workflow
+        version: [20] # NOTE: 18 is cached in the main release workflow
 
     steps:
       - name: Checkout Repo

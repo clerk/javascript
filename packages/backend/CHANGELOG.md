@@ -1,5 +1,40 @@
 # Change Log
 
+## 1.0.0-beta.36
+
+### Minor Changes
+
+- Add support for the `orderBy` parameter to the `getOrganizationList()` function ([#3164](https://github.com/clerk/javascript/pull/3164)) by [@IGassmann](https://github.com/IGassmann)
+
+### Patch Changes
+
+- Introduce `debug: true` option for the `clerkMiddleware` helper ([#3189](https://github.com/clerk/javascript/pull/3189)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5)]:
+  - @clerk/shared@2.0.0-beta.22
+
+## 1.0.0-beta.35
+
+### Patch Changes
+
+- Trigger the handshake when no dev browser token exists in development. ([#3175](https://github.com/clerk/javascript/pull/3175)) by [@BRKalow](https://github.com/BRKalow)
+
+## 1.0.0-beta.34
+
+### Minor Changes
+
+- Implement token signature verification when passing verified token from Next.js middleware to the application origin. ([#3121](https://github.com/clerk/javascript/pull/3121)) by [@BRKalow](https://github.com/BRKalow)
+
+## 1.0.0-beta.33
+
+### Major Changes
+
+- Rename property `members_count` to `membersCount` for `Organization` resource ([#3094](https://github.com/clerk/javascript/pull/3094)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Resolve Vercel edge-runtime "TypeError: Failed to parse URL" when `@clerk/remix` is used ([#3129](https://github.com/clerk/javascript/pull/3129)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.0.0-beta.32
 
 ### Patch Changes

@@ -85,6 +85,7 @@ export const ptBR: LocalizationResource = {
     'Endereço de e-mail para receber um código e verificar este domínio',
   formFieldLabel__organizationName: 'Nome da organização',
   formFieldLabel__organizationSlug: 'Rótulo do URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Senha',
   formFieldLabel__phoneNumber: 'Telefone',
   formFieldLabel__role: 'Função',
@@ -488,7 +489,7 @@ export const ptBR: LocalizationResource = {
     passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
     passkey_registration_cancelled: 'Registro de chave de acesso cancelado ou expirado.',
     passkey_retrieval_cancelled: 'Verificação de chave de acesso cancelada ou expirada.',
-    passkeys_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
+    passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
     passwordComplexity: {
       maximumLength: 'menos de {{length}} caracteres',
       minimumLength: '{{length}} ou mais caracteres',
@@ -678,6 +679,14 @@ export const ptBR: LocalizationResource = {
       security: 'Segurança',
       title: 'Conta',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'É recomendado sair de todos os demais dispositivos que podem ter utilizado sua senha antiga.',
@@ -765,6 +774,11 @@ export const ptBR: LocalizationResource = {
           destructiveActionTitle: 'Remover',
           headerTitle: 'Applicativo autenticador',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Defina a senha',

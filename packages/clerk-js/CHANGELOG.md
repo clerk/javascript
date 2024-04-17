@@ -1,5 +1,138 @@
 # Change Log
 
+## 5.0.0-beta.45
+
+### Minor Changes
+
+- Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+### Patch Changes
+
+- Align country code position with phone number input. ([#3199](https://github.com/clerk/javascript/pull/3199)) by [@octoper](https://github.com/octoper)
+
+- Fix SSO callback Turnstile widget alignment ([#3205](https://github.com/clerk/javascript/pull/3205)) by [@anagstef](https://github.com/anagstef)
+
+- Fallback to invisible CAPTCHA if the element to render to is not found in the DOM ([#3191](https://github.com/clerk/javascript/pull/3191)) by [@anagstef](https://github.com/anagstef)
+
+- Fix transfer flow when having the Smart Bot Protection enabled ([#3202](https://github.com/clerk/javascript/pull/3202)) by [@anagstef](https://github.com/anagstef)
+
+- Removed hoverable state from no-interactive sections in `<UserProfile/>` ([#3201](https://github.com/clerk/javascript/pull/3201)) by [@octoper](https://github.com/octoper)
+
+- Make UI-triggered redirects default to hash-based routing. If a routing strategy is not provided, default to hash routing. All routing strategies know how to convert a hash-based url to their own format. ([#3061](https://github.com/clerk/javascript/pull/3061)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Align action buttons with user preview in `<UserButton/>` ([#3200](https://github.com/clerk/javascript/pull/3200)) by [@octoper](https://github.com/octoper)
+
+- Fixed issue that prevented backup codes showing up for TOTP ([#3194](https://github.com/clerk/javascript/pull/3194)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`d9f265fcb`](https://github.com/clerk/javascript/commit/d9f265fcb12b39301b9802e4787dc636ee28444f), [`2b8fe238a`](https://github.com/clerk/javascript/commit/2b8fe238a114f4c21bc2068bf6f1871280da7fae), [`1078e8c58`](https://github.com/clerk/javascript/commit/1078e8c5896f5e3364bf89ec5312c81d8f1a3be8), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5)]:
+  - @clerk/types@4.0.0-beta.28
+  - @clerk/localizations@2.0.0-beta.24
+  - @clerk/shared@2.0.0-beta.22
+
+## 5.0.0-beta.44
+
+### Patch Changes
+
+- Bug Fix: When authenticating with a passkey and user was looked out an error was thrown for accessing an undefined variable ([#3172](https://github.com/clerk/javascript/pull/3172)) by [@panteliselef](https://github.com/panteliselef)
+
+- Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes. ([#3173](https://github.com/clerk/javascript/pull/3173)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`94519aa33`](https://github.com/clerk/javascript/commit/94519aa33774c8d6e557ce47a00974ad7b194c5d)]:
+  - @clerk/localizations@2.0.0-beta.23
+  - @clerk/types@4.0.0-beta.27
+
+## 5.0.0-beta.43
+
+### Minor Changes
+
+- Add support for different CAPTCHA widget types ([#3154](https://github.com/clerk/javascript/pull/3154)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Updated dependencies [[`0699fa496`](https://github.com/clerk/javascript/commit/0699fa49693dc7a8d3de8ba053c4f16a5c8431d0)]:
+  - @clerk/types@4.0.0-beta.26
+
+## 5.0.0-beta.42
+
+### Minor Changes
+
+- Move passkey related apis to stable: ([#3134](https://github.com/clerk/javascript/pull/3134)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Register passkey for a user
+    Usage: `await clerk.user.createPasskey()`
+  - Authenticate with passkey
+    Usage: `await clerk.client.signIn.authenticateWithPasskey()`
+    ```ts
+    try {
+      await clerk.client.signIn.authenticateWithPasskey(...args);
+    }catch (e) {
+      if (isClerkRuntimeError(e)) {
+          if (err.code === 'passkey_operation_aborted') {
+              ...
+          }
+      }
+    }
+    ```
+  - ClerkRuntimeError codes introduced:
+
+    - `passkey_not_supported`
+    - `passkeys_pa_not_supported`
+    - `passkey_invalid_rpID_or_domain`
+    - `passkey_already_exists`
+    - `passkey_operation_aborted`
+    - `passkey_retrieval_cancelled`
+    - `passkey_retrieval_failed`
+    - `passkey_registration_cancelled`
+    - `passkey_registration_failed`
+
+  - Get the user's passkeys
+    `clerk.user.passkeys`
+  - Update the name of a passkey
+    `clerk.user.passkeys?.[0].update({name:'Company issued passkey'})`
+  - Delete a passkey
+    `clerk.user.passkeys?.[0].delete()`
+
+### Patch Changes
+
+- Resolve type issues when importing `@clerk/clerk-js` directly ([#3142](https://github.com/clerk/javascript/pull/3142)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2352149f6`](https://github.com/clerk/javascript/commit/2352149f6ba9708095146a3087538faf2d4f161f)]:
+  - @clerk/localizations@2.0.0-beta.22
+  - @clerk/types@4.0.0-beta.25
+
+## 5.0.0-beta.41
+
+### Patch Changes
+
+- Hide maintenance banner when card has global error by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.0.0-beta.40
+
+### Minor Changes
+
+- Deprecate `supported_identifiers` and remove `supported_external_accounts`. ([#3089](https://github.com/clerk/javascript/pull/3089)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes memebership count in `<OrganizationProfile/>` Members page for members with `org:sys_memberships:read` permission ([#3093](https://github.com/clerk/javascript/pull/3093)) by [@octoper](https://github.com/octoper)
+
+- Avoid depending on `count` as it can be zero but invitations may still exist. ([#3092](https://github.com/clerk/javascript/pull/3092)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixes an icon misalignment in account switcher. ([#3108](https://github.com/clerk/javascript/pull/3108)) by [@octoper](https://github.com/octoper)
+
+- Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Ensures we don't attempt to access `window.addEventListener()` in non-browser environments. ([#3097](https://github.com/clerk/javascript/pull/3097)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`88d5d2ca0`](https://github.com/clerk/javascript/commit/88d5d2ca0255b1e5d589881e42e433d5238420ab), [`9180c8b80`](https://github.com/clerk/javascript/commit/9180c8b80e0ad95c1a9e490e8201ffd089634a48), [`c6a5e0f5d`](https://github.com/clerk/javascript/commit/c6a5e0f5dbd9ec4a7b5657855e8a31bc8347d0a4), [`e6f8928f1`](https://github.com/clerk/javascript/commit/e6f8928f1578710f7cbc45520cd510f3aaf80510), [`f3b6f32b3`](https://github.com/clerk/javascript/commit/f3b6f32b3f0d018db3a7624f030795fffa950f8c)]:
+  - @clerk/localizations@2.0.0-beta.21
+  - @clerk/types@4.0.0-beta.24
+
 ## 5.0.0-beta.39
 
 ### Minor Changes

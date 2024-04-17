@@ -1,5 +1,57 @@
 # Change Log
 
+## 5.0.0-beta.39
+
+### Minor Changes
+
+- Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+- Speed up loading of clerk-js by using a `<script/>` tag when html is generated. ([#3156](https://github.com/clerk/javascript/pull/3156)) by [@panteliselef](https://github.com/panteliselef)
+
+  This is supported during SSR, SSG in
+
+  - Next.js Pages Router
+  - Next.js App Router
+
+### Patch Changes
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`d9f265fcb`](https://github.com/clerk/javascript/commit/d9f265fcb12b39301b9802e4787dc636ee28444f), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5)]:
+  - @clerk/types@4.0.0-beta.28
+  - @clerk/shared@2.0.0-beta.22
+
+## 5.0.0-beta.38
+
+### Patch Changes
+
+- Updated dependencies [[`94519aa33`](https://github.com/clerk/javascript/commit/94519aa33774c8d6e557ce47a00974ad7b194c5d)]:
+  - @clerk/types@4.0.0-beta.27
+
+## 5.0.0-beta.37
+
+### Patch Changes
+
+- Updated dependencies [[`0699fa496`](https://github.com/clerk/javascript/commit/0699fa49693dc7a8d3de8ba053c4f16a5c8431d0)]:
+  - @clerk/types@4.0.0-beta.26
+
+## 5.0.0-beta.36
+
+### Patch Changes
+
+- Updated dependencies [[`2352149f6`](https://github.com/clerk/javascript/commit/2352149f6ba9708095146a3087538faf2d4f161f)]:
+  - @clerk/types@4.0.0-beta.25
+
+## 5.0.0-beta.35
+
+### Patch Changes
+
+- Updated dependencies [[`9180c8b80`](https://github.com/clerk/javascript/commit/9180c8b80e0ad95c1a9e490e8201ffd089634a48), [`c6a5e0f5d`](https://github.com/clerk/javascript/commit/c6a5e0f5dbd9ec4a7b5657855e8a31bc8347d0a4)]:
+  - @clerk/types@4.0.0-beta.24
+
 ## 5.0.0-beta.34
 
 ### Patch Changes

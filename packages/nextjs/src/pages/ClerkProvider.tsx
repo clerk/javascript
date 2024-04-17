@@ -7,8 +7,10 @@ import React from 'react';
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
 import { useSafeLayoutEffect } from '../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../types';
+import { ClerkJSScript } from '../utils/clerk-js-script';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
+
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 
 export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
@@ -45,6 +47,7 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
         {...mergedProps}
         initialState={initialState}
       >
+        <ClerkJSScript router='pages' />
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

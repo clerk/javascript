@@ -1,5 +1,67 @@
 # Change Log
 
+## 5.0.0-beta.44
+
+### Minor Changes
+
+- Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+- Speed up loading of clerk-js by using a `<script/>` tag when html is generated. ([#3156](https://github.com/clerk/javascript/pull/3156)) by [@panteliselef](https://github.com/panteliselef)
+
+  This is supported during SSR, SSG in
+
+  - Next.js Pages Router
+  - Next.js App Router
+
+### Patch Changes
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Introduce `debug: true` option for the `clerkMiddleware` helper ([#3189](https://github.com/clerk/javascript/pull/3189)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`f98e480b1`](https://github.com/clerk/javascript/commit/f98e480b1a9e41f5370efcd53aa6887af2ad6816), [`142ded732`](https://github.com/clerk/javascript/commit/142ded73265b776789b65404d96b6c91cfe15e98), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5), [`e6fc58ae4`](https://github.com/clerk/javascript/commit/e6fc58ae4df5091eff00ba0d9045ce5ff0fff538)]:
+  - @clerk/clerk-react@5.0.0-beta.39
+  - @clerk/backend@1.0.0-beta.36
+  - @clerk/shared@2.0.0-beta.22
+
+## 5.0.0-beta.43
+
+### Patch Changes
+
+- Updated dependencies [[`7cb1241a9`](https://github.com/clerk/javascript/commit/7cb1241a9929b3d8a0d2157637734d82dd9fd852)]:
+  - @clerk/backend@1.0.0-beta.35
+  - @clerk/clerk-react@5.0.0-beta.38
+
+## 5.0.0-beta.42
+
+### Minor Changes
+
+- Implement token signature verification when passing verified token from Next.js middleware to the application origin. ([#3121](https://github.com/clerk/javascript/pull/3121)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Updated dependencies [[`ecb60da48`](https://github.com/clerk/javascript/commit/ecb60da48029b9cb2d17ab9b0a73cb92bc5c924b)]:
+  - @clerk/backend@1.0.0-beta.34
+  - @clerk/clerk-react@5.0.0-beta.37
+
+## 5.0.0-beta.41
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-beta.36
+
+## 5.0.0-beta.40
+
+### Patch Changes
+
+- Updated dependencies [[`63dfe8dc9`](https://github.com/clerk/javascript/commit/63dfe8dc92c28213db5c5644782e7d6751fa22a6), [`d22e6164d`](https://github.com/clerk/javascript/commit/d22e6164ddb765542e0e6335421d2ebf484af059)]:
+  - @clerk/backend@1.0.0-beta.33
+  - @clerk/clerk-react@5.0.0-beta.35
+
 ## 5.0.0-beta.39
 
 ### Minor Changes

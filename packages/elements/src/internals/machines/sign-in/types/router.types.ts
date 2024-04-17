@@ -12,6 +12,7 @@ import type {
   BaseRouterRedirectEvent,
   BaseRouterRouteRegisterEvent,
   BaseRouterRouteUnregisterEvent,
+  BaseRouterSetClerkEvent,
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
 } from '~/internals/machines/types';
@@ -52,6 +53,7 @@ export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
 export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications'>;
+export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -81,7 +83,8 @@ export type SignInRouterEvents =
   | SignInRouterRouteEvents
   | SignInRouterRedirectEvent
   | SignInVerificationFactorUpdateEvent
-  | SignInRouterLoadingEvent;
+  | SignInRouterLoadingEvent
+  | BaseRouterSetClerkEvent;
 
 // ---------------------------------- Context ---------------------------------- //
 

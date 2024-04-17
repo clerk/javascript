@@ -85,6 +85,7 @@ export const frFR: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: "Nom de l'organisation",
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Mot de passe',
   formFieldLabel__phoneNumber: 'Numéro de téléphone',
   formFieldLabel__role: 'Rôle',
@@ -489,7 +490,7 @@ export const frFR: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'moins de {{length}} caractères',
       minimumLength: '{{length}} caractères ou plus',
@@ -679,6 +680,14 @@ export const frFR: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -766,6 +775,11 @@ export const frFR: LocalizationResource = {
           destructiveActionTitle: 'Désactiver',
           headerTitle: "Application d'authentification",
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Définir le mot de passe',

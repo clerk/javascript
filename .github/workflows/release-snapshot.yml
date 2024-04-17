@@ -13,7 +13,7 @@ jobs:
   snapshot-release:
     if: ${{ startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
     runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    timeout-minutes: 10
 
     permissions:
       contents: read
@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Limit action to Clerk members
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           result-encoding: string
           retries: 3
@@ -48,11 +48,11 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          registry-url: "https://registry.npmjs.org"
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Extract snapshot name
         id: extract-snapshot-name
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const match = context.payload.comment.body.match(/!snapshot (.*)/)
@@ -81,7 +81,7 @@ jobs:
       - name: Package info
         if: steps.version-packages.outputs.success == '1'
         id: package-info
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require("fs");

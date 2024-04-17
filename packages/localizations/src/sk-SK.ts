@@ -85,6 +85,7 @@ export const skSK: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Názov organizácie',
   formFieldLabel__organizationSlug: 'URL adresa',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Heslo',
   formFieldLabel__phoneNumber: 'Telefónne číslo',
   formFieldLabel__role: 'Rola',
@@ -486,7 +487,7 @@ export const skSK: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'menej ako {{length}} znakov',
       minimumLength: '{{length}} alebo viac znakov',
@@ -674,6 +675,14 @@ export const skSK: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -760,6 +769,11 @@ export const skSK: LocalizationResource = {
           destructiveActionTitle: 'Odstrániť',
           headerTitle: 'Aplikácia Authenticator',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Nastaviť heslo',

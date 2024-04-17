@@ -489,7 +489,8 @@ type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
 };
 type FormInputProps =
   | RadixFormControlProps
-  | ({ type: 'otp' } & OTPInputProps)
+  | ({ type: 'otp'; render: any } & Omit<OTPInputProps, 'asChild'>)
+  | ({ type: 'otp'; render?: undefined } & OTPInputProps)
   | ({ type: 'password' } & PasswordInputProps);
 
 /**

@@ -1,6 +1,6 @@
 import type { SignInResource } from '@clerk/types';
 import type { ActorRefFrom } from 'xstate';
-import { fromPromise, sendTo, setup } from 'xstate';
+import { fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form/form.types';
@@ -50,6 +50,9 @@ export const SignInStartMachine = setup({
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
     sendToLoading,
   },
+  guards: {
+    isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
+  },
   types: {} as SignInStartSchema,
 }).createMachine({
   id: SignInStartMachineId,
@@ -66,6 +69,7 @@ export const SignInStartMachine = setup({
       description: 'Waiting for user input',
       on: {
         SUBMIT: {
+          guard: not('isExampleMode'),
           target: 'Attempting',
           reenter: true,
         },

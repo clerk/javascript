@@ -84,6 +84,7 @@ export const ptPT: LocalizationResource = {
     'Endereço de e-mail para receber um código e verificar este domínio',
   formFieldLabel__organizationName: 'Nome da organização',
   formFieldLabel__organizationSlug: 'URL Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Palavra-passe',
   formFieldLabel__phoneNumber: 'Telemóvel',
   formFieldLabel__role: 'Função',
@@ -487,7 +488,7 @@ export const ptPT: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'menos de {{length}} caracteres',
       minimumLength: '{{length}} ou mais caracteres',
@@ -675,6 +676,14 @@ export const ptPT: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -761,6 +770,11 @@ export const ptPT: LocalizationResource = {
           destructiveActionTitle: 'Remover',
           headerTitle: 'Autenticador',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Definir palavra-passe',

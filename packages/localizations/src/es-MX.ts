@@ -85,6 +85,7 @@ export const esMX: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Nombre de la Organización',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Contraseña',
   formFieldLabel__phoneNumber: 'Número telefónico',
   formFieldLabel__role: 'Rol',
@@ -488,7 +489,7 @@ export const esMX: LocalizationResource = {
     passkey_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkeys_pa_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} o mas caracteres',
@@ -678,6 +679,14 @@ export const esMX: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -764,6 +773,11 @@ export const esMX: LocalizationResource = {
           destructiveActionTitle: 'Eliminar',
           headerTitle: 'Aplicación de autenticación',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Establecer contraseña ',

@@ -15,6 +15,7 @@ export type LocalizationResource = DeepPartial<_LocalizationResource>;
 
 type _LocalizationResource = {
   locale: string;
+  maintenanceMode: LocalizationValue;
   /**
    * @experimental
    * Add role keys and their localized value
@@ -47,10 +48,12 @@ type _LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
+  // TODO-PASSKEYS: Remove in the next minor
   /**
    * @experimental
    */
   __experimental_formFieldLabel__passkeyName: LocalizationValue;
+  formFieldLabel__passkeyName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -332,10 +335,16 @@ type _LocalizationResource = {
         primaryButton__updatePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
       };
+      // TODO-PASSKEYS: Remove in the next minor
       /**
        * @experimental
        */
       __experimental_passkeysSection: {
+        title: LocalizationValue;
+        menuAction__rename: LocalizationValue;
+        menuAction__destructive: LocalizationValue;
+      };
+      passkeysSection: {
         title: LocalizationValue;
         menuAction__rename: LocalizationValue;
         menuAction__destructive: LocalizationValue;
@@ -410,10 +419,20 @@ type _LocalizationResource = {
         successMessage: LocalizationValue;
       };
     };
+
+    // TODO-PASSKEYS: Remove in the next minor
     /**
      * @experimental
      */
     __experimental_passkeyScreen: {
+      title__rename: LocalizationValue;
+      subtitle__rename: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+      };
+    };
+    passkeyScreen: {
       title__rename: LocalizationValue;
       subtitle__rename: LocalizationValue;
       removeResource: {
@@ -727,7 +746,7 @@ type UnstableErrors = WithParamName<{
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
   passkey_not_supported: LocalizationValue;
-  passkeys_pa_not_supported: LocalizationValue;
+  passkey_pa_not_supported: LocalizationValue;
   passkey_retrieval_cancelled: LocalizationValue;
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
