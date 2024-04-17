@@ -718,6 +718,9 @@ export const enUS: LocalizationResource = {
     action__createOrganization: 'Create organization',
   },
   unstable__errors: {
+    form_identifier_exists__email_address: 'This email address is taken. Please try another.',
+    form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
+    form_identifier_exists__username: 'This username is taken. Please try another.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     phone_number_exists: 'This phone number is taken. Please try another.',
     form_identifier_not_found: '',
