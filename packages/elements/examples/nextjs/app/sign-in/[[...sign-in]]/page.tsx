@@ -127,7 +127,6 @@ export default function SignInPage() {
             <div className='flex flex-col gap-2 self-stretch'>
               <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
               <CustomProvider provider='google'>Continue with Google</CustomProvider>
-              <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
             </div>
 
             {continueWithEmail ? (
@@ -150,19 +149,7 @@ export default function SignInPage() {
                   )}
                 </Field>
 
-                <CustomSubmit>
-                  <Loading>
-                    {isLoading =>
-                      isLoading ? (
-                        <>
-                          <Spinner /> Loading...
-                        </>
-                      ) : (
-                        'Sign in with Email'
-                      )
-                    }
-                  </Loading>
-                </CustomSubmit>
+                <CustomSubmit>Sign in with Email</CustomSubmit>
               </>
             ) : (
               <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
@@ -196,7 +183,6 @@ export default function SignInPage() {
             <div className='flex flex-col gap-2 self-stretch'>
               <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
               <CustomProvider provider='google'>Continue with Google</CustomProvider>
-              <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
             </div>
 
             {continueWithEmail ? (
@@ -287,7 +273,6 @@ export default function SignInPage() {
 
             <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
             <CustomProvider provider='google'>Continue with Google</CustomProvider>
-            <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
             <Action
               asChild

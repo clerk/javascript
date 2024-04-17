@@ -38,8 +38,6 @@ export function useSignInRouteRegistration<
     isMounted.current = true;
 
     return () => {
-      if (isMounted.current) return;
-
       routerRef.send({
         type: 'ROUTE.UNREGISTER',
         id,

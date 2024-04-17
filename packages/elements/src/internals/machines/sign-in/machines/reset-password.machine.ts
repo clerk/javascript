@@ -1,5 +1,5 @@
 import type { SignInResource } from '@clerk/types';
-import type { ActorRefFrom } from 'xstate';
+import type { ActorRefFrom, DoneActorEvent } from 'xstate';
 import { fromPromise, sendTo, setup } from 'xstate';
 
 import type { FormFields } from '~/internals/machines/form/form.types';
@@ -33,7 +33,8 @@ export const SignInResetPasswordMachine = setup({
       },
     ),
     sendToLoading,
-    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    sendToNext: ({ context, event }) =>
+      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
   },
   types: {} as SignInResetPasswordSchema,
 }).createMachine({
