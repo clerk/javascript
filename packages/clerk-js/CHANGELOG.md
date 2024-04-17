@@ -1,5 +1,39 @@
 # Change Log
 
+## 5.0.0-beta.45
+
+### Minor Changes
+
+- Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+### Patch Changes
+
+- Align country code position with phone number input. ([#3199](https://github.com/clerk/javascript/pull/3199)) by [@octoper](https://github.com/octoper)
+
+- Fix SSO callback Turnstile widget alignment ([#3205](https://github.com/clerk/javascript/pull/3205)) by [@anagstef](https://github.com/anagstef)
+
+- Fallback to invisible CAPTCHA if the element to render to is not found in the DOM ([#3191](https://github.com/clerk/javascript/pull/3191)) by [@anagstef](https://github.com/anagstef)
+
+- Fix transfer flow when having the Smart Bot Protection enabled ([#3202](https://github.com/clerk/javascript/pull/3202)) by [@anagstef](https://github.com/anagstef)
+
+- Removed hoverable state from no-interactive sections in `<UserProfile/>` ([#3201](https://github.com/clerk/javascript/pull/3201)) by [@octoper](https://github.com/octoper)
+
+- Make UI-triggered redirects default to hash-based routing. If a routing strategy is not provided, default to hash routing. All routing strategies know how to convert a hash-based url to their own format. ([#3061](https://github.com/clerk/javascript/pull/3061)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Align action buttons with user preview in `<UserButton/>` ([#3200](https://github.com/clerk/javascript/pull/3200)) by [@octoper](https://github.com/octoper)
+
+- Fixed issue that prevented backup codes showing up for TOTP ([#3194](https://github.com/clerk/javascript/pull/3194)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`d9f265fcb`](https://github.com/clerk/javascript/commit/d9f265fcb12b39301b9802e4787dc636ee28444f), [`2b8fe238a`](https://github.com/clerk/javascript/commit/2b8fe238a114f4c21bc2068bf6f1871280da7fae), [`1078e8c58`](https://github.com/clerk/javascript/commit/1078e8c5896f5e3364bf89ec5312c81d8f1a3be8), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5)]:
+  - @clerk/types@4.0.0-beta.28
+  - @clerk/localizations@2.0.0-beta.24
+  - @clerk/shared@2.0.0-beta.22
+
 ## 5.0.0-beta.44
 
 ### Patch Changes

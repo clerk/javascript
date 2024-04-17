@@ -1,5 +1,18 @@
 # Change Log
 
+## 1.0.0-beta.36
+
+### Minor Changes
+
+- Add support for the `orderBy` parameter to the `getOrganizationList()` function ([#3164](https://github.com/clerk/javascript/pull/3164)) by [@IGassmann](https://github.com/IGassmann)
+
+### Patch Changes
+
+- Introduce `debug: true` option for the `clerkMiddleware` helper ([#3189](https://github.com/clerk/javascript/pull/3189)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5)]:
+  - @clerk/shared@2.0.0-beta.22
+
 ## 1.0.0-beta.35
 
 ### Patch Changes
