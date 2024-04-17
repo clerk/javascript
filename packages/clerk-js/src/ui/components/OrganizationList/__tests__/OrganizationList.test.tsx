@@ -319,6 +319,38 @@ describe('OrganizationList', () => {
           expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/org1`);
         });
       });
+
+      it('navigates to afterCreateOrganizationUrl', async () => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withUser({
+            id: 'test_user_id',
+            email_addresses: ['test@clerk.com'],
+          });
+        });
+
+        props.setProps({
+          afterSelectOrganizationUrl: '/org/:slug',
+          afterCreateOrganizationUrl: '/org',
+          skipInvitationScreen: true,
+        });
+
+        const { userEvent, getByRole, findByLabelText, findByRole, getByLabelText } = render(<OrganizationList />, {
+          wrapper,
+        });
+
+        fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+        await waitFor(async () =>
+          expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+        );
+        await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+        await waitFor(async () => expect(await findByLabelText(/name/i)).toBeInTheDocument());
+        await userEvent.type(getByLabelText(/name/i), 'new org');
+        await userEvent.click(getByRole('button', { name: /create organization/i }));
+        await waitFor(async () => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org`);
+        });
+      });
     });
   });
 });
