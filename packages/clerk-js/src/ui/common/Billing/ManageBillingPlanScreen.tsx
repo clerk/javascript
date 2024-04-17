@@ -81,6 +81,7 @@ const Feature = ({ name }: { name: string }) => {
         sx={t => ({
           color: t.colors.$colorTextSecondary,
           fontSize: t.fontSizes.$md,
+          wordBreak: 'break-word',
         })}
       >
         {name}
