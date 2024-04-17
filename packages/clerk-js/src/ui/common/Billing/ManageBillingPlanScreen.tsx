@@ -68,18 +68,20 @@ const DividerLine = () => {
 const Feature = ({ name }: { name: string }) => {
   return (
     <Flex
-      align='center'
+      align='start'
       gap={2}
       sx={t => ({ color: t.colors.$colorTextSecondary })}
     >
       <Icon
         size='xs'
         icon={Check}
+        sx={t => ({ marginTop: t.space.$1 })}
       />
       <Text
         sx={t => ({
           color: t.colors.$colorTextSecondary,
           fontSize: t.fontSizes.$md,
+          wordBreak: 'break-word',
         })}
       >
         {name}
@@ -99,6 +101,12 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
 
   const extendedFeatures = params.features.slice(6);
   const initialFeatures = params.features.slice(0, 6);
+
+  const evenInitialFeatures = initialFeatures.filter((_, index) => index % 2 === 0);
+  const oddInitialFeatures = initialFeatures.filter((_, index) => index % 2 !== 0);
+
+  const evenExtendedFeatures = extendedFeatures.filter((_, index) => index % 2 === 0);
+  const oddExtendedFeatures = extendedFeatures.filter((_, index) => index % 2 !== 0);
 
   return (
     <Col
@@ -173,32 +181,52 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
             <Animated asChild>
               <Col gap={2}>
                 <Grid
-                  sx={t => ({
+                  sx={{
                     gridTemplateColumns: 'repeat(2,1fr)',
-                    rowGap: t.space.$2,
-                  })}
+                  }}
+                  gap={6}
                 >
-                  {initialFeatures.map((feature: string) => (
-                    <Feature
-                      key={feature}
-                      name={feature}
-                    />
-                  ))}
-                </Grid>
-
-                {showAllFeatures && (
-                  <Grid
-                    sx={t => ({
-                      gridTemplateColumns: 'repeat(2,1fr)',
-                      rowGap: t.space.$2,
-                    })}
-                  >
-                    {extendedFeatures.map((feature: string) => (
+                  <Col gap={2}>
+                    {evenInitialFeatures.map(feature => (
                       <Feature
                         key={feature}
                         name={feature}
                       />
                     ))}
+                  </Col>
+                  <Col gap={2}>
+                    {oddInitialFeatures.map(feature => (
+                      <Feature
+                        key={feature}
+                        name={feature}
+                      />
+                    ))}
+                  </Col>
+                </Grid>
+
+                {showAllFeatures && (
+                  <Grid
+                    sx={{
+                      gridTemplateColumns: 'repeat(2,1fr)',
+                    }}
+                    gap={6}
+                  >
+                    <Col gap={2}>
+                      {evenExtendedFeatures.map(feature => (
+                        <Feature
+                          key={feature}
+                          name={feature}
+                        />
+                      ))}
+                    </Col>
+                    <Col gap={2}>
+                      {oddExtendedFeatures.map(feature => (
+                        <Feature
+                          key={feature}
+                          name={feature}
+                        />
+                      ))}
+                    </Col>
                   </Grid>
                 )}
 
