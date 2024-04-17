@@ -66,7 +66,7 @@ export const mockRouteContextValue = ({ queryString = '' }: Partial<DeepJestMock
     getMatchData: jest.fn(),
     matches: jest.fn(),
     baseNavigate: jest.fn(),
-    navigate: jest.fn(),
+    navigate: jest.fn(() => Promise.resolve(true)),
     resolve: jest.fn((to: string) => new URL(to, 'https://clerk.com')),
     refresh: jest.fn(),
     params: {},
