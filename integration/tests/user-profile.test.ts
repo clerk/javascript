@@ -89,22 +89,8 @@ export default function Page() {
     await u.po.userProfile.waitForMounted();
 
     await u.po.userProfile.clickSetUsername();
-
-    u.page.getByText(/Update username/i);
-
-    await u.po.userProfile.typeUsername('some_username');
-
     await u.page.getByText(/Cancel/i).click();
-
     await u.page.waitForSelector('.cl-profileSectionContent__username .cl-headerTitle', { state: 'detached' });
-
-    await u.po.userProfile.clickAddEmailAddress();
-
-    u.page.getByText(/an email containing/i);
-
-    await u.po.userProfile.typeEmailAddress('some@email.com');
-
-    await u.page.getByText(/Cancel/i).click();
   });
 
   test('user profile with hash routing', async ({ page, context }) => {
@@ -118,22 +104,8 @@ export default function Page() {
     await u.po.userProfile.waitForMounted();
 
     await u.po.userProfile.clickSetUsername();
-
-    u.page.getByText(/Update username/i);
-
-    await u.po.userProfile.typeUsername('some_username');
-
     await u.page.getByText(/Cancel/i).click();
-
     await u.page.waitForSelector('.cl-profileSectionContent__username .cl-headerTitle', { state: 'detached' });
-
-    await u.po.userProfile.clickAddEmailAddress();
-
-    u.page.getByText(/an email containing/i);
-
-    await u.po.userProfile.typeEmailAddress('some@email.com');
-
-    await u.page.getByText(/Cancel/i).click();
   });
 
   test('user profile from user button opens actions correctly', async ({ page, context }) => {
@@ -150,14 +122,43 @@ export default function Page() {
 
     await u.page.getByText(/Manage account/).click();
 
-    await u.page.waitForSelector('.cl-modalContent > .cl-userProfile-root', { state: 'attached' });
+    await u.po.userProfile.waitForUserProfileModal();
 
     await u.po.userProfile.clickSetUsername();
+    await u.page.getByText(/Cancel/i).click();
+
+    await u.po.userProfile.waitForSectionCardClosed('username');
+
+    await u.po.userProfile.clickAddEmailAddress();
+    await u.page.getByText(/Cancel/i).click();
+
+    await u.po.userProfile.waitForSectionCardClosed('emailAddresses');
+  });
+
+  test('can update user username', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+
+    await u.po.userProfile.clickSetUsername();
+
+    await u.po.userProfile.typeUsername(fakeUser.username);
+
     await u.page.getByText(/Cancel/i).click();
 
     await u.page.waitForSelector('.cl-profileSectionContent__username .cl-headerTitle', { state: 'detached' });
 
     await u.po.userProfile.clickAddEmailAddress();
+
+    u.page.getByText(/an email containing/i);
+
+    await u.po.userProfile.typeEmailAddress('some@email.com');
+
     await u.page.getByText(/Cancel/i).click();
   });
 });
