@@ -20,4 +20,19 @@ export type ClerkFieldId =
  */
 export type ClerkInputType = HTMLInputTypeAttribute | 'otp';
 
-export type FieldStates = 'valid' | 'invalid';
+export const FIELD_STATES = {
+  success: 'success',
+  error: 'error',
+  idle: 'idle',
+  warning: 'warning',
+  info: 'info',
+} as const;
+
+export type FieldStates = (typeof FIELD_STATES)[keyof typeof FIELD_STATES];
+
+export const FIELD_VALIDITY = {
+  valid: 'valid',
+  invalid: 'invalid',
+} as const;
+
+export type FieldValidity = (typeof FIELD_VALIDITY)[keyof typeof FIELD_VALIDITY];

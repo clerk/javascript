@@ -30,7 +30,7 @@ export const fieldHasValueSelector = (name: string | undefined) => (state: Snaps
   Boolean(fieldValueSelector(name)(state));
 
 /**
- * Selects a field-specific error, if it exists
+ * Selects field-specific feedback, if they exist
  */
-export const fieldErrorsSelector = (name: string | undefined) => (state: SnapshotState) =>
-  name ? state.context.fields.get(name)?.errors : undefined;
+export const fieldFeedbackSelector = (name: string | undefined) => (state: SnapshotState) =>
+  name ? state.context.fields.get(name)?.feedback : undefined;
