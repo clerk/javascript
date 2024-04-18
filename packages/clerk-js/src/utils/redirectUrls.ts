@@ -14,6 +14,7 @@ export class RedirectUrls {
     'signUpFallbackRedirectUrl',
     'afterSignInUrl',
     'afterSignUpUrl',
+    'redirectUrl',
   ];
 
   private static preserved = ['redirectUrl'];
@@ -84,7 +85,12 @@ export class RedirectUrls {
 
     // TODO: v6
     // Remove the compatibility layer for afterSignInUrl and afterSignUpUrl
-    result ||= this.fromSearchParams[legacyPropKey] || this.fromProps[legacyPropKey] || this.fromOptions[legacyPropKey];
+    result ||=
+      this.fromSearchParams[legacyPropKey] ||
+      this.fromSearchParams.redirectUrl ||
+      this.fromProps[legacyPropKey] ||
+      this.fromProps.redirectUrl ||
+      this.fromOptions[legacyPropKey];
 
     return result || '/';
   }

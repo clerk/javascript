@@ -101,6 +101,39 @@ describe('redirectUrls', () => {
       expect(redirectUrls.getAfterSignUpUrl()).toBe(`${mockWindowLocation.href}sign-up-fallback-redirect-url`);
     });
 
+    // TODO: v6 - remove this test
+    it('falls back to legacy redirect prop if no new props are found', () => {
+      const redirectUrls = new RedirectUrls(
+        {
+          signUpFallbackRedirectUrl: 'sign-up-fallback-redirect-url',
+        },
+        {
+          redirectUrl: 'redirect-url',
+        },
+      );
+
+      expect(redirectUrls.getAfterSignInUrl()).toBe(`${mockWindowLocation.href}redirect-url`);
+      expect(redirectUrls.getAfterSignUpUrl()).toBe(`${mockWindowLocation.href}sign-up-fallback-redirect-url`);
+    });
+
+    // TODO: v6 - remove this test
+    it('falls back to legacy redirect prop if no new props are found', () => {
+      const redirectUrls = new RedirectUrls(
+        {
+          signUpForceRedirectUrl: 'sign-up-fallback-redirect-url',
+        },
+        {
+          redirectUrl: 'redirect-url',
+        },
+        {
+          redirect_url: 'redirect-url-params',
+        },
+      );
+
+      expect(redirectUrls.getAfterSignInUrl()).toBe(`${mockWindowLocation.href}redirect-url-params`);
+      expect(redirectUrls.getAfterSignUpUrl()).toBe(`${mockWindowLocation.href}sign-up-fallback-redirect-url`);
+    });
+
     it('prioritizes force urls among other urls in the same group', () => {
       const redirectUrls = new RedirectUrls({
         signInForceRedirectUrl: 'sign-in-force-redirect-url',

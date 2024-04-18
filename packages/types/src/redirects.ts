@@ -21,6 +21,11 @@ export type LegacyRedirectProps = {
    * Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
    */
   afterSignUpUrl?: string | null;
+  /**
+   * @deprecated This is deprecated and will be removed in a future release.
+   * Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
+   */
+  redirectUrl?: string | null;
 };
 
 /**
