@@ -15,8 +15,8 @@ concurrency:
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
-    runs-on: ubuntu-latest-l
-    timeout-minutes: 10
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
       TURBO_SUMMARIZE: false
@@ -80,8 +80,8 @@ jobs:
   unit-tests:
     name: Unit Tests
     needs: formatting-linting
-    runs-on: ubuntu-latest-l
-    timeout-minutes: 10
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
       TURBO_SUMMARIZE: false
@@ -124,8 +124,8 @@ jobs:
   integration-tests:
     name: Integration Tests
     needs: formatting-linting
-    runs-on: ubuntu-latest-m
-    timeout-minutes: 10
+    runs-on: ${{ vars.RUNNER_MEDIUM || 'ubuntu-latest-m' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     strategy:
       matrix:

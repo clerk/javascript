@@ -16,8 +16,8 @@ concurrency:
 
 jobs:
   preview:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
     permissions:
       contents: write
       pull-requests: write
