@@ -341,9 +341,9 @@ describe('OrganizationList', () => {
 
         fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
         await waitFor(async () =>
-          expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+          expect(await findByRole('button', { name: 'Create organization' })).toBeInTheDocument(),
         );
-        await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+        await userEvent.click(getByRole('button', { name: 'Create organization' }));
         await waitFor(async () => expect(await findByLabelText(/name/i)).toBeInTheDocument());
         await userEvent.type(getByLabelText(/name/i), 'new org');
         await userEvent.click(getByRole('button', { name: /create organization/i }));
