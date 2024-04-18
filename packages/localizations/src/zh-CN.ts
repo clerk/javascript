@@ -557,6 +557,9 @@ export const zhCN: LocalizationResource = {
     },
   },
   unstable__errors: {
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     form_password_pwned: '这个密码在数据泄露中被发现，不能使用，请换一个密码试试。',

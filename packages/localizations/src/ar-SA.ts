@@ -704,6 +704,9 @@ export const arSA: LocalizationResource = {
     action__createOrganization: 'أنشاء منظمة',
   },
   unstable__errors: {
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     form_identifier_not_found: '',

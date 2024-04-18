@@ -569,6 +569,9 @@ export const csCZ: LocalizationResource = {
     },
   },
   unstable__errors: {
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_password_pwned: 'Toto heslo bylo nalezeno v rámci uniku dat a nemůže být použito, prosím zvolte jiné heslo.',
     form_username_invalid_length: '',

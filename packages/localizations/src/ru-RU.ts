@@ -632,6 +632,9 @@ export const ruRU: LocalizationResource = {
     },
   },
   unstable__errors: {
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_password_pwned: 'Этот пароль был взломан и не может быть использован, попробуйте другой пароль.',
     form_password_validation_failed: 'Неверный пароль',

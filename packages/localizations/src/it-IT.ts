@@ -538,6 +538,9 @@ export const itIT: LocalizationResource = {
     },
   },
   unstable__errors: {
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_password_pwned: '',
     form_username_invalid_length: '',
