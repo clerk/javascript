@@ -4,7 +4,7 @@ category: 'middleware'
 matcher: "withClerkMiddleware\\("
 ---
 
-`withClerkMiddleware` has been deprecated and is now removed in v5. We recommend moving to `clerkMiddleware` instead. Please read the [clerkMiddleware guide](https://beta.clerk.com/docs/references/nextjs/clerk-middleware) for more details. Here’s an example of how a simple middleware setup might look before and after.
+`withClerkMiddleware` has been deprecated and is now removed in v5. We recommend moving to `clerkMiddleware` instead. Please read the [clerkMiddleware guide](https://clerk.com/docs/references/nextjs/clerk-middleware) for more details. Here’s an example of how a simple middleware setup might look before and after.
 
 ```js
 // Before: using withClerkMiddleware

@@ -6,9 +6,9 @@ matcherFlags: 'm'
 warning: true
 ---
 
-The [`authMiddleware`](https://clerk.com/docs/references/nextjs/auth-middleware) API from `@clerk/nextjs` has been marked as deprecated. We highly recommend using [`clerkMiddleware`](https://beta.clerk.com/docs/references/nextjs/clerk-middleware) going forward. `clerkMiddleware` protects no routes by default and you need to add your individual routes you want to opt into protection. Here's an example of having all routes public except for everything under `/dashboard`.
+The [`authMiddleware`](https://clerk.com/docs/references/nextjs/auth-middleware) API from `@clerk/nextjs` has been marked as deprecated. We highly recommend using [`clerkMiddleware`](https://clerk.com/docs/references/nextjs/clerk-middleware) going forward. `clerkMiddleware` protects no routes by default and you need to add your individual routes you want to opt into protection. Here's an example of having all routes public except for everything under `/dashboard`.
 
-For more documentation on the new `clerkMiddleware` function, check out [our official docs](https://beta.clerk.com/docs/references/nextjs/clerk-middleware)!
+For more documentation on the new `clerkMiddleware` function, check out [our official docs](https://clerk.com/docs/references/nextjs/clerk-middleware)!
 
 **Before:**
 
