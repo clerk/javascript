@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { useAppearance } from '../../customizables';
+import { Col, useAppearance } from '../../customizables';
 import { Form } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import type { FormControlState } from '../../utils';
 import type { ActiveIdentifier, Fields } from './signUpFormHelpers';
 
@@ -99,7 +100,10 @@ export const SignUpForm = (props: SignUpFormProps) => {
           />
         </Form.ControlRow>
       )}
-      <Form.SubmitButton>Continue</Form.SubmitButton>
+      <Col center>
+        <CaptchaElement />
+        <Form.SubmitButton>Continue</Form.SubmitButton>
+      </Col>
     </Form.Root>
   );
 };

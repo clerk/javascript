@@ -2,6 +2,7 @@ import type { DisplayThemeJSON } from './json';
 import type { ClerkResource } from './resource';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
+export type CaptchaWidgetType = 'smart' | 'invisible' | null;
 
 export interface DisplayConfigJSON {
   object: 'display_config';
@@ -14,6 +15,8 @@ export interface DisplayConfigJSON {
   application_name: string;
   branded: boolean;
   captcha_public_key: string | null;
+  captcha_widget_type: CaptchaWidgetType;
+  captcha_public_key_invisible: string | null;
   home_url: string;
   instance_environment_type: string;
   /* @deprecated */
@@ -47,6 +50,8 @@ export interface DisplayConfigResource extends ClerkResource {
   backendHost: string;
   branded: boolean;
   captchaPublicKey: string | null;
+  captchaWidgetType: CaptchaWidgetType;
+  captchaPublicKeyInvisible: string | null;
   homeUrl: string;
   instanceEnvironmentType: string;
   logoImageUrl: string;
