@@ -35,6 +35,7 @@ async function generate() {
     '## Breaking Changes',
     markdown('redesign-preview'),
     markdown('after-sign-x-handling'),
+    singleItem('aftersignxurl-changes'),
     singleItem('navigate-to-routerpush-routerreplace'),
     markdown('orgs-claim'),
     markdownTemplate('path-routing', { packageName }),

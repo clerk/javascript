@@ -38,6 +38,7 @@ const jsChanges = [
   'organization-getpendinginvitations',
   'mfa-dropdown',
   'appearance-variables-breaking-changes',
+  'aftersignxurl-changes',
 ];
 
 const reactChanges = [

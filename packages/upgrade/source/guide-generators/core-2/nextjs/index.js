@@ -6,6 +6,7 @@ import {
   loadVersionChangeData,
   markdown,
   markdownTemplate,
+  singleItem,
   writeToFile,
 } from '../../text-generation.js';
 
@@ -37,6 +38,7 @@ async function generate() {
     markdown('middleware-changes'),
     markdown('import-changes'),
     markdown('after-sign-x-handling'),
+    singleItem('aftersignxurl-changes'),
     markdown('orgs-claim'),
     markdownTemplate('path-routing', { packageName }),
     markdown('image-url'),

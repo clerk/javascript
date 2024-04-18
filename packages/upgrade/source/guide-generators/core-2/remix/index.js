@@ -36,6 +36,7 @@ async function generate() {
     singleItem('clerkerrorboundary-removed'),
     markdown('redesign-preview'),
     markdown('after-sign-x-handling'),
+    singleItem('aftersignxurl-changes'),
     markdown('orgs-claim'),
     markdownTemplate('path-routing', { packageName }),
     markdown('image-url'),
