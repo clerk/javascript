@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.0-beta.47
+
+### Patch Changes
+
+- Warn instead of erroring when a legacy redirect prop ('redirectUrl', 'afterSignInUrl', 'afterSignUpUrl') is used by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.0.0-beta.46
 
 ### Patch Changes
