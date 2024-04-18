@@ -87,7 +87,7 @@ export const OrgListCreateOrganizationPage = withCardStateProvider(
   }) => {
     const { showListInitially, isCreateOrganizationFlow, setCreateOrganizationFlow } = props;
     const environment = useEnvironment();
-    const { navigateAfterSelectOrganization, skipInvitationScreen } = useOrganizationListContext();
+    const { navigateAfterCreateOrganization, skipInvitationScreen } = useOrganizationListContext();
     return (
       <>
         <Box
@@ -105,7 +105,7 @@ export const OrgListCreateOrganizationPage = withCardStateProvider(
               }),
             }}
             navigateAfterCreateOrganization={org =>
-              navigateAfterSelectOrganization(org).then(() => setCreateOrganizationFlow(false))
+              navigateAfterCreateOrganization(org).then(() => setCreateOrganizationFlow(false))
             }
             onCancel={
               showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
