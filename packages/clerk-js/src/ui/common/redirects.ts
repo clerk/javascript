@@ -2,6 +2,7 @@ import { buildURL } from '../../utils/url';
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 
 const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
+const SIGN_UP_CONTINUE_PATH_ROUTE = '/sign-up/continue';
 const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 
 export function buildEmailLinkRedirectUrl(
@@ -29,6 +30,16 @@ export function buildSSOCallbackURL(
     authQueryString,
     path,
     endpoint: SSO_CALLBACK_PATH_ROUTE,
+  });
+}
+
+export function buildSignUpContinueURL(baseUrl: string | undefined = ''): string {
+  return buildRedirectUrl({
+    routing: 'hash',
+    baseUrl,
+    authQueryString: '',
+    path: '',
+    endpoint: SIGN_UP_CONTINUE_PATH_ROUTE,
   });
 }
 
