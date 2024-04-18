@@ -13,6 +13,7 @@ import {
 import { dark, experimental__simple, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
 import React, { FunctionComponent, useEffect, useState } from 'react';
+import { GoogleOneTap } from '../components/google-one-tap';
 
 const themes = { default: undefined, dark, neobrutalism, shadesOfPurple };
 
@@ -77,6 +78,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         smooth={selectedSmoothing}
         onPrimaryColorChange={setPrimaryColor}
       />
+      <GoogleOneTap />
       <C {...pageProps} />
     </ClerkProvider>
   );
