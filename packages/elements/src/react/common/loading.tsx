@@ -47,8 +47,8 @@ function isSignUpScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is
 /**
  * Access the loading state of a chosen scope. Scope can refer to a step, a provider, or the global loading state. The global loading state is `true` when any of the other scopes are loading.
  *
- * @param scope - Optional. Specify which loading state to access. Can be a step, a provider, or the global loading state. If `<Loading>` is used outside a `<Step>` it will default to `"global"`. If used inside a `<Step>` it will default to the current step.
- * @param {Function} children - A render prop function that receives `isLoading` as an argument. `isLoading` is a boolean that indicates if the current scope is loading or not.
+ * @param scope - Optional. Specify which loading state to access. Can be a step, a provider, or the global loading state. If `<Loading>` is used outside a `<Step>`, the scope will default to "global". If used inside a `<Step>` the scope will default to the current step. For external authentication providers, the scope needs to be manually defined in the format of `provider:<provider name>`
+ * @param {Function} children - A function that receives `isLoading` as an argument. `isLoading` is a boolean that indicates if the current scope is loading or not.
  *
  * @example
  * <SignIn>

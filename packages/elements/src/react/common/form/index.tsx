@@ -368,11 +368,11 @@ type FormFieldProps = Omit<RadixFormFieldProps, 'children'> & {
 };
 
 /**
- * A wrapper component used to associate its child elements with a specific form field. Automatically handles unique ID generation and associating labels with inputs.
+ * Field is used to associate its child elements with a specific input. It automatically handles unique ID generation and associating the contained label and input elements.
  *
  * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `emailAddress`, `password`, `phoneNumber`, and `code`.
  * @param alwaysShow - Optional. When `true`, the field will always be rendered, regardless of its state. By default, a field is hidden if it's optional or if it's a filled-out required field.
- * @param {Function} children - A render prop function that receives `state` as an argument. `state` is a union of `"success" | "error" | "idle" | "warning" | "info"`.
+ * @param {Function} children - A function that receives `state` as an argument. `state` is a union of `"success" | "error" | "idle" | "warning" | "info"`.
  *
  * @example
  * <Field name="emailAddress">
@@ -435,9 +435,9 @@ type FieldStateRenderFn = {
 };
 
 /**
- * Programmatically access the state of the wrapping `<Field>`. Useful for implementing animations when direct access to the value is necessary.
+ * Programmatically access the state of the wrapping `<Field>`. Useful for implementing animations when direct access to the state value is necessary.
  *
- * @param {Function} children - A render prop function that receives `state`, `message`, and `codes` as an argument. `state` will is a union of `"success" | "error" | "idle" | "warning" | "info"`. `message` will be the corresponding message, e.g. error message. `codes` will be an array of keys that were used to generate the password validation messages. This prop is only available when the field is of type `password` and has `validatePassword` set to `true`.
+ * @param {Function} children - A function that receives `state`, `message`, and `codes` as an argument. `state` will is a union of `"success" | "error" | "idle" | "warning" | "info"`. `message` will be the corresponding message, e.g. error message. `codes` will be an array of keys that were used to generate the password validation messages. This prop is only available when the field is of type `password` and has `validatePassword` set to `true`.
  *
  * @example
  *
@@ -494,9 +494,9 @@ type FormInputProps =
   | ({ type: 'password' } & PasswordInputProps);
 
 /**
- * Renders an `<input />` element within Clerk's flow. Passes all props to the underlying input element. The `<input />` element will have two data properties: `data-valid` and `data-invalid`. An input is invalid if it has an associated error.
+ * Handles rendering of `<input>` elements within Clerk's flows. Supports special `type` prop values to render input types that are unique to authentication and user management flows. Additional props will be passed through to the `<input>` element.
  *
- * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ * @param {boolean} [asChild] - If true, `<Input />` will render as its child element, passing along any necessary props.
  * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` component.
  *
  * @example
@@ -506,6 +506,7 @@ type FormInputProps =
  * </Field>
  *
  * @param {Number} [length] - The length of the OTP input. Defaults to 6.
+ * @param {Number} [passwordManagerOffset] - Password managers place their icon inside an `<input />`. This default behaviour is not desirable when you use the render prop to display N distinct element. With this prop you can increase the width of the `<input />` so that the icon is rendered outside the OTP inputs.
  * @param {string} [type] - Type of control to render. Supports a special `'otp'` type for one-time password inputs. If the wrapping `<Field>` component has `name='code'`, the type will default to `'otp'`. With the `'otp'` type, the input will have a pattern and length set to 6 by default and render a single `<input />` element.
  *
  * @example
@@ -546,9 +547,9 @@ Input.displayName = INPUT_NAME;
 const LABEL_NAME = 'ClerkElementsLabel';
 
 /**
- * Renders a `<label>` element within Clerk's flow. Is automatically associated with its sibling `<Input />` component inside of a `<Field>`. Passes all props to the underlying label element.
+ * Renders a `<label>` element that is automatically associated with its sibling `<Input />` inside of a `<Field>`. Additional props will be passed through to the `<label>` element.
  *
- * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ * @param {boolean} [asChild] - If true, `<Label />` will render as its child element, passing along any necessary props.
  *
  * @example
  * <Field name="email">
@@ -615,11 +616,11 @@ type FormFieldErrorElement = React.ElementRef<typeof RadixFormMessage>;
 type FormFieldErrorProps = FormErrorProps<RadixFormMessageProps & { name?: string }>;
 
 /**
- * Renders errors that are returned from Clerk's API but are not associated with a specific field. By default, it will render the error's message wrapped in an unstyled `<div>` element. **Must** be placed inside components like `<SignIn>` or `<SignUp>` to work correctly.
+ * Used to render errors that are returned from Clerk's API, but that are not associated with a specific form field. By default, will render the error's message wrapped in a `<div>`. Optionally, the `children` prop accepts a function to completely customize rendering. Must be placed **inside** components like `<SignIn>`/`<SignUp>` to have access to the underlying form state.
  *
  * @param {string} [code] - Forces the message with the matching code to be shown. This is useful when using server-side validation.
- * @param {Function} [children] - A render prop function that receives `message` and `code` as arguments.
- * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ * @param {Function} [children] - A function that receives `message` and `code` as arguments.
+ * @param {boolean} [asChild] - If `true`, `<GlobalError>` will render as its child element, passing along any necessary props.
  *
  * @example
  * <SignIn>
@@ -666,20 +667,14 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
 );
 
 /**
- * Renders error messages associated with the parent `<Field>` component. By default, it will render the error message wrapped in an unstyled `<span>` element.
+ * FieldError renders error messages associated with a specific field. By default, the error's message will be rendered in an unstyled `<span>`. Optionally, the `children` prop accepts a function to completely customize rendering.
  *
  * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` component.
- * @param {string} [code] - Forces the message with the matching code to be shown. This is useful when using server-side validation.
- * @param {Function} [children] - A render prop function that receives `message` and `code` as arguments.
+ * @param {Function} [children] - A function that receives `message` and `code` as arguments.
  *
  * @example
  * <Field name="email">
  *   <FieldError />
- * </Field>
- *
- * @example
- * <Field name="email">
- *   <FieldError code="form_password_incorrect">Your custom error message.</FieldError>
  * </Field>
  *
  * @example

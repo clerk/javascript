@@ -19,6 +19,11 @@ export type SignUpActionProps = { asChild?: boolean } & (
 /**
  * Perform various actions during the sign-in process. This component is used to navigate between steps, submit the form, or resend a verification codes.
  *
+ * @param {boolean} [submit] - If `true`, the action will submit the form.
+ * @param {string} [navigate] - The name of the step to navigate to.
+ * @param {boolean} [resend] - If `true`, the action will resend the verification code for the currently active strategy, if applicable.
+ * @param {Function} [fallback] - Only used when `resend` is `true`. If provided, the fallback markup will be rendered before the resend delay has expired.
+ *
  * @example
  * import { Action } from '@clerk/elements/sign-up';
  * <Action navigate="start">Go Back</Action>

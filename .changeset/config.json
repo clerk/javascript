@@ -12,7 +12,7 @@
   "access": "public",
   "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@clerk/elements"],
+  "ignore": ["@clerk/elements","gatsby-plugin-clerk"],
   "snapshot": {
     "useCalculatedVersion": true,
     "prereleaseTemplate": "{tag}.v{commit}"
