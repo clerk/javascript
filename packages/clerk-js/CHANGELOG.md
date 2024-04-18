@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.0.0-beta.46
+
+### Patch Changes
+
+- Bug fix: Respect `navigateAfterCreateOrganization` in `<OrganizationList/>`. ([#3209](https://github.com/clerk/javascript/pull/3209)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce forceRedirectUrl and fallbackRedirectUrl ([#3162](https://github.com/clerk/javascript/pull/3162)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`bab2e7e05`](https://github.com/clerk/javascript/commit/bab2e7e0590d0da1fd7db0680e63e8f2eb836b41)]:
+  - @clerk/shared@2.0.0-beta.23
+  - @clerk/types@4.0.0-beta.29
+
 ## 5.0.0-beta.45
 
 ### Minor Changes
