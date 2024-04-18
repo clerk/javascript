@@ -1,17 +1,7 @@
 'use client';
 
-import { Field, FieldError, GlobalError, Input, Label, Loading } from '@clerk/elements/common';
-import {
-  Action,
-  Provider,
-  ProviderIcon,
-  SafeIdentifier,
-  Salutation,
-  SignIn,
-  Step,
-  Strategy,
-  SupportedStrategy,
-} from '@clerk/elements/sign-in';
+import { Connection, Field, FieldError, GlobalError, Icon, Input, Label, Loading } from '@clerk/elements/common';
+import { Action, SafeIdentifier, Salutation, SignIn, Step, Strategy, SupportedStrategy } from '@clerk/elements/sign-in';
 import Link from 'next/link';
 import { type ComponentProps, useState } from 'react';
 
@@ -24,19 +14,17 @@ function CustomProvider({
   provider,
 }: {
   children: string;
-  provider: ComponentProps<typeof Provider>['name'];
+  provider: ComponentProps<typeof Connection>['name'];
 }) {
   return (
     <Loading scope={`provider:${provider}`}>
       {isLoading => (
-        <Provider
+        <Connection
           name={provider}
           className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
           disabled={isLoading}
         >
-          <ProviderIcon
-            className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
-          />
+          <Icon className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`} />
           <span className='leading-loose inline-flex justify-center items-center'>
             {isLoading ? (
               <>
@@ -46,7 +34,7 @@ function CustomProvider({
               children
             )}
           </span>
-        </Provider>
+        </Connection>
       )}
     </Loading>
   );

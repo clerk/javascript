@@ -7,7 +7,6 @@ export { SignUpRoot as SignUp, SignUpRoot as Root } from './root';
 export { SignUpStep as Step } from './step';
 export { SignUpAction as Action } from './action';
 export { SignUpStrategy as Strategy } from './verifications';
-export { SignUpProvider as Provider, SignUpProviderIcon as ProviderIcon } from './providers';
 
 /** @internal Internal use only */
 export const useSignUpActorRef_internal = SignUpRouterCtx.useActorRef;
