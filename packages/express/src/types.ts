@@ -12,7 +12,7 @@ export type ClerkMiddlewareOptions = AuthenticateRequestOptions & {
 
 /**
  * Middleware for Express that handles authentication and authorization with Clerk.
- * For more details, please refer to the docs: https://beta.clerk.com/docs/references/express/overview?utm_source=github&utm_medium=expres
+ * For more details, please refer to the docs: https://clerk.com/docs/references/express/overview?utm_source=github&utm_medium=expres
  */
 export interface ClerkMiddleware {
   /**
