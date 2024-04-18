@@ -53,7 +53,7 @@ The most basic migration will be updating the import and changing out the defaul
 
 Of course, in most cases you'll have a more complicated setup than this. You can find some examples below for how to migrate a few common use cases. Be sure to review the [`clerkMiddleware()` documentation](/docs/references/nextjs/clerk-middleware) if your specific use case is not mentioned.
 
-<Accordion titles={["Protecting all routes except one or more public paths", "Protecting a single route path", "Combining with other Middlewares (like i18n)"]} heading="h4">
+<Accordion titles={["Protecting all routes except one or more public paths", "Protecting a single route path", "Combining with other Middlewares (like i18n)", "Using the redirectToSignIn method"]} heading="h4">
   <AccordionPanel>
     By default, `clerkMiddleware()` treats all pages as public unless explicitly protected. If you prefer for it to operate the other way around (all pages are protected unless explicitly made public), you can reverse the middleware logic in this way:
 
@@ -175,6 +175,38 @@ Of course, in most cases you'll have a more complicated setup than this. You can
       if (isDashboardRoute(request)) auth().protect()
 
       return intlMiddleware(request)
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    You can now access `redirectToSignIn` from the `auth()` object, rather than importing at the top level.
+
+    Before:
+
+    ```ts filename="middleware.ts"
+    import { authMiddleware, redirectToSignIn } from "@clerk/nextjs"
+
+    export default authMiddleware({
+      if (someCondition) redirectToSignIn()
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+    After:
+
+    ```ts filename="middleware.ts"
+    import { clerkMiddleware } from "@clerk/nextjs/server"
+
+    export default clerkMiddleware((auth, req) => {
+      if (someCondition) auth().redirectToSignIn()
     })
 
     export const config = {
