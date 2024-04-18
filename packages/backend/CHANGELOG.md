@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.38.7
+
+### Patch Changes
+
+- Deprecate `organization.members_count`. Use `organization.membersCount` instead. ([#3192](https://github.com/clerk/javascript/pull/3192)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`220b813d5`](https://github.com/clerk/javascript/commit/220b813d536618837b8082cf776ad77fe8f239a9), [`4cf2a2198`](https://github.com/clerk/javascript/commit/4cf2a2198ed418adbcd5c04a1b2cbf95335696f6), [`c8ba96b86`](https://github.com/clerk/javascript/commit/c8ba96b865b3d112c8e0ee92f1426e927807ad05)]:
+  - @clerk/types@3.64.0
+
 ## 0.38.6
 
 ### Patch Changes

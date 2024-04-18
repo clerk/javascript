@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.31.0
+
+### Minor Changes
+
+- Introduce experimental support for Google One Tap ([#3196](https://github.com/clerk/javascript/pull/3196)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+### Patch Changes
+
+- Updated dependencies [[`220b813d5`](https://github.com/clerk/javascript/commit/220b813d536618837b8082cf776ad77fe8f239a9), [`4cf2a2198`](https://github.com/clerk/javascript/commit/4cf2a2198ed418adbcd5c04a1b2cbf95335696f6), [`c8ba96b86`](https://github.com/clerk/javascript/commit/c8ba96b865b3d112c8e0ee92f1426e927807ad05)]:
+  - @clerk/types@3.64.0
+
 ## 4.30.10
 
 ### Patch Changes
