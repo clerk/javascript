@@ -1089,8 +1089,14 @@ export class Clerk implements ClerkInterface {
 
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
+    console.log('userExistsButNeedsToSignIn', userExistsButNeedsToSignIn);
+
     if (userExistsButNeedsToSignIn) {
-      const res = await signIn.create({ transfer: true });
+      let res = signIn;
+      if (!res.status) {
+        res = await signIn.create({ transfer: true });
+      }
+
       switch (res.status) {
         case 'complete':
           return this.setActive({
@@ -1131,10 +1137,16 @@ export class Clerk implements ClerkInterface {
       return navigateToResetPassword();
     }
 
-    const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
+    const userNeedsToBeCreated =
+      si.firstFactorVerificationStatus === 'transferable' || su.status === 'missing_requirements';
 
+    console.log('userNeedsToBeCreated', userNeedsToBeCreated);
     if (userNeedsToBeCreated) {
-      const res = await signUp.create({ transfer: true });
+      // const res = await signUp.create({ transfer: true });
+      let res = signUp;
+      if (!res.status) {
+        res = await signUp.create({ transfer: true });
+      }
       switch (res.status) {
         case 'complete':
           return this.setActive({

@@ -8,6 +8,7 @@ import { useCoreSignIn, useEnvironment, useGoogleOneTapContext } from '../../con
 import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { buildSignUpContinueURL } from '../../common';
 
 function _OneTapStart(): JSX.Element | null {
   const clerk = useClerk();
@@ -17,6 +18,7 @@ function _OneTapStart(): JSX.Element | null {
 
   const supportEmail = useSupportEmail();
   const ctx = useGoogleOneTapContext();
+  const { displayConfig } = useEnvironment();
 
   async function oneTapCallback(response: GISCredentialResponse) {
     try {
@@ -24,12 +26,24 @@ function _OneTapStart(): JSX.Element | null {
         token: response.credential,
       });
 
+      await clerk.handleRedirectCallback();
+
       switch (res.status) {
         case 'complete':
           await clerk.setActive({
             session: res.createdSessionId,
           });
           break;
+        case 'missing_requirements': {
+          console.log('missing_requirements');
+          // const url = new URL(buildSignUpContinueURL(displayConfig.signUpUrl)).pathname;
+          // const finalUrl = clerk.buildUrlWithAuth(new URL(url, displayConfig.signUpUrl).href);
+          const url = new URL('/sign-up#/continue', displayConfig.signUpUrl);
+          console.log('URL', url, displayConfig.signUpUrl);
+          const finalUrl = clerk.buildUrlWithAuth(url);
+          // await clerk.navigate(finalUrl, { replace: false });
+          break;
+        }
         // TODO-ONETAP: Add a new case in order to handle the `missing_requirements` status and the PSU flow
         default:
           clerkInvalidFAPIResponse(res.status, supportEmail);
