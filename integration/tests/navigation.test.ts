@@ -112,7 +112,7 @@ export default function Page() {
 
     await u.po.signIn.getGoToSignUp().click();
     await u.po.signUp.waitForMounted();
-    await u.page.waitForURL(`${app.serverUrl}/sign-up?redirect_url=${encodeURIComponent(app.serverUrl + '/')}`);
+    await u.page.waitForURL(`${app.serverUrl}/sign-up`);
 
     await page.goBack();
     await u.po.signIn.waitForMounted();

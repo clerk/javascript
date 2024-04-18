@@ -4,7 +4,9 @@ import type { OrganizationResource, UserResource } from '@clerk/types';
 import React, { useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
-import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
+import { buildURL, createDynamicParamParser } from '../../utils';
+import { assertNoLegacyProp } from '../../utils/assertNoLegacyProp';
+import { RedirectUrls } from '../../utils/redirectUrls';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import { useEnvironment, useOptions } from '../contexts';
 import type { NavbarRoute } from '../elements';
@@ -48,6 +50,8 @@ export type SignUpContextType = SignUpCtx & {
   signUpUrl: string;
   secondFactorUrl: string;
   authQueryString: string | null;
+  afterSignUpUrl: string;
+  afterSignInUrl: string;
 };
 
 export const useSignUpContext = (): SignUpContextType => {
@@ -58,54 +62,41 @@ export const useSignUpContext = (): SignUpContextType => {
   const options = useOptions();
   const clerk = useClerk();
 
+  assertNoLegacyProp(options);
+  assertNoLegacyProp(ctx);
+
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
     [],
+  );
+
+  const redirectUrls = new RedirectUrls(
+    options,
+    {
+      ...ctx,
+      signUpFallbackRedirectUrl: ctx.fallbackRedirectUrl,
+      signUpForceRedirectUrl: ctx.forceRedirectUrl,
+    },
+    queryParams,
   );
 
   if (componentName !== 'SignUp') {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignUpUrl', {
-      queryParams,
-      ctx,
-      options,
-    }) || '/',
-  );
-
-  const afterSignInUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignInUrl', {
-      queryParams,
-      ctx,
-      options,
-    }) || '/',
-  );
+  const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
+  const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
-
-  // Add query strings to the sign in URL
-  const authQs = buildAuthQueryString({
-    afterSignInUrl: afterSignInUrl,
-    afterSignUpUrl: afterSignUpUrl,
-    displayConfig: displayConfig,
-  });
 
   // The `ctx` object here refers to the SignUp component's props.
   // SignUp's own options won't have a `signUpUrl` property, so we have to get the value
   // from the `path` prop instead, when the routing is set to 'path'.
-  let signUpUrl =
-    (ctx.routing === 'path' ? ctx.path : undefined) ||
-    pickRedirectionProp('signUpUrl', { options, displayConfig }, false);
-  if (authQs && ctx.routing !== 'virtual') {
-    signUpUrl += `#/?${authQs}`;
-  }
+  let signUpUrl = (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl;
+  let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
 
-  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
-  if (authQs && ctx.routing !== 'virtual') {
-    signInUrl += `#/?${authQs}`;
-  }
+  signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
+  signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
 
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
@@ -121,7 +112,7 @@ export const useSignUpContext = (): SignUpContextType => {
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: authQs,
+    authQueryString: redirectUrls.toSearchParams().toString(),
   };
 };
 
@@ -132,6 +123,8 @@ export type SignInContextType = SignInCtx & {
   signInUrl: string;
   signUpContinueUrl: string;
   authQueryString: string | null;
+  afterSignUpUrl: string;
+  afterSignInUrl: string;
 };
 
 export const useSignInContext = (): SignInContextType => {
@@ -142,55 +135,41 @@ export const useSignInContext = (): SignInContextType => {
   const options = useOptions();
   const clerk = useClerk();
 
+  assertNoLegacyProp(options);
+  assertNoLegacyProp(ctx);
+
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
     [],
+  );
+
+  const redirectUrls = new RedirectUrls(
+    options,
+    {
+      ...ctx,
+      signInFallbackRedirectUrl: ctx.fallbackRedirectUrl,
+      signInForceRedirectUrl: ctx.forceRedirectUrl,
+    },
+    queryParams,
   );
 
   if (componentName !== 'SignIn') {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignUpUrl', {
-      queryParams,
-      ctx,
-      options,
-    }) || '/',
-  );
-
-  const afterSignInUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignInUrl', {
-      queryParams,
-      ctx,
-      options,
-    }) || '/',
-  );
+  const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
+  const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
-
-  // Add query strings to the sign in URL
-  const authQs = buildAuthQueryString({
-    afterSignInUrl: afterSignInUrl,
-    afterSignUpUrl: afterSignUpUrl,
-    displayConfig: displayConfig,
-  });
-
-  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
-  if (authQs && ctx.routing !== 'virtual') {
-    signUpUrl += `#/?${authQs}`;
-  }
 
   // The `ctx` object here refers to the SignIn component's props.
   // SignIn's own options won't have a `signInUrl` property, so we have to get the value
   // from the `path` prop instead, when the routing is set to 'path'.
-  let signInUrl =
-    (ctx.routing === 'path' ? ctx.path : undefined) ||
-    pickRedirectionProp('signInUrl', { options, displayConfig }, false);
-  if (authQs && ctx.routing !== 'virtual') {
-    signInUrl += `#/?${authQs}`;
-  }
+  let signInUrl = (ctx.routing === 'path' && ctx.path) || options.signInUrl || displayConfig.signInUrl;
+  let signUpUrl = ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
 
+  signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
+  signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
   return {
@@ -204,7 +183,7 @@ export const useSignInContext = (): SignInContextType => {
     signUpContinueUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: authQs,
+    authQueryString: redirectUrls.toSearchParams().toString(),
   };
 };
 
@@ -266,7 +245,7 @@ export const useUserButtonContext = () => {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
 
-  const signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
+  const signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
   const afterSignOutUrl = ctx.afterSignOutUrl || clerk.buildAfterSignOutUrl();

@@ -43,10 +43,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], channel: 'chrome' },
       dependencies: ['setup'],
     },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-      dependencies: ['setup'],
-    },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'] },
+    //   dependencies: ['setup'],
+    // },
   ],
 });

@@ -13,8 +13,10 @@ import {
   isDataUri,
   isDevAccountPortalOrigin,
   isRedirectForFAPIInitiatedFlow,
+  isRelativeUrl,
   isValidUrl,
   mergeFragmentIntoUrl,
+  relativeToAbsoluteUrl,
   requiresUserInput,
   trimLeadingSlash,
   trimTrailingSlash,
@@ -60,15 +62,41 @@ describe('isValidUrl(url)', () => {
 
 describe('isValidUrl(url,base)', () => {
   const cases: Array<[string, boolean]> = [
+    ['', false],
+    ['/', false],
+    ['/test', false],
+    ['/test?clerk=false', false],
+    ['/?clerk=false', false],
+    ['https://www.clerk.com/', true],
+    ['https://www.clerk.com/?test=clerk', true],
+    ['https://www.clerk.com', true],
+    ['https://clerk.com', true],
+    ['https://clerk.com#test', true],
+    ['www.clerk.com/', false],
+    ['www.clerk.com', false],
+    ['www.clerk', false],
+    ['clerk.com', false],
+    ['clerk.com?clerk=yes', false],
+    ['clerk.com#/?clerk=yes', false],
+  ];
+
+  test.each(cases)('.isValidUrl(%s,%s)', (a, expected) => {
+    expect(isValidUrl(a)).toBe(expected);
+  });
+});
+
+describe('isRelativeUrl(url,base)', () => {
+  const cases: Array<[string, boolean]> = [
     ['', true],
     ['/', true],
     ['/test', true],
     ['/test?clerk=true', true],
     ['/?clerk=true', true],
+    ['https://www.clerk.com/', false],
   ];
 
-  test.each(cases)('.isValidUrl(%s,%s)', (a, expected) => {
-    expect(isValidUrl(a, { includeRelativeUrls: true })).toBe(expected);
+  test.each(cases)('.isRelativeUrl(%s,%s)', (a, expected) => {
+    expect(isRelativeUrl(a)).toBe(expected);
   });
 });
 
@@ -363,6 +391,7 @@ describe('mergeFragmentIntoUrl(url | string)', () => {
     ['https://test.test/foo?a=a&b=b#/bar?c=c', new URL('https://test.test/foo/bar?a=a&b=b&c=c')],
     ['https://test.test?a=a#/?a=b', new URL('https://test.test?a=b')],
     ['https://test.test/en-US/sign-in#/?a=b', new URL('https://test.test/en-US/sign-in?a=b')],
+    ['https://test.test/en-US/sign-in?a=c#/?a=b', new URL('https://test.test/en-US/sign-in?a=b')],
   ];
 
   test.each(testCases)('url=(%s), expected value=(%s)', (url, expectedParamValue) => {
@@ -457,7 +486,7 @@ describe('isAllowedRedirectOrigin', () => {
   afterAll(() => warnMock.mockRestore());
 
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
-    expect(isAllowedRedirectOrigin(url, allowedOrigins)).toEqual(expected);
+    expect(isAllowedRedirectOrigin(allowedOrigins)(url)).toEqual(expected);
     expect(warnMock).toHaveBeenCalledTimes(Number(!expected)); // Number(boolean) evaluates to 0 or 1
   });
 });
@@ -489,5 +518,20 @@ describe('createAllowedRedirectOrigins', () => {
     );
 
     expect(allowedRedirectOriginsValues).toEqual(['https://test.host', 'https://*.test.host']);
+  });
+});
+
+describe('relativeToAbsoluteUrl', () => {
+  const cases: [string, string, string][] = [
+    ['https://www.clerk.com', '/test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com', 'test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com/', '/test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com/', 'test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com', 'https://www.clerk.com/test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com', 'https://www.google.com/test', 'https://www.google.com/test'],
+  ];
+
+  test.each(cases)('relativeToAbsoluteUrl(%s, %s) === %s', (origin, relative, expected) => {
+    expect(relativeToAbsoluteUrl(relative, origin)).toEqual(expected);
   });
 });

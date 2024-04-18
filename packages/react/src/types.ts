@@ -6,8 +6,11 @@ import type {
   InitialState,
   LoadedClerk,
   MultiDomainAndOrProxy,
+  RedirectUrlProp,
   SDKMetadata,
+  SignInProps,
   SignInRedirectOptions,
+  SignUpProps,
   SignUpRedirectOptions,
   Without,
 } from '@clerk/types';
@@ -74,20 +77,25 @@ export type ClerkProp =
   | null;
 
 type ButtonProps = {
-  afterSignInUrl?: string;
-  afterSignUpUrl?: string;
-  redirectUrl?: string;
   mode?: 'redirect' | 'modal';
   children?: React.ReactNode;
 };
 
-export type SignInButtonProps = ButtonProps;
+export type SignInButtonProps = ButtonProps &
+  Pick<
+    SignInProps,
+    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
+  >;
 
-export interface SignUpButtonProps extends ButtonProps {
+export type SignUpButtonProps = {
   unsafeMetadata?: SignUpUnsafeMetadata;
-}
+} & ButtonProps &
+  Pick<
+    SignUpProps,
+    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl'
+  >;
 
-export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'children'>;
+export type SignInWithMetamaskButtonProps = ButtonProps & RedirectUrlProp;
 
 export type RedirectToSignInProps = SignInRedirectOptions;
 export type RedirectToSignUpProps = SignUpRedirectOptions;
