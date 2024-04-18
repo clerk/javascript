@@ -31,7 +31,7 @@ interface Google {
 
 declare global {
   export interface Window {
-    google: Google;
+    google?: Google;
   }
 }
 
@@ -44,7 +44,7 @@ async function loadGIS() {
       clerkFailedToLoadThirdPartyScript('Google Identity Services');
     }
   }
-  return window.google;
+  return window.google as Google;
 }
 
 export { loadGIS };
