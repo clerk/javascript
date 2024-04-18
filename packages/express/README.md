@@ -13,7 +13,7 @@
 <div align="center">
 
 [![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
-[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://beta.clerk.com/docs?utm_source=github&utm_medium=express)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=express)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 [Changelog](https://github.com/clerk/javascript/blob/main/packages/express/CHANGELOG.md)
@@ -31,7 +31,7 @@
 ## Overview
 
 [Clerk](https://clerk.com?utm_source=github&utm_medium=express) is the easiest way to add authentication and user management to your Node.js application. To gain a better understanding of the Express SDK and Clerk Backend API, refer to
-the <a href="https://beta.clerk.com/docs/reference/express/overview?utm_source=github&utm_medium=express" target="_blank">Express SDK</a> and <a href="https://beta.clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
+the <a href="https://clerk.com/docs/reference/express/overview?utm_source=github&utm_medium=express" target="_blank">Express SDK</a> and <a href="https://clerk.com/docs/reference/backend-api" target="_blank">Backend API</a> documentation.
 
 ## Getting started
 
@@ -70,7 +70,7 @@ import { clerkClient } from '@clerk/express';
 const { data: userList } = await clerkClient.users.getUserList();
 ```
 
-_For further details and examples, please refer to our [Documentation](https://beta.clerk.com/docs/references/express/overview?utm_source=github&utm_medium=express)._
+_For further details and examples, please refer to our [Documentation](https://clerk.com/docs/references/express/overview?utm_source=github&utm_medium=express)._
 
 ## Support
 
