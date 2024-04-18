@@ -309,6 +309,7 @@ export default {
       'signoutcallback-to-redirecturl',
       'externalaccount-avatarurl',
       'organizationmembershippublicuserdata-profileimageurl',
+      'clerk-import',
     ]),
   ),
   shared: load('shared', [
@@ -365,6 +366,7 @@ export default {
       'createclerkclient-apikey',
       'getclientlist-arguments',
       'getsessionlist-arguments',
+      'members-count',
     ]),
   ),
   types: [],
