@@ -1,5 +1,24 @@
 # Change Log
 
+## 3.64.0
+
+### Minor Changes
+
+- Add support for different Bot Protection widget types ([#3216](https://github.com/clerk/javascript/pull/3216)) by [@anagstef](https://github.com/anagstef)
+
+- Introduce experimental support for Google One Tap ([#3196](https://github.com/clerk/javascript/pull/3196)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+### Patch Changes
+
+- Adds translation keys to be able to customize error messages when an identifier already exists: ([#3208](https://github.com/clerk/javascript/pull/3208)) by [@octoper](https://github.com/octoper)
+
+  - form_identifier_exists\_\_email_address
+  - form_identifier_exists\_\_username
+  - form_identifier_exists\_\_phone_number
+
 ## 3.63.1
 
 ### Patch Changes
