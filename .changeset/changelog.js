@@ -30,12 +30,11 @@ const getDependencyReleaseLine = async (changesets, dependenciesUpdated) => {
   if (dependenciesUpdated.length === 0) return '';
 
   const fetchLinksWithRetry = async commit => {
-    let links;
     let retries = 0;
     while (retries < 3) {
       try {
-        links = await getInfo({repo, commit});
-        break;
+        const { links } = await getInfo({repo, commit});
+        return links;
       } catch (e) {
         retries++;
         console.log('retrying', retries);
