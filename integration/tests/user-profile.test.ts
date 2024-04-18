@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
@@ -69,8 +69,16 @@ export default function Page() {
     await app.dev();
 
     const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser();
-    await m.services.users.createBapiUser(fakeUser);
+    fakeUser = m.services.users.createFakeUser({
+      withUsername: true,
+      fictionalEmail: true,
+      withPhoneNumber: true,
+    });
+    await m.services.users.createBapiUser({
+      ...fakeUser,
+      username: undefined,
+      phoneNumber: undefined,
+    });
   });
 
   test.afterAll(async () => {
@@ -146,19 +154,55 @@ export default function Page() {
     await u.po.userProfile.waitForMounted();
 
     await u.po.userProfile.clickSetUsername();
+    await u.po.userProfile.waitForSectionCardOpened('username');
 
     await u.po.userProfile.typeUsername(fakeUser.username);
+    await u.page.getByText(/Save/i).click();
+    await u.po.userProfile.waitForSectionCardClosed('username');
 
-    await u.page.getByText(/Cancel/i).click();
+    const username = await u.page.locator(`.cl-profileSectionItem__username`).innerText();
+    expect(username).toContain(fakeUser.username);
+  });
 
-    await u.page.waitForSelector('.cl-profileSectionContent__username .cl-headerTitle', { state: 'detached' });
+  test('add new email address', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
 
     await u.po.userProfile.clickAddEmailAddress();
+    await u.po.userProfile.waitForSectionCardOpened('emailAddresses');
+    await u.po.userProfile.typeEmailAddress(`new-${fakeUser.email}`);
 
-    u.page.getByText(/an email containing/i);
+    await u.page.getByRole('button', { name: /^add$/i }).click();
 
-    await u.po.userProfile.typeEmailAddress('some@email.com');
+    await u.po.userProfile.enterTestOtpCode();
 
-    await u.page.getByText(/Cancel/i).click();
+    // TODO: Add assertion
+  });
+
+  test('add new phone number', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+
+    await u.po.userProfile.clickAddPhoneNumber();
+    await u.po.userProfile.waitForSectionCardOpened('phoneNumbers');
+    await u.po.userProfile.typePhoneNumber(fakeUser.phoneNumber);
+
+    await u.page.getByRole('button', { name: /^add$/i }).click();
+
+    await u.po.userProfile.enterTestOtpCode();
+
+    // TODO: Add assertion
   });
 });
