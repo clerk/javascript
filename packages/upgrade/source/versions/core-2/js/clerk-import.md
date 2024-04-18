@@ -1,6 +1,6 @@
 ---
 title: '`Clerk` import changed'
-matcher: "import\\s+{[^}]*?(Clerk)[\\s\\S]*?}\\s+from\\s+['\"]@clerk/clerk-js['\"]"
+matcher: "import\\s+{[^}]*?(Clerk)[\\s\\S]*?}\\s+from\\s+['\"]@clerk/clerk-js(?:\/headless)?['\"]"
 matcherFlags: 'm'
 replaceWithString: '{ Clerk }'
 ---

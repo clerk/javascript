@@ -39,6 +39,7 @@ const jsChanges = [
   'mfa-dropdown',
   'appearance-variables-breaking-changes',
   'aftersignxurl-changes',
+  'supported-external-accounts-type-removed',
 ];
 
 const reactChanges = [
@@ -269,6 +270,8 @@ export default {
       'clerk-import-change',
       'organizationmembershippublicuserdata-profileimageurl',
       'externalaccount-picture',
+      'createclerkexpressrequireauth-public-key-required',
+      'createclerkexpresswithauth-publickey-required',
     ]),
   ),
   react: load('react', dedupeMerge(changesAffectingAll, reactChanges, jsChanges)),
