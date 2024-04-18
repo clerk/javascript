@@ -15,7 +15,7 @@ concurrency:
 jobs:
   preview:
     if: ${{ startsWith(github.event.comment.body, '!preview') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     env:

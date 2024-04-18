@@ -13,7 +13,7 @@ concurrency:
 jobs:
   canary-release:
     if: ${{ github.repository == 'clerk/javascript' }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}

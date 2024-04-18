@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   preview:
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write

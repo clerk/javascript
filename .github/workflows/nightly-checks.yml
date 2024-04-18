@@ -7,7 +7,7 @@ on:
 jobs:
   integration-tests:
     name: Integration Tests
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     strategy:

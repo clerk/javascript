@@ -15,7 +15,7 @@ concurrency:
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ubuntu-latest-l
     timeout-minutes: 10
 
     env:
@@ -80,7 +80,7 @@ jobs:
   unit-tests:
     name: Unit Tests
     needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ubuntu-latest-l
     timeout-minutes: 10
 
     env:
@@ -124,7 +124,7 @@ jobs:
   integration-tests:
     name: Integration Tests
     needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_MEDIUM }}
+    runs-on: ubuntu-latest-m
     timeout-minutes: 10
 
     strategy:

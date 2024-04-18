@@ -8,7 +8,7 @@ on:
 jobs:
   integration-tests:
     name: Cleanup e2e instances
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:

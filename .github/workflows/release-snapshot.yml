@@ -12,7 +12,7 @@ concurrency:
 jobs:
   snapshot-release:
     if: ${{ startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
-    runs-on: ${{ vars.RUNNER_LARGE }}
+    runs-on: ubuntu-latest-l
     timeout-minutes: 10
 
     permissions:
