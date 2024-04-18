@@ -4,4 +4,4 @@
 '@clerk/types': patch
 ---
 
-Introduce forceRedirectUrl and fallbackRedirectUrl
+Support but warn when `afterSignInUrl` and `afterSignUpUrl` are used

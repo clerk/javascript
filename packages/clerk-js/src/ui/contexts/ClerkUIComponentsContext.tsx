@@ -5,7 +5,6 @@ import React, { useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildURL, createDynamicParamParser } from '../../utils';
-import { assertNoLegacyProp } from '../../utils/assertNoLegacyProp';
 import { RedirectUrls } from '../../utils/redirectUrls';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import { useEnvironment, useOptions } from '../contexts';
@@ -61,9 +60,6 @@ export const useSignUpContext = (): SignUpContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
-
-  assertNoLegacyProp(options);
-  assertNoLegacyProp(ctx);
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_UP_INITIAL_VALUE_KEYS),
@@ -134,9 +130,6 @@ export const useSignInContext = (): SignInContextType => {
   const { queryParams, queryString } = useRouter();
   const options = useOptions();
   const clerk = useClerk();
-
-  assertNoLegacyProp(options);
-  assertNoLegacyProp(ctx);
 
   const initialValuesFromQueryParams = useMemo(
     () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
