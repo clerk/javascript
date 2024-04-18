@@ -51,9 +51,10 @@ const getDependencyReleaseLine = async (changesets, dependenciesUpdated) => {
     return fetchLinksWithRetry(changeset.commit).then(links => links.commit);
   }
 
+  const batchSize = 3;
   const batches = [];
-  for (let i = 0; i < changesets.length; i += 10) {
-    batches.push(changesets.slice(i, i + 5).map(cs => () => getLinksCommitFromChangeset(cs)));
+  for (let i = 0; i < changesets.length; i += batchSize) {
+    batches.push(changesets.slice(i, i + batchSize).map(cs => () => getLinksCommitFromChangeset(cs)));
   }
 
   const resolvedPromises = [];
@@ -62,7 +63,7 @@ const getDependencyReleaseLine = async (changesets, dependenciesUpdated) => {
     const batch = batches[i];
     const resolvedBatch = await Promise.all(batch.map(fn => fn()));
     resolvedPromises.push(resolvedBatch);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 2000));
   }
 
   const list = (resolvedPromises.flat()).filter(_ => _).join(', ')
