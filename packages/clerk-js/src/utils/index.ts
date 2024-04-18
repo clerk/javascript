@@ -23,7 +23,7 @@ export * from './web3';
 export * from './windowNavigate';
 export * from './componentGuards';
 export * from './queryStateParams';
-export * from './authPropHelpers';
+export * from './normalizeRoutingOptions';
 export * from './image';
 export * from './captcha';
 export * from './completeSignUpFlow';

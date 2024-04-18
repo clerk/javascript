@@ -3,8 +3,8 @@ import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useTransition } from 'react';
 
+import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
-import { useSafeLayoutEffect } from '../../client-boundary/useSafeLayoutEffect';
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';

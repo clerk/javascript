@@ -15,7 +15,7 @@ import type { ClerkRouter } from '~/react/router';
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type BaseRouterLoadingStep = 'start' | 'verifications' | 'continue';
+export type BaseRouterLoadingStep = 'start' | 'verifications' | 'continue' | 'reset-password';
 
 export type BaseRouterNextEvent<T extends ClerkResource> = { type: 'NEXT'; resource?: T };
 export type BaseRouterPrevEvent = { type: 'NAVIGATE.PREVIOUS' };

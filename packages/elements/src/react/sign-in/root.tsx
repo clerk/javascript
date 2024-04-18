@@ -18,7 +18,7 @@ type SignInFlowProviderProps = {
 };
 
 const actor = createActor(SignInRouterMachine, { inspect: consoleInspector });
-const ref = actor.start();
+actor.start();
 
 function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) {
   const clerk = useClerk();
@@ -37,13 +37,13 @@ function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) 
         exampleMode,
       };
 
-      if (ref.getSnapshot().can(evt)) {
-        ref.send(evt);
+      if (actor.getSnapshot().can(evt)) {
+        actor.send(evt);
       }
     });
   }, [clerk, router, exampleMode]);
 
-  return <SignInRouterCtx.Provider actorRef={ref}>{children}</SignInRouterCtx.Provider>;
+  return <SignInRouterCtx.Provider actorRef={actor}>{children}</SignInRouterCtx.Provider>;
 }
 
 export type SignInRootProps = {

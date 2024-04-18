@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.0-beta.45
+
+### Patch Changes
+
+- Throw a descriptive error when a Clerk component that is using path-based routing is mounted in a non-catch-all route ([#3204](https://github.com/clerk/javascript/pull/3204)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`bab2e7e05`](https://github.com/clerk/javascript/commit/bab2e7e0590d0da1fd7db0680e63e8f2eb836b41)]:
+  - @clerk/shared@2.0.0-beta.23
+  - @clerk/backend@1.0.0-beta.37
+  - @clerk/clerk-react@5.0.0-beta.40
+
 ## 5.0.0-beta.44
 
 ### Minor Changes

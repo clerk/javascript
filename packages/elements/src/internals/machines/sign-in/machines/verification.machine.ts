@@ -189,8 +189,12 @@ const SignInVerificationMachine = setup({
       description: 'Waiting for user input',
       on: {
         'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
+        'NAVIGATE.FORGOT_PASSWORD': 'ChooseStrategy',
         RETRY: 'Preparing',
-        SUBMIT: 'Attempting',
+        SUBMIT: {
+          target: 'Attempting',
+          reenter: true,
+        },
       },
       initial: 'NotResendable',
       states: {
@@ -229,7 +233,8 @@ const SignInVerificationMachine = setup({
       },
     },
     ChooseStrategy: {
-      tags: ['state:choose-strategy'],
+      description: 'Handles both choose strategy and forgot password as the latter is similar in functionality',
+      tags: ['state:choose-strategy', 'state:forgot-password'],
       on: {
         'STRATEGY.UPDATE': {
           actions: assign({ currentFactor: ({ event }) => event.factor || null }),
@@ -299,7 +304,6 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         case 'reset_password_phone_code':
         case 'reset_password_email_code': {
           assertIsDefined(code);
-          assertIsDefined(password);
 
           attemptParams = {
             strategy,

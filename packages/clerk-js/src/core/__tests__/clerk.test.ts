@@ -981,7 +981,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('redirects the user to the afterSignInUrl if one was provided', async () => {
+    it('redirects the user to the signInForceRedirectUrl if one was provided', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -1028,7 +1028,7 @@ describe('Clerk singleton', () => {
       sut.setActive = mockSetActive as any;
 
       sut.handleRedirectCallback({
-        redirectUrl: '/custom-sign-in',
+        signInForceRedirectUrl: '/custom-sign-in',
       });
 
       await waitFor(() => {
@@ -1036,7 +1036,7 @@ describe('Clerk singleton', () => {
       });
     });
 
-    it('gives priority to afterSignInUrl if afterSignInUrl and redirectUrl were provided ', async () => {
+    it('gives priority to signInForceRedirectUrl if signInForceRedirectUrl and signInFallbackRedirectUrl were provided ', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
           authConfig: {},
@@ -1083,8 +1083,8 @@ describe('Clerk singleton', () => {
       sut.setActive = mockSetActive as any;
 
       sut.handleRedirectCallback({
-        afterSignInUrl: '/custom-sign-in',
-        redirectUrl: '/redirect-to',
+        signInForceRedirectUrl: '/custom-sign-in',
+        signInFallbackRedirectUrl: '/redirect-to',
       } as any);
 
       await waitFor(() => {

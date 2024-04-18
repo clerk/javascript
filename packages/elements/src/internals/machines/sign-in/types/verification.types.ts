@@ -10,6 +10,7 @@ import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines
 export type SignInVerificationTags =
   | 'state:attempting'
   | 'state:choose-strategy'
+  | 'state:forgot-password'
   | 'state:loading'
   | 'state:pending'
   | 'state:preparing';
