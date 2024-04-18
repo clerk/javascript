@@ -1,7 +1,7 @@
 'use client';
 
-import { Connection, GlobalError, Icon, Loading } from '@clerk/elements/common';
-import { Action, SignUp, Step, Strategy } from '@clerk/elements/sign-up';
+import * as Clerk from '@clerk/elements/common';
+import * as SignUp from '@clerk/elements/sign-up';
 import type { ComponentProps } from 'react';
 
 import { H1, HR as Hr } from '@/components/design';
@@ -10,52 +10,52 @@ import { Spinner } from '@/components/spinner';
 
 function CustomSubmit({ children }: ComponentProps<'button'>) {
   return (
-    <Action
+    <SignUp.Action
       className='inline-flex px-7 py-3 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,255,255)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(160,160,160)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'
       submit
     >
       {children}
-    </Action>
+    </SignUp.Action>
   );
 }
 
 export default function SignUpPage() {
   return (
-    <SignUp
+    <SignUp.Root
       fallback={
         <div className='m-auto w-max text-sm'>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>Sign Up</H1>
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
-              <Connection
+              <Clerk.Connection
                 name='github'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <Icon className='invert' />
+                <Clerk.Icon className='invert' />
                 Sign In with GitHub
-              </Connection>
+              </Clerk.Connection>
 
-              <Connection
+              <Clerk.Connection
                 name='google'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <Icon />
+                <Clerk.Icon />
                 Sign In with Google
-              </Connection>
+              </Clerk.Connection>
 
-              <Connection
+              <Clerk.Connection
                 name='metamask'
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <Icon />
+                <Clerk.Icon />
                 Sign In with Metamask
-              </Connection>
+              </Clerk.Connection>
             </div>
 
             <Hr />
 
-            <GlobalError className='block text-red-400 font-mono' />
+            <Clerk.GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex gap-6 flex-col'>
               <CustomField
@@ -68,7 +68,7 @@ export default function SignUpPage() {
                 name='phoneNumber'
               />
               <CustomSubmit>
-                <Loading>
+                <Clerk.Loading>
                   {isLoading =>
                     isLoading ? (
                       <>
@@ -78,7 +78,7 @@ export default function SignUpPage() {
                       'Sign Up'
                     )
                   }
-                </Loading>
+                </Clerk.Loading>
               </CustomSubmit>
             </div>
           </div>
@@ -86,39 +86,39 @@ export default function SignUpPage() {
       }
     >
       <div className='m-auto text-sm'>
-        <Step name='start'>
+        <SignUp.Step name='start'>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>Sign Up</H1>
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
-              <Connection
+              <Clerk.Connection
                 name='github'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#171717] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <Icon className='invert' />
+                <Clerk.Icon className='invert' />
                 Sign In with GitHub
-              </Connection>
+              </Clerk.Connection>
 
-              <Connection
+              <Clerk.Connection
                 name='google'
                 className='flex items-center justify-center gap-4 text-white rounded bg-[#333f61] px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <Icon />
+                <Clerk.Icon />
                 Sign In with Google
-              </Connection>
+              </Clerk.Connection>
 
-              <Connection
+              <Clerk.Connection
                 name='metamask'
                 className='flex items-center justify-center gap-4 text-[#161616] rounded bg-white px-4 py-3 text-sm shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
               >
-                <Icon />
+                <Clerk.Icon />
                 Sign In with Metamask
-              </Connection>
+              </Clerk.Connection>
             </div>
 
             <Hr />
 
-            <GlobalError className='block text-red-400 font-mono' />
+            <Clerk.GlobalError className='block text-red-400 font-mono' />
 
             <div className='flex gap-6 flex-col w-96'>
               <CustomField
@@ -133,7 +133,7 @@ export default function SignUpPage() {
               />
 
               <CustomSubmit>
-                <Loading>
+                <Clerk.Loading>
                   {isLoading =>
                     isLoading ? (
                       <>
@@ -143,22 +143,22 @@ export default function SignUpPage() {
                       'Sign Up'
                     )
                   }
-                </Loading>
+                </Clerk.Loading>
               </CustomSubmit>
             </div>
           </div>
-        </Step>
+        </SignUp.Step>
 
-        <Step name='continue'>
+        <SignUp.Step name='continue'>
           <H1>Please enter additional information:</H1>
-          <GlobalError className='block text-red-400 font-mono' />
+          <Clerk.GlobalError className='block text-red-400 font-mono' />
           <CustomField
             label='Password'
             name='password'
           />
 
           <CustomSubmit>
-            <Loading>
+            <Clerk.Loading>
               {isLoading =>
                 isLoading ? (
                   <>
@@ -168,23 +168,23 @@ export default function SignUpPage() {
                   'Sign Up'
                 )
               }
-            </Loading>
+            </Clerk.Loading>
           </CustomSubmit>
-        </Step>
+        </SignUp.Step>
 
-        <Step name='verifications'>
+        <SignUp.Step name='verifications'>
           <H1>Verify your information:</H1>
 
-          <GlobalError className='block text-red-400 font-mono' />
+          <Clerk.GlobalError className='block text-red-400 font-mono' />
 
-          <Strategy name='phone_code'>
+          <SignUp.Strategy name='phone_code'>
             <CustomField
               label='SMS Code'
               name='code'
             />
 
             <CustomSubmit>
-              <Loading>
+              <Clerk.Loading>
                 {isLoading =>
                   isLoading ? (
                     <>
@@ -194,18 +194,18 @@ export default function SignUpPage() {
                     'Verify'
                   )
                 }
-              </Loading>
+              </Clerk.Loading>
             </CustomSubmit>
-          </Strategy>
+          </SignUp.Strategy>
 
-          <Strategy name='email_code'>
+          <SignUp.Strategy name='email_code'>
             <CustomField
               label='Email Code'
               name='code'
             />
 
             <CustomSubmit>
-              <Loading>
+              <Clerk.Loading>
                 {isLoading =>
                   isLoading ? (
                     <>
@@ -215,13 +215,15 @@ export default function SignUpPage() {
                     'Verify'
                   )
                 }
-              </Loading>
+              </Clerk.Loading>
             </CustomSubmit>
-          </Strategy>
+          </SignUp.Strategy>
 
-          <Strategy name='email_link'>Please check your email for a link to verify your account.</Strategy>
-        </Step>
+          <SignUp.Strategy name='email_link'>
+            Please check your email for a link to verify your account.
+          </SignUp.Strategy>
+        </SignUp.Step>
       </div>
-    </SignUp>
+    </SignUp.Root>
   );
 }
