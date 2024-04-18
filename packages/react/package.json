@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-react",
-  "version": "5.0.0-beta.39",
+  "version": "5.0.0-beta.40",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -76,13 +76,13 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/shared": "2.0.0-beta.22",
-    "@clerk/types": "4.0.0-beta.28",
+    "@clerk/shared": "2.0.0-beta.23",
+    "@clerk/types": "4.0.0-beta.29",
     "eslint-config-custom": "*",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/themes": "2.0.0-beta.13",
+    "@clerk/themes": "2.0.0-beta.14",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",

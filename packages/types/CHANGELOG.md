@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-beta.29
+
+### Patch Changes
+
+- Introduce forceRedirectUrl and fallbackRedirectUrl ([#3162](https://github.com/clerk/javascript/pull/3162)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.0.0-beta.28
 
 ### Minor Changes

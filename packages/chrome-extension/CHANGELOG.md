@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.0.0-beta.46
+
+### Patch Changes
+
+- Updated dependencies [[`3daa937a7`](https://github.com/clerk/javascript/commit/3daa937a7a64949ec986542b57df36eba26fd10e), [`bab2e7e05`](https://github.com/clerk/javascript/commit/bab2e7e0590d0da1fd7db0680e63e8f2eb836b41)]:
+  - @clerk/clerk-js@5.0.0-beta.46
+  - @clerk/shared@2.0.0-beta.23
+  - @clerk/clerk-react@5.0.0-beta.40
+
 ## 1.0.0-beta.45
 
 ### Patch Changes
