@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0-beta.49
+
+### Patch Changes
+
+- Support legacy redirectUrl prop on SignIn and SignUp by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`f00fd2dfe`](https://github.com/clerk/javascript/commit/f00fd2dfe309cfeac82a776cc006f2c21b6d7988)]:
+  - @clerk/types@4.0.0-beta.30
+
 ## 5.0.0-beta.48
 
 ### Patch Changes

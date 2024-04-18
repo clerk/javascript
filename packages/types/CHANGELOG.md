@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.0-beta.30
+
+### Patch Changes
+
+- Support legacy redirectUrl prop on SignIn and SignUp by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.0.0-beta.29
 
 ### Patch Changes
