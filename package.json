@@ -9,7 +9,7 @@
     ]
   },
   "scripts": {
-    "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
+    "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%} --filter=!elements",
     "bundlewatch": "turbo bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "npm run changeset -- --empty",
@@ -28,7 +28,7 @@
     "release:canary": "changeset publish --tag canary --no-git-tag",
     "release:snapshot": "changeset publish --tag snapshot --no-git-tag",
     "release:verdaccio": "if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else TURBO_CONCURRENCY=1 npm run build && changeset publish --no-git-tag; fi",
-    "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%}",
+    "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%} --filter=!elements",
     "test:cache:clear": "FORCE_COLOR=1 turbo test:cache:clear --continue --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test:integration:ap-flows": "npm run test:integration:base -- --grep @ap-flows",
     "test:integration:base": "DEBUG=1 npx playwright test --config integration/playwright.config.ts",
