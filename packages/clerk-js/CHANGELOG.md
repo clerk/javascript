@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.72.1
+
+### Patch Changes
+
+- Bug fix: Respect `navigateAfterCreateOrganization` in `<OrganizationList/>`. ([#3217](https://github.com/clerk/javascript/pull/3217)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.72.0
 
 ### Minor Changes

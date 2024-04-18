@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "0.6.22",
+  "version": "0.6.23",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -45,7 +45,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/clerk-js": "4.72.0",
+    "@clerk/clerk-js": "4.72.1",
     "@clerk/clerk-react": "4.31.0"
   },
   "devDependencies": {
