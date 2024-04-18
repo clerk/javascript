@@ -566,6 +566,9 @@ export const jaJP: LocalizationResource = {
     },
   },
   unstable__errors: {
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_password_pwned:
       'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',

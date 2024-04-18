@@ -571,6 +571,9 @@ export const zhTW: LocalizationResource = {
     },
   },
   unstable__errors: {
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     captcha_invalid: '由於安全驗證失敗，注冊未成功。請刷新頁面重試或聯系支持獲取更多幫助。',
     form_password_pwned: '這個密碼在數據泄露中被發現，不能使用，請換一個密碼試試。',
