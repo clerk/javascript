@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-clerk",
-  "version": "4.4.41",
+  "version": "4.4.42",
   "description": "Clerk SDK for Gatsby",
   "keywords": [
     "clerk",
@@ -44,10 +44,10 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/backend": "0.38.6",
-    "@clerk/clerk-react": "4.30.10",
-    "@clerk/clerk-sdk-node": "4.13.14",
-    "@clerk/types": "3.63.1",
+    "@clerk/backend": "0.38.7",
+    "@clerk/clerk-react": "4.31.0",
+    "@clerk/clerk-sdk-node": "4.13.15",
+    "@clerk/types": "3.64.0",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
   },
