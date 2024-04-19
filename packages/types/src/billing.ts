@@ -61,4 +61,5 @@ export type ChangePlanParams = {
 
 export type BillingData = {
   enabled: boolean;
+  portal_enabled: boolean;
 };

@@ -56,7 +56,7 @@ const CardIcon = ({ cardType }: { cardType: string }) => {
 
 export const PaymentMethodSection = () => {
   const { t, locale } = useLocalizations();
-  const { currentPlan } = useBillingContext();
+  const { currentPlan, portalEnabled } = useBillingContext();
 
   if (!currentPlan) {
     return null;
@@ -91,7 +91,7 @@ export const PaymentMethodSection = () => {
             </Box>
           </Box>
         )}
-        <ManagePaymentMethodButton currentPlan={currentPlan} />
+        {portalEnabled && <ManagePaymentMethodButton currentPlan={currentPlan} />}
       </ProfileSection.Item>
     </ProfileSection.Root>
   );
@@ -169,8 +169,10 @@ const CurrentPlanSection = () => {
 };
 
 export const PlanAndBillingScreen = () => {
-  const { checkPermissions } = useBillingContext();
+  const { checkPermissions, currentPlan, portalEnabled } = useBillingContext();
   const card = useCardState();
+
+  const enablePaymentMethodSection = !!(portalEnabled || currentPlan.paymentMethod);
 
   return (
     <Col
@@ -188,17 +190,16 @@ export const PlanAndBillingScreen = () => {
             textVariant='h2'
           />
         </Header.Root>
-
         <Card.Alert>{card.error}</Card.Alert>
-
         <CurrentPlanSection />
-        {checkPermissions ? (
-          <Protect permission='org:sys_billing:manage'>
+        {enablePaymentMethodSection &&
+          (checkPermissions ? (
+            <Protect permission='org:sys_billing:manage'>
+              <PaymentMethodSection />
+            </Protect>
+          ) : (
             <PaymentMethodSection />
-          </Protect>
-        ) : (
-          <PaymentMethodSection />
-        )}
+          ))}
       </Col>
     </Col>
   );
