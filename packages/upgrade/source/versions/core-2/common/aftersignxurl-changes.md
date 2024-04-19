@@ -30,6 +30,6 @@ All `afterSignXUrl` props and `CLERK_AFTER_SIGN_X_URL` environment variables hav
 If neither value is set, Clerk will redirect to the `redirect_url` if present, otherwise it will redirect to `/`. If you'd like to retain the current behavior of your app without any changes, you can switch `afterSignXUrl` with `signXFallbackRedirectUrl` as such:
 
 ```diff
-- <SignIn afterSignInUrl='/foo' />
-+ <SignIn signInFallbackRedirectUrl='/foo' />
+- <SignIn afterSignInUrl='/foo' afterSignUpUrl='/bar' />
++ <SignIn fallbackRedirectUrl='/foo' signUpFallbackRedirectUrl='/bar' />
 ```
