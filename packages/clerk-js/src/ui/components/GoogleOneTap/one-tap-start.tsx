@@ -3,25 +3,41 @@ import { useEffect, useRef } from 'react';
 
 import type { GISCredentialResponse } from '../../../utils/one-tap';
 import { loadGIS } from '../../../utils/one-tap';
-import { useCoreSignIn, useEnvironment, useGoogleOneTapContext } from '../../contexts';
+import { useEnvironment, useGoogleOneTapContext } from '../../contexts';
 import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
+import { useRouter } from '../../router';
 
 function _OneTapStart(): JSX.Element | null {
   const clerk = useClerk();
-  const signIn = useCoreSignIn();
   const { user } = useUser();
   const environment = useEnvironment();
   const isPromptedRef = useRef(false);
+  const { navigate } = useRouter();
 
   const ctx = useGoogleOneTapContext();
+  const { signInUrl, signUpUrl, continueSignUpUrl, secondFactorUrl, firstFactorUrl } = ctx;
 
   async function oneTapCallback(response: GISCredentialResponse) {
-    await signIn.__experimental_authenticateWithGoogleOneTap({
-      token: response.credential,
-    });
-
-    await clerk.handleRedirectCallback();
+    isPromptedRef.current = false;
+    try {
+      const res = await clerk.__experimental_authenticateWithGoogleOneTap({
+        token: response.credential,
+      });
+      await clerk.__experimental__handleGoogleOneTapCallback(
+        res,
+        {
+          signInUrl,
+          signUpUrl,
+          continueSignUpUrl,
+          secondFactorUrl,
+          firstFactorUrl,
+        },
+        navigate,
+      );
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   const environmentClientID = environment.displayConfig.googleOneTapClientId;

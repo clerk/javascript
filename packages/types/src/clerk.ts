@@ -27,6 +27,8 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { ActiveSessionResource } from './session';
+import type { SignInResource } from './signIn';
+import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 
@@ -439,6 +441,16 @@ export interface Clerk {
   redirectToAfterSignOut: () => void;
 
   /**
+   * Completes an Google One Tap redirection flow started by
+   * {@link Clerk.__experimental_authenticateWithGoogleOneTap}
+   */
+  __experimental__handleGoogleOneTapCallback: (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes an OAuth or SAML redirection flow started by
    * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
@@ -459,6 +471,14 @@ export interface Clerk {
    * Authenticates user using their Metamask browser extension
    */
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
+
+  /**
+   * @experimental
+   * Authenticates user using a google token generated from google identity services.
+   */
+  __experimental_authenticateWithGoogleOneTap: (
+    params: __experimental_AuthenticateWithGoogleOneTapParams,
+  ) => Promise<SignInResource | SignUpResource>;
 
   /**
    * Creates an organization, adding the current user as admin.
@@ -1034,6 +1054,10 @@ export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+}
+
+export interface __experimental_AuthenticateWithGoogleOneTapParams {
+  token: string;
 }
 
 export interface LoadedClerk extends Clerk {

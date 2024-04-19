@@ -495,13 +495,33 @@ export const useCreateOrganizationContext = () => {
 
 export const useGoogleOneTapContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OneTapCtx;
+  const options = useOptions();
+  const { displayConfig } = useEnvironment();
+  const { queryParams } = useRouter();
 
   if (componentName !== 'OneTap') {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
 
+  const redirectUrls = new RedirectUrls(options, {}, queryParams);
+
+  let signUpUrl = options.signUpUrl || displayConfig.signUpUrl;
+  let signInUrl = options.signInUrl || displayConfig.signInUrl;
+
+  signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
+  signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
+
+  const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
+  const firstFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-one' }, { stringify: true });
+  const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
+
   return {
     ...ctx,
     componentName,
+    signInUrl,
+    signUpUrl,
+    firstFactorUrl,
+    secondFactorUrl,
+    continueSignUpUrl: signUpContinueUrl,
   };
 };
