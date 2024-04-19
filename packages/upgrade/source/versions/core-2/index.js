@@ -39,7 +39,7 @@ const jsChanges = [
   'mfa-dropdown',
   'appearance-variables-breaking-changes',
   'aftersignxurl-changes',
-  'supported-external-accounts-type-removed',
+  'supported-external-accounts-removed',
 ];
 
 const reactChanges = [
