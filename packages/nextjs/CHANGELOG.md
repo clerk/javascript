@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.1
+
+### Patch Changes
+
+- cfbe43d3a: Correctly read legacy NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL and NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL env variables
+
 ## 5.0.0
 
 ### Major Changes
@@ -94,7 +100,8 @@
   - use `publishableKey` instead of `frontendApi`
   - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
 - 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
-  ```typescript
+
+  ````typescript
   // Before
   import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
   // After
@@ -119,6 +126,8 @@
   - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
+
+  ````
 
 - dd5703013: Change the response payload of Backend API requests to return `{ data, errors }` instead of return the data and throwing on error response.
   Code example to keep the same behavior:
