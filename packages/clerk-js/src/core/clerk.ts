@@ -109,6 +109,8 @@ import {
   EmailLinkErrorCode,
   Environment,
   Organization,
+  SignIn,
+  SignUp,
 } from './resources/internal';
 import { SessionCookieService } from './services';
 import { warnings } from './warnings';
@@ -1050,34 +1052,44 @@ export class Clerk implements ClerkInterface {
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
-    const makeNavigate = (to: string) => () => navigate(to);
+    const makeNavigate = (to: string, withAuth: boolean) => () => navigate(withAuth ? this.buildUrlWithAuth(to) : to);
 
-    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig.signInUrl);
+    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig.signInUrl, !!params.signInOrUp);
 
-    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig.signUpUrl);
+    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig.signUpUrl, !!params.signInOrUp);
 
     const navigateToFactorOne = makeNavigate(
       params.firstFactorUrl ||
         buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-one' }, { stringify: true }),
+      !!params.signInOrUp,
     );
 
     const navigateToFactorTwo = makeNavigate(
       params.secondFactorUrl ||
         buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
+      !!params.signInOrUp,
     );
 
     const navigateToResetPassword = makeNavigate(
       params.resetPasswordUrl ||
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
+      !!params.signInOrUp,
     );
 
     const redirectUrls = new RedirectUrls(this.#options, params);
-    const navigateAfterSignIn = makeNavigate(redirectUrls.getAfterSignInUrl());
-    const navigateAfterSignUp = makeNavigate(redirectUrls.getAfterSignUpUrl());
+    const navigateAfterSignIn = makeNavigate(redirectUrls.getAfterSignInUrl(), !!params.signInOrUp);
+    const navigateAfterSignUp = makeNavigate(redirectUrls.getAfterSignUpUrl(), !!params.signInOrUp);
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||
-        buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
+        buildURL(
+          {
+            base: displayConfig.signUpUrl,
+            hashPath: '/continue',
+          },
+          { stringify: true },
+        ),
+      !!params.signInOrUp,
     );
 
     const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
@@ -1099,7 +1111,7 @@ export class Clerk implements ClerkInterface {
 
     const userExistsButNeedsToSignIn =
       (su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists') ||
-      (!!params.signInOrUp && params.signInOrUp.status !== 'needs_identifier');
+      (!!params.signInOrUp && params.signInOrUp instanceof SignIn && params.signInOrUp.status !== 'needs_identifier');
 
     console.log('userExistsButNeedsToSignIn', userExistsButNeedsToSignIn);
 
@@ -1154,7 +1166,9 @@ export class Clerk implements ClerkInterface {
 
     const userNeedsToBeCreated =
       si.firstFactorVerificationStatus === 'transferable' ||
-      (!!params.signInOrUp && params.signInOrUp.status === 'missing_requirements');
+      (!!params.signInOrUp &&
+        params.signInOrUp instanceof SignUp &&
+        params.signInOrUp.status === 'missing_requirements');
 
     if (userNeedsToBeCreated) {
       let res = params.signInOrUp || signUp;
