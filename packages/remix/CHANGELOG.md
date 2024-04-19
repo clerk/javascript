@@ -1,5 +1,356 @@
 # Change Log
 
+## 4.0.0
+
+### Major Changes
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- cfea3d9c0: Path-based routing is now the default routing strategy if the `path` prop is filled. Additionally, if the `path` and `routing` props are not filled, an error will be thrown.
+
+  ```jsx
+
+  // Without path or routing props, an error with be thrown
+  <UserProfile />
+  <CreateOrganization />
+  <OrganizationProfile />
+  <SignIn />
+  <SignUp />
+
+  // Alternative #1
+  <UserProfile path="/whatever"/>
+  <CreateOrganization path="/whatever"/>
+  <OrganizationProfile path="/whatever"/>
+  <SignIn path="/whatever"/>
+  <SignUp path="/whatever"/>
+
+  // Alternative #2
+  <UserProfile routing="hash_or_virtual"/>
+  <CreateOrganization routing="hash_or_virtual"/>
+  <OrganizationProfile routing="hash_or_virtual"/>
+  <SignIn routing="hash_or_virtual"/>
+  <SignUp routing="hash_or_virtual"/>
+  ```
+
+- fa6874687: Update `@clerk/remix`'s `rootAuthLoader` and `getAuth` helpers to handle handshake auth status, this replaces the previous interstitial flow. As a result of this, the `ClerkErrorBoundary` is no longer necessary and has been removed.
+
+  To migrate, remove usage of `ClerkErrorBoundary`:
+
+  ```diff
+  - import { ClerkApp, ClerkErrorBoundary } from "@clerk/remix";
+  + import { ClerkApp } from "@clerk/remix";
+
+  ...
+
+  - export const ErrorBoundary = ClerkErrorBoundary();
+  ```
+
+- 2a22aade8: Drop deprecations. Migration steps:
+  - drop `orgs` jwt claim from session token
+  - change type of `auth` param of `withServerAuth()` callback to `AuthObject` from `ServerSideAuth` in `gatsby-clerk-plugin`
+    - use `auth.sessionClaims` instead of `auth.claims`
+    - use `AuthObject` properties from `auth`
+  - use `publishableKey` instead of `frontendApi`
+  - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
+- c08f804cf: Drop deprecations. Migration steps:
+
+  - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY` env variable
+  - use `secretKey` instead of `apiKey`
+  - use `CLERK_PUBLISHABLE_KEY` instead of `CLERK_FRONTEND_API` env variable
+  - use `publishableKey` instead of `frontendApi`
+
+- 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
+  ```typescript
+  // Before
+  import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
+  // After
+  import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
+      // Before
+      import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+      // After
+      import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
+
+      // Before
+      import { MultisessionAppSupport } from '@clerk/clerk-react';
+      // After
+      import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+      ```
+
+  - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
+    - `__internal__setErrorThrowerOptions` internal utility (moved to /internal subpath)
+    - `WithClerkProp` type
+    - `MultisessionAppSupport` component (moved to /internal subpath)
+    - `EmailLinkErrorCode` enum
+  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
+    to reduce the export surface since it's trivial to implement if needed.
+
+- 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
+  to fix issues with vite & rollup building.
+- 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
+- 0ec3a146c: Changes in exports of `@clerk/backend`:
+  - Expose the following helpers and enums from `@clerk/backend/internal`:
+    ```typescript
+    import {
+      AuthStatus,
+      buildRequestUrl,
+      constants,
+      createAuthenticateRequest,
+      createIsomorphicRequest,
+      debugRequestState,
+      makeAuthObjectSerializable,
+      prunePrivateMetadata,
+      redirect,
+      sanitizeAuthObject,
+      signedInAuthObject,
+      signedOutAuthObject,
+    } from '@clerk/backend/internal';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { AuthStatus, ... } from '@clerk/backend';
+    // After
+    import { AuthStatus, ... } from '@clerk/backend/internal';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+- 02976d494: (Note: This is only relevant if, in the unlikely case, you are using `Clerk` from `@clerk/remix` directly. If not, you can safely ignore this change.)
+
+  Remove the named `Clerk` import from `@clerk/remix` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
+
+  ```js
+  import { Clerk } from '@clerk/remix';
+  const clerk = Clerk({ secretKey: '...' });
+  ```
+
+  You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
+
+  ```js
+  import { createClerkClient } from '@clerk/remix';
+  const clerk = createClerkClient({ secretKey: '...' });
+  ```
+
+- 1ad910eb9: Changes in exports of `@clerk/backend`:
+  - Drop the following internal exports from the top-level api:
+    ```typescript
+    // Before
+    import {
+      AllowlistIdentifier,
+      Client,
+      DeletedObject,
+      Email,
+      EmailAddress,
+      ExternalAccount,
+      IdentificationLink,
+      Invitation,
+      OauthAccessToken,
+      ObjectType,
+      Organization,
+      OrganizationInvitation,
+      OrganizationMembership,
+      OrganizationMembershipPublicUserData,
+      PhoneNumber,
+      RedirectUrl,
+      SMSMessage,
+      Session,
+      SignInToken,
+      Token,
+      User,
+      Verification,
+    } from '@clerk/backend';
+    // After : no alternative since there is no need to use those classes
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+  - Keep those 3 resource related type exports
+    ```typescript
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    ```
+- 9a1fe3728: Use the new `routerPush` and `routerReplace` props for `<ClerkProvider />` instead of `navigate`.
+- e1f7eae87: Limit TokenVerificationError exports to TokenVerificationError and TokenVerificationErrorReason
+
+### Minor Changes
+
+- 7f6a64f43: - By default, all the components with routing will have the `routing` prop assigned as `'path'` by default when the `path` prop is filled.
+  - The `<UserButton />` component will set the default value of the `userProfileMode` prop to `'navigation'` if the `userProfileUrl` prop is provided.
+  - The `<OrganizationSwitcher />` component will have the `organizationProfileMode` and `createOrganizationMode` props assigned with `'navigation'` by default if the `organizationProfileUrl` and `createOrganizationUrl` props are filled accordingly.
+- 2964f8a47: Expose debug headers in response for handshake / signed-out states from SDKs using headers returned from `authenticateRequest()`
+- b4e79c1b9: Replace the `Clerk-Backend-SDK` header with `User-Agent` in BAPI requests and update it's value to contain both the package name and the package version of the clerk package
+  executing the request. Eg request from `@clerk/nextjs` to BAPI with append `User-Agent: @clerk/nextjs@5.0.0-alpha-v5.16` using the latest version.
+
+  Miscellaneous changes: The backend test build changed to use tsup.
+
+### Patch Changes
+
+- a8901be64: Expose resources types
+- 2de442b24: Rename beta-v5 to beta
+- ef2325dcc: Introduce `isTruthy` helper to better cast environment variables to a boolean. Previously only the string `"true"` was checked, now `true`, `"true"`, `"1"`, and `1` will work.
+- 6a769771c: Update README for v5
+- ee57f21ac: Export `EmailLinkErrorCode` from `/errors` module
+- 2e77cd737: Set correct information on required Node.js and React versions in README
+- ee57f21ac: Introduce `/errors` module. This path exports all error-related APIs such as `isClerkAPIResponseError`, `isEmailLinkError`, `isKnownError`, `isMetamaskError`, `EmailLinkErrorCode`
+- 63dfe8dc9: Resolve Vercel edge-runtime "TypeError: Failed to parse URL" when `@clerk/remix` is used
+- b67f6ab79: Fix property `Page`/ `Link` missing from the `UserProfile` / `OrganizationProfile`
+  when imported from `@clerk/nextjs` or `@clerk/remix`.
+- 7644b7472: Improve the default value for `CLERK_API_URL` by utilizing the publishable key to differentiate between local, staging and prod environments.
+- 3a0eacd36: Replace `response.clone()` with `new Response(response.body, response)` to avoid creating multiple branches of a single stream on Cloudflare workers ([issue reference](https://github.com/cloudflare/workers-sdk/issues/3259)).
+- 3a2f13604: Fix adding `user`/`sessions`/`organization` resources into request.
+- 395c6d7e3: Correctly get environment variables inside Cloudflare Pages by accessing `context.cloudflare`
+- 40ac4b645: Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry.
+- de90d9bca: Automatically infer the path for where the component is mounted.
+- Updated dependencies [3a2f13604]
+- Updated dependencies [8c23651b8]
+- Updated dependencies [f4f99f18d]
+- Updated dependencies [743c4d204]
+- Updated dependencies [4b8bedc66]
+- Updated dependencies [9272006e7]
+- Updated dependencies [2a67f729d]
+- Updated dependencies [c2a090513]
+- Updated dependencies [6ac9e717a]
+- Updated dependencies [966b31205]
+- Updated dependencies [1834a3ee4]
+- Updated dependencies [a8901be64]
+- Updated dependencies [896cb6104]
+- Updated dependencies [64d3763ec]
+- Updated dependencies [8350109ab]
+- Updated dependencies [7b200af49]
+- Updated dependencies [988a299c0]
+- Updated dependencies [ecb60da48]
+- Updated dependencies [deac67c1c]
+- Updated dependencies [b3a3dcdf4]
+- Updated dependencies [1dc28ab46]
+- Updated dependencies [83e9d0846]
+- Updated dependencies [244de5ea3]
+- Updated dependencies [791c49807]
+- Updated dependencies [935b0886e]
+- Updated dependencies [93d05c868]
+- Updated dependencies [ea4933655]
+- Updated dependencies [7f6a64f43]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [448e02e93]
+- Updated dependencies [2671e7aa5]
+- Updated dependencies [799abc281]
+- Updated dependencies [4aaf5103d]
+- Updated dependencies [a68eb3083]
+- Updated dependencies [2de442b24]
+- Updated dependencies [15af02a83]
+- Updated dependencies [db18787c4]
+- Updated dependencies [7f833da9e]
+- Updated dependencies [de6519daa]
+- Updated dependencies [e6ecbaa2f]
+- Updated dependencies [ef2325dcc]
+- Updated dependencies [6a769771c]
+- Updated dependencies [fc3ffd880]
+- Updated dependencies [8b6b094b9]
+- Updated dependencies [bab2e7e05]
+- Updated dependencies [71663c568]
+- Updated dependencies [a6b893d28]
+- Updated dependencies [02976d494]
+- Updated dependencies [492b8a7b1]
+- Updated dependencies [8e5c881c4]
+- Updated dependencies [9e99eb727]
+- Updated dependencies [034c47ccb]
+- Updated dependencies [cfea3d9c0]
+- Updated dependencies [e5c989a03]
+- Updated dependencies [ff08fe237]
+- Updated dependencies [7ecd6f6ab]
+- Updated dependencies [12f3c5c55]
+- Updated dependencies [c776f86fb]
+- Updated dependencies [90aa2ea9c]
+- Updated dependencies [ee57f21ac]
+- Updated dependencies [1e98187b4]
+- Updated dependencies [7bffc47cb]
+- Updated dependencies [a605335e1]
+- Updated dependencies [2e77cd737]
+- Updated dependencies [2964f8a47]
+- Updated dependencies [7af0949ae]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [2a22aade8]
+- Updated dependencies [63dfe8dc9]
+- Updated dependencies [ae3a6683a]
+- Updated dependencies [e921af259]
+- Updated dependencies [d08ec6d8f]
+- Updated dependencies [6e54b1b59]
+- Updated dependencies [8aea39cd6]
+- Updated dependencies [dd5703013]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [03079579d]
+- Updated dependencies [c22cd5214]
+- Updated dependencies [52ff8fe6b]
+- Updated dependencies [c9e0f68af]
+- Updated dependencies [86d52fb5c]
+- Updated dependencies [fe2607b6f]
+- Updated dependencies [c7e6d00f5]
+- Updated dependencies [8cc45d2af]
+- Updated dependencies [797e327e0]
+- Updated dependencies [ab4eb56a5]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [12962bc58]
+- Updated dependencies [7cb1241a9]
+- Updated dependencies [9615e6cda]
+- Updated dependencies [0ec3a146c]
+- Updated dependencies [4bb57057e]
+- Updated dependencies [c86f73be3]
+- Updated dependencies [bad4de1a2]
+- Updated dependencies [d4ff346dd]
+- Updated dependencies [7644b7472]
+- Updated dependencies [2ec9f6b09]
+- Updated dependencies [2e4a43017]
+- Updated dependencies [f98e480b1]
+- Updated dependencies [66b283653]
+- Updated dependencies [1affbb22a]
+- Updated dependencies [46040a2f3]
+- Updated dependencies [cace85374]
+- Updated dependencies [f5fb63cf1]
+- Updated dependencies [1ad910eb9]
+- Updated dependencies [8daf8451c]
+- Updated dependencies [f58a9949b]
+- Updated dependencies [4aaf5103d]
+- Updated dependencies [75ea300bc]
+- Updated dependencies [d22e6164d]
+- Updated dependencies [e1f7eae87]
+- Updated dependencies [7f751c4ef]
+- Updated dependencies [4fced88ac]
+- Updated dependencies [f5d55bb1f]
+- Updated dependencies [18c0d015d]
+- Updated dependencies [0d1052ac2]
+- Updated dependencies [d30ea1faa]
+- Updated dependencies [e9841dd91]
+- Updated dependencies [e7e2a1eae]
+- Updated dependencies [1fd2eff38]
+- Updated dependencies [5471c7e8d]
+- Updated dependencies [a6308c67e]
+- Updated dependencies [0ce0edc28]
+- Updated dependencies [477170962]
+- Updated dependencies [9b02c1aae]
+- Updated dependencies [051833167]
+- Updated dependencies [59f9a7296]
+- Updated dependencies [b4e79c1b9]
+- Updated dependencies [38d8b3e8a]
+- Updated dependencies [be991365e]
+- Updated dependencies [8350f73a6]
+- Updated dependencies [d6a7ea61a]
+- Updated dependencies [e0e79b4fe]
+- Updated dependencies [e602d6c1f]
+- Updated dependencies [142ded732]
+- Updated dependencies [3c4209068]
+- Updated dependencies [fb794ce7b]
+- Updated dependencies [e6fc58ae4]
+- Updated dependencies [6fffd3b54]
+- Updated dependencies [a6451aece]
+- Updated dependencies [987994909]
+- Updated dependencies [40ac4b645]
+- Updated dependencies [1bea9c200]
+- Updated dependencies [6f755addd]
+- Updated dependencies [844847e0b]
+- Updated dependencies [6eab66050]
+- Updated dependencies [db2d82901]
+- Updated dependencies [c2b982749]
+  - @clerk/backend@1.0.0
+  - @clerk/shared@2.0.0
+  - @clerk/clerk-react@5.0.0
+
 ## 4.0.0-beta.46
 
 ### Patch Changes

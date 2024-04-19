@@ -1,5 +1,641 @@
 # Change Log
 
+## 1.0.0
+
+### Major Changes
+
+- 3a2f13604: Drop `user` / `organization` / `session` from auth object on **signed-out** state (current value was `null`). Eg
+
+  ```diff
+      // Backend
+      import { createClerkClient } from '@clerk/backend';
+
+      const clerkClient = createClerkClient({...});
+      const requestState = clerkClient.authenticateRequest(request, {...});
+
+      - const { user, organization, session } = requestState.toAuth();
+      + const { userId, organizationId, sessionId } = requestState.toAuth();
+
+      // Remix
+      import { getAuth } from '@clerk/remix/ssr.server';
+
+      - const { user, organization, session } = await getAuth(args);
+      + const { userId, organizationId, sessionId } = await getAuth(args);
+
+      // or
+      rootAuthLoader(
+          args,
+          ({ request }) => {
+              - const { user, organization, session } = request.auth;
+              + const { userId, organizationId, sessionId } = request.auth;
+              // ...
+          },
+          { loadUser: true },
+      );
+
+      // NextJS
+      import { getAuth } from '@clerk/nextjs/server';
+
+      - const { user, organization, session } = getAuth(args);
+      + const { userId, organizationId, sessionId } = getAuth(req, opts);
+
+      // Gatsby
+      import { withServerAuth } from 'gatsby-plugin-clerk';
+
+      export const getServerData: GetServerData<any> = withServerAuth(
+          async props => {
+              - const { user, organization, session } =  props;
+              + const { userId, organizationId, sessionId } = props;
+              return { props: { data: '1', auth: props.auth, userId, organizationId, sessionId } };
+          },
+          { loadUser: true },
+      );
+  ```
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- deac67c1c: Drop default exports from all packages. Migration guide:
+  - use `import { Clerk } from '@clerk/backend';`
+  - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-js';`
+  - use `import { Clerk } from '@clerk/clerk-js/headless';`
+  - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
+- 244de5ea3: Make all listing API requests to return consistent `{ data: Resource[], totalCount: number }`.
+
+  Support pagination request params `{ limit, offset }` to:
+
+  - `sessions.getSessionList({ limit, offset })`
+  - `clients.getClientList({ limit, offset })`
+
+  Since the `users.getUserList()` does not return the `total_count` as a temporary solution that
+  method will perform 2 BAPI requests:
+
+  1. retrieve the data
+  2. retrieve the total count (invokes `users.getCount()` internally)
+
+- a9fe242be: Change return value of `verifyToken()` from `@clerk/backend` to `{ data, error}`.
+  To replicate the current behaviour use this:
+
+  ```typescript
+  import { verifyToken } from '@clerk/backend'
+
+  const { data, error }  = await verifyToken(...);
+  if(error){
+      throw error;
+  }
+  ```
+
+- 799abc281: Change `SessionApi.getToken()` to return consistent `{ data, errors }` return value
+  and fix the `getToken()` from requestState to have the same return behavior as v4
+  (return Promise<string> or throw error).
+  This change fixes issues with `getToken()` in `@clerk/nextjs` / `@clerk/remix` / `@clerk/fastify` / `@clerk/sdk-node` / `gatsby-plugin-clerk`:
+
+  Example:
+
+  ```typescript
+  import { getAuth } from '@clerk/nextjs/server';
+
+  const { getToken } = await getAuth(...);
+  const jwtString = await getToken(...);
+  ```
+
+  The change in `SessionApi.getToken()` return value is a breaking change, to keep the existing behavior use the following:
+
+  ```typescript
+  import { ClerkAPIResponseError } from '@clerk/shared/error';
+
+  const response = await clerkClient.sessions.getToken(...);
+
+  if (response.errors) {
+      const { status, statusText, clerkTraceId } = response;
+      const error = new ClerkAPIResponseError(statusText || '', {
+          data: [],
+          status: Number(status || ''),
+          clerkTraceId,
+      });
+      error.errors = response.errors;
+
+      throw error;
+  }
+
+  // the value of the v4 `clerkClient.sessions.getToken(...)`
+  const jwtString = response.data.jwt;
+  ```
+
+- 71663c568: Internal update default apiUrl domain from clerk.dev to clerk.com
+- 02976d494: Remove the named `Clerk` import from `@clerk/backend` and import `createClerkClient` instead. The latter is a factory method that will create a Clerk client instance for you. This aligns usage across our SDKs and will enable us to better ship DX improvements in the future.
+
+  Inside your code, search for occurrences like these:
+
+  ```js
+  import { Clerk } from '@clerk/backend';
+  const clerk = Clerk({ secretKey: '...' });
+  ```
+
+  You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
+
+  ```js
+  import { createClerkClient } from '@clerk/backend';
+  const clerk = createClerkClient({ secretKey: '...' });
+  ```
+
+- 8e5c881c4: The following paginated APIs now return `{ data, totalCount }` instead of simple arrays, in order to make building paginated UIs easier:
+
+  - `clerkClient.users.getOrganizationMembershipList(...)`
+  - `clerkClient.organization.getOrganizationList(...)`
+  - `clerkClient.organization.getOrganizationInvitationList(...)`
+
+  Revert changing the `{ data, errors }` return value of the following helpers to throw the `errors` or return the `data` (keep v4 format):
+
+  - `import { verifyToken } from '@clerk/backend'`
+  - `import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt'`
+  - BAPI `clerkClient` methods eg (`clerkClient.users.getUserList(...)`)
+
+- dd5703013: Change the response payload of Backend API requests to return `{ data, errors }` instead of return the data and throwing on error response.
+  Code example to keep the same behavior:
+
+  ```typescript
+  import { users } from '@clerk/backend';
+  import { ClerkAPIResponseError } from '@clerk/shared/error';
+
+  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
+  if (errors) {
+    throw new ClerkAPIResponseError(statusText, { data: errors, status, clerkTraceId });
+  }
+  ```
+
+- 86d52fb5c: - Refactor the `authenticateRequest()` flow to use the new client handshake endpoint. This replaces the previous "interstitial"-based flow. This should improve performance and overall reliability of Clerk's server-side request authentication functionality.
+  - `authenticateRequest()` now accepts two arguments, a `Request` object to authenticate and options:
+    ```ts
+    authenticateRequest(new Request(...), { secretKey: '...' })
+    ```
+- a9fe242be: Change return values of `signJwt`, `hasValidSignature`, `decodeJwt`, `verifyJwt`
+  to return `{ data, error }`. Example of keeping the same behavior using those utilities:
+
+  ```typescript
+  import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt';
+
+  const { data, error } = await signJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await hasValidSignature(...)
+  if (error) throw error;
+
+  const { data, error } = decodeJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await verifyJwt(...)
+  if (error) throw error;
+  ```
+
+- 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
+- 9615e6cda: Enforce passing `request` param to `authenticateRequest` method of `@clerk/backend`
+  instead of passing each header or cookie related option that is used internally to
+  determine the request state.
+
+  Migration guide:
+
+  - use `request` param in `clerkClient.authenticateRequest()` instead of:
+    - `origin`
+    - `host`
+    - `forwardedHost`
+    - `forwardedProto`
+    - `referrer`
+    - `userAgent`
+    - `cookieToken`
+    - `clientUat`
+    - `headerToken`
+    - `searchParams`
+
+  Example
+
+  ```typescript
+  //
+  // current
+  //
+  import { clerkClient } from '@clerk/backend'
+
+  const requestState = await clerkClient.authenticateRequest({
+      secretKey: 'sk_....'
+      publishableKey: 'pk_....'
+      origin: req.headers.get('origin'),
+      host: req.headers.get('host'),
+      forwardedHost: req.headers.get('x-forwarded-host'),
+      forwardedProto: req.headers.get('x-forwarded-proto'),
+      referrer: req.headers.get('referer'),
+      userAgent: req.headers.get('user-agent'),
+      clientUat: req.cookies.get('__client_uat'),
+      cookieToken: req.cookies.get('__session'),
+      headerToken: req.headers.get('authorization'),
+      searchParams: req.searchParams
+  });
+
+  //
+  // new
+  //
+  import { clerkClient,  } from '@clerk/backend'
+
+  // use req (if it's a fetch#Request instance) or use `createIsomorphicRequest` from `@clerk/backend`
+  // to re-construct fetch#Request instance
+  const requestState = await clerkClient.authenticateRequest({
+      secretKey: 'sk_....'
+      publishableKey: 'pk_....'
+      request: req
+  });
+
+  ```
+
+- 0ec3a146c: Changes in exports of `@clerk/backend`:
+  - Expose the following helpers and enums from `@clerk/backend/internal`:
+    ```typescript
+    import {
+      AuthStatus,
+      buildRequestUrl,
+      constants,
+      createAuthenticateRequest,
+      createIsomorphicRequest,
+      debugRequestState,
+      makeAuthObjectSerializable,
+      prunePrivateMetadata,
+      redirect,
+      sanitizeAuthObject,
+      signedInAuthObject,
+      signedOutAuthObject,
+    } from '@clerk/backend/internal';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { AuthStatus, ... } from '@clerk/backend';
+    // After
+    import { AuthStatus, ... } from '@clerk/backend/internal';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+- cace85374: Drop deprecated properties. Migration steps:
+
+  - use `createClerkClient` instead of `__unstable_options`
+  - use `publishableKey` instead of `frontendApi`
+  - use `clockSkewInMs` instead of `clockSkewInSeconds`
+  - use `apiKey` instead of `secretKey`
+  - drop `httpOptions`
+  - use `*.image` instead of
+    - `ExternalAccount.picture`
+    - `ExternalAccountJSON.avatar_url`
+    - `Organization.logoUrl`
+    - `OrganizationJSON.logo_url`
+    - `User.profileImageUrl`
+    - `UserJSON.profile_image_url`
+    - `OrganizationMembershipPublicUserData.profileImageUrl`
+    - `OrganizationMembershipPublicUserDataJSON.profile_image_url`
+  - drop `pkgVersion`
+  - use `Organization.getOrganizationInvitationList` with `status` instead of `getPendingOrganizationInvitationList`
+  - drop `orgs` claim (if required, can be manually added by using `user.organizations` in a jwt template)
+  - use `localInterstitial` instead of `remotePublicInterstitial` / `remotePublicInterstitialUrl`
+
+  Internal changes:
+
+  - replaced error enum (and it's) `SetClerkSecretKeyOrAPIKey` with `SetClerkSecretKey`
+
+- 1ad910eb9: Changes in exports of `@clerk/backend`:
+  - Drop the following internal exports from the top-level api:
+    ```typescript
+    // Before
+    import {
+      AllowlistIdentifier,
+      Client,
+      DeletedObject,
+      Email,
+      EmailAddress,
+      ExternalAccount,
+      IdentificationLink,
+      Invitation,
+      OauthAccessToken,
+      ObjectType,
+      Organization,
+      OrganizationInvitation,
+      OrganizationMembership,
+      OrganizationMembershipPublicUserData,
+      PhoneNumber,
+      RedirectUrl,
+      SMSMessage,
+      Session,
+      SignInToken,
+      Token,
+      User,
+      Verification,
+    } from '@clerk/backend';
+    // After : no alternative since there is no need to use those classes
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+  - Keep those 3 resource related type exports
+    ```typescript
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    ```
+- f58a9949b: Changes in exports of `@clerk/backend`:
+  - Expose the following helpers and enums from `@clerk/backend/jwt`:
+    ```typescript
+    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { decodeJwt, ... } from '@clerk/backend';
+    // After
+    import { decodeJwt, ... } from '@clerk/backend/jwt';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+- d22e6164d: Rename property `members_count` to `membersCount` for `Organization` resource
+- e1f7eae87: Limit TokenVerificationError exports to TokenVerificationError and TokenVerificationErrorReason
+- 9b02c1aae: Changes in `@clerk/backend` exports:
+  - Drop Internal `deserialize` helper
+  - Introduce `/errors` subpath export, eg:
+    ```typescript
+    import {
+      TokenVerificationError,
+      TokenVerificationErrorAction,
+      TokenVerificationErrorCode,
+      TokenVerificationErrorReason,
+    } from '@clerk/backend/errors';
+    ```
+  - Drop errors from top-level export
+    ```typescript
+    // Before
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
+    // After
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
+    ```
+- e602d6c1f: Drop unused SearchParams.AuthStatus constant
+- 6fffd3b54: Replace return the value of the following jwt helpers to match the format of backend API client return values (for consistency).
+
+  ```diff
+  import { signJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await signJwt(...);
+  + const { data, errors: [error] = [] } = await signJwt(...);
+  ```
+
+  ```diff
+  import { verifyJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await verifyJwt(...);
+  + const { data, errors: [error] = [] } = await verifyJwt(...);
+  ```
+
+  ```diff
+  import { hasValidSignature } from '@clerk/backend/jwt';
+
+  - const { data, error } = await hasValidSignature(...);
+  + const { data, errors: [error] = [] } = await hasValidSignature(...);
+  ```
+
+  ```diff
+  import { decodeJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await decodeJwt(...);
+  + const { data, errors: [error] = [] } = await decodeJwt(...);
+  ```
+
+  ```diff
+  import { verifyToken } from '@clerk/backend';
+
+  - const { data, error } = await verifyToken(...);
+  + const { data, errors: [error] = [] } = await verifyToken(...);
+  ```
+
+### Minor Changes
+
+- 966b31205: Add `unbanUser`, `lockUser`, and `unlockUser` methods to the UserAPI class.
+- ecb60da48: Implement token signature verification when passing verified token from Next.js middleware to the application origin.
+- 448e02e93: Add fullName, primaryEmailAddress, primaryPhoneNumber, primaryWeb3Wallet to User class.
+- 2671e7aa5: Add `external_account_id` to OAuth access token response
+- 8b6b094b9: Added prefers-color-scheme to interstitial
+- a6b893d28: - Added the `User.last_active_at` timestamp field which stores the latest date of session activity, with day precision. For further details, please consult the [Backend API documentation](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUser).
+  - Added the `last_active_at_since` filtering parameter for the Users listing request. The new parameter can be used to retrieve users that have displayed session activity since the given date. For further details, please consult the [Backend API documentation](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUserList).
+  - Added the `last_active_at` available options for the `orderBy` parameter of the Users listing request. For further details, please consult the [Backend API documentation](https://clerk.com/docs/reference/backend-api/tag/Users#operation/GetUserList).
+- a605335e1: Add support for NextJS 14
+- 2964f8a47: Expose debug headers in response for handshake / signed-out states from SDKs using headers returned from `authenticateRequest()`
+- 7af0949ae: Add missing `createdAt` param in `User#createUser()` of `@clerk/backend`.
+  Fix `clerkClient.verifyToken()` signature to support a single `token: string` parameter.
+- d08ec6d8f: Improve ESM support in `@clerk/backend` for Node by using .mjs for #crypto subpath import
+- 03079579d: Expose `totalCount` from `@clerk/backend` client responses for responses
+  containing pagination information or for responses with type `{ data: object[] }`.
+
+  Example:
+
+  ```typescript
+  import { Clerk } from '@clerk/backend';
+
+  const clerkClient = Clerk({ secretKey: '...' });
+
+  // current
+  const { data } = await clerkClient.organizations.getOrganizationList();
+  console.log('totalCount: ', data.length);
+
+  // new
+  const { data, totalCount } = await clerkClient.organizations.getOrganizationList();
+  console.log('totalCount: ', totalCount);
+  ```
+
+- c7e6d00f5: Experimental support for `<Gate/>` with role checks.
+- 12962bc58: Re-use common pagination types for consistency across types.
+
+  Types introduced in `@clerk/types`:
+
+  - `ClerkPaginationRequest` : describes pagination related props in request payload
+  - `ClerkPaginatedResponse` : describes pagination related props in response body
+  - `ClerkPaginationParams` : describes pagination related props in api client method params
+
+- 4bb57057e: Breaking Changes:
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+- 46040a2f3: Introduce Protect for authorization.
+  Changes in public APIs:
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+- 4aaf5103d: Deprecate `createSMSMessage` and `SMSMessageApi` from `clerkClient`.
+
+  The equivalent `/sms_messages` Backend API endpoint will also be dropped in the future, since this feature will no longer be available for new instances.
+
+  For a brief period it will still be accessible for instances that have used it in the past 7
+  days (13-11-2023 to 20-11-2023).
+
+  New instances will get a 403 forbidden response if they try to access it.
+
+- 7f751c4ef: Add support for X/Twitter v2 OAuth provider
+- 4fced88ac: Add `banUser` method to the User operations (accessible under `clerkClient.users`). Executes the [Ban a user](https://clerk.com/docs/reference/backend-api/tag/Users#operation/BanUser) backend API call.
+- e7e2a1eae: Add `createOrganizationEnabled` param in `@clerk/backend` method `User.updateUser()`
+  Example:
+
+  ```typescript
+      import { createClerkClient }  from '@clerk/backend';
+
+      const clerkClient = createClerkClient({...});
+      await clerkClient.users.updateUser('user_...', { createOrganizationEnabled: true })
+  ```
+
+- b4e79c1b9: Replace the `Clerk-Backend-SDK` header with `User-Agent` in BAPI requests and update it's value to contain both the package name and the package version of the clerk package
+  executing the request. Eg request from `@clerk/nextjs` to BAPI with append `User-Agent: @clerk/nextjs@5.0.0-alpha-v5.16` using the latest version.
+
+  Miscellaneous changes: The backend test build changed to use tsup.
+
+- 142ded732: Add support for the `orderBy` parameter to the `getOrganizationList()` function
+
+### Patch Changes
+
+- 8c23651b8: Introduce `clerkClient.samlConnections` to expose `getSamlConnectionList`, `createSamlConnection`, `getSamlConnection`, `updateSamlConnection` and `deleteSamlConnection` endpoints. Introduce `SamlConnection` resource for BAPI.
+
+  Example:
+
+  ```
+  import { clerkClient } from '@clerk/nextjs/server';
+  const samlConnection = await clerkClient.samlConnections.getSamlConnectionList();
+  ```
+
+- f4f99f18d: `OrganizationMembershipRole` should respect authorization types provided by the developer if those exist.
+- 9272006e7: Export the JSON types for clerk resources.
+- a8901be64: Expose resources types
+- 7b200af49: The `auth().redirectToSignIn()` helper no longer needs to be explicitly returned when called within the middleware. The following examples are now equivalent:
+
+  ```js
+  // Before
+  export default clerkMiddleware(auth => {
+    if (protectedRoute && !auth.user) {
+      return auth().redirectToSignIn()
+    }
+  })
+
+  // After
+  export default clerkMiddleware(auth => {
+    if (protectedRoute && !auth.user) {
+      auth().redirectToSignIn()
+    }
+  })
+  ```
+
+  Calling `auth().protect()` from a page will now automatically redirect back to the same page by setting `redirect_url` to the request url before the redirect to the sign-in URL takes place.
+
+- 988a299c0: Fix typo in `jwk-remote-missing` error message
+- b3a3dcdf4: Add OrganizationRoleAPI for CRUD operations regarding instance level organization roles.
+- 935b0886e: The `emails` endpoint helper and the corresponding `createEmail` method have been removed from the `@clerk/backend` SDK and `apiClint.emails.createEmail` will no longer be available.
+
+  We will not be providing an alternative method for creating and sending emails directly from our JavaScript SDKs with this release. If you are currently using `createEmail` and you wish to update to the latest SDK version, please reach out to our support team (https://clerk.com/support) so we can assist you.
+
+- 93d05c868: Drop the introduction of `OrganizationRole` and `OrganizationPermission` resources fro BAPI.
+- 4aaf5103d: Remove createSms functions from @clerk/backend and @clerk/sdk-node.
+
+  The equivalent /sms_messages Backend API endpoint will also dropped in the future, since this feature will no longer be available for new instances.
+
+  For a brief period it will still be accessible for instances that have used it in the past 7
+  days (13-11-2023 to 20-11-2023).
+
+  New instances will get a 403 forbidden response if they try to access it.
+
+- 2de442b24: Rename beta-v5 to beta
+- 15af02a83: Remove `__dev_session` legacy query param used to pass the Dev Browser token in previous major version.
+  This param will be visible only when using Account Portal with "Core 1" version.
+- de6519daa: Added missing types for `clerkClient.invitations.createInvitation`
+- e6ecbaa2f: Fix an error in the handshake flow where the request would throw an unhandled error when verification of the handshake payload fails.
+- 6a769771c: Update README for v5
+- 9e99eb727: Update `@clerk/nextjs` error messages to refer to `clerkMiddleware()` and deprecated `authMiddleware()` and fix a typo in `cannotRenderSignUpComponentWhenSessionExists` error message.
+- 034c47ccb: Fix `clerkClient.organizations.getOrganizationMembershipList()` return type to be `{ data, totalCount }`
+- 90aa2ea9c: Add `sha256` hasher support to PasswordHasher as described in [`Users#CreateUser`](https://clerk.com/docs/reference/backend-api/tag/Users#operation/CreateUser!path=password_hasher)
+- 1e98187b4: Update the handshake flow to only trigger for document requests.
+- 2e77cd737: Set correct information on required Node.js and React versions in README
+- 63dfe8dc9: Resolve Vercel edge-runtime "TypeError: Failed to parse URL" when `@clerk/remix` is used
+- e921af259: Replace enums with `as const` objects so `@clerk/backend` is consistent with the other packages
+- c22cd5214: Fix type inferance for auth helper.
+- 7cb1241a9: Trigger the handshake when no dev browser token exists in development.
+- bad4de1a2: Fixed an issue where errors returned from backend api requests are not converted to camelCase.
+- 66b283653: Fix infinite redirect loops for production instances with incorrect secret keys'
+- f5d55bb1f: Add clerkTraceId to ClerkBackendApiResponse and ClerkAPIResponseError to allow for better tracing and debugging API error responses.
+  Uses `clerk_trace_id` when available in a response and defaults to [`cf-ray` identifier](https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/) if missing.
+- a6308c67e: Add the following properties to `users.updateUser(userId, params)` params:
+
+  - `password_hasher`
+  - `password_digest`
+  - `publicMetadata`
+  - `privateMetadata`
+  - `unsafeMetadata`
+
+- 0ce0edc28: Add OrganizationPermissionAPI for CRUD operations regarding instance level organization permissions.
+- 051833167: fix(backend): Align types based on FAPI/BAPI structs
+- e6fc58ae4: Introduce `debug: true` option for the `clerkMiddleware` helper
+- a6451aece: Strip `experimental__has` from the auth object in `makeAuthObjectSerializable()`. This fixes an issue in Next.js where an error is being thrown when this function is passed to a client component as a prop.
+- 987994909: Add support for `scrypt_werkzeug` in `UserAPI` `PasswordHasher`.
+- 40ac4b645: Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry.
+- 1bea9c200: Add missing pagination params types for `clerkClient.invitations.getInvitationList()`
+- c2b982749: Preserve url protocol when joining paths.
+- Updated dependencies [743c4d204]
+- Updated dependencies [4b8bedc66]
+- Updated dependencies [c2a090513]
+- Updated dependencies [1834a3ee4]
+- Updated dependencies [896cb6104]
+- Updated dependencies [64d3763ec]
+- Updated dependencies [8350109ab]
+- Updated dependencies [1dc28ab46]
+- Updated dependencies [83e9d0846]
+- Updated dependencies [791c49807]
+- Updated dependencies [ea4933655]
+- Updated dependencies [a68eb3083]
+- Updated dependencies [2de442b24]
+- Updated dependencies [db18787c4]
+- Updated dependencies [7f833da9e]
+- Updated dependencies [ef2325dcc]
+- Updated dependencies [fc3ffd880]
+- Updated dependencies [bab2e7e05]
+- Updated dependencies [71663c568]
+- Updated dependencies [492b8a7b1]
+- Updated dependencies [e5c989a03]
+- Updated dependencies [7ecd6f6ab]
+- Updated dependencies [12f3c5c55]
+- Updated dependencies [c776f86fb]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [52ff8fe6b]
+- Updated dependencies [8cc45d2af]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [4bb57057e]
+- Updated dependencies [d4ff346dd]
+- Updated dependencies [7644b7472]
+- Updated dependencies [2ec9f6b09]
+- Updated dependencies [8daf8451c]
+- Updated dependencies [75ea300bc]
+- Updated dependencies [f5d55bb1f]
+- Updated dependencies [0d1052ac2]
+- Updated dependencies [d30ea1faa]
+- Updated dependencies [1fd2eff38]
+- Updated dependencies [5471c7e8d]
+- Updated dependencies [38d8b3e8a]
+- Updated dependencies [be991365e]
+- Updated dependencies [8350f73a6]
+- Updated dependencies [e0e79b4fe]
+- Updated dependencies [fb794ce7b]
+- Updated dependencies [40ac4b645]
+- Updated dependencies [6f755addd]
+- Updated dependencies [6eab66050]
+  - @clerk/shared@2.0.0
+
 ## 1.0.0-beta.37
 
 ### Patch Changes

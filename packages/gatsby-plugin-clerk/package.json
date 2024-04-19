@@ -44,14 +44,14 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/backend": "1.0.0-beta.37",
-    "@clerk/clerk-react": "5.0.0-beta.41",
-    "@clerk/clerk-sdk-node": "5.0.0-beta.38",
+    "@clerk/backend": "1.0.0",
+    "@clerk/clerk-react": "5.0.0",
+    "@clerk/clerk-sdk-node": "5.0.0",
     "cookie": "0.5.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-beta.30",
+    "@clerk/types": "4.0.0",
     "@types/cookie": "^0.5.0",
     "@types/node": "^18.17.0",
     "eslint-config-custom": "*",

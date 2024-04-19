@@ -1,5 +1,404 @@
 # Change Log
 
+## 5.0.0
+
+### Major Changes
+
+- 2a67f729d: Replace the `signOutCallback` prop on the `<SignOutButton />` with `redirectUrl`. This aligns the API surface with other UI components provided by `@clerk/clerk-react`.
+
+  If you previously used the `signOutCallback` prop to navigate to another page, you can migrate as shown below.
+
+  Before:
+
+  ```jsx
+  import { SignOutButton } from '@clerk/clerk-react';
+
+  export const Signout = () => {
+    return (
+      <SignOutButton
+        signOutCallback={() => {
+          window.location.href = '/your-path';
+        }}
+      >
+        <button>Sign Out</button>
+      </SignOutButton>
+    );
+  };
+  ```
+
+  After:
+
+  ```jsx
+  import { SignOutButton } from '@clerk/clerk-react';
+
+  export const Signout = () => {
+    return (
+      <SignOutButton redirectUrl='/your-path'>
+        <button>Sign Out</button>
+      </SignOutButton>
+    );
+  };
+  ```
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- deac67c1c: Drop default exports from all packages. Migration guide:
+  - use `import { Clerk } from '@clerk/backend';`
+  - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-js';`
+  - use `import { Clerk } from '@clerk/clerk-js/headless';`
+  - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
+- 83e9d0846: Drop deprecations. Migration steps:
+  - use `EmailLinkError` instead of `MagicLinkError`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - use `buildRequestUrl` from `@clerk/backend` instead of `getRequestUrl` from `@clerk/shared`
+  - use `OrganizationProvider` instead of `OrganizationContext`
+  - use `userMemberships` instead of `organizationList` from `useOrganizationList`
+- 7f833da9e: Drop deprecations. Migration steps:
+  - use `publishableKey` instead of `frontendApi`
+  - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - drop `orgs` jwt claim from session token
+  - use `ExternalAccount.imageUrl` instead of `ExternalAccount.avatarUrl`
+  - use `Organization.imageUrl` instead of `Organization.logoUrl`
+  - use `User.imageUrl` instead of `User.profileImageUrl`
+  - use `OrganizationMembershipPublicUserData.imageUrl` instead of `OrganizationMembershipPublicUserData.profileImageUrl`
+  - use `useOrganizationList` instead of `useOrganizations`
+  - use `userProfileProps` instead of `userProfile` in `Appearance`
+  - use `Clerk.setActive()` instead of `Clerk.setSession()`
+  - drop `password` param in `User.update()`
+  - use `afterSelectOrganizationUrl` instead of `afterSwitchOrganizationUrl` in `OrganizationSwitcher`
+  - drop `Clerk.experimental_canUseCaptcha` / `Clerk.Clerk.experimental_captchaSiteKey` / `Clerk.experimental_captchaURL` (were meant for internal use)
+  - use `User.getOrganizationMemberships()` instead of `Clerk.getOrganizationMemberships()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from Clerk emitted events
+  - drop `Clerk.__unstable__invitationUpdate` / `Clerk.__unstable__membershipUpdate`
+  - drop support for string param in `Organization.create()`
+  - use `Organization.getInvitations()` instead of `Organization.getPendingInvitations()`
+  - use `pageSize` instead of `limit` in `OrganizationMembership.retrieve()`
+  - use `initialPage` instead of `offset` in `OrganizationMembership.retrieve()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from ClerkProvider
+  - use `invitations` instead of `invitationList` in `useOrganization`
+  - use `memberships` instead of `membershipList` in `useOrganization`
+  - use `redirectUrl` instead of `redirect_url` in `User.createExternalAccount()`
+  - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
+- cfea3d9c0: Path-based routing is now the default routing strategy if the `path` prop is filled. Additionally, if the `path` and `routing` props are not filled, an error will be thrown.
+
+  ```jsx
+
+  // Without path or routing props, an error with be thrown
+  <UserProfile />
+  <CreateOrganization />
+  <OrganizationProfile />
+  <SignIn />
+  <SignUp />
+
+  // Alternative #1
+  <UserProfile path="/whatever"/>
+  <CreateOrganization path="/whatever"/>
+  <OrganizationProfile path="/whatever"/>
+  <SignIn path="/whatever"/>
+  <SignUp path="/whatever"/>
+
+  // Alternative #2
+  <UserProfile routing="hash_or_virtual"/>
+  <CreateOrganization routing="hash_or_virtual"/>
+  <OrganizationProfile routing="hash_or_virtual"/>
+  <SignIn routing="hash_or_virtual"/>
+  <SignUp routing="hash_or_virtual"/>
+  ```
+
+- 7bffc47cb: Drop `Clerk.isReady(). Use `Clerk.loaded` instead.`
+- 2a22aade8: Drop deprecations. Migration steps:
+  - drop `orgs` jwt claim from session token
+  - change type of `auth` param of `withServerAuth()` callback to `AuthObject` from `ServerSideAuth` in `gatsby-clerk-plugin`
+    - use `auth.sessionClaims` instead of `auth.claims`
+    - use `AuthObject` properties from `auth`
+  - use `publishableKey` instead of `frontendApi`
+  - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
+- 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
+  ```typescript
+  // Before
+  import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
+  // After
+  import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
+      // Before
+      import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+      // After
+      import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
+
+      // Before
+      import { MultisessionAppSupport } from '@clerk/clerk-react';
+      // After
+      import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+      ```
+
+  - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
+    - `__internal__setErrorThrowerOptions` internal utility (moved to /internal subpath)
+    - `WithClerkProp` type
+    - `MultisessionAppSupport` component (moved to /internal subpath)
+    - `EmailLinkErrorCode` enum
+  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
+    to reduce the export surface since it's trivial to implement if needed.
+
+- 5f58a2274: Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters.
+- 5f58a2274: - `buildUrlWithAuth` no longer accepts an `options` argument.
+- 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
+  to fix issues with vite & rollup building.
+- ab4eb56a5: Drop `redirectToHome` redirect method in favour of `redirectToAfterSignUp` or `redirectToAfterSignIn`.
+
+  When the `<SignIn/>` and `<SignUp/>` components are rendered while a user is already logged in, they will now redirect to the configured `afterSignIn` and `afterSignUp` URLs, respectively. Previously, the redirect URL was set to the home URL configured in the dashboard.
+
+- 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
+- f5fb63cf1: Consolidate `afterSignOutOneUrl` & `afterSignOutAllUrl` to `afterSignOutUrl` and drop usage of Dashboard settings in ClerkJS components. The Dashboard settings should only apply to the Account Portal application.
+- 477170962: Drop deprecations. Migration steps:
+  - drop `formFieldLabel__emailAddress_phoneNumber` from localization keys
+  - drop `formFieldLabel__phoneNumber_username` from localization keys
+  - drop `formFieldLabel__emailAddress_phoneNumber_username` from localization keys
+  - drop `formFieldInputPlaceholder__emailAddress_phoneNumber` from localization keys
+  - drop `formFieldInputPlaceholder__phoneNumber_username` from localization keys
+  - drop `formFieldInputPlaceholder__emailAddress_phoneNumber_username` from localization keys
+  - use `title__connectionFailed` instead of `title__conectionFailed` from localization keys
+  - use `actionLabel__connectionFailed` instead of `actionLabel__conectionFailed` from localization keys
+  - use `headerTitle__members` instead of `headerTitle__active` from localization keys
+  - use `headerTitle__invitations` instead of `headerTitle__invited` from localization keys
+  - drop `createOrganization.subtitle` from localization keys
+  - use `deDE` instead of `deDe` localization from `@clerk/localizations`
+- 3c4209068: Drop deprecations. Migration steps:
+  - use `setActive` instead of `setSession` from `useSessionList | useSignUp | useSignIn` hooks
+  - use `publishableKey` instead of `frontendApi`
+  - use `handleEmailLinkVerification` instead of `handleMagicLinkVerification` from `IsomorphicClerk`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+- 844847e0b: Align return types for redirectTo\* methods in ClerkJS [SDK-1037]
+
+  Breaking Changes:
+
+  - `redirectToUserProfile` now returns `Promise<unknown>` instead of `void`
+  - `redirectToOrganizationProfile` now returns `Promise<unknown>` instead of `void`
+  - `redirectToCreateOrganization` now returns `Promise<unknown>` instead of `void`
+  - `redirectToHome` now returns `Promise<unknown>` instead of `void`
+
+### Minor Changes
+
+- 7f6a64f43: - By default, all the components with routing will have the `routing` prop assigned as `'path'` by default when the `path` prop is filled.
+  - The `<UserButton />` component will set the default value of the `userProfileMode` prop to `'navigation'` if the `userProfileUrl` prop is provided.
+  - The `<OrganizationSwitcher />` component will have the `organizationProfileMode` and `createOrganizationMode` props assigned with `'navigation'` by default if the `organizationProfileUrl` and `createOrganizationUrl` props are filled accordingly.
+- ff08fe237: Introduce experimental support for Google One Tap
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+- c9e0f68af: Fix `@clerk/clerk-react` bundle output to resolve issues with vite / rollup ESM module imports.
+  We have also used the `bundle` output to export a single index.ts and dropped the unnecessary
+  published files / folders (eg `__tests__`).
+- fe2607b6f: Remove MembershipRole. The type `MembershipRole` would always include the old role keys `admin`, `basic_member`, `guest_member`.
+  If developers still depend on them after the introduction of custom roles, the can provide them as their custom types for authorization.
+
+  ```ts
+  // clerk.d.ts
+  interface ClerkAuthorization {
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
+  }
+  ```
+
+- c7e6d00f5: Experimental support for `<Gate/>` with role checks.
+- 4bb57057e: Breaking Changes:
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+- 2e4a43017: Update `@clerk/clerk-js` and `@clerk/clerk-react` to support the following examples:
+
+  ```typescript
+  Clerk.signOut({ redirectUrl: '/' })
+
+  <SignOutButton redirectUrl='/' />
+  // uses Clerk.signOut({ redirectUrl: '/' })
+  <UserButton afterSignOutUrl='/after' />
+  // uses Clerk.signOut({ redirectUrl: '/after' })
+  <ClerkProvider afterSignOutUrl='/after' />
+  // uses Clerk.signOut({ redirectUrl: '/after' })
+  ```
+
+- f98e480b1: Speed up loading of clerk-js by using a `<script/>` tag when html is generated.
+  This is supported during SSR, SSG in
+  - Next.js Pages Router
+  - Next.js App Router
+- 46040a2f3: Introduce Protect for authorization.
+  Changes in public APIs:
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+- 18c0d015d: Pass environment into `sdkMetadata` in order to detect if production clerk-js is used by other sdks in dev mode. When it is log dev warning from clerk-js.
+- d6a7ea61a: Update the TypeScript types of `<ClerkProvider />`. If you use the `routerPush` prop you're now required to also provide the `routerReplace` prop (or other way around). You can also not provide them at all since both props are optional.
+- db2d82901: Apply the following changes to components with routing props:
+
+  - default is `routing="path"` and `path` prop is required to be set via env or context
+  - when `routing="hash"` or `routing="virtual"` is set the implicit (via env or context) `path` option is ignored
+  - when `routing="hash"` or `routing="virtual"` then `path` prop is not allowed to be set
+
+  Examples of components with routing props:
+
+  - `<CreateOrganization />`
+  - `<OrganizationProfile />`
+  - `<SignIn />`
+  - `<SignUp />`
+  - `<UserProfile />`
+
+### Patch Changes
+
+- 6ac9e717a: Properly fire onLoad event when clerk-js is already loaded.
+- 2de442b24: Rename beta-v5 to beta
+- ee57f21ac: Export `EmailLinkErrorCode` from `/errors` module
+- 2e77cd737: Set correct information on required Node.js and React versions in README
+- ae3a6683a: Ignore `.test.ts` files for the build output. Should result in smaller bundle size.
+- 6e54b1b59: Sync IsomorphicClerk with the clerk singleton and the LoadedClerk interface. IsomorphicClerk now extends from LoadedClerk.
+- 8cc45d2af: Allow dynamic values components props, even if these values change after the components are rendered. For example, a `SignIn` component with a `redirectUrl` prop passed in will always respect the latest value of `redirectUrl`.
+- 797e327e0: Replace internal logic of determining package tag & major version with [semver](https://www.npmjs.com/package/semver) in order to have a more robust solution
+- c86f73be3: Introducing stricter types for custom pages for UserProfile and OrganizationProfile.
+- 1affbb22a: Replace semver with custom regex in versionSelector
+- 75ea300bc: Add `useAssertWrappedByClerkProvider` to internal code. If you use hooks like `useAuth` outside of the `<ClerkProvider />` context an error will be thrown. For example:
+
+  ```shell
+  @clerk/clerk-react: useAuth can only be used within the <ClerkProvider /> component
+  ```
+
+- e9841dd91: Fixes error thrown for missing path & routing props when path was passed from context.
+  This change affects components `<SignIn />`, `<SignUp />` from `@clerk/nextjs` and `@clerk/remix`.
+- 59f9a7296: Fixes error when path is passed from context and a routing strategy other than `path` is passed as a prop.
+  This change affects components `<SignIn />`, `<SignUp />` from `@clerk/nextjs` and `@clerk/remix`.
+- e0e79b4fe: Use the errorThrower shared utility when throwing errors
+- fb794ce7b: Support older iOS 13.3 and 13.4 mobile devices
+- 40ac4b645: Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry.
+- Updated dependencies [743c4d204]
+- Updated dependencies [4b8bedc66]
+- Updated dependencies [1db1f4068]
+- Updated dependencies [c2a090513]
+- Updated dependencies [0d0b1d89a]
+- Updated dependencies [1834a3ee4]
+- Updated dependencies [896cb6104]
+- Updated dependencies [64d3763ec]
+- Updated dependencies [8350109ab]
+- Updated dependencies [1dc28ab46]
+- Updated dependencies [83e9d0846]
+- Updated dependencies [d37d44a68]
+- Updated dependencies [fe356eebd]
+- Updated dependencies [791c49807]
+- Updated dependencies [ea4933655]
+- Updated dependencies [7f6a64f43]
+- Updated dependencies [afec17953]
+- Updated dependencies [0699fa496]
+- Updated dependencies [a68eb3083]
+- Updated dependencies [2de442b24]
+- Updated dependencies [0293f29c8]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [9180c8b80]
+- Updated dependencies [db18787c4]
+- Updated dependencies [7f833da9e]
+- Updated dependencies [ef2325dcc]
+- Updated dependencies [fc3ffd880]
+- Updated dependencies [840636a14]
+- Updated dependencies [bab2e7e05]
+- Updated dependencies [71663c568]
+- Updated dependencies [492b8a7b1]
+- Updated dependencies [2352149f6]
+- Updated dependencies [e5c989a03]
+- Updated dependencies [ff08fe237]
+- Updated dependencies [7ecd6f6ab]
+- Updated dependencies [12f3c5c55]
+- Updated dependencies [244de5ea3]
+- Updated dependencies [c776f86fb]
+- Updated dependencies [d9f265fcb]
+- Updated dependencies [7bffc47cb]
+- Updated dependencies [9737ef510]
+- Updated dependencies [fafa76fb6]
+- Updated dependencies [1f650f30a]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [2a22aade8]
+- Updated dependencies [69ce3e185]
+- Updated dependencies [78fc5eec0]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [6a33709cc]
+- Updated dependencies [52ff8fe6b]
+- Updated dependencies [f77e8cdbd]
+- Updated dependencies [8b466a9ba]
+- Updated dependencies [fe2607b6f]
+- Updated dependencies [c7e6d00f5]
+- Updated dependencies [8cc45d2af]
+- Updated dependencies [663243220]
+- Updated dependencies [c6a5e0f5d]
+- Updated dependencies [4edb77632]
+- Updated dependencies [ab4eb56a5]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [5c239d973]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [12962bc58]
+- Updated dependencies [4bb57057e]
+- Updated dependencies [d4ff346dd]
+- Updated dependencies [7644b7472]
+- Updated dependencies [2ec9f6b09]
+- Updated dependencies [2e4a43017]
+- Updated dependencies [5aab9f04a]
+- Updated dependencies [46040a2f3]
+- Updated dependencies [f00fd2dfe]
+- Updated dependencies [8daf8451c]
+- Updated dependencies [75ea300bc]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [7f751c4ef]
+- Updated dependencies [f5d55bb1f]
+- Updated dependencies [18c0d015d]
+- Updated dependencies [0d1052ac2]
+- Updated dependencies [d30ea1faa]
+- Updated dependencies [7886ba89d]
+- Updated dependencies [1fd2eff38]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [5471c7e8d]
+- Updated dependencies [f540e9843]
+- Updated dependencies [477170962]
+- Updated dependencies [38d8b3e8a]
+- Updated dependencies [be991365e]
+- Updated dependencies [8350f73a6]
+- Updated dependencies [d6a7ea61a]
+- Updated dependencies [e0e79b4fe]
+- Updated dependencies [41ae1d2f0]
+- Updated dependencies [fb794ce7b]
+- Updated dependencies [48ca40af9]
+- Updated dependencies [94519aa33]
+- Updated dependencies [ebf9be77f]
+- Updated dependencies [008ac4217]
+- Updated dependencies [40ac4b645]
+- Updated dependencies [6f755addd]
+- Updated dependencies [429d030f7]
+- Updated dependencies [844847e0b]
+- Updated dependencies [6eab66050]
+  - @clerk/shared@2.0.0
+  - @clerk/types@4.0.0
+
 ## 5.0.0-beta.41
 
 ### Patch Changes
