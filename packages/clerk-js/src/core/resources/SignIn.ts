@@ -347,13 +347,6 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  // TODO-PASSKEYS: Remove in the next minor
-  public __experimental_authenticateWithPasskey = async (params?: {
-    flow?: 'autofill' | 'discoverable';
-  }): Promise<SignInResource> => {
-    return this.authenticateWithPasskey(params);
-  };
-
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
       return createValidatePassword({

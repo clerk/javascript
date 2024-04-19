@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Tilbake',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annen imitators enhet',
@@ -95,6 +94,7 @@ export const nbNO: LocalizationResource = {
     action__signOut: 'Logg ut',
     title: 'Logget inn som {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',
   membershipRole__guestMember: 'Gjest',
@@ -488,9 +488,9 @@ export const nbNO: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'mindre enn {{length}} tegn',
       minimumLength: '{{length}} eller flere tegn',
@@ -548,14 +548,6 @@ export const nbNO: LocalizationResource = {
     action__signOutAll: 'Logg ut av alle kontoer',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopier alle',
@@ -720,11 +712,6 @@ export const nbNO: LocalizationResource = {
       title: 'Oppdater profil',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Logg ut fra enhet',
         title: 'Aktive enheter',

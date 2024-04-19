@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Quay lại',
   badge__default: 'Mặc định',
   badge__otherImpersonatorDevice: 'Thiết bị nhân danh khác',
@@ -95,6 +94,7 @@ export const viVN: LocalizationResource = {
     action__signOut: 'Đăng xuất',
     title: 'Đăng nhập với tư cách {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Quản trị viên',
   membershipRole__basicMember: 'Thành viên',
   membershipRole__guestMember: 'Khách',
@@ -486,9 +486,9 @@ export const viVN: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'ít hơn {{length}} ký tự',
       minimumLength: '{{length}} hoặc nhiều ký tự',
@@ -546,14 +546,6 @@ export const viVN: LocalizationResource = {
     action__signOutAll: 'Đăng xuất khỏi tất cả các tài khoản',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Đã sao chép!',
       actionLabel__copy: 'Sao chép tất cả',
@@ -717,11 +709,6 @@ export const viVN: LocalizationResource = {
       title: 'Cập nhật hồ sơ',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Đăng xuất khỏi thiết bị',
         title: 'Thiết bị hoạt động',

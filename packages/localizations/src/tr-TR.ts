@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Geri',
   badge__default: 'Varsayılan',
   badge__otherImpersonatorDevice: 'Farklı bir kılıkçı cihazı',
@@ -95,6 +94,7 @@ export const trTR: LocalizationResource = {
     action__signOut: 'Çıkış yap',
     title: '{{identifier}} olarak giriş yapıldı',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Üye',
   membershipRole__guestMember: 'Misafir',
@@ -486,9 +486,9 @@ export const trTR: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} karakterden kısa olmalı',
       minimumLength: '{{length}} veya daha fazla karakter içermeli',
@@ -546,14 +546,6 @@ export const trTR: LocalizationResource = {
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopyalandı!',
       actionLabel__copy: 'Hepsini kopayala',
@@ -717,11 +709,6 @@ export const trTR: LocalizationResource = {
       title: 'Profili güncelle',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Cihaz oturumunu sonlandır',
         title: 'Aktif cihazlar',

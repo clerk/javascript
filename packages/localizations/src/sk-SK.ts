@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const skSK: LocalizationResource = {
   locale: 'sk-SK',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Späť',
   badge__default: 'Predvolené',
   badge__otherImpersonatorDevice: 'Iné zariadenie zástupcu',
@@ -95,6 +94,7 @@ export const skSK: LocalizationResource = {
     action__signOut: 'Odhlásiť sa',
     title: 'Prihlásený(á) ako {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Správca',
   membershipRole__basicMember: 'Člen',
   membershipRole__guestMember: 'Host',
@@ -485,9 +485,9 @@ export const skSK: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'menej ako {{length}} znakov',
       minimumLength: '{{length}} alebo viac znakov',
@@ -545,14 +545,6 @@ export const skSK: LocalizationResource = {
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Skopírované!',
       actionLabel__copy: 'Kopírovať všetko',
@@ -716,11 +708,6 @@ export const skSK: LocalizationResource = {
       title: 'Aktualizovať profil',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Odhlásiť sa zo zariadenia',
         title: 'Aktívne zariadenia',

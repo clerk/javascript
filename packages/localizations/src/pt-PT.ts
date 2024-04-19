@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Voltar',
   badge__default: 'Padrão',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
@@ -94,6 +93,7 @@ export const ptPT: LocalizationResource = {
     action__signOut: 'Terminar sessão',
     title: 'Sessão iniciada como {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
   membershipRole__guestMember: 'Convidado',
@@ -486,9 +486,9 @@ export const ptPT: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'menos de {{length}} caracteres',
       minimumLength: '{{length}} ou mais caracteres',
@@ -546,14 +546,6 @@ export const ptPT: LocalizationResource = {
     action__signOutAll: 'Terminar sessão de todas as contas',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar tudo',
@@ -717,11 +709,6 @@ export const ptPT: LocalizationResource = {
       title: 'Atualizar perfil',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Terminar sessão',
         title: 'Dispositivos ativos',

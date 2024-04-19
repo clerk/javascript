@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: '戻る',
   badge__default: 'デフォルト',
   badge__otherImpersonatorDevice: '他の模倣者デバイス',
@@ -95,6 +94,7 @@ export const jaJP: LocalizationResource = {
     action__signOut: 'サインアウト',
     title: '{{identifier}}としてサインイン中',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: '管理者',
   membershipRole__basicMember: 'メンバー',
   membershipRole__guestMember: 'ゲスト',
@@ -488,9 +488,9 @@ export const jaJP: LocalizationResource = {
     not_allowed_access: 'アクセスが許可されていません。',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}}文字未満',
       minimumLength: '{{length}}文字以上',
@@ -548,14 +548,6 @@ export const jaJP: LocalizationResource = {
     action__signOutAll: '全てのアカウントからサインアウト',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'コピー済み！',
       actionLabel__copy: 'すべてコピー',
@@ -715,11 +707,6 @@ export const jaJP: LocalizationResource = {
       title: 'プロフィールの更新',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'デバイスからサインアウト',
         title: 'アクティブなデバイス',

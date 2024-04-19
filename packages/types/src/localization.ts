@@ -48,11 +48,6 @@ type _LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
-  // TODO-PASSKEYS: Remove in the next minor
-  /**
-   * @experimental
-   */
-  __experimental_formFieldLabel__passkeyName: LocalizationValue;
   formFieldLabel__passkeyName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
@@ -335,15 +330,6 @@ type _LocalizationResource = {
         primaryButton__updatePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
       };
-      // TODO-PASSKEYS: Remove in the next minor
-      /**
-       * @experimental
-       */
-      __experimental_passkeysSection: {
-        title: LocalizationValue;
-        menuAction__rename: LocalizationValue;
-        menuAction__destructive: LocalizationValue;
-      };
       passkeysSection: {
         title: LocalizationValue;
         menuAction__rename: LocalizationValue;
@@ -417,19 +403,6 @@ type _LocalizationResource = {
         messageLine1: LocalizationValue;
         messageLine2: LocalizationValue;
         successMessage: LocalizationValue;
-      };
-    };
-
-    // TODO-PASSKEYS: Remove in the next minor
-    /**
-     * @experimental
-     */
-    __experimental_passkeyScreen: {
-      title__rename: LocalizationValue;
-      subtitle__rename: LocalizationValue;
-      removeResource: {
-        title: LocalizationValue;
-        messageLine1: LocalizationValue;
       };
     };
     passkeyScreen: {

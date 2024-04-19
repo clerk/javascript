@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const esES: LocalizationResource = {
   locale: 'es-ES',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Atrás',
   badge__default: 'Por defecto',
   badge__otherImpersonatorDevice: 'Otro dispositivo de imitación',
@@ -95,6 +94,7 @@ export const esES: LocalizationResource = {
     action__signOut: 'Cerrar',
     title: 'Registrado como {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
   membershipRole__guestMember: 'Invitado',
@@ -486,9 +486,9 @@ export const esES: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -546,14 +546,6 @@ export const esES: LocalizationResource = {
     action__signOutAll: 'Salir de todas las cuentas',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar todo',
@@ -719,11 +711,6 @@ export const esES: LocalizationResource = {
       title: 'Actualizar Cuenta',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Cerrar sesión en el dispositivo',
         title: 'Dispositivos activos',

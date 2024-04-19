@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Πίσω',
   badge__default: 'Προεπιλογή',
   badge__otherImpersonatorDevice: 'Άλλη συσκευή υποδυόμενου',
@@ -95,6 +94,7 @@ export const elGR: LocalizationResource = {
     action__signOut: 'Αποσύνδεση',
     title: 'Είστε συνδεδεμένος ως {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Διαχειριστής',
   membershipRole__basicMember: 'Μέλος',
   membershipRole__guestMember: 'Επισκέπτης',
@@ -488,9 +488,9 @@ export const elGR: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'λιγότερους από {{length}} χαρακτήρες',
       minimumLength: '{{length}} ή περισσότερους χαρακτήρες',
@@ -551,14 +551,6 @@ export const elGR: LocalizationResource = {
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Αντιγράφηκαν!',
       actionLabel__copy: 'Αντιγραφή όλων',
@@ -726,11 +718,6 @@ export const elGR: LocalizationResource = {
       title: 'Ενημέρωση προφίλ',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Αποσύνδεση από τη συσκευή',
         title: 'Ενεργές συσκευές',
