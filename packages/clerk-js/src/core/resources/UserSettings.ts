@@ -73,7 +73,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
       Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }]),
     ) as Attributes;
     this.actions = data.actions;
-    this.billing = data.billing;
+    this.billing = { enabled: data?.billing?.enabled || false, portal_enabled: data?.billing?.portal_enabled || false };
     this.signIn = data.sign_in;
     this.signUp = data.sign_up;
     this.passwordSettings = {

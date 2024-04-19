@@ -1,6 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 
 import { Billing } from '../../common';
+import { useEnvironment } from '../../contexts';
 import { FullHeightLoader, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 
@@ -11,6 +12,7 @@ export const BillingPage = withCardStateProvider(() => {
     user?.getAvailablePlans,
     'user-available-plans',
   );
+  const { userSettings } = useEnvironment();
 
   if (isLoadingCurrentPlan || isLoadingAvailablePlans || !user) {
     return <FullHeightLoader />;
@@ -26,6 +28,7 @@ export const BillingPage = withCardStateProvider(() => {
       changePlan={user?.changePlan}
       currentPlan={currentPlan}
       availablePlans={availablePlans?.data || []}
+      portalEnabled={userSettings?.billing.portal_enabled}
     >
       <Billing />
     </Billing.Root>
