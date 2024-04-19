@@ -29,7 +29,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     this.enabled = enabled;
     this.maxAllowedMemberships = max_allowed_memberships;
     this.actions = { adminDelete: actions?.admin_delete || false };
-    this.billing = { enabled: billing?.enabled || false };
+    this.billing = { enabled: billing?.enabled || false, portal_enabled: billing?.portal_enabled || false };
     this.domains = {
       enabled: domains?.enabled || false,
       enrollmentModes: domains?.enrollment_modes || [],
