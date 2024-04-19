@@ -78,6 +78,8 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
 
     void loadedClerk.handleRedirectCallback(
       {
+        afterSignInUrl: ClerkJSNavigationEvent.signIn,
+        afterSignUpUrl: ClerkJSNavigationEvent.signUp,
         signInForceRedirectUrl: ClerkJSNavigationEvent.complete,
         signInFallbackRedirectUrl: ClerkJSNavigationEvent.complete,
         signUpForceRedirectUrl: ClerkJSNavigationEvent.signUp,
@@ -90,7 +92,7 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
         verifyPhoneNumberUrl: ClerkJSNavigationEvent.verification,
         signUpUrl: ClerkJSNavigationEvent.signUp,
         signInUrl: ClerkJSNavigationEvent.signIn,
-      } satisfies Required<HandleOAuthCallbackParams>,
+      } satisfies HandleOAuthCallbackParams,
       customNavigate,
     );
 
