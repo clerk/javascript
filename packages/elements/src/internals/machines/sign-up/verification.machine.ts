@@ -10,20 +10,25 @@ import type {
 } from '@clerk/types';
 import type { Writable } from 'type-fest';
 import type { ActorRefFrom } from 'xstate';
-import { and, assign, enqueueActions, fromCallback, fromPromise, raise, sendParent, sendTo, setup } from 'xstate';
+import { and, assign, enqueueActions, fromCallback, fromPromise, log, raise, sendParent, sendTo, setup } from 'xstate';
 
-import { MAGIC_LINK_VERIFY_PATH_ROUTE, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import {
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  RESENDABLE_COUNTDOWN_DEFAULT,
+  SIGN_UP_DEFAULT_BASE_PATH,
+} from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type { WithParams } from '~/internals/machines/shared';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
 import type { TSignUpRouterMachine } from './router.machine';
-import type {
-  SignUpVerificationContext,
-  SignUpVerificationEmailLinkFailedEvent,
-  SignUpVerificationEvents,
-  SignUpVerificationSchema,
+import {
+  type SignUpVerificationContext,
+  SignUpVerificationDelays,
+  type SignUpVerificationEmailLinkFailedEvent,
+  type SignUpVerificationEvents,
+  type SignUpVerificationSchema,
 } from './verification.types';
 
 export type SignUpVerificationsResourceKey = keyof SignUpVerificationsResource;
@@ -131,6 +136,14 @@ export const SignUpVerificationMachine = setup({
     ),
   },
   actions: {
+    resendableTick: assign(({ context }) => ({
+      resendable: context.resendableAfter === 0,
+      resendableAfter: context.resendableAfter > 0 ? context.resendableAfter - 1 : context.resendableAfter,
+    })),
+    resendableReset: assign({
+      resendable: false,
+      resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
+    }),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -154,6 +167,7 @@ export const SignUpVerificationMachine = setup({
 
       return resource.unverifiedFields.includes(field);
     },
+    isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
     isStrategyEnabled: (
       { context },
       { attribute, strategy }: { attribute: Attribute; strategy: VerificationStrategy },
@@ -167,16 +181,19 @@ export const SignUpVerificationMachine = setup({
     shouldVerifyEmailLink: shouldVerify('email_address', 'email_link'),
     shouldVerifyEmailCode: shouldVerify('email_address', 'email_code'),
   },
+  delays: SignUpVerificationDelays,
   types: {} as SignUpVerificationSchema,
 }).createMachine({
   id: SignUpVerificationMachineId,
   initial: 'Init',
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
-    resource: input.parent.getSnapshot().context.clerk.client.signUp,
+    loadingStep: 'verifications',
     formRef: input.form,
     parent: input.parent,
-    loadingStep: 'verifications',
+    resendable: false,
+    resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
+    resource: input.parent.getSnapshot().context.clerk.client.signUp,
   }),
   on: {
     NEXT: [
@@ -284,6 +301,7 @@ export const SignUpVerificationMachine = setup({
           tags: ['state:pending'],
           on: {
             NEXT: 'Preparing',
+            RETRY: 'Preparing',
           },
         },
         Attempting: {
@@ -296,14 +314,43 @@ export const SignUpVerificationMachine = setup({
             }),
           },
           after: {
-            // TODO: Use named delays
-            300_000: {
+            emailLinkTimeout: {
               description: 'Timeout after 5 minutes',
               target: 'Pending',
               actions: sendTo(({ context }) => context.formRef, {
                 type: 'ERRORS.SET',
                 error: new ClerkElementsError('verify-email-link-timeout', 'Email link verification timed out'),
               }),
+            },
+          },
+          initial: 'NotResendable',
+          states: {
+            Resendable: {
+              description: 'Waiting for user to retry',
+            },
+            NotResendable: {
+              description: 'Handle countdowns',
+              on: {
+                RETRY: {
+                  actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
+                },
+              },
+              after: {
+                resendableTimeout: [
+                  {
+                    description: 'Set as retriable if countdown is 0',
+                    guard: 'isResendable',
+                    actions: 'resendableTick',
+                    target: 'Resendable',
+                  },
+                  {
+                    description: 'Continue countdown if not retriable',
+                    actions: 'resendableTick',
+                    target: 'NotResendable',
+                    reenter: true,
+                  },
+                ],
+              },
             },
           },
         },
@@ -341,9 +388,40 @@ export const SignUpVerificationMachine = setup({
         Pending: {
           tags: ['state:pending'],
           on: {
+            RETRY: 'Preparing',
             SUBMIT: {
               target: 'Attempting',
               reenter: true,
+            },
+          },
+          initial: 'NotResendable',
+          states: {
+            Resendable: {
+              description: 'Waiting for user to retry',
+            },
+            NotResendable: {
+              description: 'Handle countdowns',
+              on: {
+                RETRY: {
+                  actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
+                },
+              },
+              after: {
+                resendableTimeout: [
+                  {
+                    description: 'Set as retriable if countdown is 0',
+                    guard: 'isResendable',
+                    actions: 'resendableTick',
+                    target: 'Resendable',
+                  },
+                  {
+                    description: 'Continue countdown if not retriable',
+                    actions: 'resendableTick',
+                    target: 'NotResendable',
+                    reenter: true,
+                  },
+                ],
+              },
             },
           },
         },
@@ -408,9 +486,40 @@ export const SignUpVerificationMachine = setup({
         Pending: {
           tags: ['state:pending'],
           on: {
+            RETRY: 'Preparing',
             SUBMIT: {
               target: 'Attempting',
               reenter: true,
+            },
+          },
+          initial: 'NotResendable',
+          states: {
+            Resendable: {
+              description: 'Waiting for user to retry',
+            },
+            NotResendable: {
+              description: 'Handle countdowns',
+              on: {
+                RETRY: {
+                  actions: log(({ context }) => `Not retriable; Try again in ${context.resendableAfter}s`),
+                },
+              },
+              after: {
+                resendableTimeout: [
+                  {
+                    description: 'Set as retriable if countdown is 0',
+                    guard: 'isResendable',
+                    actions: 'resendableTick',
+                    target: 'Resendable',
+                  },
+                  {
+                    description: 'Continue countdown if not retriable',
+                    actions: 'resendableTick',
+                    target: 'NotResendable',
+                    reenter: true,
+                  },
+                ],
+              },
             },
           },
         },
