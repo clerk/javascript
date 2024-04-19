@@ -1,3 +1,4 @@
+import type { __experimental_AuthenticateWithGoogleOneTapParams } from './clerk';
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -216,10 +217,6 @@ export type ResetPasswordParams = {
 
 export type AuthenticateWithPasskeyParams = {
   flow?: 'autofill' | 'discoverable';
-};
-
-export type __experimental_AuthenticateWithGoogleOneTapParams = {
-  token: string;
 };
 
 export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams {

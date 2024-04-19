@@ -4,6 +4,7 @@ import {
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
+  isClerkAPIResponseError,
   isHttpOrHttps,
   isValidBrowserOnline,
   isValidProxyUrl,
@@ -16,6 +17,7 @@ import {
 } from '@clerk/shared';
 import { eventComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
+  __experimental_AuthenticateWithGoogleOneTapParams,
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   Clerk as ClerkInterface,
@@ -1011,8 +1013,16 @@ export class Clerk implements ClerkInterface {
     return null;
   };
 
+  public __experimental__handleGoogleOneTapCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    return this.handleRedirectCallback({ ...params, signInOrUp }, customNavigate);
+  };
+
   public handleRedirectCallback = async (
-    params: HandleOAuthCallbackParams = {},
+    params: HandleOAuthCallbackParams & { signInOrUp?: SignInResource | SignUpResource } = {},
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
     if (!this.loaded || !this.#environment || !this.client) {
@@ -1088,14 +1098,19 @@ export class Clerk implements ClerkInterface {
     };
 
     const userExistsButNeedsToSignIn =
-      su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
+      (su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists') ||
+      (!!params.signInOrUp && params.signInOrUp.status !== 'needs_identifier');
+
     console.log('userExistsButNeedsToSignIn', userExistsButNeedsToSignIn);
 
     if (userExistsButNeedsToSignIn) {
-      let res = signIn;
-      if (!res.status) {
+      let res = params.signInOrUp || signIn;
+      console.log('TRANFER', !params.signInOrUp);
+      if (!params.signInOrUp) {
         res = await signIn.create({ transfer: true });
       }
+
+      console.log('status', res);
 
       switch (res.status) {
         case 'complete':
@@ -1138,13 +1153,12 @@ export class Clerk implements ClerkInterface {
     }
 
     const userNeedsToBeCreated =
-      si.firstFactorVerificationStatus === 'transferable' || su.status === 'missing_requirements';
+      si.firstFactorVerificationStatus === 'transferable' ||
+      (!!params.signInOrUp && params.signInOrUp.status === 'missing_requirements');
 
-    console.log('userNeedsToBeCreated', userNeedsToBeCreated);
     if (userNeedsToBeCreated) {
-      // const res = await signUp.create({ transfer: true });
-      let res = signUp;
-      if (!res.status) {
+      let res = params.signInOrUp || signUp;
+      if (!params.signInOrUp) {
         res = await signUp.create({ transfer: true });
       }
       switch (res.status) {
@@ -1209,6 +1223,29 @@ export class Clerk implements ClerkInterface {
       this.#broadcastSignOutEvent();
     }
     return this.setActive({ session: null });
+  };
+
+  public __experimental_authenticateWithGoogleOneTap = async (
+    params: __experimental_AuthenticateWithGoogleOneTapParams,
+  ): Promise<SignInResource | SignUpResource> => {
+    return this.client?.signIn
+      .create({
+        // TODO-ONETAP: Add new types when feature is ready for public beta
+        // @ts-expect-error
+        strategy: 'google_one_tap',
+        googleOneTapToken: params.token,
+      })
+      .catch(err => {
+        if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
+          return this.client?.signUp.create({
+            // TODO-ONETAP: Add new types when feature is ready for public beta
+            // @ts-expect-error
+            strategy: 'google_one_tap',
+            googleOneTapToken: params.token,
+          });
+        }
+        throw err;
+      }) as Promise<SignInResource | SignUpResource>;
   };
 
   public authenticateWithMetamask = async ({
