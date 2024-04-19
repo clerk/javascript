@@ -147,6 +147,8 @@ export default function SignUpPage() {
                 validatePassword
               />
 
+              <SignUp.Captcha id='test' />
+
               <CustomSubmit>Sign Up</CustomSubmit>
             </div>
           </div>

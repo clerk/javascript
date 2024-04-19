@@ -22,3 +22,5 @@ export const SEARCH_PARAMS = {
 } as const;
 
 export const RESENDABLE_COUNTDOWN_DEFAULT = 60;
+
+export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
