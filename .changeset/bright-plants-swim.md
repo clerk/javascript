@@ -1,5 +1,4 @@
 ---
-'gatsby-plugin-clerk': major
 '@clerk/chrome-extension': major
 '@clerk/localizations': major
 '@clerk/clerk-js': major

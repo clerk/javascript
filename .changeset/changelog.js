@@ -1,30 +1,76 @@
 const { getInfo, getInfoFromPullRequest } = require('@changesets/get-github-info');
 
+// mocks for local testing
+// const getInfo = async (...args) => {
+//   return {
+//     links: {
+//       commit: 'commit-link',
+//     },
+//   };
+// }
+//
+// const getInfoFromPullRequest = async (...args) => {
+//   return {
+//     links: {
+//       pull: 'pull-link',
+//     },
+//   };
+// }
+
 const repo = 'clerk/javascript';
 
+const delayRandomJitter = async (maxSeconds) => {
+  const seconds = Math.random() * (maxSeconds || 10);
+  await new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
 const getDependencyReleaseLine = async (changesets, dependenciesUpdated) => {
+  await delayRandomJitter(5);
+  console.log('dependenciesUpdated ------------')
   if (dependenciesUpdated.length === 0) return '';
 
-  const changesetLink = `- Updated dependencies [${(
-    await Promise.all(
-      changesets.map(async cs => {
-        if (cs.commit) {
-          let { links } = await getInfo({
-            repo,
-            commit: cs.commit,
-          });
-          return links.commit;
-        }
-      }),
-    )
-  )
-    .filter(_ => _)
-    .join(', ')}]:`;
+  const fetchLinksWithRetry = async commit => {
+    let retries = 0;
+    while (retries < 3) {
+      try {
+        const { links } = await getInfo({repo, commit});
+        return links;
+      } catch (e) {
+        retries++;
+        console.log('retrying', retries);
+        await delayRandomJitter(2);
+      }
+    }
+  }
 
+  const getLinksCommitFromChangeset = async changeset => {
+    if(!changeset.commit) {
+      return
+    }
+    console.log('fetching links for commit', changeset.commit);
+    return fetchLinksWithRetry(changeset.commit).then(links => links.commit);
+  }
+
+  const batchSize = 3;
+  const batches = [];
+  for (let i = 0; i < changesets.length; i += batchSize) {
+    batches.push(changesets.slice(i, i + batchSize).map(cs => () => getLinksCommitFromChangeset(cs)));
+  }
+
+  const resolvedPromises = [];
+  for (let i = 0; i < batches.length; i++) {
+    console.log('batch', i)
+    const batch = batches[i];
+    const resolvedBatch = await Promise.all(batch.map(fn => fn()));
+    resolvedPromises.push(resolvedBatch);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+
+  const list = (resolvedPromises.flat()).filter(_ => _).join(', ')
+  const changesetLink = `- Updated dependencies [${list}]:`;
   const updatedDependenciesList = dependenciesUpdated.map(
     dependency => `  - ${dependency.name}@${dependency.newVersion}`,
   );
-
   return [changesetLink, ...updatedDependenciesList].join('\n');
 };
 

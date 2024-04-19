@@ -1,5 +1,4 @@
 ---
-'gatsby-plugin-clerk': patch
 '@clerk/clerk-js': patch
 '@clerk/clerk-sdk-node': patch
 '@clerk/backend': patch

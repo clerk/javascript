@@ -18,6 +18,7 @@ import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   AfterSignOutUrl,
+  LegacyRedirectProps,
   RedirectOptions,
   RedirectUrlProp,
   SignInFallbackRedirectUrl,
@@ -478,7 +479,8 @@ export interface Clerk {
 export type HandleOAuthCallbackParams = SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl & {
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps & {
     /**
      * Full URL or path where the SignIn component is mounted.
      */
@@ -543,6 +545,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
+  LegacyRedirectProps &
   AfterSignOutUrl & {
     appearance?: Appearance;
     localization?: LocalizationResource;
@@ -686,21 +689,6 @@ export type SignInProps = RoutingOptions & {
    */
   fallbackRedirectUrl?: string | null;
   /**
-   * Full URL or path to navigate after successful sign up, triggered through the <SignIn/> component,
-   * for example, when the user clicks the "Sign up" link or signs up using OAuth.
-   * This value has precedence over other redirect props, environment variables or search params.
-   * Use this prop to override the redirect URL when needed.
-   * @default undefined
-   */
-  signUpForceRedirectUrl?: string | null;
-  /**
-   * Full URL or path to navigate after successful sign up, triggered through the <SignIn/> component,
-   * for example, when the user clicks the "Sign up" link or signs up using OAuth.
-   * This value is used when no other redirect props, environment variables or search params are present.
-   * @default undefined
-   */
-  signUpFallbackRedirectUrl?: string | null;
-  /**
    * Full URL or path to for the sign up process.
    * Used to fill the "Sign up" link in the SignUp component.
    */
@@ -715,7 +703,10 @@ export type SignInProps = RoutingOptions & {
    * Initial values that are used to prefill the sign in form.
    */
   initialValues?: SignInInitialValues;
-} & AfterSignOutUrl;
+} & SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps &
+  AfterSignOutUrl;
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
@@ -739,21 +730,6 @@ export type SignUpProps = RoutingOptions & {
    */
   fallbackRedirectUrl?: string | null;
   /**
-   * Full URL or path to navigate after successful sign up, triggered through the <SignUp/> component,
-   * for example, when the user clicks the "Sign in" link or signs up using OAuth.
-   * This value has precedence over other redirect props, environment variables or search params.
-   * Use this prop to override the redirect URL when needed.
-   * @default undefined
-   */
-  signInForceRedirectUrl?: string | null;
-  /**
-   * Full URL or path to navigate after successful sign up, triggered through the <SignUp/> component,
-   * for example, when the user clicks the "Sign in" link or signs up using OAuth.
-   * This value is used when no other redirect props, environment variables or search params are present.
-   * @default undefined
-   */
-  signInFallbackRedirectUrl?: string | null;
-  /**
    * Full URL or path to for the sign in process.
    * Used to fill the "Sign in" link in the SignUp component.
    */
@@ -773,7 +749,10 @@ export type SignUpProps = RoutingOptions & {
    * Initial values that are used to prefill the sign up form.
    */
   initialValues?: SignUpInitialValues;
-} & AfterSignOutUrl;
+} & SignInFallbackRedirectUrl &
+  SignInForceRedirectUrl &
+  LegacyRedirectProps &
+  AfterSignOutUrl;
 
 export type SignUpModalProps = WithoutRouting<SignUpProps>;
 

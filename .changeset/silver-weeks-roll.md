@@ -1,5 +1,4 @@
 ---
-'gatsby-plugin-clerk': major
 '@clerk/clerk-sdk-node': major
 '@clerk/backend': major
 '@clerk/fastify': major

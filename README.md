@@ -19,7 +19,7 @@
 This repository contains all the Clerk JavaScript SDKs under the `@clerk` namespace. Visit [clerk.com](https://clerk.com) to signup for an account.
 
 [![chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
-[![documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://beta.clerk.com/docs)
+[![documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs)
 [![twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
 ---
@@ -34,7 +34,7 @@ Would you like to work on Open Source software and help maintain this repository
 
 1. [Sign up for an account](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_js_repo_readme)
 1. Create an application in your Clerk dashboard
-1. Spin up a new codebase with one of the [quickstart guides](https://beta.clerk.com/docs/quickstarts/overview?utm_source=github&utm_medium=clerk_js_repo_readme)
+1. Spin up a new codebase with one of the [quickstart guides](https://clerk.com/docs/quickstarts/overview?utm_source=github&utm_medium=clerk_js_repo_readme)
 
 This repository contains the SDKs for environment/platforms that Clerk supports. For example, if you want to use Clerk with Node.js you can install:
 
@@ -48,10 +48,10 @@ pnpm add @clerk/clerk-sdk-node
 
 ## 🎓 Learning Clerk
 
-Clerk's full documentation is available at [clerk.com/docs](https://beta.clerk.com/docs?utm_source=github&utm_medium=clerk_js_repo_readme).
+Clerk's full documentation is available at [clerk.com/docs](https://clerk.com/docs?utm_source=github&utm_medium=clerk_js_repo_readme).
 
-- **We recommend starting with the [Quickstart guides](https://beta.clerk.com/docs/quickstarts/overview).** It'll enable you to quickly add Clerk to your application. If you're starting a new project and are not sure what to pick, use [Next.js](https://nextjs.org/docs/getting-started/installation) and [@clerk/nextjs](https://beta.clerk.com/docs/quickstarts/nextjs).
-- **To learn more about Clerk's components and features, checkout the rest of the [Clerk documentation](https://beta.clerk.com/docs?utm_source=github&utm_medium=clerk_js_repo_readme).** You'll be able to e.g. browse the [component reference](https://beta.clerk.com/docs/components/overview?utm_source=github&utm_medium=clerk_js_repo_readme) page.
+- **We recommend starting with the [Quickstart guides](https://clerk.com/docs/quickstarts/overview).** It'll enable you to quickly add Clerk to your application. If you're starting a new project and are not sure what to pick, use [Next.js](https://nextjs.org/docs/getting-started/installation) and [@clerk/nextjs](https://clerk.com/docs/quickstarts/nextjs).
+- **To learn more about Clerk's components and features, checkout the rest of the [Clerk documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_js_repo_readme).** You'll be able to e.g. browse the [component reference](https://clerk.com/docs/components/overview?utm_source=github&utm_medium=clerk_js_repo_readme) page.
 
 ## 🚢 Release Notes
 

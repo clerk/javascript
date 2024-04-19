@@ -1,5 +1,4 @@
 ---
-'gatsby-plugin-clerk': major
 '@clerk/clerk-js': major
 '@clerk/nextjs': major
 '@clerk/remix': major

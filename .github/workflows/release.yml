@@ -49,7 +49,7 @@ jobs:
           playwright-enabled: true # Must be present to enable caching on branched workflows
 
       - name: Build release
-        run: npx turbo build $TURBO_ARGS --force
+        run: npx turbo build $TURBO_ARGS --filter=!elements --force
 
       - name: Create Release PR
         id: changesets

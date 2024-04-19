@@ -20,9 +20,15 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
     signUpForceRedirectUrl:
       props.signUpForceRedirectUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL || '',
     signInFallbackRedirectUrl:
-      props.signInFallbackRedirectUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL || '',
+      props.signInFallbackRedirectUrl ||
+      process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL ||
+      process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL ||
+      '',
     signUpFallbackRedirectUrl:
-      props.signUpFallbackRedirectUrl || process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL || '',
+      props.signUpFallbackRedirectUrl ||
+      process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL ||
+      process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL ||
+      '',
     telemetry: props.telemetry ?? {
       disabled: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
