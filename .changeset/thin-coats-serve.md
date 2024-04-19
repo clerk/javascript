@@ -1,5 +1,4 @@
 ---
-'gatsby-plugin-clerk': minor
 '@clerk/clerk-sdk-node': minor
 '@clerk/backend': minor
 '@clerk/fastify': minor

@@ -1,7 +1,6 @@
 ---
 '@clerk/nextjs': patch
 '@clerk/remix': patch
-'gatsby-plugin-clerk': patch
 '@clerk/shared': patch
 '@clerk/fastify': patch
 ---

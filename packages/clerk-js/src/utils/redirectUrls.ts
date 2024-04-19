@@ -3,6 +3,7 @@ import { camelToSnake } from '@clerk/shared/underscore';
 import type { ClerkOptions, RedirectOptions } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 
+import { assertNoLegacyProp } from './assertNoLegacyProp';
 import { buildURL, isAllowedRedirectOrigin, relativeToAbsoluteUrl } from './url';
 
 export class RedirectUrls {
@@ -11,6 +12,9 @@ export class RedirectUrls {
     'signInFallbackRedirectUrl',
     'signUpForceRedirectUrl',
     'signUpFallbackRedirectUrl',
+    'afterSignInUrl',
+    'afterSignUpUrl',
+    'redirectUrl',
   ];
 
   private static preserved = ['redirectUrl'];
@@ -68,17 +72,31 @@ export class RedirectUrls {
   #getRedirectUrl(prefix: 'signIn' | 'signUp') {
     const forceKey = `${prefix}ForceRedirectUrl` as const;
     const fallbackKey = `${prefix}FallbackRedirectUrl` as const;
+
+    const legacyPropKey = `after${prefix[0].toUpperCase()}${prefix.slice(1)}Url` as 'afterSignInUrl' | 'afterSignUpUrl';
+
     let result;
     // Prioritize forceRedirectUrl
     result = this.fromSearchParams[forceKey] || this.fromProps[forceKey] || this.fromOptions[forceKey];
-    // Try to get redirect_url that only allowed as a search param
+    // Try to get redirect_url, only allowed as a search param
     result ||= this.fromSearchParams.redirectUrl;
     // Otherwise, fallback to fallbackRedirectUrl
     result ||= this.fromSearchParams[fallbackKey] || this.fromProps[fallbackKey] || this.fromOptions[fallbackKey];
+
+    // TODO: v6
+    // Remove the compatibility layer for afterSignInUrl and afterSignUpUrl
+    result ||=
+      this.fromSearchParams[legacyPropKey] ||
+      this.fromSearchParams.redirectUrl ||
+      this.fromProps[legacyPropKey] ||
+      this.fromProps.redirectUrl ||
+      this.fromOptions[legacyPropKey];
+
     return result || '/';
   }
 
   #parse(obj: unknown) {
+    assertNoLegacyProp(obj as any);
     const res = {} as RedirectOptions;
     RedirectUrls.keys.forEach(key => {
       // @ts-expect-error
@@ -88,6 +106,7 @@ export class RedirectUrls {
   }
 
   #parseSearchParams(obj: any) {
+    assertNoLegacyProp(obj);
     const res = {} as typeof this.fromSearchParams;
     RedirectUrls.keys.forEach(key => {
       res[key] = obj[camelToSnake(key)];

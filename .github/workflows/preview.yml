@@ -15,8 +15,8 @@ concurrency:
 jobs:
   preview:
     if: ${{ startsWith(github.event.comment.body, '!preview') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: 10
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_CLERK_PROD_ORG_ID }}
