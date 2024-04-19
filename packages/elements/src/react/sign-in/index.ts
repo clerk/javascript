@@ -10,7 +10,6 @@ export {
   SignInChooseStrategy as ChooseStrategy,
   SignInSupportedStrategy as SupportedStrategy,
 } from './choose-strategy';
-export { SignInProvider as Provider, SignInProviderIcon as ProviderIcon } from './providers';
 
 export {
   SignInFirstFactor as FirstFactor,
