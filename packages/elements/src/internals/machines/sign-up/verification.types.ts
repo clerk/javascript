@@ -29,6 +29,7 @@ export type SignUpVerificationFriendlyTags = 'code' | 'email_link' | 'email_code
 
 export type SignUpVerificationSubmitEvent = { type: 'SUBMIT' };
 export type SignUpVerificationNextEvent = { type: 'NEXT'; resource?: SignUpResource };
+export type SignUpVerificationRetryEvent = { type: 'RETRY' };
 
 export type SignUpVerificationEmailLinkVerifiedEvent = { type: 'EMAIL_LINK.VERIFIED'; resource: SignUpResource };
 export type SignUpVerificationEmailLinkUnverifiedEvent = { type: 'EMAIL_LINK.UNVERIFIED'; resource: SignUpResource };
@@ -54,6 +55,7 @@ export type SignUpVerificationEmailLinkEvent =
 export type SignUpVerificationEvents =
   | DoneActorEvent
   | ErrorActorEvent
+  | SignUpVerificationRetryEvent
   | SignUpVerificationSubmitEvent
   | SignUpVerificationNextEvent
   | SignUpVerificationEmailLinkEvent;
@@ -66,6 +68,15 @@ export type SignUpVerificationInput = {
   parent: ActorRefFrom<TSignUpRouterMachine>;
 };
 
+// ---------------------------------- Delays ---------------------------------- //
+
+export const SignUpVerificationDelays = {
+  emailLinkTimeout: 300_000, // 5 minutes
+  resendableTimeout: 1_000, // 1 second
+} as const;
+
+export type SignUpVerificationDelays = keyof typeof SignUpVerificationDelays;
+
 // ---------------------------------- Context ---------------------------------- //
 
 export interface SignUpVerificationContext {
@@ -75,12 +86,15 @@ export interface SignUpVerificationContext {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignUpRouterMachine>;
   loadingStep: 'verifications';
+  resendable: boolean;
+  resendableAfter: number;
 }
 
 // ---------------------------------- Schema ---------------------------------- //
 
 export interface SignUpVerificationSchema {
   context: SignUpVerificationContext;
+  delays: SignUpVerificationDelays;
   input: SignUpVerificationInput;
   events: SignUpVerificationEvents;
   tags: SignUpVerificationTags;

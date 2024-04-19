@@ -15,6 +15,7 @@ import type {
 import type { ActorRefFrom, DoneActorEvent } from 'xstate';
 import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
+import { RESENDABLE_COUNTDOWN_DEFAULT } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
 import type { WithParams } from '~/internals/machines/shared';
@@ -42,7 +43,6 @@ export type AttemptFirstFactorInput = { parent: Parent; fields: FormFields; curr
 export type AttemptSecondFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInSecondFactor | null };
 
 export const SignInVerificationMachineId = 'SignInVerification';
-export const RESENDABLE_COUNTDOWN_DEFAULT = 60;
 
 const SignInVerificationMachine = setup({
   actors: {
@@ -133,9 +133,7 @@ const SignInVerificationMachine = setup({
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
   },
-  delays: {
-    resendableTimeout: SignInVerificationDelays.resendableTimeout,
-  },
+  delays: SignInVerificationDelays,
   types: {} as SignInVerificationSchema,
 }).createMachine({
   id: SignInVerificationMachineId,

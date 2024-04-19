@@ -2,8 +2,11 @@ import * as React from 'react';
 
 import type { FormSubmitProps } from '~/react/common';
 import { Submit } from '~/react/common';
-import type { SignUpNavigateProps } from '~/react/sign-up/navigation';
-import { SignUpNavigate } from '~/react/sign-up/navigation';
+
+import type { SignUpNavigateProps } from './navigate';
+import { SignUpNavigate } from './navigate';
+import type { SignUpResendProps } from './resend';
+import { SignUpResend } from './resend';
 
 export type SignUpActionProps = { asChild?: boolean } & (
   | ({
@@ -13,7 +16,7 @@ export type SignUpActionProps = { asChild?: boolean } & (
       className?: string;
     } & Omit<SignUpNavigateProps, 'to'>)
   | ({ navigate?: never; resend?: never; submit: true } & FormSubmitProps)
-  | { navigate?: never; resend: true; submit: never; className?: string }
+  | ({ navigate?: never; resend: true; submit: never; className?: string } & SignUpResendProps)
 );
 
 /**
@@ -38,28 +41,24 @@ export type SignUpActionProps = { asChild?: boolean } & (
  */
 
 export const SignUpAction = React.forwardRef<React.ElementRef<'button'>, SignUpActionProps>((props, forwardedRef) => {
-  if (props.submit) {
-    const { submit, ...rest } = props;
-    return (
-      <Submit
-        {...rest}
-        ref={forwardedRef}
-      />
-    );
+  const { submit, navigate, resend, ...rest } = props;
+  let Comp: React.ForwardRefExoticComponent<any> | undefined;
+
+  if (submit) {
+    Comp = Submit;
+  } else if (navigate) {
+    Comp = SignUpNavigate;
+  } else if (resend) {
+    Comp = SignUpResend;
   }
 
-  if (props.navigate) {
-    const { navigate, ...rest } = props;
-    return (
-      <SignUpNavigate
-        {...rest}
-        to={navigate}
-        ref={forwardedRef}
-      />
-    );
-  }
-
-  return null;
+  return Comp ? (
+    <Comp
+      to={navigate}
+      {...rest}
+      ref={forwardedRef}
+    />
+  ) : null;
 });
 
 SignUpAction.displayName = 'SignUpAction';

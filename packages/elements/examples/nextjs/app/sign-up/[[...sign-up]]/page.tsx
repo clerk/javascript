@@ -4,7 +4,7 @@ import * as Clerk from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 import type { ComponentProps } from 'react';
 
-import { H1, HR as Hr } from '@/components/design';
+import { H1, HR as Hr, P } from '@/components/design';
 import { CustomField } from '@/components/form';
 import { Spinner } from '@/components/spinner';
 
@@ -14,7 +14,22 @@ function CustomSubmit({ children }: ComponentProps<'button'>) {
       className='inline-flex px-7 py-3 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,255,255)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(160,160,160)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'
       submit
     >
-      {children}
+      <Clerk.Loading>{isLoading => (isLoading ? <Spinner /> : children)}</Clerk.Loading>
+    </SignUp.Action>
+  );
+}
+
+function ResendableFallback({ resendableAfter }: { resendableAfter: number }) {
+  return <P className='text-sm'>Didn&apos;t recieve a code? Retry in {resendableAfter} seconds.</P>;
+}
+
+function CustomResendable() {
+  return (
+    <SignUp.Action
+      fallback={ResendableFallback}
+      resend
+    >
+      Didn&apos;t recieve a code? <strong className='text-blue-400'>Retry Now</strong>
     </SignUp.Action>
   );
 }
@@ -132,19 +147,7 @@ export default function SignUpPage() {
                 validatePassword
               />
 
-              <CustomSubmit>
-                <Clerk.Loading>
-                  {isLoading =>
-                    isLoading ? (
-                      <>
-                        <Spinner /> Loading...
-                      </>
-                    ) : (
-                      'Sign Up'
-                    )
-                  }
-                </Clerk.Loading>
-              </CustomSubmit>
+              <CustomSubmit>Sign Up</CustomSubmit>
             </div>
           </div>
         </SignUp.Step>
@@ -157,19 +160,7 @@ export default function SignUpPage() {
             name='password'
           />
 
-          <CustomSubmit>
-            <Clerk.Loading>
-              {isLoading =>
-                isLoading ? (
-                  <>
-                    <Spinner /> Loading...
-                  </>
-                ) : (
-                  'Sign Up'
-                )
-              }
-            </Clerk.Loading>
-          </CustomSubmit>
+          <CustomSubmit>Sign Up</CustomSubmit>
         </SignUp.Step>
 
         <SignUp.Step name='verifications'>
@@ -178,49 +169,30 @@ export default function SignUpPage() {
           <Clerk.GlobalError className='block text-red-400 font-mono' />
 
           <SignUp.Strategy name='phone_code'>
+            <CustomResendable />
+
             <CustomField
               label='SMS Code'
               name='code'
             />
 
-            <CustomSubmit>
-              <Clerk.Loading>
-                {isLoading =>
-                  isLoading ? (
-                    <>
-                      <Spinner /> Loading...
-                    </>
-                  ) : (
-                    'Verify'
-                  )
-                }
-              </Clerk.Loading>
-            </CustomSubmit>
+            <CustomSubmit>Verify</CustomSubmit>
           </SignUp.Strategy>
 
           <SignUp.Strategy name='email_code'>
+            <CustomResendable />
+
             <CustomField
               label='Email Code'
               name='code'
             />
 
-            <CustomSubmit>
-              <Clerk.Loading>
-                {isLoading =>
-                  isLoading ? (
-                    <>
-                      <Spinner /> Loading...
-                    </>
-                  ) : (
-                    'Verify'
-                  )
-                }
-              </Clerk.Loading>
-            </CustomSubmit>
+            <CustomSubmit>Verify</CustomSubmit>
           </SignUp.Strategy>
 
           <SignUp.Strategy name='email_link'>
             Please check your email for a link to verify your account.
+            <CustomResendable />
           </SignUp.Strategy>
         </SignUp.Step>
       </div>
