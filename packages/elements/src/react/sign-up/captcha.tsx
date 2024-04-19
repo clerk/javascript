@@ -7,9 +7,43 @@ import { ClerkElementsRuntimeError } from '~/internals/errors';
 import { SignUpStartCtx } from './start';
 
 export type SignUpCaptchaElement = React.ElementRef<'div'>;
-export type SignUpCaptchaProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
-  asChild?: boolean;
-};
+
+type CaptchaElementProps = Omit<
+  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>,
+  'id' | 'children'
+>;
+
+export type SignUpCaptchaProps =
+  | ({
+      asChild: true;
+      /* Must only be a self-closing element/component */
+      children: React.ReactElement;
+    } & CaptchaElementProps)
+  | ({ asChild?: false; children?: undefined } & CaptchaElementProps);
+
+/**
+ * The `<SignUp.Captcha>` component is used to render the Cloudflare Turnstile widget. It must be used within the `<SignUp.Step name="start">` component.
+ *
+ * If utilizing the `asChild` prop, the component must be a self-closing element or component. Any children passed to the immediate child component of <SignUp.Captcha> will be ignored.
+ *
+ * @example
+ * <SignUp.Root>
+ *   <SignUp.Step name="start">
+ *     <SignUp.Captcha />
+ *     <Clerk.Action submit>Sign Up</Clerk.Action>
+ *   </SignUp.Step>
+ * </SignIn>
+ *
+ * @example
+ * <SignUp.Root>
+ *   <SignUp.Step name="start">
+ *     <SignUp.Captcha asChild>
+ *       <aside/>
+ *     </SignUp.Captcha>
+ *     <Clerk.Action submit>Sign Up</Clerk.Action>
+ *   </SignUp.Step>
+ * </SignIn>
+ */
 
 export const SignUpCaptcha = React.forwardRef<SignUpCaptchaElement, SignUpCaptchaProps>(
   ({ asChild, children, ...rest }, forwardedRef) => {
