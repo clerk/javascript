@@ -70,7 +70,7 @@ const Feature = ({ name }: { name: string }) => {
     <Flex
       align='start'
       gap={2}
-      sx={t => ({ color: t.colors.$colorTextSecondary })}
+      sx={t => ({ color: t.colors.$colorTextSecondary, marginBottom: t.space.$2 })}
     >
       <Icon
         size='xs'
@@ -98,15 +98,14 @@ export type OrganizationPlanCardProps = Pick<BillingPlanResource, 'name' | 'feat
 
 export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
   const [showAllFeatures, setShowAllFeatures] = React.useState(false);
+  const features = params.features;
 
-  const extendedFeatures = params.features.slice(6);
-  const initialFeatures = params.features.slice(0, 6);
-
-  const evenInitialFeatures = initialFeatures.filter((_, index) => index % 2 === 0);
-  const oddInitialFeatures = initialFeatures.filter((_, index) => index % 2 !== 0);
-
-  const evenExtendedFeatures = extendedFeatures.filter((_, index) => index % 2 === 0);
-  const oddExtendedFeatures = extendedFeatures.filter((_, index) => index % 2 !== 0);
+  const evenFeatures = showAllFeatures
+    ? features.filter((_, index) => index % 2 === 0)
+    : features.filter((_, index) => index % 2 === 0).slice(0, 3);
+  const oddFeatures = showAllFeatures
+    ? features.filter((_, index) => index % 2 !== 0)
+    : features.filter((_, index) => index % 2 !== 0).slice(0, 3);
 
   return (
     <Col
@@ -175,91 +174,69 @@ export const OrganizationPlanCard = (params: OrganizationPlanCardProps) => {
             )}
           </Flex>
 
-          {initialFeatures.length > 0 && <DividerLine />}
+          {(features.length > 0 || params.description) && <DividerLine />}
           {params.description && <Text colorScheme='secondary'>{params.description}</Text>}
-          {initialFeatures.length > 0 && (
+          <Col gap={2}>
+            <Grid
+              sx={{
+                gridTemplateColumns: 'repeat(2,1fr)',
+              }}
+              gap={6}
+            >
+              <Col gap={2}>
+                <Animated>
+                  {evenFeatures.map(feature => (
+                    <Feature
+                      key={feature}
+                      name={feature}
+                    />
+                  ))}
+                </Animated>
+              </Col>
+              <Col>
+                <Animated>
+                  {oddFeatures.map(feature => (
+                    <Feature
+                      name={feature}
+                      key={feature}
+                    />
+                  ))}
+                </Animated>
+              </Col>
+            </Grid>
+          </Col>
+
+          {features.length > 6 && (
             <Animated asChild>
               <Col gap={2}>
-                <Grid
-                  sx={{
-                    gridTemplateColumns: 'repeat(2,1fr)',
-                  }}
-                  gap={6}
-                >
-                  <Col gap={2}>
-                    {evenInitialFeatures.map(feature => (
-                      <Feature
-                        key={feature}
-                        name={feature}
-                      />
-                    ))}
-                  </Col>
-                  <Col gap={2}>
-                    {oddInitialFeatures.map(feature => (
-                      <Feature
-                        key={feature}
-                        name={feature}
-                      />
-                    ))}
-                  </Col>
-                </Grid>
-
-                {showAllFeatures && (
-                  <Grid
-                    sx={{
-                      gridTemplateColumns: 'repeat(2,1fr)',
-                    }}
-                    gap={6}
+                <Box>
+                  <Button
+                    onClick={() => setShowAllFeatures(value => !value)}
+                    sx={t => ({ padding: `0 ${t.space.$2}`, color: t.colors.$colorTextSecondary })}
+                    variant='ghost'
                   >
-                    <Col gap={2}>
-                      {evenExtendedFeatures.map(feature => (
-                        <Feature
-                          key={feature}
-                          name={feature}
-                        />
-                      ))}
-                    </Col>
-                    <Col gap={2}>
-                      {oddExtendedFeatures.map(feature => (
-                        <Feature
-                          key={feature}
-                          name={feature}
-                        />
-                      ))}
-                    </Col>
-                  </Grid>
-                )}
+                    <Text
+                      as='span'
+                      sx={t => ({
+                        fontWeight: t.fontWeights.$normal,
+                        color: t.colors.$colorTextSecondary,
+                      })}
+                      localizationKey={
+                        showAllFeatures
+                          ? localizationKeys('billing.managePlanScreen.action__showLess')
+                          : localizationKeys('billing.managePlanScreen.action__showAll')
+                      }
+                    />
 
-                {initialFeatures.length > 5 && (
-                  <Box>
-                    <Button
-                      onClick={() => setShowAllFeatures(value => !value)}
-                      sx={t => ({ padding: `0 ${t.space.$2}`, color: t.colors.$colorTextSecondary })}
-                      variant='ghost'
-                    >
-                      <Text
-                        as='span'
-                        sx={t => ({
-                          fontWeight: t.fontWeights.$normal,
-                          color: t.colors.$colorTextSecondary,
-                        })}
-                        localizationKey={
-                          showAllFeatures
-                            ? localizationKeys('billing.managePlanScreen.action__showLess')
-                            : localizationKeys('billing.managePlanScreen.action__showAll')
-                        }
-                      />
-
-                      <Icon
-                        icon={ChevronDown}
-                        sx={t => ({
-                          transform: showAllFeatures ? 'rotate(180deg)' : 'rotate(0)',
-                          marginLeft: t.space.$1,
-                        })}
-                      />
-                    </Button>
-                  </Box>
-                )}
+                    <Icon
+                      icon={ChevronDown}
+                      sx={t => ({
+                        transform: showAllFeatures ? 'rotate(180deg)' : 'rotate(0)',
+                        marginLeft: t.space.$1,
+                      })}
+                    />
+                  </Button>
+                </Box>
               </Col>
             </Animated>
           )}
