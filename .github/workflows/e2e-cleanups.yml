@@ -8,8 +8,8 @@ on:
 jobs:
   integration-tests:
     name: Cleanup e2e instances
-    runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: 10
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     steps:
       - name: Checkout Repo

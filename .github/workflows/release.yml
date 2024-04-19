@@ -15,8 +15,8 @@ jobs:
   release:
     name: Release
     if: ${{ github.repository == 'clerk/javascript' }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: 10
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     permissions:
       contents: write
@@ -110,8 +110,8 @@ jobs:
   # than recreating them every time.
   cache-for-alternate-node-versions:
     name: Cache for Alternate Node Versions
-    runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
     continue-on-error: true
 
     strategy:

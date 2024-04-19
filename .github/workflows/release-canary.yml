@@ -13,8 +13,8 @@ concurrency:
 jobs:
   canary-release:
     if: ${{ github.repository == 'clerk/javascript' }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: 10
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
