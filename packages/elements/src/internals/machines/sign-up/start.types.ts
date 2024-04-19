@@ -2,8 +2,9 @@ import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
-import type { FormMachine } from '~/internals/machines/form/form.machine';
-import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
+import type { FormMachine } from '~/internals/machines/form';
+
+import type { TSignUpRouterMachine } from './router.machine';
 
 // ---------------------------------- Tags ---------------------------------- //
 

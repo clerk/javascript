@@ -1,5 +1,5 @@
-import type { TSignInResetPasswordMachine } from '~/internals/machines/sign-in/machines/reset-password.machine';
-import { SignInResetPasswordMachine } from '~/internals/machines/sign-in/machines/reset-password.machine';
+import type { TSignInResetPasswordMachine } from '~/internals/machines/sign-in';
+import { SignInResetPasswordMachine } from '~/internals/machines/sign-in';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';

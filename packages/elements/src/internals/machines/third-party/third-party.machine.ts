@@ -2,11 +2,11 @@ import type { LoadedClerk } from '@clerk/types';
 import { assertEvent, assign, log, not, sendParent, setup } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
-import { sendToLoading } from '~/internals/machines/shared.actions';
+import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-import { handleRedirectCallback, redirect } from './actors';
-import type { ThirdPartyMachineSchema } from './types';
+import { handleRedirectCallback, redirect } from './third-party.actors';
+import type { ThirdPartyMachineSchema } from './third-party.types';
 
 export const ThirdPartyMachineId = 'ThirdParty';
 

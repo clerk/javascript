@@ -1,4 +1,10 @@
-import type { AuthenticateWithRedirectParams, LoadedClerk, OAuthStrategy, SamlStrategy } from '@clerk/types';
+import type {
+  AuthenticateWithRedirectParams,
+  LoadedClerk,
+  OAuthStrategy,
+  SamlStrategy,
+  SignInStrategy,
+} from '@clerk/types';
 import type { SetRequired, Simplify } from 'type-fest';
 
 export type WithClerk<T = Record<string, unknown>> = { clerk: LoadedClerk } & T;
@@ -23,3 +29,7 @@ export type AuthenticateWithRedirectSamlParams = Simplify<
     strategy: SamlStrategy;
   }
 >;
+
+// ================= Strategies ================= //
+
+export type SignInStrategyName = SignInStrategy | 'oauth' | 'web3';

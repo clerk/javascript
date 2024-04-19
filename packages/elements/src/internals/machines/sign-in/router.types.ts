@@ -1,7 +1,6 @@
 import type { SignInResource } from '@clerk/types';
 import type { AnyActorLogic, MachineSnapshot } from 'xstate';
 
-import type { SignInVerificationFactorUpdateEvent } from '~/internals/machines/sign-in/types';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
@@ -16,6 +15,8 @@ import type {
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
 } from '~/internals/machines/types';
+
+import type { SignInVerificationFactorUpdateEvent } from './verification.types';
 
 // ---------------------------------- Tags ---------------------------------- //
 

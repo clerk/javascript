@@ -5,8 +5,8 @@ import { createActor } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider } from '~/internals/machines/form/form.context';
-import { SignUpRouterMachine } from '~/internals/machines/sign-up/machines';
-import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up/types';
+import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
+import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { consoleInspector } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';

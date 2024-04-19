@@ -23,6 +23,7 @@ import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
 import { ClerkElementsFieldError } from '~/internals/errors';
+import type { FieldDetails } from '~/internals/machines/form';
 import {
   fieldFeedbackSelector,
   fieldHasValueSelector,
@@ -31,7 +32,6 @@ import {
   useFormSelector,
   useFormStore,
 } from '~/internals/machines/form/form.context';
-import type { FieldDetails } from '~/internals/machines/form/form.types';
 import { usePassword } from '~/react/hooks/use-password.hook';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
 
@@ -724,9 +724,9 @@ FieldError.displayName = FIELD_ERROR_NAME;
 export { Field, FieldError, FieldState, Form, GlobalError, Input, Label, Submit };
 export type {
   RadixFormControlProps as FormControlProps,
-  FormFieldErrorProps,
   FormErrorProps,
   FormErrorRenderProps,
+  FormFieldErrorProps,
   FormFieldProps,
   FormGlobalErrorProps,
   FormInputProps,

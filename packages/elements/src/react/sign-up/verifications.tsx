@@ -1,6 +1,9 @@
-import type { TSignUpVerificationMachine } from '~/internals/machines/sign-up/machines';
-import { SignUpVerificationMachine } from '~/internals/machines/sign-up/machines';
-import type { SignUpVerificationFriendlyTags, SignUpVerificationTags } from '~/internals/machines/sign-up/types';
+import type {
+  SignUpVerificationFriendlyTags,
+  SignUpVerificationTags,
+  TSignUpVerificationMachine,
+} from '~/internals/machines/sign-up';
+import { SignUpVerificationMachine } from '~/internals/machines/sign-up';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';

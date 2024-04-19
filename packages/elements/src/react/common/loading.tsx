@@ -7,12 +7,14 @@ import { useLoading } from '~/react/hooks/use-loading.hook';
 import { SignInChooseStrategyCtx } from '~/react/sign-in/choose-strategy';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 import { SignInStartCtx } from '~/react/sign-in/start';
-import { SIGN_IN_STEPS, type TSignInStep } from '~/react/sign-in/step';
+import type { TSignInStep } from '~/react/sign-in/step';
+import { SIGN_IN_STEPS } from '~/react/sign-in/step';
 import { SignInFirstFactorCtx, SignInSecondFactorCtx } from '~/react/sign-in/verifications';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 import { SignUpContinueCtx } from '~/react/sign-up/continue';
 import { SignUpStartCtx } from '~/react/sign-up/start';
-import { SIGN_UP_STEPS, type TSignUpStep } from '~/react/sign-up/step';
+import type { TSignUpStep } from '~/react/sign-up/step';
+import { SIGN_UP_STEPS } from '~/react/sign-up/step';
 import { SignUpVerificationCtx } from '~/react/sign-up/verifications';
 import { mapScopeToStrategy } from '~/react/utils/map-scope-to-strategy';
 

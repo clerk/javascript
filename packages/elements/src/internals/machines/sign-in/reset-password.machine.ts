@@ -2,11 +2,12 @@ import type { SignInResource } from '@clerk/types';
 import type { ActorRefFrom, DoneActorEvent } from 'xstate';
 import { fromPromise, sendTo, setup } from 'xstate';
 
-import type { FormFields } from '~/internals/machines/form/form.types';
-import { sendToLoading } from '~/internals/machines/shared.actions';
-import { type TSignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
-import type { SignInResetPasswordSchema } from '~/internals/machines/sign-in/types';
+import type { FormFields } from '~/internals/machines/form';
+import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
+
+import type { SignInResetPasswordSchema } from './reset-password.types';
+import type { TSignInRouterMachine } from './router.machine';
 
 export type TSignInResetPasswordMachine = typeof SignInResetPasswordMachine;
 

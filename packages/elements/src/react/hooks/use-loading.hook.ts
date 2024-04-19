@@ -1,10 +1,8 @@
 import { useSelector } from '@xstate/react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
-import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines';
-import type { SignInRouterLoadingContext } from '~/internals/machines/sign-in/types';
-import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
-import type { SignUpRouterLoadingContext } from '~/internals/machines/sign-up/types';
+import type { SignInRouterLoadingContext, TSignInRouterMachine } from '~/internals/machines/sign-in';
+import type { SignUpRouterLoadingContext, TSignUpRouterMachine } from '~/internals/machines/sign-up';
 
 export type ActorSignIn = ActorRefFrom<TSignInRouterMachine>;
 export type ActorSignUp = ActorRefFrom<TSignUpRouterMachine>;

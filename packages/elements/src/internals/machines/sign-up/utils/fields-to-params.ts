@@ -1,6 +1,6 @@
 import type { SignUpCreateParams, SignUpUpdateParams } from '@clerk/types';
 
-import type { FormFields } from '~/internals/machines/form/form.types';
+import type { FormFields } from '~/internals/machines/form';
 
 const SignUpAdditionalKeys = ['firstName', 'lastName', 'emailAddress', 'username', 'password', 'phoneNumber'] as const;
 

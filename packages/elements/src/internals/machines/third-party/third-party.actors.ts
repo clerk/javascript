@@ -10,7 +10,7 @@ import { fromCallback, fromPromise } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import type { WithParams, WithUnsafeMetadata } from '~/internals/machines/shared.types';
+import type { WithParams, WithUnsafeMetadata } from '~/internals/machines/shared';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
 
 type OptionalRedirectParams = 'redirectUrl' | 'redirectUrlComplete';
@@ -78,6 +78,8 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
 
     void loadedClerk.handleRedirectCallback(
       {
+        afterSignInUrl: ClerkJSNavigationEvent.signIn,
+        afterSignUpUrl: ClerkJSNavigationEvent.signUp,
         signInForceRedirectUrl: ClerkJSNavigationEvent.complete,
         signInFallbackRedirectUrl: ClerkJSNavigationEvent.complete,
         signUpForceRedirectUrl: ClerkJSNavigationEvent.signUp,
@@ -90,7 +92,7 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
         verifyPhoneNumberUrl: ClerkJSNavigationEvent.verification,
         signUpUrl: ClerkJSNavigationEvent.signUp,
         signInUrl: ClerkJSNavigationEvent.signIn,
-      } satisfies Required<HandleOAuthCallbackParams>,
+      } satisfies HandleOAuthCallbackParams,
       customNavigate,
     );
 

@@ -16,19 +16,20 @@ import type { ActorRefFrom, DoneActorEvent } from 'xstate';
 import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import type { FormFields } from '~/internals/machines/form/form.types';
-import { sendToLoading } from '~/internals/machines/shared.actions';
-import type { WithParams } from '~/internals/machines/shared.types';
-import type { SignInRouterMachine } from '~/internals/machines/sign-in/machines/router.machine';
-import type { SignInVerificationSchema } from '~/internals/machines/sign-in/types';
-import { SignInVerificationDelays } from '~/internals/machines/sign-in/types';
+import type { FormFields } from '~/internals/machines/form';
+import type { WithParams } from '~/internals/machines/shared';
+import { sendToLoading } from '~/internals/machines/shared';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
+
+import type { TSignInRouterMachine } from './router.machine';
+import type { SignInVerificationSchema } from './verification.types';
+import { SignInVerificationDelays } from './verification.types';
 
 export type TSignInFirstFactorMachine = typeof SignInFirstFactorMachine;
 export type TSignInSecondFactorMachine = typeof SignInSecondFactorMachine;
 
-type Parent = ActorRefFrom<typeof SignInRouterMachine>;
+type Parent = ActorRefFrom<TSignInRouterMachine>;
 
 export type PrepareFirstFactorInput = WithParams<SignInFirstFactor | null> & {
   parent: Parent;

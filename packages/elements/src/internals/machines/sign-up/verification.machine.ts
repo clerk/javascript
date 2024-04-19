@@ -14,17 +14,17 @@ import { and, assign, enqueueActions, fromCallback, fromPromise, raise, sendPare
 
 import { MAGIC_LINK_VERIFY_PATH_ROUTE, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
-import { sendToLoading } from '~/internals/machines/shared.actions';
-import type { TSignUpRouterMachine } from '~/internals/machines/sign-up/machines';
+import type { WithParams } from '~/internals/machines/shared';
+import { sendToLoading } from '~/internals/machines/shared';
+import { assertActorEventError } from '~/internals/machines/utils/assert';
+
+import type { TSignUpRouterMachine } from './router.machine';
 import type {
   SignUpVerificationContext,
   SignUpVerificationEmailLinkFailedEvent,
   SignUpVerificationEvents,
   SignUpVerificationSchema,
-} from '~/internals/machines/sign-up/types';
-import { assertActorEventError } from '~/internals/machines/utils/assert';
-
-import type { WithParams } from '../../shared.types';
+} from './verification.types';
 
 export type SignUpVerificationsResourceKey = keyof SignUpVerificationsResource;
 export type TSignUpVerificationMachine = typeof SignUpVerificationMachine;

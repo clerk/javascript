@@ -11,14 +11,15 @@ import {
 } from '~/internals/constants';
 import type { ClerkElementsError } from '~/internals/errors';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
+import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
+import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
+
 import type {
   SignUpRouterContext,
   SignUpRouterEvents,
   SignUpRouterNextEvent,
   SignUpRouterSchema,
-} from '~/internals/machines/sign-up/types';
-import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party/machine';
-import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
+} from './router.types';
 
 const isCurrentPath =
   (path: `/${string}`) =>

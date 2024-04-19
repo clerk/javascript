@@ -1,5 +1,6 @@
-import type { SignInRouterSnapshot } from '~/internals/machines/sign-in/types';
 import { formatSalutation } from '~/internals/machines/utils/formatters';
+
+import type { SignInRouterSnapshot } from './router.types';
 
 export function SignInSafeIdentifierSelector(s: SignInRouterSnapshot): string {
   return s.context.clerk?.client.signIn.identifier || '';
