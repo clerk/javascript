@@ -1,5 +1,86 @@
 # Change Log
 
+## 2.0.0
+
+### Major Changes
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
+  to fix issues with vite & rollup building.
+- 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
+- 7886ba89d: Refresh the look and feel of the Clerk UI components
+
+  For more info, refer to the [upgrade guide from v4 to v5 in Clerk docs](https://clerk.com/docs/upgrade-guides/upgrading-from-v4-to-v5).
+
+### Patch Changes
+
+- 2ae9fd601: Release the latest beta changes of the `@clerk/themes` package
+- 2de442b24: Rename beta-v5 to beta
+- be5bc7b4b: Rename `unstable_createTheme` to `experimental_createTheme`
+- Updated dependencies [1db1f4068]
+- Updated dependencies [c2a090513]
+- Updated dependencies [0d0b1d89a]
+- Updated dependencies [d37d44a68]
+- Updated dependencies [fe356eebd]
+- Updated dependencies [7f6a64f43]
+- Updated dependencies [afec17953]
+- Updated dependencies [0699fa496]
+- Updated dependencies [2de442b24]
+- Updated dependencies [0293f29c8]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [9180c8b80]
+- Updated dependencies [7f833da9e]
+- Updated dependencies [fc3ffd880]
+- Updated dependencies [840636a14]
+- Updated dependencies [bab2e7e05]
+- Updated dependencies [2352149f6]
+- Updated dependencies [ff08fe237]
+- Updated dependencies [244de5ea3]
+- Updated dependencies [d9f265fcb]
+- Updated dependencies [7bffc47cb]
+- Updated dependencies [9737ef510]
+- Updated dependencies [fafa76fb6]
+- Updated dependencies [1f650f30a]
+- Updated dependencies [2a22aade8]
+- Updated dependencies [69ce3e185]
+- Updated dependencies [78fc5eec0]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [6a33709cc]
+- Updated dependencies [f77e8cdbd]
+- Updated dependencies [8b466a9ba]
+- Updated dependencies [fe2607b6f]
+- Updated dependencies [c7e6d00f5]
+- Updated dependencies [663243220]
+- Updated dependencies [c6a5e0f5d]
+- Updated dependencies [4edb77632]
+- Updated dependencies [ab4eb56a5]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [5c239d973]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [12962bc58]
+- Updated dependencies [2e4a43017]
+- Updated dependencies [5aab9f04a]
+- Updated dependencies [46040a2f3]
+- Updated dependencies [f00fd2dfe]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [7f751c4ef]
+- Updated dependencies [18c0d015d]
+- Updated dependencies [7886ba89d]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [f540e9843]
+- Updated dependencies [477170962]
+- Updated dependencies [d6a7ea61a]
+- Updated dependencies [41ae1d2f0]
+- Updated dependencies [48ca40af9]
+- Updated dependencies [94519aa33]
+- Updated dependencies [ebf9be77f]
+- Updated dependencies [008ac4217]
+- Updated dependencies [40ac4b645]
+- Updated dependencies [429d030f7]
+- Updated dependencies [844847e0b]
+  - @clerk/types@4.0.0
+
 ## 2.0.0-beta.15
 
 ### Patch Changes
