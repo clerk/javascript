@@ -1,5 +1,5 @@
-import { snakeToCamel } from '@clerk/shared';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { snakeToCamel } from '@clerk/shared/underscore';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 

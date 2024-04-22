@@ -1,4 +1,4 @@
-import { Poller } from '@clerk/shared';
+import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptVerificationParams,
   Attribute,
