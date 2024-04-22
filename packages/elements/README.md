@@ -30,7 +30,7 @@
 
 ## Overview
 
-Clerk is the easiest way to add authentication and user management to your React application. Add sign up, sign in, and profile management to your application in minutes.
+Clerk is the easiest way to add authentication and user management to your React application. Add sign-up, sign-in, and profile management to your application in minutes.
 
 ## Package Development
 

@@ -48,7 +48,7 @@ function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) 
 
 export type SignInRootProps = {
   /**
-   * The base path for your sign in route. Defaults to `/sign-in`.
+   * The base path for your sign-in route. Defaults to `/sign-in`.
    *
    * TODO: re-use usePathnameWithoutCatchAll from the next SDK
    */
