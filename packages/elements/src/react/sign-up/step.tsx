@@ -29,17 +29,11 @@ export type SignUpStepProps =
  * @param {string} name - Step name. Use `'start'`, `'continue'`, or `'verifications'`.
  *
  * @example
- * <SignUp>
- *  <Step name='start'>
- *    Enter email and password
- *  </Step>
- *  <Step name='continue'>
- *    Enter username and phone number
- *  </Step>
- *  <Step name='verifications'>
- *    Verify with email link
- *  </Step>
- * </SignUp>
+ * <SignUp.Root>
+ *  <SignUp.Step name='start' />
+ *  <SignUp.Step name='continue' />
+ *  <SignUp.Step name='verifications' />
+ * </SignUp.Root>
  */
 export function SignUpStep(props: SignUpStepProps) {
   switch (props.name) {

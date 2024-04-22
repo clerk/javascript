@@ -62,12 +62,15 @@ export type SignInRootProps = {
  * Root component for the sign-in flow. It sets up providers and state management for its children.
  * Must wrap all sign-in related components.
  *
+ * @param {string} path - The root path the sign-in flow is mounted at. Default: `/sign-in`
+ * @param {React.ReactNode} fallback - Fallback markup to render while Clerk is loading. Default: `null`
+ *
  * @example
- * import { SignIn } from "@clerk/elements/sign-in"
+ * import * as SignIn from "@clerk/elements/sign-in"
  *
  * export default SignInPage = () => (
- *  <SignIn>
- *  </SignIn>
+ *  <SignIn.Root>
+ *  </SignIn.Root>
  * )
  */
 export function SignInRoot({

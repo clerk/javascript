@@ -28,16 +28,13 @@ export type SignUpActionProps = { asChild?: boolean } & (
  * @param {Function} [fallback] - Only used when `resend` is `true`. If provided, the fallback markup will be rendered before the resend delay has expired.
  *
  * @example
- * import { Action } from '@clerk/elements/sign-up';
- * <Action navigate="start">Go Back</Action>
+ * <SignUp.Action navigate="start">Go Back</SignUp.Action>
  *
  * @example
- * import { Action } from '@clerk/elements/sign-up';
- * <Action submit>Sign Up</Action>
+ * <SignUp.Action submit>Sign Up</SignUp.Action>
  *
  * @example
- * import { Action } from '@clerk/elements/sign-up';
- * <Action resend>Resend</Action>
+ * <SignUp.Action resend>Resend</SignUp.Action>
  */
 
 export const SignUpAction = React.forwardRef<React.ElementRef<'button'>, SignUpActionProps>((props, forwardedRef) => {

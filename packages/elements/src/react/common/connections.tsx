@@ -32,6 +32,23 @@ export interface ConnectionProps extends React.ButtonHTMLAttributes<HTMLButtonEl
   name: OAuthProvider | Web3Provider;
 }
 
+/**
+ * Renders a social connection button based on the provided name. If your instance does not have the social connection enabled, this component will throw an error in development.
+ *
+ * **Tip:** You can use the `<Icon />` component to render the social connection icon.
+ *
+ * @param {boolean} [asChild] - If true, `<Connection />` will render as its child element, passing along any necessary props.
+ * @param {OAuthProvider | Web3Provider} name - The name of the social connection to render.
+ *
+ * @example
+ * <SignIn.Root>
+ *  <SignIn.Step name="start">
+ *    <Clerk.Connection name="google">
+ *      Sign in with Google
+ *    </Clerk.Connection>
+ *  </SignIn.Step>
+ * </SignIn.Root>
+ */
 export function Connection({ asChild, name, ...rest }: ConnectionProps) {
   const signInRef = SignInRouterCtx.useActorRef(true);
   const signUpRef = SignUpRouterCtx.useActorRef(true);
@@ -59,6 +76,21 @@ export interface IconProps extends Omit<React.HTMLAttributes<HTMLImageElement>, 
   asChild?: boolean;
 }
 
+/**
+ * `<Icon>` **must** be used inside `<Connection>`. By default, `<Icon>` will render as an `<img>` element with the `src` pointing to the logo of the currently used `<Connection>`.
+ *
+ * @param {boolean} [asChild] - If true, `<Icon />` will render as its child element, passing along any necessary props.
+ *
+ * @example
+ * <SignIn.Root>
+ *  <SignIn.Step name="start">
+ *    <Clerk.Connection name="google">
+ *      <Clerk.Icon />
+ *      Sign in with Google
+ *    </Clerk.Connection>
+ *  </SignIn.Step>
+ * </SignIn.Root>
+ */
 export function Icon({ asChild, ...rest }: IconProps) {
   const { iconUrl, name } = useConnectionContext();
 
