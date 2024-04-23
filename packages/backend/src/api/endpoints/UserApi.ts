@@ -13,7 +13,6 @@ type UserCountParams = {
   phoneNumber?: string[];
   username?: string[];
   web3Wallet?: string[];
-  organizationId?: string[];
   query?: string;
   userId?: string[];
   externalId?: string[];
@@ -33,6 +32,7 @@ type UserListParams = ClerkPaginationRequest<
       | '+last_active_at'
       | '-last_sign_in_at'
       | '-last_active_at';
+    organizationId?: string[];
   }
 >;
 
