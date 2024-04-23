@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Назад',
   badge__default: 'За замовчуванням',
   badge__otherImpersonatorDevice: 'Інший пристрій-двійник',
@@ -95,6 +94,7 @@ export const ukUA: LocalizationResource = {
     action__signOut: 'Вийти',
     title: 'Ви увійшли як {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Адміністратор',
   membershipRole__basicMember: 'Член',
   membershipRole__guestMember: 'Гість',
@@ -485,9 +485,9 @@ export const ukUA: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'менше {{length}} символів',
       minimumLength: '{{length}} або більше символів',
@@ -545,14 +545,6 @@ export const ukUA: LocalizationResource = {
     action__signOutAll: 'Вийти з усіх акаунтів',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Скопійовано!',
       actionLabel__copy: 'Копіювати все',
@@ -717,11 +709,6 @@ export const ukUA: LocalizationResource = {
       title: 'Оновити профіль',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Вийти з пристрою',
         title: 'Активні пристрої',

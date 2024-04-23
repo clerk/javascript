@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Zurück',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Anderes Imitationsgerät',
@@ -97,6 +96,7 @@ export const deDE: LocalizationResource = {
     action__signOut: 'Ausloggen',
     title: 'Angemeldet als {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Mitglied',
   membershipRole__guestMember: 'Gast',
@@ -491,9 +491,9 @@ export const deDE: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'weniger als {{length}} Zeichen lang sein',
       minimumLength: 'mindestens {{length}} Zeichen lang sein',
@@ -552,14 +552,6 @@ export const deDE: LocalizationResource = {
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopiert!',
       actionLabel__copy: 'Kopiere alle',
@@ -726,11 +718,6 @@ export const deDE: LocalizationResource = {
       title: 'Profil aktualisieren',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Vom Gerät abmelden',
         title: 'Aktive Geräte',

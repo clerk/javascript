@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Înapoi',
   badge__default: 'Implicit',
   badge__otherImpersonatorDevice: 'Alt dispozitiv de imitație',
@@ -96,6 +95,7 @@ export const roRO: LocalizationResource = {
     action__signOut: 'Deconectați-vă',
     title: 'Conectat ca {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Membru',
   membershipRole__guestMember: 'Invitat',
@@ -490,9 +490,9 @@ export const roRO: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'mai puțin de {{length}} caractere',
       minimumLength: '{{length}} sau mai multe caractere',
@@ -552,14 +552,6 @@ export const roRO: LocalizationResource = {
     action__signOutAll: 'Deconectați-vă din toate conturile',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiat!',
       actionLabel__copy: 'Copiați toate',
@@ -728,11 +720,6 @@ export const roRO: LocalizationResource = {
       title: 'Actualizarea profilului',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Deconectați-vă de la dispozitiv',
         title: 'Dispozitive active',

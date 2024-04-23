@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'חזור',
   badge__default: 'ברירת מחדל',
   badge__otherImpersonatorDevice: 'מכשיר מחקה אחר',
@@ -94,6 +93,7 @@ export const heIL: LocalizationResource = {
     action__signOut: 'התנתק',
     title: 'מחובר כ{{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'מנהל',
   membershipRole__basicMember: 'חבר',
   membershipRole__guestMember: 'אורח',
@@ -482,9 +482,9 @@ export const heIL: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'פחות מ-{{length}} תווים',
       minimumLength: '{{length}} תווים או יותר',
@@ -542,14 +542,6 @@ export const heIL: LocalizationResource = {
     action__signOutAll: 'התנתק מכל החשבונות',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'הועתק!',
       actionLabel__copy: 'העתק הכל',
@@ -706,11 +698,6 @@ export const heIL: LocalizationResource = {
       title: 'עדכן פרופיל',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'התנתק מהמכשיר',
         title: 'מכשירים פעילים',

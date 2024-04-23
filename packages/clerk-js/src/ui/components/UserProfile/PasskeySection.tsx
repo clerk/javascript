@@ -51,7 +51,7 @@ export const UpdatePasskeyForm = withCardStateProvider((props: UpdatePasskeyForm
 
   const passkeyNameField = useFormControl('passkeyName', passkey.name || '', {
     type: 'text',
-    label: localizationKeys('__experimental_formFieldLabel__passkeyName'),
+    label: localizationKeys('formFieldLabel__passkeyName'),
     isRequired: true,
   });
 
