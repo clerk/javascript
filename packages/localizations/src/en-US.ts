@@ -330,7 +330,7 @@ export const enUS: LocalizationResource = {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'to reset your password',
-      subtitle_email: 'First, enter the code sent to your email ID',
+      subtitle_email: 'First, enter the code sent to your email address',
       subtitle_phone: 'First, enter the code sent to your phone',
       title: 'Reset password',
     },
