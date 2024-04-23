@@ -1,4 +1,4 @@
-import { parsePublishableKey } from '@clerk/shared/keys';
+import { isProductionFromSecretKey, parsePublishableKey } from '@clerk/shared/keys';
 import dotenv from 'dotenv';
 
 type ClerkSetupParams = {
@@ -16,7 +16,7 @@ type ClerkSetupParams = {
   /*
    * The frontend API URL for your Clerk dev instance, without the protocol.
    * If provided, it overrides the Frontend API URL parsed from the publishable key.
-   * Example: 'relieved-chamois-66.accounts.dev'
+   * Example: 'relieved-chamois-66.clerk.accounts.dev'
    */
   frontendApiUrl?: string;
   /*
@@ -27,6 +27,18 @@ type ClerkSetupParams = {
 
 const TESTING_TOKEN_API_URL = 'https://api.clerk.com/v1/testing_tokens';
 
+/**
+ * Sets up Clerk for testing by fetching the testing token from the Clerk Backend API.
+ *
+ * @param options.publishableKey - The publishable key for your Clerk dev instance.
+ * @param options.frontendApiUrl - The frontend API URL for your Clerk dev instance, without the protocol. It overrides the Frontend API URL parsed from the publishable key.
+ * @param options.debug - Enable debug logs.
+ * @returns A promise that resolves when Clerk is set up.
+ *
+ * @throws An error if the publishable key or the secret key is not provided.
+ * @throws An error if the secret key is from a production instance.
+ * @throws An error if the testing token cannot be fetched from the Clerk Backend API.
+ */
 export const clerkSetup = async (options?: ClerkSetupParams) => {
   const log = (msg: string) => {
     if (options?.debug) {
@@ -37,7 +49,7 @@ export const clerkSetup = async (options?: ClerkSetupParams) => {
   log('Setting up Clerk...');
   dotenv.config({ path: ['.env.local', '.env'] });
 
-  const pubKey =
+  const publishableKey =
     options?.publishableKey ||
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
     process.env.VITE_CLERK_PUBLISHABLE_KEY ||
@@ -49,7 +61,7 @@ export const clerkSetup = async (options?: ClerkSetupParams) => {
   const secretKey = process.env.CLERK_SECRET_KEY;
   let testingToken = process.env.CLERK_TESTING_TOKEN;
 
-  if (!pubKey) {
+  if (!publishableKey) {
     throw new Error('You need to set the CLERK_PUBLISHABLE_KEY environment variable.');
   }
 
@@ -57,9 +69,11 @@ export const clerkSetup = async (options?: ClerkSetupParams) => {
     throw new Error('You need to set the CLERK_SECRET_KEY or the CLERK_TESTING_KEY environment variable.');
   }
 
-  if (!testingToken) {
-    if (secretKey?.startsWith('sk_live_') || secretKey?.startsWith('live_')) {
-      throw new Error('You are using a live secret key. E2E testing is only supported in dev instances.');
+  if (secretKey && !testingToken) {
+    if (isProductionFromSecretKey(secretKey)) {
+      throw new Error(
+        'You are using a secret key from a production instance, but this helper only works for development instances.',
+      );
     }
 
     const options = {
@@ -70,7 +84,7 @@ export const clerkSetup = async (options?: ClerkSetupParams) => {
       },
     };
 
-    log('Fetching testing token from Clerk API...');
+    log('Fetching testing token from Clerk Backend API...');
 
     const apiUrl = process.env.CLERK_API_URL;
     const testingTokenApiUrl = apiUrl ? `${apiUrl}/v1/testing_tokens` : TESTING_TOKEN_API_URL;
@@ -81,14 +95,12 @@ export const clerkSetup = async (options?: ClerkSetupParams) => {
       })
       .then(data => {
         testingToken = data.token;
-        log('Testing token fetched successfully!');
       })
-      .catch(() => {
-        throw new Error('Failed to fetch testing token from Clerk API');
+      .catch(reason => {
+        throw new Error('Failed to fetch testing token from Clerk API. Error: ' + reason);
       });
   }
 
-  process.env.CLERK_FAPI = options?.frontendApiUrl || parsePublishableKey(pubKey)?.frontendApi;
+  process.env.CLERK_FAPI = options?.frontendApiUrl || parsePublishableKey(publishableKey)?.frontendApi;
   process.env.CLERK_TESTING_TOKEN = testingToken;
-  log('Setup complete!');
 };

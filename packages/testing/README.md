@@ -36,7 +36,7 @@ It currently supports the following testing frameworks:
 
 - [Playwright](https://playwright.dev/), a Node.js library to automate browsers and web pages.
 
-## Playwright
+## Getting started
 
 ### Prerequisites
 
@@ -51,6 +51,8 @@ npm install @clerk/testing --save-dev
 
 ## Usage
 
+### Playwright
+
 On your global setup file for Playwright, you must use the `clerkSetup` function to set up Clerk for your tests.
 
 ```typescript
@@ -64,15 +66,15 @@ setup('global setup', async ({ }) => {
 });
 ```
 
-Then, you can use the `clerkBypassBotProtection` function to bypass bot protection on your tests.
+Then, you can use the `setupClerkTestingToken` function to bypass bot protection on your tests.
 
 ```typescript
 // my-test.spec.ts
-import { clerkBypassBotProtection } from "@clerk/testing/playwright";
+import { setupClerkTestingToken } from "@clerk/testing/playwright";
 import { test } from "@playwright/test";
 
 test("sign up", async ({ page }) => {
-  await clerkBypassBotProtection({ page });
+  await setupClerkTestingToken({ page });
 
   await page.goto("/sign-up");
   ...
