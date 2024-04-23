@@ -164,7 +164,7 @@ describe('SignInFactorOne', () => {
         screen.getByText('Forgot Password?');
         screen.getByText('Or, sign in with another method');
         await userEvent.click(screen.getByText('Reset your password'));
-        screen.getByText('First, enter the code sent to your email ID');
+        screen.getByText('First, enter the code sent to your email address');
       });
 
       it('shows a UI error when submission fails', async () => {
@@ -270,7 +270,7 @@ describe('SignInFactorOne', () => {
           });
 
           await userEvent.click(screen.getByText('Reset your password'));
-          screen.getByText('First, enter the code sent to your email ID');
+          screen.getByText('First, enter the code sent to your email address');
         });
       });
 
