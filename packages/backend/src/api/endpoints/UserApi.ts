@@ -13,6 +13,7 @@ type UserCountParams = {
   phoneNumber?: string[];
   username?: string[];
   web3Wallet?: string[];
+  organizationId?: string[];
   query?: string;
   userId?: string[];
   externalId?: string[];
