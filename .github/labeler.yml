@@ -45,6 +45,9 @@ themes:
 types:
   - packages/types/**
 
+testing:
+  - packages/testing/**
+
 playground:
   - playground/**
 

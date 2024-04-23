@@ -1,0 +1,53 @@
+{
+  "name": "@clerk/testing",
+  "version": "0.1.0",
+  "description": "Testing utils to support E2E testing with Clerk",
+  "homepage": "https://clerk.com",
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "exports": {
+    "./playwright": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@clerk/shared": "2.0.0",
+    "@clerk/types": "4.0.0",
+    "dotenv": "16.4.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.43.1",
+    "@types/node": "^18.17.0",
+    "eslint-config-custom": "*",
+    "tsup": "*",
+    "typescript": "*"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}

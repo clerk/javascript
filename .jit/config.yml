@@ -35,3 +35,4 @@ folders:
   - path: /packages/express
     exclude:
       - ./**/*.test.ts
+  - path: /packages/testing
