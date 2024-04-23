@@ -2,7 +2,25 @@
   "name": "@clerk/testing",
   "version": "0.1.0",
   "description": "Testing utils to support E2E testing with Clerk",
+  "keywords": [
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "playwright",
+    "testing",
+    "e2e"
+  ],
   "homepage": "https://clerk.com",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/testing"
+  },
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
@@ -49,5 +67,8 @@
   },
   "engines": {
     "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
