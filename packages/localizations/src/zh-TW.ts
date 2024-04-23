@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: '返回',
   badge__default: '默認',
   badge__otherImpersonatorDevice: '其他模擬器設備',
@@ -94,6 +93,7 @@ export const zhTW: LocalizationResource = {
     action__signOut: '退出登錄',
     title: '以 {{identifier}} 登錄',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: '管理員',
   membershipRole__basicMember: '成員',
   membershipRole__guestMember: '訪客',
@@ -480,9 +480,9 @@ export const zhTW: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '少於{{length}}個字元',
       minimumLength: '{{length}}個或更多字元',
@@ -540,14 +540,6 @@ export const zhTW: LocalizationResource = {
     action__signOutAll: '退出所有帳戶',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: '已複製！',
       actionLabel__copy: '複製全部',
@@ -702,11 +694,6 @@ export const zhTW: LocalizationResource = {
       title: '更新個人資料',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: '退出設備',
         title: '活動設備',

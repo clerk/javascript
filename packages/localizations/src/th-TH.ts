@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
-  __experimental_formFieldLabel__passkeyName: 'ชื่อพาสคีย์',
   backButton: 'กลับ',
   badge__default: 'ค่าเริ่มต้น',
   badge__otherImpersonatorDevice: 'อุปกรณ์ปลอมตัวอื่น',
@@ -94,6 +93,7 @@ export const thTH: LocalizationResource = {
     action__signOut: 'ออกจากระบบ',
     title: 'เข้าสู่ระบบในฐานะ {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'ผู้ดูแลระบบ',
   membershipRole__basicMember: 'สมาชิก',
   membershipRole__guestMember: 'ผู้เยี่ยมชม',
@@ -485,9 +485,9 @@ export const thTH: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: 'พาสคีย์ถูกลงทะเบียนกับอุปกรณ์นี้แล้ว',
     passkey_not_supported: 'อุปกรณ์นี้ไม่รองรับพาสคีย์',
+    passkey_pa_not_supported: 'การลงทะเบียนต้องใช้ระบบยืนยันตัวตนของแพลตฟอร์ม แต่อุปกรณ์ไม่รองรับ',
     passkey_registration_cancelled: 'การลงทะเบียนพาสคีย์ถูกยกเลิกหรือหมดเวลา',
     passkey_retrieval_cancelled: 'การยืนยันพาสคีย์ถูกยกเลิกหรือหมดเวลา',
-    passkey_pa_not_supported: 'การลงทะเบียนต้องใช้ระบบยืนยันตัวตนของแพลตฟอร์ม แต่อุปกรณ์ไม่รองรับ',
     passwordComplexity: {
       maximumLength: 'น้อยกว่า {{length}} ตัวอักษร',
       minimumLength: '{{length}} ตัวอักษรหรือมากกว่า',
@@ -545,14 +545,6 @@ export const thTH: LocalizationResource = {
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: '{{name}} จะถูกลบออกจากบัญชีนี้',
-        title: 'ลบพาสคีย์',
-      },
-      subtitle__rename: 'คุณสามารถเปลี่ยนชื่อพาสคีย์เพื่อให้ค้นหาได้ง่ายขึ้น',
-      title__rename: 'เปลี่ยนชื่อพาสคีย์',
-    },
     backupCodePage: {
       actionLabel__copied: 'คัดลอกแล้ว!',
       actionLabel__copy: 'คัดลอกทั้งหมด',
@@ -712,11 +704,6 @@ export const thTH: LocalizationResource = {
       title: 'อัปเดตโปรไฟล์',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: 'ลบ',
-        menuAction__rename: 'เปลี่ยนชื่อ',
-        title: 'พาสคีย์',
-      },
       activeDevicesSection: {
         destructiveAction: 'ลงชื่อออกจากอุปกรณ์',
         title: 'อุปกรณ์ที่ใช้งานอยู่',

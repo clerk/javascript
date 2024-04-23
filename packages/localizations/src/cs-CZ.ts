@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Zpět',
   badge__default: 'Výchozí',
   badge__otherImpersonatorDevice: 'Jiné zařízení představitele',
@@ -95,6 +94,7 @@ export const csCZ: LocalizationResource = {
     action__signOut: 'Odhlásit se',
     title: 'Přihlášen(a) jako {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Správce',
   membershipRole__basicMember: 'Člen',
   membershipRole__guestMember: 'Host',
@@ -484,9 +484,9 @@ export const csCZ: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'méně než {{length}} znaků',
       minimumLength: '{{length}} nebo více znaků',
@@ -544,14 +544,6 @@ export const csCZ: LocalizationResource = {
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Zkopírováno!',
       actionLabel__copy: 'Zkopírovat vše',
@@ -715,11 +707,6 @@ export const csCZ: LocalizationResource = {
       title: 'Aktualizovat profil',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Odhlásit se z zařízení',
         title: 'Aktivní zařízení',

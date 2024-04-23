@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Назад',
   badge__default: 'По подразбиране',
   badge__otherImpersonatorDevice: 'Друго устройство за имитация',
@@ -94,6 +93,7 @@ export const bgBG: LocalizationResource = {
     action__signOut: 'Изход',
     title: 'Влезли сте като {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Член',
   membershipRole__guestMember: 'Гост',
@@ -487,9 +487,9 @@ export const bgBG: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'по-малко от {{length}} символа',
       minimumLength: '{{length}} или повече символа',
@@ -547,14 +547,6 @@ export const bgBG: LocalizationResource = {
     action__signOutAll: 'Изход от всички акаунти',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Копирано!',
       actionLabel__copy: 'Копиране на всички',
@@ -720,11 +712,6 @@ export const bgBG: LocalizationResource = {
       title: 'Актуализиране на профила',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Излез от устройството',
         title: 'Активни устройства',

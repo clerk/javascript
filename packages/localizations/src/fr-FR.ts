@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Retour',
   badge__default: 'Défaut',
   badge__otherImpersonatorDevice: "Autre dispositif d'imitation",
@@ -95,6 +94,7 @@ export const frFR: LocalizationResource = {
     action__signOut: 'Déconnexion',
     title: 'Connecté en tant que {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrateur',
   membershipRole__basicMember: 'Membre',
   membershipRole__guestMember: 'Invité',
@@ -488,9 +488,9 @@ export const frFR: LocalizationResource = {
     not_allowed_access: 'Accès non autorisé',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'moins de {{length}} caractères',
       minimumLength: '{{length}} caractères ou plus',
@@ -549,14 +549,6 @@ export const frFR: LocalizationResource = {
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copié !',
       actionLabel__copy: 'Copier tous les codes',
@@ -722,11 +714,6 @@ export const frFR: LocalizationResource = {
       title: 'Mettre à jour le profil',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: "Se déconnecter de l'appareil",
         title: 'Appareils actifs',

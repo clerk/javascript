@@ -2,9 +2,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
-  maintenanceMode:
-    "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
-  __experimental_formFieldLabel__passkeyName: 'Name of passkey',
   backButton: 'Back',
   badge__default: 'Default',
   badge__otherImpersonatorDevice: 'Other impersonator device',
@@ -84,6 +81,8 @@ export const enUS: LocalizationResource = {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
   },
+  maintenanceMode:
+    "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
@@ -331,7 +330,7 @@ export const enUS: LocalizationResource = {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'to reset your password',
-      subtitle_email: 'First, enter the code sent to your email ID',
+      subtitle_email: 'First, enter the code sent to your email address',
       subtitle_phone: 'First, enter the code sent to your phone',
       title: 'Reset password',
     },
@@ -477,9 +476,9 @@ export const enUS: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: 'A passkey is already registered with this device.',
     passkey_not_supported: 'Passkeys are not supported on this device.',
+    passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
     passkey_registration_cancelled: 'Passkey registration was cancelled or timed out.',
     passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
-    passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} or more characters',
@@ -537,14 +536,6 @@ export const enUS: LocalizationResource = {
     action__signOutAll: 'Sign out of all accounts',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: '{{name}} will be removed from this account.',
-        title: 'Remove passkey',
-      },
-      subtitle__rename: 'You can change the passkey name to make it easier to find.',
-      title__rename: 'Rename Passkey',
-    },
     backupCodePage: {
       actionLabel__copied: 'Copied!',
       actionLabel__copy: 'Copy all',
@@ -709,11 +700,6 @@ export const enUS: LocalizationResource = {
       title: 'Update profile',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: 'Remove',
-        menuAction__rename: 'Rename',
-        title: 'Passkeys',
-      },
       activeDevicesSection: {
         destructiveAction: 'Sign out of device',
         title: 'Active devices',

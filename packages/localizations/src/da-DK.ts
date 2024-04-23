@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Tilbage',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: '',
@@ -95,6 +94,7 @@ export const daDK: LocalizationResource = {
     action__signOut: 'Log ud',
     title: 'Logget ind som {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',
   membershipRole__guestMember: 'Gæst',
@@ -485,9 +485,9 @@ export const daDK: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} or more characters',
@@ -545,14 +545,6 @@ export const daDK: LocalizationResource = {
     action__signOutAll: 'Log ud af alle konti',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopieret!',
       actionLabel__copy: 'Kopier alle',
@@ -716,11 +708,6 @@ export const daDK: LocalizationResource = {
       title: '',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Log ud af enhed',
         title: 'Aktive enheder',

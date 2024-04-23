@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Terug',
   badge__default: 'Standaard',
   badge__otherImpersonatorDevice: 'Ander immitatie apparaat',
@@ -95,6 +94,7 @@ export const nlNL: LocalizationResource = {
     action__signOut: 'Uitloggen',
     title: 'Ingelogd als {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Lid',
   membershipRole__guestMember: 'Gast',
@@ -485,9 +485,9 @@ export const nlNL: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -545,14 +545,6 @@ export const nlNL: LocalizationResource = {
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Gekopieerd!',
       actionLabel__copy: 'Kopieer',
@@ -715,11 +707,6 @@ export const nlNL: LocalizationResource = {
       title: 'Profiel bijwerken',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Log uit op apparaat',
         title: 'Actieve apparaten',

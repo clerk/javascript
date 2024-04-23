@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
-  __experimental_formFieldLabel__passkeyName: 'Nome da chave de acesso',
   backButton: 'Voltar',
   badge__default: 'Padrão',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
@@ -95,6 +94,7 @@ export const ptBR: LocalizationResource = {
     action__signOut: 'Sair',
     title: 'Logado como {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
   membershipRole__guestMember: 'Convidado',
@@ -487,9 +487,9 @@ export const ptBR: LocalizationResource = {
     not_allowed_access: 'Aceso não permitido.',
     passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
     passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
+    passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
     passkey_registration_cancelled: 'Registro de chave de acesso cancelado ou expirado.',
     passkey_retrieval_cancelled: 'Verificação de chave de acesso cancelada ou expirada.',
-    passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
     passwordComplexity: {
       maximumLength: 'menos de {{length}} caracteres',
       minimumLength: '{{length}} ou mais caracteres',
@@ -547,14 +547,6 @@ export const ptBR: LocalizationResource = {
     action__signOutAll: 'Sair de todas as contas',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: '{{name}} será removido desta conta.',
-        title: 'Remover chave de acesso.',
-      },
-      subtitle__rename: 'Você pode mudar o nome da chave de acesso para facilitar a sua busca.',
-      title__rename: 'Renomear chave de acesso',
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiado!',
       actionLabel__copy: 'Copiar tudo',
@@ -721,11 +713,6 @@ export const ptBR: LocalizationResource = {
       title: 'Atualizar perfil',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: 'Remover',
-        menuAction__rename: 'Renomear',
-        title: 'Chaves de acesso',
-      },
       activeDevicesSection: {
         destructiveAction: 'Sair do dispositivo',
         title: 'Dispositivos ativos',

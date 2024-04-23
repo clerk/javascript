@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: '돌아가기',
   badge__default: '기본값',
   badge__otherImpersonatorDevice: '기타 사칭 장치',
@@ -95,6 +94,7 @@ export const koKR: LocalizationResource = {
     action__signOut: '로그아웃',
     title: '{{identifier}}로 로그인했습니다',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: '관리자',
   membershipRole__basicMember: '멤버',
   membershipRole__guestMember: '게스트',
@@ -482,9 +482,9 @@ export const koKR: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} 보다 짧은 문자열',
       minimumLength: '{{length}} 또는 그 이상의 문자열',
@@ -542,14 +542,6 @@ export const koKR: LocalizationResource = {
     action__signOutAll: '모든 계정에서 로그아웃',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: '복사 완료!',
       actionLabel__copy: '전체 복사',
@@ -707,11 +699,6 @@ export const koKR: LocalizationResource = {
       title: '프로필 업데이트',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: '이 장치에서 로그아웃',
         title: '활성화된 장치',
