@@ -11,7 +11,9 @@ export function usesHttps() {
 }
 
 export function inIframe() {
-  return inBrowser() && window.self !== window.top;
+  // checks if the current window is an iframe
+  // excludes the case where the current window runs in a Cypress test
+  return inBrowser() && window.self !== window.top && !window.Cypress;
 }
 
 export function inCrossOriginIframe() {
