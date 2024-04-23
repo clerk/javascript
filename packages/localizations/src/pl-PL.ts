@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Powrót',
   badge__default: 'Domyślny',
   badge__otherImpersonatorDevice: 'Inne urządzenie osobiste',
@@ -95,6 +94,7 @@ export const plPL: LocalizationResource = {
     action__signOut: 'Wyloguj',
     title: 'Zalogowano jako {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Użytkownik',
   membershipRole__guestMember: 'Gość',
@@ -485,9 +485,9 @@ export const plPL: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'mniej niż {{length}} znaków',
       minimumLength: '{{length}} lub więcej znaków',
@@ -545,14 +545,6 @@ export const plPL: LocalizationResource = {
     action__signOutAll: 'Wyloguj ze wszystkich kont',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Skopiowane!',
       actionLabel__copy: 'Skopiuj wszystkie',
@@ -718,11 +710,6 @@ export const plPL: LocalizationResource = {
       title: 'Edytuj profil',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Wyloguj z urządzenia',
         title: 'Aktywne urządzenia',

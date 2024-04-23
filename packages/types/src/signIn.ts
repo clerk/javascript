@@ -98,9 +98,6 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithMetamask: () => Promise<SignInResource>;
 
-  // TODO-PASSKEY: Remove in the next minor
-  __experimental_authenticateWithPasskey: (params?: { flow?: 'autofill' | 'discoverable' }) => Promise<SignInResource>;
-
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   /**

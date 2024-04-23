@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Назад',
   badge__default: 'По-умолчанию',
   badge__otherImpersonatorDevice: 'Другое устройство',
@@ -95,6 +94,7 @@ export const ruRU: LocalizationResource = {
     action__signOut: 'Выйти',
     title: 'Вы вошли как {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Администратор',
   membershipRole__basicMember: 'Участник',
   membershipRole__guestMember: 'Гость',
@@ -489,9 +489,9 @@ export const ruRU: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'менее {{length}} символов',
       minimumLength: '{{length}} или более символов',
@@ -549,14 +549,6 @@ export const ruRU: LocalizationResource = {
     action__signOutAll: 'Выйти из всех аккаунтов',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Скопировано!',
       actionLabel__copy: 'Копировать все',
@@ -721,11 +713,6 @@ export const ruRU: LocalizationResource = {
       title: 'Обновить профиль',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Выйти из устройства',
         title: 'Активные устройства',

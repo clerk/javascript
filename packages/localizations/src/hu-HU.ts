@@ -14,8 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
-  maintenanceMode: 'Jelenleg karbantartás alatt állunk, de ne aggódj, ez nem tart tovább pár percnél!',
-  __experimental_formFieldLabel__passkeyName: 'Passkey neve',
   backButton: 'Vissza',
   badge__default: 'Alapértelmezett',
   badge__otherImpersonatorDevice: 'Másik megszemélyesítő eszköz',
@@ -95,6 +93,7 @@ export const huHU: LocalizationResource = {
     action__signOut: 'Kijelentkezés',
     title: 'Bejelntkezve mint {{identifier}}',
   },
+  maintenanceMode: 'Jelenleg karbantartás alatt állunk, de ne aggódj, ez nem tart tovább pár percnél!',
   membershipRole__admin: 'Adminisztrátor',
   membershipRole__basicMember: 'Tag',
   membershipRole__guestMember: 'Vendég',
@@ -490,9 +489,9 @@ export const huHU: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: 'Egy passkey már regisztrálva van ehhez az eszközhöz.',
     passkey_not_supported: 'Passkeyk nem támogatottak ezen az eszközön.',
+    passkey_pa_not_supported: 'A regisztrációhoz egy platform hitelesítő kell, de ez az eszköz ezt nem támogatja.',
     passkey_registration_cancelled: 'Passkey regisztráció megszakadt vagy lejárt.',
     passkey_retrieval_cancelled: 'Passkey visszaigazolás megszakadt vagy lejárt.',
-    passkey_pa_not_supported: 'A regisztrációhoz egy platform hitelesítő kell, de ez az eszköz ezt nem támogatja.',
     passwordComplexity: {
       maximumLength: 'kevesebb mint {{length}} karaktert',
       minimumLength: '{{length}} vagy több karaktert',
@@ -551,14 +550,6 @@ export const huHU: LocalizationResource = {
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: '{{name}} el lesz távolítva ebből a fiókból.',
-        title: 'passkey törlése',
-      },
-      subtitle__rename: 'Megváltoztathatod a passkey nevét, hogy könnyebb legyen megtalálni.',
-      title__rename: 'Passkey Átnevezése',
-    },
     backupCodePage: {
       actionLabel__copied: 'Kimásolva!',
       actionLabel__copy: 'Az összes kimásolása',
@@ -724,11 +715,6 @@ export const huHU: LocalizationResource = {
       title: 'Profil frissítése',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: 'Eltávolítás',
-        menuAction__rename: 'Eltávolítás',
-        title: 'Passkey-k',
-      },
       activeDevicesSection: {
         destructiveAction: 'Kijelentkezés az eszközről',
         title: 'Aktív eszközök',

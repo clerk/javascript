@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Tillbaka',
   badge__default: 'Standard',
   badge__otherImpersonatorDevice: 'Annans imitatörenhet',
@@ -95,6 +94,7 @@ export const svSE: LocalizationResource = {
     action__signOut: 'Logga ut',
     title: 'Inloggad som {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Medlem',
   membershipRole__guestMember: 'Gäst',
@@ -485,9 +485,9 @@ export const svSE: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -545,14 +545,6 @@ export const svSE: LocalizationResource = {
     action__signOutAll: 'Logga ut från alla konton',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Kopierat!',
       actionLabel__copy: 'Kopiera alla',
@@ -715,11 +707,6 @@ export const svSE: LocalizationResource = {
       title: 'Uppdatera profil',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Logga ut från enhet',
         title: 'Aktiva enheter',

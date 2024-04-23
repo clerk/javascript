@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'Indietro',
   badge__default: 'Predefinito',
   badge__otherImpersonatorDevice: 'Altro dispositivo impersonato',
@@ -95,6 +94,7 @@ export const itIT: LocalizationResource = {
     action__signOut: 'Disconnetti',
     title: 'Accesso tramite {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Amministratore',
   membershipRole__basicMember: 'Utente',
   membershipRole__guestMember: 'Ospite',
@@ -485,9 +485,9 @@ export const itIT: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -545,14 +545,6 @@ export const itIT: LocalizationResource = {
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'Copiati!',
       actionLabel__copy: 'Copia tutti',
@@ -717,11 +709,6 @@ export const itIT: LocalizationResource = {
       title: 'Aggiorna profilo',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'Disconnetti dal dispositivo',
         title: 'Dispositivi attivi',

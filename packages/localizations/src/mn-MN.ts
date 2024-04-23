@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
-  __experimental_formFieldLabel__passkeyName: 'Name of passkey',
   backButton: 'Буцах',
   badge__default: 'Анхдагч',
   badge__otherImpersonatorDevice: 'Бусад дуурайгч төхөөрөмж',
@@ -95,6 +94,7 @@ export const mnMN: LocalizationResource = {
     action__signOut: 'Гарах',
     title: '{{identifier}}-р нэвтэрсэн',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Гишүүн',
   membershipRole__guestMember: 'Зочин',
@@ -489,9 +489,9 @@ export const mnMN: LocalizationResource = {
     not_allowed_access: 'Хандалтыг зөвшөөрөгдөөгүй',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} тэмдэгтээс бага',
       minimumLength: '{{length}} буюу түүнээс олон тэмдэгт',
@@ -549,14 +549,6 @@ export const mnMN: LocalizationResource = {
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: '{{name}} энэ бүртгэлээс хасагдана.',
-        title: 'Passkey устгах',
-      },
-      subtitle__rename: 'Та олоход хялбар болгохын тулд нэвтрэх түлхүүрийн нэрийг өөрчилж болно.',
-      title__rename: 'Passkey өөрчлөх',
-    },
     backupCodePage: {
       actionLabel__copied: 'Хуулсан!',
       actionLabel__copy: 'Бүгдийг хуулах',
@@ -721,11 +713,6 @@ export const mnMN: LocalizationResource = {
       title: 'Профайлыг шинэчлэх',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: 'Устгэх',
-        menuAction__rename: 'Засах',
-        title: 'Passkeys',
-      },
       activeDevicesSection: {
         destructiveAction: 'Төхөөрөмжөөс гарах',
         title: 'Идэвхтэй төхөөрөмжүүд',

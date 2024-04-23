@@ -14,7 +14,6 @@ import type { LocalizationResource } from '@clerk/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
-  __experimental_formFieldLabel__passkeyName: undefined,
   backButton: 'الرجوع',
   badge__default: 'الأفتراضي',
   badge__otherImpersonatorDevice: 'جهاز منتحل آخر',
@@ -94,6 +93,7 @@ export const arSA: LocalizationResource = {
     action__signOut: 'تسجيل الخروج',
     title: 'تسجيل الدخول بأسم {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'المسؤول',
   membershipRole__basicMember: 'عضو',
   membershipRole__guestMember: 'ضيف',
@@ -484,9 +484,9 @@ export const arSA: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: undefined,
     passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
     passkey_registration_cancelled: undefined,
     passkey_retrieval_cancelled: undefined,
-    passkey_pa_not_supported: undefined,
     passwordComplexity: {
       maximumLength: 'أقل من {{length}} حروف',
       minimumLength: '{{length}} حروف أو أكثر',
@@ -544,14 +544,6 @@ export const arSA: LocalizationResource = {
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
   userProfile: {
-    __experimental_passkeyScreen: {
-      removeResource: {
-        messageLine1: undefined,
-        title: undefined,
-      },
-      subtitle__rename: undefined,
-      title__rename: undefined,
-    },
     backupCodePage: {
       actionLabel__copied: 'تم النسخ',
       actionLabel__copy: 'نسخ الكل',
@@ -711,11 +703,6 @@ export const arSA: LocalizationResource = {
       title: 'تحديث الملف الشخصي',
     },
     start: {
-      __experimental_passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
-      },
       activeDevicesSection: {
         destructiveAction: 'قم بتسجيل الخروج من الجهاز',
         title: 'الأجهزة النشطة',
