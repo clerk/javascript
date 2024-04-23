@@ -4,8 +4,8 @@ import type React from 'react';
 import { useCallback } from 'react';
 import type { ActorRef } from 'xstate';
 
-import type { SignInRouterEvents } from '~/internals/machines/sign-in/types';
-import type { SignUpRouterEvents } from '~/internals/machines/sign-up/types';
+import type { SignInRouterEvents } from '~/internals/machines/sign-in';
+import type { SignUpRouterEvents } from '~/internals/machines/sign-up';
 import type { UseThirdPartyProviderReturn } from '~/react/common/providers';
 import {
   getEnabledThirdPartyProviders,

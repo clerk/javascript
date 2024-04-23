@@ -3,8 +3,7 @@ import { useEffect, useRef } from 'react';
 import type { ActorRefFrom, AnyActorLogic, SnapshotFrom } from 'xstate';
 
 import { useFormStore } from '~/internals/machines/form/form.context';
-import type { TSignInRouterMachine } from '~/internals/machines/sign-in/machines';
-import type { SignInRouterRouteRegisterEvent } from '~/internals/machines/sign-in/types';
+import type { SignInRouterRouteRegisterEvent, TSignInRouterMachine } from '~/internals/machines/sign-in';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
 export type SnapshotState = SnapshotFrom<TSignInRouterMachine>;

@@ -1,7 +1,4 @@
-import {
-  SignInSafeIdentifierSelector,
-  SignInSalutationSelector,
-} from '~/internals/machines/sign-in/selectors/sign-in.selectors';
+import { SignInSafeIdentifierSelector, SignInSalutationSelector } from '~/internals/machines/sign-in';
 
 import { SignInRouterCtx } from './context';
 

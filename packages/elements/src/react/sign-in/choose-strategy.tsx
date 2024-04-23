@@ -4,8 +4,8 @@ import { useSelector } from '@xstate/react';
 import * as React from 'react';
 import type { ActorRefFrom } from 'xstate';
 
-import type { TSignInFirstFactorMachine } from '~/internals/machines/sign-in/machines';
-import { SignInRouterSystemId } from '~/internals/machines/sign-in/types';
+import type { TSignInFirstFactorMachine } from '~/internals/machines/sign-in';
+import { SignInRouterSystemId } from '~/internals/machines/sign-in';
 
 import { useActiveTags } from '../hooks';
 import { ActiveTagsMode } from '../hooks/use-active-tags.hook';

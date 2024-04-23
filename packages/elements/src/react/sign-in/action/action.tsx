@@ -3,8 +3,10 @@ import * as React from 'react';
 import type { FormSubmitProps } from '~/react/common';
 import { Submit } from '~/react/common';
 
-import { SignInNavigate, type SignInNavigateElementKey, type SignInNavigateProps } from './navigate';
-import { SignInResend, type SignInResendProps } from './resend';
+import type { SignInNavigateElementKey, SignInNavigateProps } from './navigate';
+import { SignInNavigate } from './navigate';
+import type { SignInResendProps } from './resend';
+import { SignInResend } from './resend';
 
 export type SignInActionProps = { asChild?: boolean } & FormSubmitProps &
   (

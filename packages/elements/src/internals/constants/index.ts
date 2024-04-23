@@ -20,3 +20,7 @@ export const SEARCH_PARAMS = {
   ticket: '__clerk_ticket',
   transfer: '__clerk_transfer',
 } as const;
+
+export const RESENDABLE_COUNTDOWN_DEFAULT = 60;
+
+export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
