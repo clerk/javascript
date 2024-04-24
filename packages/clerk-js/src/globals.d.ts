@@ -6,7 +6,6 @@ declare global {
   interface Window {
     __unstable__onBeforeSetActive: () => Promise<void> | void;
     __unstable__onAfterSetActive: () => Promise<void> | void;
-    Cypress?: any;
   }
 }
 
