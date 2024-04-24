@@ -72,7 +72,7 @@ export const clerkSetup = async (options?: ClerkSetupParams) => {
   if (secretKey && !testingToken) {
     if (isProductionFromSecretKey(secretKey)) {
       throw new Error(
-        'You are using a secret key from a production instance, but this helper only works for development instances.',
+        'You are using a secret key from a production instance, but Testing Tokens only work in development instances.',
       );
     }
 
