@@ -72,7 +72,6 @@ function _OneTapStart(): JSX.Element | null {
     },
   });
 
-  // Trigger only on mount/unmount. Above we handle the logic for the initial fetch + initialization
   useEffect(() => {
     if (window.google && !user?.id && !isPromptedRef.current) {
       window.google.accounts.id.prompt();
