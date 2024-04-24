@@ -1198,7 +1198,7 @@ export class Clerk implements ClerkInterface {
 
     if (su.status === 'complete') {
       return this.setActive({
-        session: si.sessionId,
+        session: su.sessionId,
         beforeEmit: navigateAfterSignUp,
       });
     }
