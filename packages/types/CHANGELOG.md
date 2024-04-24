@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.1.0
+
+### Minor Changes
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
 ## 4.0.0
 
 ### Major Changes

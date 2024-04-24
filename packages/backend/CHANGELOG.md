@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.0.1
+
+### Patch Changes
+
+- Export all Webhook event types and related JSON types. The newly exported types are: `DeletedObjectJSON`, `EmailJSON`, `OrganizationInvitationJSON`, `OrganizationJSON`, `OrganizationMembershipJSON`, `SessionJSON`, `SMSMessageJSON`, `UserJSON`, `UserWebhookEvent`, `EmailWebhookEvent`, `SMSWebhookEvent`, `SessionWebhookEvent`, `OrganizationWebhookEvent`, `OrganizationMembershipWebhookEvent`, `OrganizationInvitationWebhookEvent` ([#3248](https://github.com/clerk/javascript/pull/3248)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Added missing 'organizationId' parameter to UserListParams ([#3240](https://github.com/clerk/javascript/pull/3240)) by [@royanger](https://github.com/royanger)
+
+  Moved last_active_at_since from UserCountParams to UserListParams
+
 ## 1.0.0
 
 ### Major Changes
