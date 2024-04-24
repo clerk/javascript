@@ -18,7 +18,6 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
   const ctx = useSignInContext();
   const signIn = useCoreSignIn();
   const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
-  console.log('Sign in SSO Callback', redirectUrl);
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
   return (

@@ -234,10 +234,7 @@ export class SignIn extends BaseResource implements SignInResource {
       strategy: 'google_one_tap',
       googleOneTapToken: params.token,
     }).catch(err => {
-      console.log('Error', err);
-      console.log('Error', isClerkAPIResponseError(err), err.errors[0].code);
       if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
-        console.log('is external_account_not_found');
         return SignIn.clerk.client?.signUp.create({
           // TODO-ONETAP: Add new types when feature is ready for public beta
           // @ts-expect-error

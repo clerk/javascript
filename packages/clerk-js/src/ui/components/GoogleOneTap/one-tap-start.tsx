@@ -32,7 +32,7 @@ function _OneTapStart(): JSX.Element | null {
       const res = await clerk.__experimental_authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      await clerk.__experimental__handleGoogleOneTapCallback(
+      await clerk.__experimental_handleGoogleOneTapCallback(
         res,
         {
           signInUrl,

@@ -1013,7 +1013,7 @@ export class Clerk implements ClerkInterface {
     return null;
   };
 
-  public __experimental__handleGoogleOneTapCallback = async (
+  public __experimental_handleGoogleOneTapCallback = async (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,

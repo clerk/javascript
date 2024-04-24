@@ -444,7 +444,7 @@ export interface Clerk {
    * Completes an Google One Tap redirection flow started by
    * {@link Clerk.__experimental_authenticateWithGoogleOneTap}
    */
-  __experimental__handleGoogleOneTapCallback: (
+  __experimental_handleGoogleOneTapCallback: (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
