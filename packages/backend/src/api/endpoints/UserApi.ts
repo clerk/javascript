@@ -16,7 +16,6 @@ type UserCountParams = {
   query?: string;
   userId?: string[];
   externalId?: string[];
-  last_active_at_since?: number;
 };
 
 type UserListParams = ClerkPaginationRequest<
@@ -32,6 +31,8 @@ type UserListParams = ClerkPaginationRequest<
       | '+last_active_at'
       | '-last_sign_in_at'
       | '-last_active_at';
+    last_active_at_since?: number;
+    organizationId?: string[];
   }
 >;
 

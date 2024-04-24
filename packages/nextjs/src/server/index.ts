@@ -7,6 +7,29 @@ export { verifyToken, createClerkClient } from '@clerk/backend';
 export { clerkClient } from './clerkClient';
 
 /**
+ * Webhook-specific exports
+ */
+export type {
+  DeletedObjectJSON,
+  EmailJSON,
+  OrganizationInvitationJSON,
+  OrganizationJSON,
+  OrganizationMembershipJSON,
+  SessionJSON,
+  SMSMessageJSON,
+  UserJSON,
+  WebhookEvent,
+  WebhookEventType,
+  UserWebhookEvent,
+  EmailWebhookEvent,
+  SMSWebhookEvent,
+  SessionWebhookEvent,
+  OrganizationWebhookEvent,
+  OrganizationMembershipWebhookEvent,
+  OrganizationInvitationWebhookEvent,
+} from '@clerk/backend';
+
+/**
  * NextJS-specific exports
  */
 export { getAuth } from './createGetAuth';
@@ -22,8 +45,6 @@ export type { ClerkMiddlewareAuth, ClerkMiddlewareAuthObject, ClerkMiddlewareOpt
 export type {
   OrganizationMembershipRole,
   // Webhook event types
-  WebhookEvent,
-  WebhookEventType,
   // Resources
   AllowlistIdentifier,
   Client,
