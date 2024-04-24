@@ -2,13 +2,13 @@ import { experimental_createTheme } from '../createTheme';
 
 export const dark = experimental_createTheme({
   variables: {
-    colorBackground: '#19191A',
-    colorInputBackground: '#19191A',
-    colorAlphaShade: 'white',
+    colorBackground: '#212126',
+    colorNeutral: 'white',
+    colorPrimary: '#ffffff',
+    colorTextOnPrimaryBackground: 'black',
     colorText: 'white',
     colorInputText: 'white',
-    colorShimmer: 'rgba(255,255,255,0.36)',
-    shadowShimmer: '1px 1px 2px rgba(0,0,0,0.36)',
+    colorInputBackground: '#26262B',
   },
   elements: {
     providerIcon__apple: { filter: 'invert(1)' },

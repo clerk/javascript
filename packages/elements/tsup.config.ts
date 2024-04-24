@@ -16,7 +16,10 @@ export default defineConfig(overrideOptions => {
     },
     dts: true,
     entry: {
-      index: 'src/index.tsx',
+      index: 'src/index.ts',
+      'react/common/index': 'src/react/common/index.ts',
+      'react/sign-in/index': 'src/react/sign-in/index.ts',
+      'react/sign-up/index': 'src/react/sign-up/index.ts',
     },
     external: ['react', 'react-dom'],
     format: ['cjs', 'esm'],

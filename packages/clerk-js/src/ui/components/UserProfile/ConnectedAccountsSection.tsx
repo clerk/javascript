@@ -4,14 +4,14 @@ import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy 
 import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
-import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
+import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
 import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
-import { ConnectedAccountsForm } from './ConnectedAccountsForm';
+import { AddConnectedAccount } from './ConnectedAccountsMenu';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
 type RemoveConnectedAccountScreenProps = { accountId: string };
@@ -26,20 +26,9 @@ const RemoveConnectedAccountScreen = (props: RemoveConnectedAccountScreenProps) 
   );
 };
 
-type ConnectedAccountsScreenProps = { accountId?: string };
-const ConnectedAccountsScreen = (props: ConnectedAccountsScreenProps) => {
-  const { close } = useActionContext();
-  return (
-    <ConnectedAccountsForm
-      onSuccess={close}
-      onReset={close}
-      {...props}
-    />
-  );
-};
-
-export const ConnectedAccountsSection = () => {
+export const ConnectedAccountsSection = withCardStateProvider(() => {
   const { user } = useUser();
+  const card = useCardState();
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const { additionalOAuthScopes } = useUserProfileContext();
 
@@ -55,8 +44,10 @@ export const ConnectedAccountsSection = () => {
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
+      centered={false}
       id='connectedAccounts'
     >
+      <Card.Alert>{card.error}</Card.Alert>
       <Action.Root>
         <ProfileSection.ItemList id='connectedAccounts'>
           {accounts.map(account => {
@@ -64,45 +55,55 @@ export const ConnectedAccountsSection = () => {
             const error = account.verification?.error?.longMessage;
             const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
             const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
+            const errorMessage = !reauthorizationRequired
+              ? error
+              : localizationKeys('userProfile.start.connectedAccountsSection.subtitle__reauthorize');
 
             return (
               <Action.Root key={account.id}>
-                <Action.Closed value=''>
-                  <ProfileSection.Item id='connectedAccounts'>
-                    <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
-                      <Image
-                        elementDescriptor={[descriptors.providerIcon]}
-                        elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
-                        alt={providerToDisplayData[account.provider].name}
-                        src={providerToDisplayData[account.provider].iconUrl}
-                        sx={theme => ({ width: theme.sizes.$4 })}
-                      />
-                      <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                        <Flex
-                          as={'span'}
-                          gap={2}
-                          center
+                <ProfileSection.Item id='connectedAccounts'>
+                  <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
+                    <Image
+                      elementDescriptor={[descriptors.providerIcon]}
+                      elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
+                      alt={providerToDisplayData[account.provider].name}
+                      src={providerToDisplayData[account.provider].iconUrl}
+                      sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
+                    />
+                    <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                      <Flex
+                        gap={2}
+                        center
+                      >
+                        <Text sx={t => ({ color: t.colors.$colorText })}>{`${
+                          providerToDisplayData[account.provider].name
+                        }`}</Text>
+                        <Text
+                          truncate
+                          as='span'
+                          colorScheme='secondary'
                         >
-                          <Text>{`${providerToDisplayData[account.provider].name}`}</Text>
-                          <Text
-                            as='span'
-                            sx={t => ({ color: t.colors.$blackAlpha400 })}
-                          >
-                            {label ? `• ${label}` : ''}
-                          </Text>
-                          {(error || reauthorizationRequired) && (
-                            <Badge
-                              colorScheme='danger'
-                              localizationKey={localizationKeys('badge__requiresAction')}
-                            />
-                          )}
-                        </Flex>
-                      </Box>
-                    </Flex>
+                          {label ? `• ${label}` : ''}
+                        </Text>
+                        {(error || reauthorizationRequired) && (
+                          <Badge
+                            colorScheme='danger'
+                            localizationKey={localizationKeys('badge__requiresAction')}
+                          />
+                        )}
+                      </Flex>
+                    </Box>
+                  </Flex>
 
-                    <ConnectedAccountMenu account={account} />
-                  </ProfileSection.Item>
-                </Action.Closed>
+                  <ConnectedAccountMenu account={account} />
+                </ProfileSection.Item>
+                {(error || reauthorizationRequired) && (
+                  <Text
+                    colorScheme='danger'
+                    sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$8x5}` })}
+                    localizationKey={errorMessage}
+                  />
+                )}
 
                 <Action.Open value='remove'>
                   <Action.Card variant='destructive'>
@@ -112,24 +113,13 @@ export const ConnectedAccountsSection = () => {
               </Action.Root>
             );
           })}
-
-          <Action.Trigger value='add'>
-            <ProfileSection.Button
-              id='connectedAccounts'
-              localizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
-            />
-          </Action.Trigger>
         </ProfileSection.ItemList>
 
-        <Action.Open value='add'>
-          <Action.Card>
-            <ConnectedAccountsScreen />
-          </Action.Card>
-        </Action.Open>
+        <AddConnectedAccount />
       </Action.Root>
     </ProfileSection.Root>
   );
-};
+});
 
 const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource }) => {
   const card = useCardState();

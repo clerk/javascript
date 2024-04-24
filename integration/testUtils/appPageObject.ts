@@ -34,8 +34,16 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
         return window.Clerk?.loaded;
       });
     },
+    signOut: async () => {
+      return page.waitForFunction(() => {
+        return window.Clerk?.signOut({});
+      });
+    },
     waitForClerkComponentMounted: async () => {
       return page.waitForSelector('.cl-rootBox', { state: 'attached' });
+    },
+    waitForAppUrl: async (relativePath: string) => {
+      return page.waitForURL(new URL(relativePath, app.serverUrl).toString());
     },
   };
   return Object.assign(appPage, helpers);

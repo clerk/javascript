@@ -7,12 +7,16 @@ body {
 }
 
 body {
-  background: #e7e7e7;
+  background: white;
   color: black;
 }
 body.dark-mode {
   background: black;
   color: white;
+}
+body.font-smoothing {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {

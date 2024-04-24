@@ -3,9 +3,6 @@ import type { PermissionJSON, PermissionResource } from '@clerk/types';
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
 
-/**
- * @experimental
- */
 export class Permission extends BaseResource implements PermissionResource {
   id!: string;
   key!: string;

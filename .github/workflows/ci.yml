@@ -15,22 +15,20 @@ concurrency:
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
-    runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
       TURBO_SUMMARIZE: false
 
     steps:
       - name: Checkout Repo
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           show-progress: false
 
       - name: Setup
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         id: config
         uses: ./.github/actions/init
         with:
@@ -44,7 +42,6 @@ jobs:
         shell: bash
 
       - name: Require Changeset
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         if: ${{ !(github.event_name == 'merge_group') }}
         run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
@@ -53,29 +50,23 @@ jobs:
         shell: bash
 
       - name: Check Formatting
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
         run: npm run format:check
 
       - name: Build Packages
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo build $TURBO_ARGS --only
+        run: npx turbo build $TURBO_ARGS --filter=!elements --only
 
       - name: Lint packages using publint
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:publint $TURBO_ARGS --only
+        run: npx turbo lint:publint $TURBO_ARGS --filter=!elements --only
 
       - name: Lint types using attw
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!backend --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!elements --filter=!backend --only
 
       - name: Lint types using attw [Errors Allowed]
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --continue --only
-        continue-on-error: true  # TODO: Remove this when all related errors are fixed
+        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --filter=elements --continue --only
+        continue-on-error: true # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-        run: npx turbo lint $TURBO_ARGS --only -- --quiet
+        run: npx turbo lint $TURBO_ARGS --filter=!elements --only -- --quiet
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v3
@@ -89,15 +80,15 @@ jobs:
   unit-tests:
     name: Unit Tests
     needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
       TURBO_SUMMARIZE: false
 
     strategy:
       matrix:
-        node-version: [ 18, 20 ]
+        node-version: [18, 20]
 
     steps:
       - name: Checkout Repo
@@ -117,12 +108,12 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run tests
-        run: npx turbo test $TURBO_ARGS
+        run: npx turbo test $TURBO_ARGS --filter=!elements
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
       - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
@@ -133,12 +124,13 @@ jobs:
   integration-tests:
     name: Integration Tests
     needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_MEDIUM }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    runs-on: ${{ vars.RUNNER_MEDIUM || 'ubuntu-latest-m' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs', 'express' ]
+        test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
+        test-project: ['chrome']
 
     steps:
       - name: Checkout Repo
@@ -160,7 +152,7 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --filter=!elements --only && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
@@ -171,7 +163,7 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
-        run: npm run test:integration:${{ matrix.test-name }}
+        run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'

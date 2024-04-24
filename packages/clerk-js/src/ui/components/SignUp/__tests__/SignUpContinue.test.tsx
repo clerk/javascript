@@ -49,8 +49,7 @@ describe('SignUpContinue', () => {
     screen.getByText(/password/i);
   });
 
-  // TODO-RETHEME: Continue button includes a <div>. We should avoid that.
-  it.skip('shows the continue button', async () => {
+  it('shows the continue button', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
       f.withPassword({ required: true });
@@ -58,7 +57,8 @@ describe('SignUpContinue', () => {
     });
     render(<SignUpContinue />, { wrapper });
     const button = screen.getByText('Continue');
-    expect(button.tagName.toUpperCase()).toBe('BUTTON');
+    expect(button.tagName.toUpperCase()).toBe('SPAN');
+    expect(button.parentElement?.tagName.toUpperCase()).toBe('BUTTON');
   });
 
   it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {

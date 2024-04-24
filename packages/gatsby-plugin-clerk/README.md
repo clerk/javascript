@@ -20,7 +20,7 @@
 ·
 [Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://feedback.clerk.com/roadmap)
 ·
 [Ask a Question](https://github.com/clerk/javascript/discussions)
 
@@ -137,8 +137,8 @@ Importing `'gatsby-plugin-clerk/api'` gives access to all the exports coming fro
 import { clerkClient, withAuth } from 'gatsby-plugin-clerk/api';
 
 const handler = withAuth(async (req, res) => {
-  const users = await clerkClient.users.getUserList();
-  res.send({ title: `We have ${users.length} users`, auth: req.auth });
+  const { totalCount } = await clerkClient.users.getUserList();
+  res.send({ title: `We have ${totalCount} users`, auth: req.auth });
 });
 
 export default handler;

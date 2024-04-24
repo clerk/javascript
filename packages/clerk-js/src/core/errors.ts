@@ -8,8 +8,8 @@ export function clerkErrorInitFailed(): never {
   throw new Error(`${errorPrefix} Something went wrong initializing Clerk.`);
 }
 
-export function clerkErrorDevInitFailed(msg?: string): never {
-  throw new Error(`${errorPrefix} Something went wrong initializing Clerk in development mode${msg && ` - ${msg}`}.`);
+export function clerkErrorDevInitFailed(msg: string = ''): never {
+  throw new Error(`${errorPrefix} Something went wrong initializing Clerk in development mode.${msg && ` ${msg}`}`);
 }
 
 export function clerkErrorPathRouterMissingPath(componentName: string): never {
@@ -18,24 +18,8 @@ export function clerkErrorPathRouterMissingPath(componentName: string): never {
   );
 }
 
-export function clerkErrorInvalidColor(name: string): never {
-  throw new Error(`${errorPrefix} You're using an invalid ${name} color. Change the ${name} color from the dashboard.`);
-}
-
 export function clerkCoreErrorContextProviderNotFound(providerName: string): never {
   throw new Error(`${errorPrefix} You must wrap your application in a <${providerName}> component.`);
-}
-
-export function clerkCoreErrorUserIsNotDefined(): never {
-  throw new Error(`${errorPrefix} User is undefined. Try wrapping your component with \`withUserGuard\``);
-}
-
-export function clerkCoreErrorSessionIsNotDefined(): never {
-  throw new Error(`${errorPrefix} Session is undefined. Try wrapping your component with \`withUserGuard\``);
-}
-
-export function clerkCoreErrorOrganizationIsNotDefined(): never {
-  throw new Error(`${errorPrefix} Organization is undefined. Try wrapping your component with \`withUserGuard\``);
 }
 
 export function clerkCoreErrorNoClerkSingleton(): never {
@@ -71,6 +55,12 @@ export function clerkInvalidStrategy(functionaName: string, strategy: string): n
 export function clerkVerifyWeb3WalletCalledBeforeCreate(type: 'SignIn' | 'SignUp'): never {
   throw new Error(
     `${errorPrefix} You need to start a ${type} flow by calling ${type}.create({ identifier: 'your web3 wallet address' }) first`,
+  );
+}
+
+export function clerkVerifyPasskeyCalledBeforeCreate(): never {
+  throw new Error(
+    `${errorPrefix} You need to start a SignIn flow by calling SignIn.create({ strategy: 'passkey' }) first`,
   );
 }
 
@@ -118,4 +108,14 @@ export function clerkFailedToLoadThirdPartyScript(name?: string): never {
 
 export function clerkInvalidRoutingStrategy(strategy?: string): never {
   throw new Error(`${errorPrefix} Invalid routing strategy, path cannot be used in tandem with ${strategy}.`);
+}
+
+export function clerkUnsupportedReloadMethod(className: string): never {
+  throw new Error(`${errorPrefix} Calling ${className}.reload is not currently supported. Please contact support.`);
+}
+
+export function clerkMissingWebAuthnPublicKeyOptions(name: 'create' | 'get'): never {
+  throw new Error(
+    `${errorPrefix} Missing publicKey. When calling 'navigator.credentials.${name}()' it is required to pass a publicKey object.`,
+  );
 }

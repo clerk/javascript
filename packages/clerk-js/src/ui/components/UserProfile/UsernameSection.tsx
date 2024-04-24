@@ -1,9 +1,10 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Button, localizationKeys, Text } from '../../customizables';
+import { localizationKeys, Text } from '../../customizables';
 import { ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { mqu } from '../../styledSystem';
 import { UsernameForm } from './UsernameForm';
 
 const UsernameScreen = () => {
@@ -27,19 +28,31 @@ export const UsernameSection = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.usernameSection.title')}
       id='username'
+      sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.Item id='username'>
-            {user.username && <Text>{user.username}</Text>}
+          <ProfileSection.Item
+            id='username'
+            sx={{
+              paddingLeft: !user.username ? '0' : undefined,
+            }}
+          >
+            {user.username && (
+              <Text
+                truncate
+                sx={t => ({ color: t.colors.$colorText })}
+              >
+                {user.username}
+              </Text>
+            )}
 
             <Action.Trigger value='edit'>
-              <Button
+              <ProfileSection.Button
                 id='username'
-                variant='ghost'
                 localizationKey={
                   user.username
-                    ? localizationKeys('userProfile.start.usernameSection.primaryButton__changeUsername')
+                    ? localizationKeys('userProfile.start.usernameSection.primaryButton__updateUsername')
                     : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
                 }
               />

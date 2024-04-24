@@ -4,9 +4,9 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import type { LocalizationKey } from '../../customizables';
-import { localizationKeys, Text } from '../../customizables';
+import { Button, Flex, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyWithCode } from './VerifyWithCode';
 
@@ -31,9 +31,9 @@ export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
       />
       <VerifyPhone
         resourceRef={phoneNumberRef}
-        title={localizationKeys('userProfile.phoneNumberPage.title')}
+        title={localizationKeys('userProfile.phoneNumberPage.verifyTitle')}
         onSuccess={onSuccess}
-        onReset={wizard.prevStep}
+        onReset={onReset}
       />
     </Wizard>
   );
@@ -42,10 +42,11 @@ export const PhoneForm = withCardStateProvider((props: PhoneFormProps) => {
 type AddPhoneProps = FormProps & {
   title: LocalizationKey;
   resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
+  onUseExistingNumberClick?: React.MouseEventHandler;
 };
 
 export const AddPhone = (props: AddPhoneProps) => {
-  const { title, onSuccess, onReset, resourceRef } = props;
+  const { title, onSuccess, onReset, onUseExistingNumberClick, resourceRef } = props;
   const card = useCardState();
   const { user } = useUser();
 
@@ -56,6 +57,7 @@ export const AddPhone = (props: AddPhoneProps) => {
   });
 
   const canSubmit = phoneField.value.length > 1 && user?.username !== phoneField.value;
+  const hasExistingNumber = !!user?.phoneNumbers?.length && onUseExistingNumberClick;
 
   const addPhone = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,33 +71,59 @@ export const AddPhone = (props: AddPhoneProps) => {
   };
 
   return (
-    <FormContent headerTitle={title}>
-      <Form.Root onSubmit={addPhone}>
+    <FormContainer
+      headerTitle={title}
+      gap={1}
+    >
+      <Form.Root
+        gap={4}
+        onSubmit={addPhone}
+      >
+        <Text
+          localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')}
+          colorScheme='secondary'
+        />
         <Form.ControlRow elementId={phoneField.id}>
           <Form.PhoneInput
             {...phoneField.props}
             autoFocus
           />
         </Form.ControlRow>
-        <Text localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText')} />
-        <Text
-          colorScheme='neutral'
-          localizationKey={localizationKeys('userProfile.phoneNumberPage.infoText__secondary')}
-        />
-        <FormButtons
-          isDisabled={!canSubmit}
-          onReset={onReset}
-        />
+        <Flex justify={hasExistingNumber ? 'between' : 'end'}>
+          {hasExistingNumber && (
+            <Button
+              variant='ghost'
+              localizationKey={localizationKeys('userProfile.mfaPhoneCodePage.backButton')}
+              onClick={onUseExistingNumberClick}
+            />
+          )}
+
+          <FormButtons
+            submitLabel={localizationKeys('userProfile.formButtonPrimary__add')}
+            isDisabled={!canSubmit}
+            onReset={onReset}
+          />
+        </Flex>
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 };
 
-export const VerifyPhone = (props: AddPhoneProps) => {
+type VerifyPhoneProps = FormProps & {
+  title: LocalizationKey;
+  resourceRef: React.MutableRefObject<PhoneNumberResource | undefined>;
+};
+
+export const VerifyPhone = (props: VerifyPhoneProps) => {
   const { title, onSuccess, resourceRef, onReset } = props;
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer
+      headerTitle={title}
+      headerSubtitle={localizationKeys('userProfile.phoneNumberPage.verifySubtitle', {
+        identifier: resourceRef.current?.phoneNumber,
+      })}
+    >
       <VerifyWithCode
         nextStep={onSuccess}
         identification={resourceRef.current}
@@ -103,6 +131,6 @@ export const VerifyPhone = (props: AddPhoneProps) => {
         prepareVerification={resourceRef.current?.prepareVerification}
         onReset={onReset}
       />
-    </FormContent>
+    </FormContainer>
   );
 };

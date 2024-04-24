@@ -42,7 +42,9 @@ export async function signJwt(
 
   const algorithm = getCryptoAlgorithm(options.algorithm);
   if (!algorithm) {
-    throw new Error(`Unsupported algorithm ${options.algorithm}`);
+    return {
+      errors: [new SignJWTError(`Unsupported algorithm ${options.algorithm}`)],
+    };
   }
 
   const cryptoKey = await importKey(key, algorithm, 'sign');
@@ -60,6 +62,6 @@ export async function signJwt(
     const encodedSignature = `${firstPart}.${base64url.stringify(new Uint8Array(signature), { pad: false })}`;
     return { data: encodedSignature };
   } catch (error) {
-    return { error: new SignJWTError((error as Error)?.message) };
+    return { errors: [new SignJWTError((error as Error)?.message)] };
   }
 }

@@ -1,24 +1,25 @@
-import type { SessionStatus } from '@clerk/types';
+import type { ClerkPaginationRequest, SessionStatus } from '@clerk/types';
 
 import { joinPaths } from '../../util/path';
+import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { Session } from '../resources/Session';
 import type { Token } from '../resources/Token';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/sessions';
 
-type QueryParams = {
+type SessionListParams = ClerkPaginationRequest<{
   clientId?: string;
   userId?: string;
   status?: SessionStatus;
-};
+}>;
 
 export class SessionAPI extends AbstractAPI {
-  public async getSessionList(queryParams?: QueryParams) {
-    return this.request<Session[]>({
+  public async getSessionList(params: SessionListParams = {}) {
+    return this.request<PaginatedResourceResponse<Session[]>>({
       method: 'GET',
       path: basePath,
-      queryParams: queryParams,
+      queryParams: params,
     });
   }
 
@@ -49,11 +50,9 @@ export class SessionAPI extends AbstractAPI {
 
   public async getToken(sessionId: string, template: string) {
     this.requireId(sessionId);
-    return (
-      (await this.request<Token>({
-        method: 'POST',
-        path: joinPaths(basePath, sessionId, 'tokens', template || ''),
-      })) as any
-    ).jwt;
+    return this.request<Token>({
+      method: 'POST',
+      path: joinPaths(basePath, sessionId, 'tokens', template || ''),
+    });
   }
 }

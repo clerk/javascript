@@ -7,8 +7,8 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
+import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource } from './internal';
 
 export class UserOrganizationInvitation extends BaseResource implements UserOrganizationInvitationResource {
@@ -27,21 +27,16 @@ export class UserOrganizationInvitation extends BaseResource implements UserOrga
     return await BaseResource._fetch({
       path: '/me/organization_invitations',
       method: 'GET',
-      search: convertPageToOffset(params),
-    })
-      .then(res => {
-        const { data: invites, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<UserOrganizationInvitationJSON>;
+      search: convertPageToOffsetSearchParams(params),
+    }).then(res => {
+      const { data: invites, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<UserOrganizationInvitationJSON>;
 
-        return {
-          total_count,
-          data: invites.map(invitation => new UserOrganizationInvitation(invitation)),
-        };
-      })
-      .catch(() => ({
-        total_count: 0,
-        data: [],
-      }));
+      return {
+        total_count,
+        data: invites.map(invitation => new UserOrganizationInvitation(invitation)),
+      };
+    });
   }
 
   constructor(data: UserOrganizationInvitationJSON) {

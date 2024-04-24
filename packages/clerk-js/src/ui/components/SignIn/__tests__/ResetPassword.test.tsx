@@ -131,12 +131,9 @@ describe('ResetPassword', () => {
       });
     }, 10000);
 
-    // TODO-RETHEME: Replace back button whith the new edit (pencil) icon
-    it.skip('navigates to the root page upon pressing the back link', async () => {
+    it('navigates to the root page upon pressing the back link', async () => {
       const { wrapper, fixtures } = await createFixtures();
-
       const { userEvent } = render(<ResetPassword />, { wrapper });
-
       await userEvent.click(screen.getByText(/back/i));
       expect(fixtures.router.navigate).toHaveBeenCalledWith('../');
     });
@@ -151,7 +148,7 @@ describe('ResetPassword', () => {
       } as SignInResource);
       const { userEvent } = render(<ResetPassword />, { wrapper });
 
-      expect(screen.queryByText(/account already exists/i)).toBeInTheDocument();
+      expect(screen.queryByText('For security reasons, it is required to reset your password.')).toBeInTheDocument();
       expect(screen.queryByRole('checkbox', { name: /sign out of all other devices/i })).not.toBeInTheDocument();
       await userEvent.type(screen.getByLabelText(/New password/i), 'testtest');
       await userEvent.type(screen.getByLabelText(/Confirm password/i), 'testtest');

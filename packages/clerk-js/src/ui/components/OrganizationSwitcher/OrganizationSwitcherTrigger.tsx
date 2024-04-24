@@ -31,13 +31,13 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
       <Button
         elementDescriptor={descriptors.organizationSwitcherTrigger}
         variant='ghost'
-        focusRing
+        colorScheme='neutral'
+        hoverAsFocus
+        focusRing={false}
         sx={[
           t => ({
-            minHeight: 0,
             padding: `${t.space.$1} ${t.space.$2}`,
             position: 'relative',
-            color: t.colors.$colorText,
           }),
           sx,
         ]}
@@ -54,7 +54,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             size='xs'
             fetchRoles
             organization={organization}
-            sx={t => ({ maxWidth: '30ch', color: t.colors.$blackAlpha600 })}
+            sx={{ maxWidth: '30ch' }}
           />
         )}
         {!organization && (
@@ -63,7 +63,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             gap={3}
             user={userWithoutIdentifiers}
             showAvatar={!hidePersonal}
-            sx={t => ({ color: t.colors.$blackAlpha600 })}
+            sx={t => ({ color: t.colors.$colorTextSecondary })}
             title={
               hidePersonal
                 ? localizationKeys('organizationSwitcher.notSelected')
@@ -77,7 +77,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         <Icon
           elementDescriptor={descriptors.organizationSwitcherTriggerIcon}
           icon={ChevronDown}
-          sx={t => ({ color: t.colors.$blackAlpha400, marginLeft: `${t.space.$2}` })}
+          sx={t => ({ marginLeft: `${t.space.$2}` })}
         />
       </Button>
     );

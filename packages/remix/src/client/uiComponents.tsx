@@ -15,26 +15,43 @@ import type {
 } from '@clerk/types';
 import React from 'react';
 
-import { useClerkRemixOptions } from './RemixOptionsContext';
+import { usePathnameWithoutSplatRouteParams } from './usePathnameWithoutSplatRouteParams';
 
-export const UserProfile = (props: UserProfileProps) => {
-  return <BaseUserProfile {...useRoutingProps('UserProfile', props)} />;
-};
+// The assignment of UserProfile with BaseUserProfile props is used
+// to support the CustomPage functionality (eg UserProfile.Page)
+// Also the `typeof BaseUserProfile` is used to resolved the following error:
+// "The inferred type of 'UserProfile' cannot be named without a reference to ..."
+export const UserProfile: typeof BaseUserProfile = Object.assign(
+  (props: UserProfileProps) => {
+    const path = usePathnameWithoutSplatRouteParams();
+    return <BaseUserProfile {...useRoutingProps('UserProfile', props, { path })} />;
+  },
+  { ...BaseUserProfile },
+);
 
 export const CreateOrganization = (props: CreateOrganizationProps) => {
-  return <BaseCreateOrganization {...useRoutingProps('CreateOrganization', props)} />;
+  const path = usePathnameWithoutSplatRouteParams();
+  return <BaseCreateOrganization {...useRoutingProps('CreateOrganization', props, { path })} />;
 };
 
-export const OrganizationProfile = (props: OrganizationProfileProps) => {
-  return <BaseOrganizationProfile {...useRoutingProps('OrganizationProfile', props)} />;
-};
+// The assignment of OrganizationProfile with BaseOrganizationProfile props is used
+// to support the CustomPage functionality (eg OrganizationProfile.Page)
+// Also the `typeof BaseOrganizationProfile` is used to resolved the following error:
+// "The inferred type of 'OrganizationProfile' cannot be named without a reference to ..."
+export const OrganizationProfile: typeof BaseOrganizationProfile = Object.assign(
+  (props: OrganizationProfileProps) => {
+    const path = usePathnameWithoutSplatRouteParams();
+    return <BaseOrganizationProfile {...useRoutingProps('OrganizationProfile', props, { path })} />;
+  },
+  { ...BaseOrganizationProfile },
+);
 
 export const SignIn = (props: SignInProps) => {
-  const { signInUrl } = useClerkRemixOptions();
-  return <BaseSignIn {...useRoutingProps('SignIn', props, { path: signInUrl })} />;
+  const path = usePathnameWithoutSplatRouteParams();
+  return <BaseSignIn {...useRoutingProps('SignIn', props, { path })} />;
 };
 
 export const SignUp = (props: SignUpProps) => {
-  const { signUpUrl } = useClerkRemixOptions();
-  return <BaseSignUp {...useRoutingProps('SignUp', props, { path: signUpUrl })} />;
+  const path = usePathnameWithoutSplatRouteParams();
+  return <BaseSignUp {...useRoutingProps('SignUp', props, { path })} />;
 };

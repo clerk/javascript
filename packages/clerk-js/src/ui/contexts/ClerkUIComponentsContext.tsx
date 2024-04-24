@@ -4,7 +4,9 @@ import type { OrganizationResource, UserResource } from '@clerk/types';
 import React, { useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
-import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
+import { buildURL, createDynamicParamParser } from '../../utils';
+import { RedirectUrls } from '../../utils/redirectUrls';
+import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import { useEnvironment, useOptions } from '../contexts';
 import type { NavbarRoute } from '../elements';
 import type { ParsedQs } from '../router';
@@ -12,6 +14,7 @@ import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
   CreateOrganizationCtx,
+  OneTapCtx,
   OrganizationListCtx,
   OrganizationProfileCtx,
   OrganizationSwitcherCtx,
@@ -43,8 +46,11 @@ export type SignUpContextType = SignUpCtx & {
   navigateAfterSignUp: () => any;
   queryParams: ParsedQs;
   signInUrl: string;
+  signUpUrl: string;
   secondFactorUrl: string;
   authQueryString: string | null;
+  afterSignUpUrl: string;
+  afterSignInUrl: string;
 };
 
 export const useSignUpContext = (): SignUpContextType => {
@@ -60,41 +66,33 @@ export const useSignUpContext = (): SignUpContextType => {
     [],
   );
 
+  const redirectUrls = new RedirectUrls(
+    options,
+    {
+      ...ctx,
+      signUpFallbackRedirectUrl: ctx.fallbackRedirectUrl,
+      signUpForceRedirectUrl: ctx.forceRedirectUrl,
+    },
+    queryParams,
+  );
+
   if (componentName !== 'SignUp') {
     throw new Error('Clerk: useSignUpContext called outside of the mounted SignUp component.');
   }
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignUpUrl', {
-      queryParams,
-      ctx,
-      options,
-    }) || '/',
-  );
-
-  const afterSignInUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignInUrl', {
-      queryParams,
-      ctx,
-      options,
-    }) || '/',
-  );
+  const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
+  const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
 
   const navigateAfterSignUp = () => navigate(afterSignUpUrl);
 
-  let signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
+  // The `ctx` object here refers to the SignUp component's props.
+  // SignUp's own options won't have a `signUpUrl` property, so we have to get the value
+  // from the `path` prop instead, when the routing is set to 'path'.
+  let signUpUrl = (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl;
+  let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
 
-  // Add query strings to the sign in URL
-  const authQs = buildAuthQueryString({
-    afterSignInUrl: afterSignInUrl,
-    afterSignUpUrl: afterSignUpUrl,
-    displayConfig: displayConfig,
-  });
-
-  // Todo: Look for a better way than checking virtual
-  if (authQs && ctx.routing != 'virtual') {
-    signInUrl += `#/?${authQs}`;
-  }
+  signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
+  signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
 
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
@@ -103,13 +101,14 @@ export const useSignUpContext = (): SignUpContextType => {
     ...ctx,
     componentName,
     signInUrl,
+    signUpUrl,
     secondFactorUrl,
     afterSignUpUrl,
     afterSignInUrl,
     navigateAfterSignUp,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: authQs,
+    authQueryString: redirectUrls.toSearchParams().toString(),
   };
 };
 
@@ -117,8 +116,11 @@ export type SignInContextType = SignInCtx & {
   navigateAfterSignIn: () => any;
   queryParams: ParsedQs;
   signUpUrl: string;
+  signInUrl: string;
   signUpContinueUrl: string;
   authQueryString: string | null;
+  afterSignUpUrl: string;
+  afterSignInUrl: string;
 };
 
 export const useSignInContext = (): SignInContextType => {
@@ -134,53 +136,47 @@ export const useSignInContext = (): SignInContextType => {
     [],
   );
 
+  const redirectUrls = new RedirectUrls(
+    options,
+    {
+      ...ctx,
+      signInFallbackRedirectUrl: ctx.fallbackRedirectUrl,
+      signInForceRedirectUrl: ctx.forceRedirectUrl,
+    },
+    queryParams,
+  );
+
   if (componentName !== 'SignIn') {
     throw new Error('Clerk: useSignInContext called outside of the mounted SignIn component.');
   }
 
-  const afterSignUpUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignUpUrl', {
-      queryParams,
-      ctx,
-      options,
-    }) || '/',
-  );
-
-  const afterSignInUrl = clerk.buildUrlWithAuth(
-    pickRedirectionProp('afterSignInUrl', {
-      queryParams,
-      ctx,
-      options,
-    }) || '/',
-  );
+  const afterSignInUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignInUrl());
+  const afterSignUpUrl = clerk.buildUrlWithAuth(redirectUrls.getAfterSignUpUrl());
 
   const navigateAfterSignIn = () => navigate(afterSignInUrl);
 
-  let signUpUrl = pickRedirectionProp('signUpUrl', { ctx, options, displayConfig }, false);
+  // The `ctx` object here refers to the SignIn component's props.
+  // SignIn's own options won't have a `signInUrl` property, so we have to get the value
+  // from the `path` prop instead, when the routing is set to 'path'.
+  let signInUrl = (ctx.routing === 'path' && ctx.path) || options.signInUrl || displayConfig.signInUrl;
+  let signUpUrl = ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
 
-  // Add query strings to the sign in URL
-  const authQs = buildAuthQueryString({
-    afterSignInUrl: afterSignInUrl,
-    afterSignUpUrl: afterSignUpUrl,
-    displayConfig: displayConfig,
-  });
-  if (authQs && ctx.routing !== 'virtual') {
-    signUpUrl += `#/?${authQs}`;
-  }
-
+  signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
+  signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
   return {
     ...ctx,
     componentName,
     signUpUrl,
+    signInUrl,
     afterSignInUrl,
     afterSignUpUrl,
     navigateAfterSignIn,
     signUpContinueUrl,
     queryParams,
     initialValues: { ...ctx.initialValues, ...initialValuesFromQueryParams },
-    authQueryString: authQs,
+    authQueryString: redirectUrls.toSearchParams().toString(),
   };
 };
 
@@ -212,12 +208,15 @@ export type UserProfileContextType = UserProfileCtx & {
 export const useUserProfileContext = (): UserProfileContextType => {
   const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as UserProfileCtx;
   const { queryParams } = useRouter();
+  const clerk = useClerk();
 
   if (componentName !== 'UserProfile') {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
-  const pages = createUserProfileCustomPages(customPages || []);
+  const pages = useMemo(() => {
+    return createUserProfileCustomPages(customPages || [], clerk);
+  }, [customPages]);
 
   return {
     ...ctx,
@@ -239,7 +238,7 @@ export const useUserButtonContext = () => {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
 
-  const signInUrl = pickRedirectionProp('signInUrl', { ctx, options, displayConfig }, false);
+  const signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
   const afterSignOutUrl = ctx.afterSignOutUrl || clerk.buildAfterSignOutUrl();
@@ -334,6 +333,7 @@ export const useOrganizationSwitcherContext = () => {
     hidePersonal: ctx.hidePersonal || false,
     organizationProfileMode: organizationProfileMode || 'modal',
     createOrganizationMode: createOrganizationMode || 'modal',
+    skipInvitationScreen: ctx.skipInvitationScreen || false,
     afterCreateOrganizationUrl,
     afterLeaveOrganizationUrl,
     navigateOrganizationProfile,
@@ -424,27 +424,39 @@ export const useOrganizationListContext = () => {
 export type OrganizationProfileContextType = OrganizationProfileCtx & {
   pages: PagesType;
   navigateAfterLeaveOrganization: () => Promise<unknown>;
+  navigateToGeneralPageRoot: () => Promise<unknown>;
+  isMembersPageRoot: boolean;
+  isGeneralPageRoot: boolean;
 };
 
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
   const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
+  const clerk = useClerk();
 
   if (componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
   }
 
-  const pages = createOrganizationProfileCustomPages(customPages || []);
+  const pages = useMemo(() => createOrganizationProfileCustomPages(customPages || [], clerk), [customPages]);
 
   const navigateAfterLeaveOrganization = () =>
     navigate(ctx.afterLeaveOrganizationUrl || displayConfig.afterLeaveOrganizationUrl);
+
+  const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
+  const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
+  const navigateToGeneralPageRoot = () =>
+    navigate(isGeneralPageRoot ? '../' : isMembersPageRoot ? './organization-general' : '../organization-general');
 
   return {
     ...ctx,
     pages,
     navigateAfterLeaveOrganization,
     componentName,
+    navigateToGeneralPageRoot,
+    isMembersPageRoot,
+    isGeneralPageRoot,
   };
 };
 
@@ -477,6 +489,19 @@ export const useCreateOrganizationContext = () => {
     ...ctx,
     skipInvitationScreen: ctx.skipInvitationScreen || false,
     navigateAfterCreateOrganization,
+    componentName,
+  };
+};
+
+export const useGoogleOneTapContext = () => {
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OneTapCtx;
+
+  if (componentName !== 'OneTap') {
+    throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
+  }
+
+  return {
+    ...ctx,
     componentName,
   };
 };

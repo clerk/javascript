@@ -1,3 +1,5 @@
+import { colorOptionToHslaAlphaScale } from '../utils/colorOptionToHslaScale';
+
 export const whiteAlpha = Object.freeze({
   whiteAlpha25: 'hsla(0, 0%, 100%, 0.02)',
   whiteAlpha50: 'hsla(0, 0%, 100%, 0.03)',
@@ -16,40 +18,37 @@ export const whiteAlpha = Object.freeze({
   whiteAlpha950: 'hsla(0, 0%, 100%, 0.92)',
 } as const);
 
-export const blackAlpha = Object.freeze({
-  blackAlpha25: 'hsla(0, 0%, 0%, 0.02)',
-  blackAlpha50: 'hsla(0, 0%, 0%, 0.03)',
-  blackAlpha100: 'hsla(0, 0%, 0%, 0.07)',
-  blackAlpha150: 'hsla(0, 0%, 0%, 0.11)',
-  blackAlpha200: 'hsla(0, 0%, 0%, 0.15)',
-  blackAlpha300: 'hsla(0, 0%, 0%, 0.28)',
-  blackAlpha400: 'hsla(0, 0%, 0%, 0.41)',
-  blackAlpha500: 'hsla(0, 0%, 0%, 0.53)',
-  blackAlpha600: 'hsla(0, 0%, 0%, 0.62)',
-  blackAlpha700: 'hsla(0, 0%, 0%, 0.73)',
-  blackAlpha750: 'hsla(0, 0%, 0%, 0.78)',
-  blackAlpha800: 'hsla(0, 0%, 0%, 0.81)',
-  blackAlpha850: 'hsla(0, 0%, 0%, 0.84)',
-  blackAlpha900: 'hsla(0, 0%, 0%, 0.87)',
-  blackAlpha950: 'hsla(0, 0%, 0%, 0.92)',
+export const neutralAlpha = Object.freeze({
+  neutralAlpha25: 'hsla(0, 0%, 0%, 0.02)',
+  neutralAlpha50: 'hsla(0, 0%, 0%, 0.03)',
+  neutralAlpha100: 'hsla(0, 0%, 0%, 0.07)',
+  neutralAlpha150: 'hsla(0, 0%, 0%, 0.11)',
+  neutralAlpha200: 'hsla(0, 0%, 0%, 0.15)',
+  neutralAlpha300: 'hsla(0, 0%, 0%, 0.28)',
+  neutralAlpha400: 'hsla(0, 0%, 0%, 0.41)',
+  neutralAlpha500: 'hsla(0, 0%, 0%, 0.53)',
+  neutralAlpha600: 'hsla(0, 0%, 0%, 0.62)',
+  neutralAlpha700: 'hsla(0, 0%, 0%, 0.73)',
+  neutralAlpha750: 'hsla(0, 0%, 0%, 0.78)',
+  neutralAlpha800: 'hsla(0, 0%, 0%, 0.81)',
+  neutralAlpha850: 'hsla(0, 0%, 0%, 0.84)',
+  neutralAlpha900: 'hsla(0, 0%, 0%, 0.87)',
+  neutralAlpha950: 'hsla(0, 0%, 0%, 0.92)',
 } as const);
 
 export const colors = Object.freeze({
-  // Colors that are not affected by `alphaShadesMode`
-  avatarBorder: blackAlpha.blackAlpha200,
-  avatarBackground: blackAlpha.blackAlpha400,
-  modalBackdrop: blackAlpha.blackAlpha700,
-  activeDeviceBackground: whiteAlpha.whiteAlpha200,
+  avatarBorder: neutralAlpha.neutralAlpha200,
+  avatarBackground: neutralAlpha.neutralAlpha400,
+  modalBackdrop: neutralAlpha.neutralAlpha700,
   // Themable colors
-  ...blackAlpha,
+  ...neutralAlpha,
   ...whiteAlpha,
   colorBackground: 'white',
   colorInputBackground: 'white',
-  colorText: 'black',
+  colorText: '#212126',
+  colorTextSecondary: '#747686',
+  colorInputText: '#131316',
   colorTextOnPrimaryBackground: 'white',
-  colorTextSecondary: 'rgba(0,0,0,0.65)',
-  colorTextTertiary: 'rgba(147,148,161,1)',
-  colorInputText: 'black',
   colorShimmer: 'rgba(255, 255, 255, 0.36)',
   transparent: 'transparent',
   white: 'white',
@@ -64,6 +63,8 @@ export const colors = Object.freeze({
   primary700: '#25232A',
   primary800: '#201D23',
   primary900: '#1B171C',
+  primaryHover: '#3B3C45', //primary 500 adjusted for lightness
+  ...colorOptionToHslaAlphaScale('#2F3037', 'primaryAlpha')!,
   danger50: '#FEF2F2',
   danger100: '#FEE5E5',
   danger200: '#FECACA',
@@ -75,6 +76,7 @@ export const colors = Object.freeze({
   danger800: '#991B1B',
   danger900: '#7F1D1D',
   danger950: '#450A0A',
+  ...colorOptionToHslaAlphaScale('#EF4444', 'dangerAlpha')!,
   warning50: '#FFF6ED',
   warning100: '#FFEBD5',
   warning200: '#FED1AA',
@@ -86,6 +88,7 @@ export const colors = Object.freeze({
   warning800: '#9A2F12',
   warning900: '#7C2912',
   warning950: '#431207',
+  ...colorOptionToHslaAlphaScale('#F36B16', 'warningAlpha')!,
   success50: '#F0FDF2',
   success100: '#DCFCE2',
   success200: '#BBF7C6',
@@ -97,4 +100,5 @@ export const colors = Object.freeze({
   success800: '#166527',
   success900: '#145323',
   success950: '#052E0F',
+  ...colorOptionToHslaAlphaScale('#22C543', 'successAlpha')!,
 } as const);

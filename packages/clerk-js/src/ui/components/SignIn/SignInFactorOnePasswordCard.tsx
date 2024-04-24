@@ -1,4 +1,4 @@
-import { isUserLockedError } from '@clerk/shared/error';
+import { isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
@@ -6,7 +6,7 @@ import React from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
-import { Card, Footer, Form, Header, IdentityPreview, useCardState } from '../../elements';
+import { Card, Form, Header, IdentityPreview, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router/RouteContext';
 import { handleError, useFormControl } from '../../utils';
@@ -17,6 +17,7 @@ type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
   onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
+  onPasswordPwned?: () => void;
 };
 
 const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
@@ -45,7 +46,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
 };
 
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
-  const { onShowAlternativeMethodsClick } = props;
+  const { onShowAlternativeMethodsClick, onPasswordPwned } = props;
   const card = useCardState();
   const { setActive } = useClerk();
   const signIn = useCoreSignIn();
@@ -81,6 +82,12 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
 
+        if (isPasswordPwnedError(err) && onPasswordPwned) {
+          card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
+          onPasswordPwned();
+          return;
+        }
+
         handleError(err, [passwordControl], card.setError);
       });
   };
@@ -93,8 +100,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
     <Flow.Part part='password'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root gap={1}>
+          <Header.Root showLogo>
             <Header.Title localizationKey={localizationKeys('signIn.password.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.password.subtitle')} />
             <IdentityPreview
@@ -103,13 +109,17 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               onClick={goBack}
             />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
             gap={4}
           >
-            <Form.Root onSubmit={handlePasswordSubmit}>
+            <Form.Root
+              onSubmit={handlePasswordSubmit}
+              gap={8}
+            >
               {/* For password managers */}
               <input
                 readOnly
@@ -126,20 +136,17 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
               </Form.ControlRow>
               <Form.SubmitButton hasArrow />
             </Form.Root>
-          </Flex>
-
-          <Footer.Root>
-            <Footer.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
-              <Footer.ActionLink
+            <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
+              <Card.ActionLink
                 localizationKey={localizationKeys(
                   onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
                 )}
                 onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
               />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+            </Card.Action>
+          </Flex>
         </Card.Content>
+
         <Card.Footer />
       </Card.Root>
     </Flow.Part>

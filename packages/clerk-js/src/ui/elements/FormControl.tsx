@@ -2,7 +2,15 @@ import { titleize } from '@clerk/shared';
 import type { FieldId } from '@clerk/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { descriptors, Flex, FormErrorText, FormInfoText, FormSuccessText, FormWarningText } from '../customizables';
+import {
+  descriptors,
+  Flex,
+  FormErrorText,
+  FormInfoText,
+  FormSuccessText,
+  FormWarningText,
+  useAppearance,
+} from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
@@ -11,10 +19,11 @@ import type { FeedbackType, useFormControlFeedback } from '../utils';
 
 export function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
 
   const getFormTextAnimation = useCallback(
     (enterAnimation: boolean, options?: { inDelay?: boolean }): ThemableCssProp => {
-      if (prefersReducedMotion) {
+      if (prefersReducedMotion || !appearanceAnimations) {
         return {
           animation: 'none',
         };
@@ -26,7 +35,9 @@ export function useFormTextAnimation() {
         animation: `${enterAnimation ? inAnimation : animations.outAnimation} ${t.transitionDuration.$textField} ${
           t.transitionTiming.$common
         }`,
-        transition: `height ${t.transitionDuration.$slow} ${t.transitionTiming.$common}`, // This is expensive but required for a smooth layout shift
+        transitionProperty: 'height',
+        transitionDuration: t.transitionDuration.$slow,
+        transitionTimingFunction: t.transitionTiming.$common,
       });
     },
     [prefersReducedMotion],
@@ -62,10 +73,11 @@ type Feedback = { feedback?: string; feedbackType?: FeedbackType; shouldEnter: b
 export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
   center?: boolean;
+  sx?: ThemableCssProp;
 };
 
 export const FormFeedback = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors, feedback, feedbackType = 'info', center = false } = props;
+  const { id, elementDescriptors, sx, feedback, feedbackType = 'info', center = false } = props;
   const feedbacksRef = useRef<{
     a?: Feedback;
     b?: Feedback;
@@ -153,7 +165,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
         position: 'relative',
       }}
       center={center}
-      sx={[getFormTextAnimation(!!feedback)]}
+      sx={[getFormTextAnimation(!!feedback), sx]}
     >
       <InfoComponentA
         {...getElementProps(feedbacks.a?.feedbackType)}

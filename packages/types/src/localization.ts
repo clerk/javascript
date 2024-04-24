@@ -15,6 +15,7 @@ export type LocalizationResource = DeepPartial<_LocalizationResource>;
 
 type _LocalizationResource = {
   locale: string;
+  maintenanceMode: LocalizationValue;
   /**
    * @experimental
    * Add role keys and their localized value
@@ -47,6 +48,7 @@ type _LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
+  formFieldLabel__passkeyName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -146,11 +148,19 @@ type _LocalizationResource = {
       actionLink__use_phone: LocalizationValue;
       actionLink__use_username: LocalizationValue;
       actionLink__use_email_username: LocalizationValue;
+      actionLink__use_passkey: LocalizationValue;
     };
     password: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
+    };
+    passwordPwned: {
+      title: LocalizationValue;
+    };
+    passkey: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
     forgotPasswordAlternativeMethods: {
       title: LocalizationValue;
@@ -159,22 +169,11 @@ type _LocalizationResource = {
     };
     forgotPassword: {
       title: LocalizationValue;
+      subtitle: LocalizationValue;
       subtitle_email: LocalizationValue;
       subtitle_phone: LocalizationValue;
-      inputLabel: LocalizationValue;
-      resendButton: LocalizationValue;
-      // TODO-RETHEME remove
-      title_email: LocalizationValue;
-      // TODO-RETHEME remove
-      title_phone: LocalizationValue;
-      // TODO-RETHEME remove
-      subtitle: LocalizationValue;
-      // TODO-RETHEME remove
       formTitle: LocalizationValue;
-      // TODO-RETHEME remove
-      formSubtitle_email: LocalizationValue;
-      // TODO-RETHEME remove
-      formSubtitle_phone: LocalizationValue;
+      resendButton: LocalizationValue;
     };
     resetPassword: {
       title: LocalizationValue;
@@ -188,12 +187,8 @@ type _LocalizationResource = {
     emailCode: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      inputLabel: LocalizationValue;
-      resendButton: LocalizationValue;
-      // TODO-RETHEME remove
       formTitle: LocalizationValue;
-      // TODO-RETHEME remove
-      formSubtitle: LocalizationValue;
+      resendButton: LocalizationValue;
     };
     emailLink: {
       title: LocalizationValue;
@@ -229,43 +224,34 @@ type _LocalizationResource = {
     phoneCode: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      inputLabel: LocalizationValue;
       formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
     phoneCodeMfa: {
       title: LocalizationValue;
-      // TODO-RETHEME remove
-      formTitle: LocalizationValue;
-      // TODO-RETHEME remove
-      formSubtitle: LocalizationValue;
       subtitle: LocalizationValue;
-      inputLabel: LocalizationValue;
+      formTitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
     totpMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      inputLabel: LocalizationValue;
       formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
     };
     backupCodeMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      formTitle: LocalizationValue;
-      formSubtitle: LocalizationValue;
     };
     alternativeMethods: {
       title: LocalizationValue;
+      subtitle: LocalizationValue;
       actionLink: LocalizationValue;
       actionText: LocalizationValue;
-      subtitle: LocalizationValue;
       blockButton__emailLink: LocalizationValue;
       blockButton__emailCode: LocalizationValue;
       blockButton__phoneCode: LocalizationValue;
       blockButton__password: LocalizationValue;
+      blockButton__passkey: LocalizationValue;
       blockButton__totp: LocalizationValue;
       blockButton__backupCode: LocalizationValue;
       getHelp: {
@@ -279,17 +265,26 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       message: LocalizationValue;
     };
+    accountSwitcher: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      action__addAccount: LocalizationValue;
+      action__signOutAll: LocalizationValue;
+    };
   };
   userProfile: {
     mobileButton__menu: LocalizationValue;
-    formButtonPrimary__save: LocalizationValue;
-    // TODO-RETHEME remove
     formButtonPrimary__continue: LocalizationValue;
+    formButtonPrimary__save: LocalizationValue;
     formButtonPrimary__finish: LocalizationValue;
+    formButtonPrimary__remove: LocalizationValue;
+    formButtonPrimary__add: LocalizationValue;
     formButtonReset: LocalizationValue;
     navbar: {
       title: LocalizationValue;
       description: LocalizationValue;
+      account: LocalizationValue;
+      security: LocalizationValue;
     };
     start: {
       headerTitle__account: LocalizationValue;
@@ -300,72 +295,51 @@ type _LocalizationResource = {
       };
       usernameSection: {
         title: LocalizationValue;
-        primaryButton__changeUsername: LocalizationValue;
+        primaryButton__updateUsername: LocalizationValue;
         primaryButton__setUsername: LocalizationValue;
       };
       emailAddressesSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        detailsTitle__primary: LocalizationValue;
-        detailsSubtitle__primary: LocalizationValue;
         detailsAction__primary: LocalizationValue;
-        detailsTitle__nonPrimary: LocalizationValue;
-        detailsSubtitle__nonPrimary: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
-        detailsTitle__unverified: LocalizationValue;
-        detailsSubtitle__unverified: LocalizationValue;
         detailsAction__unverified: LocalizationValue;
-        destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
       };
       phoneNumbersSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        detailsTitle__primary: LocalizationValue;
-        detailsSubtitle__primary: LocalizationValue;
         detailsAction__primary: LocalizationValue;
-        detailsTitle__nonPrimary: LocalizationValue;
-        detailsSubtitle__nonPrimary: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
-        detailsTitle__unverified: LocalizationValue;
-        detailsSubtitle__unverified: LocalizationValue;
         detailsAction__unverified: LocalizationValue;
-        destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
       };
       connectedAccountsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        title__connectionFailed: LocalizationValue;
-        title__reauthorize: LocalizationValue;
-        subtitle__reauthorize: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
         actionLabel__reauthorize: LocalizationValue;
+        subtitle__reauthorize: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
-        destructiveActionAccordionSubtitle: LocalizationValue;
       };
       enterpriseAccountsSection: {
         title: LocalizationValue;
       };
       passwordSection: {
         title: LocalizationValue;
-        primaryButton__changePassword: LocalizationValue;
+        primaryButton__updatePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
+      };
+      passkeysSection: {
+        title: LocalizationValue;
+        menuAction__rename: LocalizationValue;
+        menuAction__destructive: LocalizationValue;
       };
       mfaSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         phoneCode: {
-          destructiveActionTitle: LocalizationValue;
-          destructiveActionSubtitle: LocalizationValue;
           destructiveActionLabel: LocalizationValue;
-          title__default: LocalizationValue;
-          title__setDefault: LocalizationValue;
-          subtitle__default: LocalizationValue;
-          subtitle__setDefault: LocalizationValue;
           actionLabel__setDefault: LocalizationValue;
         };
         backupCodes: {
@@ -376,34 +350,21 @@ type _LocalizationResource = {
         };
         totp: {
           headerTitle: LocalizationValue;
-          title: LocalizationValue;
-          subtitle: LocalizationValue;
           destructiveActionTitle: LocalizationValue;
-          destructiveActionSubtitle: LocalizationValue;
-          destructiveActionLabel: LocalizationValue;
         };
       };
       activeDevicesSection: {
         title: LocalizationValue;
-        primaryButton: LocalizationValue;
-        detailsTitle: LocalizationValue;
-        detailsSubtitle: LocalizationValue;
-        destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
       };
       web3WalletsSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
-        destructiveActionTitle: LocalizationValue;
-        destructiveActionSubtitle: LocalizationValue;
         destructiveAction: LocalizationValue;
       };
       dangerSection: {
         title: LocalizationValue;
         deleteAccountButton: LocalizationValue;
-        deleteAccountTitle: LocalizationValue;
-        deleteAccountDescription: LocalizationValue;
       };
     };
     profilePage: {
@@ -411,18 +372,18 @@ type _LocalizationResource = {
       imageFormTitle: LocalizationValue;
       imageFormSubtitle: LocalizationValue;
       imageFormDestructiveActionSubtitle: LocalizationValue;
-      fileDropAreaTitle: LocalizationValue;
-      fileDropAreaAction: LocalizationValue;
       fileDropAreaHint: LocalizationValue;
       readonly: LocalizationValue;
       successMessage: LocalizationValue;
     };
     usernamePage: {
-      title: LocalizationValue;
       successMessage: LocalizationValue;
+      title__set: LocalizationValue;
+      title__update: LocalizationValue;
     };
     emailAddressPage: {
       title: LocalizationValue;
+      verifyTitle: LocalizationValue;
       emailCode: {
         formHint: LocalizationValue;
         formTitle: LocalizationValue;
@@ -444,11 +405,20 @@ type _LocalizationResource = {
         successMessage: LocalizationValue;
       };
     };
+    passkeyScreen: {
+      title__rename: LocalizationValue;
+      subtitle__rename: LocalizationValue;
+      removeResource: {
+        title: LocalizationValue;
+        messageLine1: LocalizationValue;
+      };
+    };
     phoneNumberPage: {
       title: LocalizationValue;
+      verifyTitle: LocalizationValue;
+      verifySubtitle: LocalizationValue;
       successMessage: LocalizationValue;
       infoText: LocalizationValue;
-      infoText__secondary: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;
@@ -482,12 +452,13 @@ type _LocalizationResource = {
       };
     };
     passwordPage: {
-      title: LocalizationValue;
+      successMessage__set: LocalizationValue;
+      successMessage__update: LocalizationValue;
+      successMessage__signOutOfOtherSessions: LocalizationValue;
+      checkboxInfoText__signOutOfOtherSessions: LocalizationValue;
       readonly: LocalizationValue;
-      successMessage: LocalizationValue;
-      changePasswordTitle: LocalizationValue;
-      changePasswordSuccessMessage: LocalizationValue;
-      sessionsSignedOutSuccessMessage: LocalizationValue;
+      title__set: LocalizationValue;
+      title__update: LocalizationValue;
     };
     mfaPage: {
       title: LocalizationValue;
@@ -516,9 +487,12 @@ type _LocalizationResource = {
     mfaPhoneCodePage: {
       title: LocalizationValue;
       primaryButton__addPhoneNumber: LocalizationValue;
+      backButton: LocalizationValue;
       subtitle__availablePhoneNumbers: LocalizationValue;
       subtitle__unavailablePhoneNumbers: LocalizationValue;
-      successMessage: LocalizationValue;
+      successTitle: LocalizationValue;
+      successMessage1: LocalizationValue;
+      successMessage2: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;
@@ -573,38 +547,21 @@ type _LocalizationResource = {
       general: LocalizationValue;
       members: LocalizationValue;
     };
-    general: {
-      title: LocalizationValue;
-      profileSection: {
-        title: LocalizationValue;
-        primaryButton: LocalizationValue;
-        uploadAction__title: LocalizationValue;
-      };
-      domainSection: {
-        title: LocalizationValue;
-        subtitle: LocalizationValue;
-        primaryButton: LocalizationValue;
-        menuAction__verify: LocalizationValue;
-        menuAction__remove: LocalizationValue;
-        menuAction__manage: LocalizationValue;
-        unverifiedDomain_menuAction__verify: LocalizationValue;
-        unverifiedDomain_menuAction__remove: LocalizationValue;
-      };
-    };
-    members: {
-      title: LocalizationValue;
-    };
     badge__unverified: LocalizationValue;
     badge__automaticInvitation: LocalizationValue;
     badge__automaticSuggestion: LocalizationValue;
     badge__manualInvitation: LocalizationValue;
     start: {
       headerTitle__members: LocalizationValue;
-      headerTitle__settings: LocalizationValue;
+      headerTitle__general: LocalizationValue;
+      profileSection: {
+        title: LocalizationValue;
+        primaryButton: LocalizationValue;
+        uploadAction__title: LocalizationValue;
+      };
     };
     profilePage: {
       title: LocalizationValue;
-      subtitle: LocalizationValue;
       successMessage: LocalizationValue;
       dangerSection: {
         title: LocalizationValue;
@@ -612,8 +569,8 @@ type _LocalizationResource = {
           title: LocalizationValue;
           messageLine1: LocalizationValue;
           messageLine2: LocalizationValue;
-          actionDescription: LocalizationValue;
           successMessage: LocalizationValue;
+          actionDescription: LocalizationValue;
         };
         deleteOrganization: {
           title: LocalizationValue;
@@ -627,8 +584,9 @@ type _LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
         primaryButton: LocalizationValue;
-        unverifiedDomain_menuAction__verify: LocalizationValue;
-        unverifiedDomain_menuAction__remove: LocalizationValue;
+        menuAction__verify: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+        menuAction__manage: LocalizationValue;
       };
     };
     createDomainPage: {
@@ -658,7 +616,6 @@ type _LocalizationResource = {
         automaticInvitationOption__description: LocalizationValue;
         automaticSuggestionOption__label: LocalizationValue;
         automaticSuggestionOption__description: LocalizationValue;
-        formButton__save: LocalizationValue;
         calloutInfoLabel: LocalizationValue;
         calloutInvitationCountLabel: LocalizationValue;
         calloutSuggestionCountLabel: LocalizationValue;
@@ -670,18 +627,19 @@ type _LocalizationResource = {
         calloutInfoLabel: LocalizationValue;
       };
     };
-    removeDomainPage: {
-      title: LocalizationValue;
-      messageLine1: LocalizationValue;
-      messageLine2: LocalizationValue;
-      successMessage: LocalizationValue;
-    };
     invitePage: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       successMessage: LocalizationValue;
       detailsTitle__inviteFailed: LocalizationValue;
       formButtonPrimary__continue: LocalizationValue;
+      selectDropdown__role: LocalizationValue;
+    };
+    removeDomainPage: {
+      title: LocalizationValue;
+      messageLine1: LocalizationValue;
+      messageLine2: LocalizationValue;
+      successMessage: LocalizationValue;
     };
     membersPage: {
       detailsTitle__emptyRow: LocalizationValue;
@@ -704,10 +662,6 @@ type _LocalizationResource = {
       };
       invitationsTab: {
         table__emptyRow: LocalizationValue;
-        manualInvitations: {
-          headerTitle: LocalizationValue;
-          headerSubtitle: LocalizationValue;
-        };
         autoInvitations: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
@@ -719,10 +673,6 @@ type _LocalizationResource = {
         menuAction__approve: LocalizationValue;
         menuAction__reject: LocalizationValue;
         table__emptyRow: LocalizationValue;
-        requests: {
-          headerTitle: LocalizationValue;
-          headerSubtitle: LocalizationValue;
-        };
         autoSuggestions: {
           headerTitle: LocalizationValue;
           headerSubtitle: LocalizationValue;
@@ -743,11 +693,11 @@ type _LocalizationResource = {
     title: LocalizationValue;
     titleWithoutPersonal: LocalizationValue;
     subtitle: LocalizationValue;
-    action__createOrganization: LocalizationValue;
     action__invitationAccept: LocalizationValue;
+    invitationAcceptedLabel: LocalizationValue;
     action__suggestionsAccept: LocalizationValue;
     suggestionsAcceptedLabel: LocalizationValue;
-    invitationAcceptedLabel: LocalizationValue;
+    action__createOrganization: LocalizationValue;
   };
   unstable__errors: UnstableErrors;
   dates: {
@@ -768,7 +718,13 @@ type UnstableErrors = WithParamName<{
   form_identifier_not_found: LocalizationValue;
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
+  passkey_not_supported: LocalizationValue;
+  passkey_pa_not_supported: LocalizationValue;
+  passkey_retrieval_cancelled: LocalizationValue;
+  passkey_registration_cancelled: LocalizationValue;
+  passkey_already_exists: LocalizationValue;
   form_password_pwned: LocalizationValue;
+  form_password_pwned__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;
@@ -780,6 +736,9 @@ type UnstableErrors = WithParamName<{
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;
+  form_identifier_exists__email_address: LocalizationValue;
+  form_identifier_exists__username: LocalizationValue;
+  form_identifier_exists__phone_number: LocalizationValue;
   form_password_not_strong_enough: LocalizationValue;
   form_password_size_in_bytes_exceeded: LocalizationValue;
   passwordComplexity: {

@@ -20,13 +20,17 @@
 ·
 [Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://feedback.clerk.com/roadmap)
 ·
 [Ask a Question](https://github.com/clerk/javascript/discussions)
 
 </div>
 
 ---
+
+### ⚠️ Important Notice:
+
+**Clerk officially maintains only the `en-US` (English - United States) locale. All other language translations provided within this package are community contributions.**
 
 ## Overview
 

@@ -3,11 +3,11 @@ import {
   ClientAPI,
   DomainAPI,
   EmailAddressAPI,
-  EmailAPI,
   InvitationAPI,
   OrganizationAPI,
   PhoneNumberAPI,
   RedirectUrlAPI,
+  SamlConnectionAPI,
   SessionAPI,
   SignInTokenAPI,
   UserAPI,
@@ -25,7 +25,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     allowlistIdentifiers: new AllowlistIdentifierAPI(request),
     clients: new ClientAPI(request),
     emailAddresses: new EmailAddressAPI(request),
-    emails: new EmailAPI(request),
     invitations: new InvitationAPI(request),
     organizations: new OrganizationAPI(request),
     phoneNumbers: new PhoneNumberAPI(request),
@@ -34,5 +33,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     signInTokens: new SignInTokenAPI(request),
     users: new UserAPI(request),
     domains: new DomainAPI(request),
+    samlConnections: new SamlConnectionAPI(request),
   };
 }

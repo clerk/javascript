@@ -31,7 +31,7 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
     },
   });
   const card = useCardState();
-  const { t, locale } = useLocalizations();
+  const { t, locale, translateError } = useLocalizations();
   const [isValidUnsubmittedEmail, setIsValidUnsubmittedEmail] = useState(false);
 
   const validateUnsubmittedEmail = (value: string) => setIsValidUnsubmittedEmail(isEmail(value));
@@ -70,6 +70,9 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canSubmit) {
+      return;
+    }
 
     const submittedData = new FormData(e.currentTarget);
     return organization
@@ -96,6 +99,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
               }),
             ),
           );
+        } else if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_param_format_invalid') {
+          card.setError(translateError(err.errors[0]));
         } else {
           handleError(err, [], card.setError);
         }
@@ -135,7 +140,6 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
           <Form.SubmitButton
             block={false}
             isDisabled={!canSubmit}
-            hasArrow
             localizationKey={localizationKeys('organizationProfile.invitePage.formButtonPrimary__continue')}
           />
           <Form.ResetButton
@@ -152,6 +156,8 @@ export const InviteMembersForm = (props: InviteMembersFormProps) => {
 const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
   const { options, isLoading } = useFetchRoles();
 
+  const { t } = useLocalizations();
+
   return (
     <Form.ControlRow elementId={field.id}>
       <Flex
@@ -163,8 +169,9 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
           roles={options}
           isDisabled={isLoading}
           onChange={value => field.setValue(value)}
-          triggerSx={t => ({ width: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
+          triggerSx={t => ({ minWidth: t.sizes.$40, justifyContent: 'space-between', display: 'flex' })}
           optionListSx={t => ({ minWidth: t.sizes.$48 })}
+          prefixLocalizationKey={`${t(localizationKeys('formFieldLabel__role'))}:`}
         />
       </Flex>
     </Form.ControlRow>

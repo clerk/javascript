@@ -3,7 +3,7 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
-import { decodeJwt } from '../jwt';
+import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidSecretKey } from '../util/assertValidSecretKey';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
@@ -74,16 +74,25 @@ export async function authenticateRequest(
     assertProxyUrlOrDomain(authenticateContext.proxyUrl || authenticateContext.domain);
   }
 
+  function removeDevBrowserFromURL(url: URL) {
+    const updatedURL = new URL(url);
+
+    updatedURL.searchParams.delete(constants.QueryParameters.DevBrowser);
+    // Remove legacy dev browser query param key to support local app with v5 using AP with v4
+    updatedURL.searchParams.delete(constants.QueryParameters.LegacyDevBrowser);
+
+    return updatedURL;
+  }
+
   function buildRedirectToHandshake() {
-    const redirectUrl = new URL(authenticateContext.clerkUrl);
-    redirectUrl.searchParams.delete('__clerk_db_jwt');
+    const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = pk.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
 
     if (pk?.instanceType === 'development' && authenticateContext.devBrowserToken) {
-      url.searchParams.append('__clerk_db_jwt', authenticateContext.devBrowserToken);
+      url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
     }
 
     return new Headers({ location: url.href });
@@ -101,15 +110,15 @@ export async function authenticateRequest(
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
       headers.append('Set-Cookie', x);
-      if (x.startsWith('__session=')) {
+      if (x.startsWith(`${constants.Cookies.Session}=`)) {
         sessionToken = x.split(';')[0].substring(10);
       }
     });
 
     if (instanceType === 'development') {
       const newUrl = new URL(authenticateContext.clerkUrl);
-      newUrl.searchParams.delete('__clerk_handshake');
-      newUrl.searchParams.delete('__clerk_help');
+      newUrl.searchParams.delete(constants.QueryParameters.Handshake);
+      newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
       headers.append('Location', newUrl.toString());
     }
 
@@ -117,15 +126,15 @@ export async function authenticateRequest(
       return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
     }
 
-    const { data, error } = await verifyToken(sessionToken, authenticateContext);
+    const { data, errors: [error] = [] } = await verifyToken(sessionToken, authenticateContext);
     if (data) {
-      return signedIn(authenticateContext, data, headers);
+      return signedIn(authenticateContext, data, headers, sessionToken);
     }
 
     if (
       instanceType === 'development' &&
-      (error.reason === TokenVerificationErrorReason.TokenExpired ||
-        error.reason === TokenVerificationErrorReason.TokenNotActiveYet)
+      (error?.reason === TokenVerificationErrorReason.TokenExpired ||
+        error?.reason === TokenVerificationErrorReason.TokenNotActiveYet)
     ) {
       error.tokenCarrier = 'cookie';
       // This probably means we're dealing with clock skew
@@ -140,12 +149,12 @@ ${error.getFullMessage()}`,
       );
 
       // Retry with a generous clock skew allowance (1 day)
-      const { data: retryResult, error: retryError } = await verifyToken(sessionToken, {
+      const { data: retryResult, errors: [retryError] = [] } = await verifyToken(sessionToken, {
         ...authenticateContext,
         clockSkewInMs: 86_400_000,
       });
       if (retryResult) {
-        return signedIn(authenticateContext, retryResult, headers);
+        return signedIn(authenticateContext, retryResult, headers, sessionToken);
       }
 
       throw retryError;
@@ -180,12 +189,12 @@ ${error.getFullMessage()}`,
     const { sessionTokenInHeader } = authenticateContext;
 
     try {
-      const { data, error } = await verifyToken(sessionTokenInHeader!, authenticateContext);
-      if (error) {
-        throw error;
+      const { data, errors } = await verifyToken(sessionTokenInHeader!, authenticateContext);
+      if (errors) {
+        throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data);
+      return await signedIn(authenticateContext, data, undefined, sessionTokenInHeader!);
     } catch (err) {
       return handleError(err, 'header');
     }
@@ -194,6 +203,7 @@ ${error.getFullMessage()}`,
   async function authenticateRequestWithTokenInCookie() {
     const hasActiveClient = authenticateContext.clientUat;
     const hasSessionToken = !!authenticateContext.sessionTokenInCookie;
+    const hasDevBrowserToken = !!authenticateContext.devBrowserToken;
 
     const isRequestEligibleForMultiDomainSync =
       authenticateContext.isSatellite &&
@@ -204,7 +214,32 @@ ${error.getFullMessage()}`,
      * If we have a handshakeToken, resolve the handshake and attempt to return a definitive signed in or signed out state.
      */
     if (authenticateContext.handshakeToken) {
-      return resolveHandshake();
+      try {
+        return await resolveHandshake();
+      } catch (error) {
+        // If for some reason the handshake token is invalid or stale, we ignore it and continue trying to authenticate the request.
+        // Worst case, the handshake will trigger again and return a refreshed token.
+        if (error instanceof TokenVerificationError) {
+          if (instanceType === 'development') {
+            if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
+              throw new Error(
+                `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`,
+              );
+            }
+
+            throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
+          }
+
+          if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
+            // Avoid infinite redirect loops due to incorrect secret-keys
+            return signedOut(
+              authenticateContext,
+              AuthErrorReason.UnexpectedError,
+              `Clerk: Handshake token verification failed with "${error.reason}"`,
+            );
+          }
+        }
+      }
     }
 
     /**
@@ -241,7 +276,7 @@ ${error.getFullMessage()}`,
       constants.QueryParameters.ClerkRedirectUrl,
     );
     if (instanceType === 'development' && !authenticateContext.isSatellite && redirectUrl) {
-      // Dev MD sync from primary, redirect back to satellite w/ __clerk_db_jwt
+      // Dev MD sync from primary, redirect back to satellite w/ dev browser query param
       const redirectBackToSatelliteUrl = new URL(redirectUrl);
 
       if (authenticateContext.devBrowserToken) {
@@ -259,6 +294,10 @@ ${error.getFullMessage()}`,
      * End multi-domain sync flows
      */
 
+    if (instanceType === 'development' && !hasDevBrowserToken) {
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserMissing, '');
+    }
+
     if (!hasActiveClient && !hasSessionToken) {
       return signedOut(authenticateContext, AuthErrorReason.SessionTokenAndUATMissing, '');
     }
@@ -272,9 +311,9 @@ ${error.getFullMessage()}`,
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ClientUATWithoutSessionToken, '');
     }
 
-    const { data: decodeResult, error: decodedError } = decodeJwt(authenticateContext.sessionTokenInCookie!);
-    if (decodedError) {
-      return handleError(decodedError, 'cookie');
+    const { data: decodeResult, errors: decodedErrors } = decodeJwt(authenticateContext.sessionTokenInCookie!);
+    if (decodedErrors) {
+      return handleError(decodedErrors[0], 'cookie');
     }
 
     if (decodeResult.payload.iat < authenticateContext.clientUat) {
@@ -282,12 +321,12 @@ ${error.getFullMessage()}`,
     }
 
     try {
-      const { data, error } = await verifyToken(authenticateContext.sessionTokenInCookie!, authenticateContext);
-      if (error) {
-        throw error;
+      const { data, errors } = await verifyToken(authenticateContext.sessionTokenInCookie!, authenticateContext);
+      if (errors) {
+        throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data);
+      return await signedIn(authenticateContext, data, undefined, authenticateContext.sessionTokenInCookie!);
     } catch (err) {
       return handleError(err, 'cookie');
     }

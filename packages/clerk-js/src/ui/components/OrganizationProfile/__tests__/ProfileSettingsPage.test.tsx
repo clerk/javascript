@@ -1,22 +1,26 @@
 import type { OrganizationResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import React from 'react';
 
 import { render } from '../../../../testUtils';
-import { ProfileSection } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { ProfileForm } from '../ProfileForm';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
-//TODO-RETHEME
-describe.skip('ProfileSettingsPage', () => {
+describe('OrganizationProfileScreen', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
-    const { getByDisplayValue } = render(<ProfileSection />, { wrapper });
+    const { getByDisplayValue } = render(
+      <ProfileForm
+        onSuccess={jest.fn()}
+        onReset={jest.fn()}
+      />,
+      { wrapper },
+    );
     expect(getByDisplayValue('Org1')).toBeDefined();
   });
 
@@ -29,10 +33,16 @@ describe.skip('ProfileSettingsPage', () => {
       });
     });
 
-    const { getByLabelText, userEvent, getByRole } = render(<ProfileSection />, { wrapper });
-    expect(getByRole('button', { name: 'Continue' })).toBeDisabled();
-    await userEvent.type(getByLabelText('Organization name'), '2');
-    expect(getByRole('button', { name: 'Continue' })).not.toBeDisabled();
+    const { getByLabelText, userEvent, getByRole } = render(
+      <ProfileForm
+        onSuccess={jest.fn()}
+        onReset={jest.fn()}
+      />,
+      { wrapper },
+    );
+    expect(getByRole('button', { name: /save/i })).toBeDisabled();
+    await userEvent.type(getByLabelText(/^name/i), 'another name');
+    expect(getByRole('button', { name: /save/i })).not.toBeDisabled();
   });
 
   it('updates organization name on clicking continue', async () => {
@@ -45,10 +55,16 @@ describe.skip('ProfileSettingsPage', () => {
     });
 
     fixtures.clerk.organization?.update.mockResolvedValue({} as OrganizationResource);
-    const { getByDisplayValue, getByLabelText, userEvent, getByRole } = render(<ProfileSection />, { wrapper });
-    await userEvent.type(getByLabelText('Organization name'), '234');
+    const { getByDisplayValue, getByLabelText, userEvent, getByRole } = render(
+      <ProfileForm
+        onSuccess={jest.fn()}
+        onReset={jest.fn()}
+      />,
+      { wrapper },
+    );
+    await userEvent.type(getByLabelText(/^name/i), '234');
     expect(getByDisplayValue('Org1234')).toBeDefined();
-    await userEvent.click(getByRole('button', { name: 'Continue' }));
+    await userEvent.click(getByRole('button', { name: /save/i }));
     expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1234', slug: '' });
   });
 
@@ -62,24 +78,16 @@ describe.skip('ProfileSettingsPage', () => {
     });
 
     fixtures.clerk.organization?.update.mockResolvedValue({} as OrganizationResource);
-    const { getByDisplayValue, getByLabelText, userEvent, getByRole } = render(<ProfileSection />, { wrapper });
-    await userEvent.type(getByLabelText('Slug URL'), 'my-org');
+    const { getByDisplayValue, getByLabelText, userEvent, getByRole } = render(
+      <ProfileForm
+        onSuccess={jest.fn()}
+        onReset={jest.fn()}
+      />,
+      { wrapper },
+    );
+    await userEvent.type(getByLabelText(/^slug$/i), 'my-org');
     expect(getByDisplayValue('my-org')).toBeDefined();
-    await userEvent.click(getByRole('button', { name: 'Continue' }));
+    await userEvent.click(getByRole('button', { name: /save$/i }));
     expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1', slug: 'my-org' });
-  });
-
-  it('opens file drop area to update organization logo on clicking "Upload image"', async () => {
-    const { wrapper } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
-        organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
-      });
-    });
-
-    const { userEvent, getByRole } = render(<ProfileSection />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Upload image' }));
-    expect(getByRole('button', { name: 'Select file' })).toBeDefined();
   });
 });

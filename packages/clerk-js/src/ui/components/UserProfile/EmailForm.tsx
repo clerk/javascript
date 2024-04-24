@@ -4,9 +4,9 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { localizationKeys, Text } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { emailLinksEnabledForInstance } from './utils';
 import { VerifyWithCode } from './VerifyWithCode';
@@ -17,7 +17,6 @@ type EmailFormProps = FormProps & {
 };
 export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
   const { emailId: id, onSuccess, onReset } = props;
-  const title = localizationKeys('userProfile.emailAddressPage.title');
   const card = useCardState();
   const { user } = useUser();
   const environment = useEnvironment();
@@ -51,7 +50,14 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent headerTitle={title}>
+      <FormContainer
+        headerTitle={localizationKeys('userProfile.emailAddressPage.title')}
+        headerSubtitle={
+          preferEmailLinks
+            ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
+            : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
+        }
+      >
         <Form.Root onSubmit={addEmail}>
           <Form.ControlRow elementId={emailField.id}>
             <Form.PlainInput
@@ -59,26 +65,31 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
               autoFocus
             />
           </Form.ControlRow>
-          <Text
-            localizationKey={
-              preferEmailLinks
-                ? localizationKeys('userProfile.emailAddressPage.emailLink.formHint')
-                : localizationKeys('userProfile.emailAddressPage.emailCode.formHint')
-            }
-          />
           <FormButtons
+            submitLabel={localizationKeys('userProfile.formButtonPrimary__add')}
             isDisabled={!canSubmit}
             onReset={onReset}
           />
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
-      <FormContent headerTitle={title}>
+      <FormContainer
+        headerTitle={localizationKeys('userProfile.emailAddressPage.verifyTitle')}
+        headerSubtitle={
+          preferEmailLinks
+            ? localizationKeys('userProfile.emailAddressPage.emailLink.formSubtitle', {
+                identifier: emailAddressRef.current?.emailAddress,
+              })
+            : localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', {
+                identifier: emailAddressRef.current?.emailAddress,
+              })
+        }
+      >
         {preferEmailLinks ? (
           <VerifyWithLink
             nextStep={onSuccess}
             email={emailAddressRef.current as any}
-            onReset={wizard.prevStep}
+            onReset={onReset}
           />
         ) : (
           <VerifyWithCode
@@ -86,10 +97,10 @@ export const EmailForm = withCardStateProvider((props: EmailFormProps) => {
             identification={emailAddressRef.current}
             identifier={emailAddressRef.current?.emailAddress}
             prepareVerification={() => emailAddressRef.current?.prepareVerification({ strategy: 'email_code' })}
-            onReset={wizard.prevStep}
+            onReset={onReset}
           />
         )}
-      </FormContent>
+      </FormContainer>
     </Wizard>
   );
 });

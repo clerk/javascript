@@ -20,12 +20,10 @@ export const FormButtons = (props: FormButtonsProps) => {
       <Form.SubmitButton
         block={false}
         isDisabled={isDisabled}
-        // TODO-RETHEME Should the default key come from userProfile?
         localizationKey={submitLabel || localizationKeys('userProfile.formButtonPrimary__save')}
         {...rest}
       />
       <Form.ResetButton
-        // TODO-RETHEME Should the default key come from userProfile?
         localizationKey={resetLabel || localizationKeys('userProfile.formButtonReset')}
         block={false}
         onClick={onReset || navigateToFlowStart}
@@ -40,7 +38,6 @@ export const FormButtonContainer = (props: PropsOfComponent<typeof Flex>) => {
       direction={'rowReverse'}
       gap={2}
       {...props}
-      sx={[theme => ({ marginTop: theme.space.$1 }), props.sx]}
     >
       {props.children}
     </Flex>

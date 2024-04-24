@@ -6,14 +6,14 @@ import { Flex } from './Flex';
 const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     padding: `${theme.space.$3} ${theme.space.$4}`,
-    backgroundColor: theme.colors.$blackAlpha50,
+    backgroundColor: theme.colors.$neutralAlpha50,
     ...common.borderVariants(theme).normal,
   },
   variants: {
     colorScheme: {
       danger: {
         color: theme.colors.$danger500,
-        backgroundColor: theme.colors.$danger50,
+        backgroundColor: theme.colors.$dangerAlpha50,
         ...common.borderVariants(theme, {
           hasError: true,
         }).normal,

@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
-import { Col, descriptors, Flex, Flow, Link, localizationKeys, useAppearance } from '../customizables';
+import { Col, Flex, Flow, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
-import { animations } from '../styledSystem';
+import { animations, common } from '../styledSystem';
+import { colors } from '../utils';
 import { Card } from '.';
-import { PoweredByClerkTag } from './PoweredByClerk';
 
 const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Content>>((props, ref) => {
   return (
@@ -17,8 +17,9 @@ const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof
           width: t.sizes.$94,
           maxWidth: `calc(100vw - ${t.sizes.$8})`,
           zIndex: t.zIndices.$modal,
-          borderRadius: t.radii.$lg,
-          animation: `${animations.dropdownSlideInScaleAndFade} 140ms `,
+          borderRadius: t.radii.$xl,
+          animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$fast}`,
+          outline: 'none',
         })}
       >
         {props.children}
@@ -37,6 +38,10 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
           backgroundColor: t.colors.$colorBackground,
           overflow: 'hidden',
           borderRadius: t.radii.$lg,
+          zIndex: t.zIndices.$card,
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$neutralAlpha50,
           boxShadow: t.shadows.$cardContentShadow,
         }),
         sx,
@@ -51,76 +56,46 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
 const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
   const { sx, children, ...rest } = props;
   const { branded } = useEnvironment().displayConfig;
-  const { privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
-  const shouldShow = branded || privacyPageUrl || termsPageUrl;
-
-  if (!shouldShow) {
-    return null;
-  }
+  const { privacyPageUrl, termsPageUrl, helpPageUrl } = useAppearance().parsedLayout;
+  const shouldShowTagOrLinks = branded || privacyPageUrl || termsPageUrl || helpPageUrl;
 
   return (
     <Col
       justify='between'
       sx={[
-        {
+        t => ({
+          background: common.mergedColorsBackground(
+            colors.setAlpha(t.colors.$colorBackground, 1),
+            t.colors.$neutralAlpha50,
+          ),
+          marginTop: `-${t.space.$2}`,
+          paddingTop: t.space.$2,
           borderBottomLeftRadius: 'inherit',
           borderBottomRightRadius: 'inherit',
           '&:empty': {
-            padding: '0',
+            padding: 0,
+            marginTop: 0,
           },
-        },
+          '>:not(:first-of-type)': {
+            padding: `${t.space.$4} ${t.space.$8}`,
+            borderTopWidth: t.borderWidths.$normal,
+            borderTopStyle: t.borderStyles.$solid,
+            borderTopColor: t.colors.$neutralAlpha100,
+          },
+        }),
         sx,
       ]}
       {...rest}
     >
       {children}
-      <PoweredByClerkTag sx={t => ({ padding: `${t.space.$4} 0` })} />
-      <PopoverCardLinks />
+
+      {shouldShowTagOrLinks && (
+        <Card.ClerkAndPagesTag
+          withFooterPages
+          sx={t => ({ padding: `${t.space.$4} ${t.space.$8}` })}
+        />
+      )}
     </Col>
-  );
-};
-
-const PopoverCardLink = (props: PropsOfComponent<typeof Link>) => {
-  return (
-    <Link
-      colorScheme='neutral'
-      isExternal
-      {...props}
-    />
-  );
-};
-
-const PopoverCardLinks = (props: PropsOfComponent<typeof Flex>) => {
-  const { sx, ...rest } = props;
-  const { privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
-
-  if (!termsPageUrl && !privacyPageUrl) {
-    return null;
-  }
-
-  return (
-    <Flex
-      gap={4}
-      sx={sx}
-      {...rest}
-    >
-      {termsPageUrl && (
-        <PopoverCardLink
-          localizationKey={localizationKeys('footerPageLink__terms')}
-          elementDescriptor={descriptors.userButtonPopoverFooterPagesLink}
-          elementId={descriptors.userButtonPopoverFooterPagesLink.setId('terms')}
-          href={termsPageUrl}
-        />
-      )}
-      {privacyPageUrl && (
-        <PopoverCardLink
-          localizationKey={localizationKeys('footerPageLink__privacy')}
-          elementDescriptor={descriptors.userButtonPopoverFooterPagesLink}
-          elementId={descriptors.userButtonPopoverFooterPagesLink.setId('privacy')}
-          href={privacyPageUrl}
-        />
-      )}
-    </Flex>
   );
 };
 

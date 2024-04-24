@@ -15,6 +15,7 @@ import type {
   GetUserOrganizationSuggestionsParams,
   ImageResource,
   OrganizationMembershipResource,
+  PasskeyResource,
   PhoneNumberResource,
   RemoveUserPasswordParams,
   SamlAccountResource,
@@ -41,6 +42,7 @@ import {
   Image,
   OrganizationMembership,
   OrganizationSuggestion,
+  Passkey,
   PhoneNumber,
   SamlAccount,
   SessionWithActivities,
@@ -59,6 +61,7 @@ export class User extends BaseResource implements UserResource {
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
+  passkeys: PasskeyResource[] = [];
 
   samlAccounts: SamlAccountResource[] = [];
 
@@ -122,6 +125,10 @@ export class User extends BaseResource implements UserResource {
       },
       this.path() + '/email_addresses/',
     ).create();
+  };
+
+  createPasskey = (): Promise<PasskeyResource> => {
+    return Passkey.registerPasskey();
   };
 
   createPhoneNumber = (params: CreatePhoneNumberParams): Promise<PhoneNumberResource> => {
@@ -326,6 +333,8 @@ export class User extends BaseResource implements UserResource {
     this.externalAccounts = (data.external_accounts || []).map(
       ea => new ExternalAccount(ea, this.path() + '/external_accounts'),
     );
+
+    this.passkeys = (data.passkeys || []).map(passkey => new Passkey(passkey));
 
     this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
 

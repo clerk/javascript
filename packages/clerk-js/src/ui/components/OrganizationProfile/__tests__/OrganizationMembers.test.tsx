@@ -37,8 +37,8 @@ describe('OrganizationMembers', () => {
     expect(getByRole('heading', { name: /members/i })).toBeInTheDocument();
 
     // Tabs
-    expect(getByRole('tab', { name: 'Members' })).toBeInTheDocument();
-    expect(getByRole('tab', { name: 'Invitations' })).toBeInTheDocument();
+    expect(getByRole('tab', { name: /Members/i })).toBeInTheDocument();
+    expect(getByRole('tab', { name: /Invitations/i })).toBeInTheDocument();
   });
 
   it('shows requests if domains is turned on', async () => {
@@ -54,7 +54,7 @@ describe('OrganizationMembers', () => {
 
     await waitForLoadingCompleted(container);
 
-    expect(getByRole('tab', { name: 'Requests' })).toBeInTheDocument();
+    expect(getByRole('tab', { name: /Requests/i })).toBeInTheDocument();
   });
 
   it('shows an invite button inside invitations tab if the current user is an admin', async () => {
@@ -67,7 +67,7 @@ describe('OrganizationMembers', () => {
 
     const { getByRole, findByText } = render(<OrganizationMembers />, { wrapper });
 
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
+    await userEvent.click(getByRole('tab', { name: /Invitations/i }));
     expect(await findByText('Invited')).toBeInTheDocument();
     expect(getByRole('button', { name: 'Invite' })).toBeInTheDocument();
   });
@@ -87,9 +87,9 @@ describe('OrganizationMembers', () => {
 
     await waitForLoadingCompleted(container);
 
-    expect(queryByRole('tab', { name: 'Members' })).toBeInTheDocument();
-    expect(queryByRole('tab', { name: 'Invitations' })).not.toBeInTheDocument();
-    expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
+    expect(queryByRole('tab', { name: /Members/i })).toBeInTheDocument();
+    expect(queryByRole('tab', { name: /Invitations/i })).not.toBeInTheDocument();
+    expect(queryByRole('tab', { name: /Requests/i })).not.toBeInTheDocument();
   });
 
   it('does not show members tab or navbar route if user is lacking permissions', async () => {
@@ -108,26 +108,6 @@ describe('OrganizationMembers', () => {
     expect(queryByRole('tab', { name: 'Members' })).not.toBeInTheDocument();
     expect(queryByRole('tab', { name: 'Invitations' })).not.toBeInTheDocument();
     expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
-  });
-
-  it('shows the invite screen when user clicks on Invite button', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
-    });
-
-    fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
-
-    const { container, getByRole } = render(<OrganizationMembers />, { wrapper });
-
-    await waitForLoadingCompleted(container);
-
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
-    await userEvent.click(getByRole('button', { name: 'Invite' }));
-
-    await waitFor(() => {
-      screen.getByRole('heading', { name: /invite new members/i });
-    });
   });
 
   it('lists all the members of the Organization', async () => {
@@ -215,7 +195,7 @@ describe('OrganizationMembers', () => {
     await waitForLoadingCompleted(container);
 
     expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-    expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
     expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
 
     expect(queryByText('test_user1')).toBeInTheDocument();
@@ -252,7 +232,7 @@ describe('OrganizationMembers', () => {
     await waitForLoadingCompleted(container);
 
     expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-    expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalled();
     expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
 
     await userEvent.click(getByLabelText(/next/i));
@@ -263,7 +243,7 @@ describe('OrganizationMembers', () => {
     });
   });
 
-  it('display pagination counts for 1 page', async () => {
+  it('dont display pagination counts for 1 page', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
@@ -281,14 +261,12 @@ describe('OrganizationMembers', () => {
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
-    const { container, getByText, getByLabelText } = render(<OrganizationMembers />, { wrapper });
+    const { container, queryByText, queryByLabelText } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
 
-    const pagination = getByText(/displaying/i).closest('p');
-    expect(pagination?.textContent).toEqual('Displaying 1 – 5 of 5');
-
-    expect(getByLabelText(/next/i)).toBeDisabled();
+    expect(queryByText(/displaying/i)).not.toBeInTheDocument();
+    expect(queryByLabelText(/next/i)).not.toBeInTheDocument();
   });
 
   // TODO: Bring this test back once we can determine the last admin by permissions.
@@ -400,7 +378,7 @@ describe('OrganizationMembers', () => {
     const { container, getByRole, getByText, findByText } = render(<OrganizationMembers />, { wrapper });
 
     await waitForLoadingCompleted(container);
-    await userEvent.click(getByRole('tab', { name: 'Invitations' }));
+    await userEvent.click(getByRole('tab', { name: /Invitations/i }));
 
     expect(await findByText('admin1@clerk.com')).toBeInTheDocument();
     expect(getByText('Admin')).toBeInTheDocument();
@@ -454,7 +432,7 @@ describe('OrganizationMembers', () => {
     const { queryByText, getByRole } = render(<OrganizationMembers />, { wrapper });
 
     await waitFor(async () => {
-      await userEvent.click(getByRole('tab', { name: 'Requests' }));
+      await userEvent.click(getByRole('tab', { name: /Requests/i }));
     });
 
     expect(fixtures.clerk.organization?.getMembershipRequests).toHaveBeenCalledWith({
@@ -495,5 +473,56 @@ describe('OrganizationMembers', () => {
 
     expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
     expect(getByText('You')).toBeInTheDocument();
+  });
+
+  describe('InviteMembersScreen', () => {
+    it('shows the invite screen when user clicks on Invite button', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+      const { container, getByRole } = render(<OrganizationMembers />, { wrapper });
+
+      await waitForLoadingCompleted(container);
+
+      await userEvent.click(getByRole('button', { name: 'Invite' }));
+
+      await waitFor(() => {
+        screen.getByRole('heading', { name: /invite new members/i });
+      });
+    });
+
+    it('hides the invite screen when user clicks cancel button', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', role: 'admin' }],
+        });
+      });
+
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+
+      const { container, getByRole, queryByRole, findByRole } = render(<OrganizationMembers />, { wrapper });
+
+      await waitForLoadingCompleted(container);
+
+      const inviteButton = queryByRole('button', { name: 'Invite' });
+      await userEvent.click(inviteButton!);
+      await waitFor(async () =>
+        expect(await findByRole('heading', { name: /invite new members/i })).toBeInTheDocument(),
+      );
+      expect(inviteButton).not.toBeInTheDocument();
+      await userEvent.click(getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(async () => expect(await findByRole('button', { name: 'Invite' })).toBeInTheDocument());
+      expect(queryByRole('heading', { name: /invite new members/i })).not.toBeInTheDocument();
+    });
   });
 });

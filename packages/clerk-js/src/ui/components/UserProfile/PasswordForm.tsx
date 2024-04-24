@@ -8,7 +8,7 @@ import {
   Form,
   FormButtonContainer,
   FormButtons,
-  FormContent,
+  FormContainer,
   InformationBox,
   useCardState,
   withCardStateProvider,
@@ -20,13 +20,13 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
   const localizedTexts = [];
 
   if (userHasPassword) {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.changePasswordSuccessMessage'));
+    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage__update'));
   } else {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage'));
+    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage__set'));
   }
 
   if (sessionSignOut) {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.sessionsSignedOutSuccessMessage'));
+    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage__signOutOfOtherSessions'));
   }
 
   return localizedTexts;
@@ -43,15 +43,15 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
 
   const { session } = useSession();
   const title = user.passwordEnabled
-    ? localizationKeys('userProfile.passwordPage.changePasswordTitle')
-    : localizationKeys('userProfile.passwordPage.title');
+    ? localizationKeys('userProfile.passwordPage.title__update')
+    : localizationKeys('userProfile.passwordPage.title__set');
   const card = useCardState();
 
   const passwordEditDisabled = user.samlAccounts.some(sa => sa.active);
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
-    title: localizationKeys('userProfile.passwordPage.title'),
+    title: localizationKeys('userProfile.passwordPage.title__set'),
   });
 
   const currentPasswordField = useFormControl('currentPassword', '', {
@@ -112,8 +112,8 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
     try {
       successPagePropsRef.current = {
         title: user.passwordEnabled
-          ? localizationKeys('userProfile.passwordPage.changePasswordTitle')
-          : localizationKeys('userProfile.passwordPage.title'),
+          ? localizationKeys('userProfile.passwordPage.title__update')
+          : localizationKeys('userProfile.passwordPage.title__set'),
         text: generateSuccessPageText(user.passwordEnabled, !!sessionsField.checked),
       };
 
@@ -125,7 +125,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   };
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
 
       <Form.Root
@@ -135,6 +135,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         {/* For password managers */}
         <input
           readOnly
+          data-testid='hidden-identifier'
           id='identifier-field'
           name='identifier'
           value={session?.publicUserData.identifier || ''}
@@ -176,8 +177,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         <Form.ControlRow elementId={sessionsField.id}>
           <Form.Checkbox
             {...sessionsField.props}
-            //TODO: localize this
-            description={'It is advised to logout of all other devices that may user an old password'}
+            description={localizationKeys('userProfile.passwordPage.checkboxInfoText__signOutOfOtherSessions')}
             isDisabled={passwordEditDisabled}
           />
         </Form.ControlRow>
@@ -196,6 +196,6 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
           />
         )}
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

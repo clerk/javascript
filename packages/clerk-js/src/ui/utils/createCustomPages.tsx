@@ -1,5 +1,4 @@
-import { isDevelopmentEnvironment } from '@clerk/shared';
-import type { CustomPage } from '@clerk/types';
+import type { CustomPage, LoadedClerk } from '@clerk/types';
 
 import { isValidUrl } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
@@ -7,6 +6,7 @@ import type { NavbarRoute } from '../elements';
 import { Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
+import { isDevelopmentSDK } from './runtimeEnvironment';
 
 export type CustomPageContent = {
   url: string;
@@ -47,39 +47,43 @@ type CreateCustomPagesParams = {
   excludedPathsFromDuplicateWarning: string[];
 };
 
-export const createUserProfileCustomPages = (customPages: CustomPage[]) => {
-  return createCustomPages({
-    customPages,
-    getDefaultRoutes: getUserProfileDefaultRoutes,
-    setFirstPathToRoot: setFirstPathToUserProfileRoot,
-    excludedPathsFromDuplicateWarning: [],
-  });
+export const createUserProfileCustomPages = (customPages: CustomPage[], clerk: LoadedClerk) => {
+  return createCustomPages(
+    {
+      customPages,
+      getDefaultRoutes: getUserProfileDefaultRoutes,
+      setFirstPathToRoot: setFirstPathToUserProfileRoot,
+      excludedPathsFromDuplicateWarning: [],
+    },
+    clerk,
+  );
 };
 
-export const createOrganizationProfileCustomPages = (customPages: CustomPage[]) => {
-  return createCustomPages({
-    customPages,
-    getDefaultRoutes: getOrganizationProfileDefaultRoutes,
-    setFirstPathToRoot: setFirstPathToOrganizationProfileRoot,
-    excludedPathsFromDuplicateWarning: [],
-  });
+export const createOrganizationProfileCustomPages = (customPages: CustomPage[], clerk: LoadedClerk) => {
+  return createCustomPages(
+    {
+      customPages,
+      getDefaultRoutes: getOrganizationProfileDefaultRoutes,
+      setFirstPathToRoot: setFirstPathToOrganizationProfileRoot,
+      excludedPathsFromDuplicateWarning: [],
+    },
+    clerk,
+  );
 };
 
-const createCustomPages = ({
-  customPages,
-  getDefaultRoutes,
-  setFirstPathToRoot,
-  excludedPathsFromDuplicateWarning,
-}: CreateCustomPagesParams) => {
+const createCustomPages = (
+  { customPages, getDefaultRoutes, setFirstPathToRoot, excludedPathsFromDuplicateWarning }: CreateCustomPagesParams,
+  clerk: LoadedClerk,
+) => {
   const { INITIAL_ROUTES, pageToRootNavbarRouteMap, validReorderItemLabels } = getDefaultRoutes();
 
-  if (isDevelopmentEnvironment()) {
+  if (isDevelopmentSDK(clerk)) {
     checkForDuplicateUsageOfReorderingItems(customPages, validReorderItemLabels);
   }
 
   const validCustomPages = customPages.filter(cp => {
     if (!isValidPageItem(cp, validReorderItemLabels)) {
-      if (isDevelopmentEnvironment()) {
+      if (isDevelopmentSDK(clerk)) {
         console.error('Clerk: Invalid custom page data: ', cp);
       }
       return false;
@@ -96,7 +100,7 @@ const createCustomPages = ({
 
   const routes = setFirstPathToRoot(allRoutes);
 
-  if (isDevelopmentEnvironment()) {
+  if (isDevelopmentSDK(clerk)) {
     warnForDuplicatePaths(routes, excludedPathsFromDuplicateWarning);
   }
 
@@ -236,13 +240,13 @@ const assertExternalLinkAsRoot = (routes: NavbarRoute[]) => {
 const getUserProfileDefaultRoutes = (): GetDefaultRoutesReturnType => {
   const INITIAL_ROUTES: NavbarRoute[] = [
     {
-      name: localizationKeys('userProfile.start.headerTitle__account'),
+      name: localizationKeys('userProfile.navbar.account'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.ACCOUNT,
       icon: User,
       path: 'account',
     },
     {
-      name: localizationKeys('userProfile.start.headerTitle__security'),
+      name: localizationKeys('userProfile.navbar.security'),
       id: USER_PROFILE_NAVBAR_ROUTE_ID.SECURITY,
       icon: TickShield,
       path: 'security',

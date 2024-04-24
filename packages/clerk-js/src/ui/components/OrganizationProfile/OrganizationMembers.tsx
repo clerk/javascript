@@ -2,11 +2,11 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
-import { Col, descriptors, Flex, Icon, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import {
+  Animated,
   Card,
   Header,
-  IconButton,
   Tab,
   TabPanel,
   TabPanels,
@@ -16,41 +16,23 @@ import {
   withCardStateProvider,
 } from '../../elements';
 import { Action } from '../../elements/Action';
-import { UserAdd } from '../../icons';
-import { mqu, type ThemableCssProp } from '../../styledSystem';
+import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
-import { InviteMembersScreen } from './InviteMembersScreen';
+import { MembersActionsRow } from './MembersActions';
 import { MembershipWidget } from './MembershipWidget';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
-
-export const InviteMembersButton = (props: { sx?: ThemableCssProp }) => {
-  return (
-    <IconButton
-      {...props}
-      elementDescriptor={descriptors.membersPageInviteButton}
-      aria-label='Invite'
-      icon={
-        <Icon
-          icon={UserAdd}
-          size={'sm'}
-          sx={t => ({ marginRight: t.space.$2 })}
-        />
-      }
-      textVariant='buttonSmall'
-      localizationKey={localizationKeys('organizationProfile.membersPage.action__invite')}
-    />
-  );
-};
 
 export const OrganizationMembers = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
   const card = useCardState();
   const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
   const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
-  const isDomainsEnabled = organizationSettings?.domains?.enabled;
-  const { membershipRequests } = useOrganization({
+  const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
+  const { membershipRequests, memberships, invitations } = useOrganization({
     membershipRequests: isDomainsEnabled || undefined,
+    invitations: canManageMemberships || undefined,
+    memberships: canReadMemberships || undefined,
   });
 
   // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
@@ -63,71 +45,66 @@ export const OrganizationMembers = withCardStateProvider(() => {
   return (
     <Col
       elementDescriptor={descriptors.page}
-      gap={8}
+      gap={2}
     >
-      <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('organizationMembers')}
-        gap={8}
+        gap={4}
       >
-        <Action.Root>
-          <Header.Root sx={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
-            <Header.Title
-              localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
-              textVariant='h2'
-            />
-            {canManageMemberships && (
-              <Action.Trigger value='invite'>
-                <InviteMembersButton
-                  sx={{
-                    display: 'none',
-                    [mqu.md]: {
-                      display: 'inline-flex',
-                    },
-                  }}
-                />
-              </Action.Trigger>
-            )}
-          </Header.Root>
+        <Action.Root animate={false}>
+          <Animated asChild>
+            <Header.Root
+              contentSx={{
+                [mqu.md]: {
+                  flexDirection: 'row',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                },
+              }}
+            >
+              <Header.Title
+                localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
+                textVariant='h2'
+              />
+            </Header.Root>
+          </Animated>
+          <Card.Alert>{card.error}</Card.Alert>
           <Tabs>
-            <TabsList>
+            <TabsList sx={t => ({ gap: t.space.$2 })}>
               {canReadMemberships && (
-                <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')} />
+                <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
+                  {memberships?.data && !memberships.isLoading && (
+                    <NotificationCountBadge
+                      notificationCount={memberships.count}
+                      colorScheme='outline'
+                    />
+                  )}
+                </Tab>
               )}
               {canManageMemberships && (
                 <Tab
                   localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
-                />
+                >
+                  {invitations?.data && !invitations.isLoading && (
+                    <NotificationCountBadge
+                      notificationCount={invitations.count}
+                      colorScheme='outline'
+                    />
+                  )}
+                </Tab>
               )}
               {canManageMemberships && isDomainsEnabled && (
                 <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}>
-                  <NotificationCountBadge notificationCount={membershipRequests?.count || 0} />
+                  {membershipRequests?.data && !membershipRequests.isLoading && (
+                    <NotificationCountBadge
+                      notificationCount={membershipRequests.count}
+                      colorScheme='outline'
+                    />
+                  )}
                 </Tab>
               )}
-              <Col
-                justify='center'
-                sx={{
-                  marginLeft: 'auto',
-                  [mqu.md]: {
-                    display: 'none',
-                  },
-                }}
-              >
-                {canManageMemberships && (
-                  <Action.Trigger value='invite'>
-                    <InviteMembersButton />
-                  </Action.Trigger>
-                )}
-              </Col>
             </TabsList>
-            {canReadMemberships && (
-              <Action.Open value='invite'>
-                <Action.Card>
-                  <InviteMembersScreen />
-                </Action.Card>
-              </Action.Open>
-            )}
             <TabPanels>
               {canReadMemberships && (
                 <TabPanel sx={{ width: '100%' }}>
@@ -139,7 +116,16 @@ export const OrganizationMembers = withCardStateProvider(() => {
                     }}
                   >
                     {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
-                    <ActiveMembersList />
+                    <Flex
+                      gap={2}
+                      direction='col'
+                      sx={{
+                        width: '100%',
+                      }}
+                    >
+                      <MembersActionsRow />
+                      <ActiveMembersList />
+                    </Flex>
                   </Flex>
                 </TabPanel>
               )}

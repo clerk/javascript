@@ -6,8 +6,11 @@ import type {
   InitialState,
   LoadedClerk,
   MultiDomainAndOrProxy,
+  RedirectUrlProp,
   SDKMetadata,
+  SignInProps,
   SignInRedirectOptions,
+  SignUpProps,
   SignUpRedirectOptions,
   Without,
 } from '@clerk/types';
@@ -74,28 +77,42 @@ export type ClerkProp =
   | null;
 
 type ButtonProps = {
-  afterSignInUrl?: string;
-  afterSignUpUrl?: string;
-  redirectUrl?: string;
   mode?: 'redirect' | 'modal';
   children?: React.ReactNode;
 };
 
-export type SignInButtonProps = ButtonProps;
-export interface SignUpButtonProps extends ButtonProps {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-}
+export type SignInButtonProps = ButtonProps &
+  Pick<
+    SignInProps,
+    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
+  >;
 
-export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'children'>;
+export type SignUpButtonProps = {
+  unsafeMetadata?: SignUpUnsafeMetadata;
+} & ButtonProps &
+  Pick<
+    SignUpProps,
+    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl'
+  >;
+
+export type SignInWithMetamaskButtonProps = ButtonProps & RedirectUrlProp;
 
 export type RedirectToSignInProps = SignInRedirectOptions;
 export type RedirectToSignUpProps = SignUpRedirectOptions;
 
-export type UserProfilePageProps = {
-  url?: string;
-  label: string;
-  labelIcon?: React.ReactNode;
-};
+type PageProps<T extends string> =
+  | {
+      label: string;
+      url: string;
+      labelIcon: React.ReactNode;
+    }
+  | {
+      label: T;
+      url?: never;
+      labelIcon?: never;
+    };
+
+export type UserProfilePageProps = PageProps<'account' | 'security'>;
 
 export type UserProfileLinkProps = {
   url: string;
@@ -103,5 +120,5 @@ export type UserProfileLinkProps = {
   labelIcon: React.ReactNode;
 };
 
-export type OrganizationProfilePageProps = UserProfilePageProps;
+export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
 export type OrganizationProfileLinkProps = UserProfileLinkProps;

@@ -17,12 +17,13 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
       sx={[
         t => ({
           width: t.sizes.$220,
-          maxWidth: `calc(100vw - ${t.sizes.$20})`,
-          display: 'grid',
+          maxWidth: `calc(100vw - ${t.sizes.$8})`,
+          display: 'flex',
+          flexDirection: 'row',
           [mqu.md]: {
             display: 'flex',
+            flexDirection: 'column',
           },
-          gridTemplateColumns: '1fr 2.5fr',
           overflow: 'hidden',
           height: t.sizes.$176,
           position: 'relative',
@@ -41,7 +42,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
             },
             zIndex: t.zIndices.$modal,
             position: 'absolute',
-            top: t.space.$0x5,
+            top: t.space.$2,
             right: t.space.$2,
           })}
         >
@@ -57,7 +58,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
               />
             }
             sx={t => ({
-              color: t.colors.$colorTextTertiary,
+              color: t.colors.$colorTextSecondary,
               padding: t.space.$3,
             })}
           />
@@ -65,6 +66,7 @@ export const ProfileCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent
       )}
       {children}
       <Card.Footer
+        isProfileFooter
         sx={{
           display: 'none',
           [mqu.md]: {

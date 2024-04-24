@@ -1,9 +1,11 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { MenuId } from '@clerk/types';
+import type { Placement } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
 
-import { Button, Col, descriptors } from '../customizables';
+import type { Button } from '../customizables';
+import { Col, descriptors, SimpleButton } from '../customizables';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -17,16 +19,19 @@ type MenuState = {
   elementId?: MenuId;
 };
 
-const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
+export const [MenuStateCtx, useMenuState] = createContextAndHook<MenuState>('MenuState');
 
-type MenuProps = PropsWithChildren<Record<never, never>> & { elementId?: MenuId };
+type MenuProps = PropsWithChildren<Record<never, never>> & {
+  elementId?: MenuId;
+  popoverPlacement?: Placement;
+};
 
 export const Menu = withFloatingTree((props: MenuProps) => {
-  const { elementId } = props;
+  const { popoverPlacement = 'bottom-end', elementId, ...rest } = props;
   const popoverCtx = usePopover({
-    placement: 'right-start',
+    placement: popoverPlacement,
     offset: 8,
-    bubbles: false,
+    shoudFlip: true,
   });
 
   const value = React.useMemo(() => ({ value: { popoverCtx, elementId } }), [{ ...popoverCtx }, elementId]);
@@ -34,7 +39,7 @@ export const Menu = withFloatingTree((props: MenuProps) => {
   return (
     <MenuStateCtx.Provider
       value={value}
-      {...props}
+      {...rest}
     />
   );
 });
@@ -53,8 +58,8 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
   return cloneElement(children, {
     // @ts-expect-error
     ref: reference,
-    elementDescriptor: descriptors.menuButton,
-    elementId: descriptors.menuButton.setId(elementId),
+    elementDescriptor: children.props.elementDescriptor || descriptors.menuButton,
+    elementId: children.props.elementId || descriptors.menuButton.setId(elementId),
     onClick: (e: React.MouseEvent) => {
       children.props?.onClick?.(e);
       toggle();
@@ -72,10 +77,12 @@ const findMenuItem = (el: Element, siblingType: 'prev' | 'next', options?: { cou
   return sibling;
 };
 
-type MenuListProps = PropsOfComponent<typeof Col>;
+type MenuListProps = PropsOfComponent<typeof Col> & {
+  asPortal?: boolean;
+};
 
 export const MenuList = (props: MenuListProps) => {
-  const { sx, ...rest } = props;
+  const { sx, asPortal, ...rest } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -106,7 +113,7 @@ export const MenuList = (props: MenuListProps) => {
       context={context}
       nodeId={nodeId}
       isOpen={isOpen}
-      order={['floating', 'content']}
+      portal={asPortal}
     >
       <Col
         elementDescriptor={descriptors.menuList}
@@ -114,22 +121,22 @@ export const MenuList = (props: MenuListProps) => {
         ref={containerRef}
         role='menu'
         onKeyDown={onKeyDown}
-        tabIndex={0}
         sx={[
-          theme => ({
-            backgroundColor: colors.makeSolid(theme.colors.$colorBackground),
-            border: theme.borders.$normal,
+          t => ({
+            backgroundColor: colors.makeSolid(t.colors.$colorBackground),
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$neutralAlpha50,
             outline: 'none',
-            borderRadius: theme.radii.$lg,
-            borderColor: theme.colors.$blackAlpha200,
-            paddingTop: theme.space.$2,
-            paddingBottom: theme.space.$2,
+            borderRadius: t.radii.$md,
+            padding: t.space.$0x5,
             overflow: 'hidden',
-            top: `calc(100% + ${theme.space.$2})`,
-            animation: `${animations.dropdownSlideInScaleAndFade} ${theme.transitionDuration.$slower} ${theme.transitionTiming.$slowBezier}`,
+            top: `calc(100% + ${t.space.$2})`,
+            animation: `${animations.dropdownSlideInScaleAndFade} ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
             transformOrigin: 'top center',
-            boxShadow: theme.shadows.$menuShadow,
-            zIndex: theme.zIndices.$dropdown,
+            boxShadow: t.shadows.$menuShadow,
+            zIndex: t.zIndices.$dropdown,
+            gap: t.space.$0x5,
           }),
           sx,
         ]}
@@ -142,10 +149,11 @@ export const MenuList = (props: MenuListProps) => {
 
 type MenuItemProps = PropsOfComponent<typeof Button> & {
   destructive?: boolean;
+  closeAfterClick?: boolean;
 };
 
 export const MenuItem = (props: MenuItemProps) => {
-  const { sx, onClick, destructive, ...rest } = props;
+  const { sx, onClick, destructive, closeAfterClick = true, ...rest } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { toggle } = popoverCtx;
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -167,25 +175,25 @@ export const MenuItem = (props: MenuItemProps) => {
   };
 
   return (
-    <Button
+    <SimpleButton
       ref={buttonRef}
       elementDescriptor={descriptors.menuItem}
       elementId={descriptors.menuItem.setId(elementId)}
       hoverAsFocus
-      variant={destructive ? 'secondaryDanger' : 'secondary'}
+      variant='ghost'
+      colorScheme={destructive ? 'danger' : 'neutral'}
       role='menuitem'
       onKeyDown={onKeyDown}
+      focusRing={false}
       onClick={e => {
         onClick?.(e);
-        toggle();
+        closeAfterClick && toggle();
       }}
       sx={[
         theme => ({
-          boxShadow: 'none',
           justifyContent: 'start',
-          borderRadius: theme.radii.$none,
-          paddingLeft: theme.space.$4,
-          paddingRight: theme.space.$4,
+          borderRadius: theme.radii.$sm,
+          padding: `${theme.space.$1} ${theme.space.$3}`,
         }),
         sx,
       ]}

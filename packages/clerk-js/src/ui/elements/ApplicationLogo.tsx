@@ -49,6 +49,7 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       sx={{
         display: loaded ? 'inline-block' : 'none',
         height: '100%',
+        width: 'auto',
       }}
     />
   );
@@ -59,14 +60,25 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       {...props}
       sx={[
         theme => ({
-          height: getContainerHeightForImageRatio(imageRef, theme.sizes.$6),
+          height: getContainerHeightForImageRatio(imageRef, theme.sizes.$4),
           objectFit: 'cover',
           justifyContent: 'center',
         }),
         props.sx,
       ]}
     >
-      {logoUrl ? <RouterLink to={logoUrl}>{image}</RouterLink> : image}
+      {logoUrl ? (
+        <RouterLink
+          sx={{
+            justifyContent: 'center',
+          }}
+          to={logoUrl}
+        >
+          {image}
+        </RouterLink>
+      ) : (
+        image
+      )}
     </Flex>
   );
 };

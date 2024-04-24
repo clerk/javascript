@@ -5,7 +5,7 @@ import { useWizard, Wizard } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { VerifyDomainForm } from './VerifyDomainForm';
 
@@ -21,6 +21,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
   });
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const [domainId, setDomainId] = useState('');
+  const [verified, setVerified] = useState(false);
   const title = localizationKeys('organizationProfile.createDomainPage.title');
   const subtitle = localizationKeys('organizationProfile.createDomainPage.subtitle');
   const card = useCardState();
@@ -47,10 +48,9 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
         setDomainId(res.id);
         domains?.revalidate?.();
         if (res.verification && res.verification.status === 'verified') {
-          onSuccess();
-        } else {
-          wizard.nextStep();
+          setVerified(true);
         }
+        wizard.nextStep();
       })
       .catch(err => {
         handleError(err, [nameField], card.setError);
@@ -59,7 +59,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
+      <FormContainer
         headerTitle={title}
         headerSubtitle={subtitle}
       >
@@ -68,6 +68,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
             <Form.PlainInput
               {...nameField.props}
               autoFocus
+              ignorePasswordManager
               isRequired
             />
           </Form.ControlRow>
@@ -76,7 +77,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
             onReset={onReset}
           />
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
       <VerifyDomainForm
         domainId={domainId}
@@ -84,6 +85,7 @@ export const AddDomainForm = withCardStateProvider((props: AddDomainFormProps) =
           domains?.revalidate?.();
           onSuccess?.();
         }}
+        skipToVerified={verified}
         onReset={onReset}
       />
     </Wizard>

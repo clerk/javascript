@@ -120,7 +120,6 @@ const useCodeControl = (formControl: FormControlState, options?: UseCodeInputOpt
 };
 
 export type OTPInputProps = {
-  // TODO-RETHEME make label required again
   label?: string | LocalizationKey;
   resendButton?: LocalizationKey;
   description?: string | LocalizationKey;
@@ -128,6 +127,7 @@ export type OTPInputProps = {
   isDisabled?: boolean;
   onResendCode?: React.MouseEventHandler<HTMLButtonElement>;
   otpControl: ReturnType<typeof useFieldOTP>['otpControl'];
+  centerAlign?: boolean;
 };
 
 const [OTPInputContext, useOTPInputContext] = createContextAndHook<OTPInputProps>('OTPInputContext');
@@ -160,7 +160,7 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
   const refs = React.useRef<Array<HTMLInputElement | null>>([]);
   const firstClickRef = React.useRef(false);
 
-  const { otpControl, isLoading, isDisabled } = useOTPInputContext();
+  const { otpControl, isLoading, isDisabled, centerAlign = true } = useOTPInputContext();
   const { feedback, values, setValues, feedbackType, length } = otpControl.otpInputProps;
 
   React.useImperativeHandle(ref, () => ({
@@ -270,14 +270,15 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
     }
   };
 
+  const centerSx = centerAlign ? { justifyContent: 'center', alignItems: 'center' } : {};
+
   return (
     <Flex
       isLoading={isLoading}
       hasError={feedbackType === 'error'}
       elementDescriptor={descriptors.otpCodeFieldInputs}
       gap={2}
-      center
-      sx={t => ({ direction: 'ltr', padding: t.space.$1 })}
+      sx={t => ({ direction: 'ltr', padding: t.space.$1, marginLeft: `-${t.space.$1}`, ...centerSx })}
     >
       {values.map((value, index: number) => (
         <SingleCharInput
@@ -289,10 +290,11 @@ export const OTPCodeControl = React.forwardRef<{ reset: any }>((_, ref) => {
           onKeyDown={handleOnKeyDown(index)}
           onInput={handleOnInput(index)}
           onPaste={handleOnPaste(index)}
+          id={`digit-${index}-field`}
           ref={node => (refs.current[index] = node)}
           autoFocus={index === 0 || undefined}
           autoComplete='one-time-code'
-          aria-label={`${index === 0 ? 'Enter verification code. ' : ''} Digit ${index + 1}`}
+          aria-label={`${index === 0 ? 'Enter verification code. ' : ''}Digit ${index + 1}`}
           isDisabled={isDisabled || isLoading || disabled || feedbackType === 'success'}
           hasError={feedbackType === 'error'}
           isSuccessfullyFilled={feedbackType === 'success'}
@@ -322,11 +324,10 @@ const SingleCharInput = React.forwardRef<
         height: theme.space.$10,
         width: theme.space.$10,
         borderRadius: theme.radii.$md,
-        border: 'none',
         ...(isSuccessfullyFilled ? { borderColor: theme.colors.$success500 } : common.borderColor(theme, props)),
         backgroundColor: 'unset',
         '&:focus': {},
-        [mqu.xs]: {
+        [mqu.sm]: {
           height: theme.space.$8,
           width: theme.space.$8,
         },

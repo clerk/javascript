@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "2.0.0-alpha-v5.8",
+  "version": "2.0.0",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -53,6 +53,7 @@
   "files": [
     "dist",
     "ar-SA",
+    "ca-ES",
     "cs-CZ",
     "da-DK",
     "de-DE",
@@ -64,8 +65,10 @@
     "it-IT",
     "ja-JP",
     "ko-KR",
+    "mn-MN",
     "nb-NO",
     "nl-NL",
+    "nl-BE",
     "pl-PL",
     "pt-BR",
     "pt-PT",
@@ -77,17 +80,22 @@
     "uk-UA",
     "vi-VN",
     "zh-CN",
-    "zh-TW"
+    "zh-TW",
+    "es-MX",
+    "bg-BG",
+    "th-TH",
+    "hu-HU"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
     "postbuild": "node ../../scripts/subpath-workaround.mjs localizations",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
+    "generate": "tsc src/utils/generate.ts && node src/utils/generate.js && prettier --write src/*.ts",
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-alpha-v5.12",
+    "@clerk/types": "4.0.0",
     "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "tsup": "*",

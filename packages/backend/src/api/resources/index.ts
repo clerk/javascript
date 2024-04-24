@@ -11,7 +11,6 @@ export type {
   OrganizationInvitationStatus,
   OrganizationMembershipRole,
   SignInStatus,
-  SignUpAttributeRequirements,
   SignUpStatus,
 } from './Enums';
 
@@ -31,6 +30,7 @@ export * from './SMSMessage';
 export * from './Token';
 export * from './User';
 export * from './Verification';
+export * from './SamlConnection';
 
 export type {
   EmailWebhookEvent,

@@ -9,6 +9,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
   variants: {
     size: {
+      xs: { width: theme.sizes.$2x5, height: theme.sizes.$2x5 },
       sm: { width: theme.sizes.$3, height: theme.sizes.$3 },
       md: { width: theme.sizes.$4, height: theme.sizes.$4 },
       lg: { width: theme.sizes.$5, height: theme.sizes.$5 },
@@ -17,7 +18,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       success: { color: theme.colors.$success500 },
       danger: { color: theme.colors.$danger500 },
       warning: { color: theme.colors.$warning500 },
-      neutral: { color: theme.colors.$blackAlpha400 },
+      neutral: { color: theme.colors.$neutralAlpha400 },
     },
   },
   defaultVariants: {

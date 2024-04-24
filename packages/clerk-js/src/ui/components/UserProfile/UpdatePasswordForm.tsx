@@ -9,7 +9,7 @@ import {
   Form,
   FormButtonContainer,
   FormButtons,
-  FormContent,
+  FormContainer,
   InformationBox,
   SuccessPage,
   useCardState,
@@ -22,13 +22,13 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
   const localizedTexts: LocalizationKey[] = [];
 
   if (userHasPassword) {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.changePasswordSuccessMessage'));
+    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage__update'));
   } else {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage'));
+    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage__set'));
   }
 
   if (sessionSignOut) {
-    localizedTexts.push(localizationKeys('userProfile.passwordPage.sessionsSignedOutSuccessMessage'));
+    localizedTexts.push(localizationKeys('userProfile.passwordPage.successMessage__signOutOfOtherSessions'));
   }
 
   return localizedTexts;
@@ -50,7 +50,7 @@ export const UpdatePasswordForm = withCardStateProvider(() => {
 
   // Ensure that messages will not use the updated state of User after a password has been set or changed
   const successPagePropsRef = useRef<Parameters<typeof SuccessPage>[0]>({
-    title: localizationKeys('userProfile.passwordPage.title'),
+    title: localizationKeys('userProfile.passwordPage.title__set'),
   });
 
   const currentPasswordField = useFormControl('currentPassword', '', {
@@ -111,8 +111,8 @@ export const UpdatePasswordForm = withCardStateProvider(() => {
     try {
       successPagePropsRef.current = {
         title: user.passwordEnabled
-          ? localizationKeys('userProfile.passwordPage.changePasswordTitle')
-          : localizationKeys('userProfile.passwordPage.title'),
+          ? localizationKeys('userProfile.passwordPage.title__update')
+          : localizationKeys('userProfile.passwordPage.title__set'),
         text: generateSuccessPageText(user.passwordEnabled, !!sessionsField.checked),
       };
 
@@ -125,7 +125,7 @@ export const UpdatePasswordForm = withCardStateProvider(() => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent>
+      <FormContainer>
         {passwordEditDisabled && <InformationBox message={localizationKeys('userProfile.passwordPage.readonly')} />}
 
         <Form.Root
@@ -176,8 +176,7 @@ export const UpdatePasswordForm = withCardStateProvider(() => {
           <Form.ControlRow elementId={sessionsField.id}>
             <Form.Checkbox
               {...sessionsField.props}
-              //TODO: localize this
-              description={'It is advised to logout of all other devices that may user an old password'}
+              description={localizationKeys('userProfile.passwordPage.checkboxInfoText__signOutOfOtherSessions')}
               isDisabled={passwordEditDisabled}
             />
           </Form.ControlRow>
@@ -193,7 +192,7 @@ export const UpdatePasswordForm = withCardStateProvider(() => {
             <FormButtons isDisabled={!canSubmit} />
           )}
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
       <SuccessPage {...successPagePropsRef.current} />
     </Wizard>

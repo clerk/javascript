@@ -10,7 +10,7 @@ import { Check, Copy, Download, Print } from '../../icons';
 import { MfaBackupCodeTile } from './MfaBackupCodeTile';
 
 type MfaBackupCodeListProps = {
-  subtitle: LocalizationKey;
+  subtitle?: LocalizationKey;
   backupCodes?: string[];
 };
 
@@ -52,13 +52,15 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
         <Text
           localizationKey={subtitle}
           variant='caption'
-          colorScheme='neutral'
+          colorScheme='secondary'
         />
       </Col>
       <Box
         sx={t => ({
-          border: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-          borderRadius: t.radii.$card,
+          borderWidth: t.borderWidths.$normal,
+          borderStyle: t.borderStyles.$solid,
+          borderColor: t.colors.$neutralAlpha100,
+          borderRadius: t.radii.$lg,
         })}
       >
         <Grid
@@ -78,19 +80,21 @@ export const MfaBackupCodeList = (props: MfaBackupCodeListProps) => {
 
         <Grid
           sx={t => ({
-            borderTop: `1px solid ${t.colors.$blackAlpha100}`,
+            borderTopWidth: t.borderWidths.$normal,
+            borderTopStyle: t.borderStyles.$solid,
+            borderTopColor: t.colors.$neutralAlpha100,
             gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
             '>:not([hidden])~:not([hidden])': {
               borderRightWidth: '0px',
               borderLeftWidth: '1px',
               borderStyle: 'solid',
-              borderColor: t.colors.$blackAlpha100,
+              borderColor: t.colors.$neutralAlpha100,
             },
             '>:first-child': {
-              borderBottomLeftRadius: t.radii.$card,
+              borderBottomLeftRadius: t.radii.$lg,
             },
             '>:last-child': {
-              borderBottomRightRadius: t.radii.$card,
+              borderBottomRightRadius: t.radii.$lg,
             },
           })}
         >

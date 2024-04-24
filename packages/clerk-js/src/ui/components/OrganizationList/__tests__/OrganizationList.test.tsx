@@ -186,53 +186,65 @@ describe('OrganizationList', () => {
   });
 
   describe('CreateOrganization', () => {
-    //TODO-RETHEME: fix flaky test
-    it.skip('display CreateOrganization within OrganizationList', async () => {
+    it('display CreateOrganization within OrganizationList', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'] });
       });
 
-      const { queryByLabelText, getByRole, userEvent, queryByRole } = render(<OrganizationList />, { wrapper });
+      const { queryByLabelText, getByRole, userEvent, findByRole, queryByRole, queryByText } = render(
+        <OrganizationList />,
+        {
+          wrapper,
+        },
+      );
 
+      // Header
       await waitFor(async () => {
-        // Header
-        expect(queryByRole('heading', { name: /choose an account/i })).toBeInTheDocument();
-        // Form fields of CreateOrganizationForm
-        expect(queryByLabelText(/organization name/i)).not.toBeInTheDocument();
-        expect(queryByLabelText(/slug url/i)).not.toBeInTheDocument();
-        await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
-        // Header
-        expect(queryByRole('heading', { name: /Create organization/i })).toBeInTheDocument();
-        // Form fields of CreateOrganizationForm
-        expect(queryByLabelText(/organization name/i)).toBeInTheDocument();
-        expect(queryByLabelText(/slug url/i)).toBeInTheDocument();
-
-        expect(queryByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-        expect(queryByRole('button', { name: 'Create organization' })).toBeInTheDocument();
+        expect(await findByRole('heading', { name: /choose an account/i })).toBeInTheDocument();
       });
+
+      // Form fields of CreateOrganizationForm not to be there
+      expect(queryByText(/logo/i)).not.toBeInTheDocument();
+      expect(queryByText('Recommended size 1:1, up to 10MB.')).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: 'Upload' })).not.toBeInTheDocument();
+      expect(queryByLabelText(/name/i)).not.toBeInTheDocument();
+      expect(queryByLabelText(/slug/i)).not.toBeInTheDocument();
+      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      // Header
+      expect(queryByRole('heading', { name: /Create organization/i })).toBeInTheDocument();
+      // Form fields of CreateOrganizationForm
+      expect(queryByText(/logo/i)).toBeInTheDocument();
+      expect(queryByText('Recommended size 1:1, up to 10MB.')).toBeInTheDocument();
+      expect(queryByRole('button', { name: 'Upload' })).toBeInTheDocument();
+      expect(queryByLabelText(/name/i)).toBeInTheDocument();
+      expect(queryByLabelText(/slug/i)).toBeInTheDocument();
+
+      expect(queryByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(queryByRole('button', { name: 'Create organization' })).toBeInTheDocument();
     });
 
-    //TODO-RETHEME: fix flaky test
-    it.skip('display CreateOrganization and navigates to Invite Members', async () => {
+    it('display CreateOrganization and navigates to Invite Members', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'] });
       });
 
-      const { getByLabelText, getByRole, userEvent, queryByText } = render(<OrganizationList />, {
-        wrapper,
-      });
-
+      const { getByLabelText, getByRole, userEvent, findByLabelText, findByText, findByRole } = render(
+        <OrganizationList />,
+        {
+          wrapper,
+        },
+      );
+      await waitFor(async () =>
+        expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+      );
+      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      await waitFor(async () => expect(await findByLabelText(/name/i)).toBeInTheDocument());
+      await userEvent.type(getByLabelText(/name/i), 'new org');
+      await userEvent.click(getByRole('button', { name: /create organization/i }));
       await waitFor(async () => {
-        // await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
-
-        await userEvent.type(getByLabelText(/Organization name/i), 'new org');
-        await userEvent.click(getByRole('button', { name: /create organization/i }));
-
-        await waitFor(() => {
-          expect(queryByText(/Invite members/i)).toBeInTheDocument();
-        });
+        expect(await findByText(/Invite new members/i)).toBeInTheDocument();
       });
     });
 
@@ -312,6 +324,38 @@ describe('OrganizationList', () => {
             }),
           );
           expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/org1`);
+        });
+      });
+
+      it('navigates to afterCreateOrganizationUrl', async () => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withUser({
+            id: 'test_user_id',
+            email_addresses: ['test@clerk.com'],
+          });
+        });
+
+        props.setProps({
+          afterSelectOrganizationUrl: '/org/:slug',
+          afterCreateOrganizationUrl: '/org',
+          skipInvitationScreen: true,
+        });
+
+        const { userEvent, getByRole, findByLabelText, findByRole, getByLabelText } = render(<OrganizationList />, {
+          wrapper,
+        });
+
+        fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+        await waitFor(async () =>
+          expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+        );
+        await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+        await waitFor(async () => expect(await findByLabelText(/name/i)).toBeInTheDocument());
+        await userEvent.type(getByLabelText(/name/i), 'new org');
+        await userEvent.click(getByRole('button', { name: /create organization/i }));
+        await waitFor(async () => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org`);
         });
       });
     });

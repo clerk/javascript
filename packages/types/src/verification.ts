@@ -1,4 +1,5 @@
 import type { ClerkAPIError } from './api';
+import type { PublicKeyCredentialCreationOptionsWithoutExtensions } from './passkey';
 import type { ClerkResource } from './resource';
 
 export interface VerificationResource extends ClerkResource {
@@ -11,6 +12,10 @@ export interface VerificationResource extends ClerkResource {
   strategy: string | null;
   verifiedAtClient: string | null;
   verifiedFromTheSameClient: () => boolean;
+}
+
+export interface PasskeyVerificationResource extends VerificationResource {
+  publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null;
 }
 
 export type VerificationStatus = 'unverified' | 'verified' | 'transferable' | 'failed' | 'expired';

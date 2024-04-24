@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
 import { usePopover, useSearchInput } from '../hooks';
-import { ArrowUpDown } from '../icons';
+import { ChevronDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 import { animations } from '../styledSystem';
 import { colors } from '../utils';
@@ -30,6 +30,8 @@ type SelectProps<O extends Option> = {
   noResultsMessage?: string;
   renderOption?: RenderOption<O>;
   elementId?: SelectId;
+  portal?: boolean;
+  referenceElement?: React.RefObject<HTMLElement>;
 };
 
 type SelectState<O extends Option> = Pick<
@@ -44,6 +46,7 @@ type SelectState<O extends Option> = Pick<
   select: (option: O) => void;
   focusedItemRef: React.RefObject<HTMLDivElement>;
   onTriggerClick: () => void;
+  portal?: boolean;
 };
 
 const [SelectStateCtx, useSelectState] = createContextAndHook<SelectState<any>>('SelectState');
@@ -56,9 +59,9 @@ const defaultRenderOption = <O extends Option>(option: O, _index?: number, isFoc
         padding: `${theme.space.$2} ${theme.space.$4}`,
         margin: `0 ${theme.space.$1}`,
         borderRadius: theme.radii.$md,
-        ...(isFocused && { backgroundColor: theme.colors.$blackAlpha200 }),
+        ...(isFocused && { backgroundColor: theme.colors.$neutralAlpha100 }),
         '&:hover': {
-          backgroundColor: theme.colors.$blackAlpha200,
+          backgroundColor: theme.colors.$neutralAlpha100,
         },
       })}
     >
@@ -83,9 +86,15 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     searchPlaceholder,
     elementId,
     children,
+    portal = false,
+    referenceElement = null,
     ...rest
   } = props;
-  const popoverCtx = usePopover({ autoUpdate: true, bubbles: false });
+  const popoverCtx = usePopover({
+    autoUpdate: true,
+    adjustToReferenceWidth: !!referenceElement,
+    referenceElement: referenceElement,
+  });
   const togglePopover = popoverCtx.toggle;
   const focusedItemRef = React.useRef<HTMLDivElement>(null);
   const searchInputCtx = useSearchInput({
@@ -126,6 +135,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
           select,
           onTriggerClick: togglePopover,
           elementId,
+          portal,
         },
       }}
       {...rest}
@@ -181,16 +191,16 @@ const SelectSearchbar = (props: PropsOfComponent<typeof InputWithIcon>) => {
   const { elementId } = useSelectState();
 
   return (
-    <Flex sx={t => ({ padding: t.space.$1 })}>
+    <Flex sx={t => ({ padding: t.space.$0x5 })}>
       <Input
         elementDescriptor={descriptors.selectSearchInput}
         elementId={descriptors.selectSearchInput.setId(elementId)}
         focusRing={false}
+        variant='unstyled'
         sx={[
           t => ({
-            border: 'none',
             borderRadius: t.radii.$md,
-            backgroundColor: t.colors.$blackAlpha50,
+            backgroundColor: t.colors.$neutralAlpha100,
             padding: t.space.$2,
           }),
           sx,
@@ -206,7 +216,13 @@ export const SelectNoResults = (props: PropsOfComponent<typeof Text>) => {
   return (
     <Text
       as='div'
-      sx={[theme => ({ width: '100%', padding: `${theme.space.$2} 0 0 ${theme.space.$4}` }), sx]}
+      sx={[
+        theme => ({
+          width: '100%',
+          padding: `${theme.space.$1} ${theme.space.$2} ${theme.space.$2} ${theme.space.$2}`,
+        }),
+        sx,
+      ]}
       {...rest}
     />
   );
@@ -230,6 +246,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
     select,
     onTriggerClick,
     elementId,
+    portal,
   } = useSelectState();
   const { filteredItems: options, searchInputProps } = searchInputCtx;
   const [focusedIndex, setFocusedIndex] = useState(0);
@@ -241,7 +258,8 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
       setFocusedIndex(-1);
       return;
     }
-    focusedItemRef.current?.scrollIntoView({ block: 'nearest' });
+    // Jest could not resolve `focusedItemRef.current` so we need to call scrollIntoView with ?.()
+    focusedItemRef.current?.scrollIntoView?.({ block: 'nearest' });
   };
 
   React.useEffect(scrollToItemOnSelectedIndexChange, [focusedIndex, isOpen]);
@@ -253,7 +271,8 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
 
     if (isOpen) {
       setFocusedIndex(options.findIndex(o => o.value === value));
-      focusedItemRef.current?.scrollIntoView({ block: 'nearest' });
+      // Jest could not resolve `focusedItemRef.current` so we need to call scrollIntoView with ?.()
+      focusedItemRef.current?.scrollIntoView?.({ block: 'nearest' });
       return;
     }
   }, [isOpen]);
@@ -286,7 +305,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
-      portal={false}
+      portal={portal || false}
       order={['content']}
     >
       <Flex
@@ -322,11 +341,11 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           tabIndex={comparator ? undefined : 0}
           sx={[
             theme => ({
-              gap: theme.space.$1,
+              gap: theme.space.$0x5,
               outline: 'none',
               overflowY: 'auto',
               maxHeight: '18vh',
-              padding: `${theme.space.$2} 0`,
+              padding: `${theme.space.$0x5} ${theme.space.$0x5}`,
             }),
             containerSx,
           ]}
@@ -357,8 +376,13 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   );
 };
 
-export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
-  const { sx, children, ...rest } = props;
+export const SelectButton = (
+  props: PropsOfComponent<typeof Button> & {
+    icon?: React.ReactElement | React.ComponentType;
+    iconSx?: ThemableCssProp;
+  },
+) => {
+  const { sx, children, icon, iconSx, ...rest } = props;
   const { popoverCtx, onTriggerClick, buttonRenderOption, selectedOption, placeholder, elementId } = useSelectState();
   const { reference } = popoverCtx;
 
@@ -367,7 +391,12 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
     show = selectedOption ? (
       buttonRenderOption(selectedOption)
     ) : (
-      <Text sx={t => ({ opacity: t.opacity.$inactive })}>{placeholder}</Text>
+      <Text
+        as='span'
+        sx={t => ({ opacity: t.opacity.$inactive })}
+      >
+        {placeholder}
+      </Text>
     );
   }
 
@@ -376,17 +405,12 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
       elementDescriptor={descriptors.selectButton}
       elementId={descriptors.selectButton.setId(elementId)}
       ref={reference}
-      variant='unstyled'
+      variant='outline'
       textVariant='buttonLarge'
       onClick={onTriggerClick}
       sx={[
         theme => ({
           gap: theme.space.$2,
-          fontWeight: theme.fontWeights.$normal,
-          color: theme.colors.$colorInputText,
-          backgroundColor: theme.colors.$colorInputBackground,
-          borderRadius: theme.radii.$md,
-          boxShadow: theme.shadows.$selectButtonShadow,
           paddingLeft: theme.space.$3x5,
           paddingRight: theme.space.$3x5,
           alignItems: 'center',
@@ -401,7 +425,8 @@ export const SelectButton = (props: PropsOfComponent<typeof Button>) => {
         elementDescriptor={descriptors.selectButtonIcon}
         elementId={descriptors.selectButtonIcon.setId(elementId)}
         size='md'
-        icon={ArrowUpDown}
+        icon={icon || ChevronDown}
+        sx={iconSx}
       />
     </Button>
   );

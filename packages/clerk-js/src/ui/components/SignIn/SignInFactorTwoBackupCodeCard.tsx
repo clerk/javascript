@@ -6,7 +6,7 @@ import React from 'react';
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
-import { Card, Footer, Form, Header, useCardState } from '../../elements';
+import { Card, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
@@ -65,8 +65,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
   return (
     <Card.Root>
       <Card.Content>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Header.Root>
+        <Header.Root showLogo>
           <Header.Title localizationKey={localizationKeys('signIn.backupCodeMfa.title')} />
           <Header.Subtitle
             localizationKey={
@@ -76,6 +75,7 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
             }
           />
         </Header.Root>
+        <Card.Alert>{card.error}</Card.Alert>
         <Col
           elementDescriptor={descriptors.main}
           gap={8}
@@ -88,21 +88,21 @@ export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCa
                 onActionClicked={onShowAlternativeMethodsClicked}
               />
             </Form.ControlRow>
-            <Form.SubmitButton hasArrow />
+            <Col gap={3}>
+              <Form.SubmitButton hasArrow />
+              <Card.Action elementId='alternativeMethods'>
+                {onShowAlternativeMethodsClicked && (
+                  <Card.ActionLink
+                    localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                    onClick={onShowAlternativeMethodsClicked}
+                  />
+                )}
+              </Card.Action>
+            </Col>
           </Form.Root>
         </Col>
-        <Footer.Root>
-          <Footer.Action elementId='alternativeMethods'>
-            {onShowAlternativeMethodsClicked && (
-              <Footer.ActionLink
-                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-                onClick={onShowAlternativeMethodsClicked}
-              />
-            )}
-          </Footer.Action>
-          <Footer.Links />
-        </Footer.Root>
       </Card.Content>
+
       <Card.Footer />
     </Card.Root>
   );

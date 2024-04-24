@@ -1,6 +1,5 @@
 import { useId } from 'react';
 
-import { withOrganizationsEnabledGuard } from '../../common';
 import { AcceptedInvitationsProvider, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
@@ -17,13 +16,17 @@ const _OrganizationSwitcher = withFloatingTree(() => {
   const switcherButtonMenuId = useId();
 
   return (
-    <Flow.Root flow='organizationSwitcher'>
+    <Flow.Root
+      flow='organizationSwitcher'
+      sx={{ display: 'inline-flex' }}
+    >
       <AcceptedInvitationsProvider>
         <OrganizationSwitcherTrigger
           ref={reference}
           onClick={toggle}
           isOpen={isOpen}
-          aria-controls={switcherButtonMenuId}
+          aria-controls={isOpen ? switcherButtonMenuId : undefined}
+          aria-expanded={isOpen}
         />
         <Popover
           nodeId={nodeId}
@@ -42,8 +45,4 @@ const _OrganizationSwitcher = withFloatingTree(() => {
   );
 });
 
-export const OrganizationSwitcher = withOrganizationsEnabledGuard(
-  withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher)),
-  'OrganizationSwitcher',
-  { mode: 'hide' },
-);
+export const OrganizationSwitcher = withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher));

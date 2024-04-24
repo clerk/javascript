@@ -1,7 +1,8 @@
 import { useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/types';
 
-import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
+import { sortIdentificationBasedOnVerification } from '../../components/UserProfile/utils';
+import { Badge, Flex, localizationKeys, Text } from '../../customizables';
 import { ProfileSection, ThreeDotsMenu, useCardState } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -9,7 +10,6 @@ import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { EmailForm } from './EmailForm';
 import { RemoveEmailForm } from './RemoveResourceForm';
-import { primaryIdentificationFirst } from './utils';
 
 type RemoveEmailScreenProps = { emailId: string };
 const RemoveEmailScreen = (props: RemoveEmailScreenProps) => {
@@ -41,33 +41,30 @@ export const EmailsSection = () => {
   return (
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.emailAddressesSection.title')}
+      centered={false}
       id='emailAddresses'
     >
       <Action.Root>
         <ProfileSection.ItemList id='emailAddresses'>
-          {user?.emailAddresses.sort(primaryIdentificationFirst(user.primaryEmailAddressId)).map(email => (
+          {sortIdentificationBasedOnVerification(user?.emailAddresses, user?.primaryEmailAddressId).map(email => (
             <Action.Root key={email.emailAddress}>
-              <Action.Closed value=''>
-                <ProfileSection.Item id='emailAddresses'>
-                  <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                    <Flex
-                      as={'span'}
-                      gap={2}
-                      center
-                    >
-                      <Text>{email.emailAddress} </Text>
-                      {user?.primaryEmailAddressId === email.id && (
-                        <Badge localizationKey={localizationKeys('badge__primary')} />
-                      )}
-                      {email.verification.status !== 'verified' && (
-                        <Badge localizationKey={localizationKeys('badge__unverified')} />
-                      )}
-                    </Flex>
-                  </Box>
-
-                  <EmailMenu email={email} />
-                </ProfileSection.Item>
-              </Action.Closed>
+              <ProfileSection.Item id='emailAddresses'>
+                <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$1 })}>
+                  <Text
+                    sx={t => ({ color: t.colors.$colorText })}
+                    truncate
+                  >
+                    {email.emailAddress}
+                  </Text>
+                  {user?.primaryEmailAddressId === email.id && (
+                    <Badge localizationKey={localizationKeys('badge__primary')} />
+                  )}
+                  {email.verification.status !== 'verified' && (
+                    <Badge localizationKey={localizationKeys('badge__unverified')} />
+                  )}
+                </Flex>
+                <EmailMenu email={email} />
+              </ProfileSection.Item>
 
               <Action.Open value='remove'>
                 <Action.Card variant='destructive'>
@@ -84,18 +81,18 @@ export const EmailsSection = () => {
           ))}
 
           <Action.Trigger value='add'>
-            <ProfileSection.Button
+            <ProfileSection.ArrowButton
               id='emailAddresses'
               localizationKey={localizationKeys('userProfile.start.emailAddressesSection.primaryButton')}
             />
           </Action.Trigger>
-        </ProfileSection.ItemList>
 
-        <Action.Open value='add'>
-          <Action.Card>
-            <EmailScreen />
-          </Action.Card>
-        </Action.Open>
+          <Action.Open value='add'>
+            <Action.Card>
+              <EmailScreen />
+            </Action.Card>
+          </Action.Open>
+        </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
   );

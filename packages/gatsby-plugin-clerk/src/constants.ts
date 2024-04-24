@@ -15,4 +15,5 @@ export const TELEMETRY_DEBUG = isTruthy(process.env.GATSBY_CLERK_TELEMETRY_DEBUG
 export const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
+  environment: process.env.NODE_ENV,
 };

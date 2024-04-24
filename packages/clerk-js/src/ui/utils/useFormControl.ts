@@ -8,10 +8,13 @@ import { useLocalizations } from '../localization';
 
 type SelectOption = { value: string; label?: string };
 
+type Transformer = (value: string) => string;
+
 type Options = {
   isRequired?: boolean;
   placeholder?: string | LocalizationKey;
   options?: SelectOption[];
+  transformer?: Transformer;
   defaultChecked?: boolean;
   infoText?: LocalizationKey | string;
 } & (
@@ -60,6 +63,7 @@ type FieldStateProps<Id> = {
   clearFeedback: () => void;
   hasPassedComplexity: boolean;
   isFocused: boolean;
+  ignorePasswordManager?: boolean;
 } & Omit<Options, 'defaultChecked'>;
 
 export type FormControlState<Id = string> = FieldStateProps<Id> & {
@@ -74,12 +78,21 @@ export type FormControlState<Id = string> = FieldStateProps<Id> & {
 
 export type FeedbackType = 'success' | 'error' | 'warning' | 'info';
 
+const emailTransformer = (v: string) => v.trim();
+const applyTransformers = (v: string, transformers: Transformer[]) => {
+  let value = v;
+  for (let i = 0; i < transformers.length; i++) {
+    value = transformers[i](value);
+  }
+  return value;
+};
+
 export const useFormControl = <Id extends string>(
   id: Id,
   initialState: string,
   opts?: Options,
 ): FormControlState<Id> => {
-  opts = opts || {
+  const options = opts || {
     type: 'text',
     label: '',
     isRequired: false,
@@ -87,11 +100,18 @@ export const useFormControl = <Id extends string>(
     options: [],
     defaultChecked: false,
   };
+  const transformers: Transformer[] = [];
+  if (options.transformer) {
+    transformers.push(options.transformer);
+  }
+  if (options.type === 'email') {
+    transformers.push(emailTransformer);
+  }
 
   const { translateError, t } = useLocalizations();
-  const [value, setValueInternal] = useState<string>(initialState);
+  const [value, setValueInternal] = useState<string>(applyTransformers(initialState, transformers));
   const [isFocused, setFocused] = useState(false);
-  const [checked, setCheckedInternal] = useState<boolean>(opts?.defaultChecked || false);
+  const [checked, setCheckedInternal] = useState<boolean>(options?.defaultChecked || false);
   const [hasPassedComplexity, setHasPassedComplexity] = useState(false);
   const [feedback, setFeedback] = useState<{ message: string; type: FeedbackType }>({
     message: '',
@@ -99,10 +119,10 @@ export const useFormControl = <Id extends string>(
   });
 
   const onChange: FormControlState['onChange'] = event => {
-    if (opts?.type === 'checkbox') {
+    if (options?.type === 'checkbox') {
       return setCheckedInternal(event.target.checked);
     }
-    return setValueInternal(event.target.value || '');
+    return setValueInternal(applyTransformers(event.target.value || '', transformers));
   };
 
   const setValue: FormControlState['setValue'] = val => setValueInternal(val || '');
@@ -134,7 +154,7 @@ export const useFormControl = <Id extends string>(
     setFocused(false);
   };
 
-  const { defaultChecked, validatePassword: validatePasswordProp, buildErrorMessage, ...restOpts } = opts;
+  const { defaultChecked, validatePassword: validatePasswordProp, buildErrorMessage, ...restOpts } = options;
 
   const props = {
     id,
@@ -147,13 +167,13 @@ export const useFormControl = <Id extends string>(
     onBlur,
     onFocus,
     setWarning,
-    feedback: feedback.message || t(opts.infoText),
+    feedback: feedback.message || t(options.infoText),
     feedbackType: feedback.type,
     setInfo,
     clearFeedback,
     hasPassedComplexity,
     setHasPassedComplexity,
-    validatePassword: opts.type === 'password' ? opts.validatePassword : undefined,
+    validatePassword: options.type === 'password' ? options.validatePassword : undefined,
     isFocused,
     ...restOpts,
   };

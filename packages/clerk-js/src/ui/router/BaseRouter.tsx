@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import type { NavigateOptions } from '@clerk/types';
 import qs from 'qs';
 import React from 'react';
 
@@ -14,7 +15,7 @@ interface BaseRouterProps {
   startPath: string;
   getPath: () => string;
   getQueryString: () => string;
-  internalNavigate: (toURL: URL) => Promise<any> | any;
+  internalNavigate: (toURL: URL, options?: NavigateOptions) => Promise<any> | any;
   onExternalNavigate?: () => any;
   refreshEvents?: Array<keyof WindowEventMap>;
   preservedParams?: string[];
@@ -114,7 +115,7 @@ export const BaseRouter = ({
       });
       toURL.search = qs.stringify(toQueryParams);
     }
-    const internalNavRes = await internalNavigate(toURL);
+    const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
     setRouteParts({ path: toURL.pathname, queryString: toURL.search });
     return internalNavRes;
   };

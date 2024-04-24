@@ -1,5 +1,9 @@
+import { parseError } from '@clerk/shared/error';
 import type {
   ClerkAPIError,
+  PasskeyVerificationResource,
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
   SignUpVerificationJSON,
   SignUpVerificationResource,
   SignUpVerificationsJSON,
@@ -10,7 +14,8 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, parseError } from './internal';
+import { convertJSONToPublicKeyCreateOptions } from '../../utils/passkeys';
+import { BaseResource } from './internal';
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';
@@ -47,6 +52,28 @@ export class Verification extends BaseResource implements VerificationResource {
       this.attempts = data.attempts;
       this.expireAt = unixEpochToDate(data.expire_at);
       this.error = data.error ? parseError(data.error) : null;
+    }
+    return this;
+  }
+}
+
+export class PasskeyVerification extends Verification implements PasskeyVerificationResource {
+  publicKey: PublicKeyCredentialCreationOptionsWithoutExtensions | null = null;
+
+  constructor(data: VerificationJSON | null) {
+    super(data);
+    this.fromJSON(data);
+  }
+
+  /**
+   * Transform base64url encoded strings to ArrayBuffer
+   */
+  protected fromJSON(data: VerificationJSON | null): this {
+    super.fromJSON(data);
+    if (data?.nonce) {
+      this.publicKey = convertJSONToPublicKeyCreateOptions(
+        JSON.parse(data.nonce) as PublicKeyCredentialCreationOptionsJSON,
+      );
     }
     return this;
   }

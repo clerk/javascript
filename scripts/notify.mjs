@@ -6,6 +6,16 @@ import { globby as glob } from 'globby';
 const { GITHUB_REF = 'main' } = process.env;
 const baseUrl = new URL(`https://github.com/clerk/javascript/blob/${GITHUB_REF}/`);
 
+const getReleaseChannel = version => {
+  if (version?.includes('alpha')) {
+    return 'Alpha';
+  } else if (version?.includes('beta')) {
+    return 'Beta';
+  } else {
+    return 'Stable';
+  }
+};
+
 /**
  * @typedef {Object} PackageData
  * @property {string} name
@@ -52,7 +62,8 @@ const slackFormatter = {
     });
     const blocks = [];
 
-    blocks.push(header(`Javascript SDKs - Stable Release - ${new Date().toLocaleDateString('en-US')}`));
+    const releaseChannel = getReleaseChannel(packageData?.[0]?.version);
+    blocks.push(header(`Javascript SDKs - ${releaseChannel} Release - ${new Date().toLocaleDateString('en-US')}`));
 
     let body = '';
     for (const { name, version, changelogUrl } of packageData) {

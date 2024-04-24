@@ -1,17 +1,17 @@
 {
   "name": "@clerk/elements",
-  "version": "0.0.2-alpha-v5.2",
-  "private": true,
+  "version": "0.1.45",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
     "typescript",
-    "nextjs",
     "auth",
     "authentication",
     "passwordless",
     "session",
-    "jwt"
+    "jwt",
+    "elements",
+    "radix"
   ],
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -26,6 +26,16 @@
   "author": "Clerk",
   "sideEffects": false,
   "exports": {
+    "./*": {
+      "import": {
+        "types": "./dist/react/*/index.d.mts",
+        "default": "./dist/react/*/index.mjs"
+      },
+      "require": {
+        "types": "./dist/react/*/index.d.ts",
+        "default": "./dist/react/*/index.js"
+      }
+    },
     ".": {
       "import": {
         "types": "./dist/index.d.mts",
@@ -37,53 +47,64 @@
       }
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "app:build": "(cd examples/nextjs && npm run build)",
-    "app:dev": "(cd examples/nextjs && npm run dev)",
+    "app:build": "(cd examples/nextjs && npm run build --turbo)",
+    "app:dev": "(cd examples/nextjs && npm run dev --turbo)",
+    "app:dev:debug": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true npm run dev --turbo)",
+    "app:dev:debug:server": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true CLERK_ELEMENTS_DEBUG_SERVER=true npm run dev --turbo)",
     "app:e2e": "(cd examples/nextjs && npm run e2e)",
     "app:lint": "(cd examples/nextjs && npm run lint)",
     "build": "tsup",
-    "clean": "rimraf ./dist",
+    "build:analyze": "tsup --metafile; open https://esbuild.github.io/analyze/",
+    "build:declarations": "tsc -p tsconfig.json",
     "dev": "tsup --watch",
-    "dev:publish": "npm run dev -- --env.publish",
+    "dev:example": "concurrently \"npm run dev\" \"npm run app:dev\"",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/clerk-react": "5.0.0-alpha-v5.13",
-    "@clerk/nextjs": "5.0.0-alpha-v5.14",
-    "@clerk/shared": "2.0.0-alpha-v5.8",
     "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-slot": "^1.0.2",
-    "@xstate/react": "^4.0.1",
-    "clsx": "^2.0.0",
-    "react-children-utilities": "^2.9.0",
-    "xstate": "^5.3.1"
+    "@statelyai/inspect": "^0.1.0",
+    "@xstate/react": "^4.1.1",
+    "client-only": "^0.0.1",
+    "xstate": "^5.11.0"
   },
   "devDependencies": {
-    "@clerk/types": "^4.0.0-alpha-v5.11",
+    "@clerk/clerk-react": "5.0.0",
+    "@clerk/shared": "2.0.0",
+    "@clerk/types": "^4.0.0",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "concurrently": "^8.2.2",
     "eslint-config-custom": "*",
-    "next": "^13.4.19",
+    "next": "^14.0.4",
     "tslib": "2.4.1",
-    "typescript": "*"
+    "tsup": "*",
+    "type-fest": "^4.9.0",
+    "typescript": "^5.3.3"
   },
   "peerDependencies": {
-    "next": ">=13.0.4",
+    "@clerk/clerk-react": "^5.0.0-beta",
+    "@clerk/shared": "^2.0.0-beta",
+    "next": "^13.0.4 || ^14.0.3",
     "react": ">=18",
     "react-dom": ">=18"
   },
   "peerDependenciesMeta": {
+    "@clerk/clerk-react": {
+      "optional": true
+    },
+    "@clerk/shared": {
+      "optional": true
+    },
     "next": {
       "optional": true
     }

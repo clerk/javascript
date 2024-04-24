@@ -2,18 +2,9 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 // @ts-ignore
-import emailJson from '../../fixtures/email.json';
-// @ts-ignore
 import userJson from '../../fixtures/user.json';
 import runtime from '../../runtime';
-import {
-  assertErrorResponse,
-  assertResponse,
-  jsonError,
-  jsonNotOk,
-  jsonOk,
-  jsonPaginatedOk,
-} from '../../util/testUtils';
+import { jsonError, jsonNotOk, jsonOk, jsonPaginatedOk } from '../../util/testUtils';
 import { createBackendApiClient } from '../factory';
 
 export default (QUnit: QUnit) => {
@@ -37,16 +28,12 @@ export default (QUnit: QUnit) => {
 
       const response = await apiClient.users.getUser('user_deadbeef');
 
-      assertResponse(assert, response);
-      const { data: payload, totalCount } = response;
-
-      assert.equal(payload.firstName, 'John');
-      assert.equal(payload.lastName, 'Doe');
-      assert.equal(payload.emailAddresses[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload.phoneNumbers[0].phoneNumber, '+311-555-2368');
-      assert.equal(payload.externalAccounts[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload.publicMetadata.zodiac_sign, 'leo');
-      assert.equal(totalCount, undefined);
+      assert.equal(response.firstName, 'John');
+      assert.equal(response.lastName, 'Doe');
+      assert.equal(response.emailAddresses[0].emailAddress, 'john.doe@clerk.test');
+      assert.equal(response.phoneNumbers[0].phoneNumber, '+311-555-2368');
+      assert.equal(response.externalAccounts[0].emailAddress, 'john.doe@clerk.test');
+      assert.equal(response.publicMetadata.zodiac_sign, 'leo');
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
@@ -54,68 +41,46 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
     });
 
-    test('executes a successful backend API request for a list of resources and parses the response', async assert => {
+    test('executes 2 backend API request for users.getUserList()', async assert => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonOk([userJson]));
+      // use different total_count from data in the 1st response to assert that this value is returned from method
+      fakeFetch.onCall(1).returns(jsonOk({ object: 'total_count', total_count: 2 }));
 
-      const response = await apiClient.users.getUserList({ offset: 2, limit: 5 });
-      assertResponse(assert, response);
-      const { data: payload, totalCount } = response;
+      const { data, totalCount } = await apiClient.users.getUserList({
+        offset: 2,
+        limit: 5,
+        userId: ['user_cafebabe'],
+      });
 
-      assert.equal(payload[0].firstName, 'John');
-      assert.equal(payload[0].lastName, 'Doe');
-      assert.equal(payload[0].emailAddresses[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload[0].phoneNumbers[0].phoneNumber, '+311-555-2368');
-      assert.equal(payload[0].externalAccounts[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload[0].publicMetadata.zodiac_sign, 'leo');
-      assert.equal(totalCount, 1);
+      assert.equal(data[0].firstName, 'John');
+      assert.equal(data[0].id, 'user_cafebabe');
+      assert.equal(data.length, 1);
+      assert.equal(totalCount, 2);
 
       assert.ok(
-        fakeFetch.calledOnceWith('https://api.clerk.test/v1/users?offset=2&limit=5', {
+        fakeFetch.calledWith('https://api.clerk.test/v1/users?offset=2&limit=5&user_id=user_cafebabe', {
           method: 'GET',
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
-    });
-
-    test('executes a successful backend API request for a resource that contains data (key related to pagination)', async assert => {
-      fakeFetch = sinon.stub(runtime, 'fetch');
-      fakeFetch.onCall(0).returns(jsonOk(emailJson));
-
-      const body = {
-        fromEmailName: 'foobar123',
-        emailAddressId: 'test@test.dev',
-        body: 'this is a test',
-        subject: 'this is a test',
-      };
-      const requestBody =
-        '{"from_email_name":"foobar123","email_address_id":"test@test.dev","body":"this is a test","subject":"this is a test"}';
-      const response = await apiClient.emails.createEmail(body);
-      assertResponse(assert, response);
-      const { data: payload, totalCount } = response;
-
-      assert.equal(JSON.stringify(payload.data), '{}');
-      assert.equal(payload.id, 'ema_2PHa2N3bS7D6NPPQ5mpHEg0waZQ');
-      assert.equal(totalCount, undefined);
-
       assert.ok(
-        fakeFetch.calledOnceWith('https://api.clerk.test/v1/emails', {
-          method: 'POST',
-          body: requestBody,
+        fakeFetch.calledWith('https://api.clerk.test/v1/users/count?user_id=user_cafebabe', {
+          method: 'GET',
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -123,32 +88,18 @@ export default (QUnit: QUnit) => {
 
     test('executes a successful backend API request for a paginated response', async assert => {
       fakeFetch = sinon.stub(runtime, 'fetch');
-      fakeFetch.onCall(0).returns(jsonPaginatedOk([userJson], 3));
+      fakeFetch.onCall(0).returns(jsonPaginatedOk([{ id: '1' }], 3));
 
-      const response = await apiClient.users.getUserList({ offset: 2, limit: 5 });
-      assertResponse(assert, response);
-      const { data: payload, totalCount } = response;
+      const { data: response, totalCount } = await apiClient.users.getOrganizationMembershipList({
+        offset: 2,
+        limit: 5,
+        userId: 'user_123',
+      });
 
-      assert.equal(payload[0].firstName, 'John');
-      assert.equal(payload[0].lastName, 'Doe');
-      assert.equal(payload[0].emailAddresses[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload[0].phoneNumbers[0].phoneNumber, '+311-555-2368');
-      assert.equal(payload[0].externalAccounts[0].emailAddress, 'john.doe@clerk.test');
-      assert.equal(payload[0].publicMetadata.zodiac_sign, 'leo');
+      assert.equal(response[0].id, '1');
       // payload.length is different from response total_count to check that totalCount use the total_count from response
-      assert.equal(payload.length, 1);
       assert.equal(totalCount, 3);
-
-      assert.ok(
-        fakeFetch.calledOnceWith('https://api.clerk.test/v1/users?offset=2&limit=5', {
-          method: 'GET',
-          headers: {
-            Authorization: 'Bearer deadbeef',
-            'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
-          },
-        }),
-      );
+      assert.equal(response.length, 1);
     });
 
     test('executes a successful backend API request to create a new resource', async assert => {
@@ -162,10 +113,8 @@ export default (QUnit: QUnit) => {
           star_sign: 'Leon',
         },
       });
-      assertResponse(assert, response);
-      const { data: payload } = response;
 
-      assert.equal(payload.firstName, 'John');
+      assert.equal(response.firstName, 'John');
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users', {
@@ -173,7 +122,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
           body: JSON.stringify({
             first_name: 'John',
@@ -197,16 +146,14 @@ export default (QUnit: QUnit) => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonNotOk({ errors: [mockErrorPayload], clerk_trace_id: traceId }));
 
-      const response = await apiClient.users.getUser('user_deadbeef');
-      assertErrorResponse(assert, response);
+      const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
 
-      assert.equal(response.clerkTraceId, traceId);
-      assert.equal(response.status, 422);
-      assert.equal(response.statusText, '422');
-      assert.equal(response.errors[0].code, 'whatever_error');
-      assert.equal(response.errors[0].message, 'whatever error');
-      assert.equal(response.errors[0].longMessage, 'some long message');
-      assert.equal(response.errors[0].meta.paramName, 'some param');
+      assert.equal(errResponse.clerkTraceId, traceId);
+      assert.equal(errResponse.status, 422);
+      assert.equal(errResponse.errors[0].code, 'whatever_error');
+      assert.equal(errResponse.errors[0].message, 'whatever error');
+      assert.equal(errResponse.errors[0].longMessage, 'some long message');
+      assert.equal(errResponse.errors[0].meta.paramName, 'some param');
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
@@ -214,7 +161,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -224,12 +171,10 @@ export default (QUnit: QUnit) => {
       fakeFetch = sinon.stub(runtime, 'fetch');
       fakeFetch.onCall(0).returns(jsonError({ errors: [] }));
 
-      const response = await apiClient.users.getUser('user_deadbeef');
-      assertErrorResponse(assert, response);
+      const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
 
-      assert.equal(response.status, 500);
-      assert.equal(response.statusText, '500');
-      assert.equal(response.clerkTraceId, 'mock_cf_ray');
+      assert.equal(errResponse.status, 500);
+      assert.equal(errResponse.clerkTraceId, 'mock_cf_ray');
 
       assert.ok(
         fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef', {
@@ -237,7 +182,7 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );
@@ -262,7 +207,42 @@ export default (QUnit: QUnit) => {
           headers: {
             Authorization: 'Bearer deadbeef',
             'Content-Type': 'application/json',
-            'Clerk-Backend-SDK': '@clerk/backend',
+            'User-Agent': '@clerk/backend@0.0.0-test',
+          },
+        }),
+      );
+    });
+
+    test('successfully retrieves user access tokens from backend API for a specific provider', async assert => {
+      const fakeResponse = [
+        {
+          external_account_id: 'eac_2dYS7stz9bgxQsSRvNqEAHhuxvW',
+          object: 'oauth_access_token',
+          token: '<token>',
+          provider: 'oauth_google',
+          public_metadata: {},
+          label: null,
+          scopes: ['email', 'profile'],
+        },
+      ];
+
+      fakeFetch = sinon.stub(runtime, 'fetch');
+      fakeFetch.onCall(0).returns(jsonOk(fakeResponse));
+
+      const response = await apiClient.users.getUserOauthAccessToken('user_deadbeef', 'oauth_google');
+
+      assert.equal(response[0].externalAccountId, 'eac_2dYS7stz9bgxQsSRvNqEAHhuxvW');
+      assert.equal(response[0].provider, 'oauth_google');
+      assert.equal(response[0].token, '<token>');
+      assert.deepEqual(response[0].scopes, ['email', 'profile']);
+
+      assert.ok(
+        fakeFetch.calledOnceWith('https://api.clerk.test/v1/users/user_deadbeef/oauth_access_tokens/oauth_google', {
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer deadbeef',
+            'Content-Type': 'application/json',
+            'User-Agent': '@clerk/backend@0.0.0-test',
           },
         }),
       );

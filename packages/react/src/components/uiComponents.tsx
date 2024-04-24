@@ -1,6 +1,8 @@
-import { logErrorInDevMode } from '@clerk/shared';
+import { logErrorInDevMode, without } from '@clerk/shared';
+import { isDeeplyEqual } from '@clerk/shared/react';
 import type {
   CreateOrganizationProps,
+  OneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -89,11 +91,15 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<OrganizationSwitcherP
 class Portal extends React.PureComponent<MountProps> {
   private portalRef = React.createRef<HTMLDivElement>();
 
-  componentDidUpdate(prevProps: Readonly<MountProps>) {
-    if (
-      prevProps.props.appearance !== this.props.props.appearance ||
-      prevProps.props?.customPages?.length !== this.props.props?.customPages?.length
-    ) {
+  componentDidUpdate(_prevProps: Readonly<MountProps>) {
+    // Remove children and customPages from props before comparing
+    // children might hold circular references which deepEqual can't handle
+    // and the implementation of customPages relies on props getting new references
+    const prevProps = without(_prevProps.props, 'customPages', 'children');
+    const newProps = without(this.props.props, 'customPages', 'children');
+    // instead, we simply use the length of customPages to determine if it changed or not
+    const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
+    if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged) {
       this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
     }
   }
@@ -269,3 +275,14 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
     />
   );
 }, 'OrganizationList');
+
+export const __experimental_GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<OneTapProps>) => {
+  return (
+    <Portal
+      mount={clerk.__experimental_mountGoogleOneTap}
+      unmount={clerk.__experimental_unmountGoogleOneTap}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'OneTap');

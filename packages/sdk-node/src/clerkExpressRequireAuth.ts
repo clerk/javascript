@@ -1,10 +1,6 @@
 import type { createClerkClient } from '@clerk/backend';
 
-import {
-  authenticateRequest,
-  decorateResponseWithObservabilityHeaders,
-  setResponseForHandshake,
-} from './authenticateRequest';
+import { authenticateRequest, setResponseHeaders } from './authenticateRequest';
 import type { ClerkMiddlewareOptions, MiddlewareRequireAuthProp, RequireAuthProp } from './types';
 
 export type CreateClerkExpressMiddlewareOptions = {
@@ -26,9 +22,8 @@ export const createClerkExpressRequireAuth = (createOpts: CreateClerkExpressMidd
         req,
         options,
       });
-      decorateResponseWithObservabilityHeaders(res, requestState);
 
-      const err = setResponseForHandshake(requestState, res);
+      const err = setResponseHeaders(requestState, res);
       if (err || res.writableEnded) {
         if (err) {
           next(err);

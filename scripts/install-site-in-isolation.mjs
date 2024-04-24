@@ -47,4 +47,5 @@ FULL_TMP_FOLDER: ${FULL_TMP_FOLDER}`);
 } catch (e) {
   // Bail on errors
   core.setFailed(`Script failed with error: ${e}`);
+  process.exit();
 }

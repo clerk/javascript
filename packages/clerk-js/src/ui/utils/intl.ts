@@ -1,4 +1,4 @@
-function supportedLocalesOf(locale?: string | string[]) {
+function listFormatSupportedLocalesOf(locale?: string | string[]) {
   if (!locale) {
     return false;
   }
@@ -11,5 +11,31 @@ function supportedLocalesOf(locale?: string | string[]) {
  * It is recommended to first check for browser support before using it
  */
 export function canUseListFormat(locale: string | undefined) {
-  return 'ListFormat' in Intl && supportedLocalesOf(locale);
+  return 'ListFormat' in Intl && listFormatSupportedLocalesOf(locale);
+}
+
+function numberFormatSupportedLocalesOf(locale?: string) {
+  if (!locale) {
+    return false;
+  }
+
+  try {
+    return (Intl as any).NumberFormat.supportedLocalesOf(locale).length > 0;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function canUseNumberFormat(locale: string | undefined) {
+  return 'NumberFormat' in Intl && numberFormatSupportedLocalesOf(locale);
+}
+
+export function formatToCompactNumber(value: number, locale: string): string {
+  if (!canUseNumberFormat(locale)) {
+    return value.toString();
+  }
+
+  const formatter = new Intl.NumberFormat(locale, { notation: 'compact' });
+
+  return formatter.format(value);
 }

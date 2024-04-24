@@ -1,80 +1,121 @@
 import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
-import { Col, descriptors, Flow, Icon } from '../../customizables';
-import { Card, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
-import { ArrowBlockButton } from '../../elements/ArrowBlockButton';
+import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Action, Actions, Card, Header, PreviewButton, UserPreview, withCardStateProvider } from '../../elements';
 import { useCardState } from '../../elements/contexts';
-import { Plus, SignOutDouble } from '../../icons';
+import { Add, SwitchArrowRight } from '../../icons';
+import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
 const _SignInAccountSwitcher = () => {
   const card = useCardState();
-  const { applicationName, userProfileUrl, signInUrl } = useEnvironment().displayConfig;
-  const { navigateAfterSignIn } = useSignInContext();
+  const { userProfileUrl } = useEnvironment().displayConfig;
+  const { navigateAfterSignIn, path: signInPath } = useSignInContext();
   const { navigateAfterSignOut } = useSignOutContext();
   const { handleSignOutAllClicked, handleSessionClicked, activeSessions, handleAddAccountClicked } =
     useMultisessionActions({
       navigateAfterSignOut,
       navigateAfterSwitchSession: navigateAfterSignIn,
       userProfileUrl,
-      signInUrl,
+      signInUrl: signInPath,
       user: undefined,
     });
 
   return (
     <Flow.Part part='accountSwitcher'>
       <Card.Root>
-        <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
+        <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}` })}>
           <Header.Root>
-            <Header.Title>Signed out</Header.Title>
-            <Header.Subtitle>Select account to continue to {applicationName}</Header.Subtitle>
+            <Header.Title localizationKey={localizationKeys('signIn.accountSwitcher.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signIn.accountSwitcher.subtitle')} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           <Col
             elementDescriptor={descriptors.main}
             gap={8}
+            sx={t => ({
+              borderTopWidth: t.borderWidths.$normal,
+              borderTopStyle: t.borderStyles.$solid,
+              borderTopColor: t.colors.$neutralAlpha100,
+            })}
           >
-            <Col>
+            <Actions role='menu'>
               {activeSessions.map(s => (
                 <PreviewButton
                   key={s.id}
                   onClick={handleSessionClicked(s)}
-                  sx={theme => ({ height: theme.sizes.$16, justifyContent: 'flex-start' })}
+                  sx={theme => ({
+                    height: theme.sizes.$16,
+                    justifyContent: 'flex-start',
+                    borderRadius: 0,
+                  })}
+                  icon={SwitchArrowRight}
                 >
-                  <UserPreview user={s.user} />
+                  <UserPreview
+                    user={s.user}
+                    sx={{
+                      width: '100%',
+                    }}
+                  />
                 </PreviewButton>
               ))}
-            </Col>
-            <Col gap={2}>
-              <ArrowBlockButton
-                isDisabled={card.isLoading}
-                leftIcon={
-                  <Icon
-                    size='sm'
-                    icon={Plus}
-                    sx={theme => ({ color: theme.colors.$blackAlpha500 })}
-                  />
-                }
+
+              <Action
+                elementDescriptor={descriptors.accountSwitcherActionButton}
+                elementId={descriptors.accountSwitcherActionButton.setId('addAccount')}
+                iconBoxElementDescriptor={descriptors.accountSwitcherActionButtonIconBox}
+                iconBoxElementId={descriptors.accountSwitcherActionButtonIconBox.setId('addAccount')}
+                iconElementDescriptor={descriptors.accountSwitcherActionButtonIcon}
+                iconElementId={descriptors.accountSwitcherActionButtonIcon.setId('addAccount')}
+                icon={Add}
+                label={localizationKeys('signIn.accountSwitcher.action__addAccount')}
                 onClick={handleAddAccountClicked}
-              >
-                Add account
-              </ArrowBlockButton>
-              <ArrowBlockButton
-                isDisabled={card.isLoading}
-                leftIcon={
-                  <Icon
-                    icon={SignOutDouble}
-                    sx={theme => ({ color: theme.colors.$blackAlpha500 })}
-                  />
-                }
-                onClick={handleSignOutAllClicked}
-              >
-                Sign out of all accounts
-              </ArrowBlockButton>
-            </Col>
+                iconSx={t => ({
+                  width: t.sizes.$9,
+                  height: t.sizes.$6,
+                })}
+                iconBoxSx={t => ({
+                  minHeight: t.sizes.$9,
+                  minWidth: t.sizes.$6,
+                  alignItems: 'center',
+                })}
+                spinnerSize='md'
+              />
+            </Actions>
           </Col>
         </Card.Content>
-        <Card.Footer />
+        <Card.Footer
+          sx={t => ({
+            '>:first-of-type': {
+              padding: `${t.space.$1}`,
+              width: '100%',
+            },
+          })}
+        >
+          <Card.Action
+            sx={{
+              width: '100%',
+              '>:first-of-type': {
+                width: '100%',
+                borderBottomWidth: 0,
+              },
+            }}
+          >
+            <SignOutAllActions
+              handleSignOutAllClicked={handleSignOutAllClicked}
+              elementDescriptor={descriptors.accountSwitcherActionButton}
+              elementId={descriptors.accountSwitcherActionButton.setId('signOutAll')}
+              iconBoxElementDescriptor={descriptors.accountSwitcherActionButtonIconBox}
+              iconBoxElementId={descriptors.accountSwitcherActionButtonIconBox.setId('signOutAll')}
+              iconElementDescriptor={descriptors.accountSwitcherActionButtonIcon}
+              iconElementId={descriptors.accountSwitcherActionButtonIcon.setId('signOutAll')}
+              label={localizationKeys('signIn.accountSwitcher.action__signOutAll')}
+              actionSx={t => ({
+                padding: `${t.space.$2} ${t.space.$2}`,
+              })}
+            />
+          </Card.Action>
+        </Card.Footer>
       </Card.Root>
     </Flow.Part>
   );

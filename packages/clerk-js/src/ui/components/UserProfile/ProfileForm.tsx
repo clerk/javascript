@@ -5,7 +5,7 @@ import { isDefaultImage } from '../../../utils';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, InformationBox, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, InformationBox, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 
@@ -20,7 +20,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     return null;
   }
 
-  const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { first_name, last_name } = useEnvironment().userSettings.attributes;
   const showFirstName = first_name.enabled;
   const showLastName = last_name.enabled;
@@ -42,7 +41,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
 
   const userInfoChanged =
     (showFirstName && firstNameField.value !== userFirstName) || (showLastName && lastNameField.value !== userLastName);
-  const optionalFieldsChanged = userInfoChanged || avatarChanged;
+  const optionalFieldsChanged = userInfoChanged;
 
   const hasRequiredFields = (showFirstName && first_name.required) || (showLastName && last_name.required);
   const requiredFieldsFilled =
@@ -68,7 +67,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     return user
       .setProfileImage({ file })
       .then(() => {
-        setAvatarChanged(true);
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
@@ -78,17 +76,19 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     void user
       .setProfileImage({ file: null })
       .then(() => {
-        setAvatarChanged(true);
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
   };
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.profilePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.profilePage.title')}>
       {nameEditDisabled && <InformationBox message={localizationKeys('userProfile.profilePage.readonly')} />}
 
-      <Form.Root onSubmit={onSubmit}>
+      <Form.Root
+        onSubmit={onSubmit}
+        sx={t => ({ gap: t.space.$6 })}
+      >
         <UserProfileAvatarUploader
           user={user}
           onAvatarChange={uploadAvatar}
@@ -118,6 +118,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
           onReset={onReset}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

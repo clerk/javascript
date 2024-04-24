@@ -4,7 +4,7 @@ import React from 'react';
 import { isDefaultImage } from '../../../utils';
 import { localizationKeys } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 import { OrganizationProfileAvatarUploader } from './OrganizationProfileAvatarUploader';
 
@@ -14,7 +14,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const { onSuccess, onReset } = props;
   const title = localizationKeys('organizationProfile.profilePage.title');
   const card = useCardState();
-  const [avatarChanged, setAvatarChanged] = React.useState(false);
   const { organization } = useOrganization();
 
   const nameField = useFormControl('name', organization?.name || '', {
@@ -34,7 +33,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   }
 
   const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
-  const canSubmit = (dataChanged || avatarChanged) && slugField.feedbackType !== 'error';
+  const canSubmit = dataChanged && slugField.feedbackType !== 'error';
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +48,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     return organization
       .setLogo({ file })
       .then(() => {
-        setAvatarChanged(true);
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
@@ -59,7 +57,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     void organization
       .setLogo({ file: null })
       .then(() => {
-        setAvatarChanged(true);
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
@@ -75,7 +72,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   };
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer headerTitle={title}>
       <Form.Root onSubmit={onSubmit}>
         <OrganizationProfileAvatarUploader
           organization={organization}
@@ -87,20 +84,21 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
             {...nameField.props}
             autoFocus
             isRequired
+            ignorePasswordManager
           />
         </Form.ControlRow>
         <Form.ControlRow elementId={slugField.id}>
           <Form.PlainInput
             {...slugField.props}
             onChange={onChangeSlug}
+            ignorePasswordManager
           />
         </Form.ControlRow>
         <FormButtons
           isDisabled={!canSubmit}
           onReset={onReset}
-          sx={t => ({ marginTop: t.space.$1 })}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

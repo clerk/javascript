@@ -1,5 +1,618 @@
 # Change Log
 
+## 1.0.0
+
+### Major Changes
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- 71663c568: Internal update default apiUrl domain from clerk.dev to clerk.com
+- cfb50e1f6: Drop deprecations. Migration steps:
+  - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY` env variable
+  - use `secretKey` instead of `apiKey`
+  - use `CLERK_PUBLISHABLE_KEY` instead of `CLERK_FRONTEND_API` env variable
+  - use `publishableKey` instead of `frontendApi`
+- 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
+- 0ec3a146c: Changes in exports of `@clerk/backend`:
+  - Expose the following helpers and enums from `@clerk/backend/internal`:
+    ```typescript
+    import {
+      AuthStatus,
+      buildRequestUrl,
+      constants,
+      createAuthenticateRequest,
+      createIsomorphicRequest,
+      debugRequestState,
+      makeAuthObjectSerializable,
+      prunePrivateMetadata,
+      redirect,
+      sanitizeAuthObject,
+      signedInAuthObject,
+      signedOutAuthObject,
+    } from '@clerk/backend/internal';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { AuthStatus, ... } from '@clerk/backend';
+    // After
+    import { AuthStatus, ... } from '@clerk/backend/internal';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+- 1ad910eb9: Changes in exports of `@clerk/backend`:
+  - Drop the following internal exports from the top-level api:
+    ```typescript
+    // Before
+    import {
+      AllowlistIdentifier,
+      Client,
+      DeletedObject,
+      Email,
+      EmailAddress,
+      ExternalAccount,
+      IdentificationLink,
+      Invitation,
+      OauthAccessToken,
+      ObjectType,
+      Organization,
+      OrganizationInvitation,
+      OrganizationMembership,
+      OrganizationMembershipPublicUserData,
+      PhoneNumber,
+      RedirectUrl,
+      SMSMessage,
+      Session,
+      SignInToken,
+      Token,
+      User,
+      Verification,
+    } from '@clerk/backend';
+    // After : no alternative since there is no need to use those classes
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+  - Keep those 3 resource related type exports
+    ```typescript
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    ```
+- 02976d494: (Note: This is only relevant if, in the unlikely case, you are using `Clerk` from `@clerk/fastify` directly. If not, you can safely ignore this change.)
+
+  Remove the named `Clerk` import from `@clerk/fastify` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
+
+  ```js
+  import { Clerk } from '@clerk/fastify';
+  const clerk = Clerk({ secretKey: '...' });
+  ```
+
+  You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
+
+  ```js
+  import { createClerkClient } from '@clerk/fastify';
+  const clerk = createClerkClient({ secretKey: '...' });
+  ```
+
+### Minor Changes
+
+- 4a93c6720: Introduce handshake mechanism and `x-clerk-auth-status` in response
+- 629881cba: Re-export everything from `@clerk/backend` in `@clerk/fastify` to support common backend types and functionality without adding `@clerk/backend` as dependency.
+
+  New exports:
+
+  - `verifyToken()`
+
+  New exported types:
+
+  - `ClerkOptions`
+  - `ClerkClient`
+  - `OrganizationMembershipRole`
+  - `VerifyTokenOptions`
+  - `WebhookEvent`
+  - `WebhookEventType`
+  - `AllowlistIdentifier`
+  - `Client`
+  - `EmailAddress`
+  - `ExternalAccount`
+  - `Invitation`
+  - `OauthAccessToken`
+  - `Organization`
+  - `OrganizationInvitation`
+  - `OrganizationMembership`
+  - `OrganizationMembershipPublicUserData`
+  - `PhoneNumber`
+  - `Session`
+  - `SignInToken`
+  - `SMSMessage`
+  - `Token`
+  - `User`
+
+- 2964f8a47: Expose debug headers in response for handshake / signed-out states from SDKs using headers returned from `authenticateRequest()`
+- 18c0d015d: Pass environment into `sdkMetadata` in order to detect if production clerk-js is used by other sdks in dev mode. When it is log dev warning from clerk-js.
+- b4e79c1b9: Replace the `Clerk-Backend-SDK` header with `User-Agent` in BAPI requests and update it's value to contain both the package name and the package version of the clerk package
+  executing the request. Eg request from `@clerk/nextjs` to BAPI with append `User-Agent: @clerk/nextjs@5.0.0-alpha-v5.16` using the latest version.
+
+  Miscellaneous changes: The backend test build changed to use tsup.
+
+### Patch Changes
+
+- 2de442b24: Rename beta-v5 to beta
+- 2e77cd737: Set correct information on required Node.js and React versions in README
+- 7644b7472: Improve the default value for `CLERK_API_URL` by utilizing the publishable key to differentiate between local, staging and prod environments.
+- 40ac4b645: Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry.
+- Updated dependencies [3a2f13604]
+- Updated dependencies [8c23651b8]
+- Updated dependencies [f4f99f18d]
+- Updated dependencies [743c4d204]
+- Updated dependencies [4b8bedc66]
+- Updated dependencies [9272006e7]
+- Updated dependencies [1db1f4068]
+- Updated dependencies [c2a090513]
+- Updated dependencies [966b31205]
+- Updated dependencies [0d0b1d89a]
+- Updated dependencies [1834a3ee4]
+- Updated dependencies [a8901be64]
+- Updated dependencies [896cb6104]
+- Updated dependencies [64d3763ec]
+- Updated dependencies [8350109ab]
+- Updated dependencies [7b200af49]
+- Updated dependencies [988a299c0]
+- Updated dependencies [ecb60da48]
+- Updated dependencies [deac67c1c]
+- Updated dependencies [b3a3dcdf4]
+- Updated dependencies [1dc28ab46]
+- Updated dependencies [83e9d0846]
+- Updated dependencies [d37d44a68]
+- Updated dependencies [244de5ea3]
+- Updated dependencies [fe356eebd]
+- Updated dependencies [791c49807]
+- Updated dependencies [935b0886e]
+- Updated dependencies [93d05c868]
+- Updated dependencies [ea4933655]
+- Updated dependencies [7f6a64f43]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [448e02e93]
+- Updated dependencies [2671e7aa5]
+- Updated dependencies [afec17953]
+- Updated dependencies [799abc281]
+- Updated dependencies [0699fa496]
+- Updated dependencies [4aaf5103d]
+- Updated dependencies [a68eb3083]
+- Updated dependencies [2de442b24]
+- Updated dependencies [15af02a83]
+- Updated dependencies [0293f29c8]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [9180c8b80]
+- Updated dependencies [db18787c4]
+- Updated dependencies [7f833da9e]
+- Updated dependencies [de6519daa]
+- Updated dependencies [e6ecbaa2f]
+- Updated dependencies [ef2325dcc]
+- Updated dependencies [6a769771c]
+- Updated dependencies [fc3ffd880]
+- Updated dependencies [8b6b094b9]
+- Updated dependencies [840636a14]
+- Updated dependencies [bab2e7e05]
+- Updated dependencies [71663c568]
+- Updated dependencies [a6b893d28]
+- Updated dependencies [02976d494]
+- Updated dependencies [492b8a7b1]
+- Updated dependencies [8e5c881c4]
+- Updated dependencies [9e99eb727]
+- Updated dependencies [034c47ccb]
+- Updated dependencies [2352149f6]
+- Updated dependencies [e5c989a03]
+- Updated dependencies [ff08fe237]
+- Updated dependencies [7ecd6f6ab]
+- Updated dependencies [12f3c5c55]
+- Updated dependencies [244de5ea3]
+- Updated dependencies [c776f86fb]
+- Updated dependencies [90aa2ea9c]
+- Updated dependencies [d9f265fcb]
+- Updated dependencies [1e98187b4]
+- Updated dependencies [7bffc47cb]
+- Updated dependencies [a605335e1]
+- Updated dependencies [2e77cd737]
+- Updated dependencies [9737ef510]
+- Updated dependencies [fafa76fb6]
+- Updated dependencies [2964f8a47]
+- Updated dependencies [1f650f30a]
+- Updated dependencies [7af0949ae]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [2a22aade8]
+- Updated dependencies [69ce3e185]
+- Updated dependencies [63dfe8dc9]
+- Updated dependencies [e921af259]
+- Updated dependencies [78fc5eec0]
+- Updated dependencies [d08ec6d8f]
+- Updated dependencies [dd5703013]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [6a33709cc]
+- Updated dependencies [03079579d]
+- Updated dependencies [c22cd5214]
+- Updated dependencies [52ff8fe6b]
+- Updated dependencies [86d52fb5c]
+- Updated dependencies [f77e8cdbd]
+- Updated dependencies [8b466a9ba]
+- Updated dependencies [fe2607b6f]
+- Updated dependencies [c7e6d00f5]
+- Updated dependencies [8cc45d2af]
+- Updated dependencies [663243220]
+- Updated dependencies [c6a5e0f5d]
+- Updated dependencies [4edb77632]
+- Updated dependencies [ab4eb56a5]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [5c239d973]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [12962bc58]
+- Updated dependencies [7cb1241a9]
+- Updated dependencies [9615e6cda]
+- Updated dependencies [0ec3a146c]
+- Updated dependencies [4bb57057e]
+- Updated dependencies [bad4de1a2]
+- Updated dependencies [d4ff346dd]
+- Updated dependencies [7644b7472]
+- Updated dependencies [2ec9f6b09]
+- Updated dependencies [2e4a43017]
+- Updated dependencies [66b283653]
+- Updated dependencies [5aab9f04a]
+- Updated dependencies [46040a2f3]
+- Updated dependencies [f00fd2dfe]
+- Updated dependencies [cace85374]
+- Updated dependencies [1ad910eb9]
+- Updated dependencies [8daf8451c]
+- Updated dependencies [f58a9949b]
+- Updated dependencies [4aaf5103d]
+- Updated dependencies [75ea300bc]
+- Updated dependencies [d22e6164d]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [e1f7eae87]
+- Updated dependencies [7f751c4ef]
+- Updated dependencies [4fced88ac]
+- Updated dependencies [f5d55bb1f]
+- Updated dependencies [18c0d015d]
+- Updated dependencies [0d1052ac2]
+- Updated dependencies [d30ea1faa]
+- Updated dependencies [e7e2a1eae]
+- Updated dependencies [7886ba89d]
+- Updated dependencies [1fd2eff38]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [5471c7e8d]
+- Updated dependencies [a6308c67e]
+- Updated dependencies [0ce0edc28]
+- Updated dependencies [f540e9843]
+- Updated dependencies [477170962]
+- Updated dependencies [9b02c1aae]
+- Updated dependencies [051833167]
+- Updated dependencies [b4e79c1b9]
+- Updated dependencies [38d8b3e8a]
+- Updated dependencies [be991365e]
+- Updated dependencies [8350f73a6]
+- Updated dependencies [d6a7ea61a]
+- Updated dependencies [e0e79b4fe]
+- Updated dependencies [41ae1d2f0]
+- Updated dependencies [e602d6c1f]
+- Updated dependencies [142ded732]
+- Updated dependencies [fb794ce7b]
+- Updated dependencies [48ca40af9]
+- Updated dependencies [e6fc58ae4]
+- Updated dependencies [6fffd3b54]
+- Updated dependencies [94519aa33]
+- Updated dependencies [ebf9be77f]
+- Updated dependencies [a6451aece]
+- Updated dependencies [008ac4217]
+- Updated dependencies [987994909]
+- Updated dependencies [40ac4b645]
+- Updated dependencies [1bea9c200]
+- Updated dependencies [6f755addd]
+- Updated dependencies [429d030f7]
+- Updated dependencies [844847e0b]
+- Updated dependencies [6eab66050]
+- Updated dependencies [c2b982749]
+  - @clerk/backend@1.0.0
+  - @clerk/shared@2.0.0
+  - @clerk/types@4.0.0
+
+## 1.0.0-beta.46
+
+### Patch Changes
+
+- Updated dependencies [[`f00fd2dfe`](https://github.com/clerk/javascript/commit/f00fd2dfe309cfeac82a776cc006f2c21b6d7988)]:
+  - @clerk/types@4.0.0-beta.30
+
+## 1.0.0-beta.45
+
+### Patch Changes
+
+- Updated dependencies [[`bab2e7e05`](https://github.com/clerk/javascript/commit/bab2e7e0590d0da1fd7db0680e63e8f2eb836b41)]:
+  - @clerk/shared@2.0.0-beta.23
+  - @clerk/types@4.0.0-beta.29
+  - @clerk/backend@1.0.0-beta.37
+
+## 1.0.0-beta.44
+
+### Patch Changes
+
+- Updated dependencies [[`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`d9f265fcb`](https://github.com/clerk/javascript/commit/d9f265fcb12b39301b9802e4787dc636ee28444f), [`142ded732`](https://github.com/clerk/javascript/commit/142ded73265b776789b65404d96b6c91cfe15e98), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5), [`e6fc58ae4`](https://github.com/clerk/javascript/commit/e6fc58ae4df5091eff00ba0d9045ce5ff0fff538)]:
+  - @clerk/types@4.0.0-beta.28
+  - @clerk/backend@1.0.0-beta.36
+  - @clerk/shared@2.0.0-beta.22
+
+## 1.0.0-beta.43
+
+### Patch Changes
+
+- Updated dependencies [[`7cb1241a9`](https://github.com/clerk/javascript/commit/7cb1241a9929b3d8a0d2157637734d82dd9fd852), [`94519aa33`](https://github.com/clerk/javascript/commit/94519aa33774c8d6e557ce47a00974ad7b194c5d)]:
+  - @clerk/backend@1.0.0-beta.35
+  - @clerk/types@4.0.0-beta.27
+
+## 1.0.0-beta.42
+
+### Patch Changes
+
+- Updated dependencies [[`ecb60da48`](https://github.com/clerk/javascript/commit/ecb60da48029b9cb2d17ab9b0a73cb92bc5c924b), [`0699fa496`](https://github.com/clerk/javascript/commit/0699fa49693dc7a8d3de8ba053c4f16a5c8431d0)]:
+  - @clerk/backend@1.0.0-beta.34
+  - @clerk/types@4.0.0-beta.26
+
+## 1.0.0-beta.41
+
+### Patch Changes
+
+- Updated dependencies [[`2352149f6`](https://github.com/clerk/javascript/commit/2352149f6ba9708095146a3087538faf2d4f161f)]:
+  - @clerk/types@4.0.0-beta.25
+
+## 1.0.0-beta.40
+
+### Patch Changes
+
+- Updated dependencies [[`9180c8b80`](https://github.com/clerk/javascript/commit/9180c8b80e0ad95c1a9e490e8201ffd089634a48), [`63dfe8dc9`](https://github.com/clerk/javascript/commit/63dfe8dc92c28213db5c5644782e7d6751fa22a6), [`c6a5e0f5d`](https://github.com/clerk/javascript/commit/c6a5e0f5dbd9ec4a7b5657855e8a31bc8347d0a4), [`d22e6164d`](https://github.com/clerk/javascript/commit/d22e6164ddb765542e0e6335421d2ebf484af059)]:
+  - @clerk/types@4.0.0-beta.24
+  - @clerk/backend@1.0.0-beta.33
+
+## 1.0.0-beta.39
+
+### Patch Changes
+
+- Updated dependencies [[`fc3ffd880`](https://github.com/clerk/javascript/commit/fc3ffd88064a09ab98877dfba119150390f9296e), [`840636a14`](https://github.com/clerk/javascript/commit/840636a14537d4f6b810832e7662518ef4bd4500), [`1fd2eff38`](https://github.com/clerk/javascript/commit/1fd2eff38dc71e45d2ff95a5b6e5a99cca53c6e7), [`f540e9843`](https://github.com/clerk/javascript/commit/f540e98435c86298415552537e33164471298a5c), [`987994909`](https://github.com/clerk/javascript/commit/987994909b7c462cc2b785f75afe4d621f5c960d), [`1bea9c200`](https://github.com/clerk/javascript/commit/1bea9c20090abdde962c7da1a859933e1cd51660)]:
+  - @clerk/shared@2.0.0-beta.21
+  - @clerk/types@4.0.0-beta.23
+  - @clerk/backend@1.0.0-beta.32
+
+## 1.0.0-beta.38
+
+### Patch Changes
+
+- Updated dependencies [[`988a299c0`](https://github.com/clerk/javascript/commit/988a299c0abf708e905592c29e394f8e4d79968e)]:
+  - @clerk/backend@1.0.0-beta.31
+
+## 1.0.0-beta.37
+
+### Patch Changes
+
+- Updated dependencies [[`8350109ab`](https://github.com/clerk/javascript/commit/8350109ab85909e0457199da1db0c9787d94001e)]:
+  - @clerk/shared@2.0.0-beta.20
+  - @clerk/backend@1.0.0-beta.30
+
+## 1.0.0-beta.36
+
+### Patch Changes
+
+- Updated dependencies [[`afec17953`](https://github.com/clerk/javascript/commit/afec17953d1ae4ba39ee73e4383757694375524d)]:
+  - @clerk/types@4.0.0-beta.22
+
+## 1.0.0-beta.35
+
+### Patch Changes
+
+- Updated dependencies [[`8c23651b8`](https://github.com/clerk/javascript/commit/8c23651b8c3ff1474057a7d62e3ddba939cb0b64), [`9272006e7`](https://github.com/clerk/javascript/commit/9272006e744fc906cfdee520d2dc6d7db141cc97), [`0d0b1d89a`](https://github.com/clerk/javascript/commit/0d0b1d89a46d2418cb05a10940f4a399cbd8ffeb), [`2671e7aa5`](https://github.com/clerk/javascript/commit/2671e7aa5081eb9ae38b92ee647f2e3fd824741f), [`1f650f30a`](https://github.com/clerk/javascript/commit/1f650f30a97939817b7b2f3cc6283e22dc431523), [`663243220`](https://github.com/clerk/javascript/commit/6632432208aa6ca507f33fa9ab79abaa40431be6), [`66b283653`](https://github.com/clerk/javascript/commit/66b28365370bcbcdf4e51da39de58c7f8b1fc1b4), [`ebf9be77f`](https://github.com/clerk/javascript/commit/ebf9be77f17f8880541de67f66879324f68cf6bd)]:
+  - @clerk/backend@1.0.0-beta.29
+  - @clerk/types@4.0.0-beta.21
+
+## 1.0.0-beta.34
+
+### Minor Changes
+
+- Re-export everything from `@clerk/backend` in `@clerk/fastify` to support common backend types and functionality without adding `@clerk/backend` as dependency. ([#2968](https://github.com/clerk/javascript/pull/2968)) by [@dimkl](https://github.com/dimkl)
+
+  New exports:
+
+  - `verifyToken()`
+
+  New exported types:
+
+  - `ClerkOptions`
+  - `ClerkClient`
+  - `OrganizationMembershipRole`
+  - `VerifyTokenOptions`
+  - `WebhookEvent`
+  - `WebhookEventType`
+  - `AllowlistIdentifier`
+  - `Client`
+  - `EmailAddress`
+  - `ExternalAccount`
+  - `Invitation`
+  - `OauthAccessToken`
+  - `Organization`
+  - `OrganizationInvitation`
+  - `OrganizationMembership`
+  - `OrganizationMembershipPublicUserData`
+  - `PhoneNumber`
+  - `Session`
+  - `SignInToken`
+  - `SMSMessage`
+  - `Token`
+  - `User`
+
+- Expose debug headers in response for handshake / signed-out states from SDKs using headers returned from `authenticateRequest()` ([#2898](https://github.com/clerk/javascript/pull/2898)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Updated dependencies [[`2964f8a47`](https://github.com/clerk/javascript/commit/2964f8a47e473fa8457a27104adb4d008613a0e3)]:
+  - @clerk/backend@1.0.0-beta.28
+
+## 1.0.0-beta.33
+
+### Patch Changes
+
+- Updated dependencies [[`008ac4217`](https://github.com/clerk/javascript/commit/008ac4217bc648085b3caba92a4524c31cc0925b)]:
+  - @clerk/types@4.0.0-beta.20
+
+## 1.0.0-beta.32
+
+### Patch Changes
+
+- Updated dependencies [[`8350f73a6`](https://github.com/clerk/javascript/commit/8350f73a67f8980be78e3bd3343e772f5653d718)]:
+  - @clerk/shared@2.0.0-beta.19
+  - @clerk/backend@1.0.0-beta.27
+
+## 1.0.0-beta.31
+
+### Patch Changes
+
+- Updated dependencies [[`fafa76fb6`](https://github.com/clerk/javascript/commit/fafa76fb66585b5836cc79985f8bdf1d1b4dca97)]:
+  - @clerk/types@4.0.0-beta.19
+
+## 1.0.0-beta.30
+
+### Patch Changes
+
+- Updated dependencies [[`e5c989a03`](https://github.com/clerk/javascript/commit/e5c989a035fa16413414c213febe16fcdbeef9b1), [`2ec9f6b09`](https://github.com/clerk/javascript/commit/2ec9f6b09f98ae276658d6dc705e16df0573d817)]:
+  - @clerk/shared@2.0.0-beta.18
+  - @clerk/backend@1.0.0-beta.26
+
+## 1.0.0-beta.29
+
+### Minor Changes
+
+- Pass environment into `sdkMetadata` in order to detect if production clerk-js is used by other sdks in dev mode. When it is log dev warning from clerk-js. ([#2802](https://github.com/clerk/javascript/pull/2802)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`18c0d015d`](https://github.com/clerk/javascript/commit/18c0d015d20493e14049fed73a5b6f732372a5cf)]:
+  - @clerk/types@4.0.0-beta.18
+
+## 1.0.0-beta.28
+
+### Patch Changes
+
+- Updated dependencies [[`fe356eebd`](https://github.com/clerk/javascript/commit/fe356eebd8ff527133e0818cf664e7def577cccc)]:
+  - @clerk/types@4.0.0-beta.17
+
+## 1.0.0-beta.27
+
+### Patch Changes
+
+- Updated dependencies [[`1834a3ee4`](https://github.com/clerk/javascript/commit/1834a3ee496ea27b9f7ceeb32ec5361f9de8ee30), [`15af02a83`](https://github.com/clerk/javascript/commit/15af02a837b0e87ea83f3a86dfacc149adca1345)]:
+  - @clerk/shared@2.0.0-beta.17
+  - @clerk/backend@1.0.0-beta.25
+
+## 1.0.0-beta.26
+
+### Patch Changes
+
+- Updated dependencies [[`db18787c4`](https://github.com/clerk/javascript/commit/db18787c4d9fa8ee1306db9b65f3b3f5e2fe2dad)]:
+  - @clerk/shared@2.0.0-beta.16
+  - @clerk/backend@1.0.0-beta.24
+
+## 1.0.0-beta.25
+
+### Patch Changes
+
+- Updated dependencies [[`6eab66050`](https://github.com/clerk/javascript/commit/6eab66050608a1bc5cb9aca6a234b1fea16106e5)]:
+  - @clerk/shared@2.0.0-beta.15
+  - @clerk/backend@1.0.0-beta.23
+
+## 1.0.0-beta.24
+
+### Patch Changes
+
+- Updated dependencies [[`12f3c5c55`](https://github.com/clerk/javascript/commit/12f3c5c55580f93a81df27851fbc92ce1312107e)]:
+  - @clerk/shared@2.0.0-beta.14
+  - @clerk/backend@1.0.0-beta.22
+
+## 1.0.0-beta.23
+
+### Patch Changes
+
+- Updated dependencies [[`5c239d973`](https://github.com/clerk/javascript/commit/5c239d97373ad2f2aa91ded1b84670f201f7db8f), [`051833167`](https://github.com/clerk/javascript/commit/0518331675ffb4d6c6830d79a1d61f9e4466773a)]:
+  - @clerk/types@4.0.0-beta.16
+  - @clerk/backend@1.0.0-beta.21
+
+## 1.0.0-beta.22
+
+### Patch Changes
+
+- Rename beta-v5 to beta by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2de442b24`](https://github.com/clerk/javascript/commit/2de442b2465cc5d424b8a0b21aa57c557f3aa2e7)]:
+  - @clerk/backend@1.0.0-beta.20
+  - @clerk/shared@2.0.0-beta.13
+  - @clerk/types@4.0.0-beta.15
+
+## 1.0.0-beta-v5.21
+
+### Minor Changes
+
+- Introduce handshake mechanism and `x-clerk-auth-status` in response ([#2774](https://github.com/clerk/javascript/pull/2774)) by [@dimkl](https://github.com/dimkl)
+
+### Patch Changes
+
+- Updated dependencies [[`966b31205`](https://github.com/clerk/javascript/commit/966b312050b572fbbbc07a6f0581cbec21847375), [`a8901be64`](https://github.com/clerk/javascript/commit/a8901be64fe91125a0d38a3c880ffa73168ccf5c), [`7b200af49`](https://github.com/clerk/javascript/commit/7b200af4908839ea661ddf2a76811057b545cafc), [`244de5ea3`](https://github.com/clerk/javascript/commit/244de5ea3a7641727cd85c544bb79fb04f2c0808), [`034c47ccb`](https://github.com/clerk/javascript/commit/034c47ccbef0129b9be9ff8aef683aa039e52602), [`244de5ea3`](https://github.com/clerk/javascript/commit/244de5ea3a7641727cd85c544bb79fb04f2c0808), [`9737ef510`](https://github.com/clerk/javascript/commit/9737ef5104346821461972d31f3c69e93924f0e0), [`8b466a9ba`](https://github.com/clerk/javascript/commit/8b466a9ba93ca10315b534079b09fa5d76ffa305), [`8daf8451c`](https://github.com/clerk/javascript/commit/8daf8451cb564bc834dd856174ffc2cdfa932e37), [`7f751c4ef`](https://github.com/clerk/javascript/commit/7f751c4ef2d14410058cf65ea984a93b50c0b87e), [`4fced88ac`](https://github.com/clerk/javascript/commit/4fced88acc66a4837779d8bbca359086cddeec56), [`be991365e`](https://github.com/clerk/javascript/commit/be991365e1c78d0f1dfc59bb33dd533b6fad223a), [`c2b982749`](https://github.com/clerk/javascript/commit/c2b98274970bac5af33c9bb2e84c70ad90225180)]:
+  - @clerk/backend@1.0.0-beta-v5.19
+  - @clerk/types@4.0.0-beta-v5.14
+  - @clerk/shared@2.0.0-beta-v5.12
+
+## 1.0.0-beta-v5.20
+
+### Patch Changes
+
+- Updated dependencies [[`8e5c881c4`](https://github.com/clerk/javascript/commit/8e5c881c40d7306c5dbd2e1f1803fbf75127bd71), [`d4ff346dd`](https://github.com/clerk/javascript/commit/d4ff346dd53bb3e1970e80bdc7b188c2dd344f12), [`7886ba89d`](https://github.com/clerk/javascript/commit/7886ba89d76bfea2d6882a46baf64bf98f1148d3), [`a6308c67e`](https://github.com/clerk/javascript/commit/a6308c67e329879e001cee56cccd82e60b804422)]:
+  - @clerk/backend@1.0.0-beta-v5.18
+  - @clerk/shared@2.0.0-beta-v5.11
+  - @clerk/types@4.0.0-beta-v5.13
+
+## 1.0.0-alpha-v5.19
+
+### Patch Changes
+
+- Updated dependencies [[`3a2f13604`](https://github.com/clerk/javascript/commit/3a2f13604e1b8b351a05de26d2c0672503aa67b3), [`9e99eb727`](https://github.com/clerk/javascript/commit/9e99eb7276249c68ef6f930cce418ce0004653b9), [`6fffd3b54`](https://github.com/clerk/javascript/commit/6fffd3b542f3df0bcb49281b7c4f77209a83f7a1)]:
+  - @clerk/backend@1.0.0-alpha-v5.17
+
+## 1.0.0-alpha-v5.18
+
+### Patch Changes
+
+- Updated dependencies [[`935b0886e`](https://github.com/clerk/javascript/commit/935b0886e8317445f30c92000a27ed68e1223ff6), [`6a769771c`](https://github.com/clerk/javascript/commit/6a769771c975996d8d52b35b5cfdbae5dcec85d4)]:
+  - @clerk/backend@1.0.0-alpha-v5.16
+
+## 1.0.0-alpha-v5.17
+
+### Minor Changes
+
+- Replace the `Clerk-Backend-SDK` header with `User-Agent` in BAPI requests and update it's value to contain both the package name and the package version of the clerk package ([#2558](https://github.com/clerk/javascript/pull/2558)) by [@dimkl](https://github.com/dimkl)
+
+  executing the request. Eg request from `@clerk/nextjs` to BAPI with append `User-Agent: @clerk/nextjs@5.0.0-alpha-v5.16` using the latest version.
+
+  Miscellaneous changes: The backend test build changed to use tsup.
+
+### Patch Changes
+
+- Updated dependencies [[`799abc281`](https://github.com/clerk/javascript/commit/799abc281182efb953dd6637f9db7fc61c71a2cd), [`8cc45d2af`](https://github.com/clerk/javascript/commit/8cc45d2af98320ccced3768fb039b86576e424a5), [`b4e79c1b9`](https://github.com/clerk/javascript/commit/b4e79c1b9ab8e14cbfccaf290f0f596da0416e13)]:
+  - @clerk/backend@1.0.0-alpha-v5.15
+  - @clerk/shared@2.0.0-alpha-v5.10
+
+## 1.0.0-alpha-v5.16
+
+### Patch Changes
+
+- Updated dependencies [[`448e02e93`](https://github.com/clerk/javascript/commit/448e02e93cf2392878d5891009640c52103d99a8), [`e6ecbaa2f`](https://github.com/clerk/javascript/commit/e6ecbaa2ff7add95bf888cb4ce43457b9fde7a13), [`e921af259`](https://github.com/clerk/javascript/commit/e921af259e9bdc8810a830bed54d71cf8eced1f8)]:
+  - @clerk/backend@1.0.0-alpha-v5.14
+
+## 1.0.0-alpha-v5.15
+
+### Patch Changes
+
+- Updated dependencies [[`1dc28ab46`](https://github.com/clerk/javascript/commit/1dc28ab46f6930074334be183c637ce7a81bebf7), [`ea4933655`](https://github.com/clerk/javascript/commit/ea4933655863ce315324aa2a3be7d5f263c2b61f), [`38d8b3e8a`](https://github.com/clerk/javascript/commit/38d8b3e8a0387bcf0b9c8d16e3bbfcfe9b643ca2)]:
+  - @clerk/shared@2.0.0-alpha-v5.9
+  - @clerk/backend@1.0.0-alpha-v5.13
+
 ## 1.0.0-alpha-v5.14
 
 ### Patch Changes

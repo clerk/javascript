@@ -1,7 +1,7 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
 
-import { inSecureCrossOriginIframe } from '../../utils';
+import { inCrossOriginIframe } from '../../utils';
 
 const SESSION_COOKIE_NAME = '__session';
 
@@ -16,8 +16,8 @@ export const removeSessionCookie = () => sessionCookie.remove();
 
 export const setSessionCookie = (token: string) => {
   const expires = addYears(Date.now(), 1);
-  const sameSite = inSecureCrossOriginIframe() ? 'None' : 'Lax';
-  const secure = inSecureCrossOriginIframe() || window.location.protocol === 'https:';
+  const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
+  const secure = window.location.protocol === 'https:';
 
   return sessionCookie.set(token, {
     expires,

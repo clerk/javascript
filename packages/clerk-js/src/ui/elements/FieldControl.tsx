@@ -4,6 +4,7 @@ import React, { forwardRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import {
+  CheckboxInput,
   descriptors,
   Flex,
   FormLabel,
@@ -59,6 +60,7 @@ const FieldAction = (
       elementId={descriptors.formFieldLabel.setId(fieldId)}
       isDisabled={isDisabled}
       colorScheme='primary'
+      variant='buttonSmall'
       onClick={e => {
         e.preventDefault();
         props.onClick?.(e);
@@ -78,7 +80,7 @@ const FieldOptionalLabel = () => {
       elementId={descriptors.formFieldHintText.setId(fieldId)}
       as='span'
       variant='caption'
-      colorScheme='neutral'
+      colorScheme='secondary'
       isDisabled={isDisabled}
     />
   );
@@ -102,7 +104,7 @@ const FieldLabelIcon = (props: { icon?: React.ComponentType }) => {
         icon={props.icon}
         sx={theme => ({
           marginLeft: theme.space.$0x5,
-          color: theme.colors.$blackAlpha400,
+          color: theme.colors.$neutralAlpha400,
           width: theme.sizes.$4,
           height: theme.sizes.$4,
         })}
@@ -126,11 +128,10 @@ const FieldLabel = (props: PropsWithChildren<{ localizationKey?: LocalizationKey
       hasError={!!hasError}
       isDisabled={isDisabled}
       isRequired={isRequired}
-      sx={t => ({
+      sx={{
         display: 'flex',
         alignItems: 'center',
-        color: t.colors.$blackAlpha700,
-      })}
+      }}
     >
       {props.children}
     </FormLabel>
@@ -145,10 +146,6 @@ const FieldLabelRow = (props: PropsWithChildren) => {
       align='center'
       elementDescriptor={descriptors.formFieldLabelRow}
       elementId={descriptors.formFieldLabelRow.setId(fieldId)}
-      sx={theme => ({
-        marginBottom: theme.space.$1,
-        marginLeft: 0,
-      })}
     >
       {props.children}
     </Flex>
@@ -181,6 +178,7 @@ const PhoneInputElement = forwardRef<HTMLInputElement>((_, ref) => {
       elementDescriptor={descriptors.formFieldInput}
       elementId={descriptors.formFieldInput.setId(formField.fieldId)}
       {...inputProps}
+      feedbackType={formField.feedbackType}
       placeholder={t(placeholder)}
     />
   );
@@ -215,7 +213,7 @@ const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
   const { placeholder, ...inputProps } = sanitizeInputProps(formField);
 
   return (
-    <Input
+    <CheckboxInput
       ref={ref}
       {...inputProps}
       elementDescriptor={descriptors.formFieldInput}
@@ -224,12 +222,7 @@ const CheckboxIndicator = forwardRef<HTMLInputElement>((_, ref) => {
       sx={t => ({
         width: 'fit-content',
         marginTop: t.space.$0x5,
-        boxShadow: 'none',
-        ':hover': {
-          boxShadow: 'none',
-        },
       })}
-      type='checkbox'
     />
   );
 });

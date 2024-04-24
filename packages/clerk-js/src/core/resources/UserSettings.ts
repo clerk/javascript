@@ -2,6 +2,7 @@ import type {
   Attributes,
   OAuthProviders,
   OAuthStrategy,
+  PasskeySettingsData,
   PasswordSettingsData,
   SamlSettings,
   SignInData,
@@ -35,6 +36,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   signIn!: SignInData;
   signUp!: SignUpData;
   passwordSettings!: PasswordSettingsData;
+  passkeySettings!: PasskeySettingsData;
 
   socialProviderStrategies: OAuthStrategy[] = [];
   authenticatableSocialStrategies: OAuthStrategy[] = [];
@@ -79,6 +81,7 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
           ? defaultMaxPasswordLength
           : Math.min(data?.password_settings?.max_length, defaultMaxPasswordLength),
     };
+    this.passkeySettings = data.passkey_settings;
     this.socialProviderStrategies = this.getSocialProviderStrategies(data.social);
     this.authenticatableSocialStrategies = this.getAuthenticatableSocialStrategies(data.social);
     this.web3FirstFactors = this.getWeb3FirstFactors(this.attributes);

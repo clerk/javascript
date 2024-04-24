@@ -1,20 +1,44 @@
-import type { AuthObject } from '@clerk/backend/internal';
+import type { AuthObject, RedirectFun } from '@clerk/backend/internal';
+import { createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
+import { buildClerkProps } from '../../server/buildClerkProps';
+import { PUBLISHABLE_KEY, SIGN_IN_URL, SIGN_UP_URL } from '../../server/constants';
+import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
-import { buildClerkProps, createGetAuth } from '../../server/getAuth';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
+import { getAuthKeyFromRequest } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
-export const auth = (): AuthObject & { protect: AuthProtect } => {
+type Auth = AuthObject & { protect: AuthProtect; redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
+
+export const auth = (): Auth => {
   const request = buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
     noAuthStatusMessage: authAuthHeaderMissing(),
   })(request);
 
-  return Object.assign(authObject, { protect: createProtect({ request, authObject, notFound, redirect }) });
+  const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
+
+  const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
+    return createRedirect({
+      redirectAdapter: redirect,
+      baseUrl: createClerkRequest(request).clerkUrl.toString(),
+      // TODO: Support runtime-value configuration of these options
+      // via setting and reading headers from clerkMiddleware
+      publishableKey: PUBLISHABLE_KEY,
+      signInUrl: SIGN_IN_URL,
+      signUpUrl: SIGN_UP_URL,
+    }).redirectToSignIn({
+      returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl?.toString(),
+    });
+  };
+
+  const protect = createProtect({ request, authObject, redirectToSignIn, notFound, redirect });
+
+  return Object.assign(authObject, { protect, redirectToSignIn });
 };
 
 export const initialState = () => {

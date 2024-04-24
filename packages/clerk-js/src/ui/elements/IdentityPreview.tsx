@@ -19,6 +19,7 @@ export const IdentityPreview = (props: IdentityPreviewProps) => {
     <Button
       elementDescriptor={descriptors.identityPreviewEditButton}
       variant='link'
+      textVariant='buttonSmall'
       onClick={onClick}
       aria-label={'Edit'}
     >
@@ -59,7 +60,7 @@ const IdentifierContainer = (props: React.PropsWithChildren) => {
   return (
     <Text
       elementDescriptor={descriptors.identityPreviewText}
-      colorScheme='neutral'
+      colorScheme='secondary'
       truncate
       {...props}
     />

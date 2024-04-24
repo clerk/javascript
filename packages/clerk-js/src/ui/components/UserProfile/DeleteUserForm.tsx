@@ -3,7 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
 
 type DeleteUserFormProps = FormProps;
@@ -36,11 +36,14 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const canSubmit = confirmationField.value === 'Delete account';
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.deletePage.title')}>
+    <FormContainer
+      headerTitle={localizationKeys('userProfile.deletePage.title')}
+      sx={t => ({ gap: t.space.$0x5 })}
+    >
       <Form.Root onSubmit={deleteUser}>
         <Col gap={1}>
           <Text
-            colorScheme='neutral'
+            colorScheme='secondary'
             localizationKey={localizationKeys('userProfile.deletePage.messageLine1')}
           />
           <Text
@@ -50,15 +53,18 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
         </Col>
 
         <Form.ControlRow elementId={confirmationField.id}>
-          <Form.PlainInput {...confirmationField.props} />
+          <Form.PlainInput
+            {...confirmationField.props}
+            ignorePasswordManager
+          />
         </Form.ControlRow>
         <FormButtons
           submitLabel={localizationKeys('userProfile.deletePage.confirm')}
-          variant='primaryDanger'
+          colorScheme='danger'
           isDisabled={!canSubmit}
           onReset={onReset}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

@@ -1,18 +1,21 @@
 import type { RoutingOptions } from '@clerk/types';
 
 import { errorThrower } from '../errors/errorThrower';
-import { noPathProvidedError } from '../errors/messages';
+import { incompatibleRoutingWithPathProvidedError, noPathProvidedError } from '../errors/messages';
 
 export function useRoutingProps<T extends RoutingOptions>(
   componentName: string,
   props: T,
   routingOptions?: RoutingOptions,
 ): T {
-  if (!props.path && !props.routing) {
-    errorThrower.throw(noPathProvidedError(componentName));
-  }
+  const path = props.path || routingOptions?.path;
+  const routing = props.routing || routingOptions?.routing || 'path';
 
-  if (props.path) {
+  if (routing === 'path') {
+    if (!path) {
+      return errorThrower.throw(noPathProvidedError(componentName));
+    }
+
     return {
       ...routingOptions,
       ...props,
@@ -20,8 +23,13 @@ export function useRoutingProps<T extends RoutingOptions>(
     };
   }
 
+  if (props.path) {
+    return errorThrower.throw(incompatibleRoutingWithPathProvidedError(componentName));
+  }
+
   return {
     ...routingOptions,
     ...props,
+    path: undefined,
   };
 }

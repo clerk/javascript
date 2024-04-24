@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.0.0-alpha-v5.8",
+  "version": "2.0.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -89,10 +89,11 @@
   "dependencies": {
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.1",
+    "std-env": "^3.7.0",
     "swr": "2.2.0"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-alpha-v5.12",
+    "@clerk/types": "4.0.0",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
     "@types/node": "^18.17.0",

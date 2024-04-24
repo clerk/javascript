@@ -54,7 +54,7 @@ export const DataTable = (props: MembersListTableProps) => {
       sx={{ width: '100%' }}
     >
       <Flex sx={t => ({ overflowX: 'auto', padding: t.space.$1 })}>
-        <Table sx={{ width: '100%' }}>
+        <Table>
           <Thead>
             <Tr>
               {headers.map((h, index) => (
@@ -88,7 +88,7 @@ export const DataTable = (props: MembersListTableProps) => {
           </Tbody>
         </Table>
       </Flex>
-      {
+      {pageCount > 1 && (
         <Pagination
           count={pageCount}
           page={page}
@@ -100,7 +100,7 @@ export const DataTable = (props: MembersListTableProps) => {
             endingRow,
           }}
         />
-      }
+      )}
     </Col>
   );
 };
@@ -111,12 +111,11 @@ const EmptyRow = (props: { localizationKey: LocalizationKey }) => {
       <Td colSpan={4}>
         <Text
           localizationKey={props.localizationKey}
-          sx={t => ({
+          sx={{
             margin: 'auto',
             display: 'block',
             width: 'fit-content',
-            fontSize: t.fontSizes.$xs,
-          })}
+          }}
         />
       </Td>
     </Tr>
@@ -127,7 +126,7 @@ export const RowContainer = (props: PropsOfComponent<typeof Tr>) => {
   return (
     <Tr
       {...props}
-      sx={t => ({ ':hover': { backgroundColor: t.colors.$blackAlpha50 } })}
+      sx={t => ({ ':hover': { backgroundColor: t.colors.$neutralAlpha50 } })}
     />
   );
 };
@@ -139,15 +138,16 @@ export const RoleSelect = (props: {
   isDisabled?: boolean;
   triggerSx?: ThemableCssProp;
   optionListSx?: ThemableCssProp;
+  prefixLocalizationKey?: LocalizationKey | string;
 }) => {
-  const { value, roles, onChange, isDisabled, triggerSx, optionListSx } = props;
+  const { value, roles, onChange, isDisabled, triggerSx, optionListSx, prefixLocalizationKey } = props;
 
   const { localizeCustomRole } = useLocalizeCustomRoles();
-  const { t } = useLocalizations();
 
   const fetchedRoles = useMemo(() => [...(roles || [])], [roles]);
 
   const selectedRole = useMemo(() => fetchedRoles.find(r => r.value === value), [fetchedRoles]);
+  const { t } = useLocalizations();
 
   const localizedOptions = useMemo(
     () =>
@@ -163,14 +163,18 @@ export const RoleSelect = (props: {
       elementId='role'
       options={localizedOptions}
       value={value}
+      placeholder={t(localizationKeys('organizationProfile.invitePage.selectDropdown__role'))}
       onChange={role => onChange(role.value)}
       renderOption={(option, _index, isSelected) => (
         <RolesListItem
           isSelected={isSelected}
           option={option}
           sx={theme => ({
-            '&:hover, &[data-focused="true"]': {
-              backgroundColor: theme.colors.$blackAlpha200,
+            '&:hover': {
+              backgroundColor: theme.colors.$neutralAlpha100,
+            },
+            '&[data-focused="true"]': {
+              backgroundColor: theme.colors.$neutralAlpha150,
             },
           })}
         />
@@ -186,7 +190,7 @@ export const RoleSelect = (props: {
         sx={
           triggerSx ||
           (t => ({
-            color: t.colors.$colorTextSecondary,
+            color: t.colors.$colorText,
             backgroundColor: 'transparent',
             textWrap: 'nowrap',
           }))
@@ -198,27 +202,23 @@ export const RoleSelect = (props: {
             as='span'
             gap={1}
           >
+            {prefixLocalizationKey && (
+              <Text
+                as='span'
+                colorScheme='secondary'
+                localizationKey={prefixLocalizationKey}
+              />
+            )}
             <Text
               as='span'
-              sx={t => ({ color: t.colors.$blackAlpha400 })}
-            >
-              {`${t(localizationKeys('formFieldLabel__role'))}:`}
-            </Text>
-            <Text
-              as='span'
-              sx={t => ({ color: t.colors.$blackAlpha950 })}
+              sx={t => ({ color: t.colors.$colorText })}
             >
               {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
             </Text>
           </Flex>
         )}
       </SelectButton>
-      <SelectOptionList
-        sx={optionListSx}
-        containerSx={{
-          gap: 0,
-        }}
-      />
+      <SelectOptionList sx={optionListSx} />
     </Select>
   );
 };
@@ -235,18 +235,17 @@ const RolesListItem = memo((props: RolesListItemProps) => {
   const { option, isSelected, sx, ...rest } = props;
   return (
     <Flex
-      center
       sx={[
         theme => ({
           width: '100%',
-          gap: theme.space.$1,
           padding: `${theme.space.$2} ${theme.space.$4}`,
+          borderRadius: theme.radii.$md,
         }),
         sx,
       ]}
       {...rest}
     >
-      <Text colorScheme='neutral'>{option?.label}</Text>
+      <Text colorScheme='secondary'>{option?.label}</Text>
     </Flex>
   );
 });

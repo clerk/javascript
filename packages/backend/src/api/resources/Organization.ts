@@ -14,7 +14,7 @@ export class Organization {
     readonly privateMetadata: OrganizationPrivateMetadata = {},
     readonly maxAllowedMemberships: number,
     readonly adminDeleteEnabled: boolean,
-    readonly members_count?: number,
+    readonly membersCount?: number,
   ) {}
 
   static fromJSON(data: OrganizationJSON): Organization {
@@ -22,7 +22,7 @@ export class Organization {
       data.id,
       data.name,
       data.slug,
-      data.image_url,
+      data.image_url || '',
       data.has_image,
       data.created_by,
       data.created_at,

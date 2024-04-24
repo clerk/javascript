@@ -17,35 +17,14 @@ import {
   useOrganizationContext,
   useSessionContext,
 } from '../contexts';
-import type { PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 type UseOrganizationParams = {
-  domains?:
-    | true
-    | (GetDomainsParams & {
-        infinite?: boolean;
-        keepPreviousData?: boolean;
-      });
-  membershipRequests?:
-    | true
-    | (GetMembershipRequestParams & {
-        infinite?: boolean;
-        keepPreviousData?: boolean;
-      });
-  memberships?:
-    | true
-    | (GetMembersParams & {
-        infinite?: boolean;
-        keepPreviousData?: boolean;
-      });
-
-  invitations?:
-    | true
-    | (GetInvitationsParams & {
-        infinite?: boolean;
-        keepPreviousData?: boolean;
-      });
+  domains?: true | PaginatedHookConfig<GetDomainsParams>;
+  membershipRequests?: true | PaginatedHookConfig<GetMembershipRequestParams>;
+  memberships?: true | PaginatedHookConfig<GetMembersParams>;
+  invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
 };
 
 type UseOrganization = <T extends UseOrganizationParams>(
@@ -94,6 +73,7 @@ type UseOrganization = <T extends UseOrganizationParams>(
 const undefinedPaginatedResource = {
   data: undefined,
   count: undefined,
+  error: undefined,
   isLoading: false,
   isFetching: false,
   isError: false,
@@ -246,8 +226,8 @@ export const useOrganization: UseOrganization = params => {
     },
     organization?.getInvitations,
     {
-      keepPreviousData: membersSafeValues.keepPreviousData,
-      infinite: membersSafeValues.infinite,
+      keepPreviousData: invitationsSafeValues.keepPreviousData,
+      infinite: invitationsSafeValues.infinite,
       enabled: !!invitationsParams,
     },
     {

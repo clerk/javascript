@@ -22,7 +22,9 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
       elementDescriptor={descriptors.alert}
       elementId={descriptors.alert.setId(variant)}
       colorScheme={variant}
+      align='start'
       {...rest}
+      sx={[t => ({ backgroundColor: t.colors.$warningAlpha100 }), rest.sx]}
     >
       <AlertIcon
         elementId={descriptors.alert.setId(variant)}
@@ -39,9 +41,10 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
         <Text
           elementDescriptor={descriptors.alertText}
           elementId={descriptors.alert.setId(variant)}
-          colorScheme={variant === 'danger' ? 'danger' : 'neutral'}
+          colorScheme={variant === 'danger' ? 'danger' : variant === 'warning' ? 'warning' : 'secondary'}
           variant='body'
           localizationKey={title}
+          sx={{ textAlign: 'left' }}
         >
           {children}
         </Text>
@@ -49,7 +52,7 @@ export const Alert = (props: AlertProps): JSX.Element | null => {
           <Text
             elementDescriptor={descriptors.alertText}
             elementId={descriptors.alert.setId(variant)}
-            colorScheme={variant === 'danger' ? 'danger' : 'neutral'}
+            colorScheme={variant === 'danger' ? 'danger' : 'secondary'}
             variant='body'
             localizationKey={subtitle}
           />

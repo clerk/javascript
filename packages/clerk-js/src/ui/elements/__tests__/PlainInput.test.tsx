@@ -47,7 +47,6 @@ describe('PlainInput', () => {
     expect(getByLabelText('some label')).not.toHaveAttribute('disabled');
     expect(getByLabelText('some label')).not.toHaveAttribute('required');
     expect(getByLabelText('some label')).toHaveAttribute('aria-invalid', 'false');
-    expect(getByLabelText('some label')).toHaveAttribute('aria-describedby', '');
     expect(getByLabelText('some label')).toHaveAttribute('aria-required', 'false');
     expect(getByLabelText('some label')).toHaveAttribute('aria-disabled', 'false');
   });

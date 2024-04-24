@@ -1,18 +1,15 @@
 import { Protect } from '../../common';
 import { CustomPageContentContainer } from '../../common/CustomPageContentContainer';
-import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
 import { Route, Switch } from '../../router';
 import { OrganizationGeneralPage } from './OrganizationGeneralPage';
 import { OrganizationMembers } from './OrganizationMembers';
 
 export const OrganizationProfileRoutes = () => {
-  const { pages } = useOrganizationProfileContext();
-  const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
-  const isSettingsPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
+  const { pages, isMembersPageRoot, isGeneralPageRoot } = useOrganizationProfileContext();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
-    const shouldFirstCustomItemBeOnRoot = !isSettingsPageRoot && !isMembersPageRoot && index === 0;
+    const shouldFirstCustomItemBeOnRoot = !isGeneralPageRoot && !isMembersPageRoot && index === 0;
     return (
       <Route
         index={shouldFirstCustomItemBeOnRoot}
@@ -31,7 +28,7 @@ export const OrganizationProfileRoutes = () => {
     <Switch>
       {customPageRoutesWithContents}
       <Route>
-        <Route path={isSettingsPageRoot ? undefined : 'organization-settings'}>
+        <Route path={isGeneralPageRoot ? undefined : 'organization-general'}>
           <Switch>
             <Route index>
               <OrganizationGeneralPage />
@@ -45,7 +42,7 @@ export const OrganizationProfileRoutes = () => {
                 condition={has =>
                   has({ permission: 'org:sys_memberships:read' }) || has({ permission: 'org:sys_memberships:manage' })
                 }
-                redirectTo={isSettingsPageRoot ? '../' : './organization-settings'}
+                redirectTo={isGeneralPageRoot ? '../' : './organization-general'}
               >
                 <OrganizationMembers />
               </Protect>

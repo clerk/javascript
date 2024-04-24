@@ -4,7 +4,7 @@ import React from 'react';
 import { useCoreSignIn } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { ArrowBlockButton, Card, Footer, Header } from '../../elements';
+import { ArrowBlockButton, Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { backupCodePrefFactorComparator, formatSafeIdentifier } from '../../utils';
 import { HavingTrouble } from './HavingTrouble';
@@ -32,7 +32,7 @@ export const SignInFactorTwoAlternativeMethods = (props: AlternativeMethodsProps
 };
 
 const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroubleClick: React.MouseEventHandler }) => {
-  const { onHavingTroubleClick, onFactorSelected } = props;
+  const { onHavingTroubleClick, onFactorSelected, onBackLinkClick } = props;
   const card = useCardState();
   const { supportedSecondFactors } = useCoreSignIn();
 
@@ -40,15 +40,15 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
     <Flow.Part part='alternativeMethods'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+          <Header.Root showLogo>
             <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
           <Col
             elementDescriptor={descriptors.main}
-            gap={8}
+            gap={3}
           >
             <Col gap={2}>
               {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
@@ -63,19 +63,25 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
                 />
               ))}
             </Col>
+            <Card.Action elementId='alternativeMethods'>
+              {onBackLinkClick && (
+                <Card.ActionLink
+                  localizationKey={localizationKeys('backButton')}
+                  onClick={props.onBackLinkClick}
+                />
+              )}
+            </Card.Action>
           </Col>
         </Card.Content>
+
         <Card.Footer>
-          <Footer.Root key='signIn.alternativeMethods.actionLink'>
-            <Footer.Action elementId='havingTrouble'>
-              <Footer.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
-              <Footer.ActionLink
-                localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
-                onClick={onHavingTroubleClick}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+          <Card.Action elementId='havingTrouble'>
+            <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
+            <Card.ActionLink
+              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+              onClick={onHavingTroubleClick}
+            />
+          </Card.Action>
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

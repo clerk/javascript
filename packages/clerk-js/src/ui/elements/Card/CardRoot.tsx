@@ -18,6 +18,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
       {appearance.parsedLayout.logoPlacement === 'outside' && (
         <ApplicationLogo
           sx={t => ({
+            position: 'relative',
             [mqu.sm]: {
               margin: `0 0 ${t.space.$7} 0`,
             },
@@ -25,17 +26,21 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
         />
       )}
       <Col
-        elementDescriptor={[descriptors.card, props.elementDescriptor as ElementDescriptor]}
+        elementDescriptor={[descriptors.cardBox, props.elementDescriptor as ElementDescriptor]}
         className={generateFlowPartClassname(flowMetadata)}
         ref={ref}
         sx={[
           t => ({
-            background: `linear-gradient(${t.colors.$blackAlpha100},${t.colors.$blackAlpha100}), linear-gradient(${t.colors.$colorBackground}, ${t.colors.$colorBackground})`,
-            maxWidth: `calc(100vw - ${t.sizes.$20})`,
+            maxWidth: `calc(100vw - ${t.sizes.$10})`,
             width: t.sizes.$100,
-            boxShadow: t.shadows.$cardRootShadow,
+            borderWidth: t.borderWidths.$normal,
+            borderStyle: t.borderStyles.$solid,
+            borderColor: t.colors.$neutralAlpha100,
+            boxShadow: t.shadows.$cardBoxShadow,
             borderRadius: t.radii.$xl,
             color: t.colors.$colorText,
+            position: 'relative',
+            overflow: 'hidden',
           }),
           sx,
         ]}

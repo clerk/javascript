@@ -1,5 +1,6 @@
 import type { SignInFactor } from '@clerk/types';
 
+import { isWebAuthnSupported } from '../../utils/passkeys';
 import { factorHasLocalStrategy, isResetPasswordStrategy } from '../components/SignIn/utils';
 import { useCoreSignIn } from '../contexts';
 import { allStrategiesButtonsComparator } from '../utils';
@@ -19,6 +20,9 @@ export function useAlternativeStrategies({ filterOutFactor }: { filterOutFactor:
   const firstPartyFactors = supportedFirstFactors
     .filter(f => !f.strategy.startsWith('oauth_') && !(f.strategy === filterOutFactor?.strategy))
     .filter(factor => factorHasLocalStrategy(factor))
+    // Only include passkey if the device supports it.
+    // @ts-ignore Types are not public yet.
+    .filter(factor => (factor.strategy === 'passkey' ? isWebAuthnSupported() : true))
     .sort(allStrategiesButtonsComparator);
 
   return {

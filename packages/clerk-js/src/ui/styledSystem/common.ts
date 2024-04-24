@@ -2,16 +2,15 @@ import type { InternalTheme } from './types';
 
 const textVariants = (t: InternalTheme) => {
   const base = {
-    WebkitFontSmoothing: t.options.$fontSmoothing,
     fontFamily: 'inherit',
     letterSpacing: t.letterSpacings.$normal,
   };
 
   const h1 = {
     ...base,
-    fontWeight: t.fontWeights.$medium,
+    fontWeight: t.fontWeights.$semibold,
     fontSize: t.fontSizes.$xl,
-    lineHeight: t.lineHeights.$large,
+    lineHeight: t.lineHeights.$extraSmall,
   } as const;
 
   const h2 = {
@@ -46,7 +45,7 @@ const textVariants = (t: InternalTheme) => {
     ...base,
     fontWeight: t.fontWeights.$medium,
     fontSize: t.fontSizes.$xs,
-    lineHeight: t.lineHeights.$none,
+    lineHeight: t.lineHeights.$large,
   } as const;
 
   const buttonLarge = {
@@ -61,7 +60,7 @@ const textVariants = (t: InternalTheme) => {
     ...base,
     fontWeight: t.fontWeights.$medium,
     fontSize: t.fontSizes.$sm,
-    lineHeight: t.lineHeights.$none,
+    lineHeight: t.lineHeights.$extraSmall,
     fontFamily: t.fonts.$buttons,
   } as const;
 
@@ -78,16 +77,16 @@ const textVariants = (t: InternalTheme) => {
 };
 
 const borderVariants = (t: InternalTheme, props?: any) => {
-  const defaultBoxShadow = t.shadows.$input
-    .replace('{{color1}}', !props?.hasError ? t.colors.$blackAlpha200 : t.colors.$danger200)
-    .replace('{{color2}}', !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger300);
-  const hoverBoxShadow = t.shadows.$inputHover
-    .replace('{{color1}}', !props?.hasError ? t.colors.$blackAlpha300 : t.colors.$danger300)
-    .replace('{{color2}}', !props?.hasError ? t.colors.$blackAlpha400 : t.colors.$danger400);
+  const hoverBorderColor = !props?.hasError ? t.colors.$neutralAlpha300 : t.colors.$dangerAlpha500;
+  const hoverBoxShadow = t.shadows.$input.replace(
+    '{{color}}',
+    !props?.hasError ? t.colors.$neutralAlpha150 : t.colors.$dangerAlpha200,
+  );
   const hoverStyles = {
     '&:hover': {
       WebkitTapHighlightColor: 'transparent',
-      boxShadow: [defaultBoxShadow, hoverBoxShadow].toString(),
+      borderColor: hoverBorderColor,
+      boxShadow: hoverBoxShadow,
     },
   };
   const focusStyles =
@@ -95,19 +94,27 @@ const borderVariants = (t: InternalTheme, props?: any) => {
       ? {}
       : {
           '&:focus': {
+            borderColor: hoverBorderColor,
             WebkitTapHighlightColor: 'transparent',
             boxShadow: [
-              defaultBoxShadow,
               hoverBoxShadow,
-              t.shadows.$focusRing.replace('{{color}}', props?.hasError ? t.colors.$danger200 : t.colors.$primary50),
+              t.shadows.$focusRing.replace(
+                '{{color}}',
+                !props?.hasError ? t.colors.$neutralAlpha150 : (t.colors.$dangerAlpha200 as string),
+              ),
             ].toString(),
           },
         };
   return {
     normal: {
       borderRadius: t.radii.$md,
-      border: 'none',
-      boxShadow: defaultBoxShadow,
+      borderWidth: t.borderWidths.$normal,
+      borderStyle: t.borderStyles.$solid,
+      borderColor: !props?.hasError ? t.colors.$neutralAlpha150 : t.colors.$dangerAlpha500,
+      boxShadow: t.shadows.$input.replace(
+        '{{color}}',
+        !props?.hasError ? t.colors.$neutralAlpha100 : t.colors.$neutralAlpha150,
+      ),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
@@ -119,7 +126,7 @@ const borderVariants = (t: InternalTheme, props?: any) => {
 
 const borderColor = (t: InternalTheme, props?: any) => {
   return {
-    borderColor: props?.hasError ? t.colors.$danger500 : t.colors.$blackAlpha300,
+    borderColor: props?.hasError ? t.colors.$dangerAlpha500 : t.colors.$neutralAlpha150,
   } as const;
 };
 
@@ -128,31 +135,12 @@ const focusRing = (t: InternalTheme) => {
     '&:focus': {
       '&::-moz-focus-inner': { border: '0' },
       WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$primary200),
+      boxShadow: t.shadows.$focusRing.replace('{{color}}', t.colors.$neutralAlpha200),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
     },
   } as const;
-};
-
-const focusRingInput = (t: InternalTheme, props?: any) => {
-  return {
-    '&:focus': {
-      WebkitTapHighlightColor: 'transparent',
-      boxShadow: t.shadows.$focusRing.replace(
-        '{{color}}',
-        props?.hasError ? t.colors.$danger400 : t.colors.$primary400,
-      ),
-      transitionProperty: t.transitionProperty.$common,
-      transitionTimingFunction: t.transitionTiming.$common,
-      transitionDuration: t.transitionDuration.$focusRing,
-    },
-  } as const;
-};
-
-const buttonShadow = (t: InternalTheme) => {
-  return { boxShadow: t.shadows.$buttonShadow.replace('{{color}}', t.colors.$primary800) };
 };
 
 const disabled = (t: InternalTheme) => {
@@ -178,7 +166,7 @@ const unstyledScrollbar = (t: InternalTheme) => ({
     height: '8px',
   },
   '::-webkit-scrollbar-thumb': {
-    background: t.colors.$blackAlpha500,
+    background: t.colors.$neutralAlpha500,
   },
   '::-webkit-scrollbar-track': {
     background: 'transparent',
@@ -192,15 +180,18 @@ const maxHeightScroller = (t: InternalTheme) =>
     ...unstyledScrollbar(t),
   } as const);
 
+const mergedColorsBackground = (colorBack: string, colorFront: string) => {
+  return `linear-gradient(${colorFront},${colorFront}), linear-gradient(${colorBack}, ${colorBack})`;
+};
+
 export const common = {
   textVariants,
   borderVariants,
   focusRing,
-  focusRingInput,
-  buttonShadow,
   disabled,
   borderColor,
   centeredFlex,
   maxHeightScroller,
   unstyledScrollbar,
+  mergedColorsBackground,
 };

@@ -43,14 +43,19 @@ export const TabsList = (props: TabsListProps) => {
   const { children, sx, ...rest } = props;
   const { setSelectedIndex, selectedIndex, setFocusedIndex } = useTabsContext();
 
-  const childrenWithProps = getValidChildren(children).map((child, index) =>
-    React.cloneElement(child, {
-      tabIndex: index,
-    }),
-  );
+  let index = 0;
+  const childrenWithProps = getValidChildren(children).map(child => {
+    const el = React.cloneElement(child, {
+      tabIndex: child.type === Tab ? index : undefined,
+    });
+    index++;
+    return el;
+  });
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const tabs = childrenWithProps.filter(child => !child.props?.isDisabled).map(child => child.props.tabIndex);
+    const tabs = childrenWithProps
+      .filter(child => !child.props?.isDisabled && child.type === Tab)
+      .map(child => child.props.tabIndex);
     const tabsLenth = tabs.length;
     const current = tabs.indexOf(selectedIndex);
 
@@ -70,11 +75,12 @@ export const TabsList = (props: TabsListProps) => {
     <Flex
       elementDescriptor={descriptors.tabListContainer}
       onKeyDown={onKeyDown}
-      justify='center'
+      role='tablist'
       sx={[
-        theme => ({
-          borderBottom: theme.borders.$normal,
-          borderColor: theme.colors.$blackAlpha100,
+        t => ({
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomWidth: t.borderWidths.$normal,
+          borderColor: t.colors.$neutralAlpha100,
         }),
         sx,
       ]}
@@ -84,7 +90,6 @@ export const TabsList = (props: TabsListProps) => {
     </Flex>
   );
 };
-
 type TabProps = PropsOfComponent<typeof Button>;
 type TabPropsWithTabIndex = TabProps & { tabIndex?: number };
 export const Tab = (props: TabProps) => {
@@ -132,16 +137,17 @@ export const Tab = (props: TabProps) => {
       sx={[
         t => ({
           background: t.colors.$transparent,
-          color: isActive ? t.colors.$blackAlpha900 : t.colors.$blackAlpha700,
+          color: isActive ? t.colors.$primary500 : t.colors.$neutralAlpha700,
           gap: t.space.$1x5,
           fontWeight: t.fontWeights.$medium,
-          borderBottom: t.borders.$normal,
-          marginBottom: '-1px',
-          borderColor: isActive ? t.colors.$blackAlpha800 : t.colors.$transparent,
+          borderBottomWidth: isActive ? t.borderWidths.$normal : 0,
+          borderBottomStyle: t.borderStyles.$solid,
+          borderBottomColor: t.colors.$primary500,
+          marginBottom: isActive ? '-1px' : 0,
           borderRadius: 0,
-          padding: `${t.space.$2x5} ${t.space.$3x5}`,
+          padding: `${t.space.$2x5} ${t.space.$0x25}`,
           width: 'fit-content',
-          '&:hover, :focus': { backgroundColor: t.colors.$transparent },
+          '&:hover, :focus': { backgroundColor: t.colors.$transparent, boxShadow: 'none' },
         }),
         sx,
       ]}

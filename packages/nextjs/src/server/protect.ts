@@ -1,4 +1,4 @@
-import type { AuthObject, SignedInAuthObject } from '@clerk/backend/internal';
+import type { AuthObject, RedirectFun, SignedInAuthObject } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationParamsWithCustomPermissions,
@@ -6,21 +6,20 @@ import type {
 } from '@clerk/types';
 
 import { constants as nextConstants } from '../constants';
-import { SIGN_IN_URL } from './constants';
 
-type AuthProtectOptions = { redirectUrl?: string };
+type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: string };
 
 /**
- * @experimental
- * This function is experimental as it throws a Nextjs notFound error if user is not authenticated or authorized.
- * In the future we would investigate a way to throw a more appropriate error that clearly describes the not authorized of authenticated status.
+ * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
 export interface AuthProtect {
   (params?: CheckAuthorizationParamsWithCustomPermissions, options?: AuthProtectOptions): SignedInAuthObject;
+
   (
     params?: (has: CheckAuthorizationWithCustomPermissions) => boolean,
     options?: AuthProtectOptions,
   ): SignedInAuthObject;
+
   (options?: AuthProtectOptions): SignedInAuthObject;
 }
 
@@ -42,32 +41,34 @@ export const createProtect = (opts: {
    * protect() in pages throws a notFound error if signed out
    * use this callback to customise the behavior
    */
-  redirectToSignIn?: () => void;
+  redirectToSignIn: RedirectFun<unknown>;
 }): AuthProtect => {
   const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
 
   return ((...args: any[]) => {
-    const paramsOrFunction = args[0]?.redirectUrl
+    const optionValuesAsParam = args[0]?.unauthenticatedUrl || args[0]?.unauthorizedUrl;
+    const paramsOrFunction = optionValuesAsParam
       ? undefined
       : (args[0] as
           | CheckAuthorizationParamsWithCustomPermissions
           | ((has: CheckAuthorizationWithCustomPermissions) => boolean));
-    const redirectUrl = (args[0]?.redirectUrl || args[1]?.redirectUrl) as string | undefined;
+    const unauthenticatedUrl = (args[0]?.unauthenticatedUrl || args[1]?.unauthenticatedUrl) as string | undefined;
+    const unauthorizedUrl = (args[0]?.unauthorizedUrl || args[1]?.unauthorizedUrl) as string | undefined;
 
     const handleUnauthenticated = () => {
-      if (redirectUrl) {
-        return redirect(redirectUrl);
+      if (unauthenticatedUrl) {
+        return redirect(unauthenticatedUrl);
       }
       if (isPageRequest(request)) {
         // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
-        return redirectToSignIn ? redirectToSignIn() : redirect(SIGN_IN_URL);
+        return redirectToSignIn();
       }
       return notFound();
     };
 
     const handleUnauthorized = () => {
-      if (redirectUrl) {
-        return redirect(redirectUrl);
+      if (unauthorizedUrl) {
+        return redirect(unauthorizedUrl);
       }
       return notFound();
     };
@@ -120,7 +121,8 @@ const isPageRequest = (req: Request): boolean => {
   return (
     req.headers.get(constants.Headers.SecFetchDest) === 'document' ||
     req.headers.get(constants.Headers.Accept)?.includes('text/html') ||
-    (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req))
+    (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req)) ||
+    !!req.headers.get(nextConstants.Headers.NextjsData)
   );
 };
 

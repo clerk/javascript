@@ -3,8 +3,30 @@
   "pipeline": {
     "dev": {
       "dependsOn": ["^build"],
+      "inputs": ["src/**", "!examples/**"],
       "cache": false,
       "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "*.d.ts",
+        "bundlewatch.config.json",
+        "jest.*",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputMode": "new-only",
+      "outputs": []
     }
   }
 }

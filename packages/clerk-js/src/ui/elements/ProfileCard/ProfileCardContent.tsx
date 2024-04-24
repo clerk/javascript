@@ -36,7 +36,10 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         borderRadius: t.radii.$lg,
         width: '100%',
         height: '100%',
-        overflowY: 'auto',
+        overflow: 'hidden',
+        borderWidth: t.borderWidths.$normal,
+        borderStyle: t.borderStyles.$solid,
+        borderColor: t.colors.$neutralAlpha50,
         boxShadow: t.shadows.$cardContentShadow,
       })}
     >
@@ -44,8 +47,12 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         elementDescriptor={descriptors.pageScrollBox}
         sx={theme => ({
           flex: `1`,
-          padding: `${theme.space.$7} ${theme.space.$8}`,
-          [mqu.xs]: {
+          scrollbarGutter: 'stable',
+          paddingTop: theme.space.$7,
+          paddingBottom: theme.space.$7,
+          paddingLeft: theme.space.$8,
+          paddingRight: theme.space.$6, //smaller because of stable scrollbar gutter
+          [mqu.sm]: {
             padding: `${theme.space.$8} ${theme.space.$5}`,
           },
           ...common.maxHeightScroller(theme),

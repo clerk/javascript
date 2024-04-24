@@ -2,8 +2,9 @@ import { decorateObjectWithResources } from '@clerk/backend/internal';
 import type { defer } from '@remix-run/server-runtime';
 import { isDeferredData } from '@remix-run/server-runtime/dist/responses';
 
-import { invalidRootLoaderCallbackReturn } from '../errors';
+import { invalidRootLoaderCallbackReturn } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
+import { loadOptions } from './loadOptions';
 import type { LoaderFunctionArgs, LoaderFunctionReturn, RootAuthLoaderCallback, RootAuthLoaderOptions } from './types';
 import {
   assertValidHandlerResult,
@@ -46,8 +47,9 @@ export const rootAuthLoader: RootAuthLoader = async (
     ? handlerOrOptions
     : {};
 
+  const loadedOptions = loadOptions(args, opts);
   // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
-  const requestState = await authenticateRequest(args, opts);
+  const requestState = await authenticateRequest(args, loadedOptions);
 
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
@@ -55,8 +57,9 @@ export const rootAuthLoader: RootAuthLoader = async (
   }
 
   const authObj = requestState.toAuth();
-  Object.assign(args.request, { auth: authObj });
-  const handlerResult = await handler(await decorateObjectWithResources(args, authObj, opts));
+  const requestWithAuth = Object.assign(args.request, { auth: authObj });
+  await decorateObjectWithResources(requestWithAuth, authObj, loadedOptions);
+  const handlerResult = await handler(args);
   assertValidHandlerResult(handlerResult, invalidRootLoaderCallbackReturn);
 
   // When using defer(), we need to inject the clerk auth state into its internal data object.

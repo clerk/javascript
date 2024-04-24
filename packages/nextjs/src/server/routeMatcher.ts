@@ -7,12 +7,7 @@ import { paths } from '../utils';
 type WithPathPatternWildcard<T> = `${T & string}(.*)`;
 type NextTypedRoute<T = Parameters<typeof Link>['0']['href']> = T extends string ? T : never;
 
-// For extra safety, we won't recommend using a `/(.*)` route matcher.
-type ExcludeRootPath<T> = T extends '/' ? never : T;
-
-type RouteMatcherWithNextTypedRoutes = Autocomplete<
-  WithPathPatternWildcard<ExcludeRootPath<NextTypedRoute>> | NextTypedRoute
->;
+type RouteMatcherWithNextTypedRoutes = Autocomplete<WithPathPatternWildcard<NextTypedRoute> | NextTypedRoute>;
 
 export type RouteMatcherParam =
   | Array<RegExp | RouteMatcherWithNextTypedRoutes>
@@ -21,9 +16,12 @@ export type RouteMatcherParam =
   | ((req: NextRequest) => boolean);
 
 /**
- * Create a function that matches a request against the specified routes.
- * Precomputes the glob matchers for the public routes, so we don't have to
- * recompile the regular expressions on every request.
+ * Returns a function that accepts a `Request` object and returns whether the request matches the list of
+ * predefined routes that can be passed in as the first argument.
+ *
+ * You can use glob patterns to match multiple routes or a function to match against the request object.
+ * Path patterns and regular expressions are supported, for example: `['/foo', '/bar(.*)'] or `[/^\/foo\/.*$/]`
+ * For more information, see: https://clerk.com/docs
  */
 export const createRouteMatcher = (routes: RouteMatcherParam) => {
   if (typeof routes === 'function') {

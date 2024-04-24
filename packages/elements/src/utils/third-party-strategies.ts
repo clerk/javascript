@@ -6,7 +6,7 @@ import { OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types'; // TODO: This im
 import { fromEntries, iconImageUrl } from './clerk-js';
 
 export interface ThirdPartyStrategy {
-  id: Web3Provider | OAuthProvider;
+  id: Web3Strategy | OAuthStrategy;
   iconUrl: string;
   name: string;
 }
@@ -35,7 +35,7 @@ export interface EnabledThirdPartyProviders {
 
 const oauthStrategies = OAUTH_PROVIDERS.map(p => p.strategy);
 
-const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries(
+export const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries(
   [...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
     return [p.provider, { iconUrl: iconImageUrl(p.provider), name: p.name, strategy: p.strategy }];
   }),
@@ -58,10 +58,24 @@ export function isAuthenticatableOauthStrategy(
   strategy: any,
   available: EnabledThirdPartyProviders['authenticatableOauthStrategies'],
 ): strategy is OAuthStrategy {
-  return available.includes(strategy);
+  return available.includes(strategy.startsWith('oauth_') ? strategy : `oauth_${strategy}`);
 }
 
-export const getEnabledThirdPartyProviders = (environment: EnvironmentResource): EnabledThirdPartyProviders => {
+const emptyThirdPartyProviders: EnabledThirdPartyProviders = {
+  authenticatableOauthStrategies: [],
+  providerToDisplayData: {} as any,
+  strategies: [],
+  strategyToDisplayData: {} as any,
+  web3Strategies: [],
+};
+
+export const getEnabledThirdPartyProviders = (
+  environment: EnvironmentResource | undefined | null,
+): EnabledThirdPartyProviders => {
+  if (!environment?.userSettings) {
+    return emptyThirdPartyProviders;
+  }
+
   const { socialProviderStrategies, web3FirstFactors, authenticatableSocialStrategies } = environment.userSettings;
 
   // Filter out any OAuth strategies that are not yet known, they are not included in our types.

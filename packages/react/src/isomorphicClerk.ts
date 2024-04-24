@@ -14,6 +14,7 @@ import type {
   InstanceType,
   ListenerCallback,
   LoadedClerk,
+  OneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -47,7 +48,11 @@ import type {
 } from './types';
 import { isConstructor, loadClerkJsScript } from './utils';
 
-const SDK_METADATA = { name: PACKAGE_NAME, version: PACKAGE_VERSION };
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+  environment: process.env.NODE_ENV,
+};
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
@@ -90,6 +95,7 @@ type IsomorphicLoadedClerk = Without<
   | 'mountSignUp'
   | 'mountSignIn'
   | 'mountUserProfile'
+  | '__experimental_mountGoogleOneTap'
   | 'client'
 > & {
   // TODO: Align return type and parms
@@ -125,6 +131,7 @@ type IsomorphicLoadedClerk = Without<
   mountOrganizationProfile: (node: HTMLDivElement, props: OrganizationProfileProps) => void;
   mountCreateOrganization: (node: HTMLDivElement, props: CreateOrganizationProps) => void;
   mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
+  __experimental_mountGoogleOneTap: (node: HTMLDivElement, props: OneTapProps) => void;
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
   client: ClientResource | undefined;
@@ -164,7 +171,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.#loaded;
   }
 
-  static #instance: IsomorphicClerk;
+  static #instance: IsomorphicClerk | null | undefined;
 
   static getOrCreateInstance(options: IsomorphicClerkOptions) {
     // During SSR: a new instance should be created for every request
@@ -175,6 +182,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.#instance = new IsomorphicClerk(options);
     }
     return this.#instance;
+  }
+
+  static clearInstance() {
+    this.#instance = null;
   }
 
   get domain(): string {
@@ -417,6 +428,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   public addOnLoaded = (cb: () => void) => {
     this.loadedListeners.push(cb);
+    /**
+     * When IsomorphicClerk is loaded execute the callback directly
+     */
+    if (this.loaded) {
+      this.emitLoaded();
+    }
   };
 
   public emitLoaded = () => {
@@ -654,6 +671,18 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountSignIn(node);
     } else {
       this.premountSignInNodes.delete(node);
+    }
+  };
+
+  __experimental_mountGoogleOneTap = (node: HTMLDivElement, props: OneTapProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__experimental_mountGoogleOneTap(node, props);
+    }
+  };
+
+  __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__experimental_unmountGoogleOneTap(node);
     }
   };
 

@@ -17,6 +17,5 @@ export * from './useSafeState';
 export * from './useSearchInput';
 export * from './useDebounce';
 export * from './useScrollLock';
-export * from './useDeepEqualMemo';
 export * from './useClerkModalStateParams';
 export * from './useNavigateToFlowStart';

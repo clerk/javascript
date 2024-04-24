@@ -14,11 +14,18 @@ const camelize = (s: string) => s.replace(/-./g, x => x[1].toUpperCase());
  * descriptor map
  */
 export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
+  'button',
+  'input',
+  'checkbox',
+  'radio',
+  'table',
+
   'rootBox',
+  'cardBox',
   'card',
-  'cardContent',
-  'cardFooter',
-  'cardFooterItem',
+  'footerItem',
+
+  'actionCard',
 
   'logoBox',
   'logoImage',
@@ -43,7 +50,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsIconButton',
   'socialButtonsBlockButton',
   'socialButtonsBlockButtonText',
-  'socialButtonsBlockButtonArrow',
   'socialButtonsProviderIcon',
 
   'enterpriseButtonsProviderIcon',
@@ -52,10 +58,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'alternativeMethodsBlockButtonText',
   'alternativeMethodsBlockButtonArrow',
 
-  'otpCodeBox',
-  'otpCodeHeader',
-  'otpCodeHeaderTitle',
-  'otpCodeHeaderSubtitle',
   'otpCodeField',
   'otpCodeFieldInputs',
   'otpCodeFieldInput',
@@ -93,9 +95,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formFieldWarningText',
   'formFieldSuccessText',
   'formFieldInfoText',
-  'formFieldDirectionsText',
   'formFieldHintText',
-  'formButtonRow',
   'formButtonPrimary',
   'formButtonReset',
   'formFieldInputGroup',
@@ -121,13 +121,11 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userButtonPopoverRootBox',
   'userButtonPopoverCard',
   'userButtonPopoverMain',
-  'userButtonPopoverUserPreview',
   'userButtonPopoverActions',
   'userButtonPopoverActionButton',
   'userButtonPopoverActionButtonIconBox',
   'userButtonPopoverActionButtonIcon',
   'userButtonPopoverFooter',
-  'userButtonPopoverFooterPages',
   'userButtonPopoverFooterPagesLink',
 
   'organizationSwitcherTrigger',
@@ -140,13 +138,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationSwitcherPopoverActionButton',
   'organizationSwitcherPreviewButton',
   'organizationSwitcherInvitationAcceptButton',
-  'organizationSwitcherInvitationRejectButton',
   'organizationSwitcherPopoverActionButtonIconBox',
   'organizationSwitcherPopoverActionButtonIcon',
-  'organizationSwitcherPopoverActionButtonText',
   'organizationSwitcherPopoverFooter',
-  'organizationSwitcherPopoverFooterPages',
-  'organizationSwitcherPopoverFooterPagesLink',
 
   'organizationListPreviewItems',
   'organizationListPreviewItem',
@@ -172,14 +166,17 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationPreviewSecondaryIdentifier',
 
   'membersPageInviteButton',
-  'organizationProfilePage',
 
   'identityPreview',
-  'identityPreviewAvatarBox',
-  'identityPreviewAvatarImage',
   'identityPreviewText',
   'identityPreviewEditButton',
   'identityPreviewEditButtonIcon',
+
+  'passkeyIcon',
+
+  'accountSwitcherActionButton',
+  'accountSwitcherActionButtonIconBox',
+  'accountSwitcherActionButtonIcon',
 
   'alert',
   'alertIcon',
@@ -210,9 +207,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'menuList',
   'menuItem',
 
-  'loader',
-  'loaderIcon',
-
   'modalBackdrop',
   'modalContent',
   'modalCloseButton',
@@ -233,13 +227,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formattedPhoneNumberFlag',
   'formattedPhoneNumberText',
 
-  'breadcrumbs',
-  'breadcrumbsItems',
-  'breadcrumbsItemBox',
-  'breadcrumbsItem',
-  'breadcrumbsItemIcon',
-  'breadcrumbsItemDivider',
-
   'scrollBox',
 
   'navbar',
@@ -252,7 +239,6 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
 
   'pageScrollBox',
   'page',
-  'pageHeader',
 
   'activeDevice',
   'activeDeviceListItem',
@@ -264,31 +250,17 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'impersonationFabTitle',
   'impersonationFabActionLink',
 
-  'fileDropAreaOuterBox',
-  'fileDropAreaBox',
-  'fileDropAreaIconBox',
-  'fileDropAreaIcon',
-  'fileDropAreaHint',
-  'fileDropAreaButtonPrimary',
-  'fileDropAreaFooterHint',
-
   'invitationsSentIconBox',
   'invitationsSentIcon',
-
-  'accordionTriggerButton',
-  'accordionContent',
 
   'qrCodeRow',
   'qrCodeContainer',
 
   'badge',
   'notificationBadge',
-  'button',
   'buttonArrowIcon',
   'providerIcon',
   'spinner',
-  // Decide if we want to keep the keys as camel cased in HTML as well,
-  // if yes, refactor and remove the .map(camelize) method
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

@@ -3,15 +3,14 @@ import { constants } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
+import hmacSHA1 from 'crypto-js/hmac-sha1';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
-import { missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import { authSignatureInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { RequestLike } from './types';
-
-type AuthKey = 'AuthStatus' | 'AuthMessage' | 'AuthReason';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
   Object.assign(req, { [key]: value });
@@ -22,7 +21,10 @@ export function getCustomAttributeFromRequest(req: RequestLike, key: string): st
   return key in req ? req[key] : undefined;
 }
 
-export function getAuthKeyFromRequest(req: RequestLike, key: AuthKey): string | null | undefined {
+export function getAuthKeyFromRequest(
+  req: RequestLike,
+  key: keyof typeof constants.Attributes,
+): string | null | undefined {
   return getCustomAttributeFromRequest(req, constants.Attributes[key]) || getHeader(req, constants.Headers[key]);
 }
 
@@ -107,8 +109,13 @@ export const injectSSRStateIntoObject = <O, T>(obj: O, authObject: T) => {
 };
 
 // Auth result will be set as both a query param & header when applicable
-export function decorateRequest(req: Request, res: Response, requestState: RequestState): Response {
-  const { reason, message, status } = requestState;
+export function decorateRequest(
+  req: ClerkRequest,
+  res: Response,
+  requestState: RequestState,
+  secretKey: string,
+): Response {
+  const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
   if (!res) {
     res = NextResponse.next();
@@ -143,8 +150,11 @@ export function decorateRequest(req: Request, res: Response, requestState: Reque
   if (rewriteURL) {
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
+      [constants.Headers.AuthToken]: token || '',
+      [constants.Headers.AuthSignature]: token ? createTokenSignature(token, secretKey) : '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
+      [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
@@ -192,9 +202,35 @@ export const handleMultiDomainAndProxy = (clerkRequest: ClerkRequest, opts: Auth
   };
 };
 
-export const decorateResponseWithObservabilityHeaders = (res: Response, requestState: RequestState): Response => {
-  requestState.message && res.headers.set(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
-  requestState.reason && res.headers.set(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
-  requestState.status && res.headers.set(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
-  return res;
+export const redirectAdapter = (url: string | URL) => {
+  return NextResponse.redirect(url, { headers: { [constants.Headers.ClerkRedirectTo]: 'true' } });
 };
+
+export function assertKey(key: string, onError: () => never): string {
+  if (!key) {
+    onError();
+  }
+
+  return key;
+}
+
+/**
+ * Compute a cryptographic signature from a session token and provided secret key. Used to validate that the token has not been modified when transferring between middleware and the Next.js origin.
+ */
+function createTokenSignature(token: string, key: string): string {
+  return hmacSHA1(token, key).toString();
+}
+
+/**
+ * Assert that the provided token generates a matching signature.
+ */
+export function assertTokenSignature(token: string, key: string, signature?: string | null) {
+  if (!signature) {
+    throw new Error(authSignatureInvalid);
+  }
+
+  const expectedSignature = createTokenSignature(token, key);
+  if (expectedSignature !== signature) {
+    throw new Error(authSignatureInvalid);
+  }
+}

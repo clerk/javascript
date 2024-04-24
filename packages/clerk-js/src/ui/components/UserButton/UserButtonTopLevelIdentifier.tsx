@@ -16,7 +16,13 @@ export const UserButtonTopLevelIdentifier = ({ showName }: UserButtonTopLevelIde
   return (
     <Text
       variant='subtitle'
+      as='span'
       elementDescriptor={descriptors.userButtonOuterIdentifier}
+      sx={[
+        t => ({
+          paddingLeft: t.space.$2,
+        }),
+      ]}
     >
       {getFullName(user) || getIdentifier(user)}
     </Text>

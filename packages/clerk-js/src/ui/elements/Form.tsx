@@ -51,7 +51,7 @@ const FormRoot = (props: FormProps): JSX.Element => {
     <FormState.Provider value={value}>
       <FormPrim
         elementDescriptor={descriptors.form}
-        gap={4}
+        gap={6}
         {...props}
         onSubmit={onSubmit}
       >
@@ -96,7 +96,6 @@ const FormReset = (props: PropsOfComponent<typeof Button>) => {
       elementDescriptor={descriptors.formButtonReset}
       block
       variant='ghost'
-      textVariant='buttonSmall'
       type='reset'
       isDisabled={isLoading || isDisabled}
       {...props}
@@ -130,28 +129,33 @@ const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
   const { isOptional, icon, actionLabel, children, onActionClicked, ...fieldProps } = props;
   return (
     <Field.Root {...fieldProps}>
-      <Flex
-        direction='col'
+      <Col
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(fieldProps.id)}
         sx={{ position: 'relative', flex: '1 1 auto' }}
-        gap={1}
       >
-        <Field.LabelRow>
-          <Field.Label />
-          <Field.LabelIcon icon={icon} />
-          {!actionLabel && isOptional && <Field.AsOptional />}
-          {actionLabel && (
-            <Field.Action
-              localizationKey={actionLabel}
-              onClick={onActionClicked}
-            />
-          )}
-          <Field.Action />
-        </Field.LabelRow>
-        {children}
+        <Flex
+          direction='col'
+          sx={t => ({ gap: t.space.$2 })}
+        >
+          <Field.LabelRow>
+            <Field.Label />
+            <Field.LabelIcon icon={icon} />
+            {!actionLabel && isOptional && <Field.AsOptional />}
+            {actionLabel && (
+              <Field.Action
+                localizationKey={actionLabel}
+                onClick={onActionClicked}
+              />
+            )}
+            <Field.Action />
+          </Field.LabelRow>
+
+          {children}
+        </Flex>
+
         <Field.Feedback />
-      </Flex>
+      </Col>
     </Field.Root>
   );
 };
@@ -224,7 +228,9 @@ const RadioGroup = (
           <Flex
             key={value}
             sx={t => ({
-              border: `1px solid ${t.colors.$blackAlpha100}`,
+              borderWidth: t.borderWidths.$normal,
+              borderStyle: t.borderStyles.$solid,
+              borderColor: t.colors.$neutralAlpha100,
               borderRadius: t.radii.$md,
               padding: t.space.$2,
             })}
@@ -245,6 +251,7 @@ const RadioGroup = (
 
 const OTPInput = (props: OTPInputProps) => {
   const { ref, ...restInputProps } = props.otpControl.otpInputProps;
+  const { centerAlign = true } = props;
   return (
     // Use Field.Root in order to pass feedback down to Field.Feedback
     // @ts-ignore
@@ -254,7 +261,7 @@ const OTPInput = (props: OTPInputProps) => {
         <Col
           elementDescriptor={descriptors.form}
           gap={2}
-          align='center'
+          align={centerAlign ? 'center' : 'start'}
         >
           <Flex
             elementDescriptor={descriptors.otpCodeField}

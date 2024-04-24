@@ -2,30 +2,45 @@ import type { Theme } from '@clerk/types';
 
 import { spaceScaleKeys } from '../foundations/sizes';
 import type { fontSizes, fontWeights } from '../foundations/typography';
-import { colors, fromEntries, removeUndefinedProps } from '../utils';
-import { colorOptionToHslaAlphaScale, colorOptionToHslaLightnessScale } from './colorOptionToHslaScale';
+import {
+  colorOptionToHslaAlphaScale,
+  colorOptionToHslaLightnessScale,
+  colors,
+  fromEntries,
+  removeUndefinedProps,
+} from '../utils';
 
 export const createColorScales = (theme: Theme) => {
   const variables = theme.variables || {};
+
+  const primaryScale = colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary');
+  const primaryAlphaScale = colorOptionToHslaAlphaScale(primaryScale?.primary500, 'primaryAlpha');
+  const dangerScale = colorOptionToHslaLightnessScale(variables.colorDanger, 'danger');
+  const dangerAlphaScale = colorOptionToHslaAlphaScale(dangerScale?.danger500, 'dangerAlpha');
+  const successScale = colorOptionToHslaLightnessScale(variables.colorSuccess, 'success');
+  const successAlphaScale = colorOptionToHslaAlphaScale(successScale?.success500, 'successAlpha');
+  const warningScale = colorOptionToHslaLightnessScale(variables.colorWarning, 'warning');
+  const warningAlphaScale = colorOptionToHslaAlphaScale(warningScale?.warning500, 'warningAlpha');
+
   return removeUndefinedProps({
-    ...colorOptionToHslaLightnessScale(variables.colorPrimary, 'primary'),
-    ...colorOptionToHslaLightnessScale(variables.colorDanger, 'danger'),
-    ...colorOptionToHslaLightnessScale(variables.colorSuccess, 'success'),
-    ...colorOptionToHslaLightnessScale(variables.colorWarning, 'warning'),
-    ...colorOptionToHslaAlphaScale(variables.colorAlphaShade, 'blackAlpha'),
-    colorText: toHSLA(variables.colorText),
+    ...primaryScale,
+    ...primaryAlphaScale,
+    ...dangerScale,
+    ...dangerAlphaScale,
+    ...successScale,
+    ...successAlphaScale,
+    ...warningScale,
+    ...warningAlphaScale,
+    ...colorOptionToHslaAlphaScale(variables.colorNeutral, 'neutralAlpha'),
+    primaryHover: colors.adjustForLightness(primaryScale?.primary500),
     colorTextOnPrimaryBackground: toHSLA(variables.colorTextOnPrimaryBackground),
+    colorText: toHSLA(variables.colorText),
     colorTextSecondary: toHSLA(variables.colorTextSecondary) || colors.makeTransparent(variables.colorText, 0.35),
     colorInputText: toHSLA(variables.colorInputText),
     colorBackground: toHSLA(variables.colorBackground),
     colorInputBackground: toHSLA(variables.colorInputBackground),
     colorShimmer: toHSLA(variables.colorShimmer),
   });
-};
-
-export const createThemeOptions = (theme: Theme) => {
-  const { fontSmoothing = 'auto !important' } = theme.variables || {};
-  return { fontSmoothing };
 };
 
 export const toHSLA = (str: string | undefined) => {
@@ -41,11 +56,10 @@ export const createRadiiUnits = (theme: Theme) => {
   const md = borderRadius === 'none' ? '0' : borderRadius;
   const { numericValue, unit = 'rem' } = splitCssUnit(md);
   return {
-    sm: percentage(numericValue, 0.23).toString() + unit,
+    sm: (numericValue * 0.66).toString() + unit,
     md,
-    lg: percentage(numericValue, 0.35).toString() + unit,
-    xl: percentage(numericValue, 1.7).toString() + unit,
-    '2xl': percentage(numericValue, 2.35).toString() + unit,
+    lg: (numericValue * 1.33).toString() + unit,
+    xl: (numericValue * 2).toString() + unit,
   };
 };
 
@@ -92,17 +106,8 @@ export const createFonts = (theme: Theme) => {
   return removeUndefinedProps({ main: fontFamily, buttons: fontFamilyButtons });
 };
 
-export const createShadows = (theme: Theme) => {
-  const { shadowShimmer } = theme.variables || {};
-  return removeUndefinedProps({ shadowShimmer });
-};
-
 const splitCssUnit = (str: string) => {
   const numericValue = Number.parseFloat(str);
   const unit = str.replace(numericValue.toString(), '') || undefined;
   return { numericValue, unit };
-};
-
-const percentage = (base: number, perc: number) => {
-  return base + base * perc;
 };

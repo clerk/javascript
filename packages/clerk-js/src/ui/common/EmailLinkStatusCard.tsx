@@ -36,11 +36,11 @@ export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
     <Flow.Part part='emailLinkStatus'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
           <Header.Root>
             <Header.Title localizationKey={props.title} />
             <Header.Subtitle localizationKey={props.subtitle} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           <Col elementDescriptor={descriptors.main}>
             <StatusRow status={props.status} />
           </Col>
@@ -71,7 +71,7 @@ const StatusRow = (props: { status: VerificationStatus }) => {
           <StatusIcon status={props.status} />
           <Text
             elementDescriptor={descriptors.verificationLinkStatusText}
-            colorScheme='neutral'
+            colorScheme='secondary'
             localizationKey={localizationKeys('signIn.emailLink.unusedTab.title')}
           />
         </>
@@ -91,7 +91,7 @@ const StatusIcon = (props: { status: Exclude<VerificationStatus, 'loading'> }) =
         width: theme.sizes.$24,
         height: theme.sizes.$24,
         borderRadius: theme.radii.$circle,
-        backgroundColor: theme.colors.$blackAlpha100,
+        backgroundColor: theme.colors.$neutralAlpha100,
         color: statusToColor(theme, status),
         animation: `${animations.dropdownSlideInScaleAndFade} 500ms ease`,
       })}

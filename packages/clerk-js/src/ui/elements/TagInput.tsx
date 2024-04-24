@@ -120,13 +120,14 @@ export const TagInput = (props: TagInputProps) => {
       sx={[
         t => ({
           maxWidth: '100%',
-          padding: `${t.space.$2x5} ${t.space.$4}`,
+          padding: `${t.space.$1x5} ${t.space.$2}`,
           backgroundColor: t.colors.$colorInputBackground,
           color: t.colors.$colorInputText,
           minHeight: t.sizes.$20,
           maxHeight: t.sizes.$60,
           overflowY: 'auto',
           cursor: 'text',
+          justifyItems: 'center',
           ...common.borderVariants(t).normal,
         }),
         sx,
@@ -155,19 +156,20 @@ export const TagInput = (props: TagInputProps) => {
         onBlur={handleOnBlur}
         focusRing={false}
         autoFocus={autoFocus}
+        variant='unstyled'
         sx={t => ({
           flexGrow: 1,
-          border: 'none',
+          borderWidth: 0,
           width: 'initial',
           padding: 0,
-          lineHeight: t.space.$6,
+          lineHeight: t.space.$5,
           paddingLeft: t.space.$1,
+          '::placeholder': {
+            color: t.colors.$colorTextSecondary,
+          },
           boxShadow: 'none',
           ':hover': {
             boxShadow: 'none',
-          },
-          '::placeholder': {
-            color: t.colors.$colorTextTertiary,
           },
         })}
       />
@@ -188,11 +190,19 @@ const TagPill = (props: TagPillProps) => {
       {...rest}
       sx={t => ({
         padding: `${t.space.$0x5} ${t.space.$1x5}`,
-        backgroundColor: t.colors.$blackAlpha50,
-        color: t.colors.$blackAlpha700,
         borderRadius: t.radii.$sm,
-        boxShadow: t.shadows.$badge.replace('{{color}}', t.colors.$blackAlpha100),
+        color: t.colors.$primary500,
+        backgroundColor: t.colors.$neutralAlpha50,
+        boxShadow: t.shadows.$badge,
+        borderWidth: t.borderWidths.$normal,
+        borderStyle: t.borderStyles.$solid,
+        borderColor: t.colors.$neutralAlpha100,
+        display: 'inline-flex',
+        marginRight: '1px',
         cursor: 'pointer',
+        ':hover': {
+          backgroundColor: t.colors.$neutralAlpha100,
+        },
         ':hover svg': {
           color: t.colors.$danger500,
         },
@@ -207,9 +217,9 @@ const TagPill = (props: TagPillProps) => {
       </Text>
       <Icon
         elementDescriptor={descriptors.tagPillIcon}
-        size='sm'
+        size='md'
         icon={Plus}
-        sx={t => ({ color: t.colors.$colorTextTertiary, transform: 'translateY(1px) rotate(45deg)' })}
+        sx={t => ({ color: t.colors.$colorTextSecondary, transform: 'translateY(0px) rotate(45deg)' })}
       />
     </Flex>
   );

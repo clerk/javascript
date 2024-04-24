@@ -15,6 +15,9 @@ export const PreviewListItems = (props: PropsWithChildren) => {
       sx={t => ({
         maxHeight: `calc(8 * ${t.sizes.$12})`,
         overflowY: 'auto',
+        borderTopWidth: t.borderWidths.$normal,
+        borderTopStyle: t.borderStyles.$solid,
+        borderTopColor: t.colors.$neutralAlpha100,
         ...common.unstyledScrollbar(t),
       })}
     >
@@ -25,13 +28,12 @@ export const PreviewListItems = (props: PropsWithChildren) => {
 
 const sharedStyles: ThemableCssProp = t => ({
   padding: `${t.space.$4} ${t.space.$5}`,
-  borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
 });
 
 export const sharedMainIdentifierSx: ThemableCssProp = t => ({
-  color: t.colors.$blackAlpha950,
+  color: t.colors.$colorText,
   ':hover': {
-    color: t.colors.$blackAlpha950,
+    color: t.colors.$colorText,
   },
 });
 
@@ -45,10 +47,13 @@ export const PreviewListItem = (
       align='center'
       gap={2}
       sx={[
-        {
+        t => ({
           minHeight: 'unset',
           justifyContent: 'space-between',
-        },
+          borderTopWidth: t.borderWidths.$normal,
+          borderTopStyle: t.borderStyles.$solid,
+          borderTopColor: t.colors.$neutralAlpha100,
+        }),
         sharedStyles,
       ]}
       elementDescriptor={descriptors.organizationListPreviewItem}
@@ -97,7 +102,7 @@ export const PreviewListItemButton = (props: Parameters<typeof Button>[0]) => {
     <Button
       elementDescriptor={descriptors.organizationListPreviewItemActionButton}
       textVariant='buttonSmall'
-      variant='secondary'
+      variant='outline'
       size='xs'
       {...props}
     />
@@ -110,7 +115,6 @@ export const OrganizationListPreviewButton = (props: PropsWithChildren<{ onClick
       elementDescriptor={descriptors.organizationListPreviewButton}
       sx={[sharedStyles]}
       icon={SwitchArrowRight}
-      showIconOnHover={false}
       {...props}
     />
   );

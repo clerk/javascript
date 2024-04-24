@@ -18,12 +18,16 @@ const _UserButton = withFloatingTree(() => {
   const userButtonMenuId = useId();
 
   return (
-    <Flow.Root flow='userButton'>
+    <Flow.Root
+      flow='userButton'
+      sx={{ display: 'inline-flex' }}
+    >
       <UserButtonTrigger
         ref={reference}
         onClick={toggle}
         isOpen={isOpen}
-        aria-controls={userButtonMenuId}
+        aria-controls={isOpen ? userButtonMenuId : undefined}
+        aria-expanded={isOpen}
       />
       <Popover
         nodeId={nodeId}

@@ -1,28 +1,16 @@
 import React from 'react';
 
-import { createVariants, type PrimitiveProps } from '../styledSystem';
+import { type PrimitiveProps } from '../styledSystem';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
 
 export type TbodyProps = PrimitiveProps<'tbody'> & Omit<BoxProps, 'as'>;
 
-const { applyVariants, filterProps } = createVariants(theme => {
-  return {
-    base: {
-      width: '100%',
-      borderRadius: theme.radii.$lg,
-      boxShadow: theme.shadows.$tableBodyShadow,
-    },
-    variants: {},
-  };
-});
-
 export const Tbody = React.forwardRef<HTMLTableSectionElement, TbodyProps>((props, ref) => {
   return (
     <Box
       as='tbody'
-      {...filterProps(props)}
-      css={applyVariants(props) as any}
+      {...props}
       ref={ref}
     />
   );

@@ -3,14 +3,14 @@ import { describe, it } from '@jest/globals';
 import userEvent from '@testing-library/user-event';
 
 import { act, render, waitFor } from '../../../../testUtils';
+import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationGeneralPage } from '../OrganizationGeneralPage';
 import { createFakeDomain, createFakeMember } from './utils';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
-//TODO-RETHEME
-describe.skip('OrganizationSettings', () => {
+describe('OrganizationSettings', () => {
   it.skip('enables organization profile button and disables leave when user is the only admin', async () => {
     const adminsList: OrganizationMembershipResource[] = [createFakeMember({ id: '1', orgId: '1', role: 'admin' })];
     const domainList: OrganizationDomainResource[] = [
@@ -41,7 +41,7 @@ describe.skip('OrganizationSettings', () => {
     expect(getByText(/leave organization/i, { exact: false }).closest('button')).toHaveAttribute('disabled');
   });
 
-  it('enables organization profile button and enables leave when user is admin and there is more', async () => {
+  it('enables organization profile button when user has permissions', async () => {
     const domainList: OrganizationDomainResource[] = [
       createFakeDomain({ id: '1', organizationId: '1', name: 'clerk.com' }),
     ];
@@ -57,11 +57,38 @@ describe.skip('OrganizationSettings', () => {
         total_count: 1,
       }),
     );
-    const { getByText } = render(<OrganizationGeneralPage />, { wrapper });
+    const { getByText, getByRole } = render(<OrganizationGeneralPage />, { wrapper });
     await waitFor(() => {
       expect(getByText('General')).toBeDefined();
-      expect(getByText('Org1', { exact: false }).closest('button')).not.toBeNull();
-      expect(getByText(/leave organization/i, { exact: false }).closest('button')).not.toHaveAttribute('disabled');
+      getByRole('button', { name: /update profile/i });
+      expect(getByRole('button', { name: /leave organization/i })).not.toBeDisabled();
+    });
+  });
+
+  it('disabled organization profile button when user does not have permissions', async () => {
+    const domainList: OrganizationDomainResource[] = [
+      createFakeDomain({ id: '1', organizationId: '1', name: 'clerk.com' }),
+    ];
+
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [{ name: 'Org1', permissions: [] }],
+      });
+    });
+
+    fixtures.clerk.organization?.getDomains.mockReturnValue(
+      Promise.resolve({
+        data: domainList,
+        total_count: 1,
+      }),
+    );
+    const { getByText, queryByRole } = render(<OrganizationGeneralPage />, { wrapper });
+    await waitFor(() => {
+      expect(getByText('General')).toBeDefined();
+      expect(queryByRole('button', { name: /update profile/i })).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: /leave organization/i })).not.toBeDisabled();
     });
   });
 
@@ -160,10 +187,9 @@ describe.skip('OrganizationSettings', () => {
         });
       });
 
-      const { getByText, queryByRole } = await act(() => render(<OrganizationGeneralPage />, { wrapper }));
+      const { queryByRole } = await act(() => render(<OrganizationGeneralPage />, { wrapper }));
       await waitFor(() => {
-        expect(getByText('Danger')).toBeDefined();
-        expect(getByText(/leave organization/i).closest('button')).toBeInTheDocument();
+        expect(queryByRole('button', { name: /leave organization/i })).toBeInTheDocument();
         expect(queryByRole('button', { name: /delete organization/i })).not.toBeInTheDocument();
       });
     });
@@ -177,11 +203,10 @@ describe.skip('OrganizationSettings', () => {
         });
       });
 
-      const { getByText } = render(<OrganizationGeneralPage />, { wrapper });
+      const { getByRole } = render(<OrganizationGeneralPage />, { wrapper });
       await waitFor(() => {
-        expect(getByText('Danger')).toBeDefined();
-        expect(getByText(/leave organization/i).closest('button')).not.toHaveAttribute('disabled');
-        expect(getByText(/delete organization/i).closest('button')).toBeInTheDocument();
+        expect(getByRole('button', { name: /leave organization/i })).not.toHaveAttribute('disabled');
+        expect(getByRole('button', { name: /delete organization/i })).toBeInTheDocument();
       });
     });
 
@@ -211,43 +236,47 @@ describe.skip('OrganizationSettings', () => {
       });
 
       fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve(adminsList));
-      const { getByText, getByRole } = render(<OrganizationGeneralPage />, { wrapper });
+      const { getByRole } = render(<OrganizationGeneralPage />, { wrapper });
       await waitFor(() => {
         expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalled();
-        expect(getByText('Danger')).toBeDefined();
-        expect(getByText(/leave organization/i).closest('button')).toHaveAttribute('disabled');
-        expect(getByText(/delete organization/i).closest('button')).toBeInTheDocument();
+        expect(getByRole('button', { name: /leave organization/i })).toHaveAttribute('disabled');
         expect(getByRole('button', { name: /delete organization/i })).toBeInTheDocument();
       });
     });
   });
 
   describe('Navigation', () => {
-    it('navigates to Organization Profile edit page when clicking on organization name and user is admin', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+    it('open the profile section', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
-          organization_memberships: [{ name: 'Org1' }],
+          organization_memberships: [{ name: 'Org1', slug: 'Org1' }],
         });
       });
 
-      fixtures.clerk.organization?.getDomains.mockReturnValue(
-        Promise.resolve({
-          data: [],
-          total_count: 0,
-        }),
+      const { getByText, getByLabelText, getByRole, userEvent, queryByText, queryByLabelText } = render(
+        <OrganizationGeneralPage />,
+        {
+          wrapper,
+        },
       );
-      const { getByText } = render(<OrganizationGeneralPage />, { wrapper });
-      await waitFor(async () => {
-        await userEvent.click(getByText('Org1', { exact: false }));
-      });
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('profile');
+      getByText('Org1');
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => getByLabelText(/name/i));
+      expect(queryByText('Logo')).toBeInTheDocument();
+      expect(queryByLabelText(/name/i)).toBeInTheDocument();
+      expect(queryByLabelText(/slug/i)).toBeInTheDocument();
+      expect(getByRole('button', { name: /upload/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /save/i })).toBeDisabled();
     });
+  });
 
+  describe('Leave organization', () => {
     // TODO(@panteliselef): Update this test to allow user to leave an org, only if there will be at least one person left with the minimum set of permissions
-    it('navigates to Leave Organization page when clicking on the respective button', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+    // ^ This require FAPI changes
+    it('shows Leave Organization screen when clicking on the respective button', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
@@ -255,11 +284,53 @@ describe.skip('OrganizationSettings', () => {
         });
       });
 
-      const { findByText } = render(<OrganizationGeneralPage />, { wrapper });
-      await waitFor(async () => {
-        await userEvent.click(await findByText(/leave organization/i, { exact: false }));
+      const { findByRole, getByRole, getByText } = render(
+        <CardStateProvider>
+          <OrganizationGeneralPage />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(async () =>
+        expect(await findByRole('button', { name: /leave organization/i })).toBeInTheDocument(),
+      );
+      await userEvent.click(getByRole('button', { name: /leave organization/i }));
+
+      await waitFor(async () =>
+        expect(await findByRole('heading', { name: /leave organization/i })).toBeInTheDocument(),
+      );
+      getByText(/Are you sure you want to leave this organization/i);
+      getByText(/This action is permanent and irreversible/i);
+    });
+
+    it('hides Leave Organization screen when clicking cancel', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions: [] }],
+        });
       });
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('leave');
+
+      const { findByRole, getByRole, queryByRole } = render(
+        <CardStateProvider>
+          <OrganizationGeneralPage />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(async () =>
+        expect(await findByRole('button', { name: /leave organization/i })).toBeInTheDocument(),
+      );
+      await userEvent.click(getByRole('button', { name: /leave organization/i }));
+      await waitFor(async () =>
+        expect(await findByRole('heading', { name: /leave organization/i })).toBeInTheDocument(),
+      );
+      await userEvent.click(getByRole('button', { name: /cancel/i }));
+      await waitFor(async () =>
+        expect(await findByRole('button', { name: /leave organization/i })).toBeInTheDocument(),
+      );
+      expect(queryByRole('heading', { name: /leave organization/i })).not.toBeInTheDocument();
     });
   });
 });

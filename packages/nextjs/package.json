@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "5.0.0-alpha-v5.14",
+  "version": "5.0.1",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -39,6 +39,11 @@
       "types": "./dist/types/errors.d.ts",
       "import": "./dist/esm/errors.js",
       "require": "./dist/cjs/errors.js"
+    },
+    "./internal": {
+      "types": "./dist/types/internal.d.ts",
+      "import": "./dist/esm/internal.js",
+      "require": "./dist/cjs/internal.js"
     }
   },
   "types": "./dist/types/index.d.ts",
@@ -62,23 +67,25 @@
     "test:ci": "jest --maxWorkers=70%"
   },
   "dependencies": {
-    "@clerk/backend": "1.0.0-alpha-v5.12",
-    "@clerk/clerk-react": "5.0.0-alpha-v5.13",
-    "@clerk/shared": "2.0.0-alpha-v5.8",
-    "path-to-regexp": "6.2.1"
+    "@clerk/backend": "1.0.0",
+    "@clerk/clerk-react": "5.0.0",
+    "@clerk/shared": "2.0.0",
+    "crypto-js": "4.2.0",
+    "path-to-regexp": "6.2.1",
+    "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/types": "4.0.0-alpha-v5.12",
+    "@clerk/types": "4.0.0",
+    "@types/crypto-js": "4.2.2",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "eslint-config-custom": "*",
-    "next": "^13.4.19",
-    "tslib": "2.4.1",
+    "next": "^13.5.4",
     "typescript": "*"
   },
   "peerDependencies": {
-    "next": "^13.0.4 || ^14.0.3",
+    "next": "^13.5.4 || ^14.0.3",
     "react": ">=18",
     "react-dom": ">=18"
   },

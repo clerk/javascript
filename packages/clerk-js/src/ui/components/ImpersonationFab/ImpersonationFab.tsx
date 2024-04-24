@@ -71,7 +71,7 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
       })}
     >
       <Text
-        colorScheme='neutral'
+        colorScheme='secondary'
         elementDescriptor={descriptors.impersonationFabTitle}
         variant='buttonLarge'
         truncate

@@ -12,8 +12,9 @@ export const EnterpriseAccountsSection = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.enterpriseAccountsSection.title')}
       id='enterpriseAccounts'
+      centered={false}
     >
-      <ProfileSection.Item id='enterpriseAccounts'>
+      <ProfileSection.ItemList id='enterpriseAccounts'>
         {user?.samlAccounts.map(account => {
           const label = account.emailAddress;
           const providerName = getSamlProviderName(account.provider);
@@ -21,9 +22,13 @@ export const EnterpriseAccountsSection = () => {
           const error = account.verification?.error?.longMessage;
 
           return (
-            <Flex
+            <ProfileSection.Item
+              id='enterpriseAccounts'
+              sx={t => ({
+                gap: t.space.$2,
+                justifyContent: 'start',
+              })}
               key={account.id}
-              sx={t => ({ gap: t.space.$2, width: '100%' })}
             >
               <Image
                 elementDescriptor={[descriptors.providerIcon]}
@@ -37,7 +42,19 @@ export const EnterpriseAccountsSection = () => {
                   gap={2}
                   center
                 >
-                  <Text>{`${providerName} ${label ? `(${label})` : ''}`}</Text>
+                  <Text
+                    truncate
+                    colorScheme='body'
+                  >
+                    {providerName}
+                  </Text>
+                  <Text
+                    truncate
+                    as='span'
+                    colorScheme='secondary'
+                  >
+                    {label ? `• ${label}` : ''}
+                  </Text>
                   {error && (
                     <Badge
                       colorScheme='danger'
@@ -46,10 +63,10 @@ export const EnterpriseAccountsSection = () => {
                   )}
                 </Flex>
               </Box>
-            </Flex>
+            </ProfileSection.Item>
           );
         })}
-      </ProfileSection.Item>
+      </ProfileSection.ItemList>
     </ProfileSection.Root>
   );
 };

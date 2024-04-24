@@ -1,14 +1,14 @@
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
-import { decodeJwt, hasValidSignature } from '../jwt';
 import { assertHeaderAlgorithm, assertHeaderType } from '../jwt/assertions';
+import { decodeJwt, hasValidSignature } from '../jwt/verifyJwt';
 import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
 import type { VerifyTokenOptions } from './verify';
 
 async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Promise<{ handshake: string[] }> {
-  const { data: decoded, error } = decodeJwt(token);
-  if (error) {
-    throw error;
+  const { data: decoded, errors } = decodeJwt(token);
+  if (errors) {
+    throw errors[0];
   }
 
   const { header, payload } = decoded;
@@ -19,11 +19,11 @@ async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Pro
   assertHeaderType(typ);
   assertHeaderAlgorithm(alg);
 
-  const { data: signatureValid, error: signatureError } = await hasValidSignature(decoded, key);
-  if (signatureError) {
+  const { data: signatureValid, errors: signatureErrors } = await hasValidSignature(decoded, key);
+  if (signatureErrors) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Error verifying handshake token. ${signatureError}`,
+      message: `Error verifying handshake token. ${signatureErrors[0]}`,
     });
   }
 
@@ -46,9 +46,9 @@ export async function verifyHandshakeToken(
 ): Promise<{ handshake: string[] }> {
   const { secretKey, apiUrl, apiVersion, jwksCacheTtlInMs, jwtKey, skipJwksCache } = options;
 
-  const { data, error } = decodeJwt(token);
-  if (error) {
-    throw error;
+  const { data, errors } = decodeJwt(token);
+  if (errors) {
+    throw errors[0];
   }
 
   const { kid } = data.header;

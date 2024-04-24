@@ -16,7 +16,7 @@ export const common: PlaywrightTestConfig = {
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  timeout: process.env.CI ? 90000 : 30000,
+  timeout: 90000,
   maxFailures: process.env.CI ? 1 : undefined,
   workers: process.env.CI ? numAvailableWorkers : '70%',
   reporter: process.env.CI ? 'line' : 'list',
@@ -43,5 +43,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], channel: 'chrome' },
       dependencies: ['setup'],
     },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'] },
+    //   dependencies: ['setup'],
+    // },
   ],
 });

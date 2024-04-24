@@ -1,14 +1,12 @@
+import type { MouseEventHandler } from 'react';
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { descriptors, Flex, Flow, Icon, localizationKeys, Text } from '../customizables';
+import { Button, descriptors, Flex, Flow, localizationKeys, Text } from '../customizables';
 import { useSupportEmail } from '../hooks/useSupportEmail';
-import { Email } from '../icons';
 import { useRouter } from '../router';
-import { ArrowBlockButton } from './ArrowBlockButton';
 import { Card } from './Card';
 import { useCardState } from './contexts';
-import { Footer } from './Footer';
 import { Header } from './Header';
 
 type ErrorCardProps = {
@@ -27,7 +25,10 @@ export const ErrorCard = (props: ErrorCardProps) => {
     window.location.href = `mailto:${supportEmail}`;
   };
 
-  const goBack = () => {
+  const goBack: MouseEventHandler = e => {
+    if (props.onBackLinkClick) {
+      return props.onBackLinkClick(e);
+    }
     void navigate('../');
   };
 
@@ -35,11 +36,11 @@ export const ErrorCard = (props: ErrorCardProps) => {
     <Flow.Part part='havingTrouble'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+          <Header.Root showLogo>
             <Header.Title localizationKey={props.cardTitle || 'Error'} />
             {props.cardSubtitle && <Header.Subtitle localizationKey={props.cardSubtitle} />}
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
           <Flex
             direction='col'
@@ -48,35 +49,22 @@ export const ErrorCard = (props: ErrorCardProps) => {
           >
             {props.message && (
               <Text
-                colorScheme='neutral'
+                colorScheme='secondary'
                 localizationKey={props.message}
               />
             )}
-            {/*TODO: extract  */}
-            <Text
-              colorScheme='neutral'
-              localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.content')}
-            />
-            <ArrowBlockButton
-              textLocalizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
+            <Button
+              localizationKey={localizationKeys('signIn.alternativeMethods.getHelp.blockButton__emailSupport')}
               onClick={handleEmailSupport}
-              leftIcon={
-                <Icon
-                  icon={Email}
-                  sx={theme => ({ color: theme.colors.$blackAlpha500 })}
-                />
-              }
+              hasArrow
             />
-          </Flex>
-          <Footer.Root>
-            <Footer.Action elementId='alternativeMethods'>
-              <Footer.ActionLink
+            <Card.Action elementId='alternativeMethods'>
+              <Card.ActionLink
                 localizationKey={localizationKeys('backButton')}
                 onClick={goBack}
               />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+            </Card.Action>
+          </Flex>
         </Card.Content>
         <Card.Footer />
       </Card.Root>

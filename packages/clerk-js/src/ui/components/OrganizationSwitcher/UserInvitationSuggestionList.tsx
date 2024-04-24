@@ -57,7 +57,7 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
   if (props.status === 'accepted') {
     return (
       <Text
-        colorScheme='neutral'
+        colorScheme='secondary'
         localizationKey={localizationKeys('organizationSwitcher.suggestionsAcceptedLabel')}
       />
     );
@@ -67,7 +67,8 @@ const AcceptRejectSuggestionButtons = (props: OrganizationSuggestionResource) =>
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
       textVariant='buttonSmall'
-      variant='secondary'
+      variant='outline'
+      colorScheme='neutral'
       size='sm'
       isLoading={card.isLoading}
       onClick={handleAccept}
@@ -83,7 +84,8 @@ const AcceptRejectInvitationButtons = (props: { onAccept: () => void }) => {
     <Button
       elementDescriptor={descriptors.organizationSwitcherInvitationAcceptButton}
       textVariant='buttonSmall'
-      variant='secondary'
+      variant='outline'
+      colorScheme='neutral'
       size='xs'
       isLoading={card.isLoading}
       onClick={props.onAccept}
@@ -113,9 +115,9 @@ const Preview = (
         elementId='organizationSwitcherListedOrganization'
         organization={publicOrganizationData}
         sx={t => ({
-          color: t.colors.$blackAlpha600,
+          color: t.colors.$colorTextSecondary,
           ':hover': {
-            color: t.colors.$blackAlpha600,
+            color: t.colors.$colorTextSecondary,
           },
         })}
       />
@@ -176,9 +178,9 @@ const InvitationPreview = withCardStateProvider(
             elementId='organizationSwitcherListedOrganization'
             organization={publicOrganizationData}
             sx={t => ({
-              color: t.colors.$blackAlpha600,
+              color: t.colors.$colorTextSecondary,
               ':hover': {
-                color: t.colors.$blackAlpha600,
+                color: t.colors.$colorTextSecondary,
               },
             })}
           />
@@ -197,9 +199,6 @@ const SwitcherInvitationActions = (props: PropsOfComponent<typeof Flex> & { show
   const { showBorder, ...restProps } = props;
   return (
     <Actions
-      sx={t => ({
-        borderBottom: showBorder ? `${t.borders.$normal} ${t.colors.$blackAlpha100}` : 'none',
-      })}
       role='menu'
       {...restProps}
     />
@@ -220,11 +219,16 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
   const { ref, userSuggestions, userInvitations } = useFetchInvitations();
   const isLoading = userInvitations.isLoading || userSuggestions.isLoading;
   const hasNextPage = userInvitations.hasNextPage || userSuggestions.hasNextPage;
-  const hasAnyData = !!(userInvitations.count || userSuggestions.count);
 
   // Solve weird bug with swr while running unit tests
-  const userInvitationsData = userInvitations.data?.filter(a => !!a);
-  const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+  const userInvitationsData = userInvitations.data?.filter(a => !!a) || [];
+  const userSuggestionsData = userSuggestions.data?.filter(a => !!a) || [];
+  const hasAnyData = userInvitationsData.length > 0 || userSuggestionsData.length > 0;
+
+  if (!hasAnyData && !isLoading) {
+    return null;
+  }
+
   return (
     <SwitcherInvitationActions
       showBorder={hasAnyData || isLoading}
@@ -232,7 +236,8 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
     >
       <Box
         sx={t => ({
-          maxHeight: `calc(4 * ${t.sizes.$12})`,
+          // 4 items + 4px border (four 1px borders)
+          maxHeight: `calc(4 * ${t.sizes.$17} + 4px)`,
           overflowY: 'auto',
           ...common.unstyledScrollbar(t),
         })}

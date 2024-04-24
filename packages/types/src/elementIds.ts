@@ -9,6 +9,7 @@ export type FieldId =
   | 'currentPassword'
   | 'newPassword'
   | 'signOutOfOtherSessions'
+  | 'passkeyName'
   | 'password'
   | 'confirmPassword'
   | 'identifier'
@@ -29,13 +30,15 @@ export type ProfileSectionId =
   | 'enterpriseAccounts'
   | 'web3Wallets'
   | 'password'
+  | 'passkeys'
   | 'mfa'
   | 'danger'
   | 'activeDevices'
   | 'organizationProfile'
   | 'organizationDanger'
-  | 'organizationDomains';
-export type ProfilePageId = 'account' | 'security' | 'organizationSettings' | 'organizationMembers';
+  | 'organizationDomains'
+  | 'manageVerifiedDomains';
+export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
 export type OrganizationPreviewId =
@@ -44,7 +47,7 @@ export type OrganizationPreviewId =
   | 'organizationSwitcherListedOrganization'
   | 'organizationSwitcherActiveOrganization';
 
-export type FooterActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn';
+export type CardActionId = 'havingTrouble' | 'alternativeMethods' | 'signUp' | 'signIn' | 'usePasskey';
 
-export type MenuId = 'invitation' | 'member';
+export type MenuId = 'invitation' | 'member' | ProfileSectionId;
 export type SelectId = 'countryCode' | 'role';

@@ -1,9 +1,10 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Button, localizationKeys } from '../../customizables';
+import { localizationKeys } from '../../customizables';
 import { ProfileSection, UserPreview } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { mqu } from '../../styledSystem';
 import { ProfileForm } from './ProfileForm';
 
 const ProfileScreen = () => {
@@ -29,16 +30,21 @@ export const UserProfileSection = () => {
     <ProfileSection.Root
       title={localizationKeys('userProfile.start.profileSection.title')}
       id='profile'
+      sx={{ [mqu.md]: { alignItems: 'flex-start' } }}
     >
       <Action.Root>
         <Action.Closed value='edit'>
           <ProfileSection.Item id='profile'>
-            <UserPreview user={userWithoutIdentifiers} />
+            <UserPreview
+              user={userWithoutIdentifiers}
+              size='lg'
+              mainIdentifierVariant='subtitle'
+              sx={t => ({ color: t.colors.$colorText })}
+            />
 
             <Action.Trigger value='edit'>
-              <Button
+              <ProfileSection.Button
                 id='profile'
-                variant='ghost'
                 localizationKey={localizationKeys('userProfile.start.profileSection.primaryButton')}
               />
             </Action.Trigger>

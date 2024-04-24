@@ -7,7 +7,6 @@ import {
   SignUp as BaseSignUp,
   UserProfile as BaseUserProfile,
 } from '@clerk/clerk-react';
-import { useRoutingProps } from '@clerk/clerk-react/internal';
 import type {
   CreateOrganizationProps,
   OrganizationProfileProps,
@@ -17,7 +16,7 @@ import type {
 } from '@clerk/types';
 import React from 'react';
 
-import { useClerkNextOptions } from './NextOptionsContext';
+import { useEnforceCorrectRoutingProps } from './hooks/useEnforceRoutingProps';
 
 export {
   OrganizationList,
@@ -27,26 +26,39 @@ export {
   SignOutButton,
   SignUpButton,
   UserButton,
+  __experimental_GoogleOneTap,
 } from '@clerk/clerk-react';
 
-export const UserProfile = (props: UserProfileProps) => {
-  return <BaseUserProfile {...useRoutingProps('UserProfile', props)} />;
-};
+// The assignment of UserProfile with BaseUserProfile props is used
+// to support the CustomPage functionality (eg UserProfile.Page)
+// Also the `typeof BaseUserProfile` is used to resolve the following error:
+// "The inferred type of 'UserProfile' cannot be named without a reference to ..."
+export const UserProfile: typeof BaseUserProfile = Object.assign(
+  (props: UserProfileProps) => {
+    return <BaseUserProfile {...useEnforceCorrectRoutingProps('UserProfile', props)} />;
+  },
+  { ...BaseUserProfile },
+);
 
 export const CreateOrganization = (props: CreateOrganizationProps) => {
-  return <BaseCreateOrganization {...useRoutingProps('CreateOrganization', props)} />;
+  return <BaseCreateOrganization {...useEnforceCorrectRoutingProps('CreateOrganization', props)} />;
 };
 
-export const OrganizationProfile = (props: OrganizationProfileProps) => {
-  return <BaseOrganizationProfile {...useRoutingProps('OrganizationProfile', props)} />;
-};
+// The assignment of OrganizationProfile with BaseOrganizationProfile props is used
+// to support the CustomPage functionality (eg OrganizationProfile.Page)
+// Also the `typeof BaseOrganizationProfile` is used to resolved the following error:
+// "The inferred type of 'OrganizationProfile' cannot be named without a reference to ..."
+export const OrganizationProfile: typeof BaseOrganizationProfile = Object.assign(
+  (props: OrganizationProfileProps) => {
+    return <BaseOrganizationProfile {...useEnforceCorrectRoutingProps('OrganizationProfile', props)} />;
+  },
+  { ...BaseOrganizationProfile },
+);
 
 export const SignIn = (props: SignInProps) => {
-  const { signInUrl } = useClerkNextOptions();
-  return <BaseSignIn {...useRoutingProps('SignIn', props, { path: signInUrl })} />;
+  return <BaseSignIn {...useEnforceCorrectRoutingProps('SignIn', props)} />;
 };
 
 export const SignUp = (props: SignUpProps) => {
-  const { signUpUrl } = useClerkNextOptions();
-  return <BaseSignUp {...useRoutingProps('SignUp', props, { path: signUpUrl })} />;
+  return <BaseSignUp {...useEnforceCorrectRoutingProps('SignUp', props)} />;
 };

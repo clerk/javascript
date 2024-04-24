@@ -20,7 +20,7 @@
 ·
 [Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://feedback.clerk.com/roadmap)
 ·
 [Ask a Question](https://github.com/clerk/javascript/discussions)
 
@@ -58,7 +58,7 @@ await clerk.load({
 
 ### Install ClerkJS as script
 
-ClerkJS can be loaded from a `<script />` tag with the source from your [Frontend API](https://dashboard.clerk.com/last-active?path=api-keys) URL.
+ClerkJS can be loaded from a `<script />` tag with the source from your [Frontend API URL](https://dashboard.clerk.com/last-active?path=api-keys).
 
 Add the following script to your site's `<body>` element:
 
@@ -66,14 +66,14 @@ Add the following script to your site's `<body>` element:
 <script>
   // Get this URL and Publishable Key from the Clerk Dashboard
   const clerkPublishableKey = 'pk_[publishable_key]';
-  const frontendApi = '[your-domain].clerk.accounts.dev';
+  const frontendApiUrl = '[your-domain].clerk.accounts.dev';
   const version = '@latest'; // Set to appropriate version
 
   // Creates asynchronous script
   const script = document.createElement('script');
   script.setAttribute('data-clerk-publishable-key', clerkPublishableKey);
   script.async = true;
-  script.src = `https://${frontendApi}/npm/@clerk/clerk-js${version}/dist/clerk.browser.js`;
+  script.src = `https://${frontendApiUrl}/npm/@clerk/clerk-js${version}/dist/clerk.browser.js`;
 
   // Adds listener to initialize ClerkJS after it's loaded
   script.addEventListener('load', async function () {

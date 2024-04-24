@@ -4,9 +4,6 @@ import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
 import { Permission } from './Permission';
 
-/**
- * @experimental
- */
 export class Role extends BaseResource implements RoleResource {
   id!: string;
   key!: string;

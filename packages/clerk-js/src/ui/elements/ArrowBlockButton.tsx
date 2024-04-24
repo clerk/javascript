@@ -22,9 +22,10 @@ type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
   spinnerElementDescriptor?: ElementDescriptor;
   spinnerElementId?: ElementId;
   textLocalizationKey?: LocalizationKey | string;
+  textVariant?: PropsOfComponent<typeof Text>['variant'];
 };
 
-export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
+export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockButtonProps>((props, ref) => {
   const {
     rightIcon = ArrowRightIcon,
     rightIconSx,
@@ -43,6 +44,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
     textLocalizationKey,
     childrenSx,
     badge,
+    textVariant = 'buttonSmall',
     ...rest
   } = props;
 
@@ -50,17 +52,19 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
 
   return (
     <SimpleButton
-      variant='secondary'
+      variant='outline'
       block
       isLoading={isLoading}
       {...rest}
+      ref={ref}
       sx={theme => [
         {
-          gap: theme.space.$4,
+          gap: theme.space.$1,
           position: 'relative',
           justifyContent: 'center',
-          borderColor: theme.colors.$blackAlpha200,
+          borderColor: theme.colors.$neutralAlpha100,
           alignItems: 'center',
+          padding: `${theme.space.$1x5} ${theme.space.$3} ${theme.space.$1x5} ${theme.space.$2x5}`,
           '--arrow-opacity': '0',
           '--arrow-transform': `translateX(-${theme.space.$2});`,
           '&:hover,&:focus ': {
@@ -89,7 +93,6 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
               icon={leftIcon as React.ComponentType}
               sx={[
                 theme => ({
-                  color: theme.colors.$blackAlpha600,
                   width: theme.sizes.$5,
                 }),
                 leftIconSx,
@@ -102,6 +105,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
       )}
       <Flex
         gap={2}
+        as='span'
         sx={[
           {
             overflow: 'hidden',
@@ -114,7 +118,7 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
           elementId={textElementId}
           as='span'
           truncate
-          variant='buttonSmall'
+          variant={textVariant}
           localizationKey={textLocalizationKey}
         >
           {children}
@@ -140,4 +144,4 @@ export const ArrowBlockButton = (props: ArrowBlockButtonProps) => {
       />
     </SimpleButton>
   );
-};
+});

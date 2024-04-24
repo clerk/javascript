@@ -27,25 +27,33 @@ export const PasswordSection = () => {
 
   return (
     <ProfileSection.Root
+      centered={false}
       title={localizationKeys('userProfile.start.passwordSection.title')}
       id='password'
     >
       <Action.Root>
         <Action.Closed value='edit'>
-          <ProfileSection.ItemList id='password'>
-            {passwordEnabled && <Text sx={t => ({ padding: `${t.space.$2} ${t.space.$4}` })}>••••••••••</Text>}
+          <ProfileSection.Item
+            id='password'
+            sx={t => ({
+              paddingLeft: !passwordEnabled ? '0' : undefined,
+              paddingTop: t.space.$0x25,
+              paddingBottom: t.space.$0x25,
+            })}
+          >
+            {passwordEnabled && <Text variant='h2'>••••••••••</Text>}
 
             <Action.Trigger value='edit'>
               <ProfileSection.Button
                 id='password'
                 localizationKey={
                   passwordEnabled
-                    ? localizationKeys('userProfile.start.passwordSection.primaryButton__changePassword')
+                    ? localizationKeys('userProfile.start.passwordSection.primaryButton__updatePassword')
                     : localizationKeys('userProfile.start.passwordSection.primaryButton__setPassword')
                 }
               />
             </Action.Trigger>
-          </ProfileSection.ItemList>
+          </ProfileSection.Item>
         </Action.Closed>
 
         <Action.Open value='edit'>

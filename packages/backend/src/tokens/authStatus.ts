@@ -1,18 +1,21 @@
 import type { JwtPayload } from '@clerk/types';
 
+import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
 import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
 
-export enum AuthStatus {
-  SignedIn = 'signed-in',
-  SignedOut = 'signed-out',
-  Handshake = 'handshake',
-}
+export const AuthStatus = {
+  SignedIn: 'signed-in',
+  SignedOut: 'signed-out',
+  Handshake: 'handshake',
+} as const;
+
+export type AuthStatus = (typeof AuthStatus)[keyof typeof AuthStatus];
 
 export type SignedInState = {
-  status: AuthStatus.SignedIn;
+  status: typeof AuthStatus.SignedIn;
   reason: null;
   message: null;
   proxyUrl?: string;
@@ -26,10 +29,11 @@ export type SignedInState = {
   isSignedIn: true;
   toAuth: () => SignedInAuthObject;
   headers: Headers;
+  token: string;
 };
 
 export type SignedOutState = {
-  status: AuthStatus.SignedOut;
+  status: typeof AuthStatus.SignedOut;
   message: string;
   reason: AuthReason;
   proxyUrl?: string;
@@ -43,25 +47,29 @@ export type SignedOutState = {
   isSignedIn: false;
   toAuth: () => SignedOutAuthObject;
   headers: Headers;
+  token: null;
 };
 
 export type HandshakeState = Omit<SignedOutState, 'status' | 'toAuth'> & {
-  status: AuthStatus.Handshake;
+  status: typeof AuthStatus.Handshake;
   headers: Headers;
   toAuth: () => null;
 };
 
-export enum AuthErrorReason {
-  ClientUATWithoutSessionToken = 'client-uat-but-no-session-token',
-  DevBrowserSync = 'dev-browser-sync',
-  PrimaryRespondsToSyncing = 'primary-responds-to-syncing',
-  SatelliteCookieNeedsSyncing = 'satellite-needs-syncing',
-  SessionTokenAndUATMissing = 'session-token-and-uat-missing',
-  SessionTokenMissing = 'session-token-missing',
-  SessionTokenOutdated = 'session-token-outdated',
-  SessionTokenWithoutClientUAT = 'session-token-but-no-client-uat',
-  UnexpectedError = 'unexpected-error',
-}
+export const AuthErrorReason = {
+  ClientUATWithoutSessionToken: 'client-uat-but-no-session-token',
+  DevBrowserMissing: 'dev-browser-missing',
+  DevBrowserSync: 'dev-browser-sync',
+  PrimaryRespondsToSyncing: 'primary-responds-to-syncing',
+  SatelliteCookieNeedsSyncing: 'satellite-needs-syncing',
+  SessionTokenAndUATMissing: 'session-token-and-uat-missing',
+  SessionTokenMissing: 'session-token-missing',
+  SessionTokenOutdated: 'session-token-outdated',
+  SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
+  UnexpectedError: 'unexpected-error',
+} as const;
+
+export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorReason];
 
 export type AuthReason = AuthErrorReason | TokenVerificationErrorReason;
 
@@ -71,6 +79,7 @@ export function signedIn(
   authenticateContext: AuthenticateContext,
   sessionClaims: JwtPayload,
   headers: Headers = new Headers(),
+  token: string,
 ): SignedInState {
   const authObject = signedInAuthObject(authenticateContext, sessionClaims);
   return {
@@ -88,6 +97,7 @@ export function signedIn(
     isSignedIn: true,
     toAuth: () => authObject,
     headers,
+    token,
   };
 }
 
@@ -97,7 +107,7 @@ export function signedOut(
   message = '',
   headers: Headers = new Headers(),
 ): SignedOutState {
-  return {
+  return withDebugHeaders({
     status: AuthStatus.SignedOut,
     reason,
     message,
@@ -112,7 +122,8 @@ export function signedOut(
     isSignedIn: false,
     headers,
     toAuth: () => signedOutAuthObject({ ...authenticateContext, status: AuthStatus.SignedOut, reason, message }),
-  };
+    token: null,
+  });
 }
 
 export function handshake(
@@ -121,7 +132,7 @@ export function handshake(
   message = '',
   headers: Headers,
 ): HandshakeState {
-  return {
+  return withDebugHeaders({
     status: AuthStatus.Handshake,
     reason,
     message,
@@ -136,5 +147,24 @@ export function handshake(
     isSignedIn: false,
     headers,
     toAuth: () => null,
-  };
+    token: null,
+  });
 }
+
+const withDebugHeaders = <T extends RequestState>(requestState: T): T => {
+  const headers = new Headers(requestState.headers || {});
+
+  if (requestState.message) {
+    headers.set(constants.Headers.AuthMessage, requestState.message);
+  }
+  if (requestState.reason) {
+    headers.set(constants.Headers.AuthReason, requestState.reason);
+  }
+  if (requestState.status) {
+    headers.set(constants.Headers.AuthStatus, requestState.status);
+  }
+
+  requestState.headers = headers;
+
+  return requestState;
+};

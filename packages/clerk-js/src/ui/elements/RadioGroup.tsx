@@ -1,7 +1,7 @@
 import { forwardRef, useId } from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { descriptors, Flex, FormLabel, Input, Text } from '../customizables';
+import { descriptors, Flex, FormLabel, RadioInput, Text } from '../customizables';
 import { sanitizeInputProps, useFormField } from '../primitives/hooks';
 
 const RadioIndicator = forwardRef<HTMLInputElement, { value: string; id: string }>((props, ref) => {
@@ -9,7 +9,7 @@ const RadioIndicator = forwardRef<HTMLInputElement, { value: string; id: string 
   const { value, placeholder, ...inputProps } = sanitizeInputProps(formField);
 
   return (
-    <Input
+    <RadioInput
       ref={ref}
       {...inputProps}
       elementDescriptor={descriptors.formFieldRadioInput}
@@ -18,12 +18,7 @@ const RadioIndicator = forwardRef<HTMLInputElement, { value: string; id: string 
       sx={t => ({
         width: 'fit-content',
         marginTop: t.space.$0x5,
-        boxShadow: 'none',
-        ':hover': {
-          boxShadow: 'none',
-        },
       })}
-      type='radio'
       value={props.value}
       checked={props.value === value}
     />
@@ -54,7 +49,7 @@ export const RadioLabel = (props: {
       {props.description && (
         <Text
           elementDescriptor={descriptors.formFieldRadioLabelDescription}
-          colorScheme='neutral'
+          colorScheme='secondary'
           localizationKey={props.description}
         />
       )}

@@ -1,5 +1,6 @@
 import {
   addClerkPrefix,
+  ClerkRuntimeError,
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
@@ -31,11 +32,11 @@ import type {
   InstanceType,
   ListenerCallback,
   NavigateOptions,
+  OneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
-  RedirectOptions,
   Resources,
   SDKMetadata,
   SetActiveParams,
@@ -55,15 +56,14 @@ import type {
   UserResource,
 } from '@clerk/types';
 
-import type { MountComponentRenderer } from '~ui/Components';
-
+import type { MountComponentRenderer } from '../ui/Components';
 import {
-  appendAsQueryParams,
   buildURL,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledOrganizationsFeature,
   errorThrower,
   getClerkQueryParam,
   hasExternalAccountSignUpError,
@@ -75,17 +75,16 @@ import {
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
-  pickRedirectionProp,
   removeClerkQueryParam,
   requiresUserInput,
   sessionExistsAndSingleSessionModeEnabled,
   stripOrigin,
-  stripSameOrigin,
-  toURL,
   windowNavigate,
 } from '../utils';
+import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { getClientUatCookie } from '../utils/cookies/clientUat';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
+import { RedirectUrls } from '../utils/redirectUrls';
 import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
@@ -131,9 +130,11 @@ const defaultOptions: ClerkOptions = {
   isSatellite: false,
   signInUrl: undefined,
   signUpUrl: undefined,
-  afterSignInUrl: undefined,
-  afterSignUpUrl: undefined,
   afterSignOutUrl: undefined,
+  signInFallbackRedirectUrl: undefined,
+  signUpFallbackRedirectUrl: undefined,
+  signInForceRedirectUrl: undefined,
+  signUpForceRedirectUrl: undefined,
 };
 
 export class Clerk implements ClerkInterface {
@@ -143,6 +144,7 @@ export class Clerk implements ClerkInterface {
   public static sdkMetadata: SDKMetadata = {
     name: __PKG_NAME__,
     version: __PKG_VERSION__,
+    environment: process.env.NODE_ENV || 'production',
   };
 
   public client: ClientResource | undefined;
@@ -273,6 +275,8 @@ export class Clerk implements ClerkInterface {
       ...options,
     };
 
+    assertNoLegacyProp(this.#options);
+
     if (this.#options.sdkMetadata) {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
     }
@@ -329,8 +333,12 @@ export class Clerk implements ClerkInterface {
 
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
-      console.info(warnings.cannotOpenSignUpOrSignUp);
+    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
+          code: 'cannot_render_single_session_enabled',
+        });
+      }
       return;
     }
     void this.#componentControls
@@ -345,8 +353,13 @@ export class Clerk implements ClerkInterface {
 
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotOpenSignUpOrSignUp);
+    if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenSignInOrSignUp, {
+          code: 'cannot_render_single_session_enabled',
+        });
+      }
+      return;
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'SignUp' })
@@ -360,8 +373,13 @@ export class Clerk implements ClerkInterface {
 
   public openUserProfile = (props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (noUserExists(this) && this.#instanceType === 'development') {
-      return console.info(warnings.cannotOpenUserProfile);
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
+          code: 'cannot_render_user_missing',
+        });
+      }
+      return;
     }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'UserProfile' })
@@ -375,8 +393,20 @@ export class Clerk implements ClerkInterface {
 
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      console.info(warnings.cannotOpenOrgProfile);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
+      return;
+    }
+    if (noOrganizationExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+          code: 'cannot_render_organization_missing',
+        });
+      }
       return;
     }
     void this.#componentControls
@@ -391,6 +421,14 @@ export class Clerk implements ClerkInterface {
 
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
+      return;
+    }
     void this.#componentControls
       .ensureMounted({ preloadHint: 'CreateOrganization' })
       .then(controls => controls.openModal('createOrganization', props || {}));
@@ -423,6 +461,30 @@ export class Clerk implements ClerkInterface {
     );
   };
 
+  public __experimental_mountGoogleOneTap = (node: HTMLDivElement, props?: OneTapProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+
+    void this.#componentControls.ensureMounted({ preloadHint: 'OneTap' }).then(controls =>
+      controls.mountComponent({
+        name: 'OneTap',
+        appearanceKey: 'oneTap',
+        node,
+        props,
+      }),
+    );
+    // TODO-ONETAP: Enable telemetry one feature is ready for public beta
+    // this.telemetry?.record(eventComponentMounted('GoogleOneTap', props));
+  };
+
+  public __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
@@ -447,8 +509,12 @@ export class Clerk implements ClerkInterface {
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
-    if (noUserExists(this) && this.#instanceType === 'development') {
-      console.info(warnings.cannotRenderComponentWhenUserDoesNotExist);
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenUserDoesNotExist, {
+          code: 'cannot_render_user_missing',
+        });
+      }
       return;
     }
     void this.#componentControls.ensureMounted({ preloadHint: 'UserProfile' }).then(controls =>
@@ -474,8 +540,20 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
-    if (noOrganizationExists(this) && this.#instanceType === 'development') {
-      console.info(warnings.cannotRenderComponentWhenOrgDoesNotExist);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
+      return;
+    }
+    if (noOrganizationExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
+          code: 'cannot_render_organization_missing',
+        });
+      }
       return;
     }
     void this.#componentControls.ensureMounted({ preloadHint: 'OrganizationProfile' }).then(controls =>
@@ -501,6 +579,14 @@ export class Clerk implements ClerkInterface {
 
   public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
+      return;
+    }
     void this.#componentControls?.ensureMounted({ preloadHint: 'CreateOrganization' }).then(controls =>
       controls.mountComponent({
         name: 'CreateOrganization',
@@ -524,6 +610,14 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
+      return;
+    }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationSwitcher',
@@ -543,6 +637,14 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
+    if (disabledOrganizationsFeature(this, this.#environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationList'), {
+          code: 'cannot_render_organizations_disabled',
+        });
+      }
+      return;
+    }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationList' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationList',
@@ -593,7 +695,7 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    type SetActiveHook = () => void;
+    type SetActiveHook = () => void | Promise<void>;
     const onBeforeSetActive: SetActiveHook =
       typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
         ? window.__unstable__onBeforeSetActive
@@ -628,7 +730,7 @@ export class Clerk implements ClerkInterface {
       this.#broadcastSignOutEvent();
     }
 
-    onBeforeSetActive();
+    await onBeforeSetActive();
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization
@@ -645,22 +747,22 @@ export class Clerk implements ClerkInterface {
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
     //   automatic reloading when reloading shouldn't be happening.
-    const beforeUnloadTracker = createBeforeUnloadTracker();
+    const beforeUnloadTracker = this.#options.standardBrowser ? createBeforeUnloadTracker() : undefined;
     if (beforeEmit) {
-      beforeUnloadTracker.startTracking();
+      beforeUnloadTracker?.startTracking();
       this.#setTransitiveState();
       await beforeEmit(newSession);
-      beforeUnloadTracker.stopTracking();
+      beforeUnloadTracker?.stopTracking();
     }
 
     //3. Check if hard reloading (onbeforeunload).  If not, set the user/session and emit
-    if (beforeUnloadTracker.isUnloading()) {
+    if (beforeUnloadTracker?.isUnloading()) {
       return;
     }
 
     this.#setAccessors(newSession);
     this.#emit();
-    onAfterSetActive();
+    await onAfterSetActive();
     this.#resetComponentsState();
   };
 
@@ -701,8 +803,9 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
+    const metadata = options?.metadata ? { __internal_metadata: options?.metadata } : undefined;
     // React router only wants the path, search or hash portion.
-    return await customNavigate(stripOrigin(toURL));
+    return await customNavigate(stripOrigin(toURL), metadata);
   };
 
   public buildUrlWithAuth(to: string): string {
@@ -725,11 +828,17 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildSignInUrl(options?: SignInRedirectOptions): string {
-    return this.#buildUrl('signInUrl', options);
+    return this.#buildUrl('signInUrl', {
+      ...options?.initialValues,
+      redirect_url: options?.redirectUrl || window.location.href,
+    });
   }
 
   public buildSignUpUrl(options?: SignUpRedirectOptions): string {
-    return this.#buildUrl('signUpUrl', options);
+    return this.#buildUrl('signUpUrl', {
+      ...options?.initialValues,
+      redirect_url: options?.redirectUrl || window.location.href,
+    });
   }
 
   public buildUserProfileUrl(): string {
@@ -747,19 +856,11 @@ export class Clerk implements ClerkInterface {
   }
 
   public buildAfterSignInUrl(): string {
-    if (!this.#options.afterSignInUrl) {
-      return '/';
-    }
-
-    return this.buildUrlWithAuth(this.#options.afterSignInUrl);
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignInUrl());
   }
 
   public buildAfterSignUpUrl(): string {
-    if (!this.#options.afterSignUpUrl) {
-      return '/';
-    }
-
-    return this.buildUrlWithAuth(this.#options.afterSignUpUrl);
+    return this.buildUrlWithAuth(new RedirectUrls(this.#options).getAfterSignUpUrl());
   }
 
   public buildAfterSignOutUrl(): string {
@@ -941,9 +1042,9 @@ export class Clerk implements ClerkInterface {
 
     const makeNavigate = (to: string) => () => navigate(to);
 
-    const navigateToSignIn = makeNavigate(displayConfig.signInUrl);
+    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig.signInUrl);
 
-    const navigateToSignUp = makeNavigate(displayConfig.signUpUrl);
+    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig.signUpUrl);
 
     const navigateToFactorOne = makeNavigate(
       params.firstFactorUrl ||
@@ -960,9 +1061,9 @@ export class Clerk implements ClerkInterface {
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
     );
 
-    const navigateAfterSignIn = makeNavigate(params.afterSignInUrl || params.redirectUrl || '/');
-
-    const navigateAfterSignUp = makeNavigate(params.afterSignUpUrl || params.redirectUrl || '/');
+    const redirectUrls = new RedirectUrls(this.#options, params);
+    const navigateAfterSignIn = makeNavigate(redirectUrls.getAfterSignInUrl());
+    const navigateAfterSignUp = makeNavigate(redirectUrls.getAfterSignUpUrl());
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||
@@ -988,7 +1089,6 @@ export class Clerk implements ClerkInterface {
 
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
-
     if (userExistsButNeedsToSignIn) {
       const res = await signIn.create({ transfer: true });
       switch (res.status) {
@@ -1416,6 +1516,8 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    this.#clearHandshakeFromUrl();
+
     this.#handleImpersonationFab();
     return true;
   };
@@ -1540,31 +1642,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  #buildUrl = (key: 'signInUrl' | 'signUpUrl', options?: SignInRedirectOptions | SignUpRedirectOptions): string => {
-    if (!this.loaded || !this.#environment || !this.#environment.displayConfig) {
+  #buildUrl = (key: 'signInUrl' | 'signUpUrl', params?: Record<string, string>): string => {
+    if (!key || !this.loaded || !this.#environment || !this.#environment.displayConfig) {
       return '';
     }
-
-    const signInOrUpUrl = pickRedirectionProp(
-      key,
-      { options: this.#options, displayConfig: this.#environment.displayConfig },
-      false,
-    );
-
-    const urls: RedirectOptions = {
-      afterSignInUrl: pickRedirectionProp('afterSignInUrl', { ctx: options, options: this.#options }, false),
-      afterSignUpUrl: pickRedirectionProp('afterSignUpUrl', { ctx: options, options: this.#options }, false),
-      redirectUrl: options?.redirectUrl || window.location.href,
-    };
-
-    (Object.keys(urls) as Array<keyof typeof urls>).forEach(function (key) {
-      const url = urls[key];
-      if (url) {
-        urls[key] = stripSameOrigin(toURL(url), toURL(signInOrUpUrl));
-      }
-    });
-
-    return this.buildUrlWithAuth(appendAsQueryParams(signInOrUpUrl, { ...urls, ...options?.initialValues }));
+    const signInOrUpUrl = this.#options[key] || this.#environment.displayConfig[key];
+    const redirectUrls = new RedirectUrls(this.#options, params);
+    return this.buildUrlWithAuth(redirectUrls.appendPreservedPropsToUrl(signInOrUpUrl, params));
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {
@@ -1586,15 +1670,30 @@ export class Clerk implements ClerkInterface {
     }
 
     const userSignedIn = this.session;
-    const signInUrl = this.#environment?.displayConfig.signInUrl;
+    const signInUrl = this.#options.signInUrl || this.#environment?.displayConfig.signInUrl;
     const referrerIsSignInUrl = signInUrl && window.location.href.startsWith(signInUrl);
+    const signUpUrl = this.#options.signUpUrl || this.#environment?.displayConfig.signUpUrl;
+    const referrerIsSignUpUrl = signUpUrl && window.location.href.startsWith(signUpUrl);
 
-    // don't redirect if user is not signed in and referrer is sign in url
-    if (requiresUserInput(redirectUrl) && !userSignedIn && referrerIsSignInUrl) {
+    // don't redirect if user is not signed in and referrer is sign in/up url
+    if (requiresUserInput(redirectUrl) && !userSignedIn && (referrerIsSignInUrl || referrerIsSignUpUrl)) {
       return false;
     }
 
     await this.navigate(this.buildUrlWithAuth(redirectUrl));
     return true;
+  };
+
+  /**
+   * The handshake payload is transported in the URL in development. In cases where FAPI is returning the handshake payload, but Clerk is being used in a client-only application,
+   * we remove the handshake associated parameters as they are not necessary.
+   */
+  #clearHandshakeFromUrl = () => {
+    try {
+      removeClerkQueryParam('__clerk_handshake');
+      removeClerkQueryParam('__clerk_help');
+    } catch (_) {
+      // ignore
+    }
   };
 }

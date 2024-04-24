@@ -140,6 +140,8 @@ export const sanitizeInputProps = (
     clearFeedback,
     infoText,
     debouncedFeedback,
+    ignorePasswordManager,
+    transformer,
     ...inputProps
   } = obj;
   /* eslint-enable */

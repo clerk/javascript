@@ -12,7 +12,7 @@ export const FormWarningText = forwardRef<HTMLElement, FormTextProps>((props, re
   return (
     <Text
       ref={ref}
-      colorScheme='neutral'
+      colorScheme='secondary'
       aria-live='polite'
       {...rest}
       css={applyVariants(props) as any}

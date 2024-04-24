@@ -25,9 +25,8 @@ export const AccountPage = withCardStateProvider(() => {
   return (
     <Col
       elementDescriptor={descriptors.page}
-      sx={t => ({ gap: t.space.$8 })}
+      sx={t => ({ gap: t.space.$8, color: t.colors.$colorText })}
     >
-      <Card.Alert>{card.error}</Card.Alert>
       <Col
         elementDescriptor={descriptors.profilePage}
         elementId={descriptors.profilePage.setId('account')}
@@ -39,6 +38,8 @@ export const AccountPage = withCardStateProvider(() => {
             textVariant='h2'
           />
         </Header.Root>
+
+        <Card.Alert>{card.error}</Card.Alert>
 
         <UserProfileSection />
         {showUsername && <UsernameSection />}

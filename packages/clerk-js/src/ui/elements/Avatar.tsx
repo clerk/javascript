@@ -40,9 +40,7 @@ export const Avatar = (props: AvatarProps) => {
         title={title}
         alt={title}
         src={imageUrl || ''}
-        width='100%'
-        height='100%'
-        sx={{ objectFit: 'cover' }}
+        sx={{ objectFit: 'cover', width: '100%', height: '100%' }}
         onError={() => setError(true)}
         size={imageFetchSize}
       />
@@ -51,19 +49,18 @@ export const Avatar = (props: AvatarProps) => {
   // TODO: Revise size handling. Do we need to be this dynamic or should we use the theme instead?
   return (
     <Flex
+      as='span'
       elementDescriptor={[boxElementDescriptor, descriptors.avatarBox]}
       sx={[
         t => ({
           flexShrink: 0,
-          borderRadius: rounded ? t.radii.$circle : t.radii.$md,
+          borderRadius: rounded ? t.radii.$circle : t.radii.$avatar,
           overflow: 'hidden',
           width: size(t),
           height: size(t),
           backgroundColor: t.colors.$avatarBackground,
           backgroundClip: 'padding-box',
           position: 'relative',
-          boxShadow: 'var(--cl-shimmer-hover-shadow)',
-          transition: `box-shadow ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
         }),
         sx,
       ]}
@@ -75,13 +72,14 @@ export const Avatar = (props: AvatarProps) => {
        * The ":after" selector is responsible for the border shimmer animation.
        */}
       <Box
+        as='span'
         sx={t => ({
           overflow: 'hidden',
           background: t.colors.$colorShimmer,
           position: 'absolute',
           width: '25%',
           height: '100%',
-          transition: `all ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
+          transition: `all ${t.transitionDuration.$slow} ${t.transitionTiming.$easeOut}`,
           transform: 'var(--cl-shimmer-hover-transform, skewX(-45deg) translateX(-300%))',
           ':after': {
             display: 'block',
@@ -91,10 +89,11 @@ export const Avatar = (props: AvatarProps) => {
             width: '400%',
             height: '100%',
             transform: 'var(--cl-shimmer-hover-after-transform, skewX(45deg) translateX(75%))',
-            transition: `all ${t.transitionDuration.$slower} ${t.transitionTiming.$easeOut}`,
-            border: t.borders.$heavy,
+            transition: `all ${t.transitionDuration.$slow} ${t.transitionTiming.$easeOut}`,
+            borderWidth: t.borderWidths.$heavy,
+            borderStyle: t.borderStyles.$solid,
             borderColor: t.colors.$colorShimmer,
-            borderRadius: rounded ? t.radii.$circle : t.radii.$md,
+            borderRadius: rounded ? t.radii.$circle : t.radii.$avatar,
           },
         })}
       />

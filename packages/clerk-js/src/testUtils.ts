@@ -6,6 +6,8 @@ import UserEvent from '@testing-library/user-event';
 
 expect.extend(matchers);
 
+Element.prototype.scrollIntoView = jest.fn();
+
 const render = (ui: React.ReactElement, options?: RenderOptions) => {
   const userEvent = UserEvent.setup({ delay: null });
   return { ..._render(ui, { ...options }), userEvent };
@@ -42,6 +44,25 @@ export const mockNativeRuntime = (fn: () => void) => {
     afterAll(() => {
       spyDocument.mockRestore();
       spyNavigator.mockRestore();
+    });
+
+    fn();
+  });
+};
+
+export const mockWebAuthn = (fn: () => void) => {
+  describe('with WebAuthn', () => {
+    let originalPublicKeyCredential: any;
+    beforeAll(() => {
+      originalPublicKeyCredential = global.PublicKeyCredential;
+      const publicKeyCredential: any = () => {};
+      global.PublicKeyCredential = publicKeyCredential;
+      publicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable = () => Promise.resolve(true);
+      publicKeyCredential.isConditionalMediationAvailable = () => Promise.resolve(true);
+    });
+
+    afterAll(() => {
+      global.PublicKeyCredential = originalPublicKeyCredential;
     });
 
     fn();

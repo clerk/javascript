@@ -4,7 +4,7 @@ import { describe, it, jest } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
 
 import { ClerkAPIResponseError } from '../../../../core/resources';
-import { act, render, screen } from '../../../../testUtils';
+import { act, mockWebAuthn, render, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
 import { SignInFactorOne } from '../SignInFactorOne';
@@ -164,7 +164,7 @@ describe('SignInFactorOne', () => {
         screen.getByText('Forgot Password?');
         screen.getByText('Or, sign in with another method');
         await userEvent.click(screen.getByText('Reset your password'));
-        screen.getByText('First, enter the code sent to your email ID');
+        screen.getByText('First, enter the code sent to your email address');
       });
 
       it('shows a UI error when submission fails', async () => {
@@ -225,6 +225,153 @@ describe('SignInFactorOne', () => {
           await waitFor(() => {
             expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
           });
+        });
+      });
+
+      it('Prompts the user to reset their password via email if it has been pwned', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportPassword: true,
+            supportEmailCode: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'form_password_pwned',
+          long_message:
+            'Password has been found in an online data breach. For account safety, please reset your password.',
+          message: 'Password has been found in an online data breach. For account safety, please reset your password.',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText('Password'), '123456');
+          await userEvent.click(screen.getByText('Continue'));
+
+          await waitFor(() => {
+            screen.getByText('Password compromised');
+            screen.getByText(
+              'This password has been found as part of a breach and can not be used, please reset your password.',
+            );
+            screen.getByText('Or, sign in with another method');
+          });
+
+          await userEvent.click(screen.getByText('Reset your password'));
+          screen.getByText('First, enter the code sent to your email address');
+        });
+      });
+
+      it('Prompts the user to reset their password via phone if it has been pwned', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithPhoneNumber({
+            supportPassword: true,
+            supportPhoneCode: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'form_password_pwned',
+          long_message:
+            'Password has been found in an online data breach. For account safety, please reset your password.',
+          message: 'Password has been found in an online data breach. For account safety, please reset your password.',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText('Password'), '123456');
+          await userEvent.click(screen.getByText('Continue'));
+
+          await waitFor(() => {
+            screen.getByText('Password compromised');
+            screen.getByText(
+              'This password has been found as part of a breach and can not be used, please reset your password.',
+            );
+            screen.getByText('Or, sign in with another method');
+          });
+
+          await userEvent.click(screen.getByText('Reset your password'));
+          screen.getByText('First, enter the code sent to your phone');
+        });
+      });
+
+      it('entering a pwned password, then going back and clicking forgot password should result in the correct title', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportPassword: true,
+            supportEmailCode: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'form_password_pwned',
+          long_message:
+            'Password has been found in an online data breach. For account safety, please reset your password.',
+          message: 'Password has been found in an online data breach. For account safety, please reset your password.',
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+
+        await runFakeTimers(async () => {
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+          await userEvent.type(screen.getByLabelText('Password'), '123456');
+          await userEvent.click(screen.getByText('Continue'));
+
+          await waitFor(() => {
+            screen.getByText('Password compromised');
+            screen.getByText(
+              'This password has been found as part of a breach and can not be used, please reset your password.',
+            );
+            screen.getByText('Or, sign in with another method');
+          });
+
+          // Go back
+          await userEvent.click(screen.getByText('Back'));
+
+          // Choose to reset password via "Forgot password" instead
+          await userEvent.click(screen.getByText(/Forgot password/i));
+          screen.getByText('Forgot Password?');
+          expect(
+            screen.queryByText(
+              'This password has been found as part of a breach and can not be used, please reset your password.',
+            ),
+          ).not.toBeInTheDocument();
         });
       });
     });
@@ -578,6 +725,59 @@ describe('SignInFactorOne', () => {
         });
       });
     });
+
+    describe('Passkey', () => {
+      it('shows the next available factor because webauthn is not supported', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPasskey();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        render(<SignInFactorOne />, { wrapper });
+        screen.getByText('Check your email');
+      });
+
+      mockWebAuthn(() => {
+        it('shows a passkey factor one screen', async () => {
+          const { wrapper } = await createFixtures(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.withPasskey();
+            f.withPreferredSignInStrategy({ strategy: 'otp' });
+            f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true });
+          });
+          render(<SignInFactorOne />, { wrapper });
+          screen.getByText('Use your passkey');
+          screen.getByText(
+            "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+          );
+          screen.getByText('hello@clerk.com');
+        });
+
+        it('call appropriate method from passkey factor one screen', async () => {
+          const { wrapper, fixtures } = await createFixtures(f => {
+            f.withEmailAddress();
+            f.withPassword();
+            f.withPasskey();
+            f.withPreferredSignInStrategy({ strategy: 'otp' });
+            f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true });
+          });
+          fixtures.signIn.authenticateWithPasskey.mockResolvedValue({
+            status: 'complete',
+          } as SignInResource);
+          const { userEvent } = render(<SignInFactorOne />, { wrapper });
+
+          await userEvent.click(screen.getByText('Continue'));
+
+          await waitFor(() => {
+            expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalled();
+          });
+        });
+      });
+    });
   });
 
   describe('Use another method', () => {
@@ -644,6 +844,43 @@ describe('SignInFactorOne', () => {
       expect(deactivatedMethod).not.toBeInTheDocument();
     });
 
+    it('should skip passkey alternative method when webauthn is not supported', async () => {
+      const email = 'test@clerk.com';
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+        f.withPasskey();
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+        f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true, identifier: email });
+      });
+      fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
+      await userEvent.click(screen.getByText('Use another method'));
+      await userEvent.click(screen.getByText('Sign in with your password'));
+      await userEvent.click(screen.getByText('Use another method'));
+      const deactivatedMethod = screen.queryByText(`Sign in with your passkey`);
+      expect(deactivatedMethod).not.toBeInTheDocument();
+    });
+
+    mockWebAuthn(() => {
+      it('should not skip passkey alternative method when webauthn is supported', async () => {
+        const email = 'test@clerk.com';
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPasskey();
+          f.withPreferredSignInStrategy({ strategy: 'otp' });
+          f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true, identifier: email });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(screen.getByText('Use another method'));
+        await userEvent.click(screen.getByText('Sign in with your password'));
+        await userEvent.click(screen.getByText('Use another method'));
+        screen.getByText(`Sign in with your passkey`);
+      });
+    });
+
     it('should list enabled first factor methods without the current one', async () => {
       const email = 'test@clerk.com';
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -664,7 +901,7 @@ describe('SignInFactorOne', () => {
       expect(deactivatedMethod).not.toBeInTheDocument();
     });
 
-    it.skip('clicking the password method should show the password input', async () => {
+    it('clicking the password method should show the password input', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
         f.withPassword();
@@ -755,20 +992,20 @@ describe('SignInFactorOne', () => {
         screen.getByText('Email support');
       });
 
-      // TODO-RETHEME: The component seems not to be ready yet for this case
-      it.skip('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
+      it('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
           f.startSignInWithEmailAddress({ supportEmailCode: true, supportEmailLink: true });
         });
 
-        const { userEvent } = render(<SignInFactorOne />, { wrapper });
-        await userEvent.click(screen.getByText('Use another method'));
-        await userEvent.click(screen.getByText('Get help'));
-        screen.getByText('Use another method');
+        const { userEvent, getByText } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.click(getByText('Use another method'));
+        await userEvent.click(getByText('Get help'));
+        await userEvent.click(getByText('Back'));
+
+        expect(getByText('Use another method'));
       });
 
-      // this test needs us to mock the window.location.href to work properly
       it('should open a "mailto:" link when clicking the email support button', async () => {
         const { wrapper } = await createFixtures(f => {
           f.withEmailAddress({ first_factors: ['email_code', 'email_link'] });
@@ -778,9 +1015,23 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText('Use another method'));
         await userEvent.click(screen.getByText('Get help'));
-        screen.getByText('Email support');
+
+        const assignMock = jest.fn();
+        const mockResponse = jest.fn();
+        Object.defineProperty(window, 'location', {
+          value: {
+            set href(_) {
+              assignMock();
+            },
+            get href() {
+              return '';
+            },
+            assign: mockResponse,
+          },
+          writable: true,
+        });
         await userEvent.click(screen.getByText('Email support'));
-        //TODO: check that location.href setter is called
+        expect(assignMock).toHaveBeenCalled();
       });
     });
   });

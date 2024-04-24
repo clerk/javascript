@@ -95,12 +95,13 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           gap={2}
           sx={{
             justifyContent: 'center',
-            [mqu.xs]: {
+            [mqu.sm]: {
               gridTemplateColumns: 'repeat(1, 1fr)',
             },
-            gridTemplateColumns: preferBlockButtons
-              ? `repeat(1, 1fr)`
-              : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
+            gridTemplateColumns:
+              strategies.length < 1
+                ? `repeat(1, 1fr)`
+                : `repeat(${row.length}, ${rowIndex === 0 ? `1fr` : `${firstElementRect.width}px`})`,
           }}
         >
           {row.map((strategy, strategyIndex) => {
@@ -168,7 +169,9 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       ref={ref}
       elementDescriptor={descriptors.socialButtonsIconButton}
       elementId={descriptors.socialButtonsIconButton.setId(id)}
-      variant='secondary'
+      textVariant='buttonLarge'
+      variant='outline'
+      colorScheme='neutral'
       sx={t => ({
         minHeight: t.sizes.$8,
         width: '100%',
@@ -188,7 +191,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
     <SimpleButton
       elementDescriptor={descriptors.socialButtonsBlockButton}
       elementId={descriptors.socialButtonsBlockButton.setId(id)}
-      variant='secondary'
+      variant='outline'
       block
       isLoading={isLoading}
       {...rest}
@@ -197,7 +200,6 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
           gap: theme.space.$4,
           position: 'relative',
           justifyContent: 'flex-start',
-          borderColor: theme.colors.$blackAlpha200,
         },
         props.sx,
       ]}
@@ -205,6 +207,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
       <Flex
         justify='center'
         align='center'
+        as='span'
         gap={3}
         sx={{
           width: '100%',
@@ -227,7 +230,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
                 icon={icon as unknown as React.ComponentType}
                 sx={[
                   theme => ({
-                    color: theme.colors.$blackAlpha600,
+                    color: theme.colors.$neutralAlpha600,
                     width: theme.sizes.$4,
                     position: 'absolute',
                   }),
@@ -243,7 +246,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
           elementId={descriptors.socialButtonsBlockButtonText.setId(id)}
           as='span'
           truncate
-          variant='buttonSmall'
+          variant='buttonLarge'
           localizationKey={textLocalizationKey}
         >
           {label}

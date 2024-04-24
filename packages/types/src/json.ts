@@ -14,7 +14,6 @@ import type { SamlIdpSlug } from './saml';
 import type { SessionStatus } from './session';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
-import type { OAuthStrategy } from './strategies';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
 import type { CamelToSnake } from './utils';
@@ -59,6 +58,7 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;
+  maintenance_mode: boolean;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -80,7 +80,6 @@ export interface SignUpJSON extends ClerkResourceJSON {
   optional_fields: SignUpField[];
   missing_fields: SignUpField[];
   unverified_fields: SignUpIdentificationField[];
-  supported_external_accounts: OAuthStrategy[];
   username: string | null;
   first_name: string | null;
   last_name: string | null;
@@ -136,6 +135,16 @@ export interface PhoneNumberJSON extends ClerkResourceJSON {
   backup_codes?: string[];
 }
 
+export interface PasskeyJSON extends ClerkResourceJSON {
+  object: 'passkey';
+  id: string;
+  name: string | null;
+  verification: VerificationJSON | null;
+  last_used_at: number | null;
+  updated_at: number;
+  created_at: number;
+}
+
 export interface Web3WalletJSON extends ClerkResourceJSON {
   object: 'web3_wallet';
   id: string;
@@ -184,7 +193,7 @@ export interface UserJSON extends ClerkResourceJSON {
   phone_numbers: PhoneNumberJSON[];
   web3_wallets: Web3WalletJSON[];
   external_accounts: ExternalAccountJSON[];
-
+  passkeys: PasskeyJSON[];
   saml_accounts: SamlAccountJSON[];
 
   organization_memberships: OrganizationMembershipJSON[];
@@ -341,9 +350,6 @@ export interface OrganizationDomainJSON extends ClerkResourceJSON {
   total_pending_suggestions: number;
 }
 
-/**
- * @experimental
- */
 export interface RoleJSON extends ClerkResourceJSON {
   object: 'role';
   id: string;
@@ -355,9 +361,6 @@ export interface RoleJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-/**
- * @experimental
- */
 export interface PermissionJSON extends ClerkResourceJSON {
   object: 'permission';
   id: string;
@@ -443,3 +446,46 @@ export interface DeletedObjectJSON {
 
 export type SignInFirstFactorJSON = CamelToSnake<SignInFirstFactor>;
 export type SignInSecondFactorJSON = CamelToSnake<SignInSecondFactor>;
+
+/**
+ * Types for WebAuthN passkeys
+ */
+
+type Base64UrlString = string;
+
+interface PublicKeyCredentialUserEntityJSON {
+  name: string;
+  displayName: string;
+  id: Base64UrlString;
+}
+
+interface PublicKeyCredentialDescriptorJSON {
+  type: 'public-key';
+  id: Base64UrlString;
+  transports?: ('ble' | 'hybrid' | 'internal' | 'nfc' | 'usb')[];
+}
+
+interface AuthenticatorSelectionCriteriaJSON {
+  requireResidentKey: boolean;
+  residentKey: 'discouraged' | 'preferred' | 'required';
+  userVerification: 'discouraged' | 'preferred' | 'required';
+}
+
+export interface PublicKeyCredentialCreationOptionsJSON {
+  rp: PublicKeyCredentialRpEntity;
+  user: PublicKeyCredentialUserEntityJSON;
+  challenge: Base64UrlString;
+  pubKeyCredParams: PublicKeyCredentialParameters[];
+  timeout: number;
+  excludeCredentials: PublicKeyCredentialDescriptorJSON[];
+  authenticatorSelection: AuthenticatorSelectionCriteriaJSON;
+  attestation: 'direct' | 'enterprise' | 'indirect' | 'none';
+}
+
+export interface PublicKeyCredentialRequestOptionsJSON {
+  allowCredentials: PublicKeyCredentialDescriptorJSON[];
+  challenge: Base64UrlString;
+  rpId: string;
+  timeout: number;
+  userVerification: 'discouraged' | 'preferred' | 'required';
+}

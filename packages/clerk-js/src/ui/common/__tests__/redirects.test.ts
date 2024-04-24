@@ -1,7 +1,7 @@
 import { buildEmailLinkRedirectUrl, buildSSOCallbackURL } from '../redirects';
 
 describe('buildEmailLinkRedirectUrl(routing, baseUrl)', () => {
-  it('handles empty routing strategy based routing ', function () {
+  it('defaults to hash based routing strategy on empty routing', function () {
     expect(buildEmailLinkRedirectUrl({ path: '', authQueryString: '' } as any, '')).toBe('http://localhost/#/verify');
   });
 

@@ -1,6 +1,8 @@
+import type { SignUpResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
 
-import { render, screen } from '../../../../testUtils';
+import { act, render, screen } from '../../../../testUtils';
+import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpStart } from '../SignUpStart';
 
@@ -102,14 +104,15 @@ describe('SignUpStart', () => {
       expect(screen.getByText('Phone number').nextElementSibling?.textContent).toBe('Optional');
     });
 
-    // TODO-RETHEME: Continue button includes a <div>. We should avoid that.
-    it.skip('shows the "Continue" button', async () => {
+    it('shows the "Continue" button', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
         f.withPassword({ required: true });
       });
       render(<SignUpStart />, { wrapper });
-      expect(screen.getByText('Continue').tagName.toUpperCase()).toBe('BUTTON');
+      const button = screen.getByText('Continue');
+      expect(button.tagName.toUpperCase()).toBe('SPAN');
+      expect(button.parentElement?.tagName.toUpperCase()).toBe('BUTTON');
     });
 
     it.each(OAUTH_PROVIDERS)('shows the "Continue with $name" social OAuth button', async ({ provider, name }) => {
@@ -127,9 +130,9 @@ describe('SignUpStart', () => {
         f.withSocialProvider({ provider: 'google' });
       });
 
-      render(<SignUpStart />, { wrapper });
+      const { container } = render(<SignUpStart />, { wrapper });
       screen.getByText(/Continue with/i);
-      screen.getByText(/or/i);
+      expect(container.querySelector('.cl-dividerText')?.textContent?.includes('or')).toBeTruthy();
     });
   });
 
@@ -199,6 +202,79 @@ describe('SignUpStart', () => {
       props.setProps({ initialValues: { username: 'foo' } });
       render(<SignUpStart />, { wrapper });
       screen.getByDisplayValue(/foo/i);
+    });
+  });
+
+  describe('ticket flow', () => {
+    it('calls the appropriate resource function upon detecting the ticket', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword();
+      });
+      fixtures.signUp.create.mockResolvedValueOnce({} as SignUpResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-up?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: jest.fn() },
+      });
+
+      await act(() =>
+        render(
+          <CardStateProvider>
+            <SignUpStart />
+          </CardStateProvider>,
+          { wrapper },
+        ),
+      );
+      expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' });
+
+      //don't remove the query param quite yet
+      expect(window.history.replaceState).not.toHaveBeenCalledWith(
+        undefined,
+        '',
+        expect.not.stringContaining('__clerk_ticket'),
+      );
+    });
+
+    it('removes the ticket from the url when completing the sign up', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signUp.status = 'complete';
+      fixtures.signUp.create.mockResolvedValueOnce(fixtures.signUp as SignUpResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-up?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: jest.fn() },
+      });
+
+      await act(() =>
+        render(
+          <CardStateProvider>
+            <SignUpStart />
+          </CardStateProvider>,
+          { wrapper },
+        ),
+      );
+
+      expect(window.history.replaceState).toHaveBeenCalledWith(
+        undefined,
+        '',
+        expect.not.stringContaining('__clerk_ticket'),
+      );
+      expect(window.history.replaceState).toHaveBeenCalledWith(
+        undefined,
+        '',
+        expect.not.stringContaining('__clerk_invitation_token'),
+      );
     });
   });
 });

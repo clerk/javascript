@@ -1,6 +1,6 @@
 import type { ExternalAccountResource } from '@clerk/types';
 import { describe, it } from '@jest/globals';
-import React from 'react';
+import { act, waitFor } from '@testing-library/react';
 
 import { render, screen } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -8,43 +8,75 @@ import { ConnectedAccountsSection } from '../ConnectedAccountsSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
 
-const initConfig = createFixtures.config(f => {
+const withoutConnections = createFixtures.config(f => {
   f.withSocialProvider({ provider: 'google' });
+  f.withSocialProvider({ provider: 'github' });
   f.withUser({});
 });
 
-//TODO-RETHEME
-describe.skip('ConnectedAccountsSection ', () => {
+const withSomeConnections = createFixtures.config(f => {
+  f.withSocialProvider({ provider: 'google' });
+  f.withSocialProvider({ provider: 'github' });
+  f.withUser({
+    external_accounts: [{ provider: 'google', email_address: 'test@clerk.com' }],
+  });
+});
+
+const withConnections = createFixtures.config(f => {
+  f.withSocialProvider({ provider: 'google' });
+  f.withSocialProvider({ provider: 'github' });
+  f.withUser({
+    external_accounts: [
+      { provider: 'google', email_address: 'test@clerk.com' },
+      { provider: 'github', email_address: 'test@clerk.com' },
+    ],
+  });
+});
+
+describe('ConnectedAccountsSection ', () => {
   it('renders the component', async () => {
-    const { wrapper } = await createFixtures(initConfig);
+    const { wrapper } = await createFixtures(withoutConnections);
 
-    render(<ConnectedAccountsSection />, { wrapper });
+    const { getByText, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+    getByText(/^Connected accounts/i);
+    getByRole('button', { name: /connect account/i });
   });
 
-  it('shows the title', async () => {
-    const { wrapper } = await createFixtures(initConfig);
+  it('renders the component with some enabled connections', async () => {
+    const { wrapper } = await createFixtures(withSomeConnections);
 
-    render(<ConnectedAccountsSection />, { wrapper });
+    const { getByText, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
 
-    screen.getByRole('heading', { name: /add connected account/i });
+    getByText(/^Connected accounts/i);
+    getByText(/google/i);
+    getByText(/test@clerk.com/i);
+    getByRole('button', { name: /connect account/i });
   });
 
-  it('shows the "connect account" button', async () => {
-    const { wrapper } = await createFixtures(initConfig);
+  it('renders the component with all enabled connections', async () => {
+    const { wrapper } = await createFixtures(withConnections);
 
-    render(<ConnectedAccountsSection />, { wrapper });
+    const { getByText, getAllByText, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
 
-    expect(screen.getByText(/connect google account/i).closest('button')).not.toBeNull();
+    getByText(/^Connected accounts/i);
+
+    getByText(/github/i);
+    getByText(/google/i);
+    getAllByText(/test@clerk.com/i);
+    expect(queryByRole('button', { name: /connect account/i })).not.toBeInTheDocument();
   });
 
-  describe('Actions', () => {
+  describe('Add connection', () => {
     it('calls the appropriate function upon pressing the "connect" button', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
+      const { wrapper, fixtures } = await createFixtures(withoutConnections);
 
       fixtures.clerk.user?.createExternalAccount.mockResolvedValue({} as ExternalAccountResource);
-      const { userEvent } = render(<ConnectedAccountsSection />, { wrapper });
+      const { userEvent, getByText } = render(<ConnectedAccountsSection />, { wrapper });
 
-      await userEvent.click(screen.getByText(/connect google account/i));
+      await userEvent.click(getByText(/connect account/i));
+      await waitFor(() => getByText('Google'));
+      await userEvent.click(getByText(/Google/i));
       expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalledWith({
         redirectUrl: window.location.href,
         strategy: 'oauth_google',
@@ -53,68 +85,62 @@ describe.skip('ConnectedAccountsSection ', () => {
     });
   });
 
-  describe('Form buttons', () => {
-    it('navigates to the root page when pressing cancel', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
+  describe('Remove connection', () => {
+    it('Renders remove screen and references the external account of the user in the message', async () => {
+      const { wrapper } = await createFixtures(withConnections);
+      const { userEvent, getByText, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
 
-      const { userEvent } = render(<ConnectedAccountsSection />, { wrapper });
+      const item = getByText(/github/i);
+      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+      getByRole('menuitem', { name: /remove/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove/i }));
+      await waitFor(() => getByRole('heading', { name: /Remove connected account/i }));
 
-      await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
-    });
-  });
-});
-
-//TODO-RETHEME
-describe.skip('RemoveConnectedAccountPage', () => {
-  it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixtures(initConfig);
-
-    fixtures.router.params.id = 'id';
-    render(<ConnectedAccountsSection />, { wrapper });
-  });
-
-  it('shows the title', async () => {
-    const { wrapper, fixtures } = await createFixtures(initConfig);
-
-    fixtures.router.params.id = 'id';
-    render(<ConnectedAccountsSection />, { wrapper });
-
-    screen.getByRole('heading', { name: /remove connected account/i });
-  });
-
-  describe('User information', () => {
-    it('references the external account of the user in the message', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
-
-      fixtures.router.params.id = 'id';
-      render(<ConnectedAccountsSection />, { wrapper });
-
-      screen.getByText(/google/i);
-      screen.getByText(/will be removed/i);
-    });
-  });
-
-  describe('Form buttons', () => {
-    it('navigates to the root page when pressing cancel', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
-
-      fixtures.router.params.id = 'id';
-      const { userEvent } = render(<ConnectedAccountsSection />, { wrapper });
-
-      await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      getByText('GitHub will be removed from this account.');
+      getByText(
+        'You will no longer be able to use this connected account and any dependent features will no longer work.',
+      );
     });
 
-    it('calls the appropriate function upon pressing continue', async () => {
-      const { wrapper, fixtures } = await createFixtures(initConfig);
+    it('removes a connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withConnections);
+      fixtures.clerk.user?.externalAccounts[1].destroy.mockResolvedValue();
+      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
 
-      fixtures.router.params.id = 'id';
-      fixtures.clerk.user?.externalAccounts[0].destroy.mockResolvedValue();
-      const { userEvent } = render(<ConnectedAccountsSection />, { wrapper });
+      const item = getByText(/github/i);
+      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+      getByRole('menuitem', { name: /remove/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove/i }));
+      await waitFor(() => getByRole('heading', { name: /Remove connected account/i }));
 
-      await userEvent.click(screen.getByRole('button', { name: /continue/i }));
-      expect(fixtures.clerk.user?.externalAccounts[0].destroy).toHaveBeenCalled();
+      await userEvent.click(getByRole('button', { name: /remove/i }));
+      expect(fixtures.clerk.user?.externalAccounts[1].destroy).toHaveBeenCalled();
+
+      await waitFor(() =>
+        expect(queryByRole('heading', { name: /Remove connected account/i })).not.toBeInTheDocument(),
+      );
+    });
+
+    it('hides screen when when pressing cancel', async () => {
+      const { wrapper } = await createFixtures(withConnections);
+      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+      const item = getByText(/github/i);
+      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+      getByRole('menuitem', { name: /remove/i });
+      await userEvent.click(getByRole('menuitem', { name: /remove/i }));
+      await waitFor(() => getByRole('heading', { name: /Remove connected account/i }));
+      await userEvent.click(screen.getByRole('button', { name: /cancel$/i }));
+      expect(queryByRole('heading', { name: /Remove connected account/i })).not.toBeInTheDocument();
     });
   });
 });

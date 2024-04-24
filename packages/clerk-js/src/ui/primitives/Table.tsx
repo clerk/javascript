@@ -8,8 +8,22 @@ import { Box } from './Box';
 const { applyVariants, filterProps } = createVariants(theme => {
   return {
     base: {
-      borderCollapse: 'collapse',
       borderSpacing: '0',
+      borderCollapse: 'separate',
+      borderWidth: theme.borderWidths.$normal,
+      borderStyle: theme.borderStyles.$solid,
+      borderColor: theme.colors.$neutralAlpha100,
+      borderRadius: theme.radii.$lg,
+      boxShadow: theme.shadows.$tableBodyShadow,
+      width: '100%',
+      '>:not([hidden])~:not([hidden])': {
+        borderBottomWidth: '0px',
+        borderTopWidth: '1px',
+        borderStyle: 'solid',
+        borderLeftWidth: '0px',
+        borderRightWidth: '0px',
+        borderColor: theme.colors.$neutralAlpha100,
+      },
       'td:not(:first-of-type)': {
         paddingLeft: theme.space.$2,
       },
@@ -17,6 +31,9 @@ const { applyVariants, filterProps } = createVariants(theme => {
         paddingLeft: theme.space.$2,
       },
       'tr > td': {
+        borderTopWidth: theme.borderWidths.$normal,
+        borderTopStyle: theme.borderStyles.$solid,
+        borderTopColor: theme.colors.$neutralAlpha100,
         paddingBottom: theme.space.$2,
         paddingTop: theme.space.$2,
         paddingLeft: theme.space.$4,
@@ -28,7 +45,13 @@ const { applyVariants, filterProps } = createVariants(theme => {
         borderStyle: 'solid',
         borderLeftWidth: '0px',
         borderRightWidth: '0px',
-        borderColor: theme.colors.$blackAlpha100,
+        borderColor: theme.colors.$neutralAlpha100,
+      },
+      'tr:hover td:first-of-type': {
+        borderBottomLeftRadius: theme.radii.$lg,
+      },
+      'tr:hover td:last-of-type': {
+        borderBottomRightRadius: theme.radii.$lg,
       },
       'tr > th:first-of-type': {
         paddingLeft: theme.space.$5,
@@ -36,19 +59,7 @@ const { applyVariants, filterProps } = createVariants(theme => {
       'thead::after': {
         content: '""',
         display: 'block',
-        paddingBottom: theme.space.$2,
       },
-      'tbody::before': {
-        content: '""',
-        display: 'block',
-        paddingTop: theme.space.$2,
-      },
-      'tbody::after': {
-        content: '""',
-        display: 'block',
-        paddingBottom: theme.space.$2,
-      },
-      width: '100%',
     },
     variants: {},
   };

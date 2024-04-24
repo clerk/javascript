@@ -7,12 +7,12 @@ on:
 jobs:
   integration-tests:
     name: Integration Tests
-    runs-on: ${{ vars.RUNNER_NORMAL }}
-    timeout-minutes: ${{ fromJSON(vars.TIMEOUT_MINUTES_NORMAL) }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     strategy:
       matrix:
-        test-name: [ 'nextjs' ]
+        test-name: ['nextjs']
 
     steps:
       - name: Checkout Repo
@@ -34,7 +34,7 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS && npx changeset publish --no-git-tag; fi
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
@@ -45,23 +45,19 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
-        run: npm run test:integration:${{ matrix.test-name }}
+        run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only --force --no-cache
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           E2E_NEXTJS_VERSION: 'canary'
-  notify-slack:
-    name: Notify Slack
-    needs: integration-tests
-    if: ${{ contains(needs.*.result, 'failure') }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
-    steps:
+
       - name: Report Status
+        if: always()
         uses: ravsamhq/notify-slack-action@v1
         with:
-          status: 'failure'
+          status: ${{ job.status }}
           notify_when: 'failure'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_SDK_E2E_ALERTS_WEBHOOK_URL }}

@@ -16,7 +16,7 @@ export const SignInFactorOneForgotPasswordCard = (props: SignInForgotPasswordCar
         {...props}
         showAlternativeMethods={false}
         cardTitle={localizationKeys('signIn.forgotPassword.title')}
-        inputLabel={localizationKeys('signIn.forgotPassword.inputLabel')}
+        inputLabel={localizationKeys('signIn.forgotPassword.formTitle')}
         resendButton={localizationKeys('signIn.forgotPassword.resendButton')}
       />
     </Flow.Part>

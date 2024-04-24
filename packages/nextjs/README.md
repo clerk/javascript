@@ -20,7 +20,7 @@
 ·
 [Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://feedback.clerk.com/roadmap)
 ·
 [Ask a Question](https://github.com/clerk/javascript/discussions)
 
@@ -37,7 +37,8 @@ and profile management to your application in minutes.
 
 ### Prerequisites
 
-- Next.js v10+
+- Next.js 13.0.4 or later
+- React 18 or later
 - Node.js `>=18.17.0` or later
 
 ### Installation

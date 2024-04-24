@@ -2,8 +2,8 @@ import type * as CSS from 'csstype';
 
 import type {
   AlertId,
+  CardActionId,
   FieldId,
-  FooterActionId,
   MenuId,
   OrganizationPreviewId,
   ProfilePageId,
@@ -41,7 +41,9 @@ type Shade =
   | '900'
   | '950';
 export type ColorScale<T = string> = Record<Shade, T>;
-export type AlphaColorScale<T = string> = Record<'20' | Shade, T>;
+export type AlphaColorScale<T = string> = {
+  [K in Shade]: T;
+};
 
 export type ColorScaleWithRequiredBase<T = string> = Partial<ColorScale<T>> & { '500': T };
 
@@ -49,7 +51,6 @@ export type CssColorOrScale = string | ColorScaleWithRequiredBase;
 export type CssColorOrAlphaScale = string | AlphaColorScale;
 type CssColor = string | TransparentColor | BuiltInColors;
 type CssLengthUnit = string;
-type FontSmoothing = 'auto' | 'antialiased' | 'never';
 
 type FontWeightNamedValue = CSS.Properties['fontWeight'];
 type FontWeightNumericValue = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
@@ -132,16 +133,19 @@ export type ElementObjectKey<K extends string> = K extends `${infer Parent}-${in
  * Kebab-case is used to differentiate between the container and child elements
  */
 export type ElementsConfig = {
+  button: WithOptions;
+  input: WithOptions;
+  checkbox: WithOptions;
+  radio: WithOptions;
+  table: WithOptions;
+
   rootBox: WithOptions;
+  cardBox: WithOptions;
   card: WithOptions;
-  cardContent: WithOptions;
-  cardFooter: WithOptions;
-  cardFooterItem: WithOptions;
+  actionCard: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
-  // outerLogo: WithOptions;
-  // 'outerLogo-image': WithOptions;
 
   header: WithOptions;
   headerTitle: WithOptions;
@@ -153,7 +157,8 @@ export type ElementsConfig = {
   main: WithOptions;
 
   footer: WithOptions;
-  footerAction: WithOptions<FooterActionId>;
+  footerItem: WithOptions;
+  footerAction: WithOptions<CardActionId>;
   footerActionText: WithOptions;
   footerActionLink: WithOptions;
   footerPages: WithOptions;
@@ -163,7 +168,6 @@ export type ElementsConfig = {
   socialButtonsIconButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
-  socialButtonsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
 
   enterpriseButtonsProviderIcon: WithOptions<SamlIdpSlug, LoadingState>;
@@ -173,10 +177,6 @@ export type ElementsConfig = {
   alternativeMethodsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider>;
 
-  otpCodeBox: WithOptions;
-  otpCodeHeader: WithOptions;
-  otpCodeHeaderTitle: WithOptions;
-  otpCodeHeaderSubtitle: WithOptions;
   otpCodeField: WithOptions;
   otpCodeFieldInputs: WithOptions;
   otpCodeFieldInput: WithOptions;
@@ -214,9 +214,7 @@ export type ElementsConfig = {
   formFieldWarningText: WithOptions<FieldId, ControlState>;
   formFieldSuccessText: WithOptions<FieldId, ControlState>;
   formFieldInfoText: WithOptions<FieldId, ControlState>;
-  formFieldDirectionsText: WithOptions<FieldId, ControlState>;
   formFieldHintText: WithOptions<FieldId, ControlState>;
-  formButtonRow: WithOptions<never, ControlState | LoadingState>;
   formButtonPrimary: WithOptions<never, ControlState | LoadingState>;
   formButtonReset: WithOptions<never, ControlState | LoadingState>;
   formFieldInputGroup: WithOptions;
@@ -243,13 +241,11 @@ export type ElementsConfig = {
   userButtonPopoverRootBox: WithOptions;
   userButtonPopoverCard: WithOptions;
   userButtonPopoverMain: WithOptions;
-  userButtonPopoverUserPreview: WithOptions;
   userButtonPopoverActions: WithOptions<'singleSession' | 'multiSession'>;
   userButtonPopoverActionButton: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverFooter: WithOptions;
-  userButtonPopoverFooterPages: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
 
   organizationSwitcherTrigger: WithOptions<never, 'open'>;
@@ -260,23 +256,13 @@ export type ElementsConfig = {
   organizationSwitcherPopoverActions: WithOptions;
   organizationSwitcherPopoverInvitationActions: WithOptions;
   organizationSwitcherPopoverActionButton: WithOptions<
-    'manageOrganization' | 'createOrganization' | 'switchOrganization',
-    never,
-    never
+    'manageOrganization' | 'createOrganization' | 'switchOrganization'
   >;
   organizationSwitcherPreviewButton: WithOptions;
   organizationSwitcherInvitationAcceptButton: WithOptions;
-  organizationSwitcherInvitationRejectButton: WithOptions;
-  organizationSwitcherPopoverActionButtonIconBox: WithOptions<
-    'manageOrganization' | 'createOrganization',
-    never,
-    never
-  >;
+  organizationSwitcherPopoverActionButtonIconBox: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverActionButtonIcon: WithOptions<'manageOrganization' | 'createOrganization'>;
-  organizationSwitcherPopoverActionButtonText: WithOptions<'manageOrganization' | 'createOrganization'>;
   organizationSwitcherPopoverFooter: WithOptions;
-  organizationSwitcherPopoverFooterPages: WithOptions;
-  organizationSwitcherPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;
@@ -304,14 +290,17 @@ export type ElementsConfig = {
   organizationPreviewSecondaryIdentifier: WithOptions<OrganizationPreviewId>;
 
   membersPageInviteButton: WithOptions;
-  organizationProfilePage: WithOptions;
 
   identityPreview: WithOptions;
-  identityPreviewAvatarBox: WithOptions;
-  identityPreviewAvatarImage: WithOptions;
   identityPreviewText: WithOptions;
   identityPreviewEditButton: WithOptions;
   identityPreviewEditButtonIcon: WithOptions;
+
+  passkeyIcon: WithOptions<'firstFactor'>;
+
+  accountSwitcherActionButton: WithOptions<'addAccount' | 'signOutAll'>;
+  accountSwitcherActionButtonIconBox: WithOptions<'addAccount' | 'signOutAll'>;
+  accountSwitcherActionButtonIcon: WithOptions<'addAccount' | 'signOutAll'>;
 
   alert: WithOptions<AlertId>;
   alertIcon: WithOptions<AlertId>;
@@ -342,9 +331,6 @@ export type ElementsConfig = {
   menuList: WithOptions<MenuId>;
   menuItem: WithOptions<MenuId>;
 
-  loader: WithOptions;
-  loaderIcon: WithOptions<never, ErrorState>;
-
   modalBackdrop: WithOptions;
   modalContent: WithOptions;
   modalCloseButton: WithOptions;
@@ -366,13 +352,6 @@ export type ElementsConfig = {
   formattedPhoneNumberFlag: WithOptions;
   formattedPhoneNumberText: WithOptions;
 
-  breadcrumbs: WithOptions;
-  breadcrumbsItems: WithOptions;
-  breadcrumbsItemBox: WithOptions<'currentPage'>;
-  breadcrumbsItem: WithOptions<'currentPage'>;
-  breadcrumbsItemIcon: WithOptions<'currentPage'>;
-  breadcrumbsItemDivider: WithOptions;
-
   scrollBox: WithOptions;
 
   navbar: WithOptions;
@@ -385,7 +364,6 @@ export type ElementsConfig = {
 
   pageScrollBox: WithOptions;
   page: WithOptions;
-  pageHeader: WithOptions;
 
   activeDevice: WithOptions<'current'>;
   activeDeviceListItem: WithOptions<'current'>;
@@ -397,19 +375,8 @@ export type ElementsConfig = {
   impersonationFabTitle: WithOptions;
   impersonationFabActionLink: WithOptions;
 
-  fileDropAreaOuterBox: WithOptions;
-  fileDropAreaBox: WithOptions;
-  fileDropAreaIconBox: WithOptions;
-  fileDropAreaIcon: WithOptions;
-  fileDropAreaHint: WithOptions;
-  fileDropAreaButtonPrimary: WithOptions;
-  fileDropAreaFooterHint: WithOptions;
-
   invitationsSentIconBox: WithOptions;
   invitationsSentIcon: WithOptions;
-
-  accordionTriggerButton: WithOptions;
-  accordionContent: WithOptions;
 
   qrCodeRow: WithOptions;
   qrCodeContainer: WithOptions;
@@ -417,7 +384,6 @@ export type ElementsConfig = {
   // default descriptors
   badge: WithOptions<'primary' | 'actionRequired'>;
   notificationBadge: WithOptions;
-  button: WithOptions<never, LoadingState>;
   buttonArrowIcon: WithOptions;
   providerIcon: WithOptions<OAuthProvider | Web3Provider>;
   spinner: WithOptions;
@@ -430,61 +396,73 @@ export type Elements = {
 export type Variables = {
   /**
    * The primary color used throughout the components. Set this to your brand color.
+   * @default '#2F3037'
    */
   colorPrimary?: CssColorOrScale;
   /**
+   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
+   * eg: solid primary buttons.
+   * @default 'white'
+   */
+  colorTextOnPrimaryBackground?: CssColor;
+  /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
+   * @default '#EF4444'
    */
   colorDanger?: CssColorOrScale;
   /**
    * The color used to indicate an action that completed successfully or a positive result.
+   * @default '#22C543'
    */
   colorSuccess?: CssColorOrScale;
   /**
    * The color used for potentially destructive actions or when the user's attention is required.
+   * @default '#F36B16'
    */
   colorWarning?: CssColorOrScale;
   /**
-   * The color that will be used for all to generate the alpha shades the components use. To achieve sufficient contrast,
-   * light themes should be using dark shades (`black`), while dark themes should be using light (`white`) shades. This option applies to borders,
-   * backgrounds for hovered elements, hovered dropdown options etc.
+   * The color that will be used as the neutral color for all the components. To achieve sufficient contrast,
+   * light themes should be using dark shades ('black'), while dark themes should be using light shades ('white').
+   * This option applies to borders, backgrounds for hovered elements, hovered dropdown options etc.
    * @default 'black'
    */
-  colorAlphaShade?: CssColorOrAlphaScale;
+  colorNeutral?: CssColorOrAlphaScale;
   /**
    * The default text color.
-   * @default black
+   * @default '#212126'
    */
   colorText?: CssColor;
   /**
-   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
-   * eg: solid primary buttons.
-   * @default white
-   */
-  colorTextOnPrimaryBackground?: CssColor;
-  /**
    * The text color for elements of lower importance, eg: a subtitle text.
-   * @default A lighter shade of {@link Variables.colorText}
+   * This color is a lighter shade of {@link Variables.colorText}.
+   * @default '#747686'
    */
   colorTextSecondary?: CssColor;
   /**
    * The background color for the card container.
+   * @default 'white'
    */
   colorBackground?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
-   * @default The value of {@link Variables.colorText}
+   * @default 'black'
    */
   colorInputText?: CssColor;
   /**
    * The background color for all input elements.
+   * @default 'white'
    */
   colorInputBackground?: CssColor;
+  /**
+   * The color of the avatar shimmer
+   * @default 'rgba(255, 255, 255, 0.36)'
+   */
+  colorShimmer?: CssColor;
   /**
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
    * If a specific fontFamily is not provided, the components will inherit the font of the parent element.
-   * @default inherit
+   * @default 'inherit'
    * @example
    * { fontFamily: 'Montserrat' }
    */
@@ -492,48 +470,34 @@ export type Variables = {
   /**
    * The default font that will be used in all buttons. See {@link Variables.fontFamily} for details.
    * If not provided, {@link Variables.fontFamily} will be used instead.
-   * @default inherit
+   * @default 'inherit'
    */
   fontFamilyButtons?: FontFamily;
   /**
-   * The value will be used as the base `md` to calculate all the other scale values (`2xs`, `xs`, `sm`, `lg` and `xl`).
+   * The value will be used as the base `md` to calculate all the other scale values (`xs`, `sm`, `lg` and `xl`).
    * By default, this value is relative to the root fontSize of the html element.
-   * @default 1rem;
+   * @default '0.8125rem'
    */
   fontSize?: CssLengthUnit;
   /**
-   * What text anti-aliasing strategy the components will use by default. You can set it to `auto`, `antialiased` or `never`
-   * @default auto;
-   */
-  fontSmoothing?: FontSmoothing;
-  /**
-   * The font weight the components will use. By default, the components will use the 400, 500 and 600 weights for normal, medium and bold
-   * text respectively. You can override the default weights by passing a {@FontWeightScale} object
-   * @default { normal: 400, medium: 500, bold: 600 };
+   * The font weight the components will use. By default, the components will use the 400, 500, 600 and 700 weights
+   * for normal, medium, semibold and bold text respectively.
+   * You can override the default weights by passing a {@FontWeightScale} object
+   * @default { normal: 400, medium: 500, semibold: 600, bold: 700 };
    */
   fontWeight?: FontWeightScale;
   /**
-   * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `lg`, `xl`, `2xl`
+   * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `sm`, `lg`, `xl`,
    * our components use. As a general rule, the bigger an element is, the larger its borderRadius is going to be.
-   * eg: the Card element uses '2xl'
-   * @default 0.375rem
+   * eg: the Card element uses 'xl'
+   * @default '0.375rem'
    */
   borderRadius?: CssLengthUnit;
   /**
    * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
-   * @default 1rem
+   * @default '1rem'
    */
   spacingUnit?: CssLengthUnit;
-  /**
-   * The color of the avatar shimmer
-   * @default rgba(255, 255, 255, 0.36)
-   */
-  colorShimmer?: CssColor;
-  /**
-   * The shadow that appears on the avatar when hovered
-   * @default rgba(0, 0, 0, 0.36)
-   */
-  shadowShimmer?: CssColor;
 };
 
 export type BaseThemeTaggedType = { __type: 'prebuilt_appearance' };
@@ -547,7 +511,7 @@ export type Theme = {
    * import { dark } from "@clerk/themes";
    * appearance={{ baseTheme: dark }}
    */
-  baseTheme?: BaseTheme;
+  baseTheme?: BaseTheme | BaseTheme[];
   /**
    * Configuration options that affect the layout of the components, allowing
    * customizations that hard to implement with just CSS.
@@ -632,6 +596,12 @@ export type Layout = {
    * @default true
    */
   shimmer?: boolean;
+  /**
+   * This option enables/disables animations for the components. If you want to disable animations, you can set this to false.
+   * Also the prefers-reduced-motion media query is respected and animations are disabled if the user has set it to reduce motion regardless of this option.
+   * @default true
+   */
+  animations?: boolean;
 };
 
 export type SignInTheme = Theme;
@@ -676,4 +646,8 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<CreateOrganization />` component
    */
   createOrganization?: T;
+  /**
+   * Theme overrides that only apply to the `<CreateOrganization />` component
+   */
+  oneTap?: T;
 };

@@ -1,10 +1,10 @@
 import type { RequestState } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
+import { AuthStatus, createClerkRequest } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative, isValidProxyUrl } from '@clerk/shared/proxy';
 import type { Response } from 'express';
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage } from 'http';
 
 import type { AuthenticateRequestParams } from './types';
 import { loadApiEnv, loadClientEnv } from './utils';
@@ -57,21 +57,23 @@ const incomingMessageToRequest = (req: IncomingMessage): Request => {
   });
 };
 
+export const setResponseHeaders = (requestState: RequestState, res: Response): Error | undefined => {
+  if (requestState.headers) {
+    requestState.headers.forEach((value, key) => res.appendHeader(key, value));
+  }
+  return setResponseForHandshake(requestState, res);
+};
+
 /**
  * Depending on the auth state of the request, handles applying redirects and validating that a handshake state was properly handled.
  *
  * Returns an error if state is handshake without a redirect, otherwise returns undefined. res.writableEnded should be checked after this method is called.
  */
-export const setResponseForHandshake = (requestState: RequestState, res: Response) => {
+const setResponseForHandshake = (requestState: RequestState, res: Response): Error | undefined => {
   const hasLocationHeader = requestState.headers.get('location');
   if (hasLocationHeader) {
-    requestState.headers.forEach((value, key) => {
-      res.appendHeader(key, value);
-    });
-
     // triggering a handshake redirect
     res.status(307).end();
-
     return;
   }
 
@@ -80,13 +82,6 @@ export const setResponseForHandshake = (requestState: RequestState, res: Respons
   }
 
   return;
-};
-
-// TODO: Move to backend
-export const decorateResponseWithObservabilityHeaders = (res: ServerResponse, requestState: RequestState) => {
-  requestState.message && res.setHeader(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
-  requestState.reason && res.setHeader(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
-  requestState.status && res.setHeader(constants.Headers.AuthStatus, encodeURIComponent(requestState.status));
 };
 
 const absoluteProxyUrl = (relativeOrAbsoluteUrl: string, baseUrl: string): string => {

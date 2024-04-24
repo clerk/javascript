@@ -1,4 +1,4 @@
-import { borders } from './borders';
+import { borderStyles, borderWidths } from './borders';
 import { colors } from './colors';
 import { opacity } from './opacity';
 import { shadows } from './shadows';
@@ -6,10 +6,6 @@ import { radii, sizes, space } from './sizes';
 import { transitionDuration, transitionProperty, transitionTiming } from './transitions';
 import { fonts, fontSizes, fontStyles, fontWeights, letterSpacings, lineHeights } from './typography';
 import { zIndices } from './zIndices';
-
-const options = {
-  fontSmoothing: 'auto !important',
-} as const;
 
 const defaultInternalThemeFoundations = Object.freeze({
   colors,
@@ -27,9 +23,9 @@ const defaultInternalThemeFoundations = Object.freeze({
   transitionTiming,
   transitionDuration,
   opacity,
-  borders,
+  borderStyles,
+  borderWidths,
   zIndices,
-  options,
 } as const);
 
 type InternalThemeFoundations = typeof defaultInternalThemeFoundations;

@@ -8,10 +8,10 @@ export const TileButton = (props: PropsOfComponent<typeof Button> & { icon: Reac
 
   return (
     <Button
-      variant='secondary'
+      variant='outline'
       sx={[
         t => ({
-          borderColor: t.colors.$blackAlpha200,
+          borderColor: t.colors.$neutralAlpha200,
         }),
         props.sx,
       ]}

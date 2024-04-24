@@ -9,10 +9,12 @@ import {
   parsePublishableKey,
 } from '../keys';
 
-describe('buildPublishableKey(key)', () => {
+describe('buildPublishableKey(frontendApi)', () => {
   const cases = [
     ['example.clerk.accounts.dev', 'pk_live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk'],
     ['foo-bar-13.clerk.accounts.dev', 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk'],
+    ['clerk.boring.sawfly-91.lcl.dev', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2wuZGV2JA=='],
+    ['clerk.boring.sawfly-91.lclclerk.com', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2xjbGVyay5jb20k'],
   ];
 
   test.each(cases)(

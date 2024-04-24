@@ -7,8 +7,8 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
+import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { convertPageToOffset } from '../../utils/pagesToOffset';
 import { BaseResource } from './Base';
 
 export class OrganizationSuggestion extends BaseResource implements OrganizationSuggestionResource {
@@ -29,21 +29,16 @@ export class OrganizationSuggestion extends BaseResource implements Organization
     return await BaseResource._fetch({
       path: '/me/organization_suggestions',
       method: 'GET',
-      search: convertPageToOffset(params),
-    })
-      .then(res => {
-        const { data: suggestions, total_count } =
-          res?.response as unknown as ClerkPaginatedResponse<OrganizationSuggestionJSON>;
+      search: convertPageToOffsetSearchParams(params),
+    }).then(res => {
+      const { data: suggestions, total_count } =
+        res?.response as unknown as ClerkPaginatedResponse<OrganizationSuggestionJSON>;
 
-        return {
-          total_count,
-          data: suggestions.map(suggestion => new OrganizationSuggestion(suggestion)),
-        };
-      })
-      .catch(() => ({
-        total_count: 0,
-        data: [],
-      }));
+      return {
+        total_count,
+        data: suggestions.map(suggestion => new OrganizationSuggestion(suggestion)),
+      };
+    });
   }
 
   accept = async (): Promise<OrganizationSuggestionResource> => {

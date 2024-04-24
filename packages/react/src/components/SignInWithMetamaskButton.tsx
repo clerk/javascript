@@ -15,7 +15,7 @@ export const SignInWithMetamaskButton = withClerk(
     // eslint-disable-next-line @typescript-eslint/require-await
     const clickHandler = async () => {
       async function authenticate() {
-        await clerk.authenticateWithMetamask({ redirectUrl });
+        await clerk.authenticateWithMetamask({ redirectUrl: redirectUrl || undefined });
       }
       void authenticate();
     };

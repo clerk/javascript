@@ -13,4 +13,5 @@ export interface EnvironmentResource extends ClerkResource {
   isProduction: () => boolean;
   isDevelopmentOrStaging: () => boolean;
   onWindowLocationHost: () => boolean;
+  maintenanceMode: boolean;
 }

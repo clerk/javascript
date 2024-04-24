@@ -9,7 +9,7 @@
     ]
   },
   "scripts": {
-    "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%}",
+    "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%} --filter=!elements",
     "bundlewatch": "turbo bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "npm run changeset -- --empty",
@@ -28,18 +28,20 @@
     "release:canary": "changeset publish --tag canary --no-git-tag",
     "release:snapshot": "changeset publish --tag snapshot --no-git-tag",
     "release:verdaccio": "if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else TURBO_CONCURRENCY=1 npm run build && changeset publish --no-git-tag; fi",
-    "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%}",
+    "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%} --filter=!elements",
     "test:cache:clear": "FORCE_COLOR=1 turbo test:cache:clear --continue --concurrency=${TURBO_CONCURRENCY:-80%}",
+    "test:integration:ap-flows": "npm run test:integration:base -- --grep @ap-flows",
     "test:integration:base": "DEBUG=1 npx playwright test --config integration/playwright.config.ts",
     "test:integration:cleanup": "DEBUG=1 npx playwright test --config integration/playwright.cleanup.config.ts",
     "test:integration:deployment:nextjs": "DEBUG=1 npx playwright test --config integration/playwright.deployments.config.ts",
     "test:integration:express": "E2E_APP_ID=express.* npm run test:integration:base -- --grep @express",
     "test:integration:generic": "E2E_APP_ID=react.vite.* npm run test:integration:base -- --grep @generic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* npm run test:integration:base -- --grep @nextjs",
+    "test:integration:quickstart": "E2E_APP_ID=quickstart.* npm run test:integration:base -- --grep @quickstart",
     "test:integration:remix": "echo 'placeholder'",
     "turbo:clean": "turbo daemon clean",
     "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo",
-    "version": "changeset version && ./scripts/version-info.sh",
+    "version": "changeset version && npm install --package-lock-only",
     "version:canary": "./scripts/canary.mjs",
     "version:snapshot": "./scripts/snapshot.mjs",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; npx yalc push --replace --sig; cd '../../'; done"
@@ -92,11 +94,14 @@
     "rimraf": "^5.0.5",
     "tree-kill": "^1.2.2",
     "ts-jest": "^29.0.3",
-    "tsup": "^7.2.0",
+    "tsup": "^8.0.1",
     "turbo": "^1.10.16",
     "typescript": "^5.2.2",
     "verdaccio": "^5.26.3",
     "zx": "^7.2.3"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.14.0"
   },
   "packageManager": "npm@8.5.0",
   "engines": {

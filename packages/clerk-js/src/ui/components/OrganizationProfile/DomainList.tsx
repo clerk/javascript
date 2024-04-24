@@ -32,18 +32,18 @@ const useMenuActions = (domain: OrganizationDomainResource): PropsOfComponent<ty
 
   if (domain.verification && domain.verification.status === 'verified') {
     menuActions.push({
-      label: localizationKeys('organizationProfile.general.domainSection.menuAction__manage'),
+      label: localizationKeys('organizationProfile.profilePage.domainSection.menuAction__manage'),
       onClick: () => open('manage'),
     });
   } else {
     menuActions.push({
-      label: localizationKeys('organizationProfile.general.domainSection.menuAction__verify'),
+      label: localizationKeys('organizationProfile.profilePage.domainSection.menuAction__verify'),
       onClick: () => open('verify'),
     });
   }
 
   menuActions.push({
-    label: localizationKeys('organizationProfile.general.domainSection.menuAction__remove'),
+    label: localizationKeys('organizationProfile.profilePage.domainSection.menuAction__remove'),
     isDestructive: true,
     onClick: () => open('remove'),
   });
@@ -101,13 +101,20 @@ export const DomainList = withProtect(
 
     const hasNextOrFetching = domains?.hasNextPage || domains?.isFetching;
 
+    if (domainList.length === 0 && !domains?.isLoading && !fallback) {
+      return null;
+    }
+
     return (
       <ProfileSection.ItemList id='organizationDomains'>
         {domainList.length === 0 && !domains?.isLoading && fallback}
         {domainList.map(domain => {
           return (
             <Action.Root key={domain.id}>
-              <ProfileSection.Item id='organizationDomains'>
+              <ProfileSection.Item
+                id='organizationDomains'
+                hoverable
+              >
                 <Flex sx={t => ({ gap: t.space.$1 })}>
                   <Text>{domain.name}</Text>
                   <EnrollmentBadge organizationDomain={domain} />

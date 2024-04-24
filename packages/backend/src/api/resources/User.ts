@@ -16,8 +16,6 @@ export class User {
     readonly updatedAt: number,
     readonly imageUrl: string,
     readonly hasImage: boolean,
-    readonly gender: string,
-    readonly birthday: string,
     readonly primaryEmailAddressId: string | null,
     readonly primaryPhoneNumberId: string | null,
     readonly primaryWeb3WalletId: string | null,
@@ -49,8 +47,6 @@ export class User {
       data.updated_at,
       data.image_url,
       data.has_image,
-      data.gender,
-      data.birthday,
       data.primary_email_address_id,
       data.primary_phone_number_id,
       data.primary_web3_wallet_id,
@@ -69,5 +65,21 @@ export class User {
       data.last_active_at,
       data.create_organization_enabled,
     );
+  }
+
+  get primaryEmailAddress() {
+    return this.emailAddresses.find(({ id }) => id === this.primaryEmailAddressId) ?? null;
+  }
+
+  get primaryPhoneNumber() {
+    return this.phoneNumbers.find(({ id }) => id === this.primaryPhoneNumberId) ?? null;
+  }
+
+  get primaryWeb3Wallet() {
+    return this.web3Wallets.find(({ id }) => id === this.primaryWeb3WalletId) ?? null;
+  }
+
+  get fullName() {
+    return [this.firstName, this.lastName].join(' ').trim() || null;
   }
 }

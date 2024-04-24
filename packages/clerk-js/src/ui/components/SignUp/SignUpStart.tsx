@@ -2,18 +2,18 @@ import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
 import { ERROR_CODES } from '../../../core/constants';
-import { getClerkQueryParam } from '../../../utils/getClerkQueryParam';
+import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { buildSSOCallbackURL, withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import {
   Card,
-  Footer,
   Header,
   LoadingCard,
   SocialButtonsReversibleContainerWithDivider,
   withCardStateProvider,
 } from '../../elements';
+import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useCardState } from '../../elements/contexts';
 import { useLoadingStatus } from '../../hooks';
 import { useRouter } from '../../router';
@@ -69,6 +69,7 @@ function _SignUpStart(): JSX.Element {
       type: 'text',
       label: localizationKeys('formFieldLabel__username'),
       placeholder: localizationKeys('formFieldInputPlaceholder__username'),
+      transformer: value => value.trim(),
     }),
     phoneNumber: useFormControl('phoneNumber', signUp.phoneNumber || initialValues.phoneNumber || '', {
       type: 'tel',
@@ -120,7 +121,11 @@ function _SignUpStart(): JSX.Element {
           signUp,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
-          handleComplete: () => setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp }),
+          handleComplete: () => {
+            removeClerkQueryParam('__clerk_ticket');
+            removeClerkQueryParam('__clerk_invitation_token');
+            return setActive({ session: signUp.createdSessionId, beforeEmit: navigateAfterSignUp });
+          },
           navigate,
         });
       })
@@ -151,7 +156,7 @@ function _SignUpStart(): JSX.Element {
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
-            card.setError(error.longMessage);
+            card.setError(error);
             break;
           default:
             // Error from server may be too much information for the end user, so set a generic error
@@ -245,15 +250,15 @@ function _SignUpStart(): JSX.Element {
     <Flow.Part part='start'>
       <Card.Root>
         <Card.Content>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Header.Root>
+          <Header.Root showLogo>
             <Header.Title localizationKey={localizationKeys('signUp.start.title')} />
             <Header.Subtitle localizationKey={localizationKeys('signUp.start.subtitle')} />
           </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
           <Flex
             direction='col'
             elementDescriptor={descriptors.main}
-            gap={8}
+            gap={6}
           >
             <SocialButtonsReversibleContainerWithDivider>
               {(showOauthProviders || showWeb3Providers) && (
@@ -273,19 +278,18 @@ function _SignUpStart(): JSX.Element {
                 />
               )}
             </SocialButtonsReversibleContainerWithDivider>
+            {!shouldShowForm && <CaptchaElement />}
           </Flex>
         </Card.Content>
+
         <Card.Footer>
-          <Footer.Root>
-            <Footer.Action elementId='signUp'>
-              <Footer.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
-              <Footer.ActionLink
-                localizationKey={localizationKeys('signUp.start.actionLink')}
-                to={clerk.buildUrlWithAuth(signInUrl)}
-              />
-            </Footer.Action>
-            <Footer.Links />
-          </Footer.Root>
+          <Card.Action elementId='signUp'>
+            <Card.ActionText localizationKey={localizationKeys('signUp.start.actionText')} />
+            <Card.ActionLink
+              localizationKey={localizationKeys('signUp.start.actionLink')}
+              to={clerk.buildUrlWithAuth(signInUrl)}
+            />
+          </Card.Action>
         </Card.Footer>
       </Card.Root>
     </Flow.Part>

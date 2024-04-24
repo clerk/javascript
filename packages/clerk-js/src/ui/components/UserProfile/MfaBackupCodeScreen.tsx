@@ -1,7 +1,7 @@
 import { useWizard, Wizard } from '../../common';
 import { Button, descriptors, localizationKeys, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { FormButtonContainer, FormContent, withCardStateProvider } from '../../elements';
+import { FormButtonContainer, FormContainer, withCardStateProvider } from '../../elements';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
 
@@ -31,7 +31,7 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
   const { close } = useActionContext();
 
   return (
-    <FormContent headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
+    <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
       <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText1')} />
       <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText2')} />
 
@@ -50,6 +50,6 @@ const AddBackupCode = (props: AddBackupCodeProps) => {
           elementDescriptor={descriptors.formButtonReset}
         />
       </FormButtonContainer>
-    </FormContent>
+    </FormContainer>
   );
 };

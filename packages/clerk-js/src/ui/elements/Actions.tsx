@@ -8,11 +8,26 @@ import { useLoadingStatus } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 export const Actions = (props: PropsOfComponent<typeof Flex>) => {
-  return <Col {...props} />;
+  const { sx, ...rest } = props;
+  return (
+    <Col
+      sx={[
+        t => ({
+          '> button,div': { border: `0 solid ${t.colors.$neutralAlpha100}` },
+          '>:not([hidden],:empty)~:not([hidden],:empty)': {
+            borderTopWidth: '1px',
+            borderBottomWidth: '0',
+          },
+        }),
+        sx,
+      ]}
+      {...rest}
+    />
+  );
 };
 
-export const SecondaryActions = (props: PropsOfComponent<typeof Flex>) => {
-  return <Actions {...props} />;
+export const SmallActions = (props: PropsOfComponent<typeof Flex>) => {
+  return <Col {...props} />;
 };
 
 type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
@@ -60,15 +75,14 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
   return (
     <SimpleButton
       size='xs'
-      variant='secondary'
+      variant='outline'
       hoverAsFocus
       sx={[
         t => ({
           borderRadius: t.radii.$lg,
-          borderBottom: 'none',
           gap: 0,
           justifyContent: 'center',
-          padding: `${t.space.$1} ${t.space.$1x5}`,
+          padding: t.space.$1,
         }),
         sx,
       ]}
@@ -81,6 +95,7 @@ export const ExtraSmallAction = (props: Omit<ActionProps, 'label'>) => {
         elementDescriptor={iconBoxElementDescriptor}
         elementId={iconBoxElementId}
         justify='center'
+        as='span'
       >
         {status.isLoading ? (
           <Spinner
@@ -112,12 +127,11 @@ export const SmallAction = (props: ActionProps) => {
   return (
     <Action
       size='xs'
-      variant='secondary'
+      variant='outline'
       textVariant='buttonSmall'
       sx={[
         t => ({
           borderRadius: t.radii.$lg,
-          borderBottom: 'none',
           gap: t.space.$0x5,
           justifyContent: 'center',
           flex: '1 1 0',
@@ -172,15 +186,16 @@ export const Action = (props: ActionProps) => {
   return (
     <Button
       size='md'
-      variant='ghostAction'
+      variant='ghost'
+      colorScheme='neutral'
       textVariant='buttonLarge'
       hoverAsFocus
+      focusRing={false}
       sx={[
         t => ({
           flex: '1',
           borderRadius: 0,
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
-          gap: t.space.$3,
+          gap: t.space.$4,
           justifyContent: 'flex-start',
         }),
         sx,
@@ -194,6 +209,7 @@ export const Action = (props: ActionProps) => {
         elementDescriptor={iconBoxElementDescriptor}
         elementId={iconBoxElementId}
         justify='center'
+        as='span'
         sx={[t => ({ flex: `0 0 ${t.sizes.$9}`, gap: t.space.$2, alignItems: 'center' }), iconBoxSx]}
       >
         {status.isLoading ? (

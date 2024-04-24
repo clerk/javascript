@@ -7,7 +7,7 @@ import { useInput } from './hooks/useInput';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => ({
   base: {
-    boxSizing: 'inherit',
+    boxSizing: 'border-box',
     margin: 0,
     padding: `${theme.space.$1x5} ${theme.space.$3}`,
     backgroundColor: theme.colors.$colorInputBackground,
@@ -20,16 +20,33 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     aspectRatio: props.type === 'checkbox' ? '1/1' : 'unset',
     accentColor: theme.colors.$primary500,
     ...common.textVariants(theme).body,
-    ...common.borderVariants(theme, props).normal,
     ...common.disabled(theme),
+    // This is a workaround to prevent zooming on iOS when focusing an input
     [mqu.ios]: {
       fontSize: theme.fontSizes.$lg,
+      '&:not([type="checkbox"]):not([type="radio"])': {
+        WebkitAppearance: 'none',
+      },
     },
     ':autofill': {
       animationName: 'onAutoFillStart',
     },
   },
-  variants: {},
+  variants: {
+    variant: {
+      default: {
+        ...common.borderVariants(theme, props).normal,
+      },
+      unstyled: {
+        borderWidth: 0,
+        boxShadow: 'unset',
+        backgroundColor: 'transparent',
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
 }));
 
 type OwnProps = {
@@ -44,30 +61,70 @@ export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVar
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const fieldControl = useFormField() || {};
   // @ts-expect-error Typescript is complaining that `errorMessageId` does not exist. We are clearly passing them from above.
-  const { errorMessageId, ...fieldControlProps } = sanitizeInputProps(fieldControl, ['errorMessageId']);
+  const { errorMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } = sanitizeInputProps(
+    fieldControl,
+    ['errorMessageId', 'ignorePasswordManager', 'feedbackType'],
+  );
+
   const propsWithoutVariants = filterProps({
     ...props,
     hasError: props.hasError || fieldControlProps.hasError,
   });
   const { onChange } = useInput(propsWithoutVariants.onChange);
-  const { isDisabled, hasError, focusRing, isRequired, ...rest } = propsWithoutVariants;
+  const { isDisabled, hasError, focusRing, isRequired, type, ...rest } = propsWithoutVariants;
   const _disabled = isDisabled || fieldControlProps.isDisabled;
   const _required = isRequired || fieldControlProps.isRequired;
   const _hasError = hasError || fieldControlProps.hasError;
 
+  /**
+   * type="email" will not allow characters like this one "ö", instead remove type email and provide a pattern that accepts any character before the "@" symbol
+   */
+
+  const typeProps = type === 'email' ? { pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$' } : { type };
+
+  const passwordManagerProps = ignorePasswordManager
+    ? {
+        'data-1p-ignore': true,
+      }
+    : undefined;
+
   return (
     <input
       {...rest}
+      {...typeProps}
+      {...passwordManagerProps}
       ref={ref}
       onChange={onChange}
       disabled={isDisabled}
       required={_required}
       id={props.id || fieldControlProps.id}
       aria-invalid={_hasError}
-      aria-describedby={errorMessageId}
+      aria-describedby={errorMessageId ? errorMessageId : undefined}
       aria-required={_required}
       aria-disabled={_disabled}
-      css={applyVariants(propsWithoutVariants)}
+      data-feedback={feedbackType}
+      data-variant={props.variant || 'default'}
+      css={applyVariants(props)}
+    />
+  );
+});
+
+export const CheckboxInput = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  return (
+    <Input
+      {...props}
+      type='checkbox'
+      ref={ref}
+    />
+  );
+});
+
+export const RadioInput = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  return (
+    <Input
+      {...props}
+      type='radio'
+      ref={ref}
     />
   );
 });

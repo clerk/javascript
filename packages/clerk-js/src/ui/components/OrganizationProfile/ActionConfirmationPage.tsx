@@ -1,4 +1,4 @@
-import { useOrganization, useUser } from '@clerk/shared/react';
+import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
@@ -8,27 +8,45 @@ import type { FormProps } from '../../elements';
 import {
   Form,
   FormButtonContainer,
-  FormContent,
+  FormContainer,
   SuccessPage,
   useCardState,
   withCardStateProvider,
 } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
+import { organizationListParams } from '../OrganizationSwitcher/utils';
 
 type LeaveOrganizationFormProps = FormProps;
-export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
+
+const useLeaveWithRevalidations = (leavePromise: (() => Promise<any>) | undefined) => {
   const card = useCardState();
   const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
+  const { userMemberships, userInvitations } = useOrganizationList({
+    userMemberships: organizationListParams.userMemberships,
+    userInvitations: organizationListParams.userInvitations,
+  });
+
+  return () =>
+    card
+      .runAsync(async () => {
+        await leavePromise?.();
+      })
+      .then(() => {
+        void userMemberships.revalidate?.();
+        void userInvitations.revalidate?.();
+        void navigateAfterLeaveOrganization();
+      });
+};
+
+export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
   const { organization } = useOrganization();
   const { user } = useUser();
+
+  const leaveOrg = useLeaveWithRevalidations(() => user!.leaveOrganization(organization!.id));
 
   if (!organization || !user) {
     return null;
   }
-
-  const leave = () => {
-    return card.runAsync(user.leaveOrganization(organization.id)).then(navigateAfterLeaveOrganization);
-  };
 
   return (
     <ActionConfirmationPage
@@ -44,7 +62,7 @@ export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
       successMessage={localizationKeys(
         'organizationProfile.profilePage.dangerSection.leaveOrganization.successMessage',
       )}
-      onConfirmation={leave}
+      onConfirmation={leaveOrg}
       {...props}
     />
   );
@@ -52,17 +70,13 @@ export const LeaveOrganizationForm = (props: LeaveOrganizationFormProps) => {
 
 type DeleteOrganizationFormProps = FormProps;
 export const DeleteOrganizationForm = (props: DeleteOrganizationFormProps) => {
-  const card = useCardState();
-  const { navigateAfterLeaveOrganization } = useOrganizationProfileContext();
-  const { organization } = useOrganization();
+  const { organization, membership } = useOrganization();
 
-  if (!organization) {
+  const deleteOrg = useLeaveWithRevalidations(organization?.destroy);
+
+  if (!organization || !membership) {
     return null;
   }
-
-  const deleteOrg = () => {
-    return card.runAsync(organization.destroy()).then(navigateAfterLeaveOrganization);
-  };
 
   return (
     <ActionConfirmationPage
@@ -93,7 +107,7 @@ type ActionConfirmationPageProps = FormProps & {
   successMessage: LocalizationKey;
   submitLabel: LocalizationKey;
   onConfirmation: () => Promise<any>;
-  variant?: 'primaryDanger' | 'primary';
+  colorScheme?: 'danger' | 'primary';
 };
 
 const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationPageProps) => {
@@ -108,7 +122,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     onSuccess,
     onReset,
     onConfirmation,
-    variant = 'primaryDanger',
+    colorScheme = 'danger',
   } = props;
   const wizard = useWizard();
   const card = useCardState();
@@ -137,12 +151,15 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent headerTitle={title}>
+      <FormContainer
+        headerTitle={title}
+        gap={1}
+      >
         <Form.Root onSubmit={handleSubmit}>
-          <Col gap={1}>
+          <Col>
             <Text
               localizationKey={messageLine1}
-              colorScheme='neutral'
+              colorScheme='secondary'
             />
             <Text
               localizationKey={messageLine2}
@@ -157,7 +174,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
           <FormButtonContainer>
             <Form.SubmitButton
               block={false}
-              variant={variant}
+              colorScheme={colorScheme}
               localizationKey={submitLabel}
               isDisabled={!canSubmit}
             />
@@ -168,7 +185,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
             />
           </FormButtonContainer>
         </Form.Root>
-      </FormContent>
+      </FormContainer>
       <SuccessPage
         title={title}
         text={successMessage}

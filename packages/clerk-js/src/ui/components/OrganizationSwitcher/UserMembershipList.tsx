@@ -61,7 +61,14 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
   return (
     <Box
       sx={t => ({
+        // 4 items + 4px border (four 1px borders)
+        maxHeight: `calc((4 * ${t.sizes.$17}) + 4px)`,
         overflowY: 'auto',
+        '> button,div': { border: `0 solid ${t.colors.$neutralAlpha100}` },
+        '>:not([hidden])~:not([hidden])': {
+          borderTopWidth: '1px',
+          borderBottomWidth: '0',
+        },
         ...common.unstyledScrollbar(t),
       })}
       role='group'
@@ -78,12 +85,6 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
             user={userWithoutIdentifiers}
             mainIdentifierVariant={'buttonLarge'}
             title={localizationKeys('organizationSwitcher.personalWorkspace')}
-            mainIdentifierSx={t => ({
-              color: t.colors.$blackAlpha600,
-              ':hover': {
-                color: t.colors.$blackAlpha600,
-              },
-            })}
           />
         </PreviewButton>
       )}
@@ -94,16 +95,13 @@ export const UserMembershipList = (props: UserMembershipListProps) => {
           icon={SwitchArrowRight}
           onClick={() => onOrganizationClick(organization)}
           role='menuitem'
+          sx={t => ({
+            border: `0 solid ${t.colors.$neutralAlpha100}`,
+          })}
         >
           <OrganizationPreview
             elementId='organizationSwitcherListedOrganization'
             organization={organization}
-            sx={t => ({
-              color: t.colors.$blackAlpha600,
-              ':hover': {
-                color: t.colors.$blackAlpha600,
-              },
-            })}
           />
         </PreviewButton>
       ))}

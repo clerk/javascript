@@ -83,5 +83,11 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
     isomorphicClerk.addOnLoaded(() => setLoaded(true));
   }, []);
 
+  React.useEffect(() => {
+    return () => {
+      IsomorphicClerk.clearInstance();
+    };
+  }, []);
+
   return { isomorphicClerk, loaded };
 };

@@ -25,10 +25,6 @@ export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
   inputLabel: LocalizationKey;
-  // TODO-RETHEME remove
-  formTitle?: LocalizationKey;
-  // TODO-RETHEME remove
-  formSubtitle?: LocalizationKey;
   resendButton: LocalizationKey;
 };
 

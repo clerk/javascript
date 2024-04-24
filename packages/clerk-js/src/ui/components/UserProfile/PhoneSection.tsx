@@ -9,7 +9,7 @@ import type { PropsOfComponent } from '../../styledSystem';
 import { handleError, stringToFormattedPhoneString } from '../../utils';
 import { PhoneForm } from './PhoneForm';
 import { RemovePhoneForm } from './RemoveResourceForm';
-import { primaryIdentificationFirst } from './utils';
+import { sortIdentificationBasedOnVerification } from './utils';
 
 type RemovePhoneScreenProps = { phoneId: string };
 const RemovePhoneScreen = (props: RemovePhoneScreenProps) => {
@@ -40,12 +40,13 @@ export const PhoneSection = () => {
 
   return (
     <ProfileSection.Root
+      centered={false}
       title={localizationKeys('userProfile.start.phoneNumbersSection.title')}
       id='phoneNumbers'
     >
       <Action.Root>
         <ProfileSection.ItemList id='phoneNumbers'>
-          {user?.phoneNumbers.sort(primaryIdentificationFirst(user.primaryPhoneNumberId)).map(phone => (
+          {sortIdentificationBasedOnVerification(user?.phoneNumbers, user?.primaryPhoneNumberId).map(phone => (
             <Action.Root key={phone.id}>
               <Action.Closed value=''>
                 <ProfileSection.Item id='phoneNumbers'>
@@ -54,7 +55,9 @@ export const PhoneSection = () => {
                       gap={2}
                       center
                     >
-                      <Text>{stringToFormattedPhoneString(phone.phoneNumber)} </Text>
+                      <Text sx={t => ({ color: t.colors.$colorText })}>
+                        {stringToFormattedPhoneString(phone.phoneNumber)}
+                      </Text>
                       {user?.primaryPhoneNumberId === phone.id && (
                         <Badge localizationKey={localizationKeys('badge__primary')} />
                       )}
@@ -83,18 +86,18 @@ export const PhoneSection = () => {
           ))}
 
           <Action.Trigger value='add'>
-            <ProfileSection.Button
+            <ProfileSection.ArrowButton
               id='phoneNumbers'
               localizationKey={localizationKeys('userProfile.start.phoneNumbersSection.primaryButton')}
             />
           </Action.Trigger>
-        </ProfileSection.ItemList>
 
-        <Action.Open value='add'>
-          <Action.Card>
-            <PhoneScreen />
-          </Action.Card>
-        </Action.Open>
+          <Action.Open value='add'>
+            <Action.Card>
+              <PhoneScreen />
+            </Action.Card>
+          </Action.Open>
+        </ProfileSection.ItemList>
       </Action.Root>
     </ProfileSection.Root>
   );

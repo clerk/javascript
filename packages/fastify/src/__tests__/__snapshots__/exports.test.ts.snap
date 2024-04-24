@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`/api public exports should not include a breaking change 1`] = `
+[
+  "clerkClient",
+  "clerkPlugin",
+  "createClerkClient",
+  "getAuth",
+  "verifyToken",
+]
+`;

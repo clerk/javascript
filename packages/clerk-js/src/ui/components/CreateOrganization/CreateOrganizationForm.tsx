@@ -4,7 +4,16 @@ import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
 import { Col, Icon } from '../../customizables';
-import { Form, FormButtonContainer, FormContent, Header, IconButton, SuccessPage, useCardState } from '../../elements';
+import {
+  Form,
+  FormButtonContainer,
+  FormContainer,
+  Header,
+  IconButton,
+  SuccessPage,
+  useCardState,
+  withCardStateProvider,
+} from '../../elements';
 import { Upload } from '../../icons';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
@@ -12,6 +21,7 @@ import { createSlug, handleError, useFormControl } from '../../utils';
 import { InviteMembersForm } from '../OrganizationProfile/InviteMembersForm';
 import { InvitationsSentMessage } from '../OrganizationProfile/InviteMembersScreen';
 import { OrganizationProfileAvatarUploader } from '../OrganizationProfile/OrganizationProfileAvatarUploader';
+import { organizationListParams } from '../OrganizationSwitcher/utils';
 
 type CreateOrganizationFormProps = {
   skipInvitationScreen: boolean;
@@ -25,12 +35,14 @@ type CreateOrganizationFormProps = {
   };
 };
 
-export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
+export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
 
   const lastCreatedOrganizationRef = React.useRef<OrganizationResource | null>(null);
-  const { createOrganization, isLoaded, setActive } = useOrganizationList();
+  const { createOrganization, isLoaded, setActive, userMemberships } = useOrganizationList({
+    userMemberships: organizationListParams.userMemberships,
+  });
   const { organization } = useOrganization();
   const [file, setFile] = React.useState<File | null>();
 
@@ -67,6 +79,8 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
 
       lastCreatedOrganizationRef.current = organization;
       await setActive({ organization });
+
+      void userMemberships.revalidate?.();
 
       if (props.skipInvitationScreen ?? organization.maxAllowedMemberships === 1) {
         return completeFlow();
@@ -109,14 +123,17 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
 
   return (
     <Wizard {...wizard.props}>
-      <FormContent
+      <FormContainer
         headerTitle={props?.startPage?.headerTitle}
         headerSubtitle={props?.startPage?.headerSubtitle}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
         sx={t => ({ minHeight: t.sizes.$60, gap: t.space.$6, textAlign: 'left' })}
       >
-        <Form.Root onSubmit={onSubmit}>
+        <Form.Root
+          onSubmit={onSubmit}
+          sx={t => ({ gap: t.space.$6 })}
+        >
           <Col>
             <OrganizationProfileAvatarUploader
               organization={{ name: nameField.value }}
@@ -131,7 +148,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
                       size='md'
                       icon={Upload}
                       sx={t => ({
-                        color: t.colors.$blackAlpha400,
+                        color: t.colors.$colorTextSecondary,
                         transitionDuration: t.transitionDuration.$controls,
                       })}
                     />
@@ -140,10 +157,12 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
                     width: t.sizes.$16,
                     height: t.sizes.$16,
                     borderRadius: t.radii.$md,
-                    border: `${t.borders.$dashed} ${t.colors.$blackAlpha200}`,
-                    backgroundColor: t.colors.$blackAlpha50,
+                    borderWidth: t.borderWidths.$normal,
+                    borderStyle: t.borderStyles.$dashed,
+                    borderColor: t.colors.$neutralAlpha200,
+                    backgroundColor: t.colors.$neutralAlpha50,
                     ':hover': {
-                      backgroundColor: t.colors.$blackAlpha50,
+                      backgroundColor: t.colors.$neutralAlpha50,
                       svg: {
                         transform: 'scale(1.2)',
                       },
@@ -159,6 +178,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
               onChange={onChangeName}
               isRequired
               autoFocus
+              ignorePasswordManager
             />
           </Form.ControlRow>
           <Form.ControlRow elementId={slugField.id}>
@@ -167,13 +187,13 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
               onChange={onChangeSlug}
               isRequired
               pattern='^[a-z0-9\-]+$'
+              ignorePasswordManager
             />
           </Form.ControlRow>
-          <FormButtonContainer>
+          <FormButtonContainer sx={t => ({ marginTop: t.space.$none })}>
             <Form.SubmitButton
               block={false}
               isDisabled={!canSubmit}
-              hasArrow
               localizationKey={localizationKeys('createOrganization.formButtonSubmit')}
             />
             {props.onCancel && (
@@ -185,9 +205,9 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             )}
           </FormButtonContainer>
         </Form.Root>
-      </FormContent>
+      </FormContainer>
 
-      <FormContent
+      <FormContainer
         headerTitle={localizationKeys('organizationProfile.invitePage.title')}
         headerTitleTextVariant={headerTitleTextVariant}
         headerSubtitleTextVariant={headerSubtitleTextVariant}
@@ -200,7 +220,7 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
             onReset={completeFlow}
           />
         )}
-      </FormContent>
+      </FormContainer>
 
       <Col>
         <Header.Root>
@@ -217,4 +237,4 @@ export const CreateOrganizationForm = (props: CreateOrganizationFormProps) => {
       </Col>
     </Wizard>
   );
-};
+});

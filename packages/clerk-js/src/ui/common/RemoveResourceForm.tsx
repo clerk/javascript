@@ -1,19 +1,15 @@
-import React from 'react';
-
-import { Text } from '../customizables';
+import { localizationKeys, Text } from '../customizables';
 import type { FormProps } from '../elements';
-import { Form, FormButtons, FormContent, useCardState, withCardStateProvider } from '../elements';
+import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../elements';
 import type { LocalizationKey } from '../localization';
 import { handleError } from '../utils';
 
 type RemoveFormProps = FormProps & {
   title: LocalizationKey;
-  breadcrumbTitle?: LocalizationKey;
   messageLine1: LocalizationKey;
-  messageLine2: LocalizationKey;
+  messageLine2?: LocalizationKey;
   successMessage?: LocalizationKey;
   deleteResource: () => Promise<any>;
-  Breadcrumbs?: React.ComponentType<any> | null;
 };
 
 export const RemoveResourceForm = withCardStateProvider((props: RemoveFormProps) => {
@@ -29,15 +25,23 @@ export const RemoveResourceForm = withCardStateProvider((props: RemoveFormProps)
   };
 
   return (
-    <FormContent headerTitle={title}>
+    <FormContainer
+      headerTitle={title}
+      headerSubtitle={messageLine1}
+    >
       <Form.Root onSubmit={handleSubmit}>
-        <Text localizationKey={messageLine1} />
-        <Text localizationKey={messageLine2} />
+        {messageLine2 ? (
+          <Text
+            colorScheme='secondary'
+            localizationKey={messageLine2}
+          />
+        ) : null}
         <FormButtons
-          variant='primaryDanger'
+          submitLabel={localizationKeys('userProfile.formButtonPrimary__remove')}
+          colorScheme='danger'
           onReset={onReset}
         />
       </Form.Root>
-    </FormContent>
+    </FormContainer>
   );
 });

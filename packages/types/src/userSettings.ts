@@ -11,7 +11,8 @@ export type Attribute =
   | 'password'
   | 'web3_wallet'
   | 'authenticator_app'
-  | 'backup_code';
+  | 'backup_code'
+  | 'passkey';
 
 export type VerificationStrategy = 'email_link' | 'email_code' | 'phone_code' | 'totp' | 'backup_code';
 
@@ -63,6 +64,11 @@ export type PasswordSettingsData = {
   min_zxcvbn_strength: number;
 };
 
+export type PasskeySettingsData = {
+  allow_autofill: boolean;
+  show_sign_in_button: boolean;
+};
+
 export type OAuthProviders = {
   [provider in OAuthStrategy]: OAuthProviderSettings;
 };
@@ -96,6 +102,7 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   sign_in: SignInData;
   sign_up: SignUpData;
   password_settings: PasswordSettingsData;
+  passkey_settings: PasskeySettingsData;
 }
 
 export interface UserSettingsResource extends ClerkResource {
@@ -109,6 +116,7 @@ export interface UserSettingsResource extends ClerkResource {
   signIn: SignInData;
   signUp: SignUpData;
   passwordSettings: PasswordSettingsData;
+  passkeySettings: PasskeySettingsData;
   socialProviderStrategies: OAuthStrategy[];
   authenticatableSocialStrategies: OAuthStrategy[];
   web3FirstFactors: Web3Strategy[];

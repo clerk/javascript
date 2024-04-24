@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { Action, Card, Header, SecondaryActions, useCardState, withCardStateProvider } from '../../elements';
+import { Action, Actions, Card, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useInView } from '../../hooks';
 import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
@@ -78,7 +78,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const { navigateAfterSelectOrganization, skipInvitationScreen } = useOrganizationListContext();
+  const { navigateAfterCreateOrganization, skipInvitationScreen } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   return (
     <>
@@ -97,7 +97,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>
-              navigateAfterSelectOrganization(org).then(() => setCreateOrganizationFlow(false))
+              navigateAfterCreateOrganization(org).then(() => setCreateOrganizationFlow(false))
             }
             onCancel={
               showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
@@ -144,12 +144,9 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
           })}
         />
       </Header.Root>
-      <Col
-        elementDescriptor={descriptors.main}
-        sx={t => ({ borderTop: `${t.borders.$normal} ${t.colors.$blackAlpha100}` })}
-      >
+      <Col elementDescriptor={descriptors.main}>
         <PreviewListItems>
-          <SecondaryActions role='menu'>
+          <Actions role='menu'>
             <PersonalAccountPreview />
             {(userMemberships.count || 0) > 0 &&
               userMemberships.data?.map(inv => {
@@ -183,23 +180,25 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
               })}
 
             {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
-          </SecondaryActions>
-        </PreviewListItems>
 
-        <Action
-          elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
-          icon={Add}
-          label={localizationKeys('organizationList.action__createOrganization')}
-          onClick={handleCreateOrganizationClicked}
-          sx={t => ({
-            borderBottom: 'none',
-            padding: `${t.space.$5} ${t.space.$5}`,
-          })}
-          iconSx={t => ({
-            width: t.sizes.$9,
-            height: t.sizes.$6,
-          })}
-        />
+            <Action
+              elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
+              icon={Add}
+              label={localizationKeys('organizationList.action__createOrganization')}
+              onClick={handleCreateOrganizationClicked}
+              sx={t => ({
+                borderTopWidth: t.borderWidths.$normal,
+                borderTopStyle: t.borderStyles.$solid,
+                borderTopColor: t.colors.$neutralAlpha100,
+                padding: `${t.space.$5} ${t.space.$5}`,
+              })}
+              iconSx={t => ({
+                width: t.sizes.$9,
+                height: t.sizes.$6,
+              })}
+            />
+          </Actions>
+        </PreviewListItems>
       </Col>
     </>
   );

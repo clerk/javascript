@@ -1,5 +1,4 @@
 import { describe, it } from '@jest/globals';
-import React from 'react';
 
 import { render, screen, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
@@ -9,85 +8,66 @@ const { createFixtures } = bindCreateFixtures('UserProfile');
 
 describe('AccountPage', () => {
   it('renders the component', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
-    fixtures.clerk.user?.getSessions.mockReturnValue(Promise.resolve([]));
 
     render(<AccountPage />, { wrapper });
   });
 
   describe('Sections', () => {
-    // TODO-RETHEME: Revise the test when the UI is done
-    it.skip('shows the profile section along with the identifier of the user and has a button', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'George', last_name: 'Clerk' });
+    it('open the profile section and can update name', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withName();
+        f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Clerk', last_name: 'User' });
       });
-      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<AccountPage />, { wrapper });
-      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
-      screen.getByText(/Profile details/i);
-      const button = screen.getByText('George Clerk');
-      expect(button.closest('button')).not.toBeNull();
+      const { getByText, getByLabelText, getByRole, userEvent, queryByText, queryByLabelText } = render(
+        <AccountPage />,
+        { wrapper },
+      );
+      getByText('Clerk User');
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => getByLabelText(/first name/i));
+      expect(queryByText('Clerk User')).not.toBeInTheDocument();
+      expect(queryByLabelText(/last name/i)).toBeInTheDocument();
+
+      expect(getByRole('button', { name: /save$/i })).toBeDisabled();
     });
 
-    // TODO-RETHEME: Revise the test when the UI is done
-    it.skip('shows the profile section along with the identifier of the user and has a button', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'George', last_name: 'Clerk' });
+    it('open the profile section and cannot update name', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'], first_name: 'Clerk', last_name: 'User' });
       });
-      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<AccountPage />, { wrapper });
-      await waitFor(() => expect(fixtures.clerk.user?.getSessions).toHaveBeenCalled());
-      screen.getByText(/Profile details/i);
-      const button = screen.getByText('George Clerk');
-      expect(button.closest('button')).not.toBeNull();
+      const { getByText, getByRole, userEvent, queryByText, queryByLabelText } = render(<AccountPage />, { wrapper });
+      getByText('Clerk User');
+      await userEvent.click(getByRole('button', { name: /update profile/i }));
+      await waitFor(() => getByRole('button', { name: /save/i }));
+      expect(queryByText('Clerk User')).not.toBeInTheDocument();
+      expect(queryByLabelText(/first name/i)).not.toBeInTheDocument();
+      expect(queryByLabelText(/last name/i)).not.toBeInTheDocument();
+
+      expect(getByRole('button', { name: /save$/i })).toBeDisabled();
     });
 
-    it('shows the email addresses section with the email addresses of the user', async () => {
-      const emails = ['test@clerk.com', 'test2@clerk.com'];
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEmailAddress();
+    it('hides section that are disabled', async () => {
+      const { wrapper } = await createFixtures(f => {
         f.withUser({
-          email_addresses: emails,
           first_name: 'George',
           last_name: 'Clerk',
         });
       });
-      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
-      render(<AccountPage />, { wrapper });
-      screen.getByText(/Email addresses/i);
-      const emailTexts: HTMLElement[] = [];
-      emails.forEach(email => {
-        emailTexts.push(screen.getByText(email));
-      });
-    });
-
-    it('shows the phone numbers section with the phone numbers of the user and has appropriate buttons', async () => {
-      const numbers = ['+30 691 1111111', '+30 692 2222222'];
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.withUser({
-          phone_numbers: numbers,
-          first_name: 'George',
-          last_name: 'Clerk',
-        });
-      });
-      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
-
-      render(<AccountPage />, { wrapper });
-      screen.getByText(/Phone numbers/i);
-      const numberButtons: HTMLElement[] = [];
-      numbers.forEach(number => {
-        numberButtons.push(screen.getByText(number));
-      });
+      const { queryByText } = render(<AccountPage />, { wrapper });
+      expect(queryByText(/Email addresses/i)).not.toBeInTheDocument();
+      expect(queryByText(/Phone numbers/i)).not.toBeInTheDocument();
+      expect(queryByText(/Connected Accounts/i)).not.toBeInTheDocument();
+      expect(queryByText(/Enterprise Accounts/i)).not.toBeInTheDocument();
     });
 
     it('shows the connected accounts of the user', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
         f.withUser({
           external_accounts: [{ provider: 'google', email_address: 'test@clerk.com' }],
@@ -95,7 +75,6 @@ describe('AccountPage', () => {
           last_name: 'Clerk',
         });
       });
-      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
       render(<AccountPage />, { wrapper });
       screen.getByText(/Connected Accounts/i);
@@ -108,7 +87,7 @@ describe('AccountPage', () => {
       const firstName = 'George';
       const lastName = 'Clerk';
 
-      const { wrapper, fixtures } = await createFixtures(f => {
+      const { wrapper } = await createFixtures(f => {
         f.withEmailAddress();
         f.withSaml();
         f.withUser({
@@ -126,7 +105,6 @@ describe('AccountPage', () => {
           last_name: lastName,
         });
       });
-      fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
       render(<AccountPage />, { wrapper });
       screen.getByText(/Enterprise Accounts/i);

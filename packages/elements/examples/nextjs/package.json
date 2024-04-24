@@ -2,35 +2,35 @@
   "name": "elements-nextjs",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "../.."
-  ],
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "dev:debug": "NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true next dev",
     "e2e": "playwright test",
     "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
-    "@clerk/elements": "*",
+    "@clerk/elements": "file:../../elements",
     "@clerk/nextjs": "file:../../nextjs",
     "@radix-ui/react-form": "^0.0.3",
     "clsx": "^2.0.0",
-    "next": "14.0.4",
+    "framer-motion": "^11.0.28",
+    "geist": "^1.3",
+    "next": "^14.2",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.1",
+    "@playwright/test": "^1.43",
     "@types/node": "^18",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "autoprefixer": "^10.0.1",
+    "autoprefixer": "^10.4.19",
     "eslint": "^8",
-    "eslint-config-next": "14.0.4",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "eslint-config-next": "14.2",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5"
   }
 }

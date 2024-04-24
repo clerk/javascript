@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useUserProfileContext } from '../../contexts';
-import { Breadcrumbs, NavBar, NavbarContextProvider } from '../../elements';
+import { NavBar, NavbarContextProvider } from '../../elements';
 import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
 
@@ -20,15 +20,5 @@ export const UserProfileNavbar = (
       />
       {props.children}
     </NavbarContextProvider>
-  );
-};
-
-export const UserProfileBreadcrumbs = (props: Pick<PropsOfComponent<typeof Breadcrumbs>, 'title'>) => {
-  const { pages } = useUserProfileContext();
-  return (
-    <Breadcrumbs
-      {...props}
-      pageToRootNavbarRoute={pages.pageToRootNavbarRouteMap}
-    />
   );
 };

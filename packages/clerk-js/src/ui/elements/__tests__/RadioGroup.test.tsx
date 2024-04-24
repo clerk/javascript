@@ -32,7 +32,10 @@ const createField = (...params: Parameters<typeof useFormControl>) => {
 describe('RadioGroup', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures();
-    const { Field } = createField('some-radio', '');
+    const { Field } = createField('some-radio', '', {
+      label: 'Some checkbox',
+      type: 'radio',
+    });
 
     const { getAllByRole } = render(
       <Field
@@ -62,7 +65,10 @@ describe('RadioGroup', () => {
 
   it('renders the component with default value', async () => {
     const { wrapper } = await createFixtures();
-    const { Field } = createField('some-radio', 'two');
+    const { Field } = createField('some-radio', 'two', {
+      label: 'Some checkbox',
+      type: 'radio',
+    });
 
     const { getAllByRole } = render(
       <Field
@@ -94,7 +100,10 @@ describe('RadioGroup', () => {
 
   it('disabled', async () => {
     const { wrapper } = await createFixtures();
-    const { Field } = createField('some-radio', 'two');
+    const { Field } = createField('some-radio', 'two', {
+      label: 'Some checkbox',
+      type: 'radio',
+    });
 
     const { getAllByRole } = render(
       <Field
@@ -117,7 +126,10 @@ describe('RadioGroup', () => {
 
   it('required', async () => {
     const { wrapper } = await createFixtures();
-    const { Field } = createField('some-radio', 'two');
+    const { Field } = createField('some-radio', 'two', {
+      label: 'Some checkbox',
+      type: 'radio',
+    });
 
     const { getAllByRole } = render(
       <Field
@@ -139,7 +151,10 @@ describe('RadioGroup', () => {
 
   it('with error', async () => {
     const { wrapper } = await createFixtures();
-    const { Field } = createField('some-radio', 'two');
+    const { Field } = createField('some-radio', 'two', {
+      label: 'Some checkbox',
+      type: 'radio',
+    });
 
     const { getAllByRole, getByRole, findByText } = render(
       <Field

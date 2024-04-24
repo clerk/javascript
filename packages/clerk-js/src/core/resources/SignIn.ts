@@ -1,12 +1,16 @@
-import { deepSnakeToCamel, Poller } from '@clerk/shared';
+import { deepSnakeToCamel, isClerkAPIResponseError, Poller } from '@clerk/shared';
 import type {
+  __experimental_AuthenticateWithGoogleOneTapParams,
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
+  AuthenticateWithPasskeyParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailLinkConfig,
+  PassKeyConfig,
+  PasskeyFactor,
   PhoneCodeConfig,
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
@@ -22,18 +26,29 @@ import type {
   SignInSecondFactor,
   SignInStartEmailLinkFlowParams,
   SignInStatus,
+  SignUpResource,
   VerificationResource,
   Web3SignatureConfig,
   Web3SignatureFactor,
 } from '@clerk/types';
 
 import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import {
+  ClerkWebAuthnError,
+  convertJSONToPublicKeyRequestOptions,
+  isWebAuthnAutofillSupported,
+  isWebAuthnSupported,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential,
+} from '../../utils/passkeys';
 import { createValidatePassword } from '../../utils/passwords/password';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
   clerkMissingOptionError,
+  clerkMissingWebAuthnPublicKeyOptions,
   clerkVerifyEmailAddressCalledBeforeCreate,
+  clerkVerifyPasskeyCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { BaseResource, UserData, Verification } from './internal';
@@ -74,6 +89,9 @@ export class SignIn extends BaseResource implements SignInResource {
   prepareFirstFactor = (factor: PrepareFirstFactorParams): Promise<SignInResource> => {
     let config;
     switch (factor.strategy) {
+      case 'passkey':
+        config = {} as PassKeyConfig;
+        break;
       case 'email_link':
         config = {
           emailAddressId: factor.emailAddressId,
@@ -113,9 +131,20 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  attemptFirstFactor = (params: AttemptFirstFactorParams): Promise<SignInResource> => {
+  attemptFirstFactor = (attemptFactor: AttemptFirstFactorParams): Promise<SignInResource> => {
+    let config;
+    switch (attemptFactor.strategy) {
+      case 'passkey':
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
+        };
+        break;
+      default:
+        config = { ...attemptFactor };
+    }
+
     return this._basePost({
-      body: params,
+      body: { ...config, strategy: attemptFactor.strategy },
       action: 'attempt_first_factor',
     });
   };
@@ -196,6 +225,27 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
+  public __experimental_authenticateWithGoogleOneTap = async (
+    params: __experimental_AuthenticateWithGoogleOneTapParams,
+  ): Promise<SignInResource | SignUpResource> => {
+    return this.create({
+      // TODO-ONETAP: Add new types when feature is ready for public beta
+      // @ts-expect-error
+      strategy: 'google_one_tap',
+      googleOneTapToken: params.token,
+    }).catch(err => {
+      if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
+        return SignIn.clerk.client?.signUp.create({
+          // TODO-ONETAP: Add new types when feature is ready for public beta
+          // @ts-expect-error
+          strategy: 'google_one_tap',
+          googleOneTapToken: params.token,
+        });
+      }
+      throw err;
+    }) as Promise<SignInResource | SignUpResource>;
+  };
+
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
     const { identifier, generateSignature } = params || {};
     if (!(typeof generateSignature === 'function')) {
@@ -231,6 +281,69 @@ export class SignIn extends BaseResource implements SignInResource {
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
+    });
+  };
+
+  public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
+    const { flow } = params || {};
+
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    if (flow === 'autofill' || flow === 'discoverable') {
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      await this.create({ strategy: 'passkey' });
+    } else {
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      const passKeyFactor = this.supportedFirstFactors.find(
+        // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+        f => f.strategy === 'passkey',
+      ) as PasskeyFactor;
+
+      if (!passKeyFactor) {
+        clerkVerifyPasskeyCalledBeforeCreate();
+      }
+      // @ts-ignore As this is experimental we want to support it at runtime, but not at the type level
+      await this.prepareFirstFactor(passKeyFactor);
+    }
+
+    const { nonce } = this.firstFactorVerification;
+    const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+    if (!publicKeyOptions) {
+      clerkMissingWebAuthnPublicKeyOptions('get');
+    }
+
+    let canUseConditionalUI = false;
+
+    if (flow === 'autofill') {
+      /**
+       * If autofill is not supported gracefully handle the result, we don't need to throw.
+       * The caller should always check this before calling this method.
+       */
+      canUseConditionalUI = await isWebAuthnAutofillSupported();
+    }
+
+    // Invoke the navigator.create.get() method.
+    const { publicKeyCredential, error } = await webAuthnGetCredential({
+      publicKeyOptions,
+      conditionalUI: canUseConditionalUI,
+    });
+
+    if (!publicKeyCredential) {
+      throw error;
+    }
+
+    return this.attemptFirstFactor({
+      publicKeyCredential,
+      strategy: 'passkey',
     });
   };
 

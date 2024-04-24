@@ -17,3 +17,7 @@ export const noUserExists: ComponentGuard = clerk => {
 export const noOrganizationExists: ComponentGuard = clerk => {
   return !clerk.organization;
 };
+
+export const disabledOrganizationsFeature: ComponentGuard = (_, environment) => {
+  return !environment?.organizationSettings.enabled;
+};

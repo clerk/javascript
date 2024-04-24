@@ -43,10 +43,10 @@ export const VerifyWithCode = (props: VerifyWithCodeProps) => {
         label={localizationKeys('userProfile.emailAddressPage.emailCode.formTitle')}
         description={localizationKeys('userProfile.emailAddressPage.emailCode.formSubtitle', { identifier })}
         resendButton={localizationKeys('userProfile.emailAddressPage.emailCode.resendButton')}
+        centerAlign={false}
       />
       <FormButtonContainer>
         <Button
-          variant='primary'
           isLoading={otp.isLoading}
           localizationKey={localizationKeys('formButtonPrimary__verify')}
           elementDescriptor={descriptors.formButtonPrimary}

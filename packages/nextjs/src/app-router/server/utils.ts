@@ -1,15 +1,19 @@
-import { headers } from 'next/headers';
 import { NextRequest } from 'next/server';
 
 export const buildRequestLike = () => {
   try {
+    // Dynamically import next/headers, otherwise Next12 apps will break
+    // because next/headers was introduced in next@13
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { headers } = require('next/headers');
     return new NextRequest('https://placeholder.com', { headers: headers() });
   } catch (e: any) {
     if (
       e &&
       'message' in e &&
       typeof e.message === 'string' &&
-      e.message.toLowerCase().includes('Dynamic server usage'.toLowerCase())
+      (e.message.toLowerCase().includes('Dynamic server usage'.toLowerCase()) ||
+        e.message.toLowerCase().includes('This page needs to bail out of prerendering'.toLowerCase()))
     ) {
       throw e;
     }

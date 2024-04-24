@@ -229,15 +229,33 @@ export function getSearchParameterFromHash({
   return dummyUrlForHash.searchParams.get(paramName);
 }
 
-export function isValidUrl(val: unknown, opts?: { includeRelativeUrls?: boolean }): val is string {
-  const { includeRelativeUrls = false } = opts || {};
-  if (!val && !includeRelativeUrls) {
+export function isValidUrl(val: unknown): val is string {
+  if (!val) {
     return false;
   }
 
   try {
-    new URL(val as string, includeRelativeUrls ? DUMMY_URL_BASE : undefined);
+    new URL(val as string);
     return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function relativeToAbsoluteUrl(url: string, origin: string | URL): string {
+  if (isValidUrl(url)) {
+    return url;
+  }
+  return new URL(url, origin).href;
+}
+
+export function isRelativeUrl(val: unknown): val is string {
+  if (val !== val && !val) {
+    return false;
+  }
+  try {
+    const temp = new URL(val as string, DUMMY_URL_BASE);
+    return temp.origin === DUMMY_URL_BASE;
   } catch (e) {
     return false;
   }
@@ -328,28 +346,29 @@ export function requiresUserInput(redirectUrl: string): boolean {
   return frontendApiRedirectPathsWithUserInput.includes(url.pathname);
 }
 
-export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: Array<string | RegExp> | undefined) => {
-  if (!allowedRedirectOrigins) {
-    return true;
-  }
+export const isAllowedRedirectOrigin =
+  (allowedRedirectOrigins: Array<string | RegExp> | undefined) => (_url: string) => {
+    if (!allowedRedirectOrigins) {
+      return true;
+    }
 
-  const url = new URL(_url, DUMMY_URL_BASE);
-  const isRelativeUrl = url.origin === DUMMY_URL_BASE;
-  if (isRelativeUrl) {
-    return true;
-  }
+    const url = new URL(_url, DUMMY_URL_BASE);
+    const isRelativeUrl = url.origin === DUMMY_URL_BASE;
+    if (isRelativeUrl) {
+      return true;
+    }
 
-  const isAllowed = allowedRedirectOrigins
-    .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
-    .some(origin => origin.test(trimTrailingSlash(url.origin)));
+    const isAllowed = allowedRedirectOrigins
+      .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
+      .some(origin => origin.test(trimTrailingSlash(url.origin)));
 
-  if (!isAllowed) {
-    console.warn(
-      `Clerk: Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,
-    );
-  }
-  return isAllowed;
-};
+    if (!isAllowed) {
+      console.warn(
+        `Clerk: Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,
+      );
+    }
+    return isAllowed;
+  };
 
 export function createAllowedRedirectOrigins(
   allowedRedirectOrigins: Array<string | RegExp> | undefined,
@@ -369,3 +388,16 @@ export function createAllowedRedirectOrigins(
 
   return origins;
 }
+
+export const isCrossOrigin = (url: string | URL, origin: string | URL = window.location.origin): boolean => {
+  try {
+    if (isRelativeUrl(url)) {
+      return false;
+    }
+    const urlOrigin = new URL(url).origin;
+    const originOrigin = new URL(origin).origin;
+    return urlOrigin !== originOrigin;
+  } catch (e) {
+    return false;
+  }
+};

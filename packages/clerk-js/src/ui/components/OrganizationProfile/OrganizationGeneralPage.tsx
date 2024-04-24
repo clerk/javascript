@@ -2,7 +2,7 @@ import { useOrganization } from '@clerk/shared/react';
 
 import { Protect, useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
-import { Button, Col, descriptors, localizationKeys } from '../../customizables';
+import { Col, descriptors, localizationKeys, Text } from '../../customizables';
 import { Header, OrganizationPreview, ProfileSection } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -59,11 +59,11 @@ export const OrganizationGeneralPage = () => {
     >
       <Col
         elementDescriptor={descriptors.profilePage}
-        elementId={descriptors.profilePage.setId('organizationSettings')}
+        elementId={descriptors.profilePage.setId('organizationGeneral')}
       >
         <Header.Root>
           <Header.Title
-            localizationKey={localizationKeys('organizationProfile.general.title')}
+            localizationKey={localizationKeys('organizationProfile.start.headerTitle__general')}
             sx={t => ({ marginBottom: t.space.$4 })}
             textVariant='h2'
           />
@@ -72,7 +72,8 @@ export const OrganizationGeneralPage = () => {
         <Protect permission='org:sys_domains:read'>
           <OrganizationDomainsSection />
         </Protect>
-        <OrganizationDangerSection />
+        <OrganizationLeaveSection />
+        <OrganizationDeleteSection />
       </Col>
     </Col>
   );
@@ -85,11 +86,17 @@ const OrganizationProfileSection = () => {
     return null;
   }
 
-  const profile = <OrganizationPreview organization={organization} />;
+  const profile = (
+    <OrganizationPreview
+      size='lg'
+      mainIdentifierVariant='subtitle'
+      organization={organization}
+    />
+  );
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('organizationProfile.general.profileSection.title')}
+      title={localizationKeys('organizationProfile.start.profileSection.title')}
       id='organizationProfile'
     >
       <Action.Root>
@@ -102,10 +109,9 @@ const OrganizationProfileSection = () => {
               {profile}
 
               <Action.Trigger value='edit'>
-                <Button
+                <ProfileSection.Button
                   id='organizationProfile'
-                  variant='ghost'
-                  localizationKey={localizationKeys('organizationProfile.general.profileSection.primaryButton')}
+                  localizationKey={localizationKeys('organizationProfile.start.profileSection.primaryButton')}
                 />
               </Action.Trigger>
             </ProfileSection.Item>
@@ -136,19 +142,28 @@ const OrganizationDomainsSection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('organizationProfile.general.domainSection.title')}
-      subtitle={localizationKeys('organizationProfile.general.domainSection.subtitle')}
+      title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
       id='organizationDomains'
+      centered={false}
     >
       <Action.Root>
         <DomainList />
 
         <Protect permission='org:sys_domains:manage'>
           <Action.Trigger value='add'>
-            <ProfileSection.Button
-              localizationKey={localizationKeys('organizationProfile.general.domainSection.primaryButton')}
-              id='organizationDomains'
-            />
+            <Col>
+              <ProfileSection.ArrowButton
+                localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
+                id='organizationDomains'
+              />
+              <Text
+                localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
+                sx={t => ({
+                  paddingLeft: t.space.$9,
+                })}
+                colorScheme='secondary'
+              />
+            </Col>
           </Action.Trigger>
 
           <Action.Open value='add'>
@@ -162,7 +177,53 @@ const OrganizationDomainsSection = () => {
   );
 };
 
-const OrganizationDangerSection = () => {
+const OrganizationLeaveSection = () => {
+  const { organization } = useOrganization();
+
+  if (!organization) {
+    return null;
+  }
+
+  return (
+    <ProfileSection.Root
+      id='organizationDanger'
+      title={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
+    >
+      <Action.Root>
+        <Action.Closed value='leave'>
+          <ProfileSection.Item
+            sx={t => ({
+              paddingTop: 0,
+              paddingBottom: 0,
+              paddingLeft: t.space.$1,
+            })}
+            id='organizationDanger'
+          >
+            <Action.Trigger value='leave'>
+              <ProfileSection.Button
+                id='organizationDanger'
+                variant='ghost'
+                colorScheme='danger'
+                textVariant='buttonLarge'
+                localizationKey={localizationKeys(
+                  'organizationProfile.profilePage.dangerSection.leaveOrganization.title',
+                )}
+              />
+            </Action.Trigger>
+          </ProfileSection.Item>
+        </Action.Closed>
+
+        <Action.Open value='leave'>
+          <Action.Card variant='destructive'>
+            <LeaveOrganizationScreen />
+          </Action.Card>
+        </Action.Open>
+      </Action.Root>
+    </ProfileSection.Root>
+  );
+};
+
+const OrganizationDeleteSection = () => {
   const { organization } = useOrganization();
   const canDeleteOrganization = useProtect({ permission: 'org:sys_profile:delete' });
 
@@ -172,49 +233,39 @@ const OrganizationDangerSection = () => {
 
   const adminDeleteEnabled = organization.adminDeleteEnabled;
 
+  if (!canDeleteOrganization || !adminDeleteEnabled) {
+    return null;
+  }
+
   return (
     <ProfileSection.Root
       id='organizationDanger'
-      title={localizationKeys('organizationProfile.profilePage.dangerSection.title')}
+      title={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
       sx={t => ({ marginBottom: t.space.$4 })}
     >
       <Action.Root>
-        <Action.Closed value={['leave', 'delete']}>
-          <ProfileSection.ItemList
-            sx={{ flexDirection: 'row' }}
-            id='organizationDanger'
+        <Action.Closed value='delete'>
+          <ProfileSection.Item
+            sx={t => ({
+              paddingTop: 0,
+              paddingBottom: 0,
+              paddingLeft: t.space.$1,
+            })}
+            id={'organizationDanger'}
           >
-            <ProfileSection.Item id='organizationDanger'>
-              <Action.Trigger value='leave'>
-                <Button
-                  variant='ghostDanger'
-                  localizationKey={localizationKeys(
-                    'organizationProfile.profilePage.dangerSection.leaveOrganization.title',
-                  )}
-                />
-              </Action.Trigger>
-            </ProfileSection.Item>
-
-            {canDeleteOrganization && adminDeleteEnabled && (
-              <ProfileSection.Item id={'organizationDanger'}>
-                <Action.Trigger value='delete'>
-                  <Button
-                    variant='ghostDanger'
-                    localizationKey={localizationKeys(
-                      'organizationProfile.profilePage.dangerSection.deleteOrganization.title',
-                    )}
-                  />
-                </Action.Trigger>
-              </ProfileSection.Item>
-            )}
-          </ProfileSection.ItemList>
+            <Action.Trigger value='delete'>
+              <ProfileSection.Button
+                id='organizationDanger'
+                variant='ghost'
+                colorScheme='danger'
+                textVariant='buttonLarge'
+                localizationKey={localizationKeys(
+                  'organizationProfile.profilePage.dangerSection.deleteOrganization.title',
+                )}
+              />
+            </Action.Trigger>
+          </ProfileSection.Item>
         </Action.Closed>
-
-        <Action.Open value='leave'>
-          <Action.Card variant='destructive'>
-            <LeaveOrganizationScreen />
-          </Action.Card>
-        </Action.Open>
 
         <Action.Open value='delete'>
           <Action.Card variant='destructive'>

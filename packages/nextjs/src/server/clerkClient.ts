@@ -6,6 +6,7 @@ import {
   DOMAIN,
   IS_SATELLITE,
   PROXY_URL,
+  PUBLISHABLE_KEY,
   SDK_METADATA,
   SECRET_KEY,
   TELEMETRY_DEBUG,
@@ -14,10 +15,10 @@ import {
 
 const clerkClient = createClerkClient({
   secretKey: SECRET_KEY,
+  publishableKey: PUBLISHABLE_KEY,
   apiUrl: API_URL,
   apiVersion: API_VERSION,
-  // TODO: Fetch version from package.json
-  userAgent: '@clerk/nextjs',
+  userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
   proxyUrl: PROXY_URL,
   domain: DOMAIN,
   isSatellite: IS_SATELLITE,

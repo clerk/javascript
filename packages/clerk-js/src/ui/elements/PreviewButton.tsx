@@ -17,17 +17,16 @@ export const PreviewButton = (props: PreviewButtonProps) => {
   return (
     <Button
       variant='ghost'
+      colorScheme='neutral'
       focusRing={false}
       block
       hoverAsFocus
       isDisabled={card.isLoading}
       sx={[
         t => ({
-          minHeight: 'unset',
           justifyContent: 'space-between',
           padding: `${t.space.$4} ${t.space.$5}`,
           borderRadius: 0,
-          borderBottom: `${t.borders.$normal} ${t.colors.$blackAlpha100}`,
           ...(showIconOnHover
             ? {
                 ':hover > svg': {
@@ -46,7 +45,7 @@ export const PreviewButton = (props: PreviewButtonProps) => {
           icon={icon}
           sx={[
             t => ({
-              color: t.colors.$blackAlpha500,
+              color: t.colors.$colorTextSecondary,
               marginLeft: t.space.$2,
               visibility: showIconOnHover ? 'hidden' : 'initial',
             }),

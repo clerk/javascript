@@ -10,14 +10,18 @@ import {
   SignOutButton,
   UserButton,
 } from '@clerk/nextjs';
-import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
+import { dark, experimental__simple, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 
 const themes = { default: undefined, dark, neobrutalism, shadesOfPurple };
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof themes>('default');
+  const [selectedSmoothing, setSelectedSmoothing] = useState<boolean>(true);
+  const [styleReset, setStyleReset] = useState<boolean>(false);
+  const [animations, setAnimations] = useState<boolean>(true);
+  const [primaryColor, setPrimaryColor] = useState<string | undefined>(undefined);
 
   const onToggleDark = () => {
     if (window.document.body.classList.contains('dark-mode')) {
@@ -29,14 +33,35 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   };
 
+  const onToggleAnimations = () => {
+    setAnimations(s => !s);
+  };
+
+  const onToggleSmooth = () => {
+    if (window.document.body.classList.contains('font-smoothing')) {
+      setSelectedSmoothing(false);
+      window.document.body.classList.remove('font-smoothing');
+    } else {
+      setSelectedSmoothing(true);
+      window.document.body.classList.add('font-smoothing');
+    }
+  };
+
+  useEffect(() => {
+    window.document.body.classList.add('font-smoothing');
+  }, []);
+
   const C = Component as FunctionComponent;
 
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: themes[selectedTheme],
+        baseTheme: styleReset ? [experimental__simple, themes[selectedTheme]] : themes[selectedTheme],
+        variables: {
+          colorPrimary: primaryColor,
+        },
         layout: {
-          shimmer: true,
+          animations,
         },
       }}
       {...pageProps}
@@ -44,6 +69,13 @@ function MyApp({ Component, pageProps }: AppProps) {
       <AppBar
         onChangeTheme={e => setSelectedTheme(e.target.value as any)}
         onToggleDark={onToggleDark}
+        onToggleSmooth={onToggleSmooth}
+        onResetStyles={() => setStyleReset(s => !s)}
+        onToggleAnimations={onToggleAnimations}
+        animations={animations}
+        styleReset={styleReset}
+        smooth={selectedSmoothing}
+        onPrimaryColorChange={setPrimaryColor}
       />
       <C {...pageProps} />
     </ClerkProvider>
@@ -53,6 +85,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 type AppBarProps = {
   onChangeTheme: React.ChangeEventHandler<HTMLSelectElement>;
   onToggleDark: React.MouseEventHandler<HTMLButtonElement>;
+  onToggleSmooth: React.MouseEventHandler<HTMLButtonElement>;
+  onResetStyles: React.MouseEventHandler<HTMLButtonElement>;
+  onToggleAnimations: React.MouseEventHandler<HTMLButtonElement>;
+  smooth: boolean;
+  styleReset: boolean;
+  animations: boolean;
+  onPrimaryColorChange: (primaryColor: string | undefined) => void;
 };
 
 const AppBar = (props: AppBarProps) => {
@@ -90,6 +129,15 @@ const AppBar = (props: AppBarProps) => {
         <option value='shadesOfPurple'>shadesOfPurple</option>
       </select>
       <button onClick={props.onToggleDark}>toggle dark mode</button>
+      <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
+      <div style={{ position: 'fixed', left: '10px', bottom: '10px', display: 'inline-flex', gap: '10px' }}>
+        <button onClick={props.onResetStyles}>simple styles: {props.styleReset ? 'On' : 'Off'}</button>
+        <button onClick={props.onToggleAnimations}>animations: {props.animations ? 'On' : 'Off'}</button>
+      </div>
+      <input
+        type='color'
+        onChange={e => props.onPrimaryColorChange(e.target.value)}
+      />
       <UserButton />
 
       <SignedIn>

@@ -33,6 +33,7 @@ export function buildSSOCallbackURL(
 }
 
 type AuthQueryString = string | null | undefined;
+
 type BuildRedirectUrlParams = {
   routing: string | undefined;
   authQueryString: AuthQueryString;
@@ -42,6 +43,11 @@ type BuildRedirectUrlParams = {
 };
 
 const buildRedirectUrl = ({ routing, authQueryString, baseUrl, path, endpoint }: BuildRedirectUrlParams): string => {
+  // If a routing strategy is not provided, default to hash routing
+  // All routing strategies know how to convert a hash-based url to their own format
+  // Example: navigating from a hash-based to a path-based component,
+  // the path-based component can parse and fix the URL automatically
+  // /#/sso-callback?code=123 -> /sso-callback?code=123
   if (!routing || routing === 'hash') {
     return buildHashBasedUrl(authQueryString, endpoint);
   }

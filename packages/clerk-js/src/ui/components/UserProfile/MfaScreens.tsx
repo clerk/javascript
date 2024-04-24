@@ -1,3 +1,5 @@
+import type { VerificationStrategy } from '@clerk/types';
+
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
 import { MfaForm } from './MfaForm';
@@ -35,12 +37,16 @@ export const MfaBackupCodeCreateScreen = () => {
   );
 };
 
-export const MfaScreen = () => {
+type MfaScreenProps = {
+  selectedStrategy: VerificationStrategy;
+};
+export const MfaScreen = (props: MfaScreenProps) => {
   const { close } = useActionContext();
   return (
     <MfaForm
       onSuccess={close}
       onReset={close}
+      selectedStrategy={props.selectedStrategy}
     />
   );
 };

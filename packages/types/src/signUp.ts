@@ -1,10 +1,4 @@
-import type {
-  BirthdayAttribute,
-  FirstNameAttribute,
-  GenderAttribute,
-  LastNameAttribute,
-  PasswordAttribute,
-} from './attributes';
+import type { FirstNameAttribute, LastNameAttribute, PasswordAttribute } from './attributes';
 import type { AttemptEmailAddressVerificationParams, PrepareEmailAddressVerificationParams } from './emailAddress';
 import type {
   EmailAddressIdentifier,
@@ -135,12 +129,7 @@ export type AttemptVerificationParams =
       signature: string;
     };
 
-export type SignUpAttributeField =
-  | FirstNameAttribute
-  | LastNameAttribute
-  | PasswordAttribute
-  | BirthdayAttribute
-  | GenderAttribute;
+export type SignUpAttributeField = FirstNameAttribute | LastNameAttribute | PasswordAttribute;
 
 // TODO: SignUpVerifiableField or SignUpIdentifier?
 export type SignUpVerifiableField =

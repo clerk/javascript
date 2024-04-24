@@ -4,13 +4,14 @@ import type {
   OrganizationEnrollmentMode,
   OrganizationSettingsResource,
 } from '@clerk/types';
+import { useEffect } from 'react';
 
 import { CalloutWithAction } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import type { FormProps } from '../../elements';
-import { Form, FormButtons, FormContent, Header, useCardState, withCardStateProvider } from '../../elements';
+import { Form, FormButtons, FormContainer, Header, useCardState, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
 import { InformationCircle } from '../../icons';
 import { handleError, useFormControl } from '../../utils';
@@ -112,19 +113,16 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
     type: 'checkbox',
   });
 
-  const { data: domain, isLoading: domainIsLoading } = useFetch(
-    organization?.getDomain,
-    {
-      domainId: id,
-    },
-    {
-      onSuccess(d) {
-        enrollmentMode.setValue(d.enrollmentMode);
-      },
-    },
-  );
+  const { data: domain, isLoading: domainIsLoading } = useFetch(organization?.getDomain, {
+    domainId: id,
+  });
 
-  const isFormDirty = deletePending.checked || domain?.enrollmentMode !== enrollmentMode.value;
+  useEffect(() => {
+    if (domain) {
+      enrollmentMode.setValue(domain.enrollmentMode);
+    }
+  }, [domain?.id]);
+
   const title = localizationKeys('organizationProfile.verifiedDomainPage.title', {
     domain: domain?.name,
   });
@@ -183,7 +181,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
   }
 
   return (
-    <FormContent
+    <FormContainer
       headerTitle={title}
       headerSubtitle={allowsEdit ? undefined : subtitle}
       gap={4}
@@ -217,19 +215,18 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
             <Form.RadioGroup {...enrollmentMode.props} />
           </Form.ControlRow>
 
-          {allowsEdit && (
+          {allowsEdit && enrollmentMode.value === 'manual_invitation' && (
             <Form.ControlRow elementId={deletePending.id}>
               <Form.Checkbox {...deletePending.props} />
             </Form.ControlRow>
           )}
 
           <FormButtons
-            localizationKey={localizationKeys('organizationProfile.verifiedDomainPage.enrollmentTab.formButton__save')}
-            isDisabled={domainIsLoading || !domain || !isFormDirty}
+            isDisabled={domainIsLoading || !domain}
             onReset={onReset}
           />
         </Form.Root>
       </Col>
-    </FormContent>
+    </FormContainer>
   );
 });

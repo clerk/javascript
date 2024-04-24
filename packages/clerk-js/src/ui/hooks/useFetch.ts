@@ -31,7 +31,7 @@ export const clearFetchCache = () => {
   requestCache = new Map<string, State>();
 };
 
-const serialize = (obj: unknown) => JSON.stringify(obj);
+const serialize = (key: unknown) => (typeof key === 'string' ? key : JSON.stringify(key));
 
 const useCache = <K = any, V = any>(
   key: K,
@@ -94,7 +94,7 @@ export const useFetch = <K, T>(
     fetcherRef.current!(params)
       .then(result => {
         if (typeof result !== 'undefined') {
-          const data = typeof result === 'object' ? { ...result } : result;
+          const data = Array.isArray(result) ? result : typeof result === 'object' ? { ...result } : result;
           setCache({
             data,
             isLoading: false,

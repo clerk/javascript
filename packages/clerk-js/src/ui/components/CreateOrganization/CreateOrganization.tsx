@@ -1,6 +1,5 @@
 import type { CreateOrganizationModalProps } from '@clerk/types';
 
-import { withOrganizationsEnabledGuard } from '../../common';
 import { ComponentContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { withCardStateProvider } from '../../elements';
@@ -26,11 +25,7 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
   return <CreateOrganizationPage />;
 });
 
-export const CreateOrganization = withOrganizationsEnabledGuard(
-  withCardStateProvider(_CreateOrganization),
-  'CreateOrganization',
-  { mode: 'redirect' },
-);
+export const CreateOrganization = withCardStateProvider(_CreateOrganization);
 
 export const CreateOrganizationModal = (props: CreateOrganizationModalProps): JSX.Element => {
   const createOrganizationProps: CreateOrganizationCtx = {

@@ -13,7 +13,7 @@ export const SignInFactorOneEmailCodeCard = (props: SignInFactorOneEmailCodeCard
         {...props}
         cardTitle={localizationKeys('signIn.emailCode.title')}
         cardSubtitle={localizationKeys('signIn.emailCode.subtitle')}
-        inputLabel={localizationKeys('signIn.emailCode.inputLabel')}
+        inputLabel={localizationKeys('signIn.emailCode.formTitle')}
         resendButton={localizationKeys('signIn.emailCode.resendButton')}
       />
     </Flow.Part>

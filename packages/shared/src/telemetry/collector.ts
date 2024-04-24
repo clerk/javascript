@@ -14,7 +14,7 @@ import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
-import type { TelemetryCollectorOptions, TelemetryEvent } from './types';
+import type { TelemetryCollectorOptions, TelemetryEvent, TelemetryEventRaw } from './types';
 
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
@@ -105,12 +105,12 @@ export class TelemetryCollector {
     return this.#config.debug || (typeof process !== 'undefined' && isTruthy(process.env.CLERK_TELEMETRY_DEBUG));
   }
 
-  record(event: Pick<TelemetryEvent, 'event' | 'payload'>): void {
+  record(event: TelemetryEventRaw): void {
     const preparedPayload = this.#preparePayload(event.event, event.payload);
 
     this.#logEvent(preparedPayload.event, preparedPayload);
 
-    if (!this.#shouldRecord()) {
+    if (!this.#shouldRecord(event.eventSamplingRate)) {
       return;
     }
 
@@ -119,8 +119,13 @@ export class TelemetryCollector {
     this.#scheduleFlush();
   }
 
-  #shouldRecord(): boolean {
-    return this.isEnabled && !this.isDebug && Math.random() <= this.#config.samplingRate;
+  #shouldRecord(eventSamplingRate?: number): boolean {
+    const randomSeed = Math.random();
+    const shouldBeSampled =
+      randomSeed <= this.#config.samplingRate &&
+      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
+
+    return this.isEnabled && !this.isDebug && shouldBeSampled;
   }
 
   #scheduleFlush(): void {

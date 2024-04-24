@@ -20,7 +20,7 @@
 ·
 [Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://feedback.clerk.com/roadmap)
 ·
 [Ask a Question](https://github.com/clerk/javascript/discussions)
 
@@ -51,7 +51,10 @@ cd examples/nextjs && npm i
 Changes in the `packages/elements` directory will be hotloaded in the example app.
 
 ```sh
-cd examples/nextjs && npm run dev
+npm run dev:example
+
+# With the XState Inspector
+NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true npm run app:dev
 ```
 
 #### E2E Testing
@@ -67,4 +70,49 @@ npm run e2e -- --headed
 
 # Specific Tests: https://playwright.dev/docs/running-tests#run-specific-tests
 npm run e2e -- e2e/elements.spec.ts
+```
+
+### Flows
+
+Flows per `clerk-js` UI components
+
+#### `<SignInRoutes>`
+
+```
+/sign-in
+  /factor-one               <SignInFactorOne />
+  /factor-two               <SignInFactorTwo />
+  /reset-password           <ResetPassword />
+  /reset-password-success   <ResetPasswordSuccess />
+  /sso-callback             <SignInSSOCallback {...} />
+  /choose                   <SignInAccountSwitcher />
+  /verify                   <SignInEmailLinkFlowComplete {...} />
+  /                         <SignInStart />
+  [ELSE]                    <RedirectToSignIn />
+```
+
+#### `<SignUpRoutes>`
+
+```
+/sign-up
+  /verify-email-address     <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
+  /verify-phone-number      <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
+  /sso-callback             <SignUpSSOCallback {...} />
+  /verify                   <SignUpEmailLinkFlowComplete {...} />
+  /continue
+    /verify-email-address   <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
+    /verify-phone-number    <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
+    /                       <SignUpContinue />
+  /                         <SignUpStart />
+  [ELSE]                    <RedirectToSignUp />
+
+/sign-up
+  /verify-email-address     <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
+  /verify-phone-number      <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
+  /sso-callback             <SignUpSSOCallback {...} />
+  /verify                   <SignUpEmailLinkFlowComplete {...} />
+  /continue
+    /                       <SignUpContinue />
+  /                         <SignUpStart />
+  [ELSE]                    <RedirectToSignUp />
 ```
