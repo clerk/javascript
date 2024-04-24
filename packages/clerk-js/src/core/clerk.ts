@@ -109,8 +109,6 @@ import {
   EmailLinkErrorCode,
   Environment,
   Organization,
-  SignIn,
-  SignUp,
 } from './resources/internal';
 import { SessionCookieService } from './services';
 import { warnings } from './warnings';
@@ -1020,17 +1018,42 @@ export class Clerk implements ClerkInterface {
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
-    return this.handleRedirectCallback({ ...params, signInOrUp }, customNavigate);
+    if (!this.loaded || !this.#environment || !this.client) {
+      return;
+    }
+    const { signIn: _signIn, signUp: _signUp } = this.client;
+
+    const signIn = 'identifier' in (signInOrUp || {}) ? (signInOrUp as SignInResource) : _signIn;
+    const signUp = 'missingFields' in (signInOrUp || {}) ? (signInOrUp as SignUpResource) : _signUp;
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function'
+        ? customNavigate(this.buildUrlWithAuth(to))
+        : this.navigate(this.buildUrlWithAuth(to));
+
+    return this._handleRedirectCallback(params, {
+      signUp,
+      signIn,
+      navigate,
+    });
   };
 
-  public handleRedirectCallback = async (
-    params: HandleOAuthCallbackParams & { signInOrUp?: SignInResource | SignUpResource } = {},
-    customNavigate?: (to: string) => Promise<unknown>,
+  private _handleRedirectCallback = async (
+    params: HandleOAuthCallbackParams,
+    {
+      signIn,
+      signUp,
+      navigate,
+    }: {
+      signIn: SignInResource;
+      signUp: SignUpResource;
+      navigate: (to: string) => Promise<unknown>;
+    },
   ): Promise<unknown> => {
     if (!this.loaded || !this.#environment || !this.client) {
       return;
     }
-    const { signIn, signUp } = this.client;
+
     const { displayConfig } = this.#environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
@@ -1040,6 +1063,7 @@ export class Clerk implements ClerkInterface {
       externalAccountStatus: externalAccount.status,
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
+      sessionId: signUp.createdSessionId,
     };
 
     const si = {
@@ -1047,44 +1071,33 @@ export class Clerk implements ClerkInterface {
       firstFactorVerificationStatus: firstFactorVerification.status,
       firstFactorVerificationErrorCode: firstFactorVerification.error?.code,
       firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
+      sessionId: signIn.createdSessionId,
     };
 
-    const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+    const makeNavigate = (to: string) => () => navigate(to);
 
-    const makeNavigate = (to: string, withAuth: boolean) => () => navigate(withAuth ? this.buildUrlWithAuth(to) : to);
+    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig.signInUrl);
 
-    const navigateToSignIn = makeNavigate(params.signInUrl || displayConfig.signInUrl, !!params.signInOrUp);
-
-    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig.signUpUrl, !!params.signInOrUp);
+    const navigateToSignUp = makeNavigate(params.signUpUrl || displayConfig.signUpUrl);
 
     const navigateToFactorOne = makeNavigate(
       params.firstFactorUrl ||
         buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-one' }, { stringify: true }),
-      !!params.signInOrUp,
     );
 
     const navigateToFactorTwo = makeNavigate(
       params.secondFactorUrl ||
         buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
-      !!params.signInOrUp,
     );
 
     const navigateToResetPassword = makeNavigate(
       params.resetPasswordUrl ||
         buildURL({ base: displayConfig.signInUrl, hashPath: '/reset-password' }, { stringify: true }),
-      !!params.signInOrUp,
     );
 
     const redirectUrls = new RedirectUrls(this.#options, params);
-    const navigateAfterSignIn = makeNavigate(
-      params.afterSignInUrl || redirectUrls.getAfterSignInUrl(),
-      !!params.signInOrUp,
-    );
-    const navigateAfterSignUp = makeNavigate(
-      params.afterSignUpUrl || redirectUrls.getAfterSignUpUrl(),
-      !!params.signInOrUp,
-    );
+    const navigateAfterSignIn = makeNavigate(redirectUrls.getAfterSignInUrl());
+    const navigateAfterSignUp = makeNavigate(redirectUrls.getAfterSignUpUrl());
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||
@@ -1095,7 +1108,6 @@ export class Clerk implements ClerkInterface {
           },
           { stringify: true },
         ),
-      !!params.signInOrUp,
     );
 
     const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
@@ -1115,21 +1127,18 @@ export class Clerk implements ClerkInterface {
       });
     };
 
-    const userExistsButNeedsToSignIn =
-      (su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists') ||
-      (!!params.signInOrUp && params.signInOrUp instanceof SignIn && params.signInOrUp.status !== 'needs_identifier');
+    if (si.status === 'complete') {
+      return this.setActive({
+        session: si.sessionId,
+        beforeEmit: navigateAfterSignIn,
+      });
+    }
 
-    console.log('userExistsButNeedsToSignIn', userExistsButNeedsToSignIn);
+    const userExistsButNeedsToSignIn =
+      su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
 
     if (userExistsButNeedsToSignIn) {
-      let res = params.signInOrUp || signIn;
-      console.log('TRANFER', !params.signInOrUp);
-      if (!params.signInOrUp) {
-        res = await signIn.create({ transfer: true });
-      }
-
-      console.log('status', res);
-
+      const res = await signIn.create({ transfer: true });
       switch (res.status) {
         case 'complete':
           return this.setActive({
@@ -1170,17 +1179,10 @@ export class Clerk implements ClerkInterface {
       return navigateToResetPassword();
     }
 
-    const userNeedsToBeCreated =
-      si.firstFactorVerificationStatus === 'transferable' ||
-      (!!params.signInOrUp &&
-        params.signInOrUp instanceof SignUp &&
-        params.signInOrUp.status === 'missing_requirements');
+    const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
     if (userNeedsToBeCreated) {
-      let res = params.signInOrUp || signUp;
-      if (!params.signInOrUp) {
-        res = await signUp.create({ transfer: true });
-      }
+      const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
           return this.setActive({
@@ -1192,6 +1194,13 @@ export class Clerk implements ClerkInterface {
         default:
           clerkOAuthCallbackDidNotCompleteSignInSignUp('sign in');
       }
+    }
+
+    if (su.status === 'complete') {
+      return this.setActive({
+        session: si.sessionId,
+        beforeEmit: navigateAfterSignUp,
+      });
     }
 
     if (si.status === 'needs_second_factor') {
@@ -1228,6 +1237,25 @@ export class Clerk implements ClerkInterface {
     }
 
     return navigateToSignIn();
+  };
+
+  public handleRedirectCallback = async (
+    params: HandleOAuthCallbackParams = {},
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.loaded || !this.#environment || !this.client) {
+      return;
+    }
+    const { signIn, signUp } = this.client;
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    return this._handleRedirectCallback(params, {
+      signUp,
+      signIn,
+      navigate,
+    });
   };
 
   public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {

@@ -517,15 +517,15 @@ export const useGoogleOneTapContext = () => {
   signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
   signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
 
-  const afterSignInUrl = ctx.returnToCurrentLocation ? window.location.href : redirectUrls.getAfterSignInUrl();
-  const afterSignUpUrl = ctx.returnToCurrentLocation ? window.location.href : redirectUrls.getAfterSignUpUrl();
+  const signInForceRedirectUrl = ctx.returnToCurrentLocation ? window.location.href : redirectUrls.getAfterSignInUrl();
+  const signUpForceRedirectUrl = ctx.returnToCurrentLocation ? window.location.href : redirectUrls.getAfterSignUpUrl();
 
   const signUpContinueUrl = buildURL(
     {
       base: signUpUrl,
       hashPath: '/continue',
       hashSearch: new URLSearchParams({
-        sign_up_force_redirect_url: afterSignUpUrl,
+        sign_up_force_redirect_url: signUpForceRedirectUrl,
       }).toString(),
     },
     { stringify: true },
@@ -536,7 +536,7 @@ export const useGoogleOneTapContext = () => {
       base: signInUrl,
       hashPath: '/factor-one',
       hashSearch: new URLSearchParams({
-        sign_in_force_redirect_url: afterSignInUrl,
+        sign_in_force_redirect_url: signInForceRedirectUrl,
       }).toString(),
     },
     { stringify: true },
@@ -546,7 +546,7 @@ export const useGoogleOneTapContext = () => {
       base: signInUrl,
       hashPath: '/factor-two',
       hashSearch: new URLSearchParams({
-        sign_in_force_redirect_url: afterSignInUrl,
+        sign_in_force_redirect_url: signInForceRedirectUrl,
       }).toString(),
     },
     { stringify: true },
@@ -560,7 +560,7 @@ export const useGoogleOneTapContext = () => {
     firstFactorUrl,
     secondFactorUrl,
     continueSignUpUrl: signUpContinueUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
+    signInForceRedirectUrl,
+    signUpForceRedirectUrl,
   };
 };
