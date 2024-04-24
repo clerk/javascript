@@ -59,12 +59,15 @@ export type SignUpRootProps = {
  * Root component for the sign-up flow. It sets up providers and state management for its children.
  * Must wrap all sign-up related components.
  *
+ * @param {string} path - The root path the sign-up flow is mounted at. Default: `/sign-up`
+ * @param {React.ReactNode} fallback - Fallback markup to render while Clerk is loading. Default: `null`
+ *
  * @example
- * import { SignUp } from "@clerk/elements/sign-up"
+ * import * as SignUp from "@clerk/elements/sign-up"
  *
  * export default SignUpPage = () => (
- *  <SignUp>
- *  </SignUp>
+ *  <SignUp.Root>
+ *  </SignUp.Root>
  * )
  */
 export function SignUpRoot({

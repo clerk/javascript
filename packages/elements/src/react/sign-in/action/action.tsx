@@ -36,16 +36,13 @@ const SIGN_IN_ACTION_NAME = 'SignInAction';
  * @param {Function} [fallback] - Only used when `resend` is `true`. If provided, the fallback markup will be rendered before the resend delay has expired.
  *
  * @example
- * import { Action } from '@clerk/elements/sign-in';
- * <Action navigate="start">Go Back</Action>
+ * <SignIn.Action navigate="start">Go Back</SignIn.Action>
  *
  * @example
- * import { Action } from '@clerk/elements/sign-in';
- * <Action submit>Sign In</Action>
+ * <SignIn.Action submit>Sign In</SignIn.Action>
  *
  * @example
- * import { Action } from '@clerk/elements/sign-in';
- * <Action resend>Resend</Action>
+ * <SignIn.Action resend>Resend</SignIn.Action>
  */
 export const SignInAction = React.forwardRef<React.ElementRef<'button'>, SignInActionProps>((props, forwardedRef) => {
   const { submit, navigate, resend, ...rest } = props;

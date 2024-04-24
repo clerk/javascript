@@ -57,10 +57,12 @@ function useFactorCtx() {
 /**
  * Generic component to handle both first and second factor verifications.
  *
+ * @param {string} name - The name of the strategy for which its children will be rendered.
+ *
  * @example
- * <Step name="verifications">
- *   <Strategy name="password">...<Strategy />
- * </Step>
+ * <SignIn.Step name="verifications">
+ *   <SignIn.Strategy name="password">...</SignIn.Strategy>
+ * </SignIn.Step>
  */
 export function SignInStrategy({ children, name }: SignInStrategyProps) {
   const { active } = useStrategy(name);
