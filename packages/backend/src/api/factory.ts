@@ -10,6 +10,7 @@ import {
   SamlConnectionAPI,
   SessionAPI,
   SignInTokenAPI,
+  TestingTokenAPI,
   UserAPI,
 } from './endpoints';
 import { buildRequest } from './request';
@@ -34,5 +35,6 @@ export function createBackendApiClient(options: CreateBackendApiOptions) {
     users: new UserAPI(request),
     domains: new DomainAPI(request),
     samlConnections: new SamlConnectionAPI(request),
+    testingTokens: new TestingTokenAPI(request),
   };
 }
