@@ -9,3 +9,17 @@ export function assertNoLegacyProp(props: Record<string, any>) {
     );
   }
 }
+
+export function warnForNewPropShadowingLegacyProp(
+  newKey: string | undefined,
+  newValue: string | undefined | null,
+  legacyKey: string | undefined,
+  legacyValue: string | undefined | null,
+) {
+  if (newValue && legacyValue) {
+    // TODO: @nikos update with the docs link
+    console.warn(
+      `Clerk: The "${newKey}" prop ("${newValue}") has priority over the legacy "${legacyKey}" (or "redirectUrl") ("${legacyValue}"), which will be completely ignored in this case. "${legacyKey}" (or "redirectUrl" prop) should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead.`,
+    );
+  }
+}
