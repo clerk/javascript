@@ -22,6 +22,7 @@ const cli = meow(
 
 		Examples
 		  $ clerk-upgrade --sdk=nextjs --dir=src/**
+      $ clerk-upgrade --ignore=**/public/** --ignore=**/dist/**
 	`,
   {
     importMeta: import.meta,
@@ -44,6 +45,7 @@ render(
     _toVersion={cli.flags.to}
     _sdk={cli.flags.sdk}
     _dir={cli.flags.dir}
+    _ignore={cli.flags.ignore}
     _yolo={cli.flags.yolo}
     noWarnings={cli.flags.noWarnings}
     disableTelemetry={cli.flags.disableTelemetry}

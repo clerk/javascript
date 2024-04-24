@@ -197,7 +197,7 @@ export default function App({
           </Text>
           <Text color='gray'>(globstar syntax supported)</Text>
           <TextInput
-            placeholder='docs/**, images/**'
+            placeholder='**/public**, **/docs/**'
             defaultValue={ignore}
             onSubmit={val => {
               setIgnore(val.includes(',') ? val.split(/\s*,\s*/) : [].concat(val));

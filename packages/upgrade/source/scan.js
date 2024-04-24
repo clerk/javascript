@@ -1,6 +1,6 @@
 import { ProgressBar } from '@inkjs/ui';
 import fs from 'fs/promises';
-import { globby } from 'globby';
+import { convertPathToPattern, globby } from 'globby';
 import indexToPosition from 'index-to-position';
 import { Newline, Text } from 'ink';
 import path from 'path';
@@ -59,7 +59,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarn
       '**/*.(png|webp|svg|gif|jpg|jpeg)+', // common image files
       '**/*.(mp4|mkv|wmv|m4v|mov|avi|flv|webm|flac|mka|m4a|aac|ogg)+', // common video files
     );
-    globby(path.resolve(dir), { ignore: [...ignore.filter(x => x)] }).then(files => {
+    globby(convertPathToPattern(path.resolve(dir)), { ignore: ignore.filter(Boolean) }).then(files => {
       setFiles(files);
     });
   }, [dir, ignore]);
