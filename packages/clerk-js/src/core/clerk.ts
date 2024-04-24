@@ -1077,8 +1077,14 @@ export class Clerk implements ClerkInterface {
     );
 
     const redirectUrls = new RedirectUrls(this.#options, params);
-    const navigateAfterSignIn = makeNavigate(redirectUrls.getAfterSignInUrl(), !!params.signInOrUp);
-    const navigateAfterSignUp = makeNavigate(redirectUrls.getAfterSignUpUrl(), !!params.signInOrUp);
+    const navigateAfterSignIn = makeNavigate(
+      params.afterSignInUrl || redirectUrls.getAfterSignInUrl(),
+      !!params.signInOrUp,
+    );
+    const navigateAfterSignUp = makeNavigate(
+      params.afterSignUpUrl || redirectUrls.getAfterSignUpUrl(),
+      !!params.signInOrUp,
+    );
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||

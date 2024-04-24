@@ -730,7 +730,8 @@ export type SignInProps = RoutingOptions & {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-export type OneTapProps = {
+export type OneTapProps = RedirectOptions & {
+  returnToCurrentLocation?: boolean;
   cancelOnTapOutside?: boolean;
   appearance?: SignInTheme;
 };
