@@ -102,7 +102,7 @@ export interface SignInResource extends ClerkResource {
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   /**
-   * @experimental
+   * @deprecated Use `Clerk.__experimental_authenticateWithGoogleOneTap`
    */
   __experimental_authenticateWithGoogleOneTap: (
     params: __experimental_AuthenticateWithGoogleOneTapParams,
