@@ -53,7 +53,7 @@ npm install @clerk/testing --save-dev
 
 ### Playwright
 
-Firstly, add your Clerk keys (Publishable Key and Secret Key) to your environment variables file (e.g. `.env.local` or `.env.`).
+Firstly, add your Clerk keys (`CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`) to your environment variables file (e.g. `.env.local` or `.env.`).
 You can find these keys in your Clerk Dashboard.
 
 All Playwright related utilities are exported from `@clerk/testing/playwright`. Make sure that your import paths are correct!
