@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -36,8 +36,11 @@
       }
     }
   },
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "playwright"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",

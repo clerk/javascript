@@ -22,7 +22,6 @@ const TESTING_TOKEN_PARAM = '__clerk_testing_token';
  * @returns A promise that resolves when the bot protection bypass is set up.
  * @throws An error if the Frontend API URL is not provided.
  * @example
- * ```ts
  * import { setupClerkTestingToken } from '@clerk/testing/playwright';
  *
  * test('should bypass bot protection', async ({ page }) => {
@@ -30,8 +29,6 @@ const TESTING_TOKEN_PARAM = '__clerk_testing_token';
  *    await page.goto('https://your-app.com');
  *    // Continue with your test...
  *  });
- * ```
- *
  */
 export const setupClerkTestingToken = async ({ page, options }: BypassBotProtectionParams) => {
   const fapiUrl = options?.frontendApiUrl || process.env.CLERK_FAPI;

@@ -66,7 +66,7 @@ export const clerkSetup = async (options?: ClerkSetupParams) => {
   }
 
   if (!secretKey && !testingToken) {
-    throw new Error('You need to set the CLERK_SECRET_KEY or the CLERK_TESTING_KEY environment variable.');
+    throw new Error('You need to set the CLERK_SECRET_KEY or the CLERK_TESTING_TOKEN environment variable.');
   }
 
   if (secretKey && !testingToken) {
