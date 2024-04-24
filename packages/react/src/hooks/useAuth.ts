@@ -1,3 +1,4 @@
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type {
   ActJWTClaim,
   CheckAuthorizationWithCustomPermissions,
@@ -5,7 +6,7 @@ import type {
   OrganizationCustomRoleKey,
   SignOut,
 } from '@clerk/types';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -140,6 +141,10 @@ export const useAuth: UseAuth = () => {
     },
     [orgId, orgRole, userId, orgPermissions],
   );
+
+  useEffect(() => {
+    isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth'));
+  }, [isomorphicClerk?.telemetry]);
 
   if (sessionId === undefined && userId === undefined) {
     return {
