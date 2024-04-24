@@ -21,6 +21,7 @@ const snapshot = `---
 '@clerk/types': patch
 '@clerk/clerk-expo': patch
 '@clerk/express': patch
+'@clerk/testing': patch
 ---
 
 Canary release
