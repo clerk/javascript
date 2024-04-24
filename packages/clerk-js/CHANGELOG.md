@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.1.0
+
+### Minor Changes
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
+### Patch Changes
+
+- Check if any legacy properties have value before displaying a warning ([#3254](https://github.com/clerk/javascript/pull/3254)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Hide "Create Organization" in <OrganizationList/> when it's disabled for user ([#3249](https://github.com/clerk/javascript/pull/3249)) by [@dimkl](https://github.com/dimkl)
+
+- Warn when a legacy redirect prop is being shadowed by "fallbackRedirectUrl" or "forceRedirectUrl" by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`de1d75d1a`](https://github.com/clerk/javascript/commit/de1d75d1acab452ad2b7c533053f45d2e0ec66cc), [`956d8792f`](https://github.com/clerk/javascript/commit/956d8792fefe9d6a89022f1e938149b25503ec7f)]:
+  - @clerk/localizations@2.1.0
+  - @clerk/types@4.1.0
+
 ## 5.0.0
 
 ### Major Changes

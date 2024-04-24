@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.1.0
+
+### Minor Changes
+
+- Replace "email ID" with "email address" in `en-US.ts` for `signIn.forgotPassword.subtitle_email` ([#3242](https://github.com/clerk/javascript/pull/3242)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
 ## 2.0.0
 
 ### Major Changes

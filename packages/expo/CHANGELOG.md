@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`e79610344`](https://github.com/clerk/javascript/commit/e79610344ee8f48c742f2ffe2ef31d43d63cdf5a), [`6a67bc96b`](https://github.com/clerk/javascript/commit/6a67bc96ba38dfcf8fbd9a098613f50e62e5be7a), [`956d8792f`](https://github.com/clerk/javascript/commit/956d8792fefe9d6a89022f1e938149b25503ec7f), [`6f3c11de6`](https://github.com/clerk/javascript/commit/6f3c11de638b360597ca5d2141e5f4bee12f604d)]:
+  - @clerk/clerk-js@5.1.0
+  - @clerk/clerk-react@5.0.1
+
 ## 1.0.0
 
 ### Major Changes
@@ -49,7 +57,8 @@
   - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
   - use `useEmailLink` instead of `useMagicLink`
 - 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
-  ```typescript
+
+  ````typescript
   // Before
   import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
   // After
@@ -74,6 +83,8 @@
   - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
+
+  ````
 
 - 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
   to fix issues with vite & rollup building.
