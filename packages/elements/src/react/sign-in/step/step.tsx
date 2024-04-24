@@ -31,30 +31,16 @@ export type SignInStepProps =
  *
  * You typically want to place fields like username, password, or social providers in the `'start'` step. The `'verifications'` step is used to verify the user's credentials like password or MFA. Once the user has been verified, the sign-in attempt will be completed.
  *
- * @param {string} props.name - Step name. Use `'start'`, `'verifications'`, `'choose-strategy'`, or `'forgot-password'`.
+ * @param {string} name - Step name. Use `'start'`, `'verifications'`, `'choose-strategy'`, `'reset-password'`, or `'forgot-password'`.
  *
  * @example
- * <SignIn>
- *  <Step name='start'>
- *    Continue with Google
- *  </Step>
- *  <Step name='verifications'>
- *    Verify with email code
- *    <Action navigate='choose-strategy'>
- *      Use a different method
- *    </Action>
- *  </Step>
- *  <Step name='choose-strategy'>
- *    <SocialProvider name='github'>
- *      Continue with GitHub
- *    </SocialProvider>
- *  </Step>
- *  <Step name='forgot-password'>
- *    <SocialProvider name='github'>
- *      Continue with GitHub
- *    </SocialProvider>
- *  </Step>
- * </SignIn>
+ * <SignIn.Root>
+ *  <SignIn.Step name='start' />
+ *  <SignIn.Step name='verifications' />
+ *  <SignIn.Step name='choose-strategy' />
+ *  <SignIn.Step name='forgot-password' />
+ *  <SignIn.Step name='reset-password' />
+ * </SignIn.Root>
  */
 export function SignInStep(props: SignInStepProps) {
   switch (props.name) {

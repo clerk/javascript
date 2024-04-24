@@ -1,4 +1,4 @@
-import { joinURL } from '@clerk/shared';
+import { joinURL } from '@clerk/shared/url';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, not, or, sendTo, setup, stopChild } from 'xstate';

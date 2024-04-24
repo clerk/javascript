@@ -375,18 +375,18 @@ type FormFieldProps = Omit<RadixFormFieldProps, 'children'> & {
  * @param {Function} children - A function that receives `state` as an argument. `state` is a union of `"success" | "error" | "idle" | "warning" | "info"`.
  *
  * @example
- * <Field name="emailAddress">
- *   <Label>Email</Label>
- *   <Input />
- * </Field>
+ * <Clerk.Field name="emailAddress">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input />
+ * </Clerk.Field>
  *
  * @example
- * <Field name="emailAddress">
+ * <Clerk.Field name="emailAddress">
  *  {(fieldState) => (
- *    <Label>Email</Label>
- *    <Input className={`text-${fieldState}`} />
+ *    <Clerk.Label>Email</Clerk.Label>
+ *    <Clerk.Input className={`text-${fieldState}`} />
  *  )}
- * </Field>
+ * </Clerk.Field>
  */
 const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, ...rest }, forwardedRef) => {
   const formRef = useFormStore();
@@ -441,27 +441,27 @@ type FieldStateRenderFn = {
  *
  * @example
  *
- * <Field name="email">
- *  <Label>Email</Label>
- *  <FieldState>
+ * <Clerk.Field name="email">
+ *  <Clerk.Label>Email</Clerk.Label>
+ *  <Clerk.FieldState>
  *    {({ state }) => (
- *      <Input className={`text-${state}`} />
+ *      <Clerk.Input className={`text-${state}`} />
  *    )}
- *  </FieldState>
- * </Field>
+ *  </Clerk.FieldState>
+ * </Clerk.Field>
  *
  * @example
- * <Field name="password">
- *  <Label>Password</Label>
- *  <Input validatePassword />
- *  <FieldState>
+ * <Clerk.Field name="password">
+ *  <Clerk.Label>Password</Clerk.Label>
+ *  <Clerk.Input validatePassword />
+ *  <Clerk.FieldState>
  *    {({ state, message, codes }) => (
  *      <pre>Field state: {state}</pre>
  *      <pre>Field msg: {message}</pre>
  *      <pre>Pwd keys: {codes.join(', ')}</pre>
  *    )}
- *  </FieldState>
- * </Field>
+ *  </Clerk.FieldState>
+ * </Clerk.Field>
  */
 function FieldState({ children }: FieldStateRenderFn) {
   const field = useFieldContext();
@@ -500,31 +500,31 @@ type FormInputProps =
  * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` component.
  *
  * @example
- * <Field name="identifier">
- *   <Label>Email</Label>
- *   <Input type="email" autoComplete="email" className="emailInput" />
- * </Field>
+ * <Clerk.Field name="identifier">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input type="email" autoComplete="email" className="emailInput" />
+ * </Clerk.Field>
  *
  * @param {Number} [length] - The length of the OTP input. Defaults to 6.
  * @param {Number} [passwordManagerOffset] - Password managers place their icon inside an `<input />`. This default behaviour is not desirable when you use the render prop to display N distinct element. With this prop you can increase the width of the `<input />` so that the icon is rendered outside the OTP inputs.
  * @param {string} [type] - Type of control to render. Supports a special `'otp'` type for one-time password inputs. If the wrapping `<Field>` component has `name='code'`, the type will default to `'otp'`. With the `'otp'` type, the input will have a pattern and length set to 6 by default and render a single `<input />` element.
  *
  * @example
- * <Field name="code">
- *   <Label>Email code</Label>
- *   <Input type="otp" />
- * </Field>
+ * <Clerk.Field name="code">
+ *   <Clerk.Label>Email code</Clerk.Label>
+ *   <Clerk.Input type="otp" />
+ * </Clerk.Field>
  *
  * @param {Function} [render] - Optionally, you can use a render prop that controls how each individual character is rendered. If no `render` prop is provided, a single text `<input />` will be rendered.
  *
  * @example
- * <Field name="code">
- *   <Label>Email code</Label>
- *   <Input
+ * <Clerk.Field name="code">
+ *   <Clerk.Label>Email code</Clerk.Label>
+ *   <Clerk.Input
  *     type="otp"
  *     render={({ value, status }) => <span data-status={status}>{value}</span>}
  *   />
- * </Field>
+ * </Clerk.Field>
  */
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
@@ -552,10 +552,10 @@ const LABEL_NAME = 'ClerkElementsLabel';
  * @param {boolean} [asChild] - If true, `<Label />` will render as its child element, passing along any necessary props.
  *
  * @example
- * <Field name="email">
- *   <Label>Email</Label>
- *   <Input />
- * </Field>
+ * <Clerk.Field name="email">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input />
+ * </Clerk.Field>
  */
 const Label = RadixLabel;
 
@@ -623,23 +623,23 @@ type FormFieldErrorProps = FormErrorProps<RadixFormMessageProps & { name?: strin
  * @param {boolean} [asChild] - If `true`, `<GlobalError>` will render as its child element, passing along any necessary props.
  *
  * @example
- * <SignIn>
- *   <GlobalError />
- * </SignIn>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError />
+ * </SignIn.Root>
  *
  * @example
- * <SignIn>
- *   <GlobalError code="user_locked">Your custom error message.</GlobalError>
- * </SignIn>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError code="user_locked">Your custom error message.</Clerk.GlobalError>
+ * </SignIn.Root>
  *
  * @example
- * <SignUp>
- *   <GlobalError>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError>
  *     {({ message, code }) => (
  *       <span data-error-code={code}>{message}</span>
  *     )}
- *   </GlobalError>
- * </SignUp>
+ *   </Clerk.GlobalError>
+ * </SignIn.Root>
  */
 const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProps>(
   ({ asChild = false, children, code, ...rest }, forwardedRef) => {
@@ -673,18 +673,18 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
  * @param {Function} [children] - A function that receives `message` and `code` as arguments.
  *
  * @example
- * <Field name="email">
- *   <FieldError />
- * </Field>
+ * <Clerk.Field name="email">
+ *   <Clerk.FieldError />
+ * </Clerk.Field>
  *
  * @example
- * <Field name="email">
- *   <FieldError>
+ * <Clerk.Field name="email">
+ *   <Clerk.FieldError>
  *     {({ message, code }) => (
  *       <span data-error-code={code}>{message}</span>
  *     )}
- *   </FieldError>
- * </Field>
+ *   </Clerk.FieldError>
+ * </Clerk.Field>
  */
 const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
   ({ children, code, name, ...rest }, forwardedRef) => {

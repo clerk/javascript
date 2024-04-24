@@ -70,11 +70,11 @@ export type SignInSupportedStrategyProps = {
  * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
  *
  * @example
- * <Step name='choose-strategy'>
- *   <SupportedStrategy name='password'>
+ * <SignIn.Step name='choose-strategy'>
+ *   <SignIn.SupportedStrategy name='password'>
  *     Sign in with password
- *   </SupportedStrategy>
- * </Step
+ *   </SignIn.SupportedStrategy>
+ * </SignIn.Step>
  */
 export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyElement, SignInSupportedStrategyProps>(
   ({ asChild, children, name, ...rest }, forwardedRef) => {

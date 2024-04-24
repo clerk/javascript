@@ -21,7 +21,7 @@ export function useStrategy(name: SignInStrategyName) {
 
   if (!ctx) {
     throw new ClerkElementsRuntimeError(
-      'useStrategy must be used within a <Step name="verifications"> component. Did you mean to `import { Step } from "@clerk/elements/sign-up"` instead?',
+      'useStrategy must be used within a <SignIn.Step name="verifications"> component. Did you mean to `import { Step } from "@clerk/elements/sign-up"` instead?',
     );
   }
 

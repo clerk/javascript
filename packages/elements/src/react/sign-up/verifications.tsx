@@ -57,27 +57,26 @@ function SignUpVerifyInner(props: SignUpVerificationsProps) {
 export type SignUpStrategyProps = { name: SignUpVerificationFriendlyTags; children: React.ReactNode };
 
 /**
- * Conditionally renders its children based on the currently active verification method (e.g. password, email code, etc.).
- * You'll most likely want to use this components inside a `<Verify>` component to provide different verification methods during the verification step (after a user signed up but before their account is active & verified).
- * @example
- * import { SignUp, Step, Strategy } from "@clerk/elements/sign-up"
+ * Conditionally render its children depending on the authentication strategy that needs to be verified. Does not render any markup on its own.
  *
- * export default SignUpPage = () => (
- *  <SignUp>
- *    <Step name="verifications">
- *      <Strategy name="email_link">
- *        Please check your email for a verification link.
- *      </Strategy>
- *    </Step>
- *  </SignUp>
- * )
+ * @param {string} name - The name of the strategy for which its children will be rendered.
+ *
+ * @example
+ * <SignUp.Strategy name="email_code">
+ *  <Clerk.Field name="code">
+ *    <Clerk.Label>Code</Clerk.Label>
+ *    <Clerk.Input />
+ *    <Clerk.FieldError />
+ *  </Clerk.Field>
+ *  <SignUp.Action submit>Verify</SignUp.Action>
+ * </SignUp.Strategy>
  */
 export function SignUpStrategy({ children, name: tag }: SignUpStrategyProps) {
   const ref = SignUpVerificationCtx.useActorRef(true);
 
   if (!ref) {
     throw new Error(
-      '<SignUpStrategy> used outside of <SignUp>. Did you mean to `import { Strategy } from "@clerk/elements/sign-in"` instead?',
+      '<Strategy> used outside of <SignUp>. Did you mean to `import { Strategy } from "@clerk/elements/sign-in"` instead?',
     );
   }
 
@@ -85,10 +84,6 @@ export function SignUpStrategy({ children, name: tag }: SignUpStrategyProps) {
     `verification:${tag}`,
     `verification:category:${tag}`,
   ] as unknown as SignUpVerificationTags[]);
-
-  if (!ref) {
-    return null;
-  }
 
   return active ? children : null;
 }
