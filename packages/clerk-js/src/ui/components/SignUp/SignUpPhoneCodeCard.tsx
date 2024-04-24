@@ -1,11 +1,13 @@
 import { useCoreSignUp } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
-import { withCardStateProvider } from '../../elements';
+import { useCardState, withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
+import { handleError } from '../../utils';
 import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
 
 export const SignUpPhoneCodeCard = withCardStateProvider(() => {
   const signUp = useCoreSignUp();
+  const card = useCardState();
 
   const phoneVerificationStatus = signUp.verifications.phoneNumber.status;
   const shouldAvoidPrepare = !signUp.status || phoneVerificationStatus === 'verified';
@@ -13,12 +15,19 @@ export const SignUpPhoneCodeCard = withCardStateProvider(() => {
     if (shouldAvoidPrepare) {
       return;
     }
-    return signUp.preparePhoneNumberVerification({ strategy: 'phone_code' });
+    return signUp
+      .preparePhoneNumberVerification({ strategy: 'phone_code' })
+      .catch(err => handleError(err, [], card.setError));
   };
 
   // TODO: Introduce a useMutation to handle mutating requests
   useFetch(
-    shouldAvoidPrepare ? undefined : () => signUp.preparePhoneNumberVerification({ strategy: 'phone_code' }),
+    shouldAvoidPrepare
+      ? undefined
+      : () =>
+          signUp
+            .preparePhoneNumberVerification({ strategy: 'phone_code' })
+            .catch(err => handleError(err, [], card.setError)),
     {
       name: 'signUp.preparePhoneNumberVerification',
       strategy: 'phone_code',
