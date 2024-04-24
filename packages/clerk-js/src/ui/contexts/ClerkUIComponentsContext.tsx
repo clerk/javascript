@@ -503,7 +503,13 @@ export const useGoogleOneTapContext = () => {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
 
-  const redirectUrls = new RedirectUrls(options, {}, queryParams);
+  const redirectUrls = new RedirectUrls(
+    options,
+    {
+      ...ctx,
+    },
+    queryParams,
+  );
 
   let signUpUrl = options.signUpUrl || displayConfig.signUpUrl;
   let signInUrl = options.signInUrl || displayConfig.signInUrl;
@@ -511,13 +517,15 @@ export const useGoogleOneTapContext = () => {
   signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
   signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
 
+  const afterSignInUrl = ctx.returnToCurrentLocation ? window.location.href : redirectUrls.getAfterSignInUrl();
+  const afterSignUpUrl = ctx.returnToCurrentLocation ? window.location.href : redirectUrls.getAfterSignUpUrl();
+
   const signUpContinueUrl = buildURL(
     {
       base: signUpUrl,
       hashPath: '/continue',
       hashSearch: new URLSearchParams({
-        // or // sign_up_force_redirect_url: window.location.href,
-        sign_up_force_redirect_url: redirectUrls.getAfterSignUpUrl(),
+        sign_up_force_redirect_url: afterSignUpUrl,
       }).toString(),
     },
     { stringify: true },
@@ -528,8 +536,7 @@ export const useGoogleOneTapContext = () => {
       base: signInUrl,
       hashPath: '/factor-one',
       hashSearch: new URLSearchParams({
-        // or //  sign_in_force_redirect_url: window.location.href,
-        sign_in_force_redirect_url: redirectUrls.getAfterSignInUrl(),
+        sign_in_force_redirect_url: afterSignInUrl,
       }).toString(),
     },
     { stringify: true },
@@ -539,8 +546,7 @@ export const useGoogleOneTapContext = () => {
       base: signInUrl,
       hashPath: '/factor-two',
       hashSearch: new URLSearchParams({
-        // or //  sign_in_force_redirect_url: window.location.href,
-        sign_in_force_redirect_url: redirectUrls.getAfterSignInUrl(),
+        sign_in_force_redirect_url: afterSignInUrl,
       }).toString(),
     },
     { stringify: true },
@@ -554,5 +560,7 @@ export const useGoogleOneTapContext = () => {
     firstFactorUrl,
     secondFactorUrl,
     continueSignUpUrl: signUpContinueUrl,
+    afterSignInUrl,
+    afterSignUpUrl,
   };
 };
