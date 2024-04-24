@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup';
 
+// @ts-ignore
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
