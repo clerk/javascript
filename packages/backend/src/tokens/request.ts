@@ -230,7 +230,10 @@ ${error.getFullMessage()}`,
             throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
           }
 
-          if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
+          if (
+            error.reason === TokenVerificationErrorReason.TokenInvalidSignature ||
+            error.reason === TokenVerificationErrorReason.InvalidSecretKey
+          ) {
             // Avoid infinite redirect loops due to incorrect secret-keys
             return signedOut(
               authenticateContext,
