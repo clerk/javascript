@@ -68,3 +68,40 @@ It'll show you how to make changes to the SDKs, open pull requests, or submittin
 This project is licensed under the **MIT license**.
 
 See [LICENSE](https://github.com/clerk/javascript/blob/main/LICENSE) for more information.
+
+## Contribution Guide
+
+### Introduction to Contributing
+We welcome contributions from everyone! Here are a few ways you can help make this project better:
+
+### Setting Up the Development Environment
+1. Fork the repository.
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/yourusername/projectname.git
+   ```
+3. Set up your machine with:
+   ```bash
+   npm install
+   ```
+
+### How to Submit Changes
+1. Create a new branch for your changes:
+   ```bash
+   git checkout -b feature-branch-name
+   ```
+2. Make your changes and commit them:
+   ```bash
+   git commit -am "Add a brief description of your change"
+   ```
+3. Push to your fork and submit a pull request.
+
+### Coding Guidelines
+Please adhere to the coding style of the project. Use ESLint to check your code.
+
+### Reporting Bugs
+Report bugs through the project's issues page. Please include a detailed description of the issue and steps to reproduce the bug.
+
+### Community and Support
+Join the conversation on Discord or reach out on our support channels if you need help.
+
