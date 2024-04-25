@@ -81,7 +81,7 @@ export type TelemetryClientCacheOptions = {
   /**
    * The unique identifier for the cache entry.
    */
-  key: string;
+  eventKey: string;
   /**
    * The time-to-live (TTL) for the cache entry, in milliseconds. If not specified, a default value will be used.
    */

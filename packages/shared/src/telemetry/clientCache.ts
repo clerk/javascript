@@ -9,32 +9,38 @@ const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
  * mitigate event flooding in frequently executed code paths.
  */
 export class TelemetryClientCache {
-  #key: TelemetryClientCacheOptions['key'];
+  #storageKey = 'clerk_telemetry';
+  #eventKey: TelemetryClientCacheOptions['eventKey'];
   #cacheTtl: NonNullable<TelemetryClientCacheOptions['cacheTtl']>;
 
   constructor(options: TelemetryClientCacheOptions) {
-    this.#key = options.key;
+    this.#eventKey = options.eventKey;
     this.#cacheTtl = options.cacheTtl ?? DEFAULT_CACHE_TTL_MS;
   }
 
   cacheAndRetrieve(): boolean {
     const now = Date.now();
-    const item = this.#getItem();
+    const event = this.#cache?.[this.#eventKey];
 
-    if (!item) {
-      localStorage.setItem(this.#key, now.toString());
+    if (!event) {
+      localStorage.setItem(
+        this.#storageKey,
+        JSON.stringify({
+          [this.#eventKey]: now,
+        }),
+      );
     }
 
-    const hasExpired = item && now - item > this.#cacheTtl;
+    const hasExpired = event && now - event > this.#cacheTtl;
     if (hasExpired) {
-      localStorage.removeItem(this.#key);
+      localStorage.removeItem(this.#storageKey);
     }
 
-    return !!item;
+    return !!event;
   }
 
-  #getItem(): TtlInMilliseconds | undefined {
-    const cacheString = localStorage.getItem(this.#key);
+  get #cache(): Record<string, TtlInMilliseconds> | undefined {
+    const cacheString = localStorage.getItem(this.#storageKey);
 
     if (!cacheString) {
       return;
@@ -58,13 +64,25 @@ export class TelemetryClientCache {
     }
 
     try {
-      const testKey = `__storage_test__`;
+      const testKey = 'test';
       storage.setItem(testKey, testKey);
       storage.removeItem(testKey);
 
       return true;
     } catch (err) {
+      if (this.#isQuotaExceededError(err) && storage.length > 0) {
+        storage.removeItem(this.#storageKey);
+      }
+
       return false;
     }
+  }
+
+  #isQuotaExceededError(err: unknown): boolean {
+    return (
+      err instanceof DOMException &&
+      // Check error names for different browsers
+      (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED')
+    );
   }
 }

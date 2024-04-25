@@ -22,7 +22,7 @@ export function eventComponentMounted(
   return {
     event: EVENT_COMPONENT_MOUNTED,
     clientCache: new TelemetryClientCache({
-      key: `${EVENT_COMPONENT_MOUNTED}:${component}`,
+      eventKey: `${EVENT_COMPONENT_MOUNTED}:${component}`,
     }),
     eventSamplingRate: EVENT_SAMPLING_RATE,
     payload: {
