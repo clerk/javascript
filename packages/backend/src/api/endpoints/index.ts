@@ -11,3 +11,4 @@ export * from './SessionApi';
 export * from './SignInTokenApi';
 export * from './UserApi';
 export * from './SamlConnectionApi';
+export * from './TestingTokenApi';
