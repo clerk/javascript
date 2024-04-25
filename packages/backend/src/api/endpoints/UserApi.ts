@@ -5,6 +5,7 @@ import { joinPaths } from '../../util/path';
 import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
+import type { WithSign } from './util-types';
 
 const basePath = '/users';
 
@@ -20,17 +21,18 @@ type UserCountParams = {
 
 type UserListParams = ClerkPaginationRequest<
   UserCountParams & {
-    orderBy?:
+    orderBy?: WithSign<
       | 'created_at'
       | 'updated_at'
-      | '+created_at'
-      | '+updated_at'
-      | '-created_at'
-      | '-updated_at'
-      | '+last_sign_in_at'
-      | '+last_active_at'
-      | '-last_sign_in_at'
-      | '-last_active_at';
+      | 'email_address'
+      | 'web3wallet'
+      | 'first_name'
+      | 'last_name'
+      | 'phone_number'
+      | 'username'
+      | 'last_active_at'
+      | 'last_sign_in_at'
+    >;
     last_active_at_since?: number;
     organizationId?: string[];
   }
