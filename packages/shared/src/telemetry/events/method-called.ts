@@ -18,7 +18,7 @@ export function eventMethodCalled(
   return {
     event: EVENT_METHOD_CALLED,
     eventSamplingRate: EVENT_SAMPLING_RATE,
-    eventSamplingClientCache: new TelemetryClientCache({
+    clientCache: new TelemetryClientCache({
       key: `${EVENT_METHOD_CALLED}:${method}`,
     }),
     payload: {

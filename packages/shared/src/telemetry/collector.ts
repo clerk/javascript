@@ -123,19 +123,17 @@ export class TelemetryCollector {
     return this.isEnabled && !this.isDebug && this.#shouldBeSampled(event);
   }
 
-  #shouldBeSampled({ eventSamplingRate, eventSamplingClientCache }: TelemetryEventRaw): boolean {
-    if (typeof window === 'undefined' || !eventSamplingRate) {
-      const randomSeed = Math.random();
+  #shouldBeSampled({ eventSamplingRate, clientCache }: TelemetryEventRaw) {
+    const randomSeed = Math.random();
 
-      return (
-        randomSeed <= this.#config.samplingRate &&
-        (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate)
-      );
+    if (window && clientCache?.isStorageSupported) {
+      return clientCache?.cacheAndRetrieve();
     }
 
-    const isCached = eventSamplingClientCache?.cacheAndRetrieve();
-
-    return !isCached;
+    return (
+      randomSeed <= this.#config.samplingRate &&
+      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate)
+    );
   }
 
   #scheduleFlush(): void {

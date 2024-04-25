@@ -21,7 +21,7 @@ export function eventComponentMounted(
 ): TelemetryEventRaw<EventComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
-    eventSamplingClientCache: new TelemetryClientCache({
+    clientCache: new TelemetryClientCache({
       key: `${EVENT_COMPONENT_MOUNTED}:${component}`,
     }),
     eventSamplingRate: EVENT_SAMPLING_RATE,
