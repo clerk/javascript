@@ -110,7 +110,7 @@ export class TelemetryCollector {
 
     this.#logEvent(preparedPayload.event, preparedPayload);
 
-    if (!this.#shouldRecord(event.eventSamplingRate)) {
+    if (!this.#shouldRecord(event)) {
       return;
     }
 
@@ -119,13 +119,23 @@ export class TelemetryCollector {
     this.#scheduleFlush();
   }
 
-  #shouldRecord(eventSamplingRate?: number): boolean {
-    const randomSeed = Math.random();
-    const shouldBeSampled =
-      randomSeed <= this.#config.samplingRate &&
-      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
+  #shouldRecord(event: TelemetryEventRaw): boolean {
+    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(event);
+  }
 
-    return this.isEnabled && !this.isDebug && shouldBeSampled;
+  #shouldBeSampled({ eventSamplingRate, eventSamplingClientCache }: TelemetryEventRaw): boolean {
+    if (typeof window === 'undefined' || !eventSamplingRate) {
+      const randomSeed = Math.random();
+
+      return (
+        randomSeed <= this.#config.samplingRate &&
+        (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate)
+      );
+    }
+
+    const isCached = eventSamplingClientCache?.cacheAndRetrieve();
+
+    return !isCached;
   }
 
   #scheduleFlush(): void {

@@ -1,5 +1,7 @@
 import type { InstanceType } from '@clerk/types';
 
+import type { TelemetryClientCache } from './clientCache';
+
 export type TelemetryCollectorOptions = {
   /**
    * If true, telemetry will not be collected.
@@ -71,5 +73,17 @@ export type TelemetryEvent = {
 export type TelemetryEventRaw<Payload = TelemetryEvent['payload']> = {
   event: TelemetryEvent['event'];
   eventSamplingRate?: number;
+  eventSamplingClientCache?: TelemetryClientCache;
   payload: Payload;
+};
+
+export type TelemetryClientCacheOptions = {
+  /**
+   * The unique identifier for the cache entry.
+   */
+  key: string;
+  /**
+   * The time-to-live (TTL) for the cache entry, in milliseconds. If not specified, a default value will be used.
+   */
+  cacheTtl?: number;
 };
