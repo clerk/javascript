@@ -3,4 +3,4 @@
 '@clerk/themes': minor
 ---
 
-Drop react as peer dependency from `@clerk/localizations` and `@clerk/themes`.
+Drop `react` and `react-dom` as peer dependencies since they are not necessary for this package.
