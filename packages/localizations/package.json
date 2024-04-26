@@ -96,14 +96,9 @@
   },
   "devDependencies": {
     "@clerk/types": "4.1.0",
-    "@types/node": "^18.17.0",
     "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
-  },
-  "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
   },
   "engines": {
     "node": ">=18.17.0"
