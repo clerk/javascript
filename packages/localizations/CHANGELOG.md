@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.2.0
+
+### Minor Changes
+
+- Drop `react` and `react-dom` as peer dependencies since they are not necessary for this package. ([#3273](https://github.com/clerk/javascript/pull/3273)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 2.1.0
 
 ### Minor Changes
