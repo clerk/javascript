@@ -28,7 +28,7 @@
     "./playwright": {
       "import": {
         "types": "./dist/types/index.d.ts",
-        "default": "./dist/esm/index.js"
+        "default": "./dist/index.mjs"
       },
       "require": {
         "types": "./dist/types/index.d.ts",

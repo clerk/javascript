@@ -13,7 +13,6 @@ export default defineConfig(overrideOptions => {
     clean: true,
     sourcemap: true,
     format: ['cjs', 'esm'],
-    legacyOutput: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
