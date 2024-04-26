@@ -69,20 +69,17 @@ export class TelemetryClientCache {
       storage.removeItem(testKey);
 
       return true;
-    } catch (err) {
-      if (this.#isQuotaExceededError(err) && storage.length > 0) {
+    } catch (err: unknown) {
+      const isQuotaExceededError =
+        err instanceof DOMException &&
+        // Check error names for different browsers
+        (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED');
+
+      if (isQuotaExceededError && storage.length > 0) {
         storage.removeItem(this.#storageKey);
       }
 
       return false;
     }
-  }
-
-  #isQuotaExceededError(err: unknown): boolean {
-    return (
-      err instanceof DOMException &&
-      // Check error names for different browsers
-      (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED')
-    );
   }
 }

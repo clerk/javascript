@@ -17,10 +17,10 @@ export function eventMethodCalled(
 ): TelemetryEventRaw<EventMethodCalled> {
   return {
     event: EVENT_METHOD_CALLED,
-    eventSamplingRate: EVENT_SAMPLING_RATE,
     clientCache: new TelemetryClientCache({
       eventKey: `${EVENT_METHOD_CALLED}:${method}`,
     }),
+    eventSamplingRate: EVENT_SAMPLING_RATE,
     payload: {
       method,
       ...payload,

@@ -1,6 +1,7 @@
 import 'cross-fetch/polyfill';
 
 import { TelemetryCollector } from '../telemetry';
+import { TelemetryClientCache } from '../telemetry/clientCache';
 
 jest.useFakeTimers();
 
@@ -169,5 +170,97 @@ describe('TelemetryCollector', () => {
 
     fetchSpy.mockRestore();
     randomSpy.mockRestore;
+  });
+
+  describe('with client-side caching', () => {
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    test('sends event when it is not in the cache', () => {
+      const fetchSpy = jest.spyOn(global, 'fetch');
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const event = 'TEST_EVENT';
+
+      collector.record({
+        event,
+        payload: {},
+        clientCache: new TelemetryClientCache({
+          eventKey: `${event}:foo`,
+        }),
+      });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).toHaveBeenCalled();
+
+      fetchSpy.mockRestore();
+    });
+
+    test('does not send event when it is in the cache', () => {
+      const fetchSpy = jest.spyOn(global, 'fetch');
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const event = 'TEST_EVENT';
+
+      collector.record({
+        event,
+        eventSamplingRate: 0.01,
+        payload: {},
+        clientCache: new TelemetryClientCache({
+          eventKey: `${event}:foo`,
+        }),
+      });
+
+      collector.record({
+        event,
+        payload: {},
+        clientCache: new TelemetryClientCache({
+          eventKey: `${event}:foo`,
+        }),
+      });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+      fetchSpy.mockRestore();
+    });
+
+    test('fallbacks to event-specific sampling rate when storage is not supported', () => {
+      jest.spyOn(TelemetryClientCache.prototype, 'isStorageSupported', 'get').mockReturnValue(false);
+
+      const fetchSpy = jest.spyOn(global, 'fetch');
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.1);
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const event = 'TEST_EVENT';
+
+      collector.record({
+        event: 'TEST_EVENT',
+        eventSamplingRate: 0.01,
+        payload: {},
+        clientCache: new TelemetryClientCache({
+          eventKey: `${event}:foo`,
+        }),
+      });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      fetchSpy.mockRestore();
+      randomSpy.mockRestore;
+    });
   });
 });
