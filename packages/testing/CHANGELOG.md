@@ -1,5 +1,11 @@
 # @clerk/testing
 
+## 1.0.1
+
+### Patch Changes
+
+- Use the .mjs extension to export esm modules instead of relying on tsup's legacy output directory structure ([#3270](https://github.com/clerk/javascript/pull/3270)) by [@gcascio](https://github.com/gcascio)
+
 ## 1.0.0
 
 ### Major Changes

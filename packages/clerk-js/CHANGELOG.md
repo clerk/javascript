@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.1.1
+
+### Patch Changes
+
+- Default to text type for all inputs. This resolved inconsistencies with `@tailwindcss/forms`. ([#3260](https://github.com/clerk/javascript/pull/3260)) by [@desiprisg](https://github.com/desiprisg)
+
+- Prevent form submission for deleting user account when confirmation value is incorrect but submisssion is triggered via an "Enter" keystroke. ([#3265](https://github.com/clerk/javascript/pull/3265)) by [@panteliselef](https://github.com/panteliselef)
+
+- Set the card error when encountering an error on preparing verification via code for email or phone on sign up. ([#3256](https://github.com/clerk/javascript/pull/3256)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`0a825dcc4`](https://github.com/clerk/javascript/commit/0a825dcc4ec5743819503afed20bf3d8229f6d6f)]:
+  - @clerk/localizations@2.2.0
+
 ## 5.1.0
 
 ### Minor Changes
