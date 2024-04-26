@@ -184,14 +184,12 @@ describe('TelemetryCollector', () => {
         publishableKey: TEST_PK,
       });
 
-      const event = 'TEST_EVENT';
-
       collector.record({
-        event,
-        payload: {},
-        clientCache: new TelemetryClientCache({
-          eventKey: `${event}:foo`,
-        }),
+        event: 'TEST_EVENT',
+        payload: {
+          foo: true,
+        },
+        clientCacheKey: `TEST_EVENT:foo`,
       });
 
       jest.runAllTimers();
@@ -212,19 +210,18 @@ describe('TelemetryCollector', () => {
 
       collector.record({
         event,
-        eventSamplingRate: 0.01,
-        payload: {},
-        clientCache: new TelemetryClientCache({
-          eventKey: `${event}:foo`,
-        }),
+        payload: {
+          foo: true,
+        },
+        clientCacheKey: `TEST_EVENT:foo`,
       });
 
       collector.record({
         event,
-        payload: {},
-        clientCache: new TelemetryClientCache({
-          eventKey: `${event}:foo`,
-        }),
+        payload: {
+          foo: true,
+        },
+        clientCacheKey: `TEST_EVENT:foo`,
       });
 
       jest.runAllTimers();
@@ -244,15 +241,13 @@ describe('TelemetryCollector', () => {
         publishableKey: TEST_PK,
       });
 
-      const event = 'TEST_EVENT';
-
       collector.record({
         event: 'TEST_EVENT',
         eventSamplingRate: 0.01,
-        payload: {},
-        clientCache: new TelemetryClientCache({
-          eventKey: `${event}:foo`,
-        }),
+        payload: {
+          foo: true,
+        },
+        clientCacheKey: `TEST_EVENT:foo`,
       });
 
       jest.runAllTimers();

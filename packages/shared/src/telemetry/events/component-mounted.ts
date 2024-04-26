@@ -1,4 +1,3 @@
-import { TelemetryClientCache } from '../clientCache';
 import type { TelemetryEventRaw } from '../types';
 
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED' as const;
@@ -21,9 +20,7 @@ export function eventComponentMounted(
 ): TelemetryEventRaw<EventComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
-    clientCache: new TelemetryClientCache({
-      eventKey: `${EVENT_COMPONENT_MOUNTED}:${component}`,
-    }),
+    clientCacheKey: `${EVENT_COMPONENT_MOUNTED}:${component}`,
     eventSamplingRate: EVENT_SAMPLING_RATE,
     payload: {
       component,

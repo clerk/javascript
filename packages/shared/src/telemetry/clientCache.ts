@@ -1,5 +1,3 @@
-import type { TelemetryClientCacheOptions } from './types';
-
 type TtlInMilliseconds = number;
 
 const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
@@ -10,23 +8,17 @@ const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
  */
 export class TelemetryClientCache {
   #storageKey = 'clerk_telemetry';
-  #eventKey: TelemetryClientCacheOptions['eventKey'];
-  #cacheTtl: NonNullable<TelemetryClientCacheOptions['cacheTtl']>;
+  #cacheTtl = DEFAULT_CACHE_TTL_MS;
 
-  constructor(options: TelemetryClientCacheOptions) {
-    this.#eventKey = options.eventKey;
-    this.#cacheTtl = options.cacheTtl ?? DEFAULT_CACHE_TTL_MS;
-  }
-
-  cacheAndRetrieve(): boolean {
+  cacheAndRetrieve(key: string): boolean {
     const now = Date.now();
-    const event = this.#cache?.[this.#eventKey];
+    const event = this.#cache?.[key];
 
     if (!event) {
       localStorage.setItem(
         this.#storageKey,
         JSON.stringify({
-          [this.#eventKey]: now,
+          [key]: now,
         }),
       );
     }

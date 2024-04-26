@@ -14,6 +14,7 @@ import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
+import { TelemetryClientCache } from './clientCache';
 import type { TelemetryCollectorOptions, TelemetryEvent, TelemetryEventRaw } from './types';
 
 type TelemetryCollectorConfig = Pick<
@@ -43,6 +44,7 @@ const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
 
 export class TelemetryCollector {
   #config: Required<TelemetryCollectorConfig>;
+  #clientCache: TelemetryClientCache;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
   #pendingFlush: any;
@@ -78,6 +80,8 @@ export class TelemetryCollector {
       // Only send the first 16 characters of the secret key to to avoid sending the full key. We can still query against the partial key.
       this.#metadata.secretKey = options.secretKey.substring(0, 16);
     }
+
+    this.#clientCache = new TelemetryClientCache();
   }
 
   get isEnabled(): boolean {
@@ -110,7 +114,7 @@ export class TelemetryCollector {
 
     this.#logEvent(preparedPayload.event, preparedPayload);
 
-    if (!this.#shouldRecord(event)) {
+    if (!this.#shouldRecord(event.eventSamplingRate, event.clientCacheKey)) {
       return;
     }
 
@@ -119,15 +123,16 @@ export class TelemetryCollector {
     this.#scheduleFlush();
   }
 
-  #shouldRecord(event: TelemetryEventRaw): boolean {
-    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(event);
+  #shouldRecord(eventSamplingRate?: number, clientCacheKey?: string): boolean {
+    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(eventSamplingRate, clientCacheKey);
   }
 
-  #shouldBeSampled({ eventSamplingRate, clientCache }: TelemetryEventRaw) {
+  #shouldBeSampled(eventSamplingRate?: number, clientCacheKey?: string) {
     const randomSeed = Math.random();
+    const clientCache = this.#clientCache;
 
-    if (window && clientCache?.isStorageSupported) {
-      const isCached = clientCache?.cacheAndRetrieve();
+    if (window && clientCache.isStorageSupported && clientCacheKey) {
+      const isCached = clientCache.cacheAndRetrieve(clientCacheKey);
       return !isCached;
     }
 

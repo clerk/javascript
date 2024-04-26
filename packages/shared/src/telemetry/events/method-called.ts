@@ -1,4 +1,3 @@
-import { TelemetryClientCache } from '../clientCache';
 import type { TelemetryEventRaw } from '../types';
 
 const EVENT_METHOD_CALLED = 'METHOD_CALLED' as const;
@@ -17,9 +16,7 @@ export function eventMethodCalled(
 ): TelemetryEventRaw<EventMethodCalled> {
   return {
     event: EVENT_METHOD_CALLED,
-    clientCache: new TelemetryClientCache({
-      eventKey: `${EVENT_METHOD_CALLED}:${method}`,
-    }),
+    clientCacheKey: `${EVENT_METHOD_CALLED}:${method}`,
     eventSamplingRate: EVENT_SAMPLING_RATE,
     payload: {
       method,
