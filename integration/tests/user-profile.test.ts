@@ -4,6 +4,7 @@ import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
+import { stringPhoneNumber } from '../testUtils/phoneUtils';
 
 test.describe('user profile @generic', () => {
   test.describe.configure({ mode: 'serial' });
@@ -176,13 +177,18 @@ export default function Page() {
 
     await u.po.userProfile.clickAddEmailAddress();
     await u.po.userProfile.waitForSectionCardOpened('emailAddresses');
-    await u.po.userProfile.typeEmailAddress(`new-${fakeUser.email}`);
+    const newFakeEmail = `new-${fakeUser.email}`;
+    await u.po.userProfile.typeEmailAddress(newFakeEmail);
 
     await u.page.getByRole('button', { name: /^add$/i }).click();
 
     await u.po.userProfile.enterTestOtpCode();
 
-    // TODO: Add assertion
+    await expect(
+      u.page.locator('.cl-profileSectionItem__emailAddresses').filter({
+        hasText: newFakeEmail,
+      }),
+    ).toContainText(newFakeEmail);
   });
 
   test('add new phone number', async ({ page, context }) => {
@@ -203,6 +209,35 @@ export default function Page() {
 
     await u.po.userProfile.enterTestOtpCode();
 
-    // TODO: Add assertion
+    const formatedPhoneNumber = stringPhoneNumber(fakeUser.phoneNumber);
+
+    await expect(u.page.locator('.cl-profileSectionItem__phoneNumbers')).toContainText(formatedPhoneNumber);
+  });
+
+  test('add mfa authetiation with phone number', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+    await u.po.userProfile.switchToSecurityTab();
+
+    await u.page.getByText(/add two-step verification/i).click();
+    await u.page.getByText(/sms code/i).click();
+
+    const formatedPhoneNumber = stringPhoneNumber(fakeUser.phoneNumber);
+
+    await u.page
+      .getByRole('button', {
+        name: formatedPhoneNumber,
+      })
+      .click();
+
+    await u.page.getByText(/sms code verification enabled/i).waitFor({
+      state: 'visible',
+    });
   });
 });

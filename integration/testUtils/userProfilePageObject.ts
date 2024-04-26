@@ -46,7 +46,7 @@ export const createUserProfileComponentPageObject = (testArgs: TestArgs) => {
       return page.getByLabel(/username/i).fill(value);
     },
     typePhoneNumber: (value: string) => {
-      return page.getByLabel(/phoneNumber/i).fill(value);
+      return page.locator('#phoneNumber-field').fill(value);
     },
     clickAddEmailAddress: () => {
       return page.getByText(/add email address/i).click();
