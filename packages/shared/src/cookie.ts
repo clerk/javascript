@@ -13,8 +13,8 @@ export function createCookieHandler(cookieName: string) {
     /**
      * Setting a cookie will use some defaults such as path being set to "/".
      */
-    set(newValue: string, options: Cookies.CookieAttributes = {}) {
-      return Cookies.set(cookieName, newValue, options);
+    set(newValue: string, options: Cookies.CookieAttributes = {}): void {
+      Cookies.set(cookieName, newValue, options);
     },
     /**
      * On removing a cookie, you have to pass the exact same path/domain attributes used to set it initially
