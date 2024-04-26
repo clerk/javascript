@@ -197,6 +197,7 @@ export class UserAPI extends AbstractAPI {
     return this.request<PaginatedResourceResponse<OauthAccessToken[]>>({
       method: 'GET',
       path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
+      queryParams: { paginated: true },
     });
   }
 
