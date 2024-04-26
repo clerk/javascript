@@ -15,7 +15,6 @@ import type React from 'react';
 
 declare global {
   interface Window {
-    __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
