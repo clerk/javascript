@@ -1,3 +1,5 @@
+import type { TelemetryEventRaw } from './types';
+
 type TtlInMilliseconds = number;
 
 const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
@@ -10,11 +12,12 @@ export class TelemetryClientCache {
   #storageKey = 'clerk_telemetry';
   #cacheTtl = DEFAULT_CACHE_TTL_MS;
 
-  cacheAndRetrieve(key: string): boolean {
+  cacheAndRetrieve(event: TelemetryEventRaw): boolean {
+    const key = this.#getCacheKey(event);
     const now = Date.now();
-    const event = this.#cache?.[key];
 
-    if (!event) {
+    const cacheEntry = this.#cache?.[key];
+    if (!cacheEntry) {
       localStorage.setItem(
         this.#storageKey,
         JSON.stringify({
@@ -23,12 +26,22 @@ export class TelemetryClientCache {
       );
     }
 
-    const hasExpired = event && now - event > this.#cacheTtl;
+    const hasExpired = cacheEntry && now - cacheEntry > this.#cacheTtl;
     if (hasExpired) {
       localStorage.removeItem(this.#storageKey);
     }
 
-    return !!event;
+    return !!cacheEntry;
+  }
+
+  #getCacheKey({ event, payload }: TelemetryEventRaw): string {
+    const payloadUniqueKey = JSON.stringify(
+      Object.keys(payload)
+        .sort()
+        .map(key => payload[key]),
+    );
+
+    return `${event}:${payloadUniqueKey}`;
   }
 
   get #cache(): Record<string, TtlInMilliseconds> | undefined {

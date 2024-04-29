@@ -71,6 +71,5 @@ export type TelemetryEvent = {
 export type TelemetryEventRaw<Payload = TelemetryEvent['payload']> = {
   event: TelemetryEvent['event'];
   eventSamplingRate?: number;
-  clientCacheKey?: `${TelemetryEvent['event']}:${string}`;
   payload: Payload;
 };

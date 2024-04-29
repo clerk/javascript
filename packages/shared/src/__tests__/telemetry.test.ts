@@ -8,6 +8,10 @@ jest.useFakeTimers();
 const TEST_PK = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
 
 describe('TelemetryCollector', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   test('does nothing when disabled', async () => {
     const fetchSpy = jest.spyOn(global, 'fetch');
 
@@ -146,37 +150,47 @@ describe('TelemetryCollector', () => {
       publishableKey: TEST_PK,
     });
 
-    collector.record({ event: 'TEST_EVENT', payload: {} });
-    collector.record({ event: 'TEST_EVENT', payload: {} });
+    collector.record({ event: 'TEST_EVENT', payload: { method: 'useFoo' } });
+    collector.record({ event: 'TEST_EVENT', payload: { method: 'useBar' } });
 
     expect(fetchSpy).toHaveBeenCalled();
 
     fetchSpy.mockRestore();
   });
 
-  test('does not send events if the random seed does not exceed the event-specific sampling rate', async () => {
-    const fetchSpy = jest.spyOn(global, 'fetch');
-    const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.1);
+  describe('with server-side sampling', () => {
+    let windowSpy;
 
-    const collector = new TelemetryCollector({
-      publishableKey: TEST_PK,
+    beforeEach(() => {
+      windowSpy = jest.spyOn(window, 'window', 'get');
     });
 
-    collector.record({ event: 'TEST_EVENT', eventSamplingRate: 0.01, payload: {} });
+    afterEach(() => {
+      windowSpy.mockRestore();
+    });
 
-    jest.runAllTimers();
+    test('does not send events if the random seed does not exceed the event-specific sampling rate', async () => {
+      windowSpy.mockImplementation(() => undefined);
 
-    expect(fetchSpy).not.toHaveBeenCalled();
+      const fetchSpy = jest.spyOn(global, 'fetch');
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.1);
 
-    fetchSpy.mockRestore();
-    randomSpy.mockRestore;
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      collector.record({ event: 'TEST_EVENT', eventSamplingRate: 0.01, payload: {} });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      fetchSpy.mockRestore();
+      randomSpy.mockRestore;
+    });
   });
 
   describe('with client-side caching', () => {
-    beforeEach(() => {
-      localStorage.clear();
-    });
-
     test('sends event when it is not in the cache', () => {
       const fetchSpy = jest.spyOn(global, 'fetch');
 
@@ -189,7 +203,6 @@ describe('TelemetryCollector', () => {
         payload: {
           foo: true,
         },
-        clientCacheKey: `TEST_EVENT:foo`,
       });
 
       jest.runAllTimers();
@@ -213,7 +226,6 @@ describe('TelemetryCollector', () => {
         payload: {
           foo: true,
         },
-        clientCacheKey: `TEST_EVENT:foo`,
       });
 
       collector.record({
@@ -221,7 +233,6 @@ describe('TelemetryCollector', () => {
         payload: {
           foo: true,
         },
-        clientCacheKey: `TEST_EVENT:foo`,
       });
 
       jest.runAllTimers();
@@ -247,7 +258,6 @@ describe('TelemetryCollector', () => {
         payload: {
           foo: true,
         },
-        clientCacheKey: `TEST_EVENT:foo`,
       });
 
       jest.runAllTimers();

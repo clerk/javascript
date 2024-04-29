@@ -114,7 +114,7 @@ export class TelemetryCollector {
 
     this.#logEvent(preparedPayload.event, preparedPayload);
 
-    if (!this.#shouldRecord(event.eventSamplingRate, event.clientCacheKey)) {
+    if (!this.#shouldRecord(event)) {
       return;
     }
 
@@ -123,22 +123,22 @@ export class TelemetryCollector {
     this.#scheduleFlush();
   }
 
-  #shouldRecord(eventSamplingRate?: number, clientCacheKey?: string): boolean {
-    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(eventSamplingRate, clientCacheKey);
+  #shouldRecord(event: TelemetryEventRaw) {
+    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(event);
   }
 
-  #shouldBeSampled(eventSamplingRate?: number, clientCacheKey?: string) {
+  #shouldBeSampled(event: TelemetryEventRaw) {
     const randomSeed = Math.random();
     const clientCache = this.#clientCache;
 
-    if (clientCache.isStorageSupported && clientCacheKey) {
-      const isCached = clientCache.cacheAndRetrieve(clientCacheKey);
+    if (clientCache.isStorageSupported) {
+      const isCached = clientCache.cacheAndRetrieve(event);
       return !isCached;
     }
 
     return (
       randomSeed <= this.#config.samplingRate &&
-      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate)
+      (typeof event.eventSamplingRate === 'undefined' || randomSeed <= event.eventSamplingRate)
     );
   }
 
