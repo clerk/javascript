@@ -2,7 +2,7 @@ import type { TelemetryEventRaw } from './types';
 
 type TtlInMilliseconds = number;
 
-const DEFAULT_CACHE_TTL_MS = 1000; // 24 hours
+const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
 
 /**
  * Manages caching for telemetry events using the browser's localStorage to
