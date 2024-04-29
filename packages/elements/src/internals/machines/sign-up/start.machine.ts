@@ -27,6 +27,8 @@ export const SignUpStartMachine = setup({
     thirdParty: ThirdPartyMachine,
   },
   actions: {
+    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    sendToLoading,
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -37,8 +39,6 @@ export const SignUpStartMachine = setup({
         };
       },
     ),
-    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
-    sendToLoading,
   },
   guards: {
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
@@ -48,7 +48,7 @@ export const SignUpStartMachine = setup({
   id: SignUpStartMachineId,
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
-    formRef: input.form,
+    formRef: input.formRef,
     parent: input.parent,
     loadingStep: 'start',
   }),

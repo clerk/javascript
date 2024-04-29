@@ -1,5 +1,5 @@
 import type { LoadedClerk } from '@clerk/types';
-import { assertEvent, assign, log, not, sendParent, setup } from 'xstate';
+import { assertEvent, assign, log, not, sendTo, setup } from 'xstate';
 
 import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { sendToLoading } from '~/internals/machines/shared';
@@ -19,13 +19,6 @@ export const ThirdPartyMachine = setup({
   },
   actions: {
     logError: log(({ event }) => `Error: ${event.type}`),
-    reportError: ({ event }) => {
-      assertActorEventError(event);
-      sendParent({
-        type: 'FAILURE',
-        error: event.error,
-      });
-    },
     assignActiveStrategy: assign({
       activeStrategy: ({ event }) => {
         assertEvent(event, 'REDIRECT');
@@ -37,6 +30,16 @@ export const ThirdPartyMachine = setup({
     }),
     sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
     sendToLoading,
+    setFormErrors: sendTo(
+      ({ context }) => context.formRef,
+      ({ event }) => {
+        assertActorEventError(event);
+        return {
+          type: 'ERRORS.SET',
+          error: event.error,
+        };
+      },
+    ),
   },
   guards: {
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
@@ -47,6 +50,7 @@ export const ThirdPartyMachine = setup({
   context: ({ input }) => ({
     activeStrategy: null,
     basePath: input.basePath,
+    formRef: input.formRef,
     flow: input.flow,
     parent: input.parent,
     loadingStep: 'strategy',
@@ -93,7 +97,7 @@ export const ThirdPartyMachine = setup({
           };
         },
         onError: {
-          actions: 'reportError',
+          actions: 'setFormErrors',
           target: 'Idle',
         },
       },
@@ -106,7 +110,7 @@ export const ThirdPartyMachine = setup({
         src: 'handleRedirectCallback',
         input: ({ context }) => context.parent,
         onError: {
-          actions: ['logError', 'reportError'],
+          actions: ['logError', 'setFormErrors'],
           target: 'Idle',
         },
       },

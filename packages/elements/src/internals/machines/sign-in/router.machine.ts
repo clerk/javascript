@@ -3,7 +3,12 @@ import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, not, or, sendTo, setup, stopChild } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
+import {
+  ERROR_CODES,
+  SIGN_IN_DEFAULT_BASE_PATH,
+  SIGN_UP_DEFAULT_BASE_PATH,
+  SSO_CALLBACK_PATH_ROUTE,
+} from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
@@ -35,6 +40,7 @@ export const SignInRouterMachine = setup({
     thirdParty: ThirdPartyMachine,
   },
   actions: {
+    clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
       if (!force && shouldUseVirtualRouting()) return;
@@ -64,7 +70,41 @@ export const SignInRouterMachine = setup({
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
-    resetError: assign({ error: undefined }),
+    setFormErrors: ({ context }, params: { error: Error }) =>
+      sendTo(context.formRef, {
+        type: 'ERRORS.SET',
+        error: params.error,
+      }),
+    setFormOAuthErrors: ({ context }) => {
+      const errorOrig = context.clerk.client.signIn.firstFactorVerification.error;
+
+      if (!errorOrig) {
+        return;
+      }
+
+      let error: ClerkElementsError;
+
+      switch (errorOrig.code) {
+        case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
+        case ERROR_CODES.OAUTH_ACCESS_DENIED:
+        case ERROR_CODES.NOT_ALLOWED_ACCESS:
+        case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
+        case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
+        case ERROR_CODES.USER_LOCKED:
+          error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
+          break;
+        default:
+          error = new ClerkElementsError(
+            'unable_to_complete',
+            'Unable to complete action at this time. If the problem persists please contact support.',
+          );
+      }
+
+      context.formRef.send({
+        type: 'ERRORS.SET',
+        error,
+      });
+    },
     transfer: ({ context }) => {
       const searchParams = new URLSearchParams({ __clerk_transfer: '1' });
       context.router?.push(`${context.signUpPath}?${searchParams}`);
@@ -73,6 +113,7 @@ export const SignInRouterMachine = setup({
   guards: {
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signIn.status === null && context.clerk.client.lastActiveSessionId),
+    hasOAuthError: ({ context }) => Boolean(context.clerk?.client?.signIn?.firstFactorVerification?.error),
     hasResource: ({ context }) => Boolean(context.clerk?.client?.signIn?.status),
 
     isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', not('isExampleMode')]),
@@ -133,7 +174,7 @@ export const SignInRouterMachine = setup({
           enqueue.spawnChild(logic, {
             id,
             systemId: id,
-            input: { basePath: context.router?.basePath, parent: self, ...input },
+            input: { basePath: context.router?.basePath, parent: self, formRef: context.formRef, ...input },
             syncSnapshot: true, // Subscribes to the spawned actor and send back snapshot events
           });
         }
@@ -158,12 +199,13 @@ export const SignInRouterMachine = setup({
         INIT: {
           actions: assign(({ event }) => ({
             clerk: event.clerk,
-            router: event.router,
-            signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
             exampleMode: event.exampleMode || false,
+            formRef: event.formRef,
             loading: {
               isLoading: false,
             },
+            router: event.router,
+            signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
           })),
           target: 'Init',
         },
@@ -178,6 +220,7 @@ export const SignInRouterMachine = setup({
             input: ({ context, self }) => ({
               basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
               flow: 'signIn',
+              formRef: context.formRef,
               parent: self,
             }),
           });
@@ -229,6 +272,7 @@ export const SignInRouterMachine = setup({
     },
     Start: {
       tags: 'route:start',
+      exit: 'clearFormErrors',
       on: {
         NEXT: [
           {
@@ -355,6 +399,11 @@ export const SignInRouterMachine = setup({
       on: {
         NEXT: [
           {
+            guard: 'hasOAuthError',
+            actions: ['setFormOAuthErrors', { type: 'navigateInternal', params: { force: true, path: '/' } }],
+            target: 'Start',
+          },
+          {
             guard: or(['isComplete', 'hasAuthenticatedViaClerkJS']),
             actions: 'setActive',
             target: 'Start',
@@ -386,13 +435,13 @@ export const SignInRouterMachine = setup({
       on: {
         NEXT: {
           target: 'Start',
-          actions: 'resetError',
+          actions: 'clearFormErrors',
         },
       },
     },
     Hist: {
       type: 'history',
-      exit: 'resetError',
+      exit: 'clearFormErrors',
     },
   },
 });
