@@ -13,28 +13,28 @@ export class TelemetryClientCache {
   #cacheTtl = DEFAULT_CACHE_TTL_MS;
 
   cacheAndRetrieve(event: TelemetryEventRaw): boolean {
-    const key = this.#getCacheKey(event);
     const now = Date.now();
+    const key = this.#generateKey(event);
+    const entry = this.#cache?.[key];
 
-    const cacheEntry = this.#cache?.[key];
-    if (!cacheEntry) {
-      localStorage.setItem(
-        this.#storageKey,
-        JSON.stringify({
-          [key]: now,
-        }),
-      );
+    if (!entry) {
+      const updatedCache = {
+        ...this.#cache,
+        [key]: now,
+      };
+
+      localStorage.setItem(this.#storageKey, JSON.stringify(updatedCache));
     }
 
-    const hasExpired = cacheEntry && now - cacheEntry > this.#cacheTtl;
+    const hasExpired = entry && now - entry > this.#cacheTtl;
     if (hasExpired) {
-      localStorage.removeItem(this.#storageKey);
+      localStorage.removeItem(key);
     }
 
-    return !!cacheEntry;
+    return !!entry;
   }
 
-  #getCacheKey({ event, payload }: TelemetryEventRaw): string {
+  #generateKey({ event, payload }: TelemetryEventRaw): string {
     const payloadUniqueKey = JSON.stringify(
       Object.keys(payload)
         .sort()
@@ -48,7 +48,7 @@ export class TelemetryClientCache {
     const cacheString = localStorage.getItem(this.#storageKey);
 
     if (!cacheString) {
-      return;
+      return {};
     }
 
     return JSON.parse(cacheString);
