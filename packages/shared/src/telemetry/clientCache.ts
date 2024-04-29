@@ -2,7 +2,7 @@ import type { TelemetryEventRaw } from './types';
 
 type TtlInMilliseconds = number;
 
-const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
+const DEFAULT_CACHE_TTL_MS = 1000; // 24 hours
 
 /**
  * Manages caching for telemetry events using the browser's localStorage to
@@ -26,15 +26,15 @@ export class TelemetryClientCache {
       localStorage.setItem(this.#storageKey, JSON.stringify(updatedCache));
     }
 
-    const hasExpired = entry && now - entry > this.#cacheTtl;
-    if (hasExpired) {
+    const shouldInvalidateCache = entry && now - entry > this.#cacheTtl;
+    if (shouldInvalidateCache) {
       const updatedCache = this.#cache;
       delete updatedCache[key];
 
       localStorage.setItem(this.#storageKey, JSON.stringify(updatedCache));
     }
 
-    return !hasExpired && !!entry;
+    return !!entry;
   }
 
   #generateKey({ event, payload }: TelemetryEventRaw): string {

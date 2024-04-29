@@ -118,8 +118,6 @@ export class TelemetryCollector {
       return;
     }
 
-    console.log('Send');
-
     this.#buffer.push(preparedPayload);
 
     this.#scheduleFlush();

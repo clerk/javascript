@@ -8,10 +8,6 @@ jest.useFakeTimers();
 const TEST_PK = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
 
 describe('TelemetryCollector', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
   test('does nothing when disabled', async () => {
     const fetchSpy = jest.spyOn(global, 'fetch');
 
@@ -191,6 +187,10 @@ describe('TelemetryCollector', () => {
   });
 
   describe('with client-side caching', () => {
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
     test('sends event when it is not in the cache', () => {
       const fetchSpy = jest.spyOn(global, 'fetch');
 
@@ -218,7 +218,7 @@ describe('TelemetryCollector', () => {
       const cacheTtl = 86400000;
 
       let now = originalDateNow();
-      jest.spyOn(Date, 'now').mockImplementation(() => now);
+      const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
 
       const collector = new TelemetryCollector({
         publishableKey: TEST_PK,
@@ -243,9 +243,17 @@ describe('TelemetryCollector', () => {
         payload,
       });
 
+      collector.record({
+        event,
+        payload,
+      });
+
+      jest.runAllTimers();
+
       expect(fetchSpy).toHaveBeenCalledTimes(2);
 
       fetchSpy.mockRestore();
+      dateNowSpy.mockRestore();
     });
 
     test('does not send event when it is in the cache', () => {
@@ -295,8 +303,6 @@ describe('TelemetryCollector', () => {
           foo: true,
         },
       });
-
-      jest.runAllTimers();
 
       expect(fetchSpy).not.toHaveBeenCalled();
 
