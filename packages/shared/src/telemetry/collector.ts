@@ -131,7 +131,7 @@ export class TelemetryCollector {
     const randomSeed = Math.random();
     const clientCache = this.#clientCache;
 
-    if (window && clientCache.isStorageSupported && clientCacheKey) {
+    if (clientCache.isStorageSupported && clientCacheKey) {
       const isCached = clientCache.cacheAndRetrieve(clientCacheKey);
       return !isCached;
     }

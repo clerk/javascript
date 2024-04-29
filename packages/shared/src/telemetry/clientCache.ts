@@ -49,6 +49,10 @@ export class TelemetryClientCache {
    * the browser is in a privacy mode that restricts localStorage usage).
    */
   get isStorageSupported(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
     const storage = window['localStorage'];
 
     if (!storage) {
