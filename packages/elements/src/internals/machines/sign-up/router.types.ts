@@ -1,6 +1,7 @@
 import type { SignUpResource } from '@clerk/types';
-import type { AnyActorLogic } from 'xstate';
+import type { ActorRefFrom, AnyActorLogic } from 'xstate';
 
+import type { TFormMachine } from '~/internals/machines/form';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
@@ -52,6 +53,7 @@ export type SignUpRouterSetClerkEvent = BaseRouterSetClerkEvent;
 
 export interface SignUpRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
+  formRef: ActorRefFrom<TFormMachine>;
   signInPath?: string;
 }
 
@@ -89,8 +91,9 @@ export type SignUpRouterDelays = keyof typeof SignUpRouterDelays;
 export type SignUpRouterLoadingContext = Omit<SignUpRouterLoadingEvent, 'type'>;
 
 export interface SignUpRouterContext extends BaseRouterContext {
-  signInPath: string;
+  formRef: ActorRefFrom<TFormMachine>;
   loading: SignUpRouterLoadingContext;
+  signInPath: string;
 }
 
 // ---------------------------------- Schema ---------------------------------- //
