@@ -532,12 +532,14 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
   (props: FormInputProps, forwardedRef) => {
     const telemetry = useTelemetry();
 
-    // @ts-expect-error - Depending on type the props can be different
     telemetry?.record(
       eventComponentMountedRaw('Elements_Input', {
         type: props.type ?? false,
+        // @ts-expect-error - Depending on type the props can be different
         render: Boolean(props?.render),
+        // @ts-expect-error - Depending on type the props can be different
         asChild: Boolean(props?.asChild),
+        // @ts-expect-error - Depending on type the props can be different
         validatePassword: Boolean(props?.validatePassword),
       }),
     );
