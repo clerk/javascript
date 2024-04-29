@@ -14,6 +14,7 @@ import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
+import { TelemetryClientCache } from './clientCache';
 import type { TelemetryCollectorOptions, TelemetryEvent, TelemetryEventRaw } from './types';
 
 type TelemetryCollectorConfig = Pick<
@@ -43,6 +44,7 @@ const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
 
 export class TelemetryCollector {
   #config: Required<TelemetryCollectorConfig>;
+  #clientCache: TelemetryClientCache;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
   #pendingFlush: any;
@@ -78,6 +80,8 @@ export class TelemetryCollector {
       // Only send the first 16 characters of the secret key to to avoid sending the full key. We can still query against the partial key.
       this.#metadata.secretKey = options.secretKey.substring(0, 16);
     }
+
+    this.#clientCache = new TelemetryClientCache();
   }
 
   get isEnabled(): boolean {
@@ -110,7 +114,7 @@ export class TelemetryCollector {
 
     this.#logEvent(preparedPayload.event, preparedPayload);
 
-    if (!this.#shouldRecord(event.eventSamplingRate)) {
+    if (!this.#shouldRecord(event)) {
       return;
     }
 
@@ -119,13 +123,23 @@ export class TelemetryCollector {
     this.#scheduleFlush();
   }
 
-  #shouldRecord(eventSamplingRate?: number): boolean {
-    const randomSeed = Math.random();
-    const shouldBeSampled =
-      randomSeed <= this.#config.samplingRate &&
-      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
+  #shouldRecord(event: TelemetryEventRaw) {
+    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(event);
+  }
 
-    return this.isEnabled && !this.isDebug && shouldBeSampled;
+  #shouldBeSampled(event: TelemetryEventRaw) {
+    const randomSeed = Math.random();
+    const clientCache = this.#clientCache;
+
+    if (clientCache.isStorageSupported) {
+      const isCached = clientCache.cacheAndRetrieve(event);
+      return !isCached;
+    }
+
+    return (
+      randomSeed <= this.#config.samplingRate &&
+      (typeof event.eventSamplingRate === 'undefined' || randomSeed <= event.eventSamplingRate)
+    );
   }
 
   #scheduleFlush(): void {
