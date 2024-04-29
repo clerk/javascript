@@ -12,7 +12,7 @@ export class UserData implements IUserData {
   imageUrl?: string;
   hasImage?: boolean;
 
-  constructor(data: UserDataJSON) {
+  constructor(data: UserDataJSON | null) {
     this.fromJSON(data);
   }
 
