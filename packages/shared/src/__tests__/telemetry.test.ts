@@ -212,6 +212,42 @@ describe('TelemetryCollector', () => {
       fetchSpy.mockRestore();
     });
 
+    test('sends event when it is in the cache but has expired', () => {
+      const fetchSpy = jest.spyOn(global, 'fetch');
+      const originalDateNow = Date.now;
+      const cacheTtl = 86400000;
+
+      let now = originalDateNow();
+      jest.spyOn(Date, 'now').mockImplementation(() => now);
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        maxBufferSize: 1,
+      });
+
+      const event = 'TEST_EVENT';
+      const payload = {
+        foo: true,
+      };
+
+      collector.record({
+        event,
+        payload,
+      });
+
+      // Move time forward beyond the cache TTL
+      now += cacheTtl + 1;
+
+      collector.record({
+        event,
+        payload,
+      });
+
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+      fetchSpy.mockRestore();
+    });
+
     test('does not send event when it is in the cache', () => {
       const fetchSpy = jest.spyOn(global, 'fetch');
 

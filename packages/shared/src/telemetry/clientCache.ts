@@ -28,10 +28,13 @@ export class TelemetryClientCache {
 
     const hasExpired = entry && now - entry > this.#cacheTtl;
     if (hasExpired) {
-      localStorage.removeItem(key);
+      const updatedCache = this.#cache;
+      delete updatedCache[key];
+
+      localStorage.setItem(this.#storageKey, JSON.stringify(updatedCache));
     }
 
-    return !!entry;
+    return !hasExpired && !!entry;
   }
 
   #generateKey({ event, payload }: TelemetryEventRaw): string {
