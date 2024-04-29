@@ -22,7 +22,7 @@ export default authMiddleware({
 });
 
 export const config = {
-  matcher: ['/((?!.+\\.[\\w]+$|_next)._)', '/', '/(api|trpc)(._)'],
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 };
 ```
 
@@ -45,6 +45,6 @@ export default clerkMiddleware((auth, request) => {
 });
 
 export const config = {
-  matcher: ['/((?!.+\\.[\\w]+$|_next)._)', '/', '/(api|trpc)(._)'],
+  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
 };
 ```
