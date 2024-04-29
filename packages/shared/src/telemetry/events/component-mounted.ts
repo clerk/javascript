@@ -42,6 +42,10 @@ export function eventComponentMounted(
   };
 }
 
+/**
+ * **Caution:** Do not pass in all props from a component but instead filter them yourself.
+ * Compared to `eventComponentMounted` this function doesn't filter the props passed in. If you just want to track that a component is mounted, use `eventComponentMounted`.
+ */
 export function eventComponentMountedRaw(
   component: string,
   props: Record<string, string | boolean>,
