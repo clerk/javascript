@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -77,9 +77,9 @@
     "xstate": "^5.11.0"
   },
   "devDependencies": {
-    "@clerk/clerk-react": "5.0.0",
+    "@clerk/clerk-react": "5.0.1",
     "@clerk/shared": "2.0.0",
-    "@clerk/types": "^4.0.0",
+    "@clerk/types": "^4.1.0",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",

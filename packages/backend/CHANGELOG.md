@@ -1,5 +1,32 @@
 # Change Log
 
+## 1.1.0
+
+### Minor Changes
+
+- Updated types for `orderBy` in OrganizationApi and UserApi ([#3266](https://github.com/clerk/javascript/pull/3266)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `OrganizationAPI.getOrganizationMembershipList` now accepts `orderBy`
+    - Acceptable values `phone_number`, `+phone_number`, `-phone_number`, `email_address`, `+email_address`, `-email_address`, `created_at`, `+created_at`, `-created_at`, `first_name`, `+first_name`, `-first_name`
+  - `UserAPI.getUserList` expands the acceptable values of the `orderBy` to:
+    - `email_address`, `+email_address`, `-email_address`, `web3wallet`, `+web3wallet`, `-web3wallet`, `first_name`, `+first_name`, `-first_name`, `last_name`, `+last_name`, `-last_name`, `phone_number`, `+phone_number`, `-phone_number`, `username`, `+username`, `-username`
+
+- Add support for the Testing Tokens API ([#3258](https://github.com/clerk/javascript/pull/3258)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Fix infinite redirect loops for production instances with incorrect secret keys ([#3259](https://github.com/clerk/javascript/pull/3259)) by [@dimkl](https://github.com/dimkl)
+
+## 1.0.1
+
+### Patch Changes
+
+- Export all Webhook event types and related JSON types. The newly exported types are: `DeletedObjectJSON`, `EmailJSON`, `OrganizationInvitationJSON`, `OrganizationJSON`, `OrganizationMembershipJSON`, `SessionJSON`, `SMSMessageJSON`, `UserJSON`, `UserWebhookEvent`, `EmailWebhookEvent`, `SMSWebhookEvent`, `SessionWebhookEvent`, `OrganizationWebhookEvent`, `OrganizationMembershipWebhookEvent`, `OrganizationInvitationWebhookEvent` ([#3248](https://github.com/clerk/javascript/pull/3248)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Added missing 'organizationId' parameter to UserListParams ([#3240](https://github.com/clerk/javascript/pull/3240)) by [@royanger](https://github.com/royanger)
+
+  Moved last_active_at_since from UserCountParams to UserListParams
+
 ## 1.0.0
 
 ### Major Changes
