@@ -1,4 +1,4 @@
-import { eventComponentMounted } from '@clerk/shared/telemetry';
+import { eventComponentMountedRaw } from '@clerk/shared/telemetry';
 import type { OAuthProvider, SamlStrategy } from '@clerk/types';
 import * as React from 'react';
 
@@ -84,7 +84,7 @@ function isSignUpScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is
 export function Loading({ children, scope }: LoadingProps) {
   const telemetry = useTelemetry();
 
-  telemetry?.record(eventComponentMounted('Elements_Loading', { scope }));
+  telemetry?.record(eventComponentMountedRaw('Elements_Loading', { scope: scope ?? false }));
 
   const signInRouterRef = SignInRouterCtx.useActorRef(true);
   const signUpRouterRef = SignUpRouterCtx.useActorRef(true);
