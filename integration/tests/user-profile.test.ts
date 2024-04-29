@@ -165,6 +165,30 @@ export default function Page() {
     expect(username).toContain(fakeUser.username);
   });
 
+  test('update users first and last name', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+
+    await u.po.userProfile.clickToUpdateProfile();
+    await u.po.userProfile.waitForSectionCardOpened('profile');
+
+    await u.po.userProfile.typeFirstName('John');
+    await u.po.userProfile.typeLastName('Doe');
+
+    await u.page.getByText(/Save/i).click();
+
+    await u.po.userProfile.waitForSectionCardClosed('profile');
+
+    const fullName = await u.page.locator(`.cl-profileSectionItem__profile`).innerText();
+    expect(fullName).toContain('John Doe');
+  });
+
   test('add new email address', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();

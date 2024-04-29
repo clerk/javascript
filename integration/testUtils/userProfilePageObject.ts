@@ -25,6 +25,9 @@ export const createUserProfileComponentPageObject = (testArgs: TestArgs) => {
     clickSetUsername: () => {
       return page.getByText(/Set username/i).click();
     },
+    clickToUpdateProfile: () => {
+      return page.getByText(/update profile/i).click();
+    },
     clickUpdateUsername: () => {
       return page.getByText(/update username/i).click();
     },
@@ -43,10 +46,16 @@ export const createUserProfileComponentPageObject = (testArgs: TestArgs) => {
       return self.waitForSectionCard(section, false);
     },
     typeUsername: (value: string) => {
-      return page.getByLabel(/username/i).fill(value);
+      return self.getUsernameInput().fill(value);
+    },
+    typeFirstName: (value: string) => {
+      return self.getFirstNameInput().fill(value);
+    },
+    typeLastName: (value: string) => {
+      return self.getLastNameInput().fill(value);
     },
     typePhoneNumber: (value: string) => {
-      return page.locator('#phoneNumber-field').fill(value);
+      return self.getPhoneNumberInput().fill(value);
     },
     clickAddEmailAddress: () => {
       return page.getByText(/add email address/i).click();
