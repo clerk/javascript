@@ -3,20 +3,20 @@ import type { TelemetryEventRaw } from '../types';
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED' as const;
 const EVENT_SAMPLING_RATE = 0.1;
 
-interface ComponentMountedBase {
+type ComponentMountedBase = {
   component: string;
-}
+};
 
-interface EventPrebuiltComponentMounted extends ComponentMountedBase {
+type EventPrebuiltComponentMounted = ComponentMountedBase & {
   appearanceProp: boolean;
   elements: boolean;
   variables: boolean;
   baseTheme: boolean;
-}
+};
 
-interface EventComponentMounted extends ComponentMountedBase {
+type EventComponentMounted = ComponentMountedBase & {
   [key: string]: boolean | string;
-}
+};
 
 /**
  * Helper function for `telemetry.record()`. Create a consistent event object for when a prebuilt (AIO) component is mounted.
