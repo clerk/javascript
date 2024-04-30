@@ -3,7 +3,7 @@ import type { TelemetryEventRaw } from '../types';
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED' as const;
 const EVENT_SAMPLING_RATE = 0.1;
 
-type EventComponentMounted = {
+type EventPrebuiltComponentMounted = {
   component: string;
   appearanceProp: boolean;
   elements: boolean;
@@ -25,10 +25,10 @@ type EventComponentMountedRaw = {
  * @example
  * telemetry.record(eventComponentMounted('SignUp', props));
  */
-export function eventComponentMounted(
+export function eventPrebuiltComponentMounted(
   component: string,
   props?: Record<string, any>,
-): TelemetryEventRaw<EventComponentMounted> {
+): TelemetryEventRaw<EventPrebuiltComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
     eventSamplingRate: EVENT_SAMPLING_RATE,
