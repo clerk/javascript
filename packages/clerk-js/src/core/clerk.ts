@@ -547,7 +547,8 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    if (noOrganizationExists(this)) {
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
           code: 'cannot_render_organization_missing',
