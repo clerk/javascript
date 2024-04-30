@@ -5,14 +5,18 @@ type TtlInMilliseconds = number;
 const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
 
 /**
- * Manages caching for telemetry events using the browser's localStorage to
+ * Manages throttling for telemetry events using the browser's localStorage to
  * mitigate event flooding in frequently executed code paths.
  */
-export class TelemetryClientCache {
+export class TelemetryEventThrottler {
   #storageKey = 'clerk_telemetry';
   #cacheTtl = DEFAULT_CACHE_TTL_MS;
 
-  cacheAndRetrieve(event: TelemetryEventRaw): boolean {
+  isEventThrottled(event: TelemetryEventRaw): boolean {
+    if (this.#isValidBrowser) {
+      return false;
+    }
+
     const now = Date.now();
     const key = this.#generateKey(event);
     const entry = this.#cache?.[key];
@@ -26,8 +30,8 @@ export class TelemetryClientCache {
       localStorage.setItem(this.#storageKey, JSON.stringify(updatedCache));
     }
 
-    const shouldInvalidateCache = entry && now - entry > this.#cacheTtl;
-    if (shouldInvalidateCache) {
+    const shouldInvalidate = entry && now - entry > this.#cacheTtl;
+    if (shouldInvalidate) {
       const updatedCache = this.#cache;
       delete updatedCache[key];
 
@@ -37,6 +41,10 @@ export class TelemetryClientCache {
     return !!entry;
   }
 
+  /**
+   * Generates a consistent unique key for telemetry events by sorting payload properties.
+   * This ensures that payloads with identical content in different orders produce the same key.
+   */
   #generateKey({ event, payload }: TelemetryEventRaw): string {
     const payloadUniqueKey = JSON.stringify(
       Object.keys(payload)
@@ -64,13 +72,12 @@ export class TelemetryClientCache {
    * not supported or not writable (e.g., in cases where the storage is full or
    * the browser is in a privacy mode that restricts localStorage usage).
    */
-  get isStorageSupported(): boolean {
+  get #isValidBrowser(): boolean {
     if (typeof window === 'undefined') {
       return false;
     }
 
-    const storage = window['localStorage'];
-
+    const storage = window.localStorage;
     if (!storage) {
       return false;
     }

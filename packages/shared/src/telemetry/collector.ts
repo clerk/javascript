@@ -14,7 +14,7 @@ import type { InstanceType } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
-import { TelemetryClientCache } from './clientCache';
+import { TelemetryEventThrottler } from './throttler';
 import type { TelemetryCollectorOptions, TelemetryEvent, TelemetryEventRaw } from './types';
 
 type TelemetryCollectorConfig = Pick<
@@ -44,7 +44,7 @@ const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
 
 export class TelemetryCollector {
   #config: Required<TelemetryCollectorConfig>;
-  #clientCache: TelemetryClientCache;
+  #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
   #pendingFlush: any;
@@ -81,7 +81,7 @@ export class TelemetryCollector {
       this.#metadata.secretKey = options.secretKey.substring(0, 16);
     }
 
-    this.#clientCache = new TelemetryClientCache();
+    this.#eventThrottler = new TelemetryEventThrottler();
   }
 
   get isEnabled(): boolean {
@@ -129,11 +129,9 @@ export class TelemetryCollector {
 
   #shouldBeSampled(event: TelemetryEventRaw) {
     const randomSeed = Math.random();
-    const clientCache = this.#clientCache;
 
-    if (clientCache.isStorageSupported) {
-      const isCached = clientCache.cacheAndRetrieve(event);
-      return !isCached;
+    if (this.#eventThrottler.isEventThrottled(event)) {
+      return false;
     }
 
     return (
