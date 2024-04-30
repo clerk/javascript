@@ -39,6 +39,18 @@ export const common = ({ page }: TestArgs) => {
     getLastNameInput: () => {
       return page.locator('input[name=lastName]');
     },
+    getOrganizationNameInput: () => {
+      return page.locator('input[name=name]');
+    },
+    getOrganizationSlugInput: () => {
+      return page.locator('input[name=slug]');
+    },
+    getInviteMembersInput: () => {
+      return page.locator('input[data-testid="tag-input"]');
+    },
+    getDeleteOrganizationConfirmationInput: () => {
+      return page.locator('input[name=deleteOrganizationConfirmation]');
+    },
   };
 
   return self;

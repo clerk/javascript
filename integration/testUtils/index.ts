@@ -4,6 +4,7 @@ import type { Browser, BrowserContext, Page } from '@playwright/test';
 import type { Application } from '../models/application';
 import { createAppPageObject } from './appPageObject';
 import { createEmailService } from './emailService';
+import { createOrganizationProfileComponentPageObject } from './organizationProfilePageObject';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcherPageObject';
 import type { EnchancedPage, TestArgs } from './signInPageObject';
 import { createSignInComponentPageObject } from './signInPageObject';
@@ -70,6 +71,7 @@ export const createTestUtils = <
     signIn: createSignInComponentPageObject(testArgs),
     userProfile: createUserProfileComponentPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
+    organizationProfile: createOrganizationProfileComponentPageObject(testArgs),
     userButton: createUserButtonPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
   };

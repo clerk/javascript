@@ -16,18 +16,19 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     const m = createTestUtils({ app });
     fakeAdmin = m.services.users.createFakeUser();
     const admin = await m.services.users.createBapiUser(fakeAdmin);
-    fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
+    fakeOrganization = m.services.users.createFakeOrganization();
+    const org = await m.services.users.createBapiOrganization(fakeOrganization, admin.id);
     fakeViewer = m.services.users.createFakeUser();
     const viewer = await m.services.users.createBapiUser(fakeViewer);
     await m.services.clerk.organizations.createOrganizationMembership({
-      organizationId: fakeOrganization.organization.id,
+      organizationId: org.id,
       role: 'org:viewer' as OrganizationMembershipRole,
       userId: viewer.id,
     });
   });
 
   test.afterAll(async () => {
-    await fakeOrganization.delete();
+    await fakeOrganization.deleteIfExists();
     await fakeViewer.deleteIfExists();
     await fakeAdmin.deleteIfExists();
     await app.teardown();

@@ -46,15 +46,17 @@ export type FakeUser = {
 
 export type FakeOrganization = {
   name: string;
-  organization: { id: string };
-  delete: () => Promise<Organization>;
+  slug: string;
+  deleteIfExists: () => Promise<void>;
 };
 
 export type UserService = {
   createFakeUser: (options?: FakeUserOptions) => FakeUser;
   createBapiUser: (fakeUser: FakeUser) => Promise<User>;
   deleteIfExists: (opts: { id?: string; email?: string }) => Promise<void>;
-  createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
+  deleteIfOrganizationExists: (slug: string) => Promise<void>;
+  createFakeOrganization: () => FakeOrganization;
+  createBapiOrganization: (fakeOrg: FakeOrganization, userId: string) => Promise<Organization>;
 };
 
 export const createUserService = (clerkClient: ClerkClient) => {
@@ -102,17 +104,29 @@ export const createUserService = (clerkClient: ClerkClient) => {
         await clerkClient.users.deleteUser(id);
       }
     },
-    createFakeOrganization: async userId => {
-      const name = faker.animal.dog();
-      const organization = await clerkClient.organizations.createOrganization({
-        name: faker.animal.dog(),
-        createdBy: userId,
+    deleteIfOrganizationExists: async (orgId: string) => {
+      const orgExists = await clerkClient.organizations.getOrganization({
+        organizationId: orgId,
       });
+      if (orgExists.id) {
+        await clerkClient.organizations.deleteOrganization(orgExists.id);
+      }
+    },
+    createFakeOrganization: () => {
+      const name = faker.company.name();
+      const slug = faker.helpers.slugify(name);
+
       return {
         name,
-        organization,
-        delete: () => clerkClient.organizations.deleteOrganization(organization.id),
-      } satisfies FakeOrganization;
+        slug,
+        deleteIfExists: () => self.deleteIfOrganizationExists(slug),
+      };
+    },
+    createBapiOrganization: async (fakeOrg: FakeOrganization, userId: string) => {
+      return await clerkClient.organizations.createOrganization({
+        name: fakeOrg.name,
+        createdBy: userId,
+      });
     },
   };
 

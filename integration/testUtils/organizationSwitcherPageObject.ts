@@ -24,6 +24,16 @@ export const createOrganizationSwitcherComponentPageObject = (testArgs: TestArgs
     waitForAnOrganizationToSelected: () => {
       return page.waitForSelector('.cl-userPreviewMainIdentifier__personalWorkspace', { state: 'detached' });
     },
+    clickCreateOrganization: () => {
+      return page.getByText(/create organization/i).click();
+    },
+    selectOrganizationByName: (name: string) => {
+      return page
+        .locator('.cl-organizationSwitcherPreviewButton', {
+          hasText: name,
+        })
+        .click();
+    },
   };
 
   return self;
