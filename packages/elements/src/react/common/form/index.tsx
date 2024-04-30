@@ -1,4 +1,4 @@
-import { eventComponentMountedRaw } from '@clerk/shared/telemetry';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
@@ -533,7 +533,7 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
     const telemetry = useTelemetry();
 
     telemetry?.record(
-      eventComponentMountedRaw('Elements_Input', {
+      eventComponentMounted('Elements_Input', {
         type: props.type ?? false,
         // @ts-expect-error - Depending on type the props can be different
         render: Boolean(props?.render),

@@ -1,4 +1,4 @@
-import { eventComponentMountedRaw } from '@clerk/shared/telemetry';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import { useTelemetry } from '~/react/utils/telemetry';
@@ -48,7 +48,7 @@ export type SignInStepProps =
 export function SignInStep(props: SignInStepProps) {
   const telemetry = useTelemetry();
 
-  telemetry?.record(eventComponentMountedRaw('Elements_SignInStep', { name: props.name }));
+  telemetry?.record(eventComponentMounted('Elements_SignInStep', { name: props.name }));
 
   switch (props.name) {
     case SIGN_IN_STEPS['start']:

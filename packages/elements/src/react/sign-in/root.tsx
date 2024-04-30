@@ -1,5 +1,5 @@
 import { ClerkLoaded, ClerkLoading, useClerk } from '@clerk/clerk-react';
-import { eventComponentMountedRaw } from '@clerk/shared/telemetry';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import React, { useEffect } from 'react';
 import { createActor } from 'xstate';
 
@@ -84,7 +84,7 @@ export function SignInRoot({
   const telemetry = useTelemetry();
 
   telemetry?.record(
-    eventComponentMountedRaw('Elements_SignInRoot', {
+    eventComponentMounted('Elements_SignInRoot', {
       path,
       fallback: Boolean(fallback),
       exampleMode: Boolean(exampleMode),
