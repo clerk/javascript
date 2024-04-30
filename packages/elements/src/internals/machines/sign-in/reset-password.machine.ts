@@ -23,6 +23,9 @@ export const SignInResetPasswordMachine = setup({
     ),
   },
   actions: {
+    sendToLoading,
+    sendToNext: ({ context, event }) =>
+      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -33,9 +36,6 @@ export const SignInResetPasswordMachine = setup({
         };
       },
     ),
-    sendToLoading,
-    sendToNext: ({ context, event }) =>
-      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
   },
   types: {} as SignInResetPasswordSchema,
 }).createMachine({
@@ -43,7 +43,7 @@ export const SignInResetPasswordMachine = setup({
   context: ({ input }) => ({
     loadingStep: 'reset-password',
     parent: input.parent,
-    formRef: input.form,
+    formRef: input.formRef,
   }),
   initial: 'Pending',
   states: {

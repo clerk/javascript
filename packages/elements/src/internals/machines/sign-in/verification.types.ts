@@ -35,7 +35,7 @@ export type SignInVerificationEvents =
 // ---------------------------------- Input ---------------------------------- //
 
 export interface SignInVerificationInput {
-  form: ActorRefFrom<typeof FormMachine>;
+  formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignInRouterMachine>;
 }
 
