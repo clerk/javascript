@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.1.47",
+  "version": "0.1.48",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -85,7 +85,7 @@
     "@types/react-dom": "*",
     "concurrently": "^8.2.2",
     "eslint-config-custom": "*",
-    "next": "^14.0.4",
+    "next": "^14.2.3",
     "tslib": "2.4.1",
     "tsup": "*",
     "type-fest": "^4.9.0",
