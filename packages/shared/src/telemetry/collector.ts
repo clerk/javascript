@@ -114,7 +114,7 @@ export class TelemetryCollector {
 
     this.#logEvent(preparedPayload.event, preparedPayload);
 
-    if (!this.#shouldRecord(event)) {
+    if (!this.#shouldRecord(preparedPayload, event.eventSamplingRate)) {
       return;
     }
 
@@ -123,20 +123,20 @@ export class TelemetryCollector {
     this.#scheduleFlush();
   }
 
-  #shouldRecord(event: TelemetryEventRaw) {
-    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(event);
+  #shouldRecord(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
+    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(preparedPayload, eventSamplingRate);
   }
 
-  #shouldBeSampled(event: TelemetryEventRaw) {
+  #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
     const randomSeed = Math.random();
 
-    if (this.#eventThrottler.isEventThrottled(event)) {
+    if (this.#eventThrottler.isEventThrottled(preparedPayload)) {
       return false;
     }
 
     return (
       randomSeed <= this.#config.samplingRate &&
-      (typeof event.eventSamplingRate === 'undefined' || randomSeed <= event.eventSamplingRate)
+      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate)
     );
   }
 

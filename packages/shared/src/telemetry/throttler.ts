@@ -1,4 +1,4 @@
-import type { TelemetryEventRaw } from './types';
+import type { TelemetryEvent } from './types';
 
 type TtlInMilliseconds = number;
 
@@ -9,16 +9,16 @@ const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
  * mitigate event flooding in frequently executed code paths.
  */
 export class TelemetryEventThrottler {
-  #storageKey = 'clerk_telemetry';
+  #storageKey = 'clerk_telemetry_throttler';
   #cacheTtl = DEFAULT_CACHE_TTL_MS;
 
-  isEventThrottled(event: TelemetryEventRaw): boolean {
-    if (this.#isValidBrowser) {
+  isEventThrottled(payload: TelemetryEvent): boolean {
+    if (!this.#isValidBrowser) {
       return false;
     }
 
     const now = Date.now();
-    const key = this.#generateKey(event);
+    const key = this.#generateKey(payload);
     const entry = this.#cache?.[key];
 
     if (!entry) {
@@ -45,14 +45,22 @@ export class TelemetryEventThrottler {
    * Generates a consistent unique key for telemetry events by sorting payload properties.
    * This ensures that payloads with identical content in different orders produce the same key.
    */
-  #generateKey({ event, payload }: TelemetryEventRaw): string {
-    const payloadUniqueKey = JSON.stringify(
-      Object.keys(payload)
-        .sort()
-        .map(key => payload[key]),
-    );
+  #generateKey(event: TelemetryEvent): string {
+    const { sk: _sk, pk: _pk, payload, ...rest } = event;
 
-    return `${event}:${payloadUniqueKey}`;
+    const sanitizedEvent = {
+      ...payload,
+      ...rest,
+    };
+
+    return JSON.stringify(
+      Object.keys({
+        ...payload,
+        ...rest,
+      })
+        .sort()
+        .map(key => sanitizedEvent[key]),
+    );
   }
 
   get #cache(): Record<string, TtlInMilliseconds> | undefined {

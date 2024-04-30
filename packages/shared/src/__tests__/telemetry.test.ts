@@ -1,6 +1,9 @@
 import 'cross-fetch/polyfill';
 
+import assert from 'assert';
+
 import { TelemetryCollector } from '../telemetry';
+import type { TelemetryEvent } from '../telemetry/types';
 
 jest.useFakeTimers();
 
@@ -220,6 +223,11 @@ describe('TelemetryCollector', () => {
         payload,
       });
 
+      collector.record({
+        event,
+        payload,
+      });
+
       jest.runAllTimers();
 
       expect(fetchSpy).toHaveBeenCalledTimes(2);
@@ -275,6 +283,37 @@ describe('TelemetryCollector', () => {
       expect(fetchSpy).not.toHaveBeenCalled();
 
       randomSpy.mockRestore;
+    });
+
+    test('generates unique key without credentials based on event payload', () => {
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const event: TelemetryEvent = {
+        sk: '123',
+        pk: TEST_PK,
+        it: 'development',
+        event: 'TEST_EVENT',
+        cv: '0.1',
+        sdkv: '0.1',
+        payload: {
+          foo: true,
+        },
+      };
+
+      collector.record(event);
+      collector.record(event);
+
+      jest.runAllTimers();
+
+      const item = localStorage.getItem('clerk_telemetry_throttler');
+      assert(item);
+      const expectedKey = '["","TEST_EVENT",true,"development",null,null]';
+
+      expect(JSON.parse(item)[expectedKey]).toEqual(expect.any(Number));
+
+      fetchSpy.mockRestore();
     });
   });
 });
