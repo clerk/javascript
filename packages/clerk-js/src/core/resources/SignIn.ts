@@ -54,7 +54,7 @@ export class SignIn extends BaseResource implements SignInResource {
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
   createdSessionId: string | null = null;
-  userData!: UserData;
+  userData: UserData = new UserData(null);
 
   constructor(data: SignInJSON | null = null) {
     super();
