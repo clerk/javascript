@@ -2,7 +2,6 @@ import { useClerk } from '@clerk/clerk-react';
 import { useEffect, useRef } from 'react';
 import type { ActorRefFrom, AnyActorLogic, SnapshotFrom } from 'xstate';
 
-import { useFormStore } from '~/internals/machines/form/form.context';
 import type { SignInRouterRouteRegisterEvent, TSignInRouterMachine } from '~/internals/machines/sign-in';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
@@ -18,7 +17,6 @@ export function useSignInRouteRegistration<
 
   const clerk = useClerk();
   const routerRef = SignInRouterCtx.useActorRef();
-  const form = useFormStore();
 
   const ref = routerRef.system.get(id);
 
@@ -31,7 +29,7 @@ export function useSignInRouteRegistration<
       type: 'ROUTE.REGISTER',
       id,
       logic,
-      input: { clerk, form, ...input },
+      input: { clerk, ...input },
     });
 
     isMounted.current = true;

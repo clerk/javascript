@@ -30,7 +30,7 @@ export type SignUpStartEvents = ErrorActorEvent | SignUpStartSubmitEvent | SignU
 
 export type SignUpStartInput = {
   basePath?: string;
-  form: ActorRefFrom<typeof FormMachine>;
+  formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignUpRouterMachine>;
 };
 

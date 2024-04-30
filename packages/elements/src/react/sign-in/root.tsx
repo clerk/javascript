@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { createActor } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
-import { FormStoreProvider } from '~/internals/machines/form/form.context';
+import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
 import { consoleInspector } from '~/internals/utils/inspector';
@@ -23,6 +23,7 @@ actor.start();
 function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
+  const formRef = useFormStore();
 
   useEffect(() => {
     if (!clerk || !router) return;
@@ -32,16 +33,17 @@ function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) 
       const evt: SignInRouterInitEvent = {
         type: 'INIT',
         clerk,
+        exampleMode,
+        formRef,
         router,
         signUpPath: SIGN_UP_DEFAULT_BASE_PATH,
-        exampleMode,
       };
 
       if (actor.getSnapshot().can(evt)) {
         actor.send(evt);
       }
     });
-  }, [clerk, router, exampleMode]);
+  }, [clerk, exampleMode, formRef, router]);
 
   return <SignInRouterCtx.Provider actorRef={actor}>{children}</SignInRouterCtx.Provider>;
 }

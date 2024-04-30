@@ -19,7 +19,7 @@ export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent;
 
 export type SignInStartInput = {
   basePath?: string;
-  form: ActorRefFrom<typeof FormMachine>;
+  formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignInRouterMachine>;
 };
 

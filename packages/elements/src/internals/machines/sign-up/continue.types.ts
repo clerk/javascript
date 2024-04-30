@@ -19,7 +19,7 @@ export type SignUpContinueEvents = ErrorActorEvent | SignUpContinueSubmitEvent;
 
 export type SignUpContinueInput = {
   basePath?: string;
-  form: ActorRefFrom<typeof FormMachine>;
+  formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignUpRouterMachine>;
 };
 
