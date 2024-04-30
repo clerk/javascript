@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { createActor } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
-import { FormStoreProvider } from '~/internals/machines/form/form.context';
+import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { consoleInspector } from '~/internals/utils/inspector';
@@ -26,6 +26,7 @@ const ref = actor.start();
 function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
+  const formRef = useFormStore();
   const isReady = useSelector(ref, state => state.value !== 'Idle');
 
   useEffect(() => {
@@ -36,16 +37,17 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
       const evt: SignUpRouterInitEvent = {
         type: 'INIT',
         clerk,
+        exampleMode,
+        formRef,
         router,
         signInPath: SIGN_IN_DEFAULT_BASE_PATH,
-        exampleMode,
       };
 
       if (ref.getSnapshot().can(evt)) {
         ref.send(evt);
       }
     });
-  }, [clerk, router, exampleMode]);
+  }, [clerk, exampleMode, formRef, router]);
 
   return isReady ? <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider> : null;
 }

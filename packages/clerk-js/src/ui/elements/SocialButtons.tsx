@@ -115,7 +115,9 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 ? localizationKeys('socialButtonsBlockButton', {
                     provider: strategyToDisplayData[strategy].name,
                   })
-                : undefined;
+                : localizationKeys('socialButtonsBlockButtonManyInView', {
+                    provider: strategyToDisplayData[strategy].name,
+                  });
 
             // When strategies break into 2 rows or more, use the first item of the first
             // row as reference for the width of the buttons in the second row and beyond

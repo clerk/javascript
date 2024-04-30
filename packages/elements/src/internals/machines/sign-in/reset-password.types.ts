@@ -18,7 +18,7 @@ export type SignInResetPasswordEvents = ErrorActorEvent | SignInResetPasswordSub
 // ---------------------------------- Input ---------------------------------- //
 
 export type SignInResetPasswordInput = {
-  form: ActorRefFrom<typeof FormMachine>;
+  formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignInRouterMachine>;
 };
 

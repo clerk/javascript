@@ -64,7 +64,7 @@ export type SignUpVerificationEvents =
 
 export type SignUpVerificationInput = {
   basePath?: string;
-  form: ActorRefFrom<typeof FormMachine>;
+  formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignUpRouterMachine>;
 };
 
