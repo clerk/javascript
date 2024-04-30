@@ -58,6 +58,20 @@ describe('SignInStart', () => {
       screen.getByText(/email address or username/i);
     });
 
+    it('passkeys shall not interfere with dynamic field when email address and phone number is enabled', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withEmailAddress();
+        f.withPasskey();
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      screen.getByText(/email address/i);
+      await userEvent.click(screen.getByText(/use phone/i));
+      screen.getByText(/phone number/i);
+      await userEvent.click(screen.getByText(/use email/i));
+      screen.getByText(/email address/i);
+    });
+
     mockWebAuthn(() => {
       it('enables login with passkey via dedicated button', async () => {
         const { wrapper } = await createFixtures(f => {
