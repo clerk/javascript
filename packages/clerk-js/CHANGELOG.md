@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.72.2
+
+### Patch Changes
+
+- Use default value for `signIn.userData`, to correctly align it with the types. ([#3284](https://github.com/clerk/javascript/pull/3284)) by [@desiprisg](https://github.com/desiprisg)
+
+- Set the card error when encountering an error on preparing verification via code for email or phone on sign up. ([#3255](https://github.com/clerk/javascript/pull/3255)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`7cd9dd668`](https://github.com/clerk/javascript/commit/7cd9dd668a76be42ad37bb78b1bd805bac4768f6)]:
+  - @clerk/types@3.64.1
+  - @clerk/localizations@1.28.4
+
 ## 4.72.1
 
 ### Patch Changes
