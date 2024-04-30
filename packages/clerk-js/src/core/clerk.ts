@@ -14,7 +14,7 @@ import {
   setDevBrowserJWTInURL,
   stripScheme,
 } from '@clerk/shared';
-import { eventComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
+import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
@@ -448,7 +448,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(eventComponentMounted('SignIn', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('SignIn', props));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -472,7 +472,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
     // TODO-ONETAP: Enable telemetry one feature is ready for public beta
-    // this.telemetry?.record(eventComponentMounted('GoogleOneTap', props));
+    // this.telemetry?.record(eventPrebuiltComponentMounted('GoogleOneTap', props));
   };
 
   public __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
@@ -494,7 +494,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(eventComponentMounted('SignUp', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -525,7 +525,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('UserProfile', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props));
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -565,7 +565,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('OrganizationProfile', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationProfile', props));
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
@@ -596,7 +596,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('CreateOrganization', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('CreateOrganization', props));
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
@@ -627,7 +627,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('OrganizationSwitcher', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationSwitcher', props));
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -654,7 +654,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('OrganizationList', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationList', props));
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
@@ -673,7 +673,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('UserButton', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props));
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {

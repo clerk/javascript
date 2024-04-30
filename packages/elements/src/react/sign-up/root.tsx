@@ -1,4 +1,5 @@
 import { ClerkLoaded, ClerkLoading, useClerk } from '@clerk/clerk-react';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import { useEffect } from 'react';
 import { createActor } from 'xstate';
@@ -10,6 +11,7 @@ import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { consoleInspector } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
+import { useTelemetry } from '~/react/utils/telemetry';
 
 import { Form } from '../common/form';
 
@@ -78,6 +80,16 @@ export function SignUpRoot({
   fallback = null,
   exampleMode,
 }: SignUpRootProps): JSX.Element | null {
+  const telemetry = useTelemetry();
+
+  telemetry?.record(
+    eventComponentMounted('Elements_SignUpRoot', {
+      path,
+      fallback: Boolean(fallback),
+      exampleMode: Boolean(exampleMode),
+    }),
+  );
+
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
 
