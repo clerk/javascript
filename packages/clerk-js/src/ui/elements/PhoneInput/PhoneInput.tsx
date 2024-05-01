@@ -160,11 +160,10 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
       >
         <Text
           sx={t => ({
-            position: 'absolute',
-            left: '1ch',
-            top: '50%',
-            transform: 'translateY(-50%)',
+            display: 'flex',
+            alignItems: 'center',
             pointerEvents: 'none',
+            paddingLeft: t.space.$0x5,
             opacity: props.isDisabled ? t.opacity.$disabled : 1,
           })}
         >
@@ -190,7 +189,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
                 borderWidth: 0,
                 borderTopLeftRadius: 0,
                 borderBottomLeftRadius: 0,
-                paddingLeft: `${`+${selectedCountryOption.country.code}`.length + 1.5}ch`,
+                paddingLeft: t.space.$1,
                 '&:focus': {
                   borderColor: 'unset',
                   boxShadow: 'unset',
