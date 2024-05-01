@@ -206,6 +206,7 @@ export const SignUpRouterMachine = setup({
               isLoading: false,
             },
             exampleMode: event.exampleMode || false,
+            formRef: event.formRef,
           })),
           target: 'Init',
         },
