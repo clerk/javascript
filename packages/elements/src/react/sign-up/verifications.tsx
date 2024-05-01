@@ -85,5 +85,5 @@ export function SignUpStrategy({ children, name: tag }: SignUpStrategyProps) {
     `verification:category:${tag}`,
   ] as unknown as SignUpVerificationTags[]);
 
-  return active ? children : null;
+  return active ? <>{children}</> : null;
 }
