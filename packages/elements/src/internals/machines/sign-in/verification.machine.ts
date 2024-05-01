@@ -109,10 +109,15 @@ const SignInVerificationMachine = setup({
 
       if (
         process.env.NODE_ENV === 'development' &&
+        context.currentFactor?.strategy &&
         !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
       ) {
         throw new ClerkElementsRuntimeError(
           `Your sign-in attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+        );
+      } else if (process.env.NODE_ENV === 'development' && !context.currentFactor?.strategy) {
+        throw new ClerkElementsRuntimeError(
+          'Your Clerk configuration is missing a valid authentication strategy. Please verify your instance configuration. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy',
         );
       }
     },
