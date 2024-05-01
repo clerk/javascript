@@ -38,7 +38,10 @@ export const SignInStartMachine = setup({
     ),
   },
   actions: {
-    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    sendToNext: ({ context, event }) => {
+      // @ts-expect-error -- We're calling this in onDone, and event.output exists on the actor done event
+      return context.parent.send({ type: 'NEXT', resource: event?.output });
+    },
     sendToLoading,
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
