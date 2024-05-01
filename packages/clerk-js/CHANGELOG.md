@@ -1,5 +1,26 @@
 # Change Log
 
+## 5.2.0
+
+### Minor Changes
+
+- Allow localization of text in social buttons when many are listed. ([#3282](https://github.com/clerk/javascript/pull/3282)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Allow users to display the email address field after selecting to input a phone number. Previously that was not possible when passkeys were enabled. ([#3286](https://github.com/clerk/javascript/pull/3286)) by [@panteliselef](https://github.com/panteliselef)
+
+- Avoid throwing error for missing an active organization when no user is signed in ([#3290](https://github.com/clerk/javascript/pull/3290)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use default value for `signIn.userData`. This will prevent the SignIn modal from breaking when an appearance prop is used in Next.js App Router. ([#3280](https://github.com/clerk/javascript/pull/3280)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove deprecated `__clerk_frontend_api` from `Window` interface ([#3288](https://github.com/clerk/javascript/pull/3288)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`c7d626292`](https://github.com/clerk/javascript/commit/c7d626292a9fd12ca0f1b31a1035e711b6e99531), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc)]:
+  - @clerk/shared@2.0.1
+  - @clerk/localizations@2.3.0
+  - @clerk/types@4.2.0
+
 ## 5.1.1
 
 ### Patch Changes
