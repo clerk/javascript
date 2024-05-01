@@ -190,7 +190,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
                 borderWidth: 0,
                 borderTopLeftRadius: 0,
                 borderBottomLeftRadius: 0,
-                paddingLeft: `${`+${selectedCountryOption.country.code}`.length + 1}ch`,
+                paddingLeft: `${`+${selectedCountryOption.country.code}`.length + 1.5}ch`,
                 '&:focus': {
                   borderColor: 'unset',
                   boxShadow: 'unset',
