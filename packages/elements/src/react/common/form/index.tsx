@@ -1,3 +1,4 @@
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
@@ -34,6 +35,7 @@ import {
 } from '~/internals/machines/form/form.context';
 import { usePassword } from '~/react/hooks/use-password.hook';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
+import { useTelemetry } from '~/react/utils/telemetry';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
@@ -489,7 +491,7 @@ type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
 };
 type FormInputProps =
   | RadixFormControlProps
-  | ({ type: 'otp'; render: any } & Omit<OTPInputProps, 'asChild'>)
+  | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
   | ({ type: 'otp'; render?: undefined } & OTPInputProps)
   | ({ type: 'password' } & PasswordInputProps);
 
@@ -528,6 +530,20 @@ type FormInputProps =
  */
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
+    const telemetry = useTelemetry();
+
+    telemetry?.record(
+      eventComponentMounted('Elements_Input', {
+        type: props.type ?? false,
+        // @ts-expect-error - Depending on type the props can be different
+        render: Boolean(props?.render),
+        // @ts-expect-error - Depending on type the props can be different
+        asChild: Boolean(props?.asChild),
+        // @ts-expect-error - Depending on type the props can be different
+        validatePassword: Boolean(props?.validatePassword),
+      }),
+    );
+
     const field = useInput(props);
     return (
       <field.Element

@@ -1,5 +1,29 @@
 # Change Log
 
+## 4.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`8fbe23857`](https://github.com/clerk/javascript/commit/8fbe23857bc588a4662af78ee33b24123cd8bc2e), [`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc), [`e79d2e3d3`](https://github.com/clerk/javascript/commit/e79d2e3d3be02eb1cf8b2647ac179cc5d4aa2de2)]:
+  - @clerk/backend@1.1.1
+  - @clerk/shared@2.0.1
+  - @clerk/clerk-react@5.0.2
+
+## 4.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`b3fda50f0`](https://github.com/clerk/javascript/commit/b3fda50f03672106c6858219fc607d226851ec10), [`b3ad7a459`](https://github.com/clerk/javascript/commit/b3ad7a459c46be1f8967faf73c2cdd96406593c8), [`4e5de1164`](https://github.com/clerk/javascript/commit/4e5de1164d956c7dc21f72d25e312296d36504a7)]:
+  - @clerk/backend@1.1.0
+
+## 4.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`3c6e5a6f1`](https://github.com/clerk/javascript/commit/3c6e5a6f1dd0ac198e6e48d1b83c6d4846a7f900), [`65503dcb9`](https://github.com/clerk/javascript/commit/65503dcb97acb9538e5c0e3f8199d20ad31c9d7d)]:
+  - @clerk/backend@1.0.1
+  - @clerk/clerk-react@5.0.1
+
 ## 4.0.0
 
 ### Major Changes
@@ -59,7 +83,8 @@
   - use `publishableKey` instead of `frontendApi`
 
 - 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
-  ```typescript
+
+  ````typescript
   // Before
   import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
   // After
@@ -84,6 +109,8 @@
   - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
+
+  ````
 
 - 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
   to fix issues with vite & rollup building.

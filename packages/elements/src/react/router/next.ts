@@ -10,7 +10,8 @@ import type { ClerkHostRouter } from './router';
 export const useNextRouter = (): ClerkHostRouter => {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- The order doesn't differ between renders as we're checking the execution environment.
+  const searchParams = typeof window === 'undefined' ? new URLSearchParams() : useSearchParams();
 
   // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
   // preserve internal state between steps.

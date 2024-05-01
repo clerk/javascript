@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.1.46",
+  "version": "0.1.51",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -77,15 +77,15 @@
     "xstate": "^5.11.0"
   },
   "devDependencies": {
-    "@clerk/clerk-react": "5.0.0",
-    "@clerk/shared": "2.0.0",
-    "@clerk/types": "^4.0.0",
+    "@clerk/clerk-react": "5.0.2",
+    "@clerk/shared": "2.0.1",
+    "@clerk/types": "^4.2.0",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "concurrently": "^8.2.2",
     "eslint-config-custom": "*",
-    "next": "^14.0.4",
+    "next": "^14.2.3",
     "tslib": "2.4.1",
     "tsup": "*",
     "type-fest": "^4.9.0",

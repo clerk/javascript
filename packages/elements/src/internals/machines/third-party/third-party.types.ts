@@ -1,8 +1,10 @@
 import type { AuthenticateWithRedirectParams } from '@clerk/types';
 import type { SetOptional } from 'type-fest';
-import type { AnyActorRef } from 'xstate';
+import type { ActorRefFrom, AnyActorRef } from 'xstate';
 
 import type { ClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
+
+import type { TFormMachine } from '../form';
 
 type Flow = 'signIn' | 'signUp';
 
@@ -24,6 +26,7 @@ export interface ThirdPartyMachineContext {
   activeStrategy: string | null; // TODO: Update type
   basePath: string;
   flow: Flow;
+  formRef: ActorRefFrom<TFormMachine>;
   parent: AnyActorRef; // TODO: Fix circular dependency
   loadingStep: 'strategy';
 }
@@ -33,6 +36,7 @@ export interface ThirdPartyMachineContext {
 export interface ThirdPartyMachineInput {
   basePath: string;
   flow: Flow;
+  formRef: ActorRefFrom<TFormMachine>;
   parent: AnyActorRef; // TODO: Fix circular dependency
 }
 

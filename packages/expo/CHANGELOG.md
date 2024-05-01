@@ -1,5 +1,29 @@
 # Change Log
 
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`d1b75fa84`](https://github.com/clerk/javascript/commit/d1b75fa84ea6ad04604db58c18ef71efabb004c8), [`377bff929`](https://github.com/clerk/javascript/commit/377bff929a7e668368611482044dd9fad0c98b58), [`4678caf4b`](https://github.com/clerk/javascript/commit/4678caf4b88f524ee638b944c683af126d6e5f90), [`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`c7d626292`](https://github.com/clerk/javascript/commit/c7d626292a9fd12ca0f1b31a1035e711b6e99531), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc), [`e79d2e3d3`](https://github.com/clerk/javascript/commit/e79d2e3d3be02eb1cf8b2647ac179cc5d4aa2de2)]:
+  - @clerk/clerk-js@5.2.0
+  - @clerk/shared@2.0.1
+  - @clerk/clerk-react@5.0.2
+
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`3d659e4d6`](https://github.com/clerk/javascript/commit/3d659e4d69efb7dd1d2e33d8c6e1950e074d5467), [`8688ad73f`](https://github.com/clerk/javascript/commit/8688ad73f458af2bf7560c1c8204f67304e4ac71), [`dafdad2f8`](https://github.com/clerk/javascript/commit/dafdad2f8ddb1ea29a2db7755390e060991ae356)]:
+  - @clerk/clerk-js@5.1.1
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`e79610344`](https://github.com/clerk/javascript/commit/e79610344ee8f48c742f2ffe2ef31d43d63cdf5a), [`6a67bc96b`](https://github.com/clerk/javascript/commit/6a67bc96ba38dfcf8fbd9a098613f50e62e5be7a), [`956d8792f`](https://github.com/clerk/javascript/commit/956d8792fefe9d6a89022f1e938149b25503ec7f), [`6f3c11de6`](https://github.com/clerk/javascript/commit/6f3c11de638b360597ca5d2141e5f4bee12f604d)]:
+  - @clerk/clerk-js@5.1.0
+  - @clerk/clerk-react@5.0.1
+
 ## 1.0.0
 
 ### Major Changes
@@ -49,7 +73,8 @@
   - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
   - use `useEmailLink` instead of `useMagicLink`
 - 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
-  ```typescript
+
+  ````typescript
   // Before
   import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
   // After
@@ -74,6 +99,8 @@
   - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
+
+  ````
 
 - 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
   to fix issues with vite & rollup building.

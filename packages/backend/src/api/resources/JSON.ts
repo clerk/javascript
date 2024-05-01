@@ -32,6 +32,7 @@ export const ObjectType = {
   Web3Wallet: 'web3_wallet',
   Token: 'token',
   TotalCount: 'total_count',
+  TestingToken: 'testing_token',
 } as const;
 
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
@@ -228,6 +229,7 @@ export interface SignInJSON extends ClerkResourceJSON {
 }
 
 export interface SignInTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.SignInToken;
   user_id: string;
   token: string;
   status: 'pending' | 'accepted' | 'revoked';
@@ -355,4 +357,10 @@ export interface AttributeMappingJSON {
   email_address: string;
   first_name: string;
   last_name: string;
+}
+
+export interface TestingTokenJSON {
+  object: typeof ObjectType.TestingToken;
+  token: string;
+  expires_at: number;
 }

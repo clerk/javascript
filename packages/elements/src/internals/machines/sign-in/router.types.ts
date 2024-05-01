@@ -1,6 +1,7 @@
 import type { SignInResource } from '@clerk/types';
-import type { AnyActorLogic, MachineSnapshot } from 'xstate';
+import type { ActorRefFrom, AnyActorLogic, MachineSnapshot } from 'xstate';
 
+import type { TFormMachine } from '~/internals/machines/form';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
@@ -61,6 +62,7 @@ export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
+  formRef: ActorRefFrom<TFormMachine>;
   signUpPath?: string;
 }
 
@@ -96,8 +98,15 @@ export type SignInRouterEvents =
 export type SignInRouterLoadingContext = Omit<SignInRouterLoadingEvent, 'type'>;
 
 export interface SignInRouterContext extends BaseRouterContext {
-  signUpPath: string;
+  formRef: ActorRefFrom<TFormMachine>;
   loading: SignInRouterLoadingContext;
+  signUpPath: string;
+}
+
+// ---------------------------------- Input ---------------------------------- //
+
+export interface SignInRouterInput {
+  // NOTE: Set in INIT event
 }
 
 // ---------------------------------- Schema ---------------------------------- //

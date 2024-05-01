@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { isKnownError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
@@ -50,6 +50,8 @@ type FormMachineTypes = {
   context: FormMachineContext;
 };
 
+export type TFormMachine = typeof FormMachine;
+
 /**
  * A machine for managing form state.
  * This machine is used alongside our other, flow-specific machines and a reference to a spawned FormMachine actor is used in the flows to interact with the form state.
@@ -84,7 +86,7 @@ export const FormMachine = setup({
   on: {
     'ERRORS.SET': {
       actions: enqueueActions(({ enqueue, event }) => {
-        if (isClerkAPIResponseError(event.error)) {
+        if (isKnownError(event.error)) {
           const fields: Record<string, ClerkElementsFieldError[]> = {};
           const globalErrors: ClerkElementsError[] = [];
 

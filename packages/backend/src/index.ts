@@ -80,6 +80,7 @@ export type {
   Web3WalletJSON,
   DeletedObjectJSON,
   PaginatedResponseJSON,
+  TestingTokenJSON,
 } from './api/resources/JSON';
 
 /**
@@ -102,6 +103,7 @@ export type {
   SMSMessage,
   Token,
   User,
+  TestingToken,
 } from './api/resources';
 
 /**

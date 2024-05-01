@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.0.2
+
+### Patch Changes
+
+- Remove deprecated `__clerk_frontend_api` from `Window` interface ([#3288](https://github.com/clerk/javascript/pull/3288)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`c7d626292`](https://github.com/clerk/javascript/commit/c7d626292a9fd12ca0f1b31a1035e711b6e99531), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc)]:
+  - @clerk/shared@2.0.1
+  - @clerk/types@4.2.0
+
+## 5.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`956d8792f`](https://github.com/clerk/javascript/commit/956d8792fefe9d6a89022f1e938149b25503ec7f)]:
+  - @clerk/types@4.1.0
+
 ## 5.0.0
 
 ### Major Changes
@@ -120,7 +137,8 @@
   - use `publishableKey` instead of `frontendApi`
   - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
 - 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
-  ```typescript
+
+  ````typescript
   // Before
   import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
   // After
@@ -145,6 +163,8 @@
   - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
   - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
     to reduce the export surface since it's trivial to implement if needed.
+
+  ````
 
 - 5f58a2274: Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters.
 - 5f58a2274: - `buildUrlWithAuth` no longer accepts an `options` argument.
