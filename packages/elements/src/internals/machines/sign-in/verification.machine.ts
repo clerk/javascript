@@ -117,7 +117,7 @@ const SignInVerificationMachine = setup({
         );
       } else if (process.env.NODE_ENV === 'development' && !context.currentFactor?.strategy) {
         throw new ClerkElementsRuntimeError(
-          'Your Clerk configuration is missing a valid authentication strategy. Please verify your instance configuration. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy',
+          'Unable to determine an authentication strategy to verify. This means your instance is misconfigured. Visit the Clerk Dashboard and verify that your instance has authentication strategies enabled: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username,
         );
       }
     },
