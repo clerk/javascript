@@ -1,5 +1,17 @@
 # @clerk/elements
 
+## 0.2.0
+
+### Minor Changes
+
+- Bump version to 0.2.0 ([#3301](https://github.com/clerk/javascript/pull/3301)) by [@tmilewski](https://github.com/tmilewski)
+
+  Fix return type of `<SignIn.Strategy>` to be `JSX.Element | null`
+
+### Patch Changes
+
+- Update README to add install and usage instructions ([#3253](https://github.com/clerk/javascript/pull/3253)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 0.1.46
 
 ### Patch Changes
@@ -30,10 +42,10 @@
 ### Patch Changes
 
 - **[BREAKING]**
-    - Rename `Provider` to `Connection`
-    - Rename `ProviderIcon` to `Icon`
-    - Update to handle both sign-up and sign-in
-    - export under `/common`
+  - Rename `Provider` to `Connection`
+  - Rename `ProviderIcon` to `Icon`
+  - Update to handle both sign-up and sign-in
+  - export under `/common`
 
 ## 0.1.42
 
@@ -41,8 +53,8 @@
 
 - Add Sign In Forgot Password functionality
 - Clerk’s all-in-one components have a neat feature for the password input during sign-up: There's an instant validation (according to the dashboard password strength settings) and feedback on how good/bad the password is.
-    - You can add a `validatePassword` prop to `<Input type="password" />` to enable the aforementioned validation
-    - The `<FieldState>` component now returns beside `state` also `message` and `codes`
+  - You can add a `validatePassword` prop to `<Input type="password" />` to enable the aforementioned validation
+  - The `<FieldState>` component now returns beside `state` also `message` and `codes`
 
 ## 0.1.41
 
@@ -127,24 +139,23 @@
 ### Patch Changes
 
 - **[BREAKING]**
-    - The import for the `<Loading>` component was moved to `/common`
-        
-        ```diff
-        	- import { Loading } from "@clerk/elements/sign-in"
-        - import { Loading } from "@clerk/elements/sign-up"
-        + import { Loading } from "@clerk/elements/common"
-        ```
+  - The import for the `<Loading>` component was moved to `/common`
+    ```diff
+    	- import { Loading } from "@clerk/elements/sign-in"
+    - import { Loading } from "@clerk/elements/sign-up"
+    + import { Loading } from "@clerk/elements/common"
+    ```
 
 ## 0.1.27
 
 ### Patch Changes
 
 - **[BREAKING]**
-    - `<FieldState>` now returns its state directly in the function, not nested inside an object
-        - Before: `<FieldState>{({ state }) => ()}</FieldState>`
-        - After: `<FieldState>{state => ()}</FieldState>`
+  - `<FieldState>` now returns its state directly in the function, not nested inside an object
+    - Before: `<FieldState>{({ state }) => ()}</FieldState>`
+    - After: `<FieldState>{state => ()}</FieldState>`
 - `<Field>` now optionally allows for its children to accept a function providing the state. You don’t have to use the function, it’s optional.
-    - Example: `<Field>{state => ()}</Field>`
+  - Example: `<Field>{state => ()}</Field>`
 
 ## 0.1.26
 
@@ -163,12 +174,12 @@
 ### Patch Changes
 
 - **[BREAKING]**
-    - `<Verification>` was renamed to `<Strategy>`
-    - The `<Navigate>` component was removed. Use `<Action>` instead.
-        - Before: `<Navigate to="previous">Go back</Navigate>`
-        - After: `<Action navigate="previous">Go back</Action>`
+  - `<Verification>` was renamed to `<Strategy>`
+  - The `<Navigate>` component was removed. Use `<Action>` instead.
+    - Before: `<Navigate to="previous">Go back</Navigate>`
+    - After: `<Action navigate="previous">Go back</Action>`
 - You can use `<Action>` now instead of the `<Submit>` component
-    - Example: `<Action submit>Log in</Action>`
+  - Example: `<Action submit>Log in</Action>`
 
 ## 0.1.23
 
@@ -176,8 +187,8 @@
 
 - Adds `<SafeIdentifier>` to SignIn, enabling the ability to display the current identifier being validated against. E.g.: `We’ve sent a temporary code to <SafeIdentifier>**.**`
 - **[BREAKING]** Renames the following components:
-    - `<SocialProvider>` to `<Provider>`
-    - `<SocialProviderIcon>` to `<ProviderIcon>`
+  - `<SocialProvider>` to `<Provider>`
+  - `<SocialProviderIcon>` to `<ProviderIcon>`
 
 ## 0.1.22
 
@@ -202,8 +213,8 @@
 ### Patch Changes
 
 - **[BREAKING]**
-    - Require Core 2 Beta version to be used with Clerk Elements
-        - You can install the Next.js SDK with `npm install @clerk/nextjs@beta`
+  - Require Core 2 Beta version to be used with Clerk Elements
+    - You can install the Next.js SDK with `npm install @clerk/nextjs@beta`
 
 ## 0.1.18
 
@@ -228,7 +239,7 @@
 ### Patch Changes
 
 - You can now provide alternative login strategies during sign in. It’s the “Use another method” functionality that Clerk’s current prebuilt components offer.
-    - Introduction of a `<StrategyOption>` component for the sign in flow.
+  - Introduction of a `<StrategyOption>` component for the sign in flow.
 - Introduction of a `<Navigate>` component.
 
 ## 0.1.14
@@ -237,7 +248,7 @@
 
 - Performance improvements to underlying business logic
 - **[BREAKING]**
-    - `<Start>`, `<Continue>` and `<Verifications>` as export were removed. Use `<Step>` instead.
+  - `<Start>`, `<Continue>` and `<Verifications>` as export were removed. Use `<Step>` instead.
 
 ## 0.1.13
 
@@ -257,13 +268,10 @@
 
 - Fix bugs in SAML/OAuth flows
 - Add `<Step>` component which can be used instead of `<Start>`, `<Continue>` and `<Verifications>` like this:
-    
-    ```tsx
-    // You can also use name="continue" or name="verifications"
-    <Step name="start">
-      Contents
-    </Step>
-    ```
+  ```tsx
+  // You can also use name="continue" or name="verifications"
+  <Step name='start'>Contents</Step>
+  ```
 
 ## 0.1.10
 
