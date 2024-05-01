@@ -75,12 +75,12 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
     "@clerk/types": "4.2.0",
     "@types/crypto-js": "4.2.2",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "eslint-config-custom": "*",
     "next": "^13.5.4",
     "typescript": "*"
   },

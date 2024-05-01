@@ -80,6 +80,7 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
     "@clerk/types": "4.2.0",
     "@remix-run/react": "^2.0.0",
     "@remix-run/server-runtime": "^2.0.0",
@@ -87,7 +88,6 @@
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "eslint-config-custom": "*",
     "typescript": "*"
   },
   "peerDependencies": {

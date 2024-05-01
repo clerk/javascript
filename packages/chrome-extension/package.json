@@ -50,12 +50,12 @@
     "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
     "@types/chrome": "*",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "@types/webextension-polyfill": "^0.10.7",
-    "eslint-config-custom": "*",
     "tsup": "*",
     "type-fest": "^4.8.3",
     "typescript": "*"

@@ -46,8 +46,8 @@
     "cookies": "0.8.0"
   },
   "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
     "@types/node": "^18.17.0",
-    "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
   },

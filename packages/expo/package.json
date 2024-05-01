@@ -47,12 +47,12 @@
     "tslib": "2.4.1"
   },
   "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
     "@clerk/types": "^4.2.0",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "eslint-config-custom": "*",
     "expo-application": "^4.2.2",
     "expo-auth-session": "^5.4.0",
     "expo-constants": "^14.5.1",
