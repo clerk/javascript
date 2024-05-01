@@ -80,7 +80,7 @@ export function SignInStrategy({ children, name }: SignInStrategyProps) {
     };
   }, [factorCtx, name]);
 
-  return active ? children : null;
+  return active ? <>{children}</> : null;
 }
 
 /**
