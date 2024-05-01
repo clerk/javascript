@@ -24,3 +24,4 @@ export { createClerkExpressRequireAuth, createClerkExpressWithAuth };
 
 export { requireAuth } from './requireAuth';
 export { withAuth } from './withAuth';
+export { authenticateRequest } from './authenticateRequest';
