@@ -160,10 +160,11 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
       >
         <Text
           sx={t => ({
-            display: 'flex',
-            alignItems: 'center',
+            position: 'absolute',
+            left: '1ch',
+            top: '50%',
+            transform: 'translateY(-50%)',
             pointerEvents: 'none',
-            paddingRight: t.space.$0x5,
             opacity: props.isDisabled ? t.opacity.$disabled : 1,
           })}
         >
@@ -179,13 +180,22 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
           sx={[
             t => ({
               boxShadow: 'none',
-              borderRadius: t.radii.$md,
               height: '100%',
-              borderTopLeftRadius: '0',
-              borderBottomLeftRadius: '0',
               transitionProperty: t.transitionProperty.$common,
               transitionTimingFunction: t.transitionTiming.$common,
               transitionDuration: t.transitionDuration.$focusRing,
+              // This ensures that this input will never have any border or boxShadow styles.
+              '&[type=tel]': {
+                borderRadius: t.radii.$md,
+                borderWidth: 0,
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+                paddingLeft: `${`+${selectedCountryOption.country.code}`.length + 1}ch`,
+                '&:focus': {
+                  borderColor: 'unset',
+                  boxShadow: 'unset',
+                },
+              },
             }),
             sx,
           ]}
