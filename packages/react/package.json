@@ -78,7 +78,6 @@
   "dependencies": {
     "@clerk/shared": "2.0.1",
     "@clerk/types": "4.2.0",
-    "eslint-config-custom": "*",
     "tslib": "2.4.1"
   },
   "devDependencies": {
