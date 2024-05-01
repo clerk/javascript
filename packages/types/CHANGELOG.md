@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.64.1
+
+### Patch Changes
+
+- Use default value for `signIn.userData`, to correctly align it with the types. ([#3284](https://github.com/clerk/javascript/pull/3284)) by [@desiprisg](https://github.com/desiprisg)
+
 ## 3.64.0
 
 ### Minor Changes
