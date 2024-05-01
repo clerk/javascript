@@ -34,9 +34,11 @@ type Parent = ActorRefFrom<TSignInRouterMachine>;
 
 export type PrepareFirstFactorInput = WithParams<SignInFirstFactor | null> & {
   parent: Parent;
+  resendable: boolean;
 };
 export type PrepareSecondFactorInput = WithParams<SignInSecondFactor | null> & {
   parent: Parent;
+  resendable: boolean;
 };
 
 export type AttemptFirstFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInFirstFactor | null };
@@ -171,6 +173,7 @@ const SignInVerificationMachine = setup({
         src: 'prepare',
         input: ({ context }) => ({
           parent: context.parent,
+          resendable: context.resendable,
           params: context.currentFactor as SignInFirstFactor | null,
         }),
         onDone: {
@@ -267,10 +270,14 @@ const SignInVerificationMachine = setup({
 export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent } = input;
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
-      if (!params?.strategy || params.strategy === 'password') {
+      // If a prepare call has already been fired recently, don't re-send
+      const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
+      const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
+
+      if (!params?.strategy || params.strategy === 'password' || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
@@ -359,12 +366,16 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
   actors: {
     prepare: fromPromise(({ input }) => {
-      const { params, parent } = input;
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
+
+      // If a prepare call has already been fired recently, don't re-send
+      const currentVerificationExpiration = clerk.client.signIn.secondFactorVerification.expireAt;
+      const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
       assertIsDefined(params);
 
-      if (params.strategy !== 'phone_code') {
+      if (params.strategy !== 'phone_code' || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
