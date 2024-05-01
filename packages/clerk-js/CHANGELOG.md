@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.2.1
+
+### Patch Changes
+
+- Fixes issue where email field is required but is not shown after user tries to edit email, when already tried another email before when trying to sign up with a method that not provides and email (e.g Metamask) ([#3291](https://github.com/clerk/javascript/pull/3291)) by [@octoper](https://github.com/octoper)
+
 ## 5.2.0
 
 ### Minor Changes
