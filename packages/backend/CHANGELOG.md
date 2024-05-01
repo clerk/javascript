@@ -1,5 +1,21 @@
 # Change Log
 
+## 1.1.1
+
+### Patch Changes
+
+- Fix the following `@clerk/backend` methods to populate their paginated responses: ([#3276](https://github.com/clerk/javascript/pull/3276)) by [@dimkl](https://github.com/dimkl)
+
+  - `clerkClient.allowListIndentifiers.getAllowlistIdentifierList()`
+  - `clerkClient.clients.getClientList()`
+  - `clerkClient.invitations.getInvitationList`
+  - `clerkClient.redirectUrls.getRedirectUrlList()`
+  - `clerkClient.sessions.getSessionList()`
+  - `clerkClient.users.getUserOauthAccessToken()`
+
+- Updated dependencies [[`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc)]:
+  - @clerk/shared@2.0.1
+
 ## 1.1.0
 
 ### Minor Changes
