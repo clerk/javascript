@@ -1,15 +1,17 @@
 import { ClerkLoaded, ClerkLoading, useClerk } from '@clerk/clerk-react';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import { useEffect } from 'react';
 import { createActor } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
-import { FormStoreProvider } from '~/internals/machines/form/form.context';
+import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { consoleInspector } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
+import { useTelemetry } from '~/react/utils/telemetry';
 
 import { Form } from '../common/form';
 
@@ -24,6 +26,7 @@ const ref = actor.start();
 function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
+  const formRef = useFormStore();
   const isReady = useSelector(ref, state => state.value !== 'Idle');
 
   useEffect(() => {
@@ -34,16 +37,17 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
       const evt: SignUpRouterInitEvent = {
         type: 'INIT',
         clerk,
+        exampleMode,
+        formRef,
         router,
         signInPath: SIGN_IN_DEFAULT_BASE_PATH,
-        exampleMode,
       };
 
       if (ref.getSnapshot().can(evt)) {
         ref.send(evt);
       }
     });
-  }, [clerk, router, exampleMode]);
+  }, [clerk, exampleMode, formRef, router]);
 
   return isReady ? <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider> : null;
 }
@@ -76,6 +80,16 @@ export function SignUpRoot({
   fallback = null,
   exampleMode,
 }: SignUpRootProps): JSX.Element | null {
+  const telemetry = useTelemetry();
+
+  telemetry?.record(
+    eventComponentMounted('Elements_SignUpRoot', {
+      path,
+      fallback: Boolean(fallback),
+      exampleMode: Boolean(exampleMode),
+    }),
+  );
+
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
 

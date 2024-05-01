@@ -38,6 +38,11 @@ export const SignInStartMachine = setup({
     ),
   },
   actions: {
+    sendToNext: ({ context, event }) => {
+      // @ts-expect-error -- We're calling this in onDone, and event.output exists on the actor done event
+      return context.parent.send({ type: 'NEXT', resource: event?.output });
+    },
+    sendToLoading,
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -48,8 +53,6 @@ export const SignInStartMachine = setup({
         };
       },
     ),
-    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
-    sendToLoading,
   },
   guards: {
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
@@ -60,7 +63,7 @@ export const SignInStartMachine = setup({
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
     parent: input.parent,
-    formRef: input.form,
+    formRef: input.formRef,
     loadingStep: 'start',
   }),
   initial: 'Pending',

@@ -3,6 +3,8 @@ import { OAUTH_PROVIDERS } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
 
 import { act, fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
+import { OptionsProvider } from '../../../contexts';
+import { AppearanceProvider } from '../../../customizables';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignInStart } from '../SignInStart';
@@ -56,6 +58,20 @@ describe('SignInStart', () => {
       screen.getByText(/email address or username/i);
     });
 
+    it('passkeys shall not interfere with dynamic field when email address and phone number is enabled', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+        f.withEmailAddress();
+        f.withPasskey();
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      screen.getByText(/email address/i);
+      await userEvent.click(screen.getByText(/use phone/i));
+      screen.getByText(/phone number/i);
+      await userEvent.click(screen.getByText(/use email/i));
+      screen.getByText(/email address/i);
+    });
+
     mockWebAuthn(() => {
       it('enables login with passkey via dedicated button', async () => {
         const { wrapper } = await createFixtures(f => {
@@ -105,6 +121,44 @@ describe('SignInStart', () => {
 
       const socialOAuth = screen.getByText(`Continue with ${name}`);
       expect(socialOAuth).toBeDefined();
+    });
+
+    it('shows the "Join with $name" social OAuth button', async () => {
+      const providers = OAUTH_PROVIDERS.filter(({ provider }) => provider !== 'linkedin_oidc');
+      const { wrapper: Wrapper } = await createFixtures(f => {
+        providers.forEach(({ provider }) => {
+          f.withSocialProvider({ provider });
+        });
+      });
+
+      const wrapperBefore = ({ children }) => (
+        <Wrapper>
+          <AppearanceProvider
+            appearanceKey={'signIn'}
+            appearance={{
+              layout: {
+                socialButtonsVariant: 'blockButton',
+              },
+            }}
+          >
+            <OptionsProvider
+              value={{
+                localization: {
+                  socialButtonsBlockButtonManyInView: 'Join with {{provider}}',
+                },
+              }}
+            >
+              {children}
+            </OptionsProvider>
+          </AppearanceProvider>
+        </Wrapper>
+      );
+
+      render(<SignInStart />, { wrapper: wrapperBefore });
+
+      providers.forEach(providerData => {
+        screen.getByText(`Join with ${providerData.name}`);
+      });
     });
 
     it('uses the "cl-socialButtonsIconButton__SOCIALOAUTHNAME" classname when rendering the social button icon only', async () => {

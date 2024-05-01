@@ -144,6 +144,7 @@ export const SignUpVerificationMachine = setup({
       resendable: false,
       resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
     }),
+    sendToLoading,
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -154,7 +155,6 @@ export const SignUpVerificationMachine = setup({
         };
       },
     ),
-    sendToLoading,
   },
   guards: {
     isComplete: ({ context }) => context.resource.status === 'complete',
@@ -189,7 +189,7 @@ export const SignUpVerificationMachine = setup({
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
     loadingStep: 'verifications',
-    formRef: input.form,
+    formRef: input.formRef,
     parent: input.parent,
     resendable: false,
     resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,

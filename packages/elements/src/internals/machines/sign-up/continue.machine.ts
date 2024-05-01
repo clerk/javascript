@@ -67,7 +67,7 @@ export const SignUpContinueMachine = setup({
   id: SignUpContinueMachineId,
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
-    formRef: input.form,
+    formRef: input.formRef,
     parent: input.parent,
     loadingStep: 'continue',
   }),

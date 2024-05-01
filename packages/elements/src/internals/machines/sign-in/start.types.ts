@@ -1,5 +1,5 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
+import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
 
@@ -13,13 +13,13 @@ export type SignInStartTags = 'state:pending' | 'state:attempting' | 'state:load
 
 export type SignInStartSubmitEvent = { type: 'SUBMIT' };
 
-export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent;
+export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent | DoneActorEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 
 export type SignInStartInput = {
   basePath?: string;
-  form: ActorRefFrom<typeof FormMachine>;
+  formRef: ActorRefFrom<typeof FormMachine>;
   parent: ActorRefFrom<TSignInRouterMachine>;
 };
 

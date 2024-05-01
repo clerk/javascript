@@ -54,7 +54,9 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
     const clerk: LoadedClerk = parent.getSnapshot().context.clerk;
     const displayConfig = clerk.__unstable__environment?.displayConfig;
 
-    const customNavigate = (to: string) => {
+    const customNavigate = (toEvt: string) => {
+      const to = toEvt.split('/').slice(-1)[0];
+
       if (isClerkJSNavigationEvent(to)) {
         // Handle known redefined navigation events
         sendBack({ type: to });

@@ -116,6 +116,9 @@ const SignInVerificationMachine = setup({
         );
       }
     },
+    sendToNext: ({ context, event }) =>
+      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
+    sendToLoading,
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -126,9 +129,6 @@ const SignInVerificationMachine = setup({
         };
       },
     ),
-    sendToNext: ({ context, event }) =>
-      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
-    sendToLoading,
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
@@ -139,7 +139,7 @@ const SignInVerificationMachine = setup({
   id: SignInVerificationMachineId,
   context: ({ input }) => ({
     currentFactor: null,
-    formRef: input.form,
+    formRef: input.formRef,
     loadingStep: 'verifications',
     parent: input.parent,
     registeredStrategies: new Set<SignInFactor>(),
