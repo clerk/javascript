@@ -1,5 +1,13 @@
 # @clerk/elements
 
+## 0.2.1
+
+### Patch Changes
+
+- Add appropriate messaging for an invalid instance configuration vs implemented Elements strategies ([#3303](https://github.com/clerk/javascript/pull/3303)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fixes a bug where multiple verification codes were sent at once. ([#3303](https://github.com/clerk/javascript/pull/3303)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.2.0
 
 ### Minor Changes

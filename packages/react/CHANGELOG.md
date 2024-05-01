@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.0.3
+
+### Patch Changes
+
+- Remove type from clerkjs script attributes that prevents the satellite apps from function properly. ([#3304](https://github.com/clerk/javascript/pull/3304)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.0.2
 
 ### Patch Changes
