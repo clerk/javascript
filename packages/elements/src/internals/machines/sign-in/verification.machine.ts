@@ -117,7 +117,7 @@ const SignInVerificationMachine = setup({
         );
       } else if (process.env.NODE_ENV === 'development' && !context.currentFactor?.strategy) {
         throw new ClerkElementsRuntimeError(
-          'Unable to determine an authentication strategy to verify. This means your instance is misconfigured. Visit the Clerk Dashboard and verify that your instance has authentication strategies enabled: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username,
+          'Unable to determine an authentication strategy to verify. This means your instance is misconfigured. Visit the Clerk Dashboard and verify that your instance has authentication strategies enabled: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username',
         );
       }
     },
