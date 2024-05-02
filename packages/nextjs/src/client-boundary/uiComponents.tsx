@@ -56,9 +56,9 @@ export const OrganizationProfile: typeof BaseOrganizationProfile = Object.assign
 );
 
 export const SignIn = (props: SignInProps) => {
-  return <BaseSignIn {...useEnforceCorrectRoutingProps('SignIn', props)} />;
+  return <BaseSignIn {...useEnforceCorrectRoutingProps('SignIn', props, false)} />;
 };
 
 export const SignUp = (props: SignUpProps) => {
-  return <BaseSignUp {...useEnforceCorrectRoutingProps('SignUp', props)} />;
+  return <BaseSignUp {...useEnforceCorrectRoutingProps('SignUp', props, false)} />;
 };
