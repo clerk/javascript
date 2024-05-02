@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.3.0
+
+### Minor Changes
+
+- Fix sign in route registration on development environments ([#3308](https://github.com/clerk/javascript/pull/3308)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.2.1
 
 ### Patch Changes
