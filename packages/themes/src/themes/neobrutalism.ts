@@ -14,6 +14,11 @@ const buttonStyle = {
   },
 };
 
+const shadowStyle = {
+  boxShadow: '3px 3px 0px #000',
+  border: '2px solid #000',
+};
+
 export const neobrutalism = experimental_createTheme({
   //@ts-expect-error not public api
   simpleStyles: true,
@@ -39,19 +44,43 @@ export const neobrutalism = experimental_createTheme({
     socialButtonsIconButton: {
       ...buttonStyle,
     },
-    socialButtonsBlockButton: { ...buttonStyle, color: '#212126' },
-    profileSectionPrimaryButton: buttonStyle,
-    formButtonPrimary: buttonStyle,
-    navbarButton: buttonStyle,
-    formFieldInput: {
-      boxShadow: '3px 3px 0px #000',
-      border: '2px solid #000',
+    selectButton: {
+      ...buttonStyle,
+      ...shadowStyle,
       transition: 'all 0.2s ease-in-out',
       '&:focus': {
         boxShadow: '4px 4px 0px #000',
         border: '2px solid #000',
         transform: 'scale(1.01)',
       },
+    },
+    socialButtonsBlockButton: { ...buttonStyle, color: '#212126' },
+    profileSectionPrimaryButton: buttonStyle,
+    profileSectionItem: { color: '#212126' },
+    avatarImageActionsUpload: buttonStyle,
+    menuButton: shadowStyle,
+    menuList: shadowStyle,
+    formButtonPrimary: buttonStyle,
+    navbarButton: buttonStyle,
+    formFieldAction: {
+      fontWeight: '700',
+    },
+    formFieldInput: {
+      ...shadowStyle,
+      transition: 'all 0.2s ease-in-out',
+      '&:focus': {
+        boxShadow: '4px 4px 0px #000',
+        border: '2px solid #000',
+        transform: 'scale(1.01)',
+      },
+      '&:hover': {
+        ...shadowStyle,
+        transform: 'scale(1.01)',
+      },
+    },
+    table: shadowStyle,
+    tableHead: {
+      color: '#212126',
     },
     dividerLine: {
       background: '#000',
@@ -75,6 +104,14 @@ export const neobrutalism = experimental_createTheme({
       '&:focus': {
         boxShadow: 'none',
       },
+    },
+    actionCard: {
+      ...shadowStyle,
+    },
+    badge: {
+      border: '1px solid #000',
+      background: '#fff',
+      color: '#212126',
     },
   },
 });
