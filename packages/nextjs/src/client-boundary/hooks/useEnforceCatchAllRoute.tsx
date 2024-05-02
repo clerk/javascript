@@ -28,18 +28,18 @@ export const useEnforceCatchAllRoute = (
     return;
   }
 
-  // For components that require an active session, like UserProfile
-  // we should not enforce the catch-all route if there is no session
-  // because these components are usually protected by the middleware
-  // and if the check runs before the session is available, it will fail
-  // even if the route is a catch-all route, as the check request will result
-  // in a 404 because of auth().protect();
-  if (requireSessionBeforeCheck && !session) {
-    return;
-  }
-
   React.useEffect(() => {
     if (routing && routing !== 'path') {
+      return;
+    }
+
+    // For components that require an active session, like UserProfile
+    // we should not enforce the catch-all route if there is no session
+    // because these components are usually protected by the middleware
+    // and if the check runs before the session is available, it will fail
+    // even if the route is a catch-all route, as the check request will result
+    // in a 404 because of auth().protect();
+    if (requireSessionBeforeCheck && !session) {
       return;
     }
 
