@@ -15,6 +15,8 @@ const buttonStyle = {
 };
 
 export const neobrutalism = experimental_createTheme({
+  //@ts-expect-error not public api
+  simpleStyles: true,
   variables: {
     colorPrimary: '#DF1B1B',
     colorShimmer: 'rgba(255,255,255,0.64)',
@@ -25,15 +27,19 @@ export const neobrutalism = experimental_createTheme({
     },
   },
   elements: {
-    card: {
+    cardBox: {
       boxShadow: '7px 7px 0px #000',
       border: '3px solid #000',
     },
+    card: {
+      borderRadius: '0',
+    },
+    headerSubtitle: { color: '#212126' },
     alternativeMethodsBlockButton: buttonStyle,
     socialButtonsIconButton: {
       ...buttonStyle,
     },
-    socialButtonsBlockButton: buttonStyle,
+    socialButtonsBlockButton: { ...buttonStyle, color: '#212126' },
     profileSectionPrimaryButton: buttonStyle,
     formButtonPrimary: buttonStyle,
     navbarButton: buttonStyle,
@@ -50,9 +56,22 @@ export const neobrutalism = experimental_createTheme({
     dividerLine: {
       background: '#000',
     },
+    dividerText: {
+      fontWeight: '700',
+      color: '#212126',
+    },
+    footer: {
+      background: '#fff',
+      '& div': {
+        color: '#212126',
+      },
+    },
+    footerActionText: {
+      color: '#212126',
+    },
     footerActionLink: {
-      fontWeight: '600',
-      borderBottom: '2px solid',
+      fontWeight: '700',
+      borderBottom: '3px solid',
       '&:focus': {
         boxShadow: 'none',
       },
