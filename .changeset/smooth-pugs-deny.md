@@ -2,4 +2,4 @@
 "@clerk/themes": patch
 ---
 
-Fix Neobrutalism theme in Core 2
+Update the `neobrutalism` to make it compatible with the new Core 2 components
