@@ -185,6 +185,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           }}
           style={{
             ...inputStyle,
+            clipPath: `inset(0 ${passwordManagerOffset}px 0 0)`,
             width: `calc(100% + 1ch + ${passwordManagerOffset}px)`,
           }}
         />
