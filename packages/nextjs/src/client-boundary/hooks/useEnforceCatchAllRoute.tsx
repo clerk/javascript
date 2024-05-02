@@ -2,6 +2,7 @@ import { isProductionEnvironment } from '@clerk/shared';
 import type { RoutingStrategy } from '@clerk/types';
 import React from 'react';
 
+import { useSession } from '../hooks';
 import { usePagesRouter } from './usePagesRouter';
 
 /**
@@ -11,13 +12,29 @@ import { usePagesRouter } from './usePagesRouter';
  * fire a request to a path under window.location.href and we check whether the path
  * exists or not
  */
-export const useEnforceCatchAllRoute = (component: string, path: string, routing?: RoutingStrategy) => {
+export const useEnforceCatchAllRoute = (
+  component: string,
+  path: string,
+  routing?: RoutingStrategy,
+  requireSessionBeforeCheck = true,
+) => {
   const ref = React.useRef(0);
   const { pagesRouter } = usePagesRouter();
+  const { session } = useSession();
 
   // This check does not break the rules of hooks
   // as the condition will remain the same for the whole app lifecycle
   if (isProductionEnvironment()) {
+    return;
+  }
+
+  // For components that require an active session, like UserProfile
+  // we should not enforce the catch-all route if there is no session
+  // because these components are usually protected by the middleware
+  // and if the check runs before the session is available, it will fail
+  // even if the route is a catch-all route, as the check request will result
+  // in a 404 because of auth().protect();
+  if (requireSessionBeforeCheck && !session) {
     return;
   }
 
@@ -33,12 +50,11 @@ export const useEnforceCatchAllRoute = (component: string, path: string, routing
         `
 Clerk: The <${component}/> component is not configured correctly. The most likely reasons for this error are:
 
-1. The <${component}/> component is mounted in a catch-all route, but all routes under "${path}" are protected by the middleware.
-To resolve this, ensure that the middleware does not protect the catch-all route or any of its children. If you are using the "createRouteMatcher" helper, consider adding "(.*)" to the end of the route pattern, eg: "${path}(.*)". For more information, see: https://clerk.com/docs/references/nextjs/clerk-middleware#create-route-matcher
-
-
-2. The "${path}" route is not a catch-all route.
+1. The "${path}" route is not a catch-all route.
 It is recommended to convert this route to a catch-all route, eg: "${correctPath}". Alternatively, you can update the <${component}/> component to use hash-based routing by setting the "routing" prop to "hash".
+
+2. The <${component}/> component is mounted in a catch-all route, but all routes under "${path}" are protected by the middleware.
+To resolve this, ensure that the middleware does not protect the catch-all route or any of its children. If you are using the "createRouteMatcher" helper, consider adding "(.*)" to the end of the route pattern, eg: "${path}(.*)". For more information, see: https://clerk.com/docs/references/nextjs/clerk-middleware#create-route-matcher
 `,
       );
     };
@@ -57,7 +73,9 @@ It is recommended to convert this route to a catch-all route, eg: "${correctPath
         }
         let res;
         try {
-          const url = `${window.location.origin}${window.location.pathname}/clerk_catchall_check_${Date.now()}`;
+          const url = `${window.location.origin}${
+            window.location.pathname
+          }/${component}_clerk_catchall_check_${Date.now()}`;
           res = await fetch(url, { signal: ac.signal });
         } catch (e) {
           // no op
