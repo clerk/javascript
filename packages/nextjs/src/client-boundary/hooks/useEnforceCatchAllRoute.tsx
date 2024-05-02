@@ -20,7 +20,7 @@ export const useEnforceCatchAllRoute = (
 ) => {
   const ref = React.useRef(0);
   const { pagesRouter } = usePagesRouter();
-  const { session } = useSession();
+  const { session, isLoaded } = useSession();
 
   // This check does not break the rules of hooks
   // as the condition will remain the same for the whole app lifecycle
@@ -29,7 +29,7 @@ export const useEnforceCatchAllRoute = (
   }
 
   React.useEffect(() => {
-    if (routing && routing !== 'path') {
+    if (!isLoaded || (routing && routing !== 'path')) {
       return;
     }
 
@@ -94,5 +94,5 @@ To resolve this, ensure that the middleware does not protect the catch-all route
         ac.abort();
       }
     };
-  }, []);
+  }, [isLoaded]);
 };
