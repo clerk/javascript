@@ -8,7 +8,7 @@
  * </ClerkProvider>
  * ```
  *
- * For more information, please see the telemetry documentation page: https://beta.clerk.com/docs/telemetry
+ * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry
  */
 import type { InstanceType } from '@clerk/types';
 

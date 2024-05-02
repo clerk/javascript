@@ -11,7 +11,7 @@ function telemetryNotice() {
   console.log(`Attention: Clerk now collects telemetry data from its SDKs when connected to development instances.`);
   console.log(`The data collected is used to inform Clerk's product roadmap.`);
   console.log(
-    `To learn more, including how to opt-out from the telemetry program, visit: https://beta.clerk.com/docs/telemetry.`,
+    `To learn more, including how to opt-out from the telemetry program, visit: https://clerk.com/docs/telemetry.`,
   );
   console.log('');
 }
