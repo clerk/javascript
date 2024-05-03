@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.3.1
+
+### Patch Changes
+
+- Fix otp input overflow using clip path to prevent users clicking in the overflow space for password managers causing unexpected focus on input element ([#3317](https://github.com/clerk/javascript/pull/3317)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.3.0
 
 ### Minor Changes
