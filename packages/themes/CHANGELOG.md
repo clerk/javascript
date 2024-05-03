@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.1.2
+
+### Patch Changes
+
+- Update the `neobrutalism` to make it compatible with the new Core 2 components ([#3310](https://github.com/clerk/javascript/pull/3310)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
 ## 2.1.1
 
 ### Patch Changes

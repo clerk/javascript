@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.6
+
+### Patch Changes
+
+- Notify users when catch-all route and all of its children routes are being protected by the middleware ([#3311](https://github.com/clerk/javascript/pull/3311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Update docs links to point to the correct pages ([#3312](https://github.com/clerk/javascript/pull/3312)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
 ## 5.0.5
 
 ### Patch Changes
