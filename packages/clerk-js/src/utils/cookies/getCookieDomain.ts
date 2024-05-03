@@ -13,14 +13,11 @@ export function getCookieDomain(hostname = window.location.hostname) {
     return eTLDPlusOne;
   }
 
-  // For each segment of the hostname, construct a potential domain
-  // e.g. clerk.vercel.app -> [app, vercel.app, clerk.vercel.app]
-  const eTLDs = hostname
-    .split('.')
-    .reduceRight<string[]>((res, cur) => [...res, [cur, ...res.slice(-1)].join('.')], []);
+  const hostnameParts = hostname.split('.');
 
   // we know for sure that the first entry is definitely a TLD, skip it
-  for (const eTLD of eTLDs.slice(1)) {
+  for (let i = hostnameParts.length - 2; i >= 0; i--) {
+    const eTLD = hostnameParts.slice(i).join('.');
     eTLDCookie.set('1', { domain: eTLD });
 
     if (eTLDCookie.get() === '1') {
