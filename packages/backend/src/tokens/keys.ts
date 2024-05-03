@@ -73,7 +73,7 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
         n: modulus,
         e: 'AQAB',
       },
-      -1, // local key never expires in cache
+      false, // local key never expires in cache
     );
   }
 
@@ -158,9 +158,7 @@ export async function loadClerkJWKFromRemote({
     } else {
       throw new TokenVerificationError({
         action: `Go to your Dashboard and validate your secret and public keys are correct. ${TokenVerificationErrorAction.ContactSupport} if the issue persists.`,
-        message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.${
-          jwkKeys ? ` The following kid is available: ${jwkKeys}` : ''
-        }`,
+        message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${jwkKeys}`,
         reason: TokenVerificationErrorReason.JWKKidMismatch,
       });
     }

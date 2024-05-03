@@ -20,6 +20,7 @@ export const TokenVerificationErrorReason = {
   RemoteJWKInvalid: 'jwk-remote-invalid',
   RemoteJWKMissing: 'jwk-remote-missing',
   JWKFailedToResolve: 'jwk-failed-to-resolve',
+  JWKKidMismatch: 'jwk-kid-mismatch',
 };
 
 export type TokenVerificationErrorReason =
