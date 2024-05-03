@@ -1,4 +1,4 @@
-import { API_URL, API_VERSION, JWKS_CACHE_TTL_MS, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
+import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
 import {
   TokenVerificationError,
   TokenVerificationErrorAction,
@@ -26,19 +26,9 @@ function getCacheValues() {
   return Object.values(cache);
 }
 
-function setInCache(jwk: JsonWebKeyWithKid, jwksCacheTtlInMs: number) {
+function setInCache(jwk: JsonWebKeyWithKid, shouldExpire = true) {
   cache[jwk.kid] = jwk;
-  lastUpdatedAt = Date.now();
-
-  if (jwksCacheTtlInMs >= 0) {
-    setTimeout(() => {
-      if (jwk) {
-        delete cache[jwk.kid];
-      } else {
-        cache = {};
-      }
-    }, jwksCacheTtlInMs);
-  }
+  lastUpdatedAt = shouldExpire ? Date.now() : -1;
 }
 
 const LocalJwkKid = 'local';
@@ -116,11 +106,17 @@ export async function loadClerkJWKFromRemote({
   apiUrl = API_URL,
   apiVersion = API_VERSION,
   kid,
-  jwksCacheTtlInMs = JWKS_CACHE_TTL_MS,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  const needsFetch = !getFromCache(kid) || cacheHasExpired();
-  if (skipJwksCache || needsFetch) {
+  // 1. fetch jwks from BAPI
+  // 2. setTimeout for 1 hour to clear cache (?)
+  // 3. we have value in cache, cache is expired
+  // 4. force refetch
+  // 5. setInCache, updates lastUpdatedAt
+  // 6. the timeout triggers, clears cache
+  // 7. subsequent call to getFromCache() returns empty cache
+  // TODO: check for key mismatch, force refetch
+  if (skipJwksCache || cacheHasExpired()) {
     if (!secretKey) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,
@@ -139,7 +135,7 @@ export async function loadClerkJWKFromRemote({
       });
     }
 
-    keys.forEach(key => setInCache(key, jwksCacheTtlInMs));
+    keys.forEach(key => setInCache(key));
   }
 
   const jwk = getFromCache(kid);
@@ -151,13 +147,23 @@ export async function loadClerkJWKFromRemote({
       .sort()
       .join(', ');
 
-    throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.ContactSupport,
-      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.${
-        jwkKeys ? ` The following kid is available: ${jwkKeys}` : ''
-      }`,
-      reason: TokenVerificationErrorReason.RemoteJWKMissing,
-    });
+    if (!jwkKeys) {
+      throw new TokenVerificationError({
+        action: TokenVerificationErrorAction.ContactSupport,
+        message: `No signing key found in JWKS. This is likely a bug in Clerk. (cache=${JSON.stringify(
+          cache,
+        )}, lastUpdatedAt=${lastUpdatedAt}, kid=${kid})`,
+        reason: TokenVerificationErrorReason.RemoteJWKMissing,
+      });
+    } else {
+      throw new TokenVerificationError({
+        action: `Go to your Dashboard and validate your secret and public keys are correct. ${TokenVerificationErrorAction.ContactSupport} if the issue persists.`,
+        message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.${
+          jwkKeys ? ` The following kid is available: ${jwkKeys}` : ''
+        }`,
+        reason: TokenVerificationErrorReason.JWKKidMismatch,
+      });
+    }
   }
 
   return jwk;
@@ -208,7 +214,18 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
 }
 
 function cacheHasExpired() {
-  return Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
+  // If lastUpdatedAt is -1, it means that we're using a local JWKS and it never expires
+  if (lastUpdatedAt === -1) {
+    return false;
+  }
+
+  const isExpired = Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
+
+  if (isExpired) {
+    cache = {};
+  }
+
+  return isExpired;
 }
 
 type ErrorFields = {
