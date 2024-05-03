@@ -5,12 +5,17 @@ import type { ActorRefFrom, SnapshotFrom } from 'xstate';
 
 import type { SignInStrategyName } from '~/internals/machines/shared';
 import type { TSignInFirstFactorMachine, TSignInSecondFactorMachine } from '~/internals/machines/sign-in';
-import { SignInFirstFactorMachine, SignInSecondFactorMachine } from '~/internals/machines/sign-in';
 import { matchStrategy } from '~/internals/machines/utils/strategies';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
-import { SignInRouterCtx, StrategiesContext, useSignInRouteRegistration, useStrategy } from '~/react/sign-in/context';
+import {
+  SignInRouterCtx,
+  StrategiesContext,
+  useSignInFirstFactorStep,
+  useSignInSecondFactorStep,
+  useStrategy,
+} from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
 export type SignInVerificationsProps = { preferred?: ClerkSignInStrategy; children: React.ReactNode } & FormProps;
@@ -133,7 +138,7 @@ export function SignInSecondFactor(props: SignInVerificationsProps) {
 }
 
 export function SignInFirstFactorInner(props: SignInVerificationsProps) {
-  const ref = useSignInRouteRegistration('firstFactor', SignInFirstFactorMachine);
+  const ref = useSignInFirstFactorStep();
 
   if (!ref) {
     return null;
@@ -150,7 +155,7 @@ export function SignInFirstFactorInner(props: SignInVerificationsProps) {
 }
 
 export function SignInSecondFactorInner(props: SignInVerificationsProps) {
-  const ref = useSignInRouteRegistration('secondFactor', SignInSecondFactorMachine);
+  const ref = useSignInSecondFactorStep();
 
   if (!ref) {
     return null;

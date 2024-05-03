@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared/url';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, not, or, sendTo, setup, stopChild } from 'xstate';
+import { and, assign, enqueueActions, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -13,12 +13,15 @@ import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/error
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
+import { SignInResetPasswordMachine } from './reset-password.machine';
 import type {
   SignInRouterContext,
   SignInRouterEvents,
   SignInRouterNextEvent,
   SignInRouterSchema,
 } from './router.types';
+import { SignInStartMachine } from './start.machine';
+import { SignInFirstFactorMachine, SignInSecondFactorMachine } from './verification.machine';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
@@ -37,7 +40,11 @@ export const SignInRouterMachineId = 'SignInRouter';
 
 export const SignInRouterMachine = setup({
   actors: {
-    thirdParty: ThirdPartyMachine,
+    firstFactorMachine: SignInFirstFactorMachine,
+    resetPasswordMachine: SignInResetPasswordMachine,
+    startMachine: SignInStartMachine,
+    secondFactorMachine: SignInSecondFactorMachine,
+    thirdPartyMachine: ThirdPartyMachine,
   },
   actions: {
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
@@ -52,6 +59,7 @@ export const SignInRouterMachine = setup({
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
+    raiseNext: raise({ type: 'NEXT' }),
     setActive({ context, event }) {
       if (context.exampleMode) return;
 
@@ -165,24 +173,6 @@ export const SignInRouterMachine = setup({
     },
     'NAVIGATE.PREVIOUS': '.Hist',
     'NAVIGATE.START': '.Start',
-    'ROUTE.REGISTER': {
-      actions: enqueueActions(({ context, enqueue, event, self }) => {
-        const { id, logic, input } = event;
-
-        if (!self.getSnapshot().children[id]) {
-          // @ts-expect-error - This is valid (See: https://discord.com/channels/795785288994652170/1203714033190969405/1205595237293096960)
-          enqueue.spawnChild(logic, {
-            id,
-            systemId: id,
-            input: { basePath: context.router?.basePath, parent: self, formRef: context.formRef, ...input },
-            syncSnapshot: true, // Subscribes to the spawned actor and send back snapshot events
-          });
-        }
-      }),
-    },
-    'ROUTE.UNREGISTER': {
-      actions: stopChild(({ event }) => event.id),
-    },
     LOADING: {
       actions: assign(({ event }) => ({
         loading: {
@@ -212,17 +202,17 @@ export const SignInRouterMachine = setup({
       },
     },
     Init: {
-      entry: enqueueActions(({ enqueue, self }) => {
+      entry: enqueueActions(({ context, enqueue, self }) => {
         if (!self.getSnapshot().children[ThirdPartyMachineId]) {
-          enqueue.spawnChild('thirdParty', {
+          enqueue.spawnChild('thirdPartyMachine', {
             id: ThirdPartyMachineId,
             systemId: ThirdPartyMachineId,
-            input: ({ context, self }) => ({
+            input: {
               basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
               flow: 'signIn',
               formRef: context.formRef,
               parent: self,
-            }),
+            },
           });
         }
       }),
@@ -273,6 +263,21 @@ export const SignInRouterMachine = setup({
     Start: {
       tags: 'route:start',
       exit: 'clearFormErrors',
+      invoke: {
+        id: 'start',
+        src: 'startMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+        onError: {
+          actions: 'raiseNext', // TODO: Update
+        },
+      },
       on: {
         NEXT: [
           {
@@ -300,6 +305,21 @@ export const SignInRouterMachine = setup({
     },
     FirstFactor: {
       tags: 'route:first-factor',
+      invoke: {
+        id: 'firstFactor',
+        src: 'firstFactorMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+        onError: {
+          actions: 'raiseNext', // TODO: Update
+        },
+      },
       on: {
         NEXT: [
           {
@@ -356,6 +376,21 @@ export const SignInRouterMachine = setup({
     },
     SecondFactor: {
       tags: 'route:second-factor',
+      invoke: {
+        id: 'secondFactor',
+        src: 'secondFactorMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+        onError: {
+          actions: 'raiseNext', // TODO: Update
+        },
+      },
       on: {
         NEXT: [
           {
@@ -373,6 +408,20 @@ export const SignInRouterMachine = setup({
     },
     ResetPassword: {
       tags: 'route:reset-password',
+      invoke: {
+        id: 'resetPassword',
+        src: 'resetPasswordMachine',
+        input: ({ context, self }) => ({
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+        onError: {
+          actions: 'raiseNext', // TODO: Update
+        },
+      },
       on: {
         NEXT: [
           {

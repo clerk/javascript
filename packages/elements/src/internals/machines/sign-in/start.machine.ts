@@ -7,7 +7,7 @@ import type { FormFields } from '~/internals/machines/form';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-import type { TSignInRouterMachine } from './router.machine';
+import type { TSignInRouterMachine } from './router.types';
 import type { SignInStartSchema } from './start.types';
 
 export type TSignInStartMachine = typeof SignInStartMachine;

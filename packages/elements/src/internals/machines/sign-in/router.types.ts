@@ -1,5 +1,5 @@
 import type { SignInResource } from '@clerk/types';
-import type { ActorRefFrom, AnyActorLogic, MachineSnapshot } from 'xstate';
+import type { ActorRefFrom, MachineSnapshot, StateMachine } from 'xstate';
 
 import type { TFormMachine } from '~/internals/machines/form';
 import type {
@@ -10,8 +10,6 @@ import type {
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
   BaseRouterRedirectEvent,
-  BaseRouterRouteRegisterEvent,
-  BaseRouterRouteUnregisterEvent,
   BaseRouterSetClerkEvent,
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
@@ -66,14 +64,6 @@ export interface SignInRouterInitEvent extends BaseRouterInput {
   signUpPath?: string;
 }
 
-export type SignInRouterRouteRegisterEvent<TLogic extends AnyActorLogic = AnyActorLogic> = BaseRouterRouteRegisterEvent<
-  SignInRouterSystemId,
-  TLogic
->;
-export type SignInRouterRouteUnregisterEvent = BaseRouterRouteUnregisterEvent<SignInRouterSystemId>;
-
-export type SignInRouterRouteEvents = SignInRouterRouteRegisterEvent | SignInRouterRouteUnregisterEvent;
-
 export type SignInRouterNavigationEvents =
   | SignInRouterStartEvent
   | SignInRouterChooseStrategyEvent
@@ -86,7 +76,6 @@ export type SignInRouterEvents =
   | SignInRouterNavigationEvents
   | SignInRouterErrorEvent
   | SignInRouterTransferEvent
-  | SignInRouterRouteEvents
   | SignInRouterRedirectEvent
   | SignInVerificationFactorUpdateEvent
   | SignInRouterLoadingEvent
@@ -129,5 +118,29 @@ export type SignInRouterSnapshot = MachineSnapshot<
   SignInChildren,
   SignInStateValue,
   SignInRouterTags,
-  SignInOuptut
+  SignInOuptut,
+  any // TMeta - Introduced in XState 5.12.x
 >;
+
+// ---------------------------------- Machine Type ---------------------------------- //
+
+// Used for simple typing of parent refs passed to children
+export type TSignInRouterMachine = StateMachine<
+  SignInRouterContext,
+  SignInRouterEvents,
+  any, // children
+  any, // actor
+  any, // action
+  any, // guard
+  any, // delay
+  any, // tag
+  any, // input
+  any, // output
+  any, // emitted
+  any, // TMeta
+  any // typegen
+>;
+
+// ---------------------------------- Machine Actor Ref ---------------------------------- //
+
+export type SignInRouterMachineActorRef = ActorRefFrom<TSignInRouterMachine>;

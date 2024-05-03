@@ -3,7 +3,7 @@ import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
 
-import type { TSignInRouterMachine } from './router.machine';
+import type { TSignInRouterMachine } from './router.types';
 
 // ---------------------------------- Tags ---------------------------------- //
 

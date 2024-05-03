@@ -23,7 +23,7 @@ import { sendToLoading } from '~/internals/machines/shared';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
 
-import type { TSignInRouterMachine } from './router.machine';
+import type { TSignInRouterMachine } from './router.types';
 import type { SignInVerificationSchema } from './verification.types';
 import { SignInVerificationDelays } from './verification.types';
 
@@ -81,12 +81,10 @@ const SignInVerificationMachine = setup({
       ) {
         console.warn(
           `Clerk: Your instance is configured to support these strategies: ${clerk.client.signIn.supportedFirstFactors
-            .map(f => f.strategy)
-            .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
-            .map(s => s)
-            .join(
-              ', ',
-            )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+            .map((factor: any) => factor.strategy)
+            .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
+            ', ',
+          )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
         );
       }
 
@@ -101,11 +99,9 @@ const SignInVerificationMachine = setup({
             ...clerk.client.signIn.supportedSecondFactors,
           ]
             .map(f => f.strategy)
-            .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
-            .map(s => s)
-            .join(
-              ', ',
-            )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+            .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
+            ', ',
+          )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
         );
       }
 
@@ -288,7 +284,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
       assertIsDefined(params);
 
-      return clerk.client.signIn.prepareFirstFactor(params as PrepareFirstFactorParams);
+      return await clerk.client.signIn.prepareFirstFactor(params as PrepareFirstFactorParams);
     }),
     attempt: fromPromise(async ({ input }) => {
       const { currentFactor, fields, parent } = input as AttemptFirstFactorInput;
@@ -350,7 +346,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
           throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
       }
 
-      return parent.getSnapshot().context.clerk.client.signIn.attemptFirstFactor(attemptParams);
+      return await parent.getSnapshot().context.clerk.client.signIn.attemptFirstFactor(attemptParams);
     }),
   },
   actions: {
@@ -370,7 +366,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
 export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
   actors: {
-    prepare: fromPromise(({ input }) => {
+    prepare: fromPromise(async ({ input }) => {
       const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
@@ -384,7 +380,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
         return Promise.resolve(clerk.client.signIn);
       }
 
-      return clerk.client.signIn.prepareSecondFactor({
+      return await clerk.client.signIn.prepareSecondFactor({
         strategy: params.strategy,
         phoneNumberId: params.phoneNumberId,
       });
@@ -397,7 +393,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       assertIsDefined(currentFactor);
       assertIsDefined(code);
 
-      return parent.getSnapshot().context.clerk.client.signIn.attemptSecondFactor({
+      return await parent.getSnapshot().context.clerk.client.signIn.attemptSecondFactor({
         strategy: currentFactor.strategy,
         code,
       });

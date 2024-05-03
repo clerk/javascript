@@ -7,7 +7,7 @@ import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
 import type { SignInResetPasswordSchema } from './reset-password.types';
-import type { TSignInRouterMachine } from './router.machine';
+import type { TSignInRouterMachine } from './router.types';
 
 export type TSignInResetPasswordMachine = typeof SignInResetPasswordMachine;
 
