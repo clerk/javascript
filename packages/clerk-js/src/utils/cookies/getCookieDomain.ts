@@ -13,6 +13,10 @@ export function getCookieDomain(hostname = window.location.hostname) {
     return eTLDPlusOne;
   }
 
+  if (hostname === 'localhost') {
+    return hostname;
+  }
+
   const hostnameParts = hostname.split('.');
 
   // we know for sure that the first entry is definitely a TLD, skip it
