@@ -23,14 +23,15 @@ export type SignInVerificationsProps = { preferred?: ClerkSignInStrategy; childr
 export const SignInFirstFactorCtx = createContextFromActorRef<TSignInFirstFactorMachine>('SignInFirstFactorCtx');
 export const SignInSecondFactorCtx = createContextFromActorRef<TSignInSecondFactorMachine>('SignInSecondFactorCtx');
 
-const strategiesSelector = (state: SnapshotFrom<TSignInFirstFactorMachine>) => state.context.currentFactor?.strategy;
+const strategiesSelector = (state: SnapshotFrom<TSignInFirstFactorMachine | TSignInSecondFactorMachine>) =>
+  state.context.currentFactor?.strategy;
 
 function SignInStrategiesProvider({
   children,
   preferred,
   actorRef,
   ...props
-}: SignInVerificationsProps & { actorRef: ActorRefFrom<TSignInFirstFactorMachine> }) {
+}: SignInVerificationsProps & { actorRef: ActorRefFrom<TSignInFirstFactorMachine | TSignInSecondFactorMachine> }) {
   const routerRef = SignInRouterCtx.useActorRef();
   const current = useSelector(actorRef, strategiesSelector);
   const isChoosingAltStrategy = useActiveTags(routerRef, ['route:choose-strategy', 'route:forgot-password']);

@@ -108,39 +108,38 @@ export interface SignInRouterSchema {
 
 // ---------------------------------- Schema ---------------------------------- //
 
-export type SignInChildren = any; // TODO: Update
-export type SignInOuptut = any; // TODO: Update
-export type SignInStateValue = any; // TODO: Update
+export type SignInRouterChildren = any; // TODO: Update
+export type SignInRouterOuptut = any; // TODO: Update
+export type SignInRouterStateValue = any; // TODO: Update
 
 export type SignInRouterSnapshot = MachineSnapshot<
   SignInRouterContext,
   SignInRouterEvents,
-  SignInChildren,
-  SignInStateValue,
+  SignInRouterChildren,
+  SignInRouterStateValue,
   SignInRouterTags,
-  SignInOuptut,
+  SignInRouterOuptut,
   any // TMeta - Introduced in XState 5.12.x
 >;
 
 // ---------------------------------- Machine Type ---------------------------------- //
 
-// Used for simple typing of parent refs passed to children
-export type TSignInRouterMachine = StateMachine<
-  SignInRouterContext,
-  SignInRouterEvents,
-  any, // children
+export type TSignInRouterParentMachine = StateMachine<
+  SignInRouterContext, // context
+  SignInRouterEvents, // event
+  SignInRouterChildren, // children
   any, // actor
   any, // action
   any, // guard
   any, // delay
-  any, // tag
+  any, // state value
+  string, // tag
   any, // input
-  any, // output
+  SignInRouterOuptut, // output
   any, // emitted
-  any, // TMeta
-  any // typegen
+  any // meta
 >;
 
 // ---------------------------------- Machine Actor Ref ---------------------------------- //
 
-export type SignInRouterMachineActorRef = ActorRefFrom<TSignInRouterMachine>;
+export type SignInRouterMachineActorRef = ActorRefFrom<TSignInRouterParentMachine>;

@@ -309,7 +309,6 @@ export const SignInRouterMachine = setup({
         id: 'firstFactor',
         src: 'firstFactorMachine',
         input: ({ context, self }) => ({
-          basePath: context.router?.basePath,
           formRef: context.formRef,
           parent: self,
         }),
@@ -380,7 +379,6 @@ export const SignInRouterMachine = setup({
         id: 'secondFactor',
         src: 'secondFactorMachine',
         input: ({ context, self }) => ({
-          basePath: context.router?.basePath,
           formRef: context.formRef,
           parent: self,
         }),

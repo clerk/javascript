@@ -1,5 +1,4 @@
 import type { SignInResource } from '@clerk/types';
-import type { ActorRefFrom } from 'xstate';
 import { fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
@@ -7,7 +6,7 @@ import type { FormFields } from '~/internals/machines/form';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-import type { TSignInRouterMachine } from './router.types';
+import type { SignInRouterMachineActorRef } from './router.types';
 import type { SignInStartSchema } from './start.types';
 
 export type TSignInStartMachine = typeof SignInStartMachine;
@@ -16,7 +15,7 @@ export const SignInStartMachineId = 'SignInStart';
 
 export const SignInStartMachine = setup({
   actors: {
-    attempt: fromPromise<SignInResource, { parent: ActorRefFrom<TSignInRouterMachine>; fields: FormFields }>(
+    attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const clerk = parent.getSnapshot().context.clerk;
 
