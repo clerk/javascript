@@ -20,7 +20,7 @@ export const useEnforceCatchAllRoute = (
 ) => {
   const ref = React.useRef(0);
   const { pagesRouter } = usePagesRouter();
-  const { session } = useSession();
+  const { session, isLoaded } = useSession();
 
   // This check does not break the rules of hooks
   // as the condition will remain the same for the whole app lifecycle
@@ -28,18 +28,18 @@ export const useEnforceCatchAllRoute = (
     return;
   }
 
-  // For components that require an active session, like UserProfile
-  // we should not enforce the catch-all route if there is no session
-  // because these components are usually protected by the middleware
-  // and if the check runs before the session is available, it will fail
-  // even if the route is a catch-all route, as the check request will result
-  // in a 404 because of auth().protect();
-  if (requireSessionBeforeCheck && !session) {
-    return;
-  }
-
   React.useEffect(() => {
-    if (routing && routing !== 'path') {
+    if (!isLoaded || (routing && routing !== 'path')) {
+      return;
+    }
+
+    // For components that require an active session, like UserProfile
+    // we should not enforce the catch-all route if there is no session
+    // because these components are usually protected by the middleware
+    // and if the check runs before the session is available, it will fail
+    // even if the route is a catch-all route, as the check request will result
+    // in a 404 because of auth().protect();
+    if (requireSessionBeforeCheck && !session) {
       return;
     }
 
@@ -94,5 +94,5 @@ To resolve this, ensure that the middleware does not protect the catch-all route
         ac.abort();
       }
     };
-  }, []);
+  }, [isLoaded]);
 };
