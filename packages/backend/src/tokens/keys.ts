@@ -82,6 +82,9 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
 
 export type LoadClerkJWKFromRemoteOptions = {
   kid: string;
+  /**
+   * @deprecated This cache TTL is deprecated and will be removed in the next major version. Specifying a cache TTL is now a no-op.
+   */
   jwksCacheTtlInMs?: number;
   skipJwksCache?: boolean;
   secretKey?: string;
@@ -98,7 +101,6 @@ export type LoadClerkJWKFromRemoteOptions = {
  * @param {Object} options
  * @param {string} options.kid - The id of the key that the JWT was signed with
  * @param {string} options.alg - The algorithm of the JWT
- * @param {number} options.jwksCacheTtlInMs - The TTL of the jwks cache (defaults to 1 hour)
  * @returns {JsonWebKey} key
  */
 export async function loadClerkJWKFromRemote({
