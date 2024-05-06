@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { OAuthProvider, SamlStrategy } from '@clerk/types';
 import * as React from 'react';
@@ -18,7 +19,6 @@ import type { TSignUpStep } from '~/react/sign-up/step';
 import { SIGN_UP_STEPS } from '~/react/sign-up/step';
 import { SignUpVerificationCtx } from '~/react/sign-up/verifications';
 import { mapScopeToStrategy } from '~/react/utils/map-scope-to-strategy';
-import { useTelemetry } from '~/react/utils/telemetry';
 
 type Strategy = OAuthProvider | SamlStrategy | 'metamask';
 type LoadingScope<T extends TSignInStep | TSignUpStep> = 'global' | `step:${T}` | `provider:${Strategy}` | undefined;
@@ -82,9 +82,9 @@ function isSignUpScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is
  * </SignIn.Step>
  */
 export function Loading({ children, scope }: LoadingProps) {
-  const telemetry = useTelemetry();
+  const clerk = useClerk();
 
-  telemetry?.record(eventComponentMounted('Elements_Loading', { scope: scope ?? false }));
+  clerk.telemetry?.record(eventComponentMounted('Elements_Loading', { scope: scope ?? false }));
 
   const signInRouterRef = SignInRouterCtx.useActorRef(true);
   const signUpRouterRef = SignUpRouterCtx.useActorRef(true);

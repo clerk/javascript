@@ -1,7 +1,7 @@
+import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import { useTelemetry } from '~/react/utils/telemetry';
 
 import type { SignInChooseStrategyProps } from '../choose-strategy';
 import { SignInChooseStrategy, SignInForgotPassword } from '../choose-strategy';
@@ -46,9 +46,9 @@ export type SignInStepProps =
  * </SignIn.Root>
  */
 export function SignInStep(props: SignInStepProps) {
-  const telemetry = useTelemetry();
+  const clerk = useClerk();
 
-  telemetry?.record(eventComponentMounted('Elements_SignInStep', { name: props.name }));
+  clerk.telemetry?.record(eventComponentMounted('Elements_SignInStep', { name: props.name }));
 
   switch (props.name) {
     case SIGN_IN_STEPS['start']:
