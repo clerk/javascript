@@ -10,7 +10,7 @@
  *
  * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry
  */
-import type { InstanceType } from '@clerk/types';
+import type { InstanceType, TelemetryCollector as TelemetryCollectorInterface } from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
@@ -42,7 +42,7 @@ const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
   endpoint: 'https://clerk-telemetry.com',
 };
 
-export class TelemetryCollector {
+export class TelemetryCollector implements TelemetryCollectorInterface {
   #config: Required<TelemetryCollectorConfig>;
   #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
