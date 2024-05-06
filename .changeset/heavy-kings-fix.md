@@ -1,6 +1,7 @@
 ---
 '@clerk/shared': patch
 '@clerk/types': patch
+'@clerk/elements': patch
 ---
 
 The following are all internal changes and not relevant to any end-user:
