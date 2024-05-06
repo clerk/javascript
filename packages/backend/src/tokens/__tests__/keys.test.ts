@@ -209,8 +209,7 @@ export default (QUnit: QUnit) => {
       assert.propEqual(jwk, mockRsaJwk);
 
       // cache should be cleared, but 5m ttl is still valid
-      fakeClock.tick(6);
-      fakeClock.runAll();
+      fakeClock.next();
 
       // re-fetch, 5m cache is expired
       jwk = await loadClerkJWKFromRemote({
