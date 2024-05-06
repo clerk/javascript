@@ -108,13 +108,6 @@ export async function loadClerkJWKFromRemote({
   kid,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  // 1. fetch jwks from BAPI
-  // 2. setTimeout for 1 hour to clear cache (?)
-  // 3. we have value in cache, cache is expired (lastUpdatedAt older than 5m)
-  // 4. force refetch
-  // 5. setInCache, updates lastUpdatedAt
-  // 6. the timeout triggers, clears cache
-  // 7. subsequent call to getFromCache() returns empty cache
   // TODO: check for key mismatch, force refetch
   if (skipJwksCache || cacheHasExpired()) {
     if (!secretKey) {
