@@ -185,5 +185,39 @@ export default (QUnit: QUnit) => {
         }
       }
     });
+
+    test('cache TTLs do not conflict', async assert => {
+      fakeClock.runAll();
+
+      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+      let jwk = await loadClerkJWKFromRemote({
+        secretKey: 'deadbeef',
+        kid: mockRsaJwkKid,
+        skipJwksCache: true,
+      });
+      assert.propEqual(jwk, mockRsaJwk);
+
+      // just less than an hour, the cache TTL
+      fakeClock.tick(60 * 60 * 1000 - 5);
+
+      // re-fetch, 5m cache is expired
+      fakeFetch.onCall(1).returns(jsonOk(mockJwks));
+      jwk = await loadClerkJWKFromRemote({
+        secretKey: 'deadbeef',
+        kid: mockRsaJwkKid,
+      });
+      assert.propEqual(jwk, mockRsaJwk);
+
+      // cache should be cleared, but 5m ttl is still valid
+      fakeClock.tick(6);
+      fakeClock.runAll();
+
+      // re-fetch, 5m cache is expired
+      jwk = await loadClerkJWKFromRemote({
+        secretKey: 'deadbeef',
+        kid: mockRsaJwkKid,
+      });
+      assert.propEqual(jwk, mockRsaJwk);
+    });
   });
 };
