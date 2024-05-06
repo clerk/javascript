@@ -142,21 +142,11 @@ export async function loadClerkJWKFromRemote({
       .sort()
       .join(', ');
 
-    if (!jwkKeys) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.ContactSupport,
-        message: `No signing key found in JWKS. This is likely a bug in Clerk. (cache=${JSON.stringify(
-          cache,
-        )}, lastUpdatedAt=${lastUpdatedAt}, kid=${kid})`,
-        reason: TokenVerificationErrorReason.RemoteJWKMissing,
-      });
-    } else {
-      throw new TokenVerificationError({
-        action: `Go to your Dashboard and validate your secret and public keys are correct. ${TokenVerificationErrorAction.ContactSupport} if the issue persists.`,
-        message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${jwkKeys}`,
-        reason: TokenVerificationErrorReason.JWKKidMismatch,
-      });
-    }
+    throw new TokenVerificationError({
+      action: `Go to your Dashboard and validate your secret and public keys are correct. ${TokenVerificationErrorAction.ContactSupport} if the issue persists.`,
+      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${jwkKeys}`,
+      reason: TokenVerificationErrorReason.JWKKidMismatch,
+    });
   }
 
   return jwk;
