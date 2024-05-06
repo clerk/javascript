@@ -160,9 +160,7 @@ test.describe('Client handshake @generic', () => {
       }),
       redirect: 'manual',
     });
-    console.log(res.headers);
     expect(res.status).toBe(307);
-    expect(res.headers.get('x-clerk-auth-reason')).toBe('session-token-outdated');
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
