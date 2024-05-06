@@ -110,8 +110,7 @@ export async function loadClerkJWKFromRemote({
   kid,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  // TODO: check for key mismatch, force refetch
-  if (skipJwksCache || cacheHasExpired()) {
+  if (skipJwksCache || cacheHasExpired() || !getFromCache(kid)) {
     if (!secretKey) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,

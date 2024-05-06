@@ -17,8 +17,6 @@ export const TokenVerificationErrorReason = {
   InvalidSecretKey: 'secret-key-invalid',
   LocalJWKMissing: 'jwk-local-missing',
   RemoteJWKFailedToLoad: 'jwk-remote-failed-to-load',
-  RemoteJWKInvalid: 'jwk-remote-invalid',
-  RemoteJWKMissing: 'jwk-remote-missing',
   JWKFailedToResolve: 'jwk-failed-to-resolve',
   JWKKidMismatch: 'jwk-kid-mismatch',
 };
