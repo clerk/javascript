@@ -1,5 +1,8 @@
 import type { InstanceType } from 'instance';
 
+/**
+ * @internal
+ */
 export type TelemetryEvent = {
   event: string;
   /**
@@ -29,6 +32,9 @@ export type TelemetryEvent = {
   payload: Record<string, string | number | boolean>;
 };
 
+/**
+ * @internal
+ */
 export type TelemetryEventRaw<Payload = TelemetryEvent['payload']> = {
   event: TelemetryEvent['event'];
   eventSamplingRate?: number;
