@@ -27,6 +27,9 @@ export const setClientUatCookie = (client: ClientResource | undefined) => {
     val = Math.floor(client.updatedAt.getTime() / 1000).toString();
   }
 
+  // Removes any existing cookies without a domain specified to ensure the change doesn't break existing sessions.
+  clientUatCookie.remove();
+
   return clientUatCookie.set(val, {
     expires,
     sameSite,
