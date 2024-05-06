@@ -110,7 +110,7 @@ export async function loadClerkJWKFromRemote({
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
   // 1. fetch jwks from BAPI
   // 2. setTimeout for 1 hour to clear cache (?)
-  // 3. we have value in cache, cache is expired
+  // 3. we have value in cache, cache is expired (lastUpdatedAt older than 5m)
   // 4. force refetch
   // 5. setInCache, updates lastUpdatedAt
   // 6. the timeout triggers, clears cache
@@ -217,6 +217,7 @@ function cacheHasExpired() {
     return false;
   }
 
+  // If the cache has expired, clear the value so we don't attempt to make decisions based on stale data
   const isExpired = Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
 
   if (isExpired) {

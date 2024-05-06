@@ -172,8 +172,9 @@ export default (QUnit: QUnit) => {
       } catch (err) {
         if (err instanceof Error) {
           assert.propEqual(err, {
-            reason: 'jwk-remote-missing',
-            action: 'Contact support@clerk.com',
+            reason: 'jwk-kid-mismatch',
+            action:
+              'Go to your Dashboard and validate your secret and public keys are correct. Contact support@clerk.com if the issue persists.',
           });
           assert.propContains(err, {
             message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${mockRsaJwkKid}, local`,
