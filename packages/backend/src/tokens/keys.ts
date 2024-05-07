@@ -27,22 +27,9 @@ function getCacheValues() {
   return Object.values(cache);
 }
 
-function setInCache(
-  jwk: JsonWebKeyWithKid,
-  jwksCacheTtlInMs: number = 1000 * 60 * 60, // 1 hour
-) {
+function setInCache(jwk: JsonWebKeyWithKid, shouldExpire = true) {
   cache[jwk.kid] = jwk;
-  lastUpdatedAt = Date.now();
-
-  if (jwksCacheTtlInMs >= 0) {
-    setTimeout(() => {
-      if (jwk) {
-        delete cache[jwk.kid];
-      } else {
-        cache = {};
-      }
-    }, jwksCacheTtlInMs);
-  }
+  lastUpdatedAt = shouldExpire ? Date.now() : -1;
 }
 
 const LocalJwkKid = 'local';
@@ -87,7 +74,7 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
         n: modulus,
         e: 'AQAB',
       },
-      -1, // local key never expires in cache
+      false, // local key never expires in cache
     );
   }
 
@@ -128,10 +115,9 @@ export async function loadClerkJWKFromRemote({
   apiVersion = API_VERSION,
   issuer,
   kid,
-  jwksCacheTtlInMs = 1000 * 60 * 60, // 1 hour,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  const shouldRefreshCache = !getFromCache(kid) && reachedMaxCacheUpdatedAt();
+  const shouldRefreshCache = cacheHasExpired() || !getFromCache(kid);
   if (skipJwksCache || shouldRefreshCache) {
     let fetcher;
     const key = secretKey || apiKey;
@@ -158,7 +144,7 @@ export async function loadClerkJWKFromRemote({
       });
     }
 
-    keys.forEach(key => setInCache(key, jwksCacheTtlInMs));
+    keys.forEach(key => setInCache(key));
   }
 
   const jwk = getFromCache(kid);
@@ -240,6 +226,18 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   return response.json();
 }
 
-function reachedMaxCacheUpdatedAt() {
-  return Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
+function cacheHasExpired() {
+  // If lastUpdatedAt is -1, it means that we're using a local JWKS and it never expires
+  if (lastUpdatedAt === -1) {
+    return false;
+  }
+
+  // If the cache has expired, clear the value so we don't attempt to make decisions based on stale data
+  const isExpired = Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
+
+  if (isExpired) {
+    cache = {};
+  }
+
+  return isExpired;
 }
