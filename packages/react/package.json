@@ -78,16 +78,15 @@
   "dependencies": {
     "@clerk/shared": "2.0.1",
     "@clerk/types": "4.2.0",
-    "eslint-config-custom": "*",
     "tslib": "2.4.1"
   },
   "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
     "@clerk/themes": "2.1.2",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
     "@types/semver": "^7.5.4",
-    "eslint-config-custom": "*",
     "typescript": "*"
   },
   "peerDependencies": {
