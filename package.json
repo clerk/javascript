@@ -34,6 +34,7 @@
     "test:integration:base": "DEBUG=1 npx playwright test --config integration/playwright.config.ts",
     "test:integration:cleanup": "DEBUG=1 npx playwright test --config integration/playwright.cleanup.config.ts",
     "test:integration:deployment:nextjs": "DEBUG=1 npx playwright test --config integration/playwright.deployments.config.ts",
+    "test:integration:elements": "E2E_APP_ID=elements.* npm run test:integration:base -- --grep @elements",
     "test:integration:express": "E2E_APP_ID=express.* npm run test:integration:base -- --grep @express",
     "test:integration:generic": "E2E_APP_ID=react.vite.* npm run test:integration:base -- --grep @generic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* npm run test:integration:base -- --grep @nextjs",
