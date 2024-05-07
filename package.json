@@ -56,7 +56,7 @@
     "@emotion/jest": "^11.11.0",
     "@faker-js/faker": "^8.1.0",
     "@octokit/rest": "^20.0.2",
-    "@playwright/test": "^1.39.0",
+    "@playwright/test": "^1.44.0",
     "@testing-library/dom": "^8.19.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
