@@ -40,6 +40,7 @@ import { ukUA } from '../uk-UA';
 import { viVN } from '../vi-VN';
 import { zhCN } from '../zh-CN';
 import { zhTW } from '../zh-TW';
+import { srRS } from '../sr-RS';
 import { enUS_v4 } from './enUS_v4';
 import { createObject, getCommonKeys, getKeys, getUniqueKeys, getValue, mergeObjects } from './utils';
 
@@ -184,3 +185,4 @@ run(zhTW, 'zh-TW');
 run(bgBG, 'bg-BG');
 run(thTH, 'th-TH');
 run(huHU, 'hu-HU');
+run(srRS, 'sr-RS');
