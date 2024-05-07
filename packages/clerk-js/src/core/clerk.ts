@@ -151,7 +151,7 @@ export class Clerk implements ClerkInterface {
   public organization: OrganizationResource | null | undefined;
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
-  public telemetry?: TelemetryCollector;
+  public telemetry: TelemetryCollector | undefined;
 
   protected internal_last_error: ClerkAPIError | null = null;
 

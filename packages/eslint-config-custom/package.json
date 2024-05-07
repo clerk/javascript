@@ -1,7 +1,6 @@
 {
-  "name": "eslint-config-custom",
+  "name": "@clerk/eslint-config-custom",
   "version": "0.0.0",
-  "private": true,
   "license": "MIT",
   "dependencies": {
     "@next/eslint-plugin-next": "^12.3.0",
