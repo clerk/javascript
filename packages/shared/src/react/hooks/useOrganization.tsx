@@ -10,7 +10,6 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
 } from '@clerk/types';
-import { useEffect } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import {
@@ -137,9 +136,7 @@ export const useOrganization: UseOrganization = params => {
 
   const clerk = useClerkInstanceContext();
 
-  useEffect(() => {
-    clerk.telemetry?.record(eventMethodCalled('useOrganization'));
-  }, [clerk.telemetry]);
+  clerk.telemetry?.record(eventMethodCalled('useOrganization'));
 
   const domainParams =
     typeof domainListParams === 'undefined'

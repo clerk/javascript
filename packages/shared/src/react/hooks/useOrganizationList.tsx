@@ -10,7 +10,6 @@ import type {
   SetActive,
   UserOrganizationInvitationResource,
 } from '@clerk/types';
-import { useEffect } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
@@ -101,9 +100,7 @@ export const useOrganizationList: UseOrganizationList = params => {
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
 
-  useEffect(() => {
-    clerk.telemetry?.record(eventMethodCalled('useOrganizationList'));
-  }, [clerk.telemetry]);
+  clerk.telemetry?.record(eventMethodCalled('useOrganizationList'));
 
   const userMembershipsParams =
     typeof userMemberships === 'undefined'
