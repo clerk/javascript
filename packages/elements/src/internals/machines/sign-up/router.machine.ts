@@ -258,9 +258,6 @@ export const SignUpRouterMachine = setup({
         onDone: {
           actions: 'raiseNext',
         },
-        onError: {
-          actions: 'raiseNext', // TODO: Update
-        },
       },
       on: {
         NEXT: [
@@ -294,9 +291,6 @@ export const SignUpRouterMachine = setup({
         onDone: {
           actions: 'raiseNext',
         },
-        onError: {
-          actions: 'raiseNext', // TODO: Update
-        },
       },
       on: {
         NEXT: [
@@ -324,9 +318,6 @@ export const SignUpRouterMachine = setup({
         }),
         onDone: {
           actions: 'raiseNext',
-        },
-        onError: {
-          actions: 'raiseNext', // TODO: Update
         },
       },
       always: [
