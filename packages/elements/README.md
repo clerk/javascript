@@ -34,7 +34,7 @@ Clerk Elements is a library of unstyled, composable components that can be used 
 
 > [!WARNING]
 > Clerk Elements is currently in beta. It's not recommended to use it in production just yet, but it would be much appreciated if you give it a try.
-> If you have any feedback, please reach out to [beta-elements@clerk.dev](mailto:beta-elements@clerk.dev) or head over to the [GitHub Discussion](#TODO).
+> If you have any feedback, please reach out to [beta-elements@clerk.dev](mailto:beta-elements@clerk.dev) or head over to the [GitHub Discussion](https://github.com/orgs/clerk/discussions/3315).
 
 ## Getting started
 
@@ -52,7 +52,7 @@ npm install @clerk/elements
 ```
 
 > [!NOTE]
-> If your project uses TypeScript, make sure that [`moduleResolution`](https://www.typescriptlang.org/tsconfig/#moduleResolution) in`tsconfig.json` is set to `bundler`. Otherwise, you might run into issues with resolving TypeScript types from Clerk Elements.
+> If your project uses TypeScript, make sure that [`moduleResolution`](https://www.typescriptlang.org/tsconfig/#moduleResolution) in `tsconfig.json` is set to `bundler`. Otherwise, you might run into issues with resolving TypeScript types from Clerk Elements.
 
 ## Usage
 
@@ -84,7 +84,7 @@ You can get in touch with us in any of the following ways:
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md)).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
 
 ### Package development
 
