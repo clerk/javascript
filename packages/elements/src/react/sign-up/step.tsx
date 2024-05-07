@@ -1,7 +1,7 @@
+import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import { useTelemetry } from '~/react/utils/telemetry';
 
 import type { SignUpContinueProps } from './continue';
 import { SignUpContinue } from './continue';
@@ -39,9 +39,9 @@ export type SignUpStepProps =
  * </SignUp.Root>
  */
 export function SignUpStep(props: SignUpStepProps) {
-  const telemetry = useTelemetry();
+  const clerk = useClerk();
 
-  telemetry?.record(eventComponentMounted('Elements_SignUpStep', { name: props.name }));
+  clerk.telemetry?.record(eventComponentMounted('Elements_SignUpStep', { name: props.name }));
 
   switch (props.name) {
     case SIGN_UP_STEPS.start:
