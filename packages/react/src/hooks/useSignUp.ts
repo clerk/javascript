@@ -1,5 +1,7 @@
 import { useClientContext } from '@clerk/shared/react';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { SetActive, SignUpResource } from '@clerk/types';
+import { useEffect } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
@@ -23,6 +25,10 @@ export const useSignUp: UseSignUp = () => {
 
   const isomorphicClerk = useIsomorphicClerkContext();
   const client = useClientContext();
+
+  useEffect(() => {
+    isomorphicClerk.telemetry?.record(eventMethodCalled('useSignUp'));
+  }, [isomorphicClerk.telemetry]);
 
   if (!client) {
     return { isLoaded: false, signUp: undefined, setActive: undefined };
