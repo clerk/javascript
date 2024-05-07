@@ -252,7 +252,7 @@ function SignUpLoading({ children, scope, routerRef }: SignUpLoadingProps) {
   } else if (computedScope === 'step:continue') {
     returnValue = isContinueLoading;
   } else if (computedScope === 'step:complete') {
-    returnValue = false; // Not necessary for complete step
+    returnValue = false;
   } else if (computedScope.startsWith('provider:')) {
     const computedStrategy = mapScopeToStrategy(computedScope);
     returnValue = isStrategyLoading && strategy === computedStrategy;
