@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "5.0.5",
+  "version": "5.0.6",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",

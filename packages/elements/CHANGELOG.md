@@ -1,5 +1,23 @@
 # @clerk/elements
 
+## 0.3.2
+
+### Patch Changes
+
+- Fix issue where sign-up action resend would render type error for applying submit attribute ([#3327](https://github.com/clerk/javascript/pull/3327)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 0.3.1
+
+### Patch Changes
+
+- Fix otp input overflow using clip path to prevent users clicking in the overflow space for password managers causing unexpected focus on input element ([#3317](https://github.com/clerk/javascript/pull/3317)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 0.3.0
+
+### Minor Changes
+
+- Fix sign in route registration on development environments ([#3308](https://github.com/clerk/javascript/pull/3308)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.2.1
 
 ### Patch Changes

@@ -51,6 +51,9 @@ Clerk Elements is a library of unstyled, composable components that can be used 
 npm install @clerk/elements
 ```
 
+> [!NOTE]
+> If your project uses TypeScript, make sure that [`moduleResolution`](https://www.typescriptlang.org/tsconfig/#moduleResolution) in`tsconfig.json` is set to `bundler`. Otherwise, you might run into issues with resolving TypeScript types from Clerk Elements.
+
 ## Usage
 
 Once you've got your project set up, you can start building custom UIs with Clerk Elements. The following guides will show you how to build your own custom flows:

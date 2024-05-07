@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@clerk/themes": "2.1.1",
+    "@clerk/themes": "2.1.2",
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
