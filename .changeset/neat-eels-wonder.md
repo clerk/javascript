@@ -2,4 +2,4 @@
 '@clerk/elements': patch
 ---
 
-Handle Sign In xstate child machines via invoke vs spawn and React useEffect resolving standing race conditions
+Refactors internal logic to avoid reliance on `useEffect`. This resolves potential for race conditions as a result of functionality coupled to component renders.
