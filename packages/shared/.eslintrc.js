@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  extends: ['custom/browser', 'custom/typescript', 'custom/jest', 'custom/react'],
+  extends: ['@clerk/custom/browser', '@clerk/custom/typescript', '@clerk/custom/jest', '@clerk/custom/react'],
   overrides: [
     {
       files: ['./src/utils/globs.ts'],
