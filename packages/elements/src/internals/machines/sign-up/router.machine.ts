@@ -264,6 +264,7 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: 'setActive',
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsVerification',
@@ -297,6 +298,7 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: 'setActive',
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsVerification',
@@ -327,6 +329,7 @@ export const SignUpRouterMachine = setup({
             type: 'setActive',
             params: { sessionId: context.router?.searchParams().get(SEARCH_PARAMS.createdSession) },
           }),
+          target: 'Complete',
         },
         {
           guard: { type: 'hasClerkStatus', params: { status: 'verified' } },
@@ -342,6 +345,7 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: 'setActive',
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsContinue',
@@ -359,11 +363,13 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: 'setActive',
+            target: 'Complete',
           },
           {
             description: 'Handle a case where the user has already been authenticated via ClerkJS',
             guard: 'hasAuthenticatedViaClerkJS',
             actions: { type: 'setActive', params: { useLastActiveSession: true } },
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsVerification',
@@ -380,6 +386,13 @@ export const SignUpRouterMachine = setup({
             target: 'Start',
           },
         ],
+      },
+    },
+    Complete: {
+      tags: 'route:complete',
+      entry: 'clearFormErrors',
+      after: {
+        5000: 'Start',
       },
     },
     Error: {

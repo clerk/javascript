@@ -94,6 +94,7 @@ export function SignInRoot({
 
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
+  const isRootPath = path === router.pathname();
 
   return (
     <Router
@@ -102,9 +103,11 @@ export function SignInRoot({
     >
       <FormStoreProvider>
         <SignInFlowProvider exampleMode={exampleMode}>
-          <ClerkLoading>
-            <Form>{fallback}</Form>
-          </ClerkLoading>
+          {isRootPath ? (
+            <ClerkLoading>
+              <Form>{fallback}</Form>
+            </ClerkLoading>
+          ) : null}
           <ClerkLoaded>{children}</ClerkLoaded>
         </SignInFlowProvider>
       </FormStoreProvider>

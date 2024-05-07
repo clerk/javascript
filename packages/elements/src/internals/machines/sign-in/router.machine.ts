@@ -222,6 +222,11 @@ export const SignInRouterMachine = setup({
           target: 'Callback',
         },
         {
+          guard: 'isComplete',
+          actions: 'setActive',
+          target: 'Complete',
+        },
+        {
           guard: 'isLoggedInAndSingleSession',
           actions: [
             () => console.warn('logged-in-single-session-mode'),
@@ -280,7 +285,7 @@ export const SignInRouterMachine = setup({
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Start',
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -318,7 +323,7 @@ export const SignInRouterMachine = setup({
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Start',
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsSecondFactor',
@@ -385,7 +390,7 @@ export const SignInRouterMachine = setup({
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Start',
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsNewPassword',
@@ -413,7 +418,7 @@ export const SignInRouterMachine = setup({
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Start',
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -429,7 +434,7 @@ export const SignInRouterMachine = setup({
       },
     },
     Callback: {
-      tags: 'route:callback',
+      tags: 'route:complete',
       entry: sendTo(ThirdPartyMachineId, { type: 'CALLBACK' }),
       on: {
         NEXT: [
@@ -439,9 +444,9 @@ export const SignInRouterMachine = setup({
             target: 'Start',
           },
           {
-            guard: or(['isComplete', 'hasAuthenticatedViaClerkJS']),
+            guard: or(['isLoggedIn', 'isComplete', 'hasAuthenticatedViaClerkJS']),
             actions: 'setActive',
-            target: 'Start',
+            target: 'Complete',
           },
           {
             guard: 'statusNeedsIdentifier',
@@ -463,6 +468,13 @@ export const SignInRouterMachine = setup({
             target: 'ResetPassword',
           },
         ],
+      },
+    },
+    Complete: {
+      tags: 'route:complete',
+      entry: 'clearFormErrors',
+      after: {
+        5000: 'Start',
       },
     },
     Error: {

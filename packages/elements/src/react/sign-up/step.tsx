@@ -3,6 +3,8 @@ import { eventComponentMounted } from '@clerk/shared/telemetry';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 
+import type { SignUpCompleteProps } from './complete';
+import { SignUpComplete } from './complete';
 import type { SignUpContinueProps } from './continue';
 import { SignUpContinue } from './continue';
 import type { SignUpStartProps } from './start';
@@ -14,6 +16,7 @@ export const SIGN_UP_STEPS = {
   start: 'start',
   continue: 'continue',
   verifications: 'verifications',
+  complete: 'complete',
 } as const;
 
 export type TSignUpStep = (typeof SIGN_UP_STEPS)[keyof typeof SIGN_UP_STEPS];
@@ -22,20 +25,22 @@ type StepWithProps<N extends TSignUpStep, T> = { name: N } & T;
 export type SignUpStepProps =
   | StepWithProps<'start', SignUpStartProps>
   | StepWithProps<'continue', SignUpContinueProps>
-  | StepWithProps<'verifications', SignUpVerificationsProps>;
+  | StepWithProps<'verifications', SignUpVerificationsProps>
+  | StepWithProps<'complete', SignUpCompleteProps>;
 
 /**
  * Render different steps of the sign-up flow. Initially the `'start'` step is rendered. Optionally, you can render additional fields in the `'continue'` step. Once a sign-up attempt has been created, `'verifications'` will be displayed.
  *
  * You typically want to place fields like username, password, or social providers in the `'start'` step. The `'continue'` step can hold inputs for username, first name/last name or other metadata. The `'verifications'` step is used to verify the user's information like an email verification. Once the user has been verified, the sign-up attempt will be completed.
  *
- * @param {string} name - Step name. Use `'start'`, `'continue'`, or `'verifications'`.
+ * @param {string} name - Step name. Use `'start'`, `'continue'`, `'verifications'`, or `'complete'`.
  *
  * @example
  * <SignUp.Root>
  *  <SignUp.Step name='start' />
  *  <SignUp.Step name='continue' />
  *  <SignUp.Step name='verifications' />
+ *  <SignUp.Step name='complete' />
  * </SignUp.Root>
  */
 export function SignUpStep(props: SignUpStepProps) {
@@ -50,6 +55,8 @@ export function SignUpStep(props: SignUpStepProps) {
       return <SignUpContinue {...props} />;
     case SIGN_UP_STEPS.verifications:
       return <SignUpVerifications {...props} />;
+    case SIGN_UP_STEPS.complete:
+      return <SignUpComplete {...props} />;
     default:
       throw new ClerkElementsRuntimeError(`Invalid step name. Use 'start', 'continue', or 'verifications'.`);
   }
