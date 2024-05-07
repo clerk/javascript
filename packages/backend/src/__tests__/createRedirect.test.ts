@@ -244,5 +244,23 @@ export default (QUnit: QUnit) => {
         ),
       );
     });
+
+    test('passed dev browser when cross-origin redirect in dev', assert => {
+      const redirectAdapterSpy = sinon.spy(_url => 'redirectAdapterValue');
+      const { redirectToSignUp } = createRedirect({
+        baseUrl: 'http://www.clerk.com',
+        devBrowserToken: 'deadbeef',
+        redirectAdapter: redirectAdapterSpy,
+        publishableKey: 'pk_test_aW5jbHVkZWQua2F0eWRpZC05Mi5jbGVyay5hY2NvdW50cy5kZXYk',
+      });
+
+      const result = redirectToSignUp({ returnBackUrl });
+      assert.equal(result, 'redirectAdapterValue');
+      assert.ok(
+        redirectAdapterSpy.calledWith(
+          `https://included.katydid-92.accounts.dev/sign-up?redirect_url=${encodedUrl}&__clerk_db_jwt=deadbeef`,
+        ),
+      );
+    });
   });
 };

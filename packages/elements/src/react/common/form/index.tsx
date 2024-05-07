@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
@@ -35,7 +36,6 @@ import {
 } from '~/internals/machines/form/form.context';
 import { usePassword } from '~/react/hooks/use-password.hook';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
-import { useTelemetry } from '~/react/utils/telemetry';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
@@ -530,9 +530,9 @@ type FormInputProps =
  */
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
-    const telemetry = useTelemetry();
+    const clerk = useClerk();
 
-    telemetry?.record(
+    clerk.telemetry?.record(
       eventComponentMounted('Elements_Input', {
         type: props.type ?? false,
         // @ts-expect-error - Depending on type the props can be different
