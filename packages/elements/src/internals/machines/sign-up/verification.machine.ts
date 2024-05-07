@@ -9,7 +9,6 @@ import type {
   VerificationStrategy,
 } from '@clerk/types';
 import type { Writable } from 'type-fest';
-import type { ActorRefFrom } from 'xstate';
 import { and, assign, enqueueActions, fromCallback, fromPromise, log, raise, sendParent, sendTo, setup } from 'xstate';
 
 import {
@@ -22,7 +21,7 @@ import type { WithParams } from '~/internals/machines/shared';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-import type { TSignUpRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 import {
   type SignUpVerificationContext,
   SignUpVerificationDelays,
@@ -36,7 +35,7 @@ export type TSignUpVerificationMachine = typeof SignUpVerificationMachine;
 
 export type StartSignUpEmailLinkFlowEvents = { type: 'STOP' };
 export type StartSignUpEmailLinkFlowInput = {
-  parent: ActorRefFrom<TSignUpRouterMachine>;
+  parent: SignInRouterMachineActorRef;
 };
 
 export const SignUpVerificationMachineId = 'SignUpVerification';
@@ -65,10 +64,10 @@ const shouldVerify = (field: SignUpVerifiableField, strategy?: VerificationStrat
 };
 
 export type PrepareVerificationInput = {
-  parent: ActorRefFrom<TSignUpRouterMachine>;
+  parent: SignInRouterMachineActorRef;
 } & WithParams<PrepareVerificationParams>;
 export type AttemptVerificationInput = {
-  parent: ActorRefFrom<TSignUpRouterMachine>;
+  parent: SignInRouterMachineActorRef;
 } & WithParams<AttemptVerificationParams>;
 
 export const SignUpVerificationMachine = setup({
