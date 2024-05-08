@@ -47,7 +47,7 @@ export const plPL: LocalizationResource = {
   formButtonPrimary__verify: 'Zweryfikuj',
   formFieldAction__forgotPassword: 'Zapomniałem/am hasła',
   formFieldError__matchingPasswords: 'Hasła się zgadzają.',
-  formFieldError__notMatchingPasswords: "Hasła się nie zgadzają.",
+  formFieldError__notMatchingPasswords: 'Hasła się nie zgadzają.',
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
   formFieldHintText__optional: 'Opcjonalne',
   formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
@@ -674,7 +674,7 @@ export const plPL: LocalizationResource = {
         messageLine1: undefined,
         title: undefined,
       },
-      
+
       subtitle__rename: undefined,
       title__rename: undefined,
     },

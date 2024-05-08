@@ -679,7 +679,8 @@ export const itIT: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'È consigliabile disconnettersi da tutti gli altri dispositivi che potrebbero aver utilizzato la tua vecchia password.',
-      readonly: 'La tua password corrente non può essere modificata perché puoi accedere solo tramite la connessione aziendale.',
+      readonly:
+        'La tua password corrente non può essere modificata perché puoi accedere solo tramite la connessione aziendale.',
       successMessage__set: 'La tua password é stata impostata.',
       successMessage__signOutOfOtherSessions: 'Tutti gli altri dispositivi sono stati disconnessi.',
       successMessage__update: 'La tua password è stata aggiornata.',
