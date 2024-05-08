@@ -816,4 +816,4 @@ export const srRS: LocalizationResource = {
     next6Days: "{{ date | weekday('sr-RS','long') }} u {{ date | timeString('sr-RS') }}",
     numeric: "{{ date | numeric('sr-RS') }}",
   },
-};
+} as const;
