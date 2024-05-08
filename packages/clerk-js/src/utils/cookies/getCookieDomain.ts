@@ -5,13 +5,13 @@ import { createCookieHandler } from '@clerk/shared/cookie';
  * This aligns with logic in FAPI, which is important to ensure we don't run into
  * a scenario where two __client_uat cookies are present.
  */
-let eTLDPlusOne: string;
+let cachedETLDPlusOne: string;
 const eTLDCookie = createCookieHandler('__clerk_test_etld');
 
 export function getCookieDomain(hostname = window.location.hostname, cookieHandler = eTLDCookie) {
   // only compute it once per session to avoid unnecessary cookie ops
-  if (eTLDPlusOne) {
-    return eTLDPlusOne;
+  if (cachedETLDPlusOne) {
+    return cachedETLDPlusOne;
   }
 
   if (['localhost', '127.0.0.1', '0.0.0.0'].includes(hostname)) {
@@ -28,6 +28,7 @@ export function getCookieDomain(hostname = window.location.hostname, cookieHandl
     const res = cookieHandler.get();
     if (res === '1') {
       cookieHandler.remove({ domain: eTLD });
+      cachedETLDPlusOne = eTLD;
       return eTLD;
     }
 

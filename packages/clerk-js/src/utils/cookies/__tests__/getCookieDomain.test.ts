@@ -1,9 +1,16 @@
-import { getCookieDomain } from '../getCookieDomain';
+import type { getCookieDomain as _getCookieDomain } from '../getCookieDomain';
 
-type CookieHandler = NonNullable<Parameters<typeof getCookieDomain>[1]>;
+type CookieHandler = NonNullable<Parameters<typeof _getCookieDomain>[1]>;
 
 describe('getCookieDomain', () => {
-  it('returns the eTLD+1 domain based on where the cookie can be set', () => {
+  let getCookieDomain: typeof _getCookieDomain;
+  beforeEach(async () => {
+    // We're dynamically importing getCookieDomain here to reset the module-level cache
+    jest.resetModules();
+    getCookieDomain = await import('../getCookieDomain').then(m => m.getCookieDomain);
+  });
+
+  it('returns the eTLD+1 domain based on where the cookie can be set', async () => {
     // This unit tests relies on browser APIs that we can't mock without
     // rendering this test useless.
     // This logic will be covered by a separate E2E test suite, however, for
@@ -23,7 +30,7 @@ describe('getCookieDomain', () => {
       remove: jest.fn().mockReturnValue(undefined),
     };
     const result = getCookieDomain(hostname, handler);
-    expect(result).toBe('hostname');
+    expect(result).toBe(hostname);
   });
 
   it('handles localhost', () => {
@@ -49,5 +56,17 @@ describe('getCookieDomain', () => {
     const hostname = 'app.hello.co.uk';
     const result = getCookieDomain(hostname, handler);
     expect(result).toBeUndefined();
+  });
+
+  it('uses cached value if there is one', () => {
+    const hostname = 'clerk.com';
+    const handler: CookieHandler = {
+      get: jest.fn().mockReturnValue('1'),
+      set: jest.fn().mockReturnValue(undefined),
+      remove: jest.fn().mockReturnValue(undefined),
+    };
+    expect(getCookieDomain(hostname, handler)).toBe(hostname);
+    expect(getCookieDomain(hostname, handler)).toBe(hostname);
+    expect(handler.get).toHaveBeenCalledTimes(1);
   });
 });
