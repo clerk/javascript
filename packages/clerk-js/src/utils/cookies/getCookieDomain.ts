@@ -7,13 +7,14 @@ import { createCookieHandler } from '@clerk/shared/cookie';
  */
 let eTLDPlusOne: string;
 const eTLDCookie = createCookieHandler('__clerk_test_etld');
-export function getCookieDomain(hostname = window.location.hostname) {
+
+export function getCookieDomain(hostname = window.location.hostname, cookieHandler = eTLDCookie) {
   // only compute it once per session to avoid unnecessary cookie ops
   if (eTLDPlusOne) {
     return eTLDPlusOne;
   }
 
-  if (hostname === 'localhost') {
+  if (['localhost', '127.0.0.1', '0.0.0.0'].includes(hostname)) {
     return hostname;
   }
 
@@ -22,14 +23,15 @@ export function getCookieDomain(hostname = window.location.hostname) {
   // we know for sure that the first entry is definitely a TLD, skip it
   for (let i = hostnameParts.length - 2; i >= 0; i--) {
     const eTLD = hostnameParts.slice(i).join('.');
-    eTLDCookie.set('1', { domain: eTLD });
+    cookieHandler.set('1', { domain: eTLD });
 
-    if (eTLDCookie.get() === '1') {
-      eTLDCookie.remove({ domain: eTLD });
+    const res = cookieHandler.get();
+    if (res === '1') {
+      cookieHandler.remove({ domain: eTLD });
       return eTLD;
     }
 
-    eTLDCookie.remove({ domain: eTLD });
+    cookieHandler.remove({ domain: eTLD });
   }
 
   return;
