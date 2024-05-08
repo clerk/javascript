@@ -45,7 +45,7 @@ export const injectRequestStateIntoResponse = async (
   // without setting the header, instead of using the `json()` helper
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
   headers.forEach((value, key) => {
-    clone.headers.set(key, value);
+    clone.headers.append(key, value);
   });
 
   return json({ ...(data || {}), ...clerkState }, clone);
@@ -66,7 +66,7 @@ export function injectRequestStateIntoDeferredData(
 
     headers.forEach((value, key) => {
       // @ts-expect-error -- We are ensuring headers is defined above
-      data.init.headers.set(key, value);
+      data.init.headers.append(key, value);
     });
   }
 
