@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.0.7
+
+### Patch Changes
+
+- Fix a bug where response headers from `@clerk/backend` would not be applied to the response when a redirect was triggered from a custom middleware handler. ([#3344](https://github.com/clerk/javascript/pull/3344)) by [@BRKalow](https://github.com/BRKalow)
+
+- Pass `devBrowserToken` to `createRedirect()` to ensure methods from `auth()` that trigger redirects correctly pass the dev browser token for URL-based session syncing. ([#3334](https://github.com/clerk/javascript/pull/3334)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`39265d909`](https://github.com/clerk/javascript/commit/39265d90941c850fd1b24295b19b904a5f3eaba6), [`4f4375e88`](https://github.com/clerk/javascript/commit/4f4375e88fa2daae4d725c62da5e4cf29302e53c), [`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`4ae79af36`](https://github.com/clerk/javascript/commit/4ae79af36552aae1f0284ecc4dfcfc23ef295d26), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/clerk-react@5.0.4
+  - @clerk/backend@1.1.2
+  - @clerk/shared@2.0.2
+
 ## 5.0.6
 
 ### Patch Changes

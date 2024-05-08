@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.1.2
+
+### Patch Changes
+
+- Fix bug in JWKS cache logic that caused a race condition resulting in no JWK being available. ([#3321](https://github.com/clerk/javascript/pull/3321)) by [@BRKalow](https://github.com/BRKalow)
+
+- Pass `devBrowserToken` to `createRedirect()` to ensure methods from `auth()` that trigger redirects correctly pass the dev browser token for URL-based session syncing. ([#3334](https://github.com/clerk/javascript/pull/3334)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/shared@2.0.2
+
 ## 1.1.1
 
 ### Patch Changes

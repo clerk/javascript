@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.2.1
+
+### Patch Changes
+
+- The following are all internal changes and not relevant to any end-user: ([#3329](https://github.com/clerk/javascript/pull/3329)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Create type interface for `TelemetryCollector` on `@clerk/types`. This allows to assign `telemetry` on the main Clerk SDK object, while inheriting from the actual `TelemetryCollector` implementation.
+
 ## 4.2.0
 
 ### Minor Changes
