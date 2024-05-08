@@ -3,7 +3,7 @@ import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
 
-import type { TSignInRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 
 // ---------------------------------- Tags ---------------------------------- //
 
@@ -20,7 +20,7 @@ export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent | DoneA
 export type SignInStartInput = {
   basePath?: string;
   formRef: ActorRefFrom<typeof FormMachine>;
-  parent: ActorRefFrom<TSignInRouterMachine>;
+  parent: SignInRouterMachineActorRef;
 };
 
 // ---------------------------------- Context ---------------------------------- //
@@ -29,7 +29,7 @@ export interface SignInStartContext {
   basePath: string;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
-  parent: ActorRefFrom<TSignInRouterMachine>;
+  parent: SignInRouterMachineActorRef;
   loadingStep: 'start';
 }
 

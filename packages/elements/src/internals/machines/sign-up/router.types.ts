@@ -1,5 +1,5 @@
 import type { SignUpResource } from '@clerk/types';
-import type { ActorRefFrom, AnyActorLogic } from 'xstate';
+import type { ActorRefFrom, SnapshotFrom, StateMachine } from 'xstate';
 
 import type { TFormMachine } from '~/internals/machines/form';
 import type {
@@ -10,8 +10,6 @@ import type {
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
   BaseRouterRedirectEvent,
-  BaseRouterRouteRegisterEvent,
-  BaseRouterRouteUnregisterEvent,
   BaseRouterSetClerkEvent,
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
@@ -57,14 +55,6 @@ export interface SignUpRouterInitEvent extends BaseRouterInput {
   signInPath?: string;
 }
 
-export type SignUpRouterRouteRegisterEvent<TLogic extends AnyActorLogic = AnyActorLogic> = BaseRouterRouteRegisterEvent<
-  SignUpRouterSystemId,
-  TLogic
->;
-export type SignUpRouterRouteUnregisterEvent = BaseRouterRouteUnregisterEvent<SignUpRouterSystemId>;
-
-export type SignUpRouterRouteEvents = SignUpRouterRouteRegisterEvent | SignUpRouterRouteUnregisterEvent;
-
 export type SignUpRouterNavigationEvents = SignUpRouterStartEvent | SignUpRouterPrevEvent;
 
 export type SignUpRouterEvents =
@@ -74,7 +64,6 @@ export type SignUpRouterEvents =
   | SignUpRouterErrorEvent
   | SignUpRouterTransferEvent
   | SignUpRouterRedirectEvent
-  | SignUpRouterRouteEvents
   | SignUpRouterLoadingEvent
   | SignUpRouterSetClerkEvent;
 
@@ -104,3 +93,33 @@ export interface SignUpRouterSchema {
   tags: SignUpRouterTags;
   delays: SignUpRouterDelays;
 }
+
+// ---------------------------------- Machine Type ---------------------------------- //
+
+export type SignUpRouterChildren = any; // TODO: Update
+export type SignUpRouterOuptut = any; // TODO: Update
+export type SignUpRouterStateValue = any; // TODO: Update
+
+export type TSignUpRouterParentMachine = StateMachine<
+  SignUpRouterContext, // context
+  SignUpRouterEvents, // event
+  SignUpRouterChildren, // children
+  any, // actor
+  any, // action
+  any, // guard
+  any, // delay
+  SignUpRouterStateValue, // state value
+  string, // tag
+  any, // input
+  SignUpRouterOuptut, // output
+  any, // emitted
+  any // meta - Introduced in XState 5.12.x
+>;
+
+// ---------------------------------- Machine Actor Ref ---------------------------------- //
+
+export type SignInRouterMachineActorRef = ActorRefFrom<TSignUpRouterParentMachine>;
+
+// ---------------------------------- Snapshot ---------------------------------- //
+
+export type SignUpRouterSnapshot = SnapshotFrom<TSignUpRouterParentMachine>;

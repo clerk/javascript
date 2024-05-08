@@ -1,5 +1,3 @@
-// ---------------------------------- Events ---------------------------------- //
-
 import type {
   ClerkResource,
   LoadedClerk,
@@ -8,7 +6,6 @@ import type {
   SignInStrategy,
   Web3Strategy,
 } from '@clerk/types';
-import type { AnyActorLogic, InputFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
 import type { ClerkRouter } from '~/react/router';
@@ -32,15 +29,6 @@ export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
       strategy: SignInStrategy | undefined;
     }
 ) & { type: 'LOADING'; isLoading: boolean };
-
-export type BaseRouterRouteRegisterEvent<TSystemId extends string, TLogic extends AnyActorLogic = AnyActorLogic> = {
-  type: 'ROUTE.REGISTER';
-  id: TSystemId;
-  logic: TLogic;
-  input: Omit<InputFrom<TLogic>, 'basePath' | 'clerk' | 'form' | 'router'>;
-};
-
-export type BaseRouterRouteUnregisterEvent<T extends string> = { type: 'ROUTE.UNREGISTER'; id: T };
 
 export type BaseRouterRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
 export type BaseRouterRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };

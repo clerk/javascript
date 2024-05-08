@@ -54,9 +54,9 @@
     "dotenv": "16.4.5"
   },
   "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
     "@playwright/test": "^1.43.1",
     "@types/node": "^18.17.0",
-    "eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
   },
