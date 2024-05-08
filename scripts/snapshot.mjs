@@ -21,6 +21,7 @@ const snapshot = `---
 '@clerk/clerk-expo': patch
 '@clerk/express': patch
 '@clerk/testing': patch
+'@clerk/elements': patch
 ---
 
 Snapshot release

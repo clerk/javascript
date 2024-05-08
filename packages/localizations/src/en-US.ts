@@ -442,6 +442,7 @@ export const enUS: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',

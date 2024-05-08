@@ -1,5 +1,31 @@
 # Change Log
 
+## 2.1.2
+
+### Patch Changes
+
+- Update the `neobrutalism` to make it compatible with the new Core 2 components ([#3310](https://github.com/clerk/javascript/pull/3310)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+## 2.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`c7d626292`](https://github.com/clerk/javascript/commit/c7d626292a9fd12ca0f1b31a1035e711b6e99531)]:
+  - @clerk/types@4.2.0
+
+## 2.1.0
+
+### Minor Changes
+
+- Drop `react` and `react-dom` as peer dependencies since they are not necessary for this package. ([#3273](https://github.com/clerk/javascript/pull/3273)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`956d8792f`](https://github.com/clerk/javascript/commit/956d8792fefe9d6a89022f1e938149b25503ec7f)]:
+  - @clerk/types@4.1.0
+
 ## 2.0.0
 
 ### Major Changes

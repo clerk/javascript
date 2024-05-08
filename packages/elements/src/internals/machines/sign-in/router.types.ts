@@ -1,6 +1,7 @@
 import type { SignInResource } from '@clerk/types';
-import type { AnyActorLogic, MachineSnapshot } from 'xstate';
+import type { ActorRefFrom, MachineSnapshot, StateMachine } from 'xstate';
 
+import type { TFormMachine } from '~/internals/machines/form';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
@@ -9,8 +10,6 @@ import type {
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
   BaseRouterRedirectEvent,
-  BaseRouterRouteRegisterEvent,
-  BaseRouterRouteUnregisterEvent,
   BaseRouterSetClerkEvent,
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
@@ -61,16 +60,9 @@ export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
+  formRef: ActorRefFrom<TFormMachine>;
   signUpPath?: string;
 }
-
-export type SignInRouterRouteRegisterEvent<TLogic extends AnyActorLogic = AnyActorLogic> = BaseRouterRouteRegisterEvent<
-  SignInRouterSystemId,
-  TLogic
->;
-export type SignInRouterRouteUnregisterEvent = BaseRouterRouteUnregisterEvent<SignInRouterSystemId>;
-
-export type SignInRouterRouteEvents = SignInRouterRouteRegisterEvent | SignInRouterRouteUnregisterEvent;
 
 export type SignInRouterNavigationEvents =
   | SignInRouterStartEvent
@@ -84,7 +76,6 @@ export type SignInRouterEvents =
   | SignInRouterNavigationEvents
   | SignInRouterErrorEvent
   | SignInRouterTransferEvent
-  | SignInRouterRouteEvents
   | SignInRouterRedirectEvent
   | SignInVerificationFactorUpdateEvent
   | SignInRouterLoadingEvent
@@ -96,8 +87,15 @@ export type SignInRouterEvents =
 export type SignInRouterLoadingContext = Omit<SignInRouterLoadingEvent, 'type'>;
 
 export interface SignInRouterContext extends BaseRouterContext {
-  signUpPath: string;
+  formRef: ActorRefFrom<TFormMachine>;
   loading: SignInRouterLoadingContext;
+  signUpPath: string;
+}
+
+// ---------------------------------- Input ---------------------------------- //
+
+export interface SignInRouterInput {
+  // NOTE: Set in INIT event
 }
 
 // ---------------------------------- Schema ---------------------------------- //
@@ -110,15 +108,38 @@ export interface SignInRouterSchema {
 
 // ---------------------------------- Schema ---------------------------------- //
 
-export type SignInChildren = any; // TODO: Update
-export type SignInOuptut = any; // TODO: Update
-export type SignInStateValue = any; // TODO: Update
+export type SignInRouterChildren = any; // TODO: Update
+export type SignInRouterOuptut = any; // TODO: Update
+export type SignInRouterStateValue = any; // TODO: Update
 
 export type SignInRouterSnapshot = MachineSnapshot<
   SignInRouterContext,
   SignInRouterEvents,
-  SignInChildren,
-  SignInStateValue,
+  SignInRouterChildren,
+  SignInRouterStateValue,
   SignInRouterTags,
-  SignInOuptut
+  SignInRouterOuptut,
+  any // TMeta - Introduced in XState 5.12.x
 >;
+
+// ---------------------------------- Machine Type ---------------------------------- //
+
+export type TSignInRouterParentMachine = StateMachine<
+  SignInRouterContext, // context
+  SignInRouterEvents, // event
+  SignInRouterChildren, // children
+  any, // actor
+  any, // action
+  any, // guard
+  any, // delay
+  any, // state value
+  string, // tag
+  any, // input
+  SignInRouterOuptut, // output
+  any, // emitted
+  any // meta
+>;
+
+// ---------------------------------- Machine Actor Ref ---------------------------------- //
+
+export type SignInRouterMachineActorRef = ActorRefFrom<TSignInRouterParentMachine>;

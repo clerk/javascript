@@ -38,7 +38,7 @@ export const SignInResend = React.forwardRef<SignInResendElement, SignInResendPr
     const actorRef = firstFactorRef || secondFactorRef;
 
     if (!actorRef) {
-      throw new Error('The resend action must be used within <Step name="verifications">.');
+      throw new Error('The resend action must be used within <SignIn.Step name="verifications">.');
     }
 
     const fallbackProps: SignInResendFallbackProps = useSelector(

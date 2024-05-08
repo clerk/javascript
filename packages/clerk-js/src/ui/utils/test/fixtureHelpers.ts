@@ -14,6 +14,7 @@ import type {
   SignUpJSON,
   UserJSON,
   UserSettingsJSON,
+  VerificationJSON,
 } from '@clerk/types';
 
 import type { OrgParams } from '../../../core/test/fixtures';
@@ -224,6 +225,7 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
     emailAddress?: string;
     supportEmailCode?: boolean;
     supportEmailLink?: boolean;
+    emailVerificationStatus?: VerificationJSON['status'];
   };
 
   type SignUpWithPhoneNumberParams = {
@@ -231,7 +233,12 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
   };
 
   const startSignUpWithEmailAddress = (params?: SignUpWithEmailAddressParams) => {
-    const { emailAddress = 'hello@clerk.com', supportEmailLink = true, supportEmailCode = true } = params || {};
+    const {
+      emailAddress = 'hello@clerk.com',
+      supportEmailLink = true,
+      supportEmailCode = true,
+      emailVerificationStatus = 'unverified',
+    } = params || {};
     baseClient.sign_up = {
       id: 'sua_2HseAXFGN12eqlwARPMxyyUa9o9',
       status: 'missing_requirements',
@@ -239,6 +246,7 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
       verifications: (supportEmailLink || supportEmailCode) && {
         email_address: {
           strategy: (supportEmailLink && 'email_link') || (supportEmailCode && 'email_code'),
+          status: emailVerificationStatus,
         },
       },
     } as SignUpJSON;

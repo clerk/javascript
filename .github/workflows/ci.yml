@@ -53,10 +53,10 @@ jobs:
         run: npm run format:check
 
       - name: Build Packages
-        run: npx turbo build $TURBO_ARGS --filter=!elements --only
+        run: npx turbo build $TURBO_ARGS --only
 
       - name: Lint packages using publint
-        run: npx turbo lint:publint $TURBO_ARGS --filter=!elements --only
+        run: npx turbo lint:publint $TURBO_ARGS --only
 
       - name: Lint types using attw
         run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!elements --filter=!backend --only
@@ -66,7 +66,7 @@ jobs:
         continue-on-error: true # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        run: npx turbo lint $TURBO_ARGS --filter=!elements --only -- --quiet
+        run: npx turbo lint $TURBO_ARGS --only -- --quiet
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v3
@@ -108,7 +108,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run tests
-        run: npx turbo test $TURBO_ARGS --filter=!elements
+        run: npx turbo test $TURBO_ARGS
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 

@@ -1,25 +1,31 @@
-import { joinURL } from '@clerk/shared';
+import { joinURL } from '@clerk/shared/url';
 import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, sendTo, setup, spawnChild, stopChild } from 'xstate';
+import { and, assign, log, not, or, raise, sendTo, setup, spawnChild } from 'xstate';
 
 import {
+  ERROR_CODES,
   SEARCH_PARAMS,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
   SSO_CALLBACK_PATH_ROUTE,
 } from '~/internals/constants';
-import type { ClerkElementsError } from '~/internals/errors';
-import { ClerkElementsRuntimeError } from '~/internals/errors';
+import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
+import { SignUpContinueMachine } from './continue.machine';
 import type {
   SignUpRouterContext,
   SignUpRouterEvents,
   SignUpRouterNextEvent,
   SignUpRouterSchema,
 } from './router.types';
+import { SignUpStartMachine } from './start.machine';
+import { SignUpVerificationMachine } from './verification.machine';
+
+export const SignUpRouterMachineId = 'SignUpRouter';
+export type TSignUpRouterMachine = typeof SignUpRouterMachine;
 
 const isCurrentPath =
   (path: `/${string}`) =>
@@ -31,14 +37,15 @@ const needsStatus =
   ({ context, event }: { context: SignUpRouterContext; event?: SignUpRouterEvents }, _?: NonReducibleUnknown) =>
     (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk?.client?.signUp?.status === status;
 
-export const SignUpRouterMachineId = 'SignUpRouter';
-export type TSignUpRouterMachine = typeof SignUpRouterMachine;
-
 export const SignUpRouterMachine = setup({
   actors: {
-    thirdParty: ThirdPartyMachine,
+    continueMachine: SignUpContinueMachine,
+    startMachine: SignUpStartMachine,
+    thirdPartyMachine: ThirdPartyMachine,
+    verificationMachine: SignUpVerificationMachine,
   },
   actions: {
+    clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
       if (!context.router) return;
@@ -51,6 +58,7 @@ export const SignUpRouterMachine = setup({
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
+    raiseNext: raise({ type: 'NEXT' }),
     setActive({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) {
       const session =
         params?.sessionId ||
@@ -66,7 +74,36 @@ export const SignUpRouterMachine = setup({
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
-    resetError: assign({ error: undefined }),
+    setFormOAuthErrors: ({ context }) => {
+      const errorOrig = context.clerk.client.signIn.firstFactorVerification.error;
+
+      if (!errorOrig) {
+        return;
+      }
+
+      let error: ClerkElementsError;
+
+      switch (errorOrig.code) {
+        case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
+        case ERROR_CODES.OAUTH_ACCESS_DENIED:
+        case ERROR_CODES.NOT_ALLOWED_ACCESS:
+        case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
+        case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
+        case ERROR_CODES.USER_LOCKED:
+          error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
+          break;
+        default:
+          error = new ClerkElementsError(
+            'unable_to_complete',
+            'Unable to complete action at this time. If the problem persists please contact support.',
+          );
+      }
+
+      context.formRef.send({
+        type: 'ERRORS.SET',
+        error,
+      });
+    },
     transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl()),
   },
   guards: {
@@ -136,24 +173,6 @@ export const SignUpRouterMachine = setup({
     },
     'NAVIGATE.PREVIOUS': '.Hist',
     'NAVIGATE.START': '.Start',
-    'ROUTE.REGISTER': {
-      actions: enqueueActions(({ context, enqueue, event, self, system }) => {
-        const { id, logic, input } = event;
-
-        if (!system.get(id)) {
-          // @ts-expect-error - This is valid (See: https://discord.com/channels/795785288994652170/1203714033190969405/1205595237293096960)
-          enqueue.spawnChild(logic, {
-            id,
-            systemId: id,
-            input: { basePath: context.router?.basePath, parent: self, ...input },
-            syncSnapshot: true, // Subscribes to the spawned actor and send back snapshot events
-          });
-        }
-      }),
-    },
-    'ROUTE.UNREGISTER': {
-      actions: stopChild(({ event }) => event.id),
-    },
     LOADING: {
       actions: assign(({ event }) => ({
         loading: {
@@ -176,19 +195,21 @@ export const SignUpRouterMachine = setup({
               isLoading: false,
             },
             exampleMode: event.exampleMode || false,
+            formRef: event.formRef,
           })),
           target: 'Init',
         },
       },
     },
     Init: {
-      entry: spawnChild('thirdParty', {
+      entry: spawnChild('thirdPartyMachine', {
         id: ThirdPartyMachineId,
         systemId: ThirdPartyMachineId,
         input: ({ context, self }) => ({
           basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
           environment: context.clerk.__unstable__environment,
           flow: 'signUp',
+          formRef: context.formRef,
           parent: self,
         }),
       }),
@@ -225,6 +246,19 @@ export const SignUpRouterMachine = setup({
     },
     Start: {
       tags: 'route:start',
+      exit: 'clearFormErrors',
+      invoke: {
+        id: 'start',
+        src: 'startMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
         NEXT: [
           {
@@ -246,6 +280,18 @@ export const SignUpRouterMachine = setup({
     },
     Continue: {
       tags: 'route:continue',
+      invoke: {
+        id: 'continue',
+        src: 'continueMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
         NEXT: [
           {
@@ -262,6 +308,18 @@ export const SignUpRouterMachine = setup({
     },
     Verification: {
       tags: 'route:verification',
+      invoke: {
+        id: 'verification',
+        src: 'verificationMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       always: [
         {
           guard: 'hasCreatedSession',
@@ -329,13 +387,13 @@ export const SignUpRouterMachine = setup({
       on: {
         NEXT: {
           target: 'Start',
-          actions: 'resetError',
+          actions: 'clearFormErrors',
         },
       },
     },
     Hist: {
       type: 'history',
-      exit: 'resetError',
+      exit: 'clearFormErrors',
     },
   },
 });

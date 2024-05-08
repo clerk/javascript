@@ -35,7 +35,7 @@ export class InvitationAPI extends AbstractAPI {
     return this.request<PaginatedResourceResponse<Invitation[]>>({
       method: 'GET',
       path: basePath,
-      queryParams: params,
+      queryParams: { ...params, paginated: true },
     });
   }
 

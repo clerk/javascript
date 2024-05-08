@@ -3,7 +3,7 @@ import { camelToSnake } from '@clerk/shared/underscore';
 import type { ClerkOptions, RedirectOptions } from '@clerk/types';
 import type { ParsedQs } from 'qs';
 
-import { assertNoLegacyProp } from './assertNoLegacyProp';
+import { assertNoLegacyProp, warnForNewPropShadowingLegacyProp } from './assertNoLegacyProp';
 import { buildURL, isAllowedRedirectOrigin, relativeToAbsoluteUrl } from './url';
 
 export class RedirectUrls {
@@ -72,25 +72,37 @@ export class RedirectUrls {
   #getRedirectUrl(prefix: 'signIn' | 'signUp') {
     const forceKey = `${prefix}ForceRedirectUrl` as const;
     const fallbackKey = `${prefix}FallbackRedirectUrl` as const;
+    let newKeyInUse: string | undefined;
 
     const legacyPropKey = `after${prefix[0].toUpperCase()}${prefix.slice(1)}Url` as 'afterSignInUrl' | 'afterSignUpUrl';
 
     let result;
     // Prioritize forceRedirectUrl
     result = this.fromSearchParams[forceKey] || this.fromProps[forceKey] || this.fromOptions[forceKey];
+    if (result) {
+      newKeyInUse = forceKey;
+    }
     // Try to get redirect_url, only allowed as a search param
     result ||= this.fromSearchParams.redirectUrl;
+    if (result) {
+      newKeyInUse = 'redirectUrl';
+    }
     // Otherwise, fallback to fallbackRedirectUrl
     result ||= this.fromSearchParams[fallbackKey] || this.fromProps[fallbackKey] || this.fromOptions[fallbackKey];
+    if (result) {
+      newKeyInUse = fallbackKey;
+    }
 
     // TODO: v6
     // Remove the compatibility layer for afterSignInUrl and afterSignUpUrl
-    result ||=
+    const legacyValue =
       this.fromSearchParams[legacyPropKey] ||
-      this.fromSearchParams.redirectUrl ||
       this.fromProps[legacyPropKey] ||
       this.fromProps.redirectUrl ||
       this.fromOptions[legacyPropKey];
+
+    warnForNewPropShadowingLegacyProp(newKeyInUse, result, legacyPropKey, legacyValue);
+    result ||= legacyValue;
 
     return result || '/';
   }
