@@ -4,7 +4,7 @@ import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
 
-import type { TSignUpRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 
 // ---------------------------------- Tags ---------------------------------- //
 
@@ -65,7 +65,7 @@ export type SignUpVerificationEvents =
 export type SignUpVerificationInput = {
   basePath?: string;
   formRef: ActorRefFrom<typeof FormMachine>;
-  parent: ActorRefFrom<TSignUpRouterMachine>;
+  parent: SignInRouterMachineActorRef;
 };
 
 // ---------------------------------- Delays ---------------------------------- //
@@ -84,7 +84,7 @@ export interface SignUpVerificationContext {
   resource: SignUpResource;
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
-  parent: ActorRefFrom<TSignUpRouterMachine>;
+  parent: SignInRouterMachineActorRef;
   loadingStep: 'verifications';
   resendable: boolean;
   resendableAfter: number;
