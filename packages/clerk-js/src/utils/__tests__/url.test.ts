@@ -4,7 +4,6 @@ import {
   appendAsQueryParams,
   buildURL,
   createAllowedRedirectOrigins,
-  getAllETLDs,
   getETLDPlusOneFromFrontendApi,
   getSearchParameterFromHash,
   hasBannedProtocol,
@@ -326,12 +325,6 @@ describe('appendQueryParams(base,url)', () => {
     const url = new URL('https://www.google.com/something').href;
     const res = appendAsQueryParams(base, { redirect_url: url });
     expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=https%3A%2F%2Fwww.google.com%2Fsomething');
-  });
-});
-
-describe('getAllETLDs(hostname)', () => {
-  it('returns all ETLDs for a give hostname', () => {
-    expect(getAllETLDs('foo.bar.qux.baz')).toEqual(['baz', 'qux.baz', 'bar.qux.baz']);
   });
 });
 
