@@ -136,6 +136,14 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
       handlerResult = handleControlFlowErrors(e, clerkRequest, requestState);
     }
 
+    // TODO @nikos: we need to make this more generic
+    // and move the logic in clerk/backend
+    if (requestState.headers) {
+      requestState.headers.forEach((value, key) => {
+        handlerResult.headers.append(key, value);
+      });
+    }
+
     if (isRedirect(handlerResult)) {
       logger.debug('handlerResult is redirect');
       return serverRedirectWithAuth(clerkRequest, handlerResult, options);
@@ -146,14 +154,6 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
     }
 
     decorateRequest(clerkRequest, handlerResult, requestState, options.secretKey);
-
-    // TODO @nikos: we need to make this more generic
-    // and move the logic in clerk/backend
-    if (requestState.headers) {
-      requestState.headers.forEach((value, key) => {
-        handlerResult.headers.append(key, value);
-      });
-    }
 
     return handlerResult;
   };

@@ -12,7 +12,7 @@ import type {
   SignInSecondFactor,
   Web3Attempt,
 } from '@clerk/types';
-import type { ActorRefFrom, DoneActorEvent } from 'xstate';
+import type { DoneActorEvent } from 'xstate';
 import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
 import { RESENDABLE_COUNTDOWN_DEFAULT } from '~/internals/constants';
@@ -23,31 +23,44 @@ import { sendToLoading } from '~/internals/machines/shared';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
 
-import type { TSignInRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 import type { SignInVerificationSchema } from './verification.types';
 import { SignInVerificationDelays } from './verification.types';
 
 export type TSignInFirstFactorMachine = typeof SignInFirstFactorMachine;
 export type TSignInSecondFactorMachine = typeof SignInSecondFactorMachine;
 
-type Parent = ActorRefFrom<TSignInRouterMachine>;
+export type DetermineStartingFactorInput = {
+  parent: SignInRouterMachineActorRef;
+};
 
 export type PrepareFirstFactorInput = WithParams<SignInFirstFactor | null> & {
-  parent: Parent;
+  parent: SignInRouterMachineActorRef;
   resendable: boolean;
 };
 export type PrepareSecondFactorInput = WithParams<SignInSecondFactor | null> & {
-  parent: Parent;
+  parent: SignInRouterMachineActorRef;
   resendable: boolean;
 };
 
-export type AttemptFirstFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInFirstFactor | null };
-export type AttemptSecondFactorInput = { parent: Parent; fields: FormFields; currentFactor: SignInSecondFactor | null };
+export type AttemptFirstFactorInput = {
+  parent: SignInRouterMachineActorRef;
+  fields: FormFields;
+  currentFactor: SignInFirstFactor | null;
+};
+export type AttemptSecondFactorInput = {
+  parent: SignInRouterMachineActorRef;
+  fields: FormFields;
+  currentFactor: SignInSecondFactor | null;
+};
 
 export const SignInVerificationMachineId = 'SignInVerification';
 
 const SignInVerificationMachine = setup({
   actors: {
+    determineStartingFactor: fromPromise<SignInFactor | null, DetermineStartingFactorInput>(() =>
+      Promise.reject(new ClerkElementsRuntimeError('Actor `determineStartingFactor` must be overridden')),
+    ),
     prepare: fromPromise<SignInResource, PrepareFirstFactorInput | PrepareSecondFactorInput>(() =>
       Promise.reject(new ClerkElementsRuntimeError('Actor `prepare` must be overridden')),
     ),
@@ -56,9 +69,6 @@ const SignInVerificationMachine = setup({
     ),
   },
   actions: {
-    determineStartingFactor: () => {
-      throw new ClerkElementsRuntimeError('Action `determineStartingFactor` must be overridden');
-    },
     resendableTick: assign(({ context }) => ({
       resendable: context.resendableAfter === 0,
       resendableAfter: context.resendableAfter > 0 ? context.resendableAfter - 1 : context.resendableAfter,
@@ -81,12 +91,10 @@ const SignInVerificationMachine = setup({
       ) {
         console.warn(
           `Clerk: Your instance is configured to support these strategies: ${clerk.client.signIn.supportedFirstFactors
-            .map(f => f.strategy)
-            .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
-            .map(s => s)
-            .join(
-              ', ',
-            )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+            .map((factor: any) => factor.strategy)
+            .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
+            ', ',
+          )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
         );
       }
 
@@ -101,11 +109,9 @@ const SignInVerificationMachine = setup({
             ...clerk.client.signIn.supportedSecondFactors,
           ]
             .map(f => f.strategy)
-            .join(', ')}, but the rendered strategies are: ${[...context.registeredStrategies]
-            .map(s => s)
-            .join(
-              ', ',
-            )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+            .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
+            ', ',
+          )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
         );
       }
 
@@ -153,8 +159,7 @@ const SignInVerificationMachine = setup({
     resendable: false,
     resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
   }),
-  initial: 'Preparing',
-  entry: 'determineStartingFactor',
+  initial: 'Init',
   on: {
     'STRATEGY.REGISTER': {
       actions: assign({
@@ -171,6 +176,31 @@ const SignInVerificationMachine = setup({
     },
   },
   states: {
+    Init: {
+      tags: ['state:preparing', 'state:loading'],
+      invoke: {
+        id: 'determineStartingFactor',
+        src: 'determineStartingFactor',
+        input: ({ context }) => ({
+          parent: context.parent,
+        }),
+        onDone: {
+          target: 'Preparing',
+          actions: assign({
+            currentFactor: ({ event }) => event.output,
+          }),
+        },
+        onError: {
+          target: 'Preparing',
+          actions: [
+            log('Clerk [Sign In Verification]: Error determining starting factor'),
+            assign({
+              currentFactor: { strategy: 'password' },
+            }),
+          ],
+        },
+      },
+    },
     Preparing: {
       tags: ['state:preparing', 'state:loading'],
       invoke: {
@@ -274,6 +304,17 @@ const SignInVerificationMachine = setup({
 
 export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
   actors: {
+    determineStartingFactor: fromPromise(async ({ input }) => {
+      const clerk = input.parent.getSnapshot().context.clerk;
+
+      return Promise.resolve(
+        determineStartingSignInFactor(
+          clerk.client.signIn.supportedFirstFactors,
+          clerk.client.signIn.identifier,
+          clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
+        ),
+      );
+    }),
     prepare: fromPromise(async ({ input }) => {
       const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
@@ -288,7 +329,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
       assertIsDefined(params);
 
-      return clerk.client.signIn.prepareFirstFactor(params as PrepareFirstFactorParams);
+      return await clerk.client.signIn.prepareFirstFactor(params as PrepareFirstFactorParams);
     }),
     attempt: fromPromise(async ({ input }) => {
       const { currentFactor, fields, parent } = input as AttemptFirstFactorInput;
@@ -350,27 +391,21 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
           throw new ClerkElementsRuntimeError(`Invalid strategy: ${strategy}`);
       }
 
-      return parent.getSnapshot().context.clerk.client.signIn.attemptFirstFactor(attemptParams);
-    }),
-  },
-  actions: {
-    determineStartingFactor: assign({
-      currentFactor: ({ context }) => {
-        const clerk = context.parent.getSnapshot().context.clerk;
-
-        return determineStartingSignInFactor(
-          clerk.client.signIn.supportedFirstFactors,
-          clerk.client.signIn.identifier,
-          clerk.__unstable__environment?.displayConfig.preferredSignInStrategy,
-        );
-      },
+      return await parent.getSnapshot().context.clerk.client.signIn.attemptFirstFactor(attemptParams);
     }),
   },
 });
 
 export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
   actors: {
-    prepare: fromPromise(({ input }) => {
+    determineStartingFactor: fromPromise(async ({ input }) =>
+      Promise.resolve(
+        determineStartingSignInSecondFactor(
+          input.parent.getSnapshot().context.clerk.client.signIn.supportedSecondFactors,
+        ),
+      ),
+    ),
+    prepare: fromPromise(async ({ input }) => {
       const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
@@ -384,7 +419,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
         return Promise.resolve(clerk.client.signIn);
       }
 
-      return clerk.client.signIn.prepareSecondFactor({
+      return await clerk.client.signIn.prepareSecondFactor({
         strategy: params.strategy,
         phoneNumberId: params.phoneNumberId,
       });
@@ -397,18 +432,10 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       assertIsDefined(currentFactor);
       assertIsDefined(code);
 
-      return parent.getSnapshot().context.clerk.client.signIn.attemptSecondFactor({
+      return await parent.getSnapshot().context.clerk.client.signIn.attemptSecondFactor({
         strategy: currentFactor.strategy,
         code,
       });
-    }),
-  },
-  actions: {
-    determineStartingFactor: assign({
-      currentFactor: ({ context }) =>
-        determineStartingSignInSecondFactor(
-          context.parent.getSnapshot().context.clerk.client.signIn.supportedSecondFactors,
-        ),
     }),
   },
 });
