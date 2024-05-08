@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.0.2
+
+### Patch Changes
+
+- The following are all internal changes and not relevant to any end-user: ([#3341](https://github.com/clerk/javascript/pull/3341)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Add telemetry events for `useSignIn`, `useSignUp`, `useOrganizations` and `useOrganizationList`
+
+- The following are all internal changes and not relevant to any end-user: ([#3329](https://github.com/clerk/javascript/pull/3329)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Create type interface for `TelemetryCollector` on `@clerk/types`. This allows to assign `telemetry` on the main Clerk SDK object, while inheriting from the actual `TelemetryCollector` implementation.
+
+- Fix detection of legacy publishable keys when determining the default Clerk API URL. Previously, legacy keys would be treated as local. ([#3333](https://github.com/clerk/javascript/pull/3333)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 2.0.1
 
 ### Patch Changes

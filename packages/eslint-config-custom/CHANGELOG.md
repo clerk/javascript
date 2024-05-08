@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.0.1
+
+### Patch Changes
+
+- Rename local `eslint-config-custom` package to `@clerk/eslint-config-custom` to avoid conflicts with previously published package. Removes `eslint-config-custom` from `@clerk/clerk-react`'s dependencies, as it should only be a development dependency. ([#3307](https://github.com/clerk/javascript/pull/3307)) by [@BRKalow](https://github.com/BRKalow)
+
+- Initial release of `@clerk/eslint-config-custom`, for internal use. ([#3307](https://github.com/clerk/javascript/pull/3307)) by [@BRKalow](https://github.com/BRKalow)
+
+- Set correct properties in `package.json` for publishing ([#3340](https://github.com/clerk/javascript/pull/3340)) by [@LekoArts](https://github.com/LekoArts)
+
 ## [0.3.0](https://github.com/clerk/clerk_docker/compare/eslint-config-custom@0.2.0...eslint-config-custom@0.3.0) (2023-05-15)
 
 **Note:** Version bump only for package eslint-config-custom
