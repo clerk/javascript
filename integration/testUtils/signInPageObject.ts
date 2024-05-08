@@ -11,12 +11,20 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
   const { page } = testArgs;
   const self = {
     ...common(testArgs),
-    goTo: async (opts?: { searchParams: URLSearchParams }) => {
-      await page.goToRelative('/sign-in', opts);
-      return self.waitForMounted();
+    goTo: async (opts?: { searchParams?: URLSearchParams; headlessSelector?: string }) => {
+      await page.goToRelative('/sign-in', { searchParams: opts.searchParams });
+
+      if (typeof opts.headlessSelector !== 'undefined') {
+        return self.waitForMountedHeadless(opts.headlessSelector);
+      } else {
+        return self.waitForMounted();
+      }
     },
     waitForMounted: () => {
       return page.waitForSelector('.cl-signIn-root', { state: 'attached' });
+    },
+    waitForMountedHeadless: (selector: string) => {
+      return page.waitForSelector(selector, { state: 'attached' });
     },
     setIdentifier: (val: string) => {
       return self.getIdentifierInput().fill(val);
@@ -40,6 +48,9 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
     },
     getGoToSignUp: () => {
       return page.getByRole('link', { name: /sign up/i });
+    },
+    getSignIn: () => {
+      return page.getByRole('button', { name: /sign in/i });
     },
     getResetPassword: () => {
       return page.getByRole('button', { name: /(reset password|reset your password)/i });
