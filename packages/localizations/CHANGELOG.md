@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.3.1
+
+### Patch Changes
+
+- feat(localizations): Update PL translations ([#3342](https://github.com/clerk/javascript/pull/3342)) by [@dawid-grabowski](https://github.com/dawid-grabowski)
+
+- Add some phrases to it-IT localization ([#3314](https://github.com/clerk/javascript/pull/3314)) by [@ugoborghetti](https://github.com/ugoborghetti)
+
 ## 2.3.0
 
 ### Minor Changes

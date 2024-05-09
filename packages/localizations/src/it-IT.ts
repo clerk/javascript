@@ -606,11 +606,11 @@ export const itIT: LocalizationResource = {
       title: 'Aggiungi un indirizzo email',
       verifyTitle: 'Verify email address',
     },
-    formButtonPrimary__add: 'Add',
+    formButtonPrimary__add: 'Aggiungi',
     formButtonPrimary__continue: 'Continua',
     formButtonPrimary__finish: 'Concludi',
-    formButtonPrimary__remove: 'Remove',
-    formButtonPrimary__save: 'Save',
+    formButtonPrimary__remove: 'Rimuovi',
+    formButtonPrimary__save: 'Salva',
     formButtonReset: 'Cancella',
     mfaPage: {
       formHint: 'Seleziona un metodo da aggiungere.',
@@ -664,7 +664,7 @@ export const itIT: LocalizationResource = {
     mobileButton__menu: 'Menu',
     navbar: {
       account: 'Profile',
-      description: 'Manage your account info.',
+      description: 'Gestisci il tuo account.',
       security: 'Security',
       title: 'Account',
     },
@@ -678,8 +678,9 @@ export const itIT: LocalizationResource = {
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
-        'It is recommended to sign out of all other devices which may have used your old password.',
-      readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+        'È consigliabile disconnettersi da tutti gli altri dispositivi che potrebbero aver utilizzato la tua vecchia password.',
+      readonly:
+        'La tua password corrente non può essere modificata perché puoi accedere solo tramite la connessione aziendale.',
       successMessage__set: 'La tua password é stata impostata.',
       successMessage__signOutOfOtherSessions: 'Tutti gli altri dispositivi sono stati disconnessi.',
       successMessage__update: 'La tua password è stata aggiornata.',
