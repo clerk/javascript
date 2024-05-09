@@ -100,7 +100,7 @@ export const getCaptchaToken = async (captchaOptions: {
   const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = captchaOptions;
   let captchaToken = '',
     id = '';
-  let invisibleWidget = !widgetType || widgetType === 'invisible';
+  let isInvisibleWidget = !widgetType || widgetType === 'invisible';
   let turnstileSiteKey = siteKey;
 
   let widgetDiv: HTMLElement | null = null;
@@ -112,21 +112,6 @@ export const getCaptchaToken = async (captchaOptions: {
     return div;
   };
 
-  if (invisibleWidget) {
-    widgetDiv = createInvisibleDOMElement();
-  } else {
-    const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
-    if (visibleDiv) {
-      visibleDiv.style.display = 'block';
-      widgetDiv = visibleDiv;
-    } else {
-      console.error('Captcha DOM element not found. Using invisible captcha widget.');
-      widgetDiv = createInvisibleDOMElement();
-      invisibleWidget = true;
-      turnstileSiteKey = invisibleSiteKey;
-    }
-  }
-
   const captcha = await loadCaptcha(scriptUrl);
   let retries = 0;
   const errorCodes: (string | number)[] = [];
@@ -134,7 +119,22 @@ export const getCaptchaToken = async (captchaOptions: {
   const handleCaptchaTokenGeneration = (): Promise<[string, string]> => {
     return new Promise((resolve, reject) => {
       try {
-        const id = captcha.render(invisibleWidget ? `.${CAPTCHA_INVISIBLE_CLASSNAME}` : `#${CAPTCHA_ELEMENT_ID}`, {
+        if (isInvisibleWidget) {
+          widgetDiv = createInvisibleDOMElement();
+        } else {
+          const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
+          if (visibleDiv) {
+            visibleDiv.style.display = 'block';
+            widgetDiv = visibleDiv;
+          } else {
+            console.error('Captcha DOM element not found. Using invisible captcha widget.');
+            widgetDiv = createInvisibleDOMElement();
+            isInvisibleWidget = true;
+            turnstileSiteKey = invisibleSiteKey;
+          }
+        }
+
+        const id = captcha.render(isInvisibleWidget ? `.${CAPTCHA_INVISIBLE_CLASSNAME}` : `#${CAPTCHA_ELEMENT_ID}`, {
           sitekey: turnstileSiteKey,
           appearance: 'interaction-only',
           retry: 'never',
@@ -186,12 +186,14 @@ export const getCaptchaToken = async (captchaOptions: {
       captchaError: e,
     };
   } finally {
-    if (invisibleWidget) {
-      document.body.removeChild(widgetDiv);
-    } else {
-      widgetDiv.style.display = 'none';
+    if (widgetDiv) {
+      if (isInvisibleWidget) {
+        document.body.removeChild(widgetDiv);
+      } else {
+        widgetDiv.style.display = 'none';
+      }
     }
   }
 
-  return { captchaToken, captchaWidgetTypeUsed: invisibleWidget ? 'invisible' : 'smart' };
+  return { captchaToken, captchaWidgetTypeUsed: isInvisibleWidget ? 'invisible' : 'smart' };
 };
