@@ -12,7 +12,7 @@
 
 import type { LocalizationResource } from '@clerk/types';
 
-export const srRS: LocalizationResource ={
+export const srRS: LocalizationResource = {
   locale: 'sr-RS',
   backButton: 'Nazad',
   badge__default: 'Podrazumevano',
@@ -32,12 +32,10 @@ export const srRS: LocalizationResource ={
   },
   dates: {
     lastDay: "Juče u {{ date | timeString('sr-RS') }}",
-    next6Days:
-      "{{ date | weekday('sr-RS','long') }} u {{ date | timeString('sr-RS') }}",
+    next6Days: "{{ date | weekday('sr-RS','long') }} u {{ date | timeString('sr-RS') }}",
     nextDay: "Sutra u {{ date | timeString('sr-RS') }}",
     numeric: "{{ date | numeric('sr-RS') }}",
-    previous6Days:
-      "Prošli {{ date | weekday('sr-RS','long') }} u {{ date | timeString('sr-RS') }}",
+    previous6Days: "Prošli {{ date | weekday('sr-RS','long') }} u {{ date | timeString('sr-RS') }}",
     sameDay: "Danas u {{ date | timeString('sr-RS') }}",
   },
   dividerText: 'ili',
@@ -50,17 +48,14 @@ export const srRS: LocalizationResource ={
   formFieldAction__forgotPassword: 'Zaboravljena lozinka?',
   formFieldError__matchingPasswords: 'Lozinke se poklapaju.',
   formFieldError__notMatchingPasswords: 'Lozinke se ne poklapaju.',
-  formFieldError__verificationLinkExpired:
-    'Link za verifikaciju je istekao. Molimo zatražite novi link.',
+  formFieldError__verificationLinkExpired: 'Link za verifikaciju je istekao. Molimo zatražite novi link.',
   formFieldHintText__optional: 'Opciono',
-  formFieldHintText__slug:
-    'Slug je lako čitljivi ID koji mora biti jedinstven. Često se koristi u URL-ovima.',
+  formFieldHintText__slug: 'Slug je lako čitljivi ID koji mora biti jedinstven. Često se koristi u URL-ovima.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Obriši nalog',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddress_username: '',
-  formFieldInputPlaceholder__emailAddresses:
-    'primer@email.com, primer2@email.com',
+  formFieldInputPlaceholder__emailAddresses: 'primer@email.com, primer2@email.com',
   formFieldInputPlaceholder__firstName: '',
   formFieldInputPlaceholder__lastName: '',
   formFieldInputPlaceholder__organizationDomain: '',
@@ -70,8 +65,7 @@ export const srRS: LocalizationResource ={
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldLabel__automaticInvitations:
-    'Omogući automatske pozivnice za ovaj domen',
+  formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovaj domen',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',
   formFieldLabel__confirmPassword: 'Potvrdi lozinku',
@@ -83,10 +77,8 @@ export const srRS: LocalizationResource ={
   formFieldLabel__lastName: 'Prezime',
   formFieldLabel__newPassword: 'Nova lozinka',
   formFieldLabel__organizationDomain: 'Domen',
-  formFieldLabel__organizationDomainDeletePending:
-    'Obriši čekajuće pozivnice i predloge',
-  formFieldLabel__organizationDomainEmailAddress:
-    'E-mail adresa za verifikaciju',
+  formFieldLabel__organizationDomainDeletePending: 'Obriši čekajuće pozivnice i predloge',
+  formFieldLabel__organizationDomainEmailAddress: 'E-mail adresa za verifikaciju',
   formFieldLabel__organizationDomainEmailAddressDescription:
     'Unesite e-mail adresu pod ovim domenom da biste primili kod i verifikovali ovaj domen.',
   formFieldLabel__organizationName: 'Naziv',
@@ -101,8 +93,7 @@ export const srRS: LocalizationResource ={
     action__signOut: 'Odjavi se',
     title: 'Prijavljeni ste kao {{identifier}}',
   },
-  maintenanceMode:
-    'Trenutno smo u modu održavanja, ali ne brinite, neće trajati duže od nekoliko minuta.',
+  maintenanceMode: 'Trenutno smo u modu održavanja, ali ne brinite, neće trajati duže od nekoliko minuta.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Član',
   membershipRole__guestMember: 'Gost',
@@ -132,8 +123,7 @@ export const srRS: LocalizationResource ={
         'Pozivnice nisu poslate. Već postoje čekajuće pozivnice za sledeće e-mail adrese: {{email_addresses}}.',
       formButtonPrimary__continue: 'Pošalji pozivnice',
       selectDropdown__role: 'Izaberi ulogu',
-      subtitle:
-        'Unesi ili nalepi jednu ili više e-mail adresa, razdvojene razmacima ili zarezima.',
+      subtitle: 'Unesi ili nalepi jednu ili više e-mail adresa, razdvojene razmacima ili zarezima.',
       successMessage: 'Pozivnice su uspešno poslate',
       title: 'Pozovi nove članove',
     },
@@ -188,8 +178,7 @@ export const srRS: LocalizationResource ={
       dangerSection: {
         deleteOrganization: {
           actionDescription: 'Upiši "{{organizationName}}" ispod da nastaviš.',
-          messageLine1:
-            'Da li ste sigurni da želite da obrišete ovu organizaciju?',
+          messageLine1: 'Da li ste sigurni da želite da obrišete ovu organizaciju?',
           messageLine2: 'Ova akcija je trajna i nepovratna.',
           successMessage: 'Organizacija je obrisana.',
           title: 'Obriši organizaciju',
@@ -218,8 +207,7 @@ export const srRS: LocalizationResource ={
     },
     removeDomainPage: {
       messageLine1: 'E-mail domen {{domain}} će biti uklonjen.',
-      messageLine2:
-        'Korisnici više neće moći automatski da se pridruže organizaciji nakon ovoga.',
+      messageLine2: 'Korisnici više neće moći automatski da se pridruže organizaciji nakon ovoga.',
       successMessage: '{{domain}} je uklonjen.',
       title: 'Ukloni domen',
     },
@@ -234,8 +222,7 @@ export const srRS: LocalizationResource ={
     },
     verifiedDomainPage: {
       dangerTab: {
-        calloutInfoLabel:
-          'Uklanjanje ovog domena će uticati na pozvane korisnike.',
+        calloutInfoLabel: 'Uklanjanje ovog domena će uticati na pozvane korisnike.',
         removeDomainActionLabel__remove: 'Ukloni domen',
         removeDomainSubtitle: 'Ukloni ovaj domen iz tvojih potvrđenih domena',
         removeDomainTitle: 'Ukloni domen',
@@ -247,24 +234,18 @@ export const srRS: LocalizationResource ={
         automaticSuggestionOption__description:
           'Korisnici dobijaju predlog da zatraže pridruživanje, ali moraju biti odobreni od strane administratora pre nego što mogu da se pridruže organizaciji.',
         automaticSuggestionOption__label: 'Automatski predlozi',
-        calloutInfoLabel:
-          'Promena načina upisa će uticati samo na nove korisnike.',
-        calloutInvitationCountLabel:
-          'Čekajuće pozivnice poslate korisnicima: {{count}}',
-        calloutSuggestionCountLabel:
-          'Čekajući predlozi poslati korisnicima: {{count}}',
-        manualInvitationOption__description:
-          'Korisnici mogu biti pozvani samo ručno u organizaciju.',
+        calloutInfoLabel: 'Promena načina upisa će uticati samo na nove korisnike.',
+        calloutInvitationCountLabel: 'Čekajuće pozivnice poslate korisnicima: {{count}}',
+        calloutSuggestionCountLabel: 'Čekajući predlozi poslati korisnicima: {{count}}',
+        manualInvitationOption__description: 'Korisnici mogu biti pozvani samo ručno u organizaciju.',
         manualInvitationOption__label: 'Bez automatskog uključivanja',
-        subtitle:
-          'Izaberi kako korisnici iz ovog domena mogu da se pridruže organizaciji.',
+        subtitle: 'Izaberi kako korisnici iz ovog domena mogu da se pridruže organizaciji.',
       },
       start: {
         headerTitle__danger: 'Opasnost',
         headerTitle__enrollment: 'Opcije upisa',
       },
-      subtitle:
-        'Domen {{domain}} je sada verifikovan. Nastavi biranjem načina upisa.',
+      subtitle: 'Domen {{domain}} je sada verifikovan. Nastavi biranjem načina upisa.',
       title: 'Ažuriraj {{domain}}',
     },
     verifyDomainPage: {
@@ -272,8 +253,7 @@ export const srRS: LocalizationResource ={
       formTitle: 'Verifikacioni kod',
       resendButton: 'Nisi primio kod? Pošalji ponovo',
       subtitle: 'Domen {{domainName}} mora biti verifikovan putem e-maila.',
-      subtitleVerificationCodeScreen:
-        'Verifikacioni kod je poslat na {{emailAddress}}. Unesi kod da nastaviš.',
+      subtitleVerificationCodeScreen: 'Verifikacioni kod je poslat na {{emailAddress}}. Unesi kod da nastaviš.',
       title: 'Verifikuj domen',
     },
   },
@@ -313,13 +293,11 @@ export const srRS: LocalizationResource ={
           'Ako imaš problema sa prijavljivanjem na svoj nalog, pošalji nam e-mail i pomoći ćemo ti da što pre povratiš pristup.',
         title: 'Zatraži pomoć',
       },
-      subtitle:
-        'Imaš problema? Možeš koristiti bilo koju od ovih metoda za prijavljivanje.',
+      subtitle: 'Imaš problema? Možeš koristiti bilo koju od ovih metoda za prijavljivanje.',
       title: 'Koristi drugu metodu',
     },
     backupCodeMfa: {
-      subtitle:
-        'Tvoj rezervni kod je onaj koji si dobio kada si postavio dvostepenu autentifikaciju.',
+      subtitle: 'Tvoj rezervni kod je onaj koji si dobio kada si postavio dvostepenu autentifikaciju.',
       title: 'Unesi rezervni kod',
     },
     emailCode: {
@@ -373,8 +351,7 @@ export const srRS: LocalizationResource ={
       title: 'Zaboravljena lozinka?',
     },
     noAvailableMethods: {
-      message:
-        'Nije moguće nastaviti sa prijavom. Nema dostupnih metoda autentifikacije.',
+      message: 'Nije moguće nastaviti sa prijavom. Nema dostupnih metoda autentifikacije.',
       subtitle: 'Došlo je do greške',
       title: 'Nije moguće prijaviti se',
     },
@@ -400,21 +377,17 @@ export const srRS: LocalizationResource ={
     phoneCodeMfa: {
       formTitle: 'Verifikacioni kod',
       resendButton: 'Nisi primio kod? Pošalji ponovo',
-      subtitle:
-        'Da nastaviš, molimo unesi verifikacioni kod poslat na tvoj telefon',
+      subtitle: 'Da nastaviš, molimo unesi verifikacioni kod poslat na tvoj telefon',
       title: 'Proveri svoj telefon',
     },
     resetPassword: {
       formButtonPrimary: 'Resetuj lozinku',
-      requiredMessage:
-        'Iz sigurnosnih razloga, potrebno je da resetuješ svoju lozinku.',
-      successMessage:
-        'Tvoja lozinka je uspešno promenjena. Prijavljujem te, sačekaj trenutak.',
+      requiredMessage: 'Iz sigurnosnih razloga, potrebno je da resetuješ svoju lozinku.',
+      successMessage: 'Tvoja lozinka je uspešno promenjena. Prijavljujem te, sačekaj trenutak.',
       title: 'Postavi novu lozinku',
     },
     resetPasswordMfa: {
-      detailsLabel:
-        'Potrebno je da potvrdimo tvoj identitet pre resetovanja lozinke.',
+      detailsLabel: 'Potrebno je da potvrdimo tvoj identitet pre resetovanja lozinke.',
     },
     start: {
       actionLink: 'Registruj se',
@@ -429,8 +402,7 @@ export const srRS: LocalizationResource ={
     },
     totpMfa: {
       formTitle: 'Verifikacioni kod',
-      subtitle:
-        'Da nastaviš, molimo unesi verifikacioni kod generisan tvojom aplikacijom za autentifikaciju',
+      subtitle: 'Da nastaviš, molimo unesi verifikacioni kod generisan tvojom aplikacijom za autentifikaciju',
       title: 'Dvostepena verifikacija',
     },
   },
@@ -490,8 +462,7 @@ export const srRS: LocalizationResource ={
     form_param_format_invalid: 'Format parametra je nevažeći.',
     form_password_incorrect: 'Lozinka je netačna.',
     form_password_length_too_short: 'Lozinka je prekratka.',
-    form_username_invalid_character:
-      'Korisničko ime sadrži nevažeće karaktere.',
+    form_username_invalid_character: 'Korisničko ime sadrži nevažeće karaktere.',
     form_username_invalid_length: 'Dužina korisničkog imena nije validna.',
     not_allowed_access: 'Pristup nije dozvoljen.',
     form_param_nil: 'Parametar ne može biti prazan.',
@@ -499,22 +470,14 @@ export const srRS: LocalizationResource ={
       'Registracija neuspešna zbog neuspelog sigurnosnog proveravanja. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     captcha_unavailable:
       'Registracija neuspešna zbog neuspelog proveravanja bota. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
-    form_identifier_exists__email_address:
-      'Ova e-mail adresa je zauzeta. Molimo pokušaj sa drugom.',
-    form_identifier_exists__phone_number:
-      'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
-    form_identifier_exists__username:
-      'Ovo korisničko ime je zauzeto. Molimo pokušaj sa drugim.',
-    form_param_format_invalid__email_address:
-      'E-mail adresa mora biti važeća e-mail adresa.',
-    form_param_format_invalid__phone_number:
-      'Telefonski broj mora biti u važećem međunarodnom formatu',
-    form_param_max_length_exceeded__first_name:
-      'Ime ne sme premašiti 256 karaktera.',
-    form_param_max_length_exceeded__last_name:
-      'Prezime ne sme premašiti 256 karaktera.',
-    form_param_max_length_exceeded__name:
-      'Naziv ne sme premašiti 256 karaktera.',
+    form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušaj sa drugom.',
+    form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
+    form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušaj sa drugim.',
+    form_param_format_invalid__email_address: 'E-mail adresa mora biti važeća e-mail adresa.',
+    form_param_format_invalid__phone_number: 'Telefonski broj mora biti u važećem međunarodnom formatu',
+    form_param_max_length_exceeded__first_name: 'Ime ne sme premašiti 256 karaktera.',
+    form_param_max_length_exceeded__last_name: 'Prezime ne sme premašiti 256 karaktera.',
+    form_param_max_length_exceeded__name: 'Naziv ne sme premašiti 256 karaktera.',
     form_password_not_strong_enough: 'Tvoja lozinka nije dovoljno jaka.',
     form_password_pwned:
       'Ova lozinka je pronađena kao deo kompromitovanih podataka i ne može se koristiti, molimo pokušaj sa drugom lozinkom.',
@@ -523,17 +486,12 @@ export const srRS: LocalizationResource ={
     form_password_size_in_bytes_exceeded:
       'Tvoja lozinka je premašila maksimalni dozvoljeni broj bajtova, molimo skrati je ili ukloni neke specijalne znakove.',
     form_password_validation_failed: 'Neispravna lozinka',
-    identification_deletion_failed:
-      'Ne možeš obrisati svoju poslednju identifikaciju.',
-    passkey_already_exists:
-      'Ključ za prolaz je već registrovan sa ovim uređajem.',
+    identification_deletion_failed: 'Ne možeš obrisati svoju poslednju identifikaciju.',
+    passkey_already_exists: 'Ključ za prolaz je već registrovan sa ovim uređajem.',
     passkey_not_supported: 'Ključevi za prolaz nisu podržani na ovom uređaju.',
-    passkey_pa_not_supported:
-      'Registracija zahteva platformski autentifikator, ali uređaj to ne podržava.',
-    passkey_registration_cancelled:
-      'Registracija ključa za prolaz je otkazana ili je isteklo vreme.',
-    passkey_retrieval_cancelled:
-      'Verifikacija ključa za prolaz je otkazana ili je isteklo vreme.',
+    passkey_pa_not_supported: 'Registracija zahteva platformski autentifikator, ali uređaj to ne podržava.',
+    passkey_registration_cancelled: 'Registracija ključa za prolaz je otkazana ili je isteklo vreme.',
+    passkey_retrieval_cancelled: 'Verifikacija ključa za prolaz je otkazana ili je isteklo vreme.',
     passwordComplexity: {
       maximumLength: 'manje od {{length}} karaktera',
       minimumLength: '{{length}} ili više karaktera',
@@ -543,11 +501,9 @@ export const srRS: LocalizationResource ={
       requireUppercase: 'veliko slovo',
       sentencePrefix: 'Tvoja lozinka mora sadržati',
     },
-    phone_number_exists:
-      'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
+    phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     zxcvbn: {
-      couldBeStronger:
-        'Tvoja lozinka funkcioniše, ali može biti jača. Pokušaj dodati više karaktera.',
+      couldBeStronger: 'Tvoja lozinka funkcioniše, ali može biti jača. Pokušaj dodati više karaktera.',
       goodPassword: 'Tvoja lozinka ispunjava sve potrebne zahteve.',
       notEnough: 'Tvoja lozinka nije dovoljno jaka.',
       suggestions: {
@@ -557,12 +513,9 @@ export const srRS: LocalizationResource ={
         capitalization: 'Kapitalizuj više od prvog slova.',
         dates: 'Izbegavaj datume i godine koje su povezane sa tobom.',
         l33t: "Izbegavaj predvidljive zamene slova kao što su '@' za 'a'.",
-        longerKeyboardPattern:
-          'Koristi duže šablone na tastaturi i promeni smer kucanja više puta.',
-        noNeed:
-          'Možeš kreirati jake lozinke bez korišćenja simbola, brojeva ili velikih slova.',
-        pwned:
-          'Ako koristiš ovu lozinku negde drugde, trebalo bi da je promeniš.',
+        longerKeyboardPattern: 'Koristi duže šablone na tastaturi i promeni smer kucanja više puta.',
+        noNeed: 'Možeš kreirati jake lozinke bez korišćenja simbola, brojeva ili velikih slova.',
+        pwned: 'Ako koristiš ovu lozinku negde drugde, trebalo bi da je promeniš.',
         recentYears: 'Izbegavaj skorašnje godine.',
         repeated: 'Izbegavaj ponavljane reči i karaktere.',
         reverseWords: 'Izbegavaj obrnuto napisane uobičajene reči.',
@@ -573,24 +526,18 @@ export const srRS: LocalizationResource ={
         common: 'Ovo je često korišćena lozinka.',
         commonNames: 'Uobičajena imena i prezimena su lako za pogoditi.',
         dates: 'Datumi su lako za pogoditi.',
-        extendedRepeat:
-          'Ponavljani obrasci karaktera kao što su "abcabcabc" su lako za pogoditi.',
+        extendedRepeat: 'Ponavljani obrasci karaktera kao što su "abcabcabc" su lako za pogoditi.',
         keyPattern: 'Kratki šabloni na tastaturi su lako za pogoditi.',
-        namesByThemselves:
-          'Pojedinačna imena ili prezimena su lako za pogoditi.',
+        namesByThemselves: 'Pojedinačna imena ili prezimena su lako za pogoditi.',
         pwned: 'Tvoja lozinka je otkrivena u kršenju podataka na internetu.',
         recentYears: 'Skorašnje godine su lako za pogoditi.',
-        sequences:
-          'Uobičajene sekvence karaktera kao što su "abc" su lako za pogoditi.',
+        sequences: 'Uobičajene sekvence karaktera kao što su "abc" su lako za pogoditi.',
         similarToCommon: 'Ovo je slično često korišćenoj lozinki.',
-        simpleRepeat:
-          'Ponavljani karakteri kao što su "aaa" su lako za pogoditi.',
-        straightRow:
-          'Direktne linije tastera na tvojoj tastaturi su lako za pogoditi.',
+        simpleRepeat: 'Ponavljani karakteri kao što su "aaa" su lako za pogoditi.',
+        straightRow: 'Direktne linije tastera na tvojoj tastaturi su lako za pogoditi.',
         topHundred: 'Ovo je često korišćena lozinka.',
         topTen: 'Ovo je veoma često korišćena lozinka.',
-        userInputs:
-          'Ne sme biti ličnih podataka ili podataka vezanih za stranicu.',
+        userInputs: 'Ne sme biti ličnih podataka ili podataka vezanih za stranicu.',
         wordByItself: 'Pojedinačne reči su lako za pogoditi.',
       },
     },
@@ -623,8 +570,7 @@ export const srRS: LocalizationResource ={
       formHint__noAccounts: 'Nema dostupnih spoljnih provajdera naloga.',
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen iz ovog naloga.',
-        messageLine2:
-          'Više nećeš moći da koristiš ovaj povezani nalog i bilo koje zavisne funkcije više neće raditi.',
+        messageLine2: 'Više nećeš moći da koristiš ovaj povezani nalog i bilo koje zavisne funkcije više neće raditi.',
         successMessage: '{{connectedAccount}} je uklonjen iz tvog naloga.',
         title: 'Ukloni povezani nalog',
       },
@@ -641,26 +587,22 @@ export const srRS: LocalizationResource ={
     },
     emailAddressPage: {
       emailCode: {
-        formHint:
-          'E-mail sadrži verifikacioni kod koji će biti poslat na ovu e-mail adresu.',
+        formHint: 'E-mail sadrži verifikacioni kod koji će biti poslat na ovu e-mail adresu.',
         formSubtitle: 'Unesi verifikacioni kod poslat na {{identifier}}',
         formTitle: 'Verifikacioni kod',
         resendButton: 'Nisi primio kod? Pošalji ponovo',
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
       emailLink: {
-        formHint:
-          'E-mail sadrži verifikacioni link koji će biti poslat na ovu e-mail adresu.',
-        formSubtitle:
-          'Klikni na verifikacioni link u e-mailu poslatom na {{identifier}}',
+        formHint: 'E-mail sadrži verifikacioni link koji će biti poslat na ovu e-mail adresu.',
+        formSubtitle: 'Klikni na verifikacioni link u e-mailu poslatom na {{identifier}}',
         formTitle: 'Verifikacioni link',
         resendButton: 'Nisi primio link? Pošalji ponovo',
         successMessage: 'E-mail {{identifier}} je dodat na tvoj nalog.',
       },
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen iz ovog naloga.',
-        messageLine2:
-          'Više nećeš moći da se prijaviš koristeći ovu e-mail adresu.',
+        messageLine2: 'Više nećeš moći da se prijaviš koristeći ovu e-mail adresu.',
         successMessage: '{{emailAddress}} je uklonjen iz tvog naloga.',
         title: 'Ukloni e-mail adresu',
       },
@@ -681,12 +623,9 @@ export const srRS: LocalizationResource ={
       backButton: 'Koristi postojeći broj',
       primaryButton__addPhoneNumber: 'Dodaj telefonski broj',
       removeResource: {
-        messageLine1:
-          '{{identifier}} više neće primati verifikacione kodove prilikom prijavljivanja.',
-        messageLine2:
-          'Tvoj nalog možda neće biti toliko siguran. Da li si siguran da želiš da nastaviš?',
-        successMessage:
-          'SMS kod dvostepene verifikacije je uklonjen za {{mfaPhoneCode}}',
+        messageLine1: '{{identifier}} više neće primati verifikacione kodove prilikom prijavljivanja.',
+        messageLine2: 'Tvoj nalog možda neće biti toliko siguran. Da li si siguran da želiš da nastaviš?',
+        successMessage: 'SMS kod dvostepene verifikacije je uklonjen za {{mfaPhoneCode}}',
         title: 'Ukloni dvostepenu verifikaciju',
       },
       subtitle__availablePhoneNumbers:
@@ -706,27 +645,22 @@ export const srRS: LocalizationResource ={
         buttonUnableToScan__nonPrimary: 'Ne možeš skenirati QR kod?',
         infoText__ableToScan:
           'Podesi novi način prijave u svojoj aplikaciji za autentifikaciju i skeniraj sledeći QR kod da ga povežeš sa svojim nalogom.',
-        infoText__unableToScan:
-          'Podesi novi način prijave u svojoj autentifikaciji i unesi ključ naveden ispod.',
+        infoText__unableToScan: 'Podesi novi način prijave u svojoj autentifikaciji i unesi ključ naveden ispod.',
         inputLabel__unableToScan1:
           'Uveri se da su vremenski bazirane ili jednokratne lozinke omogućene, zatim završi povezivanje svog naloga.',
         inputLabel__unableToScan2:
           'Alternativno, ako tvoja autentifikacija podržava TOTP URI, možeš takođe kopirati celu URI adresu.',
       },
       removeResource: {
-        messageLine1:
-          'Verifikacioni kodovi iz ove autentifikacije više neće biti potrebni prilikom prijavljivanja.',
-        messageLine2:
-          'Tvoj nalog možda neće biti toliko siguran. Da li si siguran da želiš da nastaviš?',
-        successMessage:
-          'Dvostepena verifikacija preko autentifikacione aplikacije je uklonjena.',
+        messageLine1: 'Verifikacioni kodovi iz ove autentifikacije više neće biti potrebni prilikom prijavljivanja.',
+        messageLine2: 'Tvoj nalog možda neće biti toliko siguran. Da li si siguran da želiš da nastaviš?',
+        successMessage: 'Dvostepena verifikacija preko autentifikacione aplikacije je uklonjena.',
         title: 'Ukloni dvostepenu verifikaciju',
       },
       successMessage:
         'Dvostepena verifikacija je sada omogućena. Kada se prijaviš, moraćeš uneti verifikacioni kod iz ove autentifikacije kao dodatni korak.',
       title: 'Dodaj autentifikacionu aplikaciju',
-      verifySubtitle:
-        'Unesi verifikacioni kod generisan tvojom autentifikacijom',
+      verifySubtitle: 'Unesi verifikacioni kod generisan tvojom autentifikacijom',
       verifyTitle: 'Verifikacioni kod',
     },
     mobileButton__menu: 'Meni',
@@ -741,18 +675,15 @@ export const srRS: LocalizationResource ={
         messageLine1: '{{name}} će biti uklonjen iz ovog naloga.',
         title: 'Ukloni ključ za prolaz',
       },
-      subtitle__rename:
-        'Možeš promeniti ime ključa za prolaz kako bi ga lakše pronašao.',
+      subtitle__rename: 'Možeš promeniti ime ključa za prolaz kako bi ga lakše pronašao.',
       title__rename: 'Preimenuj ključ za prolaz',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Preporučuje se da se odjaviš sa svih drugih uređaja koji su možda koristili tvoju staru lozinku.',
-      readonly:
-        'Tvoja lozinka trenutno ne može biti uređivana jer se možeš prijaviti samo preko korporativne veze.',
+      readonly: 'Tvoja lozinka trenutno ne može biti uređivana jer se možeš prijaviti samo preko korporativne veze.',
       successMessage__set: 'Tvoja lozinka je postavljena.',
-      successMessage__signOutOfOtherSessions:
-        'Svi drugi uređaji su odjavljeni.',
+      successMessage__signOutOfOtherSessions: 'Svi drugi uređaji su odjavljeni.',
       successMessage__update: 'Tvoja lozinka je ažurirana.',
       title__set: 'Postavi lozinku',
       title__update: 'Ažuriraj lozinku',
@@ -762,8 +693,7 @@ export const srRS: LocalizationResource ={
         'Tekstualna poruka sa verifikacionim kodom će biti poslata na ovaj telefonski broj. Moguće su naknade za poruke i podatke.',
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen iz ovog naloga.',
-        messageLine2:
-          'Više nećeš moći da se prijaviš koristeći ovaj telefonski broj.',
+        messageLine2: 'Više nećeš moći da se prijaviš koristeći ovaj telefonski broj.',
         successMessage: '{{phoneNumber}} je uklonjen iz tvog naloga.',
         title: 'Ukloni telefonski broj',
       },
@@ -777,8 +707,7 @@ export const srRS: LocalizationResource ={
       imageFormDestructiveActionSubtitle: 'Ukloni',
       imageFormSubtitle: 'Otpremi',
       imageFormTitle: 'Profilna slika',
-      readonly:
-        'Tvoje profilne informacije su obezbeđene preko korporativne veze i ne mogu biti uređivane.',
+      readonly: 'Tvoje profilne informacije su obezbeđene preko korporativne veze i ne mogu biti uređivane.',
       successMessage: 'Tvoj profil je ažuriran.',
       title: 'Ažuriraj profil',
     },
@@ -873,13 +802,11 @@ export const srRS: LocalizationResource ={
     web3WalletPage: {
       removeResource: {
         messageLine1: '{{identifier}} će biti uklonjen iz ovog naloga.',
-        messageLine2:
-          'Više nećeš moći da se prijaviš koristeći ovaj web3 novčanik.',
+        messageLine2: 'Više nećeš moći da se prijaviš koristeći ovaj web3 novčanik.',
         successMessage: '{{web3Wallet}} je uklonjen iz tvog naloga.',
         title: 'Ukloni web3 novčanik',
       },
-      subtitle__availableWallets:
-        'Izaberi web3 novčanik da ga povežeš sa svojim nalogom.',
+      subtitle__availableWallets: 'Izaberi web3 novčanik da ga povežeš sa svojim nalogom.',
       subtitle__unavailableWallets: 'Nema dostupnih web3 novčanika.',
       successMessage: 'Novčanik je dodat na tvoj nalog.',
       title: 'Dodaj web3 novčanik',

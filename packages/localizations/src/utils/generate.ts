@@ -33,6 +33,7 @@ import { ptPT } from '../pt-PT';
 import { roRO } from '../ro-RO';
 import { ruRU } from '../ru-RU';
 import { skSK } from '../sk-SK';
+import { srRS } from '../sr-RS';
 import { svSE } from '../sv-SE';
 import { thTH } from '../th-TH';
 import { trTR } from '../tr-TR';
@@ -40,7 +41,6 @@ import { ukUA } from '../uk-UA';
 import { viVN } from '../vi-VN';
 import { zhCN } from '../zh-CN';
 import { zhTW } from '../zh-TW';
-import { srRS } from '../sr-RS';
 import { enUS_v4 } from './enUS_v4';
 import { createObject, getCommonKeys, getKeys, getUniqueKeys, getValue, mergeObjects } from './utils';
 
