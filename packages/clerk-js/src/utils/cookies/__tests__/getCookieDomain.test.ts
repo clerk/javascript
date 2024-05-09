@@ -47,6 +47,10 @@ describe('getCookieDomain', () => {
     }
   });
 
+  it('handles custom hosts defined locally', () => {
+    expect(getCookieDomain('bryce-local')).toBe('bryce-local');
+  });
+
   it('returns undefined if the domain could not be determined', () => {
     const handler: CookieHandler = {
       get: jest.fn().mockReturnValue(undefined),
