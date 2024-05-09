@@ -188,9 +188,9 @@ export const getCaptchaToken = async (captchaOptions: {
   } finally {
     if (widgetDiv) {
       if (isInvisibleWidget) {
-        document.body.removeChild(widgetDiv);
+        document.body.removeChild(widgetDiv as HTMLElement);
       } else {
-        widgetDiv.style.display = 'none';
+        (widgetDiv as HTMLElement).style.display = 'none';
       }
     }
   }
