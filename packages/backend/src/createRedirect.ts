@@ -20,7 +20,7 @@ const buildUrl = (
   }
   // For cross-origin redirects, we need to pass the dev browser token for URL session syncing
   if (_devBrowserToken && baseUrl.hostname !== res.hostname) {
-    res.searchParams.set(constants.Cookies.DevBrowser, _devBrowserToken);
+    res.searchParams.set(constants.QueryParameters.DevBrowser, _devBrowserToken);
   }
   return res.toString();
 };

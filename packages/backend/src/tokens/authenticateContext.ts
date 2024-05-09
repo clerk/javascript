@@ -48,7 +48,7 @@ class AuthenticateContext {
 
   private initHandshakeValues() {
     this.devBrowserToken =
-      this.clerkRequest.clerkUrl.searchParams.get(constants.Cookies.DevBrowser) ||
+      this.clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
       this.clerkRequest.cookies.get(constants.Cookies.DevBrowser);
     this.handshakeToken =
       this.clerkRequest.clerkUrl.searchParams.get(constants.Cookies.Handshake) ||
