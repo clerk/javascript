@@ -155,7 +155,7 @@ export class Clerk implements ClerkInterface {
 
   protected internal_last_error: ClerkAPIError | null = null;
 
-  #publishableKey: string = '';
+  #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService: SessionCookieService | null = null;
@@ -830,14 +830,22 @@ export class Clerk implements ClerkInterface {
   public buildSignInUrl(options?: SignInRedirectOptions): string {
     return this.#buildUrl('signInUrl', {
       ...options?.initialValues,
-      redirect_url: options?.redirectUrl || window.location.href,
+      redirect_url:
+        options?.signInForceRedirectUrl ||
+        options?.redirectUrl ||
+        options?.signInFallbackRedirectUrl ||
+        window.location.href,
     });
   }
 
   public buildSignUpUrl(options?: SignUpRedirectOptions): string {
     return this.#buildUrl('signUpUrl', {
       ...options?.initialValues,
-      redirect_url: options?.redirectUrl || window.location.href,
+      redirect_url:
+        options?.signUpForceRedirectUrl ||
+        options?.redirectUrl ||
+        options?.signUpFallbackRedirectUrl ||
+        window.location.href,
     });
   }
 
