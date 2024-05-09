@@ -76,6 +76,10 @@ export async function buildClerk({
     const jwt = await storageCache.get(CACHE_KEY);
 
     (requestInit.headers as Headers).set('authorization', jwt || '');
+
+    if (requestInit.method !== 'GET') {
+      (requestInit.headers as Headers).delete('origin');
+    }
   });
 
   // Store updated JWT in StorageCache on Clerk responses
