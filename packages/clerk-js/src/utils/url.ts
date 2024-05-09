@@ -43,19 +43,6 @@ export function getETLDPlusOneFromFrontendApi(frontendApi: string): string {
   return frontendApi.replace('clerk.', '');
 }
 
-export function getAllETLDs(hostname: string = window.location.hostname): string[] {
-  const parts = hostname.split('.');
-  const memo = [];
-  const domains = [];
-
-  for (let i = parts.length - 1; i > 0; i--) {
-    memo.unshift(parts[i]);
-    domains.push(memo.join('.'));
-  }
-
-  return domains;
-}
-
 interface BuildURLParams extends Partial<URL> {
   base?: string;
   hashPath?: string;

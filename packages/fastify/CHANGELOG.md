@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`4f4375e88`](https://github.com/clerk/javascript/commit/4f4375e88fa2daae4d725c62da5e4cf29302e53c), [`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`4ae79af36`](https://github.com/clerk/javascript/commit/4ae79af36552aae1f0284ecc4dfcfc23ef295d26), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/backend@1.1.2
+  - @clerk/shared@2.0.2
+  - @clerk/types@4.2.1
+
 ## 1.0.3
 
 ### Patch Changes
