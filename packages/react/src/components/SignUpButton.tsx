@@ -20,8 +20,8 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
 
   const clickHandler = () => {
     const opts = {
-      fallbackRedirectUrl,
-      forceRedirectUrl,
+      signUpFallbackRedirectUrl: fallbackRedirectUrl,
+      signUpForceRedirectUrl: forceRedirectUrl,
       signInFallbackRedirectUrl,
       signInForceRedirectUrl,
       unsafeMetadata,
@@ -35,7 +35,7 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
   };
 
   const wrappedChildClickHandler: React.MouseEventHandler = async e => {
-    await safeExecute((child as any).props.onClick)(e);
+    await safeExecute(child.props.onClick)(e);
     return clickHandler();
   };
 

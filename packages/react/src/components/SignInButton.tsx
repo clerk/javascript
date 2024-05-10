@@ -7,12 +7,17 @@ import { withClerk } from './withClerk';
 export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkProp<SignInButtonProps>) => {
   const { signUpFallbackRedirectUrl, forceRedirectUrl, fallbackRedirectUrl, signUpForceRedirectUrl, mode, ...rest } =
     props;
-
   children = normalizeWithDefaultValue(children, 'Sign in');
   const child = assertSingleChild(children)('SignInButton');
 
   const clickHandler = () => {
-    const opts = { signUpFallbackRedirectUrl, forceRedirectUrl, fallbackRedirectUrl, signUpForceRedirectUrl };
+    const opts = {
+      signUpFallbackRedirectUrl,
+      signUpForceRedirectUrl,
+      signInForceRedirectUrl: forceRedirectUrl,
+      signInFallbackRedirectUrl: fallbackRedirectUrl,
+    };
+
     if (mode === 'modal') {
       return clerk.openSignIn(opts);
     }
@@ -20,7 +25,7 @@ export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkP
   };
 
   const wrappedChildClickHandler: React.MouseEventHandler = async e => {
-    await safeExecute((child as any).props.onClick)(e);
+    await safeExecute(child.props.onClick)(e);
     return clickHandler();
   };
 
