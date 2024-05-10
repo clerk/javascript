@@ -208,6 +208,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
       ...requestInit,
       credentials: 'include',
       method: overwrittenRequestMethod,
+      // mode: 'cors',
     };
 
     try {
