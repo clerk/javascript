@@ -31,18 +31,6 @@ export async function verifyToken(
       // Fetch JWKS from Backend API using the key
       key = await loadClerkJWKFromRemote({ ...options, kid });
     } else {
-      if (!options.secretKey || !options.jwtKey) {
-        return {
-          errors: [
-            new TokenVerificationError({
-              action: TokenVerificationErrorAction.SetClerkSecretKey,
-              message: 'Both JWT Key and Secret Key are missing. Operation could not be completed.',
-              reason: TokenVerificationErrorReason.InvalidSecretKey,
-            }),
-          ],
-        };
-      }
-
       return {
         errors: [
           new TokenVerificationError({
