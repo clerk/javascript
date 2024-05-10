@@ -325,6 +325,11 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
       },
+      clientMismatch: {
+        subtitle:
+          'Open the verification link on the device and browser from which you initiatied the sign in to continue',
+        title: 'This verification link is invalid for this device',
+      },
     },
     forgotPassword: {
       formTitle: 'Reset password code',
@@ -425,6 +430,11 @@ export const enUS: LocalizationResource = {
         subtitle: 'Return to the newly opened tab to continue',
         subtitleNewTab: 'Return to previous tab to continue',
         title: 'Successfully verified email',
+      },
+      clientMismatch: {
+        subtitle:
+          'Open the verification link on the device and browser from which you initiatied the sign up to continue',
+        title: 'This verification link is invalid for this device',
       },
     },
     phoneCode: {

@@ -117,6 +117,10 @@ type _LocalizationResource = {
         subtitle: LocalizationValue;
         subtitleNewTab: LocalizationValue;
       };
+      clientMismatch: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
     };
     emailCode: {
       title: LocalizationValue;
@@ -218,6 +222,10 @@ type _LocalizationResource = {
         subtitle: LocalizationValue;
       };
       expired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      clientMismatch: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };
