@@ -16,7 +16,7 @@ browser.runtime.onInstalled.addListener(() => {
       condition: {
         initiatorDomains: [browser.runtime.id],
         isUrlFilterCaseSensitive: true,
-        regexFilter: '.+(?|&)*_is_native=1.*',
+        regexFilter: '.+_is_native=1.*',
         requestMethods: ['post', 'put', 'delete'],
         resourceTypes: ['xmlhttprequest'],
       },
