@@ -2,4 +2,4 @@
 '@clerk/chrome-extension': patch
 ---
 
-Remove `origin` from API mutation request headers.
+Remove `Origin` from API mutation request headers via `onInstalled` listener.
