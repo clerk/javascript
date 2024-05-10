@@ -25,7 +25,7 @@ export const auth = (): Auth => {
   const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
     const clerkRequest = createClerkRequest(request);
     const devBrowserToken =
-      clerkRequest.clerkUrl.searchParams.get(constants.Cookies.DevBrowser) ||
+      clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
       clerkRequest.cookies.get(constants.Cookies.DevBrowser);
 
     return createRedirect({

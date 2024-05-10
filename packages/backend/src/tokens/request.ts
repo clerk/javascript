@@ -248,7 +248,10 @@ ${error.getFullMessage()}`,
     /**
      * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
      */
-    if (instanceType === 'development' && authenticateContext.clerkUrl.searchParams.has(constants.Cookies.DevBrowser)) {
+    if (
+      instanceType === 'development' &&
+      authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser)
+    ) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserSync, '');
     }
 
@@ -284,7 +287,7 @@ ${error.getFullMessage()}`,
 
       if (authenticateContext.devBrowserToken) {
         redirectBackToSatelliteUrl.searchParams.append(
-          constants.Cookies.DevBrowser,
+          constants.QueryParameters.DevBrowser,
           authenticateContext.devBrowserToken,
         );
       }
