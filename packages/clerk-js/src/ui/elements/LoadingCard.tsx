@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { descriptors, Flex } from '../customizables';
 import { Spinner } from '../primitives';
 import { CardAlert } from './Alert';
+import { CaptchaElement } from './CaptchaElement';
 import { Card } from './Card';
 import { useCardState, withCardStateProvider } from './contexts';
 
@@ -33,6 +34,7 @@ export const LoadingCard = withCardStateProvider(() => {
     <Card>
       <CardAlert>{card.error}</CardAlert>
       <LoadingCardContainer />
+      <CaptchaElement />
     </Card>
   );
 });
