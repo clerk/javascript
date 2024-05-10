@@ -8,5 +8,10 @@ The below code now works as expected: (requires CLERK_SECRET_KEY env var to have
 ```ts
 import { clerkClient } from "@clerk/clerk-sdk-node";
 
-clerkClient.verifyToken(token, {})
+// Use the default settings from the already instanciated clerkClient
+clerkClient.verifyToken(token)
+// or provide overrides the options 
+clerkClient.verifyToken(token, {
+  secretKey: 'xxxx'
+})
 ```

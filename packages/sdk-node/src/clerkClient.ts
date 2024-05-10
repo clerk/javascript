@@ -5,14 +5,17 @@ import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import { loadApiEnv, loadClientEnv } from './utils';
 
+type MakeOptionalSecondArgument<T> = T extends (a: string, b: infer U) => infer R ? (a: string, b?: U) => R : never;
+type VerifyTokenWithOptionalSecondArgument = MakeOptionalSecondArgument<typeof _verifyToken>;
+
 type ClerkClient = ReturnType<typeof _createClerkClient> & {
   expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
   expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
-  verifyToken: typeof _verifyToken;
+  verifyToken: VerifyTokenWithOptionalSecondArgument;
 };
 
 const buildVerifyToken = (params: VerifyTokenOptions) => {
-  return (...args: Parameters<typeof _verifyToken>) =>
+  return (...args: Parameters<VerifyTokenWithOptionalSecondArgument>) =>
     _verifyToken(args[0], {
       ...params,
       ...args[1],
