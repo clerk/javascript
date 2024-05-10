@@ -6,9 +6,7 @@ import type { ActorRefFrom } from 'xstate';
 
 import type { TSignInFirstFactorMachine } from '~/internals/machines/sign-in';
 import { SignInRouterSystemId } from '~/internals/machines/sign-in';
-import { Form } from '~/react/common/form';
 
-import type { FormProps } from '../common';
 import { useActiveTags } from '../hooks';
 import { ActiveTagsMode } from '../hooks/use-active-tags.hook';
 import { createContextForDomValidation } from '../utils/create-context-for-dom-validation';
@@ -34,8 +32,8 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 
 // --------------------------------- COMPONENTS ---------------------------------
 
-export type SignInChooseStrategyProps = FormProps;
-export type SignInForgotPasswordProps = FormProps;
+export type SignInChooseStrategyProps = React.HTMLAttributes<HTMLDivElement>;
+export type SignInForgotPasswordProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
 
@@ -45,7 +43,7 @@ export function SignInChooseStrategy({ children, ...props }: SignInChooseStrateg
 
   return activeState ? (
     <SignInChooseStrategyCtx.Provider>
-      <Form {...props}>{children}</Form>
+      <div {...props}>{children}</div>
     </SignInChooseStrategyCtx.Provider>
   ) : null;
 }
@@ -56,7 +54,7 @@ export function SignInForgotPassword({ children, ...props }: SignInForgotPasswor
 
   return activeState ? (
     <SignInChooseStrategyCtx.Provider>
-      <Form {...props}>{children}</Form>
+      <div {...props}>{children}</div>
     </SignInChooseStrategyCtx.Provider>
   ) : null;
 }
