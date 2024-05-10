@@ -3,12 +3,6 @@ import { Request } from 'express';
 
 import { authenticateRequest } from '../authenticateRequest';
 
-const mockNext = jest.fn();
-
-afterEach(() => {
-  mockNext.mockReset();
-});
-
 const mockClerkClient = () => ({
   authenticateRequest: jest.fn(),
 });
