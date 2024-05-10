@@ -1,5 +1,27 @@
 # Change Log
 
+## 1.1.0
+
+### Minor Changes
+
+- This removes headers that were added for internal observability purposes. (see #2528) ([#3326](https://github.com/clerk/javascript/pull/3326)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  ```diff
+  - x-expo-execution-environment
+  - x-expo-native-application-version
+  ```
+
+  This aims to resolve reported CORS errors. (see #2266)
+
+  This removes `expo-application` & `expo-constants` as peer and development dependencies.
+
+### Patch Changes
+
+- Use a polyfill for the `atob` function to prevent errors when using the Hermes JS engine, since the engine's `atob` implementation is stricter than it should be. ([#3354](https://github.com/clerk/javascript/pull/3354)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`56c8562eb`](https://github.com/clerk/javascript/commit/56c8562eb4b05308aed2a9f10162cbf5819ad937), [`7b213d5a4`](https://github.com/clerk/javascript/commit/7b213d5a426de16e854f5d3316a24579f698ba38)]:
+  - @clerk/clerk-js@5.2.4
+
 ## 1.0.7
 
 ### Patch Changes
