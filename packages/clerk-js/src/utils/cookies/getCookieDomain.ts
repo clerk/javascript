@@ -20,6 +20,11 @@ export function getCookieDomain(hostname = window.location.hostname, cookieHandl
 
   const hostnameParts = hostname.split('.');
 
+  // Account for custom hosts defined locally, e.g. 127.0.0.1 -> local-app
+  if (hostnameParts.length === 1) {
+    return hostname;
+  }
+
   // we know for sure that the first entry is definitely a TLD, skip it
   for (let i = hostnameParts.length - 2; i >= 0; i--) {
     const eTLD = hostnameParts.slice(i).join('.');
