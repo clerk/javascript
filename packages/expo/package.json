@@ -53,9 +53,7 @@
     "@types/node": "^20.11.24",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "expo-application": "^4.2.2",
     "expo-auth-session": "^5.4.0",
-    "expo-constants": "^14.5.1",
     "expo-web-browser": "^12.8.2",
     "typescript": "*"
   },

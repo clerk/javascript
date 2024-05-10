@@ -2,6 +2,13 @@
 '@clerk/clerk-expo': minor
 ---
 
-Remove headers that were added in #2528
+This removes headers that were added for internal observability purposes. (see #2528)
 
-Remove `expo-application` & `expo-constants` peer deps
+```diff
+- x-expo-execution-environment
+- x-expo-native-application-version
+```
+
+This aims to resolve reported CORS errors. (see #2266)
+
+This removes `expo-application` & `expo-constants` as peer and development dependencies.
