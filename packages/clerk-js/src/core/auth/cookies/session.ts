@@ -5,23 +5,35 @@ import { inCrossOriginIframe } from '../../../utils';
 
 const SESSION_COOKIE_NAME = '__session';
 
-/**
- *
- * This is a short-lived JS cookie used to store the current user JWT.
- *
- */
-export const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
+export type SessionCookieHandler = {
+  set: (token: string) => void;
+  remove: () => void;
+};
 
-export const removeSessionCookie = () => sessionCookie.remove();
+export const createSessionCookie = (): SessionCookieHandler => {
+  /**
+   *
+   * This is a short-lived JS cookie used to store the current user JWT.
+   *
+   */
+  const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
 
-export const setSessionCookie = (token: string) => {
-  const expires = addYears(Date.now(), 1);
-  const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
-  const secure = window.location.protocol === 'https:';
+  const remove = () => sessionCookie.remove();
 
-  return sessionCookie.set(token, {
-    expires,
-    sameSite,
-    secure,
-  });
+  const set = (token: string) => {
+    const expires = addYears(Date.now(), 1);
+    const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
+    const secure = window.location.protocol === 'https:';
+
+    return sessionCookie.set(token, {
+      expires,
+      sameSite,
+      secure,
+    });
+  };
+
+  return {
+    set,
+    remove,
+  };
 };

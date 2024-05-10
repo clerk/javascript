@@ -7,33 +7,45 @@ import { getCookieDomain } from '../getCookieDomain';
 
 const CLIENT_UAT_COOKIE_NAME = '__client_uat';
 
-export const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
-
-export const getClientUatCookie = (): number => {
-  return parseInt(clientUatCookie.get() || '0', 10);
+export type ClientUatCookieHandler = {
+  set: (client: ClientResource | undefined) => void;
+  get: () => number;
 };
 
-export const setClientUatCookie = (client: ClientResource | undefined) => {
-  const expires = addYears(Date.now(), 1);
-  const sameSite = inCrossOriginIframe() ? 'None' : 'Strict';
-  const secure = window.location.protocol === 'https:';
-  const domain = getCookieDomain();
+export const createClientUatCookie = (): ClientUatCookieHandler => {
+  const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
 
-  // '0' indicates the user is signed out
-  let val = '0';
+  const get = (): number => {
+    return parseInt(clientUatCookie.get() || '0', 10);
+  };
 
-  if (client && client.updatedAt && client.activeSessions.length > 0) {
-    // truncate timestamp to seconds, since this is a unix timestamp
-    val = Math.floor(client.updatedAt.getTime() / 1000).toString();
-  }
+  const set = (client: ClientResource | undefined) => {
+    const expires = addYears(Date.now(), 1);
+    const sameSite = inCrossOriginIframe() ? 'None' : 'Strict';
+    const secure = window.location.protocol === 'https:';
+    const domain = getCookieDomain();
 
-  // Removes any existing cookies without a domain specified to ensure the change doesn't break existing sessions.
-  clientUatCookie.remove();
+    // '0' indicates the user is signed out
+    let val = '0';
 
-  return clientUatCookie.set(val, {
-    expires,
-    sameSite,
-    domain,
-    secure,
-  });
+    if (client && client.updatedAt && client.activeSessions.length > 0) {
+      // truncate timestamp to seconds, since this is a unix timestamp
+      val = Math.floor(client.updatedAt.getTime() / 1000).toString();
+    }
+
+    // Removes any existing cookies without a domain specified to ensure the change doesn't break existing sessions.
+    clientUatCookie.remove();
+
+    return clientUatCookie.set(val, {
+      expires,
+      sameSite,
+      domain,
+      secure,
+    });
+  };
+
+  return {
+    set,
+    get,
+  };
 };
