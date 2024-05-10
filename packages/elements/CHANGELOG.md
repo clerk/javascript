@@ -1,5 +1,17 @@
 # @clerk/elements
 
+## 0.3.3
+
+### Patch Changes
+
+- The following are all internal changes and not relevant to any end-user: ([#3329](https://github.com/clerk/javascript/pull/3329)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Create type interface for `TelemetryCollector` on `@clerk/types`. This allows to assign `telemetry` on the main Clerk SDK object, while inheriting from the actual `TelemetryCollector` implementation.
+
+- Refactors internal logic to avoid reliance on `useEffect`. This resolves potential for race conditions as a result of functionality coupled to component renders. ([#3320](https://github.com/clerk/javascript/pull/3320)) by [@tmilewski](https://github.com/tmilewski)
+
+- Typo fixes in README ([#3335](https://github.com/clerk/javascript/pull/3335)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 0.3.2
 
 ### Patch Changes

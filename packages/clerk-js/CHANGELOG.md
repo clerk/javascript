@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.2.3
+
+### Patch Changes
+
+- Fix Smart CAPTCHA on ticket flow ([#3351](https://github.com/clerk/javascript/pull/3351)) by [@anagstef](https://github.com/anagstef)
+
+## 5.2.2
+
+### Patch Changes
+
+- Fix UI for Phone Input and OTP inputs ([#3302](https://github.com/clerk/javascript/pull/3302)) by [@octoper](https://github.com/octoper)
+
+- Specify an explicit domain when setting the client_uat cookie. This ensures there are no duplicate cookie issues when also receiving cookies from the API. ([#3318](https://github.com/clerk/javascript/pull/3318)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`df4525f87`](https://github.com/clerk/javascript/commit/df4525f878012f2bb03c3714cfb813740c95050c), [`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`9d7a79841`](https://github.com/clerk/javascript/commit/9d7a79841c4832b34f5e6b968961fe8f5320c4d4), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/localizations@2.3.1
+  - @clerk/shared@2.0.2
+  - @clerk/types@4.2.1
+
 ## 5.2.1
 
 ### Patch Changes
