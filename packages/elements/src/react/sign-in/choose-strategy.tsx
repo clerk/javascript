@@ -6,6 +6,7 @@ import type { ActorRefFrom } from 'xstate';
 
 import type { TSignInFirstFactorMachine } from '~/internals/machines/sign-in';
 import { SignInRouterSystemId } from '~/internals/machines/sign-in';
+import { Form } from '~/react/common/form';
 
 import type { FormProps } from '../common';
 import { useActiveTags } from '../hooks';
@@ -38,18 +39,26 @@ export type SignInForgotPasswordProps = FormProps;
 
 export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
 
-export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
+export function SignInChooseStrategy({ children, ...props }: SignInChooseStrategyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:choose-strategy'], ActiveTagsMode.all);
 
-  return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
+  return activeState ? (
+    <SignInChooseStrategyCtx.Provider>
+      <Form {...props}>{children}</Form>
+    </SignInChooseStrategyCtx.Provider>
+  ) : null;
 }
 
-export function SignInForgotPassword({ children }: SignInForgotPasswordProps) {
+export function SignInForgotPassword({ children, ...props }: SignInForgotPasswordProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:forgot-password'], ActiveTagsMode.all);
 
-  return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
+  return activeState ? (
+    <SignInChooseStrategyCtx.Provider>
+      <Form {...props}>{children}</Form>
+    </SignInChooseStrategyCtx.Provider>
+  ) : null;
 }
 
 const SUPPORTED_STRATEGY_NAME = 'SignInSupportedStrategy';
