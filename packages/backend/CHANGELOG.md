@@ -1,5 +1,24 @@
 # Change Log
 
+## 1.1.3
+
+### Patch Changes
+
+- Inherit verifyToken options from clerkClient. ([#3296](https://github.com/clerk/javascript/pull/3296)) by [@panteliselef](https://github.com/panteliselef)
+
+  The below code now works as expected: (requires CLERK_SECRET_KEY env var to have been set)
+
+  ```ts
+  import { clerkClient } from '@clerk/clerk-sdk-node';
+
+  // Use the default settings from the already instanciated clerkClient
+  clerkClient.verifyToken(token);
+  // or provide overrides the options
+  clerkClient.verifyToken(token, {
+    secretKey: 'xxxx',
+  });
+  ```
+
 ## 1.1.2
 
 ### Patch Changes
