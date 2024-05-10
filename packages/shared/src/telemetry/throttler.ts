@@ -1,4 +1,4 @@
-import type { TelemetryEvent } from './types';
+import type { TelemetryEvent } from '@clerk/types';
 
 type TtlInMilliseconds = number;
 

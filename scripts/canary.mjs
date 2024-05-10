@@ -1,6 +1,5 @@
 #!/usr/bin/env zx
 
-import fs from 'fs/promises';
 import { $, echo } from 'zx';
 
 import { constants } from './common.mjs';
@@ -22,6 +21,7 @@ const snapshot = `---
 '@clerk/clerk-expo': patch
 '@clerk/express': patch
 '@clerk/testing': patch
+'@clerk/elements': patch
 ---
 
 Canary release
@@ -44,24 +44,9 @@ try {
 }
 
 const res = await $`npx changeset version --snapshot canary`;
-let success = !res.stderr.includes('No unreleased changesets found');
+const success = !res.stderr.includes('No unreleased changesets found');
 
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
-
-// TODO: Remove once @clerk/elements hits 1.0.0
-await fs
-  .readFile(constants.ElementsPackageJson, 'utf-8')
-  .then(body => JSON.parse(body))
-  .then(json => {
-    json.peerDependencies = constants.ElementsPeerDependencies;
-    return json;
-  })
-  .then(json => JSON.stringify(json, null, 2))
-  .then(body => fs.writeFile(constants.ElementsPackageJson, body))
-  .catch(error => {
-    console.error('Error changing the @clerk/elements pkg', error);
-    success = false;
-  });
 
 if (success) {
   echo('success=1');

@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05)]:
+  - @clerk/types@4.2.1
+
+## 2.1.2
+
+### Patch Changes
+
+- Update the `neobrutalism` to make it compatible with the new Core 2 components ([#3310](https://github.com/clerk/javascript/pull/3310)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
 ## 2.1.1
 
 ### Patch Changes

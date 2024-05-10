@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.0.4
+
+### Patch Changes
+
+- Rename local `eslint-config-custom` package to `@clerk/eslint-config-custom` to avoid conflicts with previously published package. Removes `eslint-config-custom` from `@clerk/clerk-react`'s dependencies, as it should only be a development dependency. ([#3307](https://github.com/clerk/javascript/pull/3307)) by [@BRKalow](https://github.com/BRKalow)
+
+- The following are all internal changes and not relevant to any end-user: ([#3341](https://github.com/clerk/javascript/pull/3341)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Add telemetry events for `useSignIn`, `useSignUp`, `useOrganizations` and `useOrganizationList`
+
+- Updated dependencies [[`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/shared@2.0.2
+  - @clerk/types@4.2.1
+
+## 5.0.3
+
+### Patch Changes
+
+- Remove type from clerkjs script attributes that prevents the satellite apps from function properly. ([#3304](https://github.com/clerk/javascript/pull/3304)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 5.0.2
 
 ### Patch Changes

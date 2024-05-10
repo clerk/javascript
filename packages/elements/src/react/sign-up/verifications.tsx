@@ -3,11 +3,10 @@ import type {
   SignUpVerificationTags,
   TSignUpVerificationMachine,
 } from '~/internals/machines/sign-up';
-import { SignUpVerificationMachine } from '~/internals/machines/sign-up';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
-import { SignUpRouterCtx, useSignUpRouteRegistration } from '~/react/sign-up/context';
+import { SignUpRouterCtx, useSignUpVerificationStep } from '~/react/sign-up/context';
 
 import { createContextFromActorRef } from '../utils/create-context-from-actor-ref';
 
@@ -38,7 +37,7 @@ export function SignUpVerifications(props: SignUpVerificationsProps) {
 }
 
 function SignUpVerifyInner(props: SignUpVerificationsProps) {
-  const ref = useSignUpRouteRegistration('verification', SignUpVerificationMachine);
+  const ref = useSignUpVerificationStep();
 
   if (!ref) {
     return null;
@@ -85,5 +84,5 @@ export function SignUpStrategy({ children, name: tag }: SignUpStrategyProps) {
     `verification:category:${tag}`,
   ] as unknown as SignUpVerificationTags[]);
 
-  return active ? children : null;
+  return active ? <>{children}</> : null;
 }

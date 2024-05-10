@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared/url';
 import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, sendTo, setup, spawnChild, stopChild } from 'xstate';
+import { and, assign, log, not, or, raise, sendTo, setup, spawnChild } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -14,12 +14,18 @@ import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/error
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
+import { SignUpContinueMachine } from './continue.machine';
 import type {
   SignUpRouterContext,
   SignUpRouterEvents,
   SignUpRouterNextEvent,
   SignUpRouterSchema,
 } from './router.types';
+import { SignUpStartMachine } from './start.machine';
+import { SignUpVerificationMachine } from './verification.machine';
+
+export const SignUpRouterMachineId = 'SignUpRouter';
+export type TSignUpRouterMachine = typeof SignUpRouterMachine;
 
 const isCurrentPath =
   (path: `/${string}`) =>
@@ -31,12 +37,12 @@ const needsStatus =
   ({ context, event }: { context: SignUpRouterContext; event?: SignUpRouterEvents }, _?: NonReducibleUnknown) =>
     (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk?.client?.signUp?.status === status;
 
-export const SignUpRouterMachineId = 'SignUpRouter';
-export type TSignUpRouterMachine = typeof SignUpRouterMachine;
-
 export const SignUpRouterMachine = setup({
   actors: {
-    thirdParty: ThirdPartyMachine,
+    continueMachine: SignUpContinueMachine,
+    startMachine: SignUpStartMachine,
+    thirdPartyMachine: ThirdPartyMachine,
+    verificationMachine: SignUpVerificationMachine,
   },
   actions: {
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
@@ -52,6 +58,7 @@ export const SignUpRouterMachine = setup({
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
+    raiseNext: raise({ type: 'NEXT' }),
     setActive({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) {
       const session =
         params?.sessionId ||
@@ -166,24 +173,6 @@ export const SignUpRouterMachine = setup({
     },
     'NAVIGATE.PREVIOUS': '.Hist',
     'NAVIGATE.START': '.Start',
-    'ROUTE.REGISTER': {
-      actions: enqueueActions(({ context, enqueue, event, self, system }) => {
-        const { id, logic, input } = event;
-
-        if (!system.get(id)) {
-          // @ts-expect-error - This is valid (See: https://discord.com/channels/795785288994652170/1203714033190969405/1205595237293096960)
-          enqueue.spawnChild(logic, {
-            id,
-            systemId: id,
-            input: { basePath: context.router?.basePath, parent: self, formRef: context.formRef, ...input },
-            syncSnapshot: true, // Subscribes to the spawned actor and send back snapshot events
-          });
-        }
-      }),
-    },
-    'ROUTE.UNREGISTER': {
-      actions: stopChild(({ event }) => event.id),
-    },
     LOADING: {
       actions: assign(({ event }) => ({
         loading: {
@@ -206,13 +195,14 @@ export const SignUpRouterMachine = setup({
               isLoading: false,
             },
             exampleMode: event.exampleMode || false,
+            formRef: event.formRef,
           })),
           target: 'Init',
         },
       },
     },
     Init: {
-      entry: spawnChild('thirdParty', {
+      entry: spawnChild('thirdPartyMachine', {
         id: ThirdPartyMachineId,
         systemId: ThirdPartyMachineId,
         input: ({ context, self }) => ({
@@ -257,6 +247,18 @@ export const SignUpRouterMachine = setup({
     Start: {
       tags: 'route:start',
       exit: 'clearFormErrors',
+      invoke: {
+        id: 'start',
+        src: 'startMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
         NEXT: [
           {
@@ -278,6 +280,18 @@ export const SignUpRouterMachine = setup({
     },
     Continue: {
       tags: 'route:continue',
+      invoke: {
+        id: 'continue',
+        src: 'continueMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
         NEXT: [
           {
@@ -294,6 +308,18 @@ export const SignUpRouterMachine = setup({
     },
     Verification: {
       tags: 'route:verification',
+      invoke: {
+        id: 'verification',
+        src: 'verificationMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       always: [
         {
           guard: 'hasCreatedSession',

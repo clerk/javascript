@@ -1,6 +1,6 @@
 import { snakeToCamel } from '@clerk/shared/underscore';
 import type { SignUpResource } from '@clerk/types';
-import type { ActorRefFrom, DoneActorEvent } from 'xstate';
+import type { DoneActorEvent } from 'xstate';
 import { fromPromise, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
@@ -10,7 +10,7 @@ import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
 import type { SignUpContinueSchema } from './continue.types';
-import type { TSignUpRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 
 export type TSignUpContinueMachine = typeof SignUpContinueMachine;
 
@@ -18,7 +18,7 @@ export const SignUpContinueMachineId = 'SignUpContinue';
 
 export const SignUpContinueMachine = setup({
   actors: {
-    attempt: fromPromise<SignUpResource, { parent: ActorRefFrom<TSignUpRouterMachine>; fields: FormFields }>(
+    attempt: fromPromise<SignUpResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const params = fieldsToSignUpParams(fields);
         return parent.getSnapshot().context.clerk.client.signUp.update(params);

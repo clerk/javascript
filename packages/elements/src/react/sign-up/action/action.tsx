@@ -8,16 +8,16 @@ import { SignUpNavigate } from './navigate';
 import type { SignUpResendProps } from './resend';
 import { SignUpResend } from './resend';
 
-export type SignUpActionProps = { asChild?: boolean } & (
-  | ({
-      navigate: SignUpNavigateProps['to'];
-      resend?: never;
-      submit?: never;
-      className?: string;
-    } & Omit<SignUpNavigateProps, 'to'>)
-  | ({ navigate?: never; resend?: never; submit: true } & FormSubmitProps)
-  | ({ navigate?: never; resend: true; submit: never; className?: string } & SignUpResendProps)
-);
+export type SignUpActionProps = { asChild?: boolean } & FormSubmitProps &
+  (
+    | ({
+        navigate: SignUpNavigateProps['to'];
+        resend?: never;
+        submit?: never;
+      } & Omit<SignUpNavigateProps, 'to'>)
+    | { navigate?: never; resend?: never; submit: true }
+    | ({ navigate?: never; resend: true; submit?: never } & SignUpResendProps)
+  );
 
 /**
  * Perform various actions during the sign-in process. This component is used to navigate between steps, submit the form, or resend a verification codes.
