@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.72.3
+
+### Patch Changes
+
+- Fix Smart CAPTCHA on ticket flow ([#3360](https://github.com/clerk/javascript/pull/3360)) by [@anagstef](https://github.com/anagstef)
+
 ## 4.72.2
 
 ### Patch Changes
