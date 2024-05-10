@@ -2,10 +2,10 @@ import { DEV_BROWSER_JWT_HEADER, extractDevBrowserJWTFromURL, setDevBrowserJWTIn
 import { parseErrors } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON } from '@clerk/types';
 
-import { isDevOrStagingUrl } from '../utils';
-import { getDevBrowserCookie, removeDevBrowserCookie, setDevBrowserCookie } from '../utils/cookies/devBrowser';
-import { clerkErrorDevInitFailed } from './errors';
-import type { FapiClient } from './fapiClient';
+import { isDevOrStagingUrl } from '../../utils';
+import { clerkErrorDevInitFailed } from '../errors';
+import type { FapiClient } from '../fapiClient';
+import { getDevBrowserCookie, removeDevBrowserCookie, setDevBrowserCookie } from './cookies/devBrowser';
 
 export interface DevBrowser {
   clear(): void;

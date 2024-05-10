@@ -1,7 +1,7 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
 
-import { inCrossOriginIframe } from '../../utils';
+import { inCrossOriginIframe } from '../../../utils';
 
 const SESSION_COOKIE_NAME = '__session';
 

@@ -1,11 +1,11 @@
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, EnvironmentResource, SessionResource, TokenResource } from '@clerk/types';
 
-import { inBrowser } from '../../../utils';
-import { setClientUatCookie } from '../../../utils/cookies/clientUat';
-import { removeSessionCookie, setSessionCookie } from '../../../utils/cookies/session';
-import { clerkCoreErrorTokenRefreshFailed } from '../../errors';
-import { eventBus, events } from '../../events';
+import { inBrowser } from '../../utils';
+import { clerkCoreErrorTokenRefreshFailed } from '../errors';
+import { eventBus, events } from '../events';
+import { setClientUatCookie } from './cookies/clientUat';
+import { removeSessionCookie, setSessionCookie } from './cookies/session';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
 export class SessionCookieService {

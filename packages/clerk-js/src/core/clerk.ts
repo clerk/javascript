@@ -85,12 +85,13 @@ import {
   windowNavigate,
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
-import { getClientUatCookie } from '../utils/cookies/clientUat';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
+import { getClientUatCookie } from './auth/cookies/clientUat';
+import type { DevBrowser } from './auth/devBrowser';
+import { createDevBrowser } from './auth/devBrowser';
+import { SessionCookieService } from './auth/SessionCookieService';
 import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
-import type { DevBrowser } from './devBrowser';
-import { createDevBrowser } from './devBrowser';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -111,7 +112,6 @@ import {
   Environment,
   Organization,
 } from './resources/internal';
-import { SessionCookieService } from './services';
 import { warnings } from './warnings';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
