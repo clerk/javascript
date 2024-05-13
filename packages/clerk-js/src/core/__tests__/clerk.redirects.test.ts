@@ -123,33 +123,33 @@ describe('Clerk singleton - Redirects', () => {
       });
 
       it('redirects to signInUrl for development instance', async () => {
-        await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+        await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: '/example' });
         expect(mockNavigate).toHaveBeenCalledWith(
-          '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
+          '/sign-in#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample',
           undefined,
         );
       });
 
       it('redirects to signInUrl for production instance', async () => {
-        await clerkForProductionInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+        await clerkForProductionInstance.redirectToSignIn({ redirectUrl: '/example' });
         expect(mockNavigate).toHaveBeenCalledWith(
-          '/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
+          '/sign-in#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample',
           undefined,
         );
       });
 
       it('redirects to signUpUrl for development instance', async () => {
-        await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+        await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: '/example' });
         expect(mockNavigate).toHaveBeenCalledWith(
-          '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
+          '/sign-up#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample',
           undefined,
         );
       });
 
       it('redirects to signUpUrl for production instance', async () => {
-        await clerkForProductionInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+        await clerkForProductionInstance.redirectToSignUp({ redirectUrl: '/example' });
         expect(mockNavigate).toHaveBeenCalledWith(
-          '/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F',
+          '/sign-up#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample',
           undefined,
         );
       });
@@ -220,31 +220,31 @@ describe('Clerk singleton - Redirects', () => {
       const host = 'http://another-test.host';
 
       it('redirects to signInUrl for development instance', async () => {
-        await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+        await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: '/example' });
         expect(mockHref).toHaveBeenCalledTimes(1);
         expect(mockHref).toHaveBeenCalledWith(
-          `${host}/sign-in?__clerk_db_jwt=deadbeef#/?redirect_url=https%3A%2F%2Fwww.example.com%2F`,
+          `${host}/sign-in?__clerk_db_jwt=deadbeef#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample`,
         );
       });
 
       it('redirects to signInUrl for production instance', async () => {
-        await clerkForProductionInstance.redirectToSignIn({ redirectUrl: 'https://www.example.com/' });
+        await clerkForProductionInstance.redirectToSignIn({ redirectUrl: '/example' });
         expect(mockHref).toHaveBeenCalledTimes(1);
-        expect(mockHref).toHaveBeenCalledWith(`${host}/sign-in#/?redirect_url=https%3A%2F%2Fwww.example.com%2F`);
+        expect(mockHref).toHaveBeenCalledWith(`${host}/sign-in#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample`);
       });
 
       it('redirects to signUpUrl for development instance', async () => {
-        await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+        await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: '/example' });
         expect(mockHref).toHaveBeenCalledTimes(1);
         expect(mockHref).toHaveBeenCalledWith(
-          `${host}/sign-up?__clerk_db_jwt=deadbeef#/?redirect_url=https%3A%2F%2Fwww.example.com%2F`,
+          `${host}/sign-up?__clerk_db_jwt=deadbeef#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample`,
         );
       });
 
       it('redirects to signUpUrl for production instance', async () => {
-        await clerkForProductionInstance.redirectToSignUp({ redirectUrl: 'https://www.example.com/' });
+        await clerkForProductionInstance.redirectToSignUp({ redirectUrl: '/example' });
         expect(mockHref).toHaveBeenCalledTimes(1);
-        expect(mockHref).toHaveBeenCalledWith(`${host}/sign-up#/?redirect_url=https%3A%2F%2Fwww.example.com%2F`);
+        expect(mockHref).toHaveBeenCalledWith(`${host}/sign-up#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample`);
       });
 
       it('redirects to userProfileUrl', async () => {
