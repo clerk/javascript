@@ -29,7 +29,7 @@ export type SignUpStepProps =
  *
  * You typically want to place fields like username, password, or social providers in the `'start'` step. The `'continue'` step can hold inputs for username, first name/last name or other metadata. The `'verifications'` step is used to verify the user's information like an email verification. Once the user has been verified, the sign-up attempt will be completed.
  *
- * @param {string} name - Step name. Use `'start'`, `'continue'`, `'verifications'`, or `'complete'`.
+ * @param {string} name - Step name. Use `'start'`, `'continue'`, or `'verifications'`.
  *
  * @example
  * <SignUp.Root>
