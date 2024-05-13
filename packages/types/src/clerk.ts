@@ -730,8 +730,13 @@ export type SignInProps = RoutingOptions & {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-export type OneTapProps = RedirectOptions & {
-  returnToCurrentLocation?: boolean;
+type OneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
+
+export type OneTapProps = OneTapRedirectUrlProps & {
+  /**
+   * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
+   * @default true
+   */
   cancelOnTapOutside?: boolean;
   appearance?: SignInTheme;
 };

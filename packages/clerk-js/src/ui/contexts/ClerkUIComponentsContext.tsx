@@ -507,6 +507,7 @@ export const useGoogleOneTapContext = () => {
     options,
     {
       ...ctx,
+      redirectUrl: window.location.href,
     },
     queryParams,
   );
@@ -517,8 +518,8 @@ export const useGoogleOneTapContext = () => {
   signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
   signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
 
-  const signInForceRedirectUrl = ctx.returnToCurrentLocation ? window.location.href : redirectUrls.getAfterSignInUrl();
-  const signUpForceRedirectUrl = ctx.returnToCurrentLocation ? window.location.href : redirectUrls.getAfterSignUpUrl();
+  const signInForceRedirectUrl = redirectUrls.getAfterSignInUrl();
+  const signUpForceRedirectUrl = redirectUrls.getAfterSignUpUrl();
 
   const signUpContinueUrl = buildURL(
     {
