@@ -39,7 +39,7 @@ describe('OrganizationList', () => {
   });
 
   describe('Personal Account', () => {
-    it.skip('hides the personal account with data to list', async () => {
+    it('hides the personal account with data to list', async () => {
       const { wrapper, props, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -85,7 +85,7 @@ describe('OrganizationList', () => {
       });
     });
 
-    it.skip('hides the personal account with no data to list', async () => {
+    it('hides the personal account with no data to list', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
