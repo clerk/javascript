@@ -1,14 +1,25 @@
-import type { ClerkOptions } from '@clerk/backend';
-import { createClerkClient as _createClerkClient, verifyToken } from '@clerk/backend';
+import type { ClerkOptions, VerifyTokenOptions } from '@clerk/backend';
+import { createClerkClient as _createClerkClient, verifyToken as _verifyToken } from '@clerk/backend';
 
 import { createClerkExpressRequireAuth } from './clerkExpressRequireAuth';
 import { createClerkExpressWithAuth } from './clerkExpressWithAuth';
 import { loadApiEnv, loadClientEnv } from './utils';
 
+type MakeOptionalSecondArgument<T> = T extends (a: string, b: infer U) => infer R ? (a: string, b?: U) => R : never;
+type VerifyTokenWithOptionalSecondArgument = MakeOptionalSecondArgument<typeof _verifyToken>;
+
 type ClerkClient = ReturnType<typeof _createClerkClient> & {
   expressWithAuth: ReturnType<typeof createClerkExpressWithAuth>;
   expressRequireAuth: ReturnType<typeof createClerkExpressRequireAuth>;
-  verifyToken: typeof verifyToken;
+  verifyToken: VerifyTokenWithOptionalSecondArgument;
+};
+
+const buildVerifyToken = (params: VerifyTokenOptions) => {
+  return (...args: Parameters<VerifyTokenWithOptionalSecondArgument>) =>
+    _verifyToken(args[0], {
+      ...params,
+      ...args[1],
+    });
 };
 
 /**
@@ -24,7 +35,7 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
   return Object.assign(clerkClient, {
     expressWithAuth,
     expressRequireAuth,
-    verifyToken,
+    verifyToken: buildVerifyToken(options),
   });
 }
 

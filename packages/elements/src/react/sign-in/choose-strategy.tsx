@@ -32,24 +32,31 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 
 // --------------------------------- COMPONENTS ---------------------------------
 
-export type SignInChooseStrategyProps = {
-  children: React.ReactNode;
-};
+export type SignInChooseStrategyProps = React.HTMLAttributes<HTMLDivElement>;
+export type SignInForgotPasswordProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
 
-export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
+export function SignInChooseStrategy({ children, ...props }: SignInChooseStrategyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:choose-strategy'], ActiveTagsMode.all);
 
-  return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
+  return activeState ? (
+    <SignInChooseStrategyCtx.Provider>
+      <div {...props}>{children}</div>
+    </SignInChooseStrategyCtx.Provider>
+  ) : null;
 }
 
-export function SignInForgotPassword({ children }: SignInChooseStrategyProps) {
+export function SignInForgotPassword({ children, ...props }: SignInForgotPasswordProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:forgot-password'], ActiveTagsMode.all);
 
-  return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
+  return activeState ? (
+    <SignInChooseStrategyCtx.Provider>
+      <div {...props}>{children}</div>
+    </SignInChooseStrategyCtx.Provider>
+  ) : null;
 }
 
 const SUPPORTED_STRATEGY_NAME = 'SignInSupportedStrategy';
