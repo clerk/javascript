@@ -46,7 +46,8 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
         ref.send(evt);
       }
     });
-  }, [clerk, exampleMode, formRef, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clerk, exampleMode, formRef?.id, !!router]);
 
   return isReady ? <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider> : null;
 }
