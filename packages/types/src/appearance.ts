@@ -255,6 +255,7 @@ export type ElementsConfig = {
   organizationSwitcherPopoverMain: WithOptions;
   organizationSwitcherPopoverActions: WithOptions;
   organizationSwitcherPopoverInvitationActions: WithOptions;
+  organizationSwitcherPopoverInvitationActionsBox: WithOptions;
   organizationSwitcherPopoverActionButton: WithOptions<
     'manageOrganization' | 'createOrganization' | 'switchOrganization'
   >;
