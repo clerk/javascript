@@ -327,8 +327,8 @@ export const enUS: LocalizationResource = {
       },
       clientMismatch: {
         subtitle:
-          'Open the verification link on the device and browser from which you initiatied the sign in to continue',
-        title: 'This verification link is invalid for this device',
+          'To continue, open the verification link on the device and browser from which you initiated the sign-in',
+        title: 'Verification link is invalid for this device',
       },
     },
     forgotPassword: {
@@ -433,8 +433,8 @@ export const enUS: LocalizationResource = {
       },
       clientMismatch: {
         subtitle:
-          'Open the verification link on the device and browser from which you initiatied the sign up to continue',
-        title: 'This verification link is invalid for this device',
+          'To continue, open the verification link on the device and browser from which you initiated the sign-up',
+        title: 'Verification link is invalid for this device',
       },
     },
     phoneCode: {
