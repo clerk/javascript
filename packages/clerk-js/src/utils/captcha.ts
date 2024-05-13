@@ -1,8 +1,6 @@
 import { loadScript } from '@clerk/shared/loadScript';
 import type { CaptchaWidgetType } from '@clerk/types';
 
-import { clerkFailedToLoadThirdPartyScript } from '../core/errors';
-
 interface RenderOptions {
   /**
    * Every widget has a sitekey. This sitekey is associated with the corresponding widget configuration and is created upon the widget creation.
@@ -76,9 +74,12 @@ export async function loadCaptcha(url: string) {
   if (!window.turnstile) {
     try {
       await loadScript(url, { defer: true });
-    } catch (_) {
+    } catch {
       // Rethrow with specific message
-      clerkFailedToLoadThirdPartyScript('Cloudflare Turnstile');
+      console.error('Clerk: Failed to load the CAPTCHA script from the URL: ', url);
+      throw {
+        captchaError: 'captcha_script_failed_to_load',
+      };
     }
   }
   return window.turnstile;
@@ -112,7 +113,7 @@ export const getCaptchaToken = async (captchaOptions: {
     return div;
   };
 
-  const captcha = await loadCaptcha(scriptUrl);
+  const captcha: Turnstile = await loadCaptcha(scriptUrl);
   let retries = 0;
   const errorCodes: (string | number)[] = [];
 
