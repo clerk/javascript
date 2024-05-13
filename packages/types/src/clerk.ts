@@ -738,6 +738,19 @@ export type OneTapProps = OneTapRedirectUrlProps & {
    * @default true
    */
   cancelOnTapOutside?: boolean;
+  /**
+   * Enables upgraded One Tap UX on ITP browsers.
+   * Turning this options off, would hide any One Tap UI in such browsers.
+   * @default true
+   */
+  itpSupport?: boolean;
+  /**
+   * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
+   * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
+   * Backwards compatible with browsers that still support third-party cookies.
+   * @default true
+   */
+  fedCmSupport?: boolean;
   appearance?: SignInTheme;
 };
 

@@ -61,10 +61,10 @@ function _OneTapStart(): JSX.Element | null {
       google.accounts.id.initialize({
         client_id: environmentClientID!,
         callback: oneTapCallback,
-        itp_support: true,
+        itp_support: ctx.itpSupport,
         cancel_on_tap_outside: ctx.cancelOnTapOutside,
         auto_select: false,
-        use_fedcm_for_prompt: true,
+        use_fedcm_for_prompt: ctx.fedCmSupport,
       });
 
       google.accounts.id.prompt();
