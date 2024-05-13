@@ -13,6 +13,7 @@ import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/error
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
+import { FormMachine } from '../form';
 import { SignInResetPasswordMachine } from './reset-password.machine';
 import type {
   SignInRouterContext,
@@ -41,6 +42,7 @@ export const SignInRouterMachineId = 'SignInRouter';
 export const SignInRouterMachine = setup({
   actors: {
     firstFactorMachine: SignInFirstFactorMachine,
+    formMachine: FormMachine,
     resetPasswordMachine: SignInResetPasswordMachine,
     startMachine: SignInStartMachine,
     secondFactorMachine: SignInSecondFactorMachine,
@@ -60,8 +62,8 @@ export const SignInRouterMachine = setup({
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
-    setActive({ context, event }) {
-      if (context.exampleMode) return;
+    setActive: enqueueActions(({ enqueue, check, context, event }) => {
+      if (check('isExampleMode')) return;
 
       const lastActiveSessionId = context.clerk.client.lastActiveSessionId;
       const createdSessionId = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn)
@@ -71,7 +73,9 @@ export const SignInRouterMachine = setup({
 
       const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignInUrl());
       void context.clerk.setActive({ session, beforeEmit });
-    },
+
+      enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
+    }),
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
         if (error) return error;
@@ -182,6 +186,7 @@ export const SignInRouterMachine = setup({
         },
       })),
     },
+    RESET: '.Idle',
   },
   states: {
     Idle: {
@@ -224,7 +229,6 @@ export const SignInRouterMachine = setup({
         {
           guard: 'isComplete',
           actions: 'setActive',
-          target: 'Complete',
         },
         {
           guard: 'isLoggedInAndSingleSession',
@@ -285,7 +289,6 @@ export const SignInRouterMachine = setup({
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -323,7 +326,6 @@ export const SignInRouterMachine = setup({
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsSecondFactor',
@@ -390,7 +392,6 @@ export const SignInRouterMachine = setup({
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsNewPassword',
@@ -418,7 +419,6 @@ export const SignInRouterMachine = setup({
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -446,7 +446,6 @@ export const SignInRouterMachine = setup({
           {
             guard: or(['isLoggedIn', 'isComplete', 'hasAuthenticatedViaClerkJS']),
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsIdentifier',
@@ -468,13 +467,6 @@ export const SignInRouterMachine = setup({
             target: 'ResetPassword',
           },
         ],
-      },
-    },
-    Complete: {
-      tags: 'route:complete',
-      entry: 'clearFormErrors',
-      after: {
-        5000: 'Start',
       },
     },
     Error: {

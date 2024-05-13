@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared/url';
 import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, log, not, or, raise, sendTo, setup, spawnChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup, spawnChild } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -59,15 +59,21 @@ export const SignUpRouterMachine = setup({
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
-    setActive({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) {
-      const session =
-        params?.sessionId ||
-        (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
-        ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
+    // sds @ts-expect-error - This works; Unsure why typing doesn't
+    setActive: (_, params?: { sessionId?: string; useLastActiveSession?: boolean }) =>
+      enqueueActions(({ enqueue, check, context, event }) => {
+        if (check('isExampleMode')) return;
 
-      const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignUpUrl());
-      void context.clerk.setActive({ session, beforeEmit });
-    },
+        const session =
+          params?.sessionId ||
+          (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
+          ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
+
+        const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignUpUrl());
+        void context.clerk.setActive({ session, beforeEmit });
+
+        enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
+      }),
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
         if (error) return error;
@@ -182,6 +188,7 @@ export const SignUpRouterMachine = setup({
         },
       })),
     },
+    RESET: '.Idle',
   },
   states: {
     Idle: {
@@ -264,7 +271,6 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsVerification',
@@ -298,7 +304,6 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsVerification',
@@ -329,7 +334,6 @@ export const SignUpRouterMachine = setup({
             type: 'setActive',
             params: { sessionId: context.router?.searchParams().get(SEARCH_PARAMS.createdSession) },
           }),
-          target: 'Complete',
         },
         {
           guard: { type: 'hasClerkStatus', params: { status: 'verified' } },
@@ -345,7 +349,6 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsContinue',
@@ -363,13 +366,11 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: 'setActive',
-            target: 'Complete',
           },
           {
             description: 'Handle a case where the user has already been authenticated via ClerkJS',
             guard: 'hasAuthenticatedViaClerkJS',
             actions: { type: 'setActive', params: { useLastActiveSession: true } },
-            target: 'Complete',
           },
           {
             guard: 'statusNeedsVerification',
@@ -386,13 +387,6 @@ export const SignUpRouterMachine = setup({
             target: 'Start',
           },
         ],
-      },
-    },
-    Complete: {
-      tags: 'route:complete',
-      entry: 'clearFormErrors',
-      after: {
-        5000: 'Start',
       },
     },
     Error: {

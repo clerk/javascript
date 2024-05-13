@@ -10,6 +10,7 @@ import type {
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
   BaseRouterRedirectEvent,
+  BaseRouterResetEvent,
   BaseRouterSetClerkEvent,
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
@@ -46,6 +47,7 @@ export type SignUpRouterPrevEvent = BaseRouterPrevEvent;
 export type SignUpRouterErrorEvent = BaseRouterErrorEvent;
 export type SignUpRouterTransferEvent = BaseRouterTransferEvent;
 export type SignUpRouterRedirectEvent = BaseRouterRedirectEvent;
+export type SignUpRouterResetEvent = BaseRouterResetEvent;
 export type SignUpRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'continue'>;
 export type SignUpRouterSetClerkEvent = BaseRouterSetClerkEvent;
 
@@ -64,6 +66,7 @@ export type SignUpRouterEvents =
   | SignUpRouterErrorEvent
   | SignUpRouterTransferEvent
   | SignUpRouterRedirectEvent
+  | SignUpRouterResetEvent
   | SignUpRouterLoadingEvent
   | SignUpRouterSetClerkEvent;
 
