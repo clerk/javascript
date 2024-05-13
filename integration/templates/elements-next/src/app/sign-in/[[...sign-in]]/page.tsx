@@ -32,7 +32,7 @@ export default function SignInPage() {
             className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
           >
             <header className='text-center'>
-              <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Sign in to Clover</h1>
+              <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Sign in to Clover</h1>
             </header>
             <Clerk.GlobalError className='block text-sm text-red-600' />
             <Clerk.Field
@@ -84,7 +84,7 @@ export default function SignInPage() {
             className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
           >
             <header className='text-center'>
-              <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Use another method</h1>
+              <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Use another method</h1>
             </header>
             <Clerk.GlobalError className='block text-sm text-red-600' />
             <SignIn.SupportedStrategy
@@ -138,7 +138,7 @@ export default function SignInPage() {
             className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
           >
             <header className='text-center'>
-              <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Forgot password?</h1>
+              <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Forgot password?</h1>
             </header>
             <Clerk.GlobalError className='block text-sm text-red-600' />
             <SignIn.SupportedStrategy
@@ -169,7 +169,7 @@ export default function SignInPage() {
           >
             <SignIn.Strategy name='password'>
               <header className='text-center'>
-                <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Enter your password</h1>
+                <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Enter your password</h1>
                 <p className='text-sm mt-2 text-neutral-500'>
                   Welcome back <SignIn.Salutation />
                 </p>
@@ -203,7 +203,7 @@ export default function SignInPage() {
             </SignIn.Strategy>
             <SignIn.Strategy name='email_code'>
               <header className='text-center'>
-                <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Verify email code</h1>
+                <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Verify email code</h1>
               </header>
               <Clerk.GlobalError className='block text-sm text-red-600' />
               <Clerk.Field name='code'>
@@ -226,7 +226,7 @@ export default function SignInPage() {
             </SignIn.Strategy>
             <SignIn.Strategy name='email_link'>
               <header className='text-center'>
-                <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Verify email link</h1>
+                <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Verify email link</h1>
               </header>
               <Clerk.GlobalError className='block text-sm text-red-600' />
               <Clerk.Field name='email_link'>
@@ -247,7 +247,7 @@ export default function SignInPage() {
             </SignIn.Strategy>
             <SignIn.Strategy name='reset_password_email_code'>
               <header className='text-center'>
-                <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Verify email code</h1>
+                <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Verify email code</h1>
               </header>
               <Clerk.GlobalError className='block text-sm text-red-600' />
               <Clerk.Field name='code'>
@@ -270,7 +270,7 @@ export default function SignInPage() {
             </SignIn.Strategy>
             <SignIn.Strategy name='phone_code'>
               <header className='text-center'>
-                <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Verify phone code</h1>
+                <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Verify phone code</h1>
               </header>
               <Clerk.GlobalError className='block text-sm text-red-600' />
               <Clerk.Field name='code'>
@@ -305,7 +305,7 @@ export default function SignInPage() {
             className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
           >
             <header className='text-center'>
-              <h1 className='mt-4 text-xl font-medium tracking-tight text-neutral-950'>Reset your password</h1>
+              <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Reset your password</h1>
             </header>
             <Clerk.GlobalError className='block text-sm text-red-600' />
             <Clerk.Field name='password'>

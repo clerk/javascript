@@ -15,15 +15,12 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
       await page.goToRelative('/sign-in', { searchParams: opts.searchParams });
 
       if (typeof opts.headlessSelector !== 'undefined') {
-        return self.waitForMountedHeadless(opts.headlessSelector);
+        return self.waitForMounted(opts.headlessSelector);
       } else {
         return self.waitForMounted();
       }
     },
-    waitForMounted: () => {
-      return page.waitForSelector('.cl-signIn-root', { state: 'attached' });
-    },
-    waitForMountedHeadless: (selector: string) => {
+    waitForMounted: (selector = '.cl-signIn-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
     setIdentifier: (val: string) => {
