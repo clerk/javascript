@@ -1,10 +1,9 @@
 import { applyFunctionToObj, filterProps, removeUndefined } from '@clerk/shared/object';
 import { camelToSnake } from '@clerk/shared/underscore';
 import type { ClerkOptions, RedirectOptions } from '@clerk/types';
-import type { ParsedQs } from 'qs';
 
 import { assertNoLegacyProp, warnForNewPropShadowingLegacyProp } from './assertNoLegacyProp';
-import { buildURL, isAllowedRedirectOrigin, relativeToAbsoluteUrl } from './url';
+import { isAllowedRedirectOrigin, relativeToAbsoluteUrl } from './url';
 
 export class RedirectUrls {
   private static keys: (keyof RedirectOptions)[] = [
@@ -39,23 +38,12 @@ export class RedirectUrls {
     return this.#getRedirectUrl('signUp');
   }
 
-  toSearchParams() {
-    return this.#toSearchParams(this.#flattenPreservedProps());
+  getPreservedSearchParams() {
+    return this.#toSearchParams(this.#flattenPreserved());
   }
 
-  appendPreservedPropsToUrl(url: string, _otherParams: ParsedQs = {}) {
-    const params = new URLSearchParams();
-    const otherParams = Object.entries(_otherParams);
-    const redirectParams = [...this.#toSearchParams(this.#flattenPreservedProps()).entries()];
-    // merge with existing search params, if any
-    // redirect params should always win
-    [otherParams, redirectParams].flat().forEach(([key, value]) => {
-      typeof value === 'string' && params.set(key, value);
-    });
-
-    // TODO: A potential future improvement here is to remove the origin from the params we append
-    // if `url` and the param share the same origin
-    return buildURL({ base: url, hashSearch: params.toString() }, { stringify: true });
+  toSearchParams() {
+    return this.#toSearchParams(this.#flattenAll());
   }
 
   #toSearchParams(obj: Record<string, string | undefined | null>): URLSearchParams {
@@ -63,10 +51,54 @@ export class RedirectUrls {
     return new URLSearchParams(removeUndefined(camelCased) as Record<string, string>);
   }
 
-  #flattenPreservedProps() {
+  #flattenPreserved() {
     return Object.fromEntries(
       Object.entries({ ...this.fromSearchParams }).filter(([key]) => RedirectUrls.preserved.includes(key)),
     );
+  }
+
+  #flattenAll() {
+    const signUpForceRedirectUrl =
+      this.fromSearchParams.signUpForceRedirectUrl ||
+      this.fromProps.signUpForceRedirectUrl ||
+      this.fromOptions.signUpForceRedirectUrl;
+    const signUpFallbackRedirectUrl =
+      this.fromSearchParams.signUpFallbackRedirectUrl ||
+      this.fromProps.signUpFallbackRedirectUrl ||
+      this.fromOptions.signUpFallbackRedirectUrl;
+    const signInForceRedirectUrl =
+      this.fromSearchParams.signInForceRedirectUrl ||
+      this.fromProps.signInForceRedirectUrl ||
+      this.fromOptions.signInForceRedirectUrl;
+    const signInFallbackRedirectUrl =
+      this.fromSearchParams.signInFallbackRedirectUrl ||
+      this.fromProps.signInFallbackRedirectUrl ||
+      this.fromOptions.signInFallbackRedirectUrl;
+    const afterSignInUrl =
+      this.fromSearchParams.afterSignInUrl || this.fromProps.afterSignInUrl || this.fromOptions.afterSignInUrl;
+    const afterSignUpUrl =
+      this.fromSearchParams.afterSignUpUrl || this.fromProps.afterSignUpUrl || this.fromOptions.afterSignUpUrl;
+    const redirectUrl = this.fromSearchParams.redirectUrl || this.fromProps.redirectUrl || this.fromOptions.redirectUrl;
+
+    const res: RedirectOptions = {
+      signUpForceRedirectUrl,
+      signUpFallbackRedirectUrl,
+      signInFallbackRedirectUrl,
+      signInForceRedirectUrl,
+      afterSignInUrl,
+      afterSignUpUrl,
+      redirectUrl,
+    };
+
+    if (signUpForceRedirectUrl) {
+      delete res.signUpFallbackRedirectUrl;
+    }
+
+    if (signInForceRedirectUrl) {
+      delete res.signInFallbackRedirectUrl;
+    }
+
+    return res;
   }
 
   #getRedirectUrl(prefix: 'signIn' | 'signUp') {

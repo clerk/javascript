@@ -1,4 +1,3 @@
-import type { ParsedQs } from 'qs';
 import React from 'react';
 
 export interface RouteContextValue {
@@ -15,7 +14,7 @@ export interface RouteContextValue {
   refresh: () => void;
   params: { [key: string]: string };
   queryString: string;
-  queryParams: ParsedQs;
+  queryParams: Record<string, string>;
   preservedParams?: string[];
   getMatchData: (path?: string, index?: boolean) => false | object;
   urlStateParam?: {
