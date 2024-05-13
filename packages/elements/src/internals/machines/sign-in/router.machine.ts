@@ -434,7 +434,7 @@ export const SignInRouterMachine = setup({
       },
     },
     Callback: {
-      tags: 'route:complete',
+      tags: 'route:callback',
       entry: sendTo(ThirdPartyMachineId, { type: 'CALLBACK' }),
       on: {
         NEXT: [

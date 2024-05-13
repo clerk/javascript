@@ -4,7 +4,7 @@ import * as Clerk from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 import type { ComponentProps } from 'react';
 
-import { H1, H3, HR as Hr, P } from '@/components/design';
+import { H1, HR as Hr, P } from '@/components/design';
 import { CustomField } from '@/components/form';
 import { Spinner } from '@/components/spinner';
 
@@ -196,10 +196,6 @@ export default function SignUpPage() {
             Please check your email for a link to verify your account.
             <CustomResendable />
           </SignUp.Strategy>
-        </SignUp.Step>
-
-        <SignUp.Step name='complete'>
-          <H3>You&apos;re being logged in!</H3>
         </SignUp.Step>
       </div>
     </SignUp.Root>

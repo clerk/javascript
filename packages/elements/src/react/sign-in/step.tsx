@@ -5,8 +5,6 @@ import { ClerkElementsRuntimeError } from '~/internals/errors';
 
 import type { SignInChooseStrategyProps } from './choose-strategy';
 import { SignInChooseStrategy, SignInForgotPassword } from './choose-strategy';
-import type { SignInCompleteProps } from './complete';
-import { SignInComplete } from './complete';
 import type { SignInResetPasswordProps } from './reset-password';
 import { SignInResetPassword } from './reset-password';
 import type { SignInStartProps } from './start';
@@ -20,7 +18,6 @@ export const SIGN_IN_STEPS = {
   'choose-strategy': 'choose-strategy',
   'forgot-password': 'forgot-password',
   'reset-password': 'reset-password',
-  complete: 'complete',
 } as const;
 
 export type TSignInStep = (typeof SIGN_IN_STEPS)[keyof typeof SIGN_IN_STEPS];
@@ -30,15 +27,14 @@ export type SignInStepProps =
   | StepWithProps<'start', SignInStartProps>
   | StepWithProps<'verifications', SignInVerificationsProps>
   | StepWithProps<'choose-strategy' | 'forgot-password', SignInChooseStrategyProps>
-  | StepWithProps<'reset-password', SignInResetPasswordProps>
-  | StepWithProps<'complete', SignInCompleteProps>;
+  | StepWithProps<'reset-password', SignInResetPasswordProps>;
 
 /**
  * Render different steps of the sign-in flow. Initially the `'start'` step is rendered. Once a sign-in attempt has been created, `'verifications'` will be displayed. If during that verification step the user decides to choose a different method of signing in or verifying, the `'choose-strategy'` step will be displayed.
  *
  * You typically want to place fields like username, password, or social providers in the `'start'` step. The `'verifications'` step is used to verify the user's credentials like password or MFA. Once the user has been verified, the sign-in attempt will be completed.
  *
- * @param {string} name - Step name. Use `'start'`, `'verifications'`, `'choose-strategy'`, `'reset-password'`, `'forgot-password'`, or `'complete'`.
+ * @param {string} name - Step name. Use `'start'`, `'verifications'`, `'choose-strategy'`, `'reset-password'`, or `'forgot-password'`.
  *
  * @example
  * <SignIn.Root>
@@ -47,7 +43,6 @@ export type SignInStepProps =
  *  <SignIn.Step name='choose-strategy' />
  *  <SignIn.Step name='forgot-password' />
  *  <SignIn.Step name='reset-password' />
- *  <SignIn.Step name='complete' />
  * </SignIn.Root>
  */
 export function SignInStep(props: SignInStepProps) {
@@ -66,8 +61,6 @@ export function SignInStep(props: SignInStepProps) {
       return <SignInForgotPassword {...props} />;
     case SIGN_IN_STEPS['reset-password']:
       return <SignInResetPassword {...props} />;
-    case SIGN_IN_STEPS['complete']:
-      return <SignInComplete {...props} />;
     default:
       throw new ClerkElementsRuntimeError(`Invalid step name. Use: ${Object.keys(SIGN_IN_STEPS).join(',')}.`);
   }

@@ -28,7 +28,6 @@ export const SignInRouterRoutes = {
   forgotPassword: 'route:forgot-password',
   resetPassword: 'route:reset-password',
   chooseStrategy: 'route:choose-strategy',
-  complete: 'route:complete',
 } as const;
 
 export type SignInRouterRoutes = keyof typeof SignInRouterRoutes;

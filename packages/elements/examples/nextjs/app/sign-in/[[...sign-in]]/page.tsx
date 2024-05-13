@@ -387,10 +387,6 @@ export default function SignInPage() {
             <CustomSubmit>Update Password</CustomSubmit>
           </div>
         </SignIn.Step>
-
-        <SignIn.Step name='complete'>
-          <H3>You&apos;re being logged in!</H3>
-        </SignIn.Step>
       </div>
     </SignIn.Root>
   );

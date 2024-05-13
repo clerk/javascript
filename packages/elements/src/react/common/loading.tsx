@@ -189,8 +189,6 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
     returnValue = isForgotPasswordLoading;
   } else if (computedScope === 'step:reset-password') {
     returnValue = isResetPasswordLoading;
-  } else if (computedScope === 'step:complete') {
-    returnValue = false;
   } else if (computedScope.startsWith('provider:')) {
     const computedStrategy = mapScopeToStrategy(computedScope);
     returnValue = isStrategyLoading && strategy === computedStrategy;
@@ -251,8 +249,6 @@ function SignUpLoading({ children, scope, routerRef }: SignUpLoadingProps) {
     returnValue = isVerificationsLoading;
   } else if (computedScope === 'step:continue') {
     returnValue = isContinueLoading;
-  } else if (computedScope === 'step:complete') {
-    returnValue = false;
   } else if (computedScope.startsWith('provider:')) {
     const computedStrategy = mapScopeToStrategy(computedScope);
     returnValue = isStrategyLoading && strategy === computedStrategy;

@@ -23,7 +23,6 @@ export const SignUpRouterRoutes = {
   verification: 'route:verification',
   callback: 'route:callback',
   error: 'route:error',
-  complete: 'route:complete',
 } as const;
 
 export type SignUpRouterRoutes = keyof typeof SignUpRouterRoutes;

@@ -3,8 +3,6 @@ import { eventComponentMounted } from '@clerk/shared/telemetry';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 
-import type { SignUpCompleteProps } from './complete';
-import { SignUpComplete } from './complete';
 import type { SignUpContinueProps } from './continue';
 import { SignUpContinue } from './continue';
 import type { SignUpStartProps } from './start';
@@ -16,7 +14,6 @@ export const SIGN_UP_STEPS = {
   start: 'start',
   continue: 'continue',
   verifications: 'verifications',
-  complete: 'complete',
 } as const;
 
 export type TSignUpStep = (typeof SIGN_UP_STEPS)[keyof typeof SIGN_UP_STEPS];
@@ -25,8 +22,7 @@ type StepWithProps<N extends TSignUpStep, T> = { name: N } & T;
 export type SignUpStepProps =
   | StepWithProps<'start', SignUpStartProps>
   | StepWithProps<'continue', SignUpContinueProps>
-  | StepWithProps<'verifications', SignUpVerificationsProps>
-  | StepWithProps<'complete', SignUpCompleteProps>;
+  | StepWithProps<'verifications', SignUpVerificationsProps>;
 
 /**
  * Render different steps of the sign-up flow. Initially the `'start'` step is rendered. Optionally, you can render additional fields in the `'continue'` step. Once a sign-up attempt has been created, `'verifications'` will be displayed.
@@ -40,7 +36,6 @@ export type SignUpStepProps =
  *  <SignUp.Step name='start' />
  *  <SignUp.Step name='continue' />
  *  <SignUp.Step name='verifications' />
- *  <SignUp.Step name='complete' />
  * </SignUp.Root>
  */
 export function SignUpStep(props: SignUpStepProps) {
@@ -55,8 +50,6 @@ export function SignUpStep(props: SignUpStepProps) {
       return <SignUpContinue {...props} />;
     case SIGN_UP_STEPS.verifications:
       return <SignUpVerifications {...props} />;
-    case SIGN_UP_STEPS.complete:
-      return <SignUpComplete {...props} />;
     default:
       throw new ClerkElementsRuntimeError(`Invalid step name. Use 'start', 'continue', or 'verifications'.`);
   }

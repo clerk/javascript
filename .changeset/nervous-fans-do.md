@@ -2,15 +2,5 @@
 '@clerk/elements': patch
 ---
 
-Add a `complete` step to Sign In and Sign Up flows for when a user is being set as active and has yet to be redirected to the desired URL.
-
-```tsx
-<SignIn.Step name="complete">
-  Welcome back! You're being redirected...
-</SignIn.Step>
-```
-```tsx
-<SignUp.Step name="complete">
-  Welcome! You're being redirected...
-</SignUp.Step>`
-```
+- The sign-up/in fallback prop isn't presented if the user isn't visiting the root (start) route.
+- Upon completion of sign-up/in, don't immediately return to the start step.
