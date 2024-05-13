@@ -52,28 +52,17 @@ describe('<SignInButton/>', () => {
     const btn = screen.getByText('Sign in');
     await userEvent.click(btn);
 
-    expect(mockRedirectToSignIn).toHaveBeenCalledWith({ forceRedirectUrl: url });
+    expect(mockRedirectToSignIn).toHaveBeenCalledWith({ signInForceRedirectUrl: url });
   });
 
-  it('handles forceRedirectUrl prop', async () => {
-    render(<SignInButton forceRedirectUrl={url} />);
+  it('handles fallbackRedirectUrl prop', async () => {
+    render(<SignInButton fallbackRedirectUrl={url} />);
 
     const btn = screen.getByText('Sign in');
     await userEvent.click(btn);
 
     expect(mockRedirectToSignIn).toHaveBeenCalledWith({
-      forceRedirectUrl: url,
-    });
-  });
-
-  it('handles signUpForceRedirectUrl prop', async () => {
-    render(<SignInButton signUpForceRedirectUrl={url} />);
-
-    const btn = screen.getByText('Sign in');
-    await userEvent.click(btn);
-
-    expect(mockRedirectToSignIn).toHaveBeenCalledWith({
-      signUpForceRedirectUrl: url,
+      signInFallbackRedirectUrl: url,
     });
   });
 

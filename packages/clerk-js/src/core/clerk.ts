@@ -37,6 +37,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  RedirectOptions,
   Resources,
   SDKMetadata,
   SetActiveParams,
@@ -826,19 +827,20 @@ export class Clerk implements ClerkInterface {
 
     return setDevBrowserJWTInURL(toURL, devBrowserJwt).href;
   }
-
   public buildSignInUrl(options?: SignInRedirectOptions): string {
-    return this.#buildUrl('signInUrl', {
-      ...options?.initialValues,
-      redirect_url: options?.redirectUrl || window.location.href,
-    });
+    return this.#buildUrl(
+      'signInUrl',
+      { ...options, redirectUrl: options?.redirectUrl || window.location.href },
+      options?.initialValues,
+    );
   }
 
   public buildSignUpUrl(options?: SignUpRedirectOptions): string {
-    return this.#buildUrl('signUpUrl', {
-      ...options?.initialValues,
-      redirect_url: options?.redirectUrl || window.location.href,
-    });
+    return this.#buildUrl(
+      'signUpUrl',
+      { ...options, redirectUrl: options?.redirectUrl || window.location.href },
+      options?.initialValues,
+    );
   }
 
   public buildUserProfileUrl(): string {
@@ -1642,13 +1644,19 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  #buildUrl = (key: 'signInUrl' | 'signUpUrl', params?: Record<string, string>): string => {
+  #buildUrl = (
+    key: 'signInUrl' | 'signUpUrl',
+    options: RedirectOptions,
+    _initValues?: Record<string, string>,
+  ): string => {
     if (!key || !this.loaded || !this.#environment || !this.#environment.displayConfig) {
       return '';
     }
     const signInOrUpUrl = this.#options[key] || this.#environment.displayConfig[key];
-    const redirectUrls = new RedirectUrls(this.#options, params);
-    return this.buildUrlWithAuth(redirectUrls.appendPreservedPropsToUrl(signInOrUpUrl, params));
+    const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
+    const initValues = new URLSearchParams(_initValues || {});
+    const url = buildURL({ base: signInOrUpUrl, hashSearchParams: [initValues, redirectUrls] }, { stringify: true });
+    return this.buildUrlWithAuth(url);
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {
