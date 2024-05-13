@@ -3,14 +3,14 @@ import { eventComponentMounted } from '@clerk/shared/telemetry';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 
-import type { SignInChooseStrategyProps } from '../choose-strategy';
-import { SignInChooseStrategy, SignInForgotPassword } from '../choose-strategy';
-import type { SignInStartProps } from '../start';
-import { SignInStart } from '../start';
-import type { SignInVerificationsProps } from '../verifications';
-import { SignInVerifications } from '../verifications';
+import type { SignInChooseStrategyProps } from './choose-strategy';
+import { SignInChooseStrategy, SignInForgotPassword } from './choose-strategy';
 import type { SignInResetPasswordProps } from './reset-password';
 import { SignInResetPassword } from './reset-password';
+import type { SignInStartProps } from './start';
+import { SignInStart } from './start';
+import type { SignInVerificationsProps } from './verifications';
+import { SignInVerifications } from './verifications';
 
 export const SIGN_IN_STEPS = {
   start: 'start',

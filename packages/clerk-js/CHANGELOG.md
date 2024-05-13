@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.2.4
+
+### Patch Changes
+
+- Fix a bug where client_uat domain detection would not handle hostnames with a single part. This impacts locally defined custom hostnames used as aliases. ([#3357](https://github.com/clerk/javascript/pull/3357)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fix Cypress setting cookies as third-party ([#3245](https://github.com/clerk/javascript/pull/3245)) by [@anagstef](https://github.com/anagstef)
+
 ## 5.2.3
 
 ### Patch Changes
