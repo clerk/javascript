@@ -82,7 +82,6 @@ export class SignUp extends BaseResource implements SignUpResource {
         paramsWithCaptcha.captchaToken = captchaToken;
         paramsWithCaptcha.captchaWidgetType = captchaWidgetTypeUsed;
       } catch (e) {
-        console.error('Clerk CAPTCHA Error: ', e.captchaError || e.message || e);
         if (e.captchaError) {
           paramsWithCaptcha.captchaError = e.captchaError;
         } else {
