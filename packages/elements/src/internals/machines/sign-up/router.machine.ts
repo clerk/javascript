@@ -59,7 +59,6 @@ export const SignUpRouterMachine = setup({
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
-    // sds @ts-expect-error - This works; Unsure why typing doesn't
     setActive: (_, params?: { sessionId?: string; useLastActiveSession?: boolean }) =>
       enqueueActions(({ enqueue, check, context, event }) => {
         if (check('isExampleMode')) return;
