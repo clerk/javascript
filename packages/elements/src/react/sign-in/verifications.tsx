@@ -80,7 +80,7 @@ export function SignInStrategy({ children, name }: SignInStrategyProps) {
     }
 
     return () => {
-      if (factorCtx) {
+      if (factorCtx?.getSnapshot().status === 'active') {
         factorCtx.send({ type: 'STRATEGY.UNREGISTER', factor: name as unknown as SignInFactor });
       }
     };
