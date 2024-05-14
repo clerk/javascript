@@ -1,5 +1,4 @@
 import type { SignUpResource } from '@clerk/types';
-import type { ActorRefFrom } from 'xstate';
 import { fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
@@ -9,7 +8,7 @@ import { fieldsToSignUpParams } from '~/internals/machines/sign-up/utils';
 import { ThirdPartyMachine } from '~/internals/machines/third-party';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-import type { TSignUpRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 import type { SignUpStartSchema } from './start.types';
 
 export type TSignUpStartMachine = typeof SignUpStartMachine;
@@ -18,7 +17,7 @@ export const SignUpStartMachineId = 'SignUpStart';
 
 export const SignUpStartMachine = setup({
   actors: {
-    attempt: fromPromise<SignUpResource, { parent: ActorRefFrom<TSignUpRouterMachine>; fields: FormFields }>(
+    attempt: fromPromise<SignUpResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const params = fieldsToSignUpParams(fields);
         return parent.getSnapshot().context.clerk.client.signUp.create(params);
@@ -27,6 +26,8 @@ export const SignUpStartMachine = setup({
     thirdParty: ThirdPartyMachine,
   },
   actions: {
+    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
+    sendToLoading,
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -37,8 +38,6 @@ export const SignUpStartMachine = setup({
         };
       },
     ),
-    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
-    sendToLoading,
   },
   guards: {
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
@@ -48,7 +47,7 @@ export const SignUpStartMachine = setup({
   id: SignUpStartMachineId,
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
-    formRef: input.form,
+    formRef: input.formRef,
     parent: input.parent,
     loadingStep: 'start',
   }),

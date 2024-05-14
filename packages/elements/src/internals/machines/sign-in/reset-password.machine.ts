@@ -1,5 +1,5 @@
 import type { SignInResource } from '@clerk/types';
-import type { ActorRefFrom, DoneActorEvent } from 'xstate';
+import type { DoneActorEvent } from 'xstate';
 import { fromPromise, sendTo, setup } from 'xstate';
 
 import type { FormFields } from '~/internals/machines/form';
@@ -7,7 +7,7 @@ import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
 import type { SignInResetPasswordSchema } from './reset-password.types';
-import type { TSignInRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 
 export type TSignInResetPasswordMachine = typeof SignInResetPasswordMachine;
 
@@ -15,7 +15,7 @@ export const SignInResetPasswordMachineId = 'SignInResetPasswordMachine';
 
 export const SignInResetPasswordMachine = setup({
   actors: {
-    attempt: fromPromise<SignInResource, { parent: ActorRefFrom<TSignInRouterMachine>; fields: FormFields }>(
+    attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const password = (fields.get('password')?.value as string) || '';
         return parent.getSnapshot().context.clerk.client.signIn.resetPassword({ password });
@@ -23,6 +23,9 @@ export const SignInResetPasswordMachine = setup({
     ),
   },
   actions: {
+    sendToLoading,
+    sendToNext: ({ context, event }) =>
+      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -33,9 +36,6 @@ export const SignInResetPasswordMachine = setup({
         };
       },
     ),
-    sendToLoading,
-    sendToNext: ({ context, event }) =>
-      context.parent.send({ type: 'NEXT', resource: (event as unknown as DoneActorEvent<SignInResource>).output }),
   },
   types: {} as SignInResetPasswordSchema,
 }).createMachine({
@@ -43,7 +43,7 @@ export const SignInResetPasswordMachine = setup({
   context: ({ input }) => ({
     loadingStep: 'reset-password',
     parent: input.parent,
-    formRef: input.form,
+    formRef: input.formRef,
   }),
   initial: 'Pending',
   states: {

@@ -1,3 +1,5 @@
+import type { TelemetryCollector } from 'telemetry';
+
 import type {
   Appearance,
   CreateOrganizationTheme,
@@ -11,6 +13,7 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomPage } from './customPages';
+import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
@@ -31,8 +34,6 @@ import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
-
-export type InstanceType = 'production' | 'development';
 
 export type SDKMetadata = {
   name: string;
@@ -115,6 +116,8 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  telemetry: TelemetryCollector | undefined;
 
   /**
    * Signs out the current user on single-session instances, or all users on multi-session instances

@@ -1,12 +1,18 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@2.3.0/schema.json",
+  "changelog": [
+    "./changelog.js",
+    {
+      "repo": "clerk/javascript"
+    }
+  ],
   "commit": false,
   "fixed": [],
   "linked": [],
   "access": "public",
   "baseBranch": "origin/main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@clerk/elements","gatsby-plugin-clerk"],
+  "ignore": ["gatsby-plugin-clerk"],
   "snapshot": {
     "useCalculatedVersion": true,
     "prereleaseTemplate": "{tag}.v{commit}"

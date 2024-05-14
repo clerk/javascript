@@ -1,5 +1,30 @@
 # Change Log
 
+## 2.0.2
+
+### Patch Changes
+
+- The following are all internal changes and not relevant to any end-user: ([#3341](https://github.com/clerk/javascript/pull/3341)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Add telemetry events for `useSignIn`, `useSignUp`, `useOrganizations` and `useOrganizationList`
+
+- The following are all internal changes and not relevant to any end-user: ([#3329](https://github.com/clerk/javascript/pull/3329)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Create type interface for `TelemetryCollector` on `@clerk/types`. This allows to assign `telemetry` on the main Clerk SDK object, while inheriting from the actual `TelemetryCollector` implementation.
+
+- Fix detection of legacy publishable keys when determining the default Clerk API URL. Previously, legacy keys would be treated as local. ([#3333](https://github.com/clerk/javascript/pull/3333)) by [@BRKalow](https://github.com/BRKalow)
+
+## 2.0.1
+
+### Patch Changes
+
+- Internal change to add client-side caching to Clerk's telemetry. This prevents event flooding in frequently executed code paths, such as for React hooks or components. Gracefully falls back to the old behavior if e.g. `localStorage` is not available. As such, no public API changes and user changes are required. ([#3287](https://github.com/clerk/javascript/pull/3287)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- The following are all internal changes and not relevant to any end-user: ([#3279](https://github.com/clerk/javascript/pull/3279)) by [@LekoArts](https://github.com/LekoArts)
+
+  - Rename the existing `eventComponentMounted` function inside `/telemetry` to `eventPrebuiltComponentMounted`. This better reflects that its `props` argument will be filtered for a relevant list for Clerk's prebuilt/all-in-one components.
+  - Reuse the now freed up `eventComponentMounted` name to create a new helper function that accepts a flat object for its `props` but doesn't filter any. This is useful for components that are not prebuilt.
+
 ## 2.0.0
 
 ### Major Changes

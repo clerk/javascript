@@ -1,0 +1,77 @@
+{
+  "name": "@clerk/testing",
+  "version": "1.0.3",
+  "description": "Utilities to help you create E2E test suites for apps using Clerk",
+  "keywords": [
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt",
+    "playwright",
+    "testing",
+    "e2e"
+  ],
+  "homepage": "https://clerk.com",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/testing"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "exports": {
+    "./playwright": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "playwright"
+  ],
+  "scripts": {
+    "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@clerk/shared": "2.0.2",
+    "@clerk/types": "4.2.1",
+    "dotenv": "16.4.5"
+  },
+  "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
+    "@playwright/test": "^1.43.1",
+    "@types/node": "^18.17.0",
+    "tsup": "*",
+    "typescript": "*"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1"
+  },
+  "peerDependenciesMeta": {
+    "@playwright/test": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

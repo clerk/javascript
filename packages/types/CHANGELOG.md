@@ -1,5 +1,27 @@
 # Change Log
 
+## 4.2.1
+
+### Patch Changes
+
+- The following are all internal changes and not relevant to any end-user: ([#3329](https://github.com/clerk/javascript/pull/3329)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Create type interface for `TelemetryCollector` on `@clerk/types`. This allows to assign `telemetry` on the main Clerk SDK object, while inheriting from the actual `TelemetryCollector` implementation.
+
+## 4.2.0
+
+### Minor Changes
+
+- Allow localization of text in social buttons when many are listed. ([#3282](https://github.com/clerk/javascript/pull/3282)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.1.0
+
+### Minor Changes
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
 ## 4.0.0
 
 ### Major Changes

@@ -247,7 +247,7 @@ describe('redirectUrls', () => {
   });
 
   describe('search params', () => {
-    it('appends only the preserved props', () => {
+    it('flattens and returns all params', () => {
       const redirectUrls = new RedirectUrls(
         {
           signInFallbackRedirectUrl: 'sign-in-fallback-redirect-url',
@@ -263,66 +263,33 @@ describe('redirectUrls', () => {
       );
 
       const params = redirectUrls.toSearchParams();
-      expect([...params.keys()].length).toBe(1);
+      expect([...params.keys()].length).toBe(3);
+      expect(params.get('sign_in_force_redirect_url')).toBe(
+        `${mockWindowLocation.href}props-sign-in-force-redirect-url`,
+      );
+      expect(params.get('sign_up_fallback_redirect_url')).toBe(
+        `${mockWindowLocation.href}search-param-sign-up-fallback-redirect-url`,
+      );
       expect(params.get('redirect_url')).toBe(`${mockWindowLocation.href}search-param-redirect-url`);
     });
   });
 
-  describe('append to url', () => {
-    it('does not append redirect urls from options to the url if the url is same origin', () => {
+  describe('preserved search params', () => {
+    it('does not return redirect urls if they are not in the preserved props array', () => {
       const redirectUrls = new RedirectUrls({
         signInFallbackRedirectUrl: 'sign-in-fallback-redirect-url',
         signUpFallbackRedirectUrl: 'sign-up-fallback-redirect-url',
       });
 
-      const url = redirectUrls.appendPreservedPropsToUrl('https://www.clerk.com');
-      expect(url).toBe('https://www.clerk.com/');
-    });
-
-    it('appends redirect urls from options to the url if the url is cross origin', () => {
-      const redirectUrls = new RedirectUrls({}, {}, { redirect_url: '/search-param-redirect-url' });
-
-      const url = redirectUrls.appendPreservedPropsToUrl('https://www.example.com');
-      expect(url).toContain('search-param-redirect-url');
-    });
-
-    it('overrides the existing search params', () => {
-      const redirectUrls = new RedirectUrls(
-        {
-          signInFallbackRedirectUrl: 'sign-in-fallback-redirect-url',
-          signUpFallbackRedirectUrl: 'sign-up-fallback-redirect-url',
-        },
-        {},
-        { redirect_url: '/search-param-redirect-url' },
-      );
-
-      const url = redirectUrls.appendPreservedPropsToUrl('https://www.example.com?redirect_url=existing');
-      expect(url).toBe(
-        'https://www.example.com/?redirect_url=existing#/?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fsearch-param-redirect-url',
-      );
+      const params = redirectUrls.getPreservedSearchParams();
+      expect([...params.keys()].length).toBe(0);
     });
 
     it('appends redirect urls from props to the url even if the url is same origin', () => {
       const redirectUrls = new RedirectUrls({}, {}, { redirect_url: '/search-param-redirect-url' });
 
-      const url = redirectUrls.appendPreservedPropsToUrl('https://www.clerk.com');
-      expect(url).toContain('search-param-redirect-url');
-    });
-
-    it('does not append redirect urls from props to the url if the url is same origin if they match the options urls', () => {
-      const redirectUrls = new RedirectUrls(
-        {
-          signInFallbackRedirectUrl: 'sign-in-fallback-redirect-url',
-          signUpFallbackRedirectUrl: 'sign-up-fallback-redirect-url',
-        },
-        {
-          signInFallbackRedirectUrl: 'sign-in-fallback-redirect-url',
-          signUpFallbackRedirectUrl: 'sign-up-fallback-redirect-url',
-        },
-      );
-
-      const url = redirectUrls.appendPreservedPropsToUrl('https://www.clerk.com');
-      expect(url).toBe('https://www.clerk.com/');
+      const params = redirectUrls.getPreservedSearchParams();
+      expect(params.get('redirect_url')).toContain('search-param-redirect-url');
     });
   });
 });

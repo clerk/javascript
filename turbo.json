@@ -21,7 +21,9 @@
     "NPM_VERSION",
     "TZ",
     "VERCEL",
-    "VITE_CLERK_*"
+    "VITE_CLERK_*",
+    "EXPO_PUBLIC_CLERK_*",
+    "REACT_APP_CLERK_*"
   ],
   "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
   "pipeline": {

@@ -3,7 +3,7 @@ import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
 
-import type { TSignInRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 
 // ---------------------------------- Tags ---------------------------------- //
 
@@ -18,8 +18,8 @@ export type SignInResetPasswordEvents = ErrorActorEvent | SignInResetPasswordSub
 // ---------------------------------- Input ---------------------------------- //
 
 export type SignInResetPasswordInput = {
-  form: ActorRefFrom<typeof FormMachine>;
-  parent: ActorRefFrom<TSignInRouterMachine>;
+  formRef: ActorRefFrom<typeof FormMachine>;
+  parent: SignInRouterMachineActorRef;
 };
 
 // ---------------------------------- Context ---------------------------------- //
@@ -28,7 +28,7 @@ export interface SignInResetPasswordContext {
   error?: Error | ClerkAPIResponseError;
   formRef: ActorRefFrom<typeof FormMachine>;
   loadingStep: 'reset-password';
-  parent: ActorRefFrom<TSignInRouterMachine>;
+  parent: SignInRouterMachineActorRef;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

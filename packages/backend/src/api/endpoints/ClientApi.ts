@@ -12,7 +12,7 @@ export class ClientAPI extends AbstractAPI {
     return this.request<PaginatedResourceResponse<Client[]>>({
       method: 'GET',
       path: basePath,
-      queryParams: params,
+      queryParams: { ...params, paginated: true },
     });
   }
 

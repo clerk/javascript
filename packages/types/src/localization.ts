@@ -25,6 +25,7 @@ type _LocalizationResource = {
     [r: string]: LocalizationValue;
   };
   socialButtonsBlockButton: LocalizationValue;
+  socialButtonsBlockButtonManyInView: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
@@ -115,6 +116,10 @@ type _LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
         subtitleNewTab: LocalizationValue;
+      };
+      clientMismatch: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
       };
     };
     emailCode: {
@@ -217,6 +222,10 @@ type _LocalizationResource = {
         subtitle: LocalizationValue;
       };
       expired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      clientMismatch: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };

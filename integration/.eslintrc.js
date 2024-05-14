@@ -9,7 +9,7 @@ const disabledRules = {
 module.exports = {
   root: true,
   ignorePatterns: ['!.*.js', '*.snap', 'templates/**'],
-  extends: ['custom/node', 'custom/typescript', 'custom/playwright'],
+  extends: ['@clerk/custom/node', '@clerk/custom/typescript', '@clerk/custom/playwright'],
   rules: {
     ...disabledRules,
   },

@@ -8,16 +8,16 @@ import { SignUpNavigate } from './navigate';
 import type { SignUpResendProps } from './resend';
 import { SignUpResend } from './resend';
 
-export type SignUpActionProps = { asChild?: boolean } & (
-  | ({
-      navigate: SignUpNavigateProps['to'];
-      resend?: never;
-      submit?: never;
-      className?: string;
-    } & Omit<SignUpNavigateProps, 'to'>)
-  | ({ navigate?: never; resend?: never; submit: true } & FormSubmitProps)
-  | ({ navigate?: never; resend: true; submit: never; className?: string } & SignUpResendProps)
-);
+export type SignUpActionProps = { asChild?: boolean } & FormSubmitProps &
+  (
+    | ({
+        navigate: SignUpNavigateProps['to'];
+        resend?: never;
+        submit?: never;
+      } & Omit<SignUpNavigateProps, 'to'>)
+    | { navigate?: never; resend?: never; submit: true }
+    | ({ navigate?: never; resend: true; submit?: never } & SignUpResendProps)
+  );
 
 /**
  * Perform various actions during the sign-in process. This component is used to navigate between steps, submit the form, or resend a verification codes.
@@ -28,16 +28,13 @@ export type SignUpActionProps = { asChild?: boolean } & (
  * @param {Function} [fallback] - Only used when `resend` is `true`. If provided, the fallback markup will be rendered before the resend delay has expired.
  *
  * @example
- * import { Action } from '@clerk/elements/sign-up';
- * <Action navigate="start">Go Back</Action>
+ * <SignUp.Action navigate="start">Go Back</SignUp.Action>
  *
  * @example
- * import { Action } from '@clerk/elements/sign-up';
- * <Action submit>Sign Up</Action>
+ * <SignUp.Action submit>Sign Up</SignUp.Action>
  *
  * @example
- * import { Action } from '@clerk/elements/sign-up';
- * <Action resend>Resend</Action>
+ * <SignUp.Action resend>Resend</SignUp.Action>
  */
 
 export const SignUpAction = React.forwardRef<React.ElementRef<'button'>, SignUpActionProps>((props, forwardedRef) => {

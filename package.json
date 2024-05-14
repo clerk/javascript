@@ -71,7 +71,6 @@
     "cross-spawn": "^7.0.3",
     "dotenv": "^16.3.1",
     "eslint": "^8.49.0",
-    "eslint-config-custom": "*",
     "execa": "^5.1.1",
     "expect-type": "^0.16.0",
     "fastify": "4.12.0",

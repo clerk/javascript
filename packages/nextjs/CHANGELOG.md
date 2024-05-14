@@ -1,5 +1,66 @@
 # Change Log
 
+## 5.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`b92402258`](https://github.com/clerk/javascript/commit/b924022580569c934a9d33310449b4a50156070a)]:
+  - @clerk/backend@1.1.3
+
+## 5.0.7
+
+### Patch Changes
+
+- Fix a bug where response headers from `@clerk/backend` would not be applied to the response when a redirect was triggered from a custom middleware handler. ([#3344](https://github.com/clerk/javascript/pull/3344)) by [@BRKalow](https://github.com/BRKalow)
+
+- Pass `devBrowserToken` to `createRedirect()` to ensure methods from `auth()` that trigger redirects correctly pass the dev browser token for URL-based session syncing. ([#3334](https://github.com/clerk/javascript/pull/3334)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`39265d909`](https://github.com/clerk/javascript/commit/39265d90941c850fd1b24295b19b904a5f3eaba6), [`4f4375e88`](https://github.com/clerk/javascript/commit/4f4375e88fa2daae4d725c62da5e4cf29302e53c), [`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`4ae79af36`](https://github.com/clerk/javascript/commit/4ae79af36552aae1f0284ecc4dfcfc23ef295d26), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/clerk-react@5.0.4
+  - @clerk/backend@1.1.2
+  - @clerk/shared@2.0.2
+
+## 5.0.6
+
+### Patch Changes
+
+- Notify users when catch-all route and all of its children routes are being protected by the middleware ([#3311](https://github.com/clerk/javascript/pull/3311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Update docs links to point to the correct pages ([#3312](https://github.com/clerk/javascript/pull/3312)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+## 5.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`e93b5777b`](https://github.com/clerk/javascript/commit/e93b5777b4f8578e6a6f81566e2601ab0e65590a)]:
+  - @clerk/clerk-react@5.0.3
+
+## 5.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`8fbe23857`](https://github.com/clerk/javascript/commit/8fbe23857bc588a4662af78ee33b24123cd8bc2e), [`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc), [`e79d2e3d3`](https://github.com/clerk/javascript/commit/e79d2e3d3be02eb1cf8b2647ac179cc5d4aa2de2)]:
+  - @clerk/backend@1.1.1
+  - @clerk/shared@2.0.1
+  - @clerk/clerk-react@5.0.2
+
+## 5.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`b3fda50f0`](https://github.com/clerk/javascript/commit/b3fda50f03672106c6858219fc607d226851ec10), [`b3ad7a459`](https://github.com/clerk/javascript/commit/b3ad7a459c46be1f8967faf73c2cdd96406593c8), [`4e5de1164`](https://github.com/clerk/javascript/commit/4e5de1164d956c7dc21f72d25e312296d36504a7)]:
+  - @clerk/backend@1.1.0
+
+## 5.0.2
+
+### Patch Changes
+
+- Export all Webhook event types and related JSON types. The newly exported types are: `DeletedObjectJSON`, `EmailJSON`, `OrganizationInvitationJSON`, `OrganizationJSON`, `OrganizationMembershipJSON`, `SessionJSON`, `SMSMessageJSON`, `UserJSON`, `UserWebhookEvent`, `EmailWebhookEvent`, `SMSWebhookEvent`, `SessionWebhookEvent`, `OrganizationWebhookEvent`, `OrganizationMembershipWebhookEvent`, `OrganizationInvitationWebhookEvent` ([#3248](https://github.com/clerk/javascript/pull/3248)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`3c6e5a6f1`](https://github.com/clerk/javascript/commit/3c6e5a6f1dd0ac198e6e48d1b83c6d4846a7f900), [`65503dcb9`](https://github.com/clerk/javascript/commit/65503dcb97acb9538e5c0e3f8199d20ad31c9d7d)]:
+  - @clerk/backend@1.0.1
+  - @clerk/clerk-react@5.0.1
+
 ## 5.0.1
 
 ### Patch Changes

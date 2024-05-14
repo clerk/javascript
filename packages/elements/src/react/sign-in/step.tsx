@@ -1,13 +1,16 @@
+import { useClerk } from '@clerk/clerk-react';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
+
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 
-import type { SignInChooseStrategyProps } from '../choose-strategy';
-import { SignInChooseStrategy, SignInForgotPassword } from '../choose-strategy';
-import type { SignInStartProps } from '../start';
-import { SignInStart } from '../start';
-import type { SignInVerificationsProps } from '../verifications';
-import { SignInVerifications } from '../verifications';
+import type { SignInChooseStrategyProps } from './choose-strategy';
+import { SignInChooseStrategy, SignInForgotPassword } from './choose-strategy';
 import type { SignInResetPasswordProps } from './reset-password';
 import { SignInResetPassword } from './reset-password';
+import type { SignInStartProps } from './start';
+import { SignInStart } from './start';
+import type { SignInVerificationsProps } from './verifications';
+import { SignInVerifications } from './verifications';
 
 export const SIGN_IN_STEPS = {
   start: 'start',
@@ -31,32 +34,22 @@ export type SignInStepProps =
  *
  * You typically want to place fields like username, password, or social providers in the `'start'` step. The `'verifications'` step is used to verify the user's credentials like password or MFA. Once the user has been verified, the sign-in attempt will be completed.
  *
- * @param {string} props.name - Step name. Use `'start'`, `'verifications'`, `'choose-strategy'`, or `'forgot-password'`.
+ * @param {string} name - Step name. Use `'start'`, `'verifications'`, `'choose-strategy'`, `'reset-password'`, or `'forgot-password'`.
  *
  * @example
- * <SignIn>
- *  <Step name='start'>
- *    Continue with Google
- *  </Step>
- *  <Step name='verifications'>
- *    Verify with email code
- *    <Action navigate='choose-strategy'>
- *      Use a different method
- *    </Action>
- *  </Step>
- *  <Step name='choose-strategy'>
- *    <SocialProvider name='github'>
- *      Continue with GitHub
- *    </SocialProvider>
- *  </Step>
- *  <Step name='forgot-password'>
- *    <SocialProvider name='github'>
- *      Continue with GitHub
- *    </SocialProvider>
- *  </Step>
- * </SignIn>
+ * <SignIn.Root>
+ *  <SignIn.Step name='start' />
+ *  <SignIn.Step name='verifications' />
+ *  <SignIn.Step name='choose-strategy' />
+ *  <SignIn.Step name='forgot-password' />
+ *  <SignIn.Step name='reset-password' />
+ * </SignIn.Root>
  */
 export function SignInStep(props: SignInStepProps) {
+  const clerk = useClerk();
+
+  clerk.telemetry?.record(eventComponentMounted('Elements_SignInStep', { name: props.name }));
+
   switch (props.name) {
     case SIGN_IN_STEPS['start']:
       return <SignInStart {...props} />;

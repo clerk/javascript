@@ -1,5 +1,35 @@
 # Change Log
 
+## 2.3.1
+
+### Patch Changes
+
+- feat(localizations): Update PL translations ([#3342](https://github.com/clerk/javascript/pull/3342)) by [@dawid-grabowski](https://github.com/dawid-grabowski)
+
+- Add some phrases to it-IT localization ([#3314](https://github.com/clerk/javascript/pull/3314)) by [@ugoborghetti](https://github.com/ugoborghetti)
+
+## 2.3.0
+
+### Minor Changes
+
+- Allow localization of text in social buttons when many are listed. ([#3282](https://github.com/clerk/javascript/pull/3282)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.2.0
+
+### Minor Changes
+
+- Drop `react` and `react-dom` as peer dependencies since they are not necessary for this package. ([#3273](https://github.com/clerk/javascript/pull/3273)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.1.0
+
+### Minor Changes
+
+- Replace "email ID" with "email address" in `en-US.ts` for `signIn.forgotPassword.subtitle_email` ([#3242](https://github.com/clerk/javascript/pull/3242)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
 ## 2.0.0
 
 ### Major Changes

@@ -11,6 +11,7 @@ import type {
   UserOrganizationInvitationResource,
 } from '@clerk/types';
 
+import { eventMethodCalled } from '../../telemetry/events/method-called';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -98,6 +99,8 @@ export const useOrganizationList: UseOrganizationList = params => {
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
+
+  clerk.telemetry?.record(eventMethodCalled('useOrganizationList'));
 
   const userMembershipsParams =
     typeof userMemberships === 'undefined'

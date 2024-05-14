@@ -203,74 +203,76 @@ export default function SignInPage() {
           </div>
         </SignIn.Step>
 
-        <SignIn.Step name='choose-strategy'>
-          <div className='flex flex-col items-center gap-6 w-96'>
-            <H3>CHOOSE STRATEGY:</H3>
+        <SignIn.Step
+          name='choose-strategy'
+          className='flex flex-col items-center gap-6 w-96'
+        >
+          <H3>CHOOSE STRATEGY:</H3>
 
-            <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
-            <CustomProvider provider='google'>Continue with Google</CustomProvider>
-            <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
+          <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+          <CustomProvider provider='google'>Continue with Google</CustomProvider>
+          <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='password'
-            >
-              <Button>Password</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='password'
+          >
+            <Button>Password</Button>
+          </SignIn.SupportedStrategy>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='phone_code'
-            >
-              <Button>Send a code to your phone</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='phone_code'
+          >
+            <Button>Send a code to your phone</Button>
+          </SignIn.SupportedStrategy>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='email_code'
-            >
-              <Button>Send a code to your email</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='email_code'
+          >
+            <Button>Send a code to your email</Button>
+          </SignIn.SupportedStrategy>
 
-            <SignIn.Action
-              asChild
-              navigate='previous'
-            >
-              <TextButton>Go back</TextButton>
-            </SignIn.Action>
-          </div>
+          <SignIn.Action
+            asChild
+            navigate='previous'
+          >
+            <TextButton>Go back</TextButton>
+          </SignIn.Action>
         </SignIn.Step>
 
-        <SignIn.Step name='forgot-password'>
-          <div className='flex flex-col items-center gap-6 w-96'>
-            <H3>FORGOT PASSWORD:</H3>
+        <SignIn.Step
+          name='forgot-password'
+          className='flex flex-col items-center gap-6 w-96'
+        >
+          <H3>FORGOT PASSWORD:</H3>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='reset_password_email_code'
-            >
-              <Button>Reset your password via Email</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='reset_password_email_code'
+          >
+            <Button>Reset your password via Email</Button>
+          </SignIn.SupportedStrategy>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='reset_password_phone_code'
-            >
-              <Button>Reset your password via Phone</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='reset_password_phone_code'
+          >
+            <Button>Reset your password via Phone</Button>
+          </SignIn.SupportedStrategy>
 
-            <p>Or</p>
+          <p>Or</p>
 
-            <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
-            <CustomProvider provider='google'>Continue with Google</CustomProvider>
+          <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+          <CustomProvider provider='google'>Continue with Google</CustomProvider>
 
-            <SignIn.Action
-              asChild
-              navigate='previous'
-            >
-              <TextButton>Go back</TextButton>
-            </SignIn.Action>
-          </div>
+          <SignIn.Action
+            asChild
+            navigate='previous'
+          >
+            <TextButton>Go back</TextButton>
+          </SignIn.Action>
         </SignIn.Step>
 
         <SignIn.Step name='verifications'>

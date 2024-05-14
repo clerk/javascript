@@ -15,7 +15,7 @@ import {
   setDevBrowserJWTInURL,
   stripScheme,
 } from '@clerk/shared';
-import { eventComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
+import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   __experimental_AuthenticateWithGoogleOneTapParams,
   ActiveSessionResource,
@@ -39,6 +39,7 @@ import type {
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
+  RedirectOptions,
   Resources,
   SDKMetadata,
   SetActiveParams,
@@ -118,7 +119,6 @@ export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 declare global {
   interface Window {
     Clerk?: Clerk;
-    __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: ClerkInterface['proxyUrl'];
     __clerk_domain?: ClerkInterface['domain'];
@@ -154,7 +154,7 @@ export class Clerk implements ClerkInterface {
   public organization: OrganizationResource | null | undefined;
   public user: UserResource | null | undefined;
   public __internal_country?: string | null;
-  public telemetry?: TelemetryCollector;
+  public telemetry: TelemetryCollector | undefined;
 
   protected internal_last_error: ClerkAPIError | null = null;
 
@@ -451,7 +451,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(eventComponentMounted('SignIn', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('SignIn', props));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
@@ -475,7 +475,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
     // TODO-ONETAP: Enable telemetry one feature is ready for public beta
-    // this.telemetry?.record(eventComponentMounted('GoogleOneTap', props));
+    // this.telemetry?.record(eventPrebuiltComponentMounted('GoogleOneTap', props));
   };
 
   public __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
@@ -497,7 +497,7 @@ export class Clerk implements ClerkInterface {
         props,
       }),
     );
-    this.telemetry?.record(eventComponentMounted('SignUp', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('SignUp', props));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
@@ -528,7 +528,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('UserProfile', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('UserProfile', props));
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
@@ -550,7 +550,8 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    if (noOrganizationExists(this)) {
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
           code: 'cannot_render_organization_missing',
@@ -567,7 +568,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('OrganizationProfile', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationProfile', props));
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
@@ -598,7 +599,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('CreateOrganization', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('CreateOrganization', props));
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
@@ -629,7 +630,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('OrganizationSwitcher', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationSwitcher', props));
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
@@ -656,7 +657,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('OrganizationList', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationList', props));
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
@@ -675,7 +676,7 @@ export class Clerk implements ClerkInterface {
       }),
     );
 
-    this.telemetry?.record(eventComponentMounted('UserButton', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props));
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
@@ -828,19 +829,20 @@ export class Clerk implements ClerkInterface {
 
     return setDevBrowserJWTInURL(toURL, devBrowserJwt).href;
   }
-
   public buildSignInUrl(options?: SignInRedirectOptions): string {
-    return this.#buildUrl('signInUrl', {
-      ...options?.initialValues,
-      redirect_url: options?.redirectUrl || window.location.href,
-    });
+    return this.#buildUrl(
+      'signInUrl',
+      { ...options, redirectUrl: options?.redirectUrl || window.location.href },
+      options?.initialValues,
+    );
   }
 
   public buildSignUpUrl(options?: SignUpRedirectOptions): string {
-    return this.#buildUrl('signUpUrl', {
-      ...options?.initialValues,
-      redirect_url: options?.redirectUrl || window.location.href,
-    });
+    return this.#buildUrl(
+      'signUpUrl',
+      { ...options, redirectUrl: options?.redirectUrl || window.location.href },
+      options?.initialValues,
+    );
   }
 
   public buildUserProfileUrl(): string {
@@ -981,6 +983,8 @@ export class Clerk implements ClerkInterface {
     const verificationStatus = getClerkQueryParam('__clerk_status');
     if (verificationStatus === 'expired') {
       throw new EmailLinkError(EmailLinkErrorCode.Expired);
+    } else if (verificationStatus === 'client_mismatch') {
+      throw new EmailLinkError(EmailLinkErrorCode.ClientMismatch);
     } else if (verificationStatus !== 'verified') {
       throw new EmailLinkError(EmailLinkErrorCode.Failed);
     }
@@ -1739,13 +1743,19 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  #buildUrl = (key: 'signInUrl' | 'signUpUrl', params?: Record<string, string>): string => {
+  #buildUrl = (
+    key: 'signInUrl' | 'signUpUrl',
+    options: RedirectOptions,
+    _initValues?: Record<string, string>,
+  ): string => {
     if (!key || !this.loaded || !this.#environment || !this.#environment.displayConfig) {
       return '';
     }
     const signInOrUpUrl = this.#options[key] || this.#environment.displayConfig[key];
-    const redirectUrls = new RedirectUrls(this.#options, params);
-    return this.buildUrlWithAuth(redirectUrls.appendPreservedPropsToUrl(signInOrUpUrl, params));
+    const redirectUrls = new RedirectUrls(this.#options, options).toSearchParams();
+    const initValues = new URLSearchParams(_initValues || {});
+    const url = buildURL({ base: signInOrUpUrl, hashSearchParams: [initValues, redirectUrls] }, { stringify: true });
+    return this.buildUrlWithAuth(url);
   };
 
   assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {

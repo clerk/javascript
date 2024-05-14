@@ -97,10 +97,19 @@ export const createUserService = (clerkClient: ClerkClient) => {
       });
     },
     deleteIfExists: async (opts: { id?: string; email?: string }) => {
-      const id = opts.id || (await clerkClient.users.getUserList({ emailAddress: [opts.email] }))[0]?.id;
-      if (id) {
-        await clerkClient.users.deleteUser(id);
+      let id = opts.id;
+
+      if (!id) {
+        const { data: users } = await clerkClient.users.getUserList({ emailAddress: [opts.email] });
+        id = users[0]?.id;
       }
+
+      if (!id) {
+        console.log(`User "${opts.email}" does not exist!`);
+        return;
+      }
+
+      await clerkClient.users.deleteUser(id);
     },
     createFakeOrganization: async userId => {
       const name = faker.animal.dog();

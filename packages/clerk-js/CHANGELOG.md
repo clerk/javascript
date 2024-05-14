@@ -1,5 +1,92 @@
 # Change Log
 
+## 5.2.4
+
+### Patch Changes
+
+- Fix a bug where client_uat domain detection would not handle hostnames with a single part. This impacts locally defined custom hostnames used as aliases. ([#3357](https://github.com/clerk/javascript/pull/3357)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fix Cypress setting cookies as third-party ([#3245](https://github.com/clerk/javascript/pull/3245)) by [@anagstef](https://github.com/anagstef)
+
+## 5.2.3
+
+### Patch Changes
+
+- Fix Smart CAPTCHA on ticket flow ([#3351](https://github.com/clerk/javascript/pull/3351)) by [@anagstef](https://github.com/anagstef)
+
+## 5.2.2
+
+### Patch Changes
+
+- Fix UI for Phone Input and OTP inputs ([#3302](https://github.com/clerk/javascript/pull/3302)) by [@octoper](https://github.com/octoper)
+
+- Specify an explicit domain when setting the client_uat cookie. This ensures there are no duplicate cookie issues when also receiving cookies from the API. ([#3318](https://github.com/clerk/javascript/pull/3318)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`df4525f87`](https://github.com/clerk/javascript/commit/df4525f878012f2bb03c3714cfb813740c95050c), [`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`9d7a79841`](https://github.com/clerk/javascript/commit/9d7a79841c4832b34f5e6b968961fe8f5320c4d4), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/localizations@2.3.1
+  - @clerk/shared@2.0.2
+  - @clerk/types@4.2.1
+
+## 5.2.1
+
+### Patch Changes
+
+- Fixes issue where email field is required but is not shown after user tries to edit email, when already tried another email before when trying to sign up with a method that not provides and email (e.g Metamask) ([#3291](https://github.com/clerk/javascript/pull/3291)) by [@octoper](https://github.com/octoper)
+
+## 5.2.0
+
+### Minor Changes
+
+- Allow localization of text in social buttons when many are listed. ([#3282](https://github.com/clerk/javascript/pull/3282)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Allow users to display the email address field after selecting to input a phone number. Previously that was not possible when passkeys were enabled. ([#3286](https://github.com/clerk/javascript/pull/3286)) by [@panteliselef](https://github.com/panteliselef)
+
+- Avoid throwing error for missing an active organization when no user is signed in ([#3290](https://github.com/clerk/javascript/pull/3290)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use default value for `signIn.userData`. This will prevent the SignIn modal from breaking when an appearance prop is used in Next.js App Router. ([#3280](https://github.com/clerk/javascript/pull/3280)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove deprecated `__clerk_frontend_api` from `Window` interface ([#3288](https://github.com/clerk/javascript/pull/3288)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`c7d626292`](https://github.com/clerk/javascript/commit/c7d626292a9fd12ca0f1b31a1035e711b6e99531), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc)]:
+  - @clerk/shared@2.0.1
+  - @clerk/localizations@2.3.0
+  - @clerk/types@4.2.0
+
+## 5.1.1
+
+### Patch Changes
+
+- Default to text type for all inputs. This resolved inconsistencies with `@tailwindcss/forms`. ([#3260](https://github.com/clerk/javascript/pull/3260)) by [@desiprisg](https://github.com/desiprisg)
+
+- Prevent form submission for deleting user account when confirmation value is incorrect but submisssion is triggered via an "Enter" keystroke. ([#3265](https://github.com/clerk/javascript/pull/3265)) by [@panteliselef](https://github.com/panteliselef)
+
+- Set the card error when encountering an error on preparing verification via code for email or phone on sign up. ([#3256](https://github.com/clerk/javascript/pull/3256)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`0a825dcc4`](https://github.com/clerk/javascript/commit/0a825dcc4ec5743819503afed20bf3d8229f6d6f)]:
+  - @clerk/localizations@2.2.0
+
+## 5.1.0
+
+### Minor Changes
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
+### Patch Changes
+
+- Check if any legacy properties have value before displaying a warning ([#3254](https://github.com/clerk/javascript/pull/3254)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Hide "Create Organization" in <OrganizationList/> when it's disabled for user ([#3249](https://github.com/clerk/javascript/pull/3249)) by [@dimkl](https://github.com/dimkl)
+
+- Warn when a legacy redirect prop is being shadowed by "fallbackRedirectUrl" or "forceRedirectUrl" by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`de1d75d1a`](https://github.com/clerk/javascript/commit/de1d75d1acab452ad2b7c533053f45d2e0ec66cc), [`956d8792f`](https://github.com/clerk/javascript/commit/956d8792fefe9d6a89022f1e938149b25503ec7f)]:
+  - @clerk/localizations@2.1.0
+  - @clerk/types@4.1.0
+
 ## 5.0.0
 
 ### Major Changes

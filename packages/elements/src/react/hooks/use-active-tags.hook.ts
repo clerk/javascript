@@ -2,7 +2,7 @@ import { useSelector } from '@xstate/react';
 import type { ActorRef, AnyActorRef, AnyMachineSnapshot, MachineSnapshot } from 'xstate';
 
 type TaggedActor<TActor extends AnyActorRef> = TActor extends ActorRef<
-  MachineSnapshot<any, any, any, any, infer TTags, any>,
+  MachineSnapshot<any, any, any, any, infer TTags, any, any>,
   any
 >
   ? TTags
