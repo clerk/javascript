@@ -10,6 +10,7 @@ import type {
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
   BaseRouterRedirectEvent,
+  BaseRouterResetEvent,
   BaseRouterSetClerkEvent,
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
@@ -54,6 +55,7 @@ export type SignInRouterForgotPasswordEvent = { type: 'NAVIGATE.FORGOT_PASSWORD'
 export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
+export type SignInRouterResetEvent = BaseRouterResetEvent;
 export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'reset-password'>;
 export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
@@ -77,6 +79,7 @@ export type SignInRouterEvents =
   | SignInRouterErrorEvent
   | SignInRouterTransferEvent
   | SignInRouterRedirectEvent
+  | SignInRouterResetEvent
   | SignInVerificationFactorUpdateEvent
   | SignInRouterLoadingEvent
   | SignInRouterSetClerkEvent
