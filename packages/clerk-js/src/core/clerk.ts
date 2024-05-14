@@ -86,7 +86,7 @@ import {
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
-import { SessionCookieService } from './auth/SessionCookieService';
+import { AuthCookieService } from './auth/AuthCookieService';
 import { CLERK_SATELLITE_URL, CLERK_SYNCED, ERROR_CODES } from './constants';
 import {
   clerkErrorInitFailed,
@@ -159,7 +159,7 @@ export class Clerk implements ClerkInterface {
   #publishableKey: string = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
-  #authService: SessionCookieService | null = null;
+  #authService: AuthCookieService | null = null;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
@@ -1517,7 +1517,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    this.#authService = new SessionCookieService(this, this.#fapiClient);
+    this.#authService = new AuthCookieService(this, this.#fapiClient);
 
     /**
      * 1. Multi-domain SSO handling

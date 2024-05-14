@@ -13,9 +13,9 @@ import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
-// TODO: make SessionCookieService singleton since it handles updating cookies using a poller
+// TODO: make AuthCookieService singleton since it handles updating cookies using a poller
 // and we need to avoid updating them concurrently.
-export class SessionCookieService {
+export class AuthCookieService {
   private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
   private clientUat: ClientUatCookieHandler;
