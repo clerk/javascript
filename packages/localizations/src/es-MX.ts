@@ -47,10 +47,11 @@ export const esMX: LocalizationResource = {
   formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Has olvidado tu contraseña?',
   formFieldError__matchingPasswords: 'Las contraseñas coinciden.',
-  formFieldError__notMatchingPasswords: "Las no contraseñas coinciden.",
+  formFieldError__notMatchingPasswords: 'Las no contraseñas coinciden.',
   formFieldError__verificationLinkExpired: 'El link de verificación expiro. Porfavor vuelva a solicitarlo.',
   formFieldHintText__optional: 'Opcional',
-  formFieldHintText__slug: 'Un slug es una identificación legible por humanos que debe ser única. Se utiliza a menudo en URL.',
+  formFieldHintText__slug:
+    'Un slug es una identificación legible por humanos que debe ser única. Se utiliza a menudo en URL.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eliminar cuenta',
   formFieldInputPlaceholder__emailAddress: '',
@@ -208,7 +209,8 @@ export const esMX: LocalizationResource = {
     },
     removeDomainPage: {
       messageLine1: 'Se eliminará el dominio de correo electrónico {{domain}}.',
-      messageLine2: 'Los usuarios no podrán unirse a la organización de manera automática una vez que se haya eliminado.',
+      messageLine2:
+        'Los usuarios no podrán unirse a la organización de manera automática una vez que se haya eliminado.',
       successMessage: '{{domain}} se ha eliminado.',
       title: 'Eliminar dominio',
     },
@@ -252,9 +254,10 @@ export const esMX: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'Introduce el código de verificación enviado a su dirección de correo electrónico',
       formTitle: 'Código de verificación',
-      resendButton: "No recibiste un código? Reenviar",
+      resendButton: 'No recibiste un código? Reenviar',
       subtitle: 'El dominio {{domainName}} necesita ser verificado vía correo electrónico.',
-      subtitleVerificationCodeScreen: 'Se envió un código de verificación a {{emailAddress}}. Introduzca el código para continuar.',
+      subtitleVerificationCodeScreen:
+        'Se envió un código de verificación a {{emailAddress}}. Introduzca el código para continuar.',
       title: 'Verificar dominio',
     },
   },
@@ -340,7 +343,7 @@ export const esMX: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'Código para restablecer la contraseña',
-      resendButton: "No recibiste un código? Reenviar",
+      resendButton: 'No recibiste un código? Reenviar',
       subtitle: 'para restablecer tu contraseña',
       subtitle_email: 'Primero, introduce el código enviado a tu {{email}}',
       subtitle_phone: 'Primero, introduce el código enviado a tu {{phone}}',
@@ -384,7 +387,8 @@ export const esMX: LocalizationResource = {
     resetPassword: {
       formButtonPrimary: 'Restablecer contraseña',
       requiredMessage: 'Por razones de seguridad, es necesario restablecer su contraseña.',
-      successMessage: 'Tu contraseña se ha cambiado correctamente. Te estamos redirigiendo, por favor espera un momento.',
+      successMessage:
+        'Tu contraseña se ha cambiado correctamente. Te estamos redirigiendo, por favor espera un momento.',
       title: 'Establecer nueva contraseña',
     },
     resetPasswordMfa: {
@@ -683,7 +687,8 @@ export const esMX: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Se recomienda cerrar la sesión de todos los otros dispositivos que hayan utilizado su antigua contraseña.',
-      readonly: 'Tu contraseña no se puede editar actualmente porque solo se puede acceder a través de la conexión de empresa.',
+      readonly:
+        'Tu contraseña no se puede editar actualmente porque solo se puede acceder a través de la conexión de empresa.',
       successMessage__set: 'Se ha establecido tu contraseña.',
       successMessage__signOutOfOtherSessions: 'Se cerró la sesión de todos los demás dispositivos.',
       successMessage__update: 'Tu contraseña ha sido actualizada.',
