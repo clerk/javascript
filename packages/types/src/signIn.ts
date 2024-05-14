@@ -1,3 +1,4 @@
+import type { __experimental_AuthenticateWithGoogleOneTapParams } from './clerk';
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -99,7 +100,7 @@ export interface SignInResource extends ClerkResource {
   createMagicLinkFlow: () => CreateMagicLinkFlowReturn<SignInStartMagicLinkFlowParams, SignInResource>;
 
   /**
-   * @experimental
+   * @deprecated Use `Clerk.__experimental_authenticateWithGoogleOneTap`
    */
   __experimental_authenticateWithGoogleOneTap: (
     params: __experimental_AuthenticateWithGoogleOneTapParams,
@@ -219,10 +220,6 @@ export type ResetPasswordParams = {
 export interface SignInStartMagicLinkFlowParams extends StartMagicLinkFlowParams {
   emailAddressId: string;
 }
-
-export type __experimental_AuthenticateWithGoogleOneTapParams = {
-  token: string;
-};
 
 export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams {
   emailAddressId: string;

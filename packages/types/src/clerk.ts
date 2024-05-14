@@ -18,6 +18,8 @@ import type { OrganizationResource } from './organization';
 import type { OrganizationInvitationResource } from './organizationInvitation';
 import type { MembershipRole, OrganizationMembershipResource } from './organizationMembership';
 import type { ActiveSessionResource } from './session';
+import type { SignInResource } from './signIn';
+import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 import type { DeepPartial, DeepSnakeToCamel } from './utils';
 
@@ -423,6 +425,16 @@ export interface Clerk {
   redirectToHome: () => void;
 
   /**
+   * Completes an Google One Tap redirection flow started by
+   * {@link Clerk.__experimental_authenticateWithGoogleOneTap}
+   */
+  __experimental_handleGoogleOneTapCallback: (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes an OAuth or SAML redirection flow started by
    * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
@@ -453,6 +465,14 @@ export interface Clerk {
    * Authenticates user using their Metamask browser extension
    */
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
+
+  /**
+   * @experimental
+   * Authenticates user using a google token generated from google identity services.
+   */
+  __experimental_authenticateWithGoogleOneTap: (
+    params: __experimental_AuthenticateWithGoogleOneTapParams,
+  ) => Promise<SignInResource | SignUpResource>;
 
   /**
    * Creates an organization, adding the current user as admin.
@@ -685,8 +705,27 @@ export type SignInProps = {
   initialValues?: SignInInitialValues;
 } & RedirectOptions;
 
-export type OneTapProps = {
+type OneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
+
+export type OneTapProps = OneTapRedirectUrlProps & {
+  /**
+   * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
+   * @default true
+   */
   cancelOnTapOutside?: boolean;
+  /**
+   * Enables upgraded One Tap UX on ITP browsers.
+   * Turning this options off, would hide any One Tap UI in such browsers.
+   * @default true
+   */
+  itpSupport?: boolean;
+  /**
+   * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
+   * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
+   * Backwards compatible with browsers that still support third-party cookies.
+   * @default true
+   */
+  fedCmSupport?: boolean;
   appearance?: SignInTheme;
 };
 
@@ -1060,6 +1099,10 @@ export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+}
+
+export interface __experimental_AuthenticateWithGoogleOneTapParams {
+  token: string;
 }
 
 export interface LoadedClerk extends Clerk {

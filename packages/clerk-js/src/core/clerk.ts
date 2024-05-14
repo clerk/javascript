@@ -5,6 +5,7 @@ import {
   handleValueOrFn,
   inBrowser as inClientSide,
   is4xxError,
+  isClerkAPIResponseError,
   isHttpOrHttps,
   isLegacyFrontendApiKey,
   isValidBrowserOnline,
@@ -16,6 +17,7 @@ import {
   stripScheme,
 } from '@clerk/shared';
 import type {
+  __experimental_AuthenticateWithGoogleOneTapParams,
   ActiveSessionResource,
   AuthenticateWithMetamaskParams,
   BeforeEmitCallback,
@@ -966,14 +968,47 @@ export default class Clerk implements ClerkInterface {
     return null;
   };
 
-  public handleRedirectCallback = async (
-    params: HandleOAuthCallbackParams = {},
+  public __experimental_handleGoogleOneTapCallback = async (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ): Promise<unknown> => {
     if (!this.#isReady || !this.#environment || !this.client) {
       return;
     }
-    const { signIn, signUp } = this.client;
+    const { signIn: _signIn, signUp: _signUp } = this.client;
+
+    const signIn = 'identifier' in (signInOrUp || {}) ? (signInOrUp as SignInResource) : _signIn;
+    const signUp = 'missingFields' in (signInOrUp || {}) ? (signInOrUp as SignUpResource) : _signUp;
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function'
+        ? customNavigate(this.buildUrlWithAuth(to))
+        : this.navigate(this.buildUrlWithAuth(to));
+
+    return this._handleRedirectCallback(params, {
+      signUp,
+      signIn,
+      navigate,
+    });
+  };
+
+  private _handleRedirectCallback = async (
+    params: HandleOAuthCallbackParams,
+    {
+      signIn,
+      signUp,
+      navigate,
+    }: {
+      signIn: SignInResource;
+      signUp: SignUpResource;
+      navigate: (to: string) => Promise<unknown>;
+    },
+  ): Promise<unknown> => {
+    if (!this.loaded || !this.#environment || !this.client) {
+      return;
+    }
+
     const { displayConfig } = this.#environment;
     const { firstFactorVerification } = signIn;
     const { externalAccount } = signUp.verifications;
@@ -983,6 +1018,7 @@ export default class Clerk implements ClerkInterface {
       externalAccountStatus: externalAccount.status,
       externalAccountErrorCode: externalAccount.error?.code,
       externalAccountSessionId: externalAccount.error?.meta?.sessionId,
+      sessionId: signUp.createdSessionId,
     };
 
     const si = {
@@ -990,10 +1026,8 @@ export default class Clerk implements ClerkInterface {
       firstFactorVerificationStatus: firstFactorVerification.status,
       firstFactorVerificationErrorCode: firstFactorVerification.error?.code,
       firstFactorVerificationSessionId: firstFactorVerification.error?.meta?.sessionId,
+      sessionId: signIn.createdSessionId,
     };
-
-    const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     const makeNavigate = (to: string) => () => navigate(to);
 
@@ -1026,7 +1060,13 @@ export default class Clerk implements ClerkInterface {
 
     const navigateToContinueSignUp = makeNavigate(
       params.continueSignUpUrl ||
-        buildURL({ base: displayConfig.signUpUrl, hashPath: '/continue' }, { stringify: true }),
+        buildURL(
+          {
+            base: displayConfig.signUpUrl,
+            hashPath: '/continue',
+          },
+          { stringify: true },
+        ),
     );
 
     const navigateToNextStepSignUp = ({ missingFields }: { missingFields: SignUpField[] }) => {
@@ -1045,6 +1085,13 @@ export default class Clerk implements ClerkInterface {
         navigate,
       });
     };
+
+    if (si.status === 'complete') {
+      return this.setActive({
+        session: si.sessionId,
+        beforeEmit: navigateAfterSignIn,
+      });
+    }
 
     const userExistsButNeedsToSignIn =
       su.externalAccountStatus === 'transferable' && su.externalAccountErrorCode === 'external_account_exists';
@@ -1108,6 +1155,13 @@ export default class Clerk implements ClerkInterface {
       }
     }
 
+    if (su.status === 'complete') {
+      return this.setActive({
+        session: su.sessionId,
+        beforeEmit: navigateAfterSignUp,
+      });
+    }
+
     if (si.status === 'needs_second_factor') {
       return navigateToFactorTwo();
     }
@@ -1144,6 +1198,25 @@ export default class Clerk implements ClerkInterface {
     return navigateToSignIn();
   };
 
+  public handleRedirectCallback = async (
+    params: HandleOAuthCallbackParams = {},
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.loaded || !this.#environment || !this.client) {
+      return;
+    }
+    const { signIn, signUp } = this.client;
+
+    const navigate = (to: string) =>
+      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+
+    return this._handleRedirectCallback(params, {
+      signUp,
+      signIn,
+      navigate,
+    });
+  };
+
   public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
       return;
@@ -1157,6 +1230,29 @@ export default class Clerk implements ClerkInterface {
       this.#broadcastSignOutEvent();
     }
     return this.setActive({ session: null });
+  };
+
+  public __experimental_authenticateWithGoogleOneTap = async (
+    params: __experimental_AuthenticateWithGoogleOneTapParams,
+  ): Promise<SignInResource | SignUpResource> => {
+    return this.client?.signIn
+      .create({
+        // TODO-ONETAP: Add new types when feature is ready for public beta
+        // @ts-expect-error
+        strategy: 'google_one_tap',
+        googleOneTapToken: params.token,
+      })
+      .catch(err => {
+        if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
+          return this.client?.signUp.create({
+            // TODO-ONETAP: Add new types when feature is ready for public beta
+            // @ts-expect-error
+            strategy: 'google_one_tap',
+            googleOneTapToken: params.token,
+          });
+        }
+        throw err;
+      }) as Promise<SignInResource | SignUpResource>;
   };
 
   public authenticateWithMetamask = async ({
