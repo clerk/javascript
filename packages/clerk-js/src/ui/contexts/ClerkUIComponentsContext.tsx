@@ -518,8 +518,9 @@ export const useGoogleOneTapContext = () => {
   let signUpUrl = options.signUpUrl || displayConfig.signUpUrl;
   let signInUrl = options.signInUrl || displayConfig.signInUrl;
 
-  signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
-  signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
+  const preservedParams = redirectUrls.getPreservedSearchParams();
+  signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
   const signInForceRedirectUrl = redirectUrls.getAfterSignInUrl();
   const signUpForceRedirectUrl = redirectUrls.getAfterSignUpUrl();
