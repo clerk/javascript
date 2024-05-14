@@ -55,7 +55,6 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
         window.__clerk_internal_invalidateCachePromise = res;
         startTransition(() => {
           router.refresh();
-          router.push(window.location.href);
         });
       });
     };

@@ -728,6 +728,7 @@ export class Clerk implements ClerkInterface {
     const shouldSignOutSession = this.session && newSession === null;
     if (shouldSignOutSession) {
       this.#broadcastSignOutEvent();
+      removeSessionCookie();
     }
 
     await onBeforeSetActive();
