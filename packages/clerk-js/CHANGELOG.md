@@ -1,5 +1,62 @@
 # Change Log
 
+## 5.3.0
+
+### Minor Changes
+
+- Updates related to experimental Google One Tap support ([#3250](https://github.com/clerk/javascript/pull/3250)) by [@panteliselef](https://github.com/panteliselef)
+
+  - By default we are returning back to the location where the flow started.
+    To accomplish that internally we will use the redirect_url query parameter to build the url.
+
+  ```tsx
+  <__experimental_GoogleOneTap />
+  ```
+
+  - In the above example if there is a SIGN_UP_FORCE_REDIRECT_URL or SIGN_IN_FORCE_REDIRECT_URL set then the developer would need to pass new values as props like this
+
+  ```tsx
+  <__experimental_GoogleOneTap
+    signInForceRedirectUrl=''
+    signUpForceRedirectUrl=''
+  />
+  ```
+
+  - Let the developer configure the experience they want to offer. (All these values are true by default)
+
+  ```tsx
+  <__experimental_GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+  - Moved authenticateWithGoogleOneTap to Clerk singleton
+
+  ```ts
+  Clerk.__experimental_authenticateWithGoogleOneTap;
+  ```
+
+  - Created the handleGoogleOneTapCallback in Clerk singleton
+
+  ```ts
+  Clerk.__experimental_handleGoogleOneTapCallback;
+  ```
+
+- Introduce new `client_mismatch` verification status for email link sign-in and sign-up. This error (and its message) will be shown if a verification link was opened in another device/browser from which the user initiated the sign-in/sign-up attempt. This functionality needs to be enabled in the Clerk dashboard. ([#3367](https://github.com/clerk/javascript/pull/3367)) by [@mzhong9723](https://github.com/mzhong9723)
+
+### Patch Changes
+
+- Improve logging for CAPTCHA script loading errors ([#3374](https://github.com/clerk/javascript/pull/3374)) by [@anagstef](https://github.com/anagstef)
+
+- Respect the `signInForceRedirectUrl`, `signInFallbackRedirectUrl`, `signUpForceRedirectUrl` and `signUpFallbackRedirectUrl` props passed to `SignInButton`, `SignUpButton` and the low-level `window.Clerk.buildSignInUrl` & `window.Clerk.buildSignUpUrl` methods. These props allow you to control the redirect behavior of the `SignIn` and `SignUp` components. For more information, refer to the [Custom Redirects](https://clerk.com/docs/guides/custom-redirects) guide. ([#3361](https://github.com/clerk/javascript/pull/3361)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6f61130e3`](https://github.com/clerk/javascript/commit/6f61130e35a08298a715c170d2ee14d29d15bb58), [`94197710a`](https://github.com/clerk/javascript/commit/94197710a70381c4f1c460948ef02cd2a70b88bb), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20), [`201b28d37`](https://github.com/clerk/javascript/commit/201b28d37852b5a2681f8115d1898905e7956bc2), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20)]:
+  - @clerk/localizations@2.4.0
+  - @clerk/types@4.3.0
+  - @clerk/shared@2.1.0
+
 ## 5.2.4
 
 ### Patch Changes
