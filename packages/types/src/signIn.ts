@@ -1,3 +1,4 @@
+import type { __experimental_AuthenticateWithGoogleOneTapParams } from './clerk';
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -101,7 +102,7 @@ export interface SignInResource extends ClerkResource {
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   /**
-   * @experimental
+   * @deprecated Use `Clerk.__experimental_authenticateWithGoogleOneTap`
    */
   __experimental_authenticateWithGoogleOneTap: (
     params: __experimental_AuthenticateWithGoogleOneTapParams,
@@ -216,10 +217,6 @@ export type ResetPasswordParams = {
 
 export type AuthenticateWithPasskeyParams = {
   flow?: 'autofill' | 'discoverable';
-};
-
-export type __experimental_AuthenticateWithGoogleOneTapParams = {
-  token: string;
 };
 
 export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams {

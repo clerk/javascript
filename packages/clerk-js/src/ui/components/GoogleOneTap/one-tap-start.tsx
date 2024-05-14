@@ -1,46 +1,52 @@
 import { useClerk, useUser } from '@clerk/shared/react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import type { GISCredentialResponse } from '../../../utils/one-tap';
 import { loadGIS } from '../../../utils/one-tap';
-import { useCoreSignIn, useEnvironment, useGoogleOneTapContext } from '../../contexts';
+import { useEnvironment, useGoogleOneTapContext } from '../../contexts';
 import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useRouter } from '../../router';
 
 function _OneTapStart(): JSX.Element | null {
   const clerk = useClerk();
-  const signIn = useCoreSignIn();
   const { user } = useUser();
   const environment = useEnvironment();
+  const isPromptedRef = useRef(false);
+  const { navigate } = useRouter();
 
-  const supportEmail = useSupportEmail();
   const ctx = useGoogleOneTapContext();
+  const {
+    signInUrl,
+    signUpUrl,
+    continueSignUpUrl,
+    secondFactorUrl,
+    firstFactorUrl,
+    signUpForceRedirectUrl,
+    signInForceRedirectUrl,
+  } = ctx;
 
   async function oneTapCallback(response: GISCredentialResponse) {
+    isPromptedRef.current = false;
     try {
-      const res = await signIn.__experimental_authenticateWithGoogleOneTap({
+      const res = await clerk.__experimental_authenticateWithGoogleOneTap({
         token: response.credential,
       });
-
-      switch (res.status) {
-        case 'complete':
-          await clerk.setActive({
-            session: res.createdSessionId,
-          });
-          break;
-        // TODO-ONETAP: Add a new case in order to handle the `missing_requirements` status and the PSU flow
-        default:
-          clerkInvalidFAPIResponse(res.status, supportEmail);
-          break;
-      }
-    } catch (err) {
-      /**
-       * Currently it is not possible to display an error in the UI.
-       * As a fallback we simply open the SignIn modal for the user to sign in.
-       */
-      clerk.openSignIn();
+      await clerk.__experimental_handleGoogleOneTapCallback(
+        res,
+        {
+          signInUrl,
+          signUpUrl,
+          continueSignUpUrl,
+          secondFactorUrl,
+          firstFactorUrl,
+          signUpForceRedirectUrl,
+          signInForceRedirectUrl,
+        },
+        navigate,
+      );
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -50,32 +56,38 @@ function _OneTapStart(): JSX.Element | null {
   /**
    * Prevent GIS from initializing multiple times
    */
-  const { data: google } = useFetch(shouldLoadGIS ? loadGIS : undefined, 'google-identity-services-script', {
+  useFetch(shouldLoadGIS ? loadGIS : undefined, 'google-identity-services-script', {
     onSuccess(google) {
       google.accounts.id.initialize({
         client_id: environmentClientID!,
         callback: oneTapCallback,
-        itp_support: true,
+        itp_support: ctx.itpSupport,
         cancel_on_tap_outside: ctx.cancelOnTapOutside,
         auto_select: false,
-        use_fedcm_for_prompt: true,
+        use_fedcm_for_prompt: ctx.fedCmSupport,
       });
 
       google.accounts.id.prompt();
+      isPromptedRef.current = true;
     },
   });
 
+  useEffect(() => {
+    if (window.google && !user?.id && !isPromptedRef.current) {
+      window.google.accounts.id.prompt();
+      isPromptedRef.current = true;
+    }
+  }, [user?.id]);
+
   // Trigger only on mount/unmount. Above we handle the logic for the initial fetch + initialization
   useEffect(() => {
-    if (google && !user?.id) {
-      google.accounts.id.prompt();
-    }
     return () => {
-      if (google) {
-        google.accounts.id.cancel();
+      if (window.google && isPromptedRef.current) {
+        isPromptedRef.current = false;
+        window.google.accounts.id.cancel();
       }
     };
-  }, [user?.id]);
+  }, []);
 
   return null;
 }
