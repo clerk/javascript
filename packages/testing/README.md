@@ -35,13 +35,15 @@ This package provides utilities for testing Clerk applications.
 It currently supports the following testing frameworks:
 
 - [Playwright](https://playwright.dev/), a Node.js library to automate browsers and web pages.
+- [Cypress](https://www.cypress.io/), a JavaScript-based end-to-end testing framework.
 
 ## Getting started
 
 ### Prerequisites
 
 - Node.js `>=18.17.0` or later
-- Playwright v1+
+- Playwright v1+ (if you're using Playwright)
+- Cypress v13+ (if you're using Cypress)
 
 ### Installation
 
@@ -82,6 +84,45 @@ test("sign up", async ({ page }) => {
   await setupClerkTestingToken({ page });
 
   await page.goto("/sign-up");
+  ...
+});
+```
+
+### Cypress
+
+Firstly, add your Clerk keys (`CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`) to your environment variables file (e.g. `.env.local` or `.env.`).
+You can find these keys in your Clerk Dashboard.
+
+All Cypress related utilities are exported from `@clerk/testing/cypress`. Make sure that your import paths are correct!
+
+On your `cypress.config.ts`, you must use the `clerkSetup` function to set up Clerk for your tests.
+Keep in mind that you must pass the Cypress `config` object to the `clerkSetup` function and also return the new config object from the `setupNodeEvents` function.
+
+```typescript
+// cypress.config.ts
+import { clerkSetup } from '@clerk/testing/cypress';
+import { defineConfig } from 'cypress';
+
+export default defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      return clerkSetup({ config });
+    },
+    baseUrl: 'http://localhost:3000', // or your app's URL
+  },
+});
+```
+
+Then, you can use the `setupClerkTestingToken` function to bypass bot protection on your tests.
+
+```typescript
+// cypress/e2e/app.cy.ts
+import { setupClerkTestingToken } from "@clerk/testing/cypress";
+
+it("sign up", () => {
+  setupClerkTestingToken();
+
+  cy.visit('/sign-up');
   ...
 });
 ```
