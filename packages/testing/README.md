@@ -42,8 +42,7 @@ It currently supports the following testing frameworks:
 ### Prerequisites
 
 - Node.js `>=18.17.0` or later
-- Playwright v1+ (if you're using Playwright)
-- Cypress v13+ (if you're using Cypress)
+- Playwright v1+ or Cypress v13+
 
 ### Installation
 
@@ -108,7 +107,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       return clerkSetup({ config });
     },
-    baseUrl: 'http://localhost:3000', // or your app's URL
+    baseUrl: 'http://localhost:3000', // your app's URL
   },
 });
 ```
