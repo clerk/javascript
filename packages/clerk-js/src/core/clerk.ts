@@ -981,6 +981,8 @@ export class Clerk implements ClerkInterface {
     const verificationStatus = getClerkQueryParam('__clerk_status');
     if (verificationStatus === 'expired') {
       throw new EmailLinkError(EmailLinkErrorCode.Expired);
+    } else if (verificationStatus === 'client_mismatch') {
+      throw new EmailLinkError(EmailLinkErrorCode.ClientMismatch);
     } else if (verificationStatus !== 'verified') {
       throw new EmailLinkError(EmailLinkErrorCode.Failed);
     }
