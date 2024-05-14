@@ -242,7 +242,6 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
           overflowY: 'auto',
           ...common.unstyledScrollbar(t),
         })}
-        elementDescriptor={descriptors.organizationSwitcherPopoverInvitationActionsBox}
       >
         {userInvitationsData?.map(inv => {
           return (
