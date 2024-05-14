@@ -57,6 +57,8 @@ function _OneTapStart(): JSX.Element | null {
    * Prevent GIS from initializing multiple times
    */
   useFetch(shouldLoadGIS ? loadGIS : undefined, 'google-identity-services-script', {
+    // Mark as stale, in order for the onSuccess callback to be called.
+    staleTime: 100,
     onSuccess(google) {
       google.accounts.id.initialize({
         client_id: environmentClientID!,
@@ -67,17 +69,16 @@ function _OneTapStart(): JSX.Element | null {
         use_fedcm_for_prompt: ctx.fedCmSupport,
       });
 
-      google.accounts.id.prompt();
+      google.accounts.id.prompt(notification => {
+        // Close the modal, when the user clicks outside the prompt or cancels
+        if (notification.getMomentType() === 'skipped') {
+          // Unmounts the component will cause the useEffect cleanup function from below to be called
+          clerk.__experimental_closeGoogleOneTap();
+        }
+      });
       isPromptedRef.current = true;
     },
   });
-
-  useEffect(() => {
-    if (window.google && !user?.id && !isPromptedRef.current) {
-      window.google.accounts.id.prompt();
-      isPromptedRef.current = true;
-    }
-  }, [user?.id]);
 
   // Trigger only on mount/unmount. Above we handle the logic for the initial fetch + initialization
   useEffect(() => {
