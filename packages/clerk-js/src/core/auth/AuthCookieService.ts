@@ -13,8 +13,25 @@ import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
 import { SessionCookiePoller } from './SessionCookiePoller';
 
-// TODO: make AuthCookieService singleton since it handles updating cookies using a poller
+// TODO(@dimkl): make AuthCookieService singleton since it handles updating cookies using a poller
 // and we need to avoid updating them concurrently.
+/**
+ * The AuthCookieService class is a service responsible to handle
+ * all operations and helpers required in a standard browser context
+ * based on the cookies to remove the dependency between cookies
+ * and auth from the Clerk instance.
+ * This service is responsible to:
+ *   - refresh the session cookie using a poller
+ *   - refresh the session cookie on tab visibility change
+ *   - update the related cookies listening to the `token:update` event
+ *   - initialize auth related cookies for development instances (eg __client_uat, __clerk_db_jwt)
+ *   - cookie setup for production / development instances
+ * It also provides the following helpers:
+ *   - isSignedOut(): check if the current user is signed-out using cookies
+ *   - urlWithAuth(): decorates url with auth related info (eg dev browser jwt)
+ *   - handleUnauthenticatedDevBrowser(): resets dev browser in case of invalid dev browser
+ *   - setEnvironment(): update cookies (eg client_uat) related to environment
+ */
 export class AuthCookieService {
   private environment: EnvironmentResource | undefined;
   private poller: SessionCookiePoller | null = null;
@@ -40,6 +57,7 @@ export class AuthCookieService {
     });
   }
 
+  // TODO(@dimkl): Replace this method call with an event listener to decouple Clerk with setEnvironment
   public setEnvironment(environment: EnvironmentResource) {
     this.environment = environment;
     this.setClientUatCookieForDevelopmentInstances();

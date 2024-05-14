@@ -10,6 +10,12 @@ export type DevBrowserCookieHandler = {
   remove: () => void;
 };
 
+/**
+ * Create a long-lived JS cookie to store the dev browser token
+ * ONLY for development instances.
+ * The cookie is used to authenticate FAPI requests and pass
+ * authentication from AP to the app.
+ */
 export const createDevBrowserCookie = (): DevBrowserCookieHandler => {
   const devBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
 

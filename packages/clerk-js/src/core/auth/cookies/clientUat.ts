@@ -12,6 +12,12 @@ export type ClientUatCookieHandler = {
   get: () => number;
 };
 
+/**
+ * Create a long-lived JS cookie to store the client last updated_at timestamp
+ * for development instances (for production instance is set by FAPI).
+ * The cookie is used as hint from the Clerk Backend packages to identify
+ * if the user is authenticated or not.
+ */
 export const createClientUatCookie = (): ClientUatCookieHandler => {
   const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
 

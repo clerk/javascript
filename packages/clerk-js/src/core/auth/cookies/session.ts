@@ -10,12 +10,12 @@ export type SessionCookieHandler = {
   remove: () => void;
 };
 
+/**
+ * Create a short-lived JS cookie to store the current user JWT.
+ * The cookie is used by the Clerk backend SDKs to identify
+ * the authenticated user.
+ */
 export const createSessionCookie = (): SessionCookieHandler => {
-  /**
-   *
-   * This is a short-lived JS cookie used to store the current user JWT.
-   *
-   */
   const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
 
   const remove = () => sessionCookie.remove();
