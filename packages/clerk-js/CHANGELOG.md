@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.72.4
+
+### Patch Changes
+
+- Improve logging for CAPTCHA script loading errors ([#3384](https://github.com/clerk/javascript/pull/3384)) by [@anagstef](https://github.com/anagstef)
+
+- Fix Cypress setting cookies as third-party ([#3384](https://github.com/clerk/javascript/pull/3384)) by [@anagstef](https://github.com/anagstef)
+
 ## 4.72.3
 
 ### Patch Changes
