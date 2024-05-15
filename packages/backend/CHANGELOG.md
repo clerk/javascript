@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.1.5
+
+### Patch Changes
+
+- Added missing phpass and bcrypt_sha256_django hashers to PasswordHasher type ([#3380](https://github.com/clerk/javascript/pull/3380)) by [@royanger](https://github.com/royanger)
+
+- Updated dependencies [[`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/shared@2.1.1
+
 ## 1.1.4
 
 ### Patch Changes

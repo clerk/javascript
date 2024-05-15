@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.3.1
+
+### Patch Changes
+
+- Re-organize cookie codebase into a central place, fix TokenUpdate event to be triggered on sign-out and drop duplicate event on refreshing token. ([#3362](https://github.com/clerk/javascript/pull/3362)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`9d02df655`](https://github.com/clerk/javascript/commit/9d02df65507f579e970b33a600e6c83f6d5bfd45), [`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/localizations@2.4.1
+  - @clerk/shared@2.1.1
+
 ## 5.3.0
 
 ### Minor Changes
