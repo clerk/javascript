@@ -59,7 +59,7 @@ You can find these keys in your Clerk Dashboard.
 
 All Playwright related utilities are exported from `@clerk/testing/playwright`. Make sure that your import paths are correct!
 
-On your global setup file for Playwright, you must use the `clerkSetup` function to set up Clerk for your tests.
+In your global setup file for Playwright, you must use the `clerkSetup` function to set up Clerk for your tests.
 
 ```typescript
 // global-setup.ts
@@ -72,7 +72,7 @@ setup('global setup', async ({ }) => {
 });
 ```
 
-Then, you can use the `setupClerkTestingToken` function to bypass bot protection on your tests.
+Then, you can use the `setupClerkTestingToken` function to bypass bot protection in your tests.
 
 ```typescript
 // my-test.spec.ts
@@ -94,7 +94,7 @@ You can find these keys in your Clerk Dashboard.
 
 All Cypress related utilities are exported from `@clerk/testing/cypress`. Make sure that your import paths are correct!
 
-On your `cypress.config.ts`, you must use the `clerkSetup` function to set up Clerk for your tests.
+In your `cypress.config.ts`, you must use the `clerkSetup` function to set up Clerk for your tests.
 Keep in mind that you must pass the Cypress `config` object to the `clerkSetup` function and also return the new config object from the `setupNodeEvents` function.
 
 ```typescript
@@ -112,7 +112,7 @@ export default defineConfig({
 });
 ```
 
-Then, you can use the `setupClerkTestingToken` function to bypass bot protection on your tests.
+Then, you can use the `setupClerkTestingToken` function to bypass bot protection in your tests.
 
 ```typescript
 // cypress/e2e/app.cy.ts
