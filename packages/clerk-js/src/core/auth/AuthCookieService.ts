@@ -64,7 +64,10 @@ export class AuthCookieService {
   }
 
   public isSignedOut() {
-    return this.clientUat.get() <= 0;
+    if (!this.clerk.loaded) {
+      return this.clientUat.get() <= 0;
+    }
+    return !!this.clerk.user;
   }
 
   public async setupDevelopment() {
