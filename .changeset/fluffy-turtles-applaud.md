@@ -1,5 +1,5 @@
 ---
-'@clerk/nextjs': patch
+'@clerk/clerk-js': patch
 ---
 
-Fix to update auth state after signing out
+Remove cookie when signing out before running `onBeforeSetActive` to resolve issues where we do navigations in `onBeforeSetActive`.
