@@ -20,7 +20,7 @@ import {
 } from '@radix-ui/react-form';
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
-import type { SetRequired, Simplify } from 'type-fest';
+import type { SetRequired } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
@@ -622,9 +622,8 @@ type FormErrorPropsAsChild = {
   code: string;
 };
 
-type FormErrorProps<T> = Simplify<
-  Omit<T, 'asChild' | 'children'> & (FormErrorPropsRenderFn | FormErrorPropsStd | FormErrorPropsAsChild)
->;
+type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> &
+  (FormErrorPropsRenderFn | FormErrorPropsStd | FormErrorPropsAsChild);
 
 type FormGlobalErrorElement = React.ElementRef<'div'>;
 type FormGlobalErrorProps = FormErrorProps<React.ComponentPropsWithoutRef<'div'>>;
