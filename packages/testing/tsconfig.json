@@ -15,6 +15,6 @@
     "resolveJsonModule": true,
     "declarationDir": "dist/types"
   },
-  "include": ["src/playwright/index.ts", "src/global.d.ts"],
+  "include": ["src/index.ts", "src/playwright/index.ts", "src/cypress/index.ts", "src/global.d.ts"],
   "exclude": ["node_modules"]
 }
