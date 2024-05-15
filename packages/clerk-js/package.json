@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.3.1",
+  "version": "5.3.2",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -52,7 +52,7 @@
   "dependencies": {
     "@clerk/localizations": "2.4.1",
     "@clerk/shared": "2.1.1",
-    "@clerk/types": "4.3.0",
+    "@clerk/types": "4.3.1",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.25.4",

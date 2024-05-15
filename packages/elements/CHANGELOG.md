@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.4.3
+
+### Patch Changes
+
+- Fix typing for GlobalError and FieldError render functions ([#3387](https://github.com/clerk/javascript/pull/3387)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.4.2
 
 ## 0.4.1
