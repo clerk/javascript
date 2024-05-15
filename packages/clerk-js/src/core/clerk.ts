@@ -828,7 +828,7 @@ export class Clerk implements ClerkInterface {
       return toURL.href;
     }
 
-    return this.#authService.urlWithAuth(toURL).href;
+    return this.#authService.decorateUrlWithDevBrowserToken(toURL).href;
   }
   public buildSignInUrl(options?: SignInRedirectOptions): string {
     return this.#buildUrl(

@@ -28,7 +28,7 @@ import { SessionCookiePoller } from './SessionCookiePoller';
  *   - cookie setup for production / development instances
  * It also provides the following helpers:
  *   - isSignedOut(): check if the current user is signed-out using cookies
- *   - urlWithAuth(): decorates url with auth related info (eg dev browser jwt)
+ *   - decorateUrlWithDevBrowserToken(): decorates url with auth related info (eg dev browser jwt)
  *   - handleUnauthenticatedDevBrowser(): resets dev browser in case of invalid dev browser
  *   - setEnvironment(): update cookies (eg client_uat) related to environment
  */
@@ -80,7 +80,7 @@ export class AuthCookieService {
     await this.devBrowser.setup();
   }
 
-  public urlWithAuth(url: URL): URL {
+  public decorateUrlWithDevBrowserToken(url: URL): URL {
     const devBrowserJwt = this.devBrowser.getDevBrowserJWT();
     if (!devBrowserJwt) {
       return clerkMissingDevBrowserJwt();
