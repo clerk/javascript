@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@clerk/types": "4.3.0",
+    "@clerk/types": "4.3.1",
     "@types/express": "4.17.14",
     "@types/node": "^18.17.0",
     "nock": "^13.0.7",

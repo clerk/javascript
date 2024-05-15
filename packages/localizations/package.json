@@ -97,7 +97,7 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@clerk/types": "4.3.0",
+    "@clerk/types": "4.3.1",
     "tsup": "*",
     "typescript": "*"
   },
