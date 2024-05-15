@@ -1,5 +1,16 @@
 # @clerk/testing
 
+## 1.1.0
+
+### Minor Changes
+
+- Introduce support for the Cypress framework ([#3378](https://github.com/clerk/javascript/pull/3378)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Updated dependencies [[`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/shared@2.1.1
+
 ## 1.0.4
 
 ### Patch Changes
