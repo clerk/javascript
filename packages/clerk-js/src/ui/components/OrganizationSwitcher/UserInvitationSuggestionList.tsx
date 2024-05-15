@@ -110,6 +110,7 @@ const Preview = (
         justifyContent: 'space-between',
         padding: `${t.space.$4} ${t.space.$5}`,
       })}
+      elementDescriptor={descriptors.organizationSwitcherPopoverInvitationActionsBox}
     >
       <OrganizationPreview
         elementId='organizationSwitcherListedOrganization'
