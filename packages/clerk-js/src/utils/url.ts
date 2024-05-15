@@ -1,5 +1,6 @@
 import { globs } from '@clerk/shared/globs';
 import { createDevOrStagingUrlCache } from '@clerk/shared/keys';
+import { logger } from '@clerk/shared/logger';
 import { camelToSnake } from '@clerk/shared/underscore';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 import type { SignUpResource } from '@clerk/types';
@@ -116,7 +117,7 @@ export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolea
     // Merge search params from hashSearch string
     const searchParamsFromHashSearchString = getQueryParams(hashSearch || '');
     for (const [key, val] of Object.entries(searchParamsFromHashSearchString)) {
-      dummyUrlForHash.searchParams.append(key, val as string);
+      dummyUrlForHash.searchParams.append(key, val);
     }
 
     // Merge search params from the hashSearchParams object
@@ -354,7 +355,7 @@ export const isAllowedRedirectOrigin =
       .some(origin => origin.test(trimTrailingSlash(url.origin)));
 
     if (!isAllowed) {
-      console.warn(
+      logger.warnOnce(
         `Clerk: Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,
       );
     }

@@ -68,7 +68,8 @@
     "constants",
     "apiUrlFromPublishableKey",
     "scripts",
-    "telemetry"
+    "telemetry",
+    "logger"
   ],
   "scripts": {
     "build": "tsup",
