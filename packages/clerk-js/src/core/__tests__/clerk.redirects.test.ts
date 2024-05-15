@@ -1,5 +1,5 @@
+import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
-import type { DevBrowser } from '../devBrowser';
 import type { DisplayConfig } from '../resources/internal';
 import { Client, Environment } from '../resources/internal';
 
@@ -10,7 +10,7 @@ jest.mock('../resources/Client');
 jest.mock('../resources/Environment');
 
 // Because Jest, don't ask me why...
-jest.mock('../devBrowser', () => ({
+jest.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
     clear: jest.fn(),
     setup: jest.fn(),

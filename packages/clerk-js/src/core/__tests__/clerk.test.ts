@@ -2,12 +2,11 @@ import type { ActiveSessionResource, SignInJSON, SignUpJSON, TokenResource } fro
 import { waitFor } from '@testing-library/dom';
 
 import { mockNativeRuntime } from '../../testUtils';
+import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
-import type { DevBrowser } from '../devBrowser';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, EmailLinkErrorCode, Environment, SignIn, SignUp } from '../resources/internal';
-import { SessionCookieService } from '../services';
 import { mockJwt } from '../test/fixtures';
 
 const mockClientFetch = jest.fn();
@@ -17,7 +16,7 @@ jest.mock('../resources/Client');
 jest.mock('../resources/Environment');
 
 // Because Jest, don't ask me why...
-jest.mock('../devBrowser', () => ({
+jest.mock('../auth/devBrowser', () => ({
   createDevBrowser: (): DevBrowser => ({
     clear: jest.fn(),
     setup: jest.fn(),
@@ -158,17 +157,17 @@ describe('Clerk singleton', () => {
       touch: jest.fn(),
       getToken: jest.fn(),
     };
-    let cookieSpy;
+    let evenBusSpy;
 
     beforeEach(() => {
-      cookieSpy = jest.spyOn(SessionCookieService.prototype, 'setAuthCookiesFromSession');
+      evenBusSpy = jest.spyOn(eventBus, 'dispatch');
     });
 
     afterEach(() => {
       mockSession.remove.mockReset();
       mockSession.touch.mockReset();
 
-      cookieSpy?.mockRestore();
+      evenBusSpy?.mockRestore();
       // cleanup global window pollution
       (window as any).__unstable__onBeforeSetActive = null;
       (window as any).__unstable__onAfterSetActive = null;
@@ -183,7 +182,7 @@ describe('Clerk singleton', () => {
       await sut.setActive({ session: null });
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
-        expect(cookieSpy).toBeCalledWith(null);
+        expect(evenBusSpy).toBeCalledWith('token:update', { token: null });
       });
     });
 
@@ -194,22 +193,20 @@ describe('Clerk singleton', () => {
       const sut = new Clerk(productionPublishableKey);
       await sut.load();
       await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-      await waitFor(() => {
-        expect(mockSession.touch).toHaveBeenCalled();
-        expect(cookieSpy).toBeCalledWith(mockSession);
-      });
+      expect(mockSession.touch).toHaveBeenCalled();
     });
 
     it('does not call session.touch if Clerk was initialised with touchSession set to false', async () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+      mockSession.getToken.mockResolvedValue('mocked-token');
 
       const sut = new Clerk(productionPublishableKey);
       await sut.load({ touchSession: false });
       await sut.setActive({ session: mockSession as any as ActiveSessionResource });
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
-        expect(cookieSpy).toBeCalledWith(mockSession);
+        expect(mockSession.getToken).toBeCalled();
       });
     });
 
@@ -250,6 +247,7 @@ describe('Clerk singleton', () => {
         status: 'active',
         user: {},
         touch: jest.fn(),
+        getToken: jest.fn(),
       };
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession, mockSession2] }));
 
@@ -262,9 +260,9 @@ describe('Clerk singleton', () => {
         executionOrder.push('session.touch');
         return Promise.resolve();
       });
-      cookieSpy.mockImplementationOnce(() => {
+      mockSession2.getToken.mockImplementation(() => {
         executionOrder.push('set cookie');
-        return Promise.resolve();
+        return 'mocked-token-2';
       });
       const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
         executionOrder.push('before emit');
@@ -276,7 +274,7 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
         expect(mockSession2.touch).toHaveBeenCalled();
-        expect(cookieSpy).toBeCalledWith(mockSession2);
+        expect(mockSession2.getToken).toHaveBeenCalled();
         expect(beforeEmitMock).toBeCalledWith(mockSession2);
         expect(sut.session).toMatchObject(mockSession2);
       });
@@ -285,7 +283,6 @@ describe('Clerk singleton', () => {
     // TODO: @dimkl include set transitive state
     it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
-
       const sut = new Clerk(productionPublishableKey);
       await sut.load();
 
@@ -295,10 +292,11 @@ describe('Clerk singleton', () => {
         executionOrder.push('session.touch');
         return Promise.resolve();
       });
-      cookieSpy.mockImplementationOnce(() => {
+      mockSession.getToken.mockImplementation(() => {
         executionOrder.push('set cookie');
-        return Promise.resolve();
+        return 'mocked-token';
       });
+
       const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
         executionOrder.push('before emit');
         return Promise.resolve();
@@ -309,8 +307,8 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
         expect(mockSession.touch).toHaveBeenCalled();
+        expect(mockSession.getToken).toHaveBeenCalled();
         expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
-        expect(cookieSpy).toBeCalledWith(mockSession);
         expect(beforeEmitMock).toBeCalledWith(mockSession);
         expect(sut.session).toMatchObject(mockSession);
       });
@@ -329,10 +327,6 @@ describe('Clerk singleton', () => {
           executionOrder.push('session.touch');
           return Promise.resolve();
         });
-        cookieSpy.mockImplementationOnce(() => {
-          executionOrder.push('set cookie');
-          return Promise.resolve();
-        });
         const beforeEmitMock = jest.fn().mockImplementationOnce(() => {
           executionOrder.push('before emit');
           return Promise.resolve();
@@ -343,7 +337,7 @@ describe('Clerk singleton', () => {
         expect(executionOrder).toEqual(['session.touch', 'before emit']);
         expect(mockSession.touch).toHaveBeenCalled();
         expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
-        expect(cookieSpy).not.toHaveBeenCalled();
+        expect(mockSession.getToken).toBeCalled();
         expect(beforeEmitMock).toBeCalledWith(mockSession);
         expect(sut.session).toMatchObject(mockSession);
       });
@@ -523,7 +517,7 @@ describe('Clerk singleton', () => {
       );
 
       const sut = new Clerk(productionPublishableKey);
-      sut.setActive = jest.fn(({ beforeEmit }) => beforeEmit());
+      sut.setActive = jest.fn(async ({ beforeEmit }) => void (beforeEmit && beforeEmit()));
       sut.navigate = jest.fn();
       await sut.load();
       await sut.signOut({ sessionId: '1', redirectUrl: '/after-sign-out' });

@@ -2,10 +2,10 @@ import { DEV_BROWSER_JWT_HEADER, extractDevBrowserJWTFromURL, setDevBrowserJWTIn
 import { parseErrors } from '@clerk/shared/error';
 import type { ClerkAPIErrorJSON } from '@clerk/types';
 
-import { isDevOrStagingUrl } from '../utils';
-import { getDevBrowserCookie, removeDevBrowserCookie, setDevBrowserCookie } from '../utils/cookies/devBrowser';
-import { clerkErrorDevInitFailed } from './errors';
-import type { FapiClient } from './fapiClient';
+import { isDevOrStagingUrl } from '../../utils';
+import { clerkErrorDevInitFailed } from '../errors';
+import type { FapiClient } from '../fapiClient';
+import { createDevBrowserCookie } from './cookies/devBrowser';
 
 export interface DevBrowser {
   clear(): void;
@@ -25,16 +25,18 @@ export type CreateDevBrowserOptions = {
 };
 
 export function createDevBrowser({ frontendApi, fapiClient }: CreateDevBrowserOptions): DevBrowser {
+  const devBrowserCookie = createDevBrowserCookie();
+
   function getDevBrowserJWT() {
-    return getDevBrowserCookie();
+    return devBrowserCookie.get();
   }
 
   function setDevBrowserJWT(jwt: string) {
-    setDevBrowserCookie(jwt);
+    devBrowserCookie.set(jwt);
   }
 
   function removeDevBrowserJWT() {
-    removeDevBrowserCookie();
+    devBrowserCookie.remove();
   }
 
   function clear() {
@@ -69,7 +71,7 @@ export function createDevBrowser({ frontendApi, fapiClient }: CreateDevBrowserOp
     }
 
     // 2. If no JWT is found in the first step, check if a JWT is already available in the __clerk_db_jwt JS cookie
-    if (getDevBrowserCookie()) {
+    if (devBrowserCookie.get()) {
       return;
     }
 

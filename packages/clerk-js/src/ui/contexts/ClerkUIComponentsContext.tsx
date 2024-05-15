@@ -498,13 +498,74 @@ export const useCreateOrganizationContext = () => {
 
 export const useGoogleOneTapContext = () => {
   const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OneTapCtx;
+  const options = useOptions();
+  const { displayConfig } = useEnvironment();
+  const { queryParams } = useRouter();
 
   if (componentName !== 'OneTap') {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
 
+  const redirectUrls = new RedirectUrls(
+    options,
+    {
+      ...ctx,
+      redirectUrl: window.location.href,
+    },
+    queryParams,
+  );
+
+  let signUpUrl = options.signUpUrl || displayConfig.signUpUrl;
+  let signInUrl = options.signInUrl || displayConfig.signInUrl;
+
+  const preservedParams = redirectUrls.getPreservedSearchParams();
+  signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+
+  const signInForceRedirectUrl = redirectUrls.getAfterSignInUrl();
+  const signUpForceRedirectUrl = redirectUrls.getAfterSignUpUrl();
+
+  const signUpContinueUrl = buildURL(
+    {
+      base: signUpUrl,
+      hashPath: '/continue',
+      hashSearch: new URLSearchParams({
+        sign_up_force_redirect_url: signUpForceRedirectUrl,
+      }).toString(),
+    },
+    { stringify: true },
+  );
+
+  const firstFactorUrl = buildURL(
+    {
+      base: signInUrl,
+      hashPath: '/factor-one',
+      hashSearch: new URLSearchParams({
+        sign_in_force_redirect_url: signInForceRedirectUrl,
+      }).toString(),
+    },
+    { stringify: true },
+  );
+  const secondFactorUrl = buildURL(
+    {
+      base: signInUrl,
+      hashPath: '/factor-two',
+      hashSearch: new URLSearchParams({
+        sign_in_force_redirect_url: signInForceRedirectUrl,
+      }).toString(),
+    },
+    { stringify: true },
+  );
+
   return {
     ...ctx,
     componentName,
+    signInUrl,
+    signUpUrl,
+    firstFactorUrl,
+    secondFactorUrl,
+    continueSignUpUrl: signUpContinueUrl,
+    signInForceRedirectUrl,
+    signUpForceRedirectUrl,
   };
 };
