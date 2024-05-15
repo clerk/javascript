@@ -60,7 +60,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     // TODO: In AIO this is a link with an href
     await u.page.getByRole('button', { name: /use another method/i }).click();
     await u.po.signIn.getAltMethodsEmailCodeButton().click();
-    await u.po.signIn.enterTestOtpCode();
+    await u.po.signIn.fillTestOtpCode('Enter email verification code');
+    await page.waitForTimeout(2000);
     // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
     await u.po.signIn.continue();
 
@@ -95,7 +96,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.page.getByRole('button', { name: /^use phone/i }).click();
     await u.po.signIn.getIdentifierInput().fill(fakeUserWithoutPassword.phoneNumber);
     await u.po.signIn.continue();
-    await u.po.signIn.enterTestOtpCode();
+    await u.po.signIn.fillTestOtpCode('Enter phone verification code');
+    await page.waitForTimeout(2000);
     await u.po.signIn.continue();
 
     await u.po.expect.toBeSignedIn();
@@ -130,11 +132,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     // TODO: In AIO this is a link with an empty href
     await u.page.getByRole('button', { name: /^forgot password/i }).click();
     await u.po.signIn.getResetPassword().click();
-    await u.po.signIn.enterTestOtpCode();
+    await u.po.signIn.fillTestOtpCode('Enter email verification code');
+    await page.waitForTimeout(2000);
     // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
     await u.po.signIn.continue();
-    // TODO: Compared to the original test this await is necessary for it to progress
-    await u.page.waitForAppUrl('/sign-in/reset-password');
 
     await u.po.signIn.setPassword(`${fakeUserWithPasword.password}_reset`);
     await u.po.signIn.setPasswordConfirmation(`${fakeUserWithPasword.password}_reset`);
@@ -171,7 +172,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     // TODO: In AIO this is a link with an href
     await u.page.getByRole('button', { name: /use another method/i }).click();
     await u.po.signIn.getAltMethodsEmailCodeButton().click();
-    await u.po.signIn.enterTestOtpCode();
+    await u.po.signIn.fillTestOtpCode('Enter email verification code');
+    await page.waitForTimeout(2000);
     // TODO: In original test the input has autoSubmit and this step is not needed. Not used right now because it didn't work.
     await u.po.signIn.continue();
 

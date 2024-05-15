@@ -35,7 +35,7 @@ export default function Home() {
                 prefetch={false}
                 className='text-zinc-950 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-zinc-700 hover:underline focus-visible:underline'
               >
-                Sign In
+                Sign-In
               </Link>
             </li>
             <li>
@@ -43,7 +43,7 @@ export default function Home() {
                 href='/sign-up'
                 className='text-zinc-950 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-zinc-700 hover:underline focus-visible:underline'
               >
-                Sign Up
+                Sign-Up
               </Link>
             </li>
             <li>
@@ -52,6 +52,14 @@ export default function Home() {
                 className='text-zinc-950 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-zinc-700 hover:underline focus-visible:underline'
               >
                 OTP Playground
+              </Link>
+            </li>
+            <li>
+              <Link
+                href='/validate-password'
+                className='text-zinc-950 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-zinc-700 hover:underline focus-visible:underline'
+              >
+                Password Validation
               </Link>
             </li>
           </ul>
