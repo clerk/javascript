@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.1
+
+### Patch Changes
+
+- Add missing es-ES localization keys ([#3382](https://github.com/clerk/javascript/pull/3382)) by [@frankdavidcorona](https://github.com/frankdavidcorona)
+
 ## 2.4.0
 
 ### Minor Changes
