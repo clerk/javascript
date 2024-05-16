@@ -1,0 +1,254 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`className 1`] = `
+{
+  "code": "const Button: React.FC<ButtonProps> = ({ children, className }) => {
+    return <button className="cl-c2153e59">{children}</button>;
+  }",
+  "css": "*, ::before, ::after {
+    --cl-border-spacing-x: 0;
+    --cl-border-spacing-y: 0;
+    --cl-translate-x: 0;
+    --cl-translate-y: 0;
+    --cl-rotate: 0;
+    --cl-skew-x: 0;
+    --cl-skew-y: 0;
+    --cl-scale-x: 1;
+    --cl-scale-y: 1;
+    --cl-pan-x:  ;
+    --cl-pan-y:  ;
+    --cl-pinch-zoom:  ;
+    --cl-scroll-snap-strictness: proximity;
+    --cl-gradient-from-position:  ;
+    --cl-gradient-via-position:  ;
+    --cl-gradient-to-position:  ;
+    --cl-ordinal:  ;
+    --cl-slashed-zero:  ;
+    --cl-numeric-figure:  ;
+    --cl-numeric-spacing:  ;
+    --cl-numeric-fraction:  ;
+    --cl-ring-inset:  ;
+    --cl-ring-offset-width: 0px;
+    --cl-ring-offset-color: #fff;
+    --cl-ring-color: rgb(59 130 246 / 0.5);
+    --cl-ring-offset-shadow: 0 0 #0000;
+    --cl-ring-shadow: 0 0 #0000;
+    --cl-shadow: 0 0 #0000;
+    --cl-shadow-colored: 0 0 #0000;
+    --cl-blur:  ;
+    --cl-brightness:  ;
+    --cl-contrast:  ;
+    --cl-grayscale:  ;
+    --cl-hue-rotate:  ;
+    --cl-invert:  ;
+    --cl-saturate:  ;
+    --cl-sepia:  ;
+    --cl-drop-shadow:  ;
+    --cl-backdrop-blur:  ;
+    --cl-backdrop-brightness:  ;
+    --cl-backdrop-contrast:  ;
+    --cl-backdrop-grayscale:  ;
+    --cl-backdrop-hue-rotate:  ;
+    --cl-backdrop-invert:  ;
+    --cl-backdrop-opacity:  ;
+    --cl-backdrop-saturate:  ;
+    --cl-backdrop-sepia:  ;
+    --cl-contain-size:  ;
+    --cl-contain-layout:  ;
+    --cl-contain-paint:  ;
+    --cl-contain-style:  
+}
+::backdrop {
+    --cl-border-spacing-x: 0;
+    --cl-border-spacing-y: 0;
+    --cl-translate-x: 0;
+    --cl-translate-y: 0;
+    --cl-rotate: 0;
+    --cl-skew-x: 0;
+    --cl-skew-y: 0;
+    --cl-scale-x: 1;
+    --cl-scale-y: 1;
+    --cl-pan-x:  ;
+    --cl-pan-y:  ;
+    --cl-pinch-zoom:  ;
+    --cl-scroll-snap-strictness: proximity;
+    --cl-gradient-from-position:  ;
+    --cl-gradient-via-position:  ;
+    --cl-gradient-to-position:  ;
+    --cl-ordinal:  ;
+    --cl-slashed-zero:  ;
+    --cl-numeric-figure:  ;
+    --cl-numeric-spacing:  ;
+    --cl-numeric-fraction:  ;
+    --cl-ring-inset:  ;
+    --cl-ring-offset-width: 0px;
+    --cl-ring-offset-color: #fff;
+    --cl-ring-color: rgb(59 130 246 / 0.5);
+    --cl-ring-offset-shadow: 0 0 #0000;
+    --cl-ring-shadow: 0 0 #0000;
+    --cl-shadow: 0 0 #0000;
+    --cl-shadow-colored: 0 0 #0000;
+    --cl-blur:  ;
+    --cl-brightness:  ;
+    --cl-contrast:  ;
+    --cl-grayscale:  ;
+    --cl-hue-rotate:  ;
+    --cl-invert:  ;
+    --cl-saturate:  ;
+    --cl-sepia:  ;
+    --cl-drop-shadow:  ;
+    --cl-backdrop-blur:  ;
+    --cl-backdrop-brightness:  ;
+    --cl-backdrop-contrast:  ;
+    --cl-backdrop-grayscale:  ;
+    --cl-backdrop-hue-rotate:  ;
+    --cl-backdrop-invert:  ;
+    --cl-backdrop-opacity:  ;
+    --cl-backdrop-saturate:  ;
+    --cl-backdrop-sepia:  ;
+    --cl-contain-size:  ;
+    --cl-contain-layout:  ;
+    --cl-contain-paint:  ;
+    --cl-contain-style:  
+}
+.cl-c2153e59 {
+    border-radius: 0.25rem;
+    background-color: #3b82f6;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-weight: 700;
+    --cl-text-opacity: 1;
+    color: rgb(255 255 255 / var(--cl-text-opacity))
+}
+.cl-c2153e59:hover {
+    background-color: #1d4ed8
+}
+",
+}
+`;
+
+exports[`cn 1`] = `
+{
+  "code": "const Button: React.FC<ButtonProps> = ({ children, className }) => {
+    const buttonClasses = cn(
+      (something === 'flex' || 'flex') && "cl-222f930b",
+      ["cl-222f930b", "cl-222f930b"],
+      something === 'flex' || something === 'flex' ? (something ? "cl-222f930b" : "cl-222f930b") : "cl-222f930b",
+      className,
+    );
+    return <button className={buttonClasses}>{children}</button>;
+  };",
+  "css": "*, ::before, ::after {
+    --cl-border-spacing-x: 0;
+    --cl-border-spacing-y: 0;
+    --cl-translate-x: 0;
+    --cl-translate-y: 0;
+    --cl-rotate: 0;
+    --cl-skew-x: 0;
+    --cl-skew-y: 0;
+    --cl-scale-x: 1;
+    --cl-scale-y: 1;
+    --cl-pan-x:  ;
+    --cl-pan-y:  ;
+    --cl-pinch-zoom:  ;
+    --cl-scroll-snap-strictness: proximity;
+    --cl-gradient-from-position:  ;
+    --cl-gradient-via-position:  ;
+    --cl-gradient-to-position:  ;
+    --cl-ordinal:  ;
+    --cl-slashed-zero:  ;
+    --cl-numeric-figure:  ;
+    --cl-numeric-spacing:  ;
+    --cl-numeric-fraction:  ;
+    --cl-ring-inset:  ;
+    --cl-ring-offset-width: 0px;
+    --cl-ring-offset-color: #fff;
+    --cl-ring-color: rgb(59 130 246 / 0.5);
+    --cl-ring-offset-shadow: 0 0 #0000;
+    --cl-ring-shadow: 0 0 #0000;
+    --cl-shadow: 0 0 #0000;
+    --cl-shadow-colored: 0 0 #0000;
+    --cl-blur:  ;
+    --cl-brightness:  ;
+    --cl-contrast:  ;
+    --cl-grayscale:  ;
+    --cl-hue-rotate:  ;
+    --cl-invert:  ;
+    --cl-saturate:  ;
+    --cl-sepia:  ;
+    --cl-drop-shadow:  ;
+    --cl-backdrop-blur:  ;
+    --cl-backdrop-brightness:  ;
+    --cl-backdrop-contrast:  ;
+    --cl-backdrop-grayscale:  ;
+    --cl-backdrop-hue-rotate:  ;
+    --cl-backdrop-invert:  ;
+    --cl-backdrop-opacity:  ;
+    --cl-backdrop-saturate:  ;
+    --cl-backdrop-sepia:  ;
+    --cl-contain-size:  ;
+    --cl-contain-layout:  ;
+    --cl-contain-paint:  ;
+    --cl-contain-style:  
+}
+::backdrop {
+    --cl-border-spacing-x: 0;
+    --cl-border-spacing-y: 0;
+    --cl-translate-x: 0;
+    --cl-translate-y: 0;
+    --cl-rotate: 0;
+    --cl-skew-x: 0;
+    --cl-skew-y: 0;
+    --cl-scale-x: 1;
+    --cl-scale-y: 1;
+    --cl-pan-x:  ;
+    --cl-pan-y:  ;
+    --cl-pinch-zoom:  ;
+    --cl-scroll-snap-strictness: proximity;
+    --cl-gradient-from-position:  ;
+    --cl-gradient-via-position:  ;
+    --cl-gradient-to-position:  ;
+    --cl-ordinal:  ;
+    --cl-slashed-zero:  ;
+    --cl-numeric-figure:  ;
+    --cl-numeric-spacing:  ;
+    --cl-numeric-fraction:  ;
+    --cl-ring-inset:  ;
+    --cl-ring-offset-width: 0px;
+    --cl-ring-offset-color: #fff;
+    --cl-ring-color: rgb(59 130 246 / 0.5);
+    --cl-ring-offset-shadow: 0 0 #0000;
+    --cl-ring-shadow: 0 0 #0000;
+    --cl-shadow: 0 0 #0000;
+    --cl-shadow-colored: 0 0 #0000;
+    --cl-blur:  ;
+    --cl-brightness:  ;
+    --cl-contrast:  ;
+    --cl-grayscale:  ;
+    --cl-hue-rotate:  ;
+    --cl-invert:  ;
+    --cl-saturate:  ;
+    --cl-sepia:  ;
+    --cl-drop-shadow:  ;
+    --cl-backdrop-blur:  ;
+    --cl-backdrop-brightness:  ;
+    --cl-backdrop-contrast:  ;
+    --cl-backdrop-grayscale:  ;
+    --cl-backdrop-hue-rotate:  ;
+    --cl-backdrop-invert:  ;
+    --cl-backdrop-opacity:  ;
+    --cl-backdrop-saturate:  ;
+    --cl-backdrop-sepia:  ;
+    --cl-contain-size:  ;
+    --cl-contain-layout:  ;
+    --cl-contain-paint:  ;
+    --cl-contain-style:  
+}
+.cl-222f930b {
+    display: flex
+}
+",
+}
+`;
