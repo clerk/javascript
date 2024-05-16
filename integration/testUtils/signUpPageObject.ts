@@ -24,7 +24,7 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
         return self.waitForMounted();
       }
     },
-    waitForMounted: (selector = '.cl-signIn-root') => {
+    waitForMounted: (selector = '.cl-signUp-root') => {
       return page.waitForSelector(selector, { state: 'attached' });
     },
     signUpWithOauth: (provider: string) => {
