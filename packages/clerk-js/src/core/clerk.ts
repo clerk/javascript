@@ -728,6 +728,7 @@ export class Clerk implements ClerkInterface {
     const shouldSignOutSession = this.session && newSession === null;
     if (shouldSignOutSession) {
       this.#broadcastSignOutEvent();
+      eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
     await onBeforeSetActive();
@@ -741,13 +742,9 @@ export class Clerk implements ClerkInterface {
       newSession = this.#getSessionFromClient(newSession?.id);
     }
 
-    // Sync __session and __client_uat to cookies using events.TokenUpdate dispatched event
-    // only for newSession is null since the getToken will not be executed. Since getToken
-    // triggers internally a events.TokenUpdate there is no need to trigger it when the newSession exists.
-    const token = await newSession?.getToken();
-    if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
+    // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
+    await newSession?.getToken();
+
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
