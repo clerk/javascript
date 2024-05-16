@@ -146,9 +146,9 @@ export const LazyOneTapRenderer = (props: LazyOneTapRendererProps) => {
     >
       <VirtualBodyRootPortal
         startPath={props.startPath}
-        component={ClerkComponents['OneTap']}
+        component={ClerkComponents['GoogleOneTap']}
         props={props.componentProps}
-        componentName={'OneTap'}
+        componentName={'GoogleOneTap'}
       />
     </AppearanceProvider>
   );
