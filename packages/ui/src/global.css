@@ -1,0 +1,27 @@
+:where(:root) {
+  --cl-color-primary: 233 8% 20%;
+  --cl-color-primary-foreground: 0 0% 100%;
+  --cl-color-neutral: 0 0% 0%;
+  --cl-color-background: 0 0% 100%;
+  --cl-color-foreground: 240 7% 14%;
+  --cl-font-family: inherit;
+  --cl-font-family-button: inherit;
+  /*  */
+
+  --cl-color-destructive: 0 84% 60%;
+  /*  */
+  --cl-color-input-background: 0 0% 100%;
+  --cl-color-input-foreground: 0 0% 0%;
+}
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: #e5e7eb;
+}
+::before,
+::after {
+  --cl-content: '';
+}

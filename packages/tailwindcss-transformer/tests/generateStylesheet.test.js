@@ -1,0 +1,38 @@
+import { expect, test } from 'vitest';
+import { transform, generateStylesheet } from '../src/index';
+
+test('className with cn', async () => {
+  let styleCache = new Map();
+  let _ = await transform(
+    `const Button: React.FC<ButtonProps> = ({ children, className }) => {
+    return <button className={cn('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')}>{children}</button>
+  }`,
+    {
+      styleCache,
+    },
+  );
+  const styleSheet = await generateStylesheet(styleCache, {
+    tailwindConfig: {
+      corePlugins: {
+        preflight: false,
+        backgroundOpacity: false,
+      },
+      content: ['./src/**/*.{js,jsx,ts,tsx}'],
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: 'hsl(var(--cl-color-primary))',
+              foreground: 'hsl(var(--cl-color-primary-foreground))',
+            },
+          },
+        },
+      },
+    },
+    globalCss: `:where(:root) {
+  --cl-color-primary: 233 8% 20%;
+  --cl-color-primary-foreground: 0 0% 100%;
+}`,
+  });
+  expect(styleSheet).toMatchSnapshot();
+});

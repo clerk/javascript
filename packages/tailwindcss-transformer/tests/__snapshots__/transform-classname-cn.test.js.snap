@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`className with cn 1`] = `
+"const Button: React.FC<ButtonProps> = ({ children, className }) => {
+    return <button className={cn("cl-c2153e59")}>{children}</button>;
+  }"
+`;
