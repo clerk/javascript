@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.2
+
+### Patch Changes
+
+- Added missing translations for the Spanish (Spain) locale (es_ES). ([#3389](https://github.com/clerk/javascript/pull/3389)) by [@frankdavidcorona](https://github.com/frankdavidcorona)
+
 ## 2.4.1
 
 ### Patch Changes
