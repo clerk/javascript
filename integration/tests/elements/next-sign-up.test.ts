@@ -156,13 +156,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]' });
 
-    /*
-    await u.po.signIn.signInWithEmailAndInstantPassword({
-      email: fakeUser.email,
-      password: fakeUser.password,
-    });
-    */
-
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.setPassword(fakeUser.password);

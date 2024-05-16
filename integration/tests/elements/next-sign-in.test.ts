@@ -42,7 +42,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.po.expect.toBeSignedIn();
   });
 
-  test.fixme('sign in with email and instant password', async ({ page, context }) => {
+  test('sign in with email and instant password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]' });
 
@@ -57,7 +57,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
-    // TODO: In AIO this is a link with an href
+
     await u.page.getByRole('button', { name: /use another method/i }).click();
     await u.po.signIn.getAltMethodsEmailCodeButton().click();
     await u.po.signIn.fillTestOtpCode('Enter email verification code');
@@ -73,7 +73,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]' });
 
-    // TODO: In AIO this is a link with an empty href
     await u.page.getByRole('button', { name: /^use phone/i }).click();
     await u.po.signIn.getIdentifierInput().fill(fakeUser.phoneNumber);
     await u.po.signIn.continue();
@@ -92,7 +91,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     });
     await u.services.users.createBapiUser(fakeUserWithoutPassword);
     await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]' });
-    // TODO: In AIO this is a link with an empty href
     await u.page.getByRole('button', { name: /^use phone/i }).click();
     await u.po.signIn.getIdentifierInput().fill(fakeUserWithoutPassword.phoneNumber);
     await u.po.signIn.continue();
@@ -129,7 +127,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await u.po.signIn.getIdentifierInput().fill(fakeUserWithPasword.email);
     await u.po.signIn.continue();
-    // TODO: In AIO this is a link with an empty href
     await u.page.getByRole('button', { name: /^forgot password/i }).click();
     await u.po.signIn.getResetPassword().click();
     await u.po.signIn.fillTestOtpCode('Enter email verification code');
@@ -169,7 +166,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await expect(u.page.getByText(/^password is incorrect/i)).toBeVisible();
 
-    // TODO: In AIO this is a link with an href
     await u.page.getByRole('button', { name: /use another method/i }).click();
     await u.po.signIn.getAltMethodsEmailCodeButton().click();
     await u.po.signIn.fillTestOtpCode('Enter email verification code');

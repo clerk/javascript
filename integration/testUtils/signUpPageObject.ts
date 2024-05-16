@@ -16,9 +16,9 @@ export const createSignUpComponentPageObject = (testArgs: TestArgs) => {
   const self = {
     ...common(testArgs),
     goTo: async (opts?: { searchParams?: URLSearchParams; headlessSelector?: string }) => {
-      await page.goToRelative('/sign-up', { searchParams: opts.searchParams });
+      await page.goToRelative('/sign-up', { searchParams: opts?.searchParams });
 
-      if (typeof opts.headlessSelector !== 'undefined') {
+      if (typeof opts?.headlessSelector !== 'undefined') {
         return self.waitForMounted(opts.headlessSelector);
       } else {
         return self.waitForMounted();
