@@ -493,7 +493,8 @@ type FormInputProps =
   | RadixFormControlProps
   | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
   | ({ type: 'otp'; render?: undefined } & OTPInputProps)
-  | ({ type: 'password' } & PasswordInputProps);
+  // Usecase: Toggle the visibility of the password input, therefore 'password' and 'text' are allowed
+  | ({ type: 'password' | 'text' } & PasswordInputProps);
 
 /**
  * Handles rendering of `<input>` elements within Clerk's flows. Supports special `type` prop values to render input types that are unique to authentication and user management flows. Additional props will be passed through to the `<input>` element.
