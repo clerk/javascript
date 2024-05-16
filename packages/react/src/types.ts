@@ -57,6 +57,12 @@ export interface MountProps {
   customPagesPortals?: any[];
 }
 
+export interface OpenProps {
+  open: (props: any) => void;
+  close: () => void;
+  props?: any;
+}
+
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;

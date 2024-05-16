@@ -1,7 +1,7 @@
 import { joinURL } from '@clerk/shared/url';
 import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup, spawnChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -59,20 +59,18 @@ export const SignUpRouterMachine = setup({
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
-    setActive: (_, params?: { sessionId?: string; useLastActiveSession?: boolean }) =>
-      enqueueActions(({ enqueue, check, context, event }) => {
-        if (check('isExampleMode')) return;
+    setActive: ({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) => {
+      if (context.exampleMode) return;
 
-        const session =
-          params?.sessionId ||
-          (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
-          ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
+      const session =
+        params?.sessionId ||
+        (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
+        ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
 
-        const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignUpUrl());
-        void context.clerk.setActive({ session, beforeEmit });
-
-        enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
-      }),
+      const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignUpUrl());
+      void context.clerk.setActive({ session, beforeEmit });
+    },
+    delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
         if (error) return error;
@@ -208,16 +206,19 @@ export const SignUpRouterMachine = setup({
       },
     },
     Init: {
-      entry: spawnChild('thirdPartyMachine', {
-        id: ThirdPartyMachineId,
-        systemId: ThirdPartyMachineId,
-        input: ({ context, self }) => ({
-          basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
-          environment: context.clerk.__unstable__environment,
-          flow: 'signUp',
-          formRef: context.formRef,
-          parent: self,
-        }),
+      entry: enqueueActions(({ context, enqueue, self }) => {
+        if (!self.getSnapshot().children[ThirdPartyMachineId]) {
+          enqueue.spawnChild('thirdPartyMachine', {
+            id: ThirdPartyMachineId,
+            systemId: ThirdPartyMachineId,
+            input: {
+              basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
+              flow: 'signUp',
+              formRef: context.formRef,
+              parent: self,
+            },
+          });
+        }
       }),
       always: [
         {
@@ -269,7 +270,7 @@ export const SignUpRouterMachine = setup({
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsVerification',
@@ -302,7 +303,7 @@ export const SignUpRouterMachine = setup({
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsVerification',
@@ -329,10 +330,13 @@ export const SignUpRouterMachine = setup({
       always: [
         {
           guard: 'hasCreatedSession',
-          actions: ({ context }) => ({
-            type: 'setActive',
-            params: { sessionId: context.router?.searchParams().get(SEARCH_PARAMS.createdSession) },
-          }),
+          actions: [
+            ({ context }) => ({
+              type: 'setActive',
+              params: { sessionId: context.router?.searchParams().get(SEARCH_PARAMS.createdSession) },
+            }),
+            'delayedReset',
+          ],
         },
         {
           guard: { type: 'hasClerkStatus', params: { status: 'verified' } },
@@ -347,7 +351,7 @@ export const SignUpRouterMachine = setup({
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsContinue',
@@ -364,12 +368,12 @@ export const SignUpRouterMachine = setup({
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             description: 'Handle a case where the user has already been authenticated via ClerkJS',
             guard: 'hasAuthenticatedViaClerkJS',
-            actions: { type: 'setActive', params: { useLastActiveSession: true } },
+            actions: [{ type: 'setActive', params: { useLastActiveSession: true } }, 'delayedReset'],
           },
           {
             guard: 'statusNeedsVerification',

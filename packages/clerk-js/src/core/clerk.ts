@@ -330,6 +330,18 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  public __experimental_openGoogleOneTap = (props?: OneTapProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'OneTap' })
+      .then(controls => controls.openModal('googleOneTap', props || {}));
+  };
+
+  public __experimental_closeGoogleOneTap = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('googleOneTap'));
+  };
+
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
@@ -452,30 +464,6 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
-  };
-
-  public __experimental_mountGoogleOneTap = (node: HTMLDivElement, props?: OneTapProps): void => {
-    this.assertComponentsReady(this.#componentControls);
-
-    void this.#componentControls.ensureMounted({ preloadHint: 'OneTap' }).then(controls =>
-      controls.mountComponent({
-        name: 'OneTap',
-        appearanceKey: 'oneTap',
-        node,
-        props,
-      }),
-    );
-    // TODO-ONETAP: Enable telemetry one feature is ready for public beta
-    // this.telemetry?.record(eventPrebuiltComponentMounted('GoogleOneTap', props));
-  };
-
-  public __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
@@ -728,6 +716,7 @@ export class Clerk implements ClerkInterface {
     const shouldSignOutSession = this.session && newSession === null;
     if (shouldSignOutSession) {
       this.#broadcastSignOutEvent();
+      eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
     await onBeforeSetActive();
@@ -741,13 +730,9 @@ export class Clerk implements ClerkInterface {
       newSession = this.#getSessionFromClient(newSession?.id);
     }
 
-    // Sync __session and __client_uat to cookies using events.TokenUpdate dispatched event
-    // only for newSession is null since the getToken will not be executed. Since getToken
-    // triggers internally a events.TokenUpdate there is no need to trigger it when the newSession exists.
-    const token = await newSession?.getToken();
-    if (!token) {
-      eventBus.dispatch(events.TokenUpdate, { token: null });
-    }
+    // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
+    await newSession?.getToken();
+
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
     //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or

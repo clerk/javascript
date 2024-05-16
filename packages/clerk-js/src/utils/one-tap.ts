@@ -15,9 +15,13 @@ interface InitializeProps {
   use_fedcm_for_prompt?: boolean;
 }
 
+interface PromptMomentNotification {
+  getMomentType: () => 'display' | 'skipped' | 'dismissed';
+}
+
 interface OneTapMethods {
   initialize: (params: InitializeProps) => void;
-  prompt: () => void;
+  prompt: (promptListener: (promptMomentNotification: PromptMomentNotification) => void) => void;
   cancel: () => void;
 }
 
