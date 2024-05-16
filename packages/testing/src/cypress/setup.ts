@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 import type { ClerkSetupOptions } from '../common';
 import { fetchEnvVars } from '../common';
+import { experimentalConsoleWarning } from './utils';
 
 type ClerkSetupParams = {
   config: Cypress.PluginConfigOptions;
@@ -23,6 +24,8 @@ type ClerkSetupParams = {
  * @throws An error if the Cypress config object is not provided.
  */
 export const clerkSetup = async ({ config, options }: ClerkSetupParams) => {
+  experimentalConsoleWarning();
+
   if (!config) {
     throw new Error('The Cypress config object is required.');
   }
