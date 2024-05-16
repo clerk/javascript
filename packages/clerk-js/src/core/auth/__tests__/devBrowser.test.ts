@@ -1,5 +1,5 @@
+import type { FapiClient } from '../../fapiClient';
 import { createDevBrowser } from '../devBrowser';
-import type { FapiClient } from '../fapiClient';
 
 type RecursivePartial<T> = {
   [P in keyof T]?: RecursivePartial<T[P]>;

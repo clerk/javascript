@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.3.2
+
+### Patch Changes
+
+- Add a descriptor for Invitation previews in <OrganizationSwitcher/> ([#3376](https://github.com/clerk/javascript/pull/3376)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Updated dependencies [[`eae0a32d5`](https://github.com/clerk/javascript/commit/eae0a32d5c9e97ccbfd96e001c2cac6bc753b5b3)]:
+  - @clerk/types@4.3.1
+
+## 5.3.1
+
+### Patch Changes
+
+- Re-organize cookie codebase into a central place, fix TokenUpdate event to be triggered on sign-out and drop duplicate event on refreshing token. ([#3362](https://github.com/clerk/javascript/pull/3362)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`9d02df655`](https://github.com/clerk/javascript/commit/9d02df65507f579e970b33a600e6c83f6d5bfd45), [`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/localizations@2.4.1
+  - @clerk/shared@2.1.1
+
 ## 5.3.0
 
 ### Minor Changes

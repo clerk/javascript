@@ -7,7 +7,7 @@ export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
 
   return {
-    entry: ['src/playwright/index.ts'],
+    entry: ['src/playwright/index.ts', 'src/cypress/index.ts', 'src/index.ts'],
     onSuccess: 'tsc',
     minify: isProd,
     clean: true,

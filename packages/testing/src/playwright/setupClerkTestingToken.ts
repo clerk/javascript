@@ -1,18 +1,12 @@
 import type { Page } from '@playwright/test';
 
-type BypassBotProtectionParams = {
-  page: Page;
-  options?: {
-    /*
-     * The frontend API URL for your Clerk dev instance, without the protocol.
-     * If provided, it overrides the Frontend API URL parsed from the publishable key.
-     * Example: 'relieved-chamois-66.clerk.accounts.dev'
-     */
-    frontendApiUrl?: string;
-  };
-};
+import type { SetupClerkTestingTokenOptions } from '../common';
+import { TESTING_TOKEN_PARAM } from '../common';
 
-const TESTING_TOKEN_PARAM = '__clerk_testing_token';
+type SetupClerkTestingTokenParams = {
+  page: Page;
+  options?: SetupClerkTestingTokenOptions;
+};
 
 /**
  * Bypasses bot protection by appending the testing token in the Frontend API requests.
@@ -30,7 +24,7 @@ const TESTING_TOKEN_PARAM = '__clerk_testing_token';
  *    // Continue with your test...
  *  });
  */
-export const setupClerkTestingToken = async ({ page, options }: BypassBotProtectionParams) => {
+export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestingTokenParams) => {
   const fapiUrl = options?.frontendApiUrl || process.env.CLERK_FAPI;
   if (!fapiUrl) {
     throw new Error('The Frontend API URL is required to bypass bot protection.');
