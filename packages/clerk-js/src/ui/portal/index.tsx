@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../../core/constants';
 import { clerkErrorPathRouterMissingPath } from '../../core/errors';
-import { buildVirtualRouterUrl } from '../../utils';
 import { ComponentContext } from '../contexts';
 import { HashRouter, PathRouter, VirtualRouter } from '../router';
 import type { AvailableComponentCtx } from '../types';
@@ -15,21 +14,7 @@ type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType
   props?: PropsType & { path?: string; routing?: string };
 } & Pick<CtxType, 'componentName'>;
 
-export default class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
-  private elRef = document.createElement('div');
-
-  componentDidMount() {
-    if (this.props.componentName === 'OneTap') {
-      document.body.appendChild(this.elRef);
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.componentName === 'OneTap') {
-      document.body.removeChild(this.elRef);
-    }
-  }
-
+export class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
   render() {
     const { props, component, componentName, node } = this.props;
 
@@ -38,13 +23,6 @@ export default class Portal<CtxType extends AvailableComponentCtx> extends React
         <Suspense fallback={''}>{React.createElement(component, props)}</Suspense>
       </ComponentContext.Provider>
     );
-
-    if (componentName === 'OneTap') {
-      return ReactDOM.createPortal(
-        <VirtualRouter startPath={buildVirtualRouterUrl({ base: '/one-tap', path: '' })}>{el}</VirtualRouter>,
-        this.elRef,
-      );
-    }
 
     if (props?.routing === 'path') {
       if (!props?.path) {
@@ -63,5 +41,38 @@ export default class Portal<CtxType extends AvailableComponentCtx> extends React
     }
 
     return ReactDOM.createPortal(<HashRouter preservedParams={PRESERVED_QUERYSTRING_PARAMS}>{el}</HashRouter>, node);
+  }
+}
+
+type VirtualBodyRootPortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType, 'componentName'>> = {
+  component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
+  props?: PropsType;
+  startPath: string;
+} & Pick<CtxType, 'componentName'>;
+
+export class VirtualBodyRootPortal<CtxType extends AvailableComponentCtx> extends React.PureComponent<
+  VirtualBodyRootPortalProps<CtxType>
+> {
+  private elRef = document.createElement('div');
+
+  componentDidMount() {
+    document.body.appendChild(this.elRef);
+  }
+
+  componentWillUnmount() {
+    document.body.removeChild(this.elRef);
+  }
+
+  render() {
+    const { props, startPath, component, componentName } = this.props;
+
+    return ReactDOM.createPortal(
+      <VirtualRouter startPath={startPath}>
+        <ComponentContext.Provider value={{ componentName: componentName, ...props } as CtxType}>
+          <Suspense fallback={''}>{React.createElement(component, props as PortalProps<CtxType>['props'])}</Suspense>
+        </ComponentContext.Provider>
+      </VirtualRouter>,
+      this.elRef,
+    );
   }
 }

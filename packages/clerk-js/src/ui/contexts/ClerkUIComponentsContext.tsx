@@ -49,7 +49,7 @@ export type SignUpContextType = SignUpCtx & {
 };
 
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
@@ -125,7 +125,7 @@ export type SignInContextType = SignInCtx & {
 };
 
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
@@ -202,7 +202,7 @@ export type UserProfileContextType = UserProfileCtx & {
 };
 
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, customPages, ...ctx } = React.useContext(ComponentContext) || {};
   const { queryParams } = useRouter();
 
   if (componentName !== 'UserProfile') {
@@ -221,7 +221,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
 };
 
 export const useUserButtonContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
   const Clerk = useCoreClerk();
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
@@ -258,7 +258,7 @@ export const useUserButtonContext = () => {
 };
 
 export const useOrganizationSwitcherContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -421,7 +421,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
 };
 
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
-  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, customPages, ...ctx } = React.useContext(ComponentContext) || {};
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -458,7 +458,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
 };
 
 export const useCreateOrganizationContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -491,7 +491,7 @@ export const useCreateOrganizationContext = () => {
 };
 
 export const useGoogleOneTapContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
   const options = useOptions();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
@@ -504,7 +504,8 @@ export const useGoogleOneTapContext = () => {
     options,
     {
       ...ctx,
-      redirectUrl: window.location.href,
+      signInFallbackRedirectUrl: window.location.href,
+      signUpFallbackRedirectUrl: window.location.href,
     },
     queryParams,
   );

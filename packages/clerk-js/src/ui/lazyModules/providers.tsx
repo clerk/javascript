@@ -2,6 +2,7 @@ import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements';
+import { VirtualBodyRootPortal } from '../portal';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
@@ -126,5 +127,29 @@ export const LazyImpersonationFabProvider = (
         {props.children}
       </AppearanceProvider>
     </Suspense>
+  );
+};
+
+type LazyOneTapRendererProps = React.PropsWithChildren<
+  {
+    componentProps: any;
+    startPath: string;
+  } & Omit<AppearanceProviderProps, 'appearanceKey'>
+>;
+
+export const LazyOneTapRenderer = (props: LazyOneTapRendererProps) => {
+  return (
+    <AppearanceProvider
+      globalAppearance={props.globalAppearance}
+      appearanceKey={'oneTap'}
+      appearance={props.componentAppearance}
+    >
+      <VirtualBodyRootPortal
+        startPath={props.startPath}
+        component={ClerkComponents['OneTap']}
+        props={props.componentProps}
+        componentName={'OneTap'}
+      />
+    </AppearanceProvider>
   );
 };

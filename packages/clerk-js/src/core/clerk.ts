@@ -366,6 +366,18 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
+  public __experimental_openGoogleOneTap = (props?: OneTapProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'OneTap' })
+      .then(controls => controls.openModal('googleOneTap', props || {}));
+  };
+
+  public __experimental_closeGoogleOneTap = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('googleOneTap'));
+  };
+
   public openSignIn = (props?: SignInProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.#environment) && this.#instanceType === 'development') {
@@ -451,30 +463,6 @@ export default class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
-  };
-
-  public __experimental_mountGoogleOneTap = (node: HTMLDivElement, props?: OneTapProps): void => {
-    this.assertComponentsReady(this.#componentControls);
-
-    void this.#componentControls.ensureMounted({ preloadHint: 'OneTap' }).then(controls =>
-      controls.mountComponent({
-        name: 'OneTap',
-        appearanceKey: 'oneTap',
-        node,
-        props,
-      }),
-    );
-    // TODO-ONETAP: Enable telemetry one feature is ready for public beta
-    // this.telemetry?.record(eventComponentMounted('GoogleOneTap', props));
-  };
-
-  public __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

@@ -131,6 +131,20 @@ export interface Clerk {
   closeSignIn: () => void;
 
   /**
+   * Opens the Google One Tap component.
+   * @experimental
+   * @param props Optional props that will be passed to the GoogleOneTap component.
+   */
+  __experimental_openGoogleOneTap: (props?: OneTapProps) => void;
+
+  /**
+   * Opens the Google One Tap component.
+   * If the component is not already open, results in a noop.
+   * @experimental
+   */
+  __experimental_closeGoogleOneTap: () => void;
+
+  /**
    * Opens the Clerk SignUp component in a modal.
    * @param props Optional props that will be passed to the SignUp component.
    */
@@ -188,22 +202,6 @@ export interface Clerk {
    * @param targetNode Target node to unmount the SignIn component from.
    */
   unmountSignIn: (targetNode: HTMLDivElement) => void;
-
-  /**
-   * Mounts a Google one tap flow component at the target element.
-   * @experimental
-   * @param targetNode Target node to mount the GoogleOneTap component.
-   * @param oneTapProps sign in configuration parameters.
-   */
-  __experimental_mountGoogleOneTap: (targetNode: HTMLDivElement, oneTapProps?: OneTapProps) => void;
-
-  /**
-   * Unmount a Google one tap flow component from the target element.
-   * If there is no component mounted at the target node, results in a noop.
-   * @experimental
-   * @param targetNode Target node to unmount the SignIn component from.
-   */
-  __experimental_unmountGoogleOneTap: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a sign up flow component at the target element.
