@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.4.0
+
+### Minor Changes
+
+- Replace mount with open for GoogleOneTap. New api is `__experimental_openGoogleOneTap`. ([#3379](https://github.com/clerk/javascript/pull/3379)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Remove cookie when signing out before running `onBeforeSetActive` to resolve issues where we do navigations in `onBeforeSetActive`. ([#3371](https://github.com/clerk/javascript/pull/3371)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe), [`e84090db0`](https://github.com/clerk/javascript/commit/e84090db0d9a61a5e3dfea645e7c9cc6dad214a9)]:
+  - @clerk/types@4.4.0
+  - @clerk/localizations@2.4.2
+
 ## 5.3.2
 
 ### Patch Changes

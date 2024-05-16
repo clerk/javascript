@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.4.4
+
+### Patch Changes
+
+- Fix `setActive` not firing upon a successful sign up. ([#3391](https://github.com/clerk/javascript/pull/3391)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.4.3
 
 ### Patch Changes
