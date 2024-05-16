@@ -64,16 +64,6 @@ export default function SignUpPage() {
           >
             Continue
           </SignUp.Action>
-
-          <p className='text-center text-sm text-zinc-500'>
-            Already have an account?{' '}
-            <a
-              href='#'
-              className='font-medium text-zinc-950 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-zinc-700 hover:underline focus-visible:underline'
-            >
-              Sign in
-            </a>
-          </p>
         </SignUp.Step>
         <SignUp.Step
           name='verifications'
@@ -128,15 +118,6 @@ export default function SignUpPage() {
               Continue
             </SignUp.Action>
           </SignUp.Strategy>
-          <p className='text-center text-sm text-zinc-500'>
-            Already have an account?{' '}
-            <a
-              href='#'
-              className='font-medium text-zinc-950 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-zinc-700 hover:underline focus-visible:underline'
-            >
-              Sign in
-            </a>
-          </p>
         </SignUp.Step>
         <SignUp.Step
           name='continue'
@@ -164,15 +145,6 @@ export default function SignUpPage() {
           >
             Continue
           </SignUp.Action>
-          <p className='text-center text-sm text-zinc-500'>
-            Already have an account?{' '}
-            <a
-              href='#'
-              className='font-medium text-zinc-950 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-zinc-700 hover:underline focus-visible:underline'
-            >
-              Sign in
-            </a>
-          </p>
         </SignUp.Step>
       </SignUp.Root>
     </main>

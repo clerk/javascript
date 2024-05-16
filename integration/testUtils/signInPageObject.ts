@@ -46,9 +46,6 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
     getGoToSignUp: () => {
       return page.getByRole('link', { name: /sign up/i });
     },
-    getSignIn: () => {
-      return page.getByRole('button', { name: /sign in/i });
-    },
     getResetPassword: () => {
       return page.getByRole('button', { name: /(reset password|reset your password)/i });
     },
