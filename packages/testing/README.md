@@ -89,7 +89,7 @@ test("sign up", async ({ page }) => {
 
 ### Cypress
 
-⚠️ **Using Cypress to test Clerk is still in the experimental stage. Please be aware that there may be limitations and potential issues when using this approach.**
+⚠️ **Please note:** Support for Cypress is still experimental. Be aware that there are limitations and potential issues at this stage. Please open an issue with a minimal reproduction so that these issues can be fixed. Thanks!
 
 Firstly, add your Clerk keys (`CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`) to your environment variables file (e.g. `.env.local` or `.env.`).
 You can find these keys in your Clerk Dashboard.
