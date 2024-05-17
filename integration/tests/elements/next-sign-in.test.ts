@@ -36,6 +36,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
+    await u.page.waitForAppUrl('/sign-in/continue');
     await u.po.signIn.setPassword(fakeUser.password);
     await u.po.signIn.continue();
 
@@ -76,6 +77,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.page.getByRole('button', { name: /^use phone/i }).click();
     await u.po.signIn.getIdentifierInput().fill(fakeUser.phoneNumber);
     await u.po.signIn.continue();
+    await u.page.waitForAppUrl('/sign-in/continue');
     await u.po.signIn.setPassword(fakeUser.password);
     await u.po.signIn.continue();
 
@@ -109,6 +111,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await u.po.signIn.getIdentifierInput().fill(fakeUser.username);
     await u.po.signIn.continue();
+    await u.page.waitForAppUrl('/sign-in/continue');
     await u.po.signIn.setPassword(fakeUser.password);
     await u.po.signIn.continue();
 
@@ -148,6 +151,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]' });
     await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
     await u.po.signIn.continue();
+    await u.page.waitForAppUrl('/sign-in/continue');
     await u.po.signIn.setPassword('wrong-password');
     await u.po.signIn.continue();
     await expect(u.page.getByText(/^password is incorrect/i)).toBeVisible();
@@ -161,6 +165,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]' });
     await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
     await u.po.signIn.continue();
+    await u.page.waitForAppUrl('/sign-in/continue');
     await u.po.signIn.setPassword('wrong-password');
     await u.po.signIn.continue();
 

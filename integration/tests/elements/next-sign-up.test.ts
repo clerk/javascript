@@ -158,6 +158,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
+    await u.page.waitForAppUrl('/sign-in/continue');
     await u.po.signIn.setPassword(fakeUser.password);
     await u.po.signIn.continue();
 

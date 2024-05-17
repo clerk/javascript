@@ -218,7 +218,6 @@ export default function SignInPage() {
                   type='otp'
                   required
                   placeholder='Email code'
-                  autoSubmit
                   aria-label='Enter email verification code'
                   className='w-full border-b border-neutral-200 bg-white pb-2 text-sm/6 text-neutral-950 outline-none placeholder:text-neutral-400 hover:border-neutral-300 focus:border-neutral-600 data-[invalid]:border-red-600 data-[invalid]:text-red-600'
                 />
@@ -287,7 +286,6 @@ export default function SignInPage() {
                   type='otp'
                   required
                   placeholder='Phone code'
-                  autoSubmit
                   aria-label='Enter phone verification code'
                   className='w-full border-b border-neutral-200 bg-white pb-2 text-sm/6 text-neutral-950 outline-none placeholder:text-neutral-400 hover:border-neutral-300 focus:border-neutral-600 data-[invalid]:border-red-600 data-[invalid]:text-red-600'
                 />
