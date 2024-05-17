@@ -109,3 +109,11 @@ export function isDevelopmentFromSecretKey(apiKey: string): boolean {
 export function isProductionFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('live_') || apiKey.startsWith('sk_live_');
 }
+
+export const getCookieSuffix = (publishableKey: string): string => {
+  return publishableKey.split('_').pop() || '';
+};
+
+export const getSuffixedCookieName = (cookieName: string, publishableKey: string): string => {
+  return `${cookieName}_${getCookieSuffix(publishableKey)}`;
+};
