@@ -24,7 +24,7 @@ import type { SetRequired } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
-import { ClerkElementsFieldError } from '~/internals/errors';
+import { ClerkElementsFieldError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FieldDetails } from '~/internals/machines/form';
 import {
   fieldFeedbackSelector,
@@ -36,6 +36,7 @@ import {
 } from '~/internals/machines/form/form.context';
 import { usePassword } from '~/react/hooks/use-password.hook';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
+import { isReactFragment } from '~/react/utils/is-react-fragment';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
@@ -670,6 +671,10 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
     const Comp = asChild ? Slot : 'div';
     const child = typeof children === 'function' ? children(error) : children;
 
+    if (isReactFragment(child)) {
+      throw new ClerkElementsRuntimeError('<GlobalError /> cannot render a Fragment as a child.');
+    }
+
     return (
       <Comp
         role='alert'
@@ -703,7 +708,7 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
  * </Clerk.Field>
  */
 const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
-  ({ children, code, name, ...rest }, forwardedRef) => {
+  ({ asChild = false, children, code, name, ...rest }, forwardedRef) => {
     const fieldContext = useFieldContext();
     const fieldName = fieldContext?.name || name;
     const { feedback } = useFieldFeedback({ name: fieldName });
@@ -718,8 +723,14 @@ const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
       return null;
     }
 
+    const Comp = asChild ? Slot : 'span';
     const child = typeof children === 'function' ? children(error) : children;
+
     // const forceMatch = code ? error.code === code : undefined; // TODO: Re-add when Radix Form is updated
+
+    if (isReactFragment(child)) {
+      throw new ClerkElementsRuntimeError('<FieldError /> cannot render a Fragment as a child.');
+    }
 
     return (
       <RadixFormMessage
@@ -727,8 +738,9 @@ const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
         // forceMatch={forceMatch}
         {...rest}
         ref={forwardedRef}
+        asChild
       >
-        {child || error.message}
+        <Comp>{child || error.message}</Comp>
       </RadixFormMessage>
     );
   },

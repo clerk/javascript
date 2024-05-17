@@ -95,7 +95,6 @@ type IsomorphicLoadedClerk = Without<
   | 'mountSignUp'
   | 'mountSignIn'
   | 'mountUserProfile'
-  | '__experimental_mountGoogleOneTap'
   | 'client'
 > & {
   // TODO: Align return type and parms
@@ -131,7 +130,6 @@ type IsomorphicLoadedClerk = Without<
   mountOrganizationProfile: (node: HTMLDivElement, props: OrganizationProfileProps) => void;
   mountCreateOrganization: (node: HTMLDivElement, props: CreateOrganizationProps) => void;
   mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
-  __experimental_mountGoogleOneTap: (node: HTMLDivElement, props: OneTapProps) => void;
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
   client: ClientResource | undefined;
@@ -142,6 +140,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
+  private preopenOneTap?: null | OneTapProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -462,6 +461,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openUserProfile(this.preopenUserProfile);
     }
 
+    if (this.preopenOneTap !== null) {
+      clerkjs.__experimental_openGoogleOneTap(this.preopenOneTap);
+    }
+
     if (this.preopenOrganizationProfile !== null) {
       clerkjs.openOrganizationProfile(this.preopenOrganizationProfile);
     }
@@ -594,6 +597,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  __experimental_openGoogleOneTap = (props?: OneTapProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__experimental_openGoogleOneTap(props);
+    } else {
+      this.preopenOneTap = props;
+    }
+  };
+
+  __experimental_closeGoogleOneTap = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.__experimental_closeGoogleOneTap();
+    } else {
+      this.preopenOneTap = null;
+    }
+  };
+
   openUserProfile = (props?: UserProfileProps): void => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.openUserProfile(props);
@@ -671,18 +690,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountSignIn(node);
     } else {
       this.premountSignInNodes.delete(node);
-    }
-  };
-
-  __experimental_mountGoogleOneTap = (node: HTMLDivElement, props: OneTapProps): void => {
-    if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_mountGoogleOneTap(node, props);
-    }
-  };
-
-  __experimental_unmountGoogleOneTap = (node: HTMLDivElement): void => {
-    if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_unmountGoogleOneTap(node);
     }
   };
 

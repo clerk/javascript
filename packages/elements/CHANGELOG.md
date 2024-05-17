@@ -1,5 +1,17 @@
 # @clerk/elements
 
+## 0.4.5
+
+### Patch Changes
+
+- Update `<FieldError />` to enable `asChild` prop for custom markup in render function usage. ([#3396](https://github.com/clerk/javascript/pull/3396)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 0.4.4
+
+### Patch Changes
+
+- Fix `setActive` not firing upon a successful sign up. ([#3391](https://github.com/clerk/javascript/pull/3391)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.4.3
 
 ### Patch Changes

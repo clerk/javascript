@@ -510,7 +510,8 @@ export const useGoogleOneTapContext = () => {
     options,
     {
       ...ctx,
-      redirectUrl: window.location.href,
+      signInFallbackRedirectUrl: window.location.href,
+      signUpFallbackRedirectUrl: window.location.href,
     },
     queryParams,
   );
