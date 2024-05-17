@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.4.5
+
+### Patch Changes
+
+- Update `<FieldError />` to enable `asChild` prop for custom markup in render function usage. ([#3396](https://github.com/clerk/javascript/pull/3396)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.4.4
 
 ### Patch Changes
