@@ -21,11 +21,12 @@ export interface DevBrowser {
 
 export type CreateDevBrowserOptions = {
   frontendApi: string;
+  publishableKey: string;
   fapiClient: FapiClient;
 };
 
-export function createDevBrowser({ frontendApi, fapiClient }: CreateDevBrowserOptions): DevBrowser {
-  const devBrowserCookie = createDevBrowserCookie();
+export function createDevBrowser({ publishableKey, frontendApi, fapiClient }: CreateDevBrowserOptions): DevBrowser {
+  const devBrowserCookie = createDevBrowserCookie(publishableKey);
 
   function getDevBrowserJWT() {
     return devBrowserCookie.get();
