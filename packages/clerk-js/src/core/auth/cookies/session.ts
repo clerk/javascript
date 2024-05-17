@@ -1,8 +1,8 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+import { getSuffixedCookieName } from '@clerk/shared/keys';
 
 import { inCrossOriginIframe } from '../../../utils';
-import { getSuffixedCookieName } from '../utils';
 
 const SESSION_COOKIE_NAME = '__session';
 
