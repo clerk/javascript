@@ -3,12 +3,13 @@ import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidSecretKey } from '../util/optionsAssertions';
-import { isDevelopmentFromSecretKey } from '../util/shared';
+import { getCookieSuffix, isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
+import { suffixCookie, unSuffixCookie } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import type { AuthenticateRequestOptions } from './types';
 import { verifyToken } from './verify';
@@ -105,12 +106,16 @@ export async function authenticateRequest(
 
     const handshakePayload = await verifyHandshakeToken(authenticateContext.handshakeToken!, authenticateContext);
     const cookiesToSet = handshakePayload.handshake;
+    const cookieSuffix = getCookieSuffix(authenticateContext.publishableKey);
 
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
-      headers.append('Set-Cookie', x);
-      if (x.startsWith(`${constants.Cookies.Session}=`)) {
-        sessionToken = x.split(';')[0].substring(10);
+      const suffixedCookie = suffixCookie(cookieSuffix, x);
+      headers.append('Set-Cookie', suffixedCookie);
+      const unSuffixedCookie = unSuffixCookie(cookieSuffix, x);
+      headers.append('Set-Cookie', unSuffixedCookie);
+      if (unSuffixedCookie.startsWith(`${constants.Cookies.Session}=`)) {
+        sessionToken = unSuffixedCookie.split(';')[0].substring(10);
       }
     });
 

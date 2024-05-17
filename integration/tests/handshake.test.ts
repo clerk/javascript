@@ -164,7 +164,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}${devBrowserQuery}`,
+      )}&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -185,7 +185,9 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${app.serverUrl}/`)}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/`,
+      )}&suffixed_cookies=true`,
     );
   });
 
@@ -207,7 +209,9 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${app.serverUrl}/`)}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/`,
+      )}&suffixed_cookies=true`,
     );
   });
 
@@ -230,7 +234,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}${devBrowserQuery}`,
+      )}&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -254,7 +258,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}${devBrowserQuery}`,
+      )}&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -278,7 +282,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}${devBrowserQuery}`,
+      )}&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -300,7 +304,9 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(`${app.serverUrl}/`)}`,
+      `https://example.com/clerk/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/`,
+      )}&suffixed_cookies=true`,
     );
   });
 
@@ -324,7 +330,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}${devBrowserQuery}`,
+      )}&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -346,7 +352,9 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(`${app.serverUrl}/`)}`,
+      `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/`,
+      )}&suffixed_cookies=true`,
     );
   });
 
@@ -367,7 +375,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}${devBrowserQuery}`,
+      )}&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -386,7 +394,9 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${app.serverUrl}/`)}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/`,
+      )}&suffixed_cookies=true`,
     );
   });
 
@@ -485,7 +495,9 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(app.serverUrl + '/')}`,
+      `https://clerk.example.com/v1/client/handshake?redirect_url=${encodeURIComponent(
+        app.serverUrl + '/',
+      )}&suffixed_cookies=true`,
     );
   });
 
@@ -520,7 +532,9 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(`${app.serverUrl}/`)}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
+        `${app.serverUrl}/`,
+      )}&suffixed_cookies=true`,
     );
   });
 
@@ -543,7 +557,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar${devBrowserQuery}`,
+      )}hello%3Ffoo%3Dbar&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -566,7 +580,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}hello%3Ffoo%3Dbar`,
+      )}hello%3Ffoo%3Dbar&suffixed_cookies=true`,
     );
   });
 
@@ -589,7 +603,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar${devBrowserQuery}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -612,7 +626,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%2Fhello%3Ffoo%3Dbar&suffixed_cookies=true`,
     );
   });
 
@@ -635,7 +649,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar${devBrowserQuery}`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=true${devBrowserQuery}`,
     );
   });
 
@@ -658,7 +672,7 @@ test.describe('Client handshake @generic', () => {
     });
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar`,
+      `https://${config.pkHost}/v1/client/handshake?redirect_url=https%3A%2F%2Fexample.com%3A3213%2Fhello%3Ffoo%3Dbar&suffixed_cookies=true`,
     );
   });
 
@@ -787,7 +801,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.headers.get('location')).toBe(
       `https://${config.pkHost}/v1/client/handshake?redirect_url=${encodeURIComponent(
         `${app.serverUrl}/`,
-      )}&__clerk_db_jwt=asdf`,
+      )}&suffixed_cookies=true&__clerk_db_jwt=asdf`,
     );
   });
 
