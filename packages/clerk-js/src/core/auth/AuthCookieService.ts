@@ -52,11 +52,12 @@ export class AuthCookieService {
     this.refreshTokenOnVisibilityChange();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie();
-    this.sessionCookie = createSessionCookie();
+    this.clientUat = createClientUatCookie(clerk.publishableKey);
+    this.sessionCookie = createSessionCookie(clerk.publishableKey);
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
+      publishableKey: clerk.publishableKey,
     });
   }
 
