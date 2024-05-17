@@ -23,6 +23,11 @@ type ClerkSetupParams = {
  * @throws An error if the Cypress config object is not provided.
  */
 export const clerkSetup = async ({ config, options }: ClerkSetupParams) => {
+  console.log(
+    '\x1b[33m%s\x1b[0m',
+    '@clerk/testing: Support for Cypress is experimental and subject to change in the future.',
+  );
+
   if (!config) {
     throw new Error('The Cypress config object is required.');
   }
