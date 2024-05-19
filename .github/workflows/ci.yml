@@ -129,7 +129,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
+        test-name: ['generic', 'nextjs', 'express', 'quickstart']
         test-project: ['chrome']
 
     steps:

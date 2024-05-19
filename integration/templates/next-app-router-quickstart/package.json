@@ -12,9 +12,10 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "next": "14.1.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "babel-plugin-react-compiler": "latest",
+    "next": "canary",
+    "react": "19.0.0-beta-04b058868c-20240508",
+    "react-dom": "19.0.0-beta-04b058868c-20240508",
     "typescript": "^5"
   },
   "engines": {
