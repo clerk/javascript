@@ -24,6 +24,7 @@ export const Popover = (props: PopoverProps) => {
               context={context}
               initialFocus={initialFocus}
               order={order}
+              closeOnFocusOut={false}
             >
               <>{children}</>
             </FloatingFocusManager>
@@ -40,6 +41,7 @@ export const Popover = (props: PopoverProps) => {
           context={context}
           initialFocus={initialFocus}
           order={order}
+          closeOnFocusOut={false}
         >
           <>{children}</>
         </FloatingFocusManager>
