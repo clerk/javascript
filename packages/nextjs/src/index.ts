@@ -31,7 +31,7 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   OrganizationList,
-  __experimental_GoogleOneTap,
+  GoogleOneTap,
 } from './client-boundary/uiComponents';
 
 /**
@@ -99,11 +99,11 @@ export const Protect = ComponentsModule.Protect as ServerComponentsServerModuleT
 export const auth = ServerHelperModule.auth as ServerHelpersServerModuleTypes['auth'];
 export const currentUser = ServerHelperModule.currentUser as ServerHelpersServerModuleTypes['currentUser'];
 // export const getAuth = ServerHelperModule.getAuth as ServerHelpersServerModuleTypes['getAuth'];
-export const clerkClient = ServerHelperModule.clerkClient as ServerHelpersServerModuleTypes['clerkClient'];
+export const clerkClient = ServerHelperModule.clerkClient ;
 export const authMiddleware = ServerHelperModule.authMiddleware as ServerHelpersServerModuleTypes['authMiddleware'];
 export const redirectToSignIn =
-  ServerHelperModule.redirectToSignIn as ServerHelpersServerModuleTypes['redirectToSignIn'];
+  ServerHelperModule.redirectToSignIn ;
 export const redirectToSignUp =
-  ServerHelperModule.redirectToSignUp as ServerHelpersServerModuleTypes['redirectToSignUp'];
+  ServerHelperModule.redirectToSignUp ;
 export const withClerkMiddleware =
   ServerHelperModule.withClerkMiddleware as ServerHelpersServerModuleTypes['withClerkMiddleware'];

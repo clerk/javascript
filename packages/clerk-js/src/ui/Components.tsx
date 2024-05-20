@@ -6,7 +6,7 @@ import type {
   ClerkOptions,
   CreateOrganizationProps,
   EnvironmentResource,
-  OneTapProps,
+  GoogleOneTapProps,
   OrganizationProfileProps,
   SignInProps,
   SignUpProps,
@@ -84,7 +84,7 @@ interface ComponentsProps {
 interface ComponentsState {
   appearance: Appearance | undefined;
   options: ClerkOptions | undefined;
-  googleOneTapModal: null | OneTapProps;
+  googleOneTapModal: null | GoogleOneTapProps;
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;

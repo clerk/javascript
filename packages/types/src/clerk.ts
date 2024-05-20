@@ -132,17 +132,15 @@ export interface Clerk {
 
   /**
    * Opens the Google One Tap component.
-   * @experimental
    * @param props Optional props that will be passed to the GoogleOneTap component.
    */
-  __experimental_openGoogleOneTap: (props?: OneTapProps) => void;
+  openGoogleOneTap: (props?: GoogleOneTapProps) => void;
 
   /**
    * Opens the Google One Tap component.
    * If the component is not already open, results in a noop.
-   * @experimental
    */
-  __experimental_closeGoogleOneTap: () => void;
+  closeGoogleOneTap: () => void;
 
   /**
    * Opens the Clerk SignUp component in a modal.
@@ -423,10 +421,10 @@ export interface Clerk {
   redirectToHome: () => void;
 
   /**
-   * Completes an Google One Tap redirection flow started by
-   * {@link Clerk.__experimental_authenticateWithGoogleOneTap}
+   * Completes a Google One Tap redirection flow started by
+   * {@link Clerk.authenticateWithGoogleOneTap}
    */
-  __experimental_handleGoogleOneTapCallback: (
+  handleGoogleOneTapCallback: (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
@@ -465,11 +463,10 @@ export interface Clerk {
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
-   * @experimental
-   * Authenticates user using a google token generated from google identity services.
+   * Authenticates user using a Google token generated from Google identity services.
    */
-  __experimental_authenticateWithGoogleOneTap: (
-    params: __experimental_AuthenticateWithGoogleOneTapParams,
+  authenticateWithGoogleOneTap: (
+    params: AuthenticateWithGoogleOneTapParams,
   ) => Promise<SignInResource | SignUpResource>;
 
   /**
@@ -703,9 +700,9 @@ export type SignInProps = {
   initialValues?: SignInInitialValues;
 } & RedirectOptions;
 
-type OneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
+type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
-export type OneTapProps = OneTapRedirectUrlProps & {
+export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   /**
    * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
    * @default true
@@ -1099,7 +1096,7 @@ export interface AuthenticateWithMetamaskParams {
   unsafeMetadata?: SignUpUnsafeMetadata;
 }
 
-export interface __experimental_AuthenticateWithGoogleOneTapParams {
+export interface AuthenticateWithGoogleOneTapParams {
   token: string;
 }
 

@@ -1,4 +1,4 @@
-import type { OneTapProps } from '@clerk/types';
+import type { GoogleOneTapProps } from '@clerk/types';
 import React from 'react';
 
 import { withCoreSessionSwitchGuard } from '../../contexts';
@@ -22,4 +22,4 @@ function OneTapRoutes(): JSX.Element {
 
 OneTapRoutes.displayName = 'OneTap';
 
-export const OneTap: React.ComponentType<OneTapProps> = withCoreSessionSwitchGuard(OneTapRoutes);
+export const OneTap: React.ComponentType<GoogleOneTapProps> = withCoreSessionSwitchGuard(OneTapRoutes);

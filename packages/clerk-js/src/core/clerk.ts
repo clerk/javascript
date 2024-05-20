@@ -17,8 +17,8 @@ import {
   stripScheme,
 } from '@clerk/shared';
 import type {
-  __experimental_AuthenticateWithGoogleOneTapParams,
   ActiveSessionResource,
+  AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   BeforeEmitCallback,
   Clerk as ClerkInterface,
@@ -30,12 +30,13 @@ import type {
   DomainOrProxyUrl,
   EnvironmentJSON,
   EnvironmentResource,
+  GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleMagicLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
-  OneTapProps,
+  NavigateOptions,
   OrganizationInvitationResource,
   OrganizationListProps,
   OrganizationMembershipResource,
@@ -366,14 +367,14 @@ export default class Clerk implements ClerkInterface {
     }
   };
 
-  public __experimental_openGoogleOneTap = (props?: OneTapProps): void => {
+  public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
-      .ensureMounted({ preloadHint: 'OneTap' })
+      .ensureMounted({ preloadHint: 'GoogleOneTap' })
       .then(controls => controls.openModal('googleOneTap', props || {}));
   };
 
-  public __experimental_closeGoogleOneTap = (): void => {
+  public closeGoogleOneTap = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('googleOneTap'));
   };
@@ -956,7 +957,7 @@ export default class Clerk implements ClerkInterface {
     return null;
   };
 
-  public __experimental_handleGoogleOneTapCallback = async (
+  public handleGoogleOneTapCallback = async (
     signInOrUp: SignInResource | SignUpResource,
     params: HandleOAuthCallbackParams,
     customNavigate?: (to: string) => Promise<unknown>,
@@ -1220,23 +1221,19 @@ export default class Clerk implements ClerkInterface {
     return this.setActive({ session: null });
   };
 
-  public __experimental_authenticateWithGoogleOneTap = async (
-    params: __experimental_AuthenticateWithGoogleOneTapParams,
+  public authenticateWithGoogleOneTap = async (
+    params: AuthenticateWithGoogleOneTapParams,
   ): Promise<SignInResource | SignUpResource> => {
     return this.client?.signIn
       .create({
-        // TODO-ONETAP: Add new types when feature is ready for public beta
-        // @ts-expect-error
         strategy: 'google_one_tap',
-        googleOneTapToken: params.token,
+        token: params.token,
       })
       .catch(err => {
         if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
           return this.client?.signUp.create({
-            // TODO-ONETAP: Add new types when feature is ready for public beta
-            // @ts-expect-error
             strategy: 'google_one_tap',
-            googleOneTapToken: params.token,
+            token: params.token,
           });
         }
         throw err;

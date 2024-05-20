@@ -1,7 +1,7 @@
 import { logErrorInDevMode } from '@clerk/shared';
 import type {
   CreateOrganizationProps,
-  OneTapProps,
+  GoogleOneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -151,7 +151,7 @@ export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>
     <Portal
       mount={clerk.mountSignIn}
       unmount={clerk.unmountSignIn}
-      updateProps={(clerk ).__unstable__updateProps}
+      updateProps={clerk.__unstable__updateProps}
       props={props}
     />
   );
@@ -162,7 +162,7 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
     <Portal
       mount={clerk.mountSignUp}
       unmount={clerk.unmountSignUp}
-      updateProps={(clerk ).__unstable__updateProps}
+      updateProps={clerk.__unstable__updateProps}
       props={props}
     />
   );
@@ -257,7 +257,7 @@ export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<
     <Portal
       mount={clerk.mountCreateOrganization}
       unmount={clerk.unmountCreateOrganization}
-      updateProps={(clerk ).__unstable__updateProps}
+      updateProps={clerk.__unstable__updateProps}
       props={props}
     />
   );
@@ -290,18 +290,18 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
     <Portal
       mount={clerk.mountOrganizationList}
       unmount={clerk.unmountOrganizationList}
-      updateProps={(clerk ).__unstable__updateProps}
+      updateProps={clerk.__unstable__updateProps}
       props={props}
     />
   );
 }, 'OrganizationList');
 
-export const __experimental_GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<OneTapProps>) => {
+export const GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<GoogleOneTapProps>) => {
   return (
     <Portal
-      open={clerk.__experimental_openGoogleOneTap}
-      close={clerk.__experimental_closeGoogleOneTap}
+      open={clerk.openGoogleOneTap}
+      close={clerk.closeGoogleOneTap}
       props={props}
     />
   );
-}, 'OneTap');
+}, 'GoogleOneTap');

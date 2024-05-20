@@ -1,6 +1,5 @@
-import { deepSnakeToCamel, deprecated, isClerkAPIResponseError, Poller } from '@clerk/shared';
+import { deepSnakeToCamel, deprecated, Poller } from '@clerk/shared';
 import type {
-  __experimental_AuthenticateWithGoogleOneTapParams,
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
   AuthenticateWithRedirectParams,
@@ -25,7 +24,6 @@ import type {
   SignInStartEmailLinkFlowParams,
   SignInStartMagicLinkFlowParams,
   SignInStatus,
-  SignUpResource,
   VerificationResource,
   Web3SignatureConfig,
   Web3SignatureFactor,
@@ -240,27 +238,6 @@ export class SignIn extends BaseResource implements SignInResource {
     }
   };
 
-  public __experimental_authenticateWithGoogleOneTap = async (
-    params: __experimental_AuthenticateWithGoogleOneTapParams,
-  ): Promise<SignInResource | SignUpResource> => {
-    return this.create({
-      // TODO-ONETAP: Add new types when feature is ready for public beta
-      // @ts-expect-error
-      strategy: 'google_one_tap',
-      googleOneTapToken: params.token,
-    }).catch(err => {
-      if (isClerkAPIResponseError(err) && err.errors[0].code === 'external_account_not_found') {
-        return SignIn.clerk.client?.signUp.create({
-          // TODO-ONETAP: Add new types when feature is ready for public beta
-          // @ts-expect-error
-          strategy: 'google_one_tap',
-          googleOneTapToken: params.token,
-        });
-      }
-      throw err;
-    }) as Promise<SignInResource | SignUpResource>;
-  };
-
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
     const { identifier, generateSignature } = params || {};
     if (!(typeof generateSignature === 'function')) {
@@ -282,7 +259,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const { nonce } = this.firstFactorVerification;
     const signature = await generateSignature({
       identifier: this.identifier!,
-      nonce: nonce!,
+      nonce: nonce,
     });
 
     return this.attemptFirstFactor({
@@ -302,7 +279,7 @@ export class SignIn extends BaseResource implements SignInResource {
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
       return createValidatePassword({
-        ...(SignIn.clerk.__unstable__environment?.userSettings.passwordSettings as any),
+        ...(SignIn.clerk.__unstable__environment?.userSettings.passwordSettings ),
         validatePassword: true,
       })(password, cb);
     }

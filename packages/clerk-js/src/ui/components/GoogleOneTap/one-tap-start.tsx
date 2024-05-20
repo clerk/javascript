@@ -29,10 +29,10 @@ function _OneTapStart(): JSX.Element | null {
   async function oneTapCallback(response: GISCredentialResponse) {
     isPromptedRef.current = false;
     try {
-      const res = await clerk.__experimental_authenticateWithGoogleOneTap({
+      const res = await clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      await clerk.__experimental_handleGoogleOneTapCallback(
+      await clerk.handleGoogleOneTapCallback(
         res,
         {
           signInUrl,
@@ -81,7 +81,7 @@ function _OneTapStart(): JSX.Element | null {
         // Close the modal, when the user clicks outside the prompt or cancels
         if (notification.getMomentType() === 'skipped') {
           // Unmounts the component will cause the useEffect cleanup function from below to be called
-          clerk.__experimental_closeGoogleOneTap();
+          clerk.closeGoogleOneTap();
         }
       });
       isPromptedRef.current = true;

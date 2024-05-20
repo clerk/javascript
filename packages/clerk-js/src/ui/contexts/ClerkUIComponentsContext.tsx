@@ -12,13 +12,12 @@ import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
   CreateOrganizationCtx,
-  OneTapCtx,
+  GoogleOneTapCtx,
   OrganizationListCtx,
   OrganizationProfileCtx,
   OrganizationSwitcherCtx,
   SignInCtx,
   SignUpCtx,
-  UserButtonCtx,
   UserProfileCtx,
 } from '../types';
 import type { CustomPageContent } from '../utils';
@@ -49,7 +48,7 @@ export type SignUpContextType = SignUpCtx & {
 };
 
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
@@ -125,7 +124,7 @@ export type SignInContextType = SignInCtx & {
 };
 
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
@@ -202,7 +201,7 @@ export type UserProfileContextType = UserProfileCtx & {
 };
 
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, customPages, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {});
   const { queryParams } = useRouter();
 
   if (componentName !== 'UserProfile') {
@@ -258,7 +257,7 @@ export const useUserButtonContext = () => {
 };
 
 export const useOrganizationSwitcherContext = () => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -421,7 +420,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
 };
 
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
-  const { componentName, customPages, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {});
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -458,7 +457,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
 };
 
 export const useCreateOrganizationContext = () => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -491,12 +490,12 @@ export const useCreateOrganizationContext = () => {
 };
 
 export const useGoogleOneTapContext = () => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
   const options = useOptions();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
 
-  if (componentName !== 'OneTap') {
+  if (componentName !== 'GoogleOneTap') {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
 

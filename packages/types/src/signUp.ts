@@ -20,6 +20,7 @@ import type { ClerkResource } from './resource';
 import type {
   EmailCodeStrategy,
   EmailLinkStrategy,
+  GoogleOneTapStrategy,
   OAuthStrategy,
   PhoneCodeStrategy,
   SamlStrategy,
@@ -168,12 +169,13 @@ export type SignUpCreateParams = Partial<
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
-    strategy: OAuthStrategy | SamlStrategy | TicketStrategy;
+    strategy: OAuthStrategy | SamlStrategy | TicketStrategy | GoogleOneTapStrategy;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;
     unsafeMetadata: SignUpUnsafeMetadata;
     ticket: string;
+    token: string;
   } & SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>
 >;
 
