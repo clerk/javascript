@@ -14,7 +14,7 @@ import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
   CreateOrganizationCtx,
-  OneTapCtx,
+  GoogleOneTapCtx,
   OrganizationListCtx,
   OrganizationProfileCtx,
   OrganizationSwitcherCtx,
@@ -497,12 +497,12 @@ export const useCreateOrganizationContext = () => {
 };
 
 export const useGoogleOneTapContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OneTapCtx;
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as GoogleOneTapCtx;
   const options = useOptions();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
 
-  if (componentName !== 'OneTap') {
+  if (componentName !== 'GoogleOneTap') {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
 

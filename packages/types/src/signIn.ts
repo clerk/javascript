@@ -1,4 +1,3 @@
-import type { __experimental_AuthenticateWithGoogleOneTapParams } from './clerk';
 import type {
   BackupCodeAttempt,
   BackupCodeFactor,
@@ -48,11 +47,11 @@ import type {
 import type { ValidatePasswordCallbacks } from './passwords';
 import type { AuthenticateWithRedirectParams } from './redirects';
 import type { ClerkResource } from './resource';
-import type { SignUpResource } from './signUp';
 import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
+  GoogleOneTapStrategy,
   OAuthStrategy,
   PasskeyStrategy,
   PasswordStrategy,
@@ -100,13 +99,6 @@ export interface SignInResource extends ClerkResource {
   authenticateWithMetamask: () => Promise<SignInResource>;
 
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
-
-  /**
-   * @deprecated Use `Clerk.__experimental_authenticateWithGoogleOneTap`
-   */
-  __experimental_authenticateWithGoogleOneTap: (
-    params: __experimental_AuthenticateWithGoogleOneTapParams,
-  ) => Promise<SignInResource | SignUpResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
@@ -183,6 +175,10 @@ export type SignInCreateParams = (
   | {
       strategy: TicketStrategy;
       ticket: string;
+    }
+  | {
+      strategy: GoogleOneTapStrategy;
+      token: string;
     }
   | {
       strategy: PasswordStrategy;
