@@ -22,6 +22,7 @@ const appRouterTurbo = appRouter
 const appRouterCanary = appRouter
   .clone()
   .setName('next-app-router-canary')
+  .addScript('setup', 'npm i --force')
   .addDependency('next', 'canary')
   .addDependency('react', '19.0.0-beta-04b058868c-20240508')
   .addDependency('react-dom', '19.0.0-beta-04b058868c-20240508');
