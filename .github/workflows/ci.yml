@@ -45,6 +45,9 @@ jobs:
         if: ${{ !(github.event_name == 'merge_group') }}
         run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
+      - name: Lint Pull Request Title
+        run: echo "${{ github.event.pull_request.title }}" | npx commitlint
+
       - name: Lint GitHub Actions Workflows
         run: npx eslint .github
         shell: bash
