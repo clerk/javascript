@@ -84,7 +84,7 @@ export const ptBR: LocalizationResource = {
     'Endereço de e-mail para receber um código e verificar este domínio',
   formFieldLabel__organizationName: 'Nome da organização',
   formFieldLabel__organizationSlug: 'Rótulo do URL',
-  formFieldLabel__passkeyName: undefined,
+  formFieldLabel__passkeyName: 'Nome da chave de acesso',
   formFieldLabel__password: 'Senha',
   formFieldLabel__phoneNumber: 'Telefone',
   formFieldLabel__role: 'Função',
@@ -94,7 +94,7 @@ export const ptBR: LocalizationResource = {
     action__signOut: 'Sair',
     title: 'Logado como {{identifier}}',
   },
-  maintenanceMode: undefined,
+  maintenanceMode: 'Estamos em manutenção, mas não se preocupe, não deve levar mais do que alguns minutos',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
   membershipRole__guestMember: 'Convidado',
@@ -280,7 +280,7 @@ export const ptBR: LocalizationResource = {
     },
     alternativeMethods: {
       actionLink: 'Ajuda',
-      actionText: 'Don’t have any of these?',
+      actionText: 'Não tem nenhum destes?',
       blockButton__backupCode: 'Utilize um código de backup',
       blockButton__emailCode: 'Enviar código para {{identifier}}',
       blockButton__emailLink: 'Enviar link para {{identifier}}',
@@ -337,14 +337,18 @@ export const ptBR: LocalizationResource = {
         subtitleNewTab: 'Retorne para a nova aba que foi aberta para continuar',
         titleNewTab: 'Conectado em outra aba',
       },
+      clientMismatch: {
+        subtitle: 'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o login',
+        title: 'Link de verificação é inválido para este dispositivo',
+      },
     },
     forgotPassword: {
       formTitle: 'Código de redefinição de senha',
       resendButton: 'Não recebeu um código? Reenviar',
       subtitle: 'para redefinir sua senha',
-      subtitle_email: 'Primeiro, digite o código enviado para seu email',
+      subtitle_email: 'Primeiro, digite o código enviado para seu e-mail',
       subtitle_phone: 'Primeiro, digite o código enviado para seu telefone',
-      title: 'Resetar senha',
+      title: 'Redefinir senha',
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: 'Redefinir sua senha',
@@ -354,7 +358,7 @@ export const ptBR: LocalizationResource = {
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Aconteceu um erro',
-      title: 'Não foi possível fazer login',
+      title: 'Não foi possível entrar',
     },
     passkey: {
       subtitle:
@@ -439,6 +443,11 @@ export const ptBR: LocalizationResource = {
         subtitleNewTab: 'Retorne para a aba anterior para continuar',
         title: 'E-mail verificado com sucesso',
       },
+      clientMismatch: {
+        subtitle:
+          'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o cadastro',
+        title: 'Link de verificação é inválido para este dispositivo',
+      },
     },
     phoneCode: {
       formSubtitle: 'Insira o código enviado para seu telefone',
@@ -477,14 +486,14 @@ export const ptBR: LocalizationResource = {
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
     form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
-    form_password_pwned__sign_in: 'Esta senha foi compromeditda, por favor redefina sua senha.',
+    form_password_pwned__sign_in: 'Esta senha foi comprometida, por favor redefina sua senha.',
     form_password_size_in_bytes_exceeded:
       'Sua senha excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
     form_password_validation_failed: 'Senha incorreta',
     form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
     form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
-    not_allowed_access: 'Aceso não permitido.',
+    not_allowed_access: 'Acesso não permitido.',
     passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
     passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
     passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
@@ -606,7 +615,7 @@ export const ptBR: LocalizationResource = {
         title: 'Remover e-mail',
       },
       title: 'Adicionar e-mail',
-      verifyTitle: 'Verificar endereço de email',
+      verifyTitle: 'Verificar endereço de e-mail',
     },
     formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continuar',
@@ -673,11 +682,11 @@ export const ptBR: LocalizationResource = {
     },
     passkeyScreen: {
       removeResource: {
-        messageLine1: undefined,
-        title: undefined,
+        messageLine1: '{{name}} será removido desta conta.',
+        title: 'Remover chave de acesso',
       },
-      subtitle__rename: undefined,
-      title__rename: undefined,
+      subtitle__rename: 'Você pode renomear a chave de acesso para que seja mais fácil encontrá-la.',
+      title__rename: 'Renomear chave de acesso',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
@@ -759,13 +768,13 @@ export const ptBR: LocalizationResource = {
         title: 'Verificação em duas etapas',
         totp: {
           destructiveActionTitle: 'Remover',
-          headerTitle: 'Applicativo autenticador',
+          headerTitle: 'Aplicativo autenticador',
         },
       },
       passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
+        menuAction__destructive: 'Remover',
+        menuAction__rename: 'Renomear',
+        title: 'Chaves de acesso',
       },
       passwordSection: {
         primaryButton__setPassword: 'Defina a senha',
