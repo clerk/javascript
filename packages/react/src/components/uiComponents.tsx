@@ -1,7 +1,7 @@
 import { logErrorInDevMode } from '@clerk/shared';
 import type {
   CreateOrganizationProps,
-  OneTapProps,
+  GoogleOneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -21,6 +21,7 @@ import {
 } from '../errors';
 import type {
   MountProps,
+  OpenProps,
   OrganizationProfileLinkProps,
   OrganizationProfilePageProps,
   UserProfileLinkProps,
@@ -86,10 +87,23 @@ type OrganizationSwitcherPropsWithoutCustomPages = Omit<OrganizationSwitcherProp
 // });
 
 // Portal.displayName = 'ClerkPortal';
-class Portal extends React.PureComponent<MountProps> {
+
+const isMountProps = (props: any): props is MountProps => {
+  return 'mount' in props;
+};
+
+const isOpenProps = (props: any): props is OpenProps => {
+  return 'open' in props;
+};
+
+class Portal extends React.PureComponent<MountProps | OpenProps> {
   private portalRef = React.createRef<HTMLDivElement>();
 
-  componentDidUpdate(prevProps: Readonly<MountProps>) {
+  componentDidUpdate(prevProps: Readonly<MountProps | OpenProps>) {
+    if (!isMountProps(prevProps) || !isMountProps(this.props)) {
+      return;
+    }
+
     if (
       prevProps.props.appearance !== this.props.props.appearance ||
       prevProps.props?.customPages?.length !== this.props.props?.customPages?.length
@@ -100,13 +114,24 @@ class Portal extends React.PureComponent<MountProps> {
 
   componentDidMount() {
     if (this.portalRef.current) {
-      this.props.mount(this.portalRef.current, this.props.props);
+      if (isMountProps(this.props)) {
+        this.props.mount(this.portalRef.current, this.props.props);
+      }
+
+      if (isOpenProps(this.props)) {
+        this.props.open(this.props.props);
+      }
     }
   }
 
   componentWillUnmount() {
     if (this.portalRef.current) {
-      this.props.unmount(this.portalRef.current);
+      if (isMountProps(this.props)) {
+        this.props.unmount(this.portalRef.current);
+      }
+      if (isOpenProps(this.props)) {
+        this.props.close();
+      }
     }
   }
 
@@ -114,7 +139,8 @@ class Portal extends React.PureComponent<MountProps> {
     return (
       <>
         <div ref={this.portalRef} />
-        {this.props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
+        {isMountProps(this.props) &&
+          this.props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
       </>
     );
   }
@@ -270,13 +296,12 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
   );
 }, 'OrganizationList');
 
-export const __experimental_GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<OneTapProps>) => {
+export const GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<GoogleOneTapProps>) => {
   return (
     <Portal
-      mount={clerk.__experimental_mountGoogleOneTap}
-      unmount={clerk.__experimental_unmountGoogleOneTap}
-      updateProps={(clerk as any).__unstable__updateProps}
+      open={clerk.openGoogleOneTap}
+      close={clerk.closeGoogleOneTap}
       props={props}
     />
   );
-}, 'OneTap');
+}, 'GoogleOneTap');

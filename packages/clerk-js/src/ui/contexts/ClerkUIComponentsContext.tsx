@@ -1,6 +1,6 @@
 import { deprecated, snakeToCamel } from '@clerk/shared';
-import type { OrganizationResource, UserResource } from '@clerk/types';
-import React, { useMemo } from 'react';
+import type { HandleOAuthCallbackParams, OrganizationResource, UserResource } from '@clerk/types';
+import React, { useCallback, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildAuthQueryString, buildURL, createDynamicParamParser, pickRedirectionProp } from '../../utils';
@@ -12,7 +12,7 @@ import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
   CreateOrganizationCtx,
-  OneTapCtx,
+  GoogleOneTapCtx,
   OrganizationListCtx,
   OrganizationProfileCtx,
   OrganizationSwitcherCtx,
@@ -491,14 +491,91 @@ export const useCreateOrganizationContext = () => {
 };
 
 export const useGoogleOneTapContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OneTapCtx;
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as GoogleOneTapCtx;
+  const options = useOptions();
+  const { displayConfig } = useEnvironment();
+  const { queryParams } = useRouter();
+  const clerk = useCoreClerk();
 
-  if (componentName !== 'OneTap') {
+  if (componentName !== 'GoogleOneTap') {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
+
+  const generateCallbackUrls = useCallback(
+    (returnBackUrl: string): HandleOAuthCallbackParams => {
+      const signInUrl = pickRedirectionProp('signInUrl', { options, displayConfig }, false);
+      const signUpUrl = pickRedirectionProp('signUpUrl', { options, displayConfig }, false);
+
+      const afterSignUpUrl = clerk.buildUrlWithAuth(
+        pickRedirectionProp('afterSignUpUrl', {
+          queryParams,
+          ctx: {
+            ...ctx,
+            afterSignUpUrl: returnBackUrl,
+          },
+          options,
+          displayConfig,
+        }),
+      );
+
+      const afterSignInUrl = clerk.buildUrlWithAuth(
+        pickRedirectionProp('afterSignInUrl', {
+          queryParams,
+          ctx: {
+            ...ctx,
+            afterSignInUrl: returnBackUrl,
+          },
+          options,
+          displayConfig,
+        }),
+      );
+
+      const signUpContinueUrl = buildURL(
+        {
+          base: signUpUrl,
+          hashPath: '/continue',
+          hashSearch: new URLSearchParams({
+            after_sign_up_url: afterSignUpUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+
+      const firstFactorUrl = buildURL(
+        {
+          base: signInUrl,
+          hashPath: '/factor-one',
+          hashSearch: new URLSearchParams({
+            after_sign_in_url: afterSignInUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+      const secondFactorUrl = buildURL(
+        {
+          base: signInUrl,
+          hashPath: '/factor-two',
+          hashSearch: new URLSearchParams({
+            after_sign_in_url: afterSignInUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+
+      return {
+        firstFactorUrl,
+        secondFactorUrl,
+        continueSignUpUrl: signUpContinueUrl,
+        afterSignUpUrl,
+        afterSignInUrl,
+      };
+    },
+    [ctx, displayConfig.signInUrl, displayConfig.signUpUrl, options, queryParams],
+  );
 
   return {
     ...ctx,
     componentName,
+    generateCallbackUrls,
   };
 };

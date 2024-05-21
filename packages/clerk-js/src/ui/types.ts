@@ -1,6 +1,6 @@
 import type {
   CreateOrganizationProps,
-  OneTapProps,
+  GoogleOneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -11,7 +11,7 @@ import type {
 } from '@clerk/types';
 
 export type {
-  OneTapProps,
+  GoogleOneTapProps,
   SignInProps,
   SignUpProps,
   UserButtonProps,
@@ -74,8 +74,8 @@ export type OrganizationListCtx = OrganizationListProps & {
   mode?: ComponentMode;
 };
 
-export type OneTapCtx = OneTapProps & {
-  componentName: 'OneTap';
+export type GoogleOneTapCtx = GoogleOneTapProps & {
+  componentName: 'GoogleOneTap';
 };
 
 export type AvailableComponentCtx =
@@ -87,4 +87,4 @@ export type AvailableComponentCtx =
   | CreateOrganizationCtx
   | OrganizationSwitcherCtx
   | OrganizationListCtx
-  | OneTapCtx;
+  | GoogleOneTapCtx;

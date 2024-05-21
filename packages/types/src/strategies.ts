@@ -1,6 +1,7 @@
 import type { OAuthProvider } from './oauth';
 import type { Web3Provider } from './web3';
 
+export type GoogleOneTapStrategy = 'google_one_tap';
 export type PasswordStrategy = 'password';
 export type PhoneCodeStrategy = 'phone_code';
 export type EmailCodeStrategy = 'email_code';

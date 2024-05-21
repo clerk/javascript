@@ -1,82 +1,81 @@
 import { useUserContext } from '@clerk/shared/react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import type { GISCredentialResponse } from '../../../utils/one-tap';
 import { loadGIS } from '../../../utils/one-tap';
-import { useCoreClerk, useCoreSignIn, useEnvironment, useGoogleOneTapContext } from '../../contexts';
+import { useCoreClerk, useEnvironment, useGoogleOneTapContext } from '../../contexts';
 import { withCardStateProvider } from '../../elements';
 import { useFetch } from '../../hooks';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useRouter } from '../../router';
 
 function _OneTapStart(): JSX.Element | null {
   const clerk = useCoreClerk();
-  const signIn = useCoreSignIn();
   const user = useUserContext();
   const environment = useEnvironment();
+  const isPromptedRef = useRef(false);
+  const { navigate } = useRouter();
 
-  const supportEmail = useSupportEmail();
   const ctx = useGoogleOneTapContext();
 
   async function oneTapCallback(response: GISCredentialResponse) {
+    isPromptedRef.current = false;
     try {
-      const res = await signIn.__experimental_authenticateWithGoogleOneTap({
+      const res = await clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-
-      switch (res.status) {
-        case 'complete':
-          await clerk.setActive({
-            session: res.createdSessionId,
-          });
-          break;
-        // TODO-ONETAP: Add a new case in order to handle the `missing_requirements` status and the PSU flow
-        default:
-          clerkInvalidFAPIResponse(res.status, supportEmail);
-          break;
-      }
-    } catch (err) {
-      /**
-       * Currently it is not possible to display an error in the UI.
-       * As a fallback we simply open the SignIn modal for the user to sign in.
-       */
-      clerk.openSignIn();
+      await clerk.handleGoogleOneTapCallback(res, ctx.generateCallbackUrls(window.location.href), navigate);
+    } catch (e) {
+      console.error(e);
     }
   }
 
   const environmentClientID = environment.displayConfig.googleOneTapClientId;
   const shouldLoadGIS = !user?.id && !!environmentClientID;
 
+  async function initializeGIS() {
+    const google = await loadGIS();
+    google.accounts.id.initialize({
+      client_id: environmentClientID!,
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      callback: oneTapCallback,
+      itp_support: ctx.itpSupport,
+      cancel_on_tap_outside: ctx.cancelOnTapOutside,
+      auto_select: false,
+      use_fedcm_for_prompt: ctx.fedCmSupport,
+    });
+    return google;
+  }
+
   /**
    * Prevent GIS from initializing multiple times
    */
-  const { data: google } = useFetch(shouldLoadGIS ? loadGIS : undefined, 'google-identity-services-script', {
-    onSuccess(google) {
-      google.accounts.id.initialize({
-        client_id: environmentClientID!,
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        callback: oneTapCallback,
-        itp_support: true,
-        cancel_on_tap_outside: ctx.cancelOnTapOutside,
-        auto_select: false,
-        use_fedcm_for_prompt: true,
-      });
+  const { data: initializedGoogle } = useFetch(
+    shouldLoadGIS ? initializeGIS : undefined,
+    'google-identity-services-script',
+  );
 
-      google.accounts.id.prompt();
-    },
-  });
+  useEffect(() => {
+    if (initializedGoogle && !user?.id && !isPromptedRef.current) {
+      initializedGoogle.accounts.id.prompt(notification => {
+        // Close the modal, when the user clicks outside the prompt or cancels
+        if (notification.getMomentType() === 'skipped') {
+          // Unmounts the component will cause the useEffect cleanup function from below to be called
+          clerk.closeGoogleOneTap();
+        }
+      });
+      isPromptedRef.current = true;
+    }
+  }, [clerk, initializedGoogle, user?.id]);
 
   // Trigger only on mount/unmount. Above we handle the logic for the initial fetch + initialization
   useEffect(() => {
-    if (google && !user?.id) {
-      google.accounts.id.prompt();
-    }
     return () => {
-      if (google) {
-        google.accounts.id.cancel();
+      if (initializedGoogle && isPromptedRef.current) {
+        isPromptedRef.current = false;
+        initializedGoogle.accounts.id.cancel();
       }
     };
-  }, [user?.id]);
+  }, [initializedGoogle]);
 
   return null;
 }
