@@ -1,0 +1,1234 @@
+{
+  "extends": [
+    ":separateMajorReleases",
+    ":combinePatchMinorReleases",
+    ":ignoreUnstable",
+    ":disablePeerDependencies",
+    ":maintainLockFilesDisabled",
+    ":label(dependencies)",
+    ":dependencyDashboard",
+    ":enableVulnerabilityAlerts",
+    ":ignoreModulesAndTests",
+    ":prImmediately",
+    ":semanticPrefixFixDepsChoreOthers"
+  ],
+  "includePaths": [
+    "package.json",
+    "packages/**",
+    "integration/templates/**"
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    ".nvmrc"
+  ],
+  "minimumReleaseAge": "3 days",
+  "timezone": "GMT",
+  "schedule": [
+    "before 7am on the first day of the month"
+  ],
+  "prCreation": "immediate",
+  "updateNotScheduled": false,
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "rangeStrategy": "auto",
+  "prHourlyLimit": 4,
+  "prConcurrentLimit": 16,
+  "postUpdateOptions": [
+    "npmDedupe"
+  ],
+  "packageRules": [
+    {
+      "matchDepTypes": [
+        "engines",
+        "@types/node"
+      ],
+      "enabled": false
+    },
+    {
+      "matchPackagePatterns": [
+        "^@clerk/"
+      ],
+      "enabled": false
+    },
+    {
+      "groupName": "Clerk Monorepo",
+      "groupSlug": "clerk-monorepo",
+      "matchFileNames": [
+        "+(package.json)"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
+      ],
+      "dependencyDashboardApproval": false,
+      "commitMessageTopic": "Dependencies for Clerk Monorepo"
+    },
+    {
+      "groupName": "Linting & Formatting",
+      "matchPackageNames": [
+        "@types/eslint",
+        "prettier",
+        "publint",
+        "@arethetypeswrong/cli",
+        "@commitlint/cli",
+        "@commitlint/config-conventional"
+      ],
+      "matchPackagePrefixes": [
+        "@eslint/",
+        "@stylistic/eslint-plugin",
+        "@types/eslint__",
+        "@typescript-eslint/",
+        "eslint"
+      ]
+    },
+    {
+      "groupName": "Testing",
+      "matchPackageNames": [
+        "@types/chai",
+        "@types/jest",
+        "@types/sinon",
+        "nock",
+        "nyc",
+        "ts-jest",
+        "vitest"
+      ],
+      "matchPackagePrefixes": [
+        "@testing-library",
+        "@types/testing-library__",
+        "@vitest",
+        "chai",
+        "jest",
+        "qunit",
+        "should",
+        "sinon",
+        "@playwright"
+      ]
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for backend",
+      "groupSlug": "backend-dev-minor",
+      "matchFileNames": [
+        "packages/backend/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for backend{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for backend",
+      "groupSlug": "backend-dev-major",
+      "matchFileNames": [
+        "packages/backend/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for backend{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for backend",
+      "groupSlug": "backend-prod-minor",
+      "matchFileNames": [
+        "packages/backend/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for backend{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for backend",
+      "groupSlug": "backend-prod-major",
+      "matchFileNames": [
+        "packages/backend/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for backend{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for chrome-extension",
+      "groupSlug": "chrome-extension-dev-minor",
+      "matchFileNames": [
+        "packages/chrome-extension/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for chrome-extension{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for chrome-extension",
+      "groupSlug": "chrome-extension-dev-major",
+      "matchFileNames": [
+        "packages/chrome-extension/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for chrome-extension{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for chrome-extension",
+      "groupSlug": "chrome-extension-prod-minor",
+      "matchFileNames": [
+        "packages/chrome-extension/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for chrome-extension{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for chrome-extension",
+      "groupSlug": "chrome-extension-prod-major",
+      "matchFileNames": [
+        "packages/chrome-extension/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for chrome-extension{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for clerk-js",
+      "groupSlug": "clerk-js-dev-minor",
+      "matchFileNames": [
+        "packages/clerk-js/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for clerk-js{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for clerk-js",
+      "groupSlug": "clerk-js-dev-major",
+      "matchFileNames": [
+        "packages/clerk-js/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for clerk-js{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for clerk-js",
+      "groupSlug": "clerk-js-prod-minor",
+      "matchFileNames": [
+        "packages/clerk-js/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for clerk-js{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for clerk-js",
+      "groupSlug": "clerk-js-prod-major",
+      "matchFileNames": [
+        "packages/clerk-js/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for clerk-js{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for elements",
+      "groupSlug": "elements-dev-minor",
+      "matchFileNames": [
+        "packages/elements/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for elements{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for elements",
+      "groupSlug": "elements-dev-major",
+      "matchFileNames": [
+        "packages/elements/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for elements{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for elements",
+      "groupSlug": "elements-prod-minor",
+      "matchFileNames": [
+        "packages/elements/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for elements{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for elements",
+      "groupSlug": "elements-prod-major",
+      "matchFileNames": [
+        "packages/elements/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for elements{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for eslint-config-custom",
+      "groupSlug": "eslint-config-custom-dev-minor",
+      "matchFileNames": [
+        "packages/eslint-config-custom/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for eslint-config-custom{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for eslint-config-custom",
+      "groupSlug": "eslint-config-custom-dev-major",
+      "matchFileNames": [
+        "packages/eslint-config-custom/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for eslint-config-custom{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for eslint-config-custom",
+      "groupSlug": "eslint-config-custom-prod-minor",
+      "matchFileNames": [
+        "packages/eslint-config-custom/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for eslint-config-custom{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for eslint-config-custom",
+      "groupSlug": "eslint-config-custom-prod-major",
+      "matchFileNames": [
+        "packages/eslint-config-custom/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for eslint-config-custom{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for expo",
+      "groupSlug": "expo-dev-minor",
+      "matchFileNames": [
+        "packages/expo/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for expo{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for expo",
+      "groupSlug": "expo-dev-major",
+      "matchFileNames": [
+        "packages/expo/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for expo{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for expo",
+      "groupSlug": "expo-prod-minor",
+      "matchFileNames": [
+        "packages/expo/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for expo{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for expo",
+      "groupSlug": "expo-prod-major",
+      "matchFileNames": [
+        "packages/expo/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for expo{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for express",
+      "groupSlug": "express-dev-minor",
+      "matchFileNames": [
+        "packages/express/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for express{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for express",
+      "groupSlug": "express-dev-major",
+      "matchFileNames": [
+        "packages/express/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for express{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for express",
+      "groupSlug": "express-prod-minor",
+      "matchFileNames": [
+        "packages/express/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for express{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for express",
+      "groupSlug": "express-prod-major",
+      "matchFileNames": [
+        "packages/express/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for express{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for fastify",
+      "groupSlug": "fastify-dev-minor",
+      "matchFileNames": [
+        "packages/fastify/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for fastify{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for fastify",
+      "groupSlug": "fastify-dev-major",
+      "matchFileNames": [
+        "packages/fastify/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for fastify{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for fastify",
+      "groupSlug": "fastify-prod-minor",
+      "matchFileNames": [
+        "packages/fastify/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for fastify{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for fastify",
+      "groupSlug": "fastify-prod-major",
+      "matchFileNames": [
+        "packages/fastify/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for fastify{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for gatsby-plugin-clerk",
+      "groupSlug": "gatsby-plugin-clerk-dev-minor",
+      "matchFileNames": [
+        "packages/gatsby-plugin-clerk/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for gatsby-plugin-clerk{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for gatsby-plugin-clerk",
+      "groupSlug": "gatsby-plugin-clerk-dev-major",
+      "matchFileNames": [
+        "packages/gatsby-plugin-clerk/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for gatsby-plugin-clerk{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for gatsby-plugin-clerk",
+      "groupSlug": "gatsby-plugin-clerk-prod-minor",
+      "matchFileNames": [
+        "packages/gatsby-plugin-clerk/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for gatsby-plugin-clerk{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for gatsby-plugin-clerk",
+      "groupSlug": "gatsby-plugin-clerk-prod-major",
+      "matchFileNames": [
+        "packages/gatsby-plugin-clerk/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for gatsby-plugin-clerk{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for localizations",
+      "groupSlug": "localizations-dev-minor",
+      "matchFileNames": [
+        "packages/localizations/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for localizations{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for localizations",
+      "groupSlug": "localizations-dev-major",
+      "matchFileNames": [
+        "packages/localizations/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for localizations{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for localizations",
+      "groupSlug": "localizations-prod-minor",
+      "matchFileNames": [
+        "packages/localizations/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for localizations{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for localizations",
+      "groupSlug": "localizations-prod-major",
+      "matchFileNames": [
+        "packages/localizations/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for localizations{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for nextjs",
+      "groupSlug": "nextjs-dev-minor",
+      "matchFileNames": [
+        "packages/nextjs/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for nextjs{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for nextjs",
+      "groupSlug": "nextjs-dev-major",
+      "matchFileNames": [
+        "packages/nextjs/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for nextjs{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for nextjs",
+      "groupSlug": "nextjs-prod-minor",
+      "matchFileNames": [
+        "packages/nextjs/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for nextjs{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for nextjs",
+      "groupSlug": "nextjs-prod-major",
+      "matchFileNames": [
+        "packages/nextjs/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for nextjs{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for react",
+      "groupSlug": "react-dev-minor",
+      "matchFileNames": [
+        "packages/react/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for react{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for react",
+      "groupSlug": "react-dev-major",
+      "matchFileNames": [
+        "packages/react/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for react{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for react",
+      "groupSlug": "react-prod-minor",
+      "matchFileNames": [
+        "packages/react/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for react{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for react",
+      "groupSlug": "react-prod-major",
+      "matchFileNames": [
+        "packages/react/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for react{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for remix",
+      "groupSlug": "remix-dev-minor",
+      "matchFileNames": [
+        "packages/remix/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for remix{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for remix",
+      "groupSlug": "remix-dev-major",
+      "matchFileNames": [
+        "packages/remix/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for remix{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for remix",
+      "groupSlug": "remix-prod-minor",
+      "matchFileNames": [
+        "packages/remix/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for remix{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for remix",
+      "groupSlug": "remix-prod-major",
+      "matchFileNames": [
+        "packages/remix/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for remix{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for sdk-node",
+      "groupSlug": "sdk-node-dev-minor",
+      "matchFileNames": [
+        "packages/sdk-node/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for sdk-node{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for sdk-node",
+      "groupSlug": "sdk-node-dev-major",
+      "matchFileNames": [
+        "packages/sdk-node/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for sdk-node{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for sdk-node",
+      "groupSlug": "sdk-node-prod-minor",
+      "matchFileNames": [
+        "packages/sdk-node/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for sdk-node{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for sdk-node",
+      "groupSlug": "sdk-node-prod-major",
+      "matchFileNames": [
+        "packages/sdk-node/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for sdk-node{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for shared",
+      "groupSlug": "shared-dev-minor",
+      "matchFileNames": [
+        "packages/shared/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for shared{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for shared",
+      "groupSlug": "shared-dev-major",
+      "matchFileNames": [
+        "packages/shared/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for shared{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for shared",
+      "groupSlug": "shared-prod-minor",
+      "matchFileNames": [
+        "packages/shared/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for shared{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for shared",
+      "groupSlug": "shared-prod-major",
+      "matchFileNames": [
+        "packages/shared/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for shared{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for testing",
+      "groupSlug": "testing-dev-minor",
+      "matchFileNames": [
+        "packages/testing/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for testing{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for testing",
+      "groupSlug": "testing-dev-major",
+      "matchFileNames": [
+        "packages/testing/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for testing{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for testing",
+      "groupSlug": "testing-prod-minor",
+      "matchFileNames": [
+        "packages/testing/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for testing{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for testing",
+      "groupSlug": "testing-prod-major",
+      "matchFileNames": [
+        "packages/testing/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for testing{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for themes",
+      "groupSlug": "themes-dev-minor",
+      "matchFileNames": [
+        "packages/themes/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for themes{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for themes",
+      "groupSlug": "themes-dev-major",
+      "matchFileNames": [
+        "packages/themes/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for themes{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for themes",
+      "groupSlug": "themes-prod-minor",
+      "matchFileNames": [
+        "packages/themes/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for themes{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for themes",
+      "groupSlug": "themes-prod-major",
+      "matchFileNames": [
+        "packages/themes/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for themes{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for types",
+      "groupSlug": "types-dev-minor",
+      "matchFileNames": [
+        "packages/types/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for types{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for types",
+      "groupSlug": "types-dev-major",
+      "matchFileNames": [
+        "packages/types/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for types{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for types",
+      "groupSlug": "types-prod-minor",
+      "matchFileNames": [
+        "packages/types/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for types{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for types",
+      "groupSlug": "types-prod-major",
+      "matchFileNames": [
+        "packages/types/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for types{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies for upgrade",
+      "groupSlug": "upgrade-dev-minor",
+      "matchFileNames": [
+        "packages/upgrade/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "commitMessageSuffix": "{{#unless groupName}} for upgrade{{/unless}}"
+    },
+    {
+      "groupName": "[DEV] major dependencies for upgrade",
+      "groupSlug": "upgrade-dev-major",
+      "matchFileNames": [
+        "packages/upgrade/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for upgrade{{/unless}}"
+    },
+    {
+      "groupName": "minor & patch dependencies for upgrade",
+      "groupSlug": "upgrade-prod-minor",
+      "matchFileNames": [
+        "packages/upgrade/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for upgrade{{/unless}}"
+    },
+    {
+      "groupName": "major dependencies for upgrade",
+      "groupSlug": "upgrade-prod-major",
+      "matchFileNames": [
+        "packages/upgrade/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "commitMessageSuffix": "{{#unless groupName}} for upgrade{{/unless}}"
+    }
+  ]
+}
