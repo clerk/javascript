@@ -21,6 +21,9 @@
     "**/node_modules/**",
     ".nvmrc"
   ],
+  "nvm": {
+    "enabled": false
+  },
   "minimumReleaseAge": "3 days",
   "timezone": "GMT",
   "schedule": [
@@ -40,8 +43,13 @@
   "packageRules": [
     {
       "matchDepTypes": [
-        "engines",
-        "@types/node"
+        "engines"
+      ],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": [
+        "node"
       ],
       "enabled": false
     },
@@ -108,6 +116,24 @@
         "sinon",
         "@playwright"
       ]
+    },
+    {
+      "groupName": "TypeScript",
+      "matchPackageNames": [
+        "typescript"
+      ],
+      "rangeStrategy": "bump",
+      "dependencyDashboardApproval": false
+    },
+    {
+      "groupName": "Common TypeScript Types",
+      "matchPackageNames": [
+        "@types/node",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "rangeStrategy": "bump",
+      "dependencyDashboardApproval": false
     },
     {
       "groupName": "[DEV] minor & patch dependencies for backend",

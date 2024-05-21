@@ -29,7 +29,11 @@ const rules = new Map();
  */
 const defaultRules = [
   {
-    matchDepTypes: ['engines', '@types/node'],
+    matchDepTypes: ['engines'],
+    enabled: false,
+  },
+  {
+    matchPackageNames: ['node'],
     enabled: false,
   },
   // Don't bump @clerk/ packages since changesets will handle this
@@ -72,6 +76,18 @@ const defaultRules = [
       'sinon',
       '@playwright',
     ],
+  },
+  {
+    groupName: 'TypeScript',
+    matchPackageNames: ['typescript'],
+    rangeStrategy: 'bump',
+    dependencyDashboardApproval: false,
+  },
+  {
+    groupName: 'Common TypeScript Types',
+    matchPackageNames: ['@types/node', '@types/react', '@types/react-dom'],
+    rangeStrategy: 'bump',
+    dependencyDashboardApproval: false,
   },
 ];
 
@@ -137,6 +153,9 @@ const renovateConfig = {
   ],
   includePaths: ['package.json', 'packages/**', 'integration/templates/**'],
   ignorePaths: ['**/node_modules/**', '.nvmrc'],
+  nvm: {
+    enabled: false,
+  },
   minimumReleaseAge: '3 days',
   timezone: 'GMT',
   schedule: ['before 7am on the first day of the month'],
