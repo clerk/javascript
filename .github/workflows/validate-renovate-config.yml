@@ -1,0 +1,29 @@
+name: Validate Renovate Config
+
+on:
+  pull_request:
+    paths:
+      - 'renovate.json5'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-renovate-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          node-version: 22
+      
+      - name: Validate Renovate Config
+        run: (node scripts/renovate-config-generator.mjs && (git status --porcelain renovate.json5 | grep "M renovate.json5")) && (echo "Please run \"node scripts/renovate-config-generator.mjs\" to update renovate.json5" && exit 1) || npx --yes --package renovate renovate-config-validator
