@@ -1243,8 +1243,7 @@
       "matchPackageNames": [
         "typescript"
       ],
-      "rangeStrategy": "bump",
-      "dependencyDashboardApproval": false
+      "rangeStrategy": "bump"
     },
     {
       "groupName": "Common TypeScript Types",
@@ -1253,8 +1252,7 @@
         "@types/react",
         "@types/react-dom"
       ],
-      "rangeStrategy": "bump",
-      "dependencyDashboardApproval": false
+      "rangeStrategy": "bump"
     },
     {
       "groupName": "React",
@@ -1263,6 +1261,15 @@
         "react-dom"
       ],
       "rangeStrategy": "bump"
+    },
+    {
+      "extends": "monorepo:remix",
+      "groupName": "Remix Monorepo",
+      "matchUpdateTypes": [
+        "patch",
+        "minor",
+        "major"
+      ]
     }
   ]
 }
