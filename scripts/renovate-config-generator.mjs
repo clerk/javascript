@@ -79,18 +79,21 @@ const defaultRules = [
     groupName: 'TypeScript',
     matchPackageNames: ['typescript'],
     rangeStrategy: 'bump',
-    dependencyDashboardApproval: false,
   },
   {
     groupName: 'Common TypeScript Types',
     matchPackageNames: ['@types/node', '@types/react', '@types/react-dom'],
     rangeStrategy: 'bump',
-    dependencyDashboardApproval: false,
   },
   {
     groupName: 'React',
     matchPackageNames: ['react', 'react-dom'],
     rangeStrategy: 'bump',
+  },
+  {
+    extends: 'monorepo:remix',
+    groupName: 'Remix Monorepo',
+    matchUpdateTypes: ['patch', 'minor', 'major'],
   },
 ];
 
