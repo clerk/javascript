@@ -22,6 +22,7 @@ jobs:
         with:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
+          playwright-enabled: true # Must be present to enable caching on branched workflows
           turbo-token: ${{ secrets.TURBO_TOKEN }}
       
       - name: Validate Renovate Config
