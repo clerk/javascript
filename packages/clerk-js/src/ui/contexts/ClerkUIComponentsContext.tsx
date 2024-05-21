@@ -14,6 +14,7 @@ import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
   CreateOrganizationCtx,
+  GoogleOneTapCtx,
   OrganizationListCtx,
   OrganizationProfileCtx,
   OrganizationSwitcherCtx,
@@ -496,7 +497,7 @@ export const useCreateOrganizationContext = () => {
 };
 
 export const useGoogleOneTapContext = () => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as GoogleOneTapCtx;
   const options = useOptions();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();

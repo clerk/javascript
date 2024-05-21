@@ -116,7 +116,7 @@ export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolea
     // Merge search params from hashSearch string
     const searchParamsFromHashSearchString = getQueryParams(hashSearch || '');
     for (const [key, val] of Object.entries(searchParamsFromHashSearchString)) {
-      dummyUrlForHash.searchParams.append(key, val);
+      dummyUrlForHash.searchParams.append(key, val as string);
     }
 
     // Merge search params from the hashSearchParams object
