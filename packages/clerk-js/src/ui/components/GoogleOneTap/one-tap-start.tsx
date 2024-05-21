@@ -16,7 +16,6 @@ function _OneTapStart(): JSX.Element | null {
   const { navigate } = useRouter();
 
   const ctx = useGoogleOneTapContext();
-  const { continueSignUpUrl, secondFactorUrl, firstFactorUrl, afterSignInUrl, afterSignUpUrl } = ctx;
 
   async function oneTapCallback(response: GISCredentialResponse) {
     isPromptedRef.current = false;
@@ -24,17 +23,7 @@ function _OneTapStart(): JSX.Element | null {
       const res = await clerk.authenticateWithGoogleOneTap({
         token: response.credential,
       });
-      await clerk.handleGoogleOneTapCallback(
-        res,
-        {
-          continueSignUpUrl,
-          secondFactorUrl,
-          firstFactorUrl,
-          afterSignInUrl,
-          afterSignUpUrl,
-        },
-        navigate,
-      );
+      await clerk.handleGoogleOneTapCallback(res, ctx.generateCallbackUrls(window.location.href), navigate);
     } catch (e) {
       console.error(e);
     }
