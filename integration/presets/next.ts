@@ -19,6 +19,13 @@ const appRouterTurbo = appRouter
   .setName('next-app-router-turbopack')
   .addScript('dev', 'npm run dev -- --turbo');
 
+const appRouterCanary = appRouter
+  .clone()
+  .setName('next-app-router-canary')
+  .addDependency('next', 'canary')
+  .addDependency('react', '19.0.0-beta-04b058868c-20240508')
+  .addDependency('react-dom', '19.0.0-beta-04b058868c-20240508');
+
 const appRouterQuickstart = appRouter
   .clone()
   .setName('next-app-router-quickstart')
@@ -50,4 +57,5 @@ export const next = {
   appRouterQuickstart,
   appRouterAPWithClerkNextLatest,
   appRouterAPWithClerkNextV4,
+  appRouterCanary,
 } as const;

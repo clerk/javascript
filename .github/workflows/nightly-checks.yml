@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['nextjs']
+        test-name: ['nextjs:canary']
 
     steps:
       - name: Checkout Repo
