@@ -1,10 +1,10 @@
 import type {
-  __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
   DeletedObjectJSON,
   DeletedObjectResource,
   PasskeyJSON,
   PasskeyResource,
   PasskeyVerificationResource,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
   UpdatePasskeyParams,
 } from '@clerk/types';
 
@@ -42,7 +42,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
   private static async attemptVerification(
     passkeyId: string,
-    credential: __experimental_PublicKeyCredentialWithAuthenticatorAttestationResponse,
+    credential: PublicKeyCredentialWithAuthenticatorAttestationResponse,
   ) {
     const jsonPublicKeyCredential = serializePublicKeyCredential(credential);
     return BaseResource._fetch({
@@ -82,7 +82,7 @@ export class Passkey extends BaseResource implements PasskeyResource {
         throw new ClerkWebAuthnError(
           'Registration requires a platform authenticator but the device does not support it.',
           {
-            code: 'passkeys_pa_not_supported',
+            code: 'passkey_pa_not_supported',
           },
         );
       }

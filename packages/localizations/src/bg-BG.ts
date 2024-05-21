@@ -83,6 +83,7 @@ export const bgBG: LocalizationResource = {
     'Въведете имейл адрес под този домейн, за да получите код и да потвърдите домейна.',
   formFieldLabel__organizationName: 'Име',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Парола',
   formFieldLabel__phoneNumber: 'Телефонен номер',
   formFieldLabel__role: 'Роля',
@@ -92,6 +93,7 @@ export const bgBG: LocalizationResource = {
     action__signOut: 'Изход',
     title: 'Влезли сте като {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Член',
   membershipRole__guestMember: 'Гост',
@@ -282,6 +284,7 @@ export const bgBG: LocalizationResource = {
       blockButton__backupCode: 'Използвай резервен код',
       blockButton__emailCode: 'Изпрати код по имейл до {{identifier}}',
       blockButton__emailLink: 'Изпрати линк по имейл до {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Влез с парола',
       blockButton__phoneCode: 'Изпрати SMS код до {{identifier}}',
       blockButton__totp: 'Използвай приложение за удостоверяване',
@@ -353,10 +356,17 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Възникна грешка',
       title: 'Неуспешно влизане',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Използвайте друг метод',
       subtitle: 'Въведете паролата, свързана с вашия акаунт',
       title: 'Въведете вашата парола',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Код за потвърждение',
@@ -383,6 +393,7 @@ export const bgBG: LocalizationResource = {
       actionLink: 'Регистрирайте се',
       actionLink__use_email: 'Използвайте имейл',
       actionLink__use_email_username: 'Използвайте имейл или потребителско име',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Използвайте телефон',
       actionLink__use_username: 'Използвайте потребителско име',
       actionText: 'Нямате акаунт?',
@@ -451,6 +462,9 @@ export const bgBG: LocalizationResource = {
       'Регистрацията неуспешна поради неуспешна валидация на бот. Моля, презаредете страницата, за да опитате отново, или се свържете с поддръжката за повече помощ.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Имейл адресът трябва да бъде във валиден имейл адрес.',
@@ -463,6 +477,7 @@ export const bgBG: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Вашата парола не е достатъчно сигурна.',
     form_password_pwned: 'Тази парола е част от изтекли данни и не може да се използва. Моля, опитайте с друга парола.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Паролата ви надвиши максималния брой байтове, позволен, моля, я скратете или премахнете някои специални знаци.',
     form_password_validation_failed: 'Неправилна парола',
@@ -470,6 +485,11 @@ export const bgBG: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Не можете да изтриете последната си идентификация.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'по-малко от {{length}} символа',
       minimumLength: '{{length}} или повече символа',
@@ -650,6 +670,14 @@ export const bgBG: LocalizationResource = {
       security: 'Security',
       title: 'Профил',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -732,6 +760,11 @@ export const bgBG: LocalizationResource = {
           destructiveActionTitle: 'Премахни',
           headerTitle: 'Приложение за удостоверяване',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Задай парола',

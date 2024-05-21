@@ -1,5 +1,892 @@
 # Change Log
 
+## 5.0.12
+
+### Patch Changes
+
+- Updated dependencies [[`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe)]:
+  - @clerk/clerk-react@5.1.0
+
+## 5.0.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.7
+
+## 5.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`4d3dc00fb`](https://github.com/clerk/javascript/commit/4d3dc00fb444c87e3d27f398cd0c1ce4d176f65b), [`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/backend@1.1.5
+  - @clerk/shared@2.1.1
+  - @clerk/clerk-react@5.0.6
+
+## 5.0.9
+
+### Patch Changes
+
+- Updated dependencies [[`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20), [`bcbb2c9ef`](https://github.com/clerk/javascript/commit/bcbb2c9ef42c11b13c1d2f60db4dd88a2d4f04f6)]:
+  - @clerk/shared@2.1.0
+  - @clerk/clerk-react@5.0.5
+  - @clerk/backend@1.1.4
+
+## 5.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`b92402258`](https://github.com/clerk/javascript/commit/b924022580569c934a9d33310449b4a50156070a)]:
+  - @clerk/backend@1.1.3
+
+## 5.0.7
+
+### Patch Changes
+
+- Fix a bug where response headers from `@clerk/backend` would not be applied to the response when a redirect was triggered from a custom middleware handler. ([#3344](https://github.com/clerk/javascript/pull/3344)) by [@BRKalow](https://github.com/BRKalow)
+
+- Pass `devBrowserToken` to `createRedirect()` to ensure methods from `auth()` that trigger redirects correctly pass the dev browser token for URL-based session syncing. ([#3334](https://github.com/clerk/javascript/pull/3334)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`39265d909`](https://github.com/clerk/javascript/commit/39265d90941c850fd1b24295b19b904a5f3eaba6), [`4f4375e88`](https://github.com/clerk/javascript/commit/4f4375e88fa2daae4d725c62da5e4cf29302e53c), [`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`4ae79af36`](https://github.com/clerk/javascript/commit/4ae79af36552aae1f0284ecc4dfcfc23ef295d26), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/clerk-react@5.0.4
+  - @clerk/backend@1.1.2
+  - @clerk/shared@2.0.2
+
+## 5.0.6
+
+### Patch Changes
+
+- Notify users when catch-all route and all of its children routes are being protected by the middleware ([#3311](https://github.com/clerk/javascript/pull/3311)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Update docs links to point to the correct pages ([#3312](https://github.com/clerk/javascript/pull/3312)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+## 5.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`e93b5777b`](https://github.com/clerk/javascript/commit/e93b5777b4f8578e6a6f81566e2601ab0e65590a)]:
+  - @clerk/clerk-react@5.0.3
+
+## 5.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`8fbe23857`](https://github.com/clerk/javascript/commit/8fbe23857bc588a4662af78ee33b24123cd8bc2e), [`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc), [`e79d2e3d3`](https://github.com/clerk/javascript/commit/e79d2e3d3be02eb1cf8b2647ac179cc5d4aa2de2)]:
+  - @clerk/backend@1.1.1
+  - @clerk/shared@2.0.1
+  - @clerk/clerk-react@5.0.2
+
+## 5.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`b3fda50f0`](https://github.com/clerk/javascript/commit/b3fda50f03672106c6858219fc607d226851ec10), [`b3ad7a459`](https://github.com/clerk/javascript/commit/b3ad7a459c46be1f8967faf73c2cdd96406593c8), [`4e5de1164`](https://github.com/clerk/javascript/commit/4e5de1164d956c7dc21f72d25e312296d36504a7)]:
+  - @clerk/backend@1.1.0
+
+## 5.0.2
+
+### Patch Changes
+
+- Export all Webhook event types and related JSON types. The newly exported types are: `DeletedObjectJSON`, `EmailJSON`, `OrganizationInvitationJSON`, `OrganizationJSON`, `OrganizationMembershipJSON`, `SessionJSON`, `SMSMessageJSON`, `UserJSON`, `UserWebhookEvent`, `EmailWebhookEvent`, `SMSWebhookEvent`, `SessionWebhookEvent`, `OrganizationWebhookEvent`, `OrganizationMembershipWebhookEvent`, `OrganizationInvitationWebhookEvent` ([#3248](https://github.com/clerk/javascript/pull/3248)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`3c6e5a6f1`](https://github.com/clerk/javascript/commit/3c6e5a6f1dd0ac198e6e48d1b83c6d4846a7f900), [`65503dcb9`](https://github.com/clerk/javascript/commit/65503dcb97acb9538e5c0e3f8199d20ad31c9d7d)]:
+  - @clerk/backend@1.0.1
+  - @clerk/clerk-react@5.0.1
+
+## 5.0.1
+
+### Patch Changes
+
+- cfbe43d3a: Correctly read legacy NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL and NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL env variables
+
+## 5.0.0
+
+### Major Changes
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- f31031a21: Drop deprecations. Migration steps:
+  - use `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` instead of `NEXT_PUBLIC_CLERK_FRONTEND_API` env variable
+  - use `NEXT_PUBLIC_CLERK_JS_VERSION` instead of `CLERK_JS_VERSION`
+  - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY`
+  - use `publishableKey` instead of `frontendApi`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - use `@clerk/nextjs` instead of `@clerk/nextjs/app-beta`
+  - use `@clerk/nextjs` instead of `@clerk/nextjs/ssr`
+  - use `@clerk/nextjs` instead of `@clerk/nextjs/edge-middleware` or `@clerk/nextjs/edge-middlewarefiles`
+  - use `@clerk/nextjs` instead of `@clerk/nextjs/api`
+  - use middleware with `authMiddleware` instead of `withClerkMiddleware`
+  - avoid using exported constants: `API_URL`, `API_VERSION`, `CLERK_JS_URL`, `CLERK_JS_VERSION`, `DOMAIN`, `IS_SATELLITE`, `PROXY_URL`, `PUBLISHABLE_KEY`, `SECRET_KEY`, `SIGN_IN_URL`, `SIGN_UP_URL`
+- 7f833da9e: Drop deprecations. Migration steps:
+  - use `publishableKey` instead of `frontendApi`
+  - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - drop `orgs` jwt claim from session token
+  - use `ExternalAccount.imageUrl` instead of `ExternalAccount.avatarUrl`
+  - use `Organization.imageUrl` instead of `Organization.logoUrl`
+  - use `User.imageUrl` instead of `User.profileImageUrl`
+  - use `OrganizationMembershipPublicUserData.imageUrl` instead of `OrganizationMembershipPublicUserData.profileImageUrl`
+  - use `useOrganizationList` instead of `useOrganizations`
+  - use `userProfileProps` instead of `userProfile` in `Appearance`
+  - use `Clerk.setActive()` instead of `Clerk.setSession()`
+  - drop `password` param in `User.update()`
+  - use `afterSelectOrganizationUrl` instead of `afterSwitchOrganizationUrl` in `OrganizationSwitcher`
+  - drop `Clerk.experimental_canUseCaptcha` / `Clerk.Clerk.experimental_captchaSiteKey` / `Clerk.experimental_captchaURL` (were meant for internal use)
+  - use `User.getOrganizationMemberships()` instead of `Clerk.getOrganizationMemberships()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from Clerk emitted events
+  - drop `Clerk.__unstable__invitationUpdate` / `Clerk.__unstable__membershipUpdate`
+  - drop support for string param in `Organization.create()`
+  - use `Organization.getInvitations()` instead of `Organization.getPendingInvitations()`
+  - use `pageSize` instead of `limit` in `OrganizationMembership.retrieve()`
+  - use `initialPage` instead of `offset` in `OrganizationMembership.retrieve()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from ClerkProvider
+  - use `invitations` instead of `invitationList` in `useOrganization`
+  - use `memberships` instead of `membershipList` in `useOrganization`
+  - use `redirectUrl` instead of `redirect_url` in `User.createExternalAccount()`
+  - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
+- 71663c568: Internal update default apiUrl domain from clerk.dev to clerk.com
+- 9a1fe3728: Fix a bug where navigating from the sign in page to the sign up page required two back button presses to go back.
+- cfea3d9c0: Path-based routing is now the default routing strategy if the `path` prop is filled. Additionally, if the `path` and `routing` props are not filled, an error will be thrown.
+
+  ```jsx
+
+  // Without path or routing props, an error with be thrown
+  <UserProfile />
+  <CreateOrganization />
+  <OrganizationProfile />
+  <SignIn />
+  <SignUp />
+
+  // Alternative #1
+  <UserProfile path="/whatever"/>
+  <CreateOrganization path="/whatever"/>
+  <OrganizationProfile path="/whatever"/>
+  <SignIn path="/whatever"/>
+  <SignUp path="/whatever"/>
+
+  // Alternative #2
+  <UserProfile routing="hash_or_virtual"/>
+  <CreateOrganization routing="hash_or_virtual"/>
+  <OrganizationProfile routing="hash_or_virtual"/>
+  <SignIn routing="hash_or_virtual"/>
+  <SignUp routing="hash_or_virtual"/>
+  ```
+
+- e602d6c1f: Drop support for NextJS v12: v12 was released on 26 Oct 2021. Support for security updates stopped on 21 Nov 2022.
+
+  Drop support for NextJS <13.0.4: Various header-related bugs were introduced with the 12.1.0, 12.2.0, 13.0.1, 13.0.2, 13.0.3 NextJS releases which are now fixed since next@^13.0.4. We will be dropping support for these problematic versions in order to greatly reduce complexity in our codebase.
+
+  Drop support for NextJS < 14.0.3 because of the issues described here: https://github.com/clerk/javascript/issues/1436.
+
+  Deprecate `authMiddleware` in favor of `clerkMiddleware`. For more information, see https://clerk.com/docs/upgrade-guides/v5-introduction
+
+  Move the server-side APIs from `@clerk/nextjs` to the `@clerk/nextjs/server` module: `WebhookEventType`, `WebhookEvent`, `verifyToken`, `redirectToSignIn`, `auth`, `buildClerkProps`, `clerkClient`, `currentUser`, `getAuth`, `redirectToSignUp` and `authMiddleware`. For more information, see https://clerk.com/docs/upgrade-guides/v5-introduction
+
+- 2a22aade8: Drop deprecations. Migration steps:
+  - drop `orgs` jwt claim from session token
+  - change type of `auth` param of `withServerAuth()` callback to `AuthObject` from `ServerSideAuth` in `gatsby-clerk-plugin`
+    - use `auth.sessionClaims` instead of `auth.claims`
+    - use `AuthObject` properties from `auth`
+  - use `publishableKey` instead of `frontendApi`
+  - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
+- 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
+
+  ````typescript
+  // Before
+  import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
+  // After
+  import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
+      // Before
+      import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+      // After
+      import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
+
+      // Before
+      import { MultisessionAppSupport } from '@clerk/clerk-react';
+      // After
+      import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+      ```
+
+  - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
+    - `__internal__setErrorThrowerOptions` internal utility (moved to /internal subpath)
+    - `WithClerkProp` type
+    - `MultisessionAppSupport` component (moved to /internal subpath)
+    - `EmailLinkErrorCode` enum
+  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
+    to reduce the export surface since it's trivial to implement if needed.
+
+  ````
+
+- dd5703013: Change the response payload of Backend API requests to return `{ data, errors }` instead of return the data and throwing on error response.
+  Code example to keep the same behavior:
+
+  ```typescript
+  import { users } from '@clerk/backend';
+  import { ClerkAPIResponseError } from '@clerk/shared/error';
+
+  const { data, errors, clerkTraceId, status, statusText } = await users.getUser('user_deadbeef');
+  if (errors) {
+    throw new ClerkAPIResponseError(statusText, { data: errors, status, clerkTraceId });
+  }
+  ```
+
+- 5f58a2274: Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters.
+- 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
+  to fix issues with vite & rollup building.
+- a9fe242be: Change return values of `signJwt`, `hasValidSignature`, `decodeJwt`, `verifyJwt`
+  to return `{ data, error }`. Example of keeping the same behavior using those utilities:
+
+  ```typescript
+  import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt';
+
+  const { data, error } = await signJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await hasValidSignature(...)
+  if (error) throw error;
+
+  const { data, error } = decodeJwt(...)
+  if (error) throw error;
+
+  const { data, error } = await verifyJwt(...)
+  if (error) throw error;
+  ```
+
+- 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
+- 0ec3a146c: Changes in exports of `@clerk/backend`:
+  - Expose the following helpers and enums from `@clerk/backend/internal`:
+    ```typescript
+    import {
+      AuthStatus,
+      buildRequestUrl,
+      constants,
+      createAuthenticateRequest,
+      createIsomorphicRequest,
+      debugRequestState,
+      makeAuthObjectSerializable,
+      prunePrivateMetadata,
+      redirect,
+      sanitizeAuthObject,
+      signedInAuthObject,
+      signedOutAuthObject,
+    } from '@clerk/backend/internal';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { AuthStatus, ... } from '@clerk/backend';
+    // After
+    import { AuthStatus, ... } from '@clerk/backend/internal';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+- 1ad910eb9: Changes in exports of `@clerk/backend`:
+  - Drop the following internal exports from the top-level api:
+    ```typescript
+    // Before
+    import {
+      AllowlistIdentifier,
+      Client,
+      DeletedObject,
+      Email,
+      EmailAddress,
+      ExternalAccount,
+      IdentificationLink,
+      Invitation,
+      OauthAccessToken,
+      ObjectType,
+      Organization,
+      OrganizationInvitation,
+      OrganizationMembership,
+      OrganizationMembershipPublicUserData,
+      PhoneNumber,
+      RedirectUrl,
+      SMSMessage,
+      Session,
+      SignInToken,
+      Token,
+      User,
+      Verification,
+    } from '@clerk/backend';
+    // After : no alternative since there is no need to use those classes
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+  - Keep those 3 resource related type exports
+    ```typescript
+    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    ```
+- f58a9949b: Changes in exports of `@clerk/backend`:
+  - Expose the following helpers and enums from `@clerk/backend/jwt`:
+    ```typescript
+    import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
+    ```
+  - Drop the above exports from the top-level api:
+    ```typescript
+    // Before
+    import { decodeJwt, ... } from '@clerk/backend';
+    // After
+    import { decodeJwt, ... } from '@clerk/backend/jwt';
+    ```
+    Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
+- 9a1fe3728: Use the new `routerPush` and `routerReplace` props for `<ClerkProvider />` instead of `navigate`.
+- e1f7eae87: Limit TokenVerificationError exports to TokenVerificationError and TokenVerificationErrorReason
+- 02976d494: (Note: This is only relevant if, in the unlikely case, you are using `Clerk` from `@clerk/nextjs` directly. If not, you can safely ignore this change.)
+
+  Remove the named `Clerk` import from `@clerk/nextjs` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
+
+  ```js
+  import { Clerk } from '@clerk/nextjs';
+  const clerk = Clerk({ secretKey: '...' });
+  ```
+
+  You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
+
+  ```js
+  import { createClerkClient } from '@clerk/nextjs';
+  const clerk = createClerkClient({ secretKey: '...' });
+  ```
+
+- 9b02c1aae: Changes in `@clerk/backend` exports:
+  - Drop Internal `deserialize` helper
+  - Introduce `/errors` subpath export, eg:
+    ```typescript
+    import {
+      TokenVerificationError,
+      TokenVerificationErrorAction,
+      TokenVerificationErrorCode,
+      TokenVerificationErrorReason,
+    } from '@clerk/backend/errors';
+    ```
+  - Drop errors from top-level export
+    ```typescript
+    // Before
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend';
+    // After
+    import { TokenVerificationError, TokenVerificationErrorReason } from '@clerk/backend/errors';
+    ```
+- e5598cfb1: Drop `user`, `session`, and `organization` resources from the returned value of `auth()`.
+- 6fffd3b54: Replace return the value of the following jwt helpers to match the format of backend API client return values (for consistency).
+
+  ```diff
+  import { signJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await signJwt(...);
+  + const { data, errors: [error] = [] } = await signJwt(...);
+  ```
+
+  ```diff
+  import { verifyJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await verifyJwt(...);
+  + const { data, errors: [error] = [] } = await verifyJwt(...);
+  ```
+
+  ```diff
+  import { hasValidSignature } from '@clerk/backend/jwt';
+
+  - const { data, error } = await hasValidSignature(...);
+  + const { data, errors: [error] = [] } = await hasValidSignature(...);
+  ```
+
+  ```diff
+  import { decodeJwt } from '@clerk/backend/jwt';
+
+  - const { data, error } = await decodeJwt(...);
+  + const { data, errors: [error] = [] } = await decodeJwt(...);
+  ```
+
+  ```diff
+  import { verifyToken } from '@clerk/backend';
+
+  - const { data, error } = await verifyToken(...);
+  + const { data, errors: [error] = [] } = await verifyToken(...);
+  ```
+
+- dd9d7da06: Use `NEXT_PUBLIC_CLERK_JS_URL` instead of `NEXT_PUBLIC_CLERK_JS` to pin a specific @clerk/clerk-js version.
+
+### Minor Changes
+
+- ecb60da48: Implement token signature verification when passing verified token from Next.js middleware to the application origin.
+- 7f6a64f43: - By default, all the components with routing will have the `routing` prop assigned as `'path'` by default when the `path` prop is filled.
+  - The `<UserButton />` component will set the default value of the `userProfileMode` prop to `'navigation'` if the `userProfileUrl` prop is provided.
+  - The `<OrganizationSwitcher />` component will have the `organizationProfileMode` and `createOrganizationMode` props assigned with `'navigation'` by default if the `organizationProfileUrl` and `createOrganizationUrl` props are filled accordingly.
+- ff08fe237: Introduce experimental support for Google One Tap
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+- 2964f8a47: Expose debug headers in response for handshake / signed-out states from SDKs using headers returned from `authenticateRequest()`
+- c7e6d00f5: Experimental support for `<Gate/>` with role checks.
+- c7d960ca0: Replace redirectUrl of protect with `unauthorizedUrl` and `unauthenticatedUrl`.
+- 4bb57057e: Breaking Changes:
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+- f98e480b1: Speed up loading of clerk-js by using a `<script/>` tag when html is generated.
+  This is supported during SSR, SSG in
+  - Next.js Pages Router
+  - Next.js App Router
+- 46040a2f3: Introduce Protect for authorization.
+  Changes in public APIs:
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+- 980a56cc7: Bump minimum nextjs@13 version to `13.5.4` from `13.0.4` to resolve vulnerabilities.
+
+  ref: https://github.com/advisories/GHSA-c59h-r6p8-q9wc
+
+- 18c0d015d: Pass environment into `sdkMetadata` in order to detect if production clerk-js is used by other sdks in dev mode. When it is log dev warning from clerk-js.
+- 1fd2eff38: Allow manually passing a publishable/secret key pair to the `authMiddleware` and `clerkMiddleware` helpers.
+- 5471c7e8d: Move and export the following from @clerk/clerk-js and @clerk/nextjs to @clerk/shared: - `DEV_BROWSER_SSO_JWT_PARAMETER` - `DEV_BROWSER_JWT_MARKER` - `DEV_BROWSER_SSO_JWT_KEY` - `setDevBrowserJWTInURL` - `getDevBrowserJWTFromURL` - `getDevBrowserJWTFromResponse`
+- b4e79c1b9: Replace the `Clerk-Backend-SDK` header with `User-Agent` in BAPI requests and update it's value to contain both the package name and the package version of the clerk package
+  executing the request. Eg request from `@clerk/nextjs` to BAPI with append `User-Agent: @clerk/nextjs@5.0.0-alpha-v5.16` using the latest version.
+
+  Miscellaneous changes: The backend test build changed to use tsup.
+
+### Patch Changes
+
+- 4564ad643: - Export ClerkMiddlewareAuthObject, ClerkMiddlewareAuth and ClerkMiddlewareOptions types
+
+  - Introduce `auth().redirectToSignIn()` that can be used in API routes and pages, eg
+
+  ```ts
+  import { auth } from '@clerk/nextjs/server';
+
+  export const Layout = ({ children }) => {
+    const { userId } = auth();
+
+    if (!userId) {
+      return auth().redirectToSignIn();
+    }
+
+    return <>{children}</>;
+  };
+  ```
+
+- 7b200af49: The `auth().redirectToSignIn()` helper no longer needs to be explicitly returned when called within the middleware. The following examples are now equivalent:
+
+  ```js
+  // Before
+  export default clerkMiddleware(auth => {
+    if (protectedRoute && !auth.user) {
+      return auth().redirectToSignIn()
+    }
+  })
+
+  // After
+  export default clerkMiddleware(auth => {
+    if (protectedRoute && !auth.user) {
+      auth().redirectToSignIn()
+    }
+  })
+  ```
+
+  Calling `auth().protect()` from a page will now automatically redirect back to the same page by setting `redirect_url` to the request url before the redirect to the sign-in URL takes place.
+
+- 93d05c868: Drop the introduction of `OrganizationRole` and `OrganizationPermission` resources fro BAPI.
+- 24de66951: Infer the path the component is mounted at automatically in pages and app router
+- f68b0158b: Remove usage of useSearchParams() to avoid CSR de-opt.
+- 2de442b24: Rename beta-v5 to beta
+- ef2325dcc: Introduce `isTruthy` helper to better cast environment variables to a boolean. Previously only the string `"true"` was checked, now `true`, `"true"`, `"1"`, and `1` will work.
+- 4a4287533: Throw a descriptive error when a Clerk component that is using path-based routing is mounted in a non-catch-all route
+- 6a769771c: Update README for v5
+- 9a87eced3: Introduce the new `clerkMiddleware` helper to allow for more flexibility in how Clerk is integrated into your Next.js middleware. Example usage can be found below, for more details, For more details, please see the [clerkMiddleware](https://clerk.com/docs/references/nextjs/clerkMiddleware) documentation.
+  The `clerkMiddleware` helper effectively replaces the older `authMiddleware` helper, which is now considered deprecated and will be removed in the next major release.
+
+  ### 1. Protect a route that requires authentication
+
+  ```js
+  import { clerkMiddleware } from '@clerk/nextjs/server';
+
+  export default clerkMiddleware(auth => {
+    const { userId } = auth().protect();
+    // userId is now available for use in your route handler
+    // for page requests, calling protect will automatically redirect the user to the sign-in URL if they are not authenticated
+    return NextResponse.next();
+  });
+  ```
+
+  ### 2. Protect a route that requires specific permissions
+
+  ```js
+  import { clerkMiddleware } from '@clerk/nextjs/server';
+
+  export default clerkMiddleware(auth => {
+    const { userId } = auth().protect({ permission: 'org:domains:delete' });
+    // userId is now available for use in your route handler
+    // for page requests, calling protect will automatically throw a notFound error if the user does not have the required permissions
+    return NextResponse.next();
+  });
+  ```
+
+  ### 2. Manually redirect to sign-in URL using the redirectToSignIn helper
+
+  ```js
+  import { clerkMiddleware } from '@clerk/nextjs/server';
+
+  export default clerkMiddleware(auth => {
+    // If you want more fine-grained control, you can always use the low-level redirectToSignIn helper
+    if (!auth().userId) {
+      return auth().redirectToSignIn();
+    }
+
+    return NextResponse.next();
+  });
+  ```
+
+  This commit also introduces the experimental `createRouteMatcher` helper, which can be used to create a route matcher that matches a route against the current request. This is useful for creating custom logic based on which routes you want to handle as protected or public.
+
+  ```js
+  import { clerkMiddleware, experimental_createRouteMatcher } from '@clerk/nextjs/server';
+
+  const isProtectedRoute = experimental_createRouteMatcher([/protected.*/]);
+
+  export default clerkMiddleware((auth, request) => {
+    if (isProtectedRoute(request)) {
+      auth().protect();
+    }
+
+    return NextResponse.next();
+  });
+  ```
+
+- 8e5c881c4: The following paginated APIs now return `{ data, totalCount }` instead of simple arrays, in order to make building paginated UIs easier:
+
+  - `clerkClient.users.getOrganizationMembershipList(...)`
+  - `clerkClient.organization.getOrganizationList(...)`
+  - `clerkClient.organization.getOrganizationInvitationList(...)`
+
+  Revert changing the `{ data, errors }` return value of the following helpers to throw the `errors` or return the `data` (keep v4 format):
+
+  - `import { verifyToken } from '@clerk/backend'`
+  - `import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt'`
+  - BAPI `clerkClient` methods eg (`clerkClient.users.getUserList(...)`)
+
+- 9e99eb727: Update `@clerk/nextjs` error messages to refer to `clerkMiddleware()` and deprecated `authMiddleware()` and fix a typo in `cannotRenderSignUpComponentWhenSessionExists` error message.
+- fcb91f6f1: Fixes the docs link pointing to clerk.com/docs in the `authAuthHeaderMissing` error by removing the trailing `.`
+- ee57f21ac: Export `EmailLinkErrorCode` from `/errors` module
+- 529e2e14c: Introduce `createRouteMatcher` which is designed to generate and return a function that evaluates whether a given Request object matches a set of predefined routes. It provides flexibility in defining these routes through various patterns, including glob patterns, regular expressions, and custom functions. This composable helper can be used in combination with the `clerkMiddleware` helper to easily protect specific routes, eg:
+
+  ```ts
+  import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+  const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
+
+  export default clerkMiddleware((auth, request) => {
+    if (isProtectedRoute(request)) {
+      auth().protect();
+    }
+  });
+  ```
+
+- b234400c2: Adds telemetry event to clerkMiddleware initialization, passes publishableKey to `createClerkClient()` internally.
+- 2e77cd737: Set correct information on required Node.js and React versions in README
+- ae3a6683a: Ignore `.test.ts` files for the build output. Should result in smaller bundle size.
+- 32992906c: Fix partial prerendering error when using NextJS by correctly rethrowing partial prerendering (PPR) error.
+- c22cd5214: Fix type inferance for auth helper.
+- b67f6ab79: Fix property `Page`/ `Link` missing from the `UserProfile` / `OrganizationProfile`
+  when imported from `@clerk/nextjs` or `@clerk/remix`.
+- f77e8cdbd: Add Autocomplete TS generic for union literals
+- b892ac6cb: Ensure that cookies set inside Next.js Middleware are correctly passed through while using [`authMiddleware`](https://clerk.com/docs/references/nextjs/auth-middleware).
+- 8b466a9ba: Prevent Clerk component flickering when mounted in a Next.js app using App Router
+- ceb74c464: Using auth().protect inside clerkMiddleware will perform a redirection instead of throwing a not found error when internal navigation in pages router occurs and the user is unauthenticated.
+- 7644b7472: Improve the default value for `CLERK_API_URL` by utilizing the publishable key to differentiate between local, staging and prod environments.
+- d88b52079: Update NextJS quickstart link in error message
+- 046224177: Make useAwaitableNavigate handle navigations between pages reliably
+- 0ce0edc28: Add OrganizationPermissionAPI for CRUD operations regarding instance level organization permissions.
+- a8901be64: Expose resources types
+- 05bda497c: Accept `redirectUrl` as an option for `auth().protect()`.
+
+  For example:
+
+  ```ts
+  // Authorization
+  auth().protect({ role: 'org:admin' }, { redirectUrl: '/any-page' });
+  auth().protect({ permission: 'org:settings:manage' }, { redirectUrl: '/any-page' });
+
+  // Authentication
+  auth().protect({ redirectUrl: '/any-page' });
+  ```
+
+- fb794ce7b: Support older iOS 13.3 and 13.4 mobile devices
+- e6fc58ae4: Introduce `debug: true` option for the `clerkMiddleware` helper
+- 40ac4b645: Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry.
+- c0a7455ac: Export MultisessionAppSupport from @clerk/nextjs/internal
+- Updated dependencies [3a2f13604]
+- Updated dependencies [8c23651b8]
+- Updated dependencies [f4f99f18d]
+- Updated dependencies [743c4d204]
+- Updated dependencies [4b8bedc66]
+- Updated dependencies [9272006e7]
+- Updated dependencies [2a67f729d]
+- Updated dependencies [c2a090513]
+- Updated dependencies [6ac9e717a]
+- Updated dependencies [966b31205]
+- Updated dependencies [1834a3ee4]
+- Updated dependencies [a8901be64]
+- Updated dependencies [896cb6104]
+- Updated dependencies [64d3763ec]
+- Updated dependencies [8350109ab]
+- Updated dependencies [7b200af49]
+- Updated dependencies [988a299c0]
+- Updated dependencies [ecb60da48]
+- Updated dependencies [deac67c1c]
+- Updated dependencies [b3a3dcdf4]
+- Updated dependencies [1dc28ab46]
+- Updated dependencies [83e9d0846]
+- Updated dependencies [244de5ea3]
+- Updated dependencies [791c49807]
+- Updated dependencies [935b0886e]
+- Updated dependencies [93d05c868]
+- Updated dependencies [ea4933655]
+- Updated dependencies [7f6a64f43]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [448e02e93]
+- Updated dependencies [2671e7aa5]
+- Updated dependencies [799abc281]
+- Updated dependencies [4aaf5103d]
+- Updated dependencies [a68eb3083]
+- Updated dependencies [2de442b24]
+- Updated dependencies [15af02a83]
+- Updated dependencies [db18787c4]
+- Updated dependencies [7f833da9e]
+- Updated dependencies [de6519daa]
+- Updated dependencies [e6ecbaa2f]
+- Updated dependencies [ef2325dcc]
+- Updated dependencies [6a769771c]
+- Updated dependencies [fc3ffd880]
+- Updated dependencies [8b6b094b9]
+- Updated dependencies [bab2e7e05]
+- Updated dependencies [71663c568]
+- Updated dependencies [a6b893d28]
+- Updated dependencies [02976d494]
+- Updated dependencies [492b8a7b1]
+- Updated dependencies [8e5c881c4]
+- Updated dependencies [9e99eb727]
+- Updated dependencies [034c47ccb]
+- Updated dependencies [cfea3d9c0]
+- Updated dependencies [e5c989a03]
+- Updated dependencies [ff08fe237]
+- Updated dependencies [7ecd6f6ab]
+- Updated dependencies [12f3c5c55]
+- Updated dependencies [c776f86fb]
+- Updated dependencies [90aa2ea9c]
+- Updated dependencies [ee57f21ac]
+- Updated dependencies [1e98187b4]
+- Updated dependencies [7bffc47cb]
+- Updated dependencies [a605335e1]
+- Updated dependencies [2e77cd737]
+- Updated dependencies [2964f8a47]
+- Updated dependencies [7af0949ae]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [2a22aade8]
+- Updated dependencies [63dfe8dc9]
+- Updated dependencies [ae3a6683a]
+- Updated dependencies [e921af259]
+- Updated dependencies [d08ec6d8f]
+- Updated dependencies [6e54b1b59]
+- Updated dependencies [8aea39cd6]
+- Updated dependencies [dd5703013]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [03079579d]
+- Updated dependencies [c22cd5214]
+- Updated dependencies [52ff8fe6b]
+- Updated dependencies [c9e0f68af]
+- Updated dependencies [86d52fb5c]
+- Updated dependencies [fe2607b6f]
+- Updated dependencies [c7e6d00f5]
+- Updated dependencies [8cc45d2af]
+- Updated dependencies [797e327e0]
+- Updated dependencies [ab4eb56a5]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [12962bc58]
+- Updated dependencies [7cb1241a9]
+- Updated dependencies [9615e6cda]
+- Updated dependencies [0ec3a146c]
+- Updated dependencies [4bb57057e]
+- Updated dependencies [c86f73be3]
+- Updated dependencies [bad4de1a2]
+- Updated dependencies [d4ff346dd]
+- Updated dependencies [7644b7472]
+- Updated dependencies [2ec9f6b09]
+- Updated dependencies [2e4a43017]
+- Updated dependencies [f98e480b1]
+- Updated dependencies [66b283653]
+- Updated dependencies [1affbb22a]
+- Updated dependencies [46040a2f3]
+- Updated dependencies [cace85374]
+- Updated dependencies [f5fb63cf1]
+- Updated dependencies [1ad910eb9]
+- Updated dependencies [8daf8451c]
+- Updated dependencies [f58a9949b]
+- Updated dependencies [4aaf5103d]
+- Updated dependencies [75ea300bc]
+- Updated dependencies [d22e6164d]
+- Updated dependencies [e1f7eae87]
+- Updated dependencies [7f751c4ef]
+- Updated dependencies [4fced88ac]
+- Updated dependencies [f5d55bb1f]
+- Updated dependencies [18c0d015d]
+- Updated dependencies [0d1052ac2]
+- Updated dependencies [d30ea1faa]
+- Updated dependencies [e9841dd91]
+- Updated dependencies [e7e2a1eae]
+- Updated dependencies [1fd2eff38]
+- Updated dependencies [5471c7e8d]
+- Updated dependencies [a6308c67e]
+- Updated dependencies [0ce0edc28]
+- Updated dependencies [477170962]
+- Updated dependencies [9b02c1aae]
+- Updated dependencies [051833167]
+- Updated dependencies [59f9a7296]
+- Updated dependencies [b4e79c1b9]
+- Updated dependencies [38d8b3e8a]
+- Updated dependencies [be991365e]
+- Updated dependencies [8350f73a6]
+- Updated dependencies [d6a7ea61a]
+- Updated dependencies [e0e79b4fe]
+- Updated dependencies [e602d6c1f]
+- Updated dependencies [142ded732]
+- Updated dependencies [3c4209068]
+- Updated dependencies [fb794ce7b]
+- Updated dependencies [e6fc58ae4]
+- Updated dependencies [6fffd3b54]
+- Updated dependencies [a6451aece]
+- Updated dependencies [987994909]
+- Updated dependencies [40ac4b645]
+- Updated dependencies [1bea9c200]
+- Updated dependencies [6f755addd]
+- Updated dependencies [844847e0b]
+- Updated dependencies [6eab66050]
+- Updated dependencies [db2d82901]
+- Updated dependencies [c2b982749]
+  - @clerk/backend@1.0.0
+  - @clerk/shared@2.0.0
+  - @clerk/clerk-react@5.0.0
+
+## 5.0.0-beta.46
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-beta.41
+
+## 5.0.0-beta.45
+
+### Patch Changes
+
+- Throw a descriptive error when a Clerk component that is using path-based routing is mounted in a non-catch-all route ([#3204](https://github.com/clerk/javascript/pull/3204)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`bab2e7e05`](https://github.com/clerk/javascript/commit/bab2e7e0590d0da1fd7db0680e63e8f2eb836b41)]:
+  - @clerk/shared@2.0.0-beta.23
+  - @clerk/backend@1.0.0-beta.37
+  - @clerk/clerk-react@5.0.0-beta.40
+
+## 5.0.0-beta.44
+
+### Minor Changes
+
+- Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+- Speed up loading of clerk-js by using a `<script/>` tag when html is generated. ([#3156](https://github.com/clerk/javascript/pull/3156)) by [@panteliselef](https://github.com/panteliselef)
+
+  This is supported during SSR, SSG in
+
+  - Next.js Pages Router
+  - Next.js App Router
+
+### Patch Changes
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Introduce `debug: true` option for the `clerkMiddleware` helper ([#3189](https://github.com/clerk/javascript/pull/3189)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`f98e480b1`](https://github.com/clerk/javascript/commit/f98e480b1a9e41f5370efcd53aa6887af2ad6816), [`142ded732`](https://github.com/clerk/javascript/commit/142ded73265b776789b65404d96b6c91cfe15e98), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5), [`e6fc58ae4`](https://github.com/clerk/javascript/commit/e6fc58ae4df5091eff00ba0d9045ce5ff0fff538)]:
+  - @clerk/clerk-react@5.0.0-beta.39
+  - @clerk/backend@1.0.0-beta.36
+  - @clerk/shared@2.0.0-beta.22
+
+## 5.0.0-beta.43
+
+### Patch Changes
+
+- Updated dependencies [[`7cb1241a9`](https://github.com/clerk/javascript/commit/7cb1241a9929b3d8a0d2157637734d82dd9fd852)]:
+  - @clerk/backend@1.0.0-beta.35
+  - @clerk/clerk-react@5.0.0-beta.38
+
+## 5.0.0-beta.42
+
+### Minor Changes
+
+- Implement token signature verification when passing verified token from Next.js middleware to the application origin. ([#3121](https://github.com/clerk/javascript/pull/3121)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Updated dependencies [[`ecb60da48`](https://github.com/clerk/javascript/commit/ecb60da48029b9cb2d17ab9b0a73cb92bc5c924b)]:
+  - @clerk/backend@1.0.0-beta.34
+  - @clerk/clerk-react@5.0.0-beta.37
+
+## 5.0.0-beta.41
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.0-beta.36
+
+## 5.0.0-beta.40
+
+### Patch Changes
+
+- Updated dependencies [[`63dfe8dc9`](https://github.com/clerk/javascript/commit/63dfe8dc92c28213db5c5644782e7d6751fa22a6), [`d22e6164d`](https://github.com/clerk/javascript/commit/d22e6164ddb765542e0e6335421d2ebf484af059)]:
+  - @clerk/backend@1.0.0-beta.33
+  - @clerk/clerk-react@5.0.0-beta.35
+
+## 5.0.0-beta.39
+
+### Minor Changes
+
+- Allow manually passing a publishable/secret key pair to the `authMiddleware` and `clerkMiddleware` helpers. ([#3001](https://github.com/clerk/javascript/pull/3001)) by [@desiprisg](https://github.com/desiprisg)
+
+### Patch Changes
+
+- Updated dependencies [[`fc3ffd880`](https://github.com/clerk/javascript/commit/fc3ffd88064a09ab98877dfba119150390f9296e), [`1fd2eff38`](https://github.com/clerk/javascript/commit/1fd2eff38dc71e45d2ff95a5b6e5a99cca53c6e7), [`987994909`](https://github.com/clerk/javascript/commit/987994909b7c462cc2b785f75afe4d621f5c960d), [`1bea9c200`](https://github.com/clerk/javascript/commit/1bea9c20090abdde962c7da1a859933e1cd51660)]:
+  - @clerk/shared@2.0.0-beta.21
+  - @clerk/backend@1.0.0-beta.32
+  - @clerk/clerk-react@5.0.0-beta.34
+
+## 5.0.0-beta.38
+
+### Patch Changes
+
+- Updated dependencies [[`988a299c0`](https://github.com/clerk/javascript/commit/988a299c0abf708e905592c29e394f8e4d79968e)]:
+  - @clerk/backend@1.0.0-beta.31
+
 ## 5.0.0-beta.37
 
 ### Patch Changes

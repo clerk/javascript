@@ -255,6 +255,7 @@ export type ElementsConfig = {
   organizationSwitcherPopoverMain: WithOptions;
   organizationSwitcherPopoverActions: WithOptions;
   organizationSwitcherPopoverInvitationActions: WithOptions;
+  organizationSwitcherPopoverInvitationActionsBox: WithOptions;
   organizationSwitcherPopoverActionButton: WithOptions<
     'manageOrganization' | 'createOrganization' | 'switchOrganization'
   >;
@@ -646,4 +647,8 @@ export type Appearance<T = Theme> = T & {
    * Theme overrides that only apply to the `<CreateOrganization />` component
    */
   createOrganization?: T;
+  /**
+   * Theme overrides that only apply to the `<CreateOrganization />` component
+   */
+  oneTap?: T;
 };

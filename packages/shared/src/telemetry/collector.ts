@@ -10,11 +10,17 @@
  *
  * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry
  */
-import type { InstanceType } from '@clerk/types';
+import type {
+  InstanceType,
+  TelemetryCollector as TelemetryCollectorInterface,
+  TelemetryEvent,
+  TelemetryEventRaw,
+} from '@clerk/types';
 
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';
-import type { TelemetryCollectorOptions, TelemetryEvent, TelemetryEventRaw } from './types';
+import { TelemetryEventThrottler } from './throttler';
+import type { TelemetryCollectorOptions } from './types';
 
 type TelemetryCollectorConfig = Pick<
   TelemetryCollectorOptions,
@@ -41,8 +47,9 @@ const DEFAULT_CONFIG: Partial<TelemetryCollectorConfig> = {
   endpoint: 'https://clerk-telemetry.com',
 };
 
-export class TelemetryCollector {
+export class TelemetryCollector implements TelemetryCollectorInterface {
   #config: Required<TelemetryCollectorConfig>;
+  #eventThrottler: TelemetryEventThrottler;
   #metadata: TelemetryMetadata = {} as TelemetryMetadata;
   #buffer: TelemetryEvent[] = [];
   #pendingFlush: any;
@@ -78,6 +85,8 @@ export class TelemetryCollector {
       // Only send the first 16 characters of the secret key to to avoid sending the full key. We can still query against the partial key.
       this.#metadata.secretKey = options.secretKey.substring(0, 16);
     }
+
+    this.#eventThrottler = new TelemetryEventThrottler();
   }
 
   get isEnabled(): boolean {
@@ -110,7 +119,7 @@ export class TelemetryCollector {
 
     this.#logEvent(preparedPayload.event, preparedPayload);
 
-    if (!this.#shouldRecord(event.eventSamplingRate)) {
+    if (!this.#shouldRecord(preparedPayload, event.eventSamplingRate)) {
       return;
     }
 
@@ -119,13 +128,21 @@ export class TelemetryCollector {
     this.#scheduleFlush();
   }
 
-  #shouldRecord(eventSamplingRate?: number): boolean {
-    const randomSeed = Math.random();
-    const shouldBeSampled =
-      randomSeed <= this.#config.samplingRate &&
-      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate);
+  #shouldRecord(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
+    return this.isEnabled && !this.isDebug && this.#shouldBeSampled(preparedPayload, eventSamplingRate);
+  }
 
-    return this.isEnabled && !this.isDebug && shouldBeSampled;
+  #shouldBeSampled(preparedPayload: TelemetryEvent, eventSamplingRate?: number) {
+    const randomSeed = Math.random();
+
+    if (this.#eventThrottler.isEventThrottled(preparedPayload)) {
+      return false;
+    }
+
+    return (
+      randomSeed <= this.#config.samplingRate &&
+      (typeof eventSamplingRate === 'undefined' || randomSeed <= eventSamplingRate)
+    );
   }
 
   #scheduleFlush(): void {

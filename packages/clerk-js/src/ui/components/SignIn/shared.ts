@@ -11,10 +11,11 @@ import { handleError } from '../../utils';
 
 function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>) {
   const card = useCardState();
-  const { setActive } = useClerk();
+  // @ts-expect-error -- private method for the time being
+  const { setActive, __internal_navigateWithError } = useClerk();
   const supportEmail = useSupportEmail();
   const { navigateAfterSignIn } = useSignInContext();
-  const { __experimental_authenticateWithPasskey } = useCoreSignIn();
+  const { authenticateWithPasskey } = useCoreSignIn();
 
   useEffect(() => {
     return () => {
@@ -22,9 +23,9 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
     };
   }, []);
 
-  return useCallback(async (...args: Parameters<typeof __experimental_authenticateWithPasskey>) => {
+  return useCallback(async (...args: Parameters<typeof authenticateWithPasskey>) => {
     try {
-      const res = await __experimental_authenticateWithPasskey(...args);
+      const res = await authenticateWithPasskey(...args);
       switch (res.status) {
         case 'complete':
           return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
@@ -48,8 +49,7 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
       }
 
       if (isUserLockedError(err)) {
-        // @ts-expect-error -- private method for the time being
-        return clerk.__internal_navigateWithError('..', err.errors[0]);
+        return __internal_navigateWithError('..', err.errors[0]);
       }
       handleError(err, [], card.setError);
     }

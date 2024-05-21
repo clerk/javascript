@@ -12,6 +12,9 @@ clerk-js:
 elements:
   - packages/elements/**
 
+express:
+  - packages/express/**
+
 expo:
   - packages/expo/**
 
@@ -41,6 +44,9 @@ themes:
 
 types:
   - packages/types/**
+
+testing:
+  - packages/testing/**
 
 playground:
   - playground/**

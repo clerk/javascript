@@ -71,16 +71,18 @@ export const enUS: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Name',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: 'Name of passkey',
   formFieldLabel__password: 'Password',
   formFieldLabel__phoneNumber: 'Phone number',
   formFieldLabel__role: 'Role',
   formFieldLabel__signOutOfOtherSessions: 'Sign out of all other devices',
   formFieldLabel__username: 'Username',
-  __experimental_formFieldLabel__passkeyName: 'Name of passkey',
   impersonationFab: {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
   },
+  maintenanceMode:
+    "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Member',
   membershipRole__guestMember: 'Guest',
@@ -270,8 +272,8 @@ export const enUS: LocalizationResource = {
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
       blockButton__emailLink: 'Email link to {{identifier}}',
-      blockButton__password: 'Sign in with your password',
       blockButton__passkey: 'Sign in with your passkey',
+      blockButton__password: 'Sign in with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
       blockButton__totp: 'Use your authenticator app',
       getHelp: {
@@ -323,12 +325,17 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
       },
+      clientMismatch: {
+        subtitle:
+          'To continue, open the verification link on the device and browser from which you initiated the sign-in',
+        title: 'Verification link is invalid for this device',
+      },
     },
     forgotPassword: {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'to reset your password',
-      subtitle_email: 'First, enter the code sent to your email ID',
+      subtitle_email: 'First, enter the code sent to your email address',
       subtitle_phone: 'First, enter the code sent to your phone',
       title: 'Reset password',
     },
@@ -342,14 +349,17 @@ export const enUS: LocalizationResource = {
       subtitle: 'An error occurred',
       title: 'Cannot sign in',
     },
+    passkey: {
+      subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+      title: 'Use your passkey',
+    },
     password: {
       actionLink: 'Use another method',
       subtitle: 'Enter the password associated with your account',
       title: 'Enter your password',
     },
-    passkey: {
-      title: 'Use your passkey',
-      subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+    passwordPwned: {
+      title: 'Password compromised',
     },
     phoneCode: {
       formTitle: 'Verification code',
@@ -421,6 +431,11 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to previous tab to continue',
         title: 'Successfully verified email',
       },
+      clientMismatch: {
+        subtitle:
+          'To continue, open the verification link on the device and browser from which you initiated the sign-up',
+        title: 'Verification link is invalid for this device',
+      },
     },
     phoneCode: {
       formSubtitle: 'Enter the verification code sent to your phone number',
@@ -437,18 +452,17 @@ export const enUS: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
-    passkey_not_supported: 'Passkeys are not supported on this device.',
-    passkeys_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
-    passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
-    passkey_registration_cancelled: 'Passkey registration was cancelled or timed out.',
-    passkey_already_exists: 'A passkey is already registered with this device.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: 'This email address is taken. Please try another.',
+    form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
+    form_identifier_exists__username: 'This username is taken. Please try another.',
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -462,6 +476,8 @@ export const enUS: LocalizationResource = {
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned:
       'This password has been found as part of a breach and can not be used, please try another password instead.',
+    form_password_pwned__sign_in:
+      'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -469,6 +485,11 @@ export const enUS: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: 'A passkey is already registered with this device.',
+    passkey_not_supported: 'Passkeys are not supported on this device.',
+    passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',
+    passkey_registration_cancelled: 'Passkey registration was cancelled or timed out.',
+    passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
     passwordComplexity: {
       maximumLength: 'less than {{length}} characters',
       minimumLength: '{{length}} or more characters',
@@ -648,6 +669,14 @@ export const enUS: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: '{{name}} will be removed from this account.',
+        title: 'Remove passkey',
+      },
+      subtitle__rename: 'You can change the passkey name to make it easier to find.',
+      title__rename: 'Rename Passkey',
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -731,15 +760,15 @@ export const enUS: LocalizationResource = {
           headerTitle: 'Authenticator application',
         },
       },
+      passkeysSection: {
+        menuAction__destructive: 'Remove',
+        menuAction__rename: 'Rename',
+        title: 'Passkeys',
+      },
       passwordSection: {
         primaryButton__setPassword: 'Set password',
         primaryButton__updatePassword: 'Update password',
         title: 'Password',
-      },
-      __experimental_passkeysSection: {
-        title: 'Passkeys',
-        menuAction__rename: 'Rename',
-        menuAction__destructive: 'Remove',
       },
       phoneNumbersSection: {
         destructiveAction: 'Remove phone number',
@@ -768,14 +797,6 @@ export const enUS: LocalizationResource = {
       successMessage: 'Your username has been updated.',
       title__set: 'Set username',
       title__update: 'Update username',
-    },
-    __experimental_passkeyScreen: {
-      title__rename: 'Rename Passkey',
-      subtitle__rename: 'You can change the passkey name to make it easier to find.',
-      removeResource: {
-        title: 'Remove passkey',
-        messageLine1: '{{name}} will be removed from this account.',
-      },
     },
     web3WalletPage: {
       removeResource: {

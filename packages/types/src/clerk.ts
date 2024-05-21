@@ -1,3 +1,5 @@
+import type { TelemetryCollector } from 'telemetry';
+
 import type {
   Appearance,
   CreateOrganizationTheme,
@@ -11,16 +13,27 @@ import type {
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomPage } from './customPages';
+import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
+import type {
+  AfterSignOutUrl,
+  LegacyRedirectProps,
+  RedirectOptions,
+  RedirectUrlProp,
+  SignInFallbackRedirectUrl,
+  SignInForceRedirectUrl,
+  SignUpFallbackRedirectUrl,
+  SignUpForceRedirectUrl,
+} from './redirects';
 import type { ActiveSessionResource } from './session';
+import type { SignInResource } from './signIn';
+import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
-
-export type InstanceType = 'production' | 'development';
 
 export type SDKMetadata = {
   name: string;
@@ -104,6 +117,8 @@ export interface Clerk {
   /** Current User. */
   user: UserResource | null | undefined;
 
+  telemetry: TelemetryCollector | undefined;
+
   /**
    * Signs out the current user on single-session instances, or all users on multi-session instances
    * @param signOutCallback - Optional A callback that runs after sign out completes.
@@ -122,6 +137,18 @@ export interface Clerk {
    * Closes the Clerk SignIn modal.
    */
   closeSignIn: () => void;
+
+  /**
+   * Opens the Google One Tap component.
+   * @param props Optional props that will be passed to the GoogleOneTap component.
+   */
+  openGoogleOneTap: (props?: GoogleOneTapProps) => void;
+
+  /**
+   * Opens the Google One Tap component.
+   * If the component is not already open, results in a noop.
+   */
+  closeGoogleOneTap: () => void;
 
   /**
    * Opens the Clerk SignUp component in a modal.
@@ -413,6 +440,16 @@ export interface Clerk {
   redirectToAfterSignOut: () => void;
 
   /**
+   * Completes a Google One Tap redirection flow started by
+   * {@link Clerk.authenticateWithGoogleOneTap}
+   */
+  handleGoogleOneTapCallback: (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes an OAuth or SAML redirection flow started by
    * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
@@ -435,6 +472,13 @@ export interface Clerk {
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using a Google token generated from Google identity services.
+   */
+  authenticateWithGoogleOneTap: (
+    params: AuthenticateWithGoogleOneTapParams,
+  ) => Promise<SignInResource | SignUpResource>;
+
+  /**
    * Creates an organization, adding the current user as admin.
    */
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
@@ -450,49 +494,47 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 }
 
-export type HandleOAuthCallbackParams = AfterActionURLs & {
-  /**
-   * Full URL or path to navigate after successful sign in
-   * or sign up.
-   *
-   * The same as setting afterSignInUrl and afterSignUpUrl
-   * to the same value.
-   */
-  redirectUrl?: string | null;
-
-  /**
-   * Full URL or path to navigate during sign in,
-   * if identifier verification is required.
-   */
-  firstFactorUrl?: string;
-
-  /**
-   * Full URL or path to navigate during sign in,
-   * if 2FA is enabled.
-   */
-  secondFactorUrl?: string;
-
-  /**
-   * Full URL or path to navigate during sign in,
-   * if the user is required to reset their password.
-   */
-  resetPasswordUrl?: string;
-
-  /**
-   * Full URL or path to navigate after an incomplete sign up.
-   */
-  continueSignUpUrl?: string | null;
-
-  /**
-   * Full URL or path to navigate after requesting email verification.
-   */
-  verifyEmailAddressUrl?: string | null;
-
-  /**
-   * Full URL or path to navigate after requesting phone verification.
-   */
-  verifyPhoneNumberUrl?: string | null;
-};
+export type HandleOAuthCallbackParams = SignInForceRedirectUrl &
+  SignInFallbackRedirectUrl &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps & {
+    /**
+     * Full URL or path where the SignIn component is mounted.
+     */
+    signInUrl?: string;
+    /**
+     * Full URL or path where the SignUp component is mounted.
+     */
+    signUpUrl?: string;
+    /**
+     * Full URL or path to navigate during sign in,
+     * if identifier verification is required.
+     */
+    firstFactorUrl?: string;
+    /**
+     * Full URL or path to navigate during sign in,
+     * if 2FA is enabled.
+     */
+    secondFactorUrl?: string;
+    /**
+     * Full URL or path to navigate during sign in,
+     * if the user is required to reset their password.
+     */
+    resetPasswordUrl?: string;
+    /**
+     * Full URL or path to navigate after an incomplete sign up.
+     */
+    continueSignUpUrl?: string | null;
+    /**
+     * Full URL or path to navigate after requesting email verification.
+     */
+    verifyEmailAddressUrl?: string | null;
+    /**
+     * Full URL or path to navigate after requesting phone verification.
+     */
+    verifyPhoneNumberUrl?: string | null;
+  };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
@@ -517,7 +559,12 @@ type ClerkOptionsNavigation =
     };
 
 export type ClerkOptions = ClerkOptionsNavigation &
-  AfterActionURLs & {
+  SignInForceRedirectUrl &
+  SignInFallbackRedirectUrl &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps &
+  AfterSignOutUrl & {
     appearance?: Appearance;
     localization?: LocalizationResource;
     polling?: boolean;
@@ -531,7 +578,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
     signUpUrl?: string;
     allowedRedirectOrigins?: Array<string | RegExp>;
     isSatellite?: boolean | ((url: URL) => boolean);
-
     /**
      * Telemetry options
      */
@@ -604,48 +650,21 @@ export type SignUpInitialValues = {
   username?: string;
 };
 
-type AfterActionURLs = {
-  /**
-   * Full URL or path to navigate after successful sign in.
-   */
-  afterSignInUrl?: string | null;
+export type SignInRedirectOptions = RedirectOptions &
+  RedirectUrlProp & {
+    /**
+     * Initial values that are used to prefill the sign in form.
+     */
+    initialValues?: SignInInitialValues;
+  };
 
-  /**
-   * Full URL or path to navigate after successful sign up.
-   * Sets the afterSignUpUrl if the "Sign up" link is clicked.
-   */
-  afterSignUpUrl?: string | null;
-
-  /**
-   * Full URL or path to navigate after successful sign out.
-   */
-  afterSignOutUrl?: string | null;
-};
-
-export type RedirectOptions = AfterActionURLs & {
-  /**
-   * Full URL or path to navigate after successful sign in,
-   * or sign up.
-   *
-   * The same as setting afterSignInUrl and afterSignUpUrl
-   * to the same value.
-   */
-  redirectUrl?: string | null;
-};
-
-export type SignInRedirectOptions = RedirectOptions & {
-  /**
-   * Initial values that are used to prefill the sign in form.
-   */
-  initialValues?: SignInInitialValues;
-};
-
-export type SignUpRedirectOptions = RedirectOptions & {
-  /**
-   * Initial values that are used to prefill the sign up form.
-   */
-  initialValues?: SignUpInitialValues;
-};
+export type SignUpRedirectOptions = RedirectOptions &
+  RedirectUrlProp & {
+    /**
+     * Initial values that are used to prefill the sign up form.
+     */
+    initialValues?: SignUpInitialValues;
+  };
 
 export type SetActiveParams = {
   /**
@@ -675,6 +694,19 @@ export type RoutingOptions =
 
 export type SignInProps = RoutingOptions & {
   /**
+   * Full URL or path to navigate after successful sign in.
+   * This value has precedence over other redirect props, environment variables or search params.
+   * Use this prop to override the redirect URL when needed.
+   * @default undefined
+   */
+  forceRedirectUrl?: string | null;
+  /**
+   * Full URL or path to navigate after successful sign in.
+   * This value is used when no other redirect props, environment variables or search params are present.
+   * @default undefined
+   */
+  fallbackRedirectUrl?: string | null;
+  /**
    * Full URL or path to for the sign up process.
    * Used to fill the "Sign up" link in the SignUp component.
    */
@@ -689,11 +721,51 @@ export type SignInProps = RoutingOptions & {
    * Initial values that are used to prefill the sign in form.
    */
   initialValues?: SignInInitialValues;
-} & RedirectOptions;
+} & SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps &
+  AfterSignOutUrl;
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
+type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
+
+export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
+  /**
+   * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
+   * @default true
+   */
+  cancelOnTapOutside?: boolean;
+  /**
+   * Enables upgraded One Tap UX on ITP browsers.
+   * Turning this options off, would hide any One Tap UI in such browsers.
+   * @default true
+   */
+  itpSupport?: boolean;
+  /**
+   * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
+   * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
+   * Backwards compatible with browsers that still support third-party cookies.
+   * @default true
+   */
+  fedCmSupport?: boolean;
+  appearance?: SignInTheme;
+};
+
 export type SignUpProps = RoutingOptions & {
+  /**
+   * Full URL or path to navigate after successful sign up.
+   * This value has precedence over other redirect props, environment variables or search params.
+   * Use this prop to override the redirect URL when needed.
+   * @default undefined
+   */
+  forceRedirectUrl?: string | null;
+  /**
+   * Full URL or path to navigate after successful sign up.
+   * This value is used when no other redirect props, environment variables or search params are present.
+   * @default undefined
+   */
+  fallbackRedirectUrl?: string | null;
   /**
    * Full URL or path to for the sign in process.
    * Used to fill the "Sign in" link in the SignUp component.
@@ -714,7 +786,10 @@ export type SignUpProps = RoutingOptions & {
    * Initial values that are used to prefill the sign up form.
    */
   initialValues?: SignUpInitialValues;
-} & RedirectOptions;
+} & SignInFallbackRedirectUrl &
+  SignInForceRedirectUrl &
+  LegacyRedirectProps &
+  AfterSignOutUrl;
 
 export type SignUpModalProps = WithoutRouting<SignUpProps>;
 
@@ -996,6 +1071,10 @@ export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+}
+
+export interface AuthenticateWithGoogleOneTapParams {
+  token: string;
 }
 
 export interface LoadedClerk extends Clerk {

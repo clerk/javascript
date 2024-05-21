@@ -61,10 +61,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
 
             return (
               <Action.Root key={account.id}>
-                <ProfileSection.Item
-                  id='connectedAccounts'
-                  hoverable
-                >
+                <ProfileSection.Item id='connectedAccounts'>
                   <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
                     <Image
                       elementDescriptor={[descriptors.providerIcon]}
@@ -103,7 +100,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                 {(error || reauthorizationRequired) && (
                   <Text
                     colorScheme='danger'
-                    sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$10}` })}
+                    sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$8x5}` })}
                     localizationKey={errorMessage}
                   />
                 )}

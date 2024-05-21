@@ -6,6 +6,7 @@ import type {
   ClerkOptions,
   CreateOrganizationProps,
   EnvironmentResource,
+  GoogleOneTapProps,
   OrganizationProfileProps,
   SignInProps,
   SignUpProps,
@@ -32,6 +33,7 @@ import {
   LazyComponentRenderer,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
+  LazyOneTapRenderer,
   LazyProviders,
 } from './lazyModules/providers';
 import type { AvailableComponentProps } from './types';
@@ -52,11 +54,15 @@ export type ComponentControls = {
     node?: HTMLDivElement;
     props?: unknown;
   }) => void;
-  openModal: <T extends 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization'>(
+  openModal: <
+    T extends 'googleOneTap' | 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization',
+  >(
     modal: T,
     props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
   ) => void;
-  closeModal: (modal: 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization') => void;
+  closeModal: (
+    modal: 'googleOneTap' | 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization',
+  ) => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
 };
@@ -78,6 +84,7 @@ interface ComponentsProps {
 interface ComponentsState {
   appearance: Appearance | undefined;
   options: ClerkOptions | undefined;
+  googleOneTapModal: null | GoogleOneTapProps;
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
@@ -153,6 +160,7 @@ const Components = (props: ComponentsProps) => {
   const [state, setState] = React.useState<ComponentsState>({
     appearance: props.options.appearance,
     options: props.options,
+    googleOneTapModal: null,
     signInModal: null,
     signUpModal: null,
     userProfileModal: null,
@@ -161,8 +169,15 @@ const Components = (props: ComponentsProps) => {
     nodes: new Map(),
     impersonationFab: false,
   });
-  const { signInModal, signUpModal, userProfileModal, organizationProfileModal, createOrganizationModal, nodes } =
-    state;
+  const {
+    googleOneTapModal,
+    signInModal,
+    signUpModal,
+    userProfileModal,
+    organizationProfileModal,
+    createOrganizationModal,
+    nodes,
+  } = state;
 
   const { urlStateParam, clearUrlStateParam, decodedRedirectParams } = useClerkModalStateParams();
 
@@ -176,7 +191,6 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.mountComponent = params => {
       const { node, name, props, appearanceKey } = params;
-
       assertDOMElement(node);
       setState(s => {
         s.nodes.set(node, { key: `p${++portalCt}`, name, props, appearanceKey });
@@ -219,6 +233,15 @@ const Components = (props: ComponentsProps) => {
 
     props.onComponentsMounted();
   }, []);
+
+  const mountedOneTapModal = (
+    <LazyOneTapRenderer
+      componentProps={googleOneTapModal}
+      globalAppearance={state.appearance}
+      componentAppearance={googleOneTapModal?.appearance}
+      startPath={buildVirtualRouterUrl({ base: '/one-tap', path: '' })}
+    />
+  );
 
   const mountedSignInModal = (
     <LazyModalRenderer
@@ -324,6 +347,7 @@ const Components = (props: ComponentsProps) => {
           );
         })}
 
+        {googleOneTapModal && mountedOneTapModal}
         {signInModal && mountedSignInModal}
         {signUpModal && mountedSignUpModal}
         {userProfileModal && mountedUserProfileModal}

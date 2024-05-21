@@ -1,5 +1,3 @@
-// ---------------------------------- Events ---------------------------------- //
-
 import type {
   ClerkResource,
   LoadedClerk,
@@ -8,18 +6,18 @@ import type {
   SignInStrategy,
   Web3Strategy,
 } from '@clerk/types';
-import type { AnyActorLogic, InputFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
 import type { ClerkRouter } from '~/react/router';
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type BaseRouterLoadingStep = 'start' | 'verifications' | 'continue';
+export type BaseRouterLoadingStep = 'start' | 'verifications' | 'continue' | 'reset-password';
 
 export type BaseRouterNextEvent<T extends ClerkResource> = { type: 'NEXT'; resource?: T };
 export type BaseRouterPrevEvent = { type: 'NAVIGATE.PREVIOUS' };
 export type BaseRouterStartEvent = { type: 'NAVIGATE.START' };
+export type BaseRouterResetEvent = { type: 'RESET' };
 export type BaseRouterErrorEvent = { type: 'ERROR'; error: Error };
 export type BaseRouterTransferEvent = { type: 'TRANSFER' };
 export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
@@ -33,18 +31,10 @@ export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
     }
 ) & { type: 'LOADING'; isLoading: boolean };
 
-export type BaseRouterRouteRegisterEvent<TSystemId extends string, TLogic extends AnyActorLogic = AnyActorLogic> = {
-  type: 'ROUTE.REGISTER';
-  id: TSystemId;
-  logic: TLogic;
-  input: Omit<InputFrom<TLogic>, 'basePath' | 'clerk' | 'form' | 'router'>;
-};
-
-export type BaseRouterRouteUnregisterEvent<T extends string> = { type: 'ROUTE.UNREGISTER'; id: T };
-
 export type BaseRouterRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
 export type BaseRouterRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };
 export type BaseRouterRedirectWeb3Event = { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy };
+export type BaseRouterSetClerkEvent = { type: 'CLERK.SET'; clerk: LoadedClerk };
 
 export type BaseRouterRedirectEvent =
   | BaseRouterRedirectOauthEvent
@@ -56,6 +46,7 @@ export type BaseRouterRedirectEvent =
 export interface BaseRouterInput {
   clerk: LoadedClerk;
   router?: ClerkRouter;
+  exampleMode?: boolean;
 }
 
 // ---------------------------------- Context ---------------------------------- //
@@ -64,4 +55,5 @@ export interface BaseRouterContext {
   clerk: LoadedClerk;
   error?: ClerkElementsError;
   router?: ClerkRouter;
+  exampleMode?: boolean;
 }

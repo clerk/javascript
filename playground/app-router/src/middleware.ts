@@ -1,16 +1,10 @@
-import { authMiddleware } from '@clerk/nextjs';
+import { clerkMiddleware } from '@clerk/nextjs/server';
 import { NextMiddleware, NextResponse } from 'next/server';
 
-const clerkMiddleware = authMiddleware()
 
-const middleware: NextMiddleware = (request, event) => {
-  if (request.geo?.country?.toLocaleUpperCase() === 'IN') {
-    return new NextResponse(null, { status: 403 });
-  }
-  return clerkMiddleware(request, event);
-};
-
-export default middleware;
+export default clerkMiddleware((auth)=> {
+  
+})
 
 // export default authMiddleware({
 //   publicRoutes: ['/'],

@@ -1,5 +1,43 @@
 import type { OAuthStrategy, SamlStrategy } from './strategies';
 
+export type AfterSignOutUrl = {
+  /**
+   * Full URL or path to navigate after successful sign out.
+   */
+  afterSignOutUrl?: string | null;
+};
+
+/**
+ * @deprecated This is deprecated and will be removed in a future release.
+ */
+export type LegacyRedirectProps = {
+  /**
+   * @deprecated This is deprecated and will be removed in a future release.
+   * Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
+   */
+  afterSignInUrl?: string | null;
+  /**
+   * @deprecated This is deprecated and will be removed in a future release.
+   * Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
+   */
+  afterSignUpUrl?: string | null;
+  /**
+   * @deprecated This is deprecated and will be removed in a future release.
+   * Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
+   */
+  redirectUrl?: string | null;
+};
+
+/**
+ * Redirect URLs for different actions.
+ * Mainly used to be used to type internal Clerk functions.
+ */
+export type RedirectOptions = SignInForceRedirectUrl &
+  SignInFallbackRedirectUrl &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps;
+
 export type AuthenticateWithRedirectParams = {
   /**
    * Full URL or path to the route that will complete the OAuth or SAML flow.
@@ -33,4 +71,49 @@ export type AuthenticateWithRedirectParams = {
    * Email address to use for targeting a SAML connection at sign-up
    */
   emailAddress?: string;
+};
+
+export type RedirectUrlProp = {
+  /**
+   * Full URL or path to navigate after a successful action.
+   */
+  redirectUrl?: string | null;
+};
+
+export type SignUpForceRedirectUrl = {
+  /**
+   * Full URL or path to navigate after successful sign up.
+   * This value has precedence over other redirect props, environment variables or search params.
+   * Use this prop to override the redirect URL when needed.
+   * @default undefined
+   */
+  signUpForceRedirectUrl?: string | null;
+};
+
+export type SignUpFallbackRedirectUrl = {
+  /**
+   * Full URL or path to navigate after successful sign up.
+   * This value is used when no other redirect props, environment variables or search params are present.
+   * @default undefined
+   */
+  signUpFallbackRedirectUrl?: string | null;
+};
+
+export type SignInFallbackRedirectUrl = {
+  /**
+   * Full URL or path to navigate after successful sign in.
+   * This value is used when no other redirect props, environment variables or search params are present.
+   * @default undefined
+   */
+  signInFallbackRedirectUrl?: string | null;
+};
+
+export type SignInForceRedirectUrl = {
+  /**
+   * Full URL or path to navigate after successful sign in.
+   * This value has precedence over other redirect props, environment variables or search params.
+   * Use this prop to override the redirect URL when needed.
+   * @default undefined
+   */
+  signInForceRedirectUrl?: string | null;
 };

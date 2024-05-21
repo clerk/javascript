@@ -4,8 +4,8 @@ import { useSelector } from '@xstate/react';
 import * as React from 'react';
 import type { ActorRefFrom } from 'xstate';
 
-import type { TSignInFirstFactorMachine } from '~/internals/machines/sign-in/machines';
-import { SignInRouterSystemId } from '~/internals/machines/sign-in/types';
+import type { TSignInFirstFactorMachine } from '~/internals/machines/sign-in';
+import { SignInRouterSystemId } from '~/internals/machines/sign-in';
 
 import { useActiveTags } from '../hooks';
 import { ActiveTagsMode } from '../hooks/use-active-tags.hook';
@@ -32,23 +32,37 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 
 // --------------------------------- COMPONENTS ---------------------------------
 
-export type SignInChooseStrategyProps = {
-  children: React.ReactNode;
-};
+export type SignInChooseStrategyProps = React.HTMLAttributes<HTMLDivElement>;
+export type SignInForgotPasswordProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChooseStrategyCtx');
 
-export function SignInChooseStrategy({ children }: SignInChooseStrategyProps) {
+export function SignInChooseStrategy({ children, ...props }: SignInChooseStrategyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
   const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:choose-strategy'], ActiveTagsMode.all);
 
-  return activeState ? <SignInChooseStrategyCtx.Provider>{children}</SignInChooseStrategyCtx.Provider> : null;
+  return activeState ? (
+    <SignInChooseStrategyCtx.Provider>
+      <div {...props}>{children}</div>
+    </SignInChooseStrategyCtx.Provider>
+  ) : null;
 }
 
-const STRATEGY_OPTION_NAME = 'SignInStrategyOption';
+export function SignInForgotPassword({ children, ...props }: SignInForgotPasswordProps) {
+  const routerRef = SignInRouterCtx.useActorRef();
+  const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:forgot-password'], ActiveTagsMode.all);
 
-export type SignInStrategyOptionElement = React.ElementRef<'button'>;
-export type SignInStrategyOptionProps = {
+  return activeState ? (
+    <SignInChooseStrategyCtx.Provider>
+      <div {...props}>{children}</div>
+    </SignInChooseStrategyCtx.Provider>
+  ) : null;
+}
+
+const SUPPORTED_STRATEGY_NAME = 'SignInSupportedStrategy';
+
+export type SignInSupportedStrategyElement = React.ElementRef<'button'>;
+export type SignInSupportedStrategyProps = {
   asChild?: boolean;
   name: Exclude<SignInFirstFactor['strategy'], `oauth_${string}` | 'saml'>;
   children: React.ReactNode;
@@ -63,13 +77,13 @@ export type SignInStrategyOptionProps = {
  * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
  *
  * @example
- * <Step name='choose-strategy'>
- *   <StrategyOption name='password'>
+ * <SignIn.Step name='choose-strategy'>
+ *   <SignIn.SupportedStrategy name='password'>
  *     Sign in with password
- *   </StrategyOption>
- * </Step
+ *   </SignIn.SupportedStrategy>
+ * </SignIn.Step>
  */
-export const SignInStrategyOption = React.forwardRef<SignInStrategyOptionElement, SignInStrategyOptionProps>(
+export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyElement, SignInSupportedStrategyProps>(
   ({ asChild, children, name, ...rest }, forwardedRef) => {
     const routerRef = SignInRouterCtx.useActorRef();
     const snapshot = routerRef.getSnapshot();
@@ -106,4 +120,4 @@ export const SignInStrategyOption = React.forwardRef<SignInStrategyOptionElement
   },
 );
 
-SignInStrategyOption.displayName = STRATEGY_OPTION_NAME;
+SignInSupportedStrategy.displayName = SUPPORTED_STRATEGY_NAME;

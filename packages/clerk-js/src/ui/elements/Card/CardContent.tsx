@@ -1,17 +1,29 @@
 import React from 'react';
 
-import { descriptors, Flex, generateFlowPartClassname, Icon } from '../../customizables';
+import { useEnvironment } from '../../contexts';
+import {
+  descriptors,
+  Flex,
+  generateFlowPartClassname,
+  Icon,
+  localizationKeys,
+  useLocalizations,
+} from '../../customizables';
 import { Close } from '../../icons';
 import { type PropsOfComponent } from '../../styledSystem';
-import { useFlowMetadata } from '../contexts';
+import { useCardState, useFlowMetadata } from '../contexts';
 import { IconButton } from '../IconButton';
 import { useUnsafeModalContext } from '../Modal';
+import { CardAlert } from './CardAlert';
 
 type CardContentProps = PropsOfComponent<typeof Flex>;
 export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((props, ref) => {
   const { children, sx, ...rest } = props;
   const flowMetadata = useFlowMetadata();
   const { toggle } = useUnsafeModalContext();
+  const { maintenanceMode } = useEnvironment();
+  const card = useCardState();
+  const { t } = useLocalizations();
 
   return (
     <Flex
@@ -62,6 +74,9 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
             padding: t.space.$3,
           })}
         />
+      )}
+      {maintenanceMode && !card.error && (
+        <CardAlert variant={'warning'}>{t(localizationKeys('maintenanceMode'))}</CardAlert>
       )}
       {children}
     </Flex>

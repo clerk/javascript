@@ -61,7 +61,7 @@ export class User extends BaseResource implements UserResource {
   phoneNumbers: PhoneNumberResource[] = [];
   web3Wallets: Web3WalletResource[] = [];
   externalAccounts: ExternalAccountResource[] = [];
-  __experimental_passkeys: PasskeyResource[] = [];
+  passkeys: PasskeyResource[] = [];
 
   samlAccounts: SamlAccountResource[] = [];
 
@@ -127,11 +127,7 @@ export class User extends BaseResource implements UserResource {
     ).create();
   };
 
-  /**
-   * @experimental
-   * This method is experimental, avoid using this in production applications
-   */
-  __experimental_createPasskey = (): Promise<PasskeyResource> => {
+  createPasskey = (): Promise<PasskeyResource> => {
     return Passkey.registerPasskey();
   };
 
@@ -338,7 +334,7 @@ export class User extends BaseResource implements UserResource {
       ea => new ExternalAccount(ea, this.path() + '/external_accounts'),
     );
 
-    this.__experimental_passkeys = (data.passkeys || []).map(passkey => new Passkey(passkey));
+    this.passkeys = (data.passkeys || []).map(passkey => new Passkey(passkey));
 
     this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
 

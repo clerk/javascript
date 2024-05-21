@@ -1,19 +1,22 @@
+import { useClerk } from '@clerk/clerk-react';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { OAuthProvider, SamlStrategy } from '@clerk/types';
 import * as React from 'react';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import { ActiveTagsMode, useActiveTags } from '~/react/hooks/use-active-tags.hook';
 import type { ActorSignIn, ActorSignUp } from '~/react/hooks/use-loading.hook';
 import { useLoading } from '~/react/hooks/use-loading.hook';
 import { SignInChooseStrategyCtx } from '~/react/sign-in/choose-strategy';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 import { SignInStartCtx } from '~/react/sign-in/start';
-import { SIGN_IN_STEPS, type TSignInStep } from '~/react/sign-in/step';
+import type { TSignInStep } from '~/react/sign-in/step';
+import { SIGN_IN_STEPS } from '~/react/sign-in/step';
 import { SignInFirstFactorCtx, SignInSecondFactorCtx } from '~/react/sign-in/verifications';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 import { SignUpContinueCtx } from '~/react/sign-up/continue';
 import { SignUpStartCtx } from '~/react/sign-up/start';
-import { SIGN_UP_STEPS, type TSignUpStep } from '~/react/sign-up/step';
+import type { TSignUpStep } from '~/react/sign-up/step';
+import { SIGN_UP_STEPS } from '~/react/sign-up/step';
 import { SignUpVerificationCtx } from '~/react/sign-up/verifications';
 import { mapScopeToStrategy } from '~/react/utils/map-scope-to-strategy';
 
@@ -48,37 +51,41 @@ function isSignUpScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is
 /**
  * Access the loading state of a chosen scope. Scope can refer to a step, a provider, or the global loading state. The global loading state is `true` when any of the other scopes are loading.
  *
- * @param scope - Optional. Specify which loading state to access. Can be a step, a provider, or the global loading state. If `<Loading>` is used outside a `<Step>` it will default to `"global"`. If used inside a `<Step>` it will default to the current step.
- * @param {Function} children - A render prop function that receives `isLoading` as an argument. `isLoading` is a boolean that indicates if the current scope is loading or not.
+ * @param scope - Optional. Specify which loading state to access. Can be a step, a provider, or the global loading state. If `<Loading>` is used outside a `<Step>`, the scope will default to "global". If used inside a `<Step>` the scope will default to the current step. For external authentication providers, the scope needs to be manually defined in the format of `provider:<provider name>`
+ * @param {Function} children - A function that receives `isLoading` as an argument. `isLoading` is a boolean that indicates if the current scope is loading or not.
  *
  * @example
- * <SignIn>
- *   <Loading>
+ * <SignIn.Root>
+ *   <Clerk.Loading>
  *     {(isLoading) => isLoading && "Global loading..."}
- *   </Loading>
- * </SignIn>
+ *   </Clerk.Loading>
+ * </SignIn.Root>
  *
  * @example
- * <Step name="start">
- *  <Submit>
- *    <Loading>
+ * <SignIn.Step name="start">
+ *  <Clerk.Action submit>
+ *    <Clerk.Loading>
  *      {(isLoading) => isLoading ? "Start is loading..." : "Submit"}
- *    </Loading>
- *  </Submit>
- * </Step>
+ *    </Clerk.Loading>
+ *  </Clerk.Action>
+ * </SignIn.Step>
  *
  * @example
- * <Step name="start">
- *   <Loading scope="provider:google">
+ * <SignIn.Step name="start">
+ *   <Clerk.Loading scope="provider:google">
  *     {(isLoading) => (
- *       <Provider name="google" disabled={isLoading}>
+ *       <Clerk.Connection name="google" disabled={isLoading}>
  *         {isLoading ? "Loading..." : "Continue with Google"}
- *       </Provider>
+ *       </Clerk.Connection>
  *     )}
- *   </Loading>
- * </Step>
+ *   </Clerk.Loading>
+ * </SignIn.Step>
  */
 export function Loading({ children, scope }: LoadingProps) {
+  const clerk = useClerk();
+
+  clerk.telemetry?.record(eventComponentMounted('Elements_Loading', { scope: scope ?? false }));
+
   const signInRouterRef = SignInRouterCtx.useActorRef(true);
   const signUpRouterRef = SignUpRouterCtx.useActorRef(true);
 
@@ -157,15 +164,15 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
     computedScope = inferredScope;
   }
 
-  const isChooseStrategyStep = useActiveTags(
-    routerRef,
-    ['route:first-factor', 'route:choose-strategy'],
-    ActiveTagsMode.all,
-  );
+  const snapshot = routerRef.getSnapshot();
+  const isFirstFactor = snapshot.hasTag('route:first-factor');
+
   // Determine loading states based on the step
   const isStartLoading = isLoading && loadingStep === 'start';
   const isVerificationsLoading = isLoading && loadingStep === 'verifications';
-  const isChooseStrategyLoading = isLoading && isChooseStrategyStep;
+  const isChooseStrategyLoading = isLoading && isFirstFactor && snapshot.hasTag('route:choose-strategy');
+  const isForgotPasswordLoading = isFirstFactor && snapshot.hasTag('route:forgot-password');
+  const isResetPasswordLoading = isFirstFactor && snapshot.hasTag('route:reset-password');
   const isStrategyLoading = isLoading && loadingStep === undefined && strategy !== undefined;
 
   let returnValue: boolean;
@@ -178,6 +185,10 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
     returnValue = isVerificationsLoading;
   } else if (computedScope === 'step:choose-strategy') {
     returnValue = isChooseStrategyLoading;
+  } else if (computedScope === 'step:forgot-password') {
+    returnValue = isForgotPasswordLoading;
+  } else if (computedScope === 'step:reset-password') {
+    returnValue = isResetPasswordLoading;
   } else if (computedScope.startsWith('provider:')) {
     const computedStrategy = mapScopeToStrategy(computedScope);
     returnValue = isStrategyLoading && strategy === computedStrategy;

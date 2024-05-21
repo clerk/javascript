@@ -84,6 +84,7 @@ export const trTR: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Organizasyon adı',
   formFieldLabel__organizationSlug: "Organizasyon slug'ı",
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Şifre',
   formFieldLabel__phoneNumber: 'Telefon numarası',
   formFieldLabel__role: 'Rol',
@@ -93,6 +94,7 @@ export const trTR: LocalizationResource = {
     action__signOut: 'Çıkış yap',
     title: '{{identifier}} olarak giriş yapıldı',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Üye',
   membershipRole__guestMember: 'Misafir',
@@ -281,6 +283,7 @@ export const trTR: LocalizationResource = {
       blockButton__backupCode: 'Yedekleme kodu kullan',
       blockButton__emailCode: '{{identifier}} adresine doğrulama kodu gönder',
       blockButton__emailLink: '{{identifier}} adresine doğrulama bağlantısı gönder',
+      blockButton__passkey: undefined,
       blockButton__password: 'Şifreyle giriş yap',
       blockButton__phoneCode: '{{identifier}} numarasına doğrulama kodu gönder',
       blockButton__totp: 'Authenticator uygulaması kullan',
@@ -352,10 +355,17 @@ export const trTR: LocalizationResource = {
       subtitle: 'Bir hata oluştu',
       title: 'Giriş yapılamıyor',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Başka bir yöntem kullan',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Şifrenizi girin',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Doğrulama kodu',
@@ -382,6 +392,7 @@ export const trTR: LocalizationResource = {
       actionLink: 'Kayıt ol',
       actionLink__use_email: 'E-posta kullan',
       actionLink__use_email_username: 'E-posta veya kullanıcı adı kullan',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Telefon kullan',
       actionLink__use_username: 'Kullanıcı adı kullan',
       actionText: 'Hesabınız yok mu?',
@@ -449,6 +460,9 @@ export const trTR: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: 'Hatalı kod',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -462,6 +476,7 @@ export const trTR: LocalizationResource = {
     form_password_not_strong_enough: 'Şifreniz fazla zayıf',
     form_password_pwned:
       'Bu şifre bir veri saldırısında ele geçirildiği için kullanılamaz. Lütfen başka bir şifre deneyin.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Şifrenize ayrılan depolama alanını aştınız. Lütfen daha kısa bir şifre deneyin.',
     form_password_validation_failed: 'Geçersiz şifre',
@@ -469,6 +484,11 @@ export const trTR: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} karakterden kısa olmalı',
       minimumLength: '{{length}} veya daha fazla karakter içermeli',
@@ -648,6 +668,14 @@ export const trTR: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -729,6 +757,11 @@ export const trTR: LocalizationResource = {
           destructiveActionTitle: 'Kaldır',
           headerTitle: 'Authenticator uygulaması',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Şifreyi güncelle',

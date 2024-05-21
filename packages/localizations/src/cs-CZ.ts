@@ -84,6 +84,7 @@ export const csCZ: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Název organizace',
   formFieldLabel__organizationSlug: 'URL adresa',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Heslo',
   formFieldLabel__phoneNumber: 'Telefonní číslo',
   formFieldLabel__role: 'Role',
@@ -93,6 +94,7 @@ export const csCZ: LocalizationResource = {
     action__signOut: 'Odhlásit se',
     title: 'Přihlášen(a) jako {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Správce',
   membershipRole__basicMember: 'Člen',
   membershipRole__guestMember: 'Host',
@@ -280,6 +282,7 @@ export const csCZ: LocalizationResource = {
       blockButton__backupCode: 'Použít záložní kód',
       blockButton__emailCode: 'Odeslat ověřovací kód na email {{identifier}}',
       blockButton__emailLink: 'Odeslat odkaz na email {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Přihlásit se pomocí hesla',
       blockButton__phoneCode: 'Poslat SMS kód na telefonní číslo {{identifier}}',
       blockButton__totp: 'Použít autentizační aplikaci',
@@ -351,10 +354,17 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Došlo k chybě',
       title: 'Nelze se přihlásit',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Použít jinou metodu',
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Zadejte své heslo',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Ověřovací kód',
@@ -381,6 +391,7 @@ export const csCZ: LocalizationResource = {
       actionLink: 'Registrovat se',
       actionLink__use_email: 'Použít email',
       actionLink__use_email_username: 'Použít email nebo uživatelské jméno',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Použít telefon',
       actionLink__use_username: 'Použít uživatelské jméno',
       actionText: 'Nemáte účet?',
@@ -448,6 +459,9 @@ export const csCZ: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -460,6 +474,7 @@ export const csCZ: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
     form_password_pwned: 'Toto heslo bylo nalezeno v rámci uniku dat a nemůže být použito, prosím zvolte jiné heslo.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Vaše heslo překročilo maximální povolený počet bytů, prosím zkrátit ho nebo odstranit některé speciální znaky.',
     form_password_validation_failed: 'Nesprávné heslo',
@@ -467,6 +482,11 @@ export const csCZ: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'méně než {{length}} znaků',
       minimumLength: '{{length}} nebo více znaků',
@@ -646,6 +666,14 @@ export const csCZ: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -727,6 +755,11 @@ export const csCZ: LocalizationResource = {
           destructiveActionTitle: 'Odstranit',
           headerTitle: 'Aplikace Authenticator',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Nastavit heslo',

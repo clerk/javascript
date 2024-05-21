@@ -84,6 +84,7 @@ export const ruRU: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Название организации',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Пароль',
   formFieldLabel__phoneNumber: 'Номер телефона',
   formFieldLabel__role: 'Роль',
@@ -93,6 +94,7 @@ export const ruRU: LocalizationResource = {
     action__signOut: 'Выйти',
     title: 'Вы вошли как {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Администратор',
   membershipRole__basicMember: 'Участник',
   membershipRole__guestMember: 'Гость',
@@ -285,6 +287,7 @@ export const ruRU: LocalizationResource = {
       blockButton__backupCode: 'Используйте код восстановления',
       blockButton__emailCode: 'Отправить код на {{identifier}}',
       blockButton__emailLink: 'Отправить ссылку на {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Войти с паролем',
       blockButton__phoneCode: 'Отправить код на {{identifier}}',
       blockButton__totp: 'Используйте аутентификатор',
@@ -356,10 +359,17 @@ export const ruRU: LocalizationResource = {
       subtitle: 'Произошла ошибка',
       title: 'Невозможно войти',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Использовать другой метод',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Введите пароль',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Верификационный код',
@@ -386,6 +396,7 @@ export const ruRU: LocalizationResource = {
       actionLink: 'Зарегистрироваться',
       actionLink__use_email: 'Использовать почту',
       actionLink__use_email_username: 'Использовать почту или имя пользователя',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Использовать номер телефона',
       actionLink__use_username: 'Использовать имя пользователя',
       actionText: 'Нет аккаунта?',
@@ -453,6 +464,9 @@ export const ruRU: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -465,6 +479,7 @@ export const ruRU: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Ваш пароль недостаточно надежный.',
     form_password_pwned: 'Этот пароль был взломан и не может быть использован, попробуйте другой пароль.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ваш пароль превышает максимально допустимое количество байтов, сократите его или удалите некоторые специальные символы.',
     form_password_validation_failed: 'Неверный пароль',
@@ -472,6 +487,11 @@ export const ruRU: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'менее {{length}} символов',
       minimumLength: '{{length}} или более символов',
@@ -652,6 +672,14 @@ export const ruRU: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -733,6 +761,11 @@ export const ruRU: LocalizationResource = {
           destructiveActionTitle: 'Удалить',
           headerTitle: 'Приложение аутентификации',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Установить пароль',

@@ -32,3 +32,7 @@ folders:
       - ./**/*.test.ts
   - path: /packages/themes
   - path: /packages/types
+  - path: /packages/express
+    exclude:
+      - ./**/*.test.ts
+  - path: /packages/testing

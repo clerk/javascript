@@ -83,6 +83,7 @@ export const ptPT: LocalizationResource = {
     'Endereço de e-mail para receber um código e verificar este domínio',
   formFieldLabel__organizationName: 'Nome da organização',
   formFieldLabel__organizationSlug: 'URL Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Palavra-passe',
   formFieldLabel__phoneNumber: 'Telemóvel',
   formFieldLabel__role: 'Função',
@@ -92,6 +93,7 @@ export const ptPT: LocalizationResource = {
     action__signOut: 'Terminar sessão',
     title: 'Sessão iniciada como {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
   membershipRole__guestMember: 'Convidado',
@@ -281,6 +283,7 @@ export const ptPT: LocalizationResource = {
       blockButton__backupCode: 'Utilize um código de backup',
       blockButton__emailCode: 'Enviar código para {{identifier}}',
       blockButton__emailLink: 'Enviar link para {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Fazer login com palavra-passe',
       blockButton__phoneCode: 'Enviar código para {{identifier}}',
       blockButton__totp: 'Utilize o seu autenticador',
@@ -352,10 +355,17 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Ocorreu um erro',
       title: 'Não foi possível fazer login',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utilize outro método',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Insira a sua palavra-passe',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificação',
@@ -382,6 +392,7 @@ export const ptPT: LocalizationResource = {
       actionLink: 'Registre-se',
       actionLink__use_email: 'Usar e-mail',
       actionLink__use_email_username: 'Usar e-mail ou nome de utilizador',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Usar telemóvel',
       actionLink__use_username: 'Usar nome de utilizador',
       actionText: 'Não possui uma conta?',
@@ -449,6 +460,9 @@ export const ptPT: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser válido.',
@@ -462,6 +476,7 @@ export const ptPT: LocalizationResource = {
     form_password_not_strong_enough: 'A sua palavra-passe não é forte o suficiente.',
     form_password_pwned:
       'Esta palavra-passe foi encontrada como parte de uma violação e não pode ser usada, por favor, tente outra palavra-passe.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'A sua palavra-passe excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
     form_password_validation_failed: 'Palavra-passe incorreta',
@@ -469,6 +484,11 @@ export const ptPT: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Você não pode excluir a sua última identificação.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'menos de {{length}} caracteres',
       minimumLength: '{{length}} ou mais caracteres',
@@ -648,6 +668,14 @@ export const ptPT: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -729,6 +757,11 @@ export const ptPT: LocalizationResource = {
           destructiveActionTitle: 'Remover',
           headerTitle: 'Autenticador',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Definir palavra-passe',

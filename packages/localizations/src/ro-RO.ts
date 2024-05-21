@@ -85,6 +85,7 @@ export const roRO: LocalizationResource = {
     'Introduceți o adresă de e-mail sub acest domeniu pentru a primi un cod și pentru a verifica acest domeniu.',
   formFieldLabel__organizationName: 'Numele organizației',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Parola',
   formFieldLabel__phoneNumber: 'Număr de telefon',
   formFieldLabel__role: 'Rol',
@@ -94,6 +95,7 @@ export const roRO: LocalizationResource = {
     action__signOut: 'Deconectați-vă',
     title: 'Conectat ca {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Membru',
   membershipRole__guestMember: 'Invitat',
@@ -284,6 +286,7 @@ export const roRO: LocalizationResource = {
       blockButton__backupCode: 'Utilizați un cod de rezervă',
       blockButton__emailCode: 'Codul de e-mail către {{identifier}}',
       blockButton__emailLink: 'Trimiteți un link prin e-mail către {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Conectați-vă cu parola dvs',
       blockButton__phoneCode: 'Trimiteți codul SMS la {{identifier}}',
       blockButton__totp: 'Utilizați aplicația de autentificare',
@@ -355,10 +358,17 @@ export const roRO: LocalizationResource = {
       subtitle: 'S-a produs o eroare',
       title: 'Nu se poate autentifica',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utilizați o altă metodă',
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Introduceți parola dvs',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Cod de verificare',
@@ -386,6 +396,7 @@ export const roRO: LocalizationResource = {
       actionLink: 'Înscrieți-vă',
       actionLink__use_email: 'Utilizați e-mailul',
       actionLink__use_email_username: 'Utilizați e-mail sau nume de utilizator',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Utilizați telefonul',
       actionLink__use_username: 'Utilizați numele de utilizator',
       actionText: 'Nu aveți cont?',
@@ -453,6 +464,9 @@ export const roRO: LocalizationResource = {
       'Înscrierea a eșuat din cauza unei validări nereușite a robotului. Vă rugăm să reîmprospătați pagina pentru a încerca din nou sau contactați serviciul de asistență pentru mai multă asistență.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Adresa de e-mail trebuie să fie o adresă de e-mail validă.',
@@ -466,6 +480,7 @@ export const roRO: LocalizationResource = {
     form_password_not_strong_enough: 'Parola dvs. nu este suficient de puternică.',
     form_password_pwned:
       'Această parolă a fost descoperită ca parte a unei încălcări și nu poate fi utilizată, vă rugăm să încercați o altă parolă.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Parola dvs. a depășit numărul maxim de octeți permis, vă rugăm să o scurtați sau să eliminați unele caractere speciale.',
     form_password_validation_failed: 'Parolă incorectă',
@@ -473,6 +488,11 @@ export const roRO: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'Nu vă puteți șterge ultima identificare.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'mai puțin de {{length}} caractere',
       minimumLength: '{{length}} sau mai multe caractere',
@@ -657,6 +677,14 @@ export const roRO: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -740,6 +768,11 @@ export const roRO: LocalizationResource = {
           destructiveActionTitle: 'Eliminați',
           headerTitle: 'Aplicația Authenticator',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Setați parola',

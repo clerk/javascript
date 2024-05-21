@@ -1,10 +1,8 @@
 import type { SignUpResource } from '@clerk/types';
 
 import {
-  appendAsQueryParams,
   buildURL,
   createAllowedRedirectOrigins,
-  getAllETLDs,
   getETLDPlusOneFromFrontendApi,
   getSearchParameterFromHash,
   hasBannedProtocol,
@@ -13,8 +11,10 @@ import {
   isDataUri,
   isDevAccountPortalOrigin,
   isRedirectForFAPIInitiatedFlow,
+  isRelativeUrl,
   isValidUrl,
   mergeFragmentIntoUrl,
+  relativeToAbsoluteUrl,
   requiresUserInput,
   trimLeadingSlash,
   trimTrailingSlash,
@@ -60,15 +60,41 @@ describe('isValidUrl(url)', () => {
 
 describe('isValidUrl(url,base)', () => {
   const cases: Array<[string, boolean]> = [
+    ['', false],
+    ['/', false],
+    ['/test', false],
+    ['/test?clerk=false', false],
+    ['/?clerk=false', false],
+    ['https://www.clerk.com/', true],
+    ['https://www.clerk.com/?test=clerk', true],
+    ['https://www.clerk.com', true],
+    ['https://clerk.com', true],
+    ['https://clerk.com#test', true],
+    ['www.clerk.com/', false],
+    ['www.clerk.com', false],
+    ['www.clerk', false],
+    ['clerk.com', false],
+    ['clerk.com?clerk=yes', false],
+    ['clerk.com#/?clerk=yes', false],
+  ];
+
+  test.each(cases)('.isValidUrl(%s,%s)', (a, expected) => {
+    expect(isValidUrl(a)).toBe(expected);
+  });
+});
+
+describe('isRelativeUrl(url,base)', () => {
+  const cases: Array<[string, boolean]> = [
     ['', true],
     ['/', true],
     ['/test', true],
     ['/test?clerk=true', true],
     ['/?clerk=true', true],
+    ['https://www.clerk.com/', false],
   ];
 
-  test.each(cases)('.isValidUrl(%s,%s)', (a, expected) => {
-    expect(isValidUrl(a, { includeRelativeUrls: true })).toBe(expected);
+  test.each(cases)('.isRelativeUrl(%s,%s)', (a, expected) => {
+    expect(isRelativeUrl(a)).toBe(expected);
   });
 });
 
@@ -230,6 +256,58 @@ describe('buildURL(options: URLParams, skipOrigin)', () => {
       ),
     ).toBe('http://test.host/foo?my-search=42#my-hash/qux?my-hash-search-1=42&my-hash-search-2=42');
   });
+
+  it('appends search params passed to hashSearchParams in the URL fragment', () => {
+    const base = 'https://clerk.com/';
+    const params = new URLSearchParams({ test1: '1', test2: '2' });
+    const url = buildURL({ base, hashSearchParams: params }, { stringify: true });
+    expect(url).toBe('https://clerk.com/#/?test1=1&test2=2');
+  });
+
+  it('does not append a URL fragment if nothing was passed', () => {
+    const base = 'https://clerk.com/';
+    const url = buildURL({ base }, { stringify: true });
+    expect(url).toBe('https://clerk.com/');
+  });
+
+  it('does not append a URL fragment if search params were passed but were empty', () => {
+    const base = 'https://clerk.com/';
+    const params = new URLSearchParams({});
+    const url = buildURL({ base, hashSearchParams: params }, { stringify: true });
+    expect(url).toBe('https://clerk.com/');
+  });
+
+  it('appends search params to the fragment if search params is a plain object', () => {
+    const base = 'https://clerk.com';
+    const params = { test1: '1', test2: '2' };
+    const url = buildURL({ base, hashSearchParams: params }, { stringify: true });
+    expect(url).toBe('https://clerk.com/#/?test1=1&test2=2');
+  });
+
+  it('appends search params to the fragment by merging all passed in params', () => {
+    const base = 'https://clerk.com';
+    const url = buildURL(
+      { base, hashSearchParams: [new URLSearchParams({ test1: '1', test2: '2' }), { test3: '3' }] },
+      { stringify: true },
+    );
+    expect(url).toBe('https://clerk.com/#/?test1=1&test2=2&test3=3');
+  });
+
+  it('overrides duplicate search params, giving priority to objects passed last', () => {
+    const base = 'https://clerk.com';
+    const url = buildURL(
+      { base, hashSearchParams: [new URLSearchParams({ test1: '1', test2: '2' }), { test2: '3' }] },
+      { stringify: true },
+    );
+    expect(url).toBe('https://clerk.com/#/?test1=1&test2=3');
+  });
+
+  it('snake_cases all params', () => {
+    const base = 'https://clerk.com';
+    const params = { redirectUrl: '1', test2: '2' };
+    const url = buildURL({ base, hashSearchParams: params }, { stringify: true });
+    expect(url).toBe('https://clerk.com/#/?redirect_url=1&test2=2');
+  });
 });
 
 describe('trimTrailingSlash(string)', () => {
@@ -247,63 +325,6 @@ describe('trimLeadingSlash(string)', () => {
     expect(trimLeadingSlash('/foo')).toBe('foo');
     expect(trimLeadingSlash('/foo/')).toBe('foo/');
     expect(trimLeadingSlash('//foo//bar///')).toBe('foo//bar///');
-  });
-});
-
-describe('appendQueryParams(base,url)', () => {
-  it('returns the same url if no params provided', () => {
-    const base = new URL('https://dashboard.clerk.com');
-    const res = appendAsQueryParams(base);
-    expect(res).toBe('https://dashboard.clerk.com/');
-  });
-
-  it('handles plain strings', () => {
-    const base = 'https://dashboard.clerk.com';
-    const url = 'https://dashboard.clerk.com/applications/appid/instances/';
-    const res = appendAsQueryParams(base, { redirect_url: url });
-    expect(res).toBe(
-      'https://dashboard.clerk.com/#/?redirect_url=https%3A%2F%2Fdashboard.clerk.com%2Fapplications%2Fappid%2Finstances%2F',
-    );
-  });
-
-  it('handles multiple params', () => {
-    const base = 'https://dashboard.clerk.com';
-    const url = 'https://dashboard.clerk.com/applications/appid/instances/';
-    const res = appendAsQueryParams(base, { redirect_url: url, after_sign_in_url: url });
-    expect(res).toBe(
-      'https://dashboard.clerk.com/#/?redirect_url=https%3A%2F%2Fdashboard.clerk.com%2Fapplications%2Fappid%2Finstances%2F&after_sign_in_url=https%3A%2F%2Fdashboard.clerk.com%2Fapplications%2Fappid%2Finstances%2F',
-    );
-  });
-
-  it('skips falsy values', () => {
-    const base = new URL('https://dashboard.clerk.com');
-    const res = appendAsQueryParams(base, { redirect_url: undefined });
-    expect(res).toBe('https://dashboard.clerk.com/');
-  });
-
-  it('converts relative to absolute urls', () => {
-    const base = new URL('https://dashboard.clerk.com');
-    const res = appendAsQueryParams(base, { redirect_url: 'http://localhost/test' });
-    expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=http%3A%2F%2Flocalhost%2Ftest');
-  });
-
-  it('converts keys from camel to snake case', () => {
-    const base = new URL('https://dashboard.clerk.com');
-    const res = appendAsQueryParams(base, { redirectUrl: 'http://localhost/test' });
-    expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=http%3A%2F%2Flocalhost%2Ftest');
-  });
-
-  it('keeps origin before appending if base and url have different origin', () => {
-    const base = new URL('https://dashboard.clerk.com');
-    const url = new URL('https://www.google.com/something').href;
-    const res = appendAsQueryParams(base, { redirect_url: url });
-    expect(res).toBe('https://dashboard.clerk.com/#/?redirect_url=https%3A%2F%2Fwww.google.com%2Fsomething');
-  });
-});
-
-describe('getAllETLDs(hostname)', () => {
-  it('returns all ETLDs for a give hostname', () => {
-    expect(getAllETLDs('foo.bar.qux.baz')).toEqual(['baz', 'qux.baz', 'bar.qux.baz']);
   });
 });
 
@@ -363,6 +384,7 @@ describe('mergeFragmentIntoUrl(url | string)', () => {
     ['https://test.test/foo?a=a&b=b#/bar?c=c', new URL('https://test.test/foo/bar?a=a&b=b&c=c')],
     ['https://test.test?a=a#/?a=b', new URL('https://test.test?a=b')],
     ['https://test.test/en-US/sign-in#/?a=b', new URL('https://test.test/en-US/sign-in?a=b')],
+    ['https://test.test/en-US/sign-in?a=c#/?a=b', new URL('https://test.test/en-US/sign-in?a=b')],
   ];
 
   test.each(testCases)('url=(%s), expected value=(%s)', (url, expectedParamValue) => {
@@ -457,7 +479,7 @@ describe('isAllowedRedirectOrigin', () => {
   afterAll(() => warnMock.mockRestore());
 
   test.each(cases)('isAllowedRedirectOrigin("%s","%s") === %s', (url, allowedOrigins, expected) => {
-    expect(isAllowedRedirectOrigin(url, allowedOrigins)).toEqual(expected);
+    expect(isAllowedRedirectOrigin(allowedOrigins)(url)).toEqual(expected);
     expect(warnMock).toHaveBeenCalledTimes(Number(!expected)); // Number(boolean) evaluates to 0 or 1
   });
 });
@@ -489,5 +511,20 @@ describe('createAllowedRedirectOrigins', () => {
     );
 
     expect(allowedRedirectOriginsValues).toEqual(['https://test.host', 'https://*.test.host']);
+  });
+});
+
+describe('relativeToAbsoluteUrl', () => {
+  const cases: [string, string, string][] = [
+    ['https://www.clerk.com', '/test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com', 'test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com/', '/test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com/', 'test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com', 'https://www.clerk.com/test', 'https://www.clerk.com/test'],
+    ['https://www.clerk.com', 'https://www.google.com/test', 'https://www.google.com/test'],
+  ];
+
+  test.each(cases)('relativeToAbsoluteUrl(%s, %s) === %s', (origin, relative, expected) => {
+    expect(relativeToAbsoluteUrl(relative, origin)).toEqual(expected);
   });
 });

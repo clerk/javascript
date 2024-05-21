@@ -5,6 +5,7 @@ import { joinPaths } from '../../util/path';
 import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
+import type { WithSign } from './util-types';
 
 const basePath = '/users';
 
@@ -16,22 +17,24 @@ type UserCountParams = {
   query?: string;
   userId?: string[];
   externalId?: string[];
-  last_active_at_since?: number;
 };
 
 type UserListParams = ClerkPaginationRequest<
   UserCountParams & {
-    orderBy?:
+    orderBy?: WithSign<
       | 'created_at'
       | 'updated_at'
-      | '+created_at'
-      | '+updated_at'
-      | '-created_at'
-      | '-updated_at'
-      | '+last_sign_in_at'
-      | '+last_active_at'
-      | '-last_sign_in_at'
-      | '-last_active_at';
+      | 'email_address'
+      | 'web3wallet'
+      | 'first_name'
+      | 'last_name'
+      | 'phone_number'
+      | 'username'
+      | 'last_active_at'
+      | 'last_sign_in_at'
+    >;
+    last_active_at_since?: number;
+    organizationId?: string[];
   }
 >;
 
@@ -45,11 +48,14 @@ type PasswordHasher =
   | 'argon2i'
   | 'argon2id'
   | 'bcrypt'
+  | 'bcrypt_sha256_django'
   | 'md5'
   | 'pbkdf2_sha256'
   | 'pbkdf2_sha256_django'
   | 'pbkdf2_sha1'
+  | 'phpass'
   | 'scrypt_firebase'
+  | 'scrypt_werkzeug'
   | 'sha256';
 
 type UserPasswordHashingParams = {
@@ -193,6 +199,7 @@ export class UserAPI extends AbstractAPI {
     return this.request<PaginatedResourceResponse<OauthAccessToken[]>>({
       method: 'GET',
       path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
+      queryParams: { paginated: true },
     });
   }
 

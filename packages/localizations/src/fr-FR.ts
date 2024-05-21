@@ -84,6 +84,7 @@ export const frFR: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: "Nom de l'organisation",
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Mot de passe',
   formFieldLabel__phoneNumber: 'Numéro de téléphone',
   formFieldLabel__role: 'Rôle',
@@ -93,6 +94,7 @@ export const frFR: LocalizationResource = {
     action__signOut: 'Déconnexion',
     title: 'Connecté en tant que {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrateur',
   membershipRole__basicMember: 'Membre',
   membershipRole__guestMember: 'Invité',
@@ -282,6 +284,7 @@ export const frFR: LocalizationResource = {
       blockButton__backupCode: 'Utiliser un code de récupération',
       blockButton__emailCode: 'Envoyer le code à {{identifier}}',
       blockButton__emailLink: 'Envoyer le lien à {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Connectez-vous avec votre mot de passe',
       blockButton__phoneCode: 'Envoyer le code à {{identifier}}',
       blockButton__totp: "Utilisez votre application d'authentification",
@@ -353,10 +356,17 @@ export const frFR: LocalizationResource = {
       subtitle: "Une erreur s'est produite",
       title: 'Impossible de se connecter',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Utiliser une autre méthode',
       subtitle: 'pour continuer à {{applicationName}}',
       title: 'Tapez votre mot de passe',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Code de vérification',
@@ -384,6 +394,7 @@ export const frFR: LocalizationResource = {
       actionLink: "S'inscrire",
       actionLink__use_email: 'Utiliser e-mail',
       actionLink__use_email_username: "Utiliser l'e-mail ou le nom d'utilisateur",
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Utiliser téléphone',
       actionLink__use_username: "Utiliser le nom d'utilisateur",
       actionText: "Vous n'avez pas encore de compte ?",
@@ -451,6 +462,9 @@ export const frFR: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: 'Code incorrect',
     form_identifier_exists: 'Cet identifiant existe déjà. Veuillez en renseigner un différent.',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Identifiant introuvable',
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
@@ -464,6 +478,7 @@ export const frFR: LocalizationResource = {
     form_password_not_strong_enough: "Votre mot de passe n'est pas assez fort.",
     form_password_pwned:
       'Ce mot de passe a été compromis et ne peut pas être utilisé. Veuillez essayer un autre mot de passe à la place.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       "Votre mot de passe a dépassé le nombre maximum d'octets autorisés. Veuillez le raccourcir ou supprimer certains caractères spéciaux.",
     form_password_validation_failed: 'Mot de passe incorrect',
@@ -471,6 +486,11 @@ export const frFR: LocalizationResource = {
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
     not_allowed_access: 'Accès non autorisé',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'moins de {{length}} caractères',
       minimumLength: '{{length}} caractères ou plus',
@@ -652,6 +672,14 @@ export const frFR: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -734,6 +762,11 @@ export const frFR: LocalizationResource = {
           destructiveActionTitle: 'Désactiver',
           headerTitle: "Application d'authentification",
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Définir le mot de passe',

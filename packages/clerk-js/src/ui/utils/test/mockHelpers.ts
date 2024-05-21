@@ -45,7 +45,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
       mockMethodsOf(m);
       mockMethodsOf(m.organization);
     });
-    session.user?.__experimental_passkeys.forEach(m => mockMethodsOf(m));
+    session.user?.passkeys.forEach(m => mockMethodsOf(m));
   });
   mockProp(clerk, 'navigate');
   mockProp(clerk, 'setActive');
@@ -66,7 +66,7 @@ export const mockRouteContextValue = ({ queryString = '' }: Partial<DeepJestMock
     getMatchData: jest.fn(),
     matches: jest.fn(),
     baseNavigate: jest.fn(),
-    navigate: jest.fn(),
+    navigate: jest.fn(() => Promise.resolve(true)),
     resolve: jest.fn((to: string) => new URL(to, 'https://clerk.com')),
     refresh: jest.fn(),
     params: {},

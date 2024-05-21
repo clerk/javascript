@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
 
 import { useSignOutContext } from '../../contexts';
-import { Col, localizationKeys, Text } from '../../customizables';
+import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
 import { handleError, useFormControl } from '../../utils';
@@ -12,8 +12,24 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const card = useCardState();
   const { navigateAfterSignOut } = useSignOutContext();
   const { user } = useUser();
+  const { t } = useLocalizations();
+
+  const confirmationField = useFormControl('deleteConfirmation', '', {
+    type: 'text',
+    label: localizationKeys('userProfile.deletePage.actionDescription'),
+    isRequired: true,
+    placeholder: localizationKeys('formFieldInputPlaceholder__confirmDeletionUserAccount'),
+  });
+
+  const canSubmit =
+    confirmationField.value ===
+    (t(localizationKeys('formFieldInputPlaceholder__confirmDeletionUserAccount')) || 'Delete account');
 
   const deleteUser = async () => {
+    if (!canSubmit) {
+      return;
+    }
+
     try {
       if (!user) {
         throw Error('user is not defined');
@@ -25,15 +41,6 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
       handleError(e, [], card.setError);
     }
   };
-
-  const confirmationField = useFormControl('deleteConfirmation', '', {
-    type: 'text',
-    label: localizationKeys('userProfile.deletePage.actionDescription'),
-    isRequired: true,
-    placeholder: localizationKeys('formFieldInputPlaceholder__confirmDeletionUserAccount'),
-  });
-
-  const canSubmit = confirmationField.value === 'Delete account';
 
   return (
     <FormContainer

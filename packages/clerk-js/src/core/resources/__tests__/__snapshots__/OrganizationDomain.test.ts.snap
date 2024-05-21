@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OrganizationDomain has the same initial nullable properties 1`] = `
+OrganizationDomain {
+  "affiliationEmailAddress": null,
+  "attemptAffiliationVerification": [Function],
+  "delete": [Function],
+  "enrollmentMode": "manual_invitation",
+  "id": "test_domain_id",
+  "name": "clerk.com",
+  "organizationId": "test_org_id",
+  "pathRoot": "",
+  "prepareAffiliationVerification": [Function],
+  "totalPendingInvitations": 0,
+  "totalPendingSuggestions": 0,
+  "updateEnrollmentMode": [Function],
+  "verification": null,
+}
+`;
+
+exports[`OrganizationDomain has the same initial properties 1`] = `
+OrganizationDomain {
+  "affiliationEmailAddress": "some@clerk.com",
+  "attemptAffiliationVerification": [Function],
+  "delete": [Function],
+  "enrollmentMode": "manual_invitation",
+  "id": "test_domain_id",
+  "name": "clerk.com",
+  "organizationId": "test_org_id",
+  "pathRoot": "",
+  "prepareAffiliationVerification": [Function],
+  "totalPendingInvitations": 0,
+  "totalPendingSuggestions": 0,
+  "updateEnrollmentMode": [Function],
+  "verification": {
+    "attempts": 1,
+    "expiresAt": 1970-01-01T00:00:12.345Z,
+    "status": "verified",
+    "strategy": "email_code",
+  },
+}
+`;

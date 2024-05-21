@@ -43,23 +43,11 @@ export function getETLDPlusOneFromFrontendApi(frontendApi: string): string {
   return frontendApi.replace('clerk.', '');
 }
 
-export function getAllETLDs(hostname: string = window.location.hostname): string[] {
-  const parts = hostname.split('.');
-  const memo = [];
-  const domains = [];
-
-  for (let i = parts.length - 1; i > 0; i--) {
-    memo.unshift(parts[i]);
-    domains.push(memo.join('.'));
-  }
-
-  return domains;
-}
-
 interface BuildURLParams extends Partial<URL> {
   base?: string;
   hashPath?: string;
   hashSearch?: string;
+  hashSearchParams?: URLSearchParams | Record<string, string> | Array<URLSearchParams | Record<string, string>>;
 }
 
 interface BuildURLOptions<T> {
@@ -90,7 +78,7 @@ export function buildURL<B extends boolean>(
 ): B extends true ? string : URL;
 
 export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolean> = {}): URL | string {
-  const { base, hashPath, hashSearch, searchParams, ...rest } = params;
+  const { base, hashPath, hashSearch, searchParams, hashSearchParams, ...rest } = params;
 
   let fallbackBase = '';
   // This check is necessary for React native environments where window is undefined.
@@ -107,7 +95,9 @@ export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolea
   // Properly copy URLSearchParams
   if (searchParams instanceof URLSearchParams) {
     searchParams.forEach((value, key) => {
-      url.searchParams.set(key, value);
+      if (value !== null && value !== undefined) {
+        url.searchParams.set(camelToSnake(key), value);
+      }
     });
   }
 
@@ -116,24 +106,44 @@ export function buildURL(params: BuildURLParams, options: BuildURLOptions<boolea
   // Treat that hash part of the main URL as if it's another URL with a pathname and a search.
   // Another nested hash inside the top level hash (e.g. #my-hash#my-second-hash) is currently
   // not supported as there is no use case for it yet.
-  if (hashPath || hashSearch) {
+  if (hashPath || hashSearch || hashSearchParams) {
     // Parse the hash to a URL object
     const dummyUrlForHash = new URL(DUMMY_URL_BASE + url.hash.substring(1));
 
     // Join the current hash path and with the provided one
     dummyUrlForHash.pathname = joinPaths(dummyUrlForHash.pathname, hashPath || '');
 
-    // Merge search params
-    const hashSearchParams = getQueryParams(hashSearch || '');
-    for (const [key, val] of Object.entries(hashSearchParams)) {
-      dummyUrlForHash.searchParams.append(key, val as string);
+    // Merge search params from hashSearch string
+    const searchParamsFromHashSearchString = getQueryParams(hashSearch || '');
+    for (const [key, val] of Object.entries(searchParamsFromHashSearchString)) {
+      dummyUrlForHash.searchParams.append(key, val);
     }
 
-    // Keep just the pathname and the search
+    // Merge search params from the hashSearchParams object
+    if (hashSearchParams) {
+      const paramsArr = Array.isArray(hashSearchParams) ? hashSearchParams : [hashSearchParams];
+      for (const _params of paramsArr) {
+        if (!(_params instanceof URLSearchParams) && typeof _params !== 'object') {
+          continue;
+        }
+        const params = new URLSearchParams(_params);
+        params.forEach((value, key) => {
+          if (value !== null && value !== undefined) {
+            dummyUrlForHash.searchParams.set(camelToSnake(key), value);
+          }
+        });
+      }
+    }
+
+    // Keep just the pathname and the  search
     const newHash = dummyUrlForHash.href.replace(DUMMY_URL_BASE, '');
 
-    // Assign them to the hash of the main url
-    url.hash = newHash;
+    // if the hash is `/`, it means that nothing new was added to the hash
+    // so we can skip assigning it to the hash of the main url
+    if (newHash !== '/') {
+      // Assign them to the hash of the main url
+      url.hash = newHash;
+    }
   }
 
   const { stringify, skipOrigin } = options;
@@ -193,25 +203,6 @@ export const stripSameOrigin = (url: URL, baseUrl: URL): string => {
   return sameOrigin ? stripOrigin(url) : `${url}`;
 };
 
-export const appendAsQueryParams = (
-  baseUrl: string | URL,
-  values: Record<string, string | null | undefined> = {},
-): string => {
-  const base = toURL(baseUrl);
-  const params = new URLSearchParams();
-  for (const [key, val] of Object.entries(values)) {
-    if (!val) {
-      continue;
-    }
-    params.append(camelToSnake(key), val);
-  }
-
-  // The following line will prepend the hash with a `/`.
-  // This is required for ClerkJS Components Hash router to work as expected
-  // as it treats the hash as sub-path with its nested querystring parameters.
-  return `${base}${params.toString() ? '#/?' + params.toString() : ''}`;
-};
-
 export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {
   const { externalAccount } = signUp.verifications;
   return !!externalAccount.error;
@@ -229,15 +220,33 @@ export function getSearchParameterFromHash({
   return dummyUrlForHash.searchParams.get(paramName);
 }
 
-export function isValidUrl(val: unknown, opts?: { includeRelativeUrls?: boolean }): val is string {
-  const { includeRelativeUrls = false } = opts || {};
-  if (!val && !includeRelativeUrls) {
+export function isValidUrl(val: unknown): val is string {
+  if (!val) {
     return false;
   }
 
   try {
-    new URL(val as string, includeRelativeUrls ? DUMMY_URL_BASE : undefined);
+    new URL(val as string);
     return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export function relativeToAbsoluteUrl(url: string, origin: string | URL): string {
+  if (isValidUrl(url)) {
+    return url;
+  }
+  return new URL(url, origin).href;
+}
+
+export function isRelativeUrl(val: unknown): val is string {
+  if (val !== val && !val) {
+    return false;
+  }
+  try {
+    const temp = new URL(val as string, DUMMY_URL_BASE);
+    return temp.origin === DUMMY_URL_BASE;
   } catch (e) {
     return false;
   }
@@ -328,28 +337,29 @@ export function requiresUserInput(redirectUrl: string): boolean {
   return frontendApiRedirectPathsWithUserInput.includes(url.pathname);
 }
 
-export const isAllowedRedirectOrigin = (_url: string, allowedRedirectOrigins: Array<string | RegExp> | undefined) => {
-  if (!allowedRedirectOrigins) {
-    return true;
-  }
+export const isAllowedRedirectOrigin =
+  (allowedRedirectOrigins: Array<string | RegExp> | undefined) => (_url: string) => {
+    if (!allowedRedirectOrigins) {
+      return true;
+    }
 
-  const url = new URL(_url, DUMMY_URL_BASE);
-  const isRelativeUrl = url.origin === DUMMY_URL_BASE;
-  if (isRelativeUrl) {
-    return true;
-  }
+    const url = new URL(_url, DUMMY_URL_BASE);
+    const isRelativeUrl = url.origin === DUMMY_URL_BASE;
+    if (isRelativeUrl) {
+      return true;
+    }
 
-  const isAllowed = allowedRedirectOrigins
-    .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
-    .some(origin => origin.test(trimTrailingSlash(url.origin)));
+    const isAllowed = allowedRedirectOrigins
+      .map(origin => (typeof origin === 'string' ? globs.toRegexp(trimTrailingSlash(origin)) : origin))
+      .some(origin => origin.test(trimTrailingSlash(url.origin)));
 
-  if (!isAllowed) {
-    console.warn(
-      `Clerk: Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,
-    );
-  }
-  return isAllowed;
-};
+    if (!isAllowed) {
+      console.warn(
+        `Clerk: Redirect URL ${url} is not on one of the allowedRedirectOrigins, falling back to the default redirect URL.`,
+      );
+    }
+    return isAllowed;
+  };
 
 export function createAllowedRedirectOrigins(
   allowedRedirectOrigins: Array<string | RegExp> | undefined,
@@ -369,3 +379,16 @@ export function createAllowedRedirectOrigins(
 
   return origins;
 }
+
+export const isCrossOrigin = (url: string | URL, origin: string | URL = window.location.origin): boolean => {
+  try {
+    if (isRelativeUrl(url)) {
+      return false;
+    }
+    const urlOrigin = new URL(url).origin;
+    const originOrigin = new URL(origin).origin;
+    return urlOrigin !== originOrigin;
+  } catch (e) {
+    return false;
+  }
+};

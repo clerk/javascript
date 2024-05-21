@@ -15,13 +15,13 @@ export const SignInWithMetamaskButton = withClerk(
     // eslint-disable-next-line @typescript-eslint/require-await
     const clickHandler = async () => {
       async function authenticate() {
-        await clerk.authenticateWithMetamask({ redirectUrl });
+        await clerk.authenticateWithMetamask({ redirectUrl: redirectUrl || undefined });
       }
       void authenticate();
     };
 
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {
-      await safeExecute((child as any).props.onClick)(e);
+      await safeExecute(child.props.onClick)(e);
       return clickHandler();
     };
 

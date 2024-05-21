@@ -7,6 +7,7 @@ export const JWKS_CACHE_TTL_MS = 1000 * 60 * 60;
 
 const Attributes = {
   AuthToken: '__clerkAuthToken',
+  AuthSignature: '__clerkAuthSignature',
   AuthStatus: '__clerkAuthStatus',
   AuthReason: '__clerkAuthReason',
   AuthMessage: '__clerkAuthMessage',
@@ -32,6 +33,7 @@ const QueryParameters = {
 
 const Headers = {
   AuthToken: 'x-clerk-auth-token',
+  AuthSignature: 'x-clerk-auth-signature',
   AuthStatus: 'x-clerk-auth-status',
   AuthReason: 'x-clerk-auth-reason',
   AuthMessage: 'x-clerk-auth-message',

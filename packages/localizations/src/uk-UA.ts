@@ -84,6 +84,7 @@ export const ukUA: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Назва організації',
   formFieldLabel__organizationSlug: 'URL адреса',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Пароль',
   formFieldLabel__phoneNumber: 'Номер телефону',
   formFieldLabel__role: 'Роль',
@@ -93,6 +94,7 @@ export const ukUA: LocalizationResource = {
     action__signOut: 'Вийти',
     title: 'Ви увійшли як {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Адміністратор',
   membershipRole__basicMember: 'Член',
   membershipRole__guestMember: 'Гість',
@@ -281,6 +283,7 @@ export const ukUA: LocalizationResource = {
       blockButton__backupCode: 'Використовуйте код відновлення',
       blockButton__emailCode: 'Надіслати код на {{identifier}}',
       blockButton__emailLink: 'Надіслати посилання на {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Увійти з паролем',
       blockButton__phoneCode: 'Надіслати код на {{identifier}}',
       blockButton__totp: 'Використовуйте аутентифікатор',
@@ -352,10 +355,17 @@ export const ukUA: LocalizationResource = {
       subtitle: 'Виникла помилка',
       title: 'Не вдалося увійти',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Використати інший метод',
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Введіть пароль',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Код підтвердження',
@@ -382,6 +392,7 @@ export const ukUA: LocalizationResource = {
       actionLink: 'Зареєструватися',
       actionLink__use_email: 'Використовувати пошту',
       actionLink__use_email_username: "Використовувати пошту або ім'я користувача",
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Використовувати номер телефону',
       actionLink__use_username: "Використовувати ім'я користувача",
       actionText: 'Немає акаунта?',
@@ -449,6 +460,9 @@ export const ukUA: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -461,6 +475,7 @@ export const ukUA: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Ваш пароль недостатньо надійний.',
     form_password_pwned: 'Цей пароль було зламано і його не можна використовувати, спробуйте інший пароль.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перевищує максимально допустиму кількість байтів, скоротіть його або видаліть деякі спеціальні символи.',
     form_password_validation_failed: 'Невірний пароль',
@@ -468,6 +483,11 @@ export const ukUA: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'менше {{length}} символів',
       minimumLength: '{{length}} або більше символів',
@@ -648,6 +668,14 @@ export const ukUA: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -729,6 +757,11 @@ export const ukUA: LocalizationResource = {
           destructiveActionTitle: 'Видалити',
           headerTitle: 'Додаток аутентифікації',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Встановити пароль',

@@ -17,6 +17,7 @@ describe('OrganizationList', () => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.com'],
+        create_organization_enabled: true,
       });
     });
 
@@ -39,6 +40,7 @@ describe('OrganizationList', () => {
         f.withOrganizations();
         f.withUser({
           email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
         });
       });
 
@@ -189,7 +191,10 @@ describe('OrganizationList', () => {
     it('display CreateOrganization within OrganizationList', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
-        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+        });
       });
 
       const { queryByLabelText, getByRole, userEvent, findByRole, queryByRole, queryByText } = render(
@@ -227,7 +232,10 @@ describe('OrganizationList', () => {
     it('display CreateOrganization and navigates to Invite Members', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
-        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+        });
       });
 
       const { getByLabelText, getByRole, userEvent, findByLabelText, findByText, findByRole } = render(
@@ -246,6 +254,33 @@ describe('OrganizationList', () => {
       await waitFor(async () => {
         expect(await findByText(/Invite new members/i)).toBeInTheDocument();
       });
+    });
+
+    it('does not display CreateOrganization within OrganizationList when disabled', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: false,
+        });
+      });
+
+      const { queryByLabelText, findByRole, queryByRole, queryByText } = render(<OrganizationList />, {
+        wrapper,
+      });
+
+      // Header
+      await waitFor(async () => {
+        expect(await findByRole('heading', { name: /choose an account/i })).toBeInTheDocument();
+      });
+
+      // Form fields of CreateOrganizationForm not to be there
+      expect(queryByText(/logo/i)).not.toBeInTheDocument();
+      expect(queryByText('Recommended size 1:1, up to 10MB.')).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: 'Upload' })).not.toBeInTheDocument();
+      expect(queryByLabelText(/name/i)).not.toBeInTheDocument();
+      expect(queryByLabelText(/slug/i)).not.toBeInTheDocument();
+      expect(queryByRole('button', { name: 'Create organization' })).not.toBeInTheDocument();
     });
 
     describe('navigation', () => {
@@ -324,6 +359,39 @@ describe('OrganizationList', () => {
             }),
           );
           expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org/org1`);
+        });
+      });
+
+      it('navigates to afterCreateOrganizationUrl', async () => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.withOrganizations();
+          f.withUser({
+            id: 'test_user_id',
+            email_addresses: ['test@clerk.com'],
+            create_organization_enabled: true,
+          });
+        });
+
+        props.setProps({
+          afterSelectOrganizationUrl: '/org/:slug',
+          afterCreateOrganizationUrl: '/org',
+          skipInvitationScreen: true,
+        });
+
+        const { userEvent, getByRole, findByLabelText, findByRole, getByLabelText } = render(<OrganizationList />, {
+          wrapper,
+        });
+
+        fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+        await waitFor(async () =>
+          expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+        );
+        await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+        await waitFor(async () => expect(await findByLabelText(/name/i)).toBeInTheDocument());
+        await userEvent.type(getByLabelText(/name/i), 'new org');
+        await userEvent.click(getByRole('button', { name: /create organization/i }));
+        await waitFor(async () => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org`);
         });
       });
     });

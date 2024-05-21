@@ -1,6 +1,12 @@
+import { constants } from './constants';
 import { errorThrower, parsePublishableKey } from './util/shared';
 
-const buildUrl = (_baseUrl: string | URL, _targetUrl: string | URL, _returnBackUrl?: string | URL | null) => {
+const buildUrl = (
+  _baseUrl: string | URL,
+  _targetUrl: string | URL,
+  _returnBackUrl?: string | URL | null,
+  _devBrowserToken?: string | null,
+) => {
   if (_baseUrl === '') {
     return legacyBuildUrl(_targetUrl.toString(), _returnBackUrl?.toString());
   }
@@ -11,6 +17,10 @@ const buildUrl = (_baseUrl: string | URL, _targetUrl: string | URL, _returnBackU
 
   if (returnBackUrl) {
     res.searchParams.set('redirect_url', returnBackUrl.toString());
+  }
+  // For cross-origin redirects, we need to pass the dev browser token for URL session syncing
+  if (_devBrowserToken && baseUrl.hostname !== res.hostname) {
+    res.searchParams.set(constants.QueryParameters.DevBrowser, _devBrowserToken);
   }
   return res.toString();
 };
@@ -66,6 +76,7 @@ export type RedirectFun<ReturnType> = (params?: RedirectToParams) => ReturnType;
  */
 type CreateRedirect = <ReturnType>(params: {
   publishableKey: string;
+  devBrowserToken?: string;
   redirectAdapter: RedirectAdapter<ReturnType>;
   baseUrl: URL | string;
   signInUrl?: URL | string;
@@ -77,7 +88,9 @@ type CreateRedirect = <ReturnType>(params: {
 
 export const createRedirect: CreateRedirect = params => {
   const { publishableKey, redirectAdapter, signInUrl, signUpUrl, baseUrl } = params;
-  const frontendApi = parsePublishableKey(publishableKey)?.frontendApi;
+  const parsedPublishableKey = parsePublishableKey(publishableKey);
+  const frontendApi = parsedPublishableKey?.frontendApi;
+  const isDevelopment = parsedPublishableKey?.instanceType === 'development';
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);
 
   const redirectToSignUp = ({ returnBackUrl }: RedirectToParams = {}) => {
@@ -85,7 +98,9 @@ export const createRedirect: CreateRedirect = params => {
       errorThrower.throwMissingPublishableKeyError();
     }
     const accountsSignUpUrl = `${accountsBaseUrl}/sign-up`;
-    return redirectAdapter(buildUrl(baseUrl, signUpUrl || accountsSignUpUrl, returnBackUrl));
+    return redirectAdapter(
+      buildUrl(baseUrl, signUpUrl || accountsSignUpUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
+    );
   };
 
   const redirectToSignIn = ({ returnBackUrl }: RedirectToParams = {}) => {
@@ -93,7 +108,9 @@ export const createRedirect: CreateRedirect = params => {
       errorThrower.throwMissingPublishableKeyError();
     }
     const accountsSignInUrl = `${accountsBaseUrl}/sign-in`;
-    return redirectAdapter(buildUrl(baseUrl, signInUrl || accountsSignInUrl, returnBackUrl));
+    return redirectAdapter(
+      buildUrl(baseUrl, signInUrl || accountsSignInUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
+    );
   };
 
   return { redirectToSignUp, redirectToSignIn };

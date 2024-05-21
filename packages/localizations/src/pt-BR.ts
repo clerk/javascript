@@ -44,15 +44,16 @@ export const ptBR: LocalizationResource = {
   footerPageLink__privacy: 'Privacidade',
   footerPageLink__terms: 'Termos de uso',
   formButtonPrimary: 'Continuar',
-  formButtonPrimary__verify: 'Verify',
+  formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Esqueceu a senha?',
-  formFieldError__matchingPasswords: 'Passwords match.',
-  formFieldError__notMatchingPasswords: "Passwords don't match.",
-  formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
+  formFieldError__matchingPasswords: 'Senhas conferem.',
+  formFieldError__notMatchingPasswords: 'Senhas não conferem.',
+  formFieldError__verificationLinkExpired: 'O link de verificação expirou. Por favor solicite um novo link.',
   formFieldHintText__optional: 'Opcional',
-  formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldHintText__slug:
+    'Um rótulo é um identificador legível por humanos que deve ser único. É comumente usado em URLs.',
   formFieldInputPlaceholder__backupCode: '',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Excluir conta',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddress_username: '',
   formFieldInputPlaceholder__emailAddresses: 'Insira um ou mais endereços de e-mail separados por espaços ou vírgulas',
@@ -82,7 +83,8 @@ export const ptBR: LocalizationResource = {
   formFieldLabel__organizationDomainEmailAddressDescription:
     'Endereço de e-mail para receber um código e verificar este domínio',
   formFieldLabel__organizationName: 'Nome da organização',
-  formFieldLabel__organizationSlug: 'URL Slug',
+  formFieldLabel__organizationSlug: 'Rótulo do URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Senha',
   formFieldLabel__phoneNumber: 'Telefone',
   formFieldLabel__role: 'Função',
@@ -92,6 +94,7 @@ export const ptBR: LocalizationResource = {
     action__signOut: 'Sair',
     title: 'Logado como {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
   membershipRole__guestMember: 'Convidado',
@@ -166,10 +169,10 @@ export const ptBR: LocalizationResource = {
       },
     },
     navbar: {
-      description: 'Manage your organization.',
-      general: 'General',
-      members: 'Members',
-      title: 'Organization',
+      description: 'Gerencie sua organização.',
+      general: 'Geral',
+      members: 'Membros',
+      title: 'Organização',
     },
     profilePage: {
       dangerSection: {
@@ -191,9 +194,9 @@ export const ptBR: LocalizationResource = {
         title: 'Perigo',
       },
       domainSection: {
-        menuAction__manage: 'Manage',
-        menuAction__remove: 'Delete',
-        menuAction__verify: 'Verify',
+        menuAction__manage: 'Gerenciar',
+        menuAction__remove: 'Excluir',
+        menuAction__verify: 'Verificar',
         primaryButton: 'Adicionar domínio',
         subtitle:
           'Permita que os usuários se juntem à organização automaticamente ou solicitem participação com base em um domínio de e-mail verificado.',
@@ -212,8 +215,8 @@ export const ptBR: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Membros',
       profileSection: {
-        primaryButton: '',
-        title: 'Organization Profile',
+        primaryButton: 'Atualizar perfil',
+        title: 'Perfil da Organização',
         uploadAction__title: 'Logo',
       },
     },
@@ -270,10 +273,10 @@ export const ptBR: LocalizationResource = {
   paginationRowText__of: 'de',
   signIn: {
     accountSwitcher: {
-      action__addAccount: 'Add account',
-      action__signOutAll: 'Sign out of all accounts',
-      subtitle: 'Select the account with which you wish to continue.',
-      title: 'Choose an account',
+      action__addAccount: 'Adicionar conta',
+      action__signOutAll: 'Sair de todas as contas',
+      subtitle: 'Selecione a conta com a qual gostaria de continuar.',
+      title: 'Escolha uma conta.',
     },
     alternativeMethods: {
       actionLink: 'Ajuda',
@@ -281,7 +284,8 @@ export const ptBR: LocalizationResource = {
       blockButton__backupCode: 'Utilize um código de backup',
       blockButton__emailCode: 'Enviar código para {{identifier}}',
       blockButton__emailLink: 'Enviar link para {{identifier}}',
-      blockButton__password: 'Fazer login com sua senha',
+      blockButton__passkey: 'Acessar com sua chave de acesso',
+      blockButton__password: 'Acessar com sua senha',
       blockButton__phoneCode: 'Enviar código para {{identifier}}',
       blockButton__totp: 'Utilize seu aplicativo autenticador',
       getHelp: {
@@ -290,7 +294,7 @@ export const ptBR: LocalizationResource = {
           'Se estiver com dificuldades para entrar em sua conta, envie um e-mail para nós que iremos te ajudar a restaurar seu acesso o mais rápido possível.',
         title: 'Ajuda',
       },
-      subtitle: 'Facing issues? You can use any of these methods to sign in.',
+      subtitle: 'Encontrando dificuldades? Você pode utilizar qualquer um destes métodos para acessar.',
       title: 'Utilize outro método',
     },
     backupCodeMfa: {
@@ -337,10 +341,10 @@ export const ptBR: LocalizationResource = {
     forgotPassword: {
       formTitle: 'Código de redefinição de senha',
       resendButton: 'Não recebeu um código? Reenviar',
-      subtitle: 'to reset your password',
-      subtitle_email: 'First, enter the code sent to your email ID',
-      subtitle_phone: 'First, enter the code sent to your phone',
-      title: 'Reset password',
+      subtitle: 'para redefinir sua senha',
+      subtitle_email: 'Primeiro, digite o código enviado para seu email',
+      subtitle_phone: 'Primeiro, digite o código enviado para seu telefone',
+      title: 'Resetar senha',
     },
     forgotPasswordAlternativeMethods: {
       blockButton__resetPassword: 'Redefinir sua senha',
@@ -352,10 +356,18 @@ export const ptBR: LocalizationResource = {
       subtitle: 'Aconteceu um erro',
       title: 'Não foi possível fazer login',
     },
+    passkey: {
+      subtitle:
+        'Usar sua chave de acesso confirma a sua identidade. Seu dispositivo pode solicitar sua impressão digital, reconhecimento facial ou PIN.',
+      title: 'Use sua chave de acesso.',
+    },
     password: {
       actionLink: 'Utilize outro método',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Insira sua senha',
+    },
+    passwordPwned: {
+      title: 'Senha comprometida',
     },
     phoneCode: {
       formTitle: 'Código de verificação',
@@ -366,12 +378,12 @@ export const ptBR: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: 'Código de verificação',
       resendButton: 'Reenviar código',
-      subtitle: '',
+      subtitle: 'Para continuar, insira o código enviado para o seu telefone.',
       title: 'Verifique seu telefone',
     },
     resetPassword: {
       formButtonPrimary: 'Redefinir Senha',
-      requiredMessage: 'For security reasons, it is required to reset your password.',
+      requiredMessage: 'Por razões de segurança, é necessário redefinir sua senha.',
       successMessage: 'Sua senha foi alterada com sucesso. Entrando, por favor aguarde um momento.',
       title: 'Redefinir Senha',
     },
@@ -382,6 +394,7 @@ export const ptBR: LocalizationResource = {
       actionLink: 'Registre-se',
       actionLink__use_email: 'Usar e-mail',
       actionLink__use_email_username: 'Usar e-mail ou nome de usuário',
+      actionLink__use_passkey: 'Ou use sua chave de acesso',
       actionLink__use_phone: 'Usar telefone',
       actionLink__use_username: 'Usar nome de usuário',
       actionText: 'Não possui uma conta?',
@@ -390,7 +403,7 @@ export const ptBR: LocalizationResource = {
     },
     totpMfa: {
       formTitle: 'Código de verificação',
-      subtitle: '',
+      subtitle: 'Para continuar, insira o código gerado pelo seu aplicativo autenticador.',
       title: 'Verificação em duas etapas',
     },
   },
@@ -446,29 +459,37 @@ export const ptBR: LocalizationResource = {
     captcha_invalid:
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
-      'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+      'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: '',
     form_identifier_exists: '',
-    form_identifier_not_found: '',
+    form_identifier_exists__email_address: 'E-mail já está em uso. Por favor, tente outro.',
+    form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
+    form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
+    form_identifier_not_found: 'Não foi possível encontrar o usuário.',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser um endereço de e-mail válido.',
-    form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
+    form_param_format_invalid__phone_number: 'Número de telefone precisa estar num formato internacional válido.',
     form_param_max_length_exceeded__first_name: 'O primeiro nome não deve exceder 256 caracteres.',
     form_param_max_length_exceeded__last_name: 'O sobrenome não deve exceder 256 caracteres.',
     form_param_max_length_exceeded__name: 'O nome não deve exceder 256 caracteres.',
     form_param_nil: '',
-    form_password_incorrect: '',
-    form_password_length_too_short: '',
+    form_password_incorrect: 'Senha incorreta.',
+    form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
-    form_password_pwned:
-      'Esta senha foi encontrada como parte de uma violação e não pode ser usada, por favor, tente outra senha.',
+    form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',
+    form_password_pwned__sign_in: 'Esta senha foi compromeditda, por favor redefina sua senha.',
     form_password_size_in_bytes_exceeded:
       'Sua senha excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
     form_password_validation_failed: 'Senha incorreta',
-    form_username_invalid_character: '',
-    form_username_invalid_length: '',
+    form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
+    form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
-    not_allowed_access: '',
+    not_allowed_access: 'Aceso não permitido.',
+    passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
+    passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
+    passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
+    passkey_registration_cancelled: 'Registro de chave de acesso cancelado ou expirado.',
+    passkey_retrieval_cancelled: 'Verificação de chave de acesso cancelada ou expirada.',
     passwordComplexity: {
       maximumLength: 'menos de {{length}} caracteres',
       minimumLength: '{{length}} ou mais caracteres',
@@ -585,20 +606,20 @@ export const ptBR: LocalizationResource = {
         title: 'Remover e-mail',
       },
       title: 'Adicionar e-mail',
-      verifyTitle: 'Verify email address',
+      verifyTitle: 'Verificar endereço de email',
     },
     formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Continuar',
     formButtonPrimary__finish: 'Finalizar',
-    formButtonPrimary__remove: 'Remove',
-    formButtonPrimary__save: 'Save',
+    formButtonPrimary__remove: 'Excluir',
+    formButtonPrimary__save: 'Salvar',
     formButtonReset: 'Cancelar',
     mfaPage: {
       formHint: 'Selecione um método para adicionar.',
       title: 'Adicione verificação em duas etapas',
     },
     mfaPhoneCodePage: {
-      backButton: 'Use existing number',
+      backButton: 'Usar número existente',
       primaryButton__addPhoneNumber: 'Adicione um número de telefone',
       removeResource: {
         messageLine1: '{{identifier}} não receberá mais códigos de verificação ao realizar o login.',
@@ -611,10 +632,10 @@ export const ptBR: LocalizationResource = {
       subtitle__unavailablePhoneNumbers:
         'Não há números de telefone disponíveis para registrar a verificação em duas etapas por código SMS.',
       successMessage1:
-        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+        'Ao acessar, será necessário o passo adicional de digitar o código de verificação enviado a este telefone.',
       successMessage2:
-        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
-      successTitle: 'SMS code verification enabled',
+        'Salve estes códigos de backup e os armazene em um lugar seguro. Se você perder acesso ao seu dispositivo de autenticação, você pode utilizá-los para acessar o sistema.',
+      successTitle: 'Verificação por SMS habilitada',
       title: 'Adicionar verificação por SMS',
     },
     mfaTOTPPage: {
@@ -645,14 +666,22 @@ export const ptBR: LocalizationResource = {
     },
     mobileButton__menu: 'Menu',
     navbar: {
-      account: 'Profile',
-      description: 'Manage your account info.',
-      security: 'Security',
-      title: 'Account',
+      account: 'Perfil',
+      description: 'Gerencie seus dados de perfil.',
+      security: 'Segurança',
+      title: 'Conta',
+    },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
-        'It is recommended to sign out of all other devices which may have used your old password.',
+        'É recomendado sair de todos os demais dispositivos que podem ter utilizado sua senha antiga.',
       readonly:
         'Sua senha atualmente não pode ser editada porque você só pode fazer login por meio da conexão da empresa.',
       successMessage__set: 'Sua senha foi salva.',
@@ -671,8 +700,8 @@ export const ptBR: LocalizationResource = {
       },
       successMessage: '{{identifier}} foi adicionado na sua conta.',
       title: 'Adicionar telefone',
-      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
-      verifyTitle: 'Verify phone number',
+      verifySubtitle: 'Insira o código de verificação enviado para {{identifier}}',
+      verifyTitle: 'Verificar número de telefone',
     },
     profilePage: {
       fileDropAreaHint: 'Carregue uma imagem JPG, PNG, GIF ou WEBP menor que 10 MB',
@@ -694,7 +723,7 @@ export const ptBR: LocalizationResource = {
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
         subtitle__reauthorize:
-          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
+          'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
       },
       dangerSection: {
@@ -733,6 +762,11 @@ export const ptBR: LocalizationResource = {
           headerTitle: 'Applicativo autenticador',
         },
       },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       passwordSection: {
         primaryButton__setPassword: 'Defina a senha',
         primaryButton__updatePassword: 'Trocar a senha',
@@ -747,7 +781,7 @@ export const ptBR: LocalizationResource = {
         title: 'Números de telefone',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'Atualizar perfil',
         title: 'Perfil',
       },
       usernameSection: {

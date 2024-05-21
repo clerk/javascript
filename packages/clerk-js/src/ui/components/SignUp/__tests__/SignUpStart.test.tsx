@@ -2,6 +2,8 @@ import type { SignUpResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
 
 import { act, render, screen } from '../../../../testUtils';
+import { OptionsProvider } from '../../../contexts';
+import { AppearanceProvider } from '../../../customizables';
 import { CardStateProvider } from '../../../elements';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignUpStart } from '../SignUpStart';
@@ -124,15 +126,53 @@ describe('SignUpStart', () => {
       screen.getByText(`Continue with ${name}`);
     });
 
+    it('shows the "Join with $name" social OAuth button', async () => {
+      const providers = OAUTH_PROVIDERS.filter(({ provider }) => provider !== 'linkedin_oidc');
+      const { wrapper: Wrapper } = await createFixtures(f => {
+        providers.forEach(({ provider }) => {
+          f.withSocialProvider({ provider });
+        });
+      });
+
+      const wrapperBefore = ({ children }) => (
+        <Wrapper>
+          <AppearanceProvider
+            appearanceKey={'signUp'}
+            appearance={{
+              layout: {
+                socialButtonsVariant: 'blockButton',
+              },
+            }}
+          >
+            <OptionsProvider
+              value={{
+                localization: {
+                  socialButtonsBlockButtonManyInView: 'Join with {{provider}}',
+                },
+              }}
+            >
+              {children}
+            </OptionsProvider>
+          </AppearanceProvider>
+        </Wrapper>
+      );
+
+      render(<SignUpStart />, { wrapper: wrapperBefore });
+
+      providers.forEach(providerData => {
+        screen.getByText(`Join with ${providerData.name}`);
+      });
+    });
+
     it('displays the "or" divider when using oauth and email options', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
         f.withSocialProvider({ provider: 'google' });
       });
 
-      render(<SignUpStart />, { wrapper });
+      const { container } = render(<SignUpStart />, { wrapper });
       screen.getByText(/Continue with/i);
-      screen.getByText(/or/i);
+      expect(container.querySelector('.cl-dividerText')?.textContent?.includes('or')).toBeTruthy();
     });
   });
 

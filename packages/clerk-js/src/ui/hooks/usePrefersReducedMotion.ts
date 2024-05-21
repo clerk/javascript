@@ -13,9 +13,28 @@ export function usePrefersReducedMotion() {
       setPrefersReducedMotion(!event.matches);
     };
 
-    mediaQueryList.addEventListener('change', listener);
+    const addListenerCompat = (event: any, handler: any) => {
+      if ('addEventListener' in mediaQueryList) {
+        return mediaQueryList.addEventListener(event, handler);
+      } else {
+        // @ts-expect-error This is a fix for Safari iOS 13.4
+        // This version only supports the deprecated addListener method
+        // addListener accepts a single argument, which is the handler
+        return mediaQueryList.addListener(handler);
+      }
+    };
 
-    return () => mediaQueryList.removeEventListener('change', listener);
+    const removeListenerCompat = (event: any, handler: any) => {
+      if ('addEventListener' in mediaQueryList) {
+        return mediaQueryList.removeEventListener(event, handler);
+      } else {
+        // @ts-ignore same as above
+        return mediaQueryList.removeListener(handler);
+      }
+    };
+
+    addListenerCompat('change', listener);
+    return () => removeListenerCompat('change', listener);
   }, []);
 
   return prefersReducedMotion;

@@ -8,6 +8,9 @@ import type {
   EmailLinkFactor,
   OAuthConfig,
   OauthFactor,
+  PasskeyAttempt,
+  PassKeyConfig,
+  PasskeyFactor,
   PasswordAttempt,
   PasswordFactor,
   PhoneCodeAttempt,
@@ -48,7 +51,9 @@ import type {
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
+  GoogleOneTapStrategy,
   OAuthStrategy,
+  PasskeyStrategy,
   PasswordStrategy,
   PhoneCodeStrategy,
   ResetPasswordEmailCodeStrategy,
@@ -63,6 +68,9 @@ import type { AuthenticateWithWeb3Params } from './web3Wallet';
 
 export interface SignInResource extends ClerkResource {
   status: SignInStatus | null;
+  /**
+   * @deprecated This attribute will be removed in the next major version
+   */
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[];
   supportedSecondFactors: SignInSecondFactor[];
@@ -90,7 +98,7 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithMetamask: () => Promise<SignInResource>;
 
-  __experimental_authenticateWithPasskey: (params?: { flow?: 'autofill' | 'discoverable' }) => Promise<SignInResource>;
+  authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
@@ -115,8 +123,7 @@ export type SignInFirstFactor =
   | EmailLinkFactor
   | PhoneCodeFactor
   | PasswordFactor
-  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
-  // | __experimental_PasskeyFactor
+  | PasskeyFactor
   | ResetPasswordPhoneCodeFactor
   | ResetPasswordEmailCodeFactor
   | Web3SignatureFactor
@@ -139,16 +146,14 @@ export type PrepareFirstFactorParams =
   | EmailLinkConfig
   | PhoneCodeConfig
   | Web3SignatureConfig
-  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
-  // | __experimental_PassKeyConfig
+  | PassKeyConfig
   | ResetPasswordPhoneCodeFactorConfig
   | ResetPasswordEmailCodeFactorConfig
   | OAuthConfig
   | SamlConfig;
 
 export type AttemptFirstFactorParams =
-  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
-  // | __experimental_PasskeyAttempt
+  | PasskeyAttempt
   | EmailCodeAttempt
   | PhoneCodeAttempt
   | PasswordAttempt
@@ -172,12 +177,15 @@ export type SignInCreateParams = (
       ticket: string;
     }
   | {
+      strategy: GoogleOneTapStrategy;
+      token: string;
+    }
+  | {
       strategy: PasswordStrategy;
       password: string;
       identifier: string;
     }
-  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
-  // | { strategy: __experimental_PasskeyStrategy }
+  | { strategy: PasskeyStrategy }
   | {
       strategy:
         | PhoneCodeStrategy
@@ -203,13 +211,16 @@ export type ResetPasswordParams = {
   signOutOfOtherSessions?: boolean;
 };
 
+export type AuthenticateWithPasskeyParams = {
+  flow?: 'autofill' | 'discoverable';
+};
+
 export interface SignInStartEmailLinkFlowParams extends StartEmailLinkFlowParams {
   emailAddressId: string;
 }
 
 export type SignInStrategy =
-  // TODO-PASSKEYS: Include this when the feature is not longer considered experimental
-  // | __experimental_PasskeyStrategy
+  | PasskeyStrategy
   | PasswordStrategy
   | ResetPasswordPhoneCodeStrategy
   | ResetPasswordEmailCodeStrategy
@@ -227,8 +238,10 @@ export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';
   id: string;
   status: SignInStatus;
+  /**
+   * @deprecated This attribute will be removed in the next major version
+   */
   supported_identifiers: SignInIdentifier[];
-  supported_external_accounts: OAuthStrategy[];
   identifier: string;
   user_data: UserDataJSON;
   supported_first_factors: SignInFirstFactorJSON[];

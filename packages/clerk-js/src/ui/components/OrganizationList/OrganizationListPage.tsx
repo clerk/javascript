@@ -1,4 +1,4 @@
-import { useOrganizationList } from '@clerk/shared/react';
+import { useOrganizationList, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
@@ -40,6 +40,37 @@ const useOrganizationListInView = () => {
   };
 };
 
+const CreateOrganizationButton = ({
+  onCreateOrganizationClick,
+}: {
+  onCreateOrganizationClick: React.MouseEventHandler;
+}) => {
+  const { user } = useUser();
+
+  if (!user?.createOrganizationEnabled) {
+    return null;
+  }
+
+  return (
+    <Action
+      elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
+      icon={Add}
+      label={localizationKeys('organizationList.action__createOrganization')}
+      onClick={onCreateOrganizationClick}
+      sx={t => ({
+        borderTopWidth: t.borderWidths.$normal,
+        borderTopStyle: t.borderStyles.$solid,
+        borderTopColor: t.colors.$neutralAlpha100,
+        padding: `${t.space.$5} ${t.space.$5}`,
+      })}
+      iconSx={t => ({
+        width: t.sizes.$9,
+        height: t.sizes.$6,
+      })}
+    />
+  );
+};
+
 export const OrganizationListPage = withCardStateProvider(() => {
   const card = useCardState();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
@@ -78,7 +109,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const { navigateAfterSelectOrganization, skipInvitationScreen } = useOrganizationListContext();
+  const { navigateAfterCreateOrganization, skipInvitationScreen } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   return (
     <>
@@ -97,7 +128,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
             startPage={{ headerTitle: localizationKeys('organizationList.createOrganization') }}
             skipInvitationScreen={skipInvitationScreen}
             navigateAfterCreateOrganization={org =>
-              navigateAfterSelectOrganization(org).then(() => setCreateOrganizationFlow(false))
+              navigateAfterCreateOrganization(org).then(() => setCreateOrganizationFlow(false))
             }
             onCancel={
               showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
@@ -118,7 +149,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
-  const handleCreateOrganizationClicked = () => {
+  const onCreateOrganizationClick = () => {
     props.onCreateOrganizationClick();
   };
 
@@ -181,22 +212,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
 
             {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
 
-            <Action
-              elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
-              icon={Add}
-              label={localizationKeys('organizationList.action__createOrganization')}
-              onClick={handleCreateOrganizationClicked}
-              sx={t => ({
-                borderTopWidth: t.borderWidths.$normal,
-                borderTopStyle: t.borderStyles.$solid,
-                borderTopColor: t.colors.$neutralAlpha100,
-                padding: `${t.space.$5} ${t.space.$5}`,
-              })}
-              iconSx={t => ({
-                width: t.sizes.$9,
-                height: t.sizes.$6,
-              })}
-            />
+            <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
           </Actions>
         </PreviewListItems>
       </Col>

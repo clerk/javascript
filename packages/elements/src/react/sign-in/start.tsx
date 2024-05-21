@@ -1,9 +1,8 @@
-import type { TSignInStartMachine } from '~/internals/machines/sign-in/machines';
-import { SignInStartMachine } from '~/internals/machines/sign-in/machines';
+import type { TSignInStartMachine } from '~/internals/machines/sign-in';
 import type { FormProps } from '~/react/common/form';
 import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
-import { SignInRouterCtx, useSignInRouteRegistration } from '~/react/sign-in/context';
+import { SignInRouterCtx, useSignInStartStep } from '~/react/sign-in/context';
 import { createContextFromActorRef } from '~/react/utils/create-context-from-actor-ref';
 
 export type SignInStartProps = FormProps;
@@ -18,7 +17,7 @@ export function SignInStart(props: SignInStartProps) {
 }
 
 function SignInStartInner(props: SignInStartProps) {
-  const ref = useSignInRouteRegistration('start', SignInStartMachine);
+  const ref = useSignInStartStep();
 
   if (!ref) {
     return null;

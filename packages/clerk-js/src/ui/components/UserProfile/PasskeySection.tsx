@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 import type { PasskeyResource } from '@clerk/types';
 import React from 'react';
 
@@ -51,7 +51,7 @@ export const UpdatePasskeyForm = withCardStateProvider((props: UpdatePasskeyForm
 
   const passkeyNameField = useFormControl('passkeyName', passkey.name || '', {
     type: 'text',
-    label: localizationKeys('__experimental_formFieldLabel__passkeyName'),
+    label: localizationKeys('formFieldLabel__passkeyName'),
     isRequired: true,
   });
 
@@ -67,8 +67,8 @@ export const UpdatePasskeyForm = withCardStateProvider((props: UpdatePasskeyForm
 
   return (
     <FormContainer
-      headerTitle={localizationKeys('userProfile.__experimental_passkeyScreen.title__rename')}
-      headerSubtitle={localizationKeys('userProfile.__experimental_passkeyScreen.subtitle__rename')}
+      headerTitle={localizationKeys('userProfile.passkeyScreen.title__rename')}
+      headerSubtitle={localizationKeys('userProfile.passkeyScreen.subtitle__rename')}
     >
       <Form.Root onSubmit={addEmail}>
         <Form.ControlRow elementId={passkeyNameField.id}>
@@ -96,36 +96,34 @@ export const PasskeySection = () => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys('userProfile.start.__experimental_passkeysSection.title')}
+      title={localizationKeys('userProfile.start.passkeysSection.title')}
       centered={false}
       id='passkeys'
     >
-      <Action.Root>
-        <ProfileSection.ItemList id='passkeys'>
-          {user.__experimental_passkeys.map(passkey => (
-            <Action.Root key={passkey.id}>
-              <PasskeyItem
-                key={passkey.id}
-                {...passkey}
-              />
+      <ProfileSection.ItemList id='passkeys'>
+        {user.passkeys.map(passkey => (
+          <Action.Root key={passkey.id}>
+            <PasskeyItem
+              key={passkey.id}
+              {...passkey}
+            />
 
-              <Action.Open value='remove'>
-                <Action.Card variant='destructive'>
-                  <RemovePasskeyScreen passkey={passkey} />
-                </Action.Card>
-              </Action.Open>
+            <Action.Open value='remove'>
+              <Action.Card variant='destructive'>
+                <RemovePasskeyScreen passkey={passkey} />
+              </Action.Card>
+            </Action.Open>
 
-              <Action.Open value='rename'>
-                <Action.Card>
-                  <PasskeyScreen passkey={passkey} />
-                </Action.Card>
-              </Action.Open>
-            </Action.Root>
-          ))}
+            <Action.Open value='rename'>
+              <Action.Card>
+                <PasskeyScreen passkey={passkey} />
+              </Action.Card>
+            </Action.Open>
+          </Action.Root>
+        ))}
 
-          <AddPasskeyButton />
-        </ProfileSection.ItemList>
-      </Action.Root>
+        <AddPasskeyButton />
+      </ProfileSection.ItemList>
     </ProfileSection.Root>
   );
 };
@@ -175,11 +173,11 @@ const ActiveDeviceMenu = () => {
 
   const actions = [
     {
-      label: localizationKeys('userProfile.start.__experimental_passkeysSection.menuAction__rename'),
+      label: localizationKeys('userProfile.start.passkeysSection.menuAction__rename'),
       onClick: () => open('rename'),
     },
     {
-      label: localizationKeys('userProfile.start.__experimental_passkeysSection.menuAction__destructive'),
+      label: localizationKeys('userProfile.start.passkeysSection.menuAction__destructive'),
       isDestructive: true,
       onClick: () => open('remove'),
     },
@@ -191,15 +189,20 @@ const ActiveDeviceMenu = () => {
 // TODO-PASSKEYS: Should the error be scope to the section ?
 const AddPasskeyButton = () => {
   const card = useCardState();
+  const { isSatellite } = useClerk();
   const { user } = useUser();
 
   const handleCreatePasskey = async () => {
     try {
-      await user?.__experimental_createPasskey();
+      await user?.createPasskey();
     } catch (e) {
       handleError(e, [], card.setError);
     }
   };
+
+  if (isSatellite) {
+    return null;
+  }
 
   return (
     <ProfileSection.ArrowButton

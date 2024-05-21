@@ -40,9 +40,10 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='sso-callback'>
           <SignUpSSOCallback
-            afterSignUpUrl={signUpContext.afterSignUpUrl}
-            afterSignInUrl={signUpContext.afterSignInUrl}
-            redirectUrl={signUpContext.redirectUrl}
+            signUpUrl={signUpContext.signUpUrl}
+            signInUrl={signUpContext.signInUrl}
+            signUpForceRedirectUrl={signUpContext.afterSignUpUrl}
+            signInForceRedirectUrl={signUpContext.afterSignInUrl}
             secondFactorUrl={signUpContext.secondFactorUrl}
             continueSignUpUrl='../continue'
             verifyEmailAddressUrl='../verify-email-address'
@@ -51,7 +52,7 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='verify'>
           <SignUpEmailLinkFlowComplete
-            redirectUrlComplete={signUpContext.afterSignUpUrl || signUpContext.redirectUrl || undefined}
+            redirectUrlComplete={signUpContext.afterSignUpUrl}
             verifyEmailPath='../verify-email-address'
             verifyPhonePath='../verify-phone-number'
           />

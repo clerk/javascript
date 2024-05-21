@@ -2,6 +2,7 @@ import type { DisplayThemeJSON } from './json';
 import type { ClerkResource } from './resource';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
+export type CaptchaWidgetType = 'smart' | 'invisible' | null;
 
 export interface DisplayConfigJSON {
   object: 'display_config';
@@ -14,6 +15,8 @@ export interface DisplayConfigJSON {
   application_name: string;
   branded: boolean;
   captcha_public_key: string | null;
+  captcha_widget_type: CaptchaWidgetType;
+  captcha_public_key_invisible: string | null;
   home_url: string;
   instance_environment_type: string;
   logo_image_url: string;
@@ -29,6 +32,7 @@ export interface DisplayConfigJSON {
   create_organization_url: string;
   after_leave_organization_url: string;
   after_create_organization_url: string;
+  google_one_tap_client_id?: string;
 }
 
 export interface DisplayConfigResource extends ClerkResource {
@@ -42,6 +46,8 @@ export interface DisplayConfigResource extends ClerkResource {
   backendHost: string;
   branded: boolean;
   captchaPublicKey: string | null;
+  captchaWidgetType: CaptchaWidgetType;
+  captchaPublicKeyInvisible: string | null;
   homeUrl: string;
   instanceEnvironmentType: string;
   logoImageUrl: string;
@@ -58,4 +64,5 @@ export interface DisplayConfigResource extends ClerkResource {
   createOrganizationUrl: string;
   afterLeaveOrganizationUrl: string;
   afterCreateOrganizationUrl: string;
+  googleOneTapClientId?: string;
 }

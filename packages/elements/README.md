@@ -20,7 +20,7 @@
 ·
 [Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
 ·
-[Request a Feature](https://github.com/clerk/javascript/issues/new?assignees=&labels=feature-request&projects=&template=FEATURE_REQUEST.yml)
+[Request a Feature](https://feedback.clerk.com/roadmap)
 ·
 [Ask a Question](https://github.com/clerk/javascript/discussions)
 
@@ -30,89 +30,77 @@
 
 ## Overview
 
-Clerk is the easiest way to add authentication and user management to your React application. Add sign up, sign in, and profile management to your application in minutes.
+Clerk Elements is a library of unstyled, composable components that can be used to build completely custom UIs on top of Clerk's APIs, without having to manage the underlying logic.
 
-## Package Development
+> [!WARNING]
+> Clerk Elements is currently in beta. It's not recommended to use it in production just yet, but it would be much appreciated if you give it a try.
+> If you have any feedback, please reach out to [beta-elements@clerk.dev](mailto:beta-elements@clerk.dev) or head over to the [GitHub Discussion](https://github.com/orgs/clerk/discussions/3315).
 
-```sh
-turbo dev --filter=elements
-```
+## Getting started
 
-### Examples NextJS Development
+### Prerequisites
 
-#### Setup:
+- Next.js `^13.5.4 || ^14.0.3` or later
+- React 18 or later
+- Node.js `>=18.17.0` or later
+- You need to use the [Core 2 version](https://clerk.com/changelog/2024-04-19) (or later) of Clerk's SDKs
 
-```sh
-cd examples/nextjs && npm i
-```
-
-#### Development Server:
-
-Changes in the `packages/elements` directory will be hotloaded in the example app.
+### Installation
 
 ```sh
-npm run dev:example
-
-# With the XState Inspector
-NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true npm run app:dev
+npm install @clerk/elements
 ```
 
-#### E2E Testing
+> [!NOTE]
+> If your project uses TypeScript, make sure that [`moduleResolution`](https://www.typescriptlang.org/tsconfig/#moduleResolution) in `tsconfig.json` is set to `bundler`. Otherwise, you might run into issues with resolving TypeScript types from Clerk Elements.
 
-```sh
-cd examples/nextjs && npm run e2e
+## Usage
 
-# With UI: https://playwright.dev/docs/running-tests#run-tests-in-ui-mode
-npm run e2e -- --ui
+Once you've got your project set up, you can start building custom UIs with Clerk Elements. The following guides will show you how to build your own custom flows:
 
-# Headed Mode: https://playwright.dev/docs/running-tests#run-tests-in-headed-mode
-npm run e2e -- --headed
+- [Build a sign-in flow](https://clerk.com/docs/elements/guides/sign-in?utm_source=github&utm_medium=clerk_elements)
+- [Build a sign-up flow](https://clerk.com/docs/elements/guides/sign-up?utm_source=github&utm_medium=clerk_elements)
 
-# Specific Tests: https://playwright.dev/docs/running-tests#run-specific-tests
-npm run e2e -- e2e/elements.spec.ts
-```
+If you want to see what's possible with Clerk Elements, check out these pre-built examples from the Clerk team:
 
-### Flows
+- [Sign-in examples](https://clerk.com/docs/elements/examples/sign-in?utm_source=github&utm_medium=clerk_elements)
+- [Sign-up examples](https://clerk.com/docs/elements/examples/sign-up?utm_source=github&utm_medium=clerk_elements)
 
-Flows per `clerk-js` UI components
+Finally, to learn about the available components and how to use them, check out the component reference pages:
 
-#### `<SignInRoutes>`
+- [Common components](https://clerk.com/docs/elements/reference/common?utm_source=github&utm_medium=clerk_elements)
+- [Sign-in components](https://clerk.com/docs/elements/reference/sign-in?utm_source=github&utm_medium=clerk_elements)
+- [Sign-up components](https://clerk.com/docs/elements/reference/sign-up?utm_source=github&utm_medium=clerk_elements)
 
-```
-/sign-in
-  /factor-one               <SignInFactorOne />
-  /factor-two               <SignInFactorTwo />
-  /reset-password           <ResetPassword />
-  /reset-password-success   <ResetPasswordSuccess />
-  /sso-callback             <SignInSSOCallback {...} />
-  /choose                   <SignInAccountSwitcher />
-  /verify                   <SignInEmailLinkFlowComplete {...} />
-  /                         <SignInStart />
-  [ELSE]                    <RedirectToSignIn />
-```
+_With the beta release, only sign-up and sign-in flows are supported. Support for building the rest of Clerk's prebuilt components with Elements is actively being worked on._
 
-#### `<SignUpRoutes>`
+## Support
 
-```
-/sign-up
-  /verify-email-address     <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
-  /verify-phone-number      <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
-  /sso-callback             <SignUpSSOCallback {...} />
-  /verify                   <SignUpEmailLinkFlowComplete {...} />
-  /continue
-    /verify-email-address   <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
-    /verify-phone-number    <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
-    /                       <SignUpContinue />
-  /                         <SignUpStart />
-  [ELSE]                    <RedirectToSignUp />
+You can get in touch with us in any of the following ways:
 
-/sign-up
-  /verify-email-address     <SignUpVerifyEmail />                 [Guarded: Boolean(clerk.client.signUp.emailAddress)]
-  /verify-phone-number      <SignUpVerifyPhone />                 [Guarded: Boolean(clerk.client.signUp.phoneNumber)]
-  /sso-callback             <SignUpSSOCallback {...} />
-  /verify                   <SignUpEmailLinkFlowComplete {...} />
-  /continue
-    /                       <SignUpContinue />
-  /                         <SignUpStart />
-  [ELSE]                    <RedirectToSignUp />
-```
+- Join our official community [Discord server](https://clerk.com/discord)
+- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
+- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_elements)
+
+## Contributing
+
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+
+### Package development
+
+- Navigate to `examples/nextjs` and install the dependencies
+- You can run the example app through `npm run dev:example` inside `packages/elements` afterwards
+
+## Security
+
+`@clerk/elements` follows good practices of security, but 100% security cannot be assured.
+
+`@clerk/elements` is provided **"as is"** without any **warranty**. Use at your own risk.
+
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
+
+## License
+
+This project is licensed under the **MIT license**.
+
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/elements/LICENSE) for more information.

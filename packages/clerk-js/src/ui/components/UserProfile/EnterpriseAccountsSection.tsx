@@ -28,7 +28,6 @@ export const EnterpriseAccountsSection = () => {
                 gap: t.space.$2,
                 justifyContent: 'start',
               })}
-              hoverable
               key={account.id}
             >
               <Image

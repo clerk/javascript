@@ -15,6 +15,7 @@ export type LocalizationResource = DeepPartial<_LocalizationResource>;
 
 type _LocalizationResource = {
   locale: string;
+  maintenanceMode: LocalizationValue;
   /**
    * @experimental
    * Add role keys and their localized value
@@ -24,6 +25,7 @@ type _LocalizationResource = {
     [r: string]: LocalizationValue;
   };
   socialButtonsBlockButton: LocalizationValue;
+  socialButtonsBlockButtonManyInView: LocalizationValue;
   dividerText: LocalizationValue;
   formFieldLabel__emailAddress: LocalizationValue;
   formFieldLabel__emailAddresses: LocalizationValue;
@@ -47,10 +49,7 @@ type _LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: LocalizationValue;
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
-  /**
-   * @experimental
-   */
-  __experimental_formFieldLabel__passkeyName: LocalizationValue;
+  formFieldLabel__passkeyName: LocalizationValue;
   formFieldInputPlaceholder__emailAddress: LocalizationValue;
   formFieldInputPlaceholder__emailAddresses: LocalizationValue;
   formFieldInputPlaceholder__phoneNumber: LocalizationValue;
@@ -118,6 +117,10 @@ type _LocalizationResource = {
         subtitle: LocalizationValue;
         subtitleNewTab: LocalizationValue;
       };
+      clientMismatch: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
     };
     emailCode: {
       title: LocalizationValue;
@@ -156,6 +159,9 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
+    };
+    passwordPwned: {
+      title: LocalizationValue;
     };
     passkey: {
       title: LocalizationValue;
@@ -216,6 +222,10 @@ type _LocalizationResource = {
         subtitle: LocalizationValue;
       };
       expired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      clientMismatch: {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };
@@ -329,10 +339,7 @@ type _LocalizationResource = {
         primaryButton__updatePassword: LocalizationValue;
         primaryButton__setPassword: LocalizationValue;
       };
-      /**
-       * @experimental
-       */
-      __experimental_passkeysSection: {
+      passkeysSection: {
         title: LocalizationValue;
         menuAction__rename: LocalizationValue;
         menuAction__destructive: LocalizationValue;
@@ -407,10 +414,7 @@ type _LocalizationResource = {
         successMessage: LocalizationValue;
       };
     };
-    /**
-     * @experimental
-     */
-    __experimental_passkeyScreen: {
+    passkeyScreen: {
       title__rename: LocalizationValue;
       subtitle__rename: LocalizationValue;
       removeResource: {
@@ -724,11 +728,12 @@ type UnstableErrors = WithParamName<{
   captcha_unavailable: LocalizationValue;
   captcha_invalid: LocalizationValue;
   passkey_not_supported: LocalizationValue;
-  passkeys_pa_not_supported: LocalizationValue;
+  passkey_pa_not_supported: LocalizationValue;
   passkey_retrieval_cancelled: LocalizationValue;
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
   form_password_pwned: LocalizationValue;
+  form_password_pwned__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;
@@ -740,6 +745,9 @@ type UnstableErrors = WithParamName<{
   form_password_validation_failed: LocalizationValue;
   not_allowed_access: LocalizationValue;
   form_identifier_exists: LocalizationValue;
+  form_identifier_exists__email_address: LocalizationValue;
+  form_identifier_exists__username: LocalizationValue;
+  form_identifier_exists__phone_number: LocalizationValue;
   form_password_not_strong_enough: LocalizationValue;
   form_password_size_in_bytes_exceeded: LocalizationValue;
   passwordComplexity: {

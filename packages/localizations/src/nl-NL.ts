@@ -84,6 +84,7 @@ export const nlNL: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: 'Organisatienaam',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Wachtwoord',
   formFieldLabel__phoneNumber: 'Telefoonnummer',
   formFieldLabel__role: 'Rol',
@@ -93,6 +94,7 @@ export const nlNL: LocalizationResource = {
     action__signOut: 'Uitloggen',
     title: 'Ingelogd als {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Lid',
   membershipRole__guestMember: 'Gast',
@@ -282,6 +284,7 @@ export const nlNL: LocalizationResource = {
       blockButton__backupCode: 'Gebruik een backupcode',
       blockButton__emailCode: 'Verzend code naar {{identifier}}',
       blockButton__emailLink: 'Verzend link naar {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Inloggen met je wachtwoord',
       blockButton__phoneCode: 'Verzend code naar {{identifier}}',
       blockButton__totp: 'Gebruik je authenticator app',
@@ -352,10 +355,17 @@ export const nlNL: LocalizationResource = {
       subtitle: 'Er heeft zich een fout voorgedaan',
       title: 'Inloggen onmogelijk',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Gebruik een andere methode',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Vul je wachtwoord in',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verificatie code',
@@ -382,6 +392,7 @@ export const nlNL: LocalizationResource = {
       actionLink: 'Registreren',
       actionLink__use_email: 'Use email',
       actionLink__use_email_username: 'Use email or username',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Use phone',
       actionLink__use_username: 'Use username',
       actionText: 'Geen account?',
@@ -449,6 +460,9 @@ export const nlNL: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -461,6 +475,7 @@ export const nlNL: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned: '',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
     form_password_validation_failed: 'Incorrect Password',
@@ -468,6 +483,11 @@ export const nlNL: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: '',
       minimumLength: '',
@@ -646,6 +666,14 @@ export const nlNL: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -726,6 +754,11 @@ export const nlNL: LocalizationResource = {
           destructiveActionTitle: 'Verwijderen',
           headerTitle: 'Authenticatorapplicatie',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Wachtwoord instellen',

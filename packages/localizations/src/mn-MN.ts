@@ -1,3 +1,15 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const mnMN: LocalizationResource = {
@@ -72,16 +84,17 @@ export const mnMN: LocalizationResource = {
     'Код хүлээн авч, энэ домэйныг баталгаажуулахын тулд энэ домайн доор имэйл хаягаа оруулна уу.',
   formFieldLabel__organizationName: 'Байгууллагын нэр',
   formFieldLabel__organizationSlug: 'Slug',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Нууц үг',
   formFieldLabel__phoneNumber: 'Утасны дугаар',
   formFieldLabel__role: 'Үүрэг',
   formFieldLabel__signOutOfOtherSessions: 'Бусад бүх төхөөрөмжөөс гарах',
   formFieldLabel__username: 'Хэрэглэгчийн нэр',
-  __experimental_formFieldLabel__passkeyName: 'Name of passkey',
   impersonationFab: {
     action__signOut: 'Гарах',
     title: '{{identifier}}-р нэвтэрсэн',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Гишүүн',
   membershipRole__guestMember: 'Зочин',
@@ -272,8 +285,8 @@ export const mnMN: LocalizationResource = {
       blockButton__backupCode: 'Нөөц код ашиглана уу',
       blockButton__emailCode: '{{identifier}} имэйлруу код илгээх',
       blockButton__emailLink: '{{identifier}} имэйлруу холбоос силгээх ',
-      blockButton__password: 'Нууц үгээрээ нэвтэрнэ үү',
       blockButton__passkey: 'Passkey-р нэвтэрнэ үү',
+      blockButton__password: 'Нууц үгээрээ нэвтэрнэ үү',
       blockButton__phoneCode: '{{identifier}} руу SMS илгээх',
       blockButton__totp: 'Authenticator програмаа ашиглана уу',
       getHelp: {
@@ -344,15 +357,18 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Алдаа гарлаа',
       title: 'Нэвтрэх боломжгүй',
     },
+    passkey: {
+      subtitle:
+        'Passkey-ээ ашигласнаар таныг мөн болохыг баталгаажуулна. Таны төхөөрөмж хурууны хээ, нүүр эсвэл дэлгэцийн түгжээг асууж магадгүй.',
+      title: 'Passkey ашиглана уу',
+    },
     password: {
       actionLink: 'Өөр аргыг ашигла',
       subtitle: 'Бүртгэлтэй холбоотой нууц үгээ оруулна уу',
       title: 'Нууц үгээ оруулна уу',
     },
-    passkey: {
-      title: 'Passkey ашиглана уу',
-      subtitle:
-        'Passkey-ээ ашигласнаар таныг мөн болохыг баталгаажуулна. Таны төхөөрөмж хурууны хээ, нүүр эсвэл дэлгэцийн түгжээг асууж магадгүй.',
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Баталгаажуулах код',
@@ -447,6 +463,9 @@ export const mnMN: LocalizationResource = {
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     form_code_incorrect: 'Маягтын код буруу байна',
     form_identifier_exists: 'Тодорхойлогч аль хэдийн байна.',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Тодорхойлогч олдсонгүй.',
     form_param_format_invalid: 'Параметрийн формат буруу.',
     form_param_format_invalid__email_address: 'Имэйл хаяг нь хүчинтэй имэйл хаяг байх ёстой.',
@@ -460,6 +479,7 @@ export const mnMN: LocalizationResource = {
     form_password_not_strong_enough: 'Таны нууц үг хангалттай хүчтэй биш байна.',
     form_password_pwned:
       'Энэ нууц үгийг зөрчлийн нэг хэсэг гэж олсон тул ашиглах боломжгүй, оронд нь өөр нууц үг оролдоно уу.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Энэ нууц үгийг зөрчлийн нэг хэсэг гэж олсон тул ашиглах боломжгүй. Өөр нууц үг оруулж үзнэ үү.',
     form_password_validation_failed: 'Нууц үг буруу',
@@ -467,6 +487,11 @@ export const mnMN: LocalizationResource = {
     form_username_invalid_length: 'Хэрэглэгчийн нэр буруу байна.',
     identification_deletion_failed: 'Та өөрийн сүүлчийн таниулбараа устгах боломжгүй.',
     not_allowed_access: 'Хандалтыг зөвшөөрөгдөөгүй',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} тэмдэгтээс бага',
       minimumLength: '{{length}} буюу түүнээс олон тэмдэгт',
@@ -646,6 +671,14 @@ export const mnMN: LocalizationResource = {
       security: 'Аюулгүй байдал',
       title: 'Бүртгэл',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Таны хуучин нууц үгийг ашигласан бусад бүх төхөөрөмжөөс гарахыг зөвлөж байна.',
@@ -729,15 +762,15 @@ export const mnMN: LocalizationResource = {
           headerTitle: 'Authenticator програм',
         },
       },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
+      },
       passwordSection: {
         primaryButton__setPassword: 'Нууц үг тохируулах',
         primaryButton__updatePassword: 'Нууц үг шинэчлэх',
         title: 'Нууц үг',
-      },
-      __experimental_passkeysSection: {
-        title: 'Passkeys',
-        menuAction__rename: 'Засах',
-        menuAction__destructive: 'Устгэх',
       },
       phoneNumbersSection: {
         destructiveAction: 'Утасны дугаар устгах',
@@ -766,14 +799,6 @@ export const mnMN: LocalizationResource = {
       successMessage: 'Таны хэрэглэгчийн нэр шинэчлэгдсэн.',
       title__set: 'Хэрэглэгчийн нэрийг тохируулах',
       title__update: 'эрэглэгчийн нэрийг шинэчлэх',
-    },
-    __experimental_passkeyScreen: {
-      title__rename: 'Passkey өөрчлөх',
-      subtitle__rename: 'Та олоход хялбар болгохын тулд нэвтрэх түлхүүрийн нэрийг өөрчилж болно.',
-      removeResource: {
-        title: 'Passkey устгах',
-        messageLine1: '{{name}} энэ бүртгэлээс хасагдана.',
-      },
     },
     web3WalletPage: {
       removeResource: {

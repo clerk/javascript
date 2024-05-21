@@ -14,7 +14,6 @@ import type { SamlIdpSlug } from './saml';
 import type { SessionStatus } from './session';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
-import type { OAuthStrategy } from './strategies';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
 import type { UserSettingsJSON } from './userSettings';
 import type { CamelToSnake } from './utils';
@@ -59,6 +58,7 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   display_config: DisplayConfigJSON;
   user_settings: UserSettingsJSON;
   organization_settings: OrganizationSettingsJSON;
+  maintenance_mode: boolean;
 }
 
 export interface ClientJSON extends ClerkResourceJSON {
@@ -80,7 +80,6 @@ export interface SignUpJSON extends ClerkResourceJSON {
   optional_fields: SignUpField[];
   missing_fields: SignUpField[];
   unverified_fields: SignUpIdentificationField[];
-  supported_external_accounts: OAuthStrategy[];
   username: string | null;
   first_name: string | null;
   last_name: string | null;

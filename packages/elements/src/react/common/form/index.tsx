@@ -1,6 +1,9 @@
+import { useClerk } from '@clerk/clerk-react';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
+  FormControlProps,
   FormControlProps as RadixFormControlProps,
   FormFieldProps as RadixFormFieldProps,
   FormMessageProps as RadixFormMessageProps,
@@ -17,23 +20,27 @@ import {
 } from '@radix-ui/react-form';
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
-import type { SetRequired, Simplify } from 'type-fest';
+import type { SetRequired } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
+import { ClerkElementsFieldError, ClerkElementsRuntimeError } from '~/internals/errors';
+import type { FieldDetails } from '~/internals/machines/form';
 import {
-  fieldErrorsSelector,
+  fieldFeedbackSelector,
   fieldHasValueSelector,
   fieldValueSelector,
   globalErrorsSelector,
   useFormSelector,
   useFormStore,
 } from '~/internals/machines/form/form.context';
-import type { FieldDetails } from '~/internals/machines/form/form.types';
+import { usePassword } from '~/react/hooks/use-password.hook';
+import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
+import { isReactFragment } from '~/react/utils/is-react-fragment';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
-import type { ClerkFieldId, FieldStates } from './types';
+import { type ClerkFieldId, FIELD_STATES, FIELD_VALIDITY, type FieldStates } from './types';
 
 /* -------------------------------------------------------------------------------------------------
  * Context
@@ -46,12 +53,77 @@ const useFieldContext = () => React.useContext(FieldContext);
  * Hooks
  * -----------------------------------------------------------------------------------------------*/
 
+const useGlobalErrors = () => {
+  const errors = useFormSelector(globalErrorsSelector);
+
+  return {
+    errors,
+  };
+};
+
+const useFieldFeedback = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const feedback = useFormSelector(fieldFeedbackSelector(name));
+
+  return {
+    feedback,
+  };
+};
+
+const determineInputTypeFromName = (name: FormFieldProps['name']) => {
+  if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword')
+    return 'password' as const;
+  if (name === 'emailAddress') return 'email' as const;
+  if (name === 'phoneNumber') return 'tel' as const;
+  if (name === 'code') return 'otp' as const;
+
+  return 'text' as const;
+};
+
+/**
+ * Given a field name, determine the current state of the field
+ */
+const useFieldState = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
+  const { feedback } = useFieldFeedback({ name });
+  const hasValue = useFormSelector(fieldHasValueSelector(name));
+
+  /**
+   * If hasValue is false, the state should be idle
+   * The rest depends on the feedback type
+   */
+  let state: FieldStates = FIELD_STATES.idle;
+
+  if (!hasValue) {
+    state = FIELD_STATES.idle;
+  }
+
+  switch (feedback?.type) {
+    case 'error':
+      state = FIELD_STATES.error;
+      break;
+    case 'warning':
+      state = FIELD_STATES.warning;
+      break;
+    case 'info':
+      state = FIELD_STATES.info;
+      break;
+    case 'success':
+      state = FIELD_STATES.success;
+      break;
+    default:
+      break;
+  }
+
+  return {
+    state,
+  };
+};
+
 /**
  * Provides the form submission handler along with the form's validity via a data attribute
  */
 const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
-  const error = useFormSelector(globalErrorsSelector);
-  const validity = error ? 'invalid' : 'valid';
+  const { errors } = useGlobalErrors();
+  const validity = errors.length > 0 ? FIELD_VALIDITY.invalid : FIELD_VALIDITY.valid;
 
   // Register the onSubmit handler for form submission
   // TODO: merge user-provided submit handler
@@ -75,11 +147,11 @@ const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }
 
 const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
   const hasValue = useFormSelector(fieldHasValueSelector(name));
-  const error = useFormSelector(fieldErrorsSelector(name));
+  const { feedback } = useFieldFeedback({ name });
 
   const shouldBeHidden = false; // TODO: Implement clerk-js utils
-  const hasError = Boolean(error);
-  const validity = hasError ? 'invalid' : 'valid';
+  const hasError = feedback ? feedback.type === 'error' : false;
+  const validity = hasError ? FIELD_VALIDITY.invalid : FIELD_VALIDITY.valid;
 
   return {
     hasValue,
@@ -91,49 +163,71 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
   };
 };
 
-const useGlobalErrors = () => {
-  const errors = useFormSelector(globalErrorsSelector);
-
-  return {
-    errors,
-  };
-};
-
-/**
- * Provides field-error/message-specific props based on the field's type/state
- */
-const useFieldErrors = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
-  const errors = useFormSelector(fieldErrorsSelector(name));
-
-  return {
-    errors,
-  };
-};
-
-const determineInputTypeFromName = (name: FormFieldProps['name']) => {
-  if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword')
-    return 'password' as const;
-  if (name === 'emailAddress') return 'email' as const;
-  if (name === 'phoneNumber') return 'tel' as const;
-  if (name === 'code') return 'otp' as const;
-
-  return 'text' as const;
-};
-
 const useInput = ({
   name: inputName,
   value: initialValue,
   type: inputType,
   onChange: onChangeProp,
+  onBlur: onBlurProp,
+  onFocus: onFocusProp,
   ...passthroughProps
 }: FormInputProps) => {
   // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
+  const { state: fieldState } = useFieldState({ name });
+
+  if (!name) {
+    throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
+  }
 
   const ref = useFormStore();
+  const [hasPassedValiation, setHasPassedValidation] = React.useState(false);
+
+  const { validatePassword } = usePassword({
+    onValidationComplexity: hasPassed => setHasPassedValidation(hasPassed),
+    onValidationSuccess: () => {
+      ref.send({
+        type: 'FIELD.FEEDBACK.SET',
+        field: { name, feedback: { type: 'success', message: 'Your password meets all the necessary requirements.' } },
+      });
+    },
+    onValidationError: (error, keys) => {
+      if (error) {
+        ref.send({
+          type: 'FIELD.FEEDBACK.SET',
+          field: {
+            name,
+            feedback: {
+              type: 'error',
+              message: new ClerkElementsFieldError('password-validation-error', error),
+              codes: keys,
+            },
+          },
+        });
+      }
+    },
+    onValidationWarning: (warning, keys) =>
+      ref.send({
+        type: 'FIELD.FEEDBACK.SET',
+        field: { name, feedback: { type: 'warning', message: warning, codes: keys } },
+      }),
+    onValidationInfo: (info, keys) => {
+      // TODO: If input is not focused, make this info an error
+      ref.send({
+        type: 'FIELD.FEEDBACK.SET',
+        field: { name, feedback: { type: 'info', message: info, codes: keys } },
+      });
+    },
+  });
   const value = useFormSelector(fieldValueSelector(name));
   const hasValue = Boolean(value);
+  const type = inputType ?? determineInputTypeFromName(name);
+  let shouldValidatePassword = false;
+
+  if (type === 'password' || type === 'text') {
+    shouldValidatePassword = Boolean((passthroughProps as PasswordInputProps).validatePassword);
+  }
 
   // Register the field in the machine context
   React.useEffect(() => {
@@ -150,8 +244,25 @@ const useInput = ({
       onChangeProp?.(event);
       if (!name || initialValue) return;
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
+      if (shouldValidatePassword) validatePassword(event.target.value);
     },
-    [ref, name, onChangeProp, initialValue],
+    [ref, name, onChangeProp, initialValue, shouldValidatePassword, validatePassword],
+  );
+
+  const onBlur = React.useCallback(
+    (event: React.FocusEvent<HTMLInputElement>) => {
+      onBlurProp?.(event);
+      if (shouldValidatePassword) validatePassword(event.target.value);
+    },
+    [onBlurProp, shouldValidatePassword, validatePassword],
+  );
+
+  const onFocus = React.useCallback(
+    (event: React.FocusEvent<HTMLInputElement>) => {
+      onFocusProp?.(event);
+      if (shouldValidatePassword) validatePassword(event.target.value);
+    },
+    [onFocusProp, shouldValidatePassword, validatePassword],
   );
 
   React.useEffect(() => {
@@ -165,12 +276,11 @@ const useInput = ({
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;
-  const type = inputType ?? determineInputTypeFromName(name);
 
   const Element = type === 'otp' ? OTPInput : RadixControl;
 
   let props = {};
-  if (inputType === 'otp') {
+  if (type === 'otp') {
     const p = passthroughProps as Omit<OTPInputProps, 'name' | 'value' | 'type'>;
     const length = p.length || OTP_LENGTH_DEFAULT;
 
@@ -190,6 +300,15 @@ const useInput = ({
       spellCheck: false,
     };
   }
+  if (type === 'password' && shouldValidatePassword) {
+    props = {
+      'data-has-passed-validation': hasPassedValiation ? true : undefined,
+    };
+  }
+
+  // Filter out invalid props that should not be passed through
+  // @ts-expect-error - Doesn't know about type narrowing by type here
+  const { validatePassword: _1, ...rest } = passthroughProps;
 
   return {
     Element,
@@ -197,10 +316,13 @@ const useInput = ({
       type,
       value: value ?? '',
       onChange,
+      onBlur,
+      onFocus,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
+      'data-state': fieldState,
       ...props,
-      ...passthroughProps,
+      ...rest,
     },
   };
 };
@@ -249,24 +371,25 @@ type FormFieldProps = Omit<RadixFormFieldProps, 'children'> & {
 };
 
 /**
- * A wrapper component used to associate its child elements with a specific form field. Automatically handles unique ID generation and associating labels with inputs.
+ * Field is used to associate its child elements with a specific input. It automatically handles unique ID generation and associating the contained label and input elements.
  *
  * @param name - Give your `<Field>` a unique name inside the current form. If you choose one of the following names Clerk Elements will automatically set the correct type on the `<input />` element: `emailAddress`, `password`, `phoneNumber`, and `code`.
  * @param alwaysShow - Optional. When `true`, the field will always be rendered, regardless of its state. By default, a field is hidden if it's optional or if it's a filled-out required field.
- * @param {Function} children - A render prop function that receives `state` as an argument. `state` will be either `'valid'` or `'invalid'`.
+ * @param {Function} children - A function that receives `state` as an argument. `state` is a union of `"success" | "error" | "idle" | "warning" | "info"`.
  *
  * @example
- * <Field name="emailAddress">
- *   <Label>Email</Label>
- *   <Input />
- * </Field>
+ * <Clerk.Field name="emailAddress">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input />
+ * </Clerk.Field>
  *
  * @example
- * <Field name="emailAddress">
+ * <Clerk.Field name="emailAddress">
  *  {(fieldState) => (
- *    <span>{fieldState === "invalid" ? "Error" : "All fine!"}</span>
+ *    <Clerk.Label>Email</Clerk.Label>
+ *    <Clerk.Input className={`text-${fieldState}`} />
  *  )}
- * </Field>
+ * </Clerk.Field>
  */
 const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, ...rest }, forwardedRef) => {
   const formRef = useFormStore();
@@ -290,8 +413,7 @@ const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, 
 const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, forwardedRef) => {
   const { children, ...rest } = props;
   const field = useField({ name: rest.name });
-  const error = useFormSelector(fieldErrorsSelector(rest.name));
-  const state = error ? ('invalid' as const) : ('valid' as const);
+  const { state: fieldState } = useFieldState({ name: rest.name });
 
   return (
     <RadixField
@@ -299,7 +421,7 @@ const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, fo
       {...rest}
       ref={forwardedRef}
     >
-      {typeof children === 'function' ? children(state) : children}
+      {typeof children === 'function' ? children(fieldState) : children}
     </RadixField>
   );
 });
@@ -307,26 +429,54 @@ const FieldInner = React.forwardRef<FormFieldElement, FormFieldProps>((props, fo
 Field.displayName = FIELD_NAME;
 FieldInner.displayName = FIELD_INNER_NAME;
 
+type FieldStateRenderFn = {
+  children: (state: {
+    state: FieldStates;
+    message: string | undefined;
+    codes: ErrorMessagesKey[] | undefined;
+  }) => React.ReactNode;
+};
+
 /**
- * Programmatically access the state of the wrapping `<Field>`. Useful for implementing animations when direct access to the value is necessary.
+ * Programmatically access the state of the wrapping `<Field>`. Useful for implementing animations when direct access to the state value is necessary.
  *
- * @param {Function} children - A render prop function that receives `state` as an argument. `state` will be either `'valid'` or `'invalid'`.
+ * @param {Function} children - A function that receives `state`, `message`, and `codes` as an argument. `state` will is a union of `"success" | "error" | "idle" | "warning" | "info"`. `message` will be the corresponding message, e.g. error message. `codes` will be an array of keys that were used to generate the password validation messages. This prop is only available when the field is of type `password` and has `validatePassword` set to `true`.
  *
  * @example
- * <Field name="email">
- *  <FieldState>
- *    {(state) => (
- *      <pre>Field state: {state}</pre>
+ *
+ * <Clerk.Field name="email">
+ *  <Clerk.Label>Email</Clerk.Label>
+ *  <Clerk.FieldState>
+ *    {({ state }) => (
+ *      <Clerk.Input className={`text-${state}`} />
  *    )}
- *  </FieldState>
- * </Field>
+ *  </Clerk.FieldState>
+ * </Clerk.Field>
+ *
+ * @example
+ * <Clerk.Field name="password">
+ *  <Clerk.Label>Password</Clerk.Label>
+ *  <Clerk.Input validatePassword />
+ *  <Clerk.FieldState>
+ *    {({ state, message, codes }) => (
+ *      <pre>Field state: {state}</pre>
+ *      <pre>Field msg: {message}</pre>
+ *      <pre>Pwd keys: {codes.join(', ')}</pre>
+ *    )}
+ *  </Clerk.FieldState>
+ * </Clerk.Field>
  */
-function FieldState({ children }: { children: (state: FieldStates) => React.ReactNode }) {
+function FieldState({ children }: FieldStateRenderFn) {
   const field = useFieldContext();
-  const error = useFormSelector(fieldErrorsSelector(field?.name));
-  const state = error ? ('invalid' as const) : ('valid' as const);
+  const { feedback } = useFieldFeedback({ name: field?.name });
+  const { state } = useFieldState({ name: field?.name });
 
-  return children(state);
+  const message = feedback?.message instanceof ClerkElementsFieldError ? feedback.message.message : feedback?.message;
+  const codes = feedback?.codes;
+
+  const fieldState = { state, message, codes };
+
+  return children(fieldState);
 }
 
 FieldState.displayName = FIELD_STATE_NAME;
@@ -337,42 +487,64 @@ FieldState.displayName = FIELD_STATE_NAME;
 
 const INPUT_NAME = 'ClerkElementsInput';
 
-type FormInputProps = RadixFormControlProps | ({ type: 'otp' } & OTPInputProps);
+type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
+  validatePassword?: boolean;
+};
+type FormInputProps =
+  | RadixFormControlProps
+  | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
+  | ({ type: 'otp'; render?: undefined } & OTPInputProps)
+  | ({ type: 'password' } & PasswordInputProps);
 
 /**
- * Renders an `<input />` element within Clerk's flow. Passes all props to the underlying input element. The `<input />` element will have two data properties: `data-valid` and `data-invalid`. An input is invalid if it has an associated error.
+ * Handles rendering of `<input>` elements within Clerk's flows. Supports special `type` prop values to render input types that are unique to authentication and user management flows. Additional props will be passed through to the `<input>` element.
  *
- * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ * @param {boolean} [asChild] - If true, `<Input />` will render as its child element, passing along any necessary props.
  * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` component.
  *
  * @example
- * <Field name="identifier">
- *   <Label>Email</Label>
- *   <Input type="email" autoComplete="email" className="emailInput" />
- * </Field>
+ * <Clerk.Field name="identifier">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input type="email" autoComplete="email" className="emailInput" />
+ * </Clerk.Field>
  *
  * @param {Number} [length] - The length of the OTP input. Defaults to 6.
+ * @param {Number} [passwordManagerOffset] - Password managers place their icon inside an `<input />`. This default behaviour is not desirable when you use the render prop to display N distinct element. With this prop you can increase the width of the `<input />` so that the icon is rendered outside the OTP inputs.
  * @param {string} [type] - Type of control to render. Supports a special `'otp'` type for one-time password inputs. If the wrapping `<Field>` component has `name='code'`, the type will default to `'otp'`. With the `'otp'` type, the input will have a pattern and length set to 6 by default and render a single `<input />` element.
  *
  * @example
- * <Field name="code">
- *   <Label>Email code</Label>
- *   <Input type="otp" />
- * </Field>
+ * <Clerk.Field name="code">
+ *   <Clerk.Label>Email code</Clerk.Label>
+ *   <Clerk.Input type="otp" />
+ * </Clerk.Field>
  *
  * @param {Function} [render] - Optionally, you can use a render prop that controls how each individual character is rendered. If no `render` prop is provided, a single text `<input />` will be rendered.
  *
  * @example
- * <Field name="code">
- *   <Label>Email code</Label>
- *   <Input
+ * <Clerk.Field name="code">
+ *   <Clerk.Label>Email code</Clerk.Label>
+ *   <Clerk.Input
  *     type="otp"
  *     render={({ value, status }) => <span data-status={status}>{value}</span>}
  *   />
- * </Field>
+ * </Clerk.Field>
  */
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
+    const clerk = useClerk();
+
+    clerk.telemetry?.record(
+      eventComponentMounted('Elements_Input', {
+        type: props.type ?? false,
+        // @ts-expect-error - Depending on type the props can be different
+        render: Boolean(props?.render),
+        // @ts-expect-error - Depending on type the props can be different
+        asChild: Boolean(props?.asChild),
+        // @ts-expect-error - Depending on type the props can be different
+        validatePassword: Boolean(props?.validatePassword),
+      }),
+    );
+
     const field = useInput(props);
     return (
       <field.Element
@@ -392,15 +564,15 @@ Input.displayName = INPUT_NAME;
 const LABEL_NAME = 'ClerkElementsLabel';
 
 /**
- * Renders a `<label>` element within Clerk's flow. Is automatically associated with its sibling `<Input />` component inside of a `<Field>`. Passes all props to the underlying label element.
+ * Renders a `<label>` element that is automatically associated with its sibling `<Input />` inside of a `<Field>`. Additional props will be passed through to the `<label>` element.
  *
- * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ * @param {boolean} [asChild] - If true, `<Label />` will render as its child element, passing along any necessary props.
  *
  * @example
- * <Field name="email">
- *   <Label>Email</Label>
- *   <Input />
- * </Field>
+ * <Clerk.Field name="email">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input />
+ * </Clerk.Field>
  */
 const Label = RadixLabel;
 
@@ -451,9 +623,8 @@ type FormErrorPropsAsChild = {
   code: string;
 };
 
-type FormErrorProps<T> = Simplify<
-  Omit<T, 'asChild' | 'children'> & (FormErrorPropsRenderFn | FormErrorPropsStd | FormErrorPropsAsChild)
->;
+type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> &
+  (FormErrorPropsRenderFn | FormErrorPropsStd | FormErrorPropsAsChild);
 
 type FormGlobalErrorElement = React.ElementRef<'div'>;
 type FormGlobalErrorProps = FormErrorProps<React.ComponentPropsWithoutRef<'div'>>;
@@ -461,30 +632,30 @@ type FormFieldErrorElement = React.ElementRef<typeof RadixFormMessage>;
 type FormFieldErrorProps = FormErrorProps<RadixFormMessageProps & { name?: string }>;
 
 /**
- * Renders errors that are returned from Clerk's API but are not associated with a specific field. By default, it will render the error's message wrapped in an unstyled `<div>` element. **Must** be placed inside components like `<SignIn>` or `<SignUp>` to work correctly.
+ * Used to render errors that are returned from Clerk's API, but that are not associated with a specific form field. By default, will render the error's message wrapped in a `<div>`. Optionally, the `children` prop accepts a function to completely customize rendering. Must be placed **inside** components like `<SignIn>`/`<SignUp>` to have access to the underlying form state.
  *
  * @param {string} [code] - Forces the message with the matching code to be shown. This is useful when using server-side validation.
- * @param {Function} [children] - A render prop function that receives `message` and `code` as arguments.
- * @param {boolean} [asChild] - When `true`, the component will render its child and passes all props to it.
+ * @param {Function} [children] - A function that receives `message` and `code` as arguments.
+ * @param {boolean} [asChild] - If `true`, `<GlobalError>` will render as its child element, passing along any necessary props.
  *
  * @example
- * <SignIn>
- *   <GlobalError />
- * </SignIn>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError />
+ * </SignIn.Root>
  *
  * @example
- * <SignIn>
- *   <GlobalError code="user_locked">Your custom error message.</GlobalError>
- * </SignIn>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError code="user_locked">Your custom error message.</Clerk.GlobalError>
+ * </SignIn.Root>
  *
  * @example
- * <SignUp>
- *   <GlobalError>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError>
  *     {({ message, code }) => (
  *       <span data-error-code={code}>{message}</span>
  *     )}
- *   </GlobalError>
- * </SignUp>
+ *   </Clerk.GlobalError>
+ * </SignIn.Root>
  */
 const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProps>(
   ({ asChild = false, children, code, ...rest }, forwardedRef) => {
@@ -499,6 +670,10 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
     const Comp = asChild ? Slot : 'div';
     const child = typeof children === 'function' ? children(error) : children;
 
+    if (isReactFragment(child)) {
+      throw new ClerkElementsRuntimeError('<GlobalError /> cannot render a Fragment as a child.');
+    }
+
     return (
       <Comp
         role='alert'
@@ -512,54 +687,59 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
 );
 
 /**
- * Renders error messages associated with the parent `<Field>` component. By default, it will render the error message wrapped in an unstyled `<span>` element.
+ * FieldError renders error messages associated with a specific field. By default, the error's message will be rendered in an unstyled `<span>`. Optionally, the `children` prop accepts a function to completely customize rendering.
  *
  * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` component.
- * @param {string} [code] - Forces the message with the matching code to be shown. This is useful when using server-side validation.
- * @param {Function} [children] - A render prop function that receives `message` and `code` as arguments.
+ * @param {Function} [children] - A function that receives `message` and `code` as arguments.
  *
  * @example
- * <Field name="email">
- *   <FieldError />
- * </Field>
+ * <Clerk.Field name="email">
+ *   <Clerk.FieldError />
+ * </Clerk.Field>
  *
  * @example
- * <Field name="email">
- *   <FieldError code="form_password_incorrect">Your custom error message.</FieldError>
- * </Field>
- *
- * @example
- * <Field name="email">
- *   <FieldError>
+ * <Clerk.Field name="email">
+ *   <Clerk.FieldError>
  *     {({ message, code }) => (
  *       <span data-error-code={code}>{message}</span>
  *     )}
- *   </FieldError>
- * </Field>
+ *   </Clerk.FieldError>
+ * </Clerk.Field>
  */
 const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
-  ({ children, code, name, ...rest }, forwardedRef) => {
+  ({ asChild = false, children, code, name, ...rest }, forwardedRef) => {
     const fieldContext = useFieldContext();
     const fieldName = fieldContext?.name || name;
-    const { errors } = useFieldErrors({ name: fieldName });
+    const { feedback } = useFieldFeedback({ name: fieldName });
 
-    const error = errors?.[0];
+    if (!(feedback?.type === 'error')) {
+      return null;
+    }
+
+    const error = feedback.message;
 
     if (!error) {
       return null;
     }
 
+    const Comp = asChild ? Slot : 'span';
     const child = typeof children === 'function' ? children(error) : children;
-    const forceMatch = code ? error.code === code : true;
+
+    // const forceMatch = code ? error.code === code : undefined; // TODO: Re-add when Radix Form is updated
+
+    if (isReactFragment(child)) {
+      throw new ClerkElementsRuntimeError('<FieldError /> cannot render a Fragment as a child.');
+    }
 
     return (
       <RadixFormMessage
         data-error-code={error.code}
-        forceMatch={forceMatch}
+        // forceMatch={forceMatch}
         {...rest}
         ref={forwardedRef}
+        asChild
       >
-        {child || error.message}
+        <Comp>{child || error.message}</Comp>
       </RadixFormMessage>
     );
   },
@@ -571,9 +751,9 @@ FieldError.displayName = FIELD_ERROR_NAME;
 export { Field, FieldError, FieldState, Form, GlobalError, Input, Label, Submit };
 export type {
   RadixFormControlProps as FormControlProps,
-  FormFieldErrorProps,
   FormErrorProps,
   FormErrorRenderProps,
+  FormFieldErrorProps,
   FormFieldProps,
   FormGlobalErrorProps,
   FormInputProps,

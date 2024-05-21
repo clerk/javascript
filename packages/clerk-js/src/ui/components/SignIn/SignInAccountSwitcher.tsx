@@ -110,6 +110,9 @@ const _SignInAccountSwitcher = () => {
               iconElementDescriptor={descriptors.accountSwitcherActionButtonIcon}
               iconElementId={descriptors.accountSwitcherActionButtonIcon.setId('signOutAll')}
               label={localizationKeys('signIn.accountSwitcher.action__signOutAll')}
+              actionSx={t => ({
+                padding: `${t.space.$2} ${t.space.$2}`,
+              })}
             />
           </Card.Action>
         </Card.Footer>

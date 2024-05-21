@@ -17,8 +17,8 @@ concurrency:
 
 jobs:
   action:
-    timeout-minutes: ${{  fromJSON(vars.TIMEOUT_MINUTES_SHORT) }}
-    runs-on: ${{ vars.RUNNER_NORMAL }}
+    timeout-minutes: 3
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     steps:
       - uses: actions/stale@v9
         name: Regular stale action

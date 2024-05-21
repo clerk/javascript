@@ -4,9 +4,9 @@ import ReactDOM from 'react-dom';
 
 import { PRESERVED_QUERYSTRING_PARAMS } from '../../core/constants';
 import { clerkErrorPathRouterMissingPath } from '../../core/errors';
-import { normalizeRoutingOptions } from '../../utils/authPropHelpers';
+import { normalizeRoutingOptions } from '../../utils/normalizeRoutingOptions';
 import { ComponentContext } from '../contexts';
-import { HashRouter, PathRouter } from '../router';
+import { HashRouter, PathRouter, VirtualRouter } from '../router';
 import type { AvailableComponentCtx } from '../types';
 
 type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType, 'componentName'>> = {
@@ -17,7 +17,7 @@ type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType
 } & Pick<CtxType, 'componentName'>;
 
 export class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
-  render(): React.ReactPortal {
+  render() {
     const { props, component, componentName, node } = this.props;
     const normalizedProps = { ...props, ...normalizeRoutingOptions({ routing: props?.routing, path: props?.path }) };
 
@@ -46,5 +46,38 @@ export class Portal<CtxType extends AvailableComponentCtx> extends React.PureCom
     }
 
     return ReactDOM.createPortal(<HashRouter preservedParams={PRESERVED_QUERYSTRING_PARAMS}>{el}</HashRouter>, node);
+  }
+}
+
+type VirtualBodyRootPortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType, 'componentName'>> = {
+  component: React.FunctionComponent<PropsType> | React.ComponentClass<PropsType, any>;
+  props?: PropsType;
+  startPath: string;
+} & Pick<CtxType, 'componentName'>;
+
+export class VirtualBodyRootPortal<CtxType extends AvailableComponentCtx> extends React.PureComponent<
+  VirtualBodyRootPortalProps<CtxType>
+> {
+  private elRef = document.createElement('div');
+
+  componentDidMount() {
+    document.body.appendChild(this.elRef);
+  }
+
+  componentWillUnmount() {
+    document.body.removeChild(this.elRef);
+  }
+
+  render() {
+    const { props, startPath, component, componentName } = this.props;
+
+    return ReactDOM.createPortal(
+      <VirtualRouter startPath={startPath}>
+        <ComponentContext.Provider value={{ componentName: componentName, ...props } as CtxType}>
+          <Suspense fallback={''}>{React.createElement(component, props as PortalProps<CtxType>['props'])}</Suspense>
+        </ComponentContext.Provider>
+      </VirtualRouter>,
+      this.elRef,
+    );
   }
 }

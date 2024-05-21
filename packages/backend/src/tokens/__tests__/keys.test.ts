@@ -172,17 +172,51 @@ export default (QUnit: QUnit) => {
       } catch (err) {
         if (err instanceof Error) {
           assert.propEqual(err, {
-            reason: 'jwk-remote-missing',
-            action: 'Contact support@clerk.com',
+            reason: 'jwk-kid-mismatch',
+            action:
+              'Go to your Dashboard and validate your secret and public keys are correct. Contact support@clerk.com if the issue persists.',
           });
           assert.propContains(err, {
-            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid are available: ${mockRsaJwkKid}, local`,
+            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${mockRsaJwkKid}, local`,
           });
         } else {
           // This should never be reached. If it does, the suite should fail
           assert.false(true);
         }
       }
+    });
+
+    test('cache TTLs do not conflict', async assert => {
+      fakeClock.runAll();
+
+      fakeFetch.onCall(0).returns(jsonOk(mockJwks));
+      let jwk = await loadClerkJWKFromRemote({
+        secretKey: 'deadbeef',
+        kid: mockRsaJwkKid,
+        skipJwksCache: true,
+      });
+      assert.propEqual(jwk, mockRsaJwk);
+
+      // just less than an hour, the cache TTL
+      fakeClock.tick(60 * 60 * 1000 - 5);
+
+      // re-fetch, 5m cache is expired
+      fakeFetch.onCall(1).returns(jsonOk(mockJwks));
+      jwk = await loadClerkJWKFromRemote({
+        secretKey: 'deadbeef',
+        kid: mockRsaJwkKid,
+      });
+      assert.propEqual(jwk, mockRsaJwk);
+
+      // cache should be cleared, but 5m ttl is still valid
+      fakeClock.next();
+
+      // re-fetch, 5m cache is expired
+      jwk = await loadClerkJWKFromRemote({
+        secretKey: 'deadbeef',
+        kid: mockRsaJwkKid,
+      });
+      assert.propEqual(jwk, mockRsaJwk);
     });
   });
 };

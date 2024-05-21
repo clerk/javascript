@@ -49,12 +49,6 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
  */
 export type { OrganizationMembershipRole } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
-
-/**
- * Webhook event types
- */
-export type { WebhookEvent, WebhookEventType } from './api/resources';
-
 /**
  * JSON types
  */
@@ -86,6 +80,7 @@ export type {
   Web3WalletJSON,
   DeletedObjectJSON,
   PaginatedResponseJSON,
+  TestingTokenJSON,
 } from './api/resources/JSON';
 
 /**
@@ -108,4 +103,20 @@ export type {
   SMSMessage,
   Token,
   User,
+  TestingToken,
 } from './api/resources';
+
+/**
+ * Webhooks event types
+ */
+export type {
+  UserWebhookEvent,
+  EmailWebhookEvent,
+  SMSWebhookEvent,
+  SessionWebhookEvent,
+  OrganizationWebhookEvent,
+  OrganizationMembershipWebhookEvent,
+  OrganizationInvitationWebhookEvent,
+  WebhookEvent,
+  WebhookEventType,
+} from './api/resources/Webhooks';

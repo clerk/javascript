@@ -15,6 +15,10 @@ declare global {
       NEXT_PUBLIC_CLERK_PROXY_URL: string | undefined;
       NEXT_PUBLIC_CLERK_SIGN_IN_URL: string | undefined;
       NEXT_PUBLIC_CLERK_SIGN_UP_URL: string | undefined;
+      NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL: string | undefined;
+      NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL: string | undefined;
+      NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: string | undefined;
+      NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: string | undefined;
       NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: string | undefined;
       NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: string | undefined;
     }

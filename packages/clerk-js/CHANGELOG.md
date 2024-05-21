@@ -1,5 +1,946 @@
 # Change Log
 
+## 5.4.0
+
+### Minor Changes
+
+- Replace mount with open for GoogleOneTap. New api is `__experimental_openGoogleOneTap`. ([#3379](https://github.com/clerk/javascript/pull/3379)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Remove cookie when signing out before running `onBeforeSetActive` to resolve issues where we do navigations in `onBeforeSetActive`. ([#3371](https://github.com/clerk/javascript/pull/3371)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe), [`e84090db0`](https://github.com/clerk/javascript/commit/e84090db0d9a61a5e3dfea645e7c9cc6dad214a9)]:
+  - @clerk/types@4.4.0
+  - @clerk/localizations@2.4.2
+
+## 5.3.2
+
+### Patch Changes
+
+- Add a descriptor for Invitation previews in <OrganizationSwitcher/> ([#3376](https://github.com/clerk/javascript/pull/3376)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Updated dependencies [[`eae0a32d5`](https://github.com/clerk/javascript/commit/eae0a32d5c9e97ccbfd96e001c2cac6bc753b5b3)]:
+  - @clerk/types@4.3.1
+
+## 5.3.1
+
+### Patch Changes
+
+- Re-organize cookie codebase into a central place, fix TokenUpdate event to be triggered on sign-out and drop duplicate event on refreshing token. ([#3362](https://github.com/clerk/javascript/pull/3362)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`9d02df655`](https://github.com/clerk/javascript/commit/9d02df65507f579e970b33a600e6c83f6d5bfd45), [`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/localizations@2.4.1
+  - @clerk/shared@2.1.1
+
+## 5.3.0
+
+### Minor Changes
+
+- Updates related to experimental Google One Tap support ([#3250](https://github.com/clerk/javascript/pull/3250)) by [@panteliselef](https://github.com/panteliselef)
+
+  - By default we are returning back to the location where the flow started.
+    To accomplish that internally we will use the redirect_url query parameter to build the url.
+
+  ```tsx
+  <__experimental_GoogleOneTap />
+  ```
+
+  - In the above example if there is a SIGN_UP_FORCE_REDIRECT_URL or SIGN_IN_FORCE_REDIRECT_URL set then the developer would need to pass new values as props like this
+
+  ```tsx
+  <__experimental_GoogleOneTap
+    signInForceRedirectUrl=''
+    signUpForceRedirectUrl=''
+  />
+  ```
+
+  - Let the developer configure the experience they want to offer. (All these values are true by default)
+
+  ```tsx
+  <__experimental_GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+  - Moved authenticateWithGoogleOneTap to Clerk singleton
+
+  ```ts
+  Clerk.__experimental_authenticateWithGoogleOneTap;
+  ```
+
+  - Created the handleGoogleOneTapCallback in Clerk singleton
+
+  ```ts
+  Clerk.__experimental_handleGoogleOneTapCallback;
+  ```
+
+- Introduce new `client_mismatch` verification status for email link sign-in and sign-up. This error (and its message) will be shown if a verification link was opened in another device/browser from which the user initiated the sign-in/sign-up attempt. This functionality needs to be enabled in the Clerk dashboard. ([#3367](https://github.com/clerk/javascript/pull/3367)) by [@mzhong9723](https://github.com/mzhong9723)
+
+### Patch Changes
+
+- Improve logging for CAPTCHA script loading errors ([#3374](https://github.com/clerk/javascript/pull/3374)) by [@anagstef](https://github.com/anagstef)
+
+- Respect the `signInForceRedirectUrl`, `signInFallbackRedirectUrl`, `signUpForceRedirectUrl` and `signUpFallbackRedirectUrl` props passed to `SignInButton`, `SignUpButton` and the low-level `window.Clerk.buildSignInUrl` & `window.Clerk.buildSignUpUrl` methods. These props allow you to control the redirect behavior of the `SignIn` and `SignUp` components. For more information, refer to the [Custom Redirects](https://clerk.com/docs/guides/custom-redirects) guide. ([#3361](https://github.com/clerk/javascript/pull/3361)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6f61130e3`](https://github.com/clerk/javascript/commit/6f61130e35a08298a715c170d2ee14d29d15bb58), [`94197710a`](https://github.com/clerk/javascript/commit/94197710a70381c4f1c460948ef02cd2a70b88bb), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20), [`201b28d37`](https://github.com/clerk/javascript/commit/201b28d37852b5a2681f8115d1898905e7956bc2), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20)]:
+  - @clerk/localizations@2.4.0
+  - @clerk/types@4.3.0
+  - @clerk/shared@2.1.0
+
+## 5.2.4
+
+### Patch Changes
+
+- Fix a bug where client_uat domain detection would not handle hostnames with a single part. This impacts locally defined custom hostnames used as aliases. ([#3357](https://github.com/clerk/javascript/pull/3357)) by [@BRKalow](https://github.com/BRKalow)
+
+- Fix Cypress setting cookies as third-party ([#3245](https://github.com/clerk/javascript/pull/3245)) by [@anagstef](https://github.com/anagstef)
+
+## 5.2.3
+
+### Patch Changes
+
+- Fix Smart CAPTCHA on ticket flow ([#3351](https://github.com/clerk/javascript/pull/3351)) by [@anagstef](https://github.com/anagstef)
+
+## 5.2.2
+
+### Patch Changes
+
+- Fix UI for Phone Input and OTP inputs ([#3302](https://github.com/clerk/javascript/pull/3302)) by [@octoper](https://github.com/octoper)
+
+- Specify an explicit domain when setting the client_uat cookie. This ensures there are no duplicate cookie issues when also receiving cookies from the API. ([#3318](https://github.com/clerk/javascript/pull/3318)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`df4525f87`](https://github.com/clerk/javascript/commit/df4525f878012f2bb03c3714cfb813740c95050c), [`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`9d7a79841`](https://github.com/clerk/javascript/commit/9d7a79841c4832b34f5e6b968961fe8f5320c4d4), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/localizations@2.3.1
+  - @clerk/shared@2.0.2
+  - @clerk/types@4.2.1
+
+## 5.2.1
+
+### Patch Changes
+
+- Fixes issue where email field is required but is not shown after user tries to edit email, when already tried another email before when trying to sign up with a method that not provides and email (e.g Metamask) ([#3291](https://github.com/clerk/javascript/pull/3291)) by [@octoper](https://github.com/octoper)
+
+## 5.2.0
+
+### Minor Changes
+
+- Allow localization of text in social buttons when many are listed. ([#3282](https://github.com/clerk/javascript/pull/3282)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Allow users to display the email address field after selecting to input a phone number. Previously that was not possible when passkeys were enabled. ([#3286](https://github.com/clerk/javascript/pull/3286)) by [@panteliselef](https://github.com/panteliselef)
+
+- Avoid throwing error for missing an active organization when no user is signed in ([#3290](https://github.com/clerk/javascript/pull/3290)) by [@panteliselef](https://github.com/panteliselef)
+
+- Use default value for `signIn.userData`. This will prevent the SignIn modal from breaking when an appearance prop is used in Next.js App Router. ([#3280](https://github.com/clerk/javascript/pull/3280)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove deprecated `__clerk_frontend_api` from `Window` interface ([#3288](https://github.com/clerk/javascript/pull/3288)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`c7d626292`](https://github.com/clerk/javascript/commit/c7d626292a9fd12ca0f1b31a1035e711b6e99531), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc)]:
+  - @clerk/shared@2.0.1
+  - @clerk/localizations@2.3.0
+  - @clerk/types@4.2.0
+
+## 5.1.1
+
+### Patch Changes
+
+- Default to text type for all inputs. This resolved inconsistencies with `@tailwindcss/forms`. ([#3260](https://github.com/clerk/javascript/pull/3260)) by [@desiprisg](https://github.com/desiprisg)
+
+- Prevent form submission for deleting user account when confirmation value is incorrect but submisssion is triggered via an "Enter" keystroke. ([#3265](https://github.com/clerk/javascript/pull/3265)) by [@panteliselef](https://github.com/panteliselef)
+
+- Set the card error when encountering an error on preparing verification via code for email or phone on sign up. ([#3256](https://github.com/clerk/javascript/pull/3256)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`0a825dcc4`](https://github.com/clerk/javascript/commit/0a825dcc4ec5743819503afed20bf3d8229f6d6f)]:
+  - @clerk/localizations@2.2.0
+
+## 5.1.0
+
+### Minor Changes
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
+### Patch Changes
+
+- Check if any legacy properties have value before displaying a warning ([#3254](https://github.com/clerk/javascript/pull/3254)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Hide "Create Organization" in <OrganizationList/> when it's disabled for user ([#3249](https://github.com/clerk/javascript/pull/3249)) by [@dimkl](https://github.com/dimkl)
+
+- Warn when a legacy redirect prop is being shadowed by "fallbackRedirectUrl" or "forceRedirectUrl" by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`de1d75d1a`](https://github.com/clerk/javascript/commit/de1d75d1acab452ad2b7c533053f45d2e0ec66cc), [`956d8792f`](https://github.com/clerk/javascript/commit/956d8792fefe9d6a89022f1e938149b25503ec7f)]:
+  - @clerk/localizations@2.1.0
+  - @clerk/types@4.1.0
+
+## 5.0.0
+
+### Major Changes
+
+- 043801f2a: All the components that using routing will throw a runtime error if the a path property is provided with a routing strategy other than path.
+
+  Example that will throw an error:
+
+  ```tsx
+  <SignIn
+    routing='hash'
+    path='/sign-in'
+  />
+  ```
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- deac67c1c: Drop default exports from all packages. Migration guide:
+  - use `import { Clerk } from '@clerk/backend';`
+  - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-js';`
+  - use `import { Clerk } from '@clerk/clerk-js/headless';`
+  - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
+- 7f6a64f43: - By default, all the components with routing will have the `routing` prop assigned as `'path'` by default when the `path` prop is filled.
+  - The `<UserButton />` component will set the default value of the `userProfileMode` prop to `'navigation'` if the `userProfileUrl` prop is provided.
+  - The `<OrganizationSwitcher />` component will have the `organizationProfileMode` and `createOrganizationMode` props assigned with `'navigation'` by default if the `organizationProfileUrl` and `createOrganizationUrl` props are filled accordingly.
+- 7f833da9e: Drop deprecations. Migration steps:
+  - use `publishableKey` instead of `frontendApi`
+  - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - drop `orgs` jwt claim from session token
+  - use `ExternalAccount.imageUrl` instead of `ExternalAccount.avatarUrl`
+  - use `Organization.imageUrl` instead of `Organization.logoUrl`
+  - use `User.imageUrl` instead of `User.profileImageUrl`
+  - use `OrganizationMembershipPublicUserData.imageUrl` instead of `OrganizationMembershipPublicUserData.profileImageUrl`
+  - use `useOrganizationList` instead of `useOrganizations`
+  - use `userProfileProps` instead of `userProfile` in `Appearance`
+  - use `Clerk.setActive()` instead of `Clerk.setSession()`
+  - drop `password` param in `User.update()`
+  - use `afterSelectOrganizationUrl` instead of `afterSwitchOrganizationUrl` in `OrganizationSwitcher`
+  - drop `Clerk.experimental_canUseCaptcha` / `Clerk.Clerk.experimental_captchaSiteKey` / `Clerk.experimental_captchaURL` (were meant for internal use)
+  - use `User.getOrganizationMemberships()` instead of `Clerk.getOrganizationMemberships()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from Clerk emitted events
+  - drop `Clerk.__unstable__invitationUpdate` / `Clerk.__unstable__membershipUpdate`
+  - drop support for string param in `Organization.create()`
+  - use `Organization.getInvitations()` instead of `Organization.getPendingInvitations()`
+  - use `pageSize` instead of `limit` in `OrganizationMembership.retrieve()`
+  - use `initialPage` instead of `offset` in `OrganizationMembership.retrieve()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from ClerkProvider
+  - use `invitations` instead of `invitationList` in `useOrganization`
+  - use `memberships` instead of `membershipList` in `useOrganization`
+  - use `redirectUrl` instead of `redirect_url` in `User.createExternalAccount()`
+  - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
+- 71663c568: Internal update default apiUrl domain from clerk.dev to clerk.com
+- cfea3d9c0: Path-based routing is now the default routing strategy if the `path` prop is filled. Additionally, if the `path` and `routing` props are not filled, an error will be thrown.
+
+  ```jsx
+
+  // Without path or routing props, an error with be thrown
+  <UserProfile />
+  <CreateOrganization />
+  <OrganizationProfile />
+  <SignIn />
+  <SignUp />
+
+  // Alternative #1
+  <UserProfile path="/whatever"/>
+  <CreateOrganization path="/whatever"/>
+  <OrganizationProfile path="/whatever"/>
+  <SignIn path="/whatever"/>
+  <SignUp path="/whatever"/>
+
+  // Alternative #2
+  <UserProfile routing="hash_or_virtual"/>
+  <CreateOrganization routing="hash_or_virtual"/>
+  <OrganizationProfile routing="hash_or_virtual"/>
+  <SignIn routing="hash_or_virtual"/>
+  <SignUp routing="hash_or_virtual"/>
+  ```
+
+- d18cae5fd: Make the user name on <UserButton showName /> clickable, i.e. part of the button's trigger.
+  This change inverts the positions of `cl-userButtonTrigger` and `cl-userButtonBox`, the latter now being a child of the former.
+- 7bffc47cb: Drop `Clerk.isReady(). Use `Clerk.loaded` instead.`
+- 5f58a2274: Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters.
+- 5f58a2274: - `buildUrlWithAuth` no longer accepts an `options` argument.
+- 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
+  to fix issues with vite & rollup building.
+- ab4eb56a5: Drop `redirectToHome` redirect method in favour of `redirectToAfterSignUp` or `redirectToAfterSignIn`.
+
+  When the `<SignIn/>` and `<SignUp/>` components are rendered while a user is already logged in, they will now redirect to the configured `afterSignIn` and `afterSignUp` URLs, respectively. Previously, the redirect URL was set to the home URL configured in the dashboard.
+
+- 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
+- 4bb57057e: Breaking Changes:
+
+  - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
+  - Drop default exports from `@clerk/clerk-js`
+    - on headless Clerk type
+    - on ui and ui.retheme `Portal`
+  - Use `isProductionFromSecretKey` instead of `isProductionFromApiKey`
+  - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
+
+  Changes:
+
+  - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
+  - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
+  - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
+  - Drop `node-fetch` dependency from `@clerk/backend`
+  - Drop duplicate test in `@clerk/backend`
+
+- f5fb63cf1: Consolidate `afterSignOutOneUrl` & `afterSignOutAllUrl` to `afterSignOutUrl` and drop usage of Dashboard settings in ClerkJS components. The Dashboard settings should only apply to the Account Portal application.
+- 9a1fe3728: Use the new `routerPush` and `routerReplace` props for `<ClerkProvider />` instead of `navigate`.
+- d30ea1faa: Change the default behavior of `afterSignOutUrl`, `afterSignIn` and `afterSignUp` props to be redirected to `/` instead of the Account Portal defined URL.
+- 7886ba89d: Refresh the look and feel of the Clerk UI components
+
+  For more info, refer to the [upgrade guide from v4 to v5 in Clerk docs](https://clerk.com/docs/upgrade-guides/upgrading-from-v4-to-v5).
+
+- 41ae1d2f0: Avatar Shimmer will be enabled by default for `<UserButton/>` and `<OrganizationSwitcher/>`.
+- 429d030f7: Introducing some changes and some addition for the appearence descriptors for the organization preview in `<OrganizationSwitcher/>`:
+  - `.cl-organizationPreview__organizationSwitcher` has been renamed to `.cl-organizationPreview__organizationSwitcherTrigger`.
+  - `.cl-organizationPreview__organizationSwitcherListedOrganization` was added to allow you to customize the appearance of all the listed organization previews.
+  - `.cl-organizationPreview__organizationSwitcherActiveOrganizationn` was added to allow you to customize the appearance of the active organization.
+
+### Minor Changes
+
+- 4b8bedc66: Move usage of internal useCoreX hooks to useX hooks
+- 0d0b1d89a: List passkeys under security in UserProfile.
+  - Supports renaming a passkey.
+  - Supports deleting a passkey.
+- 08dd88c4a: Introducing sign out from all open tabs at once.
+- afec17953: Improved error handling for registration and retrieval of passkeys.
+  ClerkRuntimeError codes introduced:
+
+  - `passkey_not_supported`
+  - `passkeys_pa_not_supported`
+  - `passkey_invalid_rpID_or_domain`
+  - `passkey_already_exists`
+  - `passkey_operation_aborted`
+  - `passkey_retrieval_cancelled`
+  - `passkey_retrieval_failed`
+  - `passkey_registration_cancelled`
+  - `passkey_registration_failed`
+
+  Example usage:
+
+  ```ts
+  try {
+    await __experimental_authenticateWithPasskey(...args);
+  }catch (e) {
+    if (isClerkRuntimeError(e)) {
+        if (err.code === 'passkey_operation_aborted') {
+            ...
+        }
+    }
+  }
+
+
+  ```
+
+- 0699fa496: Add support for different CAPTCHA widget types
+- 0293f29c8: Add support for custom roles in `<OrganizationProfile/>`.
+
+  The previous roles (`admin` and `basic_member`), are still kept as a fallback.
+
+- 9180c8b80: Deprecate `supported_identifiers` and remove `supported_external_accounts`.
+- e400fa9e3: Introducing default values for `allowedRedirectOrigins`. If no value is provided, default values similar to the example below will apply.
+
+  Let's assume the host of the application is `test.host`, the origins will be
+
+  - `https://test.host/`
+  - `https://yourawesomeapp.clerk.accounts.dev/`
+  - `https://*.yourawesomeapp.clerk.accounts.dev/`
+
+- fc3ffd880: Support for prompting a user to reset their password if it is found to be compromised during sign-in.
+- 31570f138: During sign in, navigate to the `reset-password` route if the user needs a new password. This happens when you enforce password usage during sign-in in your dashboard. Previously this case wasn't handled in the password form.
+
+  The `signIn.resetPassword.requiredMessage` localization was updated to `'For security reasons, it is required to reset your password.'`.
+
+- 492b8a7b1: Increase the duration until data become stale for organization hooks.
+- 2352149f6: Move passkey related apis to stable:
+
+  - Register passkey for a user
+    Usage: `await clerk.user.createPasskey()`
+  - Authenticate with passkey
+    Usage: `await clerk.client.signIn.authenticateWithPasskey()`
+    ```ts
+    try {
+      await clerk.client.signIn.authenticateWithPasskey(...args);
+    }catch (e) {
+      if (isClerkRuntimeError(e)) {
+          if (err.code === 'passkey_operation_aborted') {
+              ...
+          }
+      }
+    }
+    ```
+  - ClerkRuntimeError codes introduced:
+
+    - `passkey_not_supported`
+    - `passkeys_pa_not_supported`
+    - `passkey_invalid_rpID_or_domain`
+    - `passkey_already_exists`
+    - `passkey_operation_aborted`
+    - `passkey_retrieval_cancelled`
+    - `passkey_retrieval_failed`
+    - `passkey_registration_cancelled`
+    - `passkey_registration_failed`
+
+  - Get the user's passkeys
+    `clerk.user.passkeys`
+  - Update the name of a passkey
+    `clerk.user.passkeys?.[0].update({name:'Company issued passkey'})`
+  - Delete a passkey
+    `clerk.user.passkeys?.[0].delete()`
+
+- ff803ff20: Throw an error in development when there is an invalid mount or modal open. This includes mounting a component when the resource is not available (i.e. `mountUserProfile()` when the user does not exist) as well as mounting a component without the feature being enabled via the clerk dashboard (i.e. `mountOrganizationProfile()` without having organizations enabled).
+- ff08fe237: Introduce experimental support for Google One Tap
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+- 73849836f: Use sigUpUrl from props / context / repo-level to construct a redirectUrl in sign-in from email-link flow.
+- 9737ef510: Accept `skipInvitationScreen` as a prop from OrganizationSwitcher.
+
+  `skipInvitationScreen` hides the screen for sending invitations after an organization is created.
+  By default, Clerk will automatically hide the screen if the number of max allowed members is equal to 1
+
+- fafa76fb6: Experimental support for a user to register a passkey for their account.
+  Usage: `await clerk.user.__experimental__createPasskey()`
+- 1f650f30a: Experimental support for authenticating with a passkey.
+  Example usage: `await signIn.authenticateWithPasskey()`.
+- d941b902f: Drop firebase legacy integration code and start using sessions/:sid/tokens/:template endpoint for the firebase tokens.
+- 57e0972bb: Remove fallback data and allow promise to throw for paginated endpoint methods.
+  Affected methods:
+  - Organization.getDomains
+  - Organization.getInvitations
+  - Organization.getMembershipRequests
+  - Organization.getMemberships
+  - User.getOrganizationInvitations
+  - User.getOrganizationSuggestions
+  - User.getOrganizationMemberships
+- fe2607b6f: Remove MembershipRole. The type `MembershipRole` would always include the old role keys `admin`, `basic_member`, `guest_member`.
+  If developers still depend on them after the introduction of custom roles, the can provide them as their custom types for authorization.
+
+  ```ts
+  // clerk.d.ts
+  interface ClerkAuthorization {
+    permission: '';
+    role: 'admin' | 'basic_member' | 'guest_member';
+  }
+  ```
+
+- c7e6d00f5: Experimental support for `<Gate/>` with role checks.
+- ef72c0ae6: Remove unused error helpers.
+  - clerkErrorInvalidColor()
+  - clerkCoreErrorUserIsNotDefined()
+  - clerkCoreErrorSessionIsNotDefined()
+  - clerkCoreErrorOrganizationIsNotDefined()
+- 663243220: Remove the unused appearance keys for accordion and breadcrumb elements.
+- d1b524ffb: Handle user_locked error encountered in an oauth flow by redirecting to /sign-up or /sign-in
+- 12962bc58: Re-use common pagination types for consistency across types.
+
+  Types introduced in `@clerk/types`:
+
+  - `ClerkPaginationRequest` : describes pagination related props in request payload
+  - `ClerkPaginatedResponse` : describes pagination related props in response body
+  - `ClerkPaginationParams` : describes pagination related props in api client method params
+
+- 2e4a43017: Update `@clerk/clerk-js` and `@clerk/clerk-react` to support the following examples:
+
+  ```typescript
+  Clerk.signOut({ redirectUrl: '/' })
+
+  <SignOutButton redirectUrl='/' />
+  // uses Clerk.signOut({ redirectUrl: '/' })
+  <UserButton afterSignOutUrl='/after' />
+  // uses Clerk.signOut({ redirectUrl: '/after' })
+  <ClerkProvider afterSignOutUrl='/after' />
+  // uses Clerk.signOut({ redirectUrl: '/after' })
+  ```
+
+- 5aab9f04a: Add `routerDebug` option in `Clerk.load()` to log the destination URLs when navigating
+- 46040a2f3: Introduce Protect for authorization.
+  Changes in public APIs:
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+- 9e57e94d2: Greatly improve the UX when users are creating their passwords. The hints below the input fields now have smoother animations and show more types of feedback based on different conditions. Additionally, the password validation is now debounced.
+- 7f751c4ef: Add support for X/Twitter v2 OAuth provider
+- 18c0d015d: Pass environment into `sdkMetadata` in order to detect if production clerk-js is used by other sdks in dev mode. When it is log dev warning from clerk-js.
+- 0d1052ac2: Add a private \_\_navigateWithError util function to clerk for use in User Lockout scenarios
+- 5471c7e8d: Move and export the following from @clerk/clerk-js and @clerk/nextjs to @clerk/shared: - `DEV_BROWSER_SSO_JWT_PARAMETER` - `DEV_BROWSER_JWT_MARKER` - `DEV_BROWSER_SSO_JWT_KEY` - `setDevBrowserJWTInURL` - `getDevBrowserJWTFromURL` - `getDevBrowserJWTFromResponse`
+- 5d6937c9f: Use signInUrl from props / context / repo-level to construct a redirectUrl in sign-up from email-link flow.
+- ebf9be77f: Allow users to authenticate with passkeys via the `<SignIn/>`.
+- 008ac4217: Experimental support for reading, updating, and deleting a user's registered passkeys.
+  - Get the user's passkeys
+    `clerk.user.__experimental__passkeys`
+  - Update the name of a passkey
+    `clerk.user.__experimental__passkeys?.[0].update({name:'work laptop passkey'})`
+  - Delete a passkey
+    `clerk.user.__experimental__passkeys?.[0].delete()`
+
+### Patch Changes
+
+- 3daa937a7: Bug fix: Respect `navigateAfterCreateOrganization` in `<OrganizationList/>`.
+- 69ce3e185: Update `@zxcvbn-ts/core` from `2.2.1` to `3.0.4`. Update `@zxcvbn-ts/language-common` from `3.0.2` to `3.0.4`.
+- 3ba3f383b: Internal refactoring of form fields, deprecation of Form.Control and introduction of Form.PlainInput.
+- 1ddffb67e: A bug fix for prefetching data for OrganizationSwitcher and correctly displaying a notification count in the switcher as well.
+- 1834a3ee4: fix(shared,clerk-js): Do not replace current URL if it does not contain a clerk token
+- 64d3763ec: Fix incorrect pagination counters in data tables inside `<OrganizationProfile/>`.
+- 0a108ae3b: Inform developers who are using legacy Clerk development instances that in V5 URL Based Session Syncing must be enabled. For more information refer to https://clerk.com/docs/upgrade-guides/url-based-session-syncing.
+- e214450e9: Reset OTP field when pressing "Cancel" in VerifyDomainPage inside `<OrganziatoinProfile/>`.
+- 034abeb76: Use strict equality operator to check for lockout errors in handleRedirectCallback
+- d08d96971: Fixes errant `act` output from unit tests
+- 17a6158e8: Warn about legacy redirect search params
+- 9dc46b2c1: Fix the PhoneInput country ISO text color
+- d422dae67: Fixes memebership count in `<OrganizationProfile/>` Members page for members with `org:sys_memberships:read` permission
+- a2ab0d300: Align country code position with phone number input.
+- 6c2d88ee8: Add data-1p-ignore to input fields that do not benefit from password manager suggestions.
+- d37d44a68: Shows list of domains if member has the `org:sys_domain:read` permission.
+- 434a96ebe: Hide backup codes when adding `phone_code` mfa and instance setting is off.
+- 791c49807: Rename the @staging tag to @canary. Drop support for @next tag.
+- 5f49568f6: Emit session when permissions or role of the active memberships change.
+- 8b40dc7a3: Enhance `CreateOrganizationForm` by replacing `AvatarPreview` with an upload button to prevent layout shifts
+- dd49f93da: Fallback to custom role name if localization is not provided.
+- 7466fa505: Update cookie setting to ensure cookies can be set to be read when an application is embedded in an iframe.
+- 2de442b24: Rename beta-v5 to beta
+- db18787c4: Always drop **clerk_db_jwt and **dev_session params from the URL
+- 6a769771c: Update README for v5
+- 6d3b422c8: Avoid depending on `count` as it can be zero but invitations may still exist.
+- 23ebc89e9: Bug fix: Avoid triggering prepare verification twice. (Affects only dev mode)
+- 9e10d577e: Return reject(err) in factor one & two code forms
+- 2684f1d5c: Fix checkbox styling issues
+- beac05f39: Fix SSO callback Turnstile widget alignment
+- 097ec4872: The organizationPreviewSecondaryIdentifier element will no longer be rendered empty inside the organization switcher's list.
+- 06d2b4fca: Resolve type issues when importing `@clerk/clerk-js` directly
+- bab2e7e05: Support but warn when `afterSignInUrl` and `afterSignUpUrl` are used
+- 27052469e: Use `userMemberships` instead of `organizationList` inside `<OrganizationSwitcher/>`.
+- 9e99eb727: Update `@clerk/nextjs` error messages to refer to `clerkMiddleware()` and deprecated `authMiddleware()` and fix a typo in `cannotRenderSignUpComponentWhenSessionExists` error message.
+- 846a4c24d: Update user memberships when user creates, leaves or deletes an organization.
+- 491fba5ad: Throw error for unsupported method `OrganizationMembership.reload`
+- d65d36fc6: Tests for internal PlainInput component.
+- 94bbdf7df: Fix font size inconsistencies when selecting method to sign in.
+- 98b194b2a: Fix badge misalignment on members list when title is empty
+- 1c199d1d2: Fix for input group components with prefix or suffix to match the rest of the design
+- 676d23a59: Revalidate invitations table after invitation screen submit.
+- 12f3c5c55: Update the debBrowser handling logic to remove hash-based devBrowser JWTs from the URL. Even if v5 does not use the hash-based JWT at all, we still need to remove it from the URL in case clerk-js is initialised on a page after a redirect from an older clerk-js version, such as an AccountPortal using the v4 components
+- 394cecc6b: Prevent submitting on enter in Organization Profile form when submit button is disabled.
+- d9f265fcb: Fallback to invisible CAPTCHA if the element to render to is not found in the DOM
+- d005992e0: Require role to be selected before sending organization invite, affects `<OrganizationProfile/>` and <CreateOrganization/>`.
+- d1dc44cc7: Correct chunk loading logic in `clerk.headless.browser` variant
+- 141f09fdc: Fix the input box-shadow on iOS 16 devices
+- b6c4e1cfe: Display a warning in the browser's console when organization components are mounted but the "Organizations" feature is disabled for the instance.
+- 7d3aa44d7: Disable emailAdress field in SignUp if fields.emailAddress.disabled is true
+- fbbb1afc2: Exclude external custom links from route matching. Previously adding external links to custom pages would cause all pages that are defined below it to throw an error.
+- e7414cb3f: Remove legacy roles fallback
+  After the release of Custom Roles, roles should always be dynamically fetched.
+- 63373bf21: Correct the HTML structure of the UI components to ensure validity
+- 0ee1777e0: Allow retries for all 300xxx error codes for CF Turnstile.
+- 78fc5eec0: Introduces new element appearance descriptors:
+
+  - `activeDeviceListItem` allows you to customize the appearance of the active device list (accordion) item
+    - `activeDeviceListItem__current` allows you to customize the appearance of the _current_ active device list (accordion) item
+  - `activeDevice` allows you to customize the appearance of the active device item
+    - `activeDevice__current` allows you to customize the appearance of the _current_ active device item
+
+- 6e54b1b59: Sync IsomorphicClerk with the clerk singleton and the LoadedClerk interface. IsomorphicClerk now extends from LoadedClerk.
+- 4edb77632: Replace Form.Control with Form.PlainInput for text and email inputs.
+- 4aff3d936: Bug Fix: When authenticating with a passkey and user was looked out an error was thrown for accessing an undefined variable
+- 976c6a07e: Fixes an icon misalignment in account switcher.
+- 6a33709cc: Drop `org:sys_domains:delete` and `org:sys_memberships:delete` as those have now been merged with the respective `manage` ones.
+- 45c92006c: Ensure the token returned from `getToken()` and the token in the session cookie remain in sync.
+- d9bd2b4ea: Fix: fallback to other first factors when preferred strategy is passkey but the user has not registered a passkey yet.
+- f77e8cdbd: Add Autocomplete TS generic for union literals
+- 8b466a9ba: Prevent Clerk component flickering when mounted in a Next.js app using App Router
+- 4063bd8e9: Introduce more component animations
+- 8cc45d2af: Allow dynamic values components props, even if these values change after the components are rendered. For example, a `SignIn` component with a `redirectUrl` prop passed in will always respect the latest value of `redirectUrl`.
+- fe6215dea: Fix the OAuth errors coming from the server to use localizations
+- c6a5e0f5d: Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key.
+- 4edb77632: Localize placeholder of confirmation field when deleting a user account from `<UserProfile/>`.
+- b0ca7b801: Refactor of internal input group, password field, and checkbox inputs in forms.
+- 30dfdf2aa: Fallback to the API error message when the password is pwned and there is no translation available.
+- 8b261add2: Use pattern for email input fields.
+- 9955938d6: Hide members page of <OrganizationProfile/> if user doesn't have any membership related permissions.
+- 1affbb22a: Replace semver with custom regex in versionSelector
+- 8ca8517bf: Warn instead of erroring when a legacy redirect prop ('redirectUrl', 'afterSignInUrl', 'afterSignUpUrl') is used
+- f00fd2dfe: Support legacy redirectUrl prop on SignIn and SignUp
+- 046224177: Make useAwaitableNavigate handle navigations between pages reliably
+- e4c0ae028: Users will no longer see an error the SignIn component when they try to close popups due to passkey autofill.
+- 75ea300bc: Add `useAssertWrappedByClerkProvider` to internal code. If you use hooks like `useAuth` outside of the `<ClerkProvider />` context an error will be thrown. For example:
+
+  ```shell
+  @clerk/clerk-react: useAuth can only be used within the <ClerkProvider /> component
+  ```
+
+- db3eefe8c: Refactor of internal radio input in forms.
+- 93a611570: Re-initialize the Client to default values when is destroyed
+- aaa457097: Escape characters in pattern for inputs of [type="email"]
+- fc36e2e54: We are rolling back support for password complexity / strength checks during sign-in. Feature will be limited to HIBP for now. Hence, the password form need not expect a sign_in status of `needs_new_password`.
+- 920c9e1b5: Hide "Add domain" button inside `<OrganizationProfile/>` when user is missing the `org:sys_domains:manage` permission.
+- e7ae9c36a: Show counter of members/invitations/requests even if it is 0.
+- ebf9f165f: Fix transfer flow when having the Smart Bot Protection enabled
+- 445026ab7: Make the instant password field focusable if it is autofilled.
+- f540e9843: Return to localhost when SSO callback fails on SignIn or SignUp
+- 4705d63a8: Ensures we don't attempt to access `window.addEventListener()` in non-browser environments.
+- 7b40924e4: Remove handshake-related query parameters on load of clerk-js. It's possible that these parameters will be returned from Clerk's API, but they are only applicable for SSR-compatible frameworks and so on the client they are unused.
+- bf09d18d6: Bug fix: Clear feedback of input field if `setError` is called with undefined.
+- 59336d3d4: Refresh invited members upon revocation
+- 5dea004b1: Fix invite members to an Organization form to show error when invalid email addresses are submitted.
+- c3dccfc34: Update token refresh mechanism to handle network failures without raising an error
+- 2f6306fd3: Fix Custom Pages freeze error by using useMemo for when creating the custom pages
+- 6fd303b99: Take account custom pages when redirecting inside OrganizationProfile.
+- 750337633: Fix redirect flow for OAuth2 IDP flow with email_link verification.
+- 859b5495f: Removed hoverable state from no-interactive sections in `<UserProfile/>`
+- 9040549d6: Bug fix: fetch custom roles in OrganizationSwitcher
+- f02482bb5: Add spacing between `Add domain` button and it's subtitle that's under the Verified Domains section in `<OrganizationProfile/>` component.
+- 8fbe8ba2f: Make UI-triggered redirects default to hash-based routing. If a routing strategy is not provided, default to hash routing. All routing strategies know how to convert a hash-based url to their own format.
+- fb794ce7b: Support older iOS 13.3 and 13.4 mobile devices
+- b9dd8e7c0: Height misalignment fixes for Password section in `<UserProfile/>`
+- 94519aa33: Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes.
+- d11aa60eb: Align action buttons with user preview in `<UserButton/>`
+- 79040966f: Inputs will now trim usernames and email addresses since whitespace as a prefix or suffix is invalid in these fields.
+- 63ef35ec5: Hide "Add passkey" button in UP when app is satellite.
+- 40ac4b645: Introduces telemetry collection from Clerk's SDKs. Collected telemetry will be used to gain insights into product usage and help drive roadmap priority. For more information, see https://clerk.com/docs/telemetry.
+- 9c6411aa8: Avoid passing some of the new feedback properties down to the HTML basic elements to avoid react warnings in the console.
+- 22f19d3bf: Fixed issue that prevented backup codes showing up for TOTP
+- 11fbfdeec: Give application logo correct CSS width to prevent incorrect widths
+- 6eab66050: Remove legacy \_\_dev_session from URL search params
+- 5db6dbb90: Remove the `__clerk_ticket` and `__clerk_invitation_token` query params after they are consumed.
+- 6d89f2687: Hide maintenance banner when card has global error
+- 0551488fb: Add setter for sdkMetadata on Clerk to address issues arising from older versions of the SDK.
+- Updated dependencies [178907ff6]
+- Updated dependencies [08118edfa]
+- Updated dependencies [743c4d204]
+- Updated dependencies [4b8bedc66]
+- Updated dependencies [78ed58da4]
+- Updated dependencies [1db1f4068]
+- Updated dependencies [c2a090513]
+- Updated dependencies [0d0b1d89a]
+- Updated dependencies [1834a3ee4]
+- Updated dependencies [896cb6104]
+- Updated dependencies [64d3763ec]
+- Updated dependencies [af80d7074]
+- Updated dependencies [8350109ab]
+- Updated dependencies [f8328deb9]
+- Updated dependencies [88d5d2ca0]
+- Updated dependencies [1dc28ab46]
+- Updated dependencies [83e9d0846]
+- Updated dependencies [d37d44a68]
+- Updated dependencies [fe356eebd]
+- Updated dependencies [791c49807]
+- Updated dependencies [164ca116c]
+- Updated dependencies [ea4933655]
+- Updated dependencies [7f6a64f43]
+- Updated dependencies [afec17953]
+- Updated dependencies [0699fa496]
+- Updated dependencies [a68eb3083]
+- Updated dependencies [2de442b24]
+- Updated dependencies [0293f29c8]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [9180c8b80]
+- Updated dependencies [db18787c4]
+- Updated dependencies [7f833da9e]
+- Updated dependencies [ef2325dcc]
+- Updated dependencies [9f5491357]
+- Updated dependencies [fc3ffd880]
+- Updated dependencies [840636a14]
+- Updated dependencies [13ed9ac54]
+- Updated dependencies [31570f138]
+- Updated dependencies [bab2e7e05]
+- Updated dependencies [71663c568]
+- Updated dependencies [492b8a7b1]
+- Updated dependencies [2352149f6]
+- Updated dependencies [e5c989a03]
+- Updated dependencies [ff08fe237]
+- Updated dependencies [7ecd6f6ab]
+- Updated dependencies [12f3c5c55]
+- Updated dependencies [244de5ea3]
+- Updated dependencies [c776f86fb]
+- Updated dependencies [d9f265fcb]
+- Updated dependencies [7bffc47cb]
+- Updated dependencies [4e31fca12]
+- Updated dependencies [9737ef510]
+- Updated dependencies [fafa76fb6]
+- Updated dependencies [75d6bf9ad]
+- Updated dependencies [2b8fe238a]
+- Updated dependencies [27fb9b728]
+- Updated dependencies [b473ad862]
+- Updated dependencies [1f650f30a]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [2a22aade8]
+- Updated dependencies [69ce3e185]
+- Updated dependencies [5b8d85886]
+- Updated dependencies [78fc5eec0]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [6a33709cc]
+- Updated dependencies [eb796dd9e]
+- Updated dependencies [52ff8fe6b]
+- Updated dependencies [f77e8cdbd]
+- Updated dependencies [8b466a9ba]
+- Updated dependencies [fe2607b6f]
+- Updated dependencies [c7e6d00f5]
+- Updated dependencies [8cc45d2af]
+- Updated dependencies [390a70732]
+- Updated dependencies [663243220]
+- Updated dependencies [b8599d700]
+- Updated dependencies [c6a5e0f5d]
+- Updated dependencies [4edb77632]
+- Updated dependencies [ab4eb56a5]
+- Updated dependencies [a9fe242be]
+- Updated dependencies [5c239d973]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [12962bc58]
+- Updated dependencies [e6f8928f1]
+- Updated dependencies [4bb57057e]
+- Updated dependencies [d4ff346dd]
+- Updated dependencies [7644b7472]
+- Updated dependencies [2ec9f6b09]
+- Updated dependencies [2e4a43017]
+- Updated dependencies [2d383e413]
+- Updated dependencies [6b316611f]
+- Updated dependencies [f3b6f32b3]
+- Updated dependencies [5aab9f04a]
+- Updated dependencies [46040a2f3]
+- Updated dependencies [f00fd2dfe]
+- Updated dependencies [8daf8451c]
+- Updated dependencies [75ea300bc]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [7f751c4ef]
+- Updated dependencies [370b17b12]
+- Updated dependencies [f5d55bb1f]
+- Updated dependencies [18c0d015d]
+- Updated dependencies [1a0268509]
+- Updated dependencies [0d1052ac2]
+- Updated dependencies [d30ea1faa]
+- Updated dependencies [7886ba89d]
+- Updated dependencies [1fd2eff38]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [5471c7e8d]
+- Updated dependencies [f540e9843]
+- Updated dependencies [477170962]
+- Updated dependencies [1078e8c58]
+- Updated dependencies [38d8b3e8a]
+- Updated dependencies [be991365e]
+- Updated dependencies [8350f73a6]
+- Updated dependencies [34fe88f73]
+- Updated dependencies [d6a7ea61a]
+- Updated dependencies [e0e79b4fe]
+- Updated dependencies [41ae1d2f0]
+- Updated dependencies [fb794ce7b]
+- Updated dependencies [48ca40af9]
+- Updated dependencies [94519aa33]
+- Updated dependencies [ebf9be77f]
+- Updated dependencies [008ac4217]
+- Updated dependencies [40ac4b645]
+- Updated dependencies [6f755addd]
+- Updated dependencies [429d030f7]
+- Updated dependencies [844847e0b]
+- Updated dependencies [6eab66050]
+  - @clerk/localizations@2.0.0
+  - @clerk/shared@2.0.0
+  - @clerk/types@4.0.0
+
+## 5.0.0-beta.49
+
+### Patch Changes
+
+- Support legacy redirectUrl prop on SignIn and SignUp by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`f00fd2dfe`](https://github.com/clerk/javascript/commit/f00fd2dfe309cfeac82a776cc006f2c21b6d7988)]:
+  - @clerk/types@4.0.0-beta.30
+
+## 5.0.0-beta.48
+
+### Patch Changes
+
+- Warn about legacy redirect search params ([#3224](https://github.com/clerk/javascript/pull/3224)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.0.0-beta.47
+
+### Patch Changes
+
+- Warn instead of erroring when a legacy redirect prop ('redirectUrl', 'afterSignInUrl', 'afterSignUpUrl') is used by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.0.0-beta.46
+
+### Patch Changes
+
+- Bug fix: Respect `navigateAfterCreateOrganization` in `<OrganizationList/>`. ([#3209](https://github.com/clerk/javascript/pull/3209)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce forceRedirectUrl and fallbackRedirectUrl ([#3162](https://github.com/clerk/javascript/pull/3162)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`bab2e7e05`](https://github.com/clerk/javascript/commit/bab2e7e0590d0da1fd7db0680e63e8f2eb836b41)]:
+  - @clerk/shared@2.0.0-beta.23
+  - @clerk/types@4.0.0-beta.29
+
+## 5.0.0-beta.45
+
+### Minor Changes
+
+- Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
+
+  - React Component `<__experimental_GoogleOneTap/>`
+  - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
+
+### Patch Changes
+
+- Align country code position with phone number input. ([#3199](https://github.com/clerk/javascript/pull/3199)) by [@octoper](https://github.com/octoper)
+
+- Fix SSO callback Turnstile widget alignment ([#3205](https://github.com/clerk/javascript/pull/3205)) by [@anagstef](https://github.com/anagstef)
+
+- Fallback to invisible CAPTCHA if the element to render to is not found in the DOM ([#3191](https://github.com/clerk/javascript/pull/3191)) by [@anagstef](https://github.com/anagstef)
+
+- Fix transfer flow when having the Smart Bot Protection enabled ([#3202](https://github.com/clerk/javascript/pull/3202)) by [@anagstef](https://github.com/anagstef)
+
+- Removed hoverable state from no-interactive sections in `<UserProfile/>` ([#3201](https://github.com/clerk/javascript/pull/3201)) by [@octoper](https://github.com/octoper)
+
+- Make UI-triggered redirects default to hash-based routing. If a routing strategy is not provided, default to hash routing. All routing strategies know how to convert a hash-based url to their own format. ([#3061](https://github.com/clerk/javascript/pull/3061)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Align action buttons with user preview in `<UserButton/>` ([#3200](https://github.com/clerk/javascript/pull/3200)) by [@octoper](https://github.com/octoper)
+
+- Fixed issue that prevented backup codes showing up for TOTP ([#3194](https://github.com/clerk/javascript/pull/3194)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`d9f265fcb`](https://github.com/clerk/javascript/commit/d9f265fcb12b39301b9802e4787dc636ee28444f), [`2b8fe238a`](https://github.com/clerk/javascript/commit/2b8fe238a114f4c21bc2068bf6f1871280da7fae), [`1078e8c58`](https://github.com/clerk/javascript/commit/1078e8c5896f5e3364bf89ec5312c81d8f1a3be8), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5)]:
+  - @clerk/types@4.0.0-beta.28
+  - @clerk/localizations@2.0.0-beta.24
+  - @clerk/shared@2.0.0-beta.22
+
+## 5.0.0-beta.44
+
+### Patch Changes
+
+- Bug Fix: When authenticating with a passkey and user was looked out an error was thrown for accessing an undefined variable ([#3172](https://github.com/clerk/javascript/pull/3172)) by [@panteliselef](https://github.com/panteliselef)
+
+- Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes. ([#3173](https://github.com/clerk/javascript/pull/3173)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`94519aa33`](https://github.com/clerk/javascript/commit/94519aa33774c8d6e557ce47a00974ad7b194c5d)]:
+  - @clerk/localizations@2.0.0-beta.23
+  - @clerk/types@4.0.0-beta.27
+
+## 5.0.0-beta.43
+
+### Minor Changes
+
+- Add support for different CAPTCHA widget types ([#3154](https://github.com/clerk/javascript/pull/3154)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Updated dependencies [[`0699fa496`](https://github.com/clerk/javascript/commit/0699fa49693dc7a8d3de8ba053c4f16a5c8431d0)]:
+  - @clerk/types@4.0.0-beta.26
+
+## 5.0.0-beta.42
+
+### Minor Changes
+
+- Move passkey related apis to stable: ([#3134](https://github.com/clerk/javascript/pull/3134)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Register passkey for a user
+    Usage: `await clerk.user.createPasskey()`
+  - Authenticate with passkey
+    Usage: `await clerk.client.signIn.authenticateWithPasskey()`
+    ```ts
+    try {
+      await clerk.client.signIn.authenticateWithPasskey(...args);
+    }catch (e) {
+      if (isClerkRuntimeError(e)) {
+          if (err.code === 'passkey_operation_aborted') {
+              ...
+          }
+      }
+    }
+    ```
+  - ClerkRuntimeError codes introduced:
+
+    - `passkey_not_supported`
+    - `passkeys_pa_not_supported`
+    - `passkey_invalid_rpID_or_domain`
+    - `passkey_already_exists`
+    - `passkey_operation_aborted`
+    - `passkey_retrieval_cancelled`
+    - `passkey_retrieval_failed`
+    - `passkey_registration_cancelled`
+    - `passkey_registration_failed`
+
+  - Get the user's passkeys
+    `clerk.user.passkeys`
+  - Update the name of a passkey
+    `clerk.user.passkeys?.[0].update({name:'Company issued passkey'})`
+  - Delete a passkey
+    `clerk.user.passkeys?.[0].delete()`
+
+### Patch Changes
+
+- Resolve type issues when importing `@clerk/clerk-js` directly ([#3142](https://github.com/clerk/javascript/pull/3142)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`2352149f6`](https://github.com/clerk/javascript/commit/2352149f6ba9708095146a3087538faf2d4f161f)]:
+  - @clerk/localizations@2.0.0-beta.22
+  - @clerk/types@4.0.0-beta.25
+
+## 5.0.0-beta.41
+
+### Patch Changes
+
+- Hide maintenance banner when card has global error by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.0.0-beta.40
+
+### Minor Changes
+
+- Deprecate `supported_identifiers` and remove `supported_external_accounts`. ([#3089](https://github.com/clerk/javascript/pull/3089)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes memebership count in `<OrganizationProfile/>` Members page for members with `org:sys_memberships:read` permission ([#3093](https://github.com/clerk/javascript/pull/3093)) by [@octoper](https://github.com/octoper)
+
+- Avoid depending on `count` as it can be zero but invitations may still exist. ([#3092](https://github.com/clerk/javascript/pull/3092)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixes an icon misalignment in account switcher. ([#3108](https://github.com/clerk/javascript/pull/3108)) by [@octoper](https://github.com/octoper)
+
+- Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Ensures we don't attempt to access `window.addEventListener()` in non-browser environments. ([#3097](https://github.com/clerk/javascript/pull/3097)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`88d5d2ca0`](https://github.com/clerk/javascript/commit/88d5d2ca0255b1e5d589881e42e433d5238420ab), [`9180c8b80`](https://github.com/clerk/javascript/commit/9180c8b80e0ad95c1a9e490e8201ffd089634a48), [`c6a5e0f5d`](https://github.com/clerk/javascript/commit/c6a5e0f5dbd9ec4a7b5657855e8a31bc8347d0a4), [`e6f8928f1`](https://github.com/clerk/javascript/commit/e6f8928f1578710f7cbc45520cd510f3aaf80510), [`f3b6f32b3`](https://github.com/clerk/javascript/commit/f3b6f32b3f0d018db3a7624f030795fffa950f8c)]:
+  - @clerk/localizations@2.0.0-beta.21
+  - @clerk/types@4.0.0-beta.24
+
+## 5.0.0-beta.39
+
+### Minor Changes
+
+- Support for prompting a user to reset their password if it is found to be compromised during sign-in. ([#3034](https://github.com/clerk/javascript/pull/3034)) by [@yourtallness](https://github.com/yourtallness)
+
+### Patch Changes
+
+- Correct chunk loading logic in `clerk.headless.browser` variant ([#3062](https://github.com/clerk/javascript/pull/3062)) by [@LekoArts](https://github.com/LekoArts)
+
+- Return to localhost when SSO callback fails on SignIn or SignUp ([#2955](https://github.com/clerk/javascript/pull/2955)) by [@anagstef](https://github.com/anagstef)
+
+- Update token refresh mechanism to handle network failures without raising an error ([#3035](https://github.com/clerk/javascript/pull/3035)) by [@dimkl](https://github.com/dimkl)
+
+- Height misalignment fixes for Password section in `<UserProfile/>` ([#3081](https://github.com/clerk/javascript/pull/3081)) by [@octoper](https://github.com/octoper)
+
+- Hide "Add passkey" button in UP when app is satellite. ([#3070](https://github.com/clerk/javascript/pull/3070)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`fc3ffd880`](https://github.com/clerk/javascript/commit/fc3ffd88064a09ab98877dfba119150390f9296e), [`840636a14`](https://github.com/clerk/javascript/commit/840636a14537d4f6b810832e7662518ef4bd4500), [`1fd2eff38`](https://github.com/clerk/javascript/commit/1fd2eff38dc71e45d2ff95a5b6e5a99cca53c6e7), [`f540e9843`](https://github.com/clerk/javascript/commit/f540e98435c86298415552537e33164471298a5c)]:
+  - @clerk/localizations@2.0.0-beta.20
+  - @clerk/shared@2.0.0-beta.21
+  - @clerk/types@4.0.0-beta.23
+
+## 5.0.0-beta.38
+
+### Patch Changes
+
+- We are rolling back support for password complexity / strength checks during sign-in. Feature will be limited to HIBP for now. Hence, the password form need not expect a sign_in status of `needs_new_password`. ([#3050](https://github.com/clerk/javascript/pull/3050)) by [@yourtallness](https://github.com/yourtallness)
+
 ## 5.0.0-beta.37
 
 ### Patch Changes

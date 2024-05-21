@@ -84,6 +84,7 @@ export const nbNO: LocalizationResource = {
     'Oppgi en e-postadresse under dette domenet for å motta en kode og verifisere domenet.',
   formFieldLabel__organizationName: 'Organisasjonsnavn',
   formFieldLabel__organizationSlug: 'Slug URL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'Passord',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__role: 'Rolle',
@@ -93,6 +94,7 @@ export const nbNO: LocalizationResource = {
     action__signOut: 'Logg ut',
     title: 'Logget inn som {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',
   membershipRole__guestMember: 'Gjest',
@@ -282,6 +284,7 @@ export const nbNO: LocalizationResource = {
       blockButton__backupCode: 'Bruk en sikkerhetskopi-kode',
       blockButton__emailCode: 'Send e-postkode til {{identifier}}',
       blockButton__emailLink: 'Send lenke til {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'Logg inn med passordet ditt',
       blockButton__phoneCode: 'Send SMS-kode til {{identifier}}',
       blockButton__totp: 'Bruk autentiseringsappen din',
@@ -353,10 +356,17 @@ export const nbNO: LocalizationResource = {
       subtitle: 'En feil oppstod',
       title: 'Kan ikke logge inn',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Bruk en annen metode',
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Skriv inn passordet ditt',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifiseringskode',
@@ -384,6 +394,7 @@ export const nbNO: LocalizationResource = {
       actionLink: 'Opprett konto',
       actionLink__use_email: 'Bruk e-post',
       actionLink__use_email_username: 'Bruk e-post eller brukernavn',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'Bruk telefon',
       actionLink__use_username: 'Bruk brukernavn',
       actionText: 'Ingen konto?',
@@ -451,6 +462,9 @@ export const nbNO: LocalizationResource = {
       'Registreringen mislyktes på grunn av mislykkede bot-valideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'E-postadressen må være en gyldig e-postadresse',
@@ -464,6 +478,7 @@ export const nbNO: LocalizationResource = {
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
     form_password_pwned:
       'Dette passordet er funnet som en del av et datainnbrudd og kan ikke brukes. Vennligst prøv et annet passord.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Passordet ditt har overskredet maksimalt antall byte tillatt. Vennligst forkort det eller fjern noen spesialtegn.',
     form_password_validation_failed: 'Feil passord',
@@ -471,6 +486,11 @@ export const nbNO: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'mindre enn {{length}} tegn',
       minimumLength: '{{length}} eller flere tegn',
@@ -651,6 +671,14 @@ export const nbNO: LocalizationResource = {
       security: 'Sikkerhet',
       title: 'Konto',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Det er anbefalt å logge ut av alle de andre enhetene dine som kan ha brukt ditt gamle passord.',
@@ -732,6 +760,11 @@ export const nbNO: LocalizationResource = {
           destructiveActionTitle: 'Fjern',
           headerTitle: 'Autentiseringsapplikasjon',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'Opprett passord',

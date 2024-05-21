@@ -84,6 +84,7 @@ export const jaJP: LocalizationResource = {
     'このドメインを確認するためのコードを受け取るメールアドレスを入力してください。',
   formFieldLabel__organizationName: '組織名',
   formFieldLabel__organizationSlug: 'スラグURL',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'パスワード',
   formFieldLabel__phoneNumber: '電話番号',
   formFieldLabel__role: '役割',
@@ -93,6 +94,7 @@ export const jaJP: LocalizationResource = {
     action__signOut: 'サインアウト',
     title: '{{identifier}}としてサインイン中',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: '管理者',
   membershipRole__basicMember: 'メンバー',
   membershipRole__guestMember: 'ゲスト',
@@ -282,6 +284,7 @@ export const jaJP: LocalizationResource = {
       blockButton__backupCode: 'バックアップコードを使用する',
       blockButton__emailCode: '{{identifier}}にメールコードを送信',
       blockButton__emailLink: '{{identifier}}にメールリンクを送信',
+      blockButton__passkey: undefined,
       blockButton__password: 'パスワードでサインインする',
       blockButton__phoneCode: '{{identifier}}にSMSコードを送信',
       blockButton__totp: '認証アプリを使用する',
@@ -353,10 +356,17 @@ export const jaJP: LocalizationResource = {
       subtitle: 'エラーが発生しました',
       title: 'サインインできません',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '別の方法を使用',
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'パスワードを入力',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: '検証コード',
@@ -384,6 +394,7 @@ export const jaJP: LocalizationResource = {
       actionLink: 'サインアップ',
       actionLink__use_email: 'メールアドレスを使用',
       actionLink__use_email_username: 'メールアドレスまたはユーザー名を使用',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: '電話番号を使用',
       actionLink__use_username: 'ユーザー名を使用',
       actionText: 'アカウントをお持ちでないですか？',
@@ -451,6 +462,9 @@ export const jaJP: LocalizationResource = {
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
     form_code_incorrect: 'フォームコードが正しくありません。',
     form_identifier_exists: '識別子が既に存在します。',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '識別子が見つかりません。',
     form_param_format_invalid: 'パラメータ形式が無効です。',
     form_param_format_invalid__email_address: 'メールアドレスは有効なメールアドレスである必要があります。',
@@ -464,6 +478,7 @@ export const jaJP: LocalizationResource = {
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_pwned:
       'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'パスワードのバイト数が上限を超えています。短くするか、一部の特殊文字を削除してください。',
     form_password_validation_failed: 'パスワードが間違っています',
@@ -471,6 +486,11 @@ export const jaJP: LocalizationResource = {
     form_username_invalid_length: 'ユーザー名の長さが無効です。',
     identification_deletion_failed: '最後の識別情報は削除できません。',
     not_allowed_access: 'アクセスが許可されていません。',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: '{{length}}文字未満',
       minimumLength: '{{length}}文字以上',
@@ -646,6 +666,14 @@ export const jaJP: LocalizationResource = {
       security: 'セキュリティ',
       title: 'アカウント',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         '古いパスワードを使用している可能性のあるすべてのデバイスからサインアウトすることをお勧めします。',
@@ -727,6 +755,11 @@ export const jaJP: LocalizationResource = {
           destructiveActionTitle: '削除',
           headerTitle: '認証アプリケーション',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'パスワードを設定する',

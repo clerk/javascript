@@ -83,6 +83,7 @@ export const arSA: LocalizationResource = {
     'أدخل البريد الإلكتروني الخاص بالنطاق للحصول على  الرمز والتحقق من النطاق',
   formFieldLabel__organizationName: 'اسم المنظمة',
   formFieldLabel__organizationSlug: 'رابط المنظمة',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: 'كلمة المرور',
   formFieldLabel__phoneNumber: 'رقم الجوال',
   formFieldLabel__role: 'دور',
@@ -92,6 +93,7 @@ export const arSA: LocalizationResource = {
     action__signOut: 'تسجيل الخروج',
     title: 'تسجيل الدخول بأسم {{identifier}}',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: 'المسؤول',
   membershipRole__basicMember: 'عضو',
   membershipRole__guestMember: 'ضيف',
@@ -279,6 +281,7 @@ export const arSA: LocalizationResource = {
       blockButton__backupCode: 'استخدم رمز النسخ الاحتياطي',
       blockButton__emailCode: 'رمز البريد الإلكتروني ل  {{identifier}}',
       blockButton__emailLink: 'رابط البريد الإلكتروني ل {{identifier}}',
+      blockButton__passkey: undefined,
       blockButton__password: 'تسجيل الدخول بكلمة السر الخاصة بك',
       blockButton__phoneCode: 'أرسال رسالة نصية ل{{identifier}}',
       blockButton__totp: 'استخدم تطبيق المصادقة الخاص بك',
@@ -350,10 +353,17 @@ export const arSA: LocalizationResource = {
       subtitle: 'حدث خطأ',
       title: 'لا يمكن تسجيل الدخول',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'أستعمل طريقة أخرى',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'ادخل كلمة المرور',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'رمز التحقق',
@@ -381,6 +391,7 @@ export const arSA: LocalizationResource = {
       actionLink: 'إنشاء حساب جديد',
       actionLink__use_email: 'استخدم البريد الإلكتروني',
       actionLink__use_email_username: 'استخدم البريد الإلكتروني أو اسم المستخدم',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: 'استخدم رقم الجوال',
       actionLink__use_username: 'استخدم اسم المستخدم',
       actionText: 'ليس لديك حساب؟',
@@ -448,6 +459,9 @@ export const arSA: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'يجب أستعمال بريد إلكتروني صالح',
@@ -460,6 +474,7 @@ export const arSA: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
     form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'تجاوزت كلمة المرور الحد الأقصى للحروف المدخلة, الرجاء أدخال كلمة مرور أقصر أو حذف بعض الأحرف الخاصة',
     form_password_validation_failed: 'كلمة مرور خاطئة',
@@ -467,6 +482,11 @@ export const arSA: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: 'أقل من {{length}} حروف',
       minimumLength: '{{length}} حروف أو أكثر',
@@ -642,6 +662,14 @@ export const arSA: LocalizationResource = {
       security: 'Security',
       title: 'Account',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -723,6 +751,11 @@ export const arSA: LocalizationResource = {
           destructiveActionTitle: 'حذف',
           headerTitle: 'تطبيق المصادقة',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: 'تعيين كلمة المرور',

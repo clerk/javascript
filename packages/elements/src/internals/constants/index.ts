@@ -20,3 +20,20 @@ export const SEARCH_PARAMS = {
   ticket: '__clerk_ticket',
   transfer: '__clerk_transfer',
 } as const;
+
+export const RESENDABLE_COUNTDOWN_DEFAULT = 60;
+
+export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
+
+// Pulled from: https://github.com/clerk/javascript/blob/c7d626292a9fd12ca0f1b31a1035e711b6e99531/packages/clerk-js/src/core/constants.ts#L15
+export const ERROR_CODES = {
+  FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',
+  FORM_PASSWORD_INCORRECT: 'form_password_incorrect',
+  INVALID_STRATEGY_FOR_USER: 'strategy_for_user_invalid',
+  NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
+  OAUTH_ACCESS_DENIED: 'oauth_access_denied',
+  OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML: 'oauth_email_domain_reserved_by_saml',
+  NOT_ALLOWED_ACCESS: 'not_allowed_access',
+  SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
+  USER_LOCKED: 'user_locked',
+};

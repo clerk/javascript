@@ -110,6 +110,7 @@ const Preview = (
         justifyContent: 'space-between',
         padding: `${t.space.$4} ${t.space.$5}`,
       })}
+      elementDescriptor={descriptors.organizationSwitcherPopoverInvitationActionsBox}
     >
       <OrganizationPreview
         elementId='organizationSwitcherListedOrganization'
@@ -219,11 +220,11 @@ export const UserInvitationSuggestionList = (props: UserInvitationSuggestionList
   const { ref, userSuggestions, userInvitations } = useFetchInvitations();
   const isLoading = userInvitations.isLoading || userSuggestions.isLoading;
   const hasNextPage = userInvitations.hasNextPage || userSuggestions.hasNextPage;
-  const hasAnyData = !!(userInvitations.count || userSuggestions.count);
 
   // Solve weird bug with swr while running unit tests
-  const userInvitationsData = userInvitations.data?.filter(a => !!a);
-  const userSuggestionsData = userSuggestions.data?.filter(a => !!a);
+  const userInvitationsData = userInvitations.data?.filter(a => !!a) || [];
+  const userSuggestionsData = userSuggestions.data?.filter(a => !!a) || [];
+  const hasAnyData = userInvitationsData.length > 0 || userSuggestionsData.length > 0;
 
   if (!hasAnyData && !isLoading) {
     return null;

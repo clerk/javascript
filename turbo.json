@@ -21,7 +21,9 @@
     "NPM_VERSION",
     "TZ",
     "VERCEL",
-    "VITE_CLERK_*"
+    "VITE_CLERK_*",
+    "EXPO_PUBLIC_CLERK_*",
+    "REACT_APP_CLERK_*"
   ],
   "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
   "pipeline": {
@@ -127,6 +129,36 @@
     "format:check": {
       "dependsOn": [],
       "outputs": []
+    },
+    "//#test:integration:ap-flows": {
+      "dependsOn": ["^@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
+    "//#test:integration:generic": {
+      "dependsOn": ["^@clerk/clerk-react#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
+    "//#test:integration:express": {
+      "dependsOn": ["^@clerk/clerk-sdk-node#build", "^@clerk/clerk-react#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
+    "//#test:integration:nextjs": {
+      "dependsOn": ["^@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
+    "//#test:integration:quickstart": {
+      "dependsOn": ["^@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
     }
   }
 }

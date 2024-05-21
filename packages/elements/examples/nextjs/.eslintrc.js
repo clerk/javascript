@@ -1,4 +1,9 @@
 module.exports = {
   root: true,
-  extends: ['custom/browser', 'custom/typescript', 'custom/react', 'plugin:@next/next/recommended'],
+  extends: [
+    '@clerk/custom/browser',
+    '@clerk/custom/typescript',
+    '@clerk/custom/react',
+    'plugin:@next/next/recommended',
+  ],
 };

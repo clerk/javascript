@@ -49,10 +49,7 @@ export const PhoneSection = () => {
           {sortIdentificationBasedOnVerification(user?.phoneNumbers, user?.primaryPhoneNumberId).map(phone => (
             <Action.Root key={phone.id}>
               <Action.Closed value=''>
-                <ProfileSection.Item
-                  id='phoneNumbers'
-                  hoverable
-                >
+                <ProfileSection.Item id='phoneNumbers'>
                   <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                     <Flex
                       gap={2}

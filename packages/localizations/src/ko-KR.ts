@@ -84,6 +84,7 @@ export const koKR: LocalizationResource = {
     'Enter an email address under this domain to receive a code and verify this domain.',
   formFieldLabel__organizationName: '이름',
   formFieldLabel__organizationSlug: '슬러그',
+  formFieldLabel__passkeyName: undefined,
   formFieldLabel__password: '비밀번호',
   formFieldLabel__phoneNumber: '휴대폰 번호',
   formFieldLabel__role: '역할',
@@ -93,6 +94,7 @@ export const koKR: LocalizationResource = {
     action__signOut: '로그아웃',
     title: '{{identifier}}로 로그인했습니다',
   },
+  maintenanceMode: undefined,
   membershipRole__admin: '관리자',
   membershipRole__basicMember: '멤버',
   membershipRole__guestMember: '게스트',
@@ -279,6 +281,7 @@ export const koKR: LocalizationResource = {
       blockButton__backupCode: '백업 코드 사용하기',
       blockButton__emailCode: '{{identifier}}로 이메일 코드 보내기',
       blockButton__emailLink: '{{identifier}}로 이메일 링크 보내기',
+      blockButton__passkey: undefined,
       blockButton__password: '비밀번호로 로그인',
       blockButton__phoneCode: '{{identifier}}로 SMS 코드 보내기',
       blockButton__totp: '인증 앱 사용하기',
@@ -349,10 +352,17 @@ export const koKR: LocalizationResource = {
       subtitle: '오류가 발생했습니다',
       title: '로그인할 수 없습니다',
     },
+    passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: '다른 방법 사용하기',
       subtitle: '계정에 등록된 비밀번호를 입력해 주세요',
       title: '비밀번호를 입력하세요',
+    },
+    passwordPwned: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: '인증 코드',
@@ -379,6 +389,7 @@ export const koKR: LocalizationResource = {
       actionLink: '회원가입',
       actionLink__use_email: '이메일 사용하기',
       actionLink__use_email_username: '이메일 또는 사용자 이름 사용하기',
+      actionLink__use_passkey: undefined,
       actionLink__use_phone: '휴대폰 번호 사용하기',
       actionLink__use_username: '사용자 이름 사용하기',
       actionText: '계정이 없으신가요?',
@@ -446,6 +457,9 @@ export const koKR: LocalizationResource = {
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: '',
     form_identifier_exists: '',
+    form_identifier_exists__email_address: undefined,
+    form_identifier_exists__phone_number: undefined,
+    form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
@@ -458,6 +472,7 @@ export const koKR: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: '비밀번호가 충분히 안전하지 않습니다.',
     form_password_pwned: '이 비밀번호는 유출사항이 발견되어 사용할 수 없으므로 대신 다른 비밀번호를 사용해 보세요.',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       '비밀번호가 허용되는 최대 바이트 수를 초과했습니다. 비밀번호를 줄이거나 일부 특수 문자를 제거해 주세요.',
     form_password_validation_failed: '잘못된 비밀번호',
@@ -465,6 +480,11 @@ export const koKR: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: '',
+    passkey_already_exists: undefined,
+    passkey_not_supported: undefined,
+    passkey_pa_not_supported: undefined,
+    passkey_registration_cancelled: undefined,
+    passkey_retrieval_cancelled: undefined,
     passwordComplexity: {
       maximumLength: '{{length}} 보다 짧은 문자열',
       minimumLength: '{{length}} 또는 그 이상의 문자열',
@@ -638,6 +658,14 @@ export const koKR: LocalizationResource = {
       security: 'Security',
       title: '게정',
     },
+    passkeyScreen: {
+      removeResource: {
+        messageLine1: undefined,
+        title: undefined,
+      },
+      subtitle__rename: undefined,
+      title__rename: undefined,
+    },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'It is recommended to sign out of all other devices which may have used your old password.',
@@ -718,6 +746,11 @@ export const koKR: LocalizationResource = {
           destructiveActionTitle: '제거',
           headerTitle: '인증 애플리케이션',
         },
+      },
+      passkeysSection: {
+        menuAction__destructive: undefined,
+        menuAction__rename: undefined,
+        title: undefined,
       },
       passwordSection: {
         primaryButton__setPassword: '비밀번호 설정',

@@ -7,6 +7,7 @@ export {
   OrganizationProfile,
   CreateOrganization,
   OrganizationList,
+  GoogleOneTap,
 } from './uiComponents';
 
 export {

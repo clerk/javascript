@@ -1,5 +1,306 @@
 # Change Log
 
+## 2.4.2
+
+### Patch Changes
+
+- Added missing translations for the Spanish (Spain) locale (es_ES). ([#3389](https://github.com/clerk/javascript/pull/3389)) by [@frankdavidcorona](https://github.com/frankdavidcorona)
+
+## 2.4.1
+
+### Patch Changes
+
+- Add missing es-ES localization keys ([#3382](https://github.com/clerk/javascript/pull/3382)) by [@frankdavidcorona](https://github.com/frankdavidcorona)
+
+## 2.4.0
+
+### Minor Changes
+
+- Add srRS localization ([#3338](https://github.com/clerk/javascript/pull/3338)) by [@paunovic5ar](https://github.com/paunovic5ar)
+
+- Added new keys for email link verification under `signIn.emailLink.clientMismatch` and `signUp.emailLink.clientMismatch` ([#3367](https://github.com/clerk/javascript/pull/3367)) by [@mzhong9723](https://github.com/mzhong9723)
+
+### Patch Changes
+
+- Update esMX language module ([#3372](https://github.com/clerk/javascript/pull/3372)) by [@Thiagoamaro2431](https://github.com/Thiagoamaro2431)
+
+## 2.3.1
+
+### Patch Changes
+
+- feat(localizations): Update PL translations ([#3342](https://github.com/clerk/javascript/pull/3342)) by [@dawid-grabowski](https://github.com/dawid-grabowski)
+
+- Add some phrases to it-IT localization ([#3314](https://github.com/clerk/javascript/pull/3314)) by [@ugoborghetti](https://github.com/ugoborghetti)
+
+## 2.3.0
+
+### Minor Changes
+
+- Allow localization of text in social buttons when many are listed. ([#3282](https://github.com/clerk/javascript/pull/3282)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.2.0
+
+### Minor Changes
+
+- Drop `react` and `react-dom` as peer dependencies since they are not necessary for this package. ([#3273](https://github.com/clerk/javascript/pull/3273)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.1.0
+
+### Minor Changes
+
+- Replace "email ID" with "email address" in `en-US.ts` for `signIn.forgotPassword.subtitle_email` ([#3242](https://github.com/clerk/javascript/pull/3242)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
+## 2.0.0
+
+### Major Changes
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
+  to fix issues with vite & rollup building.
+- 7886ba89d: Refresh the look and feel of the Clerk UI components
+
+  For more info, refer to the [upgrade guide from v4 to v5 in Clerk docs](https://clerk.com/docs/upgrade-guides/upgrading-from-v4-to-v5).
+
+- 477170962: Drop deprecations. Migration steps:
+  - drop `formFieldLabel__emailAddress_phoneNumber` from localization keys
+  - drop `formFieldLabel__phoneNumber_username` from localization keys
+  - drop `formFieldLabel__emailAddress_phoneNumber_username` from localization keys
+  - drop `formFieldInputPlaceholder__emailAddress_phoneNumber` from localization keys
+  - drop `formFieldInputPlaceholder__phoneNumber_username` from localization keys
+  - drop `formFieldInputPlaceholder__emailAddress_phoneNumber_username` from localization keys
+  - use `title__connectionFailed` instead of `title__conectionFailed` from localization keys
+  - use `actionLabel__connectionFailed` instead of `actionLabel__conectionFailed` from localization keys
+  - use `headerTitle__members` instead of `headerTitle__active` from localization keys
+  - use `headerTitle__invitations` instead of `headerTitle__invited` from localization keys
+  - drop `createOrganization.subtitle` from localization keys
+  - use `deDE` instead of `deDe` localization from `@clerk/localizations`
+
+### Minor Changes
+
+- 0d0b1d89a: List passkeys under security in UserProfile.
+  - Supports renaming a passkey.
+  - Supports deleting a passkey.
+- af80d7074: Add Thai (th-TH) localization
+- afec17953: Improved error handling for registration and retrieval of passkeys.
+  ClerkRuntimeError codes introduced:
+
+  - `passkey_not_supported`
+  - `passkeys_pa_not_supported`
+  - `passkey_invalid_rpID_or_domain`
+  - `passkey_already_exists`
+  - `passkey_operation_aborted`
+  - `passkey_retrieval_cancelled`
+  - `passkey_retrieval_failed`
+  - `passkey_registration_cancelled`
+  - `passkey_registration_failed`
+
+  Example usage:
+
+  ```ts
+  try {
+    await __experimental_authenticateWithPasskey(...args);
+  }catch (e) {
+    if (isClerkRuntimeError(e)) {
+        if (err.code === 'passkey_operation_aborted') {
+            ...
+        }
+    }
+  }
+
+
+  ```
+
+- fc3ffd880: Support for prompting a user to reset their password if it is found to be compromised during sign-in.
+- 31570f138: During sign in, navigate to the `reset-password` route if the user needs a new password. This happens when you enforce password usage during sign-in in your dashboard. Previously this case wasn't handled in the password form.
+
+  The `signIn.resetPassword.requiredMessage` localization was updated to `'For security reasons, it is required to reset your password.'`.
+
+- 2352149f6: Move passkey related apis to stable:
+
+  - Register passkey for a user
+    Usage: `await clerk.user.createPasskey()`
+  - Authenticate with passkey
+    Usage: `await clerk.client.signIn.authenticateWithPasskey()`
+    ```ts
+    try {
+      await clerk.client.signIn.authenticateWithPasskey(...args);
+    }catch (e) {
+      if (isClerkRuntimeError(e)) {
+          if (err.code === 'passkey_operation_aborted') {
+              ...
+          }
+      }
+    }
+    ```
+  - ClerkRuntimeError codes introduced:
+
+    - `passkey_not_supported`
+    - `passkeys_pa_not_supported`
+    - `passkey_invalid_rpID_or_domain`
+    - `passkey_already_exists`
+    - `passkey_operation_aborted`
+    - `passkey_retrieval_cancelled`
+    - `passkey_retrieval_failed`
+    - `passkey_registration_cancelled`
+    - `passkey_registration_failed`
+
+  - Get the user's passkeys
+    `clerk.user.passkeys`
+  - Update the name of a passkey
+    `clerk.user.passkeys?.[0].update({name:'Company issued passkey'})`
+  - Delete a passkey
+    `clerk.user.passkeys?.[0].delete()`
+
+- b8599d700: Add support for Portuguese (Portugal) language
+- 6b316611f: Correct ko-KR strings naturally
+- 1078e8c58: Add hu-HU localization
+- ebf9be77f: Allow users to authenticate with passkeys via the `<SignIn/>`.
+
+### Patch Changes
+
+- 178907ff6: Update the danger section in the `es-ES` localization
+- 08118edfa: Add missing ru-RU translations
+- 78ed58da4: Translate EN strings to ES in es-ES.ts
+- f8328deb9: Improve Japanese translations
+- 88d5d2ca0: Improve ptBR localizations
+- 164ca116c: Add missing localization key for invalid phone_number (unstable error) in the en-US localization
+- 2de442b24: Rename beta-v5 to beta
+- 9f5491357: Add missing ru-RU localization keys
+- 840636a14: Adds translation keys to be able to customize error messages when an identifier already exists:
+
+  - form_identifier_exists\_\_email_address
+  - form_identifier_exists\_\_username
+  - form_identifier_exists\_\_phone_number
+
+- 13ed9ac54: Improve Norwegian translations
+- 4e31fca12: Add missing translation for profile edit button in de-DE
+- 75d6bf9ad: Added Mongolian (mn-MN) localizations
+- 2b8fe238a: Fix Hungarian language subpath exports
+- 27fb9b728: Introduce ro-RO localization
+- b473ad862: Fix zh-TW localization and export zh-TW from index.ts
+- 5b8d85886: Improve German translations
+- eb796dd9e: Introduce es-MX localization
+- 390a70732: Fix typo in ko-KR.ts
+- c6a5e0f5d: Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key.
+- 4edb77632: Localize placeholder of confirmation field when deleting a user account from `<UserProfile/>`.
+- e6f8928f1: Fix typos from pt-BR localization
+- 2d383e413: The package now allows for [subpath exports](https://nodejs.org/api/packages.html#subpath-exports). You can now import specific languages like so:
+
+  ```diff
+  # Single language
+  - import { frFR } from "@clerk/localizations"
+  + import { frFR } from "@clerk/localizations/fr-FR"
+
+  # Multiple languages
+  - import { enUS, esES } from "@clerk/localizations"
+  + import { enUS } from "@clerk/localizations/en-US"
+  + import { esES } from "@clerk/localizations/es-ES"
+  ```
+
+  This helps with tree-shaking and will reduce your total bundle size in most cases.
+
+  You can continue to use the top-level `@clerk/localizations` import as this is a non-breaking change. You can gradually opt-in to this optimization.
+
+- f3b6f32b3: Added Thai translation keys for pwned password, form identifier, passkey
+
+  Change Thai translation keys for Authenticator related to match the context
+
+- 370b17b12: Update es-ES.ts
+- 1a0268509: Add Catalan (ca-ES) localizations
+- 34fe88f73: Add Bulgarian (bg-BG) localization (#2565)
+- fb794ce7b: Support older iOS 13.3 and 13.4 mobile devices
+- 94519aa33: Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes.
+
+## 2.0.0-beta.24
+
+### Minor Changes
+
+- Add hu-HU localization ([#3190](https://github.com/clerk/javascript/pull/3190)) by [@ezkomoly](https://github.com/ezkomoly)
+
+### Patch Changes
+
+- Fix Hungarian language subpath exports ([#3206](https://github.com/clerk/javascript/pull/3206)) by [@anagstef](https://github.com/anagstef)
+
+- Support older iOS 13.3 and 13.4 mobile devices ([#3188](https://github.com/clerk/javascript/pull/3188)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 2.0.0-beta.23
+
+### Patch Changes
+
+- Renaming `passkeys_pa_not_supported` to `passkey_pa_not_supported` to align with the rest passkey error codes. ([#3173](https://github.com/clerk/javascript/pull/3173)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.0.0-beta.22
+
+### Minor Changes
+
+- Move passkey related apis to stable: ([#3134](https://github.com/clerk/javascript/pull/3134)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Register passkey for a user
+    Usage: `await clerk.user.createPasskey()`
+  - Authenticate with passkey
+    Usage: `await clerk.client.signIn.authenticateWithPasskey()`
+    ```ts
+    try {
+      await clerk.client.signIn.authenticateWithPasskey(...args);
+    }catch (e) {
+      if (isClerkRuntimeError(e)) {
+          if (err.code === 'passkey_operation_aborted') {
+              ...
+          }
+      }
+    }
+    ```
+  - ClerkRuntimeError codes introduced:
+
+    - `passkey_not_supported`
+    - `passkeys_pa_not_supported`
+    - `passkey_invalid_rpID_or_domain`
+    - `passkey_already_exists`
+    - `passkey_operation_aborted`
+    - `passkey_retrieval_cancelled`
+    - `passkey_retrieval_failed`
+    - `passkey_registration_cancelled`
+    - `passkey_registration_failed`
+
+  - Get the user's passkeys
+    `clerk.user.passkeys`
+  - Update the name of a passkey
+    `clerk.user.passkeys?.[0].update({name:'Company issued passkey'})`
+  - Delete a passkey
+    `clerk.user.passkeys?.[0].delete()`
+
+## 2.0.0-beta.21
+
+### Patch Changes
+
+- Improve ptBR localizations ([#3083](https://github.com/clerk/javascript/pull/3083)) by [@GustavoOS](https://github.com/GustavoOS)
+
+- Add maintenance mode banner to the SignIn and SignUp components. The text can be customized by updating the maintenanceMode localization key. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix typos from pt-BR localization ([#3106](https://github.com/clerk/javascript/pull/3106)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Added Thai translation keys for pwned password, form identifier, passkey ([#3128](https://github.com/clerk/javascript/pull/3128)) by [@ttwrpz](https://github.com/ttwrpz)
+
+  Change Thai translation keys for Authenticator related to match the context
+
+## 2.0.0-beta.20
+
+### Minor Changes
+
+- Support for prompting a user to reset their password if it is found to be compromised during sign-in. ([#3034](https://github.com/clerk/javascript/pull/3034)) by [@yourtallness](https://github.com/yourtallness)
+
+### Patch Changes
+
+- Adds translation keys to be able to customize error messages when an identifier already exists: ([#3073](https://github.com/clerk/javascript/pull/3073)) by [@octoper](https://github.com/octoper)
+
+  - form_identifier_exists\_\_email_address
+  - form_identifier_exists\_\_username
+  - form_identifier_exists\_\_phone_number
+
 ## 2.0.0-beta.19
 
 ### Minor Changes

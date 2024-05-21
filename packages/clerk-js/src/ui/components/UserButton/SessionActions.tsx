@@ -5,6 +5,7 @@ import type { LocalizationKey } from '../../customizables';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action, Actions, PreviewButton, SmallAction, SmallActions, UserPreview } from '../../elements';
 import { Add, CogFilled, SignOut, SwitchArrowRight } from '../../icons';
+import type { ThemableCssProp } from '../../styledSystem';
 
 type SingleSessionActionsProps = {
   handleManageAccountClicked: () => Promise<unknown> | void;
@@ -172,6 +173,8 @@ type SignOutAllActionsProps = {
   iconElementDescriptor?: ElementDescriptor;
   iconElementId?: ElementId;
   label?: LocalizationKey;
+  sx?: ThemableCssProp;
+  actionSx?: ThemableCssProp;
 };
 
 export const SignOutAllActions = (props: SignOutAllActionsProps) => {
@@ -184,13 +187,18 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
     iconElementDescriptor,
     iconElementId,
     label,
+    sx,
+    actionSx,
   } = props;
   return (
     <Actions
       role='menu'
-      sx={t => ({
-        padding: t.space.$2,
-      })}
+      sx={[
+        t => ({
+          padding: t.space.$2,
+        }),
+        sx,
+      ]}
     >
       <Action
         elementDescriptor={elementDescriptor || descriptors.userButtonPopoverActionButton}
@@ -204,12 +212,15 @@ export const SignOutAllActions = (props: SignOutAllActionsProps) => {
         onClick={handleSignOutAllClicked}
         variant='ghost'
         colorScheme='neutral'
-        sx={t => ({
-          backgroundColor: t.colors.$transparent,
-          padding: `${t.space.$2} ${t.space.$3}`,
-          borderBottomWidth: 0,
-          borderRadius: t.radii.$lg,
-        })}
+        sx={[
+          t => ({
+            backgroundColor: t.colors.$transparent,
+            padding: `${t.space.$2} ${t.space.$3}`,
+            borderBottomWidth: 0,
+            borderRadius: t.radii.$lg,
+          }),
+          actionSx,
+        ]}
         spinnerSize='md'
       />
     </Actions>

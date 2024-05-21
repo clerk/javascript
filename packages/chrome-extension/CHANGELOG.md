@@ -1,5 +1,583 @@
 # Change Log
 
+## 1.0.12
+
+### Patch Changes
+
+- Updated dependencies [[`1fdd4368b`](https://github.com/clerk/javascript/commit/1fdd4368baac91a27e40bdd7e8ff14aba1e1925c), [`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe)]:
+  - @clerk/clerk-js@5.4.0
+  - @clerk/clerk-react@5.1.0
+
+## 1.0.11
+
+### Patch Changes
+
+- Updated dependencies [[`eae0a32d5`](https://github.com/clerk/javascript/commit/eae0a32d5c9e97ccbfd96e001c2cac6bc753b5b3)]:
+  - @clerk/clerk-js@5.3.2
+  - @clerk/clerk-react@5.0.7
+
+## 1.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/clerk-js@5.3.1
+  - @clerk/shared@2.1.1
+  - @clerk/clerk-react@5.0.6
+
+## 1.0.9
+
+### Patch Changes
+
+- Remove `Origin` from API mutation request headers via `onInstalled` listener. ([#3363](https://github.com/clerk/javascript/pull/3363)) by [@tmilewski](https://github.com/tmilewski)
+
+- Revert: Remove `Origin` from API mutation request headers via `onInstalled` listener. ([#3375](https://github.com/clerk/javascript/pull/3375)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`94197710a`](https://github.com/clerk/javascript/commit/94197710a70381c4f1c460948ef02cd2a70b88bb), [`34befeebc`](https://github.com/clerk/javascript/commit/34befeebc49d95b5492a2e665ad3b31919f2c1e3), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20), [`bcbb2c9ef`](https://github.com/clerk/javascript/commit/bcbb2c9ef42c11b13c1d2f60db4dd88a2d4f04f6)]:
+  - @clerk/clerk-js@5.3.0
+  - @clerk/shared@2.1.0
+  - @clerk/clerk-react@5.0.5
+
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`56c8562eb`](https://github.com/clerk/javascript/commit/56c8562eb4b05308aed2a9f10162cbf5819ad937), [`7b213d5a4`](https://github.com/clerk/javascript/commit/7b213d5a426de16e854f5d3316a24579f698ba38)]:
+  - @clerk/clerk-js@5.2.4
+
+## 1.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`996828741`](https://github.com/clerk/javascript/commit/9968287418ba7e9fe3de1d65bc973d0035697257)]:
+  - @clerk/clerk-js@5.2.3
+
+## 1.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`39265d909`](https://github.com/clerk/javascript/commit/39265d90941c850fd1b24295b19b904a5f3eaba6), [`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53), [`12f78491d`](https://github.com/clerk/javascript/commit/12f78491d6b10f2be63891f8a7f76fc6acf37c00), [`27d612663`](https://github.com/clerk/javascript/commit/27d61266357166413ee421114df175ea283ca9c1)]:
+  - @clerk/clerk-react@5.0.4
+  - @clerk/shared@2.0.2
+  - @clerk/clerk-js@5.2.2
+
+## 1.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`e93b5777b`](https://github.com/clerk/javascript/commit/e93b5777b4f8578e6a6f81566e2601ab0e65590a)]:
+  - @clerk/clerk-react@5.0.3
+
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`c8f907a5a`](https://github.com/clerk/javascript/commit/c8f907a5ac8ba1d01bd6f2a9b027d8fa050d2082)]:
+  - @clerk/clerk-js@5.2.1
+
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies [[`d1b75fa84`](https://github.com/clerk/javascript/commit/d1b75fa84ea6ad04604db58c18ef71efabb004c8), [`377bff929`](https://github.com/clerk/javascript/commit/377bff929a7e668368611482044dd9fad0c98b58), [`4678caf4b`](https://github.com/clerk/javascript/commit/4678caf4b88f524ee638b944c683af126d6e5f90), [`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`c7d626292`](https://github.com/clerk/javascript/commit/c7d626292a9fd12ca0f1b31a1035e711b6e99531), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc), [`e79d2e3d3`](https://github.com/clerk/javascript/commit/e79d2e3d3be02eb1cf8b2647ac179cc5d4aa2de2)]:
+  - @clerk/clerk-js@5.2.0
+  - @clerk/shared@2.0.1
+  - @clerk/clerk-react@5.0.2
+
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`3d659e4d6`](https://github.com/clerk/javascript/commit/3d659e4d69efb7dd1d2e33d8c6e1950e074d5467), [`8688ad73f`](https://github.com/clerk/javascript/commit/8688ad73f458af2bf7560c1c8204f67304e4ac71), [`dafdad2f8`](https://github.com/clerk/javascript/commit/dafdad2f8ddb1ea29a2db7755390e060991ae356)]:
+  - @clerk/clerk-js@5.1.1
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`e79610344`](https://github.com/clerk/javascript/commit/e79610344ee8f48c742f2ffe2ef31d43d63cdf5a), [`6a67bc96b`](https://github.com/clerk/javascript/commit/6a67bc96ba38dfcf8fbd9a098613f50e62e5be7a), [`956d8792f`](https://github.com/clerk/javascript/commit/956d8792fefe9d6a89022f1e938149b25503ec7f), [`6f3c11de6`](https://github.com/clerk/javascript/commit/6f3c11de638b360597ca5d2141e5f4bee12f604d)]:
+  - @clerk/clerk-js@5.1.0
+  - @clerk/clerk-react@5.0.1
+
+## 1.0.0
+
+### Major Changes
+
+- c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
+- deac67c1c: Drop default exports from all packages. Migration guide:
+  - use `import { Clerk } from '@clerk/backend';`
+  - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-sdk-node';`
+  - use `import { Clerk } from '@clerk/clerk-js';`
+  - use `import { Clerk } from '@clerk/clerk-js/headless';`
+  - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
+- 7f833da9e: Drop deprecations. Migration steps:
+  - use `publishableKey` instead of `frontendApi`
+  - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+  - drop `orgs` jwt claim from session token
+  - use `ExternalAccount.imageUrl` instead of `ExternalAccount.avatarUrl`
+  - use `Organization.imageUrl` instead of `Organization.logoUrl`
+  - use `User.imageUrl` instead of `User.profileImageUrl`
+  - use `OrganizationMembershipPublicUserData.imageUrl` instead of `OrganizationMembershipPublicUserData.profileImageUrl`
+  - use `useOrganizationList` instead of `useOrganizations`
+  - use `userProfileProps` instead of `userProfile` in `Appearance`
+  - use `Clerk.setActive()` instead of `Clerk.setSession()`
+  - drop `password` param in `User.update()`
+  - use `afterSelectOrganizationUrl` instead of `afterSwitchOrganizationUrl` in `OrganizationSwitcher`
+  - drop `Clerk.experimental_canUseCaptcha` / `Clerk.Clerk.experimental_captchaSiteKey` / `Clerk.experimental_captchaURL` (were meant for internal use)
+  - use `User.getOrganizationMemberships()` instead of `Clerk.getOrganizationMemberships()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from Clerk emitted events
+  - drop `Clerk.__unstable__invitationUpdate` / `Clerk.__unstable__membershipUpdate`
+  - drop support for string param in `Organization.create()`
+  - use `Organization.getInvitations()` instead of `Organization.getPendingInvitations()`
+  - use `pageSize` instead of `limit` in `OrganizationMembership.retrieve()`
+  - use `initialPage` instead of `offset` in `OrganizationMembership.retrieve()`
+  - drop `lastOrganizationInvitation` / `lastOrganizationMember` from ClerkProvider
+  - use `invitations` instead of `invitationList` in `useOrganization`
+  - use `memberships` instead of `membershipList` in `useOrganization`
+  - use `redirectUrl` instead of `redirect_url` in `User.createExternalAccount()`
+  - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
+- 8aea39cd6: - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg
+
+  ````typescript
+  // Before
+  import { **internal**setErrorThrowerOptions } from '@clerk/clerk-react';
+  // After
+  import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+
+      // Before
+      import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+      // After
+      import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
+
+      // Before
+      import { MultisessionAppSupport } from '@clerk/clerk-react';
+      // After
+      import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+      ```
+
+  - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
+    - `__internal__setErrorThrowerOptions` internal utility (moved to /internal subpath)
+    - `WithClerkProp` type
+    - `MultisessionAppSupport` component (moved to /internal subpath)
+    - `EmailLinkErrorCode` enum
+  - Drop `StructureContext` and related errors to reduce to reduce code complexity since it seems that it was not being used.
+  - Drop `withUser`, `WithUser`, `withClerk` HOFs and `WithClerk`, `withSession`, `WithSession` HOCs from the `@clerk/clerk-react`
+    to reduce the export surface since it's trivial to implement if needed.
+
+  ````
+
+- 5f58a2274: Remove hashing and third-party cookie functionality related to development instance session syncing in favor of URL-based session syncing with query parameters.
+- 52ff8fe6b: Upgrade React version to >=18 and add react-dom as peer dependency
+  to fix issues with vite & rollup building.
+- 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
+- b6b19b5b9: Expand the ability for `@clerk/chrome-extension` WebSSO to sync with host applications which use URL-based session syncing.
+
+  ### How to Update
+
+  **WebSSO Host Permissions:**
+
+  _Local Development: You must have your explicit development domain added to your `manifest.json` file in order to use the WebSSO flow._
+
+  Example:
+
+  ```json
+  {
+    "host_permissions": [
+      // ...
+      "http://localhost"
+      // ...
+    ]
+  }
+  ```
+
+  _Production: You must have your explicit Clerk Frontend API domain added to your `manifest.json` file in order to use the WebSSO flow._
+
+  Example:
+
+  ```json
+  {
+    "host_permissions": [
+      // ...
+      "https://clerk.example.com"
+      // ...
+    ]
+  }
+  ```
+
+  **WebSSO Provider settings:**
+
+  ```tsx
+  <ClerkProvider
+    publishableKey={publishableKey}
+    routerPush={to => navigate(to)}
+    routerReplace={to => navigate(to, { replace: true })}
+    syncSessionWithTab
+
+    // tokenCache is now storageCache (See below)
+    storageCache={/* ... */}
+  >
+  ```
+
+  **WebSSO Storage Cache Interface:**
+
+  With the prop change from `tokenCache` to `storageCache`, the interface has been expanded to allow for more flexibility.
+
+  The new interface is as follows:
+
+  ```ts
+  type StorageCache = {
+    createKey: (...keys: string[]) => string;
+    get: <T = any>(key: string) => Promise<T>;
+    remove: (key: string) => Promise<void>;
+    set: (key: string, value: string) => Promise<void>;
+  };
+  ```
+
+- 3c4209068: Drop deprecations. Migration steps:
+  - use `setActive` instead of `setSession` from `useSessionList | useSignUp | useSignIn` hooks
+  - use `publishableKey` instead of `frontendApi`
+  - use `handleEmailLinkVerification` instead of `handleMagicLinkVerification` from `IsomorphicClerk`
+  - use `isEmailLinkError` instead of `isMagicLinkError`
+  - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
+  - use `useEmailLink` instead of `useMagicLink`
+
+### Minor Changes
+
+- c7e6d00f5: Experimental support for `<Gate/>` with role checks.
+- 46040a2f3: Introduce Protect for authorization.
+  Changes in public APIs:
+  - Rename Gate to Protect
+  - Support for permission checks. (Previously only roles could be used)
+  - Remove the `experimental` tags and prefixes
+  - Drop `some` from the `has` utility and Protect. Protect now accepts a `condition` prop where a function is expected with the `has` being exposed as the param.
+  - Protect can now be used without required props. In this case behaves as `<SignedIn>`, if no authorization props are passed.
+  - `has` will throw an error if neither `permission` or `role` is passed.
+  - `auth().protect()` for Nextjs App Router. Allow per page protection in app router. This utility will automatically throw a 404 error if user is not authorized or authenticated.
+    - inside a page or layout file it will render the nearest `not-found` component set by the developer
+    - inside a route handler it will return empty response body with a 404 status code
+
+### Patch Changes
+
+- 2de442b24: Rename beta-v5 to beta
+- 2e77cd737: Set correct information on required Node.js and React versions in README
+- ae3a6683a: Ignore `.test.ts` files for the build output. Should result in smaller bundle size.
+- Updated dependencies [3daa937a7]
+- Updated dependencies [69ce3e185]
+- Updated dependencies [743c4d204]
+- Updated dependencies [4b8bedc66]
+- Updated dependencies [043801f2a]
+- Updated dependencies [2a67f729d]
+- Updated dependencies [c2a090513]
+- Updated dependencies [3ba3f383b]
+- Updated dependencies [1ddffb67e]
+- Updated dependencies [6ac9e717a]
+- Updated dependencies [0d0b1d89a]
+- Updated dependencies [1834a3ee4]
+- Updated dependencies [896cb6104]
+- Updated dependencies [64d3763ec]
+- Updated dependencies [8350109ab]
+- Updated dependencies [0a108ae3b]
+- Updated dependencies [e214450e9]
+- Updated dependencies [deac67c1c]
+- Updated dependencies [034abeb76]
+- Updated dependencies [d08d96971]
+- Updated dependencies [17a6158e8]
+- Updated dependencies [1dc28ab46]
+- Updated dependencies [9dc46b2c1]
+- Updated dependencies [83e9d0846]
+- Updated dependencies [d422dae67]
+- Updated dependencies [a2ab0d300]
+- Updated dependencies [6c2d88ee8]
+- Updated dependencies [d37d44a68]
+- Updated dependencies [434a96ebe]
+- Updated dependencies [791c49807]
+- Updated dependencies [ea4933655]
+- Updated dependencies [7f6a64f43]
+- Updated dependencies [08dd88c4a]
+- Updated dependencies [5f49568f6]
+- Updated dependencies [8b40dc7a3]
+- Updated dependencies [dd49f93da]
+- Updated dependencies [afec17953]
+- Updated dependencies [0699fa496]
+- Updated dependencies [7466fa505]
+- Updated dependencies [a68eb3083]
+- Updated dependencies [2de442b24]
+- Updated dependencies [0293f29c8]
+- Updated dependencies [9180c8b80]
+- Updated dependencies [db18787c4]
+- Updated dependencies [e400fa9e3]
+- Updated dependencies [7f833da9e]
+- Updated dependencies [ef2325dcc]
+- Updated dependencies [6a769771c]
+- Updated dependencies [6d3b422c8]
+- Updated dependencies [23ebc89e9]
+- Updated dependencies [9e10d577e]
+- Updated dependencies [fc3ffd880]
+- Updated dependencies [2684f1d5c]
+- Updated dependencies [beac05f39]
+- Updated dependencies [097ec4872]
+- Updated dependencies [31570f138]
+- Updated dependencies [06d2b4fca]
+- Updated dependencies [bab2e7e05]
+- Updated dependencies [27052469e]
+- Updated dependencies [71663c568]
+- Updated dependencies [492b8a7b1]
+- Updated dependencies [9e99eb727]
+- Updated dependencies [846a4c24d]
+- Updated dependencies [491fba5ad]
+- Updated dependencies [cfea3d9c0]
+- Updated dependencies [d65d36fc6]
+- Updated dependencies [2352149f6]
+- Updated dependencies [e5c989a03]
+- Updated dependencies [94bbdf7df]
+- Updated dependencies [ff803ff20]
+- Updated dependencies [98b194b2a]
+- Updated dependencies [1c199d1d2]
+- Updated dependencies [ff08fe237]
+- Updated dependencies [676d23a59]
+- Updated dependencies [7ecd6f6ab]
+- Updated dependencies [d18cae5fd]
+- Updated dependencies [12f3c5c55]
+- Updated dependencies [c776f86fb]
+- Updated dependencies [73849836f]
+- Updated dependencies [394cecc6b]
+- Updated dependencies [ee57f21ac]
+- Updated dependencies [d9f265fcb]
+- Updated dependencies [7bffc47cb]
+- Updated dependencies [d005992e0]
+- Updated dependencies [2e77cd737]
+- Updated dependencies [9737ef510]
+- Updated dependencies [fafa76fb6]
+- Updated dependencies [d1dc44cc7]
+- Updated dependencies [141f09fdc]
+- Updated dependencies [1f650f30a]
+- Updated dependencies [b6c4e1cfe]
+- Updated dependencies [d941b902f]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [2a22aade8]
+- Updated dependencies [7d3aa44d7]
+- Updated dependencies [fbbb1afc2]
+- Updated dependencies [e7414cb3f]
+- Updated dependencies [ae3a6683a]
+- Updated dependencies [63373bf21]
+- Updated dependencies [0ee1777e0]
+- Updated dependencies [78fc5eec0]
+- Updated dependencies [6e54b1b59]
+- Updated dependencies [4edb77632]
+- Updated dependencies [8aea39cd6]
+- Updated dependencies [4aff3d936]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [976c6a07e]
+- Updated dependencies [5f58a2274]
+- Updated dependencies [57e0972bb]
+- Updated dependencies [6a33709cc]
+- Updated dependencies [45c92006c]
+- Updated dependencies [52ff8fe6b]
+- Updated dependencies [c9e0f68af]
+- Updated dependencies [d9bd2b4ea]
+- Updated dependencies [f77e8cdbd]
+- Updated dependencies [8b466a9ba]
+- Updated dependencies [4063bd8e9]
+- Updated dependencies [fe2607b6f]
+- Updated dependencies [c7e6d00f5]
+- Updated dependencies [8cc45d2af]
+- Updated dependencies [ef72c0ae6]
+- Updated dependencies [663243220]
+- Updated dependencies [797e327e0]
+- Updated dependencies [fe6215dea]
+- Updated dependencies [c6a5e0f5d]
+- Updated dependencies [4edb77632]
+- Updated dependencies [ab4eb56a5]
+- Updated dependencies [b0ca7b801]
+- Updated dependencies [97407d8aa]
+- Updated dependencies [d1b524ffb]
+- Updated dependencies [12962bc58]
+- Updated dependencies [30dfdf2aa]
+- Updated dependencies [8b261add2]
+- Updated dependencies [4bb57057e]
+- Updated dependencies [9955938d6]
+- Updated dependencies [c86f73be3]
+- Updated dependencies [d4ff346dd]
+- Updated dependencies [7644b7472]
+- Updated dependencies [2ec9f6b09]
+- Updated dependencies [2e4a43017]
+- Updated dependencies [f98e480b1]
+- Updated dependencies [5aab9f04a]
+- Updated dependencies [1affbb22a]
+- Updated dependencies [46040a2f3]
+- Updated dependencies [8ca8517bf]
+- Updated dependencies [f00fd2dfe]
+- Updated dependencies [046224177]
+- Updated dependencies [f5fb63cf1]
+- Updated dependencies [e4c0ae028]
+- Updated dependencies [8daf8451c]
+- Updated dependencies [9e57e94d2]
+- Updated dependencies [75ea300bc]
+- Updated dependencies [db3eefe8c]
+- Updated dependencies [9a1fe3728]
+- Updated dependencies [7f751c4ef]
+- Updated dependencies [93a611570]
+- Updated dependencies [f5d55bb1f]
+- Updated dependencies [18c0d015d]
+- Updated dependencies [0d1052ac2]
+- Updated dependencies [d30ea1faa]
+- Updated dependencies [e9841dd91]
+- Updated dependencies [aaa457097]
+- Updated dependencies [7886ba89d]
+- Updated dependencies [fc36e2e54]
+- Updated dependencies [920c9e1b5]
+- Updated dependencies [1fd2eff38]
+- Updated dependencies [5471c7e8d]
+- Updated dependencies [e7ae9c36a]
+- Updated dependencies [ebf9f165f]
+- Updated dependencies [445026ab7]
+- Updated dependencies [f540e9843]
+- Updated dependencies [477170962]
+- Updated dependencies [4705d63a8]
+- Updated dependencies [59f9a7296]
+- Updated dependencies [7b40924e4]
+- Updated dependencies [bf09d18d6]
+- Updated dependencies [38d8b3e8a]
+- Updated dependencies [59336d3d4]
+- Updated dependencies [be991365e]
+- Updated dependencies [5dea004b1]
+- Updated dependencies [8350f73a6]
+- Updated dependencies [5d6937c9f]
+- Updated dependencies [d6a7ea61a]
+- Updated dependencies [c3dccfc34]
+- Updated dependencies [2f6306fd3]
+- Updated dependencies [6fd303b99]
+- Updated dependencies [e0e79b4fe]
+- Updated dependencies [41ae1d2f0]
+- Updated dependencies [750337633]
+- Updated dependencies [859b5495f]
+- Updated dependencies [9040549d6]
+- Updated dependencies [f02482bb5]
+- Updated dependencies [8fbe8ba2f]
+- Updated dependencies [3c4209068]
+- Updated dependencies [fb794ce7b]
+- Updated dependencies [b9dd8e7c0]
+- Updated dependencies [94519aa33]
+- Updated dependencies [d11aa60eb]
+- Updated dependencies [ebf9be77f]
+- Updated dependencies [79040966f]
+- Updated dependencies [008ac4217]
+- Updated dependencies [63ef35ec5]
+- Updated dependencies [40ac4b645]
+- Updated dependencies [9c6411aa8]
+- Updated dependencies [22f19d3bf]
+- Updated dependencies [6f755addd]
+- Updated dependencies [429d030f7]
+- Updated dependencies [11fbfdeec]
+- Updated dependencies [844847e0b]
+- Updated dependencies [6eab66050]
+- Updated dependencies [5db6dbb90]
+- Updated dependencies [db2d82901]
+- Updated dependencies [6d89f2687]
+- Updated dependencies [0551488fb]
+  - @clerk/clerk-js@5.0.0
+  - @clerk/shared@2.0.0
+  - @clerk/clerk-react@5.0.0
+
+## 1.0.0-beta.49
+
+### Patch Changes
+
+- Updated dependencies [[`f00fd2dfe`](https://github.com/clerk/javascript/commit/f00fd2dfe309cfeac82a776cc006f2c21b6d7988)]:
+  - @clerk/clerk-js@5.0.0-beta.49
+  - @clerk/clerk-react@5.0.0-beta.41
+
+## 1.0.0-beta.48
+
+### Patch Changes
+
+- Updated dependencies [[`17a6158e8`](https://github.com/clerk/javascript/commit/17a6158e86bdf78013ea129bfccac57998bf074e)]:
+  - @clerk/clerk-js@5.0.0-beta.48
+
+## 1.0.0-beta.47
+
+### Patch Changes
+
+- Updated dependencies [[`8ca8517bf`](https://github.com/clerk/javascript/commit/8ca8517bf6f8b89aadb4ccc2c759e40fae09ab63)]:
+  - @clerk/clerk-js@5.0.0-beta.47
+
+## 1.0.0-beta.46
+
+### Patch Changes
+
+- Updated dependencies [[`3daa937a7`](https://github.com/clerk/javascript/commit/3daa937a7a64949ec986542b57df36eba26fd10e), [`bab2e7e05`](https://github.com/clerk/javascript/commit/bab2e7e0590d0da1fd7db0680e63e8f2eb836b41)]:
+  - @clerk/clerk-js@5.0.0-beta.46
+  - @clerk/shared@2.0.0-beta.23
+  - @clerk/clerk-react@5.0.0-beta.40
+
+## 1.0.0-beta.45
+
+### Patch Changes
+
+- Updated dependencies [[`a2ab0d300`](https://github.com/clerk/javascript/commit/a2ab0d3001bfe4752ed1aaa6f3399ece19a93dc7), [`beac05f39`](https://github.com/clerk/javascript/commit/beac05f391fe7f426d8334cd3558cd2405cccf04), [`ff08fe237`](https://github.com/clerk/javascript/commit/ff08fe237fa5a9ded04924b3c5821111836b49b6), [`d9f265fcb`](https://github.com/clerk/javascript/commit/d9f265fcb12b39301b9802e4787dc636ee28444f), [`f98e480b1`](https://github.com/clerk/javascript/commit/f98e480b1a9e41f5370efcd53aa6887af2ad6816), [`ebf9f165f`](https://github.com/clerk/javascript/commit/ebf9f165f8947e822db4d1d4a68807cd07729a27), [`859b5495f`](https://github.com/clerk/javascript/commit/859b5495f2835e3df418d5a79fc608830dcea68b), [`8fbe8ba2f`](https://github.com/clerk/javascript/commit/8fbe8ba2f749e0f43cdb8950ce87eb4cc21022af), [`fb794ce7b`](https://github.com/clerk/javascript/commit/fb794ce7b88001b98ad4a628bc2cc39a0c8ccfa5), [`d11aa60eb`](https://github.com/clerk/javascript/commit/d11aa60ebc0316457c5f28ccf69ddd8c4e769785), [`22f19d3bf`](https://github.com/clerk/javascript/commit/22f19d3bfa987268610e93d2028815d12b374110)]:
+  - @clerk/clerk-js@5.0.0-beta.45
+  - @clerk/clerk-react@5.0.0-beta.39
+  - @clerk/shared@2.0.0-beta.22
+
+## 1.0.0-beta.44
+
+### Patch Changes
+
+- Updated dependencies [[`4aff3d936`](https://github.com/clerk/javascript/commit/4aff3d9369ca6bcf07480cda6491dfc410302b3d), [`94519aa33`](https://github.com/clerk/javascript/commit/94519aa33774c8d6e557ce47a00974ad7b194c5d)]:
+  - @clerk/clerk-js@5.0.0-beta.44
+  - @clerk/clerk-react@5.0.0-beta.38
+
+## 1.0.0-beta.43
+
+### Patch Changes
+
+- Updated dependencies [[`0699fa496`](https://github.com/clerk/javascript/commit/0699fa49693dc7a8d3de8ba053c4f16a5c8431d0)]:
+  - @clerk/clerk-js@5.0.0-beta.43
+  - @clerk/clerk-react@5.0.0-beta.37
+
+## 1.0.0-beta.42
+
+### Patch Changes
+
+- Updated dependencies [[`06d2b4fca`](https://github.com/clerk/javascript/commit/06d2b4fca43b764b2432c40ce3f2d03cf448d5e1), [`2352149f6`](https://github.com/clerk/javascript/commit/2352149f6ba9708095146a3087538faf2d4f161f)]:
+  - @clerk/clerk-js@5.0.0-beta.42
+  - @clerk/clerk-react@5.0.0-beta.36
+
+## 1.0.0-beta.41
+
+### Patch Changes
+
+- Updated dependencies [[`6d89f2687`](https://github.com/clerk/javascript/commit/6d89f26879dcdad81194f48695016715950003f9)]:
+  - @clerk/clerk-js@5.0.0-beta.41
+
+## 1.0.0-beta.40
+
+### Patch Changes
+
+- Updated dependencies [[`d422dae67`](https://github.com/clerk/javascript/commit/d422dae67a5204c702de269008515d7622568142), [`9180c8b80`](https://github.com/clerk/javascript/commit/9180c8b80e0ad95c1a9e490e8201ffd089634a48), [`6d3b422c8`](https://github.com/clerk/javascript/commit/6d3b422c8ac2fb2df66d20f4a5ca55c5e20a5f5d), [`976c6a07e`](https://github.com/clerk/javascript/commit/976c6a07e480b47f4abe326ab282bd87833ad6c3), [`c6a5e0f5d`](https://github.com/clerk/javascript/commit/c6a5e0f5dbd9ec4a7b5657855e8a31bc8347d0a4), [`4705d63a8`](https://github.com/clerk/javascript/commit/4705d63a87c46f5820cd304301edef74d9261ff5)]:
+  - @clerk/clerk-js@5.0.0-beta.40
+  - @clerk/clerk-react@5.0.0-beta.35
+
+## 1.0.0-beta.39
+
+### Patch Changes
+
+- Updated dependencies [[`fc3ffd880`](https://github.com/clerk/javascript/commit/fc3ffd88064a09ab98877dfba119150390f9296e), [`d1dc44cc7`](https://github.com/clerk/javascript/commit/d1dc44cc771c27c95fac96e6ffa805cd6d36c3f7), [`1fd2eff38`](https://github.com/clerk/javascript/commit/1fd2eff38dc71e45d2ff95a5b6e5a99cca53c6e7), [`f540e9843`](https://github.com/clerk/javascript/commit/f540e98435c86298415552537e33164471298a5c), [`c3dccfc34`](https://github.com/clerk/javascript/commit/c3dccfc3461aafb93c45e38b5f8edad717ec1092), [`b9dd8e7c0`](https://github.com/clerk/javascript/commit/b9dd8e7c027ef2a435503aad42f7c3ac66366838), [`63ef35ec5`](https://github.com/clerk/javascript/commit/63ef35ec5d396642b64b64d77a7747758d567203)]:
+  - @clerk/clerk-js@5.0.0-beta.39
+  - @clerk/shared@2.0.0-beta.21
+  - @clerk/clerk-react@5.0.0-beta.34
+
+## 1.0.0-beta.38
+
+### Patch Changes
+
+- Updated dependencies [[`fc36e2e54`](https://github.com/clerk/javascript/commit/fc36e2e5425f52cd31e11813a6a50666149ca7ee)]:
+  - @clerk/clerk-js@5.0.0-beta.38
+
 ## 1.0.0-beta.37
 
 ### Patch Changes

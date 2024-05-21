@@ -1,5 +1,5 @@
 import type { AuthenticateRequestOptions, AuthObject, ClerkRequest } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
@@ -9,13 +9,19 @@ import { isRedirect, mergeResponses, serverRedirectWithAuth, setHeader, stringif
 import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
 import { createAuthenticateRequestOptions } from './clerkMiddleware';
-import { SECRET_KEY } from './constants';
+import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { informAboutProtectedRouteInfo, receivedRequestForIgnoredRoute } from './errors';
-import { redirectToSignIn } from './redirectHelpers';
+import { errorThrower } from './errorThrower';
 import type { RouteMatcherParam } from './routeMatcher';
 import { createRouteMatcher } from './routeMatcher';
 import type { NextMiddlewareReturn } from './types';
-import { apiEndpointUnauthorizedNextResponse, decorateRequest, setRequestHeadersOnNextResponse } from './utils';
+import {
+  apiEndpointUnauthorizedNextResponse,
+  assertKey,
+  decorateRequest,
+  redirectAdapter,
+  setRequestHeadersOnNextResponse,
+} from './utils';
 
 /**
  * The default ideal matcher that excludes the _next directory (internals) and all static files,
@@ -111,23 +117,30 @@ export interface AuthMiddleware {
 /**
  * @deprecated `authMiddleware` is deprecated and will be removed in the next major version.
  * Use {@link clerkMiddleware}` instead.
- * Migration guide: https://clerk.com/docs/upgrade-guides/upgrading-from-v4-to-v5
+ * Migration guide: https://clerk.com/docs/upgrade-guides/core-2/nextjs
  */
 const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const [params = {}] = args as [AuthMiddlewareParams?];
-  const { beforeAuth, afterAuth, publicRoutes, ignoredRoutes, apiRoutes, ...options } = params;
+  const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
+    errorThrower.throwMissingPublishableKeyError(),
+  );
+  const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingPublishableKeyError());
+  const signInUrl = params.signInUrl || SIGN_IN_URL;
+  const signUpUrl = params.signUpUrl || SIGN_UP_URL;
 
-  const isIgnoredRoute = createRouteMatcher(ignoredRoutes || DEFAULT_IGNORED_ROUTES);
-  const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(publicRoutes));
-  const isApiRoute = createApiRoutes(apiRoutes);
-  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, params);
+  const options = { ...params, publishableKey, secretKey, signInUrl, signUpUrl };
+
+  const isIgnoredRoute = createRouteMatcher(options.ignoredRoutes || DEFAULT_IGNORED_ROUTES);
+  const isPublicRoute = createRouteMatcher(withDefaultPublicRoutes(options.publicRoutes));
+  const isApiRoute = createApiRoutes(options.apiRoutes);
+  const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, options);
 
   clerkClient.telemetry.record(
     eventMethodCalled('authMiddleware', {
-      publicRoutes: Boolean(publicRoutes),
-      ignoredRoutes: Boolean(ignoredRoutes),
-      beforeAuth: Boolean(beforeAuth),
-      afterAuth: Boolean(afterAuth),
+      publicRoutes: Boolean(options.publicRoutes),
+      ignoredRoutes: Boolean(options.ignoredRoutes),
+      beforeAuth: Boolean(options.beforeAuth),
+      afterAuth: Boolean(options.afterAuth),
     }),
   );
 
@@ -146,11 +159,11 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       clerkUrl: nextRequest.experimental_clerkUrl.href,
     });
 
-    logger.debug('Options debug', { ...options, beforeAuth: !!beforeAuth, afterAuth: !!afterAuth });
+    logger.debug('Options debug', { ...options, beforeAuth: !!options.beforeAuth, afterAuth: !!options.afterAuth });
 
     if (isIgnoredRoute(nextRequest)) {
       logger.debug({ isIgnoredRoute: true });
-      if (isDevelopmentFromSecretKey(options.secretKey || SECRET_KEY) && !params.ignoredRoutes) {
+      if (isDevelopmentFromSecretKey(options.secretKey) && !options.ignoredRoutes) {
         console.warn(
           receivedRequestForIgnoredRoute(
             nextRequest.experimental_clerkUrl.href,
@@ -161,7 +174,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return setHeader(NextResponse.next(), constants.Headers.AuthReason, 'ignored-route');
     }
 
-    const beforeAuthRes = await (beforeAuth && beforeAuth(nextRequest, evt));
+    const beforeAuthRes = await (options.beforeAuth && options.beforeAuth(nextRequest, evt));
 
     if (beforeAuthRes === false) {
       logger.debug('Before auth returned false, skipping');
@@ -192,7 +205,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
     });
 
     logger.debug(() => ({ auth: JSON.stringify(auth), debug: auth.debug() }));
-    const afterAuthRes = await (afterAuth || defaultAfterAuth)(auth, nextRequest, evt);
+    const afterAuthRes = await (options.afterAuth || defaultAfterAuth)(auth, nextRequest, evt);
     const finalRes = mergeResponses(beforeAuthRes, afterAuthRes) || NextResponse.next();
     logger.debug(() => ({ mergedHeaders: stringifyHeaders(finalRes.headers) }));
 
@@ -206,7 +219,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       logger.debug(`Added ${constants.Headers.EnableDebug} on request`);
     }
 
-    const result = decorateRequest(clerkRequest, finalRes, requestState) || NextResponse.next();
+    const result = decorateRequest(clerkRequest, finalRes, requestState, secretKey) || NextResponse.next();
 
     if (requestState.headers) {
       requestState.headers.forEach((value, key) => {
@@ -223,17 +236,25 @@ export { authMiddleware };
 const createDefaultAfterAuth = (
   isPublicRoute: ReturnType<typeof createRouteMatcher>,
   isApiRoute: ReturnType<typeof createApiRoutes>,
-  params: AuthMiddlewareParams,
+  options: { signInUrl: string; signUpUrl: string; publishableKey: string; secretKey: string },
 ) => {
   return (auth: AuthObject, req: WithExperimentalClerkUrl<NextRequest>) => {
     if (!auth.userId && !isPublicRoute(req)) {
       if (isApiRoute(req)) {
-        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, true);
+        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, options, true);
         return apiEndpointUnauthorizedNextResponse();
       } else {
-        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, params, false);
+        informAboutProtectedRoute(req.experimental_clerkUrl.pathname, options, false);
       }
-      return redirectToSignIn({ returnBackUrl: req.experimental_clerkUrl.href });
+      return createRedirect({
+        redirectAdapter,
+        signInUrl: options.signInUrl,
+        signUpUrl: options.signUpUrl,
+        publishableKey: options.publishableKey,
+        // We're setting baseUrl to '' here as we want to keep the legacy behavior of
+        // the redirectToSignIn, redirectToSignUp helpers in the backend package.
+        baseUrl: '',
+      }).redirectToSignIn({ returnBackUrl: req.experimental_clerkUrl.href });
     }
     return NextResponse.next();
   };
@@ -305,13 +326,17 @@ const withNormalizedClerkUrl = (
   return Object.assign(nextRequest, { experimental_clerkUrl: res });
 };
 
-const informAboutProtectedRoute = (path: string, params: AuthMiddlewareParams, isApiRoute: boolean) => {
-  if (params.debug || isDevelopmentFromSecretKey(params.secretKey || SECRET_KEY)) {
+const informAboutProtectedRoute = (
+  path: string,
+  options: AuthMiddlewareParams & { secretKey: string },
+  isApiRoute: boolean,
+) => {
+  if (options.debug || isDevelopmentFromSecretKey(options.secretKey)) {
     console.warn(
       informAboutProtectedRouteInfo(
         path,
-        !!params.publicRoutes,
-        !!params.ignoredRoutes,
+        !!options.publicRoutes,
+        !!options.ignoredRoutes,
         isApiRoute,
         DEFAULT_IGNORED_ROUTES,
       ),

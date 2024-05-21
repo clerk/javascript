@@ -6,8 +6,11 @@ import type {
   InitialState,
   LoadedClerk,
   MultiDomainAndOrProxy,
+  RedirectUrlProp,
   SDKMetadata,
+  SignInProps,
   SignInRedirectOptions,
+  SignUpProps,
   SignUpRedirectOptions,
   Without,
 } from '@clerk/types';
@@ -15,7 +18,6 @@ import type React from 'react';
 
 declare global {
   interface Window {
-    __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
@@ -55,6 +57,12 @@ export interface MountProps {
   customPagesPortals?: any[];
 }
 
+export interface OpenProps {
+  open: (props: any) => void;
+  close: () => void;
+  props?: any;
+}
+
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
@@ -74,20 +82,25 @@ export type ClerkProp =
   | null;
 
 type ButtonProps = {
-  afterSignInUrl?: string;
-  afterSignUpUrl?: string;
-  redirectUrl?: string;
   mode?: 'redirect' | 'modal';
   children?: React.ReactNode;
 };
 
-export type SignInButtonProps = ButtonProps;
+export type SignInButtonProps = ButtonProps &
+  Pick<
+    SignInProps,
+    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
+  >;
 
-export interface SignUpButtonProps extends ButtonProps {
+export type SignUpButtonProps = {
   unsafeMetadata?: SignUpUnsafeMetadata;
-}
+} & ButtonProps &
+  Pick<
+    SignUpProps,
+    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signInForceRedirectUrl' | 'signInFallbackRedirectUrl'
+  >;
 
-export type SignInWithMetamaskButtonProps = Pick<ButtonProps, 'redirectUrl' | 'children'>;
+export type SignInWithMetamaskButtonProps = ButtonProps & RedirectUrlProp;
 
 export type RedirectToSignInProps = SignInRedirectOptions;
 export type RedirectToSignUpProps = SignUpRedirectOptions;

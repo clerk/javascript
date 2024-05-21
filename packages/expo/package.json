@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "1.0.0-beta.37",
+  "version": "1.1.4",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -39,30 +39,26 @@
     "publish:local": "npx yalc push --replace  --sig"
   },
   "dependencies": {
-    "@clerk/clerk-js": "5.0.0-beta.37",
-    "@clerk/clerk-react": "5.0.0-beta.33",
-    "@clerk/shared": "2.0.0-beta.20",
+    "@clerk/clerk-js": "5.4.0",
+    "@clerk/clerk-react": "5.1.0",
+    "@clerk/shared": "2.1.1",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
-    "@clerk/types": "^4.0.0-beta.22",
+    "@clerk/eslint-config-custom": "*",
+    "@clerk/types": "^4.4.0",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "eslint-config-custom": "*",
-    "expo-application": "^4.2.2",
     "expo-auth-session": "^5.4.0",
-    "expo-constants": "^14.5.1",
     "expo-web-browser": "^12.8.2",
     "typescript": "*"
   },
   "peerDependencies": {
-    "expo-application": ">=5",
     "expo-auth-session": ">=4",
-    "expo-constants": ">=14",
     "expo-web-browser": ">=12.5.0",
     "react": ">=18",
     "react-dom": ">=18"
