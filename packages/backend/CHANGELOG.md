@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.2.0
+
+### Minor Changes
+
+- Consume and expose the 'saml_accounts' property of the user resource ([#3405](https://github.com/clerk/javascript/pull/3405)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Updated dependencies [[`456b06849`](https://github.com/clerk/javascript/commit/456b068493b8679e1772819eea24d49aa1bc6556)]:
+  - @clerk/shared@2.2.0
+
 ## 1.1.5
 
 ### Patch Changes
