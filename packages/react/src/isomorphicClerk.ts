@@ -995,7 +995,7 @@ export default class IsomorphicClerk implements IsomorphicLoadedClerk {
     signOutCallbackOrOptions?: SignOutCallback | SignOutOptions,
     options?: SignOutOptions,
   ): Promise<void> => {
-    const callback = () => this.clerkjs?.signOut(signOutCallbackOrOptions, options);
+    const callback = () => this.clerkjs?.signOut(signOutCallbackOrOptions as any, options);
     if (this.clerkjs && this.#loaded) {
       return callback() as Promise<void>;
     } else {

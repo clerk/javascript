@@ -151,7 +151,7 @@ export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>
     <Portal
       mount={clerk.mountSignIn}
       unmount={clerk.unmountSignIn}
-      updateProps={clerk.__unstable__updateProps}
+      updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />
   );
@@ -162,7 +162,7 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
     <Portal
       mount={clerk.mountSignUp}
       unmount={clerk.unmountSignUp}
-      updateProps={clerk.__unstable__updateProps}
+      updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />
   );
@@ -257,7 +257,7 @@ export const CreateOrganization = withClerk(({ clerk, ...props }: WithClerkProp<
     <Portal
       mount={clerk.mountCreateOrganization}
       unmount={clerk.unmountCreateOrganization}
-      updateProps={clerk.__unstable__updateProps}
+      updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />
   );
@@ -290,7 +290,7 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
     <Portal
       mount={clerk.mountOrganizationList}
       unmount={clerk.unmountOrganizationList}
-      updateProps={clerk.__unstable__updateProps}
+      updateProps={(clerk as any).__unstable__updateProps}
       props={props}
     />
   );

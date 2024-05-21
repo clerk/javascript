@@ -36,7 +36,6 @@ import type {
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
-  NavigateOptions,
   OrganizationInvitationResource,
   OrganizationListProps,
   OrganizationMembershipResource,

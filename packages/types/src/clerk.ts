@@ -700,7 +700,7 @@ export type SignInProps = {
   initialValues?: SignInInitialValues;
 } & RedirectOptions;
 
-type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
+type GoogleOneTapRedirectUrlProps = RedirectOptions;
 
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   /**

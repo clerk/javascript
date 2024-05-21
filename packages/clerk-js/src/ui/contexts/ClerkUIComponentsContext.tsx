@@ -18,6 +18,7 @@ import type {
   OrganizationSwitcherCtx,
   SignInCtx,
   SignUpCtx,
+  UserButtonCtx,
   UserProfileCtx,
 } from '../types';
 import type { CustomPageContent } from '../utils';
@@ -48,7 +49,7 @@ export type SignUpContextType = SignUpCtx & {
 };
 
 export const useSignUpContext = (): SignUpContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignUpCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
@@ -124,7 +125,7 @@ export type SignInContextType = SignInCtx & {
 };
 
 export const useSignInContext = (): SignInContextType => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as SignInCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const { queryParams, queryString } = useRouter();
@@ -201,7 +202,7 @@ export type UserProfileContextType = UserProfileCtx & {
 };
 
 export const useUserProfileContext = (): UserProfileContextType => {
-  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as UserProfileCtx;
   const { queryParams } = useRouter();
 
   if (componentName !== 'UserProfile') {
@@ -220,7 +221,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
 };
 
 export const useUserButtonContext = () => {
-  const { componentName, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
   const Clerk = useCoreClerk();
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
@@ -257,7 +258,7 @@ export const useUserButtonContext = () => {
 };
 
 export const useOrganizationSwitcherContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationSwitcherCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -420,7 +421,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
 };
 
 export const useOrganizationProfileContext = (): OrganizationProfileContextType => {
-  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, customPages, ...ctx } = (React.useContext(ComponentContext) || {}) as OrganizationProfileCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -457,7 +458,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
 };
 
 export const useCreateOrganizationContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as CreateOrganizationCtx;
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
 
@@ -490,41 +491,43 @@ export const useCreateOrganizationContext = () => {
 };
 
 export const useGoogleOneTapContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {});
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as GoogleOneTapCtx;
   const options = useOptions();
   const { displayConfig } = useEnvironment();
   const { queryParams } = useRouter();
+  const clerk = useCoreClerk();
 
   if (componentName !== 'GoogleOneTap') {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
 
-  const redirectUrls = new RedirectUrls(
-    options,
-    {
-      ...ctx,
-      signInFallbackRedirectUrl: window.location.href,
-      signUpFallbackRedirectUrl: window.location.href,
-    },
-    queryParams,
+  const signInUrl = pickRedirectionProp('signInUrl', { options, displayConfig }, false);
+  const signUpUrl = pickRedirectionProp('signUpUrl', { options, displayConfig }, false);
+
+  const afterSignUpUrl = clerk.buildUrlWithAuth(
+    pickRedirectionProp('afterSignUpUrl', {
+      queryParams,
+      ctx,
+      options,
+      displayConfig,
+    }),
   );
 
-  let signUpUrl = options.signUpUrl || displayConfig.signUpUrl;
-  let signInUrl = options.signInUrl || displayConfig.signInUrl;
-
-  const preservedParams = redirectUrls.getPreservedSearchParams();
-  signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
-  signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
-
-  const signInForceRedirectUrl = redirectUrls.getAfterSignInUrl();
-  const signUpForceRedirectUrl = redirectUrls.getAfterSignUpUrl();
+  const afterSignInUrl = clerk.buildUrlWithAuth(
+    pickRedirectionProp('afterSignInUrl', {
+      queryParams,
+      ctx,
+      options,
+      displayConfig,
+    }),
+  );
 
   const signUpContinueUrl = buildURL(
     {
       base: signUpUrl,
       hashPath: '/continue',
       hashSearch: new URLSearchParams({
-        sign_up_force_redirect_url: signUpForceRedirectUrl,
+        after_sign_up: afterSignUpUrl,
       }).toString(),
     },
     { stringify: true },
@@ -535,7 +538,7 @@ export const useGoogleOneTapContext = () => {
       base: signInUrl,
       hashPath: '/factor-one',
       hashSearch: new URLSearchParams({
-        sign_in_force_redirect_url: signInForceRedirectUrl,
+        after_sign_in: afterSignInUrl,
       }).toString(),
     },
     { stringify: true },
@@ -545,7 +548,7 @@ export const useGoogleOneTapContext = () => {
       base: signInUrl,
       hashPath: '/factor-two',
       hashSearch: new URLSearchParams({
-        sign_in_force_redirect_url: signInForceRedirectUrl,
+        after_sign_in: afterSignInUrl,
       }).toString(),
     },
     { stringify: true },
@@ -559,7 +562,7 @@ export const useGoogleOneTapContext = () => {
     firstFactorUrl,
     secondFactorUrl,
     continueSignUpUrl: signUpContinueUrl,
-    signInForceRedirectUrl,
-    signUpForceRedirectUrl,
+    afterSignUpUrl,
+    afterSignInUrl,
   };
 };

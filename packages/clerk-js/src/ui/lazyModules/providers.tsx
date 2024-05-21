@@ -2,7 +2,6 @@ import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements';
-import { VirtualBodyRootPortal } from '../portal';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
@@ -13,7 +12,8 @@ const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m
 const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
 const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
 const InternalThemeProvider = lazy(() => import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })));
-const Portal = lazy(() => import('./../portal'));
+const Portal = lazy(() => import('./../portal').then(m => ({ default: m.Portal })));
+const VirtualBodyRootPortal = lazy(() => import('./../portal').then(m => ({ default: m.VirtualBodyRootPortal })));
 const FlowMetadataProvider = lazy(() => import('./../elements').then(m => ({ default: m.FlowMetadataProvider })));
 const Modal = lazy(() => import('./../elements').then(m => ({ default: m.Modal })));
 

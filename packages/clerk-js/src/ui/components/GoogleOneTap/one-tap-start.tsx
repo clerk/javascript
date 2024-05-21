@@ -16,15 +16,7 @@ function _OneTapStart(): JSX.Element | null {
   const { navigate } = useRouter();
 
   const ctx = useGoogleOneTapContext();
-  const {
-    signInUrl,
-    signUpUrl,
-    continueSignUpUrl,
-    secondFactorUrl,
-    firstFactorUrl,
-    signUpForceRedirectUrl,
-    signInForceRedirectUrl,
-  } = ctx;
+  const { continueSignUpUrl, secondFactorUrl, firstFactorUrl, afterSignInUrl, afterSignUpUrl } = ctx;
 
   async function oneTapCallback(response: GISCredentialResponse) {
     isPromptedRef.current = false;
@@ -35,13 +27,11 @@ function _OneTapStart(): JSX.Element | null {
       await clerk.handleGoogleOneTapCallback(
         res,
         {
-          signInUrl,
-          signUpUrl,
           continueSignUpUrl,
           secondFactorUrl,
           firstFactorUrl,
-          signUpForceRedirectUrl,
-          signInForceRedirectUrl,
+          afterSignInUrl,
+          afterSignUpUrl,
         },
         navigate,
       );
@@ -56,7 +46,7 @@ function _OneTapStart(): JSX.Element | null {
   async function initializeGIS() {
     const google = await loadGIS();
     google.accounts.id.initialize({
-      client_id: environmentClientID,
+      client_id: environmentClientID!,
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       callback: oneTapCallback,
       itp_support: ctx.itpSupport,

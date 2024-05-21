@@ -259,7 +259,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const { nonce } = this.firstFactorVerification;
     const signature = await generateSignature({
       identifier: this.identifier!,
-      nonce: nonce,
+      nonce: nonce!,
     });
 
     return this.attemptFirstFactor({
@@ -279,7 +279,7 @@ export class SignIn extends BaseResource implements SignInResource {
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
       return createValidatePassword({
-        ...(SignIn.clerk.__unstable__environment?.userSettings.passwordSettings ),
+        ...(SignIn.clerk.__unstable__environment?.userSettings.passwordSettings as any),
         validatePassword: true,
       })(password, cb);
     }
