@@ -1163,12 +1163,12 @@
       "commitMessageSuffix": "{{#unless groupName}} for upgrade{{/unless}}"
     },
     {
+      "matchManagers": [
+        "npm"
+      ],
       "matchDepTypes": [
         "engines"
       ],
-      "enabled": false
-    },
-    {
       "matchPackageNames": [
         "node"
       ],
@@ -1243,7 +1243,7 @@
       "matchPackageNames": [
         "typescript"
       ],
-      "rangeStrategy": "pin",
+      "rangeStrategy": "bump",
       "dependencyDashboardApproval": false
     },
     {
@@ -1253,7 +1253,7 @@
         "@types/react",
         "@types/react-dom"
       ],
-      "rangeStrategy": "pin",
+      "rangeStrategy": "bump",
       "dependencyDashboardApproval": false
     },
     {
@@ -1261,7 +1261,8 @@
       "matchPackageNames": [
         "react",
         "react-dom"
-      ]
+      ],
+      "rangeStrategy": "bump"
     }
   ]
 }

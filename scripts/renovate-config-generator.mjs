@@ -29,10 +29,8 @@ const rules = new Map();
  */
 const defaultRules = [
   {
+    matchManagers: ['npm'],
     matchDepTypes: ['engines'],
-    enabled: false,
-  },
-  {
     matchPackageNames: ['node'],
     enabled: false,
   },
@@ -80,18 +78,19 @@ const defaultRules = [
   {
     groupName: 'TypeScript',
     matchPackageNames: ['typescript'],
-    rangeStrategy: 'pin',
+    rangeStrategy: 'bump',
     dependencyDashboardApproval: false,
   },
   {
     groupName: 'Common TypeScript Types',
     matchPackageNames: ['@types/node', '@types/react', '@types/react-dom'],
-    rangeStrategy: 'pin',
+    rangeStrategy: 'bump',
     dependencyDashboardApproval: false,
   },
   {
     groupName: 'React',
     matchPackageNames: ['react', 'react-dom'],
+    rangeStrategy: 'bump',
   },
 ];
 
