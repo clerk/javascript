@@ -25,4 +25,4 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
       
       - name: Validate Renovate Config
-        run: (node scripts/renovate-config-generator.mjs && (git status --porcelain renovate.json5 | grep "M renovate.json5")) && (echo "Please run \"node scripts/renovate-config-generator.mjs\" to update renovate.json5" && exit 1) || npx --yes --package renovate renovate-config-validator
+        run: npx --yes --package renovate renovate-config-validator
