@@ -13,17 +13,16 @@ jobs:
   validate-renovate-config:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
+      - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          show-progress: false
 
-      - name: Setup NodeJS
-        uses: actions/setup-node@v4
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
         with:
-          cache: 'npm'
-          node-version: 22
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
       
       - name: Validate Renovate Config
         run: (node scripts/renovate-config-generator.mjs && (git status --porcelain renovate.json5 | grep "M renovate.json5")) && (echo "Please run \"node scripts/renovate-config-generator.mjs\" to update renovate.json5" && exit 1) || npx --yes --package renovate renovate-config-validator
