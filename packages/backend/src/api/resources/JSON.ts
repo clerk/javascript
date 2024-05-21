@@ -1,5 +1,3 @@
-import type { SamlAccountJSON } from '@clerk/types';
-
 import type {
   InvitationStatus,
   OrganizationInvitationStatus,
@@ -23,6 +21,7 @@ export const ObjectType = {
   OrganizationMembership: 'organization_membership',
   PhoneNumber: 'phone_number',
   RedirectUrl: 'redirect_url',
+  SamlAccount: 'saml_account',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
   SignInToken: 'sign_in_token',
@@ -101,6 +100,17 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   username: string | null;
   public_metadata?: Record<string, unknown> | null;
   label: string | null;
+  verification: VerificationJSON | null;
+}
+
+export interface SamlAccountJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.SamlAccount;
+  provider: string;
+  provider_user_id: string | null;
+  active: boolean;
+  email_address: string;
+  first_name: string;
+  last_name: string;
   verification: VerificationJSON | null;
 }
 

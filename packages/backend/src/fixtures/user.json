@@ -75,6 +75,24 @@
       "verification": null
     }
   ],
+  "saml_accounts": [
+    {
+      "object": "saml_account",
+      "id": "samlacc_microsoft",
+      "provider": "saml_microsoft",
+      "active": true,
+      "email_address": "john.doe@clerk.test",
+      "first_name": "John",
+      "last_name": "Doe",
+      "provider_user_id": null,
+      "verification": {
+        "status": "verified",
+        "strategy": "saml",
+        "attempts": null,
+        "expireAt": 1613831855
+      }
+    }
+  ],
   "public_metadata": {
     "zodiac_sign": "leo"
   },
