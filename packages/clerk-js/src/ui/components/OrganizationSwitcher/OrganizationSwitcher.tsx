@@ -1,6 +1,6 @@
 import { useId } from 'react';
 
-import { AcceptedInvitationsProvider, withCoreUserGuard } from '../../contexts';
+import { AcceptedInvitationsProvider, useOrganizationSwitcherContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Popover, withCardStateProvider, withFloatingTree } from '../../elements';
 import { usePopover } from '../../hooks';
@@ -8,7 +8,11 @@ import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
 import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 
 const _OrganizationSwitcher = withFloatingTree(() => {
+  const { defaultOpen, __experimental_open, __experimental_onOpenChanged } = useOrganizationSwitcherContext();
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
+    defaultOpen,
+    open: __experimental_open,
+    onOpenChanged: __experimental_onOpenChanged,
     placement: 'bottom-start',
     offset: 8,
   });
