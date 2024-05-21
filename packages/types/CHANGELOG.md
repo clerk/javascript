@@ -1,5 +1,28 @@
 # Change Log
 
+## 3.65.0
+
+### Minor Changes
+
+- Added the following types ([#3409](https://github.com/clerk/javascript/pull/3409)) by [@panteliselef](https://github.com/panteliselef)
+
+  ```tsx
+  interface Clerk {
+    ...
+    openGoogleOneTap: (props?: GoogleOneTapProps) => void;
+    closeGoogleOneTap: () => void;
+    authenticateWithGoogleOneTap: (params: AuthenticateWithGoogleOneTapParams) => Promise<SignInResource | SignUpResource>;
+    handleGoogleOneTapCallback: (
+      signInOrUp: SignInResource | SignUpResource,
+      params: HandleOAuthCallbackParams,
+      customNavigate?: (to: string) => Promise<unknown>,
+    ) => Promise<unknown>;
+    ...
+  }
+
+  type GoogleOneTapStrategy = 'google_one_tap'
+  ```
+
 ## 3.64.1
 
 ### Patch Changes

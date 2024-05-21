@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.7.0
+
+### Minor Changes
+
+- Update export snapshot tests to include `GoogleOneTap`. ([#3409](https://github.com/clerk/javascript/pull/3409)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`fcc349cb5`](https://github.com/clerk/javascript/commit/fcc349cb59e4bfdf82165144ca5509a8c73d1325), [`fcc349cb5`](https://github.com/clerk/javascript/commit/fcc349cb59e4bfdf82165144ca5509a8c73d1325)]:
+  - @clerk/clerk-react@4.32.0
+  - @clerk/clerk-js@4.73.0
+
 ## 0.6.26
 
 ### Patch Changes

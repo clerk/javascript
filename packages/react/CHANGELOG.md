@@ -1,5 +1,30 @@
 # Change Log
 
+## 4.32.0
+
+### Minor Changes
+
+- Add support for GoogleOneTap ([#3409](https://github.com/clerk/javascript/pull/3409)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### React component
+
+  - `<GoogleOneTap/>`
+
+  Customize the UX of the prompt
+
+  ```tsx
+  <GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`fcc349cb5`](https://github.com/clerk/javascript/commit/fcc349cb59e4bfdf82165144ca5509a8c73d1325)]:
+  - @clerk/types@3.65.0
+
 ## 4.31.1
 
 ### Patch Changes

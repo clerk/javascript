@@ -1,5 +1,53 @@
 # Change Log
 
+## 4.73.0
+
+### Minor Changes
+
+- ### Use the Google One Tap component from with Vanilla JS ([#3409](https://github.com/clerk/javascript/pull/3409)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `Clerk.openGoogleOneTap({ cancelOnTapOutside: false, fedCmSupport: false, itpSupport: false })`
+  - `Clerk.closeGoogleOneTap()`
+
+  ### Low level APIs for custom flows
+
+  - `await Clerk.authenticateWithGoogleOneTap({ token: 'xxxx'})`
+  - `await Clerk.handleGoogleOneTapCallback()`
+
+  We recommend using this two methods together in order and let Clerk perform the correct redirections.
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      await Clerk.handleGoogleOneTapCallback(signInOrUp, {
+        afterSignInUrl: window.location.href,
+      });
+    },
+  });
+  ```
+
+  In case you want to handle the redirection and session management yourself you can do so like this
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      if (signInOrUp.status === 'complete') {
+        await Clerk.setActive({
+          session: signInOrUp.createdSessionId,
+        });
+      }
+    },
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`fcc349cb5`](https://github.com/clerk/javascript/commit/fcc349cb59e4bfdf82165144ca5509a8c73d1325)]:
+  - @clerk/types@3.65.0
+  - @clerk/localizations@1.28.5
+
 ## 4.72.4
 
 ### Patch Changes
