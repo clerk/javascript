@@ -80,14 +80,18 @@ const defaultRules = [
   {
     groupName: 'TypeScript',
     matchPackageNames: ['typescript'],
-    rangeStrategy: 'bump',
+    rangeStrategy: 'pin',
     dependencyDashboardApproval: false,
   },
   {
     groupName: 'Common TypeScript Types',
     matchPackageNames: ['@types/node', '@types/react', '@types/react-dom'],
-    rangeStrategy: 'bump',
+    rangeStrategy: 'pin',
     dependencyDashboardApproval: false,
+  },
+  {
+    groupName: 'React',
+    matchPackageNames: ['react', 'react-dom'],
   },
 ];
 
@@ -168,7 +172,7 @@ const renovateConfig = {
   prHourlyLimit: 4,
   prConcurrentLimit: 16,
   postUpdateOptions: ['npmDedupe'],
-  packageRules: defaultRules.concat(Array.from(rules.values()).flat()),
+  packageRules: Array.from(rules.values()).flat().concat(defaultRules),
 };
 
 await fs.writeJSON(path.join(ROOT_DIR, 'renovate.json5'), renovateConfig, { spaces: 2 });
