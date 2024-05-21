@@ -1,17 +1,13 @@
-/* eslint-env es2021 */
-const glob = require('glob');
-const fs = require('fs');
+import { globbySync } from 'globby';
+import { readFileSync } from 'node:fs';
 
 const getPackageNames = () => {
-  const files = glob.sync('./packages/*/package.json');
-  const names = files.map(f => JSON.parse(fs.readFileSync(f, 'utf8')).name);
+  const files = globbySync('./packages/*/package.json');
+  const names = files.map(f => JSON.parse(readFileSync(f, 'utf8')).name as string);
   return names.map(n => n.split('/').pop());
 };
 
-/**
- * @type {import('@commitlint/types').UserConfig}
- */
-module.exports = {
+const Configuration = {
   extends: ['@commitlint/config-conventional'],
   rules: {
     'subject-case': [2, 'always', ['sentence-case']],
@@ -20,3 +16,5 @@ module.exports = {
     'scope-enum': [2, 'always', [...getPackageNames(), 'repo', 'release', 'e2e', '*']],
   },
 };
+
+export default Configuration;
