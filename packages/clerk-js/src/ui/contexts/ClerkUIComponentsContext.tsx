@@ -507,7 +507,10 @@ export const useGoogleOneTapContext = () => {
   const afterSignUpUrl = clerk.buildUrlWithAuth(
     pickRedirectionProp('afterSignUpUrl', {
       queryParams,
-      ctx,
+      ctx: {
+        ...ctx,
+        afterSignUpUrl: window.location.href,
+      },
       options,
       displayConfig,
     }),
@@ -516,7 +519,10 @@ export const useGoogleOneTapContext = () => {
   const afterSignInUrl = clerk.buildUrlWithAuth(
     pickRedirectionProp('afterSignInUrl', {
       queryParams,
-      ctx,
+      ctx: {
+        ...ctx,
+        afterSignInUrl: window.location.href,
+      },
       options,
       displayConfig,
     }),
@@ -527,7 +533,7 @@ export const useGoogleOneTapContext = () => {
       base: signUpUrl,
       hashPath: '/continue',
       hashSearch: new URLSearchParams({
-        after_sign_up: afterSignUpUrl,
+        after_sign_up_url: afterSignUpUrl,
       }).toString(),
     },
     { stringify: true },
@@ -538,7 +544,7 @@ export const useGoogleOneTapContext = () => {
       base: signInUrl,
       hashPath: '/factor-one',
       hashSearch: new URLSearchParams({
-        after_sign_in: afterSignInUrl,
+        after_sign_in_url: afterSignInUrl,
       }).toString(),
     },
     { stringify: true },
@@ -548,7 +554,7 @@ export const useGoogleOneTapContext = () => {
       base: signInUrl,
       hashPath: '/factor-two',
       hashSearch: new URLSearchParams({
-        after_sign_in: afterSignInUrl,
+        after_sign_in_url: afterSignInUrl,
       }).toString(),
     },
     { stringify: true },
