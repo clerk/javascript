@@ -358,7 +358,7 @@ export const ptBR: LocalizationResource = {
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Aconteceu um erro',
-      title: 'Não foi possível entrar',
+      title: 'Não foi possível fazer login',
     },
     passkey: {
       subtitle:
