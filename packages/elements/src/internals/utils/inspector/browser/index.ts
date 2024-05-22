@@ -1,4 +1,6 @@
 import { isTruthy } from '@clerk/shared/underscore';
+// @ts-expect-error - Exists only in devDependencies; Removed by tsup for production builds
+// eslint-disable-next-line import/no-unresolved
 import { createBrowserInspector } from '@statelyai/inspect';
 
 export const getInspector = () => {
