@@ -175,6 +175,7 @@ function _SignUpContinue() {
                 <SignUpSocialButtons
                   enableOAuthProviders={showOauthProviders}
                   enableWeb3Providers={showWeb3Providers}
+                  continueSignUp
                 />
               )}
               <SignUpForm

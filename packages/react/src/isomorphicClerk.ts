@@ -3,18 +3,19 @@ import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
+  AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   Clerk,
   ClientResource,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
+  GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
   InstanceType,
   ListenerCallback,
   LoadedClerk,
-  OneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
@@ -24,11 +25,13 @@ import type {
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
+  SignInResource,
   SignOut,
   SignOutCallback,
   SignOutOptions,
   SignUpProps,
   SignUpRedirectOptions,
+  SignUpResource,
   UnsubscribeCallback,
   UserButtonProps,
   UserProfileProps,
@@ -83,8 +86,10 @@ type IsomorphicLoadedClerk = Without<
   | 'buildAfterSignOutUrl'
   | 'buildUrlWithAuth'
   | 'handleRedirectCallback'
+  | 'handleGoogleOneTapCallback'
   | 'handleUnauthenticated'
   | 'authenticateWithMetamask'
+  | 'authenticateWithGoogleOneTap'
   | 'createOrganization'
   | 'getOrganization'
   | 'mountUserButton'
@@ -99,9 +104,13 @@ type IsomorphicLoadedClerk = Without<
 > & {
   // TODO: Align return type and parms
   handleRedirectCallback: (params: HandleOAuthCallbackParams) => void;
+  handleGoogleOneTapCallback: (signInOrUp: SignInResource | SignUpResource, params: HandleOAuthCallbackParams) => void;
   handleUnauthenticated: () => void;
   // TODO: Align Promise unknown
   authenticateWithMetamask: (params: AuthenticateWithMetamaskParams) => Promise<void>;
+  authenticateWithGoogleOneTap: (
+    params: AuthenticateWithGoogleOneTapParams,
+  ) => Promise<SignInResource | SignUpResource>;
   // TODO: Align return type (maybe not possible or correct)
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource | void>;
   // TODO: Align return type (maybe not possible or correct)
@@ -140,7 +149,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
-  private preopenOneTap?: null | OneTapProps = null;
+  private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -345,6 +354,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  #waitForClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk> {
+    return new Promise<HeadlessBrowserClerk | BrowserClerk>(resolve => {
+      if (this.#loaded) {
+        resolve(this.clerkjs!);
+      }
+      this.addOnLoaded(() => resolve(this.clerkjs!));
+    });
+  }
+
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
     if (this.mode !== 'browser' || this.#loaded) {
       return;
@@ -462,7 +480,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     if (this.preopenOneTap !== null) {
-      clerkjs.__experimental_openGoogleOneTap(this.preopenOneTap);
+      clerkjs.openGoogleOneTap(this.preopenOneTap);
     }
 
     if (this.preopenOrganizationProfile !== null) {
@@ -597,17 +615,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_openGoogleOneTap = (props?: OneTapProps): void => {
+  openGoogleOneTap = (props?: GoogleOneTapProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_openGoogleOneTap(props);
+      this.clerkjs.openGoogleOneTap(props);
     } else {
       this.preopenOneTap = props;
     }
   };
 
-  __experimental_closeGoogleOneTap = (): void => {
+  closeGoogleOneTap = (): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.__experimental_closeGoogleOneTap();
+      this.clerkjs.closeGoogleOneTap();
     } else {
       this.preopenOneTap = null;
     }
@@ -929,6 +947,26 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  handleGoogleOneTapCallback = (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+  ): void => {
+    const callback = () => this.clerkjs?.handleGoogleOneTapCallback(signInOrUp, params);
+    if (this.clerkjs && this.#loaded) {
+      void callback()?.catch(() => {
+        // This error is caused when the host app is using React18
+        // and strictMode is enabled. This useEffects runs twice because
+        // the clerk-react ui components mounts, unmounts and mounts again
+        // so the clerk-js component loses its state because of the custom
+        // unmount callback we're using.
+        // This needs to be solved by tweaking the logic in uiComponents.tsx
+        // or by making handleRedirectCallback idempotent
+      });
+    } else {
+      this.premountMethodCalls.set('handleGoogleOneTapCallback', callback);
+    }
+  };
+
   handleEmailLinkVerification = async (params: HandleEmailLinkVerificationParams): Promise<void> => {
     const callback = () => this.clerkjs?.handleEmailLinkVerification(params);
     if (this.clerkjs && this.#loaded) {
@@ -945,6 +983,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountMethodCalls.set('authenticateWithMetamask', callback);
     }
+  };
+
+  authenticateWithGoogleOneTap = async (
+    params: AuthenticateWithGoogleOneTapParams,
+  ): Promise<SignInResource | SignUpResource> => {
+    const clerkjs = await this.#waitForClerkJS();
+    return clerkjs.authenticateWithGoogleOneTap(params);
   };
 
   createOrganization = async (params: CreateOrganizationParams): Promise<OrganizationResource | void> => {

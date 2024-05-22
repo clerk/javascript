@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.2.0
+
+### Minor Changes
+
+- Unpin the version of swr and allow any minor or patch version. ([#3399](https://github.com/clerk/javascript/pull/3399)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 2.1.1
 
 ### Patch Changes

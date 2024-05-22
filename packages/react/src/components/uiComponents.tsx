@@ -2,7 +2,7 @@ import { logErrorInDevMode, without } from '@clerk/shared';
 import { isDeeplyEqual } from '@clerk/shared/react';
 import type {
   CreateOrganizationProps,
-  OneTapProps,
+  GoogleOneTapProps,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
@@ -301,12 +301,12 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
   );
 }, 'OrganizationList');
 
-export const __experimental_GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<OneTapProps>) => {
+export const GoogleOneTap = withClerk(({ clerk, ...props }: WithClerkProp<GoogleOneTapProps>) => {
   return (
     <Portal
-      open={clerk.__experimental_openGoogleOneTap}
-      close={clerk.__experimental_closeGoogleOneTap}
+      open={clerk.openGoogleOneTap}
+      close={clerk.closeGoogleOneTap}
       props={props}
     />
   );
-}, 'OneTap');
+}, 'GoogleOneTap');
