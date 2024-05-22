@@ -37,7 +37,6 @@
     "test:integration:express": "E2E_APP_ID=express.* npm run test:integration:base -- --grep @express",
     "test:integration:generic": "E2E_APP_ID=react.vite.* npm run test:integration:base -- --grep @generic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* npm run test:integration:base -- --grep @nextjs",
-    "test:integration:nextjs:canary": "E2E_APP_ID=next.appRouter.canary.* npm run test:integration:base -- --grep @nextjs",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* npm run test:integration:base -- --grep @quickstart",
     "test:integration:remix": "echo 'placeholder'",
     "turbo:clean": "turbo daemon clean",
