@@ -40,7 +40,7 @@ const defaultRules = [
     enabled: false,
   },
   {
-    groupName: 'Clerk Monorepo',
+    groupName: 'Clerk monorepo',
     groupSlug: 'clerk-monorepo',
     matchFileNames: ['+(package.json)'],
     matchDepTypes: ['devDependencies'],
@@ -49,7 +49,7 @@ const defaultRules = [
     commitMessageTopic: 'Dependencies for Clerk Monorepo',
   },
   {
-    groupName: 'Linting & Formatting',
+    groupName: 'linting & formatting',
     matchPackageNames: [
       '@types/eslint',
       'prettier',
@@ -61,7 +61,7 @@ const defaultRules = [
     matchPackagePrefixes: ['@eslint/', '@stylistic/eslint-plugin', '@types/eslint__', '@typescript-eslint/', 'eslint'],
   },
   {
-    groupName: 'Testing',
+    groupName: 'testing',
     matchPackageNames: ['@types/chai', '@types/jest', '@types/sinon', 'nock', 'nyc', 'ts-jest', 'vitest'],
     matchPackagePrefixes: [
       '@testing-library',
@@ -81,7 +81,7 @@ const defaultRules = [
     rangeStrategy: 'bump',
   },
   {
-    groupName: 'Common TypeScript Types',
+    groupName: 'common TypeScript types',
     matchPackageNames: ['@types/node', '@types/react', '@types/react-dom'],
     rangeStrategy: 'bump',
   },
@@ -92,7 +92,7 @@ const defaultRules = [
   },
   {
     extends: ['monorepo:remix'],
-    groupName: 'Remix Monorepo',
+    groupName: 'Remix monorepo',
     matchUpdateTypes: ['patch', 'minor', 'major'],
   },
 ];
@@ -106,7 +106,7 @@ for (const pkg of workspacePackages) {
    */
   const pkgRules = [
     {
-      groupName: `[DEV] Minor & patch dependencies`,
+      groupName: `[DEV] minor & patch dependencies`,
       groupSlug: `${pkg}-dev-minor`,
       matchFileNames: [`packages/${pkg}/package.json`],
       matchDepTypes: [`devDependencies`],
@@ -115,7 +115,7 @@ for (const pkg of workspacePackages) {
       semanticCommitScope: pkg,
     },
     {
-      groupName: `[DEV] Major dependencies`,
+      groupName: `[DEV] major dependencies`,
       groupSlug: `${pkg}-dev-major`,
       matchFileNames: [`packages/${pkg}/package.json`],
       matchDepTypes: [`devDependencies`],
@@ -123,7 +123,7 @@ for (const pkg of workspacePackages) {
       semanticCommitScope: pkg,
     },
     {
-      groupName: `Minor & patch dependencies`,
+      groupName: `minor & patch dependencies`,
       groupSlug: `${pkg}-prod-minor`,
       matchFileNames: [`packages/${pkg}/package.json`],
       matchDepTypes: [`dependencies`],
@@ -131,7 +131,7 @@ for (const pkg of workspacePackages) {
       semanticCommitScope: pkg,
     },
     {
-      groupName: `Major dependencies`,
+      groupName: `major dependencies`,
       groupSlug: `${pkg}-prod-major`,
       matchFileNames: [`packages/${pkg}/package.json`],
       matchDepTypes: [`dependencies`],
