@@ -19,8 +19,6 @@ export const createLongRunningApps = () => {
     { id: 'remix.node.withEmailCodes', config: remix.remixNode, env: envs.withEmailCodes },
     { id: 'next.appRouter.withEmailCodes', config: next.appRouter, env: envs.withEmailCodes },
     { id: 'next.appRouter.withCustomRoles', config: next.appRouter, env: envs.withCustomRoles },
-    { id: 'next.appRouter.canary.withEmailCodes', config: next.appRouterCanary, env: envs.withEmailCodes },
-    { id: 'next.appRouter.canary.withCustomRoles', config: next.appRouterCanary, env: envs.withCustomRoles },
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
   ] as const;
 

@@ -7,25 +7,19 @@ const appRouter = applicationConfig()
   .setName('next-app-router')
   .useTemplate(templates['next-app-router'])
   .setEnvFormatter('public', key => `NEXT_PUBLIC_${key}`)
-  .addScript('setup', 'npm i')
+  .addScript('setup', constants.E2E_NPM_FORCE ? 'npm i --force' : 'npm i')
   .addScript('dev', 'npm run dev')
   .addScript('build', 'npm run build')
   .addScript('serve', 'npm run start')
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
+  .addDependency('react', constants.E2E_NEXTJS_VERSION)
+  .addDependency('react-dom', constants.E2E_NEXTJS_VERSION)
   .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || clerkNextjsLocal);
 
 const appRouterTurbo = appRouter
   .clone()
   .setName('next-app-router-turbopack')
   .addScript('dev', 'npm run dev -- --turbo');
-
-const appRouterCanary = appRouter
-  .clone()
-  .setName('next-app-router-canary')
-  .addScript('setup', 'npm i --force')
-  .addDependency('next', 'canary')
-  .addDependency('react', '19.0.0-beta-04b058868c-20240508')
-  .addDependency('react-dom', '19.0.0-beta-04b058868c-20240508');
 
 const appRouterQuickstart = appRouter
   .clone()
@@ -58,5 +52,4 @@ export const next = {
   appRouterQuickstart,
   appRouterAPWithClerkNextLatest,
   appRouterAPWithClerkNextV4,
-  appRouterCanary,
 } as const;
