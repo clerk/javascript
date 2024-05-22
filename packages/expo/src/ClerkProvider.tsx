@@ -14,9 +14,9 @@ export type ClerkProviderProps = ClerkReactProviderProps & {
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache = MemoryTokenCache, publishableKey, ...rest } = props;
-  const key =
-    publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
+  const { children, tokenCache = MemoryTokenCache, publishableKey, Clerk, ...rest } = props;
+  const pkClerk = typeof Clerk !== 'function' ? Clerk?.publishableKey : undefined;
+  const key = publishableKey || pkClerk || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   return (
     <ClerkReactProvider
@@ -25,7 +25,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
       key={key}
       {...rest}
       publishableKey={key}
-      Clerk={buildClerk({ key, tokenCache })}
+      Clerk={Clerk || buildClerk({ publishableKey: key, tokenCache })}
       standardBrowser={!isReactNative()}
     >
       {children}
