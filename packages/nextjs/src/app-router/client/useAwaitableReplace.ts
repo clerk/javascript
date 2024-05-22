@@ -8,7 +8,7 @@ import type { NextClerkProviderProps } from '../../types';
 declare global {
   interface Window {
     __clerk_internal_navPromisesBuffer: Array<() => void> | undefined;
-    __clerk_internal_navFun: NonNullable<NextClerkProviderProps['routerPush']>;
+    __clerk_internal_navFun: NonNullable<NextClerkProviderProps['routerReplace']>;
   }
 }
 

@@ -8,7 +8,7 @@ import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsConte
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { useAwaitableNavigate } from './useAwaitableNavigate';
+import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
 declare global {
@@ -22,7 +22,7 @@ declare global {
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
-  const navigate = useAwaitableNavigate();
+  const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
 
@@ -70,7 +70,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   const mergedProps = mergeNextClerkPropsWithEnv({
     ...props,
-    routerPush: navigate,
+    routerPush: push,
     routerReplace: replace,
   });
 

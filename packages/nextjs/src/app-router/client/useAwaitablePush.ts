@@ -17,7 +17,7 @@ declare global {
  * This is accomplished by wrapping the call to `router.push` in `startTransition()`, which should rely on React to coordinate the pending state. We key off of
  * `isPending` to flush the stored promises and ensure the navigates "resolve".
  */
-export const useAwaitableNavigate = () => {
+export const useAwaitablePush = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
