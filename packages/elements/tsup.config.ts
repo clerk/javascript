@@ -40,7 +40,7 @@ export default defineConfig(overrideOptions => {
       'react/sign-in/index': 'src/react/sign-in/index.ts',
       'react/sign-up/index': 'src/react/sign-up/index.ts',
     },
-    external: ['react', 'react-dom', 'xstate', '@statelyai/inspect'],
+    external: ['react', 'react-dom', '@statelyai/inspect'],
     format: ['cjs', 'esm'],
     minify: false,
     sourcemap: true,
