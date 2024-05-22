@@ -5,7 +5,7 @@ import { createLogger, fs } from '../scripts';
 import { application } from './application.js';
 import type { EnvironmentConfig } from './environment';
 import type { Helpers } from './helpers.js';
-import { hash, helpers } from './helpers.js';
+import { helpers } from './helpers.js';
 
 export type ApplicationConfig = ReturnType<typeof applicationConfig>;
 type Scripts = { dev: string; build: string; setup: string; serve: string };
@@ -64,10 +64,11 @@ export const applicationConfig = () => {
       return self;
     },
     commit: async (opts?: { stableHash?: string }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { stableHash } = opts || {};
       logger.info(`Creating project "${name}"`);
 
-      const appDirName = stableHash || `${name}__${Date.now()}__${hash()}`;
+      const appDirName = `${name}__123`;
       const appDirPath = path.resolve(constants.TMP_DIR, appDirName);
 
       // Copy template files

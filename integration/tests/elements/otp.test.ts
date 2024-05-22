@@ -13,6 +13,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('OTP @elem
   test.beforeEach(async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/otp');
+    await u.page.waitForClerkJsLoaded();
   });
 
   const otpTypes = {

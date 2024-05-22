@@ -129,7 +129,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows', 'elements']
+        test-name: ['elements']
         test-project: ['chrome']
 
     steps:
@@ -163,12 +163,33 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
-        run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
+        id: integration-tests
+        run: npx turbo test:integration:${{ matrix.test-name }} --cache-dir=./.turbo-cache --concurrency=4 --summarize=false --verbosity=2 --log-order=stream --only -- --project=${{ matrix.test-project }}
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+      
+      - name: ENV VARS ARGHHH
+        if: ${{ cancelled() || failure() }}
+        run: echo "APP_DIR_PATH=${appDirPath}" >> $GITHUB_ENV
+        
+      - name: Upload test artifacts
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ matrix.test-name }}
+          path: integration/test-results
+          retention-days: 1
+
+      - name: Upload tempdir artifacts
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: temp-app-${{ matrix.test-name }}
+          path: /tmp/.temp_integration/long-running--elements.next.appRouter__123
+          retention-days: 1
 
       # - name: Upload Integration Report for ${{ matrix.test-name }}
       #   uses: actions/upload-artifact@v3

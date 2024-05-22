@@ -19,7 +19,7 @@ export const common: PlaywrightTestConfig = {
   timeout: 90000,
   maxFailures: process.env.CI ? 1 : undefined,
   workers: process.env.CI ? numAvailableWorkers : '70%',
-  reporter: process.env.CI ? 'line' : 'list',
+  reporter: 'line',
   use: {
     trace: 'on-first-retry',
     bypassCSP: true, // We probably need to limit this to specific tests
