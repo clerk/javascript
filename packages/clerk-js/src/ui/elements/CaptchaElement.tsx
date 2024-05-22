@@ -1,4 +1,4 @@
-import { CAPTCHA_ELEMENT_ID } from '../../utils';
+import { CAPTCHA_ELEMENT_ID } from '../../utils/captcha';
 import { Box } from '../customizables';
 
 export const CaptchaElement = () => (
