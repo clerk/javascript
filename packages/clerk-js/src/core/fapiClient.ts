@@ -1,6 +1,5 @@
 import { camelToSnake, isBrowserOnline, runWithExponentialBackOff } from '@clerk/shared';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
-import qs from 'qs';
 
 import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from '../utils';
 import { clerkNetworkError } from './errors';
@@ -32,8 +31,21 @@ export type FapiRequestCallback<T> = (
   response?: FapiResponse<T>,
 ) => Promise<unknown | false> | unknown | false;
 
-const camelToSnakeEncoder: qs.IStringifyOptions['encoder'] = (str, defaultEncoder, _, type) => {
-  return type === 'key' ? camelToSnake(str) : defaultEncoder(str);
+const customDefaultEncoder = (value: string) => {
+  return encodeURIComponent(value).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+};
+
+const camelToSnakeEncoder = (str: string, type: 'key' | 'value') => {
+  return type === 'key' ? camelToSnake(str) : customDefaultEncoder(str);
+};
+const stringifyBody = obj => {
+  return Object.keys(obj)
+    .map(key => {
+      const encodedKey = camelToSnakeEncoder(key, 'key');
+      const encodedValue = obj[key] && camelToSnakeEncoder(obj[key], 'value');
+      return encodedValue && `${encodedKey}=${encodedValue}`;
+    })
+    .join('&');
 };
 
 // TODO: Move to @clerk/types
@@ -125,7 +137,18 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
       return acc;
     }, {} as FapiQueryStringParameters & Record<string, string | string[]>);
 
-    return qs.stringify(objParams, { addQueryPrefix: true, arrayFormat: 'repeat' });
+    const queryParams = new URLSearchParams();
+
+    objParams &&
+      Object.keys(objParams).forEach(key => {
+        const value = objParams[key];
+        if (Array.isArray(value)) {
+          value.forEach(item => queryParams.append(key, item));
+        } else {
+          queryParams.append(key, value);
+        }
+      });
+    return queryParams.toString();
   }
 
   function buildUrl(requestInit: FapiRequestInit): URL {
@@ -193,8 +216,11 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     // Currently, this is needed only for form-urlencoded, so that the values reach the server in the form
     // foo=bar&baz=bar&whatever=1
     // @ts-ignore
+
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
-      requestInit.body = qs.stringify(body, { encoder: camelToSnakeEncoder, indices: false });
+      if (body && typeof body === 'object') {
+        requestInit.body = stringifyBody(body);
+      }
     }
 
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
