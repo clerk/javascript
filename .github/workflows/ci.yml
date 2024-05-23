@@ -133,9 +133,7 @@ jobs:
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'
-            next-version: '13'
-          - test-name: 'nextjs'
-            next-version: '14'
+            next-version: ['13','14']
 
     steps:
       - name: Checkout Repo
