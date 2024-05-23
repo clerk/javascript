@@ -3,13 +3,13 @@ import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidSecretKey } from '../util/optionsAssertions';
-import { getCookieSuffix, isDevelopmentFromSecretKey } from '../util/shared';
+import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
-import { suffixCookie, unSuffixCookie } from './cookie';
+import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import type { AuthenticateRequestOptions } from './types';
 import { verifyToken } from './verify';
@@ -89,7 +89,7 @@ export async function authenticateRequest(
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
-    url.searchParams.append('suffixed_cookies', 'true');
+    url.searchParams.append('suffixed_cookies', authenticateContext.suffixedCookies.toString());
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
@@ -106,16 +106,12 @@ export async function authenticateRequest(
 
     const handshakePayload = await verifyHandshakeToken(authenticateContext.handshakeToken!, authenticateContext);
     const cookiesToSet = handshakePayload.handshake;
-    const cookieSuffix = getCookieSuffix(authenticateContext.publishableKey);
 
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
-      const suffixedCookie = suffixCookie(cookieSuffix, x);
-      headers.append('Set-Cookie', suffixedCookie);
-      const unSuffixedCookie = unSuffixCookie(cookieSuffix, x);
-      headers.append('Set-Cookie', unSuffixedCookie);
-      if (unSuffixedCookie.startsWith(`${constants.Cookies.Session}=`)) {
-        sessionToken = unSuffixedCookie.split(';')[0].substring(10);
+      headers.append('Set-Cookie', x);
+      if (getCookieName(x).startsWith(constants.Cookies.Session)) {
+        sessionToken = getCookieValue(x);
       }
     });
 

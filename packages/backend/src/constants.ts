@@ -19,6 +19,7 @@ const Cookies = {
   ClientUat: '__client_uat',
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
+  SuffixedCookies: '__clerk_suffixed_cookies',
 } as const;
 
 const QueryParameters = {

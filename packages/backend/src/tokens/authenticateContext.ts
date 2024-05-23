@@ -19,6 +19,7 @@ interface AuthenticateContextInterface extends AuthenticateRequestOptions {
   // cookie-based values
   sessionTokenInCookie: string | undefined;
   clientUat: number;
+  suffixedCookies: boolean;
   // handshake-related values
   devBrowserToken: string | undefined;
   handshakeToken: string | undefined;
@@ -45,12 +46,17 @@ class AuthenticateContext {
     return this.sessionTokenInCookie || this.sessionTokenInHeader;
   }
 
+  private get cookieSuffix() {
+    return this.publishableKey?.split('_').pop();
+  }
+
   public constructor(private clerkRequest: ClerkRequest, options: AuthenticateRequestOptions) {
     // Even though the options are assigned to this later in this function
     // we set the publishableKey here because it is being used in cookies/headers/handshake-values
     // as part of getMultipleAppsCookie
     this.initPublishableKeyValues(options);
     this.initHeaderValues();
+    // initCookieValues should be used before initHandshakeValues because the it depends on suffixedCookies
     this.initCookieValues();
     this.initHandshakeValues();
     Object.assign(this, options);
@@ -70,15 +76,6 @@ class AuthenticateContext {
     this.frontendApi = pk.frontendApi;
   }
 
-  private initHandshakeValues() {
-    this.devBrowserToken =
-      this.getQueryParam(constants.QueryParameters.DevBrowser) ||
-      this.getMultipleAppsCookie(constants.Cookies.DevBrowser);
-    // Using getCookie since we don't suffix the handshake token cookie
-    this.handshakeToken =
-      this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
-  }
-
   private initHeaderValues() {
     this.sessionTokenInHeader = this.stripAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
@@ -93,8 +90,19 @@ class AuthenticateContext {
   }
 
   private initCookieValues() {
-    this.sessionTokenInCookie = this.getMultipleAppsCookie(constants.Cookies.Session);
-    this.clientUat = Number.parseInt(this.getMultipleAppsCookie(constants.Cookies.ClientUat) || '') || 0;
+    // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
+    this.suffixedCookies = this.getSuffixedCookie(constants.Cookies.SuffixedCookies) === 'true';
+    this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
+    this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
+  }
+
+  private initHandshakeValues() {
+    this.devBrowserToken =
+      this.getQueryParam(constants.QueryParameters.DevBrowser) ||
+      this.getSuffixedOrUnSuffixedCookie(constants.Cookies.DevBrowser);
+    // Using getCookie since we don't suffix the handshake token cookie
+    this.handshakeToken =
+      this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
   }
 
   private stripAuthorizationHeader(authValue: string | undefined | null): string | undefined {
@@ -113,9 +121,15 @@ class AuthenticateContext {
     return this.clerkRequest.cookies.get(name) || undefined;
   }
 
-  private getMultipleAppsCookie(cookieName: string) {
-    const suffix = this.publishableKey?.split('_').pop();
-    return this.getCookie(`${cookieName}_${suffix}`) || this.getCookie(cookieName) || undefined;
+  private getSuffixedCookie(name: string) {
+    return this.getCookie(`${name}_${this.cookieSuffix}`) || undefined;
+  }
+
+  private getSuffixedOrUnSuffixedCookie(cookieName: string) {
+    if (this.suffixedCookies) {
+      return this.getSuffixedCookie(cookieName);
+    }
+    return this.getCookie(cookieName);
   }
 }
 
