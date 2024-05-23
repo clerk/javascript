@@ -35,6 +35,14 @@ export const createProtect = (opts: {
   /**
    * see {@link notFound} above
    */
+  forbidden?: () => never;
+  /**
+   * see {@link notFound} above
+   */
+  unauthorized?: () => never;
+  /**
+   * see {@link notFound} above
+   */
   redirect: (url: string) => void;
   /**
    * protect() in middleware redirects to signInUrl if signed out
@@ -43,7 +51,7 @@ export const createProtect = (opts: {
    */
   redirectToSignIn: RedirectFun<unknown>;
 }): AuthProtect => {
-  const { redirectToSignIn, authObject, redirect, notFound, request } = opts;
+  const { redirectToSignIn, authObject, redirect, notFound, forbidden, unauthorized, request } = opts;
 
   return ((...args: any[]) => {
     const optionValuesAsParam = args[0]?.unauthenticatedUrl || args[0]?.unauthorizedUrl;
@@ -63,14 +71,14 @@ export const createProtect = (opts: {
         // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
         return redirectToSignIn();
       }
-      return notFound();
+      return typeof unauthorized === 'function' ? unauthorized() : notFound();
     };
 
     const handleUnauthorized = () => {
       if (unauthorizedUrl) {
         return redirect(unauthorizedUrl);
       }
-      return notFound();
+      return typeof forbidden === 'function' ? forbidden() : notFound();
     };
 
     /**

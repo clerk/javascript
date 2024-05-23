@@ -13,6 +13,9 @@ import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { protect: AuthProtect; redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
+let forbidden = notFound;
+let unauthorized = notFound;
+
 export const auth = (): Auth => {
   const request = buildRequestLike();
   const authObject = createGetAuth({
@@ -42,7 +45,21 @@ export const auth = (): Auth => {
     });
   };
 
-  const protect = createProtect({ request, authObject, redirectToSignIn, notFound, redirect });
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    forbidden = require('next/navigation').forbidden;
+  } catch (e) {
+    /* empty */
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    unauthorized = require('next/navigation').unauthorized;
+  } catch (e) {
+    /* empty */
+  }
+
+  const protect = createProtect({ request, authObject, redirectToSignIn, notFound, forbidden, unauthorized, redirect });
 
   return Object.assign(authObject, { protect, redirectToSignIn });
 };

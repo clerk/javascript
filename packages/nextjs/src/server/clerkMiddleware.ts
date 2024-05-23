@@ -28,6 +28,8 @@ import {
 
 const CONTROL_FLOW_ERROR = {
   FORCE_NOT_FOUND: 'CLERK_PROTECT_REWRITE',
+  FORCE_FORBIDDEN: 'CLERK_PROTECT_FORBIDDEN',
+  FORCE_UNAUTHORIZED: 'CLERK_PROTECT_UNAUTHORIZED',
   REDIRECT_TO_URL: 'CLERK_PROTECT_REDIRECT_TO_URL',
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
 };
@@ -210,14 +212,33 @@ const createMiddlewareProtect = (
       throw new Error(CONTROL_FLOW_ERROR.FORCE_NOT_FOUND) as any;
     };
 
+    const unauthorized = () => {
+      throw new Error(CONTROL_FLOW_ERROR.FORCE_UNAUTHORIZED) as any;
+    };
+
+    const forbidden = () => {
+      throw new Error(CONTROL_FLOW_ERROR.FORCE_FORBIDDEN) as any;
+    };
+
     const redirect = (url: string) => {
       const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_URL) as any;
       err.redirectUrl = url;
       throw err;
     };
 
-    // @ts-expect-error TS is not happy even though the types are correct
-    return createProtect({ request: clerkRequest, redirect, notFound, authObject, redirectToSignIn })(params, options);
+    return createProtect({
+      request: clerkRequest,
+      redirect,
+      notFound,
+      forbidden,
+      unauthorized,
+      authObject,
+      redirectToSignIn,
+    })(
+      // @ts-expect-error TS is not happy even though the types are correct
+      params,
+      options,
+    );
   }) as AuthProtect;
 };
 
@@ -237,6 +258,10 @@ const handleControlFlowErrors = (e: any, clerkRequest: ClerkRequest, requestStat
         constants.Headers.AuthReason,
         'protect-rewrite',
       );
+    case CONTROL_FLOW_ERROR.FORCE_FORBIDDEN:
+      return setHeader(NextResponse.json(null, { status: 403 }), constants.Headers.AuthReason, 'protect-forbidden');
+    case CONTROL_FLOW_ERROR.FORCE_UNAUTHORIZED:
+      return setHeader(NextResponse.json(null, { status: 401 }), constants.Headers.AuthReason, 'protect-unauthorized');
     case CONTROL_FLOW_ERROR.REDIRECT_TO_URL:
       return redirectAdapter(e.redirectUrl);
     case CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN:
