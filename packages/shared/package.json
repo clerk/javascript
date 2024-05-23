@@ -68,7 +68,8 @@
     "constants",
     "apiUrlFromPublishableKey",
     "scripts",
-    "telemetry"
+    "telemetry",
+    "logger"
   ],
   "scripts": {
     "build": "tsup",
@@ -103,8 +104,8 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": ">=18 || >=19.0.0-beta",
+    "react-dom": ">=18 || >=19.0.0-beta"
   },
   "peerDependenciesMeta": {
     "react": {

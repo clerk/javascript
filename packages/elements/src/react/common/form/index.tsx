@@ -606,9 +606,9 @@ const FIELD_ERROR_NAME = 'ClerkElementsFieldError';
 
 type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
 
-type FormErrorPropsRenderFn = {
-  asChild?: never;
-  children?: (error: FormErrorRenderProps) => React.ReactNode;
+type FormErrorPropsAsChild = {
+  asChild?: true | never;
+  children?: React.ReactElement | ((error: FormErrorRenderProps) => React.ReactNode);
   code?: string;
 };
 
@@ -618,14 +618,7 @@ type FormErrorPropsStd = {
   code: string;
 };
 
-type FormErrorPropsAsChild = {
-  asChild?: true;
-  children: React.ReactElement;
-  code: string;
-};
-
-type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> &
-  (FormErrorPropsRenderFn | FormErrorPropsStd | FormErrorPropsAsChild);
+type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> & (FormErrorPropsStd | FormErrorPropsAsChild);
 
 type FormGlobalErrorElement = React.ElementRef<'div'>;
 type FormGlobalErrorProps = FormErrorProps<React.ComponentPropsWithoutRef<'div'>>;

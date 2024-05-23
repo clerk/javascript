@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import type { SignUpResource } from '@clerk/types';
 
 import {
@@ -473,7 +474,7 @@ describe('isAllowedRedirectOrigin', () => {
     ['https://test.clerk.com/foo?hello=1', [/https:\/\/www\.clerk\.com/], false],
   ];
 
-  const warnMock = jest.spyOn(global.console, 'warn').mockImplementation();
+  const warnMock = jest.spyOn(logger, 'warnOnce');
 
   beforeEach(() => warnMock.mockClear());
   afterAll(() => warnMock.mockRestore());
