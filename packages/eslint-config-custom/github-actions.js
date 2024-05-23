@@ -8,7 +8,7 @@ module.exports = {
       parser: 'any-eslint-parser',
       rules: {
         'regex/invalid': [
-          'warn',
+          'error',
           [
             {
               regex: '^(?!.*\\$TURBO_ARGS( |$)).*turbo \\S+',

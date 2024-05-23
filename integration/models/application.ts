@@ -36,7 +36,6 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
       if (force || !nodeModulesExist) {
         const log = logger.child({ prefix: 'setup' }).info;
         await run(scripts.setup, { cwd: appDirPath, log });
-        await run(`cd node_modules/@clerk/elements && ls`, { cwd: appDirPath, log });
         state.completedSetup = true;
       }
     },

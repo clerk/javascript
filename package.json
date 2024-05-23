@@ -31,7 +31,7 @@
     "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test:cache:clear": "FORCE_COLOR=1 turbo test:cache:clear --continue --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test:integration:ap-flows": "npm run test:integration:base -- --grep @ap-flows",
-    "test:integration:base": "DEBUG=1 npx playwright test --config integration/playwright.config.ts --trace=retain-on-failure",
+    "test:integration:base": "DEBUG=1 npx playwright test --config integration/playwright.config.ts",
     "test:integration:cleanup": "DEBUG=1 npx playwright test --config integration/playwright.cleanup.config.ts",
     "test:integration:deployment:nextjs": "DEBUG=1 npx playwright test --config integration/playwright.deployments.config.ts",
     "test:integration:elements": "E2E_APP_ID=elements.* npm run test:integration:base -- --grep @elements",
