@@ -13,7 +13,7 @@ export const useAwaitableReplace = () => {
   const router = useRouter();
 
   return useInternalNavFun({
-    windowNav: window?.history.replaceState.bind(window.history),
+    windowNav: typeof window !== 'undefined' ? window.history.replaceState.bind(window.history) : undefined,
     routerNav: router.replace.bind(router),
   });
 };
