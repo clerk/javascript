@@ -366,7 +366,7 @@ export const SignInRouterMachine = setup({
             'NAVIGATE.PREVIOUS': {
               description: 'Go to Idle, and also tell firstFactor to go to Pending',
               target: 'Idle',
-              actions: sendTo(({ self }) => self.getSnapshot().children['firstFactor']!, { type: 'NAVIGATE.PREVIOUS' }),
+              actions: sendTo('firstFactor', { type: 'NAVIGATE.PREVIOUS' }),
             },
           },
         },
