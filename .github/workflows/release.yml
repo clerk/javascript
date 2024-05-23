@@ -55,7 +55,8 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: 'chore(repo): Version packages'
+          commit: 'ci(repo): Version packages'
+          title: 'ci(repo): Version packages'
           publish: npm run release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: npm run version

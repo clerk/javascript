@@ -154,6 +154,12 @@
       "inputs": ["integration/**"],
       "outputMode": "new-only"
     },
+    "//#test:integration:nextjs:canary": {
+      "dependsOn": ["^@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
+    },
     "//#test:integration:quickstart": {
       "dependsOn": ["^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
