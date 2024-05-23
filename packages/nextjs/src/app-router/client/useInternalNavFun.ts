@@ -1,24 +1,23 @@
-'use client';
-
-import { usePathname, useRouter } from 'next/navigation';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useTransition } from 'react';
 
 import type { NextClerkProviderProps } from '../../types';
 
 declare global {
   interface Window {
+    __clerk_internal_navFun: NonNullable<
+      NextClerkProviderProps['routerPush'] | NextClerkProviderProps['routerReplace']
+    >;
     __clerk_internal_navPromisesBuffer: Array<() => void> | undefined;
-    __clerk_internal_navFun: NonNullable<NextClerkProviderProps['routerPush']>;
   }
 }
 
-/**
- * Creates an "awaitable" navigation function that will do its best effort to wait for Next.js to finish its route transition.
- * This is accomplished by wrapping the call to `router.push` in `startTransition()`, which should rely on React to coordinate the pending state. We key off of
- * `isPending` to flush the stored promises and ensure the navigates "resolve".
- */
-export const useAwaitableNavigate = () => {
-  const router = useRouter();
+export const useInternalNavFun = (props: {
+  windowNav: typeof window.history.pushState | typeof window.history.replaceState;
+  routerNav: AppRouterInstance['push'] | AppRouterInstance['replace'];
+}) => {
+  const { windowNav, routerNav } = props;
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
@@ -39,15 +38,15 @@ export const useAwaitableNavigate = () => {
           if (opts?.__internal_metadata?.navigationType === 'internal') {
             // In 14.1.0, useSearchParams becomes reactive to shallow updates,
             // but only if passing `null` as the history state.
-            // Older versions need to maintain the history state for push to work,
+            // Older versions need to maintain the history state for push/replace to work,
             // without affecting how the Next router works.
             const state = ((window as any).next?.version ?? '') < '14.1.0' ? history.state : null;
-            window.history.pushState(state, '', to);
+            windowNav(state, '', to);
           } else {
             // If the navigation is external (usually when navigating away from the component but still within the app),
             // we should use the Next.js router to navigate as it will handle updating the URL and also
             // fetching the new page if necessary.
-            router.push(to);
+            routerNav(to);
           }
         });
       });
