@@ -1,7 +1,13 @@
+import type { InspectionEvent, Observer } from 'xstate';
+
 import { getInspector as getBrowserInspector } from './browser';
 import { getInspector as getConsoleInspector } from './console';
 
-export const inspect = getBrowserInspector() ?? getConsoleInspector() ?? undefined;
+export let inspect: Observer<InspectionEvent> | undefined;
+
+if (__DEV__) {
+  inspect = getBrowserInspector() ?? getConsoleInspector();
+}
 
 const inspector = {
   inspect,

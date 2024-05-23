@@ -1,26 +1,7 @@
-import type { Plugin } from 'esbuild';
 import { defineConfig } from 'tsup';
 
 import { version as clerkJsVersion } from '../clerk-js/package.json';
 import { name, version } from './package.json';
-
-/**
- * Replaces the inspect with undefined so-as not to bundle
- * inspectors outside of our development environment.
- */
-export function dynamicInspectorImport(): Plugin {
-  return {
-    name: 'dynamicInspectorImport',
-    setup(build) {
-      build.onLoad({ filter: /\/inspector\/index.ts/ }, async () => {
-        return {
-          contents: 'export const inspect = undefined;',
-          loader: 'ts',
-        };
-      });
-    },
-  };
-}
 
 export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
@@ -44,6 +25,5 @@ export default defineConfig(overrideOptions => {
     format: ['cjs', 'esm'],
     minify: false,
     sourcemap: true,
-    esbuildPlugins: isProd ? [dynamicInspectorImport()] : [],
   };
 });

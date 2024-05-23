@@ -4,6 +4,7 @@ import { createConsoleInspector } from './console';
 
 export function getInspector() {
   if (
+    __DEV__ &&
     process.env.NODE_ENV === 'development' &&
     isTruthy(process.env.NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG ?? process.env.CLERK_ELEMENTS_DEBUG)
   ) {
