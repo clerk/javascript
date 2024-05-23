@@ -131,6 +131,9 @@ jobs:
       matrix:
         test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
         test-project: ['chrome']
+        include:
+          - test-name: 'nextjs'
+            next-version: '13'
 
     steps:
       - name: Checkout Repo
@@ -165,6 +168,7 @@ jobs:
       - name: Run Integration Tests
         run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
