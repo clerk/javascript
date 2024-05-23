@@ -81,13 +81,13 @@
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "next": "^13.5.4",
+    "next": "^14.1.1",
     "typescript": "*"
   },
   "peerDependencies": {
     "next": "^13.5.4 || ^14.0.3",
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": ">=18 || >=19.0.0-beta",
+    "react-dom": ">=18 || >=19.0.0-beta"
   },
   "engines": {
     "node": ">=18.17.0"
