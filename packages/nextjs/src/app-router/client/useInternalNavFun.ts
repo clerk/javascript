@@ -14,14 +14,14 @@ declare global {
 }
 
 export const useInternalNavFun = (props: {
-  windowNav: typeof window.history.pushState | typeof window.history.replaceState;
+  windowNav: typeof window.history.pushState | typeof window.history.replaceState | undefined;
   routerNav: AppRouterInstance['push'] | AppRouterInstance['replace'];
 }) => {
   const { windowNav, routerNav } = props;
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
-  if (typeof window !== 'undefined') {
+  if (windowNav) {
     window.__clerk_internal_navFun = (to, opts) => {
       return new Promise<void>(res => {
         if (!window.__clerk_internal_navPromisesBuffer) {
