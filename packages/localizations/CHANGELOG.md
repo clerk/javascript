@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.3
+
+### Patch Changes
+
+- Review PT-BR localization: Adds missing keys, fixes some typos ([#3412](https://github.com/clerk/javascript/pull/3412)) by [@danilofuchs](https://github.com/danilofuchs)
+
 ## 2.4.2
 
 ### Patch Changes
