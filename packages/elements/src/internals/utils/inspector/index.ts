@@ -1,9 +1,16 @@
-import { isTruthy } from '@clerk/shared/underscore';
+import type { InspectionEvent, Observer } from 'xstate';
 
-export { createBrowserInspectorReactHook } from './browser';
-import { createConsoleInspector } from './console';
+import { getInspector as getBrowserInspector } from './browser';
+import { getInspector as getConsoleInspector } from './console';
 
-export const consoleInspector = createConsoleInspector({
-  enabled: isTruthy(process.env.NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG ?? process.env.CLERK_ELEMENTS_DEBUG),
-  debugServer: isTruthy(process.env.CLERK_ELEMENTS_DEBUG_SERVER),
-});
+export let inspect: Observer<InspectionEvent> | undefined;
+
+if (__DEV__) {
+  inspect = getBrowserInspector() ?? getConsoleInspector();
+}
+
+const inspector = {
+  inspect,
+};
+
+export default inspector;
