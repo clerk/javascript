@@ -12,8 +12,8 @@ const appRouter = applicationConfig()
   .addScript('build', 'npm run build')
   .addScript('serve', 'npm run start')
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
-  .addDependency('react', constants.E2E_NEXTJS_VERSION)
-  .addDependency('react-dom', constants.E2E_NEXTJS_VERSION)
+  .addDependency('react', constants.E2E_REACT_VERSION)
+  .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
   .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || clerkNextjsLocal);
 
 const appRouterTurbo = appRouter
