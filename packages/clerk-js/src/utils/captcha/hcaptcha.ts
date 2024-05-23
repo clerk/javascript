@@ -1,8 +1,9 @@
 ///<reference types="@hcaptcha/types"/>
 
 import { loadScript } from '@clerk/shared/loadScript';
+import type { CaptchaWidgetType } from '@clerk/types';
 
-import { CAPTCHA_ELEMENT_ID } from './constants';
+import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 
 async function loadCaptcha(url: string) {
   if (!window.hcaptcha) {
@@ -19,30 +20,52 @@ async function loadCaptcha(url: string) {
   return window.hcaptcha;
 }
 
-export const getHCaptchaToken = async (captchaOptions: { siteKey: string; scriptUrl: string }) => {
-  const { siteKey, scriptUrl } = captchaOptions;
+export const getHCaptchaToken = async (captchaOptions: {
+  siteKey: string;
+  scriptUrl: string;
+  widgetType: CaptchaWidgetType;
+  invisibleSiteKey: string;
+}) => {
+  const { siteKey, scriptUrl, widgetType, invisibleSiteKey } = captchaOptions;
   let captchaToken = '',
     id = '';
+  let isInvisibleWidget = !widgetType || widgetType === 'invisible';
+  let hCaptchaSiteKey = siteKey;
 
   let widgetDiv: HTMLElement | null = null;
 
-  const captcha = await loadCaptcha(scriptUrl);
+  const createInvisibleDOMElement = () => {
+    const div = document.createElement('div');
+    div.id = CAPTCHA_INVISIBLE_CLASSNAME;
+    document.body.appendChild(div);
+    return div;
+  };
+
+  const captcha: HCaptcha = await loadCaptcha(scriptUrl);
   let retries = 0;
   const errorCodes: (string | number)[] = [];
 
   const handleCaptchaTokenGeneration = (): Promise<[string, string]> => {
     return new Promise((resolve, reject) => {
       try {
-        const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
-        if (visibleDiv) {
-          visibleDiv.style.display = 'block';
-          widgetDiv = visibleDiv;
+        if (isInvisibleWidget) {
+          widgetDiv = createInvisibleDOMElement();
         } else {
-          reject(['clerk_captcha_element_not_found', undefined]);
+          const visibleDiv = document.getElementById(CAPTCHA_ELEMENT_ID);
+          if (visibleDiv) {
+            visibleDiv.style.display = 'block';
+            widgetDiv = visibleDiv;
+          } else {
+            console.error('Captcha DOM element not found. Using invisible captcha widget.');
+            widgetDiv = createInvisibleDOMElement();
+            isInvisibleWidget = true;
+            hCaptchaSiteKey = invisibleSiteKey;
+          }
         }
 
-        const id = captcha.render(CAPTCHA_ELEMENT_ID, {
-          sitekey: siteKey,
+        const id = captcha.render(isInvisibleWidget ? CAPTCHA_INVISIBLE_CLASSNAME : CAPTCHA_ELEMENT_ID, {
+          sitekey: hCaptchaSiteKey,
+          size: isInvisibleWidget ? 'invisible' : 'normal',
           callback: function (token: string) {
             resolve([token, id]);
           },
@@ -58,6 +81,10 @@ export const getHCaptchaToken = async (captchaOptions: { siteKey: string; script
             reject([errorCodes.join(','), id]);
           },
         });
+
+        if (isInvisibleWidget) {
+          captcha.execute(id);
+        }
       } catch (e) {
         /**
          * There is a case the captcha may fail before the challenge has started.
@@ -83,9 +110,13 @@ export const getHCaptchaToken = async (captchaOptions: { siteKey: string; script
     };
   } finally {
     if (widgetDiv) {
-      (widgetDiv as HTMLElement).style.display = 'none';
+      if (isInvisibleWidget) {
+        document.body.removeChild(widgetDiv as HTMLElement);
+      } else {
+        (widgetDiv as HTMLElement).style.display = 'none';
+      }
     }
   }
 
-  return { captchaToken, captchaWidgetTypeUsed: 'smart' };
+  return { captchaToken, captchaWidgetTypeUsed: isInvisibleWidget ? 'invisible' : 'smart' };
 };

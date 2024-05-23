@@ -15,15 +15,12 @@ export const retrieveCaptchaInfo = (clerk: Clerk) => {
         clerk.isStandardBrowser &&
         clerk.instanceType === 'production'
       : null,
-    captchaURL:
-      captchaProvider == 'hcaptcha'
-        ? 'https://js.hcaptcha.com/1/api.js?render=explicit'
-        : fapiClient
-            .buildUrl({
-              path: 'cloudflare/turnstile/v0/api.js',
-              pathPrefix: '',
-              search: '?render=explicit',
-            })
-            .toString(),
+    captchaURL: fapiClient
+      .buildUrl({
+        path: captchaProvider == 'hcaptcha' ? 'hcaptcha/1/api.js' : 'cloudflare/turnstile/v0/api.js',
+        pathPrefix: '',
+        search: '?render=explicit',
+      })
+      .toString(),
   };
 };
