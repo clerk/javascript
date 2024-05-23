@@ -134,6 +134,8 @@ jobs:
         include:
           - test-name: 'nextjs'
             next-version: '13'
+          - test-name: 'nextjs'
+            next-version: '14'
 
     steps:
       - name: Checkout Repo
