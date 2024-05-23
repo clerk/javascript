@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.4.7
+
+### Patch Changes
+
+- Update FieldError/GlobalError types to allow render function children while using the asChild prop ([#3426](https://github.com/clerk/javascript/pull/3426)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.4.6
 
 ## 0.4.5
