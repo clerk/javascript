@@ -1,7 +1,7 @@
 export const getQueryParams = (queryString: string) => {
   const queryParamsObject: { [key: string]: string } = {};
   const queryParams = new URLSearchParams(queryString);
-  queryParams?.forEach((value, key) => {
+  queryParams.forEach((value, key) => {
     queryParamsObject[key] = value;
   });
 
