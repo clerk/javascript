@@ -81,7 +81,7 @@
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "next": "^14.1.1",
+    "next": "^13.5.4",
     "typescript": "*"
   },
   "peerDependencies": {
