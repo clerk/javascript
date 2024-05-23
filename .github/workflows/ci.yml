@@ -131,9 +131,16 @@ jobs:
       matrix:
         test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
         test-project: ['chrome']
+        next-version: ['13', '14']
         include:
-          - test-name: 'nextjs'
-            next-version: ['13','14']
+          - test-name: 'generic'
+            next-version: ''
+          - test-name: 'express'
+            next-version: ''
+          - test-name: 'quickstart'
+            next-version: ''
+          - test-name: 'ap-flows'
+            next-version: ''
 
     steps:
       - name: Checkout Repo
