@@ -170,10 +170,10 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
-      # - name: Upload Integration Report for ${{ matrix.test-name }}
-      #   uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: integration-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
-      #     path: playwright-report/
-      #     retention-days: 1
+      - name: Upload test-results
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+          path: integration/test-results
+          retention-days: 1
