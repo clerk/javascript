@@ -8,7 +8,10 @@
   <br />
 </p>
 
-# Experimental @clerk/tailwindcss-transformer
+# @clerk/tailwindcss-transformer
+
+> [!WARNING]  
+> This is an experimental package and breaking changes may occur regularly. Usage at your own risk!
 
 Input:
 
