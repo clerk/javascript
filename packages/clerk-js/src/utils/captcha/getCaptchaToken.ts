@@ -11,16 +11,14 @@ type CaptchaOptions = {
   captchaProvider: CaptchaProvider;
 };
 
-export const getCaptchaToken = async (captchaOptions: CaptchaOptions) => {
-  const { captchaProvider, widgetType, invisibleSiteKey, siteKey, scriptUrl } = captchaOptions;
+/*
+ * This is a temporary solution to test different captcha providers, until we decide on a single one.
+ */
+export const getCaptchaToken = (captchaOptions: CaptchaOptions) => {
+  const { captchaProvider, ...captchaProviderOptions } = captchaOptions;
   if (captchaProvider === 'hcaptcha') {
-    return await getHCaptchaToken({ siteKey, scriptUrl, widgetType, invisibleSiteKey });
+    return getHCaptchaToken(captchaProviderOptions);
   } else {
-    return await getTunstileToken({
-      siteKey,
-      scriptUrl,
-      widgetType,
-      invisibleSiteKey,
-    });
+    return getTunstileToken(captchaProviderOptions);
   }
 };
