@@ -363,7 +363,11 @@ export const SignInRouterMachine = setup({
         ChoosingStrategy: {
           tags: ['route:choose-strategy'],
           on: {
-            'NAVIGATE.PREVIOUS': 'Idle',
+            'NAVIGATE.PREVIOUS': {
+              description: 'Go to Idle, and also tell firstFactor to go to Pending',
+              target: 'Idle',
+              actions: sendTo('firstFactor', { type: 'NAVIGATE.PREVIOUS' }),
+            },
           },
         },
         ForgotPassword: {
