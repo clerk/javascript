@@ -1,6 +1,6 @@
 ---
-'@clerk/clerk-js': minor
-'@clerk/types': minor
+'@clerk/clerk-js': patch
+'@clerk/types': patch
 ---
 
-Add support for hCaptcha
+Add experimental support for hCaptcha captcha provider
