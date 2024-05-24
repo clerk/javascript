@@ -1,5 +1,26 @@
 # @clerk/elements
 
+## 0.5.0
+
+### Minor Changes
+
+- - Adds Stately's Browser Inspector in development builds ([#3424](https://github.com/clerk/javascript/pull/3424)) by [@tmilewski](https://github.com/tmilewski)
+
+  - Removes `@statelyai/inspect` from dependencies
+  - Ensures all inspector-related code is omitted from the build
+
+### Patch Changes
+
+- Fix: Verification form submission wasn't working after returning from "choosing an alternate strategy" without making a selection. ([#3425](https://github.com/clerk/javascript/pull/3425)) by [@tmilewski](https://github.com/tmilewski)
+
+  Perf: Adds a `NeverRetriable` state for applicable strategies so the countdown doesn't run needlessly.
+
+## 0.4.7
+
+### Patch Changes
+
+- Update FieldError/GlobalError types to allow render function children while using the asChild prop ([#3426](https://github.com/clerk/javascript/pull/3426)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.4.6
 
 ## 0.4.5
