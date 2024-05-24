@@ -7,6 +7,9 @@ import React from 'react';
 import type { TokenCache } from './cache';
 import { isReactNative } from './runtime';
 import { getClerkInstance } from './singleton';
+import { MemoryTokenCache } from './cache';
+import { buildClerk } from './singleton';
+import { isNative } from './utils/runtime';
 
 export type ClerkProviderProps = ClerkReactProviderProps & {
   tokenCache?: TokenCache;
@@ -20,11 +23,11 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
     <ClerkReactProvider
       // Force reset the state when the provided key changes, this ensures that the provider does not retain stale state.
       // See JS-598 for additional context.
-      key={pk}
+      key={key}
       {...rest}
-      publishableKey={pk}
-      Clerk={getClerkInstance({ publishableKey: pk, tokenCache })}
-      standardBrowser={!isReactNative()}
+      publishableKey={key}
+      Clerk={isNative() ? getClerkInstance({ publishableKey: pk, tokenCache }) : null}
+      standardBrowser={!isNative()}
     >
       {children}
     </ClerkReactProvider>

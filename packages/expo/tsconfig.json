@@ -20,7 +20,8 @@
     "allowJs": true,
     "target": "ES2019",
     "noEmitOnError": false,
-    "incremental": true
+    "incremental": true,
+    "moduleSuffixes": [".ios", ".android", ".native", ""]
   },
   "include": ["src"]
 }

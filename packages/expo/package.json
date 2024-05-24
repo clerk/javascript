@@ -23,8 +23,17 @@
   },
   "license": "MIT",
   "author": "Clerk",
-  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "main": "dist/index",
   "source": "src/index.js",
+  "react-native": "./src/index",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
@@ -55,6 +64,7 @@
     "@types/react-dom": "*",
     "expo-auth-session": "^5.4.0",
     "expo-web-browser": "^12.8.2",
+    "react-native": "^0.74.1",
     "typescript": "*"
   },
   "peerDependencies": {
