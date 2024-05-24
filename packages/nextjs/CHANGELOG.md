@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.1.2
+
+### Patch Changes
+
+- Allow next@15.0.0-rc as a peer dependency by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 5.1.1
 
 ### Patch Changes

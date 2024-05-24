@@ -145,6 +145,7 @@ const SignInVerificationMachine = setup({
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
+    isNeverResendable: ({ context }) => context.currentFactor?.strategy === 'password',
   },
   delays: SignInVerificationDelays,
   types: {} as SignInVerificationSchema,
@@ -161,6 +162,7 @@ const SignInVerificationMachine = setup({
   }),
   initial: 'Init',
   on: {
+    'NAVIGATE.PREVIOUS': '.Hist',
     'STRATEGY.REGISTER': {
       actions: assign({
         registeredStrategies: ({ context, event }) => context.registeredStrategies.add(event.factor),
@@ -233,10 +235,30 @@ const SignInVerificationMachine = setup({
           reenter: true,
         },
       },
-      initial: 'NotResendable',
+      initial: 'Init',
       states: {
+        Init: {
+          description: 'Marks appropriate factors as never resendable.',
+          always: [
+            {
+              guard: 'isNeverResendable',
+              target: 'NeverResendable',
+            },
+            {
+              target: 'NotResendable',
+            },
+          ],
+        },
         Resendable: {
           description: 'Waiting for user to retry',
+        },
+        NeverResendable: {
+          description: 'Handles never resendable',
+          on: {
+            RETRY: {
+              actions: log('Never retriable'),
+            },
+          },
         },
         NotResendable: {
           description: 'Handle countdowns',
@@ -298,6 +320,9 @@ const SignInVerificationMachine = setup({
           target: 'Pending',
         },
       },
+    },
+    Hist: {
+      type: 'history',
     },
   },
 });
