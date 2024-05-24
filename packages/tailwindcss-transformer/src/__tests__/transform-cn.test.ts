@@ -1,8 +1,7 @@
-import { expect, test } from 'vitest';
-import { transform } from '../src/index';
+import { transform } from '../index';
 
-test('cn', async () => {
-  let result = await transform(
+test('cn', () => {
+  const result = transform(
     `const Button: React.FC<ButtonProps> = ({ children, className }) => {
     const buttonClasses = cn(
       (something === 'flex' || 'flex') && 'flex',

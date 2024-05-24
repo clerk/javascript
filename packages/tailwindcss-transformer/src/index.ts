@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
 
 import postcss, { type Plugin } from 'postcss';
-import recast from 'recast';
-import tsParser from 'recast/parsers/babel-ts.js';
+import * as recast from 'recast';
+import * as tsParser from 'recast/parsers/babel-ts.js';
 import type { Config } from 'tailwindcss';
 import tailwindcss from 'tailwindcss';
 
@@ -12,7 +12,6 @@ import { replaceVariableScope } from './replace-variable-scope';
  * A map of hashed classnames from Tailwind CSS classes and their original values
  */
 type StyleCache = Map<string, string>;
-type Ctx = { styleCache: StyleCache };
 
 const clRegex = /^cl-[a-z0-9]{8}$/;
 
@@ -39,7 +38,7 @@ function generateHashedClassName(value: string) {
   return 'cl-' + createHash('sha256').update(value, 'utf8').digest('hex').slice(0, 8);
 }
 
-function visitNode(node: recast.types.ASTNode, ctx: Ctx) {
+function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }) {
   recast.visit(node, {
     visitStringLiteral(path) {
       if (clRegex.test(path.node.value)) {
@@ -59,34 +58,29 @@ function visitNode(node: recast.types.ASTNode, ctx: Ctx) {
   });
 }
 
-export function transform(code: string, ctx: Ctx) {
-  try {
-    const ast = recast.parse(code, { parser: tsParser });
+export function transform(code: string, ctx: { styleCache: StyleCache }) {
+  const ast = recast.parse(code, { parser: tsParser });
 
-    recast.visit(ast, {
-      // visit className attributes containing TW classes
-      visitJSXAttribute(path) {
-        const node = path.node;
-        if (path.node.name.name === 'className') {
-          visitNode(node, ctx);
-        }
-        this.traverse(path);
-      },
-      // visit cn function calls containing TW classes
-      visitCallExpression(path) {
-        const node = path.node;
-        if (node.callee.type === 'Identifier' && node.callee.name === 'cn') {
-          visitNode(node, ctx);
-        }
-        this.traverse(path);
-      },
-    });
+  recast.visit(ast, {
+    // visit className attributes containing TW classes
+    visitJSXAttribute(path) {
+      const node = path.node;
+      if (path.node.name.name === 'className') {
+        visitNode(node, ctx);
+      }
+      this.traverse(path);
+    },
+    // visit cn function calls containing TW classes
+    visitCallExpression(path) {
+      const node = path.node;
+      if (node.callee.type === 'Identifier' && node.callee.name === 'cn') {
+        visitNode(node, ctx);
+      }
+      this.traverse(path);
+    },
+  });
 
-    return recast.print(ast).code;
-  } catch (error) {
-    console.error('Error parsing file:', error);
-    return null;
-  }
+  return recast.print(ast).code;
 }
 
 export async function generateStylesheet(

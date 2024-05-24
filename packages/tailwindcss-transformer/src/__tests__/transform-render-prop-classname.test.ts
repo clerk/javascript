@@ -1,8 +1,7 @@
-import { expect, test } from 'vitest';
-import { transform } from '../src/index';
+import { transform } from '../index';
 
-test('render prop with className', async () => {
-  let result = await transform(
+test('render prop with className', () => {
+  const result = transform(
     `const Button: React.FC<ButtonProps> = ({ children, className }) => {
     return <div render={() => <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>{children}</button>} />
   }`,

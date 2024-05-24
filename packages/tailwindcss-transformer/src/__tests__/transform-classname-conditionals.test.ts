@@ -1,8 +1,7 @@
-import { expect, test } from 'vitest';
-import { transform } from '../src/index';
+import { transform } from '../index';
 
-test('className with conditionals', async () => {
-  let result = await transform(
+test('className with conditionals', () => {
+  const result = transform(
     `const Button: React.FC<ButtonProps> = ({ children, display }) => {
     return <button className={dislay === 'flex' ? 'flex' : 'inline-flex'}>{children}</button>
   }`,

@@ -7,7 +7,6 @@
     "esModuleInterop": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
     "lib": ["es2021.intl", "dom"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -22,8 +21,7 @@
     "target": "ESNext",
     "paths": {
       "~/*": ["src/*"]
-    },
-    "typeRoots": ["../../node_modules/@types", "./src/types"]
+    }
   },
   "include": ["src"]
 }

@@ -1,9 +1,8 @@
-import { expect, test } from 'vitest';
-import { transform, generateStylesheet } from '../src/index';
+import { generateStylesheet, transform } from '../index';
 
 test('className with cn', async () => {
-  let styleCache = new Map();
-  let _ = await transform(
+  const styleCache = new Map();
+  transform(
     `const Button: React.FC<ButtonProps> = ({ children, className }) => {
     return <button className={cn('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')}>{children}</button>
   }`,
