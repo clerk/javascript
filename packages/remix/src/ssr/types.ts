@@ -10,17 +10,17 @@ export type RootAuthLoaderOptions = {
   jwtKey?: string;
   secretKey?: string;
   /**
-   * @deprecated This option will be removed in the next major version
+   * @deprecated This option will be removed in the next major version.
    * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
    */
   loadUser?: boolean;
   /**
-   * @deprecated This option will be removed in the next major version
+   * @deprecated This option will be removed in the next major version.
    * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
    */
   loadSession?: boolean;
   /**
-   * @deprecated This option will be removed in the next major version
+   * @deprecated This option will be removed in the next major version.
    * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
    */
   loadOrganization?: boolean;
