@@ -1,6 +1,13 @@
 import type { Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
-import type { AuthObject } from '@clerk/backend/internal';
-import type { MultiDomainAndOrProxy } from '@clerk/types';
+import type { AuthObject, RequestState } from '@clerk/backend/internal';
+import type {
+  LegacyRedirectProps,
+  MultiDomainAndOrProxy,
+  SignInFallbackRedirectUrl,
+  SignInForceRedirectUrl,
+  SignUpFallbackRedirectUrl,
+  SignUpForceRedirectUrl,
+} from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<AuthObject>;
@@ -15,10 +22,20 @@ export type RootAuthLoaderOptions = {
   authorizedParties?: [];
   signInUrl?: string;
   signUpUrl?: string;
-  afterSignInUrl?: string;
-  afterSignUpUrl?: string;
 } & Pick<VerifyTokenOptions, 'audience'> &
-  MultiDomainAndOrProxy;
+  MultiDomainAndOrProxy &
+  SignInForceRedirectUrl &
+  SignInFallbackRedirectUrl &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps;
+
+export type RequestStateWithRedirectUrls = RequestState &
+  SignInForceRedirectUrl &
+  SignInFallbackRedirectUrl &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,
