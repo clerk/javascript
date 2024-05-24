@@ -938,6 +938,9 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     __experimental_open?: boolean;
 
     __experimental_onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
+
+    __experimental_hideTrigger?: boolean;
+    __experimental_onActionEnded?: () => void;
     /**
      * By default, users can switch between organization and their personal account.
      * This option controls whether OrganizationSwitcher will include the user's personal account
