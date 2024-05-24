@@ -21,6 +21,7 @@ const Button = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HT
   forwardedRef,
 ) {
   return (
+    // eslint-disable-next-line react/button-has-type
     <button
       ref={forwardedRef}
       {...props}

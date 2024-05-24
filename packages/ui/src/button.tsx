@@ -1,9 +1,10 @@
-import * as React from 'react';
 import cn from 'clsx';
+import * as React from 'react';
 
 export const Button = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
   function Button({ children, className, ...props }, forwardedRef) {
     return (
+      // eslint-disable-next-line react/button-has-type
       <button
         ref={forwardedRef}
         {...props}
@@ -25,7 +26,7 @@ export const Button = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttrib
             strokeLinejoin='round'
             strokeWidth='1.5'
             d='m7.25 5-3.5-2.25v4.5L7.25 5Z'
-          ></path>
+          />
         </svg>
       </button>
     );
