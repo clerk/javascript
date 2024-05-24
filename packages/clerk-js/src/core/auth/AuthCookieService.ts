@@ -9,6 +9,8 @@ import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
 import type { SessionCookieHandler } from './cookies/session';
 import { createSessionCookie } from './cookies/session';
+import type { SuffixedCookiesCookieHandler } from './cookies/suffixedCookies';
+import { createSuffixedCookiesCookie } from './cookies/suffixedCookies';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
 import { SessionCookiePoller } from './SessionCookiePoller';
@@ -38,6 +40,7 @@ export class AuthCookieService {
   private clientUat: ClientUatCookieHandler;
   private sessionCookie: SessionCookieHandler;
   private devBrowser: DevBrowser;
+  private suffixedCookies: SuffixedCookiesCookieHandler;
 
   constructor(private clerk: Clerk, fapiClient: FapiClient) {
     // set cookie on token update
@@ -56,6 +59,7 @@ export class AuthCookieService {
       fapiClient,
       publishableKey: clerk.publishableKey,
     });
+    this.suffixedCookies = createSuffixedCookiesCookie(clerk.publishableKey);
   }
 
   // TODO(@dimkl): Replace this method call with an event listener to decouple Clerk with setEnvironment
@@ -73,6 +77,7 @@ export class AuthCookieService {
 
   public async setupDevelopment() {
     await this.devBrowser.setup();
+    this.suffixedCookies.set(true);
   }
 
   public setupProduction() {
