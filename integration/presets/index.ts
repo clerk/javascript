@@ -1,3 +1,4 @@
+import { elements } from './elements';
 import { envs } from './envs';
 import { express } from './express';
 import { createLongRunningApps } from './longRunningApps';
@@ -12,4 +13,5 @@ export const appConfigs = {
   next,
   react,
   remix,
+  elements,
 } as const;
