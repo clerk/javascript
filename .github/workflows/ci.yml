@@ -129,7 +129,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
+        test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows', 'elements']
         test-project: ['chrome']
 
     steps:
@@ -152,7 +152,7 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --filter=!elements --only && npx changeset publish --no-git-tag; fi
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
@@ -163,6 +163,7 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
+        id: integration-tests
         run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
@@ -170,10 +171,10 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
-      # - name: Upload Integration Report for ${{ matrix.test-name }}
-      #   uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: integration-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
-      #     path: playwright-report/
-      #     retention-days: 1
+      - name: Upload test-results
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+          path: integration/test-results
+          retention-days: 1

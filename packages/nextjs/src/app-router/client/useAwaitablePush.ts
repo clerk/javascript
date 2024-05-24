@@ -13,7 +13,7 @@ export const useAwaitablePush = () => {
   const router = useRouter();
 
   return useInternalNavFun({
-    windowNav: window?.history.pushState.bind(window.history),
+    windowNav: typeof window !== 'undefined' ? window.history.pushState.bind(window.history) : undefined,
     routerNav: router.push.bind(router),
   });
 };
