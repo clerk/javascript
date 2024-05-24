@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.5.0",
+  "version": "5.5.1",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -50,8 +50,8 @@
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "dependencies": {
-    "@clerk/localizations": "2.4.2",
-    "@clerk/shared": "2.2.0",
+    "@clerk/localizations": "2.4.3",
+    "@clerk/shared": "2.2.1",
     "@clerk/types": "4.5.0",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",

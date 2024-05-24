@@ -8,7 +8,7 @@ import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internal
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
-import { consoleInspector } from '~/internals/utils/inspector';
+import { inspect } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
@@ -19,7 +19,7 @@ type SignUpFlowProviderProps = {
   exampleMode?: boolean;
 };
 
-const actor = createActor(SignUpRouterMachine, { inspect: consoleInspector });
+const actor = createActor(SignUpRouterMachine, { inspect });
 const ref = actor.start();
 
 function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) {
