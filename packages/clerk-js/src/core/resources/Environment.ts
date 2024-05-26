@@ -33,6 +33,15 @@ export class Environment extends BaseResource implements EnvironmentResource {
     this.fromJSON(data);
   }
 
+  async seed(promise: Promise<unknown>) {
+    // const res = await promise;
+    // // console.log('res', res, Object.keys(res));
+    // if (!res || (res && Object.keys(res).length === 0)) {
+    //   throw 'lol';
+    // }
+    return Promise.resolve(this.fromJSON(promise));
+  }
+
   fetch({ touch = false }: { touch: boolean }): Promise<Environment> {
     if (touch) {
       return this._basePatch({});

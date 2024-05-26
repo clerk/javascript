@@ -1553,14 +1553,36 @@ export class Clerk implements ClerkInterface {
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
     const shouldTouchEnv = this.#instanceType === 'development' && !isInAccountsHostedPages;
 
+    let doneEnv = false;
+    try {
+      if (this.#options.env) {
+        await Environment.getInstance().seed(this.#options.env);
+        doneEnv = true;
+      }
+    } catch (e) {
+      doneEnv = false;
+    }
+
+    let doneClient = false;
+    try {
+      if (this.#options.env) {
+        await Environment.getInstance().seed(this.#options.env);
+        doneClient = true;
+      }
+    } catch (e) {
+      doneClient = false;
+    }
+
     let retries = 0;
     while (retries < 2) {
       retries++;
 
       try {
         const [environment, client] = await Promise.all([
-          Environment.getInstance().fetch({ touch: false }),
-          Client.getInstance().fetch(),
+          doneEnv
+            ? Environment.getInstance().seed(this.#options.env)
+            : Environment.getInstance().fetch({ touch: false }),
+          doneClient ? Client.getInstance().seed(this.#options.client) : Client.getInstance().fetch(),
         ]);
 
         this.updateClient(client);

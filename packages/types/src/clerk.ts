@@ -565,6 +565,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
   SignUpFallbackRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl & {
+    env?: Promise<unknown>;
+    client?: Promise<unknown>;
     appearance?: Appearance;
     localization?: LocalizationResource;
     polling?: boolean;

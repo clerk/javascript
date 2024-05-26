@@ -26,6 +26,7 @@ declare global {
 
 export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
   Clerk?: ClerkProp;
+  env?: Promise<unknown>;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
   clerkJSVersion?: string;
@@ -36,6 +37,8 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
 export type ClerkProviderProps = IsomorphicClerkOptions & {
   children: React.ReactNode;
   initialState?: InitialState;
+  env?: Promise<unknown>;
+  client?: Promise<unknown>;
 };
 
 export interface BrowserClerkConstructor {
