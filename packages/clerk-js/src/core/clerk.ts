@@ -780,7 +780,13 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const toURL = new URL(to, window.location.href);
+    let toURL = new URL(to, window.location.href);
+
+    if (toURL.protocol !== 'http:' && toURL.protocol !== 'https:') {
+      console.warn('Clerk: Not a valid protocol. Redirecting to /');
+      toURL = new URL('/', window.location.href);
+    }
+
     const customNavigate =
       options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
 

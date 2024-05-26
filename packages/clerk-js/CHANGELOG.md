@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.5.2
+
+### Patch Changes
+
+- Validate protocol on window navigation by [@tmilewski](https://github.com/tmilewski)
+
 ## 5.5.1
 
 ### Patch Changes
