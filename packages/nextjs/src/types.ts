@@ -16,7 +16,4 @@ export type NextClerkProviderProps = Without<ClerkProviderProps, 'publishableKey
    * @default true
    */
   __unstable_invokeMiddlewareOnAuthStateChange?: boolean;
-
-  env?: Promise<unknown>;
-  client?: Promise<unknown>;
 };

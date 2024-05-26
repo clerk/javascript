@@ -34,12 +34,11 @@ export class Environment extends BaseResource implements EnvironmentResource {
   }
 
   async seed(promise: Promise<unknown>) {
-    // const res = await promise;
-    // // console.log('res', res, Object.keys(res));
-    // if (!res || (res && Object.keys(res).length === 0)) {
-    //   throw 'lol';
-    // }
-    return Promise.resolve(this.fromJSON(promise));
+    const res = await promise;
+    if (!res || (res && Object.keys(res).length === 0)) {
+      throw 'lol';
+    }
+    return this.fromJSON(promise);
   }
 
   fetch({ touch = false }: { touch: boolean }): Promise<Environment> {

@@ -1,4 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
+import { createCookieHandler } from '@clerk/shared/cookie';
+import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
@@ -70,6 +72,16 @@ type MethodName<T> = {
 }[keyof T];
 
 type MethodCallback = () => Promise<unknown> | unknown;
+
+const fapi = 'https://artistic-tapir-20.clerk.accounts.dev';
+const clerkVersion = '5.5.2';
+
+const fetchEnvironment = (url: string) =>
+  fetch(url, {
+    credentials: 'include',
+  }).then(res => res.json());
+
+const devBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
 
 type IsomorphicLoadedClerk = Without<
   LoadedClerk,
@@ -225,7 +237,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#publishableKey = publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
-    this.options = options;
+    this.options = {
+      ...options,
+      env: fetchEnvironment(
+        `${fapi}/v1/environment?_clerk_js_version=${clerkVersion}&__clerk_db_jwt=${devBrowserCookie.get()}`,
+      ),
+      client: fetchEnvironment(
+        `${fapi}/v1/client?_clerk_js_version=${clerkVersion}&__clerk_db_jwt=${devBrowserCookie.get()}`,
+      ),
+    };
     this.Clerk = Clerk;
     this.mode = inBrowser() ? 'browser' : 'server';
 

@@ -1,12 +1,12 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouter } from 'next/navigation';
-import React, { use, useEffect, useTransition } from 'react';
+import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
-import { ClerkJSScript } from '../../utils/clerk-js-script';
+// import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
@@ -24,14 +24,6 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const router = useRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
-  let dataEnv, dataClient;
-  if (props.env) {
-    dataEnv = use(props.env);
-  }
-  if (props.client) {
-    dataClient = use(props.client);
-  }
-  // console.log('data', data);
 
   const [isPending, startTransition] = useTransition();
 
@@ -85,14 +77,8 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
 
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
-      <ReactClerkProvider
-        {...mergedProps}
-        env={dataEnv}
-        client={dataClient}
-        // env={props.env}
-        // client={props.client}
-      >
-        <ClerkJSScript router='app' />
+      <ReactClerkProvider {...mergedProps}>
+        {/*<ClerkJSScript router='app' />*/}
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

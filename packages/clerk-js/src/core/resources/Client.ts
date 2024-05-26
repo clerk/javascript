@@ -28,12 +28,11 @@ export class Client extends BaseResource implements ClientResource {
   }
 
   async seed(promise: Promise<unknown>) {
-    // const res = await promise;
-    // console.log('res', res, Object.keys(res));
-    // if (!res || (res && Object.keys(res).length === 0)) {
-    //   throw 'lol';
-    // }
-    return Promise.resolve(this.fromJSON(promise));
+    const res = await promise;
+    if (!res || (res && Object.keys(res).length === 0)) {
+      throw 'lol';
+    }
+    return this.fromJSON(promise);
   }
 
   private constructor(data: ClientJSON | null = null) {
