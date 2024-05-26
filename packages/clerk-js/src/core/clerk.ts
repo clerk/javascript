@@ -1559,7 +1559,7 @@ export class Clerk implements ClerkInterface {
 
       try {
         const [environment, client] = await Promise.all([
-          Environment.getInstance().fetch({ touch: shouldTouchEnv }),
+          Environment.getInstance().fetch({ touch: false }),
           Client.getInstance().fetch(),
         ]);
 
