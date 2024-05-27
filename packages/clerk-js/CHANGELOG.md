@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.73.1
+
+### Patch Changes
+
+- Validate protocol on window navigation ([#3448](https://github.com/clerk/javascript/pull/3448)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 4.73.0
 
 ### Minor Changes
