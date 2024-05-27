@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.0.13
+
+### Patch Changes
+
+- Deprecate `loadUser`, `loadSession` and `loadOrganization` on `rootAuthLoader` options ([#3443](https://github.com/clerk/javascript/pull/3443)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.2.2
+
 ## 4.0.12
 
 ### Patch Changes
