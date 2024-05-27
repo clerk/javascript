@@ -65,7 +65,7 @@ export const getHCaptchaToken = async (captchaOptions: {
 
         const id = captcha.render(isInvisibleWidget ? CAPTCHA_INVISIBLE_CLASSNAME : CAPTCHA_ELEMENT_ID, {
           sitekey: hCaptchaSiteKey,
-          size: isInvisibleWidget ? 'invisible' : 'normal',
+          size: 'invisible',
           callback: function (token: string) {
             resolve([token, id]);
           },
@@ -82,9 +82,7 @@ export const getHCaptchaToken = async (captchaOptions: {
           },
         });
 
-        if (isInvisibleWidget) {
-          void captcha.execute(id);
-        }
+        void captcha.execute(id);
       } catch (e) {
         /**
          * There is a case the captcha may fail before the challenge has started.
