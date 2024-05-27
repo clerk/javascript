@@ -1,5 +1,5 @@
-import type { Clerk } from '../../core/clerk';
-import { createFapiClient } from '../../core/fapiClient';
+import type Clerk from '../../core/clerk';
+import createFapiClient from '../../core/fapiClient';
 
 export const retrieveCaptchaInfo = (clerk: Clerk) => {
   const _environment = clerk.__unstable__environment;

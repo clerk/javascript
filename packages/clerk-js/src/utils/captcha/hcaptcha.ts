@@ -83,7 +83,7 @@ export const getHCaptchaToken = async (captchaOptions: {
         });
 
         if (isInvisibleWidget) {
-          captcha.execute(id);
+          void captcha.execute(id);
         }
       } catch (e) {
         /**
