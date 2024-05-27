@@ -49,7 +49,7 @@ type MenuTriggerProps = React.PropsWithChildren<Record<never, never>>;
 export const MenuTrigger = (props: MenuTriggerProps) => {
   const { children } = props;
   const { popoverCtx, elementId } = useMenuState();
-  const { reference, toggle } = popoverCtx;
+  const { reference, toggle, isOpen } = popoverCtx;
 
   if (!isValidElement(children)) {
     return null;
@@ -60,6 +60,8 @@ export const MenuTrigger = (props: MenuTriggerProps) => {
     ref: reference,
     elementDescriptor: children.props.elementDescriptor || descriptors.menuButton,
     elementId: children.props.elementId || descriptors.menuButton.setId(elementId),
+    'aria-label': `${isOpen ? 'Close' : 'Open'} menu`,
+    'aria-expanded': isOpen,
     onClick: (e: React.MouseEvent) => {
       children.props?.onClick?.(e);
       toggle();
