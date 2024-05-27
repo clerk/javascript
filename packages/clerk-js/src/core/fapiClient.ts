@@ -1,7 +1,7 @@
 import { camelToSnake, isBrowserOnline, runWithExponentialBackOff } from '@clerk/shared';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
 
-import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from '../utils';
+import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
 import { clerkNetworkError } from './errors';
 
 export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT' | 'TRACE';
@@ -30,23 +30,6 @@ export type FapiRequestCallback<T> = (
   request: FapiRequestInit,
   response?: FapiResponse<T>,
 ) => Promise<unknown | false> | unknown | false;
-
-const customDefaultEncoder = (value: string) => {
-  return encodeURIComponent(value).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
-};
-
-const camelToSnakeEncoder = (str: string, type: 'key' | 'value') => {
-  return type === 'key' ? camelToSnake(str) : customDefaultEncoder(str);
-};
-const stringifyBody = obj => {
-  return Object.keys(obj)
-    .map(key => {
-      const encodedKey = camelToSnakeEncoder(key, 'key');
-      const encodedValue = obj[key] && camelToSnakeEncoder(obj[key], 'value');
-      return encodedValue && `${encodedKey}=${encodedValue}`;
-    })
-    .join('&');
-};
 
 // TODO: Move to @clerk/types
 export interface FapiResponseJSON<T> {
@@ -137,18 +120,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
       return acc;
     }, {} as FapiQueryStringParameters & Record<string, string | string[]>);
 
-    const queryParams = new URLSearchParams();
-
-    objParams &&
-      Object.keys(objParams).forEach(key => {
-        const value = objParams[key];
-        if (Array.isArray(value)) {
-          value.forEach(item => queryParams.append(key, item));
-        } else {
-          queryParams.append(key, value);
-        }
-      });
-    return queryParams.toString();
+    return stringifyQueryParams(objParams);
   }
 
   function buildUrl(requestInit: FapiRequestInit): URL {
@@ -218,9 +190,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     // @ts-ignore
 
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
-      if (body && typeof body === 'object') {
-        requestInit.body = stringifyBody(body);
-      }
+      requestInit.body = stringifyQueryParams(body, camelToSnake);
     }
 
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
