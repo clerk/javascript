@@ -29,4 +29,4 @@ export * from './queryStateParams';
 export * from './decodeBase16';
 export * from './authPropHelpers';
 export * from './image';
-export * from './captcha';
+export * from './completeSignUpFlow';
