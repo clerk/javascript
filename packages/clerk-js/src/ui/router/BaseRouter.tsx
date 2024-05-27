@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/types';
 import React from 'react';
 
-import { getQueryParams, trimTrailingSlash } from '../../utils';
+import { getQueryParams, stringifyQueryParams, trimTrailingSlash } from '../../utils';
 import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';
@@ -113,8 +113,7 @@ export const BaseRouter = ({
         }
       });
 
-      const queryParams = new URLSearchParams(toQueryParams);
-      toURL.search = `?${queryParams.toString()}`;
+      toURL.search = stringifyQueryParams(toQueryParams);
     }
     const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
     setRouteParts({ path: toURL.pathname, queryString: toURL.search });

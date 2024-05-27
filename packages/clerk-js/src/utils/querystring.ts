@@ -8,7 +8,19 @@ export const getQueryParams = (queryString: string) => {
   return queryParamsObject as Record<string, string>;
 };
 
-// export const stringifyQueryParams = (params: Record<string, unknown> | Array<unknown>) => {
-//   // const queryParams = new URLSearchParams(toQueryParams);
-//   return qs.stringify(params || {});
-// };
+export const stringifyQueryParams = (params: Record<string, unknown> | Array<unknown>, encoder?) => {
+  const queryParams = new URLSearchParams();
+  Object.keys(params).forEach(key => {
+    const encodedKey = encoder ? encoder(key) : key;
+    const value = params[key];
+    if (Array.isArray(value)) {
+      value.forEach(item => queryParams.append(encodedKey, item));
+    } else if (value === undefined) {
+      return;
+    } else {
+      queryParams.append(encodedKey, value);
+    }
+  });
+
+  return queryParams.toString();
+};
