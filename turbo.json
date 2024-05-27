@@ -165,6 +165,12 @@
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputMode": "new-only"
+    },
+    "//#test:integration:elements": {
+      "dependsOn": ["^@clerk/nextjs#build", "^@clerk/elements#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputMode": "new-only"
     }
   }
 }

@@ -74,6 +74,36 @@ npm run test:integration:base -- --ui email.link.test.ts
 > [!TIP]
 > If you want to learn more, read the [Running and debugging tests documentation](https://playwright.dev/docs/running-tests).
 
+### Recipes
+
+Below you can find code snippets for running tests in a specific manner, easily copy/pasteable. They'll allow you to run tests quicker or make them easier to debug.
+
+#### Keep temporary site
+
+During E2E runs a temporary site is created in which the template is copied into. If you want to keep the site around, pass the `CLEANUP` environment variable:
+
+```shell
+CLEANUP=0 npm run test:integration:base
+```
+
+For all available environment variables, check the [`constants.ts`](../integration/constants.ts) file.
+
+#### Quick feedback loop on already running app
+
+You might have a similar setup to this:
+
+- App running on `localhost:3000` (e.g. running the temporary site that was created in a previous run or directly running the app from the `integration/templates` folder)
+- No need to test `clerk-js` changes
+- As such, you don't need to have a server spin up for `clerk-js` and also don't need an app created
+
+Then you can use a combination of environment variables to fast track your tests:
+
+```shell
+E2E_APP_SK=sk_test_xxx E2E_APP_PK=pk_test_xxx E2E_APP_URL=http://localhost:3000 E2E_APP_CLERK_JS=https://xxx.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js npm run test:integration:base -- --ui
+```
+
+You need to replace all environment variables with your specific values/needs, above are just placeholders.
+
 ## Writing your first test
 
 In this step-by-step instruction you'll learn how to create a new integration test. If your test case already fits into an existing file, please add a new `test()` block instead of creating a whole new file.
@@ -280,6 +310,41 @@ If you need to run a test suite inside a different environment (e.g. a different
    ```
 
 1. Ensure that your new keys are added to the `INTEGRATION_INSTANCE_KEYS` environment variable inside the repository so that GitHub actions can successfully run.
+
+## Debugging tests
+
+Sometimes tests are passing locally but not in CI 😢 But there are ways to dig into the root cause. Inside the PR with the failing tests apply these changes:
+
+1. Open the [`ci.yml`](../.github/workflows/ci.yml) file
+1. Inside the **Setup** step (of the `integration-tests` job), add `verbose: true` to the arguments. This will enable more verbose logging from Turborepo and ensure that all logs are flushed the moment they appear.
+1. Playwright will record traces of failed tests and they will be uploaded when the E2E step fails or is cancelled. Click on the **Upload test-results** step and download the archive. It contains Playwright traces.
+1. Open https://trace.playwright.dev/ and open your trace file
+
+If these information are not enough, it might be helpful to have a look at the temporary site that was created inside the test run. You'll need to make some adjustments:
+
+1. Open [`applicationConfig.ts`](../integration/models/applicationConfig.ts) and change the `appDirName` to `${name}__debug`. This way the temporary site doesn't have a random hash and date in its name
+1. In the [`ci.yml`](../.github/workflows/ci.yml) workflow file, change the `test-name` matrix of the `integration-tests` job to only include the project you're interested in. For example:
+
+   ```yaml
+   strategy:
+     matrix:
+       # In the original file the test-name includes more in its array
+       test-name: ['nextjs']
+   ```
+
+1. At the bottom of the file, add a new step to upload the temporary site.
+
+   ```yaml
+   - name: Upload app artifacts
+     if: ${{ cancelled() || failure() }}
+     uses: actions/upload-artifact@v4
+     with:
+       name: temp-app-${{ matrix.test-name }}
+       path: /tmp/.temp_integration/long-running--XXX__debug
+       retention-days: 1
+   ```
+
+You need to replace the `XXX` in the `path` with the ID of your long running app. Those IDs are defined in [`longRunningApps.ts`](../integration/presets/longRunningApps.ts), so check which ID is used for your test. Previous runs might also print the name already, look for a log that begins with "[appConfig] Copying template".
 
 ## Reference
 
@@ -510,10 +575,7 @@ The integration suite uses [`presets/envs.ts`](../integration/presets/envs.ts) t
 
 This is why you created the `.keys.json` file in the [initial setup](#initial-setup) step. Those secret and publishable keys are used to create environment configs. Inside GitHub actions these keys are provided through the `INTEGRATION_INSTANCE_KEYS` environment variable.
 
-Currently, we have two Clerk instances configured:
-
-- **with-email-codes**: a single session application with all toggles enabled.
-- **with-email-links**: a single session app with email links enabled and email codes disabled. Useful to test email links flows as the `<SignUp />` component currently does not support switching between email links and email codes.
+They keys defined in `.keys.json.sample` correspond with the Clerk instances in the **Integration testing** organization.
 
 > [!NOTE]
 > The test suite also uses these environment variables to run some tests:
