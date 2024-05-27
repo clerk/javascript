@@ -23,10 +23,10 @@ import type {
   StartMagicLinkFlowParams,
 } from '@clerk/types';
 
-import { generateSignatureWithMetamask, getCaptchaToken, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import { getCaptchaToken, retrieveCaptchaInfo } from '../../utils/captcha';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
-import { retrieveCaptchaInfo } from '../../utils/retrieveCaptchaInfo';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -71,7 +71,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
     const paramsWithCaptcha: Record<string, unknown> = params;
-    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaPublicKeyInvisible } =
+    const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
       retrieveCaptchaInfo(SignUp.clerk);
 
     if (canUseCaptcha && captchaSiteKey && captchaURL && captchaPublicKeyInvisible) {
@@ -81,6 +81,7 @@ export class SignUp extends BaseResource implements SignUpResource {
           widgetType: captchaWidgetType,
           invisibleSiteKey: captchaPublicKeyInvisible,
           scriptUrl: captchaURL,
+          captchaProvider,
         });
         paramsWithCaptcha.captchaToken = captchaToken;
         paramsWithCaptcha.captchaWidgetType = captchaWidgetTypeUsed;

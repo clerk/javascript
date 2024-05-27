@@ -3,6 +3,7 @@ import type { ClerkResource } from './resource';
 
 export type PreferredSignInStrategy = 'password' | 'otp';
 export type CaptchaWidgetType = 'smart' | 'invisible' | null;
+export type CaptchaProvider = 'hcaptcha' | 'turnstile';
 
 export interface DisplayConfigJSON {
   object: 'display_config';
@@ -17,6 +18,7 @@ export interface DisplayConfigJSON {
   captcha_public_key: string | null;
   captcha_widget_type: CaptchaWidgetType;
   captcha_public_key_invisible: string | null;
+  captcha_provider: CaptchaProvider;
   home_url: string;
   instance_environment_type: string;
   /* @deprecated */
@@ -51,6 +53,7 @@ export interface DisplayConfigResource extends ClerkResource {
   branded: boolean;
   captchaPublicKey: string | null;
   captchaWidgetType: CaptchaWidgetType;
+  captchaProvider: CaptchaProvider;
   captchaPublicKeyInvisible: string | null;
   homeUrl: string;
   instanceEnvironmentType: string;

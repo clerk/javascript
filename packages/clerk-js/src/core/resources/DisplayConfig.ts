@@ -1,5 +1,6 @@
 import { deprecatedProperty } from '@clerk/shared/deprecated';
 import type {
+  CaptchaProvider,
   CaptchaWidgetType,
   DisplayConfigJSON,
   DisplayConfigResource,
@@ -22,6 +23,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   branded!: boolean;
   captchaPublicKey: string | null = null;
   captchaWidgetType: CaptchaWidgetType = null;
+  captchaProvider: CaptchaProvider = 'turnstile';
   captchaPublicKeyInvisible: string | null = null;
   homeUrl!: string;
   instanceEnvironmentType!: string;
@@ -80,6 +82,7 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
     this.branded = data.branded;
     this.captchaPublicKey = data.captcha_public_key;
     this.captchaWidgetType = data.captcha_widget_type;
+    this.captchaProvider = data.captcha_provider;
     this.captchaPublicKeyInvisible = data.captcha_public_key_invisible;
     this.supportEmail = data.support_email || '';
     this.clerkJSVersion = data.clerk_js_version;
