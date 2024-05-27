@@ -28,7 +28,7 @@ export const createLongRunningApps = () => {
 
   return {
     getByPattern: (patterns: Array<string | (typeof configs)[number]['id']>) => {
-      const res = new Set(...patterns.map(pattern => apps.filter(app => idMatchesPattern(app.id, pattern))));
+      const res = new Set(patterns.map(pattern => apps.filter(app => idMatchesPattern(app.id, pattern))).flat());
       if (!res.size) {
         const availableIds = configs.map(c => `\n- ${c.id}`).join('');
         throw new Error(`Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`);

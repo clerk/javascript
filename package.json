@@ -36,7 +36,7 @@
     "test:integration:deployment:nextjs": "DEBUG=1 npx playwright test --config integration/playwright.deployments.config.ts",
     "test:integration:elements": "E2E_APP_ID=elements.* npm run test:integration:base -- --grep @elements",
     "test:integration:express": "E2E_APP_ID=express.* npm run test:integration:base -- --grep @express",
-    "test:integration:generic": "E2E_APP_ID=react.vite.* npm run test:integration:base -- --grep @generic",
+    "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes npm run test:integration:base -- --grep @generic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* npm run test:integration:base -- --grep @nextjs",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* npm run test:integration:base -- --grep @quickstart",
     "test:integration:remix": "echo 'placeholder'",
