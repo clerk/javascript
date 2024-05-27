@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.65.1
+
+### Patch Changes
+
+- Add experimental support for hCaptcha captcha provider ([#3451](https://github.com/clerk/javascript/pull/3451)) by [@anagstef](https://github.com/anagstef)
+
 ## 3.65.0
 
 ### Minor Changes
