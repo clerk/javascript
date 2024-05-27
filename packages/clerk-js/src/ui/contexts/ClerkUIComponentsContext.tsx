@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { OrganizationResource, UserResource } from '@clerk/types';
-import React, { useMemo } from 'react';
+import type { HandleOAuthCallbackParams, OrganizationResource, UserResource } from '@clerk/types';
+import React, { useCallback, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildURL, createDynamicParamParser } from '../../utils';
@@ -506,67 +506,76 @@ export const useGoogleOneTapContext = () => {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
 
-  const redirectUrls = new RedirectUrls(
-    options,
-    {
-      ...ctx,
-      signInFallbackRedirectUrl: window.location.href,
-      signUpFallbackRedirectUrl: window.location.href,
+  const generateCallbackUrls = useCallback(
+    (returnBackUrl: string): HandleOAuthCallbackParams => {
+      const redirectUrls = new RedirectUrls(
+        options,
+        {
+          ...ctx,
+          signInFallbackRedirectUrl: returnBackUrl,
+          signUpFallbackRedirectUrl: returnBackUrl,
+        },
+        queryParams,
+      );
+
+      let signUpUrl = options.signUpUrl || displayConfig.signUpUrl;
+      let signInUrl = options.signInUrl || displayConfig.signInUrl;
+
+      const preservedParams = redirectUrls.getPreservedSearchParams();
+      signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+      signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+
+      const signInForceRedirectUrl = redirectUrls.getAfterSignInUrl();
+      const signUpForceRedirectUrl = redirectUrls.getAfterSignUpUrl();
+
+      const signUpContinueUrl = buildURL(
+        {
+          base: signUpUrl,
+          hashPath: '/continue',
+          hashSearch: new URLSearchParams({
+            sign_up_force_redirect_url: signUpForceRedirectUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+
+      const firstFactorUrl = buildURL(
+        {
+          base: signInUrl,
+          hashPath: '/factor-one',
+          hashSearch: new URLSearchParams({
+            sign_in_force_redirect_url: signInForceRedirectUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+      const secondFactorUrl = buildURL(
+        {
+          base: signInUrl,
+          hashPath: '/factor-two',
+          hashSearch: new URLSearchParams({
+            sign_in_force_redirect_url: signInForceRedirectUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+
+      return {
+        signInUrl,
+        signUpUrl,
+        firstFactorUrl,
+        secondFactorUrl,
+        continueSignUpUrl: signUpContinueUrl,
+        signInForceRedirectUrl,
+        signUpForceRedirectUrl,
+      };
     },
-    queryParams,
-  );
-
-  let signUpUrl = options.signUpUrl || displayConfig.signUpUrl;
-  let signInUrl = options.signInUrl || displayConfig.signInUrl;
-
-  const preservedParams = redirectUrls.getPreservedSearchParams();
-  signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
-  signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
-
-  const signInForceRedirectUrl = redirectUrls.getAfterSignInUrl();
-  const signUpForceRedirectUrl = redirectUrls.getAfterSignUpUrl();
-
-  const signUpContinueUrl = buildURL(
-    {
-      base: signUpUrl,
-      hashPath: '/continue',
-      hashSearch: new URLSearchParams({
-        sign_up_force_redirect_url: signUpForceRedirectUrl,
-      }).toString(),
-    },
-    { stringify: true },
-  );
-
-  const firstFactorUrl = buildURL(
-    {
-      base: signInUrl,
-      hashPath: '/factor-one',
-      hashSearch: new URLSearchParams({
-        sign_in_force_redirect_url: signInForceRedirectUrl,
-      }).toString(),
-    },
-    { stringify: true },
-  );
-  const secondFactorUrl = buildURL(
-    {
-      base: signInUrl,
-      hashPath: '/factor-two',
-      hashSearch: new URLSearchParams({
-        sign_in_force_redirect_url: signInForceRedirectUrl,
-      }).toString(),
-    },
-    { stringify: true },
+    [ctx, displayConfig.signInUrl, displayConfig.signUpUrl, options, queryParams],
   );
 
   return {
     ...ctx,
     componentName,
-    signInUrl,
-    signUpUrl,
-    firstFactorUrl,
-    secondFactorUrl,
-    continueSignUpUrl: signUpContinueUrl,
-    signInForceRedirectUrl,
-    signUpForceRedirectUrl,
+    generateCallbackUrls,
   };
 };
