@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.5.1
+
+### Patch Changes
+
+- Update the TypeScript type of `<Input />` to allow the `validatePassword` prop also on `type="text"` (in addition to `type="password"`) ([#3394](https://github.com/clerk/javascript/pull/3394)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 0.5.0
 
 ### Minor Changes

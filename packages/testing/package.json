@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@playwright/test": "^1.43.1",
+    "@playwright/test": "^1.44.0",
     "@types/node": "^18.17.0",
     "cypress": "^13.9.0",
     "tsup": "*",
