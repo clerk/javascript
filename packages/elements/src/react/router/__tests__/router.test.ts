@@ -35,6 +35,15 @@ describe('createClerkRouter', () => {
     expect(clerkRouter.match(path)).toBe(true);
   });
 
+  it('normalizes path arguments internally', () => {
+    const path = 'dashboard/';
+    const clerkRouter = createClerkRouter(mockRouter, 'app/');
+
+    mockRouter.pathname.mockReturnValue('/app/dashboard');
+
+    expect(clerkRouter.match(path)).toBe(true);
+  });
+
   it('throws an error when no path is provided', () => {
     const clerkRouter = createClerkRouter(mockRouter, '/app');
 
