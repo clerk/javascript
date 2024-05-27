@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.73.2
+
+### Patch Changes
+
+- Add experimental support for hCaptcha captcha provider ([#3451](https://github.com/clerk/javascript/pull/3451)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`a8c0128be`](https://github.com/clerk/javascript/commit/a8c0128beb404d6c6e707b0735b439af6efdd076)]:
+  - @clerk/types@3.65.1
+  - @clerk/localizations@1.28.6
+
 ## 4.73.1
 
 ### Patch Changes
