@@ -1,0 +1,23 @@
+{
+  "name": "@clerk/ui",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Clerk, Inc.",
+    "email": "support@clerk.com",
+    "url": "git+https://github.com/clerk/javascript.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1"
+  },
+  "devDependencies": {
+    "@clerk/eslint-config-custom": "*",
+    "@clerk/tailwindcss-transformer": "*"
+  }
+}
