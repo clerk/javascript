@@ -9,7 +9,7 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
     <label
       ref={forwardedRef}
       {...props}
-      className={cn('text-[0.8125rem]/[1.125rem] font-medium flex items-center text-foreground gap-x-1', className)}
+      className={cn('text-[0.8125rem]/[1.125rem] font-medium flex items-center text-gray-12 gap-x-1', className)}
     >
       {children}
     </label>

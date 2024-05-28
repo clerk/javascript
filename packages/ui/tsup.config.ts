@@ -12,7 +12,7 @@ const tailwindcssTransformerCode = {
     const styleCache = new Map();
     build.onLoad({ filter: /.*/ }, async args => {
       const code = await fs.promises.readFile(args.path, 'utf8');
-      const transformedCode = await transform(code, { styleCache });
+      const transformedCode = transform(code, { styleCache });
       return {
         contents: transformedCode,
         resolveDir: path.dirname(args.path),
@@ -25,8 +25,7 @@ const tailwindcssTransformerCode = {
         tailwindConfig: path.join(process.cwd(), 'src', 'tailwind.config.ts'),
         globalCss: fs.readFileSync(path.join(process.cwd(), 'src', 'global.css'), 'utf8'),
       });
-      await fs.promises.mkdir(outDir, { recursive: true });
-      await fs.promises.writeFile(path.join(outDir, 'styles.css'), styleSheet);
+      fs.writeFileSync(path.join(outDir, 'styles.css'), styleSheet);
     });
   },
 };
@@ -47,7 +46,6 @@ export default defineConfig(overrideOptions => {
       card: 'src/card.tsx',
       connection: 'src/connection.tsx',
       field: 'src/field.tsx',
-      input: 'src/input.tsx',
       label: 'src/label.tsx',
       seperator: 'src/seperator.tsx',
     },
