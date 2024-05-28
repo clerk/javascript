@@ -46,7 +46,6 @@ export default defineConfig(overrideOptions => {
       card: 'src/card.tsx',
       connection: 'src/connection.tsx',
       field: 'src/field.tsx',
-      label: 'src/label.tsx',
       seperator: 'src/seperator.tsx',
     },
     external: ['react', 'react-dom'],

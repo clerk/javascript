@@ -16,6 +16,21 @@ export const Field = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
   );
 });
 
+export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTMLLabelElement>>(function Label(
+  { className, children, ...props },
+  forwardedRef,
+) {
+  return (
+    <label
+      ref={forwardedRef}
+      {...props}
+      className={cn('text-[0.8125rem]/[1.125rem] font-medium flex items-center text-gray-12 gap-x-1', className)}
+    >
+      {children}
+    </label>
+  );
+});
+
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
   { className, ...props },
   forwardedRef,
