@@ -17,3 +17,4 @@ export type {
 } from '~/react/common/form';
 export type { ConnectionProps, IconProps } from '~/react/common/connections';
 export type { OTPInputSegmentStatus } from '~/react/common/form/otp';
+export { useVirtualRouter } from '~/react/router/virtual';

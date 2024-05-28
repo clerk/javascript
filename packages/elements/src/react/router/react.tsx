@@ -20,6 +20,7 @@ export function Router({
   router,
   basePath,
 }: {
+  mode: 'virtual' | 'path' | 'hash';
   router: ClerkHostRouter;
   children: React.ReactNode;
   basePath?: string;

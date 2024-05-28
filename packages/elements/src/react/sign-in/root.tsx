@@ -8,6 +8,7 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
 import { inspect } from '~/internals/utils/inspector';
+import type { ClerkHostRouter } from '~/react/router';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
@@ -58,6 +59,7 @@ export type SignInRootProps = {
    * TODO: re-use usePathnameWithoutCatchAll from the next SDK
    */
   path?: string;
+  router?: ClerkHostRouter;
   children: React.ReactNode;
   fallback?: React.ReactNode;
   exampleMode?: boolean;
@@ -83,6 +85,7 @@ export function SignInRoot({
   path = SIGN_IN_DEFAULT_BASE_PATH,
   fallback = null,
   exampleMode,
+  router: routerFromProps,
 }: SignInRootProps): JSX.Element | null {
   const clerk = useClerk();
 
@@ -95,7 +98,7 @@ export function SignInRoot({
   );
 
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
-  const router = useNextRouter();
+  const router = routerFromProps ?? useNextRouter();
   const isRootPath = path === router.pathname();
 
   return (

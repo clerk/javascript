@@ -94,9 +94,11 @@ function CustomResendable() {
 
 export default function SignInPage() {
   const [continueWithEmail, setContinueWithEmail] = useState(false);
+  const router = Clerk.useVirtualRouter();
 
   return (
     <SignIn.Root
+      router={router}
       fallback={
         <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
           <div className='text-center'>

@@ -65,7 +65,7 @@ function normalizePath(path: string) {
  * @param basePath base path of the router, navigation and matching will be scoped to this path
  * @returns A ClerkRouter instance
  */
-export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/'): ClerkRouter {
+export function createClerkRouter(router: ClerkHostRouter, { basePath = '/', mode = 'path' }): ClerkRouter {
   const normalizedBasePath = normalizePath(basePath);
 
   /**
