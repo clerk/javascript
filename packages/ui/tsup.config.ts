@@ -25,7 +25,8 @@ const tailwindcssTransformerCode = {
         tailwindConfig: path.join(process.cwd(), 'src', 'tailwind.config.ts'),
         globalCss: fs.readFileSync(path.join(process.cwd(), 'src', 'global.css'), 'utf8'),
       });
-      fs.writeFileSync(path.join(outDir, 'styles.css'), styleSheet);
+      await fs.promises.mkdir(outDir, { recursive: true });
+      await fs.promises.writeFile(path.join(outDir, 'styles.css'), styleSheet);
     });
   },
 };
