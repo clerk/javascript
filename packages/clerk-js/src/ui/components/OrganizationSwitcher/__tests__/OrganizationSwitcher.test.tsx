@@ -10,12 +10,9 @@ import {
   createFakeUserOrganizationSuggestion,
 } from './utlis';
 
-const { createFixtures, clearCache } = bindCreateFixtures('OrganizationSwitcher');
+const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
 describe('OrganizationSwitcher', () => {
-  beforeEach(() => {
-    clearCache();
-  });
   it('renders component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -26,9 +23,6 @@ describe('OrganizationSwitcher', () => {
   });
 
   describe('Personal Workspace', () => {
-    beforeEach(() => {
-      clearCache();
-    });
     it('shows the personal workspace when enabled', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
@@ -53,9 +47,6 @@ describe('OrganizationSwitcher', () => {
   });
 
   describe('OrganizationSwitcherTrigger', () => {
-    beforeEach(() => {
-      clearCache();
-    });
     it('shows the counter for pending suggestions and invitations', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
@@ -120,9 +111,6 @@ describe('OrganizationSwitcher', () => {
   });
 
   describe('OrganizationSwitcherPopover', () => {
-    beforeEach(() => {
-      clearCache();
-    });
     it('opens the organization switcher popover when clicked', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
@@ -250,7 +238,6 @@ describe('OrganizationSwitcher', () => {
     });
 
     it('displays a list of user invitations', async () => {
-      clearCache();
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({

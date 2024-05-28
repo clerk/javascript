@@ -9,7 +9,7 @@ import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationMembers } from '../OrganizationMembers';
 import { createFakeMember, createFakeOrganizationInvitation, createFakeOrganizationMembershipRequest } from './utils';
 
-const { createFixtures, clearCache } = bindCreateFixtures('OrganizationProfile');
+const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 async function waitForLoadingCompleted(container: HTMLElement) {
   return waitForElementToBeRemoved(() => container.querySelector('span[aria-busy="true"]'));
@@ -21,7 +21,6 @@ describe('OrganizationMembers', () => {
    */
   beforeEach(() => {
     clearFetchCache();
-    clearCache();
   });
 
   it('renders the Organization Members page', async () => {

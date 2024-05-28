@@ -9,13 +9,9 @@ import {
 } from '../../OrganizationSwitcher/__tests__/utlis';
 import { OrganizationList } from '../OrganizationList';
 
-const { createFixtures, clearCache } = bindCreateFixtures('OrganizationList');
+const { createFixtures } = bindCreateFixtures('OrganizationList');
 
 describe('OrganizationList', () => {
-  beforeEach(() => {
-    clearCache();
-  });
-
   it('renders component with personal and no data', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
