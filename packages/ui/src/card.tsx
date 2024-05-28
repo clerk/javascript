@@ -162,7 +162,7 @@ const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAtt
       <a
         ref={forwardedRef}
         {...props}
-        className={cn('text-gray-a12 text-[0.8125rem]/[1.125rem] font-medium hover:underline', className)}
+        className={cn('text-accent-a10 text-[0.8125rem]/[1.125rem] font-medium hover:underline', className)}
       >
         {children}
       </a>
