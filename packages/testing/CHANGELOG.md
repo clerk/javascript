@@ -1,5 +1,55 @@
 # @clerk/testing
 
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`ff31f7255`](https://github.com/clerk/javascript/commit/ff31f725541d82caaa9c13cf42cf15f8ce3992f4), [`0e48fc210`](https://github.com/clerk/javascript/commit/0e48fc210cf0b5852052a21494a05f6e723101f5)]:
+  - @clerk/shared@2.2.1
+
+## 1.1.3
+
+### Patch Changes
+
+- Add experimental console warning on Cypress setup function ([#3395](https://github.com/clerk/javascript/pull/3395)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`d6a9b3f5d`](https://github.com/clerk/javascript/commit/d6a9b3f5dd8c64b1bd49f74c3707eb01dcd6aff4), [`456b06849`](https://github.com/clerk/javascript/commit/456b068493b8679e1772819eea24d49aa1bc6556)]:
+  - @clerk/types@4.5.0
+  - @clerk/shared@2.2.0
+
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe)]:
+  - @clerk/types@4.4.0
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`eae0a32d5`](https://github.com/clerk/javascript/commit/eae0a32d5c9e97ccbfd96e001c2cac6bc753b5b3)]:
+  - @clerk/types@4.3.1
+
+## 1.1.0
+
+### Minor Changes
+
+- Introduce support for the Cypress framework ([#3378](https://github.com/clerk/javascript/pull/3378)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Updated dependencies [[`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/shared@2.1.1
+
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`94197710a`](https://github.com/clerk/javascript/commit/94197710a70381c4f1c460948ef02cd2a70b88bb), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20)]:
+  - @clerk/types@4.3.0
+  - @clerk/shared@2.1.0
+
 ## 1.0.3
 
 ### Patch Changes

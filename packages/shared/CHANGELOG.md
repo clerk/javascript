@@ -1,5 +1,31 @@
 # Change Log
 
+## 2.2.1
+
+### Patch Changes
+
+- Add a custom logger to allow logging a message or warning to the console once per session, in order to avoid consecutive identical logs due to component rerenders. ([#3383](https://github.com/clerk/javascript/pull/3383)) by [@desiprisg](https://github.com/desiprisg)
+
+- With the next major release, NextJS@15 will depend on `react` and `react-dom` v19, which is still in beta. We are updating our peer dependencies accordingly in order to accept `react` and `react-dom` @ `19.0.0-beta` ([#3428](https://github.com/clerk/javascript/pull/3428)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 2.2.0
+
+### Minor Changes
+
+- Unpin the version of swr and allow any minor or patch version. ([#3399](https://github.com/clerk/javascript/pull/3399)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.1.1
+
+### Patch Changes
+
+- Re-organize cookie codebase into a central place, fix TokenUpdate event to be triggered on sign-out and drop duplicate event on refreshing token. ([#3362](https://github.com/clerk/javascript/pull/3362)) by [@dimkl](https://github.com/dimkl)
+
+## 2.1.0
+
+### Minor Changes
+
+- Introduce new `client_mismatch` verification status for email link sign-in and sign-up. This error (and its message) will be shown if a verification link was opened in another device/browser from which the user initiated the sign-in/sign-up attempt. This functionality needs to be enabled in the Clerk dashboard. ([#3367](https://github.com/clerk/javascript/pull/3367)) by [@mzhong9723](https://github.com/mzhong9723)
+
 ## 2.0.2
 
 ### Patch Changes

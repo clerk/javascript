@@ -1,5 +1,65 @@
 # @clerk/elements
 
+## 0.5.1
+
+### Patch Changes
+
+- Update the TypeScript type of `<Input />` to allow the `validatePassword` prop also on `type="text"` (in addition to `type="password"`) ([#3394](https://github.com/clerk/javascript/pull/3394)) by [@LekoArts](https://github.com/LekoArts)
+
+## 0.5.0
+
+### Minor Changes
+
+- - Adds Stately's Browser Inspector in development builds ([#3424](https://github.com/clerk/javascript/pull/3424)) by [@tmilewski](https://github.com/tmilewski)
+
+  - Removes `@statelyai/inspect` from dependencies
+  - Ensures all inspector-related code is omitted from the build
+
+### Patch Changes
+
+- Fix: Verification form submission wasn't working after returning from "choosing an alternate strategy" without making a selection. ([#3425](https://github.com/clerk/javascript/pull/3425)) by [@tmilewski](https://github.com/tmilewski)
+
+  Perf: Adds a `NeverRetriable` state for applicable strategies so the countdown doesn't run needlessly.
+
+## 0.4.7
+
+### Patch Changes
+
+- Update FieldError/GlobalError types to allow render function children while using the asChild prop ([#3426](https://github.com/clerk/javascript/pull/3426)) by [@tmilewski](https://github.com/tmilewski)
+
+## 0.4.6
+
+## 0.4.5
+
+### Patch Changes
+
+- Update `<FieldError />` to enable `asChild` prop for custom markup in render function usage. ([#3396](https://github.com/clerk/javascript/pull/3396)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 0.4.4
+
+### Patch Changes
+
+- Fix `setActive` not firing upon a successful sign up. ([#3391](https://github.com/clerk/javascript/pull/3391)) by [@tmilewski](https://github.com/tmilewski)
+
+## 0.4.3
+
+### Patch Changes
+
+- Fix typing for GlobalError and FieldError render functions ([#3387](https://github.com/clerk/javascript/pull/3387)) by [@tmilewski](https://github.com/tmilewski)
+
+## 0.4.2
+
+## 0.4.1
+
+### Patch Changes
+
+- This release includes various smaller fixes and one dependency update: ([#3343](https://github.com/clerk/javascript/pull/3343)) by [@tmilewski](https://github.com/tmilewski)
+
+  - `xstate` was updated from `5.12.0` to `5.13.0`
+  - Previously, the contents of the `fallback` prop were sometimes shown even if the user wasn't on the `start` step. This bug is fixed now.
+  - Upon completion of an sign-in/sign-up attempt, don't immediately return to the `start` step. This fixes the issue of a "flash of content" that could e.g. be seen during sign-in with OAuth providers.
+  - Some underlying fixes in Clerk Elements' XState logic were applied to make sure that during a sign-in/sign-up attempt the state is properly maintained. For example, if you visit an already completed attempt (some step of that flow) it now properly keeps track of that state.
+
 ## 0.4.0
 
 ### Minor Changes

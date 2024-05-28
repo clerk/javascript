@@ -1,5 +1,121 @@
 # Change Log
 
+## 4.5.0
+
+### Minor Changes
+
+- Add support for GoogleOneTap. New APIs listed: ([#3392](https://github.com/clerk/javascript/pull/3392)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### React component
+
+  - `<GoogleOneTap/>`
+
+  Customize the UX of the prompt
+
+  ```tsx
+  <GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+  ### Use the component from with Vanilla JS
+
+  - `Clerk.openGoogleOneTap(props: GoogleOneTapProps)`
+  - `Clerk.closeGoogleOneTap()`
+
+  ### Low level APIs for custom flows
+
+  - `await Clerk.authenticateWithGoogleOneTap({ token: 'xxxx'})`
+  - `await Clerk.handleGoogleOneTapCallback()`
+
+  We recommend using this two methods together in order and let Clerk to perform the correct redirections.
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      await Clerk.handleGoogleOneTapCallback(signInOrUp, {
+        signInForceRedirectUrl: window.location.href,
+      });
+    },
+  });
+  ```
+
+  In case you want to handle the redirection and session management yourself you can do so like this
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      if (signInOrUp.status === 'complete') {
+        await Clerk.setActive({
+          session: signInOrUp.createdSessionId,
+        });
+      }
+    },
+  });
+  ```
+
+## 4.4.0
+
+### Minor Changes
+
+- Replace mount with open for GoogleOneTap. New api is `__experimental_openGoogleOneTap`. ([#3379](https://github.com/clerk/javascript/pull/3379)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.3.1
+
+### Patch Changes
+
+- Add a descriptor for Invitation previews in <OrganizationSwitcher/> ([#3376](https://github.com/clerk/javascript/pull/3376)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+## 4.3.0
+
+### Minor Changes
+
+- Updates related to experimental Google One Tap support ([#3250](https://github.com/clerk/javascript/pull/3250)) by [@panteliselef](https://github.com/panteliselef)
+
+  - By default we are returning back to the location where the flow started.
+    To accomplish that internally we will use the redirect_url query parameter to build the url.
+
+  ```tsx
+  <__experimental_GoogleOneTap />
+  ```
+
+  - In the above example if there is a SIGN_UP_FORCE_REDIRECT_URL or SIGN_IN_FORCE_REDIRECT_URL set then the developer would need to pass new values as props like this
+
+  ```tsx
+  <__experimental_GoogleOneTap
+    signInForceRedirectUrl=''
+    signUpForceRedirectUrl=''
+  />
+  ```
+
+  - Let the developer configure the experience they want to offer. (All these values are true by default)
+
+  ```tsx
+  <__experimental_GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+  - Moved authenticateWithGoogleOneTap to Clerk singleton
+
+  ```ts
+  Clerk.__experimental_authenticateWithGoogleOneTap;
+  ```
+
+  - Created the handleGoogleOneTapCallback in Clerk singleton
+
+  ```ts
+  Clerk.__experimental_handleGoogleOneTapCallback;
+  ```
+
+- Introduce new `client_mismatch` verification status for email link sign-in and sign-up. This error (and its message) will be shown if a verification link was opened in another device/browser from which the user initiated the sign-in/sign-up attempt. This functionality needs to be enabled in the Clerk dashboard. ([#3367](https://github.com/clerk/javascript/pull/3367)) by [@mzhong9723](https://github.com/mzhong9723)
+
 ## 4.2.1
 
 ### Patch Changes

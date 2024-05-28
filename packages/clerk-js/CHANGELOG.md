@@ -1,5 +1,181 @@
 # Change Log
 
+## 5.5.2
+
+### Patch Changes
+
+- Validate protocol on window navigation by [@tmilewski](https://github.com/tmilewski)
+
+## 5.5.1
+
+### Patch Changes
+
+- Add a custom logger to allow logging a message or warning to the console once per session, in order to avoid consecutive identical logs due to component rerenders. ([#3383](https://github.com/clerk/javascript/pull/3383)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`ff31f7255`](https://github.com/clerk/javascript/commit/ff31f725541d82caaa9c13cf42cf15f8ce3992f4), [`8e5969d82`](https://github.com/clerk/javascript/commit/8e5969d82818c333d5459e5c70eb626d0968eb66), [`0e48fc210`](https://github.com/clerk/javascript/commit/0e48fc210cf0b5852052a21494a05f6e723101f5)]:
+  - @clerk/shared@2.2.1
+  - @clerk/localizations@2.4.3
+
+## 5.5.0
+
+### Minor Changes
+
+- Add support for GoogleOneTap. New APIs listed: ([#3392](https://github.com/clerk/javascript/pull/3392)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### React component
+
+  - `<GoogleOneTap/>`
+
+  Customize the UX of the prompt
+
+  ```tsx
+  <GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+  ### Use the component from with Vanilla JS
+
+  - `Clerk.openGoogleOneTap(props: GoogleOneTapProps)`
+  - `Clerk.closeGoogleOneTap()`
+
+  ### Low level APIs for custom flows
+
+  - `await Clerk.authenticateWithGoogleOneTap({ token: 'xxxx'})`
+  - `await Clerk.handleGoogleOneTapCallback()`
+
+  We recommend using this two methods together in order and let Clerk to perform the correct redirections.
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      await Clerk.handleGoogleOneTapCallback(signInOrUp, {
+        signInForceRedirectUrl: window.location.href,
+      });
+    },
+  });
+  ```
+
+  In case you want to handle the redirection and session management yourself you can do so like this
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      if (signInOrUp.status === 'complete') {
+        await Clerk.setActive({
+          session: signInOrUp.createdSessionId,
+        });
+      }
+    },
+  });
+  ```
+
+### Patch Changes
+
+- A bug was fixed to not override the existing sign-up state on the OAuth callback. ([#3401](https://github.com/clerk/javascript/pull/3401)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  When continuing a sign-up flow with social connections, `@clerk/clerk-js` was creating a new `SignUpResource` object, instead of patching the existing one.
+
+  This was affecting Web3 sign-up flows, since the wallet ID was being overridden on the browser redirect.
+
+- Updated dependencies [[`d6a9b3f5d`](https://github.com/clerk/javascript/commit/d6a9b3f5dd8c64b1bd49f74c3707eb01dcd6aff4), [`456b06849`](https://github.com/clerk/javascript/commit/456b068493b8679e1772819eea24d49aa1bc6556)]:
+  - @clerk/types@4.5.0
+  - @clerk/shared@2.2.0
+
+## 5.4.0
+
+### Minor Changes
+
+- Replace mount with open for GoogleOneTap. New api is `__experimental_openGoogleOneTap`. ([#3379](https://github.com/clerk/javascript/pull/3379)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Remove cookie when signing out before running `onBeforeSetActive` to resolve issues where we do navigations in `onBeforeSetActive`. ([#3371](https://github.com/clerk/javascript/pull/3371)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe), [`e84090db0`](https://github.com/clerk/javascript/commit/e84090db0d9a61a5e3dfea645e7c9cc6dad214a9)]:
+  - @clerk/types@4.4.0
+  - @clerk/localizations@2.4.2
+
+## 5.3.2
+
+### Patch Changes
+
+- Add a descriptor for Invitation previews in <OrganizationSwitcher/> ([#3376](https://github.com/clerk/javascript/pull/3376)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Updated dependencies [[`eae0a32d5`](https://github.com/clerk/javascript/commit/eae0a32d5c9e97ccbfd96e001c2cac6bc753b5b3)]:
+  - @clerk/types@4.3.1
+
+## 5.3.1
+
+### Patch Changes
+
+- Re-organize cookie codebase into a central place, fix TokenUpdate event to be triggered on sign-out and drop duplicate event on refreshing token. ([#3362](https://github.com/clerk/javascript/pull/3362)) by [@dimkl](https://github.com/dimkl)
+
+- Updated dependencies [[`9d02df655`](https://github.com/clerk/javascript/commit/9d02df65507f579e970b33a600e6c83f6d5bfd45), [`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/localizations@2.4.1
+  - @clerk/shared@2.1.1
+
+## 5.3.0
+
+### Minor Changes
+
+- Updates related to experimental Google One Tap support ([#3250](https://github.com/clerk/javascript/pull/3250)) by [@panteliselef](https://github.com/panteliselef)
+
+  - By default we are returning back to the location where the flow started.
+    To accomplish that internally we will use the redirect_url query parameter to build the url.
+
+  ```tsx
+  <__experimental_GoogleOneTap />
+  ```
+
+  - In the above example if there is a SIGN_UP_FORCE_REDIRECT_URL or SIGN_IN_FORCE_REDIRECT_URL set then the developer would need to pass new values as props like this
+
+  ```tsx
+  <__experimental_GoogleOneTap
+    signInForceRedirectUrl=''
+    signUpForceRedirectUrl=''
+  />
+  ```
+
+  - Let the developer configure the experience they want to offer. (All these values are true by default)
+
+  ```tsx
+  <__experimental_GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+  - Moved authenticateWithGoogleOneTap to Clerk singleton
+
+  ```ts
+  Clerk.__experimental_authenticateWithGoogleOneTap;
+  ```
+
+  - Created the handleGoogleOneTapCallback in Clerk singleton
+
+  ```ts
+  Clerk.__experimental_handleGoogleOneTapCallback;
+  ```
+
+- Introduce new `client_mismatch` verification status for email link sign-in and sign-up. This error (and its message) will be shown if a verification link was opened in another device/browser from which the user initiated the sign-in/sign-up attempt. This functionality needs to be enabled in the Clerk dashboard. ([#3367](https://github.com/clerk/javascript/pull/3367)) by [@mzhong9723](https://github.com/mzhong9723)
+
+### Patch Changes
+
+- Improve logging for CAPTCHA script loading errors ([#3374](https://github.com/clerk/javascript/pull/3374)) by [@anagstef](https://github.com/anagstef)
+
+- Respect the `signInForceRedirectUrl`, `signInFallbackRedirectUrl`, `signUpForceRedirectUrl` and `signUpFallbackRedirectUrl` props passed to `SignInButton`, `SignUpButton` and the low-level `window.Clerk.buildSignInUrl` & `window.Clerk.buildSignUpUrl` methods. These props allow you to control the redirect behavior of the `SignIn` and `SignUp` components. For more information, refer to the [Custom Redirects](https://clerk.com/docs/guides/custom-redirects) guide. ([#3361](https://github.com/clerk/javascript/pull/3361)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`6f61130e3`](https://github.com/clerk/javascript/commit/6f61130e35a08298a715c170d2ee14d29d15bb58), [`94197710a`](https://github.com/clerk/javascript/commit/94197710a70381c4f1c460948ef02cd2a70b88bb), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20), [`201b28d37`](https://github.com/clerk/javascript/commit/201b28d37852b5a2681f8115d1898905e7956bc2), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20)]:
+  - @clerk/localizations@2.4.0
+  - @clerk/types@4.3.0
+  - @clerk/shared@2.1.0
+
 ## 5.2.4
 
 ### Patch Changes

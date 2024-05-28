@@ -7,7 +7,7 @@ import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internal
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
-import { consoleInspector } from '~/internals/utils/inspector';
+import { inspect } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
@@ -18,7 +18,7 @@ type SignInFlowProviderProps = {
   exampleMode?: boolean;
 };
 
-const actor = createActor(SignInRouterMachine, { inspect: consoleInspector });
+const actor = createActor(SignInRouterMachine, { inspect });
 actor.start();
 
 function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) {
@@ -44,7 +44,9 @@ function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) 
         actor.send(evt);
       }
     });
-  }, [clerk, exampleMode, formRef, router]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clerk, exampleMode, formRef?.id, !!router]);
 
   return <SignInRouterCtx.Provider actorRef={actor}>{children}</SignInRouterCtx.Provider>;
 }
@@ -94,6 +96,7 @@ export function SignInRoot({
 
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
+  const isRootPath = path === router.pathname();
 
   return (
     <Router
@@ -102,9 +105,11 @@ export function SignInRoot({
     >
       <FormStoreProvider>
         <SignInFlowProvider exampleMode={exampleMode}>
-          <ClerkLoading>
-            <Form>{fallback}</Form>
-          </ClerkLoading>
+          {isRootPath ? (
+            <ClerkLoading>
+              <Form>{fallback}</Form>
+            </ClerkLoading>
+          ) : null}
           <ClerkLoaded>{children}</ClerkLoaded>
         </SignInFlowProvider>
       </FormStoreProvider>

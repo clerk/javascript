@@ -1,5 +1,113 @@
 # Change Log
 
+## 5.2.1
+
+### Patch Changes
+
+- With the next major release, NextJS@15 will depend on `react` and `react-dom` v19, which is still in beta. We are updating our peer dependencies accordingly in order to accept `react` and `react-dom` @ `19.0.0-beta` ([#3428](https://github.com/clerk/javascript/pull/3428)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`ff31f7255`](https://github.com/clerk/javascript/commit/ff31f725541d82caaa9c13cf42cf15f8ce3992f4), [`0e48fc210`](https://github.com/clerk/javascript/commit/0e48fc210cf0b5852052a21494a05f6e723101f5)]:
+  - @clerk/shared@2.2.1
+
+## 5.2.0
+
+### Minor Changes
+
+- Add support for GoogleOneTap. New APIs listed: ([#3392](https://github.com/clerk/javascript/pull/3392)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### React component
+
+  - `<GoogleOneTap/>`
+
+  Customize the UX of the prompt
+
+  ```tsx
+  <GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+  ### Use the component from with Vanilla JS
+
+  - `Clerk.openGoogleOneTap(props: GoogleOneTapProps)`
+  - `Clerk.closeGoogleOneTap()`
+
+  ### Low level APIs for custom flows
+
+  - `await Clerk.authenticateWithGoogleOneTap({ token: 'xxxx'})`
+  - `await Clerk.handleGoogleOneTapCallback()`
+
+  We recommend using this two methods together in order and let Clerk to perform the correct redirections.
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      await Clerk.handleGoogleOneTapCallback(signInOrUp, {
+        signInForceRedirectUrl: window.location.href,
+      });
+    },
+  });
+  ```
+
+  In case you want to handle the redirection and session management yourself you can do so like this
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      if (signInOrUp.status === 'complete') {
+        await Clerk.setActive({
+          session: signInOrUp.createdSessionId,
+        });
+      }
+    },
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`d6a9b3f5d`](https://github.com/clerk/javascript/commit/d6a9b3f5dd8c64b1bd49f74c3707eb01dcd6aff4), [`456b06849`](https://github.com/clerk/javascript/commit/456b068493b8679e1772819eea24d49aa1bc6556)]:
+  - @clerk/types@4.5.0
+  - @clerk/shared@2.2.0
+
+## 5.1.0
+
+### Minor Changes
+
+- Replace mount with open for GoogleOneTap. New api is `__experimental_openGoogleOneTap`. ([#3379](https://github.com/clerk/javascript/pull/3379)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe)]:
+  - @clerk/types@4.4.0
+
+## 5.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`eae0a32d5`](https://github.com/clerk/javascript/commit/eae0a32d5c9e97ccbfd96e001c2cac6bc753b5b3)]:
+  - @clerk/types@4.3.1
+
+## 5.0.6
+
+### Patch Changes
+
+- Updated dependencies [[`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/shared@2.1.1
+
+## 5.0.5
+
+### Patch Changes
+
+- Respect the `signInForceRedirectUrl`, `signInFallbackRedirectUrl`, `signUpForceRedirectUrl` and `signUpFallbackRedirectUrl` props passed to `SignInButton`, `SignUpButton` and the low-level `window.Clerk.buildSignInUrl` & `window.Clerk.buildSignUpUrl` methods. These props allow you to control the redirect behavior of the `SignIn` and `SignUp` components. For more information, refer to the [Custom Redirects](https://clerk.com/docs/guides/custom-redirects) guide. ([#3361](https://github.com/clerk/javascript/pull/3361)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`94197710a`](https://github.com/clerk/javascript/commit/94197710a70381c4f1c460948ef02cd2a70b88bb), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20)]:
+  - @clerk/types@4.3.0
+  - @clerk/shared@2.1.0
+
 ## 5.0.4
 
 ### Patch Changes

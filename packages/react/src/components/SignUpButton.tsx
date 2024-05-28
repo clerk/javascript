@@ -20,8 +20,8 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
 
   const clickHandler = () => {
     const opts = {
-      fallbackRedirectUrl,
-      forceRedirectUrl,
+      signUpFallbackRedirectUrl: fallbackRedirectUrl,
+      signUpForceRedirectUrl: forceRedirectUrl,
       signInFallbackRedirectUrl,
       signInForceRedirectUrl,
       unsafeMetadata,

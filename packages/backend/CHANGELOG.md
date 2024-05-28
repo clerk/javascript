@@ -1,5 +1,39 @@
 # Change Log
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`ff31f7255`](https://github.com/clerk/javascript/commit/ff31f725541d82caaa9c13cf42cf15f8ce3992f4), [`0e48fc210`](https://github.com/clerk/javascript/commit/0e48fc210cf0b5852052a21494a05f6e723101f5)]:
+  - @clerk/shared@2.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- Consume and expose the 'saml_accounts' property of the user resource ([#3405](https://github.com/clerk/javascript/pull/3405)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Updated dependencies [[`456b06849`](https://github.com/clerk/javascript/commit/456b068493b8679e1772819eea24d49aa1bc6556)]:
+  - @clerk/shared@2.2.0
+
+## 1.1.5
+
+### Patch Changes
+
+- Added missing phpass and bcrypt_sha256_django hashers to PasswordHasher type ([#3380](https://github.com/clerk/javascript/pull/3380)) by [@royanger](https://github.com/royanger)
+
+- Updated dependencies [[`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/shared@2.1.1
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20)]:
+  - @clerk/shared@2.1.0
+
 ## 1.1.3
 
 ### Patch Changes

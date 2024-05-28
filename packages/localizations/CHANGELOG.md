@@ -1,5 +1,35 @@
 # Change Log
 
+## 2.4.3
+
+### Patch Changes
+
+- Review PT-BR localization: Adds missing keys, fixes some typos ([#3412](https://github.com/clerk/javascript/pull/3412)) by [@danilofuchs](https://github.com/danilofuchs)
+
+## 2.4.2
+
+### Patch Changes
+
+- Added missing translations for the Spanish (Spain) locale (es_ES). ([#3389](https://github.com/clerk/javascript/pull/3389)) by [@frankdavidcorona](https://github.com/frankdavidcorona)
+
+## 2.4.1
+
+### Patch Changes
+
+- Add missing es-ES localization keys ([#3382](https://github.com/clerk/javascript/pull/3382)) by [@frankdavidcorona](https://github.com/frankdavidcorona)
+
+## 2.4.0
+
+### Minor Changes
+
+- Add srRS localization ([#3338](https://github.com/clerk/javascript/pull/3338)) by [@paunovic5ar](https://github.com/paunovic5ar)
+
+- Added new keys for email link verification under `signIn.emailLink.clientMismatch` and `signUp.emailLink.clientMismatch` ([#3367](https://github.com/clerk/javascript/pull/3367)) by [@mzhong9723](https://github.com/mzhong9723)
+
+### Patch Changes
+
+- Update esMX language module ([#3372](https://github.com/clerk/javascript/pull/3372)) by [@Thiagoamaro2431](https://github.com/Thiagoamaro2431)
+
 ## 2.3.1
 
 ### Patch Changes

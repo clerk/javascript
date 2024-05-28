@@ -20,6 +20,7 @@ const StatusToIcon: Record<Exclude<VerificationStatus, 'loading'>, React.Compone
   verified_switch_tab: SwitchArrows,
   expired: ExclamationTriangle,
   failed: ExclamationTriangle,
+  client_mismatch: ExclamationTriangle,
 };
 
 const statusToColor = (theme: InternalTheme, status: Exclude<VerificationStatus, 'loading'>) =>
@@ -28,6 +29,7 @@ const statusToColor = (theme: InternalTheme, status: Exclude<VerificationStatus,
     verified_switch_tab: theme.colors.$primary500,
     expired: theme.colors.$warning500,
     failed: theme.colors.$danger500,
+    client_mismatch: theme.colors.$warning500,
   }[status]);
 
 export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {

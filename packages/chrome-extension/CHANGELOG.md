@@ -1,5 +1,68 @@
 # Change Log
 
+## 1.0.15
+
+### Patch Changes
+
+- Updated dependencies [[`b91e0ef40`](https://github.com/clerk/javascript/commit/b91e0ef4036d215da09d144f85b0a5ef2afe6cba)]:
+  - @clerk/clerk-js@5.5.2
+
+## 1.0.14
+
+### Patch Changes
+
+- Updated dependencies [[`ff31f7255`](https://github.com/clerk/javascript/commit/ff31f725541d82caaa9c13cf42cf15f8ce3992f4), [`0e48fc210`](https://github.com/clerk/javascript/commit/0e48fc210cf0b5852052a21494a05f6e723101f5)]:
+  - @clerk/clerk-js@5.5.1
+  - @clerk/shared@2.2.1
+  - @clerk/clerk-react@5.2.1
+
+## 1.0.13
+
+### Patch Changes
+
+- Updated dependencies [[`62f8af286`](https://github.com/clerk/javascript/commit/62f8af286cc498b52c61bd75fc8581ed99fb3b40), [`d6a9b3f5d`](https://github.com/clerk/javascript/commit/d6a9b3f5dd8c64b1bd49f74c3707eb01dcd6aff4), [`456b06849`](https://github.com/clerk/javascript/commit/456b068493b8679e1772819eea24d49aa1bc6556)]:
+  - @clerk/clerk-js@5.5.0
+  - @clerk/clerk-react@5.2.0
+  - @clerk/shared@2.2.0
+
+## 1.0.12
+
+### Patch Changes
+
+- Updated dependencies [[`1fdd4368b`](https://github.com/clerk/javascript/commit/1fdd4368baac91a27e40bdd7e8ff14aba1e1925c), [`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe)]:
+  - @clerk/clerk-js@5.4.0
+  - @clerk/clerk-react@5.1.0
+
+## 1.0.11
+
+### Patch Changes
+
+- Updated dependencies [[`eae0a32d5`](https://github.com/clerk/javascript/commit/eae0a32d5c9e97ccbfd96e001c2cac6bc753b5b3)]:
+  - @clerk/clerk-js@5.3.2
+  - @clerk/clerk-react@5.0.7
+
+## 1.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/clerk-js@5.3.1
+  - @clerk/shared@2.1.1
+  - @clerk/clerk-react@5.0.6
+
+## 1.0.9
+
+### Patch Changes
+
+- Remove `Origin` from API mutation request headers via `onInstalled` listener. ([#3363](https://github.com/clerk/javascript/pull/3363)) by [@tmilewski](https://github.com/tmilewski)
+
+- Revert: Remove `Origin` from API mutation request headers via `onInstalled` listener. ([#3375](https://github.com/clerk/javascript/pull/3375)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`94197710a`](https://github.com/clerk/javascript/commit/94197710a70381c4f1c460948ef02cd2a70b88bb), [`34befeebc`](https://github.com/clerk/javascript/commit/34befeebc49d95b5492a2e665ad3b31919f2c1e3), [`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20), [`bcbb2c9ef`](https://github.com/clerk/javascript/commit/bcbb2c9ef42c11b13c1d2f60db4dd88a2d4f04f6)]:
+  - @clerk/clerk-js@5.3.0
+  - @clerk/shared@2.1.0
+  - @clerk/clerk-react@5.0.5
+
 ## 1.0.8
 
 ### Patch Changes

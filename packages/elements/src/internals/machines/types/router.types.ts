@@ -17,6 +17,7 @@ export type BaseRouterLoadingStep = 'start' | 'verifications' | 'continue' | 're
 export type BaseRouterNextEvent<T extends ClerkResource> = { type: 'NEXT'; resource?: T };
 export type BaseRouterPrevEvent = { type: 'NAVIGATE.PREVIOUS' };
 export type BaseRouterStartEvent = { type: 'NAVIGATE.START' };
+export type BaseRouterResetEvent = { type: 'RESET' };
 export type BaseRouterErrorEvent = { type: 'ERROR'; error: Error };
 export type BaseRouterTransferEvent = { type: 'TRANSFER' };
 export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (

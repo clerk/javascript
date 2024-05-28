@@ -30,6 +30,8 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { ActiveSessionResource } from './session';
+import type { SignInResource } from './signIn';
+import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 
@@ -148,6 +150,18 @@ export interface Clerk {
   closeSignIn: () => void;
 
   /**
+   * Opens the Google One Tap component.
+   * @param props Optional props that will be passed to the GoogleOneTap component.
+   */
+  openGoogleOneTap: (props?: GoogleOneTapProps) => void;
+
+  /**
+   * Opens the Google One Tap component.
+   * If the component is not already open, results in a noop.
+   */
+  closeGoogleOneTap: () => void;
+
+  /**
    * Opens the Clerk SignUp component in a modal.
    * @param props Optional props that will be passed to the SignUp component.
    */
@@ -205,22 +219,6 @@ export interface Clerk {
    * @param targetNode Target node to unmount the SignIn component from.
    */
   unmountSignIn: (targetNode: HTMLDivElement) => void;
-
-  /**
-   * Mounts a Google one tap flow component at the target element.
-   * @experimental
-   * @param targetNode Target node to mount the GoogleOneTap component.
-   * @param oneTapProps sign in configuration parameters.
-   */
-  __experimental_mountGoogleOneTap: (targetNode: HTMLDivElement, oneTapProps?: OneTapProps) => void;
-
-  /**
-   * Unmount a Google one tap flow component from the target element.
-   * If there is no component mounted at the target node, results in a noop.
-   * @experimental
-   * @param targetNode Target node to unmount the SignIn component from.
-   */
-  __experimental_unmountGoogleOneTap: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a sign up flow component at the target element.
@@ -453,6 +451,16 @@ export interface Clerk {
   redirectToAfterSignOut: () => void;
 
   /**
+   * Completes a Google One Tap redirection flow started by
+   * {@link Clerk.authenticateWithGoogleOneTap}
+   */
+  handleGoogleOneTapCallback: (
+    signInOrUp: SignInResource | SignUpResource,
+    params: HandleOAuthCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
    * Completes an OAuth or SAML redirection flow started by
    * {@link Clerk.client.signIn.authenticateWithRedirect} or {@link Clerk.client.signUp.authenticateWithRedirect}
    */
@@ -473,6 +481,13 @@ export interface Clerk {
    * Authenticates user using their Metamask browser extension
    */
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
+
+  /**
+   * Authenticates user using a Google token generated from Google identity services.
+   */
+  authenticateWithGoogleOneTap: (
+    params: AuthenticateWithGoogleOneTapParams,
+  ) => Promise<SignInResource | SignUpResource>;
 
   /**
    * Creates an organization, adding the current user as admin.
@@ -726,8 +741,27 @@ export type SignInProps = RoutingOptions & {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-export type OneTapProps = {
+type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
+
+export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
+  /**
+   * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
+   * @default true
+   */
   cancelOnTapOutside?: boolean;
+  /**
+   * Enables upgraded One Tap UX on ITP browsers.
+   * Turning this options off, would hide any One Tap UI in such browsers.
+   * @default true
+   */
+  itpSupport?: boolean;
+  /**
+   * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
+   * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
+   * Backwards compatible with browsers that still support third-party cookies.
+   * @default true
+   */
+  fedCmSupport?: boolean;
   appearance?: SignInTheme;
 };
 
@@ -1050,6 +1084,10 @@ export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+}
+
+export interface AuthenticateWithGoogleOneTapParams {
+  token: string;
 }
 
 export interface LoadedClerk extends Clerk {

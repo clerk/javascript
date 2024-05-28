@@ -7,11 +7,13 @@ const appRouter = applicationConfig()
   .setName('next-app-router')
   .useTemplate(templates['next-app-router'])
   .setEnvFormatter('public', key => `NEXT_PUBLIC_${key}`)
-  .addScript('setup', 'npm i')
+  .addScript('setup', constants.E2E_NPM_FORCE ? 'npm i --force' : 'npm i')
   .addScript('dev', 'npm run dev')
   .addScript('build', 'npm run build')
   .addScript('serve', 'npm run start')
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
+  .addDependency('react', constants.E2E_REACT_VERSION)
+  .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
   .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || clerkNextjsLocal);
 
 const appRouterTurbo = appRouter

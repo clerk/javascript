@@ -20,11 +20,11 @@ import {
 } from '@radix-ui/react-form';
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
-import type { SetRequired, Simplify } from 'type-fest';
+import type { SetRequired } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
-import { ClerkElementsFieldError } from '~/internals/errors';
+import { ClerkElementsFieldError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FieldDetails } from '~/internals/machines/form';
 import {
   fieldFeedbackSelector,
@@ -36,6 +36,7 @@ import {
 } from '~/internals/machines/form/form.context';
 import { usePassword } from '~/react/hooks/use-password.hook';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
+import { isReactFragment } from '~/react/utils/is-react-fragment';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
@@ -493,7 +494,8 @@ type FormInputProps =
   | RadixFormControlProps
   | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
   | ({ type: 'otp'; render?: undefined } & OTPInputProps)
-  | ({ type: 'password' } & PasswordInputProps);
+  // Usecase: Toggle the visibility of the password input, therefore 'password' and 'text' are allowed
+  | ({ type: 'password' | 'text' } & PasswordInputProps);
 
 /**
  * Handles rendering of `<input>` elements within Clerk's flows. Supports special `type` prop values to render input types that are unique to authentication and user management flows. Additional props will be passed through to the `<input>` element.
@@ -604,9 +606,9 @@ const FIELD_ERROR_NAME = 'ClerkElementsFieldError';
 
 type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
 
-type FormErrorPropsRenderFn = {
-  asChild?: never;
-  children?: (error: FormErrorRenderProps) => React.ReactNode;
+type FormErrorPropsAsChild = {
+  asChild?: true | never;
+  children?: React.ReactElement | ((error: FormErrorRenderProps) => React.ReactNode);
   code?: string;
 };
 
@@ -616,15 +618,7 @@ type FormErrorPropsStd = {
   code: string;
 };
 
-type FormErrorPropsAsChild = {
-  asChild?: true;
-  children: React.ReactElement;
-  code: string;
-};
-
-type FormErrorProps<T> = Simplify<
-  Omit<T, 'asChild' | 'children'> & (FormErrorPropsRenderFn | FormErrorPropsStd | FormErrorPropsAsChild)
->;
+type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> & (FormErrorPropsStd | FormErrorPropsAsChild);
 
 type FormGlobalErrorElement = React.ElementRef<'div'>;
 type FormGlobalErrorProps = FormErrorProps<React.ComponentPropsWithoutRef<'div'>>;
@@ -670,6 +664,10 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
     const Comp = asChild ? Slot : 'div';
     const child = typeof children === 'function' ? children(error) : children;
 
+    if (isReactFragment(child)) {
+      throw new ClerkElementsRuntimeError('<GlobalError /> cannot render a Fragment as a child.');
+    }
+
     return (
       <Comp
         role='alert'
@@ -703,7 +701,7 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
  * </Clerk.Field>
  */
 const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
-  ({ children, code, name, ...rest }, forwardedRef) => {
+  ({ asChild = false, children, code, name, ...rest }, forwardedRef) => {
     const fieldContext = useFieldContext();
     const fieldName = fieldContext?.name || name;
     const { feedback } = useFieldFeedback({ name: fieldName });
@@ -718,8 +716,14 @@ const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
       return null;
     }
 
+    const Comp = asChild ? Slot : 'span';
     const child = typeof children === 'function' ? children(error) : children;
+
     // const forceMatch = code ? error.code === code : undefined; // TODO: Re-add when Radix Form is updated
+
+    if (isReactFragment(child)) {
+      throw new ClerkElementsRuntimeError('<FieldError /> cannot render a Fragment as a child.');
+    }
 
     return (
       <RadixFormMessage
@@ -727,8 +731,9 @@ const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
         // forceMatch={forceMatch}
         {...rest}
         ref={forwardedRef}
+        asChild
       >
-        {child || error.message}
+        <Comp>{child || error.message}</Comp>
       </RadixFormMessage>
     );
   },

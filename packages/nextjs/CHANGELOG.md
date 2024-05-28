@@ -1,5 +1,121 @@
 # Change Log
 
+## 5.1.2
+
+### Patch Changes
+
+- Allow next@15.0.0-rc as a peer dependency by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 5.1.1
+
+### Patch Changes
+
+- With the next major release, NextJS@15 will depend on `react` and `react-dom` v19, which is still in beta. We are updating our peer dependencies accordingly in order to accept `react` and `react-dom` @ `19.0.0-beta` ([#3428](https://github.com/clerk/javascript/pull/3428)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Utilize an awaitable replace function internally to avoid race conditions when using `router.replace`. ([#3416](https://github.com/clerk/javascript/pull/3416)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`ff31f7255`](https://github.com/clerk/javascript/commit/ff31f725541d82caaa9c13cf42cf15f8ce3992f4), [`0e48fc210`](https://github.com/clerk/javascript/commit/0e48fc210cf0b5852052a21494a05f6e723101f5)]:
+  - @clerk/shared@2.2.1
+  - @clerk/clerk-react@5.2.1
+  - @clerk/backend@1.2.1
+
+## 5.1.0
+
+### Minor Changes
+
+- Add support for GoogleOneTap. New APIs listed: ([#3392](https://github.com/clerk/javascript/pull/3392)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### React component
+
+  - `<GoogleOneTap/>`
+
+  Customize the UX of the prompt
+
+  ```tsx
+  <GoogleOneTap
+    cancelOnTapOutside={false}
+    itpSupport={false}
+    fedCmSupport={false}
+  />
+  ```
+
+  ### Use the component from with Vanilla JS
+
+  - `Clerk.openGoogleOneTap(props: GoogleOneTapProps)`
+  - `Clerk.closeGoogleOneTap()`
+
+  ### Low level APIs for custom flows
+
+  - `await Clerk.authenticateWithGoogleOneTap({ token: 'xxxx'})`
+  - `await Clerk.handleGoogleOneTapCallback()`
+
+  We recommend using this two methods together in order and let Clerk to perform the correct redirections.
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      await Clerk.handleGoogleOneTapCallback(signInOrUp, {
+        signInForceRedirectUrl: window.location.href,
+      });
+    },
+  });
+  ```
+
+  In case you want to handle the redirection and session management yourself you can do so like this
+
+  ```tsx
+  google.accounts.id.initialize({
+    callback: async response => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+      if (signInOrUp.status === 'complete') {
+        await Clerk.setActive({
+          session: signInOrUp.createdSessionId,
+        });
+      }
+    },
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`d6a9b3f5d`](https://github.com/clerk/javascript/commit/d6a9b3f5dd8c64b1bd49f74c3707eb01dcd6aff4), [`456b06849`](https://github.com/clerk/javascript/commit/456b068493b8679e1772819eea24d49aa1bc6556), [`6888594cc`](https://github.com/clerk/javascript/commit/6888594cc5d0f922d166b6d28b7b994d657a5595)]:
+  - @clerk/clerk-react@5.2.0
+  - @clerk/shared@2.2.0
+  - @clerk/backend@1.2.0
+
+## 5.0.12
+
+### Patch Changes
+
+- Updated dependencies [[`3d790d5ea`](https://github.com/clerk/javascript/commit/3d790d5ea347a51ef16557c015c901a9f277effe)]:
+  - @clerk/clerk-react@5.1.0
+
+## 5.0.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.0.7
+
+## 5.0.10
+
+### Patch Changes
+
+- Updated dependencies [[`4d3dc00fb`](https://github.com/clerk/javascript/commit/4d3dc00fb444c87e3d27f398cd0c1ce4d176f65b), [`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/backend@1.1.5
+  - @clerk/shared@2.1.1
+  - @clerk/clerk-react@5.0.6
+
+## 5.0.9
+
+### Patch Changes
+
+- Updated dependencies [[`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20), [`bcbb2c9ef`](https://github.com/clerk/javascript/commit/bcbb2c9ef42c11b13c1d2f60db4dd88a2d4f04f6)]:
+  - @clerk/shared@2.1.0
+  - @clerk/clerk-react@5.0.5
+  - @clerk/backend@1.1.4
+
 ## 5.0.8
 
 ### Patch Changes

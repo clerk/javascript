@@ -8,7 +8,7 @@ import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internal
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
-import { consoleInspector } from '~/internals/utils/inspector';
+import { inspect } from '~/internals/utils/inspector';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
@@ -19,7 +19,7 @@ type SignUpFlowProviderProps = {
   exampleMode?: boolean;
 };
 
-const actor = createActor(SignUpRouterMachine, { inspect: consoleInspector });
+const actor = createActor(SignUpRouterMachine, { inspect });
 const ref = actor.start();
 
 function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) {
@@ -46,7 +46,8 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
         ref.send(evt);
       }
     });
-  }, [clerk, exampleMode, formRef, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clerk, exampleMode, formRef?.id, !!router]);
 
   return isReady ? <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider> : null;
 }
@@ -91,6 +92,7 @@ export function SignUpRoot({
 
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
   const router = useNextRouter();
+  const isRootPath = path === router.pathname();
 
   return (
     <Router
@@ -99,9 +101,11 @@ export function SignUpRoot({
     >
       <FormStoreProvider>
         <SignUpFlowProvider exampleMode={exampleMode}>
-          <ClerkLoading>
-            <Form>{fallback}</Form>
-          </ClerkLoading>
+          {isRootPath ? (
+            <ClerkLoading>
+              <Form>{fallback}</Form>
+            </ClerkLoading>
+          ) : null}
           <ClerkLoaded>{children}</ClerkLoaded>
         </SignUpFlowProvider>
       </FormStoreProvider>

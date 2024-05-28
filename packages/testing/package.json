@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.0.3",
+  "version": "1.1.4",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -9,6 +9,7 @@
     "session",
     "jwt",
     "playwright",
+    "cypress",
     "testing",
     "e2e"
   ],
@@ -27,20 +28,32 @@
   "exports": {
     "./playwright": {
       "import": {
-        "types": "./dist/types/index.d.ts",
-        "default": "./dist/index.mjs"
+        "types": "./dist/types/playwright/index.d.ts",
+        "default": "./dist/playwright/index.mjs"
       },
       "require": {
-        "types": "./dist/types/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/types/playwright/index.d.ts",
+        "default": "./dist/playwright/index.js"
+      }
+    },
+    "./cypress": {
+      "import": {
+        "types": "./dist/types/cypress/index.d.ts",
+        "default": "./dist/cypress/index.mjs"
+      },
+      "require": {
+        "types": "./dist/types/cypress/index.d.ts",
+        "default": "./dist/cypress/index.js"
       }
     }
   },
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
-    "playwright"
+    "playwright",
+    "cypress"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
@@ -49,22 +62,27 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/shared": "2.0.2",
-    "@clerk/types": "4.2.1",
+    "@clerk/shared": "2.2.1",
+    "@clerk/types": "4.5.0",
     "dotenv": "16.4.5"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@playwright/test": "^1.43.1",
+    "@playwright/test": "^1.44.0",
     "@types/node": "^18.17.0",
+    "cypress": "^13.9.0",
     "tsup": "*",
     "typescript": "*"
   },
   "peerDependencies": {
-    "@playwright/test": "^1"
+    "@playwright/test": "^1",
+    "cypress": "^13"
   },
   "peerDependenciesMeta": {
     "@playwright/test": {
+      "optional": true
+    },
+    "cypress": {
       "optional": true
     }
   },
