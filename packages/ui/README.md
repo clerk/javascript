@@ -11,7 +11,7 @@
 # @clerk/ui
 
 > [!WARNING]  
-> This is an experimental package and work-in-progress. Please come back later 👋 
+> This is an experimental package and work-in-progress. Please come back later 👋
 
 ## License
 
