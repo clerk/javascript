@@ -31,8 +31,8 @@
       "require": "./dist/index.js"
     }
   },
-  "main": "dist/index.js",
-  "source": "src/index.js",
+  "main": "./dist/index.js",
+  "source": "./src/index.js",
   "react-native": "./src/index.ts",
   "typings": "dist/index.d.ts",
   "files": [

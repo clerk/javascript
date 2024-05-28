@@ -6,18 +6,19 @@ import {
   SignUp as BaseSignUp,
   UserButton as BaseUserButton,
 } from '@clerk/clerk-react';
-import React from 'react';
-import { Platform, Text } from 'react-native';
+import { Platform } from 'react-native';
 
-const ErrorComponent = () => {
-  return <Text>Component not supported on ths platform</Text>;
+const ErrorComponent = (componentName: string) => {
+  throw new Error(`<${componentName}/> is not supported on this platform`);
 };
 
 function WrapComponent<T extends { displayName: string }>(component: T) {
+  const commonentName = component.displayName.replace('withClerk(', '').replace(')', '');
+
   // @ts-expect-error - This is a hack to make the function signature match the original
   return Platform.select<T>({
     // @ts-expect-error - This is a hack to make the function signature match the original
-    native: () => ErrorComponent,
+    native: () => () => ErrorComponent(commonentName),
     default: () => component,
   })();
 }
