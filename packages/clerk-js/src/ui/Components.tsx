@@ -169,6 +169,7 @@ const Components = (props: ComponentsProps) => {
     nodes: new Map(),
     impersonationFab: false,
   });
+
   const {
     googleOneTapModal,
     signInModal,
@@ -215,7 +216,8 @@ const Components = (props: ComponentsProps) => {
           return;
         }
       }
-      setState(s => ({ ...s, ...restProps }));
+
+      setState(s => ({ ...s, ...restProps, options: { ...s.options, ...restProps.options } }));
     };
 
     componentsControls.closeModal = name => {
