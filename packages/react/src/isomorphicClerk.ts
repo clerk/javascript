@@ -144,20 +144,11 @@ type IsomorphicLoadedClerk = Without<
   client: ClientResource | undefined;
 };
 
-class ClerkMap extends Map {
-  name = 'clerk-react';
-
-  constructor() {
-    super();
-  }
-}
-
-const cache = new ClerkMap();
-
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly mode: 'browser' | 'server';
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
+  readonly __internal_requestCache = new Map();
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenSignIn?: null | SignInProps = null;
@@ -187,17 +178,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get loaded(): boolean {
     return this.#loaded;
-  }
-
-  // @ts-ignore
-  get cache(): ClerkMap {
-    console.log('this.clerkjs', this.clerkjs?.cache);
-    return cache;
-    // if (this.clerkjs) {
-    //   return this.clerkjs.cache;
-    // } else {
-    //   return null;
-    // }
   }
 
   static #instance: IsomorphicClerk | null | undefined;
@@ -417,13 +397,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
             domain: this.domain,
           } as any);
 
-          await c.load({ ...this.options, cache });
+          c.__internal_requestCache = this.__internal_requestCache;
+          await c.load(this.options);
         } else {
           // Otherwise use the instantiated Clerk object
           c = this.Clerk;
 
           if (!c.loaded) {
-            await c.load({ ...this.options, cache });
+            c.__internal_requestCache = this.__internal_requestCache;
+            await c.load(this.options);
           }
         }
 
@@ -443,7 +425,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
 
-        await global.Clerk.load({ ...this.options, cache });
+        global.Clerk.__internal_requestCache = this.__internal_requestCache;
+        await global.Clerk.load(this.options);
       }
 
       if (global.Clerk?.loaded) {

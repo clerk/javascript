@@ -70,10 +70,6 @@ export type SetSession = (
   beforeEmit?: BeforeEmitCallback,
 ) => Promise<void>;
 
-interface ClerkMap<K, V> extends Map<K, V> {
-  name: string;
-}
-
 /**
  * Main Clerk SDK object.
  */
@@ -83,7 +79,7 @@ export interface Clerk {
    */
   version: string | undefined;
 
-  cache: ClerkMap<string, unknown>;
+  __internal_requestCache: Map<string, any>;
 
   /**
    * If present, contains information about the SDK that the host application is using.
@@ -588,8 +584,6 @@ export type ClerkOptions = ClerkOptionsNavigation &
     signInUrl?: string;
     signUpUrl?: string;
     allowedRedirectOrigins?: Array<string | RegExp>;
-    //@ts-ignore
-    cache?: ClerkMap<any, any>;
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
      * Telemetry options

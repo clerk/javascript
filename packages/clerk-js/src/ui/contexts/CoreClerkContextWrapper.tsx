@@ -47,8 +47,7 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
   );
 
   return (
-    // @ts-ignore
-    <SWRConfig value={{ provider: () => clerk.cache }}>
+    <SWRConfig value={{ provider: () => clerk.__internal_requestCache }}>
       <ClerkInstanceContext.Provider value={clerkCtx}>
         <ClientContext.Provider value={clientCtx}>
           <SessionContext.Provider value={sessionCtx}>
