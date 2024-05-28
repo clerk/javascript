@@ -25,8 +25,7 @@ const tailwindcssTransformerCode = {
         tailwindConfig: path.join(process.cwd(), 'src', 'tailwind.config.ts'),
         globalCss: fs.readFileSync(path.join(process.cwd(), 'src', 'global.css'), 'utf8'),
       });
-      await fs.promises.mkdir(outDir, { recursive: true });
-      await fs.promises.writeFile(path.join(outDir, 'styles.css'), styleSheet);
+      fs.writeFileSync(path.join(outDir, 'styles.css'), styleSheet);
     });
   },
 };
@@ -47,6 +46,7 @@ export default defineConfig(overrideOptions => {
       'primitives/card': 'src/primitives/card.tsx',
       'primitives/connection': 'src/primitives/connection.tsx',
       'primitives/field': 'src/primitives/field.tsx',
+      'primitives/icon': 'src/primitives/icon.tsx',
       'primitives/seperator': 'src/primitives/seperator.tsx',
       'components/sign-in': 'src/components/sign-in/index.tsx',
       'components/sign-up': 'src/components/sign-up/index.tsx',
