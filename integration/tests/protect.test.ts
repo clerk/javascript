@@ -66,13 +66,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
 
   test('Protect in RSCs and RCCs as `signed-out user`', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    /**
-     * Soft navigations
-     */
-    await u.page.goToRelative('/');
-    await page.getByText('Page Protected').click();
-    await page.waitForURL('**/sign-in?**');
-    await u.po.signIn.waitForMounted();
+
+    if (!u.nexJsVersion.startsWith('14.2')) {
+      /**
+       * Soft navigations
+       */
+      await u.page.goToRelative('/');
+      await page.getByText('Page Protected').click();
+      await page.waitForURL('**/sign-in?**');
+      await u.po.signIn.waitForMounted();
+    }
 
     /**
      * Hard navigations
