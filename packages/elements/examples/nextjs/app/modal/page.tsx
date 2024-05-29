@@ -95,7 +95,6 @@ function CustomResendable() {
 }
 
 export default function SignInPage() {
-  const router = Clerk.useVirtualRouter();
   const [continueWithEmail, setContinueWithEmail] = useState(false);
 
   return (
@@ -120,8 +119,7 @@ export default function SignInPage() {
         <Popover.Portal>
           <Popover.Content className='max-h-[70dvh]'>
             <SignIn.Root
-              redirectUrl='/modal'
-              router={router}
+              routing='virtual'
               fallback={
                 <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
                   <div className='text-center'>

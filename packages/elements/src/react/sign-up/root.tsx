@@ -4,13 +4,12 @@ import { useSelector } from '@xstate/react';
 import { useEffect } from 'react';
 import { createActor } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { ROUTING, SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { inspect } from '~/internals/utils/inspector';
-import type { ClerkHostRouter } from '~/react/router';
-import { Router, useClerkRouter, useNextRouter } from '~/react/router';
+import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 import { Form } from '../common/form';
@@ -18,7 +17,6 @@ import { Form } from '../common/form';
 type SignUpFlowProviderProps = {
   children: React.ReactNode;
   exampleMode?: boolean;
-  redirectUrl?: string;
 };
 
 const actor = createActor(SignUpRouterMachine, { inspect });
@@ -57,7 +55,7 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
 export type SignUpRootProps = SignUpFlowProviderProps & {
   fallback?: React.ReactNode;
   path?: string;
-  router?: ClerkHostRouter;
+  routing?: ROUTING;
 };
 
 /**
@@ -80,10 +78,10 @@ export function SignUpRoot({
   exampleMode,
   fallback = null,
   path = SIGN_UP_DEFAULT_BASE_PATH,
-  router: routerFromProps,
+  routing,
 }: SignUpRootProps): JSX.Element | null {
   const clerk = useClerk();
-  const nextRouter = useNextRouter();
+  // const nextRouter = useNextRouter();
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignUpRoot', {
@@ -94,7 +92,7 @@ export function SignUpRoot({
   );
 
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
-  const router = routerFromProps ?? nextRouter;
+  const router = (routing === ROUTING.virtual ? useVirtualRouter : useNextRouter)();
   const isRootPath = path === router.pathname();
 
   return (

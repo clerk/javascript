@@ -39,3 +39,10 @@ export const ERROR_CODES = {
   SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
   USER_LOCKED: 'user_locked',
 };
+
+export const ROUTING = {
+  path: 'path',
+  virtual: 'virtual',
+} as const;
+
+export type ROUTING = (typeof ROUTING)[keyof typeof ROUTING];

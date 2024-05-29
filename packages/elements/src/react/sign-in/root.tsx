@@ -3,13 +3,12 @@ import { eventComponentMounted } from '@clerk/shared/telemetry';
 import React, { useEffect } from 'react';
 import { createActor } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { ROUTING, SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
 import { inspect } from '~/internals/utils/inspector';
-import type { ClerkHostRouter } from '~/react/router';
-import { Router, useClerkRouter, useNextRouter } from '~/react/router';
+import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
@@ -17,13 +16,12 @@ import { Form } from '../common/form';
 type SignInFlowProviderProps = {
   children: React.ReactNode;
   exampleMode?: boolean;
-  redirectUrl?: string;
 };
 
 const actor = createActor(SignInRouterMachine, { inspect });
 actor.start();
 
-function SignInFlowProvider({ children, exampleMode, redirectUrl }: SignInFlowProviderProps) {
+function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
   const formRef = useFormStore();
@@ -38,7 +36,6 @@ function SignInFlowProvider({ children, exampleMode, redirectUrl }: SignInFlowPr
         clerk,
         exampleMode,
         formRef,
-        redirectUrl,
         router,
         signUpPath: SIGN_UP_DEFAULT_BASE_PATH,
       };
@@ -62,7 +59,7 @@ export type SignInRootProps = SignInFlowProviderProps & {
    * TODO: re-use usePathnameWithoutCatchAll from the next SDK
    */
   path?: string;
-  router?: ClerkHostRouter;
+  routing?: ROUTING;
 };
 
 /**
@@ -85,11 +82,9 @@ export function SignInRoot({
   exampleMode,
   fallback = null,
   path = SIGN_IN_DEFAULT_BASE_PATH,
-  redirectUrl,
-  router: routerFromProps,
+  routing,
 }: SignInRootProps): JSX.Element | null {
   const clerk = useClerk();
-  const nextRouter = useNextRouter();
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignInRoot', {
@@ -100,7 +95,7 @@ export function SignInRoot({
   );
 
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
-  const router = routerFromProps ?? nextRouter;
+  const router = (routing === ROUTING.virtual ? useVirtualRouter : useNextRouter)();
   const isRootPath = path === router.pathname();
 
   return (
@@ -109,10 +104,7 @@ export function SignInRoot({
       router={router}
     >
       <FormStoreProvider>
-        <SignInFlowProvider
-          exampleMode={exampleMode}
-          redirectUrl={redirectUrl}
-        >
+        <SignInFlowProvider exampleMode={exampleMode}>
           {isRootPath ? (
             <ClerkLoading>
               <Form>{fallback}</Form>

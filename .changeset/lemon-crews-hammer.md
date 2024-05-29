@@ -1,6 +1,7 @@
 ---
-'@clerk/elements': patch
+'@clerk/elements': minor
 ---
 
 - Adds virtual router to support modal scenarios
-- Adds `redirectUrl` prop to `SignIn.Root` and `SignUp.Root` to handle callback redirect paths
+- Adds `routing` prop to `SignIn.Root` and `SignUp.Root` for handling `virtual` routing
+- Better support for Account Portal redirect callback flows

@@ -5,6 +5,7 @@ import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 
 
 import {
   ERROR_CODES,
+  ROUTING,
   SEARCH_PARAMS,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
@@ -165,7 +166,12 @@ export const SignUpRouterMachine = setup({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
-          redirectUrl: context.redirectUrl,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete: context.clerk.buildAfterSignUpUrl(),
         },
       })),
     },
@@ -194,7 +200,6 @@ export const SignUpRouterMachine = setup({
         INIT: {
           actions: assign(({ event }) => ({
             clerk: event.clerk,
-            redirectUrl: event.redirectUrl,
             router: event.router,
             signInPath: event.signInPath || SIGN_IN_DEFAULT_BASE_PATH,
             loading: {

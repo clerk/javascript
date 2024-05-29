@@ -1,12 +1,14 @@
 import { withLeadingSlash, withoutTrailingSlash } from '@clerk/shared/url';
 
+import type { ROUTING } from '~/internals/constants';
+
 export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up_url', 'redirect_url'];
 
 /**
  * This type represents a generic router interface that Clerk relies on to interact with the host router.
  */
 export type ClerkHostRouter = {
-  readonly mode: 'path' | 'virtual';
+  readonly mode: ROUTING;
   readonly name: string;
   pathname: () => string;
   push: (path: string) => void;
@@ -35,7 +37,7 @@ export type ClerkRouter = {
   /**
    * Mode of the router instance, path-based or virtual
    */
-  readonly mode: 'path' | 'virtual';
+  readonly mode: ROUTING;
 
   /**
    * Name of the router instance

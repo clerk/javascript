@@ -45,7 +45,6 @@ export type BaseRouterRedirectEvent =
 
 export interface BaseRouterInput {
   clerk: LoadedClerk;
-  redirectUrl?: string;
   router?: ClerkRouter;
   exampleMode?: boolean;
 }
@@ -55,7 +54,6 @@ export interface BaseRouterInput {
 export interface BaseRouterContext {
   clerk: LoadedClerk;
   error?: ClerkElementsError;
-  redirectUrl?: string;
   router?: ClerkRouter;
   exampleMode?: boolean;
 }
