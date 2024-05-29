@@ -27,7 +27,6 @@ const componnents = {
   SignIn: <SignIn />,
   SignUp: <SignUp />,
 };
-
 type Component = keyof typeof componnents;
 
 export function ThemeBuilder() {
