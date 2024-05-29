@@ -16,8 +16,8 @@ export function ThemeDialog({ trigger, children }: { trigger: React.ReactNode; c
     <Dialog.Root>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className='fixed inset-0 grid place-items-center overflow-y-auto bg-black/50 py-12 backdrop-blur-sm'>
-          <Dialog.Content className='p-4 bg-white max-w-4xl w-full rounded-md relative'>
+        <Dialog.Overlay className='fixed inset-0 grid place-items-center overflow-y-auto bg-black/50 px-4 py-12 backdrop-blur-sm'>
+          <Dialog.Content className='p-4 bg-white max-w-4xl w-full rounded-md relative min-w-0'>
             <button
               type='button'
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -57,7 +57,7 @@ export function ThemeDialog({ trigger, children }: { trigger: React.ReactNode; c
                 </svg>
               )}
             </button>
-            <pre className='text-xs bg-neutral-100 p-4'>
+            <pre className='text-xs bg-neutral-100 p-4 overflow-x-auto w-full'>
               <code>{children}</code>
             </pre>
           </Dialog.Content>

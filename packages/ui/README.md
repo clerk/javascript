@@ -10,8 +10,11 @@
 
 # @clerk/ui
 
-> [!WARNING]  
+> [!WARNING]
 > This is an experimental package and work-in-progress. Please come back later 👋
+
+`src/primitives/*` - the building blocks for AIO components void of any Clerk logic/elements
+`src/components/*` - the AIO components built using primitives and Clerk elements
 
 ## License
 

@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 
-import { SignIn } from '../../dist/sign-in';
-import { SignUp } from '../../dist/sign-up';
+import { SignIn } from '../../dist/components/sign-in';
+import { SignUp } from '../../dist/components/sign-up';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
