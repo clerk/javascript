@@ -56,6 +56,7 @@
     "@commitlint/config-conventional": "^19.2.2",
     "@emotion/jest": "^11.11.0",
     "@faker-js/faker": "^8.1.0",
+    "@hcaptcha/types": "^1.0.3",
     "@octokit/rest": "^20.0.2",
     "@playwright/test": "^1.44.0",
     "@testing-library/dom": "^8.19.0",

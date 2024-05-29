@@ -1,4 +1,4 @@
-import { shouldRetryTurnstileErrorCode } from '../captcha';
+import { shouldRetryTurnstileErrorCode } from '../captcha/turnstile';
 
 describe('shouldRetryTurnstileErrorCode', () => {
   it.each([

@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.5.3
+
+### Patch Changes
+
+- Bug fix: Use the correct returnBack url when GoogleOneTap remains open across navigations. ([#3410](https://github.com/clerk/javascript/pull/3410)) by [@panteliselef](https://github.com/panteliselef)
+
+  Previously it will only use the url that existed in the browser url bar at the time the component was initially rendered.
+
+- Add `aria-label` and `aria-expanded` in menu trigger to improve accessibility ([#3446](https://github.com/clerk/javascript/pull/3446)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add experimental support for hCaptcha captcha provider ([#3422](https://github.com/clerk/javascript/pull/3422)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`4beb00672`](https://github.com/clerk/javascript/commit/4beb00672da64bafd67fbc98181c4c2649a9062c)]:
+  - @clerk/types@4.5.1
+
 ## 5.5.2
 
 ### Patch Changes
