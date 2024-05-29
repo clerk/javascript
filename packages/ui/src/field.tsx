@@ -1,7 +1,7 @@
 import cn from 'clsx';
 import * as React from 'react';
 
-export const Field = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Field(
+const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -16,7 +16,7 @@ export const Field = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
   );
 });
 
-export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTMLLabelElement>>(function Label(
+const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTMLLabelElement>>(function Label(
   { className, children, ...props },
   forwardedRef,
 ) {
@@ -31,7 +31,7 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
   );
 });
 
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
+const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
   { className, ...props },
   forwardedRef,
 ) {
@@ -47,30 +47,33 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
   );
 });
 
-export const Message = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  function Message({ className, children, ...props }, forwardedRef) {
-    return (
-      <p
-        ref={forwardedRef}
-        {...props}
-        className={cn('text-[0.8125rem]/[1.125rem] flex gap-x-1 text-[#ef4444]', className)}
+const Message = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(function Message(
+  { className, children, ...props },
+  forwardedRef,
+) {
+  return (
+    <p
+      ref={forwardedRef}
+      {...props}
+      className={cn('text-[0.8125rem]/[1.125rem] flex gap-x-1 text-[#ef4444]', className)}
+    >
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        fill='none'
+        viewBox='0 0 14 14'
+        className='shrink-0 size-4'
+        aria-hidden
       >
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          fill='none'
-          viewBox='0 0 14 14'
-          className='shrink-0 size-4'
-          aria-hidden
-        >
-          <path
-            fill='currentColor'
-            fillRule='evenodd'
-            d='M13.4 7A6.4 6.4 0 1 1 .6 7a6.4 6.4 0 0 1 12.8 0Zm-5.6 3.2a.8.8 0 1 1-1.6 0 .8.8 0 0 1 1.6 0ZM7 3a.8.8 0 0 0-.8.8V7a.8.8 0 0 0 1.6 0V3.8A.8.8 0 0 0 7 3Z'
-            clipRule='evenodd'
-          />
-        </svg>
-        {children}
-      </p>
-    );
-  },
-);
+        <path
+          fill='currentColor'
+          fillRule='evenodd'
+          d='M13.4 7A6.4 6.4 0 1 1 .6 7a6.4 6.4 0 0 1 12.8 0Zm-5.6 3.2a.8.8 0 1 1-1.6 0 .8.8 0 0 1 1.6 0ZM7 3a.8.8 0 0 0-.8.8V7a.8.8 0 0 0 1.6 0V3.8A.8.8 0 0 0 7 3Z'
+          clipRule='evenodd'
+        />
+      </svg>
+      {children}
+    </p>
+  );
+});
+
+export { Root, Label, Input, Message };

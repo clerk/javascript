@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from '../../dist/button';
 import * as Card from '../../dist/card';
 import * as Connection from '../../dist/connection';
-import { Field, Input, Label, Message } from '../../dist/field';
+import * as Field from '../../dist/field';
 import { Seperator } from '../../dist/seperator';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
@@ -92,11 +92,11 @@ export function ThemeBuilder() {
                     <Connection.Button>GitHub</Connection.Button>
                   </Connection.Root>
                   <Seperator>or</Seperator>
-                  <Field>
-                    <Label>Email address</Label>
-                    <Input />
-                    <Message>Identifier is invalid.</Message>
-                  </Field>
+                  <Field.Root>
+                    <Field.Label>Email address</Field.Label>
+                    <Field.Input />
+                    <Field.Message>Identifier is invalid.</Field.Message>
+                  </Field.Root>
                   <Button>Continue</Button>
                 </Card.Body>
               </Card.Content>
