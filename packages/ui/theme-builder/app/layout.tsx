@@ -22,7 +22,7 @@ export default function RootLayout({
       lang='en'
       className='h-full'
     >
-      <body className={clsx(inter.className, 'flex min-h-full flex-col dark')}>{children}</body>
+      <body className={clsx(inter.className, 'flex min-h-full flex-col')}>{children}</body>
     </html>
   );
 }

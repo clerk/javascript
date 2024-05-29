@@ -1,42 +1,60 @@
 'use client';
+import cn from 'clsx';
 import { useState } from 'react';
 
 import { SignIn } from '../../dist/components/sign-in';
 import { SignUp } from '../../dist/components/sign-up';
+import { AppearanceToggle } from './appearance-toggle';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 
-const accentDefault = '#2F3037';
-const grayDefault = '#2f3037';
-const backgroundDefault = '#fff';
+const lightAccentDefault = '#2F3037';
+const lightGrayDefault = '#2f3037';
+const lightBackgroundDefault = '#fff';
+
+const darkAccentDefault = '#2F3037';
+const darkGrayDefault = '#2f3037';
+const darkBackgroundDefault = '#111';
 
 const componnents = {
   SignIn: <SignIn />,
   SignUp: <SignUp />,
 };
-
 type Component = keyof typeof componnents;
 
 export function ThemeBuilder() {
-  const [accent, setAccent] = useState(accentDefault);
-  const [gray, setGray] = useState(grayDefault);
-  const [background, setBackground] = useState(backgroundDefault);
+  const [appearance, setAppearance] = useState('light');
+  const [lightAccent, setLightAccent] = useState(lightAccentDefault);
+  const [lightGray, setLightGray] = useState(lightGrayDefault);
+  const [lightBackground, setLightBackground] = useState(lightBackgroundDefault);
+  const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
+  const [darkGray, setDarkGray] = useState(darkGrayDefault);
+  const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
-    setAccent(accentDefault);
-    setGray(grayDefault);
-    setBackground(backgroundDefault);
+    setLightAccent(lightAccentDefault);
+    setLightGray(lightGrayDefault);
+    setLightBackground(lightBackgroundDefault);
+    setDarkAccent(darkAccentDefault);
+    setDarkGray(darkGrayDefault);
+    setDarkBackground(darkBackgroundDefault);
   };
-  const result = generateColors({
+  const lightResult = generateColors({
     appearance: 'light',
-    accent,
-    gray,
-    background,
+    accent: lightAccent,
+    gray: lightGray,
+    background: lightBackground,
+  });
+  const darkResult = generateColors({
+    appearance: 'dark',
+    accent: darkAccent,
+    gray: darkGray,
+    background: darkBackground,
   });
   const css = getPreviewStyles({
-    lightColors: result,
-    darkColors: result,
+    lightColors: lightResult,
+    darkColors: darkResult,
   });
   return (
     <>
@@ -80,24 +98,63 @@ export function ThemeBuilder() {
         <div className='flex flex-1'>
           <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-r bg-white'>
             <div className='space-y-4'>
-              <ColorPicker
-                label='Accent'
-                description='The accent color used for interactive elements.'
-                color={accent}
-                onChange={setAccent}
+              <AppearanceToggle
+                items={[
+                  {
+                    label: 'Light',
+                    value: 'light',
+                  },
+                  {
+                    label: 'Dark',
+                    value: 'dark',
+                  },
+                ]}
+                value={appearance}
+                onValueChange={setAppearance}
               />
-              <ColorPicker
-                label='Gray'
-                description='The accent color used for interactive elements.'
-                color={gray}
-                onChange={setGray}
-              />
-              <ColorPicker
-                label='Background'
-                description='The accent color used for interactive elements.'
-                color={background}
-                onChange={setBackground}
-              />
+              {appearance === 'light' ? (
+                <>
+                  <ColorPicker
+                    label='Accent'
+                    description='The accent color used for interactive elements.'
+                    color={lightAccent}
+                    onChange={setLightAccent}
+                  />
+                  <ColorPicker
+                    label='Gray'
+                    description='The accent color used for interactive elements.'
+                    color={lightGray}
+                    onChange={setLightGray}
+                  />
+                  <ColorPicker
+                    label='Background'
+                    description='The accent color used for interactive elements.'
+                    color={lightBackground}
+                    onChange={setLightBackground}
+                  />
+                </>
+              ) : (
+                <>
+                  <ColorPicker
+                    label='Accent'
+                    description='The accent color used for interactive elements.'
+                    color={darkAccent}
+                    onChange={setDarkAccent}
+                  />
+                  <ColorPicker
+                    label='Gray'
+                    description='The accent color used for interactive elements.'
+                    color={darkGray}
+                    onChange={setDarkGray}
+                  />
+                  <ColorPicker
+                    label='Background'
+                    description='The accent color used for interactive elements.'
+                    color={darkBackground}
+                    onChange={setDarkBackground}
+                  />
+                </>
+              )}
             </div>
             <div className='mt-auto space-y-2'>
               <button
@@ -121,14 +178,23 @@ export function ThemeBuilder() {
               </ThemeDialog>
             </div>
           </aside>
-          <figure className='relative isolate w-full flex-1 overflow-y-auto bg-neutral-50'>
-            <div className='relative grid h-full place-content-center bg-neutral-50 p-4'>
-              <div
-                className='absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),theme(colors.gray.400)),linear-gradient(to_right,transparent_calc(56px-1px),_theme(colors.gray.400))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]'
-                aria-hidden='true'
-              />
-              {componnents[selectedComponent]}
-            </div>
+          <figure
+            className={cn('relative isolate w-full flex-1 overflow-y-auto grid place-content-center', {
+              'bg-neutral-50': appearance === 'light',
+              'bg-neutral-950 dark': appearance === 'dark',
+            })}
+          >
+            <div
+              className={cn(
+                'absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),var(--line-color)),linear-gradient(to_right,transparent_calc(56px-1px),_var(--line-color))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]',
+                {
+                  '[--line-color:theme(colors.neutral.400)]': appearance === 'light',
+                  '[--line-color:theme(colors.neutral.600)]': appearance === 'dark',
+                },
+              )}
+              aria-hidden='true'
+            />
+            {componnents[selectedComponent]}
           </figure>
         </div>
       </div>

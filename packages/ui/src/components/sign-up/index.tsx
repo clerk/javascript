@@ -21,7 +21,7 @@ export function SignUp() {
           <Field.Root>
             <Field.Label>Email address</Field.Label>
             <Field.Input />
-            <Field.Message>Identifier is invalid.</Field.Message>
+            <Field.Message intent='error'>Identifier is invalid.</Field.Message>
           </Field.Root>
           <Button>Continue</Button>
         </Card.Body>
