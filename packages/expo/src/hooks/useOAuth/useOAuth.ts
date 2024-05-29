@@ -1,6 +1,8 @@
 import type { OAuthStrategy } from '@clerk/types';
 import { Platform } from 'react-native';
 
+import { errorThrower } from '../../utils/errors';
+
 export type UseOAuthFlowParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
@@ -8,6 +10,6 @@ export type UseOAuthFlowParams = {
 };
 export function useOAuth(_useOAuthParams: UseOAuthFlowParams) {
   if (Platform.OS === 'web') {
-    throw new Error('OAuth flow is not supported in web');
+    throw errorThrower.throw('useOAuth hook is not supported in Web');
   }
 }
