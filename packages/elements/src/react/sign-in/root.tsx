@@ -1,6 +1,5 @@
 import { ClerkLoaded, ClerkLoading, useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SignInProps } from '@clerk/types';
 import React, { useEffect } from 'react';
 import { createActor } from 'xstate';
 
@@ -15,9 +14,7 @@ import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
 
-type SignInDefaultProps = Pick<SignInProps, 'forceRedirectUrl' | 'fallbackRedirectUrl'>;
-
-type SignInFlowProviderProps = SignInDefaultProps & {
+type SignInFlowProviderProps = {
   children: React.ReactNode;
   exampleMode?: boolean;
   redirectUrl?: string;

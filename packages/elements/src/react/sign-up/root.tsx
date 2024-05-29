@@ -18,6 +18,7 @@ import { Form } from '../common/form';
 type SignUpFlowProviderProps = {
   children: React.ReactNode;
   exampleMode?: boolean;
+  redirectUrl?: string;
 };
 
 const actor = createActor(SignUpRouterMachine, { inspect });
@@ -53,9 +54,7 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
   return isReady ? <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider> : null;
 }
 
-export type SignUpRootProps = {
-  children: React.ReactNode;
-  exampleMode?: boolean;
+export type SignUpRootProps = SignUpFlowProviderProps & {
   fallback?: React.ReactNode;
   path?: string;
   router?: ClerkHostRouter;

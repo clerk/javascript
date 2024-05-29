@@ -2,7 +2,7 @@
 
 import * as Clerk from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
-import { SignedIn, SignOutButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignOutButton } from '@clerk/nextjs';
 import * as Popover from '@radix-ui/react-popover';
 import Link from 'next/link';
 import { type ComponentProps, useState } from 'react';
@@ -100,74 +100,29 @@ export default function SignInPage() {
 
   return (
     <div>
-      <SignedIn>
-        <SignOutButton redirectUrl='/modal'>
-          <p className='font-mono text-sm fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 py-4 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30 hover:border-red-500/60 hover:text-red-300 transition-colors duration-500 cursor-pointer'>
-            Sign Out
-          </p>
-        </SignOutButton>
-      </SignedIn>
-
       <Popover.Root>
-        <Popover.Trigger>Open Sign In</Popover.Trigger>
+        <div className='max-w-48'>
+          <SignedIn>
+            <SignOutButton redirectUrl='/modal'>
+              <p className='font-mono text-sm fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 py-4 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30 hover:border-red-500/60 hover:text-red-300 transition-colors duration-500 cursor-pointer'>
+                Sign Out
+              </p>
+            </SignOutButton>
+          </SignedIn>
+
+          <SignedOut>
+            <Popover.Trigger className='font-mono text-sm fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 py-4 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30 hover:border-gray-500/60 hover:text-gray-700 transition-colors duration-500 cursor-pointer'>
+              Open Sign In
+            </Popover.Trigger>
+          </SignedOut>
+        </div>
         <Popover.Anchor />
         <Popover.Portal>
-          <Popover.Content>
-            <div className='m-6'>
-              <SignIn.Root
-                redirectUrl='/modal'
-                router={router}
-                fallback={
-                  <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
-                    <div className='text-center'>
-                      <H1>Sign In</H1>
-                      <p className='text-base text-zinc-400'>
-                        Don&apos;t have an account?{' '}
-                        <Link
-                          href='/sign-up'
-                          className='no-underline hover:underline'
-                        >
-                          Sign Up
-                        </Link>
-                      </p>
-                    </div>
-                    <div className='flex flex-col items-center  gap-12 w-96'>
-                      <Clerk.GlobalError className='block text-red-400 font-mono' />
-
-                      <div className='flex flex-col gap-2 self-stretch'>
-                        <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
-                        <CustomProvider provider='google'>Continue with Google</CustomProvider>
-                      </div>
-
-                      {continueWithEmail ? (
-                        <>
-                          <Clerk.Field
-                            className='flex flex-col gap-4 w-full'
-                            name='identifier'
-                          >
-                            {fieldState => (
-                              <>
-                                <Clerk.Label className='sr-only'>Email</Clerk.Label>
-                                <Clerk.Input
-                                  className={`bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded w-full placeholder-[rgb(100,100,100)] px-4 py-2 ${
-                                    fieldState === 'invalid' && 'border-red-500'
-                                  }`}
-                                  placeholder='Enter your email address'
-                                />
-                                <Clerk.FieldError className='block text-red-400 font-mono w-full' />
-                              </>
-                            )}
-                          </Clerk.Field>
-
-                          <CustomSubmit>Sign in with Email</CustomSubmit>
-                        </>
-                      ) : (
-                        <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
-                      )}
-                    </div>
-                  </div>
-                }
-              >
+          <Popover.Content className='max-h-[70dvh]'>
+            <SignIn.Root
+              redirectUrl='/modal'
+              router={router}
+              fallback={
                 <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
                   <div className='text-center'>
                     <H1>Sign In</H1>
@@ -181,237 +136,286 @@ export default function SignInPage() {
                       </Link>
                     </p>
                   </div>
+                  <div className='flex flex-col items-center  gap-12 w-96'>
+                    <Clerk.GlobalError className='block text-red-400 font-mono' />
 
-                  <div className='absolute top-4 right-4'>
-                    <Clerk.Loading>
-                      {isLoading => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}
-                    </Clerk.Loading>
-                  </div>
-
-                  <SignIn.Step name='start'>
-                    <div className='flex flex-col items-center  gap-12 w-96'>
-                      <Clerk.GlobalError className='block text-red-400 font-mono' />
-
-                      <div className='flex flex-col gap-2 self-stretch'>
-                        <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
-                        <CustomProvider provider='google'>Continue with Google</CustomProvider>
-                      </div>
-
-                      {continueWithEmail ? (
-                        <>
-                          <Clerk.Field
-                            className='flex flex-col gap-4 w-full'
-                            name='identifier'
-                          >
-                            {fieldState => (
-                              <>
-                                <Clerk.Label className='sr-only'>Email</Clerk.Label>
-                                <Clerk.Input
-                                  className={`bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded w-full placeholder-[rgb(100,100,100)] px-4 py-2 ${
-                                    fieldState === 'invalid' && 'border-red-500'
-                                  }`}
-                                  placeholder='Enter your email address'
-                                />
-                                <Clerk.FieldError className='block text-red-400 font-mono w-full' />
-                              </>
-                            )}
-                          </Clerk.Field>
-
-                          <CustomSubmit>Sign in with Email</CustomSubmit>
-                        </>
-                      ) : (
-                        <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
-                      )}
+                    <div className='flex flex-col gap-2 self-stretch'>
+                      <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+                      <CustomProvider provider='google'>Continue with Google</CustomProvider>
                     </div>
-                  </SignIn.Step>
 
-                  <SignIn.Step
-                    name='choose-strategy'
-                    className='flex flex-col items-center gap-6 w-96'
-                  >
-                    <H3>CHOOSE STRATEGY:</H3>
-
-                    <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
-                    <CustomProvider provider='google'>Continue with Google</CustomProvider>
-
-                    <SignIn.SupportedStrategy
-                      asChild
-                      name='password'
-                    >
-                      <Button>Password</Button>
-                    </SignIn.SupportedStrategy>
-
-                    <SignIn.SupportedStrategy
-                      asChild
-                      name='phone_code'
-                    >
-                      <Button>Send a code to your phone</Button>
-                    </SignIn.SupportedStrategy>
-
-                    <SignIn.SupportedStrategy
-                      asChild
-                      name='email_code'
-                    >
-                      <Button>Send a code to your email</Button>
-                    </SignIn.SupportedStrategy>
-
-                    <SignIn.Action
-                      asChild
-                      navigate='previous'
-                    >
-                      <TextButton>Go back</TextButton>
-                    </SignIn.Action>
-                  </SignIn.Step>
-
-                  <SignIn.Step
-                    name='forgot-password'
-                    className='flex flex-col items-center gap-6 w-96'
-                  >
-                    <H3>FORGOT PASSWORD:</H3>
-
-                    <SignIn.SupportedStrategy
-                      asChild
-                      name='reset_password_email_code'
-                    >
-                      <Button>Reset your password via Email</Button>
-                    </SignIn.SupportedStrategy>
-
-                    <SignIn.SupportedStrategy
-                      asChild
-                      name='reset_password_phone_code'
-                    >
-                      <Button>Reset your password via Phone</Button>
-                    </SignIn.SupportedStrategy>
-
-                    <p>Or</p>
-
-                    <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
-                    <CustomProvider provider='google'>Continue with Google</CustomProvider>
-
-                    <SignIn.Action
-                      asChild
-                      navigate='previous'
-                    >
-                      <TextButton>Go back</TextButton>
-                    </SignIn.Action>
-                  </SignIn.Step>
-
-                  <SignIn.Step name='verifications'>
-                    <div className='flex gap-6 flex-col'>
-                      <Clerk.GlobalError className='block text-red-400 font-mono' />
-
-                      <SignIn.Strategy name='password'>
-                        <P className='text-sm'>
-                          Welcome back <SignIn.Salutation />!
-                        </P>
-
-                        <CustomField
-                          label='Password'
-                          name='password'
-                        />
-
-                        <CustomSubmit>Verify</CustomSubmit>
-
-                        <SignIn.Action
-                          asChild
-                          navigate='forgot-password'
+                    {continueWithEmail ? (
+                      <>
+                        <Clerk.Field
+                          className='flex flex-col gap-4 w-full'
+                          name='identifier'
                         >
-                          <TextButton>Forgot Password</TextButton>
-                        </SignIn.Action>
-                      </SignIn.Strategy>
+                          {fieldState => (
+                            <>
+                              <Clerk.Label className='sr-only'>Email</Clerk.Label>
+                              <Clerk.Input
+                                className={`bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded w-full placeholder-[rgb(100,100,100)] px-4 py-2 ${
+                                  fieldState === 'invalid' && 'border-red-500'
+                                }`}
+                                placeholder='Enter your email address'
+                              />
+                              <Clerk.FieldError className='block text-red-400 font-mono w-full' />
+                            </>
+                          )}
+                        </Clerk.Field>
 
-                      <SignIn.Strategy name='email_code'>
-                        <P className='text-sm'>
-                          Welcome back! We&apos;ve sent a temporary code to <SignIn.SafeIdentifier />
-                        </P>
+                        <CustomSubmit>Sign in with Email</CustomSubmit>
+                      </>
+                    ) : (
+                      <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
+                    )}
+                  </div>
+                </div>
+              }
+            >
+              <div className='flex flex-col justify-center items-center bg-zinc-950 text-white gap-10 p-6 rounded-2xl shadow-lg shadow-gray-600'>
+                <div className='text-center'>
+                  <H1>Sign In</H1>
+                  <p className='text-base text-zinc-400'>
+                    Don&apos;t have an account?{' '}
+                    <Link
+                      href='/sign-up'
+                      className='no-underline hover:underline'
+                    >
+                      Sign Up
+                    </Link>
+                  </p>
+                </div>
 
-                        <CustomResendable />
+                <div className='absolute top-4 right-4'>
+                  <Clerk.Loading>
+                    {isLoading => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}
+                  </Clerk.Loading>
+                </div>
 
-                        <CustomField
-                          // eslint-disable-next-line jsx-a11y/no-autofocus
-                          autoFocus
-                          autoSubmit
-                          label='Email Code'
-                          name='code'
-                        />
+                <SignIn.Step name='start'>
+                  <div className='flex flex-col items-center  gap-12 w-96'>
+                    <Clerk.GlobalError className='block text-red-400 font-mono' />
 
-                        <CustomSubmit>Verify</CustomSubmit>
-                      </SignIn.Strategy>
-
-                      <SignIn.Strategy name='phone_code'>
-                        <P className='text-sm'>
-                          Welcome back! We&apos;ve sent a temporary code to <SignIn.SafeIdentifier />
-                        </P>
-
-                        <CustomResendable />
-
-                        <CustomField
-                          // eslint-disable-next-line jsx-a11y/no-autofocus
-                          autoFocus
-                          autoSubmit
-                          label='Phone Code'
-                          name='code'
-                        />
-
-                        <CustomSubmit>Verify</CustomSubmit>
-                      </SignIn.Strategy>
-
-                      <SignIn.Strategy name='reset_password_email_code'>
-                        <H3>Verify your email</H3>
-
-                        <P className='text-sm'>
-                          We&apos;ve sent a verification code to <SignIn.SafeIdentifier />
-                        </P>
-
-                        <CustomField
-                          label='Code'
-                          name='code'
-                        />
-
-                        <CustomSubmit>Continue</CustomSubmit>
-                      </SignIn.Strategy>
-
-                      <SignIn.Strategy name='reset_password_phone_code'>
-                        <H3>Verify your phone number</H3>
-
-                        <P className='text-sm'>
-                          We&apos;ve sent a verification code to <SignIn.SafeIdentifier />
-                        </P>
-
-                        <CustomField
-                          label='Code'
-                          name='code'
-                        />
-
-                        <CustomSubmit>Continue</CustomSubmit>
-                      </SignIn.Strategy>
+                    <div className='flex flex-col gap-2 self-stretch'>
+                      <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+                      <CustomProvider provider='google'>Continue with Google</CustomProvider>
                     </div>
 
-                    <SignIn.Action
-                      asChild
-                      navigate='choose-strategy'
-                    >
-                      <TextButton>Use another method</TextButton>
-                    </SignIn.Action>
-                  </SignIn.Step>
+                    {continueWithEmail ? (
+                      <>
+                        <Clerk.Field
+                          className='flex flex-col gap-4 w-full'
+                          name='identifier'
+                        >
+                          {fieldState => (
+                            <>
+                              <Clerk.Label className='sr-only'>Email</Clerk.Label>
+                              <Clerk.Input
+                                className={`bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded w-full placeholder-[rgb(100,100,100)] px-4 py-2 ${
+                                  fieldState === 'invalid' && 'border-red-500'
+                                }`}
+                                placeholder='Enter your email address'
+                              />
+                              <Clerk.FieldError className='block text-red-400 font-mono w-full' />
+                            </>
+                          )}
+                        </Clerk.Field>
 
-                  <SignIn.Step name='reset-password'>
-                    <div className='flex flex-col items-center gap-6 w-96'>
-                      <H3>Reset your password</H3>
+                        <CustomSubmit>Sign in with Email</CustomSubmit>
+                      </>
+                    ) : (
+                      <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
+                    )}
+                  </div>
+                </SignIn.Step>
 
-                      <P className='text-sm'>Please reset your password to continue:</P>
+                <SignIn.Step
+                  name='choose-strategy'
+                  className='flex flex-col items-center gap-6 w-96'
+                >
+                  <H3>CHOOSE STRATEGY:</H3>
+
+                  <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+                  <CustomProvider provider='google'>Continue with Google</CustomProvider>
+
+                  <SignIn.SupportedStrategy
+                    asChild
+                    name='password'
+                  >
+                    <Button>Password</Button>
+                  </SignIn.SupportedStrategy>
+
+                  <SignIn.SupportedStrategy
+                    asChild
+                    name='phone_code'
+                  >
+                    <Button>Send a code to your phone</Button>
+                  </SignIn.SupportedStrategy>
+
+                  <SignIn.SupportedStrategy
+                    asChild
+                    name='email_code'
+                  >
+                    <Button>Send a code to your email</Button>
+                  </SignIn.SupportedStrategy>
+
+                  <SignIn.Action
+                    asChild
+                    navigate='previous'
+                  >
+                    <TextButton>Go back</TextButton>
+                  </SignIn.Action>
+                </SignIn.Step>
+
+                <SignIn.Step
+                  name='forgot-password'
+                  className='flex flex-col items-center gap-6 w-96'
+                >
+                  <H3>FORGOT PASSWORD:</H3>
+
+                  <SignIn.SupportedStrategy
+                    asChild
+                    name='reset_password_email_code'
+                  >
+                    <Button>Reset your password via Email</Button>
+                  </SignIn.SupportedStrategy>
+
+                  <SignIn.SupportedStrategy
+                    asChild
+                    name='reset_password_phone_code'
+                  >
+                    <Button>Reset your password via Phone</Button>
+                  </SignIn.SupportedStrategy>
+
+                  <p>Or</p>
+
+                  <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+                  <CustomProvider provider='google'>Continue with Google</CustomProvider>
+
+                  <SignIn.Action
+                    asChild
+                    navigate='previous'
+                  >
+                    <TextButton>Go back</TextButton>
+                  </SignIn.Action>
+                </SignIn.Step>
+
+                <SignIn.Step name='verifications'>
+                  <div className='flex gap-6 flex-col'>
+                    <Clerk.GlobalError className='block text-red-400 font-mono' />
+
+                    <SignIn.Strategy name='password'>
+                      <P className='text-sm'>
+                        Welcome back <SignIn.Salutation />!
+                      </P>
 
                       <CustomField
-                        label='New Password'
+                        label='Password'
                         name='password'
                       />
-                      <CustomSubmit>Update Password</CustomSubmit>
-                    </div>
-                  </SignIn.Step>
-                </div>
-              </SignIn.Root>
-              <Popover.Close />
-            </div>
+
+                      <CustomSubmit>Verify</CustomSubmit>
+
+                      <SignIn.Action
+                        asChild
+                        navigate='forgot-password'
+                      >
+                        <TextButton>Forgot Password</TextButton>
+                      </SignIn.Action>
+                    </SignIn.Strategy>
+
+                    <SignIn.Strategy name='email_code'>
+                      <P className='text-sm'>
+                        Welcome back! We&apos;ve sent a temporary code to <SignIn.SafeIdentifier />
+                      </P>
+
+                      <CustomResendable />
+
+                      <CustomField
+                        // eslint-disable-next-line jsx-a11y/no-autofocus
+                        autoFocus
+                        autoSubmit
+                        label='Email Code'
+                        name='code'
+                      />
+
+                      <CustomSubmit>Verify</CustomSubmit>
+                    </SignIn.Strategy>
+
+                    <SignIn.Strategy name='phone_code'>
+                      <P className='text-sm'>
+                        Welcome back! We&apos;ve sent a temporary code to <SignIn.SafeIdentifier />
+                      </P>
+
+                      <CustomResendable />
+
+                      <CustomField
+                        // eslint-disable-next-line jsx-a11y/no-autofocus
+                        autoFocus
+                        autoSubmit
+                        label='Phone Code'
+                        name='code'
+                      />
+
+                      <CustomSubmit>Verify</CustomSubmit>
+                    </SignIn.Strategy>
+
+                    <SignIn.Strategy name='reset_password_email_code'>
+                      <H3>Verify your email</H3>
+
+                      <P className='text-sm'>
+                        We&apos;ve sent a verification code to <SignIn.SafeIdentifier />
+                      </P>
+
+                      <CustomField
+                        label='Code'
+                        name='code'
+                      />
+
+                      <CustomSubmit>Continue</CustomSubmit>
+                    </SignIn.Strategy>
+
+                    <SignIn.Strategy name='reset_password_phone_code'>
+                      <H3>Verify your phone number</H3>
+
+                      <P className='text-sm'>
+                        We&apos;ve sent a verification code to <SignIn.SafeIdentifier />
+                      </P>
+
+                      <CustomField
+                        label='Code'
+                        name='code'
+                      />
+
+                      <CustomSubmit>Continue</CustomSubmit>
+                    </SignIn.Strategy>
+                  </div>
+
+                  <SignIn.Action
+                    asChild
+                    navigate='choose-strategy'
+                  >
+                    <TextButton>Use another method</TextButton>
+                  </SignIn.Action>
+                </SignIn.Step>
+
+                <SignIn.Step name='reset-password'>
+                  <div className='flex flex-col items-center gap-6 w-96'>
+                    <H3>Reset your password</H3>
+
+                    <P className='text-sm'>Please reset your password to continue:</P>
+
+                    <CustomField
+                      label='New Password'
+                      name='password'
+                    />
+                    <CustomSubmit>Update Password</CustomSubmit>
+                  </div>
+                </SignIn.Step>
+              </div>
+            </SignIn.Root>
+            <Popover.Close />
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>

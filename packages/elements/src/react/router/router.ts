@@ -35,7 +35,7 @@ export type ClerkRouter = {
   /**
    * Mode of the router instance, path-based or virtual
    */
-  mode: 'path' | 'virtual';
+  readonly mode: 'path' | 'virtual';
 
   /**
    * Name of the router instance
@@ -45,7 +45,7 @@ export type ClerkRouter = {
   /**
    * Navigates to the provided path via a history push
    */
-  readonly push: ClerkHostRouter['push'];
+  push: ClerkHostRouter['push'];
   /**
    * Navigates to the provided path via a history replace
    */
