@@ -47,33 +47,78 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
   );
 });
 
-const Message = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(function Message(
-  { className, children, ...props },
-  forwardedRef,
-) {
+type MessageIntent = 'error' | 'success' | 'neutral';
+
+const Message = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement> & {
+    /**
+     * The intent of the message.
+     * @default 'neutral'
+     */
+    intent?: MessageIntent;
+  }
+>(function Message({ className, children, intent = 'neutral', ...props }, forwardedRef) {
   return (
     <p
       ref={forwardedRef}
       {...props}
-      className={cn('text-[0.8125rem]/[1.125rem] flex gap-x-1 text-[#ef4444]', className)}
+      className={cn(
+        'text-[0.8125rem]/[1.125rem] flex gap-x-1',
+        {
+          // TODO: Use the color tokens here
+          'text-[#ef4444]': intent === 'error',
+          'text-[#10b981]': intent === 'success',
+          'text-gray-11': intent === 'neutral',
+        },
+        className,
+      )}
     >
-      <svg
-        xmlns='http://www.w3.org/2000/svg'
-        fill='none'
-        viewBox='0 0 14 14'
-        className='shrink-0 size-4'
-        aria-hidden
-      >
-        <path
-          fill='currentColor'
-          fillRule='evenodd'
-          d='M13.4 7A6.4 6.4 0 1 1 .6 7a6.4 6.4 0 0 1 12.8 0Zm-5.6 3.2a.8.8 0 1 1-1.6 0 .8.8 0 0 1 1.6 0ZM7 3a.8.8 0 0 0-.8.8V7a.8.8 0 0 0 1.6 0V3.8A.8.8 0 0 0 7 3Z'
-          clipRule='evenodd'
-        />
-      </svg>
+      {getMessageIcon(intent)}
       {children}
     </p>
   );
 });
+
+function getMessageIcon(intent: MessageIntent) {
+  let path = null;
+
+  if (intent === 'success') {
+    path = (
+      <path
+        fill='currentColor'
+        fillRule='evenodd'
+        d='M8 16A8 8 0 1 0 8-.001 8 8 0 0 0 8 16Zm3.7-9.3a1 1 0 0 0-1.4-1.4L7 8.58l-1.3-1.3A1 1 0 0 0 4.3 8.7l2 2a1 1 0 0 0 1.4 0l4-4Z'
+        clipRule='evenodd'
+      />
+    );
+  }
+
+  if (intent === 'error') {
+    path = (
+      <path
+        fill='currentColor'
+        fillRule='evenodd'
+        d='M16 8A8 8 0 1 1-.001 8 8 8 0 0 1 16 8Zm-7 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM8 3a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1Z'
+        clipRule='evenodd'
+      />
+    );
+  }
+
+  if (path) {
+    return (
+      <svg
+        fill='none'
+        viewBox='0 0 16 16'
+        className='shrink-0 size-4'
+        aria-hidden
+      >
+        {path}
+      </svg>
+    );
+  }
+
+  return null;
+}
 
 export { Root, Label, Input, Message };
