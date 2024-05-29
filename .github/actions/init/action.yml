@@ -4,7 +4,7 @@ inputs:
   node-version:
     description: 'The node version to use'
     required: false
-    default: '18.20.2'
+    default: '18.20.2' # This is pinned to `18.20.2` because `18.20.3` bumps npm from `10.5.0` to `10.7.0`, which causes our verdaccio setup to fail.
   playwright-enabled:
     description: 'Enable Playwright?'
     required: false
