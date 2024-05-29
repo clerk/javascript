@@ -161,10 +161,11 @@ export const SignUpRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+      actions: sendTo(ThirdPartyMachineId, ({ context, event }) => ({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
+          redirectUrl: context.redirectUrl,
         },
       })),
     },
@@ -193,6 +194,7 @@ export const SignUpRouterMachine = setup({
         INIT: {
           actions: assign(({ event }) => ({
             clerk: event.clerk,
+            redirectUrl: event.redirectUrl,
             router: event.router,
             signInPath: event.signInPath || SIGN_IN_DEFAULT_BASE_PATH,
             loading: {

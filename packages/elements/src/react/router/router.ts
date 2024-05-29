@@ -6,11 +6,13 @@ export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up
  * This type represents a generic router interface that Clerk relies on to interact with the host router.
  */
 export type ClerkHostRouter = {
+  readonly mode: 'path' | 'virtual';
+  readonly name: string;
+  pathname: () => string;
   push: (path: string) => void;
   replace: (path: string) => void;
-  shallowPush: (path: string) => void;
-  pathname: () => string;
   searchParams: () => URLSearchParams;
+  shallowPush: (path: string) => void;
 };
 
 /**
@@ -29,10 +31,21 @@ export type ClerkRouter = {
    * Matches the provided path against the router's current path. If index is provided, matches against the root route of the router.
    */
   match: (path?: string, index?: boolean) => boolean;
+
+  /**
+   * Mode of the router instance, path-based or virtual
+   */
+  mode: 'path' | 'virtual';
+
+  /**
+   * Name of the router instance
+   */
+  readonly name: string;
+
   /**
    * Navigates to the provided path via a history push
    */
-  push: ClerkHostRouter['push'];
+  readonly push: ClerkHostRouter['push'];
   /**
    * Navigates to the provided path via a history replace
    */
@@ -119,6 +132,8 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
   return {
     child,
     match,
+    mode: router.mode,
+    name: router.name,
     push,
     replace,
     shallowPush,

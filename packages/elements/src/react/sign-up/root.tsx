@@ -9,6 +9,7 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { inspect } from '~/internals/utils/inspector';
+import type { ClerkHostRouter } from '~/react/router';
 import { Router, useClerkRouter, useNextRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
@@ -53,10 +54,11 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
 }
 
 export type SignUpRootProps = {
-  path?: string;
   children: React.ReactNode;
-  fallback?: React.ReactNode;
   exampleMode?: boolean;
+  fallback?: React.ReactNode;
+  path?: string;
+  router?: ClerkHostRouter;
 };
 
 /**
@@ -76,11 +78,13 @@ export type SignUpRootProps = {
  */
 export function SignUpRoot({
   children,
-  path = SIGN_UP_DEFAULT_BASE_PATH,
-  fallback = null,
   exampleMode,
+  fallback = null,
+  path = SIGN_UP_DEFAULT_BASE_PATH,
+  router: routerFromProps,
 }: SignUpRootProps): JSX.Element | null {
   const clerk = useClerk();
+  const nextRouter = useNextRouter();
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignUpRoot', {
@@ -91,7 +95,7 @@ export function SignUpRoot({
   );
 
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
-  const router = useNextRouter();
+  const router = routerFromProps ?? nextRouter;
   const isRootPath = path === router.pathname();
 
   return (

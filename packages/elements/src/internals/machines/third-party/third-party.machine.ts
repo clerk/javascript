@@ -80,9 +80,9 @@ export const ThirdPartyMachine = setup({
           assertEvent(event, 'REDIRECT');
 
           const clerk: LoadedClerk = context.parent.getSnapshot().context.clerk;
-
-          const redirectUrl =
-            event.params.redirectUrl || clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`);
+          const redirectUrl = clerk.buildUrlWithAuth(
+            event.params.redirectUrl ?? `${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`,
+          );
           const redirectUrlComplete = event.params.redirectUrlComplete || redirectUrl;
 
           return {

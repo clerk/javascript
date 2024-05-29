@@ -162,10 +162,11 @@ export const SignInRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+      actions: sendTo(ThirdPartyMachineId, ({ context, event }) => ({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
+          redirectUrl: context.redirectUrl,
         },
       })),
     },
@@ -196,6 +197,7 @@ export const SignInRouterMachine = setup({
             clerk: event.clerk,
             exampleMode: event.exampleMode || false,
             formRef: event.formRef,
+            redirectUrl: event.redirectUrl,
             loading: {
               isLoading: false,
             },

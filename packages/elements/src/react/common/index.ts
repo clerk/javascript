@@ -5,6 +5,8 @@ export { Field, FieldError, FieldState, GlobalError, Input, Label, Submit } from
 export { Connection, Icon } from '~/react/common/connections';
 export { Loading } from '~/react/common/loading';
 
+export { useVirtualRouter } from '~/react/router/virtual';
+
 export type {
   FormFieldErrorProps,
   FormErrorProps,
