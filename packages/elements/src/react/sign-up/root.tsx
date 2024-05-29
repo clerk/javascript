@@ -81,7 +81,6 @@ export function SignUpRoot({
   routing,
 }: SignUpRootProps): JSX.Element | null {
   const clerk = useClerk();
-  // const nextRouter = useNextRouter();
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignUpRoot', {
