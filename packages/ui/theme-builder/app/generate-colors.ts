@@ -1,3 +1,7 @@
+/**
+ * This file is a modified version of the original file from the Radix UI theme builder.
+ * Link: https://github.com/radix-ui/website/blob/main/components/generateRadixColors.tsx
+ */
 import * as RadixColors from '@radix-ui/colors';
 import BezierEasing from 'bezier-easing';
 import Color from 'colorjs.io';
