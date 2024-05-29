@@ -63,6 +63,9 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       // @ts-ignore
       externalVerificationRedirectURL.toString(),
       oauthRedirectUrl,
+      {
+        showInRecents: true,
+      },
     );
 
     // @ts-expect-error
