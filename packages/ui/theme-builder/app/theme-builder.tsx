@@ -1,12 +1,8 @@
 'use client';
-import clsx from 'clsx';
 import { useState } from 'react';
 
-import { Button } from '../../dist/primitives/button';
-import * as Card from '../../dist/primitives/card';
-import * as Connection from '../../dist/primitives/connection';
-import * as Field from '../../dist/primitives/field';
-import { Seperator } from '../../dist/primitives/seperator';
+import { SignIn } from '../../dist/sign-in';
+import { SignUp } from '../../dist/sign-up';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
@@ -15,10 +11,18 @@ const accentDefault = '#2F3037';
 const grayDefault = '#2f3037';
 const backgroundDefault = '#fff';
 
+const componnents = {
+  SignIn: <SignIn />,
+  SignUp: <SignUp />,
+};
+
+type Component = keyof typeof componnents;
+
 export function ThemeBuilder() {
   const [accent, setAccent] = useState(accentDefault);
   const [gray, setGray] = useState(grayDefault);
   const [background, setBackground] = useState(backgroundDefault);
+  const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setAccent(accentDefault);
     setGray(grayDefault);
@@ -41,9 +45,40 @@ export function ThemeBuilder() {
           __html: css,
         }}
       />
-      <div className={clsx(`grid min-h-dvh w-full grid-cols-[20rem,1fr]`)}>
-        <div className='flex flex-col p-4 h-dvh sticky top-0'>
-          <div className='flex h-full flex-col'>
+      <div className='flex h-dvh flex-col overflow-hidden'>
+        <header className='flex shrink-0 h-16 justify-end border-b items-center px-4'>
+          <div className='inline-flex items-center gap-x-2 text-xs'>
+            <label htmlFor='component'>Component</label>
+            <div className='relative'>
+              <select
+                name='component'
+                id='component'
+                onChange={e => setSelectedComponent(e.target.value as Component)}
+                className='relative bg-neutral-100 border rounded py-1 text-xs pl-1.5 pr-5 appearance-none after:absolute after:right-1.5 after:size-2 after:bg-red-200 after:top-1'
+              >
+                <option value='SignIn'>Sign In</option>
+                <option value='SignUp'>Sign Up</option>
+              </select>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                strokeWidth='1.5'
+                stroke='currentColor'
+                className='size-2.5 absolute top-1/2 right-1.5 -translate-y-1/2 pointer-events-none user-select-none'
+                aria-hidden
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='m19.5 8.25-7.5 7.5-7.5-7.5'
+                />
+              </svg>
+            </div>
+          </div>
+        </header>
+        <div className='flex flex-1'>
+          <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-r bg-white'>
             <div className='space-y-4'>
               <ColorPicker
                 label='Accent'
@@ -85,44 +120,17 @@ export function ThemeBuilder() {
                 {css}
               </ThemeDialog>
             </div>
-          </div>
+          </aside>
+          <figure className='relative isolate w-full flex-1 overflow-y-auto bg-neutral-50'>
+            <div className='relative grid h-full place-content-center bg-neutral-50 p-4'>
+              <div
+                className='absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),theme(colors.gray.400)),linear-gradient(to_right,transparent_calc(56px-1px),_theme(colors.gray.400))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]'
+                aria-hidden='true'
+              />
+              {componnents[selectedComponent]}
+            </div>
+          </figure>
         </div>
-        <figure className='relative flex flex-col p-4'>
-          <div className='relative grid h-full place-content-center rounded border bg-neutral-50 p-4'>
-            <div
-              className='absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),theme(colors.gray.400)),linear-gradient(to_right,transparent_calc(56px-1px),_theme(colors.gray.400))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]'
-              aria-hidden='true'
-            />
-            <Card.Root>
-              <Card.Content>
-                <Card.Header>
-                  <Card.Title>Sign in to Acme Co</Card.Title>
-                  <Card.Description>Welcome back! Please sign in to continue</Card.Description>
-                </Card.Header>
-                <Card.Body>
-                  <Connection.Root>
-                    <Connection.Button>Google</Connection.Button>
-                    <Connection.Button>GitHub</Connection.Button>
-                  </Connection.Root>
-                  <Seperator>or</Seperator>
-                  <Field.Root>
-                    <Field.Label>Email address</Field.Label>
-                    <Field.Input />
-                    <Field.Message>Identifier is invalid.</Field.Message>
-                  </Field.Root>
-                  <Button>Continue</Button>
-                </Card.Body>
-              </Card.Content>
-              <Card.Footer>
-                <Card.FooterAction>
-                  <Card.FooterActionText>
-                    Don&apos;t have an account? <Card.FooterActionLink href='/sign-up'>Sign up</Card.FooterActionLink>
-                  </Card.FooterActionText>
-                </Card.FooterAction>
-              </Card.Footer>
-            </Card.Root>
-          </div>
-        </figure>
       </div>
     </>
   );

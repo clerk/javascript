@@ -48,6 +48,8 @@ export default defineConfig(overrideOptions => {
       'primitives/connection': 'src/primitives/connection.tsx',
       'primitives/field': 'src/primitives/field.tsx',
       'primitives/seperator': 'src/primitives/seperator.tsx',
+      'sign-in/index': 'src/sign-in/index.tsx',
+      'sign-up/index': 'src/sign-up/index.tsx',
     },
     external: ['react', 'react-dom'],
     format: ['cjs', 'esm'],
