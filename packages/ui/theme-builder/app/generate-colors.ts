@@ -563,7 +563,7 @@ function toOklchString(color: Color) {
     .replace(/(\S+)(.+)/, `oklch(${L}%$2`);
 }
 
-type GeneratedColors = ReturnType<typeof generateRadixColors>;
+type GeneratedColors = ReturnType<typeof generateColors>;
 
 interface GetColorScaleCssParams {
   isDarkMode: boolean;
