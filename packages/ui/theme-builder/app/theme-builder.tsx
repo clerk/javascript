@@ -9,6 +9,7 @@ import * as Field from '../../dist/field';
 import { Seperator } from '../../dist/seperator';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
+import { ThemeDialog } from './theme-dialog';
 
 const accentDefault = '#2F3037';
 const grayDefault = '#2f3037';
@@ -63,7 +64,7 @@ export function ThemeBuilder() {
                 onChange={setBackground}
               />
             </div>
-            <div className='mt-auto'>
+            <div className='mt-auto space-y-2'>
               <button
                 type='button'
                 className='w-full rounded border bg-white p-1.5 text-xs'
@@ -71,6 +72,18 @@ export function ThemeBuilder() {
               >
                 Reset
               </button>
+              <ThemeDialog
+                trigger={
+                  <button
+                    type='button'
+                    className='w-full rounded border bg-white p-1.5 text-xs'
+                  >
+                    View CSS
+                  </button>
+                }
+              >
+                {css}
+              </ThemeDialog>
             </div>
           </div>
         </div>
