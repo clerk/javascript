@@ -2,11 +2,11 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 
-import { Button } from '../../dist/button';
-import * as Card from '../../dist/card';
-import * as Connection from '../../dist/connection';
-import * as Field from '../../dist/field';
-import { Seperator } from '../../dist/seperator';
+import { Button } from '../../dist/primitives/button';
+import * as Card from '../../dist/primitives/card';
+import * as Connection from '../../dist/primitives/connection';
+import * as Field from '../../dist/primitives/field';
+import { Seperator } from '../../dist/primitives/seperator';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
