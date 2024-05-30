@@ -5,6 +5,7 @@ import { and, assign, enqueueActions, not, or, raise, sendTo, setup } from 'xsta
 
 import {
   ERROR_CODES,
+  ROUTING,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
   SSO_CALLBACK_PATH_ROUTE,
@@ -162,10 +163,16 @@ export const SignInRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+      actions: sendTo(ThirdPartyMachineId, ({ context, event }) => ({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete: context.clerk.buildAfterSignInUrl(),
         },
       })),
     },

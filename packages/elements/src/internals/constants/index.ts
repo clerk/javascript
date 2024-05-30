@@ -1,8 +1,10 @@
 export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
 export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 
-export const SIGN_IN_DEFAULT_BASE_PATH = '/sign-in';
-export const SIGN_UP_DEFAULT_BASE_PATH = '/sign-up';
+export const SIGN_IN_DEFAULT_BASE_PATH =
+  process.env.CLERK_SIGN_IN_URL ?? process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? '/sign-in';
+export const SIGN_UP_DEFAULT_BASE_PATH =
+  process.env.CLERK_SIGN_UP_URL ?? process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? '/sign-up';
 
 // The version that Next added support for the window.history.pushState and replaceState APIs.
 // ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
@@ -37,3 +39,10 @@ export const ERROR_CODES = {
   SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
   USER_LOCKED: 'user_locked',
 };
+
+export const ROUTING = {
+  path: 'path',
+  virtual: 'virtual',
+} as const;
+
+export type ROUTING = (typeof ROUTING)[keyof typeof ROUTING];

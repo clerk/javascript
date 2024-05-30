@@ -1,7 +1,5 @@
-import type { LoadedClerk } from '@clerk/types';
 import { assertEvent, assign, log, not, sendTo, setup } from 'xstate';
 
-import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
@@ -79,20 +77,10 @@ export const ThirdPartyMachine = setup({
         input: ({ context, event }) => {
           assertEvent(event, 'REDIRECT');
 
-          const clerk: LoadedClerk = context.parent.getSnapshot().context.clerk;
-
-          const redirectUrl =
-            event.params.redirectUrl || clerk.buildUrlWithAuth(`${context.basePath}${SSO_CALLBACK_PATH_ROUTE}`);
-          const redirectUrlComplete = event.params.redirectUrlComplete || redirectUrl;
-
           return {
             basePath: context.basePath,
             flow: context.flow,
-            params: {
-              redirectUrl,
-              redirectUrlComplete,
-              ...event.params,
-            },
+            params: event.params,
             parent: context.parent,
           };
         },

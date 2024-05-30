@@ -19,6 +19,8 @@ export const useNextRouter = (): ClerkHostRouter => {
     typeof window !== 'undefined' && window.next && window.next.version >= NEXT_WINDOW_HISTORY_SUPPORT_VERSION;
 
   return {
+    mode: 'path',
+    name: 'NextRouter',
     push: (path: string) => router.push(path),
     replace: (path: string) =>
       canUseWindowHistoryAPIs ? window.history.replaceState(null, '', path) : router.replace(path),

@@ -4,12 +4,12 @@ import { useSelector } from '@xstate/react';
 import { useEffect } from 'react';
 import { createActor } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { ROUTING, SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.context';
 import type { SignUpRouterInitEvent } from '~/internals/machines/sign-up';
 import { SignUpRouterMachine } from '~/internals/machines/sign-up';
 import { inspect } from '~/internals/utils/inspector';
-import { Router, useClerkRouter, useNextRouter } from '~/react/router';
+import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 import { Form } from '../common/form';
@@ -60,11 +60,10 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
   return isReady ? <SignUpRouterCtx.Provider actorRef={actor}>{children}</SignUpRouterCtx.Provider> : null;
 }
 
-export type SignUpRootProps = {
-  path?: string;
-  children: React.ReactNode;
+export type SignUpRootProps = SignUpFlowProviderProps & {
   fallback?: React.ReactNode;
-  exampleMode?: boolean;
+  path?: string;
+  routing?: ROUTING;
 };
 
 /**
@@ -84,9 +83,10 @@ export type SignUpRootProps = {
  */
 export function SignUpRoot({
   children,
-  path = SIGN_UP_DEFAULT_BASE_PATH,
-  fallback = null,
   exampleMode,
+  fallback = null,
+  path = SIGN_UP_DEFAULT_BASE_PATH,
+  routing,
 }: SignUpRootProps): JSX.Element | null {
   const clerk = useClerk();
 
@@ -99,7 +99,7 @@ export function SignUpRoot({
   );
 
   // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
-  const router = useNextRouter();
+  const router = (routing === ROUTING.virtual ? useVirtualRouter : useNextRouter)();
   const isRootPath = path === router.pathname();
 
   return (
