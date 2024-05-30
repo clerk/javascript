@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationInvitationResource } from '@clerk/types';
 
-import { localizationKeys, Td, Text } from '../../customizables';
+import { Box, descriptors, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { handleError } from '../../utils';
@@ -79,7 +79,15 @@ const InvitationRow = (props: {
           user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any}
         />
       </Td>
-      <Td>{invitation.createdAt.toLocaleDateString()}</Td>
+      <Td>
+        <Box
+          as='span'
+          elementDescriptor={descriptors.formattedDate}
+          elementId={descriptors.formattedDate.setId('tableCell')}
+        >
+          {invitation.createdAt.toLocaleDateString()}
+        </Box>
+      </Td>
       <Td>
         <Text
           colorScheme='secondary'
