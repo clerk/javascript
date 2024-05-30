@@ -17,7 +17,7 @@ const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
-const spacingUnitDefault = 1;
+const spaceScalingUnitDefault = 1;
 
 const componnents = {
   SignIn: <SignIn />,
@@ -33,7 +33,7 @@ export function ThemeBuilder() {
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
-  const [scalingUnit, setScalingUnit] = useState(spacingUnitDefault);
+  const [spaceScalingUnit, setSpaceScalingUnit] = useState(spaceScalingUnitDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
@@ -42,7 +42,7 @@ export function ThemeBuilder() {
     setDarkAccent(darkAccentDefault);
     setDarkGray(darkGrayDefault);
     setDarkBackground(darkBackgroundDefault);
-    setScalingUnit(spacingUnitDefault);
+    setSpaceScalingUnit(spaceScalingUnitDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -59,7 +59,7 @@ export function ThemeBuilder() {
   const css = getPreviewStyles({
     lightColors: lightResult,
     darkColors: darkResult,
-    scalingUnit,
+    spaceScalingUnit,
   });
   return (
     <>
@@ -165,7 +165,7 @@ export function ThemeBuilder() {
                   htmlFor='scaling-unit'
                   className='text-xs font-medium text-neutral-700'
                 >
-                  Scaling unit
+                  Space scaling unit
                 </label>
                 <input
                   type='number'
@@ -173,8 +173,8 @@ export function ThemeBuilder() {
                   min={0}
                   max={5}
                   step={0.1}
-                  value={scalingUnit}
-                  onChange={e => setScalingUnit(Number(e.target.value))}
+                  value={spaceScalingUnit}
+                  onChange={e => setSpaceScalingUnit(Number(e.target.value))}
                   className='w-full text-xs rounded border p-2'
                 />
               </div>

@@ -1,7 +1,7 @@
 :where(:root) {
   --cl-font-family: inherit;
   --cl-color-destructive: 0 84% 60%;
-  --cl-scaling-unit: 2;
+  --cl-space-scaling-unit: 1;
 }
 *,
 ::before,
