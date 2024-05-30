@@ -14,7 +14,7 @@
 > This is an experimental package and work-in-progress. Please come back later 👋
 
 - `src/primitives/*` - the building blocks for AIO components void of any Clerk Elements/logic
-`src/components/*` - the AIO components built using primitives and Clerk Elements
+- `src/components/*` - the AIO components built using primitives and Clerk Elements
 
 ## License
 
