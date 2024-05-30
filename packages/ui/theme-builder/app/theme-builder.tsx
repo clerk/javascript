@@ -12,10 +12,12 @@ import { ThemeDialog } from './theme-dialog';
 const lightAccentDefault = '#2F3037';
 const lightGrayDefault = '#2f3037';
 const lightBackgroundDefault = '#fff';
+const lightSemanticDefault = undefined;
 
 const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
+const darkSemanticDefault = undefined;
 
 const componnents = {
   SignIn: <SignIn />,
@@ -28,17 +30,25 @@ export function ThemeBuilder() {
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
   const [lightGray, setLightGray] = useState(lightGrayDefault);
   const [lightBackground, setLightBackground] = useState(lightBackgroundDefault);
+  const [lightButtonBackgroundPrimary, setLightButtonBackgroundPrimary] = useState(lightSemanticDefault);
+  const [lightButtonBackgroundPrimaryHover, setLightButtonBackgroundPrimaryHover] = useState(lightSemanticDefault);
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
+  const [darkButtonBackgroundPrimary, setDarkButtonBackgroundPrimary] = useState(darkSemanticDefault);
+  const [darkButtonBackgroundPrimaryHover, setDarkButtonBackgroundPrimaryHover] = useState(darkSemanticDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
     setLightBackground(lightBackgroundDefault);
+    setLightButtonBackgroundPrimary(lightSemanticDefault);
+    setLightButtonBackgroundPrimaryHover(lightSemanticDefault);
     setDarkAccent(darkAccentDefault);
     setDarkGray(darkGrayDefault);
     setDarkBackground(darkBackgroundDefault);
+    setDarkButtonBackgroundPrimary(darkSemanticDefault);
+    setDarkButtonBackgroundPrimaryHover(darkSemanticDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -61,6 +71,30 @@ export function ThemeBuilder() {
       <style
         dangerouslySetInnerHTML={{
           __html: css,
+        }}
+      />
+      <style
+        dangerouslySetInnerHTML={{
+          __html: [
+            `:root {
+              ${[
+                lightButtonBackgroundPrimary && `--cl-button-background-primary: ${lightButtonBackgroundPrimary};`,
+                lightButtonBackgroundPrimaryHover &&
+                  `--cl-button-background-primary-hover: ${lightButtonBackgroundPrimaryHover};`,
+              ]
+                .filter(Boolean)
+                .join('\n')}
+            }`,
+            `.dark, .dark-theme {
+              ${[
+                darkButtonBackgroundPrimary && `--cl-button-background-primary: ${darkButtonBackgroundPrimary};`,
+                darkButtonBackgroundPrimaryHover &&
+                  `--cl-button-background-primary-hover: ${darkButtonBackgroundPrimaryHover};`,
+              ]
+                .filter(Boolean)
+                .join('\n')}
+            }`,
+          ].join('\n'),
         }}
       />
       <div className='flex h-dvh flex-col overflow-hidden'>
@@ -113,47 +147,97 @@ export function ThemeBuilder() {
                 onValueChange={setAppearance}
               />
               {appearance === 'light' ? (
-                <>
-                  <ColorPicker
-                    label='Accent'
-                    description='The accent color used for interactive elements.'
-                    color={lightAccent}
-                    onChange={setLightAccent}
-                  />
-                  <ColorPicker
-                    label='Gray'
-                    description='The accent color used for interactive elements.'
-                    color={lightGray}
-                    onChange={setLightGray}
-                  />
-                  <ColorPicker
-                    label='Background'
-                    description='The accent color used for interactive elements.'
-                    color={lightBackground}
-                    onChange={setLightBackground}
-                  />
-                </>
+                <ul className='text-xs flex flex-col gap-2'>
+                  <li>
+                    <ColorPicker
+                      label='Accent'
+                      description='The accent color used for interactive elements.'
+                      color={lightAccent}
+                      onChange={setLightAccent}
+                    />
+                  </li>
+                  <li>
+                    <ColorPicker
+                      label='Gray'
+                      description='The accent color used for interactive elements.'
+                      color={lightGray}
+                      onChange={setLightGray}
+                    />
+                  </li>
+                  <li>
+                    <ColorPicker
+                      label='Background'
+                      description='The accent color used for interactive elements.'
+                      color={lightBackground}
+                      onChange={setLightBackground}
+                    />
+                  </li>
+                  <li className='flex flex-col gap-2'>
+                    <span className='font-medium'>Overrides</span>
+                    <ul className='flex flex-col gap-2'>
+                      <li>
+                        <ColorPicker
+                          label='Button Color Background Primary'
+                          color={lightButtonBackgroundPrimary}
+                          onChange={setLightButtonBackgroundPrimary}
+                        />
+                      </li>
+                      <li>
+                        <ColorPicker
+                          label='Button Color Background Primary Hover'
+                          color={lightButtonBackgroundPrimaryHover}
+                          onChange={setLightButtonBackgroundPrimaryHover}
+                        />
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
               ) : (
-                <>
-                  <ColorPicker
-                    label='Accent'
-                    description='The accent color used for interactive elements.'
-                    color={darkAccent}
-                    onChange={setDarkAccent}
-                  />
-                  <ColorPicker
-                    label='Gray'
-                    description='The accent color used for interactive elements.'
-                    color={darkGray}
-                    onChange={setDarkGray}
-                  />
-                  <ColorPicker
-                    label='Background'
-                    description='The accent color used for interactive elements.'
-                    color={darkBackground}
-                    onChange={setDarkBackground}
-                  />
-                </>
+                <ul className='text-xs flex flex-col gap-2'>
+                  <li>
+                    <ColorPicker
+                      label='Accent'
+                      description='The accent color used for interactive elements.'
+                      color={darkAccent}
+                      onChange={setDarkAccent}
+                    />
+                  </li>
+                  <li>
+                    <ColorPicker
+                      label='Gray'
+                      description='The accent color used for interactive elements.'
+                      color={darkGray}
+                      onChange={setDarkGray}
+                    />
+                  </li>
+                  <li>
+                    <ColorPicker
+                      label='Background'
+                      description='The accent color used for interactive elements.'
+                      color={darkBackground}
+                      onChange={setDarkBackground}
+                    />
+                  </li>
+                  <li className='flex flex-col gap-2'>
+                    <span className='font-medium'>Overrides</span>
+                    <ul className='flex flex-col gap-2'>
+                      <li>
+                        <ColorPicker
+                          label='Button Color Background Primary'
+                          color={darkButtonBackgroundPrimary}
+                          onChange={setDarkButtonBackgroundPrimary}
+                        />
+                      </li>
+                      <li>
+                        <ColorPicker
+                          label='Button Color Background Primary Hover'
+                          color={darkButtonBackgroundPrimaryHover}
+                          onChange={setDarkButtonBackgroundPrimaryHover}
+                        />
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
               )}
             </div>
             <div className='mt-auto space-y-2'>
