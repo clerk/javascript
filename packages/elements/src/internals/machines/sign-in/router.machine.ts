@@ -20,6 +20,7 @@ import type {
   SignInRouterContext,
   SignInRouterEvents,
   SignInRouterNextEvent,
+  SignInRouterPasskeyEvent,
   SignInRouterSchema,
 } from './router.types';
 import { SignInStartMachine } from './start.machine';
@@ -306,6 +307,16 @@ export const SignInRouterMachine = setup({
         'RESET.STEP': {
           target: 'Start',
           reenter: true,
+        },
+        'AUTHENTICATE.PASSKEY': {
+          actions: sendTo(
+            'start',
+            ({ event }) =>
+              ({
+                type: 'AUTHENTICATE.PASSKEY',
+                flow: event.flow,
+              } as SignInRouterPasskeyEvent),
+          ),
         },
         NEXT: [
           {

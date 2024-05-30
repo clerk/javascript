@@ -12,8 +12,9 @@ export type SignInStartTags = 'state:pending' | 'state:attempting' | 'state:load
 // ---------------------------------- Events ---------------------------------- //
 
 export type SignInStartSubmitEvent = { type: 'SUBMIT' };
+export type SignInStartPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY'; flow: 'discoverable' | undefined };
 
-export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent | DoneActorEvent;
+export type SignInStartEvents = ErrorActorEvent | SignInStartSubmitEvent | SignInStartPasskeyEvent | DoneActorEvent;
 
 // ---------------------------------- Input ---------------------------------- //
 

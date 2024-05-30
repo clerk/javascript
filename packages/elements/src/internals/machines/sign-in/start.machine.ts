@@ -7,7 +7,7 @@ import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
 import type { SignInRouterMachineActorRef } from './router.types';
-import type { SignInStartSchema } from './start.types';
+import type { SignInStartPasskeyEvent, SignInStartSchema } from './start.types';
 
 export type TSignInStartMachine = typeof SignInStartMachine;
 
@@ -15,6 +15,14 @@ export const SignInStartMachineId = 'SignInStart';
 
 export const SignInStartMachine = setup({
   actors: {
+    attemptPasskey: fromPromise<
+      SignInResource,
+      { parent: SignInRouterMachineActorRef; flow: 'discoverable' | undefined }
+    >(({ input: { parent, flow } }) => {
+      return parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey({
+        flow,
+      });
+    }),
     attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const clerk = parent.getSnapshot().context.clerk;
@@ -76,6 +84,11 @@ export const SignInStartMachine = setup({
           target: 'Attempting',
           reenter: true,
         },
+        'AUTHENTICATE.PASSKEY': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
       },
     },
     Attempting: {
@@ -87,6 +100,25 @@ export const SignInStartMachine = setup({
         input: ({ context }) => ({
           parent: context.parent,
           fields: context.formRef.getSnapshot().context.fields,
+        }),
+        onDone: {
+          actions: ['sendToNext', 'sendToLoading'],
+        },
+        onError: {
+          actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
+    AttemptingPasskey: {
+      tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
+      invoke: {
+        id: 'attemptPasskey',
+        src: 'attemptPasskey',
+        input: ({ context, event }) => ({
+          parent: context.parent,
+          flow: (event as SignInStartPasskeyEvent).flow,
         }),
         onDone: {
           actions: ['sendToNext', 'sendToLoading'],

@@ -145,7 +145,8 @@ const SignInVerificationMachine = setup({
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
-    isNeverResendable: ({ context }) => context.currentFactor?.strategy === 'password',
+    isNeverResendable: ({ context }) =>
+      context.currentFactor?.strategy === 'password' || context.currentFactor?.strategy === 'passkey',
   },
   delays: SignInVerificationDelays,
   types: {} as SignInVerificationSchema,
@@ -348,7 +349,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
       const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
-      if (!params?.strategy || params.strategy === 'password' || !needsPrepare) {
+      if (!params?.strategy || params.strategy === 'password' || params.strategy === 'passkey' || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
@@ -368,6 +369,9 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       const password = fields.get('password')?.value as string | undefined;
 
       switch (strategy) {
+        case 'passkey': {
+          return await parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey();
+        }
         case 'password': {
           assertIsDefined(password);
 
