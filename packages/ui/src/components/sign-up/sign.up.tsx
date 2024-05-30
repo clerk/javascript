@@ -1,5 +1,5 @@
-import * as ElCommon from '@clerk/elements/common';
-import * as ElSignIn from '@clerk/elements/sign-in';
+import * as Common from '@clerk/elements/common';
+import * as SignUp from '@clerk/elements/sign-up';
 
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -7,74 +7,74 @@ import * as Connection from '~/primitives/connection';
 import * as Field from '~/primitives/field';
 import { Seperator } from '~/primitives/seperator';
 
-export function SignIn() {
+export function SignUpComponent() {
   return (
-    <ElSignIn.Root exampleMode>
-      <ElSignIn.Step name='start'>
+    <SignUp.Root exampleMode>
+      <SignUp.Step name='start'>
         <Card.Root>
           <Card.Content>
             <Card.Header>
-              <Card.Title>Sign in to Acme Corp</Card.Title>
-              <Card.Description>Welcome back! Please sign in to continue</Card.Description>
+              <Card.Title>Create your account</Card.Title>
+              <Card.Description>Welcome! Please fill in the details to get started.</Card.Description>
             </Card.Header>
             <Card.Body>
               <Connection.Root>
-                <ElCommon.Connection
+                <Common.Connection
                   name='google'
                   asChild
                 >
                   <Connection.Button>
-                    <ElCommon.Icon className='size-4' />
+                    <Common.Icon className='size-4' />
                     Google
                   </Connection.Button>
-                </ElCommon.Connection>
-                <ElCommon.Connection
+                </Common.Connection>
+                <Common.Connection
                   name='github'
                   asChild
                 >
                   <Connection.Button>
-                    <ElCommon.Icon className='size-4' />
+                    <Common.Icon className='size-4' />
                     GitHub
                   </Connection.Button>
-                </ElCommon.Connection>
+                </Common.Connection>
               </Connection.Root>
               <Seperator>or</Seperator>
-              <ElCommon.Field
+              <Common.Field
                 name='emailAddress'
                 asChild
               >
                 <Field.Root>
-                  <ElCommon.Label asChild>
+                  <Common.Label asChild>
                     <Field.Label>Email address</Field.Label>
-                  </ElCommon.Label>
-                  <ElCommon.Input asChild>
+                  </Common.Label>
+                  <Common.Input asChild>
                     <Field.Input />
-                  </ElCommon.Input>
-                  <ElCommon.FieldError>
+                  </Common.Input>
+                  <Common.FieldError>
                     {({ message }) => {
                       return <Field.Message intent='error'>{message}</Field.Message>;
                     }}
-                  </ElCommon.FieldError>
+                  </Common.FieldError>
                 </Field.Root>
-              </ElCommon.Field>
+              </Common.Field>
 
-              <ElSignIn.Action
+              <SignUp.Action
                 submit
                 asChild
               >
                 <Button>Continue</Button>
-              </ElSignIn.Action>
+              </SignUp.Action>
             </Card.Body>
           </Card.Content>
           <Card.Footer>
             <Card.FooterAction>
               <Card.FooterActionText>
-                Don&apos;t have an account? <Card.FooterActionLink href='/sign-up'>Sign up</Card.FooterActionLink>
+                Have an account? <Card.FooterActionLink href='/sign-in'>Sign in</Card.FooterActionLink>
               </Card.FooterActionText>
             </Card.FooterAction>
           </Card.Footer>
         </Card.Root>
-      </ElSignIn.Step>
-    </ElSignIn.Root>
+      </SignUp.Step>
+    </SignUp.Root>
   );
 }
