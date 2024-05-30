@@ -1,3 +1,4 @@
+import { PROVIDERS } from '~/constants';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
@@ -15,14 +16,16 @@ export function SignIn() {
         </Card.Header>
         <Card.Body>
           <Connection.Root>
-            <Connection.Button>
-              <Icon.Google />
-              Google
-            </Connection.Button>
-            <Connection.Button>
-              <Icon.GitHub />
-              GitHub
-            </Connection.Button>
+            {PROVIDERS.map(provider => {
+              const ConnectionIcon = Icon[provider.icon];
+
+              return (
+                <Connection.Button key={provider.name}>
+                  <ConnectionIcon className='text-base' />
+                  {provider.name}
+                </Connection.Button>
+              );
+            })}
           </Connection.Root>
           <Seperator>or</Seperator>
           <Field.Root>
