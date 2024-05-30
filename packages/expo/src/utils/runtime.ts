@@ -5,7 +5,7 @@ export function isWeb(): boolean {
 }
 
 export function isNative(): boolean {
-  return Platform.OS !== 'web';
+  return !isWeb();
 }
 
 export function isHermes() {
