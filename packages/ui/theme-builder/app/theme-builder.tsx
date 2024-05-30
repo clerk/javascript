@@ -59,19 +59,13 @@ export function ThemeBuilder() {
   const css = getPreviewStyles({
     lightColors: lightResult,
     darkColors: darkResult,
+    scalingUnit,
   });
   return (
     <>
       <style
         dangerouslySetInnerHTML={{
           __html: css,
-        }}
-      />
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `:root {
-          --cl-scaling-unit: ${scalingUnit};
-        }`,
         }}
       />
       <div className='flex h-dvh flex-col overflow-hidden'>
@@ -169,19 +163,19 @@ export function ThemeBuilder() {
               <div className='space-y-2'>
                 <label
                   htmlFor='scaling-unit'
-                  className='text-xs font-medium text-neutral-700 flex justify-between'
+                  className='text-xs font-medium text-neutral-700'
                 >
-                  <span>Scaling unit</span> <span>({scalingUnit})</span>
+                  Scaling unit
                 </label>
                 <input
-                  type='range'
+                  type='number'
                   id='scaling-unit'
                   min={0}
-                  max={3}
+                  max={5}
                   step={0.1}
                   value={scalingUnit}
                   onChange={e => setScalingUnit(Number(e.target.value))}
-                  className='w-full'
+                  className='w-full text-xs rounded border p-2'
                 />
               </div>
             </div>
