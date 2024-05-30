@@ -3,9 +3,9 @@ import '../polyfills';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
-import type { TokenCache } from './cache';
+import type { TokenCache } from '../caches/types';
+import { isNative } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
-import { MemoryTokenCache } from './cache';
 import { buildClerk } from './singleton';
 import { isNative } from './utils/runtime';
 
