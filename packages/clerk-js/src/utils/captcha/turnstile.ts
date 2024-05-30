@@ -1,6 +1,8 @@
 import { loadScript } from '@clerk/shared/loadScript';
 import type { CaptchaWidgetType } from '@clerk/types';
 
+import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
+
 interface RenderOptions {
   /**
    * Every widget has a sitekey. This sitekey is associated with the corresponding widget configuration and is created upon the widget creation.
@@ -61,16 +63,13 @@ declare global {
   }
 }
 
-export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
-export const CAPTCHA_INVISIBLE_CLASSNAME = 'clerk-invisible-captcha';
-
 export const shouldRetryTurnstileErrorCode = (errorCode: string) => {
   const codesWithRetries = ['crashed', 'undefined_error', '102', '103', '104', '106', '110600', '300', '600'];
 
   return !!codesWithRetries.find(w => errorCode.startsWith(w));
 };
 
-export async function loadCaptcha(url: string) {
+async function loadCaptcha(url: string) {
   if (!window.turnstile) {
     try {
       await loadScript(url, { defer: true });
@@ -92,7 +91,7 @@ export async function loadCaptcha(url: string) {
  * - If the widgetType is 'smart', the captcha widget is rendered in a div with the id 'clerk-captcha'. If the div does
  *  not exist, the invisibleSiteKey is used as a fallback and the widget is rendered in a hidden div at the bottom of the body.
  */
-export const getCaptchaToken = async (captchaOptions: {
+export const getTunstileToken = async (captchaOptions: {
   siteKey: string;
   scriptUrl: string;
   widgetType: CaptchaWidgetType;

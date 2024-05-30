@@ -24,5 +24,4 @@ export * from './componentGuards';
 export * from './queryStateParams';
 export * from './normalizeRoutingOptions';
 export * from './image';
-export * from './captcha';
 export * from './completeSignUpFlow';

@@ -21,7 +21,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
   const { actions, elementId } = props;
   return (
     <Menu elementId={elementId}>
-      <MenuTrigger>
+      <MenuTrigger arialLabel={isOpen => `${isOpen ? 'Close' : 'Open'} menu`}>
         <Button
           sx={t => ({
             padding: t.space.$0x5,
