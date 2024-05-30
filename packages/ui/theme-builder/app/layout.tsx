@@ -1,6 +1,7 @@
 import './globals.css';
 import '../../dist/styles.css';
 
+import { ClerkProvider } from '@clerk/nextjs';
 import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
@@ -18,11 +19,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang='en'
-      className='h-full'
-    >
-      <body className={clsx(inter.className, 'flex min-h-full flex-col')}>{children}</body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang='en'
+        className='h-full'
+      >
+        <body className={clsx(inter.className, 'flex min-h-full flex-col')}>{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
