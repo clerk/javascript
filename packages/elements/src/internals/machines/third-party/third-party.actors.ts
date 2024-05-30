@@ -8,7 +8,6 @@ import type { SetOptional } from 'type-fest';
 import type { AnyActorRef, AnyEventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';
 
-import { SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { WithParams, WithUnsafeMetadata } from '~/internals/machines/shared';
 import { ClerkJSNavigationEvent, isClerkJSNavigationEvent } from '~/internals/machines/utils/clerkjs';
@@ -27,13 +26,12 @@ export type AuthenticateWithRedirectInput = (
 ) & { basePath: string; parent: AnyActorRef }; // TODO: Fix circular dependency
 
 export const redirect = fromPromise<void, AuthenticateWithRedirectInput>(
-  async ({ input: { basePath, flow, params, parent } }) => {
+  async ({ input: { flow, params, parent } }) => {
     const clerk: LoadedClerk = parent.getSnapshot().context.clerk;
-    const path = clerk.buildUrlWithAuth(`${basePath}${SSO_CALLBACK_PATH_ROUTE}`);
 
     return clerk.client[flow].authenticateWithRedirect({
-      redirectUrl: path,
-      redirectUrlComplete: path,
+      redirectUrl: clerk.buildUrlWithAuth(params.redirectUrl || '/'),
+      redirectUrlComplete: clerk.buildUrlWithAuth(params.redirectUrlComplete || '/'),
       ...params,
     });
   },
@@ -80,8 +78,6 @@ export const handleRedirectCallback = fromCallback<AnyEventObject, HandleRedirec
 
     void loadedClerk.handleRedirectCallback(
       {
-        afterSignInUrl: ClerkJSNavigationEvent.signIn,
-        afterSignUpUrl: ClerkJSNavigationEvent.signUp,
         signInForceRedirectUrl: ClerkJSNavigationEvent.complete,
         signInFallbackRedirectUrl: ClerkJSNavigationEvent.complete,
         signUpForceRedirectUrl: ClerkJSNavigationEvent.signUp,

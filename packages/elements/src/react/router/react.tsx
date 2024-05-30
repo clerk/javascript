@@ -16,13 +16,13 @@ export function useClerkRouter() {
 }
 
 export function Router({
+  basePath,
   children,
   router,
-  basePath,
 }: {
-  router: ClerkHostRouter;
   children: React.ReactNode;
   basePath?: string;
+  router: ClerkHostRouter;
 }) {
   const clerkRouter = createClerkRouter(router, basePath);
 
