@@ -10,27 +10,20 @@ if ((await which('vercel', { nothrow: true })) === null) {
 }
 
 // build top-level
-within(async () => {
+await within(async () => {
   // repo root
   cd('../../../');
 
   // turbo build
-  await $`npx turbo build --filter=ui...`;
+  await spinner('Building dependencies...', () => $`npx turbo build --filter=ui...`);
 });
-
-// Check for vercel setup
-if ((await $`ls .vercel`.exitCode) !== 0) {
-  echo('Vercel not setup, running vercel link. Follow the prompts and link with the theme-builder project.');
-
-  await $`vercel link`;
-}
 
 await $`vercel pull`;
 
 // Build
 const prod = argv.prod;
 
-await $`vercel build ${prod ? '--prod' : ''}`;
+await spinner('Building application...', () => $`vercel build ${prod ? '--prod' : ''}`);
 
 // Deploy
 await $`vercel deploy --prebuilt ${prod ? '--prod' : ''}`;
