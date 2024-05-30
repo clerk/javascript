@@ -1,3 +1,4 @@
+import { isWebAuthnAutofillSupported } from '@clerk/clerk-js/src/utils/passkeys';
 import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
@@ -35,6 +36,7 @@ import {
   useFormStore,
 } from '~/internals/machines/form/form.context';
 import { usePassword } from '~/react/hooks/use-password.hook';
+import { SignInRouterCtx } from '~/react/sign-in/context';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
 import { isReactFragment } from '~/react/utils/is-react-fragment';
 
@@ -172,7 +174,8 @@ const useInput = ({
   onFocus: onFocusProp,
   ...passthroughProps
 }: FormInputProps) => {
-  // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
+  const signInActorRef = SignInRouterCtx.useActorRef(true);
+  // Inputs can be used outside a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
   const { state: fieldState } = useFieldState({ name });
@@ -270,6 +273,29 @@ const useInput = ({
     ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
   }, [name, ref, initialValue]);
 
+  const [isSupported, setIsSupported] = React.useState(false);
+  React.useEffect(() => {
+    async function runAutofillPasskey() {
+      const _isSupported = await isWebAuthnAutofillSupported().catch(() => false);
+      setIsSupported(_isSupported);
+    }
+
+    // @ts-expect-error - Depending on type the props can be different
+    if (passthroughProps?.passkeyAutofill) {
+      runAutofillPasskey();
+    }
+
+    // @ts-expect-error - Depending on type the props can be different
+  }, [passthroughProps?.passkeyAutofill]);
+
+  React.useEffect(() => {
+    // @ts-expect-error - Depending on type the props can be different
+    if (passthroughProps?.passkeyAutofill) {
+      signInActorRef?.send({ type: 'AUTHENTICATE.PASSKEY_AUTOFILL', flow: 'autofill' });
+    }
+    // @ts-expect-error - Depending on type the props can be different
+  }, [passthroughProps?.passkeyAutofill, signInActorRef]);
+
   if (!name) {
     throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
   }
@@ -306,9 +332,18 @@ const useInput = ({
     };
   }
 
+  if (isSupported) {
+    props = {
+      autoComplete: 'webauthn',
+    };
+  }
+
   // Filter out invalid props that should not be passed through
   // @ts-expect-error - Doesn't know about type narrowing by type here
   const { validatePassword: _1, ...rest } = passthroughProps;
+
+  // @ts-expect-error - Depending on type the props can be different
+  delete rest['passkeyAutofill'];
 
   return {
     Element,
@@ -491,7 +526,7 @@ type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
   validatePassword?: boolean;
 };
 type FormInputProps =
-  | RadixFormControlProps
+  | (RadixFormControlProps & { passkeyAutofill?: boolean })
   | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
   | ({ type: 'otp'; render?: undefined } & OTPInputProps)
   // Usecase: Toggle the visibility of the password input, therefore 'password' and 'text' are allowed

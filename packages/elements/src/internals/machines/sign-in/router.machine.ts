@@ -318,6 +318,12 @@ export const SignInRouterMachine = setup({
               } as SignInRouterPasskeyEvent),
           ),
         },
+        'AUTHENTICATE.PASSKEY_AUTOFILL': {
+          actions: sendTo('start', () => ({
+            type: 'AUTHENTICATE.PASSKEY_AUTOFILL',
+            flow: 'autofill',
+          })),
+        },
         NEXT: [
           {
             guard: 'isComplete',

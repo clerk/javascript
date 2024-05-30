@@ -89,6 +89,11 @@ export const SignInStartMachine = setup({
           target: 'AttemptingPasskey',
           reenter: true,
         },
+        'AUTHENTICATE.PASSKEY_AUTOFILL': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskeyAutoFill',
+          reenter: false,
+        },
       },
     },
     Attempting: {
@@ -125,6 +130,30 @@ export const SignInStartMachine = setup({
         },
         onError: {
           actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
+    AttemptingPasskeyAutoFill: {
+      on: {
+        'AUTHENTICATE.PASSKEY': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
+      },
+      invoke: {
+        id: 'attemptPasskeyAutofill',
+        src: 'attemptPasskey',
+        input: ({ context, event }) => ({
+          parent: context.parent,
+          flow: (event as SignInStartPasskeyEvent).flow,
+        }),
+        onDone: {
+          actions: ['sendToNext'],
+        },
+        onError: {
+          actions: ['setFormErrors'],
           target: 'Pending',
         },
       },
