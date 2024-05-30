@@ -1,5 +1,17 @@
 import type { Config } from 'tailwindcss';
 
+function generateScale(name: string) {
+  const scale = Array.from({ length: 12 }, (_, i) => {
+    const id = i + 1;
+    return [
+      [id, `var(--cl-${name}-${id})`],
+      [`a${id}`, `var(--cl-${name}-a${id})`],
+    ];
+  }).flat();
+
+  return Object.fromEntries(scale);
+}
+
 const config = {
   corePlugins: {
     preflight: false,
@@ -10,30 +22,20 @@ const config = {
     extend: {
       fontFamily: {
         sans: ['var(--cl-font-family)'],
-        button: ['var(--cl-font-family-button)'],
       },
       colors: {
-        primary: {
-          DEFAULT: 'hsl(var(--cl-color-primary))',
-          foreground: 'hsl(var(--cl-color-primary-foreground))',
+        accent: {
+          ...generateScale('accent'),
+          contrast: 'var(--cl-accent-contrast)',
+          surface: 'var(--cl-accent-surface)',
         },
-        neutral: 'hsl(var(--cl-color-neutral))',
-        background: 'hsl(var(--cl-color-background))',
-        foreground: 'hsl(var(--cl-color-foreground))',
+        gray: {
+          ...generateScale('gray'),
+          contrast: 'var(--cl-gray-contrast)',
+          surface: 'var(--cl-gray-surface)',
+        },
         destructive: {
           DEFAULT: 'hsl(var(--cl-color-destructive))',
-        },
-        card: {
-          background: 'hsl(var(--cl-color-card-background))',
-          foreground: 'hsl(var(--cl-color-card-foreground))',
-        },
-        button: {
-          background: 'hsl(var(--cl-color-button-background))',
-          foreground: 'hsl(var(--cl-color-button-foreground))',
-        },
-        input: {
-          background: 'hsl(var(--cl-color-input-background))',
-          foreground: 'hsl(var(--cl-color-input-foreground))',
         },
       },
     },
