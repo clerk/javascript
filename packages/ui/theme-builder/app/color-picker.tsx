@@ -1,7 +1,7 @@
 import * as Popover from '@radix-ui/react-popover';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { type HslColor, HslColorPicker } from 'react-colorful';
-export type { HslColor } from 'react-colorful';
+import { useId } from 'react';
+import { HexColorInput, HexColorPicker } from 'react-colorful';
 
 export function ColorPicker({
   label,
@@ -11,14 +11,19 @@ export function ColorPicker({
 }: {
   label: string;
   description?: string;
-  color: HslColor;
-  onChange: (color: HslColor) => void;
+  color: string;
+  onChange: (color: string) => void;
 }) {
-  const backgroundColor = `hsl(${color.h}, ${color.s}%, ${color.l}%)`;
+  const id = useId();
   return (
     <div>
       <div className='mb-1 flex items-center gap-x-1'>
-        <label className='text-xs font-medium text-neutral-700'>{label}</label>
+        <label
+          className='text-xs font-medium text-neutral-700'
+          htmlFor={id}
+        >
+          {label}
+        </label>
         <Tooltip.Provider>
           <Tooltip.Root>
             <Tooltip.Trigger>
@@ -52,21 +57,28 @@ export function ColorPicker({
       </div>
       <div>
         <Popover.Root>
-          <Popover.Trigger className='flex w-full items-center gap-x-2 rounded border px-2 py-1 text-sm'>
-            <span
-              className='block size-4 rounded-sm border'
-              style={{
-                backgroundColor,
-              }}
-            />{' '}
-            {backgroundColor}
-          </Popover.Trigger>
+          <div className='grid grid-cols-[theme(size.8),1fr] border rounded overflow-hidden'>
+            <Popover.Trigger className='grid place-content-center border-r'>
+              <span
+                className='block size-4 rounded-sm border'
+                style={{
+                  backgroundColor: color,
+                }}
+              />
+            </Popover.Trigger>
+            <HexColorInput
+              id={id}
+              className='grow h-full px-2 py-2 outline-none text-sm'
+              color={color}
+              onChange={onChange}
+            />
+          </div>
           <Popover.Content
             sideOffset={4}
             side='bottom'
             align='start'
           >
-            <HslColorPicker
+            <HexColorPicker
               color={color}
               onChange={onChange}
             />
