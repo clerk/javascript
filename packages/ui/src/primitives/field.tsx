@@ -1,7 +1,7 @@
 import cn from 'clsx';
 import * as React from 'react';
 
-const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
+export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -16,7 +16,7 @@ const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   );
 });
 
-const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTMLLabelElement>>(function Label(
+export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTMLLabelElement>>(function Label(
   { className, children, ...props },
   forwardedRef,
 ) {
@@ -31,7 +31,7 @@ const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTMLLabelE
   );
 });
 
-const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
+export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
   { className, ...props },
   forwardedRef,
 ) {
@@ -49,7 +49,7 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
 
 type MessageIntent = 'error' | 'success' | 'neutral';
 
-const Message = React.forwardRef<
+export const Message = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement> & {
     /**
@@ -120,5 +120,3 @@ function getMessageIcon(intent: MessageIntent) {
 
   return null;
 }
-
-export { Root, Label, Input, Message };

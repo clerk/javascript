@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { Logo } from './logo';
 
-const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
+export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -21,7 +21,7 @@ const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   );
 });
 
-const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Content(
+export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Content(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -39,7 +39,7 @@ const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEle
   );
 });
 
-const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Header(
+export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Header(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -54,7 +54,7 @@ const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElem
   );
 });
 
-const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function Title(
+export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function Title(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -69,22 +69,21 @@ const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHead
   );
 });
 
-const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function Description(
-  { children, className, ...props },
-  forwardedRef,
-) {
-  return (
-    <p
-      ref={forwardedRef}
-      {...props}
-      className={cn('text-[0.8125rem]/[1.125rem] text-gray-a11', className)}
-    >
-      {children}
-    </p>
-  );
-});
+export const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  function Description({ children, className, ...props }, forwardedRef) {
+    return (
+      <p
+        ref={forwardedRef}
+        {...props}
+        className={cn('text-[0.8125rem]/[1.125rem] text-gray-a11', className)}
+      >
+        {children}
+      </p>
+    );
+  },
+);
 
-const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Body(
+export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Body(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -99,7 +98,7 @@ const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
   );
 });
 
-const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Footer(
+export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Footer(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -127,22 +126,21 @@ const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElem
   );
 });
 
-const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function FooterAction(
-  { children, className, ...props },
-  forwardedRef,
-) {
-  return (
-    <div
-      ref={forwardedRef}
-      {...props}
-      className={cn('px-6 py-4', className)}
-    >
-      {children}
-    </div>
-  );
-});
+export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  function FooterAction({ children, className, ...props }, forwardedRef) {
+    return (
+      <div
+        ref={forwardedRef}
+        {...props}
+        className={cn('px-6 py-4', className)}
+      >
+        {children}
+      </div>
+    );
+  },
+);
 
-const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   function FooterActionText({ children, className, ...props }, forwardedRef) {
     return (
       <p
@@ -156,7 +154,7 @@ const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTMLAttrib
   },
 );
 
-const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
+export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
   function FooterActionLink({ children, className, ...props }, forwardedRef) {
     return (
       <a
@@ -169,5 +167,3 @@ const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAtt
     );
   },
 );
-
-export { Root, Content, Header, Title, Description, Body, Footer, FooterAction, FooterActionText, FooterActionLink };
