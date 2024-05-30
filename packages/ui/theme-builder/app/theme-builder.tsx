@@ -160,7 +160,7 @@ export function ThemeBuilder() {
                   />
                 </>
               )}
-              <div className='space-y-1'>
+              <div>
                 <label
                   htmlFor='scaling-unit'
                   className='text-xs font-medium text-neutral-700'
