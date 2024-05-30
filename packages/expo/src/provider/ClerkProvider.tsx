@@ -1,17 +1,15 @@
-import './polyfills';
+import '../polyfills';
 
-import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import type { TokenCache } from './cache';
-import { isReactNative } from './runtime';
 import { getClerkInstance } from './singleton';
 import { MemoryTokenCache } from './cache';
 import { buildClerk } from './singleton';
 import { isNative } from './utils/runtime';
 
-export type ClerkProviderProps = ClerkReactProviderProps & {
+export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider> & {
   tokenCache?: TokenCache;
 };
 
