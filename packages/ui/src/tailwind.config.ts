@@ -1,6 +1,6 @@
 import type { Config } from 'tailwindcss';
 
-function generateScale(name: string) {
+function generateColorScale(name: string) {
   const scale = Array.from({ length: 12 }, (_, i) => {
     const id = i + 1;
     return [
@@ -36,12 +36,12 @@ const config = {
       },
       colors: {
         accent: {
-          ...generateScale('accent'),
+          ...generateColorScale('accent'),
           contrast: 'var(--cl-accent-contrast)',
           surface: 'var(--cl-accent-surface)',
         },
         gray: {
-          ...generateScale('gray'),
+          ...generateColorScale('gray'),
           contrast: 'var(--cl-gray-contrast)',
           surface: 'var(--cl-gray-surface)',
         },
