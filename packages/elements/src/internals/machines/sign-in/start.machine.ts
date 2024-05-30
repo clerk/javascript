@@ -141,6 +141,11 @@ export const SignInStartMachine = setup({
           target: 'AttemptingPasskey',
           reenter: true,
         },
+        SUBMIT: {
+          guard: not('isExampleMode'),
+          target: 'Attempting',
+          reenter: true,
+        },
       },
       invoke: {
         id: 'attemptPasskeyAutofill',
