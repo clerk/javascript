@@ -45,6 +45,14 @@ function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) 
       }
     });
 
+    // Ensure that the latest instantiated formRef is attached to the router
+    if (formRef && actor.getSnapshot().can({ type: 'RESET.STEP' })) {
+      actor.send({
+        type: 'FORM.ATTACH',
+        formRef,
+      });
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clerk, exampleMode, formRef?.id, !!router]);
 

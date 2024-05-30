@@ -93,7 +93,7 @@ function CustomResendable() {
 }
 
 export default function SignInPage() {
-  const [continueWithEmail, setContinueWithEmail] = useState(false);
+  const [continueWithEmail, setContinueWithEmail] = useState(true);
 
   return (
     <SignIn.Root
