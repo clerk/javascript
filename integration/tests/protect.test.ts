@@ -67,8 +67,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
   test('Protect in RSCs and RCCs as `signed-out user`', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
-    console.log('nextjs version', u.nexJsVersion);
-    if (!u.nexJsVersion.startsWith('14.2')) {
+    // Do not run this part for nextjs v14, the flow is broken in 14.2.3 because vercel removed a header that our page detection logic depends on
+    if (!u.nexJsVersion.startsWith('14')) {
       /**
        * Soft navigations
        */
