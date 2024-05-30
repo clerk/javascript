@@ -2,6 +2,8 @@ import { createClerkRouter } from '../router';
 
 describe('createClerkRouter', () => {
   const mockRouter = {
+    name: 'mockRouter',
+    mode: 'path' as const,
     pathname: jest.fn(),
     searchParams: jest.fn(),
     push: jest.fn(),
