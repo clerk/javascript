@@ -14,6 +14,7 @@
     "dev": "tsup --watch"
   },
   "dependencies": {
+    "@clerk/elements": "^0.5.2",
     "clsx": "^2.1.1"
   },
   "devDependencies": {
