@@ -31,6 +31,7 @@ export function ThemeBuilder() {
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
+  const [scalingUnit, setScalingUnit] = useState(1);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
@@ -61,6 +62,13 @@ export function ThemeBuilder() {
       <style
         dangerouslySetInnerHTML={{
           __html: css,
+        }}
+      />
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `:root {
+          --cl-scaling-unit: ${scalingUnit};
+        }`,
         }}
       />
       <div className='flex h-dvh flex-col overflow-hidden'>
@@ -155,6 +163,24 @@ export function ThemeBuilder() {
                   />
                 </>
               )}
+              <div className='space-y-2'>
+                <label
+                  htmlFor='scaling-unit'
+                  className='text-xs font-medium text-neutral-700'
+                >
+                  Scaling unit
+                </label>
+                <input
+                  type='range'
+                  id='scaling-unit'
+                  min={0}
+                  max={3}
+                  step={0.1}
+                  value={scalingUnit}
+                  onChange={e => setScalingUnit(Number(e.target.value))}
+                  className='w-full'
+                />
+              </div>
             </div>
             <div className='mt-auto space-y-2'>
               <button

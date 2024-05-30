@@ -23,6 +23,16 @@ const config = {
       fontFamily: {
         sans: ['var(--cl-font-family)'],
       },
+      spacing: {
+        'space-1': 'calc(0.25rem * var(--cl-scaling-unit))',
+        'space-2': 'calc(0.5rem * var(--cl-scaling-unit))',
+        'space-3': 'calc(0.75rem * var(--cl-scaling-unit))',
+        'space-4': 'calc(1rem * var(--cl-scaling-unit))',
+        'space-5': 'calc(1.25rem * var(--cl-scaling-unit))',
+        'space-6': 'calc(1.5rem * var(--cl-scaling-unit))',
+        'space-7': 'calc(1.75rem * var(--cl-scaling-unit))',
+        'space-8': 'calc(2rem * var(--cl-scaling-unit))',
+      },
       colors: {
         accent: {
           ...generateScale('accent'),
