@@ -228,6 +228,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'formattedPhoneNumberFlag',
   'formattedPhoneNumberText',
 
+  'formattedDate',
+
   'scrollBox',
 
   'navbar',
