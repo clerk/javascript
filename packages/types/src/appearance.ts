@@ -353,6 +353,8 @@ export type ElementsConfig = {
   formattedPhoneNumberFlag: WithOptions;
   formattedPhoneNumberText: WithOptions;
 
+  formattedDate: WithOptions<'tableCell'>;
+
   scrollBox: WithOptions;
 
   navbar: WithOptions;

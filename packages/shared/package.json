@@ -88,6 +88,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
+    "@clerk/types": "4.5.1",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.1",
     "std-env": "^3.7.0",
@@ -95,7 +96,6 @@
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@clerk/types": "4.5.1",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
     "@types/node": "^18.17.0",
