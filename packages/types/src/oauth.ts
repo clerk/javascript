@@ -35,6 +35,7 @@ export type BoxOauthProvider = 'box';
 export type SlackOauthProvider = 'slack';
 export type LinearOauthProvider = 'linear';
 export type XOauthProvider = 'x';
+export type EnstallOauthProvider = 'enstall';
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -62,7 +63,8 @@ export type OAuthProvider =
   | BoxOauthProvider
   | SlackOauthProvider
   | LinearOauthProvider
-  | XOauthProvider;
+  | XOauthProvider
+  | EnstallOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -220,6 +222,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     strategy: 'oauth_x',
     name: 'X / Twitter',
     docsUrl: 'https://clerk.com/docs/authentication/social-connections/x-twitter-v2',
+  },
+  {
+    provider: 'enstall',
+    strategy: 'oauth_enstall',
+    name: 'Enstall',
+    docsUrl: 'https://clerk.com/docs/authentication/social-connections/enstall',
   },
 ];
 
