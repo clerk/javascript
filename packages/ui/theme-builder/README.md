@@ -1,4 +1,8 @@
-## Theme Builder
+# Theme Builder
+
+> An experimental theme builder playground for AIO components.
+
+## Preview deployment
 
 One-time setup in `packages/ui/theme-builder`:
 
