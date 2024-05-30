@@ -17,6 +17,8 @@ const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
+const spacingUnitDefault = 1;
+
 const componnents = {
   SignIn: <SignIn />,
   SignUp: <SignUp />,
@@ -31,7 +33,7 @@ export function ThemeBuilder() {
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
-  const [scalingUnit, setScalingUnit] = useState(1);
+  const [scalingUnit, setScalingUnit] = useState(spacingUnitDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
@@ -40,6 +42,7 @@ export function ThemeBuilder() {
     setDarkAccent(darkAccentDefault);
     setDarkGray(darkGrayDefault);
     setDarkBackground(darkBackgroundDefault);
+    setScalingUnit(spacingUnitDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -166,9 +169,9 @@ export function ThemeBuilder() {
               <div className='space-y-2'>
                 <label
                   htmlFor='scaling-unit'
-                  className='text-xs font-medium text-neutral-700'
+                  className='text-xs font-medium text-neutral-700 flex justify-between'
                 >
-                  Scaling unit
+                  <span>Scaling unit</span> <span>({scalingUnit})</span>
                 </label>
                 <input
                   type='range'
