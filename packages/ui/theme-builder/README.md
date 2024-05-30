@@ -2,16 +2,10 @@
 
 > An experimental theme builder playground for AIO components.
 
-## Preview deployment
+## Deployment
 
-One-time setup in `packages/ui/theme-builder`:
+To deploy the theme builder to Vercel, run the following command:
 
-- `vercel link`
-- `vercel pull`
-
-To deploy:
-
-- ensure packages are built, from repo root: `npx turbo build`
-- `cd packages/ui/theme-builder`
-- `vercel build`
-- `vercel deploy --prebuilt --prod`
+```
+npm run deploy [-- --prod]
+```
