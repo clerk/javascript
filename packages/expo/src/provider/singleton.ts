@@ -2,7 +2,7 @@ import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/c
 import { Clerk } from '@clerk/clerk-js/headless';
 import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
-import type { TokenCache } from '../caches/MemoryTokenCache';
+import type { TokenCache } from '../caches/types';
 import { MemoryTokenCache } from './cache/MemoryTokenCache';
 import { errorThrower } from './errorThrower';
 
