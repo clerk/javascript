@@ -1,1 +1,1 @@
-export { SignUpComponent as SignUp } from './sign.up';
+export { SignUpComponent as SignUp } from './sign-up';
