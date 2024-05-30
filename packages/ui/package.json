@@ -8,7 +8,32 @@
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
   },
-  "main": "index.js",
+  "exports": {
+    "./primitives/*": {
+      "import": "./dist/primitives/*.mjs",
+      "require": "./dist/primitives/*.js",
+      "types": "./src/primitives/*.d.ts"
+    },
+    "./components/*": {
+      "import": "./dist/components/*.mjs",
+      "require": "./dist/components/*.js",
+      "types": "./src/components/*.d.ts"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "typesVersions": {
+    "*": {
+      "primitives/*": [
+        "dist/primitives/*.d.ts"
+      ],
+      "components/*": [
+        "dist/components/*.d.ts"
+      ],
+      "styles.css": [
+        "./dist/styles.css"
+      ]
+    }
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"

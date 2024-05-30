@@ -1,5 +1,5 @@
 import './globals.css';
-import '../../dist/styles.css';
+import '@clerk/ui/styles.css';
 
 import clsx from 'clsx';
 import type { Metadata } from 'next';

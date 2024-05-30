@@ -1,9 +1,9 @@
 'use client';
+import { SignIn } from '@clerk/ui/components/sign-in';
+import { SignUp } from '@clerk/ui/components/sign-up';
 import cn from 'clsx';
 import { useState } from 'react';
 
-import { SignIn } from '../../dist/components/sign-in';
-import { SignUp } from '../../dist/components/sign-up';
 import { AppearanceToggle } from './appearance-toggle';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
@@ -18,7 +18,7 @@ const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
 const componnents = {
-  SignIn: <SignIn />,
+  SignIn: <SignIn  />,
   SignUp: <SignUp />,
 };
 type Component = keyof typeof componnents;
