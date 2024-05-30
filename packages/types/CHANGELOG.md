@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.65.2
+
+### Patch Changes
+
+- Add support for Enstall OAuth provider ([#3467](https://github.com/clerk/javascript/pull/3467)) by [@Nikpolik](https://github.com/Nikpolik)
+
 ## 3.65.1
 
 ### Patch Changes
