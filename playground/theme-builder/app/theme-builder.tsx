@@ -18,7 +18,7 @@ const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
 const componnents = {
-  SignIn: <SignIn  />,
+  SignIn: <SignIn />,
   SignUp: <SignUp />,
 };
 type Component = keyof typeof componnents;
