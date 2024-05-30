@@ -25,11 +25,11 @@ if ((await $`ls .vercel`.exitCode) !== 0) {
   await $`vercel link`;
 }
 
-const prod = argv.prod;
-
-await $`vercel pull ${prod ? '--prod' : ''}`;
+await $`vercel pull`;
 
 // Build
+const prod = argv.prod;
+
 await $`vercel build ${prod ? '--prod' : ''}`;
 
 // Deploy
