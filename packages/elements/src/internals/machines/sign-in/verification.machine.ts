@@ -347,9 +347,11 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
       // If a prepare call has already been fired recently, don't re-send
       const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
+      const nonPreperableStategies = ['passkey', 'password'];
+      const preparable = params?.strategy ? !nonPreperableStategies.includes(params.strategy) : false;
       const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
-      if (!params?.strategy || params.strategy === 'password' || params.strategy === 'passkey' || !needsPrepare) {
+      if (!preparable || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
