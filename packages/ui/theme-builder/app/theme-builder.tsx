@@ -23,12 +23,6 @@ const componnents = {
 };
 type Component = keyof typeof componnents;
 
-const componnents = {
-  SignIn: <SignIn />,
-  SignUp: <SignUp />,
-};
-type Component = keyof typeof componnents;
-
 export function ThemeBuilder() {
   const [appearance, setAppearance] = useState('light');
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);

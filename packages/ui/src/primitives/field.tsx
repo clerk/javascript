@@ -49,11 +49,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
 
 type MessageIntent = 'error' | 'success' | 'neutral';
 
-<<<<<<< HEAD
 export const Message = React.forwardRef<
-=======
-const Message = React.forwardRef<
->>>>>>> d7c226405 (add message intents)
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement> & {
     /**

@@ -48,15 +48,9 @@ export default defineConfig(overrideOptions => {
       'primitives/connection': 'src/primitives/connection.tsx',
       'primitives/icon': 'src/primitives/icon.tsx',
       'primitives/field': 'src/primitives/field.tsx',
-      'primitives/icon': 'src/primitives/icon.tsx',
       'primitives/seperator': 'src/primitives/seperator.tsx',
-<<<<<<< HEAD
       'components/sign-in': 'src/components/sign-in/index.tsx',
       'components/sign-up': 'src/components/sign-up/index.tsx',
-=======
-      'components/sign-in/index': 'src/components/sign-in/index.tsx',
-      'components/sign-up/index': 'src/components/sign-up/index.tsx',
->>>>>>> d70f242e1 (organize into components folder)
     },
     external: ['react', 'react-dom'],
     format: ['cjs', 'esm'],

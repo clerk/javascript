@@ -9,14 +9,10 @@
     "url": "git+https://github.com/clerk/javascript.git"
   },
   "exports": {
-    "./primitives/*": "./src/primitives/*.tsx",
     "./components/*": "./src/components/*/index.tsx"
   },
   "typesVersions": {
     "*": {
-      "primitives/*": [
-        "src/primitives/*"
-      ],
       "components/*": [
         "src/components/*/index.tsx"
       ]
