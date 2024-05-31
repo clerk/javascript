@@ -182,6 +182,17 @@ export const SignInRouterMachine = setup({
         params: { strategy: 'saml' },
       }),
     },
+    'FORM.ATTACH': {
+      description: 'Attach/re-attach the form to the router.',
+      actions: enqueueActions(({ enqueue, event }) => {
+        enqueue.assign({
+          formRef: event.formRef,
+        });
+
+        // Reset the current step, to reset the form reference.
+        enqueue.raise({ type: 'RESET.STEP' });
+      }),
+    },
     'NAVIGATE.PREVIOUS': '.Hist',
     'NAVIGATE.START': '.Start',
     LOADING: {
@@ -292,6 +303,10 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'Start',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
@@ -329,6 +344,10 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'FirstFactor',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
@@ -399,6 +418,10 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'SecondFactor',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
@@ -426,6 +449,10 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'ResetPassword',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',

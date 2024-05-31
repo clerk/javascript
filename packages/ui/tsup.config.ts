@@ -46,6 +46,7 @@ export default defineConfig(overrideOptions => {
       'primitives/button': 'src/primitives/button.tsx',
       'primitives/card': 'src/primitives/card.tsx',
       'primitives/connection': 'src/primitives/connection.tsx',
+      'primitives/icon': 'src/primitives/icon.tsx',
       'primitives/field': 'src/primitives/field.tsx',
       'primitives/seperator': 'src/primitives/seperator.tsx',
       'components/sign-in': 'src/components/sign-in/index.tsx',
