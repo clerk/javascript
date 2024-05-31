@@ -24,10 +24,16 @@ export function SignInComponent() {
                 {PROVIDERS.map(provider => {
                   const ConnectionIcon = Icon[provider.icon];
                   return (
-                    <Connection.Button key={provider.name}>
-                      <ConnectionIcon className='text-base' />
-                      {provider.name}
-                    </Connection.Button>
+                    <Common.Connection
+                      key={provider.id}
+                      name={provider.id}
+                      asChild
+                    >
+                      <Connection.Button>
+                        <ConnectionIcon className='text-base' />
+                        {provider.name}
+                      </Connection.Button>
+                    </Common.Connection>
                   );
                 })}
               </Connection.Root>
