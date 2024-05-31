@@ -25,18 +25,18 @@ const config = {
       },
       backgroundColor: {
         button: {
-          primary: 'var(--cl-button-background-primary, var(--cl-accent-9))',
-          'primary-hover': 'var(--cl-button-background-primary-hover, var(--cl-accent-10))',
+          primary: 'var(--cl-button-background-color-primary, var(--cl-accent-9))',
+          'primary-hover': 'var(--cl-button-background-color-primary-hover, var(--cl-accent-10))',
         },
       },
       borderColor: {
         button: {
-          primary: 'var(--cl-button-border-primary, var(--cl-accent-9))',
+          primary: 'var(--cl-button-border-color-primary, var(--cl-accent-9))',
         },
       },
       textColor: {
         button: {
-          primary: 'var(--cl-button-color-primary, var(--cl-accent-contrast))',
+          primary: 'var(--cl-button-text-color-primary, var(--cl-accent-contrast))',
         },
       },
       colors: {

@@ -22,10 +22,10 @@ const darkPaletteDefault = {
 };
 
 const variables = [
-  '--cl-button-color-primary',
-  '--cl-button-background-primary',
-  '--cl-button-background-primary-hover',
-  '--cl-button-border-primary',
+  '--cl-button-background-color-primary',
+  '--cl-button-background-color-primary-hover',
+  '--cl-button-text-color-primary',
+  '--cl-button-border-color-primary',
 ];
 
 const componnents = {
