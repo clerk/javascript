@@ -291,7 +291,7 @@ const useInput = ({
   React.useEffect(() => {
     // @ts-expect-error - Depending on type the props can be different
     if (passthroughProps?.passkeyAutofill) {
-      signInActorRef?.send({ type: 'AUTHENTICATE.PASSKEY_AUTOFILL', flow: 'autofill' });
+      signInActorRef?.send({ type: 'AUTHENTICATE.PASSKEY_AUTOFILL' });
     }
     // @ts-expect-error - Depending on type the props can be different
   }, [passthroughProps?.passkeyAutofill, signInActorRef]);
