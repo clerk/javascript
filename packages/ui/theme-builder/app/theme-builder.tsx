@@ -11,12 +11,18 @@ import { ThemeDialog } from './theme-dialog';
 
 const lightPaletteDefault = {
   accent: '#2F3037',
+  success: '#16a34a',
+  danger: '#dc2626',
+  warning: '#ca8a04',
   gray: '#2f3037',
   background: '#fff',
 };
 
 const darkPaletteDefault = {
   accent: '#2F3037',
+  success: '#16a34a',
+  danger: '#dc2626',
+  warning: '#ca8a04',
   gray: '#2f3037',
   background: '#111',
 };
@@ -26,6 +32,7 @@ const variables = [
   '--cl-button-background-color-primary-hover',
   '--cl-button-text-color-primary',
   '--cl-button-border-color-primary',
+  '--cl-input-background-color',
 ];
 
 const componnents = {
@@ -50,18 +57,26 @@ export function ThemeBuilder() {
     setLightPalette(lightPaletteDefault);
     setDarkPalette(darkPaletteDefault);
   };
+
   const lightResult = generateColors({
     appearance: 'light',
     accent: lightPalette?.accent,
+    danger: lightPalette?.danger,
+    success: lightPalette?.success,
+    warning: lightPalette?.warning,
     gray: lightPalette?.gray,
     background: lightPalette?.background,
   });
   const darkResult = generateColors({
     appearance: 'dark',
     accent: darkPalette?.accent,
+    danger: darkPalette?.danger,
+    success: darkPalette?.success,
+    warning: darkPalette?.warning,
     gray: darkPalette?.gray,
     background: darkPalette?.background,
   });
+
   const css = getPreviewStyles({
     lightColors: lightResult,
     darkColors: darkResult,
@@ -148,6 +163,30 @@ export function ThemeBuilder() {
                     description='The accent color used for interactive elements.'
                     color={palette?.accent}
                     onChange={color => setPalette(p => ({ ...p, accent: color }))}
+                  />
+                </li>
+                <li>
+                  <ColorPicker
+                    label='Success'
+                    description='The accent color used for interactive elements.'
+                    color={palette?.success}
+                    onChange={color => setPalette(p => ({ ...p, success: color }))}
+                  />
+                </li>
+                <li>
+                  <ColorPicker
+                    label='Danger'
+                    description='The accent color used for interactive elements.'
+                    color={palette?.danger}
+                    onChange={color => setPalette(p => ({ ...p, danger: color }))}
+                  />
+                </li>
+                <li>
+                  <ColorPicker
+                    label='Success'
+                    description='The accent color used for interactive elements.'
+                    color={palette?.warning}
+                    onChange={color => setPalette(p => ({ ...p, warning: color }))}
                   />
                 </li>
                 <li>

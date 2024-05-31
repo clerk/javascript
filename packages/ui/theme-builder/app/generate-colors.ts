@@ -47,15 +47,20 @@ const darkGrayColors = Object.fromEntries(
   ]),
 ) as Record<(typeof grayScaleNames)[number], ArrayOf12<Color>>;
 
-export const generateColors = ({
+export const generateAccentColors = ({
   appearance,
   ...args
 }: {
   appearance: 'light' | 'dark';
   accent: string;
+  danger: string;
+  warning: string;
+  success: string;
   gray: string;
   background: string;
 }) => {
+  console.log({ args });
+
   const allScales = appearance === 'light' ? lightColors : darkColors;
   const grayScales = appearance === 'light' ? lightGrayColors : darkGrayColors;
   const backgroundColor = new Color(args.background).to('oklch');
@@ -105,16 +110,6 @@ export const generateColors = ({
 
   const accentContrastColorHex = accentContrastColor.to('srgb').toString({ format: 'hex' });
 
-  const grayScaleHex = grayScaleColors.map(color => color.to('srgb').toString({ format: 'hex' })) as ArrayOf12<string>;
-
-  const grayScaleWideGamut = grayScaleColors.map(toOklchString) as ArrayOf12<string>;
-
-  const grayScaleAlphaHex = grayScaleHex.map(color => getAlphaColorSrgb(color, backgroundHex)) as ArrayOf12<string>;
-
-  const grayScaleAlphaWideGamutString = grayScaleHex.map(color =>
-    getAlphaColorP3(color, backgroundHex),
-  ) as ArrayOf12<string>;
-
   const accentSurfaceHex =
     appearance === 'light'
       ? getAlphaColorSrgb(accentScaleHex[1], backgroundHex, 0.8)
@@ -126,22 +121,90 @@ export const generateColors = ({
       : getAlphaColorP3(accentScaleWideGamut[1], backgroundHex, 0.5);
 
   return {
-    accentScale: accentScaleHex,
-    accentScaleAlpha: accentScaleAlphaHex,
-    accentScaleWideGamut: accentScaleWideGamut,
-    accentScaleAlphaWideGamut: accentScaleAlphaWideGamutString,
-    accentContrast: accentContrastColorHex,
+    scale: accentScaleHex,
+    scaleAlpha: accentScaleAlphaHex,
+    scaleWideGamut: accentScaleWideGamut,
+    scaleAlphaWideGamut: accentScaleAlphaWideGamutString,
+    contrast: accentContrastColorHex,
+    surface: accentSurfaceHex,
+    surfaceWideGamut: accentSurfaceWideGamutString,
+  };
+};
+
+export const generateColors = ({
+  appearance,
+  ...args
+}: {
+  appearance: 'light' | 'dark';
+  accent: string;
+  danger: string;
+  warning: string;
+  success: string;
+  gray: string;
+  background: string;
+}) => {
+  const grayScales = appearance === 'light' ? lightGrayColors : darkGrayColors;
+  const backgroundColor = new Color(args.background).to('oklch');
+  // Enforce srgb for the background color
+  const backgroundHex = backgroundColor.to('srgb').toString({ format: 'hex' });
+
+  const grayBaseColor = new Color(args.gray).to('oklch');
+  const grayScaleColors = getScaleFromColor(grayBaseColor, grayScales, backgroundColor);
+
+  const accent = generateAccentColors({ appearance, ...args });
+  const success = generateAccentColors({ appearance, ...args, accent: args.success });
+  const danger = generateAccentColors({ appearance, ...args, accent: args.danger });
+  const warning = generateAccentColors({ appearance, ...args, accent: args.warning });
+
+  const grayScaleHex = grayScaleColors.map(color => color.to('srgb').toString({ format: 'hex' })) as ArrayOf12<string>;
+
+  const grayScaleWideGamut = grayScaleColors.map(toOklchString) as ArrayOf12<string>;
+
+  const grayScaleAlphaHex = grayScaleHex.map(color => getAlphaColorSrgb(color, backgroundHex)) as ArrayOf12<string>;
+
+  const grayScaleAlphaWideGamutString = grayScaleHex.map(color =>
+    getAlphaColorP3(color, backgroundHex),
+  ) as ArrayOf12<string>;
+
+  return {
+    accentScale: accent.scale,
+    accentScaleAlpha: accent.scaleAlpha,
+    accentScaleWideGamut: accent.scaleWideGamut,
+    accentScaleAlphaWideGamut: accent.scaleAlphaWideGamut,
+    accentContrast: accent.contrast,
+    accentSurface: accent.surface,
+    accentSurfaceWideGamut: accent.surfaceWideGamut,
+
+    successScale: success.scale,
+    successScaleAlpha: success.scaleAlpha,
+    successScaleWideGamut: success.scaleWideGamut,
+    successScaleAlphaWideGamut: success.scaleAlphaWideGamut,
+    successContrast: success.contrast,
+    successSurface: success.surface,
+    successSurfaceWideGamut: success.surfaceWideGamut,
+
+    dangerScale: danger.scale,
+    dangerScaleAlpha: danger.scaleAlpha,
+    dangerScaleWideGamut: danger.scaleWideGamut,
+    dangerScaleAlphaWideGamut: danger.scaleAlphaWideGamut,
+    dangerContrast: danger.contrast,
+    dangerSurface: danger.surface,
+    dangerSurfaceWideGamut: danger.surfaceWideGamut,
+
+    warningScale: warning.scale,
+    warningScaleAlpha: warning.scaleAlpha,
+    warningScaleWideGamut: warning.scaleWideGamut,
+    warningScaleAlphaWideGamut: warning.scaleAlphaWideGamut,
+    warningContrast: warning.contrast,
+    warningSurface: warning.surface,
+    warningSurfaceWideGamut: warning.surfaceWideGamut,
 
     grayScale: grayScaleHex,
     grayScaleAlpha: grayScaleAlphaHex,
     grayScaleWideGamut: grayScaleWideGamut,
     grayScaleAlphaWideGamut: grayScaleAlphaWideGamutString,
-
     graySurface: appearance === 'light' ? '#ffffffcc' : 'rgba(0, 0, 0, 0.05)',
     graySurfaceWideGamut: appearance === 'light' ? 'color(display-p3 1 1 1 / 80%)' : 'color(display-p3 0 0 0 / 5%)',
-
-    accentSurface: accentSurfaceHex,
-    accentSurfaceWideGamut: accentSurfaceWideGamutString,
 
     background: backgroundHex,
   };
@@ -592,27 +655,28 @@ export const getColorScaleCss = ({
 
   return `
 ${selector} {
+
+  --cl-${name}: ${scale[8]};
+  --cl-${name}-foreground: ${contrast};
+
   ${scale.map((value, index) => `--cl-${name}-${index + 1}: ${value};`).join('\n  ')}
 
   ${scaleAlpha.map((value, index) => `--cl-${name}-a${index + 1}: ${value};`).join('\n  ')}
 
-  --cl-${name}-contrast: ${contrast};
   --cl-${name}-surface: ${surface};
-  --cl-${name}-indicator: ${scale[8]};
-  --cl-${name}-track: ${scale[8]};
 }
 
 @supports (color: color(display-p3 1 1 1)) {
   @media (color-gamut: p3) {
     ${selector} {
+      --cl-${name}: ${scale[8]};
+      --cl-${name}-foreground: ${contrast};
+
       ${scaleWideGamut.map((value, index) => `--cl-${name}-${index + 1}: ${value};`).join('\n      ')}
 
       ${scaleAlphaWideGamut.map((value, index) => `--cl-${name}-a${index + 1}: ${value};`).join('\n      ')}
 
-      --cl-${name}-contrast: ${contrast};
       --cl-${name}-surface: ${surfaceWideGamut};
-      --cl-${name}-indicator: ${scaleWideGamut[8]};
-      --cl-${name}-track: ${scaleWideGamut[8]};
     }
   }
 }
@@ -623,14 +687,14 @@ const getBackgroundColorCss = ({ isDarkMode, background }: { isDarkMode: boolean
   if (isDarkMode) {
     return `
 .dark, .dark-theme, :is(.dark, .dark-theme) {
-  --color-background: ${background};
+  --cl-background: ${background};
 }
     `.trim();
   }
 
   return `
 :root, .light, .light-theme {
-  --color-background: ${background};
+  --cl-background: ${background};
 }
   `.trim();
 };
@@ -644,6 +708,42 @@ export const getPreviewStyles = ({ lightColors, darkColors }: GetNewPreviewStyle
   const lightAccentColorsCss = getColorScaleCss({
     isDarkMode: false,
     name: 'accent',
+    contrast: lightColors.accentContrast,
+    scale: lightColors.accentScale,
+    scaleWideGamut: lightColors.accentScaleWideGamut,
+    scaleAlpha: lightColors.accentScaleAlpha,
+    scaleAlphaWideGamut: lightColors.accentScaleAlphaWideGamut,
+    surface: lightColors.accentSurface,
+    surfaceWideGamut: lightColors.accentSurfaceWideGamut,
+  });
+
+  const lightDangerColorsCss = getColorScaleCss({
+    isDarkMode: false,
+    name: 'danger',
+    contrast: lightColors.accentContrast,
+    scale: lightColors.accentScale,
+    scaleWideGamut: lightColors.accentScaleWideGamut,
+    scaleAlpha: lightColors.accentScaleAlpha,
+    scaleAlphaWideGamut: lightColors.accentScaleAlphaWideGamut,
+    surface: lightColors.accentSurface,
+    surfaceWideGamut: lightColors.accentSurfaceWideGamut,
+  });
+
+  const lightSuccessColorsCss = getColorScaleCss({
+    isDarkMode: false,
+    name: 'success',
+    contrast: lightColors.accentContrast,
+    scale: lightColors.accentScale,
+    scaleWideGamut: lightColors.accentScaleWideGamut,
+    scaleAlpha: lightColors.accentScaleAlpha,
+    scaleAlphaWideGamut: lightColors.accentScaleAlphaWideGamut,
+    surface: lightColors.accentSurface,
+    surfaceWideGamut: lightColors.accentSurfaceWideGamut,
+  });
+
+  const lightWarningColorsCss = getColorScaleCss({
+    isDarkMode: false,
+    name: 'warning',
     contrast: lightColors.accentContrast,
     scale: lightColors.accentScale,
     scaleWideGamut: lightColors.accentScaleWideGamut,
@@ -668,6 +768,42 @@ export const getPreviewStyles = ({ lightColors, darkColors }: GetNewPreviewStyle
   const darkAccentColorsCss = getColorScaleCss({
     isDarkMode: true,
     name: 'accent',
+    contrast: darkColors.accentContrast,
+    scale: darkColors.accentScale,
+    scaleWideGamut: darkColors.accentScaleWideGamut,
+    scaleAlpha: darkColors.accentScaleAlpha,
+    scaleAlphaWideGamut: darkColors.accentScaleAlphaWideGamut,
+    surface: darkColors.accentSurface,
+    surfaceWideGamut: darkColors.accentSurfaceWideGamut,
+  });
+
+  const darkDangerColorsCss = getColorScaleCss({
+    isDarkMode: true,
+    name: 'danger',
+    contrast: darkColors.accentContrast,
+    scale: darkColors.accentScale,
+    scaleWideGamut: darkColors.accentScaleWideGamut,
+    scaleAlpha: darkColors.accentScaleAlpha,
+    scaleAlphaWideGamut: darkColors.accentScaleAlphaWideGamut,
+    surface: darkColors.accentSurface,
+    surfaceWideGamut: darkColors.accentSurfaceWideGamut,
+  });
+
+  const darkSuccessColorsCss = getColorScaleCss({
+    isDarkMode: true,
+    name: 'success',
+    contrast: darkColors.accentContrast,
+    scale: darkColors.accentScale,
+    scaleWideGamut: darkColors.accentScaleWideGamut,
+    scaleAlpha: darkColors.accentScaleAlpha,
+    scaleAlphaWideGamut: darkColors.accentScaleAlphaWideGamut,
+    surface: darkColors.accentSurface,
+    surfaceWideGamut: darkColors.accentSurfaceWideGamut,
+  });
+
+  const darkWarningColorsCss = getColorScaleCss({
+    isDarkMode: true,
+    name: 'warning',
     contrast: darkColors.accentContrast,
     scale: darkColors.accentScale,
     scaleWideGamut: darkColors.accentScaleWideGamut,
@@ -702,9 +838,15 @@ export const getPreviewStyles = ({ lightColors, darkColors }: GetNewPreviewStyle
   return `
 ${lightBackgroundCss}
 ${lightAccentColorsCss}
+${lightDangerColorsCss}
+${lightSuccessColorsCss}
+${lightWarningColorsCss}
 ${lightGrayColorsCss}
 ${darkBackgroundCss}
 ${darkAccentColorsCss}
+${darkDangerColorsCss}
+${darkSuccessColorsCss}
+${darkWarningColorsCss}
 ${darkGrayColorsCss}
   `.trim();
 };

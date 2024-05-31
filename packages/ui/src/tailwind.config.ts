@@ -23,35 +23,30 @@ const config = {
       fontFamily: {
         sans: ['var(--cl-font-family)'],
       },
-      backgroundColor: {
-        button: {
-          primary: 'var(--cl-button-background-color-primary, var(--cl-accent-9))',
-          'primary-hover': 'var(--cl-button-background-color-primary-hover, var(--cl-accent-10))',
-        },
-      },
-      borderColor: {
-        button: {
-          primary: 'var(--cl-button-border-color-primary, var(--cl-accent-9))',
-        },
-      },
-      textColor: {
-        button: {
-          primary: 'var(--cl-button-text-color-primary, var(--cl-accent-contrast))',
-        },
-      },
       colors: {
         accent: {
           ...generateScale('accent'),
-          contrast: 'var(--cl-accent-contrast)',
+          DEFAULT: 'var(--cl-accent)',
+          foreground: 'var(--cl-accent-foreground)',
           surface: 'var(--cl-accent-surface)',
+        },
+        danger: {
+          DEFAULT: 'var(--cl-danger)',
+          ...generateScale('danger'),
+        },
+        success: {
+          DEFAULT: 'var(--cl-success)',
+          ...generateScale('success'),
+        },
+        warning: {
+          DEFAULT: 'var(--cl-warning)',
+          ...generateScale('warning'),
         },
         gray: {
           ...generateScale('gray'),
-          contrast: 'var(--cl-gray-contrast)',
+          DEFAULT: 'var(--cl-gray)',
+          foreground: 'var(--cl-gray-foreground)',
           surface: 'var(--cl-gray-surface)',
-        },
-        destructive: {
-          DEFAULT: 'hsl(var(--cl-color-destructive))',
         },
       },
     },

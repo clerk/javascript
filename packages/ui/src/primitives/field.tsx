@@ -40,7 +40,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
       ref={forwardedRef}
       {...props}
       className={cn(
-        "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-[0.8125rem]/[1.125rem]",
+        "block w-full bg-gray-surface text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-danger data-[invalid='true']:focus:ring-danger-a3 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-[0.8125rem]/[1.125rem]",
         className,
       )}
     />
@@ -67,8 +67,8 @@ export const Message = React.forwardRef<
         'text-[0.8125rem]/[1.125rem] flex gap-x-1',
         {
           // TODO: Use the color tokens here
-          'text-[#ef4444]': intent === 'error',
-          'text-[#10b981]': intent === 'success',
+          'text-danger': intent === 'error',
+          'text-success': intent === 'success',
           'text-gray-11': intent === 'neutral',
         },
         className,
