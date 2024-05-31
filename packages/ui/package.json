@@ -8,7 +8,16 @@
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
   },
-  "main": "index.js",
+  "exports": {
+    "./components/*": "./src/components/*/index.tsx"
+  },
+  "typesVersions": {
+    "*": {
+      "components/*": [
+        "src/components/*/index.tsx"
+      ]
+    }
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"
