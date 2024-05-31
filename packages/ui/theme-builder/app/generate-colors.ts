@@ -638,7 +638,7 @@ const getBackgroundColorCss = ({ isDarkMode, background }: { isDarkMode: boolean
 interface GetNewPreviewStylesParams {
   lightColors: GeneratedColors;
   darkColors: GeneratedColors;
-  spaceScalingUnit: number;
+  spaceScalingUnit: string;
 }
 
 export const getPreviewStyles = ({ lightColors, darkColors, spaceScalingUnit }: GetNewPreviewStylesParams) => {

@@ -17,7 +17,7 @@ const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
-const spaceScalingUnitDefault = 1;
+const spaceScalingUnitDefault = '1rem';
 
 const componnents = {
   SignIn: <SignIn />,
@@ -168,13 +168,9 @@ export function ThemeBuilder() {
                   Space scaling unit
                 </label>
                 <input
-                  type='number'
                   id='scaling-unit'
-                  min={0}
-                  max={5}
-                  step={0.1}
                   value={spaceScalingUnit}
-                  onChange={e => setSpaceScalingUnit(Number(e.target.value))}
+                  onChange={e => setSpaceScalingUnit(e.target.value)}
                   className='w-full text-xs rounded border p-2'
                 />
               </div>
