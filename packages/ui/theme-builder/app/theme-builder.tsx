@@ -17,7 +17,7 @@ const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
-const spaceScalingUnitDefault = '1rem';
+const spacingUnitDefault = '1rem';
 
 const componnents = {
   SignIn: <SignIn />,
@@ -33,7 +33,7 @@ export function ThemeBuilder() {
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
-  const [spaceScalingUnit, setSpaceScalingUnit] = useState(spaceScalingUnitDefault);
+  const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
@@ -42,7 +42,7 @@ export function ThemeBuilder() {
     setDarkAccent(darkAccentDefault);
     setDarkGray(darkGrayDefault);
     setDarkBackground(darkBackgroundDefault);
-    setSpaceScalingUnit(spaceScalingUnitDefault);
+    setSpacingUnit(spacingUnitDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -59,7 +59,7 @@ export function ThemeBuilder() {
   const css = getPreviewStyles({
     lightColors: lightResult,
     darkColors: darkResult,
-    spaceScalingUnit,
+    spacingUnit,
   });
   return (
     <>
@@ -162,15 +162,15 @@ export function ThemeBuilder() {
               )}
               <div>
                 <label
-                  htmlFor='scaling-unit'
+                  htmlFor='spacing-unit'
                   className='text-xs font-medium text-neutral-700'
                 >
-                  Space scaling unit
+                  Spacing unit
                 </label>
                 <input
-                  id='scaling-unit'
-                  value={spaceScalingUnit}
-                  onChange={e => setSpaceScalingUnit(e.target.value)}
+                  id='spacing-unit'
+                  value={spacingUnit}
+                  onChange={e => setSpacingUnit(e.target.value)}
                   className='w-full text-xs rounded border p-2'
                 />
               </div>

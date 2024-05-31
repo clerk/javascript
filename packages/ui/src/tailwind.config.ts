@@ -27,7 +27,7 @@ const SPACE = [
 function generateSpaceScale() {
   return Object.fromEntries(
     SPACE.map(([id, value]) => {
-      return [`space-${id}`, `calc(${value} * var(--cl-space-scaling-unit, 1rem))`];
+      return [`space-${id}`, `calc(${value} * var(--cl-spacing-unit, 1rem))`];
     }),
   );
 }
