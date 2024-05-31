@@ -707,6 +707,8 @@ ${lightGrayColorsCss}
 ${darkBackgroundCss}
 ${darkAccentColorsCss}
 ${darkGrayColorsCss}
-:root { --cl-radius: ${radius}; }
+:where(:root) {
+  --cl-radius: ${radius};
+}
   `.trim();
 };
