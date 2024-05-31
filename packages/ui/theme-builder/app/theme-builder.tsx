@@ -9,15 +9,16 @@ import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 
-const lightAccentDefault = '#2F3037';
-const lightGrayDefault = '#2f3037';
-const lightBackgroundDefault = '#fff';
-const lightVariablesDefault = undefined;
-
-const darkAccentDefault = '#2F3037';
-const darkGrayDefault = '#2f3037';
-const darkBackgroundDefault = '#111';
-const darkVariablesDefault = undefined;
+const lightPaletteDefault = {
+  accent: '#2F3037',
+  gray: '#2f3037',
+  background: '#fff',
+};
+const darkPaletteDefault = {
+  accent: '#2F3037',
+  gray: '#2f3037',
+  background: '#111',
+};
 
 const componnents = {
   SignIn: <SignIn />,
@@ -27,40 +28,26 @@ type Component = keyof typeof componnents;
 
 export function ThemeBuilder() {
   const [appearance, setAppearance] = useState('light');
-  const [lightAccent, setLightAccent] = useState(lightAccentDefault);
-  const [lightGray, setLightGray] = useState(lightGrayDefault);
-  const [lightBackground, setLightBackground] = useState(lightBackgroundDefault);
-  const [lightButtonBackgroundPrimary, setLightButtonBackgroundPrimary] = useState(lightVariablesDefault);
-  const [lightButtonBackgroundPrimaryHover, setLightButtonBackgroundPrimaryHover] = useState(lightVariablesDefault);
-  const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
-  const [darkGray, setDarkGray] = useState(darkGrayDefault);
-  const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
-  const [darkButtonBackgroundPrimary, setDarkButtonBackgroundPrimary] = useState(darkVariablesDefault);
-  const [darkButtonBackgroundPrimaryHover, setDarkButtonBackgroundPrimaryHover] = useState(darkVariablesDefault);
+
+  const [lightPalette, setLightPalette] = useState<Record<string, string>>(lightPaletteDefault);
+  const [darkPalette, setDarkPalette] = useState<Record<string, string>>(darkPaletteDefault);
+
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
-    setLightAccent(lightAccentDefault);
-    setLightGray(lightGrayDefault);
-    setLightBackground(lightBackgroundDefault);
-    setLightButtonBackgroundPrimary(lightVariablesDefault);
-    setLightButtonBackgroundPrimaryHover(lightVariablesDefault);
-    setDarkAccent(darkAccentDefault);
-    setDarkGray(darkGrayDefault);
-    setDarkBackground(darkBackgroundDefault);
-    setDarkButtonBackgroundPrimary(darkVariablesDefault);
-    setDarkButtonBackgroundPrimaryHover(darkVariablesDefault);
+    setLightPalette(lightPaletteDefault);
+    setDarkPalette(darkPaletteDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
-    accent: lightAccent,
-    gray: lightGray,
-    background: lightBackground,
+    accent: lightPalette?.accent,
+    gray: lightPalette?.gray,
+    background: lightPalette?.background,
   });
   const darkResult = generateColors({
     appearance: 'dark',
-    accent: darkAccent,
-    gray: darkGray,
-    background: darkBackground,
+    accent: darkPalette?.accent,
+    gray: darkPalette?.gray,
+    background: darkPalette?.background,
   });
   const css = getPreviewStyles({
     lightColors: lightResult,
@@ -78,18 +65,22 @@ export function ThemeBuilder() {
           __html: [
             `:root {
               ${[
-                lightButtonBackgroundPrimary && `--cl-button-background-primary: ${lightButtonBackgroundPrimary};`,
-                lightButtonBackgroundPrimaryHover &&
-                  `--cl-button-background-primary-hover: ${lightButtonBackgroundPrimaryHover};`,
+                lightPalette?.buttonColorPrimary && `--cl-button-color-primary: ${lightPalette?.buttonColorPrimary};`,
+                lightPalette?.buttonBackgroundPrimary &&
+                  `--cl-button-background-primary: ${lightPalette?.buttonBackgroundPrimary};`,
+                lightPalette?.buttonBackgroundPrimaryHover &&
+                  `--cl-button-background-primary-hover: ${lightPalette?.buttonBackgroundPrimaryHover};`,
               ]
                 .filter(Boolean)
                 .join('\n')}
             }`,
             `.dark, .dark-theme {
               ${[
-                darkButtonBackgroundPrimary && `--cl-button-background-primary: ${darkButtonBackgroundPrimary};`,
-                darkButtonBackgroundPrimaryHover &&
-                  `--cl-button-background-primary-hover: ${darkButtonBackgroundPrimaryHover};`,
+                darkPalette?.buttonColorPrimary && `--cl-button-color-primary: ${darkPalette?.buttonColorPrimary};`,
+                darkPalette?.buttonBackgroundPrimary &&
+                  `--cl-button-background-primary: ${darkPalette?.buttonBackgroundPrimary};`,
+                darkPalette?.buttonBackgroundPrimaryHover &&
+                  `--cl-button-background-primary-hover: ${darkPalette?.buttonBackgroundPrimaryHover};`,
               ]
                 .filter(Boolean)
                 .join('\n')}
@@ -152,24 +143,24 @@ export function ThemeBuilder() {
                     <ColorPicker
                       label='Accent'
                       description='The accent color used for interactive elements.'
-                      color={lightAccent}
-                      onChange={setLightAccent}
+                      color={lightPalette?.accent}
+                      onChange={color => setLightPalette(p => ({ ...p, accent: color }))}
                     />
                   </li>
                   <li>
                     <ColorPicker
                       label='Gray'
                       description='The accent color used for interactive elements.'
-                      color={lightGray}
-                      onChange={setLightGray}
+                      color={lightPalette?.gray}
+                      onChange={color => setLightPalette(p => ({ ...p, gray: color }))}
                     />
                   </li>
                   <li>
                     <ColorPicker
                       label='Background'
                       description='The accent color used for interactive elements.'
-                      color={lightBackground}
-                      onChange={setLightBackground}
+                      color={lightPalette?.background}
+                      onChange={color => setLightPalette(p => ({ ...p, background: color }))}
                     />
                   </li>
                   <li className='flex flex-col gap-2 mt-2'>
@@ -177,16 +168,23 @@ export function ThemeBuilder() {
                     <ul className='flex flex-col gap-2'>
                       <li>
                         <ColorPicker
+                          label='--cl-button-color-primary'
+                          color={lightPalette?.buttonColorPrimary}
+                          onChange={color => setLightPalette(p => ({ ...p, buttonColorPrimary: color }))}
+                        />
+                      </li>
+                      <li>
+                        <ColorPicker
                           label='--cl-button-background-primary'
-                          color={lightButtonBackgroundPrimary}
-                          onChange={setLightButtonBackgroundPrimary}
+                          color={lightPalette?.buttonBackgroundPrimary}
+                          onChange={color => setLightPalette(p => ({ ...p, buttonBackgroundPrimary: color }))}
                         />
                       </li>
                       <li>
                         <ColorPicker
                           label='--cl-button-background-primary-hover'
-                          color={lightButtonBackgroundPrimaryHover}
-                          onChange={setLightButtonBackgroundPrimaryHover}
+                          color={lightPalette?.buttonBackgroundPrimaryHover}
+                          onChange={color => setLightPalette(p => ({ ...p, buttonBackgroundPrimaryHover: color }))}
                         />
                       </li>
                     </ul>
@@ -198,24 +196,24 @@ export function ThemeBuilder() {
                     <ColorPicker
                       label='Accent'
                       description='The accent color used for interactive elements.'
-                      color={darkAccent}
-                      onChange={setDarkAccent}
+                      color={darkPalette?.accent}
+                      onChange={color => setDarkPalette(p => ({ ...p, accent: color }))}
                     />
                   </li>
                   <li>
                     <ColorPicker
                       label='Gray'
                       description='The accent color used for interactive elements.'
-                      color={darkGray}
-                      onChange={setDarkGray}
+                      color={darkPalette?.gray}
+                      onChange={color => setDarkPalette(p => ({ ...p, gray: color }))}
                     />
                   </li>
                   <li>
                     <ColorPicker
                       label='Background'
                       description='The accent color used for interactive elements.'
-                      color={darkBackground}
-                      onChange={setDarkBackground}
+                      color={darkPalette?.background}
+                      onChange={color => setDarkPalette(p => ({ ...p, background: color }))}
                     />
                   </li>
                   <li className='flex flex-col gap-2 mt-2'>
@@ -223,16 +221,23 @@ export function ThemeBuilder() {
                     <ul className='flex flex-col gap-2'>
                       <li>
                         <ColorPicker
-                          label='Button Color Background Primary'
-                          color={darkButtonBackgroundPrimary}
-                          onChange={setDarkButtonBackgroundPrimary}
+                          label='--cl-button-color-primary'
+                          color={darkPalette?.buttonColorPrimary}
+                          onChange={color => setDarkPalette(p => ({ ...p, buttonColorPrimary: color }))}
                         />
                       </li>
                       <li>
                         <ColorPicker
-                          label='Button Color Background Primary Hover'
-                          color={darkButtonBackgroundPrimaryHover}
-                          onChange={setDarkButtonBackgroundPrimaryHover}
+                          label='--cl-button-background-primary'
+                          color={darkPalette?.buttonBackgroundPrimary}
+                          onChange={color => setDarkPalette(p => ({ ...p, buttonBackgroundPrimary: color }))}
+                        />
+                      </li>
+                      <li>
+                        <ColorPicker
+                          label='--cl-button-background-primary-hover'
+                          color={darkPalette?.buttonBackgroundPrimaryHover}
+                          onChange={color => setDarkPalette(p => ({ ...p, buttonBackgroundPrimaryHover: color }))}
                         />
                       </li>
                     </ul>

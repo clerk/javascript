@@ -29,6 +29,11 @@ const config = {
           'primary-hover': 'var(--cl-button-background-primary-hover, var(--cl-accent-10))',
         },
       },
+      textColor: {
+        button: {
+          primary: 'var(--cl-button-color-primary, var(--cl-accent-contrast))',
+        },
+      },
       colors: {
         accent: {
           ...generateScale('accent'),
