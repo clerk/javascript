@@ -1,10 +1,12 @@
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
+import { PROVIDERS } from '~/constants';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Field from '~/primitives/field';
+import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 
 export function SignUpComponent() {
@@ -19,24 +21,15 @@ export function SignUpComponent() {
             </Card.Header>
             <Card.Body>
               <Connection.Root>
-                <Common.Connection
-                  name='google'
-                  asChild
-                >
-                  <Connection.Button>
-                    <Common.Icon className='size-4' />
-                    Google
-                  </Connection.Button>
-                </Common.Connection>
-                <Common.Connection
-                  name='github'
-                  asChild
-                >
-                  <Connection.Button>
-                    <Common.Icon className='size-4' />
-                    GitHub
-                  </Connection.Button>
-                </Common.Connection>
+                {PROVIDERS.map(provider => {
+                  const ConnectionIcon = Icon[provider.icon];
+                  return (
+                    <Connection.Button key={provider.name}>
+                      <ConnectionIcon className='text-base' />
+                      {provider.name}
+                    </Connection.Button>
+                  );
+                })}
               </Connection.Root>
               <Seperator>or</Seperator>
               <Common.Field

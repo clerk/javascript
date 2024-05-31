@@ -30,7 +30,7 @@
     "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\""
   },
   "dependencies": {
-    "@clerk/elements": "^0.5.2",
+    "@clerk/elements": "file:../elements",
     "clsx": "^2.1.1"
   },
   "devDependencies": {
