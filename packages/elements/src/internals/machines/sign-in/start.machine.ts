@@ -7,7 +7,7 @@ import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
 import type { SignInRouterMachineActorRef } from './router.types';
-import type { SignInStartPasskeyEvent, SignInStartSchema } from './start.types';
+import type { SignInStartSchema } from './start.types';
 
 export type TSignInStartMachine = typeof SignInStartMachine;
 
@@ -17,7 +17,7 @@ export const SignInStartMachine = setup({
   actors: {
     attemptPasskey: fromPromise<
       SignInResource,
-      { parent: SignInRouterMachineActorRef; flow: 'discoverable' | undefined }
+      { parent: SignInRouterMachineActorRef; flow: 'autofill' | 'discoverable' | undefined }
     >(({ input: { parent, flow } }) => {
       return parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey({
         flow,
@@ -121,9 +121,9 @@ export const SignInStartMachine = setup({
       invoke: {
         id: 'attemptPasskey',
         src: 'attemptPasskey',
-        input: ({ context, event }) => ({
+        input: ({ context }) => ({
           parent: context.parent,
-          flow: (event as SignInStartPasskeyEvent).flow,
+          flow: 'discoverable',
         }),
         onDone: {
           actions: ['sendToNext', 'sendToLoading'],
@@ -150,9 +150,9 @@ export const SignInStartMachine = setup({
       invoke: {
         id: 'attemptPasskeyAutofill',
         src: 'attemptPasskey',
-        input: ({ context, event }) => ({
+        input: ({ context }) => ({
           parent: context.parent,
-          flow: (event as SignInStartPasskeyEvent).flow,
+          flow: 'autofill',
         }),
         onDone: {
           actions: ['sendToNext'],

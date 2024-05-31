@@ -63,10 +63,9 @@ export type SignInRouterResetStepEvent = BaseRouterResetStepEvent;
 export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'reset-password'>;
 export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
-export type SignInRouterPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY'; flow: 'autofill' | 'discoverable' | undefined };
+export type SignInRouterPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };
 export type SignInRouterPasskeyAutofillEvent = {
   type: 'AUTHENTICATE.PASSKEY_AUTOFILL';
-  flow: 'autofill' | 'discoverable' | undefined;
 };
 
 export interface SignInRouterInitEvent extends BaseRouterInput {

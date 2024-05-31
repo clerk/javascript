@@ -20,7 +20,6 @@ import type {
   SignInRouterContext,
   SignInRouterEvents,
   SignInRouterNextEvent,
-  SignInRouterPasskeyEvent,
   SignInRouterSchema,
 } from './router.types';
 import { SignInStartMachine } from './start.machine';
@@ -309,14 +308,10 @@ export const SignInRouterMachine = setup({
           reenter: true,
         },
         'AUTHENTICATE.PASSKEY': {
-          actions: sendTo(
-            'start',
-            ({ event }) =>
-              ({
-                type: 'AUTHENTICATE.PASSKEY',
-                flow: event.flow,
-              } as SignInRouterPasskeyEvent),
-          ),
+          actions: sendTo('start', () => ({
+            type: 'AUTHENTICATE.PASSKEY',
+            flow: 'discoverable',
+          })),
         },
         'AUTHENTICATE.PASSKEY_AUTOFILL': {
           actions: sendTo('start', () => ({
