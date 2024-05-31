@@ -20,13 +20,13 @@ type SignUpFlowProviderProps = {
 };
 
 const actor = createActor(SignUpRouterMachine, { inspect });
-const ref = actor.start();
+actor.start();
 
 function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
   const formRef = useFormStore();
-  const isReady = useSelector(ref, state => state.value !== 'Idle');
+  const isReady = useSelector(actor, state => state.value !== 'Idle');
 
   useEffect(() => {
     if (!clerk || !router) return;
@@ -42,14 +42,22 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
         signInPath: SIGN_IN_DEFAULT_BASE_PATH,
       };
 
-      if (ref.getSnapshot().can(evt)) {
-        ref.send(evt);
+      if (actor.getSnapshot().can(evt)) {
+        actor.send(evt);
+      }
+
+      // Ensure that the latest instantiated formRef is attached to the router
+      if (formRef && actor.getSnapshot().can({ type: 'RESET.STEP' })) {
+        actor.send({
+          type: 'FORM.ATTACH',
+          formRef,
+        });
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clerk, exampleMode, formRef?.id, !!router]);
 
-  return isReady ? <SignUpRouterCtx.Provider actorRef={ref}>{children}</SignUpRouterCtx.Provider> : null;
+  return isReady ? <SignUpRouterCtx.Provider actorRef={actor}>{children}</SignUpRouterCtx.Provider> : null;
 }
 
 export type SignUpRootProps = SignUpFlowProviderProps & {
