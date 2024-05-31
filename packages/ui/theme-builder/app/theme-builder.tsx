@@ -14,16 +14,25 @@ const lightPaletteDefault = {
   gray: '#2f3037',
   background: '#fff',
 };
+
 const darkPaletteDefault = {
   accent: '#2F3037',
   gray: '#2f3037',
   background: '#111',
 };
 
+const variables = [
+  '--cl-button-color-primary',
+  '--cl-button-background-primary',
+  '--cl-button-background-primary-hover',
+  '--cl-button-border-primary',
+];
+
 const componnents = {
   SignIn: <SignIn />,
   SignUp: <SignUp />,
 };
+
 type Component = keyof typeof componnents;
 
 export function ThemeBuilder() {
@@ -68,24 +77,14 @@ export function ThemeBuilder() {
         dangerouslySetInnerHTML={{
           __html: [
             `:root {
-              ${[
-                lightPalette?.buttonColorPrimary && `--cl-button-color-primary: ${lightPalette?.buttonColorPrimary};`,
-                lightPalette?.buttonBackgroundPrimary &&
-                  `--cl-button-background-primary: ${lightPalette?.buttonBackgroundPrimary};`,
-                lightPalette?.buttonBackgroundPrimaryHover &&
-                  `--cl-button-background-primary-hover: ${lightPalette?.buttonBackgroundPrimaryHover};`,
-              ]
+              ${variables
+                .map(variable => lightPalette[variable] && `${variable}: ${lightPalette[variable]};`)
                 .filter(Boolean)
                 .join('\n')}
             }`,
             `.dark, .dark-theme {
-              ${[
-                darkPalette?.buttonColorPrimary && `--cl-button-color-primary: ${darkPalette?.buttonColorPrimary};`,
-                darkPalette?.buttonBackgroundPrimary &&
-                  `--cl-button-background-primary: ${darkPalette?.buttonBackgroundPrimary};`,
-                darkPalette?.buttonBackgroundPrimaryHover &&
-                  `--cl-button-background-primary-hover: ${darkPalette?.buttonBackgroundPrimaryHover};`,
-              ]
+              ${variables
+                .map(variable => darkPalette[variable] && `${variable}: ${darkPalette[variable]};`)
                 .filter(Boolean)
                 .join('\n')}
             }`,
@@ -170,27 +169,15 @@ export function ThemeBuilder() {
                 <li className='flex flex-col gap-2 mt-2'>
                   <span className='font-medium'>Variables</span>
                   <ul className='flex flex-col gap-2'>
-                    <li>
-                      <ColorPicker
-                        label='--cl-button-color-primary'
-                        color={palette?.buttonColorPrimary}
-                        onChange={color => setPalette(p => ({ ...p, buttonColorPrimary: color }))}
-                      />
-                    </li>
-                    <li>
-                      <ColorPicker
-                        label='--cl-button-background-primary'
-                        color={palette?.buttonBackgroundPrimary}
-                        onChange={color => setPalette(p => ({ ...p, buttonBackgroundPrimary: color }))}
-                      />
-                    </li>
-                    <li>
-                      <ColorPicker
-                        label='--cl-button-background-primary-hover'
-                        color={palette?.buttonBackgroundPrimaryHover}
-                        onChange={color => setPalette(p => ({ ...p, buttonBackgroundPrimaryHover: color }))}
-                      />
-                    </li>
+                    {variables.map(variable => (
+                      <li key={variable}>
+                        <ColorPicker
+                          label={variable}
+                          color={palette?.[variable]}
+                          onChange={color => setPalette(p => ({ ...p, [variable]: color }))}
+                        />
+                      </li>
+                    ))}
                   </ul>
                 </li>
               </ul>
