@@ -1,6 +1,8 @@
 import cn from 'clsx';
 import * as React from 'react';
 
+import * as Icon from './icon';
+
 export const Button = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
   function Button({ children, className, ...props }, forwardedRef) {
     return (
@@ -14,20 +16,8 @@ export const Button = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttrib
         )}
       >
         {children}
-        <svg
-          className='size-2.5 ml-2 opacity-60 shrink-0'
-          viewBox='0 0 10 10'
-          aria-hidden
-        >
-          <path
-            fill='currentColor'
-            stroke='currentColor'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth='1.5'
-            d='m7.25 5-3.5-2.25v4.5L7.25 5Z'
-          />
-        </svg>
+
+        <Icon.CaretRight className='text-[0.625rem] ml-2 opacity-60 shrink-0' />
       </button>
     );
   },

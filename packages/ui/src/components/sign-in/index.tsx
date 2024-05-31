@@ -1,7 +1,9 @@
+import { PROVIDERS } from '~/constants';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Field from '~/primitives/field';
+import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 
 export function SignIn() {
@@ -14,8 +16,16 @@ export function SignIn() {
         </Card.Header>
         <Card.Body>
           <Connection.Root>
-            <Connection.Button>Google</Connection.Button>
-            <Connection.Button>GitHub</Connection.Button>
+            {PROVIDERS.map(provider => {
+              const ConnectionIcon = Icon[provider.icon];
+
+              return (
+                <Connection.Button key={provider.name}>
+                  <ConnectionIcon className='text-base' />
+                  {provider.name}
+                </Connection.Button>
+              );
+            })}
           </Connection.Root>
           <Seperator>or</Seperator>
           <Field.Root>
