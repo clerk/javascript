@@ -65,8 +65,6 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
       oauthRedirectUrl,
     );
 
-    console.log('authSessionResult', authSessionResult);
-
     // @ts-expect-error
     const { type, url } = authSessionResult || {};
 
@@ -92,7 +90,6 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     let createdSessionId = '';
 
     if (status === 'complete') {
-      console.log('signIn', signIn);
       createdSessionId = signIn.createdSessionId!;
     } else if (firstFactorVerification.status === 'transferable') {
       await signUp.create({
