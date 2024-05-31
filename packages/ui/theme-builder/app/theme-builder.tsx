@@ -32,7 +32,11 @@ export function ThemeBuilder() {
   const [lightPalette, setLightPalette] = useState<Record<string, string>>(lightPaletteDefault);
   const [darkPalette, setDarkPalette] = useState<Record<string, string>>(darkPaletteDefault);
 
+  const palette = appearance === 'light' ? lightPalette : darkPalette;
+  const setPalette = appearance === 'light' ? setLightPalette : setDarkPalette;
+
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
+
   const handleReset = () => {
     setLightPalette(lightPaletteDefault);
     setDarkPalette(darkPaletteDefault);
@@ -137,113 +141,59 @@ export function ThemeBuilder() {
                 value={appearance}
                 onValueChange={setAppearance}
               />
-              {appearance === 'light' ? (
-                <ul className='text-xs flex flex-col gap-2'>
-                  <li>
-                    <ColorPicker
-                      label='Accent'
-                      description='The accent color used for interactive elements.'
-                      color={lightPalette?.accent}
-                      onChange={color => setLightPalette(p => ({ ...p, accent: color }))}
-                    />
-                  </li>
-                  <li>
-                    <ColorPicker
-                      label='Gray'
-                      description='The accent color used for interactive elements.'
-                      color={lightPalette?.gray}
-                      onChange={color => setLightPalette(p => ({ ...p, gray: color }))}
-                    />
-                  </li>
-                  <li>
-                    <ColorPicker
-                      label='Background'
-                      description='The accent color used for interactive elements.'
-                      color={lightPalette?.background}
-                      onChange={color => setLightPalette(p => ({ ...p, background: color }))}
-                    />
-                  </li>
-                  <li className='flex flex-col gap-2 mt-2'>
-                    <span className='font-medium'>Variables</span>
-                    <ul className='flex flex-col gap-2'>
-                      <li>
-                        <ColorPicker
-                          label='--cl-button-color-primary'
-                          color={lightPalette?.buttonColorPrimary}
-                          onChange={color => setLightPalette(p => ({ ...p, buttonColorPrimary: color }))}
-                        />
-                      </li>
-                      <li>
-                        <ColorPicker
-                          label='--cl-button-background-primary'
-                          color={lightPalette?.buttonBackgroundPrimary}
-                          onChange={color => setLightPalette(p => ({ ...p, buttonBackgroundPrimary: color }))}
-                        />
-                      </li>
-                      <li>
-                        <ColorPicker
-                          label='--cl-button-background-primary-hover'
-                          color={lightPalette?.buttonBackgroundPrimaryHover}
-                          onChange={color => setLightPalette(p => ({ ...p, buttonBackgroundPrimaryHover: color }))}
-                        />
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              ) : (
-                <ul className='text-xs flex flex-col gap-2'>
-                  <li>
-                    <ColorPicker
-                      label='Accent'
-                      description='The accent color used for interactive elements.'
-                      color={darkPalette?.accent}
-                      onChange={color => setDarkPalette(p => ({ ...p, accent: color }))}
-                    />
-                  </li>
-                  <li>
-                    <ColorPicker
-                      label='Gray'
-                      description='The accent color used for interactive elements.'
-                      color={darkPalette?.gray}
-                      onChange={color => setDarkPalette(p => ({ ...p, gray: color }))}
-                    />
-                  </li>
-                  <li>
-                    <ColorPicker
-                      label='Background'
-                      description='The accent color used for interactive elements.'
-                      color={darkPalette?.background}
-                      onChange={color => setDarkPalette(p => ({ ...p, background: color }))}
-                    />
-                  </li>
-                  <li className='flex flex-col gap-2 mt-2'>
-                    <span className='font-medium'>Variables</span>
-                    <ul className='flex flex-col gap-2'>
-                      <li>
-                        <ColorPicker
-                          label='--cl-button-color-primary'
-                          color={darkPalette?.buttonColorPrimary}
-                          onChange={color => setDarkPalette(p => ({ ...p, buttonColorPrimary: color }))}
-                        />
-                      </li>
-                      <li>
-                        <ColorPicker
-                          label='--cl-button-background-primary'
-                          color={darkPalette?.buttonBackgroundPrimary}
-                          onChange={color => setDarkPalette(p => ({ ...p, buttonBackgroundPrimary: color }))}
-                        />
-                      </li>
-                      <li>
-                        <ColorPicker
-                          label='--cl-button-background-primary-hover'
-                          color={darkPalette?.buttonBackgroundPrimaryHover}
-                          onChange={color => setDarkPalette(p => ({ ...p, buttonBackgroundPrimaryHover: color }))}
-                        />
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              )}
+
+              <ul className='text-xs flex flex-col gap-2'>
+                <li>
+                  <ColorPicker
+                    label='Accent'
+                    description='The accent color used for interactive elements.'
+                    color={palette?.accent}
+                    onChange={color => setPalette(p => ({ ...p, accent: color }))}
+                  />
+                </li>
+                <li>
+                  <ColorPicker
+                    label='Gray'
+                    description='The accent color used for interactive elements.'
+                    color={palette?.gray}
+                    onChange={color => setPalette(p => ({ ...p, gray: color }))}
+                  />
+                </li>
+                <li>
+                  <ColorPicker
+                    label='Background'
+                    description='The accent color used for interactive elements.'
+                    color={palette?.background}
+                    onChange={color => setPalette(p => ({ ...p, background: color }))}
+                  />
+                </li>
+                <li className='flex flex-col gap-2 mt-2'>
+                  <span className='font-medium'>Variables</span>
+                  <ul className='flex flex-col gap-2'>
+                    <li>
+                      <ColorPicker
+                        label='--cl-button-color-primary'
+                        color={palette?.buttonColorPrimary}
+                        onChange={color => setPalette(p => ({ ...p, buttonColorPrimary: color }))}
+                      />
+                    </li>
+                    <li>
+                      <ColorPicker
+                        label='--cl-button-background-primary'
+                        color={palette?.buttonBackgroundPrimary}
+                        onChange={color => setPalette(p => ({ ...p, buttonBackgroundPrimary: color }))}
+                      />
+                    </li>
+                    <li>
+                      <ColorPicker
+                        label='--cl-button-background-primary-hover'
+                        color={palette?.buttonBackgroundPrimaryHover}
+                        onChange={color => setPalette(p => ({ ...p, buttonBackgroundPrimaryHover: color }))}
+                      />
+                    </li>
+                  </ul>
+                </li>
+              </ul>
             </div>
             <div className='mt-auto space-y-2'>
               <button
