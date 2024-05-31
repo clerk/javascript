@@ -23,6 +23,12 @@ const config = {
       fontFamily: {
         sans: ['var(--cl-font-family)'],
       },
+      backgroundColor: {
+        button: {
+          primary: 'var(--cl-button-background-primary, var(--cl-accent-9))',
+          'primary-hover': 'var(--cl-button-background-primary-hover, var(--cl-accent-10))',
+        },
+      },
       colors: {
         accent: {
           ...generateScale('accent'),

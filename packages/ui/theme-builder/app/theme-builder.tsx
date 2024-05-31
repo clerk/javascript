@@ -12,12 +12,12 @@ import { ThemeDialog } from './theme-dialog';
 const lightAccentDefault = '#2F3037';
 const lightGrayDefault = '#2f3037';
 const lightBackgroundDefault = '#fff';
-const lightSemanticDefault = undefined;
+const lightVariablesDefault = undefined;
 
 const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
-const darkSemanticDefault = undefined;
+const darkVariablesDefault = undefined;
 
 const componnents = {
   SignIn: <SignIn />,
@@ -30,25 +30,25 @@ export function ThemeBuilder() {
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
   const [lightGray, setLightGray] = useState(lightGrayDefault);
   const [lightBackground, setLightBackground] = useState(lightBackgroundDefault);
-  const [lightButtonBackgroundPrimary, setLightButtonBackgroundPrimary] = useState(lightSemanticDefault);
-  const [lightButtonBackgroundPrimaryHover, setLightButtonBackgroundPrimaryHover] = useState(lightSemanticDefault);
+  const [lightButtonBackgroundPrimary, setLightButtonBackgroundPrimary] = useState(lightVariablesDefault);
+  const [lightButtonBackgroundPrimaryHover, setLightButtonBackgroundPrimaryHover] = useState(lightVariablesDefault);
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
-  const [darkButtonBackgroundPrimary, setDarkButtonBackgroundPrimary] = useState(darkSemanticDefault);
-  const [darkButtonBackgroundPrimaryHover, setDarkButtonBackgroundPrimaryHover] = useState(darkSemanticDefault);
+  const [darkButtonBackgroundPrimary, setDarkButtonBackgroundPrimary] = useState(darkVariablesDefault);
+  const [darkButtonBackgroundPrimaryHover, setDarkButtonBackgroundPrimaryHover] = useState(darkVariablesDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
     setLightBackground(lightBackgroundDefault);
-    setLightButtonBackgroundPrimary(lightSemanticDefault);
-    setLightButtonBackgroundPrimaryHover(lightSemanticDefault);
+    setLightButtonBackgroundPrimary(lightVariablesDefault);
+    setLightButtonBackgroundPrimaryHover(lightVariablesDefault);
     setDarkAccent(darkAccentDefault);
     setDarkGray(darkGrayDefault);
     setDarkBackground(darkBackgroundDefault);
-    setDarkButtonBackgroundPrimary(darkSemanticDefault);
-    setDarkButtonBackgroundPrimaryHover(darkSemanticDefault);
+    setDarkButtonBackgroundPrimary(darkVariablesDefault);
+    setDarkButtonBackgroundPrimaryHover(darkVariablesDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -172,19 +172,19 @@ export function ThemeBuilder() {
                       onChange={setLightBackground}
                     />
                   </li>
-                  <li className='flex flex-col gap-2'>
-                    <span className='font-medium'>Overrides</span>
+                  <li className='flex flex-col gap-2 mt-2'>
+                    <span className='font-medium'>Variables</span>
                     <ul className='flex flex-col gap-2'>
                       <li>
                         <ColorPicker
-                          label='Button Color Background Primary'
+                          label='--cl-button-background-primary'
                           color={lightButtonBackgroundPrimary}
                           onChange={setLightButtonBackgroundPrimary}
                         />
                       </li>
                       <li>
                         <ColorPicker
-                          label='Button Color Background Primary Hover'
+                          label='--cl-button-background-primary-hover'
                           color={lightButtonBackgroundPrimaryHover}
                           onChange={setLightButtonBackgroundPrimaryHover}
                         />
@@ -218,8 +218,8 @@ export function ThemeBuilder() {
                       onChange={setDarkBackground}
                     />
                   </li>
-                  <li className='flex flex-col gap-2'>
-                    <span className='font-medium'>Overrides</span>
+                  <li className='flex flex-col gap-2 mt-2'>
+                    <span className='font-medium'>Variables</span>
                     <ul className='flex flex-col gap-2'>
                       <li>
                         <ColorPicker
