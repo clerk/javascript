@@ -1,3 +1,4 @@
+import type { SignInProps } from '@clerk/types';
 import React from 'react';
 
 import type { SignInButtonProps, WithClerkProp } from '../types';
@@ -11,11 +12,11 @@ export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkP
   const child = assertSingleChild(children)('SignInButton');
 
   const clickHandler = () => {
-    const opts = {
+    const opts: SignInProps = {
+      forceRedirectUrl,
+      fallbackRedirectUrl,
       signUpFallbackRedirectUrl,
       signUpForceRedirectUrl,
-      signInForceRedirectUrl: forceRedirectUrl,
-      signInFallbackRedirectUrl: fallbackRedirectUrl,
     };
 
     if (mode === 'modal') {
@@ -25,7 +26,9 @@ export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkP
   };
 
   const wrappedChildClickHandler: React.MouseEventHandler = async e => {
-    await safeExecute((child as any).props.onClick)(e);
+    if (child && typeof child === 'object' && 'props' in child) {
+      await safeExecute(child.props.onClick)(e);
+    }
     return clickHandler();
   };
 

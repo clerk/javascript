@@ -1,3 +1,4 @@
+import type { SignUpProps } from '@clerk/types';
 import React from 'react';
 
 import type { SignUpButtonProps, WithClerkProp } from '../types';
@@ -19,9 +20,9 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
   const child = assertSingleChild(children)('SignUpButton');
 
   const clickHandler = () => {
-    const opts = {
-      signUpFallbackRedirectUrl: fallbackRedirectUrl,
-      signUpForceRedirectUrl: forceRedirectUrl,
+    const opts: SignUpProps = {
+      fallbackRedirectUrl,
+      forceRedirectUrl,
       signInFallbackRedirectUrl,
       signInForceRedirectUrl,
       unsafeMetadata,
@@ -35,7 +36,9 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
   };
 
   const wrappedChildClickHandler: React.MouseEventHandler = async e => {
-    await safeExecute((child as any).props.onClick)(e);
+    if (child && typeof child === 'object' && 'props' in child) {
+      await safeExecute(child.props.onClick)(e);
+    }
     return clickHandler();
   };
 
