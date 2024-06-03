@@ -28,12 +28,17 @@ export const ActiveDevicesSection = () => {
         {isLoading ? (
           <FullHeightLoader />
         ) : (
-          sessions?.sort(currentSessionFirst(session!.id)).map(sa => (
-            <DeviceItem
-              key={sa.id}
-              session={sa}
-            />
-          ))
+          sessions?.sort(currentSessionFirst(session!.id)).map(sa => {
+            if (sa.status !== 'active') {
+              return null;
+            }
+            return (
+              <DeviceItem
+                key={sa.id}
+                session={sa}
+              />
+            );
+          })
         )}
       </ProfileSection.ItemList>
     </ProfileSection.Root>
