@@ -4,11 +4,10 @@ import { SignUp } from '@clerk/ui/sign-up';
 import cn from 'clsx';
 import { useEffect, useState } from 'react';
 
-import { AppearanceToggle } from './appearance-toggle';
 import { ColorPicker } from './color-picker';
-import { DirectionToggle } from './direction-toggle';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
+import { ToggleGroup } from './toggle-group';
 
 const lightAccentDefault = '#2F3037';
 const lightGrayDefault = '#2f3037';
@@ -112,7 +111,7 @@ export function ThemeBuilder() {
         <div className='flex flex-1'>
           <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-e bg-white'>
             <div className='space-y-4'>
-              <AppearanceToggle
+              <ToggleGroup
                 items={[
                   {
                     label: 'Light',
@@ -126,7 +125,7 @@ export function ThemeBuilder() {
                 value={appearance}
                 onValueChange={setAppearance}
               />
-              <DirectionToggle
+              <ToggleGroup
                 items={[
                   {
                     label: 'LTR',
