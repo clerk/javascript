@@ -17,5 +17,8 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Install Commitlint Configuration Dependencies
+        run: npm i globby @commitlint/cli
+
       - name: Lint Pull Request Title
-        run: echo "${{ github.event.pull_request.title }}" | npx --yes @commitlint/cli
+        run: echo "${{ github.event.pull_request.title }}" | npx @commitlint/cli
