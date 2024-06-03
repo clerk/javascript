@@ -359,10 +359,7 @@ const useInput = ({
 
   // Filter out invalid props that should not be passed through
   // @ts-expect-error - Doesn't know about type narrowing by type here
-  const { validatePassword: _1, ...rest } = passthroughProps;
-
-  // @ts-expect-error - Depending on type the props can be different
-  delete rest['passkeyAutofill'];
+  const { validatePassword: _1, passkeyAutofill, ...rest } = passthroughProps;
 
   return {
     Element,
