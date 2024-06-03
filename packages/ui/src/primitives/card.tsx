@@ -62,7 +62,7 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
     <h2
       ref={forwardedRef}
       {...props}
-      className={cn('text-[1.0625rem]/6 font-bold text-gray-12', className)}
+      className={cn('text-lg font-bold text-gray-12', className)}
     >
       {children}
     </h2>
@@ -75,7 +75,7 @@ export const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttrib
       <p
         ref={forwardedRef}
         {...props}
-        className={cn('text-[0.8125rem]/[1.125rem] text-gray-a11', className)}
+        className={cn('text-base leading-small text-gray-a11', className)}
       >
         {children}
       </p>
@@ -110,7 +110,7 @@ export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     >
       {children}
       <div className='py-4 px-6 border-t border-gray-a6 grid place-content-center'>
-        <p className='text-xs inline-flex items-center gap-x-1 text-gray-a11'>
+        <p className='text-base leading-small inline-flex items-center gap-x-1 text-gray-a11'>
           Secured by{' '}
           <a
             aria-label='Clerk logo'
@@ -146,7 +146,7 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
       <p
         ref={forwardedRef}
         {...props}
-        className={cn('text-gray-a11 text-[0.8125rem]/[1.125rem] text-center', className)}
+        className={cn('text-gray-a11 text-base leading-small text-center', className)}
       >
         {children}
       </p>
@@ -160,7 +160,7 @@ export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.Anchor
       <a
         ref={forwardedRef}
         {...props}
-        className={cn('text-accent-a10 text-[0.8125rem]/[1.125rem] font-medium hover:underline', className)}
+        className={cn('text-accent-a10 text-base leading-small font-medium hover:underline', className)}
       >
         {children}
       </a>

@@ -19,6 +19,7 @@ const darkBackgroundDefault = '#111';
 
 const radiusDefault = '0.375rem';
 const spacingUnitDefault = '1rem';
+const fontSizeDefault = '0.8125rem';
 
 const componnents = {
   SignIn: <SignIn />,
@@ -36,6 +37,7 @@ export function ThemeBuilder() {
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
   const [radius, setRadius] = useState(radiusDefault);
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
+  const [fontSize, setFontSize] = useState(fontSizeDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
@@ -46,6 +48,7 @@ export function ThemeBuilder() {
     setDarkBackground(darkBackgroundDefault);
     setRadius(radiusDefault);
     setSpacingUnit(spacingUnitDefault);
+    setFontSize(fontSizeDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -64,6 +67,7 @@ export function ThemeBuilder() {
     darkColors: darkResult,
     radius,
     spacingUnit,
+    fontSize,
   });
   return (
     <>
@@ -189,6 +193,20 @@ export function ThemeBuilder() {
                   id='spacing-unit'
                   value={spacingUnit}
                   onChange={e => setSpacingUnit(e.target.value)}
+                  className='w-full text-xs rounded border p-2'
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor='font-size'
+                  className='text-xs font-medium text-neutral-700'
+                >
+                  Font size
+                </label>
+                <input
+                  id='font-size'
+                  value={fontSize}
+                  onChange={e => setFontSize(e.target.value)}
                   className='w-full text-xs rounded border p-2'
                 />
               </div>

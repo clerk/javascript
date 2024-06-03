@@ -25,7 +25,7 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
       ref={forwardedRef}
       {...props}
       className={cn(
-        'text-[0.8125rem]/[1.125rem] font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
+        'text-base leading-small font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
         className,
       )}
     >
@@ -44,7 +44,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
       ref={forwardedRef}
       {...props}
       className={cn(
-        "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-[0.8125rem]/[1.125rem]",
+        "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base leading-small",
         className,
       )}
     />
@@ -68,7 +68,7 @@ export const Message = React.forwardRef<
       ref={forwardedRef}
       {...props}
       className={cn(
-        'text-[0.8125rem]/[1.125rem] flex gap-x-1',
+        'text-base leading-small flex gap-x-1',
         {
           // TODO: Use the color tokens here
           'text-[#ef4444]': intent === 'error',
