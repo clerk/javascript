@@ -5,7 +5,6 @@ import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import type { TokenCache } from './cache';
-import { MemoryTokenCache } from './cache';
 import { isReactNative } from './runtime';
 import { getClerkInstance } from './singleton';
 
@@ -14,7 +13,7 @@ export type ClerkProviderProps = ClerkReactProviderProps & {
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache = MemoryTokenCache, publishableKey, ...rest } = props;
+  const { children, tokenCache, publishableKey, ...rest } = props;
   const pk = publishableKey || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   return (

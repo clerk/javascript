@@ -4,6 +4,7 @@ import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
 import type { TokenCache } from './cache';
 import { MemoryTokenCache } from './cache';
+import { errorThrower } from './errorThrower';
 
 Clerk.sdkMetadata = {
   name: PACKAGE_NAME,
@@ -16,17 +17,38 @@ const KEY = '__clerk_client_jwt';
  * @deprecated Use `getClerkInstance` instead. `Clerk` will be removed in the next major version.
  */
 export let clerk: HeadlessBrowserClerk;
-let __internal_clerk: HeadlessBrowserClerk;
+let __internal_clerk: HeadlessBrowserClerk | undefined;
 
 type BuildClerkOptions = {
   publishableKey?: string;
   tokenCache?: TokenCache;
 };
 
-export function getClerkInstance({
-  publishableKey = process.env.CLERK_PUBLISHABLE_KEY || '',
-  tokenCache = MemoryTokenCache,
-}: BuildClerkOptions): HeadlessBrowserClerk {
+/**
+ * Access or create a Clerk instance outside of React.
+ * @example
+ * import { ClerkProvider, getClerkInstance } from "@clerk/expo"
+ *
+ * const clerkInstance = getClerkInstance({ publishableKey: 'xxxx' })
+ *
+ * // Always pass the `publishableKey` to `ClerkProvider`
+ * <ClerkProvider publishableKey={'xxxx'}>
+ *     ...
+ * </ClerkProvider>
+ *
+ * // Somewhere in your code, outside of React you can do
+ * const token = await clerkInstance.session?.getToken();
+ * fetch('http://example.com/', {headers: {Authorization: token })
+ * @throws MissingPublishableKeyError publishableKey is missing and Clerk has not been initialized yet
+ * @returns HeadlessBrowserClerk
+ */
+export function getClerkInstance(options?: BuildClerkOptions): HeadlessBrowserClerk {
+  const { publishableKey = process.env.CLERK_PUBLISHABLE_KEY || '', tokenCache = MemoryTokenCache } = options || {};
+
+  if (!__internal_clerk && !publishableKey) {
+    errorThrower.throwMissingPublishableKeyError();
+  }
+
   // Support "hot-swapping" the Clerk instance at runtime. See JS-598 for additional details.
   const hasKeyChanged = __internal_clerk && publishableKey !== __internal_clerk.publishableKey;
 
