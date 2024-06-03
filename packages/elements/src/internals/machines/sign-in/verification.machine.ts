@@ -54,6 +54,14 @@ export type AttemptSecondFactorInput = {
   currentFactor: SignInSecondFactor | null;
 };
 
+const isNonPreperableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
+  if (!strategy) {
+    return false;
+  }
+
+  return ['passkey', 'password'].includes(strategy);
+};
+
 export const SignInVerificationMachineId = 'SignInVerification';
 
 const SignInVerificationMachine = setup({
@@ -145,8 +153,7 @@ const SignInVerificationMachine = setup({
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
-    isNeverResendable: ({ context }) =>
-      context.currentFactor?.strategy === 'password' || context.currentFactor?.strategy === 'passkey',
+    isNeverResendable: ({ context }) => isNonPreperableStrategy(context.currentFactor?.strategy),
   },
   delays: SignInVerificationDelays,
   types: {} as SignInVerificationSchema,
@@ -347,11 +354,9 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
       // If a prepare call has already been fired recently, don't re-send
       const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
-      const nonPreperableStategies = ['passkey', 'password'];
-      const preparable = params?.strategy ? !nonPreperableStategies.includes(params.strategy) : false;
       const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
-      if (!preparable || !needsPrepare) {
+      if (isNonPreperableStrategy(params?.strategy) || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
