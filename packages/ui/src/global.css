@@ -1,6 +1,7 @@
 :where(:root) {
   --cl-font-family: inherit;
   --cl-color-destructive: 0 84% 60%;
+  --cl-spacing-unit: 1rem;
 }
 *,
 ::before,

@@ -17,6 +17,8 @@ const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
+const spacingUnitDefault = '1rem';
+
 const componnents = {
   SignIn: <SignIn />,
   SignUp: <SignUp />,
@@ -31,6 +33,7 @@ export function ThemeBuilder() {
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
+  const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
@@ -39,6 +42,7 @@ export function ThemeBuilder() {
     setDarkAccent(darkAccentDefault);
     setDarkGray(darkGrayDefault);
     setDarkBackground(darkBackgroundDefault);
+    setSpacingUnit(spacingUnitDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -55,6 +59,7 @@ export function ThemeBuilder() {
   const css = getPreviewStyles({
     lightColors: lightResult,
     darkColors: darkResult,
+    spacingUnit,
   });
   return (
     <>
@@ -155,6 +160,20 @@ export function ThemeBuilder() {
                   />
                 </>
               )}
+              <div>
+                <label
+                  htmlFor='spacing-unit'
+                  className='text-xs font-medium text-neutral-700'
+                >
+                  Spacing unit
+                </label>
+                <input
+                  id='spacing-unit'
+                  value={spacingUnit}
+                  onChange={e => setSpacingUnit(e.target.value)}
+                  className='w-full text-xs rounded border p-2'
+                />
+              </div>
             </div>
             <div className='mt-auto space-y-2'>
               <button
