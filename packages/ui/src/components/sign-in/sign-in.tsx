@@ -75,7 +75,7 @@ export function SignInComponent() {
                 asChild
               >
                 <Button
-                  icon={<Icon.CaretRight className='rtl:rotate-180' />}
+                  icon={<Icon.CaretRight />}
                   busy={isContinuing}
                   disabled={hasBusyConnection}
                   onClick={() => setIsContinuing(true)}
