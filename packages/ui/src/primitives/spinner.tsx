@@ -50,6 +50,7 @@ export const Spinner = forwardRef(function Spinner(
             .fill(`${16 / SIZE / 2}rem`)
             .join(' '),
         }}
+        aria-hidden
       >
         <g
           className={cn(
