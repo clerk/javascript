@@ -1,4 +1,4 @@
-import { SignInButton } from '@clerk/nextjs';
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
 
 export default function Home() {
   return (
@@ -16,6 +16,20 @@ export default function Home() {
       >
         Sign in button (fallback)
       </SignInButton>
+
+      <SignUpButton
+        mode='modal'
+        forceRedirectUrl='/protected'
+      >
+        Sign up button (force)
+      </SignUpButton>
+
+      <SignUpButton
+        mode='modal'
+        fallbackRedirectUrl='/protected'
+      >
+        Sign up button (fallback)
+      </SignUpButton>
     </main>
   );
 }

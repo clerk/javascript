@@ -3,7 +3,7 @@ import type { TestArgs } from './signInPageObject';
 export const common = ({ page }: TestArgs) => {
   const self = {
     continue: () => {
-      return page.locator('button').filter({ hasText: 'Continue' }).click();
+      return page.getByRole('button', { name: 'Continue', exact: true }).click();
     },
     setPassword: (val: string) => {
       return page.locator('input[name=password]').fill(val);

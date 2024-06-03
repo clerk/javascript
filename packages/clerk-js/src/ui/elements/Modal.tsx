@@ -50,7 +50,6 @@ export const Modal = withFloatingTree((props: ModalProps) => {
     >
       <ModalContext.Provider value={modalCtx}>
         <Flex
-          aria-hidden
           ref={overlayRef}
           elementDescriptor={descriptors.modalBackdrop}
           sx={[

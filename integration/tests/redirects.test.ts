@@ -30,37 +30,101 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
     await u.page.context().clearCookies();
   });
 
-  test('sign in button respects forceRedirectUrl', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+  test.describe('SignInButton', () => {
+    test('sign in button respects forceRedirectUrl', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
 
-    await u.page.goToRelative('/buttons');
-    await u.page.waitForClerkJsLoaded();
-    await u.po.expect.toBeSignedOut();
+      await u.page.goToRelative('/buttons');
+      await u.page.waitForClerkJsLoaded();
+      await u.po.expect.toBeSignedOut();
 
-    await u.page.getByText('Sign in button (force)').click();
+      await u.page.getByText('Sign in button (force)').click();
 
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
 
-    await u.page.waitForAppUrl('/protected');
+      await u.page.waitForAppUrl('/protected');
 
-    await u.po.expect.toBeSignedIn();
+      await u.po.expect.toBeSignedIn();
+    });
+
+    test('sign in button respects fallbackRedirectUrl', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.page.goToRelative('/buttons');
+      await u.page.waitForClerkJsLoaded();
+      await u.po.expect.toBeSignedOut();
+
+      await u.page.getByText('Sign in button (fallback)').click();
+
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+
+      await u.page.waitForAppUrl('/protected');
+
+      await u.po.expect.toBeSignedIn();
+    });
   });
 
-  test('sign in button respects fallbackRedirectUrl', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+  test.describe('SignUpButton', () => {
+    test('sign up button respects forceRedirectUrl', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      const fakeUser = u.services.users.createFakeUser({
+        fictionalEmail: true,
+        withPhoneNumber: true,
+        withUsername: true,
+      });
 
-    await u.page.goToRelative('/buttons');
-    await u.page.waitForClerkJsLoaded();
-    await u.po.expect.toBeSignedOut();
+      await u.page.goToRelative('/buttons');
+      await u.page.waitForClerkJsLoaded();
 
-    await u.page.getByText('Sign in button (fallback)').click();
+      await u.page.getByText('Sign up button (force)').click();
 
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      // Fill in sign up form
+      await u.po.signUp.signUpWithEmailAndPassword({
+        email: fakeUser.email,
+        password: fakeUser.password,
+      });
 
-    await u.page.waitForAppUrl('/protected');
+      // Verify email
+      await u.po.signUp.enterTestOtpCode();
 
-    await u.po.expect.toBeSignedIn();
+      await u.page.waitForAppUrl('/protected');
+
+      // Check if user is signed in
+      await u.po.expect.toBeSignedIn();
+
+      await fakeUser.deleteIfExists();
+    });
+
+    test('sign up button respects fallbackRedirectUrl', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      const fakeUser = u.services.users.createFakeUser({
+        fictionalEmail: true,
+        withPhoneNumber: true,
+        withUsername: true,
+      });
+
+      await u.page.goToRelative('/buttons');
+      await u.page.waitForClerkJsLoaded();
+
+      await u.page.getByText('Sign up button (fallback)').click();
+
+      // Fill in sign up form
+      await u.po.signUp.signUpWithEmailAndPassword({
+        email: fakeUser.email,
+        password: fakeUser.password,
+      });
+
+      // Verify email
+      await u.po.signUp.enterTestOtpCode();
+
+      await u.page.waitForAppUrl('/protected');
+
+      // Check if user is signed in
+      await u.po.expect.toBeSignedIn();
+
+      await fakeUser.deleteIfExists();
+    });
   });
 });
