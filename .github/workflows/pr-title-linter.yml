@@ -16,9 +16,15 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-
-      - name: Install Commitlint Configuration Dependencies
-        run: npm i globby @commitlint/cli --global --audit=false --fund=false
+        with:
+          show-progress: false
+          sparse-checkout: |
+            commitlint.config.ts
+            packages/*/package.json
+          sparse-checkout-cone-mode: false
 
       - name: Lint Pull Request Title
-        run: echo "${{ github.event.pull_request.title }}" | npx @commitlint/cli
+        run: |
+          npm init --scope=clerk --yes
+          npm i --save-dev @commitlint/cli globby --audit=false --fund=false
+          echo "${{ github.event.pull_request.title }}" | npx @commitlint/cli --config commitlint.config.ts
