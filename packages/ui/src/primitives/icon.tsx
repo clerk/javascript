@@ -4,8 +4,6 @@ import * as React from 'react';
 type IconRef = SVGSVGElement;
 type IconProps = Omit<React.HTMLAttributes<IconRef>, 'viewBox'>;
 
-const iconClassNames = ['size-[1em]'];
-
 function createIcon({ displayName, viewBox, path }: { displayName: string; viewBox: string; path: React.ReactNode }) {
   const Icon = React.forwardRef(function ({ className, ...props }: IconProps, ref: React.ForwardedRef<IconRef>) {
     return (
@@ -14,7 +12,7 @@ function createIcon({ displayName, viewBox, path }: { displayName: string; viewB
         viewBox={viewBox}
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
-        className={cn(iconClassNames, className)}
+        className={cn('size-[1em]', className)}
         {...props}
       >
         {path}

@@ -1,6 +1,6 @@
 import type { Config } from 'tailwindcss';
 
-function generateScale(name: string) {
+function generateColorScale(name: string) {
   const scale = Array.from({ length: 12 }, (_, i) => {
     const id = i + 1;
     return [
@@ -10,6 +10,26 @@ function generateScale(name: string) {
   }).flat();
 
   return Object.fromEntries(scale);
+}
+
+const SPACE = [
+  [1, '0.25'],
+  [1.5, '0.375'],
+  [2, '0.5'],
+  [3, '0.75'],
+  [4, '1'],
+  [5, '1.25'],
+  [6, '1.5'],
+  [7, '1.75'],
+  [8, '2'],
+] as const;
+
+function generateSpaceScale() {
+  return Object.fromEntries(
+    SPACE.map(([id, value]) => {
+      return [`space-${id}`, `calc(${value} * var(--cl-spacing-unit, 1rem))`];
+    }),
+  );
 }
 
 const config = {
@@ -30,14 +50,17 @@ const config = {
         lg: 'calc(var(--cl-radius) * 1.33)',
         xl: 'calc(var(--cl-radius) * 2)',
       },
+      spacing: {
+        ...generateSpaceScale(),
+      },
       colors: {
         accent: {
-          ...generateScale('accent'),
+          ...generateColorScale('accent'),
           contrast: 'var(--cl-accent-contrast)',
           surface: 'var(--cl-accent-surface)',
         },
         gray: {
-          ...generateScale('gray'),
+          ...generateColorScale('gray'),
           contrast: 'var(--cl-gray-contrast)',
           surface: 'var(--cl-gray-surface)',
         },

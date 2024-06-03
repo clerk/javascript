@@ -78,10 +78,10 @@ export const useFetch = <K, T>(
 
   useEffect(() => {
     const fetcherMissing = !fetcherRef.current;
-    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) < staleTime;
+    const isCacheStale = Date.now() - (getCache()?.cachedAt || 0) >= staleTime;
     const isRequestOnGoing = getCache()?.isValidating;
 
-    if (fetcherMissing || isCacheStale || isRequestOnGoing) {
+    if (fetcherMissing || !isCacheStale || isRequestOnGoing) {
       return;
     }
 
