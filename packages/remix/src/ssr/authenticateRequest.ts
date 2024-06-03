@@ -14,6 +14,11 @@ export async function authenticateRequest(
   const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey } = opts;
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
+  // RequestInit#duplex option is required when sending a body.
+  if (request?.body instanceof ReadableStream) {
+    (request as unknown as { duplex: 'half' }).duplex = 'half';
+  }
+
   const requestState = await createClerkClient({
     apiUrl,
     secretKey,
