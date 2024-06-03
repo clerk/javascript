@@ -2,10 +2,11 @@
 import { SignIn } from '@clerk/ui/sign-in';
 import { SignUp } from '@clerk/ui/sign-up';
 import cn from 'clsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { AppearanceToggle } from './appearance-toggle';
 import { ColorPicker } from './color-picker';
+import { DirectionToggle } from './direction-toggle';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 
@@ -27,6 +28,7 @@ const componnents = {
 type Component = keyof typeof componnents;
 
 export function ThemeBuilder() {
+  const [dir, setDir] = useState('ltr');
   const [appearance, setAppearance] = useState('light');
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
   const [lightGray, setLightGray] = useState(lightGrayDefault);
@@ -65,6 +67,9 @@ export function ThemeBuilder() {
     radius,
     spacingUnit,
   });
+  useEffect(() => {
+    document.documentElement.dir = dir;
+  }, [dir]);
   return (
     <>
       <style
@@ -120,6 +125,20 @@ export function ThemeBuilder() {
                 ]}
                 value={appearance}
                 onValueChange={setAppearance}
+              />
+              <DirectionToggle
+                items={[
+                  {
+                    label: 'LTR',
+                    value: 'ltr',
+                  },
+                  {
+                    label: 'RTL',
+                    value: 'rtl',
+                  },
+                ]}
+                value={dir}
+                onValueChange={setDir}
               />
               {appearance === 'light' ? (
                 <>
