@@ -110,7 +110,7 @@ export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     >
       {children}
       <div className='py-4 px-6 border-t border-gray-a6 grid place-content-center'>
-        <p className='text-base inline-flex items-center gap-x-1 text-gray-a11'>
+        <p className='text-sm inline-flex items-center gap-x-1 text-gray-a11'>
           Secured by{' '}
           <a
             aria-label='Clerk logo'
