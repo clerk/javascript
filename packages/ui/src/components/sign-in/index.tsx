@@ -12,6 +12,8 @@ type ConnectionName = (typeof PROVIDERS)[number]['name'];
 
 export function SignIn() {
   const [busyConnectionName, setBusyConnectionName] = React.useState<ConnectionName | null>(null);
+  const [isContinuing, setIsContinuing] = React.useState(false);
+
   const hasBusyConnection = busyConnectionName !== null;
 
   return (
@@ -29,7 +31,7 @@ export function SignIn() {
               return (
                 <Connection.Button
                   busy={busyConnectionName === provider.name}
-                  disabled={hasBusyConnection && busyConnectionName !== provider.name}
+                  disabled={isContinuing || (hasBusyConnection && busyConnectionName !== provider.name)}
                   icon={<ConnectionIcon className='text-base' />}
                   onClick={() => setBusyConnectionName(provider.name)}
                   key={provider.name}
@@ -42,10 +44,17 @@ export function SignIn() {
           <Seperator>or</Seperator>
           <Field.Root>
             <Field.Label>Email address</Field.Label>
-            <Field.Input disabled={hasBusyConnection} />
+            <Field.Input disabled={isContinuing || hasBusyConnection} />
             <Field.Message intent='error'>Identifier is invalid.</Field.Message>
           </Field.Root>
-          <Button disabled={hasBusyConnection}>Continue</Button>
+          <Button
+            icon={<Icon.CaretRight />}
+            busy={isContinuing}
+            disabled={hasBusyConnection}
+            onClick={() => setIsContinuing(true)}
+          >
+            Continue
+          </Button>
         </Card.Body>
       </Card.Content>
       <Card.Footer>
