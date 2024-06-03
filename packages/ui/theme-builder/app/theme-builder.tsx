@@ -1,9 +1,9 @@
 'use client';
+import { SignIn } from '@clerk/ui/sign-in';
+import { SignUp } from '@clerk/ui/sign-up';
 import cn from 'clsx';
 import { useState } from 'react';
 
-import { SignIn } from '../../dist/components/sign-in';
-import { SignUp } from '../../dist/components/sign-up';
 import { AppearanceToggle } from './appearance-toggle';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
@@ -16,6 +16,9 @@ const lightBackgroundDefault = '#fff';
 const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
+
+const radiusDefault = '0.375rem';
+const spacingUnitDefault = '1rem';
 
 const componnents = {
   SignIn: <SignIn />,
@@ -31,6 +34,8 @@ export function ThemeBuilder() {
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
+  const [radius, setRadius] = useState(radiusDefault);
+  const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
@@ -39,6 +44,8 @@ export function ThemeBuilder() {
     setDarkAccent(darkAccentDefault);
     setDarkGray(darkGrayDefault);
     setDarkBackground(darkBackgroundDefault);
+    setRadius(radiusDefault);
+    setSpacingUnit(spacingUnitDefault);
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -55,6 +62,8 @@ export function ThemeBuilder() {
   const css = getPreviewStyles({
     lightColors: lightResult,
     darkColors: darkResult,
+    radius,
+    spacingUnit,
   });
   return (
     <>
@@ -155,6 +164,34 @@ export function ThemeBuilder() {
                   />
                 </>
               )}
+              <div>
+                <label
+                  htmlFor='radius'
+                  className='text-xs font-medium text-neutral-700'
+                >
+                  Radius
+                </label>
+                <input
+                  id='radius'
+                  value={radius}
+                  onChange={e => setRadius(e.target.value)}
+                  className='w-full text-xs rounded border p-2'
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor='spacing-unit'
+                  className='text-xs font-medium text-neutral-700'
+                >
+                  Spacing unit
+                </label>
+                <input
+                  id='spacing-unit'
+                  value={spacingUnit}
+                  onChange={e => setSpacingUnit(e.target.value)}
+                  className='w-full text-xs rounded border p-2'
+                />
+              </div>
             </div>
             <div className='mt-auto space-y-2'>
               <button
