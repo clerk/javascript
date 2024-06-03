@@ -27,4 +27,4 @@ jobs:
         run: |
           npm init --scope=clerk --yes
           npm i --save-dev @commitlint/cli globby --audit=false --fund=false
-          echo "${{ github.event.pull_request.title }}" | npx @commitlint/cli --config commitlint.config.ts
+          echo "${{ github.event.pull_request.title }}" | npm exec @commitlint/cli -- --config commitlint.config.ts
