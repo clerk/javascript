@@ -21,7 +21,7 @@ class ClerkRequest extends Request {
     // https://github.com/nodejs/undici/issues/2155
     // https://github.com/nodejs/undici/blob/7153a1c78d51840bbe16576ce353e481c3934701/lib/fetch/request.js#L854
     const url = typeof input !== 'string' && 'url' in input ? input.url : String(input);
-    // Request#duplex now is required if body is provided in RequestInit
+    // RequestInit.duplex now is required if body is provided in RequestInit
     if (init?.body instanceof ReadableStream) {
       (init as { duplex: 'half' }).duplex = 'half';
     }
