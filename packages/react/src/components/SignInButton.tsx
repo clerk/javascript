@@ -22,7 +22,11 @@ export const SignInButton = withClerk(({ clerk, children, ...props }: WithClerkP
     if (mode === 'modal') {
       return clerk.openSignIn(opts);
     }
-    return clerk.redirectToSignIn(opts);
+    return clerk.redirectToSignIn({
+      ...opts,
+      signInFallbackRedirectUrl: fallbackRedirectUrl,
+      signInForceRedirectUrl: forceRedirectUrl,
+    });
   };
 
   const wrappedChildClickHandler: React.MouseEventHandler = async e => {

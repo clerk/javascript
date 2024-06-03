@@ -32,7 +32,11 @@ export const SignUpButton = withClerk(({ clerk, children, ...props }: WithClerkP
       return clerk.openSignUp(opts);
     }
 
-    return clerk.redirectToSignUp(opts);
+    return clerk.redirectToSignUp({
+      ...opts,
+      signUpFallbackRedirectUrl: fallbackRedirectUrl,
+      signUpForceRedirectUrl: forceRedirectUrl,
+    });
   };
 
   const wrappedChildClickHandler: React.MouseEventHandler = async e => {
