@@ -15,7 +15,7 @@ export async function authenticateRequest(
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
   // RequestInit#duplex option is required when sending a body.
-  if (request?.body instanceof ReadableStream) {
+  if (request?.body) {
     (request as unknown as { duplex: 'half' }).duplex = 'half';
   }
 
