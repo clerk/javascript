@@ -1,9 +1,9 @@
 'use client';
+import { SignIn } from '@clerk/ui/sign-in';
+import { SignUp } from '@clerk/ui/sign-up';
 import cn from 'clsx';
 import { useState } from 'react';
 
-import { SignIn } from '../../dist/components/sign-in';
-import { SignUp } from '../../dist/components/sign-up';
 import { AppearanceToggle } from './appearance-toggle';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
