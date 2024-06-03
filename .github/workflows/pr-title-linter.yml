@@ -17,14 +17,5 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Setup
-        id: config
-        uses: ./.github/actions/init
-        with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true # Must be present to enable caching on branched workflows
-
       - name: Lint Pull Request Title
-        run: echo "${{ github.event.pull_request.title }}" | npx commitlint
+        run: echo "${{ github.event.pull_request.title }}" | npx --yes @commitlint/cli
