@@ -68,6 +68,27 @@ export function SignUpComponent() {
                   </Common.FieldError>
                 </Field.Root>
               </Common.Field>
+              <Common.Field
+                name='password'
+                asChild
+              >
+                <Field.Root>
+                  <Common.Label asChild>
+                    <Field.Label>Password</Field.Label>
+                  </Common.Label>
+                  <Common.Input asChild>
+                    <Field.Input
+                      type='password'
+                      disabled={isContinuing || hasBusyConnection}
+                    />
+                  </Common.Input>
+                  <Common.FieldError>
+                    {({ message }) => {
+                      return <Field.Message intent='error'>{message}</Field.Message>;
+                    }}
+                  </Common.FieldError>
+                </Field.Root>
+              </Common.Field>
 
               <SignUp.Action
                 submit

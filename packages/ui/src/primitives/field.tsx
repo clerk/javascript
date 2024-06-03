@@ -1,6 +1,8 @@
 import cn from 'clsx';
 import * as React from 'react';
 
+import * as Icon from './icon';
+
 export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
   { children, className, ...props },
   forwardedRef,
@@ -34,20 +36,37 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
   );
 });
 
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
-  { className, ...props },
-  forwardedRef,
+export const Input = React.forwardRef(function Input(
+  { className, type: typeProp, ...props }: React.InputHTMLAttributes<HTMLInputElement>,
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
+  const [type, setType] = React.useState(typeProp);
   return (
-    <input
-      data-field-input=''
-      ref={forwardedRef}
-      {...props}
-      className={cn(
-        "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base",
-        className,
-      )}
-    />
+    <div className='relative'>
+      <input
+        data-field-input=''
+        ref={forwardedRef}
+        type={type}
+        className={cn(
+          "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base",
+          typeProp === 'password' && 'pr-7',
+          className,
+        )}
+        {...props}
+      />
+      {typeProp === 'password' ? (
+        <button
+          type='button'
+          className={cn(
+            'focus:ring-[3px] aspect-square absolute rounded right-1 top-1 text-gray-11 hover:text-gray-12 hover:bg-gray-3 p-1',
+          )}
+          onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
+          title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
+        >
+          {type === 'password' ? <Icon.EyeSlashSm /> : <Icon.EyeSm />}
+        </button>
+      ) : null}
+    </div>
   );
 });
 
