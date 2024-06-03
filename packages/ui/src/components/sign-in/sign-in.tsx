@@ -1,5 +1,6 @@
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import * as React from 'react';
 
 import { PROVIDERS } from '~/constants';
 import { Button } from '~/primitives/button';
@@ -9,7 +10,14 @@ import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 
+type ConnectionName = (typeof PROVIDERS)[number]['name'];
+
 export function SignInComponent() {
+  const [busyConnectionName, setBusyConnectionName] = React.useState<ConnectionName | null>(null);
+  const [isContinuing, setIsContinuing] = React.useState(false);
+
+  const hasBusyConnection = busyConnectionName !== null;
+
   return (
     <SignIn.Root exampleMode>
       <SignIn.Step name='start'>
@@ -29,8 +37,13 @@ export function SignInComponent() {
                       name={provider.id}
                       asChild
                     >
-                      <Connection.Button>
-                        <ConnectionIcon className='text-base' />
+                      <Connection.Button
+                        busy={busyConnectionName === provider.name}
+                        disabled={isContinuing || (hasBusyConnection && busyConnectionName !== provider.name)}
+                        icon={<ConnectionIcon className='text-base' />}
+                        onClick={() => setBusyConnectionName(provider.name)}
+                        key={provider.name}
+                      >
                         {provider.name}
                       </Connection.Button>
                     </Common.Connection>
@@ -47,7 +60,7 @@ export function SignInComponent() {
                     <Field.Label>Email address</Field.Label>
                   </Common.Label>
                   <Common.Input asChild>
-                    <Field.Input />
+                    <Field.Input disabled={isContinuing || hasBusyConnection} />
                   </Common.Input>
                   <Common.FieldError>
                     {({ message }) => {
@@ -61,7 +74,14 @@ export function SignInComponent() {
                 submit
                 asChild
               >
-                <Button>Continue</Button>
+                <Button
+                  icon={<Icon.CaretRight />}
+                  busy={isContinuing}
+                  disabled={hasBusyConnection}
+                  onClick={() => setIsContinuing(true)}
+                >
+                  Continue
+                </Button>
               </SignIn.Action>
             </Card.Body>
           </Card.Content>

@@ -68,6 +68,9 @@ const config = {
           DEFAULT: 'hsl(var(--cl-color-destructive))',
         },
       },
+      animation: {
+        spin: 'cl-spin linear infinite',
+      },
     },
   },
 } satisfies Config;

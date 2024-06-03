@@ -9,7 +9,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('space-y-2', className)}
+      className={cn('has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]', 'space-y-2', className)}
     >
       {children}
     </div>
@@ -24,7 +24,10 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
     <label
       ref={forwardedRef}
       {...props}
-      className={cn('text-[0.8125rem]/[1.125rem] font-medium flex items-center text-gray-12 gap-x-1', className)}
+      className={cn(
+        'text-[0.8125rem]/[1.125rem] font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
+        className,
+      )}
     >
       {children}
     </label>
@@ -37,6 +40,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
 ) {
   return (
     <input
+      data-field-input=''
       ref={forwardedRef}
       {...props}
       className={cn(
