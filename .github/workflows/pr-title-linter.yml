@@ -26,5 +26,5 @@ jobs:
       - name: Lint Pull Request Title
         run: |
           npm init --scope=clerk --yes
-          npm i --save-dev @commitlint/cli globby --audit=false --fund=false
+          npm i --save-dev @commitlint/config-conventional @commitlint/cli globby --audit=false --fund=false
           echo "${{ github.event.pull_request.title }}" | npm exec @commitlint/cli -- --config commitlint.config.ts
