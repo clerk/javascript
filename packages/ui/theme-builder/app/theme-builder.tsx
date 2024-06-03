@@ -110,7 +110,7 @@ export function ThemeBuilder() {
           </div>
         </header>
         <div className='flex flex-1'>
-          <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-r bg-white'>
+          <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-e bg-white'>
             <div className='space-y-4'>
               <AppearanceToggle
                 items={[
