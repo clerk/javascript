@@ -82,7 +82,7 @@
     "@clerk/eslint-config-custom": "*",
     "@clerk/shared": "2.2.1",
     "@statelyai/inspect": "^0.3.1",
-    "@types/node": "^18.17.0",
+    "@types/node": "^18.19.33",
     "@types/react": "*",
     "@types/react-dom": "*",
     "concurrently": "^8.2.2",

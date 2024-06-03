@@ -23,14 +23,14 @@
     "clsx": "^2.1.1",
     "colorjs.io": "^0.5.0",
     "next": "14.2.3",
-    "react": "^18",
+    "react": "^18.3.1",
     "react-colorful": "^5.6.1",
-    "react-dom": "^18"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
