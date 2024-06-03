@@ -43,6 +43,13 @@ const config = {
       fontFamily: {
         sans: ['var(--cl-font-family)'],
       },
+      borderRadius: {
+        DEFAULT: 'var(--cl-radius)',
+        sm: 'calc(var(--cl-radius) * 0.66)',
+        md: 'var(--cl-radius)',
+        lg: 'calc(var(--cl-radius) * 1.33)',
+        xl: 'calc(var(--cl-radius) * 2)',
+      },
       spacing: {
         ...generateSpaceScale(),
       },

@@ -17,6 +17,7 @@ const darkAccentDefault = '#2F3037';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
+const radiusDefault = '0.375rem';
 const spacingUnitDefault = '1rem';
 
 const componnents = {
@@ -33,6 +34,7 @@ export function ThemeBuilder() {
   const [darkAccent, setDarkAccent] = useState(darkAccentDefault);
   const [darkGray, setDarkGray] = useState(darkGrayDefault);
   const [darkBackground, setDarkBackground] = useState(darkBackgroundDefault);
+  const [radius, setRadius] = useState(radiusDefault);
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
@@ -42,6 +44,7 @@ export function ThemeBuilder() {
     setDarkAccent(darkAccentDefault);
     setDarkGray(darkGrayDefault);
     setDarkBackground(darkBackgroundDefault);
+    setRadius(radiusDefault);
     setSpacingUnit(spacingUnitDefault);
   };
   const lightResult = generateColors({
@@ -59,6 +62,7 @@ export function ThemeBuilder() {
   const css = getPreviewStyles({
     lightColors: lightResult,
     darkColors: darkResult,
+    radius,
     spacingUnit,
   });
   return (
@@ -160,6 +164,20 @@ export function ThemeBuilder() {
                   />
                 </>
               )}
+              <div>
+                <label
+                  htmlFor='radius'
+                  className='text-xs font-medium text-neutral-700'
+                >
+                  Radius
+                </label>
+                <input
+                  id='radius'
+                  value={radius}
+                  onChange={e => setRadius(e.target.value)}
+                  className='w-full text-xs rounded border p-2'
+                />
+              </div>
               <div>
                 <label
                   htmlFor='spacing-unit'

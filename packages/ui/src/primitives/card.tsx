@@ -12,7 +12,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
       ref={forwardedRef}
       {...props}
       className={cn(
-        'bg-gray-2 rounded-lg w-96 relative overflow-hidden border border-gray-a6 shadow-xl shadow-gray-a5 bg-clip-padding',
+        'bg-gray-2 rounded-xl w-96 relative overflow-hidden border border-gray-a6 shadow-xl shadow-gray-a5 bg-clip-padding',
         className,
       )}
     >
