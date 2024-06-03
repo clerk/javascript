@@ -15,7 +15,8 @@ export type ClerkProviderProps = ClerkReactProviderProps & {
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   const { children, tokenCache = MemoryTokenCache, publishableKey, ...rest } = props;
-  const key = publishableKey || process.env.CLERK_PUBLISHABLE_KEY || '';
+  const key =
+    publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   return (
     <ClerkReactProvider
