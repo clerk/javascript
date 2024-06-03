@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import { PROVIDERS } from '~/constants';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -6,7 +8,12 @@ import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 
+type ConnectionName = (typeof PROVIDERS)[number]['name'];
+
 export function SignIn() {
+  const [busyConnectionName, setBusyConnectionName] = React.useState<ConnectionName | null>(null);
+  const hasBusyConnection = busyConnectionName !== null;
+
   return (
     <Card.Root>
       <Card.Content>
@@ -20,8 +27,13 @@ export function SignIn() {
               const ConnectionIcon = Icon[provider.icon];
 
               return (
-                <Connection.Button key={provider.name}>
-                  <ConnectionIcon className='text-base' />
+                <Connection.Button
+                  busy={busyConnectionName === provider.name}
+                  disabled={hasBusyConnection && busyConnectionName !== provider.name}
+                  icon={<ConnectionIcon className='text-base' />}
+                  onClick={() => setBusyConnectionName(provider.name)}
+                  key={provider.name}
+                >
                   {provider.name}
                 </Connection.Button>
               );
@@ -30,10 +42,10 @@ export function SignIn() {
           <Seperator>or</Seperator>
           <Field.Root>
             <Field.Label>Email address</Field.Label>
-            <Field.Input />
+            <Field.Input disabled={hasBusyConnection} />
             <Field.Message intent='error'>Identifier is invalid.</Field.Message>
           </Field.Root>
-          <Button>Continue</Button>
+          <Button disabled={hasBusyConnection}>Continue</Button>
         </Card.Body>
       </Card.Content>
       <Card.Footer>

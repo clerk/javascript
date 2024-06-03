@@ -1,7 +1,17 @@
+@keyframes cl-spin {
+  to {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 :where(:root) {
   --cl-font-family: inherit;
   --cl-color-destructive: 0 84% 60%;
 }
+
 *,
 ::before,
 ::after {
@@ -10,6 +20,7 @@
   border-style: solid;
   border-color: #e5e7eb;
 }
+
 ::before,
 ::after {
   --cl-content: '';
