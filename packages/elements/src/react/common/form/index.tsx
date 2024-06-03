@@ -1,6 +1,6 @@
-import { isWebAuthnAutofillSupported } from '@clerk/clerk-js/src/utils/passkeys';
 import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
@@ -72,11 +72,18 @@ const useFieldFeedback = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 };
 
 const determineInputTypeFromName = (name: FormFieldProps['name']) => {
-  if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword')
+  if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword') {
     return 'password' as const;
-  if (name === 'emailAddress') return 'email' as const;
-  if (name === 'phoneNumber') return 'tel' as const;
-  if (name === 'code') return 'otp' as const;
+  }
+  if (name === 'emailAddress') {
+    return 'email' as const;
+  }
+  if (name === 'phoneNumber') {
+    return 'tel' as const;
+  }
+  if (name === 'code') {
+    return 'otp' as const;
+  }
 
   return 'text' as const;
 };
@@ -234,7 +241,9 @@ const useInput = ({
 
   // Register the field in the machine context
   React.useEffect(() => {
-    if (!name || ref.getSnapshot().context.fields.get(name)) return;
+    if (!name || ref.getSnapshot().context.fields.get(name)) {
+      return;
+    }
 
     ref.send({ type: 'FIELD.ADD', field: { name, value: initialValue } });
 
@@ -245,9 +254,13 @@ const useInput = ({
   const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
-      if (!name || initialValue) return;
+      if (!name || initialValue) {
+        return;
+      }
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
-      if (shouldValidatePassword) validatePassword(event.target.value);
+      if (shouldValidatePassword) {
+        validatePassword(event.target.value);
+      }
     },
     [ref, name, onChangeProp, initialValue, shouldValidatePassword, validatePassword],
   );
@@ -255,7 +268,9 @@ const useInput = ({
   const onBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onBlurProp?.(event);
-      if (shouldValidatePassword) validatePassword(event.target.value);
+      if (shouldValidatePassword) {
+        validatePassword(event.target.value);
+      }
     },
     [onBlurProp, shouldValidatePassword, validatePassword],
   );
@@ -263,13 +278,17 @@ const useInput = ({
   const onFocus = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onFocusProp?.(event);
-      if (shouldValidatePassword) validatePassword(event.target.value);
+      if (shouldValidatePassword) {
+        validatePassword(event.target.value);
+      }
     },
     [onFocusProp, shouldValidatePassword, validatePassword],
   );
 
   React.useEffect(() => {
-    if (!initialValue || !name) return;
+    if (!initialValue || !name) {
+      return;
+    }
     ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
   }, [name, ref, initialValue]);
 

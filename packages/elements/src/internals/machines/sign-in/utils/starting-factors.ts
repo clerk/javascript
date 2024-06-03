@@ -1,6 +1,6 @@
 // These utilities are ported from: packages/clerk-js/src/ui/components/SignIn/utils.ts
 // They should be functionally identical.
-import { isWebAuthnSupported } from '@clerk/clerk-js/src/utils/passkeys';
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { PreferredSignInStrategy, SignInFactor } from '@clerk/types';
 
 const ORDER_WHEN_PASSWORD_PREFERRED = ['passkey', 'password', 'email_link', 'email_code', 'phone_code'] as const;
