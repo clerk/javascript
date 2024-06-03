@@ -34,9 +34,9 @@ export const Spinner = forwardRef(function Spinner(
   ref: React.ForwardedRef<SpinnerRef>,
 ) {
   return (
-    <div
+    <span
       ref={ref}
-      className={cn('relative isolate *:size-full text-current size-[1em]', className)}
+      className={cn('relative isolate text-current size-[1em]', className)}
     >
       <span className='sr-only'>{children}</span>
 
@@ -44,6 +44,7 @@ export const Spinner = forwardRef(function Spinner(
         viewBox={[0, 0, SIZE, SIZE].join(' ')}
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
+        className='size-full'
         style={{
           ['--spinner-origin' as string]: Array.from({ length: 2 })
             .fill(`${16 / SIZE / 2}rem`)
@@ -107,6 +108,7 @@ export const Spinner = forwardRef(function Spinner(
 
         <circle
           className={cn(
+            'size-full',
             'motion-safe:origin-[--spinner-origin]',
             'motion-safe:will-change-transform',
             'motion-safe:animate-spin',
@@ -127,6 +129,6 @@ export const Spinner = forwardRef(function Spinner(
           strokeWidth={1.5}
         />
       </svg>
-    </div>
+    </span>
   );
 });
