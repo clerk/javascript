@@ -89,7 +89,7 @@ export const SignInStartMachine = setup({
           target: 'AttemptingPasskey',
           reenter: true,
         },
-        'AUTHENTICATE.PASSKEY_AUTOFILL': {
+        'AUTHENTICATE.PASSKEY.AUTOFILL': {
           guard: not('isExampleMode'),
           target: 'AttemptingPasskeyAutoFill',
           reenter: false,

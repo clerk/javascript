@@ -65,7 +65,7 @@ export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
 export type SignInRouterPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };
 export type SignInRouterPasskeyAutofillEvent = {
-  type: 'AUTHENTICATE.PASSKEY_AUTOFILL';
+  type: 'AUTHENTICATE.PASSKEY.AUTOFILL';
 };
 
 export interface SignInRouterInitEvent extends BaseRouterInput {

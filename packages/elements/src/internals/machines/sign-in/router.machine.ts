@@ -308,16 +308,10 @@ export const SignInRouterMachine = setup({
           reenter: true,
         },
         'AUTHENTICATE.PASSKEY': {
-          actions: sendTo('start', () => ({
-            type: 'AUTHENTICATE.PASSKEY',
-            flow: 'discoverable',
-          })),
+          actions: sendTo('start', ({ event }) => event),
         },
-        'AUTHENTICATE.PASSKEY_AUTOFILL': {
-          actions: sendTo('start', () => ({
-            type: 'AUTHENTICATE.PASSKEY_AUTOFILL',
-            flow: 'autofill',
-          })),
+        'AUTHENTICATE.PASSKEY.AUTOFILL': {
+          actions: sendTo('start', ({ event }) => event),
         },
         NEXT: [
           {

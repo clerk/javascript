@@ -13,7 +13,7 @@ export type SignInStartTags = 'state:pending' | 'state:attempting' | 'state:load
 
 export type SignInStartSubmitEvent = { type: 'SUBMIT' };
 export type SignInStartPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };
-export type SignInStartPasskeyAutofillEvent = { type: 'AUTHENTICATE.PASSKEY_AUTOFILL' };
+export type SignInStartPasskeyAutofillEvent = { type: 'AUTHENTICATE.PASSKEY.AUTOFILL' };
 
 export type SignInStartEvents =
   | ErrorActorEvent
