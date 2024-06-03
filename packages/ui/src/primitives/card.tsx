@@ -47,7 +47,7 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('text-center', className)}
+      className={cn('text-center space-y-space-1', className)}
     >
       {children}
     </div>
