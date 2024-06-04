@@ -17,7 +17,11 @@ export {
 
 export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
 
+/**
+ * @deprecated Use `getClerkInstance()` instead.
+ */
 export { clerk as Clerk } from './singleton';
+export { getClerkInstance } from './singleton';
 
 export * from './ClerkProvider';
 export * from './useOAuth';

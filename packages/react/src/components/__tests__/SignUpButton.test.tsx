@@ -53,7 +53,7 @@ describe('<SignUpButton/>', () => {
     const btn = screen.getByText('Sign up');
     userEvent.click(btn);
     await waitFor(() => {
-      expect(mockRedirectToSignUp).toHaveBeenCalledWith({ signUpForceRedirectUrl: url });
+      expect(mockRedirectToSignUp).toHaveBeenCalledWith({ forceRedirectUrl: url, signUpForceRedirectUrl: url });
     });
   });
 
@@ -63,6 +63,7 @@ describe('<SignUpButton/>', () => {
     userEvent.click(btn);
     await waitFor(() => {
       expect(mockRedirectToSignUp).toHaveBeenCalledWith({
+        fallbackRedirectUrl: url,
         signUpFallbackRedirectUrl: url,
       });
     });

@@ -50,7 +50,6 @@ export const Modal = withFloatingTree((props: ModalProps) => {
     >
       <ModalContext.Provider value={modalCtx}>
         <Flex
-          aria-hidden
           ref={overlayRef}
           elementDescriptor={descriptors.modalBackdrop}
           sx={[
@@ -58,7 +57,6 @@ export const Modal = withFloatingTree((props: ModalProps) => {
               animation: `${animations.fadeIn} 150ms ${t.transitionTiming.$common}`,
               zIndex: t.zIndices.$modal,
               backgroundColor: t.colors.$modalBackdrop,
-              // ...common.centeredFlex(),
               alignItems: 'flex-start',
               justifyContent: 'center',
               overflow: 'auto',
