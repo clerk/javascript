@@ -16,15 +16,15 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-
-      - name: Setup
-        id: config
-        uses: ./.github/actions/init
         with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true # Must be present to enable caching on branched workflows
+          show-progress: false
+          sparse-checkout: |
+            commitlint.config.ts
+            packages/*/package.json
+          sparse-checkout-cone-mode: false
 
       - name: Lint Pull Request Title
-        run: echo "${{ github.event.pull_request.title }}" | npx commitlint
+        run: |
+          npm init --scope=clerk --yes
+          npm i --save-dev @commitlint/config-conventional @commitlint/cli globby --audit=false --fund=false
+          echo "${{ github.event.pull_request.title }}" | npm exec @commitlint/cli -- --config commitlint.config.ts

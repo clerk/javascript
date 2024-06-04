@@ -1,5 +1,6 @@
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import * as React from 'react';
 
 import { PROVIDERS } from '~/constants';
 import { Button } from '~/primitives/button';
@@ -9,7 +10,14 @@ import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 
+type ConnectionName = (typeof PROVIDERS)[number]['name'];
+
 export function SignUpComponent() {
+  const [busyConnectionName, setBusyConnectionName] = React.useState<ConnectionName | null>(null);
+  const [isContinuing, setIsContinuing] = React.useState(false);
+
+  const hasBusyConnection = busyConnectionName !== null;
+
   return (
     <SignUp.Root exampleMode>
       <SignUp.Step name='start'>
@@ -28,8 +36,13 @@ export function SignUpComponent() {
                       key={provider.id}
                       name={provider.id}
                     >
-                      <Connection.Button>
-                        <ConnectionIcon className='text-base' />
+                      <Connection.Button
+                        busy={busyConnectionName === provider.name}
+                        disabled={isContinuing || (hasBusyConnection && busyConnectionName !== provider.name)}
+                        icon={<ConnectionIcon className='text-base' />}
+                        onClick={() => setBusyConnectionName(provider.name)}
+                        key={provider.name}
+                      >
                         {provider.name}
                       </Connection.Button>
                     </Common.Connection>
@@ -46,7 +59,7 @@ export function SignUpComponent() {
                     <Field.Label>Email address</Field.Label>
                   </Common.Label>
                   <Common.Input asChild>
-                    <Field.Input />
+                    <Field.Input disabled={isContinuing || hasBusyConnection} />
                   </Common.Input>
                   <Common.FieldError>
                     {({ message }) => {
@@ -60,7 +73,14 @@ export function SignUpComponent() {
                 submit
                 asChild
               >
-                <Button>Continue</Button>
+                <Button
+                  icon={<Icon.CaretRight />}
+                  busy={isContinuing}
+                  disabled={hasBusyConnection}
+                  onClick={() => setIsContinuing(true)}
+                >
+                  Continue
+                </Button>
               </SignUp.Action>
             </Card.Body>
           </Card.Content>

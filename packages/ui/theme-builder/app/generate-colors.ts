@@ -638,10 +638,11 @@ const getBackgroundColorCss = ({ isDarkMode, background }: { isDarkMode: boolean
 interface GetNewPreviewStylesParams {
   lightColors: GeneratedColors;
   darkColors: GeneratedColors;
+  radius: string;
   spacingUnit: string;
 }
 
-export const getPreviewStyles = ({ lightColors, darkColors, spacingUnit }: GetNewPreviewStylesParams) => {
+export const getPreviewStyles = ({ lightColors, darkColors, radius, spacingUnit }: GetNewPreviewStylesParams) => {
   const lightAccentColorsCss = getColorScaleCss({
     isDarkMode: false,
     name: 'accent',
@@ -708,6 +709,7 @@ ${darkBackgroundCss}
 ${darkAccentColorsCss}
 ${darkGrayColorsCss}
 :where(:root) {
+  --cl-radius: ${radius};
   --cl-spacing-unit: ${spacingUnit};
 }
   `.trim();
