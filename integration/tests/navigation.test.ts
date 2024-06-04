@@ -48,7 +48,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.withEmailCodes'] })('navi
     await u.po.expect.toBeSignedIn();
   });
 
-  test.skip('sign in with path routing navigates to previous page', async ({ page, context }) => {
+  test('sign in with path routing navigates to previous page', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
