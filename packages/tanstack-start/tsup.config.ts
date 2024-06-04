@@ -2,6 +2,7 @@ import type { Options } from 'tsup';
 import { defineConfig } from 'tsup';
 
 import { runAfterLast } from '../../scripts/utils';
+// @ts-ignore
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
@@ -14,9 +15,8 @@ export default defineConfig(overrideOptions => {
     clean: true,
     minify: false,
     sourcemap: true,
-    legacyOutput: true,
-    format: 'cjs',
-    outDir: './dist',
+    format: 'esm',
+    dts: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
@@ -24,5 +24,8 @@ export default defineConfig(overrideOptions => {
     },
   };
 
-  return runAfterLast(['npm run build:declarations', shouldPublish && 'npm run publish:local'])(config);
+  return runAfterLast([
+    // 'npm run build:declarations',
+    shouldPublish && 'npm run publish:local',
+  ])(config);
 });

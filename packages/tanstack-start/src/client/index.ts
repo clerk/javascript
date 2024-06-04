@@ -1,2 +1,2 @@
-export * from './ClerkProvider';
-export * from './uiComponents';
+export * from './ClerkProvider.js';
+export * from './uiComponents.js';
