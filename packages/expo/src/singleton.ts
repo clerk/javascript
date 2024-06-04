@@ -14,7 +14,7 @@ Clerk.sdkMetadata = {
 const KEY = '__clerk_client_jwt';
 
 /**
- * @deprecated Use `getClerkInstance` instead. `Clerk` will be removed in the next major version.
+ * @deprecated Use `getClerkInstance` instead. `clerk` will be removed in the next major version.
  */
 export let clerk: HeadlessBrowserClerk;
 let __internal_clerk: HeadlessBrowserClerk | undefined;
