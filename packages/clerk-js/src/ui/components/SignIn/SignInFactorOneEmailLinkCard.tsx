@@ -35,6 +35,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
 
   React.useEffect(() => {
     void startEmailLinkVerification();
+    props.onFactorPrepare();
   }, []);
 
   const restartVerification = () => {
@@ -45,6 +46,7 @@ export const SignInFactorOneEmailLinkCard = (props: SignInFactorOneEmailLinkCard
   const startEmailLinkVerification = () => {
     startEmailLinkFlow({
       emailAddressId: props.factor.emailAddressId,
+      prepare: !props.factorAlreadyPrepared,
       redirectUrl: buildEmailLinkRedirectUrl(signInContext, signInUrl),
     })
       .then(res => handleVerificationResult(res))

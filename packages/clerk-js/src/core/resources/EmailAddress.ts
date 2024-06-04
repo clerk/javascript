@@ -50,14 +50,21 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource> => {
     const { run, stop } = Poller();
 
-    const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<EmailAddressResource> => {
+    const startEmailLinkFlow = async ({
+      prepare = true,
+      redirectUrl,
+    }: StartEmailLinkFlowParams): Promise<EmailAddressResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
       }
-      await this.prepareVerification({
-        strategy: 'email_link',
-        redirectUrl: redirectUrl,
-      });
+
+      if (prepare) {
+        await this.prepareVerification({
+          strategy: 'email_link',
+          redirectUrl: redirectUrl,
+        });
+      }
+
       return new Promise((resolve, reject) => {
         void run(() => {
           return this.reload()

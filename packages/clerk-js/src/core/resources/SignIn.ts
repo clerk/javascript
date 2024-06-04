@@ -152,16 +152,21 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const startEmailLinkFlow = async ({
       emailAddressId,
+      prepare = true,
       redirectUrl,
     }: SignInStartEmailLinkFlowParams): Promise<SignInResource> => {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
       }
-      await this.prepareFirstFactor({
-        strategy: 'email_link',
-        emailAddressId: emailAddressId,
-        redirectUrl: redirectUrl,
-      });
+
+      if (prepare) {
+        await this.prepareFirstFactor({
+          strategy: 'email_link',
+          emailAddressId: emailAddressId,
+          redirectUrl: redirectUrl,
+        });
+      }
+
       return new Promise((resolve, reject) => {
         void run(() => {
           return this.reload()

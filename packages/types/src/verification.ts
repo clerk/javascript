@@ -33,6 +33,7 @@ export interface SignatureVerificationAttemptParam {
 export type VerificationAttemptParams = CodeVerificationAttemptParam | SignatureVerificationAttemptParam;
 
 export interface StartEmailLinkFlowParams {
+  prepare?: boolean;
   redirectUrl: string;
 }
 

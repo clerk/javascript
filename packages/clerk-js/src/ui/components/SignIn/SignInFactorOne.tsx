@@ -123,7 +123,6 @@ export function _SignInFactorOne(): JSX.Element {
   }
 
   switch (currentFactor?.strategy) {
-    // @ts-ignore
     case 'passkey':
       return (
         <SignInFactorOnePasskey
