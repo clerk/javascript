@@ -20,7 +20,10 @@ export function SignUpComponent() {
 
   return (
     <SignUp.Root exampleMode>
-      <SignUp.Step name='start'>
+      <SignUp.Step
+        data-clerk
+        name='start'
+      >
         <Card.Root>
           <Card.Content>
             <Card.Header>
