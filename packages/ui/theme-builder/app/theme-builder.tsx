@@ -2,12 +2,12 @@
 import { SignIn } from '@clerk/ui/sign-in';
 import { SignUp } from '@clerk/ui/sign-up';
 import cn from 'clsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { AppearanceToggle } from './appearance-toggle';
 import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
+import { ToggleGroup } from './toggle-group';
 
 const lightAccentDefault = '#2F3037';
 const lightGrayDefault = '#2f3037';
@@ -27,6 +27,7 @@ const componnents = {
 type Component = keyof typeof componnents;
 
 export function ThemeBuilder() {
+  const [dir, setDir] = useState('ltr');
   const [appearance, setAppearance] = useState('light');
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
   const [lightGray, setLightGray] = useState(lightGrayDefault);
@@ -65,6 +66,9 @@ export function ThemeBuilder() {
     radius,
     spacingUnit,
   });
+  useEffect(() => {
+    document.documentElement.dir = dir;
+  }, [dir]);
   return (
     <>
       <style
@@ -105,9 +109,9 @@ export function ThemeBuilder() {
           </div>
         </header>
         <div className='flex flex-1'>
-          <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-r bg-white'>
+          <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-e bg-white'>
             <div className='space-y-4'>
-              <AppearanceToggle
+              <ToggleGroup
                 items={[
                   {
                     label: 'Light',
@@ -120,6 +124,20 @@ export function ThemeBuilder() {
                 ]}
                 value={appearance}
                 onValueChange={setAppearance}
+              />
+              <ToggleGroup
+                items={[
+                  {
+                    label: 'LTR',
+                    value: 'ltr',
+                  },
+                  {
+                    label: 'RTL',
+                    value: 'rtl',
+                  },
+                ]}
+                value={dir}
+                onValueChange={setDir}
               />
               {appearance === 'light' ? (
                 <>
