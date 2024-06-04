@@ -90,7 +90,7 @@ export function SignUpComponent() {
                             <Button
                               icon={<Icon.CaretRight />}
                               busy={isSubmitting}
-                              disabled={isGlobalLoading}
+                              disabled={isGlobalLoading || isSubmitting}
                             >
                               Continue
                             </Button>
