@@ -4,7 +4,7 @@
 
 Support passkeys in SignIn flows.
 APIs introduced:
-- `<SignIn.Action passkey />`
+- `<SignIn.Passkey />`
 - `<SignIn.SupportedStrategy name='passkey'>`
 - `<SignIn.Strategy name='passkey'>`
 - `<Clerk.Input type='text' passkeyAutofill>`
@@ -12,12 +12,12 @@ APIs introduced:
 Usage Examples:
 - `<SignIn.Action passkey />`
 ```tsx
-<SignIn.Step name='start>
-  <SignIn.Action passkey>
+<SignIn.Step name='start'>
+  <SignIn.Passkey>
     <Clerk.Loading>
       {isLoading => (isLoading ? <Spinner /> : 'Use passkey instead')}. 
     </Clerk.Loading>
-  </SignIn.Action>
+  </SignIn.Passkey>
 </SignIn.Step>
 ```
 
@@ -47,5 +47,5 @@ Usage Examples:
     <Clerk.Input passkeyAutofill placeholder='Enter your email address' />
     <Clerk.FieldError />
   </Clerk.Field>
-</SignIn.Step/>
+</SignIn.Step>
 ```
