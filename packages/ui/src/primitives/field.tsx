@@ -37,7 +37,14 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
 });
 
 export const Input = React.forwardRef(function Input(
-  { className, type: typeProp, ...props }: React.InputHTMLAttributes<HTMLInputElement>,
+  {
+    autoCapitalize,
+    autoComplete,
+    className,
+    spellCheck,
+    type: typeProp,
+    ...props
+  }: React.InputHTMLAttributes<HTMLInputElement>,
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
   const [type, setType] = React.useState(typeProp);
@@ -49,20 +56,27 @@ export const Input = React.forwardRef(function Input(
         type={type}
         className={cn(
           "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base",
-          typeProp === 'password' && 'pr-7',
+          typeProp === 'password' && 'pe-7',
           className,
         )}
+        autoCapitalize={typeProp === 'password' ? 'none' : autoCapitalize}
+        autoComplete={typeProp === 'password' ? 'current-password' : autoComplete}
+        spellCheck={typeProp === 'password' ? 'false' : spellCheck}
         {...props}
       />
       {typeProp === 'password' ? (
         <button
           type='button'
           className={cn(
-            'focus:ring-[3px] aspect-square absolute rounded right-1 top-1 text-gray-11 hover:text-gray-12 hover:bg-gray-3 p-1',
+            'aspect-square absolute rounded-sm outline-none right-1 top-1 text-gray-11 p-1',
+            'hover:text-gray-12 hover:bg-gray-3',
+            'focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring-2 focus-visible:ring-default',
+            'rtl:right-auto rtl:left-1',
           )}
           onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
           title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
         >
+          <span className='sr-only'>{[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}</span>
           {type === 'password' ? <Icon.EyeSlashSm /> : <Icon.EyeSm />}
         </button>
       ) : null}

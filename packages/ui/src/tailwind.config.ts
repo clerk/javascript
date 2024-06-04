@@ -84,6 +84,11 @@ const config = {
           DEFAULT: 'hsl(var(--cl-color-destructive))',
         },
       },
+      ringColor: {
+        // note: it's not possible to use `DEFAULT` with `ringColor`
+        //       therefore we'll need to use `ring-default`
+        default: 'var(--cl-accent-a9)',
+      },
       animation: {
         spin: 'cl-spin linear infinite',
       },
