@@ -89,12 +89,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
     >
       {children}
 
-      {shouldShowTagOrLinks && (
-        <Card.ClerkAndPagesTag
-          withFooterPages
-          sx={t => ({ padding: `${t.space.$4} ${t.space.$8}` })}
-        />
-      )}
+      {shouldShowTagOrLinks && <Card.ClerkAndPagesTag withFooterPages />}
     </Col>
   );
 };

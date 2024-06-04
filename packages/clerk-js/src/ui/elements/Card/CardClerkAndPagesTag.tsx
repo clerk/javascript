@@ -1,52 +1,69 @@
 import React from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Flex, Icon, Link, Text } from '../../customizables';
+import { Col, Flex, Icon, Link, Text } from '../../customizables';
 import { LogoMark } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
+import { DevModeNotice } from '../DevModeNotice';
 import { Card } from '.';
 
 export const CardClerkAndPagesTag = React.memo(
-  React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Flex> & { withFooterPages?: boolean }>((props, ref) => {
-    const { sx, withFooterPages = false, ...rest } = props;
-    const { branded } = useEnvironment().displayConfig;
+  React.forwardRef<
+    HTMLDivElement,
+    PropsOfComponent<typeof Flex> & { withFooterPages?: boolean; withDevModeNotice?: boolean }
+  >((props, ref) => {
+    const { sx, withFooterPages = false, withDevModeNotice = false, ...rest } = props;
+    const { displayConfig } = useEnvironment();
 
-    if (!(branded || withFooterPages)) {
+    if (!(displayConfig.branded || withFooterPages)) {
       return null;
     }
 
     return (
-      <Flex
-        sx={[
-          t => ({
-            ':has(div:only-child)': {
-              justifyContent: 'center',
-            },
-            justifyContent: 'space-between',
-            width: '100%',
-            padding: `0 ${t.space.$8}`,
-          }),
-          sx,
-        ]}
-        {...rest}
-        ref={ref}
+      <Col
+        sx={t => ({
+          gap: t.space.$2,
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          width: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        })}
       >
-        {branded && (
-          <Flex
-            gap={1}
-            align='center'
-            justify='center'
-            sx={t => ({ color: t.colors.$colorTextSecondary })}
-          >
-            <>
-              <Text variant='buttonSmall'>Secured by</Text>
-              <LogoMarkIconLink />
-            </>
-          </Flex>
-        )}
+        <Flex
+          sx={[
+            t => ({
+              ':has(div:only-child)': {
+                justifyContent: 'center',
+              },
+              justifyContent: 'space-between',
+              width: '100%',
+              padding: `0 ${t.space.$8}`,
+            }),
+            sx,
+          ]}
+          {...rest}
+          ref={ref}
+        >
+          {displayConfig.branded && (
+            <Flex
+              gap={1}
+              align='center'
+              justify='center'
+              sx={t => ({ color: t.colors.$colorTextSecondary })}
+            >
+              <>
+                <Text variant='buttonSmall'>Secured by</Text>
+                <LogoMarkIconLink />
+              </>
+            </Flex>
+          )}
 
-        {withFooterPages && <Card.FooterLinks />}
-      </Flex>
+          {withFooterPages && <Card.FooterLinks />}
+        </Flex>
+
+        {withDevModeNotice && <DevModeNotice />}
+      </Col>
     );
   }),
 );
