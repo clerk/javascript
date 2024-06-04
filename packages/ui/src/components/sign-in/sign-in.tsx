@@ -2,13 +2,13 @@ import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
+import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
-import { getEnabledSocialConnectionsFromEnvironment } from '~/utils';
 
 export function SignInComponent() {
   const clerk = useClerk();
@@ -16,7 +16,7 @@ export function SignInComponent() {
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(clerk?.__unstable__environment);
 
   return (
-    <SignIn.Root>
+    <SignIn.Root exampleMode>
       <Common.Loading>
         {isGlobalLoading => {
           return (
