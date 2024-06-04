@@ -90,7 +90,7 @@
     "tslib": "2.4.1",
     "tsup": "*",
     "type-fest": "^4.9.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   },
   "peerDependencies": {
     "@clerk/clerk-react": "^5.0.0",
