@@ -1,7 +1,7 @@
 import type { ToggleGroupSingleProps } from '@radix-ui/react-toggle-group';
-import * as ToggleGroup from '@radix-ui/react-toggle-group';
+import * as RadixToggleGroup from '@radix-ui/react-toggle-group';
 
-export function AppearanceToggle({
+export function ToggleGroup({
   items,
   value,
   onValueChange,
@@ -9,7 +9,7 @@ export function AppearanceToggle({
   items: { label: string; value: string }[];
 }) {
   return (
-    <ToggleGroup.Root
+    <RadixToggleGroup.Root
       type='single'
       value={value}
       onValueChange={v => {
@@ -21,15 +21,15 @@ export function AppearanceToggle({
     >
       {items.map(item => {
         return (
-          <ToggleGroup.Item
+          <RadixToggleGroup.Item
             key={item.value}
             value={item.value}
             className='font-medium text-xs data-[state="on"]:bg-neutral-100 p-1.5'
           >
             {item.label}
-          </ToggleGroup.Item>
+          </RadixToggleGroup.Item>
         );
       })}
-    </ToggleGroup.Root>
+    </RadixToggleGroup.Root>
   );
 }

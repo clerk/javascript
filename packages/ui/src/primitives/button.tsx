@@ -33,7 +33,7 @@ export const Button = React.forwardRef(function Button(
       ) : (
         <>
           {children}
-          {icon && <span className='text-[0.625rem] ml-2 opacity-60 shrink-0'>{icon}</span>}
+          {icon && <span className='text-[0.625rem] opacity-60 shrink-0 ms-2'>{icon}</span>}
         </>
       )}
     </button>
