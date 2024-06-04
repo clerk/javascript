@@ -1,7 +1,8 @@
 import { joinURL } from '@clerk/shared/url';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, not, or, raise, sendTo, setup } from 'xstate';
+import { and, assign, enqueueActions, fromPromise, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -48,6 +49,7 @@ export const SignInRouterMachine = setup({
     startMachine: SignInStartMachine,
     secondFactorMachine: SignInSecondFactorMachine,
     thirdPartyMachine: ThirdPartyMachine,
+    webAuthnAutofillSupport: fromPromise(() => isWebAuthnAutofillSupported()),
   },
   actions: {
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
@@ -208,6 +210,13 @@ export const SignInRouterMachine = setup({
   },
   states: {
     Idle: {
+      invoke: {
+        id: 'webAuthnAutofill',
+        src: 'webAuthnAutofillSupport',
+        onDone: {
+          actions: assign({ webAuthnAutofillSupport: ({ event }) => event.output }),
+        },
+      },
       on: {
         INIT: {
           actions: assign(({ event }) => ({

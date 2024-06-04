@@ -105,6 +105,7 @@ export interface SignInRouterContext extends BaseRouterContext {
   formRef: ActorRefFrom<TFormMachine>;
   loading: SignInRouterLoadingContext;
   signUpPath: string;
+  webAuthnAutofillSupport: boolean;
 }
 
 // ---------------------------------- Input ---------------------------------- //

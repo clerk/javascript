@@ -1,6 +1,5 @@
 import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
@@ -37,6 +36,7 @@ import {
 } from '~/internals/machines/form/form.context';
 import { usePassword } from '~/react/hooks/use-password.hook';
 import { SignInRouterCtx } from '~/react/sign-in/context';
+import { useSignInPasskeyAutofill } from '~/react/sign-in/context/router.context';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
 import { isReactFragment } from '~/react/utils/is-react-fragment';
 
@@ -179,6 +179,8 @@ const useInput = ({
   onChange: onChangeProp,
   onBlur: onBlurProp,
   onFocus: onFocusProp,
+  // @ts-expect-error - Depending on type the props can be different
+  passkeyAutofill,
   ...passthroughProps
 }: FormInputProps) => {
   const signInActorRef = SignInRouterCtx.useActorRef(true);
@@ -292,28 +294,15 @@ const useInput = ({
     ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
   }, [name, ref, initialValue]);
 
-  const [isSupported, setIsSupported] = React.useState(false);
-  React.useEffect(() => {
-    async function runAutofillPasskey() {
-      const _isSupported = await isWebAuthnAutofillSupported().catch(() => false);
-      setIsSupported(_isSupported);
-    }
-
-    // @ts-expect-error - Depending on type the props can be different
-    if (passthroughProps?.passkeyAutofill) {
-      runAutofillPasskey();
-    }
-
-    // @ts-expect-error - Depending on type the props can be different
-  }, [passthroughProps?.passkeyAutofill]);
+  const passkeyAutofillSupported = useSignInPasskeyAutofill();
 
   React.useEffect(() => {
     // @ts-expect-error - Depending on type the props can be different
-    if (passthroughProps?.passkeyAutofill) {
+    if (passthroughProps?.passkeyAutofill && passkeyAutofillSupported) {
       signInActorRef?.send({ type: 'AUTHENTICATE.PASSKEY.AUTOFILL' });
     }
     // @ts-expect-error - Depending on type the props can be different
-  }, [passthroughProps?.passkeyAutofill, signInActorRef]);
+  }, [passthroughProps?.passkeyAutofill, passkeyAutofillSupported, signInActorRef]);
 
   if (!name) {
     throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
@@ -351,15 +340,15 @@ const useInput = ({
     };
   }
 
-  if (isSupported) {
+  // Filter out invalid props that should not be passed through
+  // @ts-expect-error - Doesn't know about type narrowing by type here
+  const { validatePassword: _1, ...rest } = passthroughProps;
+
+  if (passkeyAutofill && passkeyAutofillSupported) {
     props = {
       autoComplete: 'webauthn',
     };
   }
-
-  // Filter out invalid props that should not be passed through
-  // @ts-expect-error - Doesn't know about type narrowing by type here
-  const { validatePassword: _1, passkeyAutofill, ...rest } = passthroughProps;
 
   return {
     Element,
