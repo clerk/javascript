@@ -16,16 +16,10 @@ declare global {
   }
 }
 
-const registerNavigationType = (name: string) => {
-  if (!window.__clerk_internal_navigations) {
-    window.__clerk_internal_navigations = {};
-  }
-
-  if (!(name in window.__clerk_internal_navigations)) {
-    // @ts-ignore
-    window.__clerk_internal_navigations[name] = {};
-  }
-
+const getClerkNavigationObject = (name: string) => {
+  window.__clerk_internal_navigations ??= {};
+  // @ts-ignore
+  window.__clerk_internal_navigations[name] ??= {};
   return window.__clerk_internal_navigations[name];
 };
 
@@ -39,15 +33,13 @@ export const useInternalNavFun = (props: {
   const [isPending, startTransition] = useTransition();
 
   if (windowNav) {
-    registerNavigationType(name).fun = (to, opts) => {
+    getClerkNavigationObject(name).fun = (to, opts) => {
       return new Promise<void>(res => {
-        if (!registerNavigationType(name).promisesBuffer) {
-          // We need to use window to store the reference to the buffer,
-          // as ClerkProvider might be unmounted and remounted during navigations
-          // If we use a ref, it will be reset when ClerkProvider is unmounted
-          registerNavigationType(name).promisesBuffer = [];
-        }
-        registerNavigationType(name).promisesBuffer!.push(res);
+        // We need to use window to store the reference to the buffer,
+        // as ClerkProvider might be unmounted and remounted during navigations
+        // If we use a ref, it will be reset when ClerkProvider is unmounted
+        getClerkNavigationObject(name).promisesBuffer ??= [];
+        getClerkNavigationObject(name).promisesBuffer?.push(res);
         startTransition(() => {
           // If the navigation is internal, we should use the history API to navigate
           // as this is the way to perform a shallow navigation in Next.js App Router
@@ -71,8 +63,8 @@ export const useInternalNavFun = (props: {
   }
 
   const flushPromises = () => {
-    registerNavigationType(name).promisesBuffer?.forEach(resolve => resolve());
-    registerNavigationType(name).promisesBuffer = [];
+    getClerkNavigationObject(name).promisesBuffer?.forEach(resolve => resolve());
+    getClerkNavigationObject(name).promisesBuffer = [];
   };
 
   // Flush any pending promises on mount/unmount
@@ -89,6 +81,8 @@ export const useInternalNavFun = (props: {
   }, [pathname, isPending]);
 
   return useCallback((to: string) => {
-    return registerNavigationType(name).fun(to);
+    return getClerkNavigationObject(name).fun(to);
+    // We are not expecting name to change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
