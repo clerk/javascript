@@ -6,7 +6,7 @@ import { PROVIDERS } from '~/constants';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
-import * as Field from '~/primitives/field';
+import * as Field from '~/primitives/field-elements';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 
@@ -51,24 +51,21 @@ export function SignInComponent() {
                 })}
               </Connection.Root>
               <Seperator>or</Seperator>
-              <Common.Field
-                name='emailAddress'
-                asChild
-              >
-                <Field.Root>
-                  <Common.Label asChild>
-                    <Field.Label>Email address</Field.Label>
-                  </Common.Label>
-                  <Common.Input asChild>
-                    <Field.Input disabled={isContinuing || hasBusyConnection} />
-                  </Common.Input>
-                  <Common.FieldError>
-                    {({ message }) => {
-                      return <Field.Message intent='error'>{message}</Field.Message>;
-                    }}
-                  </Common.FieldError>
-                </Field.Root>
-              </Common.Field>
+
+              <Field.Root name='emailAddress'>
+                <Field.Label>Email address</Field.Label>
+                <Field.Input disabled={isContinuing || hasBusyConnection} />
+                <Field.Message />
+              </Field.Root>
+
+              <Field.Root name='password'>
+                <Field.Label>Password</Field.Label>
+                <Field.Input
+                  disabled={isContinuing || hasBusyConnection}
+                  validatePassword
+                />
+                <Field.Message />
+              </Field.Root>
 
               <SignIn.Action
                 submit
