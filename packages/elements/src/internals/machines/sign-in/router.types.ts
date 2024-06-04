@@ -5,12 +5,14 @@ import type { TFormMachine } from '~/internals/machines/form';
 import type {
   BaseRouterContext,
   BaseRouterErrorEvent,
+  BaseRouterFormAttachEvent,
   BaseRouterInput,
   BaseRouterLoadingEvent,
   BaseRouterNextEvent,
   BaseRouterPrevEvent,
   BaseRouterRedirectEvent,
   BaseRouterResetEvent,
+  BaseRouterResetStepEvent,
   BaseRouterSetClerkEvent,
   BaseRouterStartEvent,
   BaseRouterTransferEvent,
@@ -47,6 +49,7 @@ export type SignInRouterSystemId = keyof typeof SignInRouterSystemId;
 
 // ---------------------------------- Events ---------------------------------- //
 
+export type SignInRouterFormAttachEvent = BaseRouterFormAttachEvent;
 export type SignInRouterNextEvent = BaseRouterNextEvent<SignInResource>;
 export type SignInRouterStartEvent = BaseRouterStartEvent;
 export type SignInRouterPrevEvent = BaseRouterPrevEvent;
@@ -56,6 +59,7 @@ export type SignInRouterErrorEvent = BaseRouterErrorEvent;
 export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
 export type SignInRouterResetEvent = BaseRouterResetEvent;
+export type SignInRouterResetStepEvent = BaseRouterResetStepEvent;
 export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'reset-password'>;
 export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
@@ -73,6 +77,7 @@ export type SignInRouterNavigationEvents =
   | SignInRouterPrevEvent;
 
 export type SignInRouterEvents =
+  | SignInRouterFormAttachEvent
   | SignInRouterInitEvent
   | SignInRouterNextEvent
   | SignInRouterNavigationEvents
@@ -80,6 +85,7 @@ export type SignInRouterEvents =
   | SignInRouterTransferEvent
   | SignInRouterRedirectEvent
   | SignInRouterResetEvent
+  | SignInRouterResetStepEvent
   | SignInVerificationFactorUpdateEvent
   | SignInRouterLoadingEvent
   | SignInRouterSetClerkEvent

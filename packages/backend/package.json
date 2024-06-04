@@ -106,7 +106,7 @@
     "@cloudflare/workers-types": "^3.18.0",
     "@types/chai": "^4.3.3",
     "@types/cookie": "^0.5.1",
-    "@types/node": "^18.17.0",
+    "@types/node": "^18.19.33",
     "@types/qunit": "^2.19.7",
     "@types/sinon": "^10.0.13",
     "chai": "^4.3.6",

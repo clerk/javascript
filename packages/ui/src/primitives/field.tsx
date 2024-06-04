@@ -9,7 +9,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('space-y-2', className)}
+      className={cn('has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]', 'space-y-2', className)}
     >
       {children}
     </div>
@@ -24,7 +24,10 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
     <label
       ref={forwardedRef}
       {...props}
-      className={cn('text-[0.8125rem]/[1.125rem] font-medium flex items-center text-gray-12 gap-x-1', className)}
+      className={cn(
+        'text-base font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
+        className,
+      )}
     >
       {children}
     </label>
@@ -37,10 +40,11 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
 ) {
   return (
     <input
+      data-field-input=''
       ref={forwardedRef}
       {...props}
       className={cn(
-        "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-[0.8125rem]/[1.125rem]",
+        "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base",
         className,
       )}
     />
@@ -64,7 +68,7 @@ export const Message = React.forwardRef<
       ref={forwardedRef}
       {...props}
       className={cn(
-        'text-[0.8125rem]/[1.125rem] flex gap-x-1',
+        'text-base flex gap-x-1',
         {
           // TODO: Use the color tokens here
           'text-[#ef4444]': intent === 'error',

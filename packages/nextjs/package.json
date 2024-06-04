@@ -72,13 +72,13 @@
     "@clerk/shared": "2.2.1",
     "@clerk/types": "4.5.1",
     "crypto-js": "4.2.0",
-    "path-to-regexp": "6.2.1",
+    "path-to-regexp": "6.2.2",
     "tslib": "2.4.1"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
     "@types/crypto-js": "4.2.2",
-    "@types/node": "^18.17.0",
+    "@types/node": "^18.19.33",
     "@types/react": "*",
     "@types/react-dom": "*",
     "next": "^13.5.4",

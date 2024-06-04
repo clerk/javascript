@@ -90,7 +90,7 @@
   "dependencies": {
     "@clerk/types": "4.5.1",
     "glob-to-regexp": "0.4.1",
-    "js-cookie": "3.0.1",
+    "js-cookie": "3.0.5",
     "std-env": "^3.7.0",
     "swr": "^2.2.0"
   },
@@ -98,7 +98,7 @@
     "@clerk/eslint-config-custom": "*",
     "@types/glob-to-regexp": "0.4.1",
     "@types/js-cookie": "3.0.2",
-    "@types/node": "^18.17.0",
+    "@types/node": "^18.19.33",
     "cross-fetch": "^4.0.0",
     "tsup": "*",
     "typescript": "*"

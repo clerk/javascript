@@ -2,6 +2,7 @@
 
 import * as Clerk from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import Link from 'next/link';
 import type { ComponentProps } from 'react';
 
 import { H1, HR as Hr, P } from '@/components/design';
@@ -41,6 +42,16 @@ export default function SignUpPage() {
         <div className='m-auto w-max text-sm'>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>Sign Up</H1>
+
+            <p className='text-base text-zinc-400'>
+              Have an account?{' '}
+              <Link
+                href='/sign-in'
+                className='no-underline hover:underline'
+              >
+                Sign In
+              </Link>
+            </p>
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
               <Clerk.Connection
@@ -104,6 +115,16 @@ export default function SignUpPage() {
         <SignUp.Step name='start'>
           <div className='flex flex-col items-center justify-center gap-12'>
             <H1>Sign Up</H1>
+
+            <p className='text-base text-zinc-400'>
+              Have an account?{' '}
+              <Link
+                href='/sign-in'
+                className='no-underline hover:underline'
+              >
+                Sign In
+              </Link>
+            </p>
 
             <div className='flex flex-col items-stretch justify-center gap-2'>
               <Clerk.Connection
