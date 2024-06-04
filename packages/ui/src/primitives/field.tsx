@@ -68,10 +68,9 @@ export const Input = React.forwardRef(function Input(
         <button
           type='button'
           className={cn(
-            'aspect-square absolute rounded-sm outline-none right-1 top-1 text-gray-11 p-1',
+            'aspect-square absolute rounded-sm outline-none end-1 top-1 text-gray-11 p-1',
             'hover:text-gray-12 hover:bg-gray-3',
             'focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring-2 focus-visible:ring-default',
-            'rtl:right-auto rtl:left-1',
           )}
           onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
           title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
