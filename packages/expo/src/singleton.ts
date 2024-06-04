@@ -50,7 +50,7 @@ export function getClerkInstance(options?: BuildClerkOptions): HeadlessBrowserCl
   }
 
   // Support "hot-swapping" the Clerk instance at runtime. See JS-598 for additional details.
-  const hasKeyChanged = __internal_clerk && publishableKey !== __internal_clerk.publishableKey;
+  const hasKeyChanged = __internal_clerk && !!publishableKey && publishableKey !== __internal_clerk.publishableKey;
 
   if (!__internal_clerk || hasKeyChanged) {
     if (hasKeyChanged) {
