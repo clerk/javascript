@@ -15,5 +15,6 @@ export const useAwaitablePush = () => {
   return useInternalNavFun({
     windowNav: typeof window !== 'undefined' ? window.history.pushState.bind(window.history) : undefined,
     routerNav: router.push.bind(router),
+    name: 'push',
   });
 };
