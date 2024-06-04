@@ -51,45 +51,47 @@ export function SignInComponent() {
                 })}
               </Connection.Root>
               <Seperator>or</Seperator>
-              <Common.Field
-                name='emailAddress'
-                asChild
-              >
-                <Field.Root>
-                  <Common.Label asChild>
-                    <Field.Label>Email address</Field.Label>
-                  </Common.Label>
-                  <Common.Input asChild>
-                    <Field.Input disabled={isContinuing || hasBusyConnection} />
-                  </Common.Input>
-                  <Common.FieldError>
-                    {({ message }) => {
-                      return <Field.Message intent='error'>{message}</Field.Message>;
-                    }}
-                  </Common.FieldError>
-                </Field.Root>
-              </Common.Field>
-              <Common.Field
-                name='password'
-                asChild
-              >
-                <Field.Root>
-                  <Common.Label asChild>
-                    <Field.Label>Password</Field.Label>
-                  </Common.Label>
-                  <Common.Input asChild>
-                    <Field.Input
-                      type='password'
-                      disabled={isContinuing || hasBusyConnection}
-                    />
-                  </Common.Input>
-                  <Common.FieldError>
-                    {({ message }) => {
-                      return <Field.Message intent='error'>{message}</Field.Message>;
-                    }}
-                  </Common.FieldError>
-                </Field.Root>
-              </Common.Field>
+              <div className='space-y-4'>
+                <Common.Field
+                  name='emailAddress'
+                  asChild
+                >
+                  <Field.Root>
+                    <Common.Label asChild>
+                      <Field.Label>Email address</Field.Label>
+                    </Common.Label>
+                    <Common.Input asChild>
+                      <Field.Input disabled={isContinuing || hasBusyConnection} />
+                    </Common.Input>
+                    <Common.FieldError>
+                      {({ message }) => {
+                        return <Field.Message intent='error'>{message}</Field.Message>;
+                      }}
+                    </Common.FieldError>
+                  </Field.Root>
+                </Common.Field>
+                <Common.Field
+                  name='password'
+                  asChild
+                >
+                  <Field.Root>
+                    <Common.Label asChild>
+                      <Field.Label>Password</Field.Label>
+                    </Common.Label>
+                    <Common.Input asChild>
+                      <Field.Input
+                        type='password'
+                        disabled={isContinuing || hasBusyConnection}
+                      />
+                    </Common.Input>
+                    <Common.FieldError>
+                      {({ message }) => {
+                        return <Field.Message intent='error'>{message}</Field.Message>;
+                      }}
+                    </Common.FieldError>
+                  </Field.Root>
+                </Common.Field>
+              </div>
 
               <SignIn.Action
                 submit
