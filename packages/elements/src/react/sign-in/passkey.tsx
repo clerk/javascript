@@ -8,19 +8,18 @@ export type SignInPasskeyElement = React.ElementRef<'button'>;
 export type SignInPasskeyProps = {
   asChild?: boolean;
   children: React.ReactNode;
-};
+} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
 
 const SIGN_IN_PASSKEY_NAME = 'SignInPasskey';
 
 /**
- * Resend verification codes during the sign-in process.
+ * Prompt users to select a passkey from their device in order to sign in.
  * This component must be used within the <Step name="start">.
  *
- * @note This component is not intended to be used directly. Instead, use the <Action resend> component.
  *
  * @example
- * import { Action } from '@clerk/elements/sign-in';
- * <Action passkey>Use passkey instead</Action>;
+ * import { Passkey } from '@clerk/elements/sign-in';
+ * <Passkey>Use passkey instead</Passkey>;
  */
 export const SignInPasskey = React.forwardRef<SignInPasskeyElement, SignInPasskeyProps>(
   ({ asChild, ...rest }, forwardedRef) => {

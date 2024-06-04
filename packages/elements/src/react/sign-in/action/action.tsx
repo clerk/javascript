@@ -5,7 +5,6 @@ import { Submit } from '~/react/common';
 
 import type { SignInNavigateElementKey, SignInNavigateProps } from './navigate';
 import { SignInNavigate } from './navigate';
-import { SignInPasskey } from './passkey';
 import type { SignInResendProps } from './resend';
 import { SignInResend } from './resend';
 
@@ -15,11 +14,10 @@ export type SignInActionProps = { asChild?: boolean } & FormSubmitProps &
         navigate: SignInNavigateProps['to'];
         resend?: never;
         submit?: never;
-        passkey?: never;
       } & Omit<SignInNavigateProps, 'to'>)
-    | { navigate?: never; resend?: never; submit: true; passkey?: never }
-    | { navigate?: never; resend?: never; submit?: never; passkey: true }
-    | ({ navigate?: never; resend: true; submit?: never; passkey?: never } & SignInResendProps)
+    | { navigate?: never; resend?: never; submit: true }
+    | { navigate?: never; resend?: never; submit?: never }
+    | ({ navigate?: never; resend: true; submit?: never } & SignInResendProps)
   );
 
 export type SignInActionCompProps = React.ForwardRefExoticComponent<
@@ -51,7 +49,7 @@ const SIGN_IN_ACTION_NAME = 'SignInAction';
  * <SignIn.Action passkey>Use Passkey instead</SignIn.Action>
  */
 export const SignInAction = React.forwardRef<React.ElementRef<'button'>, SignInActionProps>((props, forwardedRef) => {
-  const { submit, navigate, passkey, resend, ...rest } = props;
+  const { submit, navigate, resend, ...rest } = props;
   let Comp: React.ForwardRefExoticComponent<any> | undefined;
 
   if (submit) {
@@ -60,8 +58,6 @@ export const SignInAction = React.forwardRef<React.ElementRef<'button'>, SignInA
     Comp = SignInNavigate;
   } else if (resend) {
     Comp = SignInResend;
-  } else if (passkey) {
-    Comp = SignInPasskey;
   }
 
   return Comp ? (
