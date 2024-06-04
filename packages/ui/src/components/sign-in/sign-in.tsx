@@ -9,6 +9,7 @@ import * as Connection from '~/primitives/connection';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
+import { PROVIDER_ICON_MAP } from '~/utils';
 
 export function SignInComponent() {
   const clerk = useClerk();
@@ -31,6 +32,8 @@ export function SignInComponent() {
                   <Card.Body>
                     <Connection.Root>
                       {enabledConnections.map(connection => {
+                        // @ts-ignore TODO: properly fix type
+                        const ConnectionIcon = Icon[PROVIDER_ICON_MAP[connection.provider]];
                         return (
                           <Common.Connection
                             key={connection.provider}
@@ -43,8 +46,7 @@ export function SignInComponent() {
                                   <Connection.Button
                                     busy={isConnectionLoading}
                                     disabled={isGlobalLoading || isConnectionLoading}
-                                    // TODO: implement custom Icon component
-                                    icon={<Common.Icon className='size-4' />}
+                                    icon={<ConnectionIcon className='text-base' />}
                                   >
                                     {connection.provider}
                                   </Connection.Button>

@@ -33,6 +33,8 @@ export function SignUpComponent() {
                   <Card.Body>
                     <Connection.Root>
                       {enabledConnections.map(connection => {
+                        // @ts-ignore TODO: properly fix type
+                        const ConnectionIcon = Icon[PROVIDER_ICON_MAP[connection.provider]];
                         return (
                           <Common.Connection
                             key={connection.provider}
@@ -45,8 +47,7 @@ export function SignUpComponent() {
                                   <Connection.Button
                                     busy={isConnectionLoading}
                                     disabled={isGlobalLoading || isConnectionLoading}
-                                    // TODO: implement custom Icon component
-                                    icon={<Common.Icon className='size-4' />}
+                                    icon={<ConnectionIcon className='text-base' />}
                                   >
                                     {connection.name}
                                   </Connection.Button>
