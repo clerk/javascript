@@ -22,11 +22,18 @@ type StringifyQueryParamsOptions = {
 };
 
 export const stringifyQueryParams = (
-  params: Record<string, string | undefined | null | object | Array<string | undefined | null>>,
+  params:
+    | Record<string, string | undefined | null | object | Array<string | undefined | null>>
+    | null
+    | undefined
+    | string,
   opts: StringifyQueryParamsOptions = {},
 ) => {
-  const queryParams = new URLSearchParams();
+  if (params === null || params === undefined) {
+    return '';
+  }
 
+  const queryParams = new URLSearchParams();
   if (params && typeof params === 'object') {
     Object.keys(params).forEach(key => {
       const encodedKey = opts.keyEncoder ? opts.keyEncoder(key) : key;
