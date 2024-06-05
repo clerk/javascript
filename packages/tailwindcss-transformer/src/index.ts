@@ -50,6 +50,9 @@ function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }) 
       if (isLogicalExpression(path.parentPath.node) && !isRightmostOperand(path)) {
         return false;
       }
+      if (path.parentPath.node.type === 'ObjectProperty' && path.parentPath.node.key === path.node) {
+        return false;
+      }
       const cn = generateHashedClassName(path.node.value);
       ctx.styleCache.set(cn, path.node.value);
       path.node.value = cn;
