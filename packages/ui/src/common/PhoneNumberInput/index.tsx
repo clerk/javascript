@@ -6,7 +6,7 @@ import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
 import * as Icon from '~/primitives/icon';
 
-import { IsoToCountryMap } from './data';
+import { type CountryIso, IsoToCountryMap } from './data';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
 
 const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
@@ -17,10 +17,10 @@ const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
 
 export function PhoneNumberInput({
   onChange,
-  className,
+  locationBasedCountryIso,
 }: {
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
-  className?: string;
+  locationBasedCountryIso: CountryIso;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const [isOpen, setOpen] = React.useState(false);
@@ -30,7 +30,7 @@ export function PhoneNumberInput({
   const contentWidth = containerRef.current?.clientWidth || 0;
   const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
     initPhoneWithCode: selectedCountry.iso,
-    locationBasedCountryIso: 'us',
+    locationBasedCountryIso,
   });
 
   const callOnChangeProp = () => {
@@ -88,7 +88,6 @@ export function PhoneNumberInput({
               intent === 'success' && 'border-success focus-within:ring-success/25',
               // warning
               intent === 'warning' && 'border-warning focus-within:ring-warning/20',
-              className,
             )}
           >
             <DialogTrigger>
