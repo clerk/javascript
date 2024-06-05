@@ -25,6 +25,7 @@ export function PhoneNumberInput({
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const [isOpen, setOpen] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const commandInputRef = React.useRef<HTMLInputElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const contentWidth = containerRef.current?.clientWidth || 0;
   const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
@@ -61,6 +62,11 @@ export function PhoneNumberInput({
   };
 
   React.useEffect(callOnChangeProp, [numberWithCode, onChange]);
+  React.useEffect(() => {
+    if (isOpen) {
+      commandInputRef.current?.focus();
+    }
+  }, [isOpen]);
 
   return (
     <Common.FieldState>
@@ -88,7 +94,7 @@ export function PhoneNumberInput({
             <DialogTrigger>
               <Button
                 onPress={() => setOpen(true)}
-                className='py-1 px-2 gap-x-2 flex items-center rounded-l-md outline-none text-base'
+                className='hover:bg-gray-2 focus-visible:bg-gray-2 py-1 px-2 gap-x-2 flex items-center rounded-l-md outline-none text-base'
               >
                 <span className='uppercase min-w-6'>{selectedCountry.iso}</span>
                 <Icon.ChevronUpDown className='text-gray-11 size-4' />
@@ -107,8 +113,9 @@ export function PhoneNumberInput({
                   <Command className='bg-white bg-clip-padding border border-gray-a3 rounded-md shadow-lg outline-none overflow-hidden'>
                     <div className='p-0.5'>
                       <Command.Input
+                        ref={commandInputRef}
                         placeholder='Search country or code'
-                        className='py-1.5 px-2 w-full text-base leading-small bg-gray-3 outline-none placeholder:text-gray-8 rounded-[calc(theme(borderRadius.md)-2px)] text-gray-12'
+                        className='py-1.5 px-2 w-full text-base leading-small bg-gray-3 outline-none placeholder:text-gray-9 rounded-[calc(theme(borderRadius.md)-2px)] text-gray-12'
                       />
                     </div>
                     <Command.List className='overflow-y-auto overflow-x-hidden max-h-80'>
