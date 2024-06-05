@@ -18,7 +18,7 @@ export const getQueryParams = (queryString: string) => {
 };
 
 type StringifyQueryParamsOptions = {
-  encoder?: (key: string) => string;
+  keyEncoder?: (key: string) => string;
 };
 
 export const stringifyQueryParams = (
@@ -29,7 +29,7 @@ export const stringifyQueryParams = (
 
   if (params && typeof params === 'object') {
     Object.keys(params).forEach(key => {
-      const encodedKey = opts.encoder ? opts.encoder(key) : key;
+      const encodedKey = opts.keyEncoder ? opts.keyEncoder(key) : key;
       const value = params[key];
       if (Array.isArray(value)) {
         value.forEach(v => v !== undefined && queryParams.append(encodedKey, v || ''));

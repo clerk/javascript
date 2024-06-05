@@ -25,14 +25,6 @@ describe('getQueryParams(string)', () => {
 });
 
 describe('stringifyQueryParams(object)', () => {
-  // it('converts an object to querystring', () => {
-  //   expect(stringifyQueryParams({})).toEqual('');
-  //   expect(stringifyQueryParams({ foo: '42', bar: '43' })).toBe('foo=42&bar=43');
-  //   expect(stringifyQueryParams({ foo: ['42', '22'], bar: '43' })).toBe('foo=42&foo=22&bar=43');
-  //   expect(stringifyQueryParams({ foo: ['42', '22'], bar: undefined })).toBe('foo=42&foo=22');
-  //   expect(stringifyQueryParams({ unsafeMetadata: { bar: '1' } })).toBe('unsafe_metadata=%7B%22bar%22%3A%221%22%7D');
-  // });
-
   it('converts an object to querystring', () => {
     expect(stringifyQueryParams({ foo: '42', bar: '43' })).toBe('foo=42&bar=43');
   });
@@ -47,8 +39,8 @@ describe('stringifyQueryParams(object)', () => {
   });
 
   it('converts an object to querystring when key is camelCase', () => {
-    expect(stringifyQueryParams({ barFoo: '1' }, { encoder: camelToSnake })).toBe('bar_foo=1');
-    expect(stringifyQueryParams({ unsafeMetadata: { bar: '1' } }, { encoder: camelToSnake })).toBe(
+    expect(stringifyQueryParams({ barFoo: '1' }, { keyEncoder: camelToSnake })).toBe('bar_foo=1');
+    expect(stringifyQueryParams({ unsafeMetadata: { bar: '1' } }, { keyEncoder: camelToSnake })).toBe(
       'unsafe_metadata=%7B%22bar%22%3A%221%22%7D',
     );
   });
