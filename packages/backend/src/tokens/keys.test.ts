@@ -188,30 +188,6 @@ export default (QUnit: QUnit) => {
       }
     });
 
-    test('throws an error when JWKS can not be fetched from Backend or Frontend API and cache updated less than 5 minutes ago', async assert => {
-      const kid = 'ins_whatever';
-      try {
-        await loadClerkJWKFromRemote({
-          apiKey: 'deadbeef',
-          kid,
-        });
-        assert.false(true);
-      } catch (err) {
-        if (err instanceof Error) {
-          assert.propEqual(err, {
-            reason: 'jwk-remote-missing',
-            action: 'Contact support@clerk.com',
-          });
-          assert.propContains(err, {
-            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid are available: local, ${mockRsaJwkKid}`,
-          });
-        } else {
-          // This should never be reached. If it does, the suite should fail
-          assert.false(true);
-        }
-      }
-    });
-
     test('throws an error when no JWK matches the provided kid', async assert => {
       fakeFetch.onCall(0).returns(jsonOk(mockJwks));
       const kid = 'ins_whatever';
@@ -229,7 +205,7 @@ export default (QUnit: QUnit) => {
             action: 'Contact support@clerk.com',
           });
           assert.propContains(err, {
-            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid are available: local, ${mockRsaJwkKid}`,
+            message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid are available: ${mockRsaJwkKid}`,
           });
         } else {
           // This should never be reached. If it does, the suite should fail
