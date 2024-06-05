@@ -25,15 +25,34 @@ describe('getQueryParams(string)', () => {
 });
 
 describe('stringifyQueryParams(object)', () => {
+  it('handles null values', () => {
+    expect(stringifyQueryParams(null)).toBe('');
+  });
+
+  it('handles undefined values', () => {
+    expect(stringifyQueryParams(undefined)).toBe('');
+  });
+
+  it('handles string values', () => {
+    expect(stringifyQueryParams('hello')).toBe('');
+  });
+
+  it('handles empty string values', () => {
+    expect(stringifyQueryParams('')).toBe('');
+  });
+
   it('converts an object to querystring', () => {
     expect(stringifyQueryParams({ foo: '42', bar: '43' })).toBe('foo=42&bar=43');
   });
+
   it('converts an object to querystring when value is an array', () => {
     expect(stringifyQueryParams({ foo: ['42', '22'], bar: '43' })).toBe('foo=42&foo=22&bar=43');
   });
+
   it('converts an object to querystring when value is undefined', () => {
     expect(stringifyQueryParams({ foo: ['42', '22'], bar: undefined })).toBe('foo=42&foo=22');
   });
+
   it('converts an object to querystring when value is an object', () => {
     expect(stringifyQueryParams({ unsafe_metadata: { bar: '1' } })).toBe('unsafe_metadata=%7B%22bar%22%3A%221%22%7D');
   });

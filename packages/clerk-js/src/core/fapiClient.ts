@@ -190,7 +190,12 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     // @ts-ignore
 
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
-      requestInit.body = stringifyQueryParams(body, { keyEncoder: camelToSnake });
+      // The native BodyInit type is too wide for our use case,
+      // so we're casting it to a more specific type here.
+      // This is covered by the test suite.
+      requestInit.body = body
+        ? stringifyQueryParams(body as any as Record<string, string>, { keyEncoder: camelToSnake })
+        : body;
     }
 
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
