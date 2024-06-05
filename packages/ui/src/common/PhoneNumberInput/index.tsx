@@ -119,7 +119,9 @@ export function PhoneNumberInput({
                       />
                     </div>
                     <Command.List className='overflow-y-auto overflow-x-hidden max-h-80'>
-                      <Command.Empty>No countries found</Command.Empty>
+                      <Command.Empty className='text-gray-12 text-base leading-small text-center py-1.5 px-4'>
+                        No countries found
+                      </Command.Empty>
                       {countryOptions.map(({ name, iso, code }, index) => {
                         return (
                           <Command.Item
