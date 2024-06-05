@@ -565,6 +565,7 @@ type FormInputProps =
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
     const clerk = useClerk();
+    const passkeyAutofillProp = (props as PasskeyInputProps).passkeyAutofill;
     const signInRouterRef = SignInRouterCtx.useActorRef(true);
 
     clerk.telemetry?.record(
@@ -579,13 +580,17 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
       }),
     );
 
-    if (signInRouterRef) {
+    if (signInRouterRef && passkeyAutofillProp) {
       return (
         <SignInInput
           ref={forwardedRef}
           {...props}
         />
       );
+    }
+
+    if (passkeyAutofillProp) {
+      throw new ClerkElementsRuntimeError(`<Input passkeyAutofill> can only be used inside <SignIn>.`);
     }
 
     return (
@@ -603,16 +608,15 @@ const SignInInput = React.forwardRef<React.ElementRef<typeof RadixControl>, Form
   (props: FormInputProps, forwardedRef) => {
     const signInRouterRef = SignInRouterCtx.useActorRef(true);
     const passkeyAutofillSupported = useSignInPasskeyAutofill();
-    const passkeyAutofillProp = (props as PasskeyInputProps).passkeyAutofill;
 
     React.useEffect(() => {
-      if (passkeyAutofillProp && passkeyAutofillSupported) {
+      if (passkeyAutofillSupported) {
         signInRouterRef?.send({ type: 'AUTHENTICATE.PASSKEY.AUTOFILL' });
       }
-    }, [passkeyAutofillProp, passkeyAutofillSupported, signInRouterRef]);
+    }, [passkeyAutofillSupported, signInRouterRef]);
 
     // @ts-expect-error - Depending on type the props can be different
-    const field = useInput({ ...props, passkeyAutofill: passkeyAutofillProp && passkeyAutofillSupported });
+    const field = useInput({ ...props, passkeyAutofill: passkeyAutofillSupported });
     return (
       <field.Element
         ref={forwardedRef}

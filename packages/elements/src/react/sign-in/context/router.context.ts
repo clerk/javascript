@@ -22,4 +22,5 @@ export const useSignInFirstFactorStep = () => useSignInStep<TSignInFirstFactorMa
 export const useSignInSecondFactorStep = () => useSignInStep<TSignInSecondFactorMachine>('secondFactor');
 export const useSignInResetPasswordStep = () => useSignInStep<TSignInResetPasswordMachine>('resetPassword');
 
-export const useSignInPasskeyAutofill = () => SignInRouterCtx.useSelector(state => state.context.webAuthnSupport);
+export const useSignInPasskeyAutofill = () =>
+  SignInRouterCtx.useSelector(state => state.context.webAuthnAutofillSupport);
