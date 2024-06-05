@@ -55,7 +55,7 @@ export const Input = React.forwardRef(function Input(
         ref={forwardedRef}
         type={type}
         className={cn(
-          "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base",
+          "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus-visible:ring-[0.1875rem] focus-visible:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus-visible:ring-destructive/30 focus-visible:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base",
           typeProp === 'password' && 'pe-7',
           className,
         )}
