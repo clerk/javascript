@@ -73,13 +73,11 @@ interface ClerkMiddleware {
 export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', logger => (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
-
   if (params.debug) {
     logger.enable();
   }
 
   const hasProvidedRuntimeOptions = params.secretKey || params.signInUrl || params.signInUrl;
-
   if (hasProvidedRuntimeOptions && !SIGNING_KEY) {
     throw new Error(missingSigningKey);
   }
