@@ -59,13 +59,13 @@ export const Input = React.forwardRef(function Input(
         (intent === 'idle' || intent === 'info') &&
           'hover:border-gray-a8 focus-visible:ring-gray-a3 focus-visible:border-gray-a8',
         // invalid
-        "data-[invalid='true']:border-destructive data-[invalid='true']:focus-visible:ring-destructive/30",
+        "data-[invalid='true']:border-danger data-[invalid='true']:focus-visible:ring-danger/30",
         // error
-        intent === 'error' && 'border-destructive focus-visible:ring-destructive/30',
-        // success
-        intent === 'success' && 'border-[#10b981] focus-visible:ring-[#10b981]/30',
+        intent === 'error' && 'border-danger focus-visible:ring-danger/20',
+        // success (optically adjusted ring to 25 opacity)
+        intent === 'success' && 'border-success focus-visible:ring-success/25',
         // warning
-        intent === 'warning' && 'border-yellow-500 focus-visible:ring-yellow-500/30',
+        intent === 'warning' && 'border-warning focus-visible:ring-warning/20',
         className,
       )}
       {...props}
@@ -90,9 +90,9 @@ export const Message = React.forwardRef<
         // tailwind-transformer doesn't support it
         intent === 'idle' && 'text-gray-11',
         intent === 'info' && 'text-gray-11',
-        intent === 'error' && 'text-destructive',
-        intent === 'success' && 'text-[#10b981]',
-        intent === 'warning' && 'text-yellow-500',
+        intent === 'error' && 'text-danger',
+        intent === 'success' && 'text-success',
+        intent === 'warning' && 'text-warning',
         className,
       )}
     >

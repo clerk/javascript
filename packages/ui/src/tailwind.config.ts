@@ -81,8 +81,14 @@ const config = {
           contrast: 'var(--cl-gray-contrast)',
           surface: 'var(--cl-gray-surface)',
         },
-        destructive: {
-          DEFAULT: 'hsl(var(--cl-color-destructive))',
+        danger: {
+          DEFAULT: 'hsl(var(--cl-color-danger))',
+        },
+        success: {
+          DEFAULT: 'hsl(var(--cl-color-success))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--cl-color-warning))',
         },
       },
       ringColor: {
