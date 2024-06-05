@@ -39,6 +39,7 @@ const Headers = {
   AuthMessage: 'x-clerk-auth-message',
   ClerkUrl: 'x-clerk-clerk-url',
   EnableDebug: 'x-clerk-debug',
+  ClerkData: 'x-clerk-data',
   ClerkRedirectTo: 'x-clerk-redirect-to',
   CloudFrontForwardedProto: 'cloudfront-forwarded-proto',
   Authorization: 'authorization',
