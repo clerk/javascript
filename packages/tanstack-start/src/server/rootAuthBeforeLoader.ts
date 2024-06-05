@@ -1,11 +1,8 @@
-'use server';
-
-import type { FileBaseRouteOptions } from '@tanstack/react-router';
 import type { ClerkState } from 'src/client/types.js';
-import { getWebRequest } from 'vinxi/http';
 
 import { authenticateRequest } from './authenticateRequest.js';
 import { loadOptions } from './loadOptions.js';
+import { getResponseClerkState } from './utils/utils.js';
 
 declare module '@tanstack/react-router' {
   interface AnyContext {
@@ -13,23 +10,10 @@ declare module '@tanstack/react-router' {
   }
 }
 
-type NonNullable<T> = Exclude<T, null | undefined>;
-
-type RootAuthBeforeLoaderOptions = Parameters<NonNullable<FileBaseRouteOptions['beforeLoad']>>[0];
-
-export const rootAuthBeforeLoader = async ({ context }: RootAuthBeforeLoaderOptions) => {
-  'use server';
-  const request = getWebRequest();
-
+export const rootAuthBeforeLoader = async (request: Request) => {
   const loadedOptions = loadOptions(request);
 
   const requestState = await authenticateRequest(request, loadedOptions);
 
-  const mergedContext = {
-    ...context,
-    clerkStateContext: {
-      publishableKey: requestState?.publishableKey,
-    },
-  };
-  return mergedContext;
+  return getResponseClerkState(requestState);
 };

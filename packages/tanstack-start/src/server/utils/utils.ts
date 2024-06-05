@@ -1,0 +1,50 @@
+import type { RequestState } from '@clerk/backend/internal';
+import { isTruthy } from '@clerk/shared/underscore';
+
+export const getEnvVariable = (name: string, defaultVaue: string = ''): string => {
+  // Node envs
+  if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
+    return (process.env[name] as string) || defaultVaue;
+  }
+
+  return defaultVaue;
+};
+
+/**
+ * Wraps obscured clerk internals with a readable `clerkState` key.
+ * This is intended to be passed by the user into <ClerkProvider>
+ *
+ * @internal
+ */
+export const wrapWithClerkState = (data: any) => {
+  return { __internal_clerk_state: { ...data } };
+};
+
+/**
+ * Returns the clerk state object and observability headers to be injected into a loader response.
+ *
+ * @internal
+ */
+export function getResponseClerkState(requestState: RequestState) {
+  const { reason, message, isSignedIn, ...rest } = requestState;
+  const clerkState = wrapWithClerkState({
+    __clerk_ssr_state: rest.toAuth(),
+    __publishableKey: requestState.publishableKey,
+    __proxyUrl: requestState.proxyUrl,
+    __domain: requestState.domain,
+    __isSatellite: requestState.isSatellite,
+    __signInUrl: requestState.signInUrl,
+    __signUpUrl: requestState.signUpUrl,
+    __afterSignInUrl: requestState.afterSignInUrl,
+    __afterSignUpUrl: requestState.afterSignUpUrl,
+    __clerkJSUrl: getEnvVariable('CLERK_JS'),
+    __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
+    __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
+    __telemetryDebug: isTruthy(getEnvVariable('CLERK_TELEMETRY_DEBUG')),
+  });
+
+  return {
+    clerkStateContext: clerkState,
+    headers: requestState.headers,
+  };
+}

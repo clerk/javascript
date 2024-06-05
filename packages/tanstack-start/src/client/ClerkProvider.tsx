@@ -13,23 +13,59 @@ const SDK_METADATA = {
   version: PACKAGE_VERSION,
 };
 
+const isServer = typeof window === 'undefined';
+
 export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProviderProps): JSX.Element {
   const contextRouter = useRouteContext({
     strict: false,
   });
 
+  const clerkInitState = !isServer ? (window as any).__clerk_init_state : contextRouter?.clerkStateContext;
+
+  const {
+    __clerk_ssr_state,
+    __publishableKey,
+    __proxyUrl,
+    __domain,
+    __isSatellite,
+    __clerk_debug,
+    __signInUrl,
+    __signUpUrl,
+    __afterSignInUrl,
+    __afterSignUpUrl,
+    __clerkJSUrl,
+    __clerkJSVersion,
+    __telemetryDisabled,
+    __telemetryDebug,
+  } = clerkInitState.__internal_clerk_state || {};
+
+  const mergedProps = {
+    publishableKey: __publishableKey,
+    proxyUrl: __proxyUrl,
+    domain: __domain,
+    isSatellite: __isSatellite,
+    signInUrl: __signInUrl,
+    signUpUrl: __signUpUrl,
+    afterSignInUrl: __afterSignInUrl,
+    afterSignUpUrl: __afterSignUpUrl,
+    clerkJSUrl: __clerkJSUrl,
+    clerkJSVersion: __clerkJSVersion,
+    telemetry: {
+      disabled: __telemetryDisabled,
+      debug: __telemetryDebug,
+    },
+  };
+
   return (
     <>
+      {/* TODO: revisit window.__clerk_init_state */}
       <Asset tag='script'>{`window.__clerk_init_state = ${JSON.stringify(contextRouter?.clerkStateContext)}`}</Asset>
-      <ClerkOptionsProvider options={{}}>
+      <ClerkOptionsProvider options={mergedProps}>
         <ReactClerkProvider
+          initialState={__clerk_ssr_state}
           sdkMetadata={SDK_METADATA}
+          {...mergedProps}
           {...restProps}
-          publishableKey={
-            typeof window !== 'undefined'
-              ? window.__clerk_init_state.publishableKey
-              : contextRouter?.clerkStateContext?.publishableKey
-          }
         >
           {children}
         </ReactClerkProvider>

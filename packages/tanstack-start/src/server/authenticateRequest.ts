@@ -1,13 +1,11 @@
 import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '@clerk/backend/internal';
 import { AuthStatus } from '@clerk/backend/internal';
-import { sendWebResponse } from 'vinxi/http';
 
 export async function authenticateRequest(
   request: Request,
   opts: AuthenticateRequestOptions,
-): Promise<SignedInState | SignedOutState | void> {
-  'use server';
+): Promise<SignedInState | SignedOutState> {
   const { audience, authorizedParties } = opts;
 
   const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey } = opts;
@@ -32,10 +30,9 @@ export async function authenticateRequest(
   });
 
   const hasLocationHeader = requestState.headers.get('location');
-  console.log('hasLocationHeader', hasLocationHeader);
   if (hasLocationHeader) {
     // triggering a handshake redirect
-    throw sendWebResponse(new Response(null, { status: 307, headers: requestState.headers }));
+    throw new Response(null, { status: 307, headers: requestState.headers });
   }
 
   if (requestState.status === AuthStatus.Handshake) {
