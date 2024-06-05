@@ -31,7 +31,9 @@
   },
   "dependencies": {
     "@clerk/elements": "file:../elements",
-    "clsx": "^2.1.1"
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "react-aria-components": "^1.2.1"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
