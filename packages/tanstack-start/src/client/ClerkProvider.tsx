@@ -1,5 +1,6 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouteContext } from '@tanstack/react-router';
+import { Asset } from '@tanstack/start';
 import React from 'react';
 
 import { ClerkOptionsProvider } from './OptionsContext.js';
@@ -13,28 +14,27 @@ const SDK_METADATA = {
 };
 
 export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProviderProps): JSX.Element {
-  // we can take the the clerk state from route context here
   const contextRouter = useRouteContext({
     strict: false,
   });
-  const { clerkStateContext } = contextRouter || {};
-
-  console.log('clerkState', clerkStateContext);
 
   return (
-    <ClerkOptionsProvider
-      options={{
-        publishableKey: clerkStateContext?.publishableKey,
-      }}
-    >
-      <ReactClerkProvider
-        sdkMetadata={SDK_METADATA}
-        {...restProps}
-        publishableKey={clerkStateContext?.publishableKey}
-      >
-        {children}
-      </ReactClerkProvider>
-    </ClerkOptionsProvider>
+    <>
+      <Asset tag='script'>{`window.__clerk_init_state = ${JSON.stringify(contextRouter?.clerkStateContext)}`}</Asset>
+      <ClerkOptionsProvider options={{}}>
+        <ReactClerkProvider
+          sdkMetadata={SDK_METADATA}
+          {...restProps}
+          publishableKey={
+            typeof window !== 'undefined'
+              ? window.__clerk_init_state.publishableKey
+              : contextRouter?.clerkStateContext?.publishableKey
+          }
+        >
+          {children}
+        </ReactClerkProvider>
+      </ClerkOptionsProvider>
+    </>
   );
 }
 ClerkProvider.displayName = 'ClerkProvider';

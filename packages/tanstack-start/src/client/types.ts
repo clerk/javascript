@@ -22,7 +22,7 @@ export type ClerkState = {
   };
 };
 
-export type TanstackStartClerkProviderProps = Without<ClerkProviderProps, 'publishableKey' | 'initialState'> & {
+export type TanstackStartClerkProviderProps = Without<ClerkProviderProps, 'initialState'> & {
   publishableKey?: string;
   children: React.ReactNode;
 };
