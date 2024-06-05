@@ -150,7 +150,7 @@ export function PhoneNumberInput({
               type='button'
               // Prevent tab stop
               tabIndex={-1}
-              className='inline-grid place-content-center px-1 cursor-text text-base'
+              className='grid place-content-center px-1 cursor-text text-base'
               onClick={() => inputRef.current?.focus()}
             >
               +{selectedCountry.code}
@@ -162,7 +162,7 @@ export function PhoneNumberInput({
               value={formattedNumber}
               onPaste={handlePaste}
               onChange={handlePhoneNumberChange}
-              className='w-full bg-white py-1.5 px-2.5 text-base rounded-r-md outline-none'
+              className='w-full bg-white py-1.5 pr-2.5 text-base rounded-r-md outline-none'
             />
           </div>
         );
