@@ -13,7 +13,8 @@ import { NextResponse } from 'next/server';
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
+import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL, SIGNING_KEY } from './constants';
+import { missingSigningKey } from './errors';
 import { errorThrower } from './errorThrower';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
@@ -72,8 +73,15 @@ interface ClerkMiddleware {
 export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', logger => (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
+
   if (params.debug) {
     logger.enable();
+  }
+
+  const hasProvidedRuntimeOptions = params.secretKey || params.signInUrl || params.signInUrl;
+
+  if (hasProvidedRuntimeOptions && !SIGNING_KEY) {
+    throw new Error(missingSigningKey);
   }
 
   const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
