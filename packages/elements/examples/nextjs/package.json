@@ -6,7 +6,6 @@
     "build": "next build",
     "dev": "next dev",
     "dev:debug": "NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG=true next dev",
-    "e2e": "playwright test",
     "lint": "next lint",
     "start": "next start"
   },
@@ -14,18 +13,18 @@
     "@clerk/elements": "file:../../elements",
     "@clerk/nextjs": "file:../../nextjs",
     "@radix-ui/react-form": "^0.0.3",
+    "@radix-ui/react-popover": "^1.0.7",
     "clsx": "^2.0.0",
     "framer-motion": "^11.0.28",
     "geist": "^1.3",
     "next": "^14.2.3",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.43",
-    "@types/node": "^18",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/node": "^18.19.33",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
     "eslint": "^8",
     "eslint-config-next": "14.2",

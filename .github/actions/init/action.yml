@@ -4,7 +4,7 @@ inputs:
   node-version:
     description: 'The node version to use'
     required: false
-    default: '18'
+    default: '18.20.2' # This is pinned to `18.20.2` because `18.20.3` bumps npm from `10.5.0` to `10.7.0`, which causes our verdaccio setup to fail (see SDK-1793).
   playwright-enabled:
     description: 'Enable Playwright?'
     required: false
@@ -38,6 +38,10 @@ inputs:
     description: 'The registry the packages will be published to'
     required: false
     default: ''
+  verbose:
+    description: 'Enable verbose output'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -54,6 +58,7 @@ runs:
         SUMMARIZE: ${{ inputs.turbo-summarize }}
         TEAM: ${{ inputs.turbo-team }}
         TOKEN: ${{ inputs.turbo-token }}
+        VERBOSE: ${{ inputs.verbose }}
       with:
         script: |
           const os = require('os')
@@ -62,15 +67,24 @@ runs:
               ? os.availableParallelism()
               : os.cpus().length;
 
-          const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, SUMMARIZE, TEAM, TOKEN } = process.env
+          const { ENABLED, CACHE_DIR, SIGNATURE, REMOTE_ONLY, SUMMARIZE, TEAM, TOKEN, VERBOSE } = process.env
+
+          const ARGS = [
+            `--cache-dir=${CACHE_DIR}`,
+            `--concurrency=${cpus}`,
+            `--summarize=${SUMMARIZE}`,
+          ]
+
+          if (VERBOSE === 'true') {
+            ARGS.push('--verbosity=2')
+            ARGS.push('--log-order=stream')
+            ARGS.push('--output-logs=full')
+          } else {
+            ARGS.push('--output-logs=new-only')
+          }
 
           core.exportVariable('TURBO_ARGS',
-            [
-              '--output-logs=new-only',
-              `--cache-dir=${CACHE_DIR}`,
-              `--concurrency=${cpus}`,
-              `--summarize=${SUMMARIZE}`,
-            ].join(' ')
+            ARGS.join(' ')
           )
 
           if (ENABLED === 'true') {

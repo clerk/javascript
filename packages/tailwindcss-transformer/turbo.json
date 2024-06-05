@@ -1,0 +1,25 @@
+{
+  "extends": ["//"],
+  "pipeline": {
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "*.d.ts",
+        "bundlewatch.config.json",
+        "jest.*",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!node_modules/**"
+      ],
+      "outputMode": "new-only",
+      "outputs": []
+    }
+  }
+}

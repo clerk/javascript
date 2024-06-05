@@ -97,10 +97,23 @@ const defaultRules = [
   },
 ];
 
-const globbed = await globby('packages/*', { cwd: ROOT_DIR, onlyDirectories: true });
-const workspacePackages = globbed.map(p => p.split('/').pop());
+const getPackageNames = async () => {
+  const files = await globby('./packages/*/package.json', { cwd: ROOT_DIR });
+  let names = [];
 
-for (const pkg of workspacePackages) {
+  for (const file of files) {
+    const content = await fs.readFile(file, 'utf8');
+    const json = JSON.parse(content);
+    names.push(json.name.split('/').pop());
+  }
+
+  // Sort alphabetically to make the output stable
+  return names.sort();
+};
+
+const packageNames = await getPackageNames();
+
+for (const pkg of packageNames) {
   /**
    * @type {Array.<PackageRule>}
    */

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -42,12 +42,12 @@
   "dependencies": {
     "@clerk/backend": "1.2.1",
     "@clerk/shared": "2.2.1",
-    "@clerk/types": "4.5.0",
+    "@clerk/types": "4.5.1",
     "cookies": "0.8.0"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@types/node": "^18.17.0",
+    "@types/node": "^18.19.33",
     "tsup": "*",
     "typescript": "*"
   },

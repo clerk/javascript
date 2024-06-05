@@ -43,7 +43,7 @@ jobs:
 
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
-        run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
+        run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
       - name: Lint GitHub Actions Workflows
         run: npx eslint .github
@@ -129,8 +129,15 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
+        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements']
         test-project: ['chrome']
+        include:
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '13'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '14'
 
     steps:
       - name: Checkout Repo
@@ -152,7 +159,7 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --filter=!elements --only && npx changeset publish --no-git-tag; fi
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
         working-directory: ./integration
@@ -163,17 +170,19 @@ jobs:
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
+        id: integration-tests
         run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
-      # - name: Upload Integration Report for ${{ matrix.test-name }}
-      #   uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: integration-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
-      #     path: playwright-report/
-      #     retention-days: 1
+      - name: Upload test-results
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+          path: integration/test-results
+          retention-days: 1

@@ -85,7 +85,7 @@ export const esMX: LocalizationResource = {
     'Entrar una dirección de correo electrónico bajo este dominio para recibir un código y verificarlo.',
   formFieldLabel__organizationName: 'Nombre de la Organización',
   formFieldLabel__organizationSlug: 'Slug',
-  formFieldLabel__passkeyName: undefined,
+  formFieldLabel__passkeyName: 'Nombre de llave de acceso',
   formFieldLabel__password: 'Contraseña',
   formFieldLabel__phoneNumber: 'Número telefónico',
   formFieldLabel__role: 'Rol',
@@ -95,7 +95,8 @@ export const esMX: LocalizationResource = {
     action__signOut: 'Cerrar',
     title: 'Registrado como {{identifier}}',
   },
-  maintenanceMode: undefined,
+  maintenanceMode: 'Actualmente estamos en mantenimiento, pero no te preocupes, no debería llevar más de unos minutos.',
+
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
   membershipRole__guestMember: 'Invitado',
@@ -287,7 +288,7 @@ export const esMX: LocalizationResource = {
       blockButton__backupCode: 'Usa un código de respaldo',
       blockButton__emailCode: 'Enviar código a{{identifier}}',
       blockButton__emailLink: 'Enviar enlace a{{identifier}}',
-      blockButton__passkey: undefined,
+      blockButton__passkey: 'Inicia sesión con tu llave de acceso',
       blockButton__password: 'Inicia sesión con tu contraseña',
       blockButton__phoneCode: 'Enviar código a{{identifier}}',
       blockButton__totp: 'Usa tu aplicación de autenticación',
@@ -361,8 +362,9 @@ export const esMX: LocalizationResource = {
       title: 'No puedo iniciar sesión',
     },
     passkey: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle:
+        'Usando tu llave de acceso confirmas que eres tú. Tu dispositivo puede pedirte la huella dactilar, el rostro o el bloqueo de pantalla.',
+      title: 'Usa tu llave de acceso',
     },
     password: {
       actionLink: 'Use otro método',
@@ -370,7 +372,7 @@ export const esMX: LocalizationResource = {
       title: 'Introduzca su contraseña',
     },
     passwordPwned: {
-      title: undefined,
+      title: 'Contraseña en peligro',
     },
     phoneCode: {
       formTitle: 'Código de verificación',
@@ -398,7 +400,7 @@ export const esMX: LocalizationResource = {
       actionLink: 'Registrarse',
       actionLink__use_email: 'Utilizar correo electrónico',
       actionLink__use_email_username: 'Utilizar correo electrónico o nombre de usuario',
-      actionLink__use_passkey: undefined,
+      actionLink__use_passkey: 'Usar llave de acceso',
       actionLink__use_phone: 'Utilizar teléfono',
       actionLink__use_username: 'Utilizar nombre de usuario',
       actionText: '¿No tiene cuenta?',
@@ -490,11 +492,11 @@ export const esMX: LocalizationResource = {
     form_username_invalid_length: 'La longitud del nombre de usuario es demasiado corta.',
     identification_deletion_failed: 'No se puede eliminar la última identificación.',
     not_allowed_access: 'No tienes permiso para acceder a este recurso.',
-    passkey_already_exists: undefined,
-    passkey_not_supported: undefined,
-    passkey_pa_not_supported: undefined,
-    passkey_registration_cancelled: undefined,
-    passkey_retrieval_cancelled: undefined,
+    passkey_already_exists: 'Ya se ha registrado una llave de acceso en este dispositivo.',
+    passkey_not_supported: 'Las llaves de acceso no son compatibles con este dispositivo.',
+    passkey_pa_not_supported: 'El registro requiere un autenticador de plataforma, pero el dispositivo no lo admite.',
+    passkey_registration_cancelled: 'El registro de la llave de acceso se ha cancelado o ha expirado.',
+    passkey_retrieval_cancelled: 'La verificación de la llave de acceso se ha cancelado o ha expirado.',
     passwordComplexity: {
       maximumLength: 'menos de {{length}} caracteres',
       minimumLength: '{{length}} o más caracteres',
@@ -678,11 +680,11 @@ export const esMX: LocalizationResource = {
     },
     passkeyScreen: {
       removeResource: {
-        messageLine1: undefined,
-        title: undefined,
+        messageLine1: '{{name}} será eliminada de esta cuenta.',
+        title: 'Eliminar llave de acceso',
       },
-      subtitle__rename: undefined,
-      title__rename: undefined,
+      subtitle__rename: 'Puedes cambiar el nombre de la llave de acceso para que sea más fácil de encontrar.',
+      title__rename: 'Renombrar llave de acceso',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
@@ -768,9 +770,9 @@ export const esMX: LocalizationResource = {
         },
       },
       passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
+        menuAction__destructive: 'Eliminar',
+        menuAction__rename: 'Renombrar',
+        title: 'Llaves de acceso',
       },
       passwordSection: {
         primaryButton__setPassword: 'Establecer contraseña ',

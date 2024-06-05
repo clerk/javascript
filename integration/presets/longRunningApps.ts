@@ -1,5 +1,6 @@
 import type { LongRunningApplication } from '../models/longRunningApplication';
 import { longRunningApplication } from '../models/longRunningApplication';
+import { elements } from './elements';
 import { envs } from './envs';
 import { express } from './express';
 import { next } from './next';
@@ -20,13 +21,14 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouter.withEmailCodes', config: next.appRouter, env: envs.withEmailCodes },
     { id: 'next.appRouter.withCustomRoles', config: next.appRouter, env: envs.withCustomRoles },
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
+    { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
   ] as const;
 
   const apps = configs.map(longRunningApplication);
 
   return {
     getByPattern: (patterns: Array<string | (typeof configs)[number]['id']>) => {
-      const res = new Set(...patterns.map(pattern => apps.filter(app => idMatchesPattern(app.id, pattern))));
+      const res = new Set(patterns.map(pattern => apps.filter(app => idMatchesPattern(app.id, pattern))).flat());
       if (!res.size) {
         const availableIds = configs.map(c => `\n- ${c.id}`).join('');
         throw new Error(`Could not find long running app with id ${patterns}. The available ids are: ${availableIds}`);

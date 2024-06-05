@@ -2,6 +2,8 @@ import { createClerkRouter } from '../router';
 
 describe('createClerkRouter', () => {
   const mockRouter = {
+    name: 'mockRouter',
+    mode: 'path' as const,
     pathname: jest.fn(),
     searchParams: jest.fn(),
     push: jest.fn(),
@@ -29,6 +31,15 @@ describe('createClerkRouter', () => {
   it('matches the path correctly', () => {
     const path = '/dashboard';
     const clerkRouter = createClerkRouter(mockRouter, '/app');
+
+    mockRouter.pathname.mockReturnValue('/app/dashboard');
+
+    expect(clerkRouter.match(path)).toBe(true);
+  });
+
+  it('normalizes path arguments internally', () => {
+    const path = 'dashboard/';
+    const clerkRouter = createClerkRouter(mockRouter, 'app/');
 
     mockRouter.pathname.mockReturnValue('/app/dashboard');
 

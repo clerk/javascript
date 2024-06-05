@@ -1,0 +1,30 @@
+@keyframes cl-spin {
+  to {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+:where(:root) {
+  --cl-font-family: inherit;
+  --cl-color-destructive: 0 84% 60%;
+  --cl-radius: 0.375rem;
+  --cl-spacing-unit: 1rem;
+  --cl-font-size: 0.8125rem;
+}
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: #e5e7eb;
+}
+
+::before,
+::after {
+  --cl-content: '';
+}

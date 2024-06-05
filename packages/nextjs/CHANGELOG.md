@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.1.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.2.2
+
 ## 5.1.2
 
 ### Patch Changes

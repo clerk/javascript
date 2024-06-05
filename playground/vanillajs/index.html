@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script>
-      // 👇 PUT YOUR API KEY HERE 👇
-      window.__clerk_publishable_api = '';
-      // 👆 PUT YOUR API KEY HERE 👆
-    </script>
-    <script src="../../packages/clerk-js/dist/clerk.browser.js"></script>
+    <script
+      async
+      crossorigin="anonymous"
+      data-clerk-publishable-key="<YOUR_PUBLISHABLE_KEY_GOES_HERE>"
+      src="https://<YOUR_FRONTEND_API_URL_GOES_HERE>/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+      type="text/javascript"
+    ></script>
     <style>
       body {
         font-family: sans-serif;
@@ -96,8 +97,8 @@
     <main>
       <p class="text">
         A simple playground for tinkering with vanilla js clerk and testing changes to components. To get started,
-        create an application on Clerk and set your API key to the <code>window.__clerk_publishable_api</code> variable at
-        the top of the source code.
+        create an application on Clerk and set your API key to the <code>data-clerk-publishable-key</code> data attribute
+        of the script that loads clerkJS.
       </p>
       <p>Use the buttons below to trigger basic functionality. Feel free to add more buttons as well!</p>
 
@@ -113,6 +114,19 @@
     <div id="stage"></div>
 
     <script>
+      window.addEventListener("load", async function () {
+        await Clerk.load();
+        console.log("ClerkJS is loaded");
+
+        if (Clerk.user) {
+          document.getElementById('username').innerText = Clerk.user.primaryEmailAddress.emailAddress;
+          Clerk.mountUserButton(document.getElementById('userbutton'));
+        }
+        if (Clerk.organization) {
+          Clerk.mountOrganizationSwitcher(document.getElementById('orgswitcher'));
+        }
+      });
+
       const stage = document.getElementById('stage');
       // clerkjs functions return null when there's an error and use console.info for reporting
       // i recommend changing this, but for now we patch console.info to be able to display the err
@@ -147,17 +161,6 @@
       function showOrganizationProfile() {
         Clerk.mountOrganizationProfile(stage);
       }
-
-      // this does not appear to be working
-      Clerk.load().then(() => {
-        if (Clerk.user) {
-          document.getElementById('username').innerText = Clerk.user.primaryEmailAddress.emailAddress;
-          Clerk.mountUserButton(document.getElementById('userbutton'));
-        }
-        if (Clerk.organization) {
-          Clerk.mountOrganizationSwitcher(document.getElementById('orgswitcher'));
-        }
-      });
 
       // utility fn
       function el(tagName, content) {

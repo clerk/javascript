@@ -5,6 +5,7 @@ import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 
 
 import {
   ERROR_CODES,
+  ROUTING,
   SEARCH_PARAMS,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
@@ -161,10 +162,16 @@ export const SignUpRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+      actions: sendTo(ThirdPartyMachineId, ({ context, event }) => ({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete: context.clerk.buildAfterSignUpUrl(),
         },
       })),
     },
@@ -172,6 +179,17 @@ export const SignUpRouterMachine = setup({
       actions: sendTo(ThirdPartyMachineId, {
         type: 'REDIRECT',
         params: { strategy: 'saml' },
+      }),
+    },
+    'FORM.ATTACH': {
+      description: 'Attach/re-attach the form to the router.',
+      actions: enqueueActions(({ enqueue, event }) => {
+        enqueue.assign({
+          formRef: event.formRef,
+        });
+
+        // Reset the current step, to reset the form reference.
+        enqueue.raise({ type: 'RESET.STEP' });
       }),
     },
     'NAVIGATE.PREVIOUS': '.Hist',
@@ -267,6 +285,10 @@ export const SignUpRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'Start',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isStatusComplete',
@@ -300,6 +322,10 @@ export const SignUpRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'Continue',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isStatusComplete',
@@ -348,6 +374,10 @@ export const SignUpRouterMachine = setup({
         },
       ],
       on: {
+        'RESET.STEP': {
+          target: 'Verification',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isStatusComplete',
