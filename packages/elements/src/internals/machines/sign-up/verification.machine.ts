@@ -263,7 +263,9 @@ export const SignUpVerificationMachine = setup({
         },
         'EMAIL_LINK.*': {
           actions: enqueueActions(({ enqueue, event }) => {
-            if (event.type === 'EMAIL_LINK.RESTART') return;
+            if (event.type === 'EMAIL_LINK.RESTART') {
+              return;
+            }
 
             enqueue.assign({ resource: event.resource });
             enqueue.raise({ type: 'NEXT', resource: event.resource });
