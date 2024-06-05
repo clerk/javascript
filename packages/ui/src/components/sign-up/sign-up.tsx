@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
+import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -33,8 +34,8 @@ export function SignUpComponent() {
                   <Card.Body>
                     <Connection.Root>
                       {enabledConnections.map(connection => {
-                        // @ts-ignore TODO: properly fix type
-                        const ConnectionIcon = Icon[PROVIDER_ICON_MAP[connection.provider]];
+                        const iconKey = PROVIDERS.find(provider => provider.id === connection.provider)?.icon;
+                        const IconComponent = iconKey ? Icon[iconKey] : null;
                         return (
                           <Common.Connection
                             key={connection.provider}
@@ -47,9 +48,9 @@ export function SignUpComponent() {
                                   <Connection.Button
                                     busy={isConnectionLoading}
                                     disabled={isGlobalLoading || isConnectionLoading}
-                                    icon={<ConnectionIcon className='text-base' />}
+                                    icon={IconComponent ? <IconComponent className='text-base' /> : null}
                                   >
-                                    {connection.name}
+                                    {connection.provider}
                                   </Connection.Button>
                                 );
                               }}
