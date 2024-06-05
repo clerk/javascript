@@ -179,8 +179,6 @@ const useInput = ({
   onChange: onChangeProp,
   onBlur: onBlurProp,
   onFocus: onFocusProp,
-  // @ts-expect-error - Depending on type the props can be different
-  passkeyAutofill,
   ...passthroughProps
 }: FormInputProps) => {
   const signInActorRef = SignInRouterCtx.useActorRef(true);
@@ -296,13 +294,13 @@ const useInput = ({
 
   const passkeyAutofillSupported = useSignInPasskeyAutofill();
 
+  const passkeyAutofillProp = (passthroughProps as PasskeyInputProps).passkeyAutofill;
+
   React.useEffect(() => {
-    // @ts-expect-error - Depending on type the props can be different
-    if (passthroughProps?.passkeyAutofill && passkeyAutofillSupported) {
+    if (passkeyAutofillProp && passkeyAutofillSupported) {
       signInActorRef?.send({ type: 'AUTHENTICATE.PASSKEY.AUTOFILL' });
     }
-    // @ts-expect-error - Depending on type the props can be different
-  }, [passthroughProps?.passkeyAutofill, passkeyAutofillSupported, signInActorRef]);
+  }, [passkeyAutofillProp, passkeyAutofillSupported, signInActorRef]);
 
   if (!name) {
     throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
@@ -340,15 +338,15 @@ const useInput = ({
     };
   }
 
-  // Filter out invalid props that should not be passed through
-  // @ts-expect-error - Doesn't know about type narrowing by type here
-  const { validatePassword: _1, ...rest } = passthroughProps;
-
-  if (passkeyAutofill && passkeyAutofillSupported) {
+  if (passkeyAutofillProp && passkeyAutofillSupported) {
     props = {
       autoComplete: 'webauthn',
     };
   }
+
+  // Filter out invalid props that should not be passed through
+  // @ts-expect-error - Doesn't know about type narrowing by type here
+  const { validatePassword: _1, passkeyAutofill, ...rest } = passthroughProps;
 
   return {
     Element,
@@ -530,8 +528,13 @@ const INPUT_NAME = 'ClerkElementsInput';
 type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
   validatePassword?: boolean;
 };
+
+type PasskeyInputProps = FormControlProps & {
+  passkeyAutofill?: boolean;
+};
+
 type FormInputProps =
-  | (RadixFormControlProps & { passkeyAutofill?: boolean })
+  | PasskeyInputProps
   | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
   | ({ type: 'otp'; render?: undefined } & OTPInputProps)
   // Usecase: Toggle the visibility of the password input, therefore 'password' and 'text' are allowed

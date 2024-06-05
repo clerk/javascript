@@ -16,7 +16,6 @@ export type SignInActionProps = { asChild?: boolean } & FormSubmitProps &
         submit?: never;
       } & Omit<SignInNavigateProps, 'to'>)
     | { navigate?: never; resend?: never; submit: true }
-    | { navigate?: never; resend?: never; submit?: never }
     | ({ navigate?: never; resend: true; submit?: never } & SignInResendProps)
   );
 
@@ -44,9 +43,6 @@ const SIGN_IN_ACTION_NAME = 'SignInAction';
  *
  * @example
  * <SignIn.Action resend>Resend</SignIn.Action>
-
- * @example
- * <SignIn.Action passkey>Use Passkey instead</SignIn.Action>
  */
 export const SignInAction = React.forwardRef<React.ElementRef<'button'>, SignInActionProps>((props, forwardedRef) => {
   const { submit, navigate, resend, ...rest } = props;

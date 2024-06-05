@@ -16,10 +16,8 @@ const SIGN_IN_PASSKEY_NAME = 'SignInPasskey';
  * Prompt users to select a passkey from their device in order to sign in.
  * This component must be used within the <Step name="start">.
  *
- *
  * @example
- * import { Passkey } from '@clerk/elements/sign-in';
- * <Passkey>Use passkey instead</Passkey>;
+ * <SignIn.Action passkey>Use Passkey instead</SignIn.Action>
  */
 export const SignInPasskey = React.forwardRef<SignInPasskeyElement, SignInPasskeyProps>(
   ({ asChild, ...rest }, forwardedRef) => {
