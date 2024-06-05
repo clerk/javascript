@@ -1,5 +1,62 @@
 # Change Log
 
+## 1.2.0
+
+### Minor Changes
+
+- Introduce `getClerkInstance()` to avoid importing the Clerk class from clerk-js manually. ([#3420](https://github.com/clerk/javascript/pull/3420)) by [@panteliselef](https://github.com/panteliselef)
+
+  This enables developers to create and access a Clerk instance in their application outside of React.
+
+  ```tsx
+  import { ClerkProvider, getClerkInstance } from "@clerk/expo"
+
+  const clerkInstance = getClerkInstance({ publishableKey: 'xxxx' })
+
+  // Always pass the `publishableKey` to `ClerkProvider`
+  <ClerkProvider publishableKey={'xxxx'}>
+      ...
+  </ClerkProvider>
+
+  // Somewhere in your code, outside of React you can do
+  const token = await clerkInstance.session?.getToken();
+  fetch('http://example.com/', {headers: {Authorization: token })
+  ```
+
+  ```tsx
+  import { ClerkProvider, getClerkInstance } from "@clerk/expo"
+
+  // Always pass the `publishableKey` to `ClerkProvider`
+  <ClerkProvider publishableKey={'xxxx'}>
+      ...
+  </ClerkProvider>
+
+  // If you sure that this code will run after the ClerkProvider has rendered then you can use `getClerkIntance` without options
+  const token = await getClerkInstance().session?.getToken();
+  fetch('http://example.com/', {headers: {Authorization: token })
+
+  ```
+
+  Attention: If `getClerkInstance` is called without a publishable key, and ClerkProvider has not rendered yet, an error will be thrown
+
+### Patch Changes
+
+- Support `EXPO_PUBLIC_` prefixes for env variables. ([#3498](https://github.com/clerk/javascript/pull/3498)) by [@panteliselef](https://github.com/panteliselef)
+
+  ```dotenv
+  ## .env
+
+  EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=xxxxxxxx
+  ```
+
+- Set `@clerk/types` as a dependency for packages that had it as a dev dependency. ([#3450](https://github.com/clerk/javascript/pull/3450)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`89318f820`](https://github.com/clerk/javascript/commit/89318f820d9089819bcf8241638a82b9a204d6e9), [`a53622b05`](https://github.com/clerk/javascript/commit/a53622b05c0aacd4a436a1fee707f24905e99a72), [`f31e38234`](https://github.com/clerk/javascript/commit/f31e382345955dd81984e35710a21cc441c039df), [`86a27f693`](https://github.com/clerk/javascript/commit/86a27f6933de50c99b6bc354bf87ff5c2cfcaf38), [`35a0015f5`](https://github.com/clerk/javascript/commit/35a0015f5dd3419f126950b3bfb51ccf51e54cda), [`ec41bb73e`](https://github.com/clerk/javascript/commit/ec41bb73eb72d175a086497fc09e6454bdf5bc0f), [`02bed2e00`](https://github.com/clerk/javascript/commit/02bed2e00d3e0a4e1bb1698b13267faf6aeb31b3), [`35a0015f5`](https://github.com/clerk/javascript/commit/35a0015f5dd3419f126950b3bfb51ccf51e54cda), [`c054dcb78`](https://github.com/clerk/javascript/commit/c054dcb785e228da4f20e253b877bdf94dd94895), [`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/clerk-js@5.6.0
+  - @clerk/shared@2.2.2
+  - @clerk/clerk-react@5.2.3
+  - @clerk/types@4.6.0
+
 ## 1.1.8
 
 ### Patch Changes
