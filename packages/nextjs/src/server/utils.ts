@@ -3,12 +3,13 @@ import { constants } from '@clerk/backend/internal';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
+import AES from 'crypto-js/aes';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
+import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL, SIGNING_KEY } from './constants';
 import { authSignatureInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
 import type { RequestLike } from './types';
 
@@ -155,6 +156,7 @@ export function decorateRequest(
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
+      [constants.Headers.ClerkRequestData]: encryptClerkRequestData({ secretKey }),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
@@ -233,4 +235,21 @@ export function assertTokenSignature(token: string, key: string, signature?: str
   if (expectedSignature !== signature) {
     throw new Error(authSignatureInvalid);
   }
+}
+
+// TODO - Improve JSDocs
+/**
+ * Encrypt request header value based on signing key
+ */
+function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>): string {
+  return AES.encrypt(JSON.stringify(options), SIGNING_KEY).toString();
+}
+
+// TODO - Improve JSDocs
+/**
+ * Decrypt request header value based on signing key
+ */
+export function decryptClerkRequestData(encryptedRequestData: string): Partial<AuthenticateRequestOptions> {
+  const decryptedBytes = AES.decrypt(encryptedRequestData, SIGNING_KEY);
+  return JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8));
 }
