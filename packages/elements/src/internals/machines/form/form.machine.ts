@@ -63,7 +63,9 @@ export const FormMachine = setup({
     }),
     setFieldFeedback: assign({
       fields: ({ context }, params: Pick<FieldDetails, 'name' | 'feedback'>) => {
-        if (!params.name) throw new Error('Field name is required');
+        if (!params.name) {
+          throw new Error('Field name is required');
+        }
 
         if (context.fields.has(params.name)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -133,7 +135,9 @@ export const FormMachine = setup({
     'FIELD.ADD': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.name) throw new Error('Field name is required');
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
 
           event.field.value = event.field.value || context.defaultValues.get(event.field.name) || undefined;
 
@@ -145,7 +149,9 @@ export const FormMachine = setup({
     'FIELD.UPDATE': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.name) throw new Error('Field name is required');
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
 
           if (context.fields.has(event.field.name)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -159,7 +165,9 @@ export const FormMachine = setup({
     'FIELD.REMOVE': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.name) throw new Error('Field name is required');
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
 
           context.fields.delete(event.field.name);
           return context.fields;
@@ -177,7 +185,9 @@ export const FormMachine = setup({
     'FIELD.FEEDBACK.CLEAR': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.name) throw new Error('Field name is required');
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
           if (context.fields.has(event.field.name)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             context.fields.get(event.field.name)!.feedback = undefined;

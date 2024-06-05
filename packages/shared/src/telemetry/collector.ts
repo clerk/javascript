@@ -165,7 +165,9 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
     }
 
     // If we have a pending flush, do nothing
-    if (this.#pendingFlush) return;
+    if (this.#pendingFlush) {
+      return;
+    }
 
     if ('requestIdleCallback' in window) {
       this.#pendingFlush = requestIdleCallback(() => {

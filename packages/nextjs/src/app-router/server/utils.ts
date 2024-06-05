@@ -1,7 +1,9 @@
 import { NextRequest } from 'next/server';
 
 const isPrerenderingBailout = (e: unknown) => {
-  if (!(e instanceof Error) || !('message' in e)) return false;
+  if (!(e instanceof Error) || !('message' in e)) {
+    return false;
+  }
 
   const { message } = e;
 
@@ -27,7 +29,9 @@ export const buildRequestLike = () => {
   } catch (e: any) {
     // rethrow the error when react throws a prerendering bailout
     // https://nextjs.org/docs/messages/ppr-caught-error
-    if (e && isPrerenderingBailout(e)) throw e;
+    if (e && isPrerenderingBailout(e)) {
+      throw e;
+    }
 
     throw new Error(
       `Clerk: auth() and currentUser() are only supported in App Router (/app directory).\nIf you're using /pages, try getAuth() instead.\nOriginal error: ${e}`,
