@@ -1,5 +1,27 @@
 # Change Log
 
+## 5.1.4
+
+### Patch Changes
+
+- Update dependency path-to-regexp to v6.2.2 ([#3490](https://github.com/clerk/javascript/pull/3490)) by [@renovate](https://github.com/apps/renovate)
+
+- Set `@clerk/types` as a dependency for packages that had it as a dev dependency. ([#3450](https://github.com/clerk/javascript/pull/3450)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated the check ran against the error caught by `buildRequestLike()` to re-throw Static Bailout errors thrown by React in the context of PPR (Partial Pre-Rendering), as these errors shouldn't be caught. This change was required as we have been checking the error message itself, but stopped working after the message was changed in a Next.js update a few months ago. ([#3499](https://github.com/clerk/javascript/pull/3499)) by [@ceIia](https://github.com/ceIia)
+
+  - Breaking PR: https://github.com/vercel/next.js/commit/3008af6b0e7b2c8aadd986bdcbce5bad6c39ccc8#diff-20c354509ae1e93e143d91b67b75e3df592c38b7d1ec6ccf7c4a2f72b32ab17d
+  - Why PPR errors shouldn't be caught: https://nextjs.org/docs/messages/ppr-caught-error
+  - Previous fix: https://github.com/clerk/javascript/pull/2518
+
+- Bug fix: Correctly update history state when on internal navigations. ([#3480](https://github.com/clerk/javascript/pull/3480)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`86a27f693`](https://github.com/clerk/javascript/commit/86a27f6933de50c99b6bc354bf87ff5c2cfcaf38), [`35a0015f5`](https://github.com/clerk/javascript/commit/35a0015f5dd3419f126950b3bfb51ccf51e54cda), [`02bed2e00`](https://github.com/clerk/javascript/commit/02bed2e00d3e0a4e1bb1698b13267faf6aeb31b3), [`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/shared@2.2.2
+  - @clerk/clerk-react@5.2.3
+  - @clerk/backend@1.2.2
+  - @clerk/types@4.6.0
+
 ## 5.1.3
 
 ### Patch Changes

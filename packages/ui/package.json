@@ -30,7 +30,9 @@
     "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\""
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.2.2",
     "@clerk/elements": "file:../elements",
+    "@clerk/types": "^4.5.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "react-aria-components": "^1.2.1"
