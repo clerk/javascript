@@ -1,6 +1,11 @@
 export { addClerkPrefix, getScriptUrl, getClerkJsMajorVersionOrTag } from '@clerk/shared/url';
 export { callWithRetry } from '@clerk/shared/callWithRetry';
-export { isDevelopmentFromSecretKey, isProductionFromSecretKey, parsePublishableKey } from '@clerk/shared/keys';
+export {
+  isDevelopmentFromSecretKey,
+  isProductionFromSecretKey,
+  parsePublishableKey,
+  getCookieSuffix,
+} from '@clerk/shared/keys';
 export { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 
 import { buildErrorThrower } from '@clerk/shared/error';

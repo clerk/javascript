@@ -1,6 +1,8 @@
 import { parsePublishableKey } from '@clerk/shared/keys';
+import type { Jwt } from '@clerk/types';
 
 import { constants } from '../constants';
+import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidPublishableKey } from '../util/optionsAssertions';
 import type { ClerkRequest } from './clerkRequest';
 import type { AuthenticateRequestOptions } from './types';
@@ -19,6 +21,7 @@ interface AuthenticateContextInterface extends AuthenticateRequestOptions {
   // cookie-based values
   sessionTokenInCookie: string | undefined;
   clientUat: number;
+  suffixedCookies: boolean;
   // handshake-related values
   devBrowserToken: string | undefined;
   handshakeToken: string | undefined;
@@ -45,12 +48,17 @@ class AuthenticateContext {
     return this.sessionTokenInCookie || this.sessionTokenInHeader;
   }
 
+  private get cookieSuffix() {
+    return this.publishableKey?.split('_').pop();
+  }
+
   public constructor(private clerkRequest: ClerkRequest, options: AuthenticateRequestOptions) {
     // Even though the options are assigned to this later in this function
     // we set the publishableKey here because it is being used in cookies/headers/handshake-values
     // as part of getMultipleAppsCookie
     this.initPublishableKeyValues(options);
     this.initHeaderValues();
+    // initCookieValues should be used before initHandshakeValues because the it depends on suffixedCookies
     this.initCookieValues();
     this.initHandshakeValues();
     Object.assign(this, options);
@@ -70,15 +78,6 @@ class AuthenticateContext {
     this.frontendApi = pk.frontendApi;
   }
 
-  private initHandshakeValues() {
-    this.devBrowserToken =
-      this.getQueryParam(constants.QueryParameters.DevBrowser) ||
-      this.getMultipleAppsCookie(constants.Cookies.DevBrowser);
-    // Using getCookie since we don't suffix the handshake token cookie
-    this.handshakeToken =
-      this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
-  }
-
   private initHeaderValues() {
     this.sessionTokenInHeader = this.stripAuthorizationHeader(this.getHeader(constants.Headers.Authorization));
     this.origin = this.getHeader(constants.Headers.Origin);
@@ -93,8 +92,19 @@ class AuthenticateContext {
   }
 
   private initCookieValues() {
-    this.sessionTokenInCookie = this.getMultipleAppsCookie(constants.Cookies.Session);
-    this.clientUat = Number.parseInt(this.getMultipleAppsCookie(constants.Cookies.ClientUat) || '') || 0;
+    // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
+    this.suffixedCookies = this.shouldUseSuffixed();
+    this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
+    this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
+  }
+
+  private initHandshakeValues() {
+    this.devBrowserToken =
+      this.getQueryParam(constants.QueryParameters.DevBrowser) ||
+      this.getSuffixedOrUnSuffixedCookie(constants.Cookies.DevBrowser);
+    // Using getCookie since we don't suffix the handshake token cookie
+    this.handshakeToken =
+      this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
   }
 
   private stripAuthorizationHeader(authValue: string | undefined | null): string | undefined {
@@ -113,9 +123,106 @@ class AuthenticateContext {
     return this.clerkRequest.cookies.get(name) || undefined;
   }
 
-  private getMultipleAppsCookie(cookieName: string) {
-    const suffix = this.publishableKey?.split('_').pop();
-    return this.getCookie(`${cookieName}_${suffix}`) || this.getCookie(cookieName) || undefined;
+  private getSuffixedCookie(name: string) {
+    return this.getCookie(`${name}_${this.cookieSuffix}`) || undefined;
+  }
+
+  private getSuffixedOrUnSuffixedCookie(cookieName: string) {
+    if (this.suffixedCookies) {
+      return this.getSuffixedCookie(cookieName);
+    }
+    return this.getCookie(cookieName);
+  }
+
+  private shouldUseSuffixed(): boolean {
+    const suffixedClientUat = this.getSuffixedCookie(constants.Cookies.ClientUat);
+    const clientUat = this.getCookie(constants.Cookies.ClientUat);
+    const suffixedSession = this.getSuffixedCookie(constants.Cookies.Session) || '';
+    const session = this.getCookie(constants.Cookies.Session) || '';
+
+    // If there is no suffixed cookies use un-suffixed
+    if (!suffixedClientUat && !suffixedSession) {
+      return false;
+    }
+
+    // If there's a token in un-suffixed, and it doesn't belong to this
+    // instance, then we must trust suffixed
+    if (session && !this.tokenBelongsToInstance(session)) {
+      return true;
+    }
+
+    const { data: sessionData } = decodeJwt(session);
+    const sessionIat = sessionData?.payload.iat || 0;
+    const { data: suffixedSessionData } = decodeJwt(suffixedSession);
+    const suffixedSessionIat = suffixedSessionData?.payload.iat || 0;
+
+    // Both indicate signed in, but un-suffixed is newer
+    // Trust un-suffixed because it's newer
+    if (suffixedClientUat !== '0' && clientUat !== '0' && sessionIat > suffixedSessionIat) {
+      return false;
+    }
+
+    // Suffixed indicates signed out, but un-suffixed indicates signed in
+    // Trust un-suffixed because it gets set with both new and old clerk.js,
+    // so we can assume it's newer
+    if (suffixedClientUat === '0' && clientUat !== '0') {
+      return false;
+    }
+
+    // Suffixed indicates signed in, un-suffixed indicates signed out
+    // This is the tricky one
+
+    // In production, suffixed_uat should be set reliably, since it's
+    // set by FAPI and not clerk.js. So in the scenario where a developer
+    // downgrades, the state will look like this:
+    // - un-suffixed session cookie: empty
+    // - un-suffixed uat: 0
+    // - suffixed session cookie: (possibly filled, possibly empty)
+    // - suffixed uat: 0
+
+    // Our SDK honors client_uat over the session cookie, so we don't
+    // need a special case for production. We can rely on suffixed,
+    // and the fact that the suffixed uat is set properly means and
+    // suffixed session cookie will be ignored.
+
+    // The important thing to make sure we have a test that confirms
+    // the user ends up as signed out in this scenario, and the suffixed
+    // session cookie is ignored
+
+    // In development, suffixed_uat is not set reliably, since it's done
+    // by clerk.js. If the developer downgrades to a pinned version of
+    // clerk.js, the suffixed uat will no longer be updated
+
+    // The best we can do is look to see if the suffixed token is expired.
+    // This means that, if a developer downgrades, and then immediately
+    // signs out, all in the span of 1 minute, then they will inadvertently
+    // remain signed in for the rest of that minute. This is a known
+    // limitation of the strategy but seems highly unlikely.
+    if (this.instanceType !== 'production') {
+      const isSuffixedSessionExpired = this.sessionExpired(suffixedSessionData);
+      if (suffixedClientUat !== '0' && clientUat === '0' && isSuffixedSessionExpired) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private tokenBelongsToInstance(token: string): boolean {
+    if (!token) {
+      return false;
+    }
+
+    const { data, errors } = decodeJwt(token);
+    if (errors) {
+      return false;
+    }
+    const tokenIssuer = data.payload.iss.replace(/https?:\/\//gi, '');
+    return this.frontendApi === tokenIssuer;
+  }
+
+  private sessionExpired(jwt: Jwt | undefined): boolean {
+    return !!jwt && jwt?.payload.exp <= (Date.now() / 1000) >> 0;
   }
 }
 
