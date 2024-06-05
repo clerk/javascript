@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.2.3
+
+### Patch Changes
+
+- Update `SignUpButton` and `SignInButton` to respect `forceRedirect` and `fallbackRedirect` props. Previously, these were getting ignored and successful completions of the flows would fallback to the default redirect URL. ([#3508](https://github.com/clerk/javascript/pull/3508)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`86a27f693`](https://github.com/clerk/javascript/commit/86a27f6933de50c99b6bc354bf87ff5c2cfcaf38), [`02bed2e00`](https://github.com/clerk/javascript/commit/02bed2e00d3e0a4e1bb1698b13267faf6aeb31b3), [`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/shared@2.2.2
+  - @clerk/types@4.6.0
+
 ## 5.2.2
 
 ### Patch Changes
