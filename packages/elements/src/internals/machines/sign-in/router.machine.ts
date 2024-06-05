@@ -5,6 +5,7 @@ import { and, assign, enqueueActions, not, or, raise, sendTo, setup } from 'xsta
 
 import {
   ERROR_CODES,
+  ROUTING,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
   SSO_CALLBACK_PATH_ROUTE,
@@ -162,10 +163,16 @@ export const SignInRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+      actions: sendTo(ThirdPartyMachineId, ({ context, event }) => ({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete: context.clerk.buildAfterSignInUrl(),
         },
       })),
     },
@@ -173,6 +180,17 @@ export const SignInRouterMachine = setup({
       actions: sendTo(ThirdPartyMachineId, {
         type: 'REDIRECT',
         params: { strategy: 'saml' },
+      }),
+    },
+    'FORM.ATTACH': {
+      description: 'Attach/re-attach the form to the router.',
+      actions: enqueueActions(({ enqueue, event }) => {
+        enqueue.assign({
+          formRef: event.formRef,
+        });
+
+        // Reset the current step, to reset the form reference.
+        enqueue.raise({ type: 'RESET.STEP' });
       }),
     },
     'NAVIGATE.PREVIOUS': '.Hist',
@@ -285,6 +303,10 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'Start',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
@@ -322,6 +344,10 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'FirstFactor',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
@@ -392,6 +418,10 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'SecondFactor',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
@@ -419,6 +449,10 @@ export const SignInRouterMachine = setup({
         },
       },
       on: {
+        'RESET.STEP': {
+          target: 'ResetPassword',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',

@@ -164,6 +164,65 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "clerk-expo-dev-minor",
+      "matchFileNames": [
+        "packages/clerk-expo/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "clerk-expo"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "clerk-expo-dev-major",
+      "matchFileNames": [
+        "packages/clerk-expo/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "clerk-expo"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "clerk-expo-prod-minor",
+      "matchFileNames": [
+        "packages/clerk-expo/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "clerk-expo"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "clerk-expo-prod-major",
+      "matchFileNames": [
+        "packages/clerk-expo/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "clerk-expo"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "clerk-js-dev-minor",
       "matchFileNames": [
         "packages/clerk-js/package.json"
@@ -220,6 +279,124 @@
         "major"
       ],
       "semanticCommitScope": "clerk-js"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "clerk-react-dev-minor",
+      "matchFileNames": [
+        "packages/clerk-react/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "clerk-react"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "clerk-react-dev-major",
+      "matchFileNames": [
+        "packages/clerk-react/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "clerk-react"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "clerk-react-prod-minor",
+      "matchFileNames": [
+        "packages/clerk-react/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "clerk-react"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "clerk-react-prod-major",
+      "matchFileNames": [
+        "packages/clerk-react/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "clerk-react"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "clerk-sdk-node-dev-minor",
+      "matchFileNames": [
+        "packages/clerk-sdk-node/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "clerk-sdk-node"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "clerk-sdk-node-dev-major",
+      "matchFileNames": [
+        "packages/clerk-sdk-node/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "clerk-sdk-node"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "clerk-sdk-node-prod-minor",
+      "matchFileNames": [
+        "packages/clerk-sdk-node/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "clerk-sdk-node"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "clerk-sdk-node-prod-major",
+      "matchFileNames": [
+        "packages/clerk-sdk-node/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "clerk-sdk-node"
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
@@ -338,65 +515,6 @@
         "major"
       ],
       "semanticCommitScope": "eslint-config-custom"
-    },
-    {
-      "groupName": "[DEV] minor & patch dependencies",
-      "groupSlug": "expo-dev-minor",
-      "matchFileNames": [
-        "packages/expo/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "automerge": true,
-      "semanticCommitScope": "expo"
-    },
-    {
-      "groupName": "[DEV] major dependencies",
-      "groupSlug": "expo-dev-major",
-      "matchFileNames": [
-        "packages/expo/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "expo"
-    },
-    {
-      "groupName": "minor & patch dependencies",
-      "groupSlug": "expo-prod-minor",
-      "matchFileNames": [
-        "packages/expo/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "semanticCommitScope": "expo"
-    },
-    {
-      "groupName": "major dependencies",
-      "groupSlug": "expo-prod-major",
-      "matchFileNames": [
-        "packages/expo/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "expo"
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
@@ -695,65 +813,6 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
-      "groupSlug": "react-dev-minor",
-      "matchFileNames": [
-        "packages/react/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "automerge": true,
-      "semanticCommitScope": "react"
-    },
-    {
-      "groupName": "[DEV] major dependencies",
-      "groupSlug": "react-dev-major",
-      "matchFileNames": [
-        "packages/react/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "react"
-    },
-    {
-      "groupName": "minor & patch dependencies",
-      "groupSlug": "react-prod-minor",
-      "matchFileNames": [
-        "packages/react/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "semanticCommitScope": "react"
-    },
-    {
-      "groupName": "major dependencies",
-      "groupSlug": "react-prod-major",
-      "matchFileNames": [
-        "packages/react/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "react"
-    },
-    {
-      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "remix-dev-minor",
       "matchFileNames": [
         "packages/remix/package.json"
@@ -813,65 +872,6 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
-      "groupSlug": "sdk-node-dev-minor",
-      "matchFileNames": [
-        "packages/sdk-node/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "automerge": true,
-      "semanticCommitScope": "sdk-node"
-    },
-    {
-      "groupName": "[DEV] major dependencies",
-      "groupSlug": "sdk-node-dev-major",
-      "matchFileNames": [
-        "packages/sdk-node/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "sdk-node"
-    },
-    {
-      "groupName": "minor & patch dependencies",
-      "groupSlug": "sdk-node-prod-minor",
-      "matchFileNames": [
-        "packages/sdk-node/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "semanticCommitScope": "sdk-node"
-    },
-    {
-      "groupName": "major dependencies",
-      "groupSlug": "sdk-node-prod-major",
-      "matchFileNames": [
-        "packages/sdk-node/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "sdk-node"
-    },
-    {
-      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "shared-dev-minor",
       "matchFileNames": [
         "packages/shared/package.json"
@@ -928,6 +928,65 @@
         "major"
       ],
       "semanticCommitScope": "shared"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "tailwindcss-transformer-dev-minor",
+      "matchFileNames": [
+        "packages/tailwindcss-transformer/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "tailwindcss-transformer"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "tailwindcss-transformer-dev-major",
+      "matchFileNames": [
+        "packages/tailwindcss-transformer/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "tailwindcss-transformer"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "tailwindcss-transformer-prod-minor",
+      "matchFileNames": [
+        "packages/tailwindcss-transformer/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "tailwindcss-transformer"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "tailwindcss-transformer-prod-major",
+      "matchFileNames": [
+        "packages/tailwindcss-transformer/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "tailwindcss-transformer"
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
@@ -1108,9 +1167,9 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
-      "groupSlug": "upgrade-dev-minor",
+      "groupSlug": "ui-dev-minor",
       "matchFileNames": [
-        "packages/upgrade/package.json"
+        "packages/ui/package.json"
       ],
       "matchDepTypes": [
         "devDependencies"
@@ -1120,13 +1179,13 @@
         "minor"
       ],
       "automerge": true,
-      "semanticCommitScope": "upgrade"
+      "semanticCommitScope": "ui"
     },
     {
       "groupName": "[DEV] major dependencies",
-      "groupSlug": "upgrade-dev-major",
+      "groupSlug": "ui-dev-major",
       "matchFileNames": [
-        "packages/upgrade/package.json"
+        "packages/ui/package.json"
       ],
       "matchDepTypes": [
         "devDependencies"
@@ -1134,13 +1193,13 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "semanticCommitScope": "upgrade"
+      "semanticCommitScope": "ui"
     },
     {
       "groupName": "minor & patch dependencies",
-      "groupSlug": "upgrade-prod-minor",
+      "groupSlug": "ui-prod-minor",
       "matchFileNames": [
-        "packages/upgrade/package.json"
+        "packages/ui/package.json"
       ],
       "matchDepTypes": [
         "dependencies"
@@ -1149,13 +1208,13 @@
         "patch",
         "minor"
       ],
-      "semanticCommitScope": "upgrade"
+      "semanticCommitScope": "ui"
     },
     {
       "groupName": "major dependencies",
-      "groupSlug": "upgrade-prod-major",
+      "groupSlug": "ui-prod-major",
       "matchFileNames": [
-        "packages/upgrade/package.json"
+        "packages/ui/package.json"
       ],
       "matchDepTypes": [
         "dependencies"
@@ -1163,7 +1222,7 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "semanticCommitScope": "upgrade"
+      "semanticCommitScope": "ui"
     },
     {
       "matchManagers": [

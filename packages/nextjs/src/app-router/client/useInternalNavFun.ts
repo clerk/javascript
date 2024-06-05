@@ -6,31 +6,40 @@ import type { NextClerkProviderProps } from '../../types';
 
 declare global {
   interface Window {
-    __clerk_internal_navFun: NonNullable<
-      NextClerkProviderProps['routerPush'] | NextClerkProviderProps['routerReplace']
+    __clerk_internal_navigations: Record<
+      string,
+      {
+        fun: NonNullable<NextClerkProviderProps['routerPush'] | NextClerkProviderProps['routerReplace']>;
+        promisesBuffer: Array<() => void> | undefined;
+      }
     >;
-    __clerk_internal_navPromisesBuffer: Array<() => void> | undefined;
   }
 }
+
+const getClerkNavigationObject = (name: string) => {
+  window.__clerk_internal_navigations ??= {};
+  // @ts-ignore
+  window.__clerk_internal_navigations[name] ??= {};
+  return window.__clerk_internal_navigations[name];
+};
 
 export const useInternalNavFun = (props: {
   windowNav: typeof window.history.pushState | typeof window.history.replaceState | undefined;
   routerNav: AppRouterInstance['push'] | AppRouterInstance['replace'];
+  name: string;
 }) => {
-  const { windowNav, routerNav } = props;
+  const { windowNav, routerNav, name } = props;
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
   if (windowNav) {
-    window.__clerk_internal_navFun = (to, opts) => {
+    getClerkNavigationObject(name).fun = (to, opts) => {
       return new Promise<void>(res => {
-        if (!window.__clerk_internal_navPromisesBuffer) {
-          // We need to use window to store the reference to the buffer,
-          // as ClerkProvider might be unmounted and remounted during navigations
-          // If we use a ref, it will be reset when ClerkProvider is unmounted
-          window.__clerk_internal_navPromisesBuffer = [];
-        }
-        window.__clerk_internal_navPromisesBuffer.push(res);
+        // We need to use window to store the reference to the buffer,
+        // as ClerkProvider might be unmounted and remounted during navigations
+        // If we use a ref, it will be reset when ClerkProvider is unmounted
+        getClerkNavigationObject(name).promisesBuffer ??= [];
+        getClerkNavigationObject(name).promisesBuffer?.push(res);
         startTransition(() => {
           // If the navigation is internal, we should use the history API to navigate
           // as this is the way to perform a shallow navigation in Next.js App Router
@@ -54,8 +63,8 @@ export const useInternalNavFun = (props: {
   }
 
   const flushPromises = () => {
-    window.__clerk_internal_navPromisesBuffer?.forEach(resolve => resolve());
-    window.__clerk_internal_navPromisesBuffer = [];
+    getClerkNavigationObject(name).promisesBuffer?.forEach(resolve => resolve());
+    getClerkNavigationObject(name).promisesBuffer = [];
   };
 
   // Flush any pending promises on mount/unmount
@@ -72,6 +81,8 @@ export const useInternalNavFun = (props: {
   }, [pathname, isPending]);
 
   return useCallback((to: string) => {
-    return window.__clerk_internal_navFun(to);
+    return getClerkNavigationObject(name).fun(to);
+    // We are not expecting name to change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };

@@ -1,18 +1,20 @@
-:where(:root) {
-  --cl-color-primary: 233 8% 20%;
-  --cl-color-primary-foreground: 0 0% 100%;
-  --cl-color-neutral: 0 0% 0%;
-  --cl-color-background: 0 0% 100%;
-  --cl-color-foreground: 240 7% 14%;
-  --cl-font-family: inherit;
-  --cl-font-family-button: inherit;
-  /*  */
-
-  --cl-color-destructive: 0 84% 60%;
-  /*  */
-  --cl-color-input-background: 0 0% 100%;
-  --cl-color-input-foreground: 0 0% 0%;
+@keyframes cl-spin {
+  to {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
+
+:where(:root) {
+  --cl-font-family: inherit;
+  --cl-color-destructive: 0 84% 60%;
+  --cl-radius: 0.375rem;
+  --cl-spacing-unit: 1rem;
+  --cl-font-size: 0.8125rem;
+}
+
 *,
 ::before,
 ::after {
@@ -21,6 +23,7 @@
   border-style: solid;
   border-color: #e5e7eb;
 }
+
 ::before,
 ::after {
   --cl-content: '';

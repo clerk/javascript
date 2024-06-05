@@ -209,7 +209,7 @@ export const zhCN: LocalizationResource = {
       headerTitle__general: '常规',
       headerTitle__members: '成员',
       profileSection: {
-        primaryButton: '',
+        primaryButton: '更新组织简介',
         title: '组织简介',
         uploadAction__title: '标志',
       },
@@ -642,10 +642,10 @@ export const zhCN: LocalizationResource = {
     },
     mobileButton__menu: '菜单',
     navbar: {
-      account: 'Profile',
-      description: 'Manage your account info.',
-      security: 'Security',
-      title: 'Account',
+      account: '账户',
+      description: '管理您的账户。',
+      security: '安全',
+      title: '账户',
     },
     passkeyScreen: {
       removeResource: {
@@ -755,7 +755,7 @@ export const zhCN: LocalizationResource = {
         title: '电话号码',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: '更新个人资料',
         title: '个人资料',
       },
       usernameSection: {

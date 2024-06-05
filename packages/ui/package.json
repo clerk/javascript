@@ -8,16 +8,34 @@
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
   },
+  "exports": {
+    "./*": {
+      "import": {
+        "types": "./dist/components/*.d.mts",
+        "default": "./dist/components/*.mjs"
+      },
+      "require": {
+        "types": "./dist/components/*.d.ts",
+        "default": "./dist/components/*.js"
+      }
+    }
+  },
   "main": "index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\""
   },
   "dependencies": {
+    "@clerk/elements": "file:../elements",
     "clsx": "^2.1.1"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@clerk/tailwindcss-transformer": "*"
+    "@clerk/tailwindcss-transformer": "*",
+    "concurrently": "^8.2.2"
   }
 }

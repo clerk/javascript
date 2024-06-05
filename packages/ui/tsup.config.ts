@@ -12,7 +12,7 @@ const tailwindcssTransformerCode = {
     const styleCache = new Map();
     build.onLoad({ filter: /.*/ }, async args => {
       const code = await fs.promises.readFile(args.path, 'utf8');
-      const transformedCode = await transform(code, { styleCache });
+      const transformedCode = transform(code, { styleCache });
       return {
         contents: transformedCode,
         resolveDir: path.dirname(args.path),
@@ -43,13 +43,14 @@ export default defineConfig(overrideOptions => {
     },
     dts: true,
     entry: {
-      button: 'src/button.tsx',
-      card: 'src/card.tsx',
-      connection: 'src/connection.tsx',
-      field: 'src/field.tsx',
-      input: 'src/input.tsx',
-      label: 'src/label.tsx',
-      seperator: 'src/seperator.tsx',
+      'primitives/button': 'src/primitives/button.tsx',
+      'primitives/card': 'src/primitives/card.tsx',
+      'primitives/connection': 'src/primitives/connection.tsx',
+      'primitives/icon': 'src/primitives/icon.tsx',
+      'primitives/field': 'src/primitives/field.tsx',
+      'primitives/seperator': 'src/primitives/seperator.tsx',
+      'components/sign-in': 'src/components/sign-in/index.tsx',
+      'components/sign-up': 'src/components/sign-up/index.tsx',
     },
     external: ['react', 'react-dom'],
     format: ['cjs', 'esm'],

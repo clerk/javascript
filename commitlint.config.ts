@@ -1,3 +1,4 @@
+// All imports must be accounted for per `npm i` in .github/workflows/pr-title-linter.yml
 import { globbySync } from 'globby';
 import { readFileSync } from 'node:fs';
 
