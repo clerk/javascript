@@ -117,7 +117,10 @@ export async function loadClerkJWKFromRemote({
   kid,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  const shouldRefreshCache = cacheHasExpired() || !getFromCache(kid);
+  if (cacheHasExpired()) {
+    cache = {};
+  }
+  const shouldRefreshCache = !getFromCache(kid);
   if (skipJwksCache || shouldRefreshCache) {
     let fetcher;
     const key = secretKey || apiKey;
@@ -234,10 +237,6 @@ function cacheHasExpired() {
 
   // If the cache has expired, clear the value so we don't attempt to make decisions based on stale data
   const isExpired = Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
-
-  if (isExpired) {
-    cache = {};
-  }
 
   return isExpired;
 }
