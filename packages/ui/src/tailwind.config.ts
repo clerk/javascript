@@ -43,12 +43,28 @@ const config = {
       fontFamily: {
         sans: ['var(--cl-font-family)'],
       },
+      fontSize: {
+        DEFAULT: ['var(--cl-font-size)', '1.38462'],
+        base: ['var(--cl-font-size)', '1.38462'],
+        xs: ['calc(var(--cl-font-size) * 0.8)', '1.38462'],
+        sm: ['calc(var(--cl-font-size) * 0.9)', '1.38462'],
+        md: ['var(--cl-font-size)', '1.38462'],
+        lg: ['calc(var(--cl-font-size) * 1.3)', '1.38462'],
+        xl: ['calc(var(--cl-font-size) * 1.85)', '1.38462'],
+      },
       borderRadius: {
         DEFAULT: 'var(--cl-radius)',
         sm: 'calc(var(--cl-radius) * 0.66)',
         md: 'var(--cl-radius)',
         lg: 'calc(var(--cl-radius) * 1.33)',
         xl: 'calc(var(--cl-radius) * 2)',
+      },
+      lineHeight: {
+        normal: 'normal',
+        extraSmall: '1.33333',
+        small: '1.38462',
+        medium: '1.41176',
+        large: '1.45455',
       },
       spacing: {
         ...generateSpaceScale(),

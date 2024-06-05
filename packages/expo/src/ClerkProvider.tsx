@@ -5,27 +5,25 @@ import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import type { TokenCache } from './cache';
-import { MemoryTokenCache } from './cache';
 import { isReactNative } from './runtime';
-import { buildClerk } from './singleton';
+import { getClerkInstance } from './singleton';
 
 export type ClerkProviderProps = ClerkReactProviderProps & {
   tokenCache?: TokenCache;
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache = MemoryTokenCache, publishableKey, ...rest } = props;
-  const key =
-    publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
+  const { children, tokenCache, publishableKey, ...rest } = props;
+  const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   return (
     <ClerkReactProvider
       // Force reset the state when the provided key changes, this ensures that the provider does not retain stale state.
       // See JS-598 for additional context.
-      key={key}
+      key={pk}
       {...rest}
-      publishableKey={key}
-      Clerk={buildClerk({ key, tokenCache })}
+      publishableKey={pk}
+      Clerk={getClerkInstance({ publishableKey: pk, tokenCache })}
       standardBrowser={!isReactNative()}
     >
       {children}
