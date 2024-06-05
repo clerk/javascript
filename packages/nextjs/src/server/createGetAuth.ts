@@ -6,7 +6,7 @@ import { withLogger } from '../utils/debugLogger';
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';
 import { getAuthAuthHeaderMissing } from './errors';
 import type { RequestLike } from './types';
-import { assertTokenSignature, getAuthKeyFromRequest, getCookie, getHeader } from './utils';
+import { assertTokenSignature, decryptClerkRequestData, getAuthKeyFromRequest, getCookie, getHeader } from './utils';
 
 export const createGetAuth = ({
   noAuthStatusMessage,
@@ -35,12 +35,15 @@ export const createGetAuth = ({
         throw new Error(noAuthStatusMessage);
       }
 
+      const requestData = getHeader(req, constants.Headers.ClerkRequestData);
+      const decryptedRequestData = requestData ? decryptClerkRequestData(requestData) : {};
+
       const options = {
         authStatus,
         apiUrl: API_URL,
         apiVersion: API_VERSION,
         authMessage,
-        secretKey: opts?.secretKey || SECRET_KEY,
+        secretKey: opts?.secretKey || decryptedRequestData.secretKey || SECRET_KEY,
         authReason,
       };
 
