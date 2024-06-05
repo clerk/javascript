@@ -1,4 +1,5 @@
 import { SignedIn, SignedOut, SignIn, UserButton, Protect } from '@clerk/nextjs';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -11,6 +12,11 @@ export default function Home() {
         path={'/'}
         signUpUrl={'/sign-up'}
       />
+      <ul>
+        <li>
+          <Link href='/page-protected'>Page Protected</Link>
+        </li>
+      </ul>
     </main>
   );
 }
