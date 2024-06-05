@@ -190,7 +190,7 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     // @ts-ignore
 
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
-      requestInit.body = stringifyQueryParams(body, camelToSnake);
+      requestInit.body = stringifyQueryParams(body, { keyEncoder: camelToSnake });
     }
 
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
