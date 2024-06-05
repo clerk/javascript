@@ -480,6 +480,91 @@ export const CaretRight = createIcon({
   ),
 });
 
+export const CheckmarkCircleSm = createIcon({
+  displayName: 'IconCheckmarkCircleSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <circle
+        cx='8'
+        cy='8'
+        r='5.25'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M6.25 8.35L7.65 9.75L9.75 6.25'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </>
+  ),
+});
+
+export const ExclamationOctagonSm = createIcon({
+  displayName: 'IconExclamationOctagonSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        d='M8 5.75V7.25'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M8 10V10.01'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M10.25 2.75H5.75L2.75 5.75V10.25L5.75 13.25H10.25L13.25 10.25V5.75L10.25 2.75Z'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </>
+  ),
+});
+
+export const ExclamationTriangleSm = createIcon({
+  displayName: 'IconExclamationTriangleSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        d='M8 6.75V8.25'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M8 10.5V10.51'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M2.95652 10.4518L6.27146 3.8188C6.98366 2.39373 9.01635 2.39373 9.72855 3.81881L13.0435 10.4518C13.686 11.7374 12.7516 13.25 11.3149 13.25H4.68506C3.24842 13.25 2.31404 11.7374 2.95652 10.4518Z'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </>
+  ),
+});
+
 export const EyeSm = createIcon({
   displayName: 'IconEyeSm',
   viewBox: '0 0 16 16',
@@ -528,6 +613,36 @@ export const EyeSlashSm = createIcon({
         d='M3 3L13 13'
         stroke='currentColor'
         strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </>
+  ),
+});
+
+export const InformationLegacy = createIcon({
+  displayName: 'IconInformationLegacy',
+  viewBox: '0 0 20 20',
+  path: (
+    <>
+      <path
+        d='M10 10.8984V13.3984'
+        stroke='currentColor'
+        strokeWidth={2}
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M10 6.75V6.76'
+        stroke='currentColor'
+        strokeWidth={2.5}
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z'
+        stroke='currentColor'
+        strokeWidth={1.5}
         strokeLinecap='round'
         strokeLinejoin='round'
       />

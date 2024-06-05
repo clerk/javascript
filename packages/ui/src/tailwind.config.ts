@@ -51,6 +51,7 @@ const config = {
         md: ['var(--cl-font-size)', '1.38462'],
         lg: ['calc(var(--cl-font-size) * 1.3)', '1.38462'],
         xl: ['calc(var(--cl-font-size) * 1.85)', '1.38462'],
+        'icon-sm': ['calc(var(--cl-font-size) * 1.23)', '0'],
       },
       borderRadius: {
         DEFAULT: 'var(--cl-radius)',
