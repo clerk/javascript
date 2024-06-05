@@ -265,7 +265,6 @@ export class Clerk implements ClerkInterface {
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
   public load = async (options?: ClerkOptions): Promise<void> => {
-    console.log('localllllllllllllllllllllllllllllllllll');
     if (this.loaded) {
       return;
     }
