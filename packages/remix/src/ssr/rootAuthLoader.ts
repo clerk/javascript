@@ -49,7 +49,9 @@ export const rootAuthLoader: RootAuthLoader = async (
 
   const loadedOptions = loadOptions(args, opts);
   // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake
-  const requestState = await authenticateRequest(args, loadedOptions);
+  const _requestState = await authenticateRequest(args, loadedOptions);
+  // TODO: Investigate if `authenticateRequest` needs to return the loadedOptions (the new request urls in particular)
+  const requestState = { ...loadedOptions, ..._requestState };
 
   if (!handler) {
     // if the user did not provide a handler, simply inject requestState into an empty response
