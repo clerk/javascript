@@ -8,6 +8,7 @@ import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsConte
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { invalidateCacheAction } from '../server-actions/invalidateCache';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
@@ -56,7 +57,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
       return new Promise(res => {
         window.__clerk_internal_invalidateCachePromise = res;
         startTransition(() => {
-          router.refresh();
+          invalidateCacheAction();
         });
       });
     };
