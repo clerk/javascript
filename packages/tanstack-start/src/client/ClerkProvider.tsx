@@ -1,9 +1,9 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { useRouter } from '@tanstack/react-router';
+import { useRouteContext } from '@tanstack/react-router';
 import React from 'react';
 
 import { ClerkOptionsProvider } from './OptionsContext.js';
-import type { TanstackStartClerkProviderProps } from './types';
+import type { TanstackStartClerkProviderProps } from './types.js';
 
 export * from '@clerk/clerk-react';
 
@@ -14,14 +14,23 @@ const SDK_METADATA = {
 
 export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProviderProps): JSX.Element {
   // we can take the the clerk state from route context here
-  const router = useRouter();
-  console.log(router);
+  const contextRouter = useRouteContext({
+    strict: false,
+  });
+  const { clerkStateContext } = contextRouter || {};
+
+  console.log('clerkState', clerkStateContext);
 
   return (
-    <ClerkOptionsProvider options={{}}>
+    <ClerkOptionsProvider
+      options={{
+        publishableKey: clerkStateContext?.publishableKey,
+      }}
+    >
       <ReactClerkProvider
         sdkMetadata={SDK_METADATA}
         {...restProps}
+        publishableKey={clerkStateContext?.publishableKey}
       >
         {children}
       </ReactClerkProvider>

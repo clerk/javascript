@@ -1,3 +1,4 @@
+/// <reference types="vinxi/types/client" />
 export * from './client/index.js';
 
 // Override Clerk React error thrower to show that errors come from @clerk/tanstack-start
