@@ -1,5 +1,35 @@
 # Change Log
 
+## 4.1.0
+
+### Minor Changes
+
+- Support new redirect urls as environment variables or options to rootAuthLoader ([#3442](https://github.com/clerk/javascript/pull/3442)) by [@panteliselef](https://github.com/panteliselef)
+
+  As options
+
+  - signInForceRedirectUrl
+  - signUpForceRedirectUrl
+  - signInFallbackRedirectUrl
+  - signUpFallbackRedirectUrl
+
+  As environment variables
+
+  - CLERK_SIGN_IN_FORCE_REDIRECT_URL
+  - CLERK_SIGN_UP_FORCE_REDIRECT_URL
+  - CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
+  - CLERK_SIGN_UP_FALLBACK_REDIRECT_URL
+
+### Patch Changes
+
+- Set `@clerk/types` as a dependency for packages that had it as a dev dependency. ([#3450](https://github.com/clerk/javascript/pull/3450)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`86a27f693`](https://github.com/clerk/javascript/commit/86a27f6933de50c99b6bc354bf87ff5c2cfcaf38), [`35a0015f5`](https://github.com/clerk/javascript/commit/35a0015f5dd3419f126950b3bfb51ccf51e54cda), [`02bed2e00`](https://github.com/clerk/javascript/commit/02bed2e00d3e0a4e1bb1698b13267faf6aeb31b3), [`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/shared@2.2.2
+  - @clerk/clerk-react@5.2.3
+  - @clerk/backend@1.2.2
+  - @clerk/types@4.6.0
+
 ## 4.0.13
 
 ### Patch Changes

@@ -1,5 +1,27 @@
 # @clerk/elements
 
+## 0.6.0
+
+### Minor Changes
+
+- - Adds virtual router to support modal scenarios ([#3461](https://github.com/clerk/javascript/pull/3461)) by [@tmilewski](https://github.com/tmilewski)
+
+  - Adds `routing` prop to `SignIn.Root` and `SignUp.Root` for handling `virtual` routing
+  - Better support for Account Portal redirect callback flows
+
+### Patch Changes
+
+- Fix forms unable to submit upon re-mounting ([#3473](https://github.com/clerk/javascript/pull/3473)) by [@tmilewski](https://github.com/tmilewski)
+
+- Set `@clerk/types` as a dependency for packages that had it as a dev dependency. ([#3450](https://github.com/clerk/javascript/pull/3450)) by [@desiprisg](https://github.com/desiprisg)
+
+- Ensure missing passwordSettings don't throw an error ([#3474](https://github.com/clerk/javascript/pull/3474)) by [@tmilewski](https://github.com/tmilewski)
+
+- Display hard to catch errors inside the sign-in verification step during development (when `NODE_ENV` is set to `development`). ([#3517](https://github.com/clerk/javascript/pull/3517)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/types@4.6.0
+
 ## 0.5.2
 
 ### Patch Changes
