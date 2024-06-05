@@ -181,7 +181,6 @@ const useInput = ({
   onFocus: onFocusProp,
   ...passthroughProps
 }: FormInputProps) => {
-  const signInActorRef = SignInRouterCtx.useActorRef(true);
   // Inputs can be used outside a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
@@ -292,16 +291,6 @@ const useInput = ({
     ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
   }, [name, ref, initialValue]);
 
-  const passkeyAutofillSupported = useSignInPasskeyAutofill();
-
-  const passkeyAutofillProp = (passthroughProps as PasskeyInputProps).passkeyAutofill;
-
-  React.useEffect(() => {
-    if (passkeyAutofillProp && passkeyAutofillSupported) {
-      signInActorRef?.send({ type: 'AUTHENTICATE.PASSKEY.AUTOFILL' });
-    }
-  }, [passkeyAutofillProp, passkeyAutofillSupported, signInActorRef]);
-
   if (!name) {
     throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
   }
@@ -338,7 +327,7 @@ const useInput = ({
     };
   }
 
-  if (passkeyAutofillProp && passkeyAutofillSupported) {
+  if ((passthroughProps as PasskeyInputProps).passkeyAutofill) {
     props = {
       autoComplete: 'webauthn',
     };
@@ -576,6 +565,7 @@ type FormInputProps =
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
     const clerk = useClerk();
+    const signInRouterRef = SignInRouterCtx.useActorRef(true);
 
     clerk.telemetry?.record(
       eventComponentMounted('Elements_Input', {
@@ -589,7 +579,40 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
       }),
     );
 
-    const field = useInput(props);
+    if (signInRouterRef) {
+      return (
+        <SignInInput
+          ref={forwardedRef}
+          {...props}
+        />
+      );
+    }
+
+    return (
+      <CommonInput
+        ref={forwardedRef}
+        {...props}
+      />
+    );
+  },
+);
+
+Input.displayName = INPUT_NAME;
+
+const SignInInput = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+  (props: FormInputProps, forwardedRef) => {
+    const signInRouterRef = SignInRouterCtx.useActorRef(true);
+    const passkeyAutofillSupported = useSignInPasskeyAutofill();
+    const passkeyAutofillProp = (props as PasskeyInputProps).passkeyAutofill;
+
+    React.useEffect(() => {
+      if (passkeyAutofillProp && passkeyAutofillSupported) {
+        signInRouterRef?.send({ type: 'AUTHENTICATE.PASSKEY.AUTOFILL' });
+      }
+    }, [passkeyAutofillProp, passkeyAutofillSupported, signInRouterRef]);
+
+    // @ts-expect-error - Depending on type the props can be different
+    const field = useInput({ ...props, passkeyAutofill: passkeyAutofillProp && passkeyAutofillSupported });
     return (
       <field.Element
         ref={forwardedRef}
@@ -599,7 +622,17 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
   },
 );
 
-Input.displayName = INPUT_NAME;
+const CommonInput = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+  (props: FormInputProps, forwardedRef) => {
+    const field = useInput(props);
+    return (
+      <field.Element
+        ref={forwardedRef}
+        {...field.props}
+      />
+    );
+  },
+);
 
 /* -------------------------------------------------------------------------------------------------
  * Label
