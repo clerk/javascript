@@ -9,7 +9,9 @@
 
 :where(:root) {
   --cl-font-family: inherit;
-  --cl-color-destructive: 0 84% 60%;
+  --cl-color-danger: 0 84% 60%;
+  --cl-color-success: 142 71% 45%;
+  --cl-color-warning: 25 95% 53%;
   --cl-radius: 0.375rem;
   --cl-spacing-unit: 1rem;
   --cl-font-size: 0.8125rem;

@@ -2,11 +2,12 @@ import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 import * as React from 'react';
 
+import { EmailField } from '~/common/EmailField';
+import { PasswordField } from '~/common/PasswordField';
 import { PROVIDERS } from '~/constants';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
-import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 
@@ -50,24 +51,10 @@ export function SignUpComponent() {
                 })}
               </Connection.Root>
               <Seperator>or</Seperator>
-              <Common.Field
-                name='emailAddress'
-                asChild
-              >
-                <Field.Root>
-                  <Common.Label asChild>
-                    <Field.Label>Email address</Field.Label>
-                  </Common.Label>
-                  <Common.Input asChild>
-                    <Field.Input disabled={isContinuing || hasBusyConnection} />
-                  </Common.Input>
-                  <Common.FieldError>
-                    {({ message }) => {
-                      return <Field.Message intent='error'>{message}</Field.Message>;
-                    }}
-                  </Common.FieldError>
-                </Field.Root>
-              </Common.Field>
+              <div className='space-y-4'>
+                <EmailField disabled={isContinuing || hasBusyConnection} />
+                <PasswordField disabled={isContinuing || hasBusyConnection} />
+              </div>
 
               <SignUp.Action
                 submit
