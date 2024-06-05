@@ -1,6 +1,10 @@
 import cn from 'clsx';
 import * as React from 'react';
 
+import * as Icon from './icon';
+
+type FieldIntent = 'error' | 'idle' | 'info' | 'success' | 'warning';
+
 export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
   { children, className, ...props },
   forwardedRef,
@@ -34,93 +38,77 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
   );
 });
 
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
-  { className, ...props },
-  forwardedRef,
+export const Input = React.forwardRef(function Input(
+  {
+    className,
+    intent = 'idle',
+    ...props
+  }: React.InputHTMLAttributes<HTMLInputElement> & {
+    intent?: FieldIntent;
+  },
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
   return (
     <input
       data-field-input=''
       ref={forwardedRef}
-      {...props}
       className={cn(
-        "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base",
+        'block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none text-base',
+        'focus-visible:ring-[0.1875rem] disabled:opacity-50 disabled:cursor-not-allowed',
+        // idle
+        (intent === 'idle' || intent === 'info') &&
+          'hover:border-gray-a8 focus-visible:ring-gray-a3 focus-visible:border-gray-a8',
+        // invalid
+        "data-[invalid='true']:border-danger data-[invalid='true']:focus-visible:ring-danger/30",
+        // error
+        intent === 'error' && 'border-danger focus-visible:ring-danger/20',
+        // success (optically adjusted ring to 25 opacity)
+        intent === 'success' && 'border-success focus-visible:ring-success/25',
+        // warning
+        intent === 'warning' && 'border-warning focus-visible:ring-warning/20',
         className,
       )}
+      {...props}
     />
   );
 });
 
-type MessageIntent = 'error' | 'success' | 'neutral';
-
 export const Message = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement> & {
-    /**
-     * The intent of the message.
-     * @default 'neutral'
-     */
-    intent?: MessageIntent;
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    children?: React.ReactNode;
+    intent?: FieldIntent;
   }
->(function Message({ className, children, intent = 'neutral', ...props }, forwardedRef) {
+>(function Message({ className, children, intent = 'idle', ...props }, forwardedRef) {
   return (
     <p
       ref={forwardedRef}
       {...props}
       className={cn(
         'text-base flex gap-x-1',
-        {
-          // TODO: Use the color tokens here
-          'text-[#ef4444]': intent === 'error',
-          'text-[#10b981]': intent === 'success',
-          'text-gray-11': intent === 'neutral',
-        },
+        // note: we can't use an object here to get the relevant intent as our
+        // tailwind-transformer doesn't support it
+        intent === 'idle' && 'text-gray-11',
+        intent === 'info' && 'text-gray-11',
+        intent === 'error' && 'text-danger',
+        intent === 'success' && 'text-success',
+        intent === 'warning' && 'text-warning',
         className,
       )}
     >
-      {getMessageIcon(intent)}
+      {intent !== 'idle' && (
+        <span className='text-icon-sm mt-px'>
+          {
+            {
+              error: <Icon.ExclamationOctagonSm />,
+              info: <Icon.InformationLegacy />,
+              success: <Icon.CheckmarkCircleSm />,
+              warning: <Icon.ExclamationTriangleSm />,
+            }[intent]
+          }
+        </span>
+      )}
       {children}
     </p>
   );
 });
-
-function getMessageIcon(intent: MessageIntent) {
-  let path = null;
-
-  if (intent === 'success') {
-    path = (
-      <path
-        fill='currentColor'
-        fillRule='evenodd'
-        d='M8 16A8 8 0 1 0 8-.001 8 8 0 0 0 8 16Zm3.7-9.3a1 1 0 0 0-1.4-1.4L7 8.58l-1.3-1.3A1 1 0 0 0 4.3 8.7l2 2a1 1 0 0 0 1.4 0l4-4Z'
-        clipRule='evenodd'
-      />
-    );
-  }
-
-  if (intent === 'error') {
-    path = (
-      <path
-        fill='currentColor'
-        fillRule='evenodd'
-        d='M16 8A8 8 0 1 1-.001 8 8 8 0 0 1 16 8Zm-7 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM8 3a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1Z'
-        clipRule='evenodd'
-      />
-    );
-  }
-
-  if (path) {
-    return (
-      <svg
-        fill='none'
-        viewBox='0 0 16 16'
-        className='shrink-0 size-4'
-        aria-hidden
-      >
-        {path}
-      </svg>
-    );
-  }
-
-  return null;
-}
