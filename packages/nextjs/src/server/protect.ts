@@ -136,3 +136,10 @@ const isPagePathAvailable = () => {
 };
 
 const isPagesRouterInternalNavigation = (req: Request) => !!req.headers.get(nextConstants.Headers.NextjsData);
+
+// /**
+//  * In case we want to handle router handlers and server actions differently in the future
+//  */
+// const isApiRouteRequest = (req: Request) => {
+//   return !isPageRequest(req) && !isServerActionRequest(req);
+// };
