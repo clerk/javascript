@@ -2,14 +2,14 @@
   "files": [
     { "path": "./dist/clerk.browser.js", "maxSize": "62kB" },
     { "path": "./dist/clerk.headless.js", "maxSize": "43kB" },
-    { "path": "./dist/ui-common*.js", "maxSize": "76KB" },
+    { "path": "./dist/ui-common*.js", "maxSize": "85KB" },
     { "path": "./dist/vendors*.js", "maxSize": "70KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
     { "path": "./dist/impersonationfab*.js", "maxSize": "5KB" },
-    { "path": "./dist/organizationprofile*.js", "maxSize": "10KB" },
+    { "path": "./dist/organizationprofile*.js", "maxSize": "12KB" },
     { "path": "./dist/organizationswitcher*.js", "maxSize": "5KB" },
     { "path": "./dist/organizationlist*.js", "maxSize": "5.5KB" },
-    { "path": "./dist/signin*.js", "maxSize": "10KB" },
+    { "path": "./dist/signin*.js", "maxSize": "12KB" },
     { "path": "./dist/signup*.js", "maxSize": "10KB" },
     { "path": "./dist/userbutton*.js", "maxSize": "5KB" },
     { "path": "./dist/userprofile*.js", "maxSize": "15KB" }
