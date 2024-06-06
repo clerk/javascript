@@ -55,8 +55,6 @@ export const Input = React.forwardRef(function Input(
       className={cn(
         'block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none text-base',
         'focus-visible:ring-[0.1875rem] disabled:opacity-50 disabled:cursor-not-allowed',
-        // invalid
-        "data-[invalid='true']:border-danger data-[invalid='true']:focus-visible:ring-danger/30",
         // intent
         {
           idle: 'hover:border-gray-a8 focus-visible:ring-gray-a3 focus-visible:border-gray-a8',
@@ -65,6 +63,8 @@ export const Input = React.forwardRef(function Input(
           success: 'border-success focus-visible:ring-success/25', // (optically adjusted ring to 25 opacity)
           warning: 'border-warning focus-visible:ring-warning/20',
         }[intent],
+        // data-[invalid] overrides all
+        'data-[invalid]:border-danger data-[invalid]:hover:border-danger data-[invalid]:focus-visible:border-danger data-[invalid]:focus-visible:ring-danger/30',
         className,
       )}
       {...props}
