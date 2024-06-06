@@ -50,7 +50,7 @@ export function SignInComponent() {
                                     disabled={isGlobalLoading || isConnectionLoading}
                                     icon={IconComponent ? <IconComponent className='text-base' /> : null}
                                   >
-                                    {connection.provider}
+                                    {connection.name}
                                   </Connection.Button>
                                 );
                               }}
