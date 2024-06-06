@@ -64,27 +64,27 @@ To resolve this, ensure that the middleware does not protect the catch-all route
         error();
       }
     } else {
-      const check = async () => {
-        // make sure to run this as soon as possible
-        // but don't run again when strict mode is enabled
-        ref.current++;
-        if (ref.current > 1) {
-          return;
-        }
-        let res;
-        try {
-          const url = `${window.location.origin}${
-            window.location.pathname
-          }/${component}_clerk_catchall_check_${Date.now()}`;
-          res = await fetch(url, { signal: ac.signal });
-        } catch (e) {
-          // no op
-        }
-        if (res?.status === 404) {
-          error();
-        }
-      };
-      void check();
+      // const check = async () => {
+      //   // make sure to run this as soon as possible
+      //   // but don't run again when strict mode is enabled
+      //   ref.current++;
+      //   if (ref.current > 1) {
+      //     return;
+      //   }
+      //   let res;
+      //   try {
+      //     const url = `${window.location.origin}${
+      //       window.location.pathname
+      //     }/${component}_clerk_catchall_check_${Date.now()}`;
+      //     res = await fetch(url, { signal: ac.signal });
+      //   } catch (e) {
+      //     // no op
+      //   }
+      //   if (res?.status === 404) {
+      //     error();
+      //   }
+      // };
+      // void check();
     }
 
     return () => {
