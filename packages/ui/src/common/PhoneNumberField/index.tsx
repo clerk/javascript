@@ -122,11 +122,11 @@ export function PhoneNumberField({
                           <Command.Input
                             ref={commandInputRef}
                             placeholder='Search country or code'
-                            className='py-1.5 px-2 w-full text-base leading-small bg-gray-3 outline-none placeholder:text-gray-9 rounded-[calc(theme(borderRadius.md)-2px)] text-gray-12'
+                            className='py-1.5 px-2 w-full text-base leading-small bg-gray-2 outline-none placeholder:text-gray-9 rounded-[calc(theme(borderRadius.md)-2px)] text-gray-12 border border-gray-4'
                           />
                         </div>
                         <Command.List className='overflow-y-auto overflow-x-hidden max-h-80'>
-                          <Command.Empty className='text-gray-12 text-base leading-small text-center py-1.5 px-4'>
+                          <Command.Empty className='text-gray-11 text-base leading-small text-center py-1.5 px-4'>
                             No countries found
                           </Command.Empty>
                           {countryOptions.map(({ name, iso, code }, index) => {
@@ -138,7 +138,7 @@ export function PhoneNumberField({
                                   setIso(iso);
                                   setOpen(false);
                                 }}
-                                className='py-1.5 px-4 flex gap-x-2 text-base leading-small cursor-pointer aria-selected:bg-gray-3'
+                                className='py-1.5 px-4 flex gap-x-2 text-base leading-small cursor-pointer aria-selected:bg-gray-2'
                               >
                                 <span className='shrink-0 w-3 grid place-content-center'>
                                   {selectedCountry === countryOptions[index] && <Icon.Checkmark className='w-3' />}
