@@ -6,6 +6,7 @@ import type {
 } from '@clerk/types';
 
 import { constants as nextConstants } from '../constants';
+import { isNextFetcher } from './nextFetcher';
 
 type AuthProtectOptions = { unauthorizedUrl?: string; unauthenticatedUrl?: string };
 
@@ -121,12 +122,24 @@ const isPageRequest = (req: Request): boolean => {
   return (
     req.headers.get(constants.Headers.SecFetchDest) === 'document' ||
     req.headers.get(constants.Headers.Accept)?.includes('text/html') ||
-    (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req)) ||
-    !!req.headers.get(nextConstants.Headers.NextjsData)
+    isAppRouterInternalNavigation(req) ||
+    isPagesRouterInternalNavigation(req)
   );
 };
 
-// In case we want to handle router handlers and server actions differently in the future
-// const isRouteHandler = (req: Request) => {
-//   return !isPageRequest(req) && !isServerAction(req);
+const isAppRouterInternalNavigation = (req: Request) =>
+  (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req)) || isPagePathAvailable();
+
+const isPagePathAvailable = () => {
+  const __fetch = globalThis.fetch;
+  return Boolean(isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore().pagePath : false);
+};
+
+const isPagesRouterInternalNavigation = (req: Request) => !!req.headers.get(nextConstants.Headers.NextjsData);
+
+// /**
+//  * In case we want to handle router handlers and server actions differently in the future
+//  */
+// const isApiRouteRequest = (req: Request) => {
+//   return !isPageRequest(req) && !isServerActionRequest(req);
 // };
