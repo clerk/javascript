@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.38.12
+
+### Patch Changes
+
+- Fix bug in JWKS cache logic that caused a race condition resulting in no JWK being available. ([#3332](https://github.com/clerk/javascript/pull/3332)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 0.38.11
 
 ### Patch Changes
