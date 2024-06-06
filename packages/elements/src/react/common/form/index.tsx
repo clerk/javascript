@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/clerk-react';
+import { logger } from '@clerk/shared/logger';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
@@ -327,15 +328,9 @@ const useInput = ({
     };
   }
 
-  if ((passthroughProps as PasskeyInputProps).passkeyAutofill) {
-    props = {
-      autoComplete: 'webauthn',
-    };
-  }
-
   // Filter out invalid props that should not be passed through
   // @ts-expect-error - Doesn't know about type narrowing by type here
-  const { validatePassword: _1, passkeyAutofill, ...rest } = passthroughProps;
+  const { validatePassword: _1, ...rest } = passthroughProps;
 
   return {
     Element,
@@ -518,12 +513,8 @@ type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
   validatePassword?: boolean;
 };
 
-type PasskeyInputProps = FormControlProps & {
-  passkeyAutofill?: boolean;
-};
-
 type FormInputProps =
-  | PasskeyInputProps
+  | RadixFormControlProps
   | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
   | ({ type: 'otp'; render?: undefined } & OTPInputProps)
   // Usecase: Toggle the visibility of the password input, therefore 'password' and 'text' are allowed
@@ -565,7 +556,10 @@ type FormInputProps =
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
     const clerk = useClerk();
-    const passkeyAutofillProp = (props as PasskeyInputProps).passkeyAutofill;
+    const field = useInput(props);
+
+    const hasPasskeyAutofillProp = Boolean(field.props.autoComplete?.includes('webauthn'));
+    const allowedTypeForPasskey = (['text', 'email'] as FormInputProps['type'][]).includes(field.props.type);
     const signInRouterRef = SignInRouterCtx.useActorRef(true);
 
     clerk.telemetry?.record(
@@ -580,23 +574,29 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
       }),
     );
 
-    if (signInRouterRef && passkeyAutofillProp) {
+    if (signInRouterRef && hasPasskeyAutofillProp && allowedTypeForPasskey) {
       return (
-        <SignInInput
+        <InputWithPasskeyAutofill
           ref={forwardedRef}
           {...props}
         />
       );
     }
 
-    if (passkeyAutofillProp) {
-      throw new ClerkElementsRuntimeError(`<Input passkeyAutofill> can only be used inside <SignIn>.`);
+    if (hasPasskeyAutofillProp && !allowedTypeForPasskey) {
+      logger.warnOnce(
+        `<Input autoComplete="webauthn"> can only be used with <Input type="text"> or <Input type="email">`,
+      );
+    } else if (hasPasskeyAutofillProp) {
+      logger.warnOnce(
+        `<Input autoComplete="webauthn"> can only be used inside <SignIn> in order to trigger a sign-in attempt, otherwise it will be ignored.`,
+      );
     }
 
     return (
-      <CommonInput
+      <field.Element
         ref={forwardedRef}
-        {...props}
+        {...field.props}
       />
     );
   },
@@ -604,7 +604,7 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
 
 Input.displayName = INPUT_NAME;
 
-const SignInInput = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+const InputWithPasskeyAutofill = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
     const signInRouterRef = SignInRouterCtx.useActorRef(true);
     const passkeyAutofillSupported = useSignInPasskeyAutofill();
@@ -615,19 +615,6 @@ const SignInInput = React.forwardRef<React.ElementRef<typeof RadixControl>, Form
       }
     }, [passkeyAutofillSupported, signInRouterRef]);
 
-    // @ts-expect-error - Depending on type the props can be different
-    const field = useInput({ ...props, passkeyAutofill: passkeyAutofillSupported });
-    return (
-      <field.Element
-        ref={forwardedRef}
-        {...field.props}
-      />
-    );
-  },
-);
-
-const CommonInput = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
-  (props: FormInputProps, forwardedRef) => {
     const field = useInput(props);
     return (
       <field.Element
