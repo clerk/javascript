@@ -26,8 +26,9 @@ export function PhoneNumberField({
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const [isOpen, setOpen] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const commandInputRef = React.useRef<HTMLInputElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const commandListRef = React.useRef<HTMLDivElement>(null);
+  const commandInputRef = React.useRef<HTMLInputElement>(null);
   const contentWidth = containerRef.current?.clientWidth || 0;
   const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
     initPhoneWithCode: selectedCountry.iso,
@@ -66,6 +67,9 @@ export function PhoneNumberField({
   React.useEffect(() => {
     if (isOpen) {
       commandInputRef.current?.focus();
+      setTimeout(() => {
+        commandListRef.current?.querySelector('[data-checked=true]')?.scrollIntoView({ block: 'start' });
+      }, 0);
     }
   }, [isOpen]);
 
@@ -125,7 +129,10 @@ export function PhoneNumberField({
                             className='py-1.5 px-2 w-full text-base leading-small bg-gray-2 outline-none placeholder:text-gray-9 rounded-[calc(theme(borderRadius.md)-2px)] text-gray-12 border border-gray-4'
                           />
                         </div>
-                        <Command.List className='overflow-y-auto overflow-x-hidden max-h-80'>
+                        <Command.List
+                          ref={commandListRef}
+                          className='overflow-y-auto overflow-x-hidden max-h-80'
+                        >
                           <Command.Empty className='text-gray-11 text-base leading-small text-center py-1.5 px-4'>
                             No countries found
                           </Command.Empty>
@@ -138,6 +145,7 @@ export function PhoneNumberField({
                                   setIso(iso);
                                   setOpen(false);
                                 }}
+                                data-checked={selectedCountry === countryOptions[index]}
                                 className='py-1.5 px-4 flex gap-x-2 text-base leading-small cursor-pointer aria-selected:bg-gray-2'
                               >
                                 <span className='shrink-0 w-3 grid place-content-center'>
