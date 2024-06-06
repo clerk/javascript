@@ -13,6 +13,7 @@ import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 import { Form } from '../common/form';
+import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
 
 type SignUpFlowProviderProps = {
   children: React.ReactNode;
@@ -61,8 +62,19 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
 }
 
 export type SignUpRootProps = SignUpFlowProviderProps & {
+  /**
+   * Fallback markup to render while Clerk is loading
+   */
   fallback?: React.ReactNode;
+  /**
+   * The base path for your sign-up route.
+   * Will be automatically inferred in Next.js.
+   * @example `/sign-up`
+   */
   path?: string;
+  /**
+   * If you want to render Clerk Elements in e.g. a modal, use the `virtual` routing mode.
+   */
   routing?: ROUTING;
 };
 
@@ -83,18 +95,21 @@ export type SignUpRootProps = SignUpFlowProviderProps & {
  */
 export function SignUpRoot({
   children,
-  exampleMode,
+  exampleMode = false,
   fallback = null,
-  path = SIGN_UP_DEFAULT_BASE_PATH,
-  routing,
+  path: pathProp,
+  routing = ROUTING.path,
 }: SignUpRootProps): JSX.Element | null {
   const clerk = useClerk();
+  const inferredPath = usePathnameWithoutCatchAll();
+  const path = pathProp || inferredPath || SIGN_UP_DEFAULT_BASE_PATH;
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignUpRoot', {
-      path,
+      exampleMode,
       fallback: Boolean(fallback),
-      exampleMode: Boolean(exampleMode),
+      path,
+      routing,
     }),
   );
 

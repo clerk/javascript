@@ -12,6 +12,7 @@ import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
+import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
 
 type SignInFlowProviderProps = {
   children: React.ReactNode;
@@ -60,13 +61,19 @@ function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) 
 }
 
 export type SignInRootProps = SignInFlowProviderProps & {
+  /**
+   * Fallback markup to render while Clerk is loading
+   */
   fallback?: React.ReactNode;
   /**
-   * The base path for your sign-in route. Defaults to `/sign-in`.
-   *
-   * TODO: re-use usePathnameWithoutCatchAll from the next SDK
+   * The base path for your sign-in route.
+   * Will be automatically inferred in Next.js.
+   * @example `/sign-in`
    */
   path?: string;
+  /**
+   * If you want to render Clerk Elements in e.g. a modal, use the `virtual` routing mode.
+   */
   routing?: ROUTING;
 };
 
@@ -87,18 +94,21 @@ export type SignInRootProps = SignInFlowProviderProps & {
  */
 export function SignInRoot({
   children,
-  exampleMode,
+  exampleMode = false,
   fallback = null,
-  path = SIGN_IN_DEFAULT_BASE_PATH,
-  routing,
+  path: pathProp,
+  routing = ROUTING.path,
 }: SignInRootProps): JSX.Element | null {
   const clerk = useClerk();
+  const inferredPath = usePathnameWithoutCatchAll();
+  const path = pathProp || inferredPath || SIGN_IN_DEFAULT_BASE_PATH;
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignInRoot', {
-      exampleMode: Boolean(exampleMode),
+      exampleMode,
       fallback: Boolean(fallback),
       path,
+      routing,
     }),
   );
 
