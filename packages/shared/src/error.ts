@@ -197,6 +197,7 @@ const DefaultMessages = Object.freeze({
   MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
   MissingSecretKeyErrorMessage: `Missing secretKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
   MissingClerkProvider: `{{source}} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
+  MissingSigningKeyErrorMessage: `Missing signingKey. When passing runtime options to clerkMiddleware, make sure to define CLERK_SIGNING_KEY.`,
 });
 
 type MessageKeys = keyof typeof DefaultMessages;
@@ -222,6 +223,8 @@ export interface ErrorThrower {
   throwMissingPublishableKeyError(): never;
 
   throwMissingSecretKeyError(): never;
+
+  throwMissingSigningKeyError(): never;
 
   throwMissingClerkProviderError(params: { source?: string }): never;
 
@@ -279,6 +282,10 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     throwMissingSecretKeyError(): never {
       throw new Error(buildMessage(messages.MissingSecretKeyErrorMessage));
+    },
+
+    throwMissingSigningKeyError(): never {
+      throw new Error(buildMessage(messages.MissingSigningKeyErrorMessage));
     },
 
     throwMissingClerkProviderError(params: { source?: string }): never {

@@ -237,17 +237,15 @@ export function assertTokenSignature(token: string, key: string, signature?: str
   }
 }
 
-// TODO - Improve JSDocs
 /**
- * Encrypt request header value based on signing key
+ * Encrypt request data using a signing key.
  */
 function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>): string {
   return AES.encrypt(JSON.stringify(options), SIGNING_KEY).toString();
 }
 
-// TODO - Improve JSDocs
 /**
- * Decrypt request header value based on signing key
+ * Decrypt request data using a signing key.
  */
 export function decryptClerkRequestData(encryptedRequestData: string): Partial<AuthenticateRequestOptions> {
   const decryptedBytes = AES.decrypt(encryptedRequestData, SIGNING_KEY);
