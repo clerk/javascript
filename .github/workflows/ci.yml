@@ -20,14 +20,6 @@ jobs:
 
     env:
       TURBO_SUMMARIZE: false
-      # Bundlewatch
-      # DO NOT REMOVE :)
-      BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-      CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
-      CI_REPO_NAME: ${{ vars.REPO_NAME }}
-      CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
-      CI_BRANCH: ${{ github.ref	}}
-      CI_BRANCH_BASE: refs/heads/main
 
     steps:
       - name: Checkout Repo
@@ -65,6 +57,14 @@ jobs:
 
       - name: Check size using bundlewatch
         run: npx turbo bundlewatch $TURBO_ARGS --only
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+          CI_REPO_NAME: ${{ vars.REPO_NAME }}
+          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_BRANCH: ${{ github.ref	}}
+          CI_BRANCH_BASE: refs/heads/main
+
 
       - name: Lint packages using publint
         run: npx turbo lint:publint $TURBO_ARGS --only
