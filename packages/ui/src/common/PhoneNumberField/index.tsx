@@ -85,18 +85,17 @@ export function PhoneNumberField({
                 ref={containerRef}
                 className={cn(
                   'flex w-full bg-white text-gray-12 rounded-md bg-clip-padding border border-gray-a6 outline-none text-base',
-                  'focus-within:ring-[0.1875rem] has-[:disabled]:opacity-50 has-[:disabled]:cursor-not-allowed',
-                  // idle
-                  (intent === 'idle' || intent === 'info') &&
-                    'hover:border-gray-a8 focus-within:ring-gray-a3 focus-within:border-gray-a8',
-                  // invalid
-                  "data-[invalid='true']:border-danger data-[invalid='true']:focus-within:ring-danger/30",
-                  // error
-                  intent === 'error' && 'border-danger focus-within:ring-danger/20',
-                  // success (optically adjusted ring to 25 opacity)
-                  intent === 'success' && 'border-success focus-within:ring-success/25',
-                  // warning
-                  intent === 'warning' && 'border-warning focus-within:ring-warning/20',
+                  'focus-within:ring-[0.1875rem] disabled:opacity-50 disabled:cursor-not-allowed',
+                  // intent
+                  {
+                    idle: 'hover:border-gray-a8 focus-within:ring-gray-a3 focus-within:border-gray-a8',
+                    info: 'hover:border-gray-a8 focus-within:ring-gray-a3 focus-within:border-gray-a8',
+                    error: 'border-danger focus-within:ring-danger/20',
+                    success: 'border-success focus-within:ring-success/25', // (optically adjusted ring to 25 opacity)
+                    warning: 'border-warning focus-within:ring-warning/20',
+                  }[intent],
+                  // data-[invalid] overrides all
+                  'data-[invalid]:border-danger data-[invalid]:hover:border-danger data-[invalid]:focus-within:border-danger data-[invalid]:focus-within:ring-danger/30',
                 )}
               >
                 <DialogTrigger>
