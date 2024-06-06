@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 
 import type { SetupClerkTestingTokenOptions } from '../common';
-import { TESTING_TOKEN_PARAM } from '../common';
+import { ERROR_MISSING_FRONTEND_API_URL, TESTING_TOKEN_PARAM } from '../common';
 
 type SetupClerkTestingTokenParams = {
   page: Page;
@@ -27,7 +27,7 @@ type SetupClerkTestingTokenParams = {
 export const setupClerkTestingToken = async ({ page, options }: SetupClerkTestingTokenParams) => {
   const fapiUrl = options?.frontendApiUrl || process.env.CLERK_FAPI;
   if (!fapiUrl) {
-    throw new Error('The Frontend API URL is required to bypass bot protection.');
+    throw new Error(ERROR_MISSING_FRONTEND_API_URL);
   }
   const apiUrl = `https://${fapiUrl}/v1/**/*`;
 
