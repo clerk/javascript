@@ -29,7 +29,9 @@ type LoadingProps = {
 };
 
 function isSignInScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is LoadingScope<TSignInStep> {
-  if (!scope) return true;
+  if (!scope) {
+    return true;
+  }
 
   if (scope.startsWith('step:')) {
     return Object.prototype.hasOwnProperty.call(SIGN_IN_STEPS, scope.replace('step:', ''));
@@ -39,7 +41,9 @@ function isSignInScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is
 }
 
 function isSignUpScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is LoadingScope<TSignUpStep> {
-  if (!scope) return true;
+  if (!scope) {
+    return true;
+  }
 
   if (scope.startsWith('step:')) {
     return Object.prototype.hasOwnProperty.call(SIGN_UP_STEPS, scope.replace('step:', ''));

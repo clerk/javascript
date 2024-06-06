@@ -5,7 +5,9 @@ import { auth } from './auth';
 
 export async function currentUser(): Promise<User | null> {
   const { userId } = auth();
-  if (!userId) return null;
+  if (!userId) {
+    return null;
+  }
 
   return clerkClient.users.getUser(userId);
 }

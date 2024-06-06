@@ -52,19 +52,29 @@ export const SignInRouterMachine = setup({
   actions: {
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
-      if (!context.router) return;
-      if (!force && shouldUseVirtualRouting()) return;
-      if (context.exampleMode) return;
+      if (!context.router) {
+        return;
+      }
+      if (!force && shouldUseVirtualRouting()) {
+        return;
+      }
+      if (context.exampleMode) {
+        return;
+      }
 
       const resolvedPath = joinURL(context.router.basePath, path);
-      if (resolvedPath === context.router.pathname()) return;
+      if (resolvedPath === context.router.pathname()) {
+        return;
+      }
 
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
     setActive: enqueueActions(({ enqueue, check, context, event }) => {
-      if (check('isExampleMode')) return;
+      if (check('isExampleMode')) {
+        return;
+      }
 
       const lastActiveSessionId = context.clerk.client.lastActiveSessionId;
       const createdSessionId = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn)
@@ -79,7 +89,9 @@ export const SignInRouterMachine = setup({
     }),
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
-        if (error) return error;
+        if (error) {
+          return error;
+        }
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
