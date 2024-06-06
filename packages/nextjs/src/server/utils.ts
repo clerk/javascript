@@ -4,6 +4,7 @@ import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import AES from 'crypto-js/aes';
+import encUtf8 from 'crypto-js/enc-utf8';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -238,16 +239,17 @@ export function assertTokenSignature(token: string, key: string, signature?: str
 }
 
 /**
- * Encrypt request data using a signing key.
+ * Encrypt request data using signing key.
  */
 function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>): string {
   return AES.encrypt(JSON.stringify(options), SIGNING_KEY).toString();
 }
 
 /**
- * Decrypt request data using a signing key.
+ * Decrypt request data using signing key.
  */
+// TODO - Throw descriptive error when decryption fail
 export function decryptClerkRequestData(encryptedRequestData: string): Partial<AuthenticateRequestOptions> {
   const decryptedBytes = AES.decrypt(encryptedRequestData, SIGNING_KEY);
-  return JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8));
+  return JSON.parse(decryptedBytes.toString(encUtf8));
 }
