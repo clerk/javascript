@@ -649,3 +649,20 @@ export const InformationLegacy = createIcon({
     </>
   ),
 });
+
+export const Envelope = createIcon({
+  displayName: 'IconEnvelope',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        fill='currentColor'
+        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
+      />
+      <path
+        fill='currentColor'
+        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
+      />
+    </>
+  ),
+});

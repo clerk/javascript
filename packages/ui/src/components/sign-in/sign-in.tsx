@@ -10,6 +10,7 @@ import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
+import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
 
 export function SignInComponent() {
@@ -58,6 +59,11 @@ export function SignInComponent() {
                         );
                       })}
                     </Connection.Root>
+                    <div className='space-y-2'>
+                      <SecondaryButton icon={<Icon.GitHub />}>Continue with Github</SecondaryButton>
+                      <SecondaryButton icon={<Icon.Google />}>Continue with Google</SecondaryButton>
+                      <SecondaryButton icon={<Icon.Envelope />}>Email code to test@gmail.com</SecondaryButton>
+                    </div>
                     <Seperator>or</Seperator>
                     <div className='space-y-4'>
                       <EmailField disabled={isGlobalLoading} />
