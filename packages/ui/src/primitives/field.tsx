@@ -55,17 +55,16 @@ export const Input = React.forwardRef(function Input(
       className={cn(
         'block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none text-base',
         'focus-visible:ring-[0.1875rem] disabled:opacity-50 disabled:cursor-not-allowed',
-        // idle
-        (intent === 'idle' || intent === 'info') &&
-          'hover:border-gray-a8 focus-visible:ring-gray-a3 focus-visible:border-gray-a8',
-        // invalid
-        "data-[invalid='true']:border-danger data-[invalid='true']:focus-visible:ring-danger/30",
-        // error
-        intent === 'error' && 'border-danger focus-visible:ring-danger/20',
-        // success (optically adjusted ring to 25 opacity)
-        intent === 'success' && 'border-success focus-visible:ring-success/25',
-        // warning
-        intent === 'warning' && 'border-warning focus-visible:ring-warning/20',
+        // intent
+        {
+          idle: 'hover:border-gray-a8 focus-visible:ring-gray-a3 focus-visible:border-gray-a8',
+          info: 'hover:border-gray-a8 focus-visible:ring-gray-a3 focus-visible:border-gray-a8',
+          error: 'border-danger focus-visible:ring-danger/20',
+          success: 'border-success focus-visible:ring-success/25', // (optically adjusted ring to 25 opacity)
+          warning: 'border-warning focus-visible:ring-warning/20',
+        }[intent],
+        // data-[invalid] overrides all
+        'data-[invalid]:border-danger data-[invalid]:hover:border-danger data-[invalid]:focus-visible:border-danger data-[invalid]:focus-visible:ring-danger/30',
         className,
       )}
       {...props}
@@ -86,13 +85,13 @@ export const Message = React.forwardRef<
       {...props}
       className={cn(
         'text-base flex gap-x-1',
-        // note: we can't use an object here to get the relevant intent as our
-        // tailwind-transformer doesn't support it
-        intent === 'idle' && 'text-gray-11',
-        intent === 'info' && 'text-gray-11',
-        intent === 'error' && 'text-danger',
-        intent === 'success' && 'text-success',
-        intent === 'warning' && 'text-warning',
+        {
+          idle: 'text-gray-11',
+          info: 'text-gray-11',
+          error: 'text-danger',
+          success: 'text-success',
+          warning: 'text-warning',
+        }[intent],
         className,
       )}
     >
