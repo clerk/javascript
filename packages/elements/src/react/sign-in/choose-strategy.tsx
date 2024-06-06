@@ -21,12 +21,16 @@ const resetPasswordStrategies: Set<TSignInStrategy> = new Set([
 ]);
 
 export function isResetPasswordStrategy(strategy: TSignInStrategy | null | undefined): boolean {
-  if (!strategy) return false;
+  if (!strategy) {
+    return false;
+  }
   return resetPasswordStrategies.has(strategy as TSignInStrategy);
 }
 
 export function factorHasLocalStrategy(factor: SignInFactor | undefined | null): boolean {
-  if (!factor) return false;
+  if (!factor) {
+    return false;
+  }
   return localStrategies.has(factor.strategy);
 }
 
@@ -102,7 +106,9 @@ export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyE
     );
 
     // Don't render if the current factor is the same as the one we're trying to render
-    if (currentFirstFactor === name) return null;
+    if (currentFirstFactor === name) {
+      return null;
+    }
 
     const Comp = asChild ? Slot : 'button';
     const defaultProps = asChild ? {} : { type: 'button' as const };

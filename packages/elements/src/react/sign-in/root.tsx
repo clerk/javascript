@@ -27,7 +27,9 @@ function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) 
   const formRef = useFormStore();
 
   useEffect(() => {
-    if (!clerk || !router) return;
+    if (!clerk || !router) {
+      return;
+    }
 
     // @ts-expect-error -- This is actually an IsomorphicClerk instance
     clerk.addOnLoaded(() => {

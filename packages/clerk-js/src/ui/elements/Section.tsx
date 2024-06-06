@@ -116,7 +116,9 @@ const ProfileSectionItemList = (props: ProfileSectionItemListProps) => {
     </Col>
   );
 
-  if (disableAnimation) return componentBody;
+  if (disableAnimation) {
+    return componentBody;
+  }
 
   return <Animated asChild>{componentBody}</Animated>;
 };

@@ -49,19 +49,29 @@ export const SignUpRouterMachine = setup({
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
-      if (!context.router) return;
-      if (!force && shouldUseVirtualRouting()) return;
-      if (context.exampleMode) return;
+      if (!context.router) {
+        return;
+      }
+      if (!force && shouldUseVirtualRouting()) {
+        return;
+      }
+      if (context.exampleMode) {
+        return;
+      }
 
       const resolvedPath = joinURL(context.router.basePath, path);
-      if (resolvedPath === context.router.pathname()) return;
+      if (resolvedPath === context.router.pathname()) {
+        return;
+      }
 
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
     setActive: ({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) => {
-      if (context.exampleMode) return;
+      if (context.exampleMode) {
+        return;
+      }
 
       const session =
         params?.sessionId ||
@@ -74,7 +84,9 @@ export const SignUpRouterMachine = setup({
     delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
-        if (error) return error;
+        if (error) {
+          return error;
+        }
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
@@ -119,7 +131,9 @@ export const SignUpRouterMachine = setup({
     hasCreatedSession: ({ context }) => Boolean(context.router?.searchParams().get(SEARCH_PARAMS.createdSession)),
     hasClerkStatus: ({ context }, params?: { status: VerificationStatus }) => {
       const value = context.router?.searchParams().get(SEARCH_PARAMS.status);
-      if (!params) return Boolean(value);
+      if (!params) {
+        return Boolean(value);
+      }
       return value === params.status;
     },
     hasClerkTransfer: ({ context }) => Boolean(context.router?.searchParams().get(SEARCH_PARAMS.transfer)),
