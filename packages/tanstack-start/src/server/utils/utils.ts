@@ -1,6 +1,16 @@
-import type { RequestState } from '@clerk/backend/internal';
+import { debugRequestState, type RequestState } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
+/**
+ *
+ * Utility function to get env variables.
+ *
+ * @param name env variable name
+ * @param defaultVaue default value to return if the env variable is not set
+ * @returns string
+ *
+ * @internal
+ */
 export const getEnvVariable = (name: string, defaultVaue: string = ''): string => {
   // Node envs
   if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
@@ -12,7 +22,7 @@ export const getEnvVariable = (name: string, defaultVaue: string = ''): string =
 
 /**
  * Wraps obscured clerk internals with a readable `clerkState` key.
- * This is intended to be passed by the user into <ClerkProvider>
+ * This is intended to be passed into <ClerkProvider>
  *
  * @internal
  */
@@ -21,7 +31,7 @@ export const wrapWithClerkState = (data: any) => {
 };
 
 /**
- * Returns the clerk state object and observability headers to be injected into a loader response.
+ * Returns the clerk state object and observability headers to be injected into a context.
  *
  * @internal
  */
@@ -37,6 +47,7 @@ export function getResponseClerkState(requestState: RequestState) {
     __signUpUrl: requestState.signUpUrl,
     __afterSignInUrl: requestState.afterSignInUrl,
     __afterSignUpUrl: requestState.afterSignUpUrl,
+    __clerk_debug: debugRequestState(requestState),
     __clerkJSUrl: getEnvVariable('CLERK_JS'),
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION'),
     __telemetryDisabled: isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
