@@ -12,16 +12,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  # Bundlewatch
-  # DO NOT REMOVE :)
-  BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-  CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
-  CI_REPO_NAME: ${{ vars.REPO_NAME }}
-  CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
-  CI_BRANCH: ${{ github.ref	}}
-  CI_BRANCH_BASE: refs/heads/main
-
 jobs:
   formatting-linting:
     name: Formatting, linting & changeset checks
@@ -30,6 +20,14 @@ jobs:
 
     env:
       TURBO_SUMMARIZE: false
+      # Bundlewatch
+      # DO NOT REMOVE :)
+      BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+      CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+      CI_REPO_NAME: ${{ vars.REPO_NAME }}
+      CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+      CI_BRANCH: ${{ github.ref	}}
+      CI_BRANCH_BASE: refs/heads/main
 
     steps:
       - name: Checkout Repo
@@ -64,6 +62,9 @@ jobs:
 
       - name: Build Packages
         run: npx turbo build $TURBO_ARGS --only
+
+      - name: Check size using bundlewatch
+        run: npx turbo bundlewatch $TURBO_ARGS --only
 
       - name: Lint packages using publint
         run: npx turbo lint:publint $TURBO_ARGS --only
