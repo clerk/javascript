@@ -1,3 +1,4 @@
+import { esbuildPluginFilePathExtensions } from 'esbuild-plugin-file-path-extensions';
 import type { Options } from 'tsup';
 import { defineConfig } from 'tsup';
 
@@ -9,14 +10,13 @@ export default defineConfig(overrideOptions => {
   const isProd = overrideOptions.env?.NODE_ENV === 'production';
   const shouldPublish = !!overrideOptions.env?.publish;
 
-  const config: Options = {
+  const common: Options = {
     entry: ['./src/**/*.{ts,tsx,js,jsx}', '!./src/**/*.test.{ts,tsx}'],
-    bundle: false,
+    bundle: true,
     clean: true,
     minify: false,
     sourcemap: true,
-    format: 'esm',
-    dts: true,
+    treeshake: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
@@ -24,8 +24,24 @@ export default defineConfig(overrideOptions => {
     },
   };
 
+  const esm: Options = {
+    ...common,
+    format: 'esm',
+    outDir: './dist/esm',
+    dts: true,
+    esbuildPlugins: [esbuildPluginFilePathExtensions({ esmExtension: 'js' })],
+  };
+
+  const cjs: Options = {
+    ...common,
+    format: 'cjs',
+    outDir: './dist/cjs',
+    dts: true,
+    esbuildPlugins: [esbuildPluginFilePathExtensions({ esmExtension: 'cjs' })],
+  };
+
   return runAfterLast([
     // 'npm run build:declarations',
     shouldPublish && 'npm run publish:local',
-  ])(config);
+  ])(esm, cjs);
 });

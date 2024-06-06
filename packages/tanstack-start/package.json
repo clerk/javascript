@@ -27,15 +27,26 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.cts",
+        "default": "./dist/cjs/index.cjs"
+      }
     },
     "./server": {
-      "types": "./dist/server/index.d.ts",
-      "default": "./dist/server/index.js"
+      "import": {
+        "types": "./dist/esm/server/index.d.ts",
+        "default": "./dist/esm/server/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/server/index.d.cts",
+        "default": "./dist/cjs/server/index.cjs"
+      }
     }
   },
-  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -68,6 +79,7 @@
     "@types/node": "^18.17.0",
     "@types/react": "*",
     "@types/react-dom": "*",
+    "esbuild-plugin-file-path-extensions": "^2.1.1",
     "typescript": "*"
   },
   "peerDependencies": {

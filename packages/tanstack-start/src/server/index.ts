@@ -1,7 +1,7 @@
 import type { AnyRouter } from '@tanstack/react-router';
 import type { EventHandler } from 'vinxi/http';
 
-import { rootAuthBeforeLoader } from './rootAuthBeforeLoader.js';
+import { rootAuthBeforeLoader } from './rootAuthBeforeLoader';
 
 export type RequestHandler<TRouter extends AnyRouter> = (ctx: {
   request: Request;

@@ -5,7 +5,7 @@ import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
 // import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
-import { getEnvVariable } from './utils/utils.js';
+import { getEnvVariable } from './utils/utils';
 
 export const loadOptions = (request: Request) => {
   const clerkRequest = createClerkRequest(request);

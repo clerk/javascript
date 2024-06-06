@@ -1,10 +1,9 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouteContext } from '@tanstack/react-router';
 import { Asset } from '@tanstack/start';
-import React from 'react';
 
-import { ClerkOptionsProvider } from './OptionsContext.js';
-import type { TanstackStartClerkProviderProps } from './types.js';
+import { ClerkOptionsProvider } from './OptionsContext';
+import type { TanstackStartClerkProviderProps } from './types';
 
 export * from '@clerk/clerk-react';
 
@@ -28,7 +27,6 @@ export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProv
     __proxyUrl,
     __domain,
     __isSatellite,
-    __clerk_debug,
     __signInUrl,
     __signUpUrl,
     __afterSignInUrl,

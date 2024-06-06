@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { TanstackStartClerkProviderProps as ClerkProviderProps } from './types.js';
+import type { TanstackStartClerkProviderProps as ClerkProviderProps } from './types';
 
 type ClerkContextValue = Partial<Omit<ClerkProviderProps, 'children'>>;
 
