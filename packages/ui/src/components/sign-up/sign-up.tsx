@@ -3,6 +3,8 @@ import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
 import { EmailField } from '~/common/EmailField';
+import { FirstNameField } from '~/common/FirstNameField';
+import { LastNameField } from '~/common/LastNameField';
 import { PasswordField } from '~/common/PasswordField';
 import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
@@ -34,16 +36,17 @@ export function SignUpComponent() {
                   </Card.Header>
                   <Card.Body>
                     <Connection.Root>
-                      {enabledConnections.map(connection => {
-                        const iconKey = PROVIDERS.find(provider => provider.id === connection.provider)?.icon;
+                      {enabledConnections.map(c => {
+                        const connection = PROVIDERS.find(provider => provider.id === c.provider);
+                        const iconKey = connection?.icon;
                         const IconComponent = iconKey ? Icon[iconKey] : null;
                         return (
                           <Common.Connection
-                            key={connection.provider}
-                            name={connection.provider}
+                            key={c.provider}
+                            name={c.provider}
                             asChild
                           >
-                            <Common.Loading scope={`provider:${connection.provider}`}>
+                            <Common.Loading scope={`provider:${c.provider}`}>
                               {isConnectionLoading => {
                                 return (
                                   <Connection.Button
@@ -51,7 +54,7 @@ export function SignUpComponent() {
                                     disabled={isGlobalLoading || isConnectionLoading}
                                     icon={IconComponent ? <IconComponent className='text-base' /> : null}
                                   >
-                                    {connection.name}
+                                    {connection?.name || c.provider}
                                   </Connection.Button>
                                 );
                               }}
@@ -63,6 +66,10 @@ export function SignUpComponent() {
 
                     <Seperator>or</Seperator>
                     <div className='space-y-4'>
+                      <div className='flex gap-4'>
+                        <FirstNameField disabled={isGlobalLoading} />
+                        <LastNameField disabled={isGlobalLoading} />
+                      </div>
                       <EmailField disabled={isGlobalLoading} />
                       <PasswordField disabled={isGlobalLoading} />
                     </div>
