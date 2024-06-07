@@ -24,7 +24,6 @@ export const Root = React.forwardRef<
   }
 >(function Root({ children, className, ...props }, forwardedRef) {
   const cols = getColumnCount(React.Children.toArray(children));
-  console.log(cols);
   return (
     <div
       ref={forwardedRef}
