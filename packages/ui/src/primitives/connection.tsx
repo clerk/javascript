@@ -29,7 +29,7 @@ export const Root = React.forwardRef<
       ref={forwardedRef}
       {...props}
       className={cn(
-        'flex items-center justify-center flex-wrap [--cl-connection-gap:theme(spacing.2)] gap-y-[--cl-connection-gap] -mx-1',
+        'flex items-center justify-center flex-wrap [--cl-connection-gap:theme(spacing.2)] gap-y-[--cl-connection-gap] -mx-[calc(var(--cl-connection-gap)/2)]',
         className,
       )}
       style={{ '--cl-connection-cols': cols } as React.CSSProperties}
