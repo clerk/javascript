@@ -117,7 +117,7 @@ export function decorateRequest(
   requestState: RequestState,
   secretKey: string,
 ): Response {
-  const { reason, message, status, token } = requestState;
+  const { reason, message, status, token, signInUrl, signUpUrl } = requestState;
   // pass-through case, convert to next()
   if (!res) {
     res = NextResponse.next();
@@ -157,7 +157,7 @@ export function decorateRequest(
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
-      [constants.Headers.ClerkRequestData]: encryptClerkRequestData({ secretKey }),
+      [constants.Headers.ClerkRequestData]: encryptClerkRequestData({ secretKey, signInUrl, signUpUrl }),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }

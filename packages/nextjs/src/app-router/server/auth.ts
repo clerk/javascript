@@ -8,7 +8,7 @@ import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
 import type { AuthProtect } from '../../server/protect';
 import { createProtect } from '../../server/protect';
-import { getAuthKeyFromRequest } from '../../server/utils';
+import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader } from '../../server/utils';
 import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { protect: AuthProtect; redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
@@ -28,6 +28,9 @@ export const auth = (): Auth => {
       clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
       clerkRequest.cookies.get(constants.Cookies.DevBrowser);
 
+    const requestData = getHeader(request, constants.Headers.ClerkRequestData);
+    const decryptedRequestData = requestData ? decryptClerkRequestData(requestData) : {};
+
     return createRedirect({
       redirectAdapter: redirect,
       devBrowserToken: devBrowserToken,
@@ -35,8 +38,8 @@ export const auth = (): Auth => {
       // TODO: Support runtime-value configuration of these options
       // via setting and reading headers from clerkMiddleware
       publishableKey: PUBLISHABLE_KEY,
-      signInUrl: SIGN_IN_URL,
-      signUpUrl: SIGN_UP_URL,
+      signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
+      signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
     }).redirectToSignIn({
       returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl?.toString(),
     });
