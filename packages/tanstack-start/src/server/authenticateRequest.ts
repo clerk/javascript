@@ -2,6 +2,8 @@ import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '@clerk/backend/internal';
 import { AuthStatus } from '@clerk/backend/internal';
 
+import { errorThrower } from '../utils';
+
 export async function authenticateRequest(
   request: Request,
   opts: AuthenticateRequestOptions,
@@ -36,7 +38,7 @@ export async function authenticateRequest(
   }
 
   if (requestState.status === AuthStatus.Handshake) {
-    throw new Error('Clerk: unexpected handshake without redirect');
+    throw errorThrower.throw('Clerk: unexpected handshake without redirect');
   }
 
   return requestState;

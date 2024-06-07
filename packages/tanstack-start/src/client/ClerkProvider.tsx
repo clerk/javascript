@@ -1,23 +1,31 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouteContext } from '@tanstack/react-router';
 import { Asset } from '@tanstack/start';
+import { useEffect } from 'react';
 
+import { isServer } from '../utils';
 import { ClerkOptionsProvider } from './OptionsContext';
 import type { TanstackStartClerkProviderProps } from './types';
-
-export * from '@clerk/clerk-react';
+import { useAwaitableNavigate } from './useAwaitableNavigate';
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
 };
 
-const isServer = typeof window === 'undefined';
+export * from '@clerk/clerk-react';
+
+const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
 export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProviderProps): JSX.Element {
+  const awaitableNavigate = useAwaitableNavigate();
   const contextRouter = useRouteContext({
     strict: false,
   });
+
+  useEffect(() => {
+    awaitableNavigateRef.current = awaitableNavigate;
+  }, [awaitableNavigate]);
 
   const clerkInitState = !isServer ? (window as any).__clerk_init_state : contextRouter?.clerkStateContext;
 
@@ -64,6 +72,18 @@ export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProv
           sdkMetadata={SDK_METADATA}
           {...mergedProps}
           {...restProps}
+          routerPush={(to: string) =>
+            awaitableNavigateRef.current?.({
+              to,
+              replace: false,
+            })
+          }
+          routerReplace={(to: string) =>
+            awaitableNavigateRef.current?.({
+              to,
+              replace: true,
+            })
+          }
         >
           {children}
         </ReactClerkProvider>

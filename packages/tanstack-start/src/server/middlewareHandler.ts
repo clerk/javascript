@@ -3,7 +3,7 @@ import type { EventHandler } from 'vinxi/http';
 
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
-import { getResponseClerkState } from './utils/utils';
+import { getResponseClerkState } from './utils';
 
 export type RequestHandler<TRouter extends AnyRouter> = (ctx: {
   request: Request;
@@ -34,6 +34,7 @@ export function clerkMiddlewareHandler<TRouter extends AnyRouter>(eventHandler: 
           return error;
         }
 
+        // rethrowing the error if it is not a Response
         throw error;
       }
 

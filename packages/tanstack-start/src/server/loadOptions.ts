@@ -4,8 +4,9 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
+import { errorThrower } from '../utils';
 // import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
-import { getEnvVariable } from './utils/utils';
+import { getEnvVariable } from './utils';
 
 export const loadOptions = (request: Request) => {
   const clerkRequest = createClerkRequest(request);
@@ -30,13 +31,13 @@ export const loadOptions = (request: Request) => {
   }
 
   if (!secretKey) {
-    throw new Error('Clerk: no secret key provided');
+    throw errorThrower.throw('Clerk: no secret key provided');
   }
   if (isSatellite && !proxyUrl && !domain) {
-    throw new Error('Clerk: satellite mode requires a proxy URL or domain');
+    throw errorThrower.throw('Clerk: satellite mode requires a proxy URL or domain');
   }
   if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
-    throw new Error('Clerk: satellite mode requires a sign-in URL in production');
+    throw errorThrower.throw('Clerk: satellite mode requires a sign-in URL in production');
   }
 
   return {
