@@ -22,9 +22,12 @@ jest.mock('../clerkClient', () => {
 });
 
 // used to assert the mock
+import assert from 'assert';
+
 import { clerkClient } from '../clerkClient';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { createRouteMatcher } from '../routeMatcher';
+import { decryptClerkRequestData } from '../utils';
 
 /**
  * Disable console warnings about config matchers
@@ -44,6 +47,7 @@ jest.mock('../constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
+    ENCRYPTION_KEY: 'test',
   };
 });
 
@@ -214,6 +218,20 @@ describe('clerkMiddleware(params)', () => {
     expect(signInResp?.status).toEqual(307);
     expect(signInResp?.headers.get(constants.Headers.Location)).toEqual('https://www.clerk.com/hello');
     expect(signInResp?.headers.get('a-custom-header')).toEqual('1');
+  });
+
+  it('propagates runtime options', async () => {
+    const secretKey = 'sk_test_xxxxxxxxxxxxxxxxxx';
+    const resp = await clerkMiddleware({ secretKey })(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+    expect(resp?.status).toEqual(200);
+
+    const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
+    assert.ok(requestData);
+
+    const decryptedData = decryptClerkRequestData(requestData);
+
+    expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
+    expect(decryptedData.secretKey).toBe(secretKey);
   });
 
   describe('auth().redirectToSignIn()', () => {
@@ -621,6 +639,4 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     );
     expect(clerkClient.authenticateRequest).toBeCalled();
   });
-
-  // TODO - Add tests
 });
