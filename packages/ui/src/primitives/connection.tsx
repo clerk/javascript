@@ -11,7 +11,12 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('grid grid-cols-2 gap-2', className)}
+      className={cn(
+        '[--cl-connection-gap:theme(spacing.2)]',
+        '[--cl-connection-cols:2]',
+        'flex gap-[--cl-connection-gap] flex-wrap items-center justify-center',
+        className,
+      )}
     >
       {children}
     </div>
@@ -35,7 +40,8 @@ export const Button = React.forwardRef(function Button(
       ref={forwardedRef}
       {...props}
       className={cn(
-        'flex items-center justify-center gap-2 w-full bg-transparent text-gray-12 font-medium rounded-md bg-clip-padding border border-gray-a6 shadow-sm shadow-gray-a3 py-1.5 px-2.5 outline-none focus-visible:ring-[0.1875rem] focus-visible:ring-gray-a3 focus-visible:border-gray-a8 text-base',
+        'w-[calc((100%/var(--cl-connection-cols))-var(--cl-connection-gap))] ',
+        'min-w-0 flex items-center justify-center gap-2 bg-transparent text-gray-12 font-medium rounded-md bg-clip-padding border border-gray-a6 shadow-sm shadow-gray-a3 py-1.5 px-2.5 outline-none focus-visible:ring-[0.1875rem] focus-visible:ring-gray-a3 focus-visible:border-gray-a8 text-base',
         busy ? 'cursor-wait' : disabled ? 'disabled:cursor-not-allowed disabled:opacity-50' : 'hover:bg-gray-a2',
         className,
       )}
