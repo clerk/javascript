@@ -52,7 +52,8 @@
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "server"
   ],
   "scripts": {
     "build": "npm run clean && tsup",
