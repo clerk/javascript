@@ -60,6 +60,110 @@ To build the package in watch mode, run the following:
 npm run dev
 ```
 
+## Usage
+
+Make sure the following environment variables are set in a `.env` file:
+
+```sh
+CLERK_PUBLISHABLE_KEY=[publishable-key]
+CLERK_SECRET_KEY=[backend-secret-key]
+```
+
+You can get these from the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) screen in your Clerk dashboard.
+
+To initialize Clerk with your TanStack Start application, you will need to make one modification to `app/routes/_root.tsx`:
+
+- Wrap the children of the `RootComponent` with `<ClerkProvider/>`
+
+```tsx
+import { ClerkProvider } from '@clerk/tanstack-start'
+import { createRootRoute } from '@tanstack/react-router'
+import { Link, Outlet, ScrollRestoration } from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { Body, Head, Html, Meta, Scripts } from '@tanstack/start'
+import * as React from 'react'
+import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
+import { NotFound } from '~/components/NotFound'
+
+export const Route = createRootRoute({
+  meta: () => [
+    {
+      charSet: 'utf-8',
+    },
+    {
+      name: 'viewport',
+      content: 'width=device-width, initial-scale=1',
+    },
+  ],
+  errorComponent: (props) => {
+    return (
+      <RootDocument>
+        <DefaultCatchBoundary {...props} />
+      </RootDocument>
+    )
+  },
+  notFoundComponent: () => <NotFound />,
+  component: RootComponent,
+})
+
+function RootComponent() {
+  return (
+    <ClerkProvider>
+      <RootDocument>
+          <Outlet />
+      </RootDocument>
+    </ClerkProvider>
+  )
+}
+
+function RootDocument({ children }: { children: React.ReactNode }) { ... }
+```
+
+Also you will need to make on more modification to `app/ssr.tsx`:
+
+- Wrap the `createRequestHandler` with `clerkMiddlewareHandler`
+
+```tsx
+import { createRequestHandler, defaultStreamHandler } from '@tanstack/start/server';
+import { getRouterManifest } from '@tanstack/start/router-manifest';
+import { createRouter } from './router';
+import { clerkMiddlewareHandler } from '@clerk/tanstack-start/server';
+
+const handler = createRequestHandler({
+  createRouter,
+  getRouterManifest,
+});
+
+export default clerkMiddlewareHandler(handler)(defaultStreamHandler);
+```
+
+After those changes are made, you can use Clerk components in your routes.
+
+For example, in `app/routes/index.tsx`:
+
+```tsx
+import { SignIn, SignedIn, SignedOut, UserButton } from '@clerk/tanstack-start';
+import { createFileRoute } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/')({
+  component: Home,
+});
+
+function Home() {
+  return (
+    <div className='p-2'>
+      <h1>Hello Clerk!</h1>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+      <SignedOut>
+        <SignIn />
+      </SignedOut>
+    </div>
+  );
+}
+```
+
 ## Support
 
 You can get in touch with us in any of the following ways:
