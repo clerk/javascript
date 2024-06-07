@@ -34,7 +34,7 @@ export const PROVIDERS: Provider[] = [
   { id: 'tiktok', name: 'TikTok', icon: 'TikTok' },
   { id: 'twitch', name: 'Twitch', icon: 'Twitch' },
   { id: 'twitter', name: 'Twitter', icon: 'Twitter' },
-  { id: 'x', name: 'X', icon: 'Twitter' },
+  { id: 'x', name: 'X / Twitter', icon: 'Twitter' },
   { id: 'xero', name: 'Xero', icon: 'Xero' },
   //
   { id: 'enstall', name: 'Enstall', icon: 'Apple' },
