@@ -10,7 +10,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL, SIGNING_KEY } from './constants';
+import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
 import { authSignatureInvalid, missingDomainAndProxy, missingSignInUrlInDev, signingKeyInvalid } from './errors';
 import type { RequestLike } from './types';
 
@@ -242,7 +242,7 @@ export function assertTokenSignature(token: string, key: string, signature?: str
  * Encrypt request data using signing key.
  */
 export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>): string {
-  return AES.encrypt(JSON.stringify(options), SIGNING_KEY).toString();
+  return AES.encrypt(JSON.stringify(options), ENCRYPTION_KEY).toString();
 }
 
 /**
@@ -250,7 +250,7 @@ export function encryptClerkRequestData(options: Partial<AuthenticateRequestOpti
  */
 export function decryptClerkRequestData(encryptedRequestData: string): Partial<AuthenticateRequestOptions> {
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, SIGNING_KEY);
+    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY);
     const encoded = decryptedBytes.toString(encUtf8);
     return JSON.parse(encoded);
   } catch (err) {
