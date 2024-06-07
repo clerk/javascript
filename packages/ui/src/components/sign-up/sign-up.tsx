@@ -36,16 +36,17 @@ export function SignUpComponent() {
                   </Card.Header>
                   <Card.Body>
                     <Connection.Root>
-                      {enabledConnections.map(connection => {
-                        const iconKey = PROVIDERS.find(provider => provider.id === connection.provider)?.icon;
+                      {enabledConnections.map(c => {
+                        const connection = PROVIDERS.find(provider => provider.id === c.provider);
+                        const iconKey = connection?.icon;
                         const IconComponent = iconKey ? Icon[iconKey] : null;
                         return (
                           <Common.Connection
-                            key={connection.provider}
-                            name={connection.provider}
+                            key={c.provider}
+                            name={c.provider}
                             asChild
                           >
-                            <Common.Loading scope={`provider:${connection.provider}`}>
+                            <Common.Loading scope={`provider:${c.provider}`}>
                               {isConnectionLoading => {
                                 return (
                                   <Connection.Button
@@ -53,7 +54,7 @@ export function SignUpComponent() {
                                     disabled={isGlobalLoading || isConnectionLoading}
                                     icon={IconComponent ? <IconComponent className='text-base' /> : null}
                                   >
-                                    {connection.provider}
+                                    {connection?.name || c.provider}
                                   </Connection.Button>
                                 );
                               }}
