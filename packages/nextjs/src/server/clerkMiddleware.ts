@@ -13,7 +13,7 @@ import { NextResponse } from 'next/server';
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
 import { clerkClient } from './clerkClient';
-import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL, SIGNING_KEY } from './constants';
+import { ENCRYPTION_KEY, PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
 import type { AuthProtect } from './protect';
 import { createProtect } from './protect';
@@ -78,7 +78,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
 
   const hasProvidedRuntimeOptions = params.secretKey || params.signInUrl || params.signInUrl;
   if (hasProvidedRuntimeOptions) {
-    assertKey(SIGNING_KEY, () => errorThrower.throwMissingSigningKeyError());
+    assertKey(ENCRYPTION_KEY, () => errorThrower.throwMissingEncryptionKeyError());
   }
 
   const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
