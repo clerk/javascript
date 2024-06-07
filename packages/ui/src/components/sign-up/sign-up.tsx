@@ -3,6 +3,8 @@ import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
 import { EmailField } from '~/common/EmailField';
+import { FirstNameField } from '~/common/FirstNameField';
+import { LastNameField } from '~/common/LastNameField';
 import { PasswordField } from '~/common/PasswordField';
 import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
@@ -64,6 +66,10 @@ export function SignUpComponent() {
 
                     <Seperator>or</Seperator>
                     <div className='space-y-4'>
+                      <div className='flex gap-4'>
+                        <FirstNameField disabled={isGlobalLoading} />
+                        <LastNameField disabled={isGlobalLoading} />
+                      </div>
                       <EmailField disabled={isGlobalLoading} />
                       <PasswordField disabled={isGlobalLoading} />
                     </div>
