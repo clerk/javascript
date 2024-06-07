@@ -1,3 +1,4 @@
+import { Slot } from '@radix-ui/react-slot';
 import cn from 'clsx';
 import * as React from 'react';
 
@@ -40,20 +41,24 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
 
 export const Input = React.forwardRef(function Input(
   {
+    asChild,
     className,
     intent = 'idle',
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
+    asChild?: boolean;
     intent?: FieldIntent;
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
+  const Comp = asChild ? Slot : 'input';
+
   return (
-    <input
+    <Comp
       data-field-input=''
       ref={forwardedRef}
       className={cn(
-        'block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none text-base',
+        'flex w-full min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none text-base',
         'focus-visible:ring-[0.1875rem] disabled:opacity-50 disabled:cursor-not-allowed',
         // intent
         {

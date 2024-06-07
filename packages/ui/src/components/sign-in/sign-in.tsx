@@ -3,6 +3,7 @@ import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
 import { EmailField } from '~/common/EmailField';
+import { OTPField } from '~/common/OTPField';
 import { PasswordField } from '~/common/PasswordField';
 import { PhoneNumberField } from '~/common/PhoneNumberField';
 import { PROVIDERS } from '~/constants';
@@ -66,6 +67,7 @@ export function SignInComponent() {
                       <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
                       <EmailField disabled={isGlobalLoading} />
                       <PasswordField disabled={isGlobalLoading} />
+                      <OTPField disabled={isGlobalLoading} />
                     </div>
 
                     <SignIn.Action
