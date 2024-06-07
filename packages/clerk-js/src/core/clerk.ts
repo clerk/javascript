@@ -159,7 +159,7 @@ export class Clerk implements ClerkInterface {
   #publishableKey: string = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
-  #authService: AuthCookieService | null = null;
+  #authService?: AuthCookieService;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
@@ -1504,7 +1504,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    this.#authService = new AuthCookieService(this, this.#fapiClient);
+    this.#authService = await AuthCookieService.create(this, this.#fapiClient);
 
     /**
      * 1. Multi-domain SSO handling

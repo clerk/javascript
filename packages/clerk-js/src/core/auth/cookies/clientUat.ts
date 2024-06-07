@@ -19,9 +19,9 @@ export type ClientUatCookieHandler = {
  * The cookie is used as hint from the Clerk Backend packages to identify
  * if the user is authenticated or not.
  */
-export const createClientUatCookie = (publishableKey: string): ClientUatCookieHandler => {
+export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHandler => {
   const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
-  const suffixedClientUatCookie = createCookieHandler(getSuffixedCookieName(CLIENT_UAT_COOKIE_NAME, publishableKey));
+  const suffixedClientUatCookie = createCookieHandler(getSuffixedCookieName(CLIENT_UAT_COOKIE_NAME, cookieSuffix));
 
   const get = (): number => {
     const value = suffixedClientUatCookie.get() || clientUatCookie.get();
