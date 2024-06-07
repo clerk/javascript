@@ -6,7 +6,9 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { initialState } from './auth';
 
-export function ClerkProvider(props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>) {
+export function ClerkProvider(
+  props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange' | 'signInUrl' | 'signUpUrl'>,
+) {
   const { children, ...rest } = props;
   const state = initialState()?.__clerk_ssr_state as InitialState;
 
