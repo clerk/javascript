@@ -11,7 +11,7 @@ import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL, SIGNING_KEY } from './constants';
-import { authSignatureInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import { authSignatureInvalid, missingDomainAndProxy, missingSignInUrlInDev, signingKeyInvalid } from './errors';
 import type { RequestLike } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
@@ -241,15 +241,19 @@ export function assertTokenSignature(token: string, key: string, signature?: str
 /**
  * Encrypt request data using signing key.
  */
-function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>): string {
+export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>): string {
   return AES.encrypt(JSON.stringify(options), SIGNING_KEY).toString();
 }
 
 /**
  * Decrypt request data using signing key.
  */
-// TODO - Throw descriptive error when decryption fail
 export function decryptClerkRequestData(encryptedRequestData: string): Partial<AuthenticateRequestOptions> {
-  const decryptedBytes = AES.decrypt(encryptedRequestData, SIGNING_KEY);
-  return JSON.parse(decryptedBytes.toString(encUtf8));
+  try {
+    const decryptedBytes = AES.decrypt(encryptedRequestData, SIGNING_KEY);
+    const encoded = decryptedBytes.toString(encUtf8);
+    return JSON.parse(encoded);
+  } catch (err) {
+    throw new Error(signingKeyInvalid);
+  }
 }
