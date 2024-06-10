@@ -109,7 +109,7 @@ export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
       className={cn('grid', className)}
     >
       {children}
-      <div className='py-4 px-6 border-t border-gray-a6 grid place-content-center'>
+      <div className='py-4 px-6 grid place-content-center'>
         <p className='text-sm inline-flex items-center gap-x-1 text-gray-a11'>
           Secured by{' '}
           <a
@@ -132,7 +132,7 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
       <div
         ref={forwardedRef}
         {...props}
-        className={cn('px-6 py-4', className)}
+        className={cn('px-6 py-4 border-b border-gray-a6 ', className)}
       >
         {children}
       </div>
