@@ -32,23 +32,25 @@ export const stringifyQueryParams = (
   if (params === null || params === undefined) {
     return '';
   }
+  if (!params || typeof params !== 'object') {
+    return '';
+  }
 
   const queryParams = new URLSearchParams();
-  if (params && typeof params === 'object') {
-    Object.keys(params).forEach(key => {
-      const encodedKey = opts.keyEncoder ? opts.keyEncoder(key) : key;
-      const value = params[key];
-      if (Array.isArray(value)) {
-        value.forEach(v => v !== undefined && queryParams.append(encodedKey, v || ''));
-      } else if (value === undefined) {
-        return;
-      } else if (typeof value === 'object' && value !== null) {
-        queryParams.append(encodedKey, JSON.stringify(value));
-      } else {
-        queryParams.append(encodedKey, value || '');
-      }
-    });
-  }
+
+  Object.keys(params).forEach(key => {
+    const encodedKey = opts.keyEncoder ? opts.keyEncoder(key) : key;
+    const value = params[key];
+    if (Array.isArray(value)) {
+      value.forEach(v => v !== undefined && queryParams.append(encodedKey, v || ''));
+    } else if (value === undefined) {
+      return;
+    } else if (typeof value === 'object' && value !== null) {
+      queryParams.append(encodedKey, JSON.stringify(value));
+    } else {
+      queryParams.append(encodedKey, value || '');
+    }
+  });
 
   return queryParams.toString();
 };

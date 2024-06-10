@@ -53,8 +53,16 @@ describe('stringifyQueryParams(object)', () => {
     expect(stringifyQueryParams({ foo: ['42', '22'], bar: undefined })).toBe('foo=42&foo=22');
   });
 
+  it('converts an object to querystring when value is null', () => {
+    expect(stringifyQueryParams({ foo: null })).toBe('foo=');
+  });
+
   it('converts an object to querystring when value is an object', () => {
     expect(stringifyQueryParams({ unsafe_metadata: { bar: '1' } })).toBe('unsafe_metadata=%7B%22bar%22%3A%221%22%7D');
+  });
+
+  it('converts an object to querystring when value contains invalid url symbols', () => {
+    expect(stringifyQueryParams({ test: 'ena=duo' })).toBe('test=ena%3Dduo');
   });
 
   it('converts an object to querystring when key is camelCase', () => {
@@ -64,3 +72,4 @@ describe('stringifyQueryParams(object)', () => {
     );
   });
 });
+//test=ena%3Dduo
