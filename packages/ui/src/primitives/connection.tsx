@@ -37,8 +37,17 @@ export const Button = React.forwardRef(function Button(
     className,
     disabled,
     icon,
+    textVisuallyHidden = false,
     ...props
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { icon?: React.ReactNode; busy?: boolean },
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    icon?: React.ReactNode;
+    busy?: boolean;
+    /**
+     * When true, the text provided in children prop will be visually hidden
+     * but still accessible to screen readers.
+     */
+    textVisuallyHidden?: boolean;
+  },
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
   return (
@@ -48,14 +57,20 @@ export const Button = React.forwardRef(function Button(
         ref={forwardedRef}
         {...props}
         className={cn(
-          'min-w-0 w-full flex items-center justify-center gap-2 bg-transparent text-gray-12 font-medium rounded-md bg-clip-padding border border-gray-a6 shadow-sm shadow-gray-a3 py-1.5 px-2.5 outline-none focus-visible:ring-[0.1875rem] focus-visible:ring-gray-a3 focus-visible:border-gray-a8 text-base',
+          'min-w-0 w-full flex items-center justify-center gap-2 bg-transparent text-gray-12 font-medium rounded-md bg-clip-padding border border-gray-a6 shadow-sm shadow-gray-a3 py-1.5 px-2.5 outline-none focus-visible:ring-[0.1875rem] focus-visible:ring-gray-a3 focus-visible:border-gray-a8 text-base min-h-8',
           busy ? 'cursor-wait' : disabled ? 'disabled:cursor-not-allowed disabled:opacity-50' : 'hover:bg-gray-a2',
           className,
         )}
         disabled={busy || disabled}
       >
         {icon ? <span className='text-base'>{busy ? <Spinner>Loading…</Spinner> : <span>{icon}</span>}</span> : null}
-        <span className='sr-only'>{children}</span>
+        <span
+          className={cn({
+            'sr-only': textVisuallyHidden,
+          })}
+        >
+          {children}
+        </span>
       </button>
     </div>
   );
