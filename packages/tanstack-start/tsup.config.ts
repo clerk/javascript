@@ -17,6 +17,11 @@ export default defineConfig(overrideOptions => {
     minify: false,
     sourcemap: true,
     treeshake: true,
+    format: 'esm',
+    outDir: './dist',
+    dts: true,
+    // @ts-expect-error - Type issue from the esbuild-plugin-file-path-extensions
+    esbuildPlugins: [esbuildPluginFilePathExtensions({ esmExtension: 'js' })],
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
@@ -24,24 +29,8 @@ export default defineConfig(overrideOptions => {
     },
   };
 
-  const esm: Options = {
-    ...common,
-    format: 'esm',
-    outDir: './dist/esm',
-    dts: true,
-    esbuildPlugins: [esbuildPluginFilePathExtensions({ esmExtension: 'js' })],
-  };
-
-  const cjs: Options = {
-    ...common,
-    format: 'cjs',
-    outDir: './dist/cjs',
-    dts: true,
-    esbuildPlugins: [esbuildPluginFilePathExtensions({ esmExtension: 'cjs' })],
-  };
-
   return runAfterLast([
     // 'npm run build:declarations',
     shouldPublish && 'npm run publish:local',
-  ])(esm, cjs);
+  ])(common);
 });
