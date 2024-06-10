@@ -7,7 +7,7 @@ import { FirstNameField } from '~/common/FirstNameField';
 import { LastNameField } from '~/common/LastNameField';
 import { PasswordField } from '~/common/PasswordField';
 import { PhoneNumberField } from '~/common/PhoneNumberField';
-import { UsernameField } from '~/common/UserNameField';
+import { UsernameField } from '~/common/UsernameField';
 import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
