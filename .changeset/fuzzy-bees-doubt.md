@@ -8,7 +8,7 @@ APIs introduced:
 - `<SignIn.Passkey />`
 - `<SignIn.SupportedStrategy name='passkey'>`
 - `<SignIn.Strategy name='passkey'>`
-- `<Clerk.Input type='text' passkeyAutofill>`
+- Detects the usage of `webauthn` to trigger passkey autofill `<Clerk.Input autoComplete="webauthn" />`
 
 Usage examples:
 - `<SignIn.Action passkey />`
@@ -40,12 +40,12 @@ Usage examples:
     </SignIn.Strategy>
     ```
 
-- `<Clerk.Input type='text' passkeyAutofill>`
+- Passkey Autofill
     ```tsx
     <SignIn.Step name='start'>
       <Clerk.Field name='identifier'>
         <Clerk.Label className='sr-only'>Email</Clerk.Label>
-        <Clerk.Input passkeyAutofill placeholder='Enter your email address' />
+        <Clerk.Input autoComplete="webauthn" placeholder='Enter your email address' />
         <Clerk.FieldError />
       </Clerk.Field>
     </SignIn.Step>
