@@ -31,7 +31,7 @@ export function OTPField({
                 passwordManagerOffset={24}
                 render={({ value, status }) => (
                   <Field.Input
-                    type='otp'
+                    variant='otp-digit'
                     intent={state}
                     state={
                       (

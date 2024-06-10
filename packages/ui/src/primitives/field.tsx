@@ -52,12 +52,13 @@ export const Input = React.forwardRef(function Input(
     className,
     intent = 'idle',
     state = 'native',
+    variant = 'default',
     ...props
-  }: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> & {
+  }: React.InputHTMLAttributes<HTMLInputElement> & {
     asChild?: boolean;
     intent?: FieldIntent;
-    type?: React.InputHTMLAttributes<HTMLInputElement>['type'] | 'otp';
     state?: 'native' | 'hover' | 'focus-visible';
+    variant?: 'default' | 'otp-digit';
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
@@ -70,10 +71,11 @@ export const Input = React.forwardRef(function Input(
       className={cn(
         'relative flex min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border outline-none text-base',
         'disabled:opacity-50 disabled:cursor-not-allowed',
-        // type-specific overrides
-        props.type === 'otp'
-          ? 'size-10 aspect-square text-[calc(var(--cl-font-size)*1.4)] font-semibold justify-center'
-          : 'w-full min-h-8 justify-start',
+        // variant
+        {
+          default: 'w-full min-h-8 justify-start',
+          'otp-digit': 'size-10 aspect-square text-[calc(var(--cl-font-size)*1.4)] font-semibold justify-center',
+        }[variant],
         // state
         {
           native:
