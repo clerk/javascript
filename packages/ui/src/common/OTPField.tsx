@@ -24,11 +24,11 @@ export function OTPField({
             <Common.Input
               type='otp'
               autoSubmit
-              className='flex gap-2'
+              className='flex justify-center gap-2'
+              passwordManagerOffset={24}
               render={({ value, status }) => (
                 <Field.Input
                   type='otp'
-                  data-status={status}
                   intent={state}
                   state={
                     (

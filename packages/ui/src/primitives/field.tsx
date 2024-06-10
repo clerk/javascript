@@ -68,12 +68,12 @@ export const Input = React.forwardRef(function Input(
       data-field-input=''
       ref={forwardedRef}
       className={cn(
-        'flex w-full min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border outline-none text-base',
+        'flex min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border outline-none text-base',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         // type-specific overrides
         props.type === 'otp'
-          ? 'min-h-10 text-[calc(var(--cl-font-size)*1.4)] font-semibold justify-center'
-          : 'min-h-8 justify-start',
+          ? 'size-10 aspect-square text-[calc(var(--cl-font-size)*1.4)] font-semibold justify-center'
+          : 'w-full min-h-8 justify-start',
         // state
         {
           native:
