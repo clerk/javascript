@@ -121,20 +121,22 @@ function RootDocument({ children }: { children: React.ReactNode }) { ... }
 
 Also you will need to make on more modification to `app/ssr.tsx`:
 
-- Wrap the `createRequestHandler` with `clerkMiddlewareHandler`
+- Wrap the `createRequestHandler` with `createClerkHandler`
 
 ```tsx
 import { createRequestHandler, defaultStreamHandler } from '@tanstack/start/server';
 import { getRouterManifest } from '@tanstack/start/router-manifest';
 import { createRouter } from './router';
-import { clerkMiddlewareHandler } from '@clerk/tanstack-start/server';
+import { createClerkHandler } from '@clerk/tanstack-start/server';
 
 const handler = createRequestHandler({
   createRouter,
   getRouterManifest,
 });
 
-export default clerkMiddlewareHandler(handler)(defaultStreamHandler);
+const clerkHandler = createClerkHandler(handler);
+
+export default clerkHandler(defaultStreamHandler);
 ```
 
 After those changes are made, you can use Clerk components in your routes.

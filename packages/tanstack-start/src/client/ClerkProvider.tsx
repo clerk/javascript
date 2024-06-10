@@ -17,7 +17,7 @@ export * from '@clerk/clerk-react';
 
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
-export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProviderProps): JSX.Element {
+export function ClerkProvider({ children, ...providerProps }: TanstackStartClerkProviderProps): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
   const routerContext = useRouteContext({
     strict: false,
@@ -43,6 +43,10 @@ export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProv
     __clerkJSVersion,
     __telemetryDisabled,
     __telemetryDebug,
+    __signInForceRedirectUrl,
+    __signUpForceRedirectUrl,
+    __signInFallbackRedirectUrl,
+    __signUpFallbackRedirectUrl,
   } = clerkInitState.__internal_clerk_state || {};
 
   const mergedProps = {
@@ -60,6 +64,11 @@ export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProv
       disabled: __telemetryDisabled,
       debug: __telemetryDebug,
     },
+    signInForceRedirectUrl: __signInForceRedirectUrl,
+    signUpForceRedirectUrl: __signUpForceRedirectUrl,
+    signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
+    signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
+    ...providerProps,
   };
 
   return (
@@ -71,7 +80,6 @@ export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProv
           initialState={__clerk_ssr_state}
           sdkMetadata={SDK_METADATA}
           {...mergedProps}
-          {...restProps}
           routerPush={(to: string) =>
             awaitableNavigateRef.current?.({
               to,
