@@ -5,7 +5,6 @@ import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { errorThrower } from '../utils';
-// import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
 import { getEnvVariable } from './utils';
 
 export const loadOptions = (request: Request) => {

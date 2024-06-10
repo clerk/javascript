@@ -3,7 +3,7 @@ import { useRouteContext } from '@tanstack/react-router';
 import { Asset } from '@tanstack/start';
 import { useEffect } from 'react';
 
-import { isServer } from '../utils';
+import { isClient } from '../utils';
 import { ClerkOptionsProvider } from './OptionsContext';
 import type { TanstackStartClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
@@ -19,7 +19,7 @@ const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> |
 
 export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProviderProps): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
-  const contextRouter = useRouteContext({
+  const routerContext = useRouteContext({
     strict: false,
   });
 
@@ -27,7 +27,7 @@ export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProv
     awaitableNavigateRef.current = awaitableNavigate;
   }, [awaitableNavigate]);
 
-  const clerkInitState = !isServer ? (window as any).__clerk_init_state : contextRouter?.clerkStateContext;
+  const clerkInitState = isClient() ? (window as any).__clerk_init_state : routerContext?.clerkInitialState;
 
   const {
     __clerk_ssr_state,
@@ -65,7 +65,7 @@ export function ClerkProvider({ children, ...restProps }: TanstackStartClerkProv
   return (
     <>
       {/* TODO: revisit window.__clerk_init_state */}
-      <Asset tag='script'>{`window.__clerk_init_state = ${JSON.stringify(contextRouter?.clerkStateContext)}`}</Asset>
+      <Asset tag='script'>{`window.__clerk_init_state = ${JSON.stringify(routerContext?.clerkInitialState)}`}</Asset>
       <ClerkOptionsProvider options={mergedProps}>
         <ReactClerkProvider
           initialState={__clerk_ssr_state}

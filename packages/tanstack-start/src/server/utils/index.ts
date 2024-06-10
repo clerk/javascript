@@ -55,7 +55,7 @@ export function getResponseClerkState(requestState: RequestState) {
   });
 
   return {
-    clerkStateContext: clerkState,
+    clerkInitialState: clerkState,
     headers: requestState.headers,
   };
 }

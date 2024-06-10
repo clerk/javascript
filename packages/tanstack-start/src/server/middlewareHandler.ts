@@ -20,11 +20,11 @@ export function clerkMiddlewareHandler<TRouter extends AnyRouter>(eventHandler: 
 
         const requestState = await authenticateRequest(request, loadedOptions);
 
-        const clerkContext = getResponseClerkState(requestState);
+        const clerkInitialState = getResponseClerkState(requestState);
 
         // Updating the TanStack router context with the Clerk context and loading the router
         router.update({
-          context: clerkContext,
+          context: clerkInitialState,
         });
 
         await router.load();
