@@ -6,6 +6,8 @@ import { EmailField } from '~/common/EmailField';
 import { FirstNameField } from '~/common/FirstNameField';
 import { LastNameField } from '~/common/LastNameField';
 import { PasswordField } from '~/common/PasswordField';
+import { PhoneNumberField } from '~/common/PhoneNumberField';
+import { UsernameField } from '~/common/UserNameField';
 import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
@@ -20,7 +22,10 @@ export function SignUpComponent() {
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(clerk?.__unstable__environment);
 
   return (
-    <SignUp.Root exampleMode>
+    <SignUp.Root
+      exampleMode
+      routing='virtual'
+    >
       <Common.Loading>
         {isGlobalLoading => {
           return (
@@ -70,6 +75,9 @@ export function SignUpComponent() {
                         <FirstNameField disabled={isGlobalLoading} />
                         <LastNameField disabled={isGlobalLoading} />
                       </div>
+                      <UsernameField disabled={isGlobalLoading} />
+                      {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
+                      <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
                       <EmailField disabled={isGlobalLoading} />
                       <PasswordField disabled={isGlobalLoading} />
                     </div>
