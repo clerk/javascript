@@ -22,7 +22,7 @@ export function ThemeDialog({ trigger, children }: { trigger: React.ReactNode; c
               type='button'
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={handleCopy}
-              className='absolute top-6 right-6 p-2'
+              className='absolute top-6 end-6 p-2'
             >
               <span className='sr-only'>Copy to clipboard</span>
               {copied ? (

@@ -43,7 +43,7 @@ jobs:
 
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
-        run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
+        run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
       - name: Lint GitHub Actions Workflows
         run: npx eslint .github
@@ -54,6 +54,16 @@ jobs:
 
       - name: Build Packages
         run: npx turbo build $TURBO_ARGS --only
+
+      - name: Check size using bundlewatch
+        run: npx turbo bundlewatch $TURBO_ARGS --only
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+          CI_REPO_NAME: ${{ vars.REPO_NAME }}
+          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_BRANCH: ${{ github.ref	}}
+          CI_BRANCH_BASE: refs/heads/main
 
       - name: Lint packages using publint
         run: npx turbo lint:publint $TURBO_ARGS --only
@@ -129,7 +139,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: [ 'generic', 'nextjs', 'express', 'quickstart', 'ap-flows', 'elements' ]
+        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'

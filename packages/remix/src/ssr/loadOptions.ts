@@ -34,6 +34,14 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
   );
   const signInUrl = overrides.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL', context) || '';
   const signUpUrl = overrides.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL', context) || '';
+  const signInForceRedirectUrl =
+    overrides.signInForceRedirectUrl || getEnvVariable('CLERK_SIGN_IN_FORCE_REDIRECT_URL', context) || '';
+  const signUpForceRedirectUrl =
+    overrides.signUpForceRedirectUrl || getEnvVariable('CLERK_SIGN_UP_FORCE_REDIRECT_URL', context) || '';
+  const signInFallbackRedirectUrl =
+    overrides.signInFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_IN_FALLBACK_REDIRECT_URL', context) || '';
+  const signUpFallbackRedirectUrl =
+    overrides.signUpFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL', context) || '';
   const afterSignInUrl = overrides.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL', context) || '';
   const afterSignUpUrl = overrides.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL', context) || '';
 
@@ -68,5 +76,9 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
+    signInForceRedirectUrl,
+    signUpForceRedirectUrl,
+    signInFallbackRedirectUrl,
+    signUpFallbackRedirectUrl,
   };
 };

@@ -58,7 +58,7 @@ export function ColorPicker({
       <div>
         <Popover.Root>
           <div className='grid grid-cols-[theme(size.8),1fr] border rounded overflow-hidden'>
-            <Popover.Trigger className='grid place-content-center border-r'>
+            <Popover.Trigger className='grid place-content-center border-e'>
               <span
                 className='block size-4 rounded-sm border'
                 style={{

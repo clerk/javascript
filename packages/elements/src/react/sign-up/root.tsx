@@ -29,7 +29,9 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
   const isReady = useSelector(actor, state => state.value !== 'Idle');
 
   useEffect(() => {
-    if (!clerk || !router) return;
+    if (!clerk || !router) {
+      return;
+    }
 
     // @ts-expect-error -- This is actually an IsomorphicClerk instance
     clerk.addOnLoaded(() => {

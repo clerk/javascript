@@ -640,9 +640,16 @@ interface GetNewPreviewStylesParams {
   darkColors: GeneratedColors;
   radius: string;
   spacingUnit: string;
+  fontSize: string;
 }
 
-export const getPreviewStyles = ({ lightColors, darkColors, radius, spacingUnit }: GetNewPreviewStylesParams) => {
+export const getPreviewStyles = ({
+  lightColors,
+  darkColors,
+  radius,
+  spacingUnit,
+  fontSize,
+}: GetNewPreviewStylesParams) => {
   const lightAccentColorsCss = getColorScaleCss({
     isDarkMode: false,
     name: 'accent',
@@ -711,6 +718,7 @@ ${darkGrayColorsCss}
 :where(:root) {
   --cl-radius: ${radius};
   --cl-spacing-unit: ${spacingUnit};
+  --cl-font-size: ${fontSize};
 }
   `.trim();
 };

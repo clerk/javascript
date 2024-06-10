@@ -52,7 +52,9 @@ export function sortIdentificationBasedOnVerification<T extends Array<EmailAddre
   array: T | null | undefined,
   primaryId: string | null | undefined,
 ): T {
-  if (!array) return [] as unknown as T;
+  if (!array) {
+    return [] as unknown as T;
+  }
   const primaryItem = array.filter(item => item.id === primaryId);
   const itemsWithoutPrimary = array.filter(item => item.id !== primaryId);
   const verifiedItems = itemsWithoutPrimary.filter(item => item.verification?.status === 'verified');
@@ -66,7 +68,9 @@ export function sortIdentificationBasedOnVerification<T extends Array<EmailAddre
 
   // Sorting unverified items by expireAt, most recent last
   unverifiedItems.sort((a, b) => {
-    if (!a.verification?.expireAt || !b.verification?.expireAt) return 0;
+    if (!a.verification?.expireAt || !b.verification?.expireAt) {
+      return 0;
+    }
     return a.verification.expireAt.getTime() - b.verification.expireAt.getTime();
   });
 

@@ -67,6 +67,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
   test('Protect in RSCs and RCCs as `signed-out user`', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
+    /**
+     * Soft navigations
+     */
+    await u.page.goToRelative('/');
+    await page.getByText('Page Protected').click();
+    await page.waitForURL('**/sign-in?**');
+    await u.po.signIn.waitForMounted();
+
+    /**
+     * Hard navigations
+     */
     await u.page.goToRelative('/settings/rsc-protect');
     await expect(u.page.getByText(/User is not admin/i)).toBeVisible();
     await u.page.goToRelative('/settings/rcc-protect');
@@ -76,6 +87,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
     await u.page.goToRelative('/settings/auth-has');
     await expect(u.page.getByText(/User is missing permissions/i)).toBeVisible();
     await u.page.goToRelative('/settings/auth-protect');
+    await u.po.signIn.waitForMounted();
+    await u.page.goToRelative('/protected');
+    await u.po.signIn.waitForMounted();
+    await u.page.goToRelative('/page-protected');
     await u.po.signIn.waitForMounted();
   });
 

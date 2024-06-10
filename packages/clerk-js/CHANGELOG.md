@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.6.0
+
+### Minor Changes
+
+- Add descriptor for formatted dates in tables. Those elements can be identified by the `cl-formattedDate__tableCell` css class. ([#3465](https://github.com/clerk/javascript/pull/3465)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- In some instances your application logo (shown at the top of the sign-in/sign-up form of the prebuilt components) might have been distorted in browsers like Firefox. By applying `object-fit: contain` to the image's CSS the logo now fills its bounding box without being distorted. ([#3501](https://github.com/clerk/javascript/pull/3501)) by [@LekoArts](https://github.com/LekoArts)
+
+- Support remounting ClerkProvider multiple times by making sure that the `updateProps` call during the loading phase does not override any defaults set by `Clerk.load()` for values that are missing ([#3455](https://github.com/clerk/javascript/pull/3455)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Sms phone code verification lists available phone numbers on cancel. ([#3479](https://github.com/clerk/javascript/pull/3479)) by [@panteliselef](https://github.com/panteliselef)
+
+- Only render active sessions in the active devices section. Fixes the bug where a device with no information would render upon revoking. ([#3497](https://github.com/clerk/javascript/pull/3497)) by [@desiprisg](https://github.com/desiprisg)
+
+- Fixed a bug where Clerk components rendered in modals were wrapped with `aria-hidden`. ([#3508](https://github.com/clerk/javascript/pull/3508)) by [@BRKalow](https://github.com/BRKalow)
+
+- Bug fix: statically loading a resource would result in an increase in bundle size for `clerk.browser.js`. ([#3519](https://github.com/clerk/javascript/pull/3519)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`86a27f693`](https://github.com/clerk/javascript/commit/86a27f6933de50c99b6bc354bf87ff5c2cfcaf38), [`478c49b41`](https://github.com/clerk/javascript/commit/478c49b41f4fc7ef37b73b81c42dfbf99eef8aec), [`02bed2e00`](https://github.com/clerk/javascript/commit/02bed2e00d3e0a4e1bb1698b13267faf6aeb31b3), [`cd424c590`](https://github.com/clerk/javascript/commit/cd424c5902ba7d3b215272b11b58187752c7a78d), [`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`68f247444`](https://github.com/clerk/javascript/commit/68f247444e757aae642500b35263bbeaad541472), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/shared@2.2.2
+  - @clerk/localizations@2.4.4
+  - @clerk/types@4.6.0
+
 ## 5.5.3
 
 ### Patch Changes

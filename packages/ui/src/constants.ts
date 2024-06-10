@@ -1,4 +1,15 @@
-export const PROVIDERS = [
+import type { OAuthProvider, Web3Provider } from '@clerk/types';
+
+import type * as Icon from './primitives/icon';
+
+type IconName = keyof typeof Icon;
+type Provider = {
+  id: OAuthProvider | Web3Provider;
+  name: string;
+  icon: IconName;
+};
+
+export const PROVIDERS: Provider[] = [
   { id: 'apple', name: 'Apple', icon: 'Apple' },
   { id: 'atlassian', name: 'Atlassian', icon: 'Atlassian' },
   { id: 'bitbucket', name: 'Bitbucket', icon: 'Bitbucket' },
@@ -23,4 +34,7 @@ export const PROVIDERS = [
   { id: 'twitch', name: 'Twitch', icon: 'Twitch' },
   { id: 'twitter', name: 'Twitter', icon: 'Twitter' },
   { id: 'xero', name: 'Xero', icon: 'Xero' },
+  //
+  { id: 'enstall', name: 'Enstall', icon: 'Apple' },
+  { id: 'spotify', name: 'Spotify', icon: 'Apple' },
 ] as const;

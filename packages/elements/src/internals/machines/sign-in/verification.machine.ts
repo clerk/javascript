@@ -150,6 +150,16 @@ const SignInVerificationMachine = setup({
         };
       },
     ),
+    setConsoleError: ({ event }) => {
+      if (process.env.NODE_ENV === 'development') {
+        assertActorEventError(event);
+
+        throw new ClerkElementsRuntimeError(`Unable to fulfill the prepare or attempt request for the sign-in verification.
+Error: ${event.error.message}
+
+Please open an issue if you continue to run into this issue.`);
+      }
+    },
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
@@ -226,7 +236,7 @@ const SignInVerificationMachine = setup({
           target: 'Pending',
         },
         onError: {
-          actions: 'setFormErrors',
+          actions: ['setFormErrors', 'setConsoleError'],
           target: 'Pending',
         },
       },
@@ -324,7 +334,7 @@ const SignInVerificationMachine = setup({
           actions: ['sendToNext', 'sendToLoading'],
         },
         onError: {
-          actions: ['setFormErrors', 'sendToLoading'],
+          actions: ['setFormErrors', 'setConsoleError', 'sendToLoading'],
           target: 'Pending',
         },
       },
@@ -360,14 +370,14 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         return Promise.resolve(clerk.client.signIn);
       }
 
-      assertIsDefined(params);
+      assertIsDefined(params, 'First factor params');
 
       return await clerk.client.signIn.prepareFirstFactor(params as PrepareFirstFactorParams);
     }),
     attempt: fromPromise(async ({ input }) => {
       const { currentFactor, fields, parent } = input as AttemptFirstFactorInput;
 
-      assertIsDefined(currentFactor);
+      assertIsDefined(currentFactor, 'Current factor');
 
       let attemptParams: AttemptFirstFactorParams;
 
@@ -380,7 +390,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
           return await parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey();
         }
         case 'password': {
-          assertIsDefined(password);
+          assertIsDefined(password, 'Password');
 
           attemptParams = {
             strategy,
@@ -391,7 +401,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         }
         case 'reset_password_phone_code':
         case 'reset_password_email_code': {
-          assertIsDefined(code);
+          assertIsDefined(code, 'Code for resetting phone/email');
 
           attemptParams = {
             strategy,
@@ -403,7 +413,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         }
         case 'phone_code':
         case 'email_code': {
-          assertIsDefined(code);
+          assertIsDefined(code, 'Code for phone/email');
 
           attemptParams = {
             strategy,
@@ -414,7 +424,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         }
         case 'web3_metamask_signature': {
           const signature = fields.get('signature')?.value as string | undefined;
-          assertIsDefined(signature);
+          assertIsDefined(signature, 'Web3 Metamask signature');
 
           attemptParams = {
             strategy,
@@ -449,7 +459,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       const currentVerificationExpiration = clerk.client.signIn.secondFactorVerification.expireAt;
       const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
-      assertIsDefined(params);
+      assertIsDefined(params, 'Second factor params');
 
       if (params.strategy !== 'phone_code' || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
@@ -465,8 +475,8 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
 
       const code = fields.get('code')?.value as string;
 
-      assertIsDefined(currentFactor);
-      assertIsDefined(code);
+      assertIsDefined(currentFactor, 'Current factor');
+      assertIsDefined(code, 'Code');
 
       return await parent.getSnapshot().context.clerk.client.signIn.attemptSecondFactor({
         strategy: currentFactor.strategy,
