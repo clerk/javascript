@@ -3,18 +3,9 @@ import * as React from 'react';
 
 import { Spinner } from './spinner';
 
-function getColumnCount<T>(items: T[], maxCols: number = 6): number {
-  const numRows = Math.ceil(items.length / maxCols);
-  const itemsPerRow = Math.ceil(items.length / numRows);
-  const rows: T[][] = Array.from({ length: numRows }, () => []);
-  let currentArrayIndex = 0;
-  for (const item of items) {
-    rows[currentArrayIndex].push(item);
-    if (rows[currentArrayIndex].length === itemsPerRow) {
-      currentArrayIndex++;
-    }
-  }
-  return Math.max(...rows.map(row => row.length));
+function getColumnCount(itemsLength: number, maxCols: number = 6): number {
+  const numRows = Math.ceil(itemsLength / maxCols);
+  return Math.ceil(itemsLength / numRows);
 }
 
 export const Root = React.forwardRef<
@@ -23,7 +14,7 @@ export const Root = React.forwardRef<
     columns?: number;
   }
 >(function Root({ children, className, ...props }, forwardedRef) {
-  const cols = getColumnCount(React.Children.toArray(children));
+  const cols = getColumnCount(React.Children.count(children));
   return (
     <div
       ref={forwardedRef}
