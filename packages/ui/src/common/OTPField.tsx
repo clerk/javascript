@@ -46,7 +46,17 @@ export function OTPField({
                     {...props}
                     asChild
                   >
-                    <span>{value}</span>
+                    <span>
+                      {status === 'cursor' && (
+                        <span
+                          data-otp-field-cursor=''
+                          // Note:
+                          // Opportunity to extract lineHeight to theme
+                          className='motion-safe:animate-blink self-center rounded-full bg-current w-[2px] h-[calc(theme(fontSize.base)*1.38462)]'
+                        />
+                      )}
+                      {value}
+                    </span>
                   </Field.Input>
                 )}
               />

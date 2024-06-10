@@ -68,7 +68,7 @@ export const Input = React.forwardRef(function Input(
       data-field-input=''
       ref={forwardedRef}
       className={cn(
-        'flex min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border outline-none text-base',
+        'relative flex min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border outline-none text-base',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         // type-specific overrides
         props.type === 'otp'
