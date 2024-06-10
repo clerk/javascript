@@ -135,6 +135,13 @@ const handler = createRequestHandler({
 });
 
 const clerkHandler = createClerkHandler(handler);
+/*
+ * // You can also override Clerk options by passing an object as second argument
+ * const clerkHandler = createClerkHandler(handler, {
+ *   afterSignInUrl: '/dashboard',
+ * });
+ *
+ */
 
 export default clerkHandler(defaultStreamHandler);
 ```
