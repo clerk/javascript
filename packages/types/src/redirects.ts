@@ -7,6 +7,14 @@ export type AfterSignOutUrl = {
   afterSignOutUrl?: string | null;
 };
 
+export type AfterMultiSessionSingleSignOutUrl = {
+  /**
+   * Full URL or path to navigate after signing out the current user is complete.
+   * This option applies to multi-session applications.
+   */
+  afterMultiSessionSingleSignOutUrl?: string | null;
+};
+
 /**
  * @deprecated This is deprecated and will be removed in a future release.
  */

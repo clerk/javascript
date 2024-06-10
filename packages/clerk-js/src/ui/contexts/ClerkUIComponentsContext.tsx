@@ -1,3 +1,4 @@
+import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import { useClerk } from '@clerk/shared/react';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import type { HandleOAuthCallbackParams, OrganizationResource, UserResource } from '@clerk/types';
@@ -185,6 +186,7 @@ export const useSignInContext = (): SignInContextType => {
 
 export type SignOutContextType = {
   navigateAfterSignOut: () => any;
+  navigateAfterMultiSessionSingleSignOutUrl: () => any;
 };
 
 export const useSignOutContext = (): SignOutContextType => {
@@ -192,8 +194,9 @@ export const useSignOutContext = (): SignOutContextType => {
   const clerk = useClerk();
 
   const navigateAfterSignOut = () => navigate(clerk.buildAfterSignOutUrl());
+  const navigateAfterMultiSessionSingleSignOutUrl = () => navigate(clerk.buildAfterMultiSessionSingleSignOutUrl());
 
-  return { navigateAfterSignOut };
+  return { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl };
 };
 
 type PagesType = {
@@ -244,10 +247,22 @@ export const useUserButtonContext = () => {
   const signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
+  if (ctx.afterSignOutUrl) {
+    deprecatedObjectProperty(ctx, 'afterSignOutUrl', `Move 'afterSignOutUrl' to '<ClerkProvider/>`);
+  }
+
   const afterSignOutUrl = ctx.afterSignOutUrl || clerk.buildAfterSignOutUrl();
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
-  const afterMultiSessionSingleSignOutUrl = ctx.afterMultiSessionSingleSignOutUrl || afterSignOutUrl;
+  if (ctx.afterSignOutUrl) {
+    deprecatedObjectProperty(
+      ctx,
+      'afterMultiSessionSingleSignOutUrl',
+      `Move 'afterMultiSessionSingleSignOutUrl' to '<ClerkProvider/>`,
+    );
+  }
+  const afterMultiSessionSingleSignOutUrl =
+    ctx.afterMultiSessionSingleSignOutUrl || clerk.buildAfterMultiSessionSingleSignOutUrl();
   const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;

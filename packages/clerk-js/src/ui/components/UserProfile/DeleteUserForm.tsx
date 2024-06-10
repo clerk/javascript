@@ -4,15 +4,17 @@ import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
 import type { FormProps } from '../../elements';
 import { Form, FormButtons, FormContainer, useCardState, withCardStateProvider } from '../../elements';
+import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { handleError, useFormControl } from '../../utils';
 
 type DeleteUserFormProps = FormProps;
 export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps) => {
   const { onReset } = props;
   const card = useCardState();
-  const { navigateAfterSignOut } = useSignOutContext();
+  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
   const { user } = useUser();
   const { t } = useLocalizations();
+  const { otherSessions } = useMultipleSessions({ user });
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -36,7 +38,12 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
       }
 
       await user.delete();
-      await navigateAfterSignOut();
+
+      // TODO: Investigate if we need to call `setActive` with {session: null}
+      if (otherSessions.length === 0) {
+        return navigateAfterSignOut();
+      }
+      await navigateAfterMultiSessionSingleSignOutUrl();
     } catch (e) {
       handleError(e, [], card.setError);
     }
