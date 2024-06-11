@@ -26,16 +26,7 @@
     "EXPO_PUBLIC_CLERK_*",
     "REACT_APP_CLERK_*"
   ],
-  "globalPassThroughEnv": [
-    "AWS_SECRET_KEY",
-    "BUNDLEWATCH_GITHUB_TOKEN",
-    "CI_BRANCH",
-    "CI_BRANCH_BASE",
-    "CI_REPO_NAME",
-    "CI_REPO_OWNER",
-    "CI_COMMIT_SHA",
-    "GITHUB_TOKEN"
-  ],
+  "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -109,7 +100,6 @@
         "**/*.md",
         "**/*.mdx",
         ".github/**",
-
         "!*/package.json",
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
@@ -131,6 +121,14 @@
     },
     "bundlewatch": {
       "dependsOn": ["build"],
+      "env": [
+        "BUNDLEWATCH_GITHUB_TOKEN",
+        "CI_BRANCH",
+        "CI_BRANCH_BASE",
+        "CI_REPO_NAME",
+        "CI_REPO_OWNER",
+        "CI_COMMIT_SHA"
+      ],
       "outputs": []
     },
     "format:check": {

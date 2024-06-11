@@ -166,7 +166,7 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
           AFFECTED=0
-          (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=remotes/origin/main) || AFFECTED=1
+          (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 
       - name: Setup
