@@ -6,8 +6,12 @@ import * as Field from '../primitives/field';
 export function EmailField({
   className,
   label = 'Email address',
+  alternativeFieldTrigger,
   ...props
-}: { label?: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+}: { label?: React.ReactNode; alternativeFieldTrigger?: React.ReactNode } & Omit<
+  React.ComponentProps<typeof Common.Input>,
+  'type'
+>) {
   return (
     <Common.Field
       name='emailAddress'
@@ -15,7 +19,10 @@ export function EmailField({
     >
       <Field.Root>
         <Common.Label asChild>
-          <Field.Label>{label}</Field.Label>
+          <Field.Label>
+            {label}{' '}
+            {alternativeFieldTrigger && <span className='flex-grow self-end text-end'>{alternativeFieldTrigger}</span>}
+          </Field.Label>
         </Common.Label>
         <Common.FieldState>
           {({ state }) => {

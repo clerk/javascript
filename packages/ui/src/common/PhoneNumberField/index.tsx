@@ -17,11 +17,15 @@ const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
 });
 
 export function PhoneNumberField({
+  label = 'Phone number',
+  alternativeFieldTrigger,
   onChange,
   locationBasedCountryIso,
 }: {
+  label?: React.ReactNode;
   locationBasedCountryIso: CountryIso;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  alternativeFieldTrigger?: React.ReactNode;
 }) {
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const [isOpen, setOpen] = React.useState(false);
@@ -80,7 +84,10 @@ export function PhoneNumberField({
     >
       <Field.Root>
         <Common.Label asChild>
-          <Field.Label>Phone number</Field.Label>
+          <Field.Label>
+            {label}{' '}
+            {alternativeFieldTrigger && <span className='flex-grow self-end text-end'>{alternativeFieldTrigger}</span>}
+          </Field.Label>
         </Common.Label>
         <Common.FieldState>
           {({ state: intent }) => {

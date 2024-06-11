@@ -3,6 +3,7 @@ import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
 import { EmailField } from '~/common/EmailField';
+import { EmailOrPhoneNumberField } from '~/common/EmailOrPhoneNumberField';
 import { FirstNameField } from '~/common/FirstNameField';
 import { LastNameField } from '~/common/LastNameField';
 import { OTPField } from '~/common/OTPField';
@@ -74,6 +75,11 @@ export function SignUpComponent() {
                       </div>
                       <EmailField disabled={isGlobalLoading} />
                       <PasswordField disabled={isGlobalLoading} />
+                      <EmailOrPhoneNumberField
+                        disabled={isGlobalLoading}
+                        // @ts-ignore: expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249
+                        locationBasedCountryIso={clerk.__internal_country}
+                      />
                       <OTPField
                         disabled={isGlobalLoading}
                         // TODO:
