@@ -236,35 +236,50 @@ export function SignUpComponent() {
 
               <SignUp.Step name='continue'>
                 <Card.Root>
-                  <div className='space-y-4'>
-                    <div className='flex gap-4'>
-                      <FirstNameField disabled={isGlobalLoading} />
-                      <LastNameField disabled={isGlobalLoading} />
-                    </div>
-                    <UsernameField disabled={isGlobalLoading} />
-                    {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
-                    <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
-                    <EmailField disabled={isGlobalLoading} />
-                    <PasswordField disabled={isGlobalLoading} />
-                  </div>
-                  <SignUp.Action
-                    submit
-                    asChild
-                  >
-                    <Common.Loading>
-                      {isSubmitting => {
-                        return (
-                          <Button
-                            icon={<Icon.CaretRight />}
-                            busy={isSubmitting}
-                            disabled={isGlobalLoading || isSubmitting}
-                          >
-                            Continue
-                          </Button>
-                        );
-                      }}
-                    </Common.Loading>
-                  </SignUp.Action>
+                  <Card.Content>
+                    <Card.Header>
+                      <Card.Title>Fill in missing fields</Card.Title>
+                      <Card.Description>Please fill in the remaining details to continue.</Card.Description>
+                    </Card.Header>
+                    <Card.Body>
+                      <div className='space-y-4'>
+                        <div className='flex gap-4'>
+                          <FirstNameField disabled={isGlobalLoading} />
+                          <LastNameField disabled={isGlobalLoading} />
+                        </div>
+                        <UsernameField disabled={isGlobalLoading} />
+                        {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
+                        <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
+                        <EmailField disabled={isGlobalLoading} />
+                        <PasswordField disabled={isGlobalLoading} />
+                      </div>
+                      <Common.Loading scope='step:continue'>
+                        {isSubmitting => {
+                          return (
+                            <SignUp.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                icon={<Icon.CaretRight />}
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading || isSubmitting}
+                              >
+                                Continue
+                              </Button>
+                            </SignUp.Action>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </Card.Content>
+                  <Card.Footer>
+                    <Card.FooterAction>
+                      <Card.FooterActionText>
+                        Have an account? <Card.FooterActionLink href='/sign-in'>Sign in</Card.FooterActionLink>
+                      </Card.FooterActionText>
+                    </Card.FooterAction>
+                  </Card.Footer>
                 </Card.Root>
               </SignUp.Step>
             </>
