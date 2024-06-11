@@ -97,25 +97,8 @@ export function SignUpComponent() {
                           <EmailField disabled={isGlobalLoading} />
                         </FieldEnabled>
 
+                        {/* TODO: conditionally render password */}
                         <PasswordField disabled={isGlobalLoading} />
-
-                        <OTPField
-                          disabled={isGlobalLoading}
-                          // TODO:
-                          // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
-                          // 2. Replace `button` with consolidated styles (tackled later)
-                          resend={
-                            <>
-                              Didn&apos;t recieve a code?{' '}
-                              <button
-                                type='button'
-                                className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
-                              >
-                                Resend
-                              </button>
-                            </>
-                          }
-                        />
                       </div>
 
                       <SignUp.Action
@@ -151,8 +134,75 @@ export function SignUpComponent() {
               <SignUp.Step name='verifications'>
                 <Card.Root>
                   <Card.Content>
-                    <SignUp.Strategy name='code'>code</SignUp.Strategy>
-                    <SignUp.Strategy name='email_code'>email_code</SignUp.Strategy>
+                    <SignUp.Strategy name='phone_code'>
+                      <Card.Header>
+                        <Card.Title>Verify your phone</Card.Title>
+                        <Card.Description>Enter the verification code sent to your phone</Card.Description>
+                      </Card.Header>
+                      <Card.Body>
+                        <OTPField
+                          disabled={isGlobalLoading}
+                          // TODO:
+                          // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
+                          // 2. Replace `button` with consolidated styles (tackled later)
+                          resend={
+                            <>
+                              Didn&apos;t recieve a code?{' '}
+                              <button
+                                type='button'
+                                className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                              >
+                                Resend
+                              </button>
+                            </>
+                          }
+                        />
+                        <SignUp.Action
+                          submit
+                          asChild
+                        >
+                          <Button
+                            icon={<Icon.CaretRight />}
+                            disabled={isGlobalLoading}
+                          >
+                            Continue
+                          </Button>
+                        </SignUp.Action>
+                      </Card.Body>
+                    </SignUp.Strategy>
+
+                    <SignUp.Strategy name='email_code'>
+                      <Card.Header>
+                        <Card.Title>Verify your email</Card.Title>
+                        <Card.Description>Enter the verification code sent to your email</Card.Description>
+                      </Card.Header>
+                      <Card.Body>
+                        <OTPField
+                          disabled={isGlobalLoading}
+                          // TODO:
+                          // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
+                          // 2. Replace `button` with consolidated styles (tackled later)
+                          resend={
+                            <>
+                              Didn&apos;t recieve a code?{' '}
+                              <button
+                                type='button'
+                                className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                              >
+                                Resend
+                              </button>
+                            </>
+                          }
+                        />
+                        <SignUp.Action
+                          submit
+                          asChild
+                        >
+                          <Button icon={<Icon.CaretRight />}>Continue</Button>
+                        </SignUp.Action>
+                      </Card.Body>
+                    </SignUp.Strategy>
+
                     <SignUp.Strategy name='email_link'>
                       <Card.Header>
                         <Card.Title>Verify your email</Card.Title>
@@ -176,7 +226,6 @@ export function SignUpComponent() {
                         </SignUp.Action>
                       </Card.Body>
                     </SignUp.Strategy>
-                    <SignUp.Strategy name='phone_code'>phone_code</SignUp.Strategy>
                   </Card.Content>
                   <Card.Footer />
                 </Card.Root>
