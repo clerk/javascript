@@ -161,7 +161,7 @@ jobs:
         run: |
           AFFECTED=0
           (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=remotes/origin/main) || AFFECTED=1
-          echo "::set-output name=affected::${AFFECTED}"
+          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 
       - name: Setup
         if: ${{ steps.task-status.outputs.affected == '1' }}
