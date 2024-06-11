@@ -10,7 +10,7 @@ type ClerkAppOptions = Partial<
 
 export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
   return () => {
-    const { clerkState } = useLoaderData();
+    const { clerkState } = useLoaderData<any>();
     return (
       <ClerkProvider
         /* @ts-ignore The type of opts cannot be inferred by TS automatically because of the complex
