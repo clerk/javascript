@@ -26,7 +26,10 @@ export function SignUpComponent() {
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(clerk?.__unstable__environment);
 
   return (
-    <SignUp.Root exampleMode>
+    <SignUp.Root
+      // exampleMode
+      routing='virtual'
+    >
       <Common.Loading>
         {isGlobalLoading => {
           return (
@@ -81,11 +84,21 @@ export function SignUpComponent() {
                           </div>
                         </FieldEnabled>
 
-                        <UsernameField disabled={isGlobalLoading} />
-                        {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
-                        <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
-                        <EmailField disabled={isGlobalLoading} />
+                        <FieldEnabled pick='username'>
+                          <UsernameField disabled={isGlobalLoading} />
+                        </FieldEnabled>
+
+                        <FieldEnabled pick='phone_number'>
+                          {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
+                          <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
+                        </FieldEnabled>
+
+                        <FieldEnabled pick='email_address'>
+                          <EmailField disabled={isGlobalLoading} />
+                        </FieldEnabled>
+
                         <PasswordField disabled={isGlobalLoading} />
+
                         <OTPField
                           disabled={isGlobalLoading}
                           // TODO:
