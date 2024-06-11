@@ -51,6 +51,7 @@ export function SignInComponent() {
                                     busy={isConnectionLoading}
                                     disabled={isGlobalLoading || isConnectionLoading}
                                     icon={IconComponent ? <IconComponent className='text-base' /> : null}
+                                    textVisuallyHidden={enabledConnections.length > 2}
                                   >
                                     {connection?.name || c.provider}
                                   </Connection.Button>
