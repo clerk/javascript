@@ -21,7 +21,7 @@ export function SignUpComponent() {
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(clerk?.__unstable__environment);
 
   return (
-    <SignUp.Root exampleMode>
+    <SignUp.Root>
       <Common.Loading>
         {isGlobalLoading => {
           return (
