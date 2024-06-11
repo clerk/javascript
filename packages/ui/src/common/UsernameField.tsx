@@ -15,7 +15,6 @@ export function UsernameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {' '}
             <span className='flex w-full items-baseline justify-between'>
               <span>{label}</span>
               {!props?.required && <span className='font-medium text-sm text-gray-10'>Optional</span>}
