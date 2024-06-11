@@ -156,7 +156,15 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
+      - name: Task Status
+        id: task-status
+        run: |
+          AFFECTED=0
+          (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=remotes/origin/main) || AFFECTED=1
+          echo "::set-output name=affected::${AFFECTED}"
+
       - name: Setup
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: config
         uses: ./.github/actions/init
         with:
@@ -166,20 +174,24 @@ jobs:
           playwright-enabled: true
 
       - name: Verdaccio
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
             if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
         run: npm init -y && npm install @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
         run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
