@@ -69,11 +69,6 @@ const config = {
         lg: '1.38462',
         xl: '1.38462',
         'icon-sm': '0',
-        // normal: 'normal',
-        // extraSmall: '1.33333',
-        // small: '1.38462',
-        // medium: '1.41176',
-        // large: '1.45455',
       },
       spacing: {
         ...generateSpaceScale(),
