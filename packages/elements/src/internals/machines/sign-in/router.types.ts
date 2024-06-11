@@ -63,6 +63,10 @@ export type SignInRouterResetStepEvent = BaseRouterResetStepEvent;
 export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'reset-password'>;
 export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
+export type SignInRouterPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };
+export type SignInRouterPasskeyAutofillEvent = {
+  type: 'AUTHENTICATE.PASSKEY.AUTOFILL';
+};
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -89,7 +93,9 @@ export type SignInRouterEvents =
   | SignInVerificationFactorUpdateEvent
   | SignInRouterLoadingEvent
   | SignInRouterSetClerkEvent
-  | SignInRouterSubmitEvent;
+  | SignInRouterSubmitEvent
+  | SignInRouterPasskeyEvent
+  | SignInRouterPasskeyAutofillEvent;
 
 // ---------------------------------- Context ---------------------------------- //
 
@@ -99,6 +105,7 @@ export interface SignInRouterContext extends BaseRouterContext {
   formRef: ActorRefFrom<TFormMachine>;
   loading: SignInRouterLoadingContext;
   signUpPath: string;
+  webAuthnAutofillSupport: boolean;
 }
 
 // ---------------------------------- Input ---------------------------------- //

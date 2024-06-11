@@ -1,4 +1,3 @@
-import { isValidBrowser } from '@clerk/shared/browser';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
   PublicKeyCredentialCreationOptionsJSON,
@@ -35,33 +34,6 @@ type ClerkWebAuthnErrorCode =
   // Registration
   | 'passkey_registration_cancelled'
   | 'passkey_registration_failed';
-
-function isWebAuthnSupported() {
-  return (
-    isValidBrowser() &&
-    // Check if `PublicKeyCredential` is a constructor
-    typeof window.PublicKeyCredential === 'function'
-  );
-}
-
-async function isWebAuthnAutofillSupported(): Promise<boolean> {
-  try {
-    return isWebAuthnSupported() && (await window.PublicKeyCredential.isConditionalMediationAvailable());
-  } catch (e) {
-    return false;
-  }
-}
-
-async function isWebAuthnPlatformAuthenticatorSupported(): Promise<boolean> {
-  try {
-    return (
-      typeof window !== 'undefined' &&
-      (await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())
-    );
-  } catch (e) {
-    return false;
-  }
-}
 
 class Base64Converter {
   static encode(buffer: ArrayBuffer): string {
@@ -284,9 +256,6 @@ export class ClerkWebAuthnError extends ClerkRuntimeError {
 }
 
 export {
-  isWebAuthnPlatformAuthenticatorSupported,
-  isWebAuthnAutofillSupported,
-  isWebAuthnSupported,
   base64UrlToBuffer,
   bufferToBase64Url,
   handlePublicKeyCreateError,

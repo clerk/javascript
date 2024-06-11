@@ -1,4 +1,5 @@
 import { deepSnakeToCamel, Poller } from '@clerk/shared';
+import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -34,8 +35,6 @@ import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } 
 import {
   ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
-  isWebAuthnAutofillSupported,
-  isWebAuthnSupported,
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential,
 } from '../../utils/passkeys';
