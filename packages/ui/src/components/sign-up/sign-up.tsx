@@ -31,10 +31,7 @@ export function SignUpComponent() {
         {isGlobalLoading => {
           return (
             <>
-              <SignUp.Step
-                data-clerk
-                name='start'
-              >
+              <SignUp.Step name='start'>
                 <Card.Root>
                   <Card.Content>
                     <Card.Header>
