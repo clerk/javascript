@@ -31,7 +31,7 @@ export function EmailField({
             );
           }}
         </Common.FieldState>
-        <Common.FieldError>
+        <Common.FieldError asChild>
           {({ message }) => {
             return <Field.Message intent='error'>{message}</Field.Message>;
           }}

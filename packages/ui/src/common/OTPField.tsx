@@ -63,7 +63,7 @@ export function OTPField({
             )}
           </Common.FieldState>
 
-          <Common.FieldError>
+          <Common.FieldError asChild>
             {({ message }) => {
               return (
                 <Field.Message
