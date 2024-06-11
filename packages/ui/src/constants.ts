@@ -25,7 +25,8 @@ export const PROVIDERS: Provider[] = [
   { id: 'instagram', name: 'Instagram', icon: 'Instagram' },
   { id: 'line', name: 'Line', icon: 'Line' },
   { id: 'linear', name: 'Linear', icon: 'Linear' },
-  { id: 'linkedin', name: 'LinkedIn', icon: 'LinkedInOIDC' },
+  { id: 'linkedin', name: 'LinkedIn', icon: 'LinkedIn' },
+  { id: 'linkedin_oidc', name: 'LinkedIn', icon: 'LinkedIn' },
   { id: 'metamask', name: 'MetaMask', icon: 'MetaMask' },
   { id: 'microsoft', name: 'Microsoft', icon: 'Microsoft' },
   { id: 'notion', name: 'Notion', icon: 'Notion' },
@@ -33,6 +34,7 @@ export const PROVIDERS: Provider[] = [
   { id: 'tiktok', name: 'TikTok', icon: 'TikTok' },
   { id: 'twitch', name: 'Twitch', icon: 'Twitch' },
   { id: 'twitter', name: 'Twitter', icon: 'Twitter' },
+  { id: 'x', name: 'X / Twitter', icon: 'Twitter' },
   { id: 'xero', name: 'Xero', icon: 'Xero' },
   //
   { id: 'enstall', name: 'Enstall', icon: 'Apple' },

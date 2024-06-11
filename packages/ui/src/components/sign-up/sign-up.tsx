@@ -5,6 +5,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 import { EmailField } from '~/common/EmailField';
 import { FirstNameField } from '~/common/FirstNameField';
 import { LastNameField } from '~/common/LastNameField';
+import { OTPField } from '~/common/OTPField';
 import { PasswordField } from '~/common/PasswordField';
 import { PhoneNumberField } from '~/common/PhoneNumberField';
 import { UsernameField } from '~/common/UsernameField';
@@ -84,6 +85,23 @@ export function SignUpComponent() {
                         <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
                         <EmailField disabled={isGlobalLoading} />
                         <PasswordField disabled={isGlobalLoading} />
+                        <OTPField
+                          disabled={isGlobalLoading}
+                          // TODO:
+                          // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
+                          // 2. Replace `button` with consolidated styles (tackled later)
+                          resend={
+                            <>
+                              Didn&apos;t recieve a code?{' '}
+                              <button
+                                type='button'
+                                className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                              >
+                                Resend
+                              </button>
+                            </>
+                          }
+                        />
                       </div>
 
                       <SignUp.Action

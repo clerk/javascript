@@ -98,6 +98,7 @@ const config = {
       },
       animation: {
         spin: 'cl-spin linear infinite',
+        blink: 'cl-blink 1s step-end 0.2s infinite',
       },
     },
   },

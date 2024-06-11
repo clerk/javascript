@@ -1,3 +1,4 @@
+import { isWebAuthnPlatformAuthenticatorSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   DeletedObjectJSON,
   DeletedObjectResource,
@@ -9,13 +10,7 @@ import type {
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import {
-  ClerkWebAuthnError,
-  isWebAuthnPlatformAuthenticatorSupported,
-  isWebAuthnSupported,
-  serializePublicKeyCredential,
-  webAuthnCreateCredential,
-} from '../../utils/passkeys';
+import { ClerkWebAuthnError, serializePublicKeyCredential, webAuthnCreateCredential } from '../../utils/passkeys';
 import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
 

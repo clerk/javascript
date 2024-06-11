@@ -69,7 +69,8 @@
     "apiUrlFromPublishableKey",
     "scripts",
     "telemetry",
-    "logger"
+    "logger",
+    "webauthn"
   ],
   "scripts": {
     "build": "tsup",
