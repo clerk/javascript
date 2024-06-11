@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
+      NODE_VERSION: 18
       TURBO_SUMMARIZE: false
 
     steps:
@@ -136,6 +137,9 @@ jobs:
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_MEDIUM || 'ubuntu-latest-m' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+
+    env:
+      NODE_VERSION: 18
 
     strategy:
       matrix:
