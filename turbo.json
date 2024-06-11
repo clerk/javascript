@@ -35,7 +35,7 @@
     "CI_COMMIT_SHA",
     "GITHUB_TOKEN"
   ],
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": [
@@ -59,7 +59,7 @@
         "!examples/**",
         "!node_modules/**"
       ],
-      "outputMode": "new-only",
+      "outputLogs": "new-only",
       "outputs": ["*/package.json", "dist/**", "scripts/**"]
     },
     "dev": {
@@ -93,7 +93,7 @@
         "!examples/**",
         "!node_modules/**"
       ],
-      "outputMode": "new-only",
+      "outputLogs": "new-only",
       "outputs": []
     },
     "test:cache:clear": {
@@ -143,43 +143,43 @@
       "dependsOn": ["^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:generic": {
       "dependsOn": ["^@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:express": {
       "dependsOn": ["^@clerk/clerk-sdk-node#build", "^@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
       "dependsOn": ["^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:nextjs:canary": {
       "dependsOn": ["^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:quickstart": {
       "dependsOn": ["^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:elements": {
       "dependsOn": ["^@clerk/nextjs#build", "^@clerk/elements#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     }
   }
 }

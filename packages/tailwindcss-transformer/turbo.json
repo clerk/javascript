@@ -18,7 +18,7 @@
         "!dist/**",
         "!node_modules/**"
       ],
-      "outputMode": "new-only",
+      "outputLogs": "new-only",
       "outputs": []
     }
   }
