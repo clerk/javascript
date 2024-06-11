@@ -9,7 +9,7 @@ export function UsernameField({
 }: { label?: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field
-      name='lastName'
+      name='username'
       asChild
     >
       <Field.Root>
