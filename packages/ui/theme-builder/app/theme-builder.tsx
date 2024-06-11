@@ -86,6 +86,12 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 onChange={e => router.push(e.target.value)}
                 className='relative bg-neutral-100 border rounded py-1 text-xs pl-1.5 pr-5 appearance-none after:absolute after:right-1.5 after:size-2 after:bg-red-200 after:top-1'
               >
+                <option
+                  value='/'
+                  disabled
+                >
+                  Select
+                </option>
                 <option value='/sign-in'>Sign In</option>
                 <option value='/sign-up'>Sign Up</option>
               </select>
