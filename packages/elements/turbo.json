@@ -1,6 +1,6 @@
 {
   "extends": ["//"],
-  "pipeline": {
+  "tasks": {
     "dev": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "!examples/**"],
