@@ -1,7 +1,7 @@
 import { titleize } from '@clerk/shared';
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { PreferredSignInStrategy, SignInFactor, SignInResource, SignInStrategy } from '@clerk/types';
 
-import { isWebAuthnSupported } from '../../../utils/passkeys';
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 

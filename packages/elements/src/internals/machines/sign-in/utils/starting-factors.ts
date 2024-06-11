@@ -1,9 +1,10 @@
 // These utilities are ported from: packages/clerk-js/src/ui/components/SignIn/utils.ts
 // They should be functionally identical.
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { PreferredSignInStrategy, SignInFactor } from '@clerk/types';
 
-const ORDER_WHEN_PASSWORD_PREFERRED = ['password', 'email_link', 'email_code', 'phone_code'] as const;
-const ORDER_WHEN_OTP_PREFERRED = ['email_link', 'email_code', 'phone_code', 'password'] as const;
+const ORDER_WHEN_PASSWORD_PREFERRED = ['passkey', 'password', 'email_link', 'email_code', 'phone_code'] as const;
+const ORDER_WHEN_OTP_PREFERRED = ['email_link', 'email_code', 'phone_code', 'passkey', 'password'] as const;
 // const ORDER_ALL_STRATEGIES = ['email_link', 'email_code', 'phone_code', 'password'] as const;
 
 const findFactorForIdentifier = (i: string | null) => (f: SignInFactor) => {
@@ -26,10 +27,26 @@ export function determineStartingSignInFactor(
     : determineStrategyWhenOTPIsPreferred(firstFactors, identifier);
 }
 
+function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
+  if (isWebAuthnSupported()) {
+    const passkeyFactor = factors.find(({ strategy }) => strategy === 'passkey');
+
+    if (passkeyFactor) {
+      return passkeyFactor;
+    }
+  }
+  return null;
+}
+
 function determineStrategyWhenPasswordIsPreferred(
   factors: SignInFactor[],
   identifier: string | null,
 ): SignInFactor | null {
+  const passkeyFactor = findPasskeyStrategy(factors);
+  if (passkeyFactor) {
+    return passkeyFactor;
+  }
+
   // Prefer the password factor if it's available
   const passwordFactor = factors.find(factor => factor.strategy === 'password');
   if (passwordFactor) {
@@ -53,6 +70,11 @@ function determineStrategyWhenPasswordIsPreferred(
 }
 
 function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier: string | null): SignInFactor | null {
+  const passkeyFactor = findPasskeyStrategy(factors);
+  if (passkeyFactor) {
+    return passkeyFactor;
+  }
+
   const factorForIdentifier = factors.find(findFactorForIdentifier(identifier));
   if (factorForIdentifier) {
     return factorForIdentifier;
