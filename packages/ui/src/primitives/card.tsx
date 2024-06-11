@@ -62,7 +62,7 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
     <h2
       ref={forwardedRef}
       {...props}
-      className={cn('text-lg leading-medium font-bold text-gray-12', className)}
+      className={cn('text-lg font-bold text-gray-12', className)}
     >
       {children}
     </h2>

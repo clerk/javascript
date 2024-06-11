@@ -52,7 +52,7 @@ export function OTPField({
                           data-otp-field-cursor=''
                           // Note:
                           // Opportunity to extract lineHeight to theme
-                          className='motion-safe:animate-blink self-center rounded-full bg-current w-[2px] h-[calc(theme(fontSize.base)*1.38462)]'
+                          className='motion-safe:animate-blink self-center rounded-full bg-current w-[2px] h-[calc(theme(fontSize.base)*theme(lineHeight.base))]'
                         />
                       )}
                       {value}
