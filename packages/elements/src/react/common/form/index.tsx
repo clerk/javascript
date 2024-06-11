@@ -559,7 +559,7 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
     const field = useInput(props);
 
     const hasPasskeyAutofillProp = Boolean(field.props.autoComplete?.includes('webauthn'));
-    const allowedTypeForPasskey = (['text', 'email'] as FormInputProps['type'][]).includes(field.props.type);
+    const allowedTypeForPasskey = (['text', 'email', 'tel'] as FormInputProps['type'][]).includes(field.props.type);
     const signInRouterRef = SignInRouterCtx.useActorRef(true);
 
     clerk.telemetry?.record(
