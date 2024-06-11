@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
-      NODE_VERSION: 18
+      NODE_VERSION: 18.20.2
       TURBO_SUMMARIZE: false
 
     steps:
@@ -33,6 +33,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          node-version: ${{ env.NODE_VERSION }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -112,7 +113,9 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          node-version: ${{ matrix.node-version }}
+          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
+          # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
+          node-version: ${{ matrix.node-version == '18' && '18.20.2' || matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -139,7 +142,7 @@ jobs:
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     env:
-      NODE_VERSION: 18
+      NODE_VERSION: 18.20.2
 
     strategy:
       matrix:
@@ -178,6 +181,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          node-version: ${{ env.NODE_VERSION }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
