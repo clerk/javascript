@@ -9,4 +9,6 @@
 
 The following are all internal changes and not relevant to any end-user:
 
-Update Turborepo configuration to skip unaffected tasks
+- Upgrade Turborepo from v1 to v2.
+- Integrate `turbo-ignore` to short-circuit E2E tests
+- Add `E2E_PROJECT` to ensure that E2E tests are also cached/ignored based on the project flag.
