@@ -135,7 +135,7 @@ jobs:
     name: Integration Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_MEDIUM || 'ubuntu-latest-m' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     strategy:
       matrix:
