@@ -57,7 +57,12 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
       return new Promise(res => {
         window.__clerk_internal_invalidateCachePromise = res;
         startTransition(() => {
-          invalidateCacheAction();
+          //@ts-expect-error next exitsts on window
+          if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
+            router.refresh();
+          } else {
+            invalidateCacheAction();
+          }
         });
       });
     };
