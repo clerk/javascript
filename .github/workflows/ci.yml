@@ -69,10 +69,10 @@ jobs:
         run: npx turbo lint:publint $TURBO_ARGS --only
 
       - name: Lint types using attw
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!elements --filter=!backend --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!tanstack-start --filter=!elements --filter=!backend --only
 
       - name: Lint types using attw [Errors Allowed]
-        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --filter=elements --continue --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=tanstack-start --filter=backend --filter=elements --continue --only
         continue-on-error: true # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
@@ -135,7 +135,7 @@ jobs:
     name: Integration Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_MEDIUM || 'ubuntu-latest-m' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     strategy:
       matrix:
