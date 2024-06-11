@@ -1,3 +1,4 @@
+import { Slot } from '@radix-ui/react-slot';
 import cn from 'clsx';
 import * as React from 'react';
 
@@ -20,16 +21,23 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   );
 });
 
-export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTMLLabelElement>>(function Label(
-  { className, children, ...props },
-  forwardedRef,
+export const Label = React.forwardRef(function Label(
+  {
+    className,
+    children,
+    visuallyHidden,
+    ...props
+  }: React.HTMLAttributes<HTMLLabelElement> & { visuallyHidden?: boolean },
+  forwardedRef: React.ForwardedRef<HTMLLabelElement>,
 ) {
   return (
     <label
       ref={forwardedRef}
       {...props}
       className={cn(
-        'text-base font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
+        visuallyHidden
+          ? 'sr-only'
+          : 'text-base font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
         className,
       )}
     >
@@ -40,31 +48,75 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
 
 export const Input = React.forwardRef(function Input(
   {
+    asChild,
     className,
     intent = 'idle',
+    state = 'native',
+    variant = 'default',
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
+    asChild?: boolean;
     intent?: FieldIntent;
+    state?: 'native' | 'hover' | 'focus-visible';
+    variant?: 'default' | 'otp-digit';
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
+  const Comp = asChild ? Slot : 'input';
+
   return (
-    <input
+    <Comp
       data-field-input=''
       ref={forwardedRef}
       className={cn(
-        'block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none text-base',
-        'focus-visible:ring-[0.1875rem] disabled:opacity-50 disabled:cursor-not-allowed',
+        'relative flex min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border outline-none text-base',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        // variant
+        {
+          default: 'w-full min-h-8 justify-start',
+          'otp-digit': 'size-10 aspect-square text-[calc(var(--cl-font-size)*1.4)] font-semibold justify-center',
+        }[variant],
+        // state
+        {
+          native:
+            'border-[--cl-field-input-border] hover:border-[--cl-field-input-border-active] focus-visible:border-[--cl-field-input-border-active] focus-visible:ring-[0.1875rem] focus-visible:ring-[--cl-field-input-ring]',
+          hover: 'border-[--cl-field-input-border-active]',
+          'focus-visible': 'border-[--cl-field-input-border-active] ring-[0.1875rem] ring-[--cl-field-input-ring]',
+        }[state],
         // intent
         {
-          idle: 'hover:border-gray-a8 focus-visible:ring-gray-a3 focus-visible:border-gray-a8',
-          info: 'hover:border-gray-a8 focus-visible:ring-gray-a3 focus-visible:border-gray-a8',
-          error: 'border-danger focus-visible:ring-danger/20',
-          success: 'border-success focus-visible:ring-success/25', // (optically adjusted ring to 25 opacity)
-          warning: 'border-warning focus-visible:ring-warning/20',
+          idle: [
+            '[--cl-field-input-border:theme(colors.gray.a6)]',
+            '[--cl-field-input-border-active:theme(colors.gray.a8)]',
+            '[--cl-field-input-ring:theme(colors.gray.a3)]',
+          ],
+          info: [
+            '[--cl-field-input-border:theme(colors.gray.a8)]',
+            '[--cl-field-input-border-active:theme(colors.gray.a8)]',
+            '[--cl-field-input-ring:theme(colors.gray.a3)]',
+          ],
+          error: [
+            '[--cl-field-input-border:theme(colors.danger.DEFAULT)]',
+            '[--cl-field-input-border-active:theme(colors.danger.DEFAULT)]',
+            '[--cl-field-input-ring:theme(colors.danger.DEFAULT/0.2)]',
+          ],
+          success: [
+            '[--cl-field-input-border:theme(colors.success.DEFAULT)]',
+            '[--cl-field-input-border-active:theme(colors.success.DEFAULT)]',
+            '[--cl-field-input-ring:theme(colors.success.DEFAULT/0.25)]', // (optically adjusted ring to 25 opacity)
+          ],
+          warning: [
+            '[--cl-field-input-border:theme(colors.warning.DEFAULT)]',
+            '[--cl-field-input-border-active:theme(colors.warning.DEFAULT)]',
+            '[--cl-field-input-ring:theme(colors.warning.DEFAULT/0.2)]',
+          ],
         }[intent],
-        // data-[invalid] overrides all
-        'data-[invalid]:border-danger data-[invalid]:hover:border-danger data-[invalid]:focus-visible:border-danger data-[invalid]:focus-visible:ring-danger/30',
+        // data-[invalid] overrides any currently-defined `intent`
+        [
+          'data-[invalid]:[--cl-field-input-border:theme(colors.danger.DEFAULT)]',
+          'data-[invalid]:[--cl-field-input-border-active:theme(colors.danger.DEFAULT)]',
+          'data-[invalid]:[--cl-field-input-ring:theme(colors.danger.DEFAULT/0.2)]',
+        ],
         className,
       )}
       {...props}
@@ -75,16 +127,22 @@ export const Input = React.forwardRef(function Input(
 export const Message = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
+    justify?: 'start' | 'center' | 'end';
     children?: React.ReactNode;
     intent?: FieldIntent;
   }
->(function Message({ className, children, intent = 'idle', ...props }, forwardedRef) {
+>(function Message({ className, children, justify = 'start', intent = 'idle', ...props }, forwardedRef) {
   return (
     <p
       ref={forwardedRef}
       {...props}
       className={cn(
         'text-base flex gap-x-1',
+        {
+          start: 'justify-start',
+          center: 'justify-center',
+          end: 'justify-end',
+        }[justify],
         {
           idle: 'text-gray-11',
           info: 'text-gray-11',
