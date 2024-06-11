@@ -154,17 +154,24 @@ export function SignUpComponent() {
                             </>
                           }
                         />
-                        <SignUp.Action
-                          submit
-                          asChild
-                        >
-                          <Button
-                            icon={<Icon.CaretRight />}
-                            disabled={isGlobalLoading}
-                          >
-                            Continue
-                          </Button>
-                        </SignUp.Action>
+                        <Common.Loading scope='step:verifications'>
+                          {isSubmitting => {
+                            return (
+                              <SignUp.Action
+                                submit
+                                asChild
+                              >
+                                <Button
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  icon={<Icon.CaretRight />}
+                                >
+                                  Continue
+                                </Button>
+                              </SignUp.Action>
+                            );
+                          }}
+                        </Common.Loading>
                       </Card.Body>
                     </SignUp.Strategy>
 
@@ -191,12 +198,24 @@ export function SignUpComponent() {
                             </>
                           }
                         />
-                        <SignUp.Action
-                          submit
-                          asChild
-                        >
-                          <Button icon={<Icon.CaretRight />}>Continue</Button>
-                        </SignUp.Action>
+                        <Common.Loading scope='step:verifications'>
+                          {isSubmitting => {
+                            return (
+                              <SignUp.Action
+                                submit
+                                asChild
+                              >
+                                <Button
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  icon={<Icon.CaretRight />}
+                                >
+                                  Continue
+                                </Button>
+                              </SignUp.Action>
+                            );
+                          }}
+                        </Common.Loading>
                       </Card.Body>
                     </SignUp.Strategy>
 
@@ -260,6 +279,7 @@ export function SignUpComponent() {
                         {/* TODO: conditionally render password */}
                         <PasswordField disabled={isGlobalLoading} />
                       </div>
+
                       <Common.Loading scope='step:continue'>
                         {isSubmitting => {
                           return (
