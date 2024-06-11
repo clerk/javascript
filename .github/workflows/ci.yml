@@ -158,6 +158,12 @@ jobs:
 
       - name: Task Status
         id: task-status
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
           AFFECTED=0
           (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=remotes/origin/main) || AFFECTED=1
@@ -195,9 +201,10 @@ jobs:
         id: integration-tests
         run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
-          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
