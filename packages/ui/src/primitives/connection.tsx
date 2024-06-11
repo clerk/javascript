@@ -82,7 +82,7 @@ export const Button = React.forwardRef(function Button(
     icon,
     textVisuallyHidden = false,
     ...props
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  }: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> & {
     icon?: React.ReactNode;
     busy?: boolean;
     /**
@@ -95,7 +95,6 @@ export const Button = React.forwardRef(function Button(
 ) {
   return (
     <div className='w-[calc(100%/var(--cl-connection-cols))] p-[calc(var(--cl-connection-gap)/2)]'>
-      {/* eslint-disable react/button-has-type */}
       <button
         ref={forwardedRef}
         {...props}
@@ -105,6 +104,7 @@ export const Button = React.forwardRef(function Button(
           className,
         )}
         disabled={busy || disabled}
+        type='button'
       >
         {icon ? <span className='text-base'>{busy ? <Spinner>Loading…</Spinner> : <span>{icon}</span>}</span> : null}
         <span
