@@ -3,6 +3,7 @@ import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
 import { EmailField } from '~/common/EmailField';
+import { OTPField } from '~/common/OTPField';
 import { PasswordField } from '~/common/PasswordField';
 import { PhoneNumberField } from '~/common/PhoneNumberField';
 import { PROVIDERS } from '~/constants';
@@ -67,6 +68,23 @@ export function SignInComponent() {
                       <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
                       <EmailField disabled={isGlobalLoading} />
                       <PasswordField disabled={isGlobalLoading} />
+                      <OTPField
+                        disabled={isGlobalLoading}
+                        // TODO:
+                        // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
+                        // 2. Replace `button` with consolidated styles (tackled later)
+                        resend={
+                          <>
+                            Didn&apos;t recieve a code?{' '}
+                            <button
+                              type='button'
+                              className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                            >
+                              Resend
+                            </button>
+                          </>
+                        }
+                      />
                     </div>
 
                     <SignIn.Action
