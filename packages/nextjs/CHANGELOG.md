@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.1.5
+
+### Patch Changes
+
+- Enhance page detection by utilizing the patched fetch from nextjs. ([#3529](https://github.com/clerk/javascript/pull/3529)) by [@panteliselef](https://github.com/panteliselef)
+
+- Replace router.refresh() with cookies().delete() ([#3518](https://github.com/clerk/javascript/pull/3518)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`4ec3f63e2`](https://github.com/clerk/javascript/commit/4ec3f63e26d8d3725a7ba9bbf988a7776fe893ff)]:
+  - @clerk/shared@2.3.0
+  - @clerk/backend@1.2.3
+  - @clerk/clerk-react@5.2.4
+
 ## 5.1.4
 
 ### Patch Changes

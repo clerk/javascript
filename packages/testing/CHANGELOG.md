@@ -1,5 +1,14 @@
 # @clerk/testing
 
+## 1.1.7
+
+### Patch Changes
+
+- Improve the error message when `setupClerkTestingToken` cannot find the FAPI URL ([#3520](https://github.com/clerk/javascript/pull/3520)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`4ec3f63e2`](https://github.com/clerk/javascript/commit/4ec3f63e26d8d3725a7ba9bbf988a7776fe893ff)]:
+  - @clerk/shared@2.3.0
+
 ## 1.1.6
 
 ### Patch Changes
