@@ -51,14 +51,16 @@ export function SignUpComponent() {
                           const iconKey = connection?.icon;
                           const IconComponent = iconKey ? Icon[iconKey] : null;
                           return (
-                            <Common.Connection
+                            <Common.Loading
                               key={c.provider}
-                              name={c.provider}
-                              asChild
+                              scope={`provider:${c.provider}`}
                             >
-                              <Common.Loading scope={`provider:${c.provider}`}>
-                                {isConnectionLoading => {
-                                  return (
+                              {isConnectionLoading => {
+                                return (
+                                  <Common.Connection
+                                    name={c.provider}
+                                    asChild
+                                  >
                                     <Connection.Button
                                       busy={isConnectionLoading}
                                       disabled={isGlobalLoading || isConnectionLoading}
@@ -67,15 +69,16 @@ export function SignUpComponent() {
                                     >
                                       {connection?.name || c.provider}
                                     </Connection.Button>
-                                  );
-                                }}
-                              </Common.Loading>
-                            </Common.Connection>
+                                  </Common.Connection>
+                                );
+                              }}
+                            </Common.Loading>
                           );
                         })}
                       </Connection.Root>
 
                       <Seperator>or</Seperator>
+
                       <div className='space-y-4'>
                         <FieldEnabled pick={['first_name', 'last_name']}>
                           <div className='flex gap-4'>
@@ -101,13 +104,13 @@ export function SignUpComponent() {
                         <PasswordField disabled={isGlobalLoading} />
                       </div>
 
-                      <SignUp.Action
-                        submit
-                        asChild
-                      >
-                        <Common.Loading>
-                          {isSubmitting => {
-                            return (
+                      <Common.Loading scope='step:start'>
+                        {isSubmitting => {
+                          return (
+                            <SignUp.Action
+                              submit
+                              asChild
+                            >
                               <Button
                                 icon={<Icon.CaretRight />}
                                 busy={isSubmitting}
@@ -115,10 +118,10 @@ export function SignUpComponent() {
                               >
                                 Continue
                               </Button>
-                            );
-                          }}
-                        </Common.Loading>
-                      </SignUp.Action>
+                            </SignUp.Action>
+                          );
+                        }}
+                      </Common.Loading>
                     </Card.Body>
                   </Card.Content>
                   <Card.Footer>
