@@ -63,7 +63,7 @@ export function SignInComponent() {
                       })}
                     </Connection.Root>
                     <Seperator>or</Seperator>
-                    <div className='space-y-4'>
+                    <div className='flex flex-col gap-4'>
                       {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
                       <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
                       <EmailField disabled={isGlobalLoading} />

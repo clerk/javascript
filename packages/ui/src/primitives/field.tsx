@@ -14,7 +14,11 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]', 'space-y-2', className)}
+      className={cn(
+        'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
+        'flex flex-col gap-2',
+        className,
+      )}
     >
       {children}
     </div>
