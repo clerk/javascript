@@ -11,7 +11,8 @@ import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
 import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
-import { authSignatureInvalid, missingDomainAndProxy, missingSignInUrlInDev, signingKeyInvalid } from './errors';
+import { authSignatureInvalid, encryptionKeyInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import { errorThrower } from './errorThrower';
 import type { RequestLike } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
@@ -239,14 +240,25 @@ export function assertTokenSignature(token: string, key: string, signature?: str
 }
 
 /**
- * Encrypt request data using signing key.
- */
+ * Encrypt request data propagated between server requests.
+ * @internal
+ **/
 export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>): string {
-  return AES.encrypt(JSON.stringify(options), ENCRYPTION_KEY).toString();
+  /**
+   * If a secretKey is provided in the options, ENCRYPTION_KEY is required.
+   * If no secretKey is provided, ENCRYPTION_KEY falls back to SECRET_KEY.
+   * This setup ensures backward compatibility and simplifies use cases where sensitive options like `secretKey` aren't provided.
+   */
+  const key = options.secretKey
+    ? assertKey(ENCRYPTION_KEY, () => errorThrower.throwMissingEncryptionKeyError())
+    : ENCRYPTION_KEY ?? assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
+
+  return AES.encrypt(JSON.stringify(options), key).toString();
 }
 
 /**
- * Decrypt request data using signing key.
+ * Decrypt request data propagated between server requests.
+ * @internal
  */
 export function decryptClerkRequestData(
   encryptedRequestData?: string | undefined | null,
@@ -256,10 +268,10 @@ export function decryptClerkRequestData(
   }
 
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY);
+    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY ?? SECRET_KEY);
     const encoded = decryptedBytes.toString(encUtf8);
     return JSON.parse(encoded);
   } catch (err) {
-    throw new Error(signingKeyInvalid);
+    throw new Error(encryptionKeyInvalid);
   }
 }

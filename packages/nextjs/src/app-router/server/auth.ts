@@ -28,8 +28,8 @@ export const auth = (): Auth => {
       clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
       clerkRequest.cookies.get(constants.Cookies.DevBrowser);
 
-    const requestData = getHeader(request, constants.Headers.ClerkRequestData);
-    const decryptedRequestData = requestData ? decryptClerkRequestData(requestData) : {};
+    const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
+    const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
 
     return createRedirect({
       redirectAdapter: redirect,
