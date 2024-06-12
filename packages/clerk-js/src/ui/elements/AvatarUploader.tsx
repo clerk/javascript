@@ -72,8 +72,8 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const previewElement = objectUrl
     ? React.cloneElement(avatarPreview, { imageUrl: objectUrl })
     : avatarPreviewPlaceholder
-    ? React.cloneElement(avatarPreviewPlaceholder, { onClick: toggle })
-    : avatarPreview;
+      ? React.cloneElement(avatarPreviewPlaceholder, { onClick: toggle })
+      : avatarPreview;
 
   return (
     <Col gap={4}>

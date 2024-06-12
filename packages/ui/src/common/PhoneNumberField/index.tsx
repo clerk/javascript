@@ -88,8 +88,8 @@ export function PhoneNumberField({
               <div
                 ref={containerRef}
                 className={cn(
-                  'flex w-full bg-white text-gray-12 rounded-md bg-clip-padding border border-gray-a6 outline-none text-base',
-                  'focus-within:ring-[0.1875rem] disabled:opacity-50 disabled:cursor-not-allowed',
+                  'text-gray-12 border-gray-a6 flex w-full rounded-md border bg-white bg-clip-padding text-base outline-none',
+                  'focus-within:ring-[0.1875rem] disabled:cursor-not-allowed disabled:opacity-50',
                   // intent
                   {
                     idle: 'hover:border-gray-a8 focus-within:ring-gray-a3 focus-within:border-gray-a8',
@@ -105,9 +105,9 @@ export function PhoneNumberField({
                 <DialogTrigger>
                   <Button
                     onPress={() => setOpen(true)}
-                    className='hover:bg-gray-2 focus-visible:bg-gray-2 py-1 px-2 gap-x-2 flex items-center rounded-l-md outline-none text-base'
+                    className='hover:bg-gray-2 focus-visible:bg-gray-2 flex items-center gap-x-2 rounded-l-md px-2 py-1 text-base outline-none'
                   >
-                    <span className='uppercase min-w-6'>{selectedCountry.iso}</span>
+                    <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
                     <Icon.ChevronUpDown className='text-gray-11 size-4' />
                   </Button>
                   <Popover
@@ -121,19 +121,19 @@ export function PhoneNumberField({
                         width: contentWidth,
                       }}
                     >
-                      <Command className='bg-white bg-clip-padding border border-gray-a3 rounded-md shadow-lg outline-none overflow-hidden'>
+                      <Command className='border-gray-a3 overflow-hidden rounded-md border bg-white bg-clip-padding shadow-lg outline-none'>
                         <div className='p-0.5'>
                           <Command.Input
                             ref={commandInputRef}
                             placeholder='Search country or code'
-                            className='py-1.5 px-2 w-full text-base leading-small bg-gray-2 outline-none placeholder:text-gray-9 rounded-[calc(theme(borderRadius.md)-2px)] text-gray-12 border border-gray-4'
+                            className='leading-small bg-gray-2 placeholder:text-gray-9 text-gray-12 border-gray-4 w-full rounded-[calc(theme(borderRadius.md)-2px)] border px-2 py-1.5 text-base outline-none'
                           />
                         </div>
                         <Command.List
                           ref={commandListRef}
-                          className='overflow-y-auto overflow-x-hidden max-h-80'
+                          className='max-h-80 overflow-y-auto overflow-x-hidden'
                         >
-                          <Command.Empty className='text-gray-11 text-base leading-small text-center py-1.5 px-4'>
+                          <Command.Empty className='text-gray-11 leading-small px-4 py-1.5 text-center text-base'>
                             No countries found
                           </Command.Empty>
                           {countryOptions.map(({ name, iso, code }, index) => {
@@ -146,13 +146,13 @@ export function PhoneNumberField({
                                   setOpen(false);
                                 }}
                                 data-checked={selectedCountry === countryOptions[index]}
-                                className='py-1.5 px-4 flex gap-x-2 text-base leading-small cursor-pointer aria-selected:bg-gray-2'
+                                className='leading-small aria-selected:bg-gray-2 flex cursor-pointer gap-x-2 px-4 py-1.5 text-base'
                               >
-                                <span className='shrink-0 w-3 grid place-content-center'>
+                                <span className='grid w-3 shrink-0 place-content-center'>
                                   {selectedCountry === countryOptions[index] && <Icon.Checkmark className='w-3' />}
                                 </span>
-                                <span className='truncate grow'>{name}</span>
-                                <span className='ms-auto text-gray-11'>+{code}</span>
+                                <span className='grow truncate'>{name}</span>
+                                <span className='text-gray-11 ms-auto'>+{code}</span>
                               </Command.Item>
                             );
                           })}
@@ -165,7 +165,7 @@ export function PhoneNumberField({
                   type='button'
                   // Prevent tab stop
                   tabIndex={-1}
-                  className='grid place-content-center px-1 cursor-text text-base'
+                  className='grid cursor-text place-content-center px-1 text-base'
                   onClick={() => inputRef.current?.focus()}
                 >
                   +{selectedCountry.code}
@@ -177,7 +177,7 @@ export function PhoneNumberField({
                   value={formattedNumber}
                   onPaste={handlePaste}
                   onChange={handlePhoneNumberChange}
-                  className='w-full bg-white py-1.5 pr-2.5 text-base rounded-r-md outline-none'
+                  className='w-full rounded-r-md bg-white py-1.5 pr-2.5 text-base outline-none'
                 />
               </div>
             );

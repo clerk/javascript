@@ -1,12 +1,8 @@
 import { useSelector } from '@xstate/react';
 import type { ActorRef, AnyActorRef, AnyMachineSnapshot, MachineSnapshot } from 'xstate';
 
-type StatefulActor<TActor extends AnyActorRef> = TActor extends ActorRef<
-  MachineSnapshot<any, any, any, infer TStateValue, any, any, any>,
-  any
->
-  ? TStateValue
-  : never;
+type StatefulActor<TActor extends AnyActorRef> =
+  TActor extends ActorRef<MachineSnapshot<any, any, any, infer TStateValue, any, any, any>, any> ? TStateValue : never;
 
 /**
  * Generic hook to check if a state is active.
