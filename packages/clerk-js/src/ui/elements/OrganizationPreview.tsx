@@ -89,6 +89,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           as='span'
           truncate
           sx={mainIdentifierSx}
+          title={organization.name}
         >
           {organization.name} {badge}
         </Text>
