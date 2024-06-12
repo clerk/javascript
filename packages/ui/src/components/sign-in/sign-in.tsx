@@ -3,7 +3,9 @@ import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
 import { EmailField } from '~/common/EmailField';
+import { OTPField } from '~/common/OTPField';
 import { PasswordField } from '~/common/PasswordField';
+import { PhoneNumberField } from '~/common/PhoneNumberField';
 import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
@@ -18,7 +20,7 @@ export function SignInComponent() {
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(clerk?.__unstable__environment);
 
   return (
-    <SignIn.Root exampleMode>
+    <SignIn.Root>
       <Common.Loading>
         {isGlobalLoading => {
           return (
@@ -32,24 +34,26 @@ export function SignInComponent() {
 
                   <Card.Body>
                     <Connection.Root>
-                      {enabledConnections.map(connection => {
-                        const iconKey = PROVIDERS.find(provider => provider.id === connection.provider)?.icon;
+                      {enabledConnections.map(c => {
+                        const connection = PROVIDERS.find(provider => provider.id === c.provider);
+                        const iconKey = connection?.icon;
                         const IconComponent = iconKey ? Icon[iconKey] : null;
                         return (
                           <Common.Connection
-                            key={connection.provider}
-                            name={connection.provider}
+                            key={c.provider}
+                            name={c.provider}
                             asChild
                           >
-                            <Common.Loading scope={`provider:${connection.provider}`}>
+                            <Common.Loading scope={`provider:${c.provider}`}>
                               {isConnectionLoading => {
                                 return (
                                   <Connection.Button
                                     busy={isConnectionLoading}
                                     disabled={isGlobalLoading || isConnectionLoading}
                                     icon={IconComponent ? <IconComponent className='text-base' /> : null}
+                                    textVisuallyHidden={enabledConnections.length > 2}
                                   >
-                                    {connection.provider}
+                                    {connection?.name || c.provider}
                                   </Connection.Button>
                                 );
                               }}
@@ -60,8 +64,27 @@ export function SignInComponent() {
                     </Connection.Root>
                     <Seperator>or</Seperator>
                     <div className='space-y-4'>
+                      {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
+                      <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
                       <EmailField disabled={isGlobalLoading} />
                       <PasswordField disabled={isGlobalLoading} />
+                      <OTPField
+                        disabled={isGlobalLoading}
+                        // TODO:
+                        // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
+                        // 2. Replace `button` with consolidated styles (tackled later)
+                        resend={
+                          <>
+                            Didn&apos;t recieve a code?{' '}
+                            <button
+                              type='button'
+                              className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                            >
+                              Resend
+                            </button>
+                          </>
+                        }
+                      />
                     </div>
 
                     <SignIn.Action

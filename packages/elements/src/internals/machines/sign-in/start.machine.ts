@@ -15,6 +15,14 @@ export const SignInStartMachineId = 'SignInStart';
 
 export const SignInStartMachine = setup({
   actors: {
+    attemptPasskey: fromPromise<
+      SignInResource,
+      { parent: SignInRouterMachineActorRef; flow: 'autofill' | 'discoverable' | undefined }
+    >(({ input: { parent, flow } }) => {
+      return parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey({
+        flow,
+      });
+    }),
     attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const clerk = parent.getSnapshot().context.clerk;
@@ -76,6 +84,16 @@ export const SignInStartMachine = setup({
           target: 'Attempting',
           reenter: true,
         },
+        'AUTHENTICATE.PASSKEY': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
+        'AUTHENTICATE.PASSKEY.AUTOFILL': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskeyAutoFill',
+          reenter: false,
+        },
       },
     },
     Attempting: {
@@ -93,6 +111,54 @@ export const SignInStartMachine = setup({
         },
         onError: {
           actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
+    AttemptingPasskey: {
+      tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
+      invoke: {
+        id: 'attemptPasskey',
+        src: 'attemptPasskey',
+        input: ({ context }) => ({
+          parent: context.parent,
+          flow: 'discoverable',
+        }),
+        onDone: {
+          actions: ['sendToNext', 'sendToLoading'],
+        },
+        onError: {
+          actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
+    AttemptingPasskeyAutoFill: {
+      on: {
+        'AUTHENTICATE.PASSKEY': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
+        SUBMIT: {
+          guard: not('isExampleMode'),
+          target: 'Attempting',
+          reenter: true,
+        },
+      },
+      invoke: {
+        id: 'attemptPasskeyAutofill',
+        src: 'attemptPasskey',
+        input: ({ context }) => ({
+          parent: context.parent,
+          flow: 'autofill',
+        }),
+        onDone: {
+          actions: ['sendToNext'],
+        },
+        onError: {
+          actions: ['setFormErrors'],
           target: 'Pending',
         },
       },

@@ -16,6 +16,7 @@ function createIcon({ displayName, viewBox, path }: { displayName: string; viewB
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
         className={cn('size-[1em]', rtlIcons.includes(displayName) && 'rtl:rotate-180', className)}
+        aria-hidden
         {...props}
       >
         {path}
@@ -249,8 +250,8 @@ export const Linear = createIcon({
   ),
 });
 
-export const LinkedInOIDC = createIcon({
-  displayName: 'IconLinkedInOIDC',
+export const LinkedIn = createIcon({
+  displayName: 'IconLinkedIn',
   viewBox: '0 0 20 20',
   path: (
     <path
@@ -647,5 +648,47 @@ export const InformationLegacy = createIcon({
         strokeLinejoin='round'
       />
     </>
+  ),
+});
+
+export const Envelope = createIcon({
+  displayName: 'IconEnvelope',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        fill='currentColor'
+        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
+      />
+      <path
+        fill='currentColor'
+        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
+      />
+    </>
+  ),
+});
+
+export const ChevronUpDown = createIcon({
+  displayName: 'IconChevronUpDown',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      fill='currentColor'
+      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
+    />
+  ),
+});
+
+export const Checkmark = createIcon({
+  displayName: 'IconCheckmark',
+  viewBox: '0 0 10 10',
+  path: (
+    <path
+      d='m1 6 3 3 5-8'
+      stroke='currentColor'
+      strokeWidth='1.25'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
   ),
 });

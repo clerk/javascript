@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/clerk-react';
+import { logger } from '@clerk/shared/logger';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
@@ -35,6 +36,8 @@ import {
   useFormStore,
 } from '~/internals/machines/form/form.context';
 import { usePassword } from '~/react/hooks/use-password.hook';
+import { SignInRouterCtx } from '~/react/sign-in/context';
+import { useSignInPasskeyAutofill } from '~/react/sign-in/context/router.context';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
 import { isReactFragment } from '~/react/utils/is-react-fragment';
 
@@ -179,7 +182,7 @@ const useInput = ({
   onFocus: onFocusProp,
   ...passthroughProps
 }: FormInputProps) => {
-  // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
+  // Inputs can be used outside a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
   const { state: fieldState } = useFieldState({ name });
@@ -509,6 +512,7 @@ const INPUT_NAME = 'ClerkElementsInput';
 type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
   validatePassword?: boolean;
 };
+
 type FormInputProps =
   | RadixFormControlProps
   | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
@@ -552,6 +556,11 @@ type FormInputProps =
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
     const clerk = useClerk();
+    const field = useInput(props);
+
+    const hasPasskeyAutofillProp = Boolean(field.props.autoComplete?.includes('webauthn'));
+    const allowedTypeForPasskey = (['text', 'email', 'tel'] as FormInputProps['type'][]).includes(field.props.type);
+    const signInRouterRef = SignInRouterCtx.useActorRef(true);
 
     clerk.telemetry?.record(
       eventComponentMounted('Elements_Input', {
@@ -565,7 +574,25 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
       }),
     );
 
-    const field = useInput(props);
+    if (signInRouterRef && hasPasskeyAutofillProp && allowedTypeForPasskey) {
+      return (
+        <InputWithPasskeyAutofill
+          ref={forwardedRef}
+          {...props}
+        />
+      );
+    }
+
+    if (hasPasskeyAutofillProp && !allowedTypeForPasskey) {
+      logger.warnOnce(
+        `<Input autoComplete="webauthn"> can only be used with <Input type="text"> or <Input type="email">`,
+      );
+    } else if (hasPasskeyAutofillProp) {
+      logger.warnOnce(
+        `<Input autoComplete="webauthn"> can only be used inside <SignIn> in order to trigger a sign-in attempt, otherwise it will be ignored.`,
+      );
+    }
+
     return (
       <field.Element
         ref={forwardedRef}
@@ -576,6 +603,27 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
 );
 
 Input.displayName = INPUT_NAME;
+
+const InputWithPasskeyAutofill = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+  (props: FormInputProps, forwardedRef) => {
+    const signInRouterRef = SignInRouterCtx.useActorRef(true);
+    const passkeyAutofillSupported = useSignInPasskeyAutofill();
+
+    React.useEffect(() => {
+      if (passkeyAutofillSupported) {
+        signInRouterRef?.send({ type: 'AUTHENTICATE.PASSKEY.AUTOFILL' });
+      }
+    }, [passkeyAutofillSupported, signInRouterRef]);
+
+    const field = useInput(props);
+    return (
+      <field.Element
+        ref={forwardedRef}
+        {...field.props}
+      />
+    );
+  },
+);
 
 /* -------------------------------------------------------------------------------------------------
  * Label

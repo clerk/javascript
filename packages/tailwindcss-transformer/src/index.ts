@@ -104,7 +104,7 @@ export async function generateStylesheet(
   stylesheet += ctx.globalCss || '';
 
   for (const [cn, value] of styleCache) {
-    stylesheet += `html :where(.${cn}) { @apply ${value} }\n`;
+    stylesheet += `.${cn} { @apply ${value} }\n`;
   }
 
   const result = await postcss([tailwindcss(ctx.tailwindConfig) as Plugin, replaceVariableScope]).process(stylesheet, {

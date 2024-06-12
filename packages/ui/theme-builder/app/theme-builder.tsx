@@ -1,7 +1,6 @@
 'use client';
-import { SignIn } from '@clerk/ui/sign-in';
-import { SignUp } from '@clerk/ui/sign-up';
 import cn from 'clsx';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { ColorPicker } from './color-picker';
@@ -21,13 +20,9 @@ const radiusDefault = '0.375rem';
 const spacingUnitDefault = '1rem';
 const fontSizeDefault = '0.8125rem';
 
-const componnents = {
-  SignIn: <SignIn />,
-  SignUp: <SignUp />,
-};
-type Component = keyof typeof componnents;
-
-export function ThemeBuilder() {
+export function ThemeBuilder({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [dir, setDir] = useState('ltr');
   const [appearance, setAppearance] = useState('light');
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
@@ -39,7 +34,6 @@ export function ThemeBuilder() {
   const [radius, setRadius] = useState(radiusDefault);
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [fontSize, setFontSize] = useState(fontSizeDefault);
-  const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
@@ -88,11 +82,18 @@ export function ThemeBuilder() {
               <select
                 name='component'
                 id='component'
-                onChange={e => setSelectedComponent(e.target.value as Component)}
+                defaultValue={pathname}
+                onChange={e => router.push(e.target.value)}
                 className='relative bg-neutral-100 border rounded py-1 text-xs pl-1.5 pr-5 appearance-none after:absolute after:right-1.5 after:size-2 after:bg-red-200 after:top-1'
               >
-                <option value='SignIn'>Sign In</option>
-                <option value='SignUp'>Sign Up</option>
+                <option
+                  value='/'
+                  disabled
+                >
+                  Select
+                </option>
+                <option value='/sign-in'>Sign In</option>
+                <option value='/sign-up'>Sign Up</option>
               </select>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -267,7 +268,7 @@ export function ThemeBuilder() {
               )}
               aria-hidden='true'
             />
-            {componnents[selectedComponent]}
+            {children}
           </figure>
         </div>
       </div>

@@ -1,6 +1,6 @@
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { SignInFactor } from '@clerk/types';
 
-import { isWebAuthnSupported } from '../../utils/passkeys';
 import { factorHasLocalStrategy, isResetPasswordStrategy } from '../components/SignIn/utils';
 import { useCoreSignIn } from '../contexts';
 import { allStrategiesButtonsComparator } from '../utils';
