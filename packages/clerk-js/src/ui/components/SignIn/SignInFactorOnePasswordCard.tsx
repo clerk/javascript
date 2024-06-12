@@ -39,8 +39,8 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
       onActionClicked: onForgotPasswordMethodClick
         ? onForgotPasswordMethodClick
         : onShowAlternativeMethodsClick
-        ? onShowAlternativeMethodsClick
-        : () => null,
+          ? onShowAlternativeMethodsClick
+          : () => null,
     },
   };
 };

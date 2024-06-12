@@ -466,7 +466,7 @@ describe('SignInFactorOne', () => {
             ({
               startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
               cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-            } as any),
+            }) as any,
         );
 
         render(<SignInFactorOne />, { wrapper });
@@ -488,7 +488,7 @@ describe('SignInFactorOne', () => {
             ({
               startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
               cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-            } as any),
+            }) as any,
         );
 
         const { getByText } = render(<SignInFactorOne />, { wrapper });
@@ -929,7 +929,7 @@ describe('SignInFactorOne', () => {
           ({
             startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
             cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          } as any),
+          }) as any,
       );
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));

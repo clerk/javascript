@@ -30,7 +30,7 @@ const statusToColor = (theme: InternalTheme, status: Exclude<VerificationStatus,
     expired: theme.colors.$warning500,
     failed: theme.colors.$danger500,
     client_mismatch: theme.colors.$warning500,
-  }[status]);
+  })[status];
 
 export const EmailLinkStatusCard = (props: EmailLinkStatusCardProps) => {
   const card = useCardState();

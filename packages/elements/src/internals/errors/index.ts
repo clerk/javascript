@@ -5,7 +5,10 @@ export abstract class ClerkElementsErrorBase extends Error {
   clerkElementsError = true;
   rawMessage: string;
 
-  constructor(readonly code: string, message: string) {
+  constructor(
+    readonly code: string,
+    message: string,
+  ) {
     super(message);
 
     this.name = 'ClerkElementsError';

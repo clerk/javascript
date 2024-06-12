@@ -30,7 +30,7 @@ export default function OTP() {
       <SignIn.Root path='/otp'>
         <SignIn.Step
           name='start'
-          className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white text-center shadow-md'
+          className='w-full space-y-6 rounded-2xl bg-white px-4 py-10 text-center shadow-md sm:w-96 sm:px-8'
         >
           <header className='text-center'>
             <h1 className='text-xl font-medium tracking-tight text-neutral-950'>OTP Playground</h1>
@@ -52,7 +52,7 @@ export default function OTP() {
           >
             <Clerk.Label className='text-sm font-medium text-zinc-950'>Segmented OTP Input</Clerk.Label>
             <Clerk.Input
-              className='flex justify-center has-[:disabled]:opacity-50 segmented-otp-wrapper'
+              className='segmented-otp-wrapper flex justify-center has-[:disabled]:opacity-50'
               type='otp'
               data-testid='segmented-otp'
               render={({ value, status, index }) => {
@@ -61,7 +61,7 @@ export default function OTP() {
                     data-status={status}
                     data-testid={`segmented-otp-${index}`}
                     className={clsx(
-                      'relative flex size-10 items-center justify-center border-y border-r border-input text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md',
+                      'border-input relative flex size-10 items-center justify-center border-y border-r text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md',
                       {
                         'z-10 ring-2 ring-black ring-offset-black': status === 'cursor' || status === 'selected',
                       },
@@ -84,7 +84,7 @@ export default function OTP() {
           >
             <Clerk.Label className='text-sm font-medium text-zinc-950'>Segmented OTP Input (with props)</Clerk.Label>
             <Clerk.Input
-              className='flex justify-center has-[:disabled]:opacity-50 segmented-otp-with-props-wrapper'
+              className='segmented-otp-with-props-wrapper flex justify-center has-[:disabled]:opacity-50'
               type='otp'
               data-testid='segmented-otp-with-props'
               passwordManagerOffset={4}
@@ -94,7 +94,7 @@ export default function OTP() {
                   <div
                     data-status={status}
                     className={clsx(
-                      'relative flex size-10 items-center justify-center border-y border-r border-input text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md',
+                      'border-input relative flex size-10 items-center justify-center border-y border-r text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md',
                       {
                         'z-10 ring-2 ring-black ring-offset-black': status === 'cursor' || status === 'selected',
                       },

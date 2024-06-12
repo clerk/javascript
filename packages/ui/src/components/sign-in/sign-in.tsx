@@ -78,7 +78,7 @@ export function SignInComponent() {
                             Didn&apos;t recieve a code?{' '}
                             <button
                               type='button'
-                              className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                              className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
                             >
                               Resend
                             </button>
