@@ -18,12 +18,15 @@ import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 import { TextButton } from '~/primitives/text-button';
 
+import { FieldAdaptor } from '../field-adaptor';
 import { FieldEnabled } from '../field-enabled';
 
 export function SignUpComponent() {
   const clerk = useClerk();
   // @ts-ignore clerk is not null
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(clerk?.__unstable__environment);
+  // @ts-ignore clerk is not null
+  const locationBasedCountryIso = clerk.__internal_country;
 
   return (
     <SignUp.Root>
@@ -76,26 +79,73 @@ export function SignUpComponent() {
                       <div className='flex flex-col gap-4'>
                         <FieldEnabled pick={['first_name', 'last_name']}>
                           <div className='flex gap-4'>
-                            <FirstNameField disabled={isGlobalLoading} />
-                            <LastNameField disabled={isGlobalLoading} />
+                            <FieldAdaptor pick='first_name'>
+                              {({ isRequired }) => {
+                                return (
+                                  <FirstNameField
+                                    required={isRequired}
+                                    disabled={isGlobalLoading}
+                                  />
+                                );
+                              }}
+                            </FieldAdaptor>
+                            <FieldAdaptor pick='last_name'>
+                              {({ isRequired }) => {
+                                return (
+                                  <LastNameField
+                                    required={isRequired}
+                                    disabled={isGlobalLoading}
+                                  />
+                                );
+                              }}
+                            </FieldAdaptor>
                           </div>
                         </FieldEnabled>
 
-                        <FieldEnabled pick='username'>
-                          <UsernameField disabled={isGlobalLoading} />
-                        </FieldEnabled>
+                        <FieldAdaptor pick='username'>
+                          {({ isEnabled, isRequired }) => {
+                            return isEnabled ? (
+                              <UsernameField
+                                required={isRequired}
+                                disabled={isGlobalLoading}
+                              />
+                            ) : null;
+                          }}
+                        </FieldAdaptor>
 
-                        <FieldEnabled pick='phone_number'>
-                          {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
-                          <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
-                        </FieldEnabled>
+                        <FieldAdaptor pick='phone_number'>
+                          {({ isEnabled, isRequired }) => {
+                            return isEnabled ? (
+                              <PhoneNumberField
+                                required={isRequired}
+                                disabled={isGlobalLoading}
+                                locationBasedCountryIso={locationBasedCountryIso}
+                              />
+                            ) : null;
+                          }}
+                        </FieldAdaptor>
 
-                        <FieldEnabled pick='email_address'>
-                          <EmailField disabled={isGlobalLoading} />
-                        </FieldEnabled>
+                        <FieldAdaptor pick='email_address'>
+                          {({ isEnabled, isRequired }) => {
+                            return isEnabled ? (
+                              <EmailField
+                                required={isRequired}
+                                disabled={isGlobalLoading}
+                              />
+                            ) : null;
+                          }}
+                        </FieldAdaptor>
 
-                        {/* TODO: conditionally render password */}
-                        <PasswordField disabled={isGlobalLoading} />
+                        <FieldAdaptor pick='password'>
+                          {({ isEnabled, isRequired }) => {
+                            return isEnabled && isRequired ? (
+                              <PasswordField
+                                required={isRequired}
+                                disabled={isGlobalLoading}
+                              />
+                            ) : null;
+                          }}
+                        </FieldAdaptor>
                       </div>
 
                       <Common.Loading scope='step:start'>
