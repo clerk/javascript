@@ -30,7 +30,7 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       ref={forwardedRef}
       {...props}
       className={cn(
-        'bg-gray-surface -mx-px -mt-px shadow-sm shadow-gray-a3 py-8 px-10 space-y-8 relative rounded-[inherit] border border-gray-a6',
+        'bg-gray-surface -mx-px -mt-px shadow-sm shadow-gray-a3 py-8 px-10 flex flex-col gap-8 relative rounded-[inherit] border border-gray-a6',
         className,
       )}
     >
@@ -47,7 +47,7 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('text-center space-y-space-1', className)}
+      className={cn('text-center flex flex-col gap-1', className)}
     >
       {children}
     </div>
@@ -91,7 +91,7 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('rounded-lg space-y-6', className)}
+      className={cn('rounded-lg flex flex-col gap-6', className)}
     >
       {children}
     </div>
