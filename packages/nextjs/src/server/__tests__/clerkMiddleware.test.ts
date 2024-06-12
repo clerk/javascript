@@ -47,7 +47,6 @@ jest.mock('../constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
-    ENCRYPTION_KEY: 'test',
   };
 });
 
@@ -220,7 +219,7 @@ describe('clerkMiddleware(params)', () => {
     expect(signInResp?.headers.get('a-custom-header')).toEqual('1');
   });
 
-  it('propagates runtime options', async () => {
+  it('propagates middleware options to the next request', async () => {
     const secretKey = 'sk_test_xxxxxxxxxxxxxxxxxx';
     const resp = await clerkMiddleware({ secretKey })(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
     expect(resp?.status).toEqual(200);
@@ -303,6 +302,8 @@ describe('clerkMiddleware(params)', () => {
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
+
+    it.todo('redirects to sign-in url when propagated as an option');
   });
 
   describe('auth().protect()', () => {
