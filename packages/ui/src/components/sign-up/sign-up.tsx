@@ -2,11 +2,11 @@ import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
-import { EmailField } from '~/common/EmailField';
-import { FirstNameField } from '~/common/FirstNameField';
-import { LastNameField } from '~/common/LastNameField';
-import { OTPField } from '~/common/OTPField';
-import { PasswordField } from '~/common/PasswordField';
+import { EmailField } from '~/common/email-field';
+import { FirstNameField } from '~/common/first-name-field';
+import { LastNameField } from '~/common/last-name-field';
+import { OTPField } from '~/common/otp-field';
+import { PasswordField } from '~/common/password-field';
 import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
