@@ -18,7 +18,7 @@ import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 import { TextButton } from '~/primitives/text-button';
 
-import { FieldAdaptor } from '../field-adaptor';
+import { FieldAdapter } from '../field-adapter';
 import { FieldEnabled } from '../field-enabled';
 
 export function SignUpComponent() {
@@ -79,7 +79,7 @@ export function SignUpComponent() {
                       <div className='flex flex-col gap-4'>
                         <FieldEnabled pick={['first_name', 'last_name']}>
                           <div className='flex gap-4'>
-                            <FieldAdaptor pick='first_name'>
+                            <FieldAdapter pick='first_name'>
                               {({ isRequired }) => {
                                 return (
                                   <FirstNameField
@@ -88,8 +88,8 @@ export function SignUpComponent() {
                                   />
                                 );
                               }}
-                            </FieldAdaptor>
-                            <FieldAdaptor pick='last_name'>
+                            </FieldAdapter>
+                            <FieldAdapter pick='last_name'>
                               {({ isRequired }) => {
                                 return (
                                   <LastNameField
@@ -98,11 +98,11 @@ export function SignUpComponent() {
                                   />
                                 );
                               }}
-                            </FieldAdaptor>
+                            </FieldAdapter>
                           </div>
                         </FieldEnabled>
 
-                        <FieldAdaptor pick='username'>
+                        <FieldAdapter pick='username'>
                           {({ isEnabled, isRequired }) => {
                             return isEnabled ? (
                               <UsernameField
@@ -111,9 +111,9 @@ export function SignUpComponent() {
                               />
                             ) : null;
                           }}
-                        </FieldAdaptor>
+                        </FieldAdapter>
 
-                        <FieldAdaptor pick='phone_number'>
+                        <FieldAdapter pick='phone_number'>
                           {({ isEnabled, isRequired }) => {
                             return isEnabled ? (
                               <PhoneNumberField
@@ -123,9 +123,9 @@ export function SignUpComponent() {
                               />
                             ) : null;
                           }}
-                        </FieldAdaptor>
+                        </FieldAdapter>
 
-                        <FieldAdaptor pick='email_address'>
+                        <FieldAdapter pick='email_address'>
                           {({ isEnabled, isRequired }) => {
                             return isEnabled ? (
                               <EmailField
@@ -134,9 +134,9 @@ export function SignUpComponent() {
                               />
                             ) : null;
                           }}
-                        </FieldAdaptor>
+                        </FieldAdapter>
 
-                        <FieldAdaptor pick='password'>
+                        <FieldAdapter pick='password'>
                           {({ isEnabled, isRequired }) => {
                             return isEnabled && isRequired ? (
                               <PasswordField
@@ -145,7 +145,7 @@ export function SignUpComponent() {
                               />
                             ) : null;
                           }}
-                        </FieldAdaptor>
+                        </FieldAdapter>
                       </div>
 
                       <Common.Loading scope='step:start'>

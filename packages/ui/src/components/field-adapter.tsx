@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/clerk-react';
 import type { Attribute, EnvironmentResource } from '@clerk/types';
 
-export function FieldAdaptor({
+export function FieldAdapter({
   pick: name,
   children,
 }: {
