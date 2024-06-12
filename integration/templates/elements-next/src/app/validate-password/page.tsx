@@ -12,11 +12,11 @@ export default function ValitePassword() {
       <SignIn.Root path='/validate-password'>
         <SignIn.Step
           name='start'
-          className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white text-center shadow-md'
+          className='w-full space-y-6 rounded-2xl bg-white px-4 py-10 text-center shadow-md sm:w-96 sm:px-8'
         >
           <header className='text-center'>
             <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Password Validation Playground</h1>
-            <p className='text-sm mt-2 text-neutral-500'>
+            <p className='mt-2 text-sm text-neutral-500'>
               Just to test out the{' '}
               <a
                 className='text-zinc-950 decoration-zinc-950/20 underline-offset-4 outline-none hover:text-zinc-700 hover:underline focus-visible:underline'
@@ -28,7 +28,7 @@ export default function ValitePassword() {
             </p>
           </header>
           <Clerk.Field name='password'>
-            <div className='flex justify-between mb-2'>
+            <div className='mb-2 flex justify-between'>
               <Clerk.Label className='text-sm font-medium text-zinc-950'>Password</Clerk.Label>
               <button
                 onClick={() => setHidden(s => !s)}
@@ -46,36 +46,36 @@ export default function ValitePassword() {
               {({ state, codes, message }) => (
                 <div className='mt-6'>
                   <p className='mb-2'>Field State Props</p>
-                  <table className='table-auto w-full border-collapse text-sm'>
+                  <table className='w-full table-auto border-collapse text-sm'>
                     <thead className='bg-slate-200'>
                       <tr>
-                        <th className='border-b font-medium p-2 pl-4 text-left'>Prop</th>
-                        <th className='border-b font-medium p-2 pl-4 text-left'>Value</th>
+                        <th className='border-b p-2 pl-4 text-left font-medium'>Prop</th>
+                        <th className='border-b p-2 pl-4 text-left font-medium'>Value</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td className='border-b font-medium p-2 pl-4 text-left'>State</td>
+                        <td className='border-b p-2 pl-4 text-left font-medium'>State</td>
                         <td
-                          className='border-b font-medium p-2 pl-4 text-left'
+                          className='border-b p-2 pl-4 text-left font-medium'
                           data-testid='state'
                         >
                           {state}
                         </td>
                       </tr>
                       <tr>
-                        <td className='border-b font-medium p-2 pl-4 text-left'>Codes</td>
+                        <td className='border-b p-2 pl-4 text-left font-medium'>Codes</td>
                         <td
-                          className='border-b font-medium p-2 pl-4 text-left'
+                          className='border-b p-2 pl-4 text-left font-medium'
                           data-testid='codes'
                         >
                           {codes?.join(', ')}
                         </td>
                       </tr>
                       <tr>
-                        <td className='border-b font-medium p-2 pl-4 text-left'>Message</td>
+                        <td className='border-b p-2 pl-4 text-left font-medium'>Message</td>
                         <td
-                          className='border-b font-medium p-2 pl-4 text-left'
+                          className='border-b p-2 pl-4 text-left font-medium'
                           data-testid='message'
                         >
                           {message}

@@ -57,7 +57,7 @@ export function ColorPicker({
       </div>
       <div>
         <Popover.Root>
-          <div className='grid grid-cols-[theme(size.8),1fr] border rounded overflow-hidden'>
+          <div className='grid grid-cols-[theme(size.8),1fr] overflow-hidden rounded border'>
             <Popover.Trigger className='grid place-content-center border-e'>
               <span
                 className='block size-4 rounded-sm border'
@@ -68,7 +68,7 @@ export function ColorPicker({
             </Popover.Trigger>
             <HexColorInput
               id={id}
-              className='grow h-full px-2 py-2 outline-none text-sm'
+              className='h-full grow px-2 py-2 text-sm outline-none'
               color={color}
               onChange={onChange}
             />

@@ -17,12 +17,12 @@ export function ThemeDialog({ trigger, children }: { trigger: React.ReactNode; c
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className='fixed inset-0 grid place-items-center overflow-y-auto bg-black/50 px-4 py-12 backdrop-blur-sm'>
-          <Dialog.Content className='p-4 bg-white max-w-4xl w-full rounded-md relative min-w-0'>
+          <Dialog.Content className='relative w-full min-w-0 max-w-4xl rounded-md bg-white p-4'>
             <button
               type='button'
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={handleCopy}
-              className='absolute top-6 end-6 p-2'
+              className='absolute end-6 top-6 p-2'
             >
               <span className='sr-only'>Copy to clipboard</span>
               {copied ? (
@@ -57,7 +57,7 @@ export function ThemeDialog({ trigger, children }: { trigger: React.ReactNode; c
                 </svg>
               )}
             </button>
-            <pre className='text-xs bg-neutral-100 p-4 overflow-x-auto w-full'>
+            <pre className='w-full overflow-x-auto bg-neutral-100 p-4 text-xs'>
               <code>{children}</code>
             </pre>
           </Dialog.Content>

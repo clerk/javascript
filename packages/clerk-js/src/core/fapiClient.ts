@@ -115,10 +115,13 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     }
 
     // TODO: extract to generic helper
-    const objParams = [...searchParams.entries()].reduce((acc, [k, v]) => {
-      acc[k] = v.includes(',') ? v.split(',') : v;
-      return acc;
-    }, {} as FapiQueryStringParameters & Record<string, string | string[]>);
+    const objParams = [...searchParams.entries()].reduce(
+      (acc, [k, v]) => {
+        acc[k] = v.includes(',') ? v.split(',') : v;
+        return acc;
+      },
+      {} as FapiQueryStringParameters & Record<string, string | string[]>,
+    );
 
     return stringifyQueryParams(objParams);
   }

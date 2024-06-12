@@ -62,8 +62,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     socialButtonsVariant === 'blockButton'
       ? true
       : socialButtonsVariant === 'iconButton'
-      ? false
-      : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
+        ? false
+        : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
 
   const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
     card.setLoading(strategy);

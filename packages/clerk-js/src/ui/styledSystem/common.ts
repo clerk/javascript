@@ -178,7 +178,7 @@ const maxHeightScroller = (t: InternalTheme) =>
     height: '100%',
     overflowY: 'auto',
     ...unstyledScrollbar(t),
-  } as const);
+  }) as const;
 
 const mergedColorsBackground = (colorBack: string, colorFront: string) => {
   return `linear-gradient(${colorFront},${colorFront}), linear-gradient(${colorBack}, ${colorBack})`;

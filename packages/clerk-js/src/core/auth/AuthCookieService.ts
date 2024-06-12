@@ -39,7 +39,10 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private devBrowser: DevBrowser;
 
-  constructor(private clerk: Clerk, fapiClient: FapiClient) {
+  constructor(
+    private clerk: Clerk,
+    fapiClient: FapiClient,
+  ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
       this.updateSessionCookie(token && token.getRawString());

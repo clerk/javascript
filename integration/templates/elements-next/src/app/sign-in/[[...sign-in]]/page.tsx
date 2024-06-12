@@ -11,7 +11,7 @@ function Button({ children, ...props }: { children: React.ReactNode }) {
   return (
     <button
       type='button'
-      className='relative w-full rounded-md bg-neutral-600 bg-gradient-to-b from-neutral-500 to-neutral-600 py-1.5 text-sm font-medium text-white shadow-[0_1px_1px_0_theme(colors.white/10%)_inset,0_1px_2.5px_0_theme(colors.black/36%)] outline-none ring-1 ring-inset ring-neutral-600 before:absolute before:inset-0 before:rounded-md before:bg-white/10 before:opacity-0 hover:before:opacity-100 focus-visible:outline-offset-2 focus-visible:outline-neutral-600 active:bg-neutral-600 active:text-white/60 active:before:opacity-0 truncate'
+      className='relative w-full truncate rounded-md bg-neutral-600 bg-gradient-to-b from-neutral-500 to-neutral-600 py-1.5 text-sm font-medium text-white shadow-[0_1px_1px_0_theme(colors.white/10%)_inset,0_1px_2.5px_0_theme(colors.black/36%)] outline-none ring-1 ring-inset ring-neutral-600 before:absolute before:inset-0 before:rounded-md before:bg-white/10 before:opacity-0 hover:before:opacity-100 focus-visible:outline-offset-2 focus-visible:outline-neutral-600 active:bg-neutral-600 active:text-white/60 active:before:opacity-0'
       {...props}
     >
       {children}
@@ -29,7 +29,7 @@ export default function SignInPage() {
           <SignIn.Step
             name='start'
             data-test-id='sign-in-step-start'
-            className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
+            className='w-full space-y-6 rounded-2xl bg-white px-4 py-10 sm:w-96 sm:px-8'
           >
             <header className='text-center'>
               <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Sign in to Clover</h1>
@@ -59,7 +59,7 @@ export default function SignInPage() {
             </Clerk.Field>
             <Clerk.Field
               name='password'
-              className='opacity-0 h-0 pointer-events-none absolute'
+              className='pointer-events-none absolute h-0 opacity-0'
             >
               <Clerk.Input />
             </Clerk.Field>
@@ -87,7 +87,7 @@ export default function SignInPage() {
           </SignIn.Step>
           <SignIn.Step
             name='choose-strategy'
-            className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
+            className='w-full space-y-6 rounded-2xl bg-white px-4 py-10 sm:w-96 sm:px-8'
           >
             <header className='text-center'>
               <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Use another method</h1>
@@ -133,7 +133,7 @@ export default function SignInPage() {
             <p className='text-center text-sm'>
               <SignIn.Action
                 navigate='previous'
-                className='hover:cursor-pointer rounded px-1 py-0.5 text-neutral-700 outline-none hover:bg-neutral-100 focus-visible:bg-neutral-100'
+                className='rounded px-1 py-0.5 text-neutral-700 outline-none hover:cursor-pointer hover:bg-neutral-100 focus-visible:bg-neutral-100'
               >
                 Go back
               </SignIn.Action>
@@ -141,7 +141,7 @@ export default function SignInPage() {
           </SignIn.Step>
           <SignIn.Step
             name='forgot-password'
-            className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
+            className='w-full space-y-6 rounded-2xl bg-white px-4 py-10 sm:w-96 sm:px-8'
           >
             <header className='text-center'>
               <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Forgot password?</h1>
@@ -171,12 +171,12 @@ export default function SignInPage() {
           </SignIn.Step>
           <SignIn.Step
             name='verifications'
-            className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
+            className='w-full space-y-6 rounded-2xl bg-white px-4 py-10 sm:w-96 sm:px-8'
           >
             <SignIn.Strategy name='password'>
               <header className='text-center'>
                 <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Enter your password</h1>
-                <p className='text-sm mt-2 text-neutral-500'>
+                <p className='mt-2 text-sm text-neutral-500'>
                   Welcome back <SignIn.Salutation />
                 </p>
               </header>
@@ -301,7 +301,7 @@ export default function SignInPage() {
             <div className='text-center text-sm'>
               <SignIn.Action
                 navigate='choose-strategy'
-                className='hover:cursor-pointer rounded px-1 py-0.5 text-neutral-700 outline-none hover:bg-neutral-100 focus-visible:bg-neutral-100'
+                className='rounded px-1 py-0.5 text-neutral-700 outline-none hover:cursor-pointer hover:bg-neutral-100 focus-visible:bg-neutral-100'
               >
                 Use another method
               </SignIn.Action>
@@ -309,7 +309,7 @@ export default function SignInPage() {
           </SignIn.Step>
           <SignIn.Step
             name='reset-password'
-            className='w-full space-y-6 rounded-2xl px-4 py-10 sm:w-96 sm:px-8 bg-white'
+            className='w-full space-y-6 rounded-2xl bg-white px-4 py-10 sm:w-96 sm:px-8'
           >
             <header className='text-center'>
               <h1 className='text-xl font-medium tracking-tight text-neutral-950'>Reset your password</h1>
