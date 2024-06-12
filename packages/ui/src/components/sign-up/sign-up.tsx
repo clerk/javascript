@@ -2,8 +2,8 @@ import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
+import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { EmailField } from '~/common/EmailField';
-import { EmailOrPhoneNumberField } from '~/common/EmailOrPhoneNumberField';
 import { FirstNameField } from '~/common/FirstNameField';
 import { LastNameField } from '~/common/LastNameField';
 import { OTPField } from '~/common/OTPField';
