@@ -2,4 +2,4 @@
 "@clerk/clerk-js": patch
 ---
 
-feat: add title attribute to organization preview so truncated org names are able to be previewed without requiring a user to switch to a different org
+Add the `title` attribute to `<OrganizationPreview>` component so that truncated organization names can be previewed e.g. through hovering
