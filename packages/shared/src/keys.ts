@@ -110,10 +110,14 @@ export function isProductionFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('live_') || apiKey.startsWith('sk_live_');
 }
 
-export const getCookieSuffix = (publishableKey: string): string => {
-  return publishableKey.split('_').pop() || '';
-};
+export async function getCookieSuffix(publishableKey: string): Promise<string> {
+  const data = new TextEncoder().encode(publishableKey);
+  const digest = await globalThis.crypto.subtle.digest('sha-1', data);
+  const stringDigest = String.fromCharCode(...new Uint8Array(digest));
+  // Base 64 Encoding with URL and Filename Safe Alphabet: https://datatracker.ietf.org/doc/html/rfc4648#section-5
+  return isomorphicBtoa(stringDigest).replace(/\+/gi, '-').replace(/\//gi, '_').substring(0, 8);
+}
 
-export const getSuffixedCookieName = (cookieName: string, publishableKey: string): string => {
-  return `${cookieName}_${getCookieSuffix(publishableKey)}`;
+export const getSuffixedCookieName = (cookieName: string, cookieSuffix: string): string => {
+  return `${cookieName}_${cookieSuffix}`;
 };

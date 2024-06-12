@@ -17,9 +17,9 @@ export type DevBrowserCookieHandler = {
  * The cookie is used to authenticate FAPI requests and pass
  * authentication from AP to the app.
  */
-export const createDevBrowserCookie = (publishableKey: string): DevBrowserCookieHandler => {
+export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHandler => {
   const devBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
-  const suffixedDevBrowserCookie = createCookieHandler(getSuffixedCookieName(DEV_BROWSER_JWT_KEY, publishableKey));
+  const suffixedDevBrowserCookie = createCookieHandler(getSuffixedCookieName(DEV_BROWSER_JWT_KEY, cookieSuffix));
 
   const get = () => suffixedDevBrowserCookie.get() || devBrowserCookie.get();
 
