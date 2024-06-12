@@ -6,6 +6,14 @@ import { removeOptionalCatchAllSegment } from './utils';
 
 // Adapted from packages/nextjs/src/client-boundary/hooks/usePathnameWithoutCatchAll.tsx
 
+/**
+ * This hook grabs the current pathname (both in pages and app router) and removes any (optional) catch all segments.
+ * @example
+ * 1. /user/[id]/profile/[[...rest]]/page.tsx
+ * 2. /user/123/profile/security
+ * 3. /user/123/profile
+ * @returns The pathname without any catch all segments
+ */
 export const usePathnameWithoutCatchAll = () => {
   const pathRef = React.useRef<string>();
 

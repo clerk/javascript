@@ -82,8 +82,9 @@ export type SignUpRootProps = SignUpFlowProviderProps & {
  * Root component for the sign-up flow. It sets up providers and state management for its children.
  * Must wrap all sign-up related components.
  *
- * @param {string} path - The root path the sign-up flow is mounted at. Default: `/sign-up`
+ * @param {string} path - The root path the sign-up flow is mounted at. Will be automatically inferred in Next.js. You can set it to `/sign-up` for example.
  * @param {React.ReactNode} fallback - Fallback markup to render while Clerk is loading. Default: `null`
+ * @param {boolean} routing - If you want to render Clerk Elements in e.g. a modal, use the `virtual` routing mode.
  *
  * @example
  * import * as SignUp from "@clerk/elements/sign-up"
