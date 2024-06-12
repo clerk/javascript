@@ -75,7 +75,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@xstate/react": "^4.1.1",
     "client-only": "^0.0.1",
-    "xstate": "^5.13.2"
+    "xstate": "^5.13.0"
   },
   "devDependencies": {
     "@clerk/clerk-react": "5.2.4",
