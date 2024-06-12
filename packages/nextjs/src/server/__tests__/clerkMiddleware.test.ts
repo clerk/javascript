@@ -47,6 +47,7 @@ jest.mock('../constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
+    ENCRYPTION_KEY: 'encryption-key',
   };
 });
 
@@ -303,7 +304,24 @@ describe('clerkMiddleware(params)', () => {
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
-    it.todo('redirects to sign-in url when propagated as an option');
+    it('redirects to sign-in url when propagated as an option', async () => {
+      const req = mockRequest({
+        url: '/protected',
+      });
+
+      const resp = await clerkMiddleware(
+        auth => {
+          auth().redirectToSignIn();
+        },
+        {
+          signInUrl: '/foo',
+        },
+      )(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('location')).toContain('foo');
+      expect(clerkClient.authenticateRequest).toBeCalled();
+    });
   });
 
   describe('auth().protect()', () => {
