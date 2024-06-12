@@ -3,6 +3,7 @@ import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '
 import { AuthStatus } from '@clerk/backend/internal';
 
 import type { LoaderFunctionArgs } from './types';
+import { patchRequest } from './utils';
 
 export async function authenticateRequest(
   args: LoaderFunctionArgs,
@@ -14,11 +15,6 @@ export async function authenticateRequest(
   const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey } = opts;
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
-  // RequestInit#duplex option is required when sending a body.
-  if (request?.body) {
-    (request as unknown as { duplex: 'half' }).duplex = 'half';
-  }
-
   const requestState = await createClerkClient({
     apiUrl,
     secretKey,
@@ -28,7 +24,7 @@ export async function authenticateRequest(
     domain,
     publishableKey,
     userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
-  }).authenticateRequest(request, {
+  }).authenticateRequest(patchRequest(request), {
     audience,
     authorizedParties,
     signInUrl,
