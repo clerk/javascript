@@ -2,13 +2,13 @@ import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
-import { EmailField } from '~/common/EmailField';
-import { FirstNameField } from '~/common/FirstNameField';
-import { LastNameField } from '~/common/LastNameField';
-import { OTPField } from '~/common/OTPField';
-import { PasswordField } from '~/common/PasswordField';
-import { PhoneNumberField } from '~/common/PhoneNumberField';
-import { UsernameField } from '~/common/UsernameField';
+import { EmailField } from '~/common/email-field';
+import { FirstNameField } from '~/common/first-name-field';
+import { LastNameField } from '~/common/last-name-field';
+import { OTPField } from '~/common/otp-field';
+import { PasswordField } from '~/common/password-field';
+import { PhoneNumberField } from '~/common/phone-number-field';
+import { UsernameField } from '~/common/username-field';
 import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
@@ -73,7 +73,7 @@ export function SignUpComponent() {
 
                       <Seperator>or</Seperator>
 
-                      <div className='space-y-4'>
+                      <div className='flex flex-col gap-4'>
                         <FieldEnabled pick={['first_name', 'last_name']}>
                           <div className='flex gap-4'>
                             <FirstNameField disabled={isGlobalLoading} />
@@ -147,7 +147,7 @@ export function SignUpComponent() {
                               Didn&apos;t recieve a code?{' '}
                               <button
                                 type='button'
-                                className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                                className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
                               >
                                 Resend
                               </button>
@@ -191,7 +191,7 @@ export function SignUpComponent() {
                               Didn&apos;t recieve a code?{' '}
                               <button
                                 type='button'
-                                className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                                className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
                               >
                                 Resend
                               </button>
@@ -231,7 +231,7 @@ export function SignUpComponent() {
                           // eslint-disable-next-line react/no-unstable-nested-components
                           fallback={({ resendableAfter }) => {
                             return (
-                              <p className='flex items-center justify-center w-full bg-transparent text-gray-a11 font-medium rounded-md bg-clip-padding border border-transparent py-1.5 px-2.5 outline-none focus-visible:ring-[0.1875rem] focus-visible:ring-gray-a3 focus-visible:border-gray-a8 text-base'>
+                              <p className='text-gray-a11 focus-visible:ring-gray-a3 focus-visible:border-gray-a8 flex w-full items-center justify-center rounded-md border border-transparent bg-transparent bg-clip-padding px-2.5 py-1.5 text-base font-medium outline-none focus-visible:ring-[0.1875rem]'>
                                 Didn&apos;t recieve a link? Resend (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
                               </p>

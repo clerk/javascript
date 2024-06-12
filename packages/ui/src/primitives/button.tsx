@@ -24,8 +24,8 @@ export const Button = React.forwardRef(function Button(
         busy
           ? 'cursor-wait'
           : disabled
-          ? 'disabled:opacity-50 disabled:cursor-not-allowed'
-          : 'hover:bg-accent-10 hover:after:opacity-0',
+            ? 'disabled:cursor-not-allowed disabled:opacity-50'
+            : 'hover:bg-accent-10 hover:after:opacity-0',
         className,
       )}
       disabled={busy || disabled}
@@ -35,7 +35,7 @@ export const Button = React.forwardRef(function Button(
       ) : (
         <>
           {children}
-          {icon && <span className='text-[0.625rem] opacity-60 shrink-0 ms-2'>{icon}</span>}
+          {icon && <span className='ms-2 shrink-0 text-[0.625rem] opacity-60'>{icon}</span>}
         </>
       )}
     </button>

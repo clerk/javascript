@@ -12,7 +12,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
       ref={forwardedRef}
       {...props}
       className={cn(
-        'bg-gray-2 rounded-xl w-96 relative overflow-hidden border border-gray-a6 shadow-xl shadow-gray-a5 bg-clip-padding',
+        'bg-gray-2 border-gray-a6 shadow-gray-a5 relative w-96 overflow-hidden rounded-xl border bg-clip-padding shadow-xl',
         className,
       )}
     >
@@ -30,7 +30,7 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       ref={forwardedRef}
       {...props}
       className={cn(
-        'bg-gray-surface -mx-px -mt-px shadow-sm shadow-gray-a3 py-8 px-10 space-y-8 relative rounded-[inherit] border border-gray-a6',
+        'bg-gray-surface shadow-gray-a3 border-gray-a6 relative -mx-px -mt-px flex flex-col gap-8 rounded-[inherit] border px-10 py-8 shadow-sm',
         className,
       )}
     >
@@ -47,7 +47,7 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('text-center space-y-space-1', className)}
+      className={cn('flex flex-col gap-1 text-center', className)}
     >
       {children}
     </div>
@@ -62,7 +62,7 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
     <h2
       ref={forwardedRef}
       {...props}
-      className={cn('text-lg leading-medium font-bold text-gray-12', className)}
+      className={cn('leading-medium text-gray-12 text-lg font-bold', className)}
     >
       {children}
     </h2>
@@ -75,7 +75,7 @@ export const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttrib
       <p
         ref={forwardedRef}
         {...props}
-        className={cn('text-base text-gray-a11', className)}
+        className={cn('text-gray-a11 text-base', className)}
       >
         {children}
       </p>
@@ -91,7 +91,7 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('rounded-lg space-y-6', className)}
+      className={cn('flex flex-col gap-6 rounded-lg', className)}
     >
       {children}
     </div>
@@ -109,8 +109,8 @@ export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
       className={cn('grid', className)}
     >
       {children}
-      <div className='py-4 px-6 grid place-content-center'>
-        <p className='text-sm inline-flex items-center gap-x-1 text-gray-a11'>
+      <div className='grid place-content-center px-6 py-4'>
+        <p className='text-gray-a11 inline-flex items-center gap-x-1 text-sm'>
           Secured by{' '}
           <a
             aria-label='Clerk logo'
@@ -132,7 +132,7 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
       <div
         ref={forwardedRef}
         {...props}
-        className={cn('px-6 py-4 border-b border-gray-a6 ', className)}
+        className={cn('border-gray-a6 border-b px-6 py-4', className)}
       >
         {children}
       </div>
@@ -146,7 +146,7 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
       <p
         ref={forwardedRef}
         {...props}
-        className={cn('text-gray-a11 text-base text-center', className)}
+        className={cn('text-gray-a11 text-center text-base', className)}
       >
         {children}
       </p>

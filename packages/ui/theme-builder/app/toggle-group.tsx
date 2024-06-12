@@ -17,14 +17,14 @@ export function ToggleGroup({
           onValueChange?.(v);
         }
       }}
-      className='grid grid-cols-2 border rounded'
+      className='grid grid-cols-2 rounded border'
     >
       {items.map(item => {
         return (
           <RadixToggleGroup.Item
             key={item.value}
             value={item.value}
-            className='font-medium text-xs data-[state="on"]:bg-neutral-100 p-1.5'
+            className='p-1.5 text-xs font-medium data-[state="on"]:bg-neutral-100'
           >
             {item.label}
           </RadixToggleGroup.Item>

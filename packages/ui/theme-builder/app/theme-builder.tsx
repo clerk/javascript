@@ -75,7 +75,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
         }}
       />
       <div className='flex h-dvh flex-col overflow-hidden'>
-        <header className='flex shrink-0 h-16 justify-end border-b items-center px-4'>
+        <header className='flex h-16 shrink-0 items-center justify-end border-b px-4'>
           <div className='inline-flex items-center gap-x-2 text-xs'>
             <label htmlFor='component'>Component</label>
             <div className='relative'>
@@ -84,7 +84,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 id='component'
                 defaultValue={pathname}
                 onChange={e => router.push(e.target.value)}
-                className='relative bg-neutral-100 border rounded py-1 text-xs pl-1.5 pr-5 appearance-none after:absolute after:right-1.5 after:size-2 after:bg-red-200 after:top-1'
+                className='relative appearance-none rounded border bg-neutral-100 py-1 pl-1.5 pr-5 text-xs after:absolute after:right-1.5 after:top-1 after:size-2 after:bg-red-200'
               >
                 <option
                   value='/'
@@ -101,7 +101,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 viewBox='0 0 24 24'
                 strokeWidth='1.5'
                 stroke='currentColor'
-                className='size-2.5 absolute top-1/2 right-1.5 -translate-y-1/2 pointer-events-none user-select-none'
+                className='user-select-none pointer-events-none absolute right-1.5 top-1/2 size-2.5 -translate-y-1/2'
                 aria-hidden
               >
                 <path
@@ -114,7 +114,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <div className='flex flex-1'>
-          <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-e bg-white'>
+          <aside className='relative isolate flex h-full w-[17rem] shrink-0 flex-col border-e bg-white p-4'>
             <div className='space-y-4'>
               <ToggleGroup
                 items={[
@@ -198,7 +198,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                   id='radius'
                   value={radius}
                   onChange={e => setRadius(e.target.value)}
-                  className='w-full text-xs rounded border p-2'
+                  className='w-full rounded border p-2 text-xs'
                 />
               </div>
               <div>
@@ -212,7 +212,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                   id='spacing-unit'
                   value={spacingUnit}
                   onChange={e => setSpacingUnit(e.target.value)}
-                  className='w-full text-xs rounded border p-2'
+                  className='w-full rounded border p-2 text-xs'
                 />
               </div>
               <div>
@@ -226,7 +226,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                   id='font-size'
                   value={fontSize}
                   onChange={e => setFontSize(e.target.value)}
-                  className='w-full text-xs rounded border p-2'
+                  className='w-full rounded border p-2 text-xs'
                 />
               </div>
             </div>
@@ -253,9 +253,9 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             </div>
           </aside>
           <figure
-            className={cn('relative isolate w-full flex-1 overflow-y-auto grid place-content-center', {
+            className={cn('relative isolate grid w-full flex-1 place-content-center overflow-y-auto', {
               'bg-neutral-50': appearance === 'light',
-              'bg-neutral-950 dark': appearance === 'dark',
+              'dark bg-neutral-950': appearance === 'dark',
             })}
           >
             <div

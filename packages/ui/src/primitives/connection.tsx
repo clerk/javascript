@@ -62,7 +62,7 @@ export const Root = React.forwardRef<
         ref={forwardedRef}
         {...props}
         className={cn(
-          'flex items-center justify-center flex-wrap [--cl-connection-gap:theme(spacing.2)] -m-[calc(var(--cl-connection-gap)/2)]',
+          '-m-[calc(var(--cl-connection-gap)/2)] flex flex-wrap items-center justify-center [--cl-connection-gap:theme(spacing.2)]',
           className,
         )}
         style={{ '--cl-connection-cols': cols } as React.CSSProperties}
@@ -99,7 +99,7 @@ export const Button = React.forwardRef(function Button(
         ref={forwardedRef}
         {...props}
         className={cn(
-          'min-w-0 w-full flex items-center justify-center gap-2 bg-transparent text-gray-12 font-medium rounded-md bg-clip-padding border border-gray-a6 shadow-sm shadow-gray-a3 py-1.5 px-2.5 outline-none focus-visible:ring-[0.1875rem] focus-visible:ring-gray-a3 focus-visible:border-gray-a8 text-base min-h-8',
+          'text-gray-12 border-gray-a6 shadow-gray-a3 focus-visible:ring-gray-a3 focus-visible:border-gray-a8 flex min-h-8 w-full min-w-0 items-center justify-center gap-2 rounded-md border bg-transparent bg-clip-padding px-2.5 py-1.5 text-base font-medium shadow-sm outline-none focus-visible:ring-[0.1875rem]',
           busy ? 'cursor-wait' : disabled ? 'disabled:cursor-not-allowed disabled:opacity-50' : 'hover:bg-gray-a2',
           className,
         )}
