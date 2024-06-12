@@ -110,7 +110,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   <Button
                     onPress={() => setOpen(true)}
                     isDisabled={props.disabled}
-                    className='hover:bg-gray-2 focus-visible:bg-gray-2 flex items-center gap-x-2 rounded-l-md px-2 py-1 text-base outline-none'
+                    className='hover:enabled:bg-gray-2 focus-visible:bg-gray-2 flex items-center gap-x-2 rounded-l-md px-2 py-1 text-base outline-none'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
                     <Icon.ChevronUpDown className='text-gray-11 size-4' />
