@@ -36,7 +36,7 @@ export const createGetAuth = ({
       }
 
       const requestData = getHeader(req, constants.Headers.ClerkRequestData);
-      const decryptedRequestData = requestData ? decryptClerkRequestData(requestData) : {};
+      const decryptedRequestData = decryptClerkRequestData(requestData);
 
       const options = {
         authStatus,
