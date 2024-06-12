@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "MIT",
   "author": {
@@ -30,7 +30,7 @@
     "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\""
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.2.2",
+    "@clerk/clerk-react": "^5.2.4",
     "@clerk/elements": "file:../elements",
     "@clerk/types": "^4.5.1",
     "@radix-ui/react-slot": "^1.0.2",
