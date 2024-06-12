@@ -85,8 +85,7 @@ export function PhoneNumberField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {label}{' '}
-            {alternativeFieldTrigger && <span className='flex-grow self-end text-end'>{alternativeFieldTrigger}</span>}
+            {label} {alternativeFieldTrigger && <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>

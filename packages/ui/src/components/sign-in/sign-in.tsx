@@ -2,10 +2,15 @@ import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
+import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
+import { EmailOrUsernameField } from '~/common/email-or-username-field';
+import { EmailOrUsernameOrPhoneNumberField } from '~/common/email-or-username-or-phone-number-field';
 import { EmailField } from '~/common/EmailField';
 import { OTPField } from '~/common/OTPField';
 import { PasswordField } from '~/common/PasswordField';
+import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { PhoneNumberField } from '~/common/PhoneNumberField';
+import { UsernameField } from '~/common/username-field';
 import { PROVIDERS } from '~/constants';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
@@ -14,10 +19,14 @@ import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 
+import { FieldEnabled } from '../field-enabled';
+
 export function SignInComponent() {
   const clerk = useClerk();
   // @ts-ignore clerk is not null
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(clerk?.__unstable__environment);
+  // @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249
+  const locationBasedCountryIso = clerk?.__internal_country;
 
   return (
     <SignIn.Root>
@@ -64,9 +73,34 @@ export function SignInComponent() {
                     </Connection.Root>
                     <Seperator>or</Seperator>
                     <div className='space-y-4'>
-                      {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
-                      <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
-                      <EmailField disabled={isGlobalLoading} />
+                      <FieldEnabled pick={['email_address', '!phone_number', '!username']}>
+                        <EmailField disabled={isGlobalLoading} />
+                      </FieldEnabled>
+
+                      <FieldEnabled pick={['username', '!email_address', '!phone_number']}>
+                        <UsernameField disabled={isGlobalLoading} />
+                      </FieldEnabled>
+
+                      <FieldEnabled pick={['phone_number', '!email_address', '!username']}>
+                        <PhoneNumberField locationBasedCountryIso={locationBasedCountryIso} />
+                      </FieldEnabled>
+
+                      <FieldEnabled pick={['email_address', 'username', '!phone_number']}>
+                        <EmailOrUsernameField />
+                      </FieldEnabled>
+
+                      <FieldEnabled pick={['email_address', 'phone_number', '!username']}>
+                        <EmailOrPhoneNumberField locationBasedCountryIso={locationBasedCountryIso} />
+                      </FieldEnabled>
+
+                      <FieldEnabled pick={['username', 'phone_number', '!email_address']}>
+                        <PhoneNumberOrUsernameField locationBasedCountryIso={locationBasedCountryIso} />
+                      </FieldEnabled>
+
+                      <FieldEnabled pick={['email_address', 'username', 'phone_number']}>
+                        <EmailOrUsernameOrPhoneNumberField locationBasedCountryIso={locationBasedCountryIso} />
+                      </FieldEnabled>
+
                       <PasswordField disabled={isGlobalLoading} />
                       <OTPField
                         disabled={isGlobalLoading}

@@ -1,6 +1,9 @@
 import { useClerk } from '@clerk/clerk-react';
 import type { Attribute, EnvironmentResource } from '@clerk/types';
 
+type NegatedAttribute = `!${Attribute}`;
+type PickOption = Attribute | NegatedAttribute;
+
 export function FieldEnabled({
   pick,
   children,
@@ -8,7 +11,7 @@ export function FieldEnabled({
   /**
    * The name or list of the attributes to check if it is enabled.
    */
-  pick: Attribute | Attribute[];
+  pick: PickOption | PickOption[];
   /**
    * The children to render if the attribute is enabled.
    */
@@ -22,9 +25,13 @@ export function FieldEnabled({
   }
 
   const names = !Array.isArray(pick) ? [pick] : pick;
-  const isEnabled = names.every(name => attrs[name].enabled);
+  const namesToCheck = names.filter(name => !name.startsWith('!')) as Attribute[];
+  const namesToNegate = names.filter(name => name.startsWith('!')).map(name => name.replace('!', '')) as Attribute[];
 
-  if (!isEnabled) {
+  const isEnabled = namesToCheck.every(name => attrs[name].enabled);
+  const isDisabled = namesToNegate.some(name => attrs[name].enabled);
+
+  if (!isEnabled || isDisabled) {
     return null;
   }
 

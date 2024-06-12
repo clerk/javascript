@@ -3,9 +3,9 @@ import React from 'react';
 
 import * as Field from '../primitives/field';
 
-export function EmailField({
+export function EmailOrUsernameField({
   className,
-  label = 'Email address',
+  label = 'Email address or username',
   alternativeFieldTrigger,
   ...props
 }: { label?: React.ReactNode; alternativeFieldTrigger?: React.ReactNode } & Omit<
@@ -14,20 +14,21 @@ export function EmailField({
 >) {
   return (
     <Common.Field
-      name='emailAddress'
+      name='identifier'
       asChild
     >
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {label} {alternativeFieldTrigger && <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>}
+            {label}{' '}
+            {alternativeFieldTrigger && <span className='flex-grow self-end text-end'>{alternativeFieldTrigger}</span>}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>
           {({ state }) => {
             return (
               <Common.Input
-                type='email'
+                type='text'
                 className={className}
                 {...props}
                 asChild
@@ -37,7 +38,7 @@ export function EmailField({
             );
           }}
         </Common.FieldState>
-        <Common.FieldError>
+        <Common.FieldError asChild>
           {({ message }) => {
             return <Field.Message intent='error'>{message}</Field.Message>;
           }}

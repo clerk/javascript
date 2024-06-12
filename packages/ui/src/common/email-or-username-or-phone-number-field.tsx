@@ -2,18 +2,18 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
-import { EmailField } from './EmailField';
+import { EmailOrUsernameField } from './email-or-username-field';
 import { PhoneNumberField } from './PhoneNumberField';
 
-export function EmailOrPhoneNumberField({
+export function EmailOrUsernameOrPhoneNumberField({
   className,
-  labelEmail = 'Email address',
+  labelEmailOrUsername = 'Email address or username',
   labelPhoneNumber = 'Phone number',
   locationBasedCountryIso,
-  toggleDescription = 'Toggle between email and phone.',
+  toggleDescription = 'Toggle between email or username, and phone.',
   ...props
 }: {
-  labelEmail?: React.ReactNode;
+  labelEmailOrUsername?: React.ReactNode;
   labelPhoneNumber?: React.ReactNode;
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
   toggleDescription?: string;
@@ -27,7 +27,7 @@ export function EmailOrPhoneNumberField({
       onChange={setShowPhoneNumberField}
     >
       <span className='sr-only'>{toggleDescription}</span>
-      {showPhoneNumberField ? 'Use email' : 'Use phone'}
+      {showPhoneNumberField ? 'Use email or username' : 'Use phone'}
     </ToggleButton>
   );
 
@@ -39,9 +39,9 @@ export function EmailOrPhoneNumberField({
       {...props}
     />
   ) : (
-    <EmailField
+    <EmailOrUsernameField
       {...props}
-      label={labelEmail}
+      label={labelEmailOrUsername}
       alternativeFieldTrigger={toggle}
     />
   );

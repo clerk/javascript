@@ -75,6 +75,7 @@ export function SignUpComponent() {
                       </div>
                       <EmailField disabled={isGlobalLoading} />
                       <PasswordField disabled={isGlobalLoading} />
+
                       <EmailOrPhoneNumberField
                         disabled={isGlobalLoading}
                         // @ts-ignore: expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249
