@@ -9,7 +9,7 @@ import { RedirectUrls } from '../../utils/redirectUrls';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import { useEnvironment, useOptions } from '../contexts';
 import type { NavbarRoute } from '../elements';
-import type { ParsedQs } from '../router';
+import type { ParsedQueryString } from '../router';
 import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
@@ -44,7 +44,7 @@ const getInitialValuesFromQueryParams = (queryString: string, params: string[]) 
 
 export type SignUpContextType = SignUpCtx & {
   navigateAfterSignUp: () => any;
-  queryParams: ParsedQs;
+  queryParams: ParsedQueryString;
   signInUrl: string;
   signUpUrl: string;
   secondFactorUrl: string;
@@ -115,7 +115,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
 export type SignInContextType = SignInCtx & {
   navigateAfterSignIn: () => any;
-  queryParams: ParsedQs;
+  queryParams: ParsedQueryString;
   signUpUrl: string;
   signInUrl: string;
   signUpContinueUrl: string;
@@ -203,7 +203,7 @@ type PagesType = {
 };
 
 export type UserProfileContextType = UserProfileCtx & {
-  queryParams: ParsedQs;
+  queryParams: ParsedQueryString;
   authQueryString: string | null;
   pages: PagesType;
 };

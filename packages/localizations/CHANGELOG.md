@@ -1,5 +1,20 @@
 # Change Log
 
+## 2.4.4
+
+### Patch Changes
+
+- Update profile primary button text and nav text in fr-FR & zh-CN ([#3494](https://github.com/clerk/javascript/pull/3494)) by [@youshengCode](https://github.com/youshengCode)
+
+- Set `@clerk/types` as a dependency for packages that had it as a dev dependency. ([#3450](https://github.com/clerk/javascript/pull/3450)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updates on ko-KR localization ([#3454](https://github.com/clerk/javascript/pull/3454)) by [@jourmooney](https://github.com/jourmooney)
+
+- Add passkeys localizations for the `es-MX` locale ([#3453](https://github.com/clerk/javascript/pull/3453)) by [@HugoCL](https://github.com/HugoCL)
+
+- Updated dependencies [[`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/types@4.6.0
+
 ## 2.4.3
 
 ### Patch Changes

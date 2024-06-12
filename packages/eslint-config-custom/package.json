@@ -1,6 +1,6 @@
 {
   "name": "@clerk/eslint-config-custom",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Internal ESLint configuration for Clerk",
   "homepage": "https://clerk.com/",
   "bugs": {

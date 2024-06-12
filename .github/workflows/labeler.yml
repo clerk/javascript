@@ -11,6 +11,11 @@ jobs:
       pull-requests: write
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          show-progress: false
       - uses: actions/labeler@v4
         with:
           repo-token: ${{ secrets.CLERK_COOKIE_PAT }}

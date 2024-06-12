@@ -1,5 +1,22 @@
 # Change Log
 
+## 2.3.0
+
+### Minor Changes
+
+- Move `isWebAuthnSupported`, `isWebAuthnAutofillSupported`, `isWebAuthnPlatformAuthenticatorSupported` to `@clerk/shared/webauthn`. ([#3472](https://github.com/clerk/javascript/pull/3472)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.2.2
+
+### Patch Changes
+
+- Update `js-cookie` from `3.0.1` to `3.0.5`. Update `swr` from `2.2.0` to `2.2.5`. ([#3493](https://github.com/clerk/javascript/pull/3493)) by [@renovate](https://github.com/apps/renovate)
+
+- Set `@clerk/types` as a dependency for packages that had it as a dev dependency. ([#3450](https://github.com/clerk/javascript/pull/3450)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/types@4.6.0
+
 ## 2.2.1
 
 ### Patch Changes

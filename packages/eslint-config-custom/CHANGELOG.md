@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.0.2
+
+### Patch Changes
+
+- The following are all internal changes and not relevant to any end-user: ([#3523](https://github.com/clerk/javascript/pull/3523)) by [@tmilewski](https://github.com/tmilewski)
+
+  Remove explicit extension of Prettier from ESLint React
+
 ## 0.0.1
 
 ### Patch Changes

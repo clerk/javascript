@@ -8,14 +8,18 @@ export const useFocus = (inputRef: React.RefObject<HTMLInputElement>) => {
 
   React.useEffect(() => {
     const input = inputRef.current;
-    if (!input) return;
+    if (!input) {
+      return;
+    }
 
     const onFocus = () => setIsFocused(true);
     const onBlur = () => setIsFocused(false);
     input.addEventListener('focus', onFocus);
     input.addEventListener('blur', onBlur);
 
-    if (isFocusedRef.current === undefined) setIsFocused(document.activeElement === input);
+    if (isFocusedRef.current === undefined) {
+      setIsFocused(document.activeElement === input);
+    }
 
     return () => {
       input.removeEventListener('focus', onFocus);

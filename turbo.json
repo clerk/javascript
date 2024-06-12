@@ -23,7 +23,13 @@
     "VERCEL",
     "VITE_CLERK_*",
     "EXPO_PUBLIC_CLERK_*",
-    "REACT_APP_CLERK_*"
+    "REACT_APP_CLERK_*",
+    "CI_REPO_OWNER",
+    "CI_REPO_NAME",
+    "CI_COMMIT_SHA",
+    "CI_BRANCH",
+    "CI_BRANCH_BASE",
+    "BUNDLEWATCH_GITHUB_TOKEN"
   ],
   "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
   "pipeline": {

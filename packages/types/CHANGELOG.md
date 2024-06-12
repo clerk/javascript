@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.6.0
+
+### Minor Changes
+
+- Add descriptor for formatted dates in tables. Those elements can be identified by the `cl-formattedDate__tableCell` css class. ([#3465](https://github.com/clerk/javascript/pull/3465)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add support for Enstall OAuth provider ([#3466](https://github.com/clerk/javascript/pull/3466)) by [@Nikpolik](https://github.com/Nikpolik)
+
 ## 4.5.1
 
 ### Patch Changes

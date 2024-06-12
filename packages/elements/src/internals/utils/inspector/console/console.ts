@@ -17,8 +17,12 @@ export function createConsoleInspector({
   enabled,
   debugServer,
 }: ConsoleInspectorOptions): Observer<InspectionEvent> | undefined {
-  if (consoleInspector) return consoleInspector;
-  if (!enabled || (!debugServer && typeof window === 'undefined')) return undefined;
+  if (consoleInspector) {
+    return consoleInspector;
+  }
+  if (!enabled || (!debugServer && typeof window === 'undefined')) {
+    return undefined;
+  }
 
   const parseRefId = (ref: AnyActorRef | undefined, includeSystemId?: false): string | undefined => {
     if (!ref) {

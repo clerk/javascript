@@ -1,4 +1,15 @@
-export const PROVIDERS = [
+import type { OAuthProvider, Web3Provider } from '@clerk/types';
+
+import type * as Icon from './primitives/icon';
+
+type IconName = keyof typeof Icon;
+type Provider = {
+  id: OAuthProvider | Web3Provider;
+  name: string;
+  icon: IconName;
+};
+
+export const PROVIDERS: Provider[] = [
   { id: 'apple', name: 'Apple', icon: 'Apple' },
   { id: 'atlassian', name: 'Atlassian', icon: 'Atlassian' },
   { id: 'bitbucket', name: 'Bitbucket', icon: 'Bitbucket' },
@@ -14,7 +25,8 @@ export const PROVIDERS = [
   { id: 'instagram', name: 'Instagram', icon: 'Instagram' },
   { id: 'line', name: 'Line', icon: 'Line' },
   { id: 'linear', name: 'Linear', icon: 'Linear' },
-  { id: 'linkedin', name: 'LinkedIn', icon: 'LinkedInOIDC' },
+  { id: 'linkedin', name: 'LinkedIn', icon: 'LinkedIn' },
+  { id: 'linkedin_oidc', name: 'LinkedIn', icon: 'LinkedIn' },
   { id: 'metamask', name: 'MetaMask', icon: 'MetaMask' },
   { id: 'microsoft', name: 'Microsoft', icon: 'Microsoft' },
   { id: 'notion', name: 'Notion', icon: 'Notion' },
@@ -22,5 +34,9 @@ export const PROVIDERS = [
   { id: 'tiktok', name: 'TikTok', icon: 'TikTok' },
   { id: 'twitch', name: 'Twitch', icon: 'Twitch' },
   { id: 'twitter', name: 'Twitter', icon: 'Twitter' },
+  { id: 'x', name: 'X / Twitter', icon: 'Twitter' },
   { id: 'xero', name: 'Xero', icon: 'Xero' },
+  //
+  { id: 'enstall', name: 'Enstall', icon: 'Apple' },
+  { id: 'spotify', name: 'Spotify', icon: 'Apple' },
 ] as const;

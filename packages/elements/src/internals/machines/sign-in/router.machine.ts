@@ -1,7 +1,8 @@
 import { joinURL } from '@clerk/shared/url';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, not, or, raise, sendTo, setup } from 'xstate';
+import { and, assign, enqueueActions, fromPromise, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -48,23 +49,34 @@ export const SignInRouterMachine = setup({
     startMachine: SignInStartMachine,
     secondFactorMachine: SignInSecondFactorMachine,
     thirdPartyMachine: ThirdPartyMachine,
+    webAuthnAutofillSupport: fromPromise(() => isWebAuthnAutofillSupported()),
   },
   actions: {
     clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
-      if (!context.router) return;
-      if (!force && shouldUseVirtualRouting()) return;
-      if (context.exampleMode) return;
+      if (!context.router) {
+        return;
+      }
+      if (!force && shouldUseVirtualRouting()) {
+        return;
+      }
+      if (context.exampleMode) {
+        return;
+      }
 
       const resolvedPath = joinURL(context.router.basePath, path);
-      if (resolvedPath === context.router.pathname()) return;
+      if (resolvedPath === context.router.pathname()) {
+        return;
+      }
 
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
     raiseNext: raise({ type: 'NEXT' }),
     setActive: enqueueActions(({ enqueue, check, context, event }) => {
-      if (check('isExampleMode')) return;
+      if (check('isExampleMode')) {
+        return;
+      }
 
       const lastActiveSessionId = context.clerk.client.lastActiveSessionId;
       const createdSessionId = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn)
@@ -79,7 +91,9 @@ export const SignInRouterMachine = setup({
     }),
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
-        if (error) return error;
+        if (error) {
+          return error;
+        }
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
@@ -208,6 +222,13 @@ export const SignInRouterMachine = setup({
   },
   states: {
     Idle: {
+      invoke: {
+        id: 'webAuthnAutofill',
+        src: 'webAuthnAutofillSupport',
+        onDone: {
+          actions: assign({ webAuthnAutofillSupport: ({ event }) => event.output }),
+        },
+      },
       on: {
         INIT: {
           actions: assign(({ event }) => ({
@@ -306,6 +327,12 @@ export const SignInRouterMachine = setup({
         'RESET.STEP': {
           target: 'Start',
           reenter: true,
+        },
+        'AUTHENTICATE.PASSKEY': {
+          actions: sendTo('start', ({ event }) => event),
+        },
+        'AUTHENTICATE.PASSKEY.AUTOFILL': {
+          actions: sendTo('start', ({ event }) => event),
         },
         NEXT: [
           {

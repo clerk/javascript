@@ -1,5 +1,10 @@
+import { Slot } from '@radix-ui/react-slot';
 import cn from 'clsx';
 import * as React from 'react';
+
+import * as Icon from './icon';
+
+type FieldIntent = 'error' | 'idle' | 'info' | 'success' | 'warning';
 
 export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
   { children, className, ...props },
@@ -16,16 +21,23 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   );
 });
 
-export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTMLLabelElement>>(function Label(
-  { className, children, ...props },
-  forwardedRef,
+export const Label = React.forwardRef(function Label(
+  {
+    className,
+    children,
+    visuallyHidden,
+    ...props
+  }: React.HTMLAttributes<HTMLLabelElement> & { visuallyHidden?: boolean },
+  forwardedRef: React.ForwardedRef<HTMLLabelElement>,
 ) {
   return (
     <label
       ref={forwardedRef}
       {...props}
       className={cn(
-        'text-base font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
+        visuallyHidden
+          ? 'sr-only'
+          : 'text-base font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
         className,
       )}
     >
@@ -34,35 +46,92 @@ export const Label = React.forwardRef<HTMLLabelElement, React.HTMLAttributes<HTM
   );
 });
 
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(function Input(
-  { className, ...props },
-  forwardedRef,
+export const Input = React.forwardRef(function Input(
+  {
+    asChild,
+    className,
+    intent = 'idle',
+    state = 'native',
+    variant = 'default',
+    ...props
+  }: React.InputHTMLAttributes<HTMLInputElement> & {
+    asChild?: boolean;
+    intent?: FieldIntent;
+    state?: 'native' | 'hover' | 'focus-visible';
+    variant?: 'default' | 'otp-digit';
+  },
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
+  const Comp = asChild ? Slot : 'input';
+
   return (
-    <input
+    <Comp
       data-field-input=''
       ref={forwardedRef}
-      {...props}
       className={cn(
-        "block w-full bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border border-gray-a6 outline-none focus:ring-[0.1875rem] focus:ring-gray-a3 data-[invalid='true']:border-destructive data-[invalid='true']:focus:ring-destructive/30 focus:border-gray-a8 hover:border-gray-a8 disabled:opacity-50 disabled:cursor-not-allowed text-base",
+        'relative flex min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border outline-none text-base',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        // variant
+        {
+          default: 'w-full min-h-8 justify-start',
+          'otp-digit': 'size-10 aspect-square text-[calc(var(--cl-font-size)*1.4)] font-semibold justify-center',
+        }[variant],
+        // state
+        {
+          native:
+            'border-[--cl-field-input-border] hover:border-[--cl-field-input-border-active] focus-visible:border-[--cl-field-input-border-active] focus-visible:ring-[0.1875rem] focus-visible:ring-[--cl-field-input-ring]',
+          hover: 'border-[--cl-field-input-border-active]',
+          'focus-visible': 'border-[--cl-field-input-border-active] ring-[0.1875rem] ring-[--cl-field-input-ring]',
+        }[state],
+        // intent
+        {
+          idle: [
+            '[--cl-field-input-border:theme(colors.gray.a6)]',
+            '[--cl-field-input-border-active:theme(colors.gray.a8)]',
+            '[--cl-field-input-ring:theme(colors.gray.a3)]',
+          ],
+          info: [
+            '[--cl-field-input-border:theme(colors.gray.a8)]',
+            '[--cl-field-input-border-active:theme(colors.gray.a8)]',
+            '[--cl-field-input-ring:theme(colors.gray.a3)]',
+          ],
+          error: [
+            '[--cl-field-input-border:theme(colors.danger.DEFAULT)]',
+            '[--cl-field-input-border-active:theme(colors.danger.DEFAULT)]',
+            '[--cl-field-input-ring:theme(colors.danger.DEFAULT/0.2)]',
+          ],
+          success: [
+            '[--cl-field-input-border:theme(colors.success.DEFAULT)]',
+            '[--cl-field-input-border-active:theme(colors.success.DEFAULT)]',
+            '[--cl-field-input-ring:theme(colors.success.DEFAULT/0.25)]', // (optically adjusted ring to 25 opacity)
+          ],
+          warning: [
+            '[--cl-field-input-border:theme(colors.warning.DEFAULT)]',
+            '[--cl-field-input-border-active:theme(colors.warning.DEFAULT)]',
+            '[--cl-field-input-ring:theme(colors.warning.DEFAULT/0.2)]',
+          ],
+        }[intent],
+        // data-[invalid] overrides any currently-defined `intent`
+        [
+          'data-[invalid]:[--cl-field-input-border:theme(colors.danger.DEFAULT)]',
+          'data-[invalid]:[--cl-field-input-border-active:theme(colors.danger.DEFAULT)]',
+          'data-[invalid]:[--cl-field-input-ring:theme(colors.danger.DEFAULT/0.2)]',
+        ],
         className,
       )}
+      {...props}
     />
   );
 });
 
-type MessageIntent = 'error' | 'success' | 'neutral';
-
 export const Message = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement> & {
-    /**
-     * The intent of the message.
-     * @default 'neutral'
-     */
-    intent?: MessageIntent;
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    justify?: 'start' | 'center' | 'end';
+    children?: React.ReactNode;
+    intent?: FieldIntent;
   }
->(function Message({ className, children, intent = 'neutral', ...props }, forwardedRef) {
+>(function Message({ className, children, justify = 'start', intent = 'idle', ...props }, forwardedRef) {
   return (
     <p
       ref={forwardedRef}
@@ -70,57 +139,33 @@ export const Message = React.forwardRef<
       className={cn(
         'text-base flex gap-x-1',
         {
-          // TODO: Use the color tokens here
-          'text-[#ef4444]': intent === 'error',
-          'text-[#10b981]': intent === 'success',
-          'text-gray-11': intent === 'neutral',
-        },
+          start: 'justify-start',
+          center: 'justify-center',
+          end: 'justify-end',
+        }[justify],
+        {
+          idle: 'text-gray-11',
+          info: 'text-gray-11',
+          error: 'text-danger',
+          success: 'text-success',
+          warning: 'text-warning',
+        }[intent],
         className,
       )}
     >
-      {getMessageIcon(intent)}
+      {intent !== 'idle' && (
+        <span className='text-icon-sm mt-px'>
+          {
+            {
+              error: <Icon.ExclamationOctagonSm />,
+              info: <Icon.InformationLegacy />,
+              success: <Icon.CheckmarkCircleSm />,
+              warning: <Icon.ExclamationTriangleSm />,
+            }[intent]
+          }
+        </span>
+      )}
       {children}
     </p>
   );
 });
-
-function getMessageIcon(intent: MessageIntent) {
-  let path = null;
-
-  if (intent === 'success') {
-    path = (
-      <path
-        fill='currentColor'
-        fillRule='evenodd'
-        d='M8 16A8 8 0 1 0 8-.001 8 8 0 0 0 8 16Zm3.7-9.3a1 1 0 0 0-1.4-1.4L7 8.58l-1.3-1.3A1 1 0 0 0 4.3 8.7l2 2a1 1 0 0 0 1.4 0l4-4Z'
-        clipRule='evenodd'
-      />
-    );
-  }
-
-  if (intent === 'error') {
-    path = (
-      <path
-        fill='currentColor'
-        fillRule='evenodd'
-        d='M16 8A8 8 0 1 1-.001 8 8 8 0 0 1 16 8Zm-7 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM8 3a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1Z'
-        clipRule='evenodd'
-      />
-    );
-  }
-
-  if (path) {
-    return (
-      <svg
-        fill='none'
-        viewBox='0 0 16 16'
-        className='shrink-0 size-4'
-        aria-hidden
-      >
-        {path}
-      </svg>
-    );
-  }
-
-  return null;
-}

@@ -17,7 +17,9 @@ const useIsProviderEnabled = (provider: OAuthProvider | Web3Provider): boolean |
   const clerk = useClerk();
 
   // null indicates we don't know for sure
-  if (!clerk.loaded) return null;
+  if (!clerk.loaded) {
+    return null;
+  }
 
   const data = getEnabledThirdPartyProviders(clerk.__unstable__environment);
 
@@ -35,7 +37,9 @@ export const useThirdPartyProvider = <
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {
-      if (!isProviderEnabled) return;
+      if (!isProviderEnabled) {
+        return;
+      }
 
       event.preventDefault();
 
