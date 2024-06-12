@@ -248,7 +248,13 @@ export function encryptClerkRequestData(options: Partial<AuthenticateRequestOpti
 /**
  * Decrypt request data using signing key.
  */
-export function decryptClerkRequestData(encryptedRequestData: string): Partial<AuthenticateRequestOptions> {
+export function decryptClerkRequestData(
+  encryptedRequestData?: string | undefined | null,
+): Partial<AuthenticateRequestOptions> {
+  if (!encryptedRequestData) {
+    return {};
+  }
+
   try {
     const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY);
     const encoded = decryptedBytes.toString(encUtf8);
