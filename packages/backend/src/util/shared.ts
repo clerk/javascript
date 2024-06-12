@@ -5,6 +5,7 @@ export {
   isProductionFromSecretKey,
   parsePublishableKey,
   getCookieSuffix,
+  getSuffixedCookieName,
 } from '@clerk/shared/keys';
 export { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 

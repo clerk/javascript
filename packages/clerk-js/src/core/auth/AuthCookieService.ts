@@ -1,5 +1,6 @@
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
+import { getCookieSuffix } from '@clerk/shared/keys';
 import type { Clerk, EnvironmentResource } from '@clerk/types';
 
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
@@ -39,9 +40,15 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private devBrowser: DevBrowser;
 
-  constructor(
+  public static async create(clerk: Clerk, fapiClient: FapiClient) {
+    const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
+    return new AuthCookieService(clerk, fapiClient, cookieSuffix);
+  }
+
+  private constructor(
     private clerk: Clerk,
     fapiClient: FapiClient,
+    cookieSuffix: string,
   ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
@@ -52,12 +59,12 @@ export class AuthCookieService {
     this.refreshTokenOnVisibilityChange();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie(clerk.publishableKey);
-    this.sessionCookie = createSessionCookie(clerk.publishableKey);
+    this.clientUat = createClientUatCookie(cookieSuffix);
+    this.sessionCookie = createSessionCookie(cookieSuffix);
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
-      publishableKey: clerk.publishableKey,
+      cookieSuffix,
     });
   }
 

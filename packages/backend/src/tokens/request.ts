@@ -62,7 +62,7 @@ export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions,
 ): Promise<RequestState> {
-  const authenticateContext = createAuthenticateContext(createClerkRequest(request), options);
+  const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
   if (authenticateContext.isSatellite) {

@@ -1,9 +1,9 @@
-import { parsePublishableKey } from '@clerk/shared/keys';
 import type { Jwt } from '@clerk/types';
 
 import { constants } from '../constants';
 import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidPublishableKey } from '../util/optionsAssertions';
+import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../util/shared';
 import type { ClerkRequest } from './clerkRequest';
 import type { AuthenticateRequestOptions } from './types';
 
@@ -48,11 +48,11 @@ class AuthenticateContext {
     return this.sessionTokenInCookie || this.sessionTokenInHeader;
   }
 
-  private get cookieSuffix() {
-    return this.publishableKey?.split('_').pop();
-  }
-
-  public constructor(private clerkRequest: ClerkRequest, options: AuthenticateRequestOptions) {
+  public constructor(
+    private cookieSuffix: string,
+    private clerkRequest: ClerkRequest,
+    options: AuthenticateRequestOptions,
+  ) {
     // Even though the options are assigned to this later in this function
     // we set the publishableKey here because it is being used in cookies/headers/handshake-values
     // as part of getMultipleAppsCookie
@@ -124,7 +124,7 @@ class AuthenticateContext {
   }
 
   private getSuffixedCookie(name: string) {
-    return this.getCookie(`${name}_${this.cookieSuffix}`) || undefined;
+    return this.getCookie(getSuffixedCookieName(name, this.cookieSuffix)) || undefined;
   }
 
   private getSuffixedOrUnSuffixedCookie(cookieName: string) {
@@ -228,8 +228,10 @@ class AuthenticateContext {
 
 export type { AuthenticateContext };
 
-export const createAuthenticateContext = (
-  ...args: ConstructorParameters<typeof AuthenticateContext>
-): AuthenticateContext => {
-  return new AuthenticateContext(...args);
+export const createAuthenticateContext = async (
+  clerkRequest: ClerkRequest,
+  options: AuthenticateRequestOptions,
+): Promise<AuthenticateContext> => {
+  const cookieSuffix = options.publishableKey ? await getCookieSuffix(options.publishableKey) : '';
+  return new AuthenticateContext(cookieSuffix, clerkRequest, options);
 };
