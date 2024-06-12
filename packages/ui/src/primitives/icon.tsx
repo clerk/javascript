@@ -250,8 +250,8 @@ export const Linear = createIcon({
   ),
 });
 
-export const LinkedInOIDC = createIcon({
-  displayName: 'IconLinkedInOIDC',
+export const LinkedIn = createIcon({
+  displayName: 'IconLinkedIn',
   viewBox: '0 0 20 20',
   path: (
     <path

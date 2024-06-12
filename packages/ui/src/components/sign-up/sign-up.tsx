@@ -21,7 +21,7 @@ export function SignUpComponent() {
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(clerk?.__unstable__environment);
 
   return (
-    <SignUp.Root exampleMode>
+    <SignUp.Root>
       <Common.Loading>
         {isGlobalLoading => {
           return (
@@ -54,6 +54,7 @@ export function SignUpComponent() {
                                     busy={isConnectionLoading}
                                     disabled={isGlobalLoading || isConnectionLoading}
                                     icon={IconComponent ? <IconComponent className='text-base' /> : null}
+                                    textVisuallyHidden={enabledConnections.length > 2}
                                   >
                                     {connection?.name || c.provider}
                                   </Connection.Button>

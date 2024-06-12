@@ -6,6 +6,8 @@ import clsx from 'clsx';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
+import { ThemeBuilder } from './theme-builder';
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -24,7 +26,9 @@ export default function RootLayout({
         lang='en'
         className='h-full'
       >
-        <body className={clsx(inter.className, 'flex min-h-full flex-col')}>{children}</body>
+        <body className={clsx(inter.className, 'flex min-h-full flex-col')}>
+          <ThemeBuilder>{children}</ThemeBuilder>
+        </body>
       </html>
     </ClerkProvider>
   );
