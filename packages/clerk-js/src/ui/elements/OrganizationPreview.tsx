@@ -68,7 +68,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           boxElementDescriptor={descriptors.organizationPreviewAvatarBox}
           imageElementDescriptor={descriptors.organizationPreviewAvatarImage}
           {...organization}
-          size={t => ({ xs: t.sizes.$5, sm: t.sizes.$8, md: t.sizes.$9, lg: t.sizes.$12 }[size])}
+          size={t => ({ xs: t.sizes.$5, sm: t.sizes.$8, md: t.sizes.$9, lg: t.sizes.$12 })[size]}
           sx={avatarSx}
           rounded={rounded}
         />
@@ -89,6 +89,7 @@ export const OrganizationPreview = (props: OrganizationPreviewProps) => {
           as='span'
           truncate
           sx={mainIdentifierSx}
+          title={organization.name}
         >
           {organization.name} {badge}
         </Text>

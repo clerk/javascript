@@ -115,8 +115,8 @@ const hslaColorToHslaString = (color: HslaColor): string => {
   return color.a === 0
     ? 'transparent'
     : color.a != undefined
-    ? `hsla(${h},${sPerc}%,${lPerc}%,${a})`
-    : `hsl(${h},${sPerc}%,${lPerc}%)`;
+      ? `hsla(${h},${sPerc}%,${lPerc}%,${a})`
+      : `hsl(${h},${sPerc}%,${lPerc}%)`;
 };
 
 const hexStringToHslaColor = (hex: string): HslaColor => {

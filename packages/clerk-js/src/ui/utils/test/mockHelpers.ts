@@ -8,10 +8,10 @@ type FunctionLike = (...args: any) => any;
 type DeepJestMocked<T> = T extends FunctionLike
   ? jest.Mocked<T>
   : T extends object
-  ? {
-      [k in keyof T]: DeepJestMocked<T[k]>;
-    }
-  : T;
+    ? {
+        [k in keyof T]: DeepJestMocked<T[k]>;
+      }
+    : T;
 
 const mockProp = <T>(obj: T, k: keyof T) => {
   if (typeof obj[k] === 'function') {

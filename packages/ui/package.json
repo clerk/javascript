@@ -27,7 +27,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\""
+    "dev:theme-builder": "concurrently \"npm run dev\" \"cd theme-builder && npm run dev\"",
+    "bundlewatch": "npx bundlewatch --config bundlewatch.config.json"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.2.4",

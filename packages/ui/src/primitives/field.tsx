@@ -41,7 +41,7 @@ export const Label = React.forwardRef(function Label(
       className={cn(
         visuallyHidden
           ? 'sr-only'
-          : 'text-base font-medium flex items-center text-gray-12 gap-x-1 opacity-[--cl-field-label-opacity,1]',
+          : 'text-gray-12 flex items-center gap-x-1 text-base font-medium opacity-[--cl-field-label-opacity,1]',
         className,
       )}
     >
@@ -73,12 +73,12 @@ export const Input = React.forwardRef(function Input(
       data-field-input=''
       ref={forwardedRef}
       className={cn(
-        'relative flex min-w-0 bg-white text-gray-12 rounded-md bg-clip-padding py-1.5 px-2.5 border outline-none text-base',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
+        'text-gray-12 relative flex min-w-0 rounded-md border bg-white bg-clip-padding px-2.5 py-1.5 text-base outline-none',
+        'disabled:cursor-not-allowed disabled:opacity-50',
         // variant
         {
-          default: 'w-full min-h-8 justify-start',
-          'otp-digit': 'size-10 aspect-square text-[calc(var(--cl-font-size)*1.4)] font-semibold justify-center',
+          default: 'min-h-8 w-full justify-start',
+          'otp-digit': 'aspect-square size-10 justify-center text-[calc(var(--cl-font-size)*1.4)] font-semibold',
         }[variant],
         // state
         {
@@ -141,7 +141,7 @@ export const Message = React.forwardRef<
       ref={forwardedRef}
       {...props}
       className={cn(
-        'text-base flex gap-x-1',
+        'flex gap-x-1 text-base',
         {
           start: 'justify-start',
           center: 'justify-center',

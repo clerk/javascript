@@ -13,13 +13,12 @@ const mockClerk = {
 
 jest.mock('../withClerk', () => {
   return {
-    withClerk: (Component: any) => (props: any) =>
-      (
-        <Component
-          {...props}
-          clerk={mockClerk}
-        />
-      ),
+    withClerk: (Component: any) => (props: any) => (
+      <Component
+        {...props}
+        clerk={mockClerk}
+      />
+    ),
   };
 });
 

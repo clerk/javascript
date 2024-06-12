@@ -142,7 +142,7 @@ export default (QUnit: QUnit) => {
       afterSignUpUrl: '',
       domain: '',
       ...options,
-    } satisfies AuthenticateRequestOptions);
+    }) satisfies AuthenticateRequestOptions;
 
   const mockRequestWithHeaderAuth = (headers?, requestUrl?) => {
     return mockRequest({ authorization: mockJwt, ...headers }, requestUrl);
