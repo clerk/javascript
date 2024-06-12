@@ -16,9 +16,9 @@ export type SessionCookieHandler = {
  * The cookie is used by the Clerk backend SDKs to identify
  * the authenticated user.
  */
-export const createSessionCookie = (publishableKey: string): SessionCookieHandler => {
+export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler => {
   const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
-  const suffixedSessionCookie = createCookieHandler(getSuffixedCookieName(SESSION_COOKIE_NAME, publishableKey));
+  const suffixedSessionCookie = createCookieHandler(getSuffixedCookieName(SESSION_COOKIE_NAME, cookieSuffix));
 
   const remove = () => {
     suffixedSessionCookie.remove();

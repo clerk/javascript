@@ -1,4 +1,4 @@
-import { parsePublishableKey } from '@clerk/shared/keys';
+import { parsePublishableKey } from './shared';
 
 export function assertValidSecretKey(val: unknown): asserts val is string {
   if (!val || typeof val !== 'string') {
