@@ -124,7 +124,7 @@ runs:
       shell: bash
 
     - name: Save node_modules
-      if: steps.cache-node-modules.outputs.cache-hit != 'true' && inputs.save-npm-cache == 'true'
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
       uses: actions/cache/save@v3
       with:
         path: node_modules
