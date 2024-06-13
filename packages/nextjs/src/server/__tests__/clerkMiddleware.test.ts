@@ -221,8 +221,12 @@ describe('clerkMiddleware(params)', () => {
   });
 
   it('propagates middleware options to the next request', async () => {
-    const secretKey = 'sk_test_xxxxxxxxxxxxxxxxxx';
-    const resp = await clerkMiddleware({ secretKey })(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+    const options = {
+      secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
+      signInUrl: '/foo',
+      signUpUrl: '/bar',
+    };
+    const resp = await clerkMiddleware(options)(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
     expect(resp?.status).toEqual(200);
 
     const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
@@ -231,7 +235,7 @@ describe('clerkMiddleware(params)', () => {
     const decryptedData = decryptClerkRequestData(requestData);
 
     expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
-    expect(decryptedData.secretKey).toBe(secretKey);
+    expect(decryptedData).toEqual(options);
   });
 
   describe('auth().redirectToSignIn()', () => {
@@ -301,25 +305,6 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
-      expect(clerkClient.authenticateRequest).toBeCalled();
-    });
-
-    it('redirects to sign-in url when propagated as an option', async () => {
-      const req = mockRequest({
-        url: '/protected',
-      });
-
-      const resp = await clerkMiddleware(
-        auth => {
-          auth().redirectToSignIn();
-        },
-        {
-          signInUrl: '/foo',
-        },
-      )(req, {} as NextFetchEvent);
-
-      expect(resp?.status).toEqual(307);
-      expect(resp?.headers.get('location')).toContain('foo');
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
   });
