@@ -116,9 +116,14 @@ export function decorateRequest(
   req: ClerkRequest,
   res: Response,
   requestState: RequestState,
-  secretKey: string,
+  {
+    secretKey,
+    signInUrl,
+    signUpUrl,
+  }: Pick<AuthenticateRequestOptions, 'signInUrl' | 'signUpUrl'> &
+    Required<Pick<AuthenticateRequestOptions, 'secretKey'>>,
 ): Response {
-  const { reason, message, status, token, signInUrl, signUpUrl } = requestState;
+  const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
   if (!res) {
     res = NextResponse.next();

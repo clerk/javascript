@@ -30,7 +30,7 @@ const withEmailCodes = environmentConfig()
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
-  .setEnvVariable('public', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
 
 const withEmailLinks = environmentConfig()
   .setId('withEmailLinks')
@@ -40,7 +40,7 @@ const withEmailLinks = environmentConfig()
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
-  .setEnvVariable('public', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
 
 const withCustomRoles = environmentConfig()
   .setId('withCustomRoles')
@@ -52,7 +52,7 @@ const withCustomRoles = environmentConfig()
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
-  .setEnvVariable('public', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
 
 const withEmailCodesQuickstart = withEmailCodes
   .removeEnvVariable('public', 'CLERK_SIGN_IN_URL')
@@ -64,14 +64,14 @@ const withAPCore1ClerkLatest = environmentConfig()
   .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-codes'].sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk)
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
-  .setEnvVariable('public', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
 
 const withAPCore1ClerkV4 = environmentConfig()
   .setId('withAPCore1ClerkV4')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
   .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-codes'].sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk)
-  .setEnvVariable('public', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
 
 const withAPCore2ClerkLatest = environmentConfig()
   .setId('withAPCore2ClerkLatest')
@@ -79,14 +79,14 @@ const withAPCore2ClerkLatest = environmentConfig()
   .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['core-2-all-enabled'].sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['core-2-all-enabled'].pk)
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
-  .setEnvVariable('public', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
 
 const withAPCore2ClerkV4 = environmentConfig()
   .setId('withAPCore2ClerkV4')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
   .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['core-2-all-enabled'].sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['core-2-all-enabled'].pk)
-  .setEnvVariable('public', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.CLERK_ENCRYPTION_KEY);
 
 export const envs = {
   withEmailCodes,

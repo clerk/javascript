@@ -35,8 +35,8 @@ export const createGetAuth = ({
         throw new Error(noAuthStatusMessage);
       }
 
-      const requestData = getHeader(req, constants.Headers.ClerkRequestData);
-      const decryptedRequestData = decryptClerkRequestData(requestData);
+      const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
+      const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
 
       const options = {
         authStatus,
