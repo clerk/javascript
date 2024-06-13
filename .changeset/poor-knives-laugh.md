@@ -1,6 +1,6 @@
 ---
-'@clerk/backend': minor
-'@clerk/nextjs': minor
+'@clerk/backend': patch
+'@clerk/nextjs': patch
 ---
 
 Support handshake in iframes
