@@ -3,6 +3,7 @@
   "remoteCache": {
     "signature": true
   },
+  "ui": "tui",
   "globalDependencies": [
     ".github/.cache-version",
     "jest.*.ts",
@@ -23,16 +24,10 @@
     "VERCEL",
     "VITE_CLERK_*",
     "EXPO_PUBLIC_CLERK_*",
-    "REACT_APP_CLERK_*",
-    "CI_REPO_OWNER",
-    "CI_REPO_NAME",
-    "CI_COMMIT_SHA",
-    "CI_BRANCH",
-    "CI_BRANCH_BASE",
-    "BUNDLEWATCH_GITHUB_TOKEN"
+    "REACT_APP_CLERK_*"
   ],
   "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
-  "pipeline": {
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": [
@@ -44,7 +39,7 @@
         "tsconfig.declarations.json",
         "tsup.config.ts",
         "subpaths.mjs",
-        "!**/**/*.test.*",
+        "!**/*.test.*",
         "!**/test/**",
         "!**/tests/**",
         "!**/__tests__/**",
@@ -56,11 +51,10 @@
         "!examples/**",
         "!node_modules/**"
       ],
-      "outputMode": "new-only",
+      "outputLogs": "new-only",
       "outputs": ["*/package.json", "dist/**", "scripts/**"]
     },
     "dev": {
-      "dependsOn": [],
       "cache": false
     },
     "dev:current": {
@@ -69,7 +63,6 @@
       "persistent": true
     },
     "clean": {
-      "dependsOn": [],
       "cache": false
     },
     "test": {
@@ -90,7 +83,7 @@
         "!examples/**",
         "!node_modules/**"
       ],
-      "outputMode": "new-only",
+      "outputLogs": "new-only",
       "outputs": []
     },
     "test:cache:clear": {
@@ -107,7 +100,6 @@
         "**/*.md",
         "**/*.mdx",
         ".github/**",
-
         "!*/package.json",
         "!**/__snapshots__/**",
         "!CHANGELOG.md",
@@ -124,59 +116,75 @@
       "cache": false
     },
     "lint:attw": {
-      "dependsOn": [],
       "outputs": [],
       "cache": false
     },
     "bundlewatch": {
       "dependsOn": ["build"],
+      "env": [
+        "BUNDLEWATCH_GITHUB_TOKEN",
+        "CI_BRANCH",
+        "CI_BRANCH_BASE",
+        "CI_REPO_NAME",
+        "CI_REPO_OWNER",
+        "CI_COMMIT_SHA"
+      ],
       "outputs": []
     },
     "format:check": {
-      "dependsOn": [],
       "outputs": []
     },
     "//#test:integration:ap-flows": {
-      "dependsOn": ["^@clerk/nextjs#build"],
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build", "^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:generic": {
-      "dependsOn": ["^@clerk/clerk-react#build"],
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build", "^@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:express": {
-      "dependsOn": ["^@clerk/clerk-sdk-node#build", "^@clerk/clerk-react#build"],
+      "dependsOn": [
+        "^@clerk/clerk-js#build",
+        "^@clerk/backend#build",
+        "^@clerk/clerk-sdk-node#build",
+        "^@clerk/clerk-react#build"
+      ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
-      "dependsOn": ["^@clerk/nextjs#build"],
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build", "^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:nextjs:canary": {
-      "dependsOn": ["^@clerk/nextjs#build"],
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build", "^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:quickstart": {
-      "dependsOn": ["^@clerk/nextjs#build"],
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build", "^@clerk/nextjs#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     },
     "//#test:integration:elements": {
-      "dependsOn": ["^@clerk/nextjs#build", "^@clerk/elements#build"],
+      "dependsOn": [
+        "^@clerk/clerk-js#build",
+        "^@clerk/backend#build",
+        "^@clerk/nextjs#build",
+        "^@clerk/elements#build"
+      ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
-      "outputMode": "new-only"
+      "outputLogs": "new-only"
     }
   }
 }
