@@ -38,7 +38,10 @@ class AuthenticateContext {
     return this.sessionTokenInCookie || this.sessionTokenInHeader;
   }
 
-  public constructor(private clerkRequest: ClerkRequest, options: AuthenticateRequestOptions) {
+  public constructor(
+    private clerkRequest: ClerkRequest,
+    options: AuthenticateRequestOptions,
+  ) {
     this.initHeaderValues();
     this.initCookieValues();
     this.initHandshakeValues();

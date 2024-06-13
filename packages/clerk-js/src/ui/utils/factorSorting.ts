@@ -1,10 +1,13 @@
 import type { SignInFactor, SignInStrategy } from '@clerk/types';
 
 const makeSortingOrderMap = <T extends string>(arr: T[]): Record<T, number> =>
-  arr.reduce((acc, k, i) => {
-    acc[k] = i;
-    return acc;
-  }, {} as Record<T, number>);
+  arr.reduce(
+    (acc, k, i) => {
+      acc[k] = i;
+      return acc;
+    },
+    {} as Record<T, number>,
+  );
 
 const STRATEGY_SORT_ORDER_PASSWORD_PREF = makeSortingOrderMap([
   'passkey',
