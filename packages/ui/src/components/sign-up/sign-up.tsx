@@ -34,12 +34,14 @@ function SignUpComponentLoaded() {
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
+  const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
   const { enabled: firstNameEnabled, required: firstNameRequired } = attributes['first_name'];
   const { enabled: lastNameEnabled, required: lastNameRequired } = attributes['last_name'];
   const { enabled: usernameEnabled, required: usernameRequired } = attributes['username'];
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = attributes['phone_number'];
   const { enabled: emailAddressEnabled, required: emailAddressRequired } = attributes['email_address'];
   const { enabled: passwordEnabled, required: passwordRequired } = attributes['password'];
+  const { applicationName, homeUrl, logoImageUrl } = displayConfig;
   return (
     <Common.Loading>
       {isGlobalLoading => {
@@ -49,6 +51,13 @@ function SignUpComponentLoaded() {
               <Card.Root>
                 <Card.Content>
                   <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
                     <Card.Title>Create your account</Card.Title>
                     <Card.Description>Welcome! Please fill in the details to get started.</Card.Description>
                   </Card.Header>

@@ -1,7 +1,7 @@
 import cn from 'clsx';
 import * as React from 'react';
 
-import { Logo } from './logo';
+import { ClerkLogo } from './clerk-logo';
 
 export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
   { children, className, ...props },
@@ -52,6 +52,27 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
       {children}
     </div>
   );
+});
+
+export const Logo = React.forwardRef(function Logo(
+  {
+    className,
+    href,
+    ...props
+  }: React.ImgHTMLAttributes<HTMLImageElement> & {
+    href?: string;
+  },
+  forwardedRef: React.ForwardedRef<HTMLImageElement>,
+) {
+  const img = (
+    <img
+      crossOrigin='anonymous'
+      ref={forwardedRef}
+      {...props}
+      className={cn('max-h-24 max-w-24 object-contain', className)}
+    />
+  );
+  return <div className='mb-4 flex justify-center'>{href ? <a href={href}>{img}</a> : img}</div>;
 });
 
 export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function Title(
@@ -118,7 +139,7 @@ export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
             target='_blank'
             rel='noopener'
           >
-            <Logo />
+            <ClerkLogo />
           </a>
         </p>
       </div>
