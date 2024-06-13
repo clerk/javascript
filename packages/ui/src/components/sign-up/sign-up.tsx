@@ -10,13 +10,13 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { PROVIDERS } from '~/constants';
-import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
 import { TextButton } from '~/primitives/text-button';
+import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
 import { FieldAdapter } from '../field-adapter';
 import { FieldEnabled } from '../field-enabled';

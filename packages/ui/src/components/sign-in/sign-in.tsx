@@ -7,12 +7,12 @@ import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PROVIDERS } from '~/constants';
-import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
+import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
 export function SignInComponent() {
   const clerk = useClerk();
