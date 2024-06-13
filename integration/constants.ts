@@ -71,4 +71,8 @@ export const constants = {
    * PK and SK pairs from the env to use for integration tests.
    */
   INTEGRATION_INSTANCE_KEYS: process.env.INTEGRATION_INSTANCE_KEYS,
+  /**
+   * Key used to encrypt request data for Next.js middleware options propagation.
+   */
+  CLERK_ENCRYPTION_KEY: process.env.CLERK_ENCRYPTION_KEY,
 } as const;
