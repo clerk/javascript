@@ -98,5 +98,5 @@ For additional information about middleware, please visit https://clerk.com/docs
 
 export const authSignatureInvalid = `Clerk: Unable to verify request, this usually means the Clerk middleware did not run. Ensure Clerk's middleware is properly integrated and matches the current route. For more information, see: https://clerk.com/docs/nextjs/middleware. (code=auth_signature_invalid)`;
 
-export const encryptionKeyInvalid = `Clerk: Unable to decrypt request data, this usually means the encryption key is invalid. Ensure the encryption key is properly set. (code=signing_key_invalid)
+export const encryptionKeyInvalid = `Clerk: Unable to decrypt request data, this usually means the encryption key is invalid. Ensure the encryption key is properly set. (code=encryption_key_invalid)
 For additional information, please visit https://clerk.com/docs/references/nextjs/clerk-middleware#clerk-middleware-options.`;

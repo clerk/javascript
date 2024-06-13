@@ -219,7 +219,12 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       logger.debug(`Added ${constants.Headers.EnableDebug} on request`);
     }
 
-    const result = decorateRequest(clerkRequest, finalRes, requestState, secretKey) || NextResponse.next();
+    const result =
+      decorateRequest(clerkRequest, finalRes, requestState, {
+        secretKey,
+        signInUrl: params.signInUrl,
+        signUpUrl: params.signUpUrl,
+      }) || NextResponse.next();
 
     if (requestState.headers) {
       requestState.headers.forEach((value, key) => {
