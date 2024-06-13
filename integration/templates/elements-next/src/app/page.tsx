@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 function Card({ children, title }: { children: React.ReactNode; title: string }) {
   return (
-    <div className='bg-white rounded-lg py-4 px-8'>
+    <div className='rounded-lg bg-white px-8 py-4'>
       <h2 className='text-lg font-medium tracking-tight'>{title}</h2>
       {children}
     </div>
@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <main>
       <h1 className='text-2xl font-medium tracking-tight text-zinc-950'>Clerk Elements: Next.js E2E</h1>
-      <p className='text-md text-zinc-500 mt-2 mb-6'>
+      <p className='text-md mb-6 mt-2 text-zinc-500'>
         Kitchen sink template to test out Clerk Elements in Next.js App Router.
       </p>
       <div className='grid grid-cols-3 gap-4'>

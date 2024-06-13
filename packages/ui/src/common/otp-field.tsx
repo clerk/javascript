@@ -52,7 +52,7 @@ export function OTPField({
                           data-otp-field-cursor=''
                           // Note:
                           // Opportunity to extract lineHeight to theme
-                          className='motion-safe:animate-blink self-center rounded-full bg-current w-[2px] h-[calc(theme(fontSize.base)*1.38462)]'
+                          className='motion-safe:animate-blink h-[calc(theme(fontSize.base)*1.38462)] w-[2px] self-center rounded-full bg-current'
                         />
                       )}
                       {value}
@@ -63,7 +63,7 @@ export function OTPField({
             )}
           </Common.FieldState>
 
-          <Common.FieldError>
+          <Common.FieldError asChild>
             {({ message }) => {
               return (
                 <Field.Message
@@ -77,7 +77,7 @@ export function OTPField({
           </Common.FieldError>
         </Field.Root>
       </Common.Field>
-      {resend && <p className='text-center font-normal text-base text-gray-10'>{resend}</p>}
+      {resend && <p className='text-gray-10 text-center text-base font-normal'>{resend}</p>}
     </div>
   );
 }

@@ -2,17 +2,17 @@ import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
-import { EmailField } from '~/common/EmailField';
-import { OTPField } from '~/common/OTPField';
-import { PasswordField } from '~/common/PasswordField';
-import { PhoneNumberField } from '~/common/PhoneNumberField';
+import { EmailField } from '~/common/email-field';
+import { OTPField } from '~/common/otp-field';
+import { PasswordField } from '~/common/password-field';
+import { PhoneNumberField } from '~/common/phone-number-field';
 import { PROVIDERS } from '~/constants';
-import { getEnabledSocialConnectionsFromEnvironment } from '~/hooks/getEnabledSocialConnectionsFromEnvironment';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { Seperator } from '~/primitives/seperator';
+import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
 export function SignInComponent() {
   const clerk = useClerk();
@@ -63,7 +63,7 @@ export function SignInComponent() {
                       })}
                     </Connection.Root>
                     <Seperator>or</Seperator>
-                    <div className='space-y-4'>
+                    <div className='flex flex-col gap-4'>
                       {/* @ts-ignore Expected https://github.com/clerk/javascript/blob/12f78491d6b10f2be63891f8a7f76fc6acf37c00/packages/clerk-js/src/ui/elements/PhoneInput/PhoneInput.tsx#L248-L249 */}
                       <PhoneNumberField locationBasedCountryIso={clerk.__internal_country} />
                       <EmailField disabled={isGlobalLoading} />
@@ -78,7 +78,7 @@ export function SignInComponent() {
                             Didn&apos;t recieve a code?{' '}
                             <button
                               type='button'
-                              className='-mx-0.5 px-0.5 text-accent-9 font-medium hover:underline rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-default'
+                              className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
                             >
                               Resend
                             </button>

@@ -1,6 +1,6 @@
 {
   "extends": ["//"],
-  "pipeline": {
+  "tasks": {
     "dev": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "!examples/**"],
@@ -25,7 +25,7 @@
         "!examples/**",
         "!node_modules/**"
       ],
-      "outputMode": "new-only",
+      "outputLogs": "new-only",
       "outputs": []
     }
   }
