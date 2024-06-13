@@ -34,7 +34,7 @@ describe('SignUpVerifyEmail', () => {
         ({
           startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
           cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-        } as any),
+        }) as any,
     );
 
     const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
@@ -82,7 +82,7 @@ describe('SignUpVerifyEmail', () => {
         ({
           startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
           cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-        } as any),
+        }) as any,
     );
     const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
     await waitFor(async () => expect((await findByText(/Resend/i)).tagName.toUpperCase()).toBe('BUTTON'));

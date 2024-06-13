@@ -36,7 +36,7 @@ export const Spinner = forwardRef(function Spinner(
   return (
     <span
       ref={ref}
-      className={cn('relative isolate text-current size-[1em] block', className)}
+      className={cn('relative isolate block size-[1em] text-current', className)}
     >
       <span className='sr-only'>{children}</span>
 

@@ -44,8 +44,8 @@ export const rootAuthLoader: RootAuthLoader = async (
   const opts: RootAuthLoaderOptions = options
     ? options
     : !!handlerOrOptions && typeof handlerOrOptions !== 'function'
-    ? handlerOrOptions
-    : {};
+      ? handlerOrOptions
+      : {};
 
   const loadedOptions = loadOptions(args, opts);
   // Note: authenticateRequest() will throw a redirect if the auth state is determined to be handshake

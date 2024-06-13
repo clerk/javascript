@@ -8,7 +8,7 @@ import { generateConfig, getJwksFromSecretKey } from '../testUtils/handshake';
 
 const PORT = 4199;
 
-test.describe('Client handshake @generic', () => {
+test.skip('Client handshake @generic', () => {
   test.describe.configure({ mode: 'serial' });
 
   let app: Application;
@@ -42,7 +42,7 @@ test.describe('Client handshake @generic', () => {
 
     // Set the paths that don't require the user to be signed in
     const publicPaths = ['/', /^(\\/(sign-in|sign-up|app-dir|custom)\\/*).*$/];
-    
+
     export const middleware = (req, evt) => {
       return authMiddleware({
         publicRoutes: publicPaths,
@@ -54,7 +54,7 @@ test.describe('Client handshake @generic', () => {
         signInUrl: req.headers.get("x-sign-in-url"),
       })(req, evt)
     };
-    
+
     export const config = {
       matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
     };

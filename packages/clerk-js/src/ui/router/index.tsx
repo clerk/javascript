@@ -5,4 +5,4 @@ export * from './VirtualRouter';
 export * from './Route';
 export * from './Switch';
 
-export type { ParsedQs } from 'qs';
+export type ParsedQueryString = Record<string, string>;

@@ -18,7 +18,7 @@ export function LastNameField({
             {' '}
             <span className='flex w-full items-baseline justify-between'>
               <span>{label}</span>
-              {!props?.required && <span className='font-medium text-sm text-gray-10'>Optional</span>}
+              {!props?.required && <span className='text-gray-10 text-sm font-medium'>Optional</span>}
             </span>
           </Field.Label>
         </Common.Label>
@@ -35,7 +35,7 @@ export function LastNameField({
             );
           }}
         </Common.FieldState>
-        <Common.FieldError>
+        <Common.FieldError asChild>
           {({ message }) => {
             return <Field.Message intent='error'>{message}</Field.Message>;
           }}

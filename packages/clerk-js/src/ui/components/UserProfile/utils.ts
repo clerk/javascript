@@ -12,7 +12,7 @@ export const primaryIdentificationFirst = (primaryId: string | null) => (val1: I
   return primaryId === val1.id ? -1 : primaryId === val2.id ? 1 : 0;
 };
 
-export const currentSessionFirst = (id: string) => (a: IDable) => a.id === id ? -1 : 1;
+export const currentSessionFirst = (id: string) => (a: IDable) => (a.id === id ? -1 : 1);
 
 export const defaultFirst = (a: PhoneNumberResource) => (a.defaultSecondFactor ? -1 : 1);
 

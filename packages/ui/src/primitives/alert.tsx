@@ -14,7 +14,7 @@ export const Alert = React.forwardRef<
       ref={forwardedRef}
       {...props}
       className={cn(
-        'text-base leading-small py-3 px-4 rounded-md border',
+        'leading-small rounded-md border px-4 py-3 text-base',
         {
           warning: 'text-warning bg-warning/10 border-warning/20',
           error: 'text-danger bg-danger/10 border-danger/20',
