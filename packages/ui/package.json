@@ -31,7 +31,7 @@
     "bundlewatch": "npx bundlewatch --config bundlewatch.config.json"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.2.2",
+    "@clerk/clerk-react": "^5.2.4",
     "@clerk/elements": "^0.6.0",
     "@clerk/types": "^4.5.1",
     "@radix-ui/react-slot": "^1.0.2",
