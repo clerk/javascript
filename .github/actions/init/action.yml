@@ -113,7 +113,7 @@ runs:
         registry-url: ${{ inputs.registry-url }}
 
     - name: Install NPM Dependencies
-      run: mkdir node_modules && npm ci --audit=false --fund=false --prefer-offline
+      run: mkdir node_modules && npm ci --cache /home/runner/.npm --audit=false --fund=false --prefer-offline
       shell: bash
 
     - name: Get Playwright Version
