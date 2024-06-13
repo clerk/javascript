@@ -3,19 +3,18 @@ import React from 'react';
 
 import * as Field from '../primitives/field';
 
-export function LastNameField({
-  label = 'Last name',
+export function UsernameField({
+  label = 'Username',
   ...props
 }: { label?: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field
-      name='lastName'
+      name='username'
       asChild
     >
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {' '}
             <span className='flex w-full items-baseline justify-between'>
               <span>{label}</span>
               {!props?.required && <span className='text-gray-10 text-sm font-medium'>Optional</span>}
