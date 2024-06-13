@@ -85,7 +85,7 @@ export type SignInRootProps = SignInFlowProviderProps & {
  *
  * @param {string} path - The root path the sign-in flow is mounted at. Will be automatically inferred in Next.js. You can set it to `/sign-in` for example.
  * @param {React.ReactNode} fallback - Fallback markup to render while Clerk is loading. Default: `null`
- * @param {boolean} routing - If you want to render Clerk Elements in e.g. a modal, use the `virtual` routing mode.
+ * @param {string} routing - If you want to render Clerk Elements in e.g. a modal, use the `'virtual'` routing mode. Default: `'path'`
  *
  * @example
  * import * as SignIn from "@clerk/elements/sign-in"
