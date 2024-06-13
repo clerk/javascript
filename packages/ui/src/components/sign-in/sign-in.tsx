@@ -28,7 +28,7 @@ export function SignInComponent() {
               <Card.Root>
                 <Card.Content>
                   <Card.Header>
-                    <Card.Title>Sign in to Acme Corp</Card.Title>
+                    <Card.Title>Sign in to Foo Corp</Card.Title>
                     <Card.Description>Welcome back! Please sign in to continue</Card.Description>
                   </Card.Header>
 
