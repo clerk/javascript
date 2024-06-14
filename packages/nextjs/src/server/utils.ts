@@ -252,11 +252,8 @@ export function assertTokenSignature(token: string, key: string, signature?: str
  * @internal
  **/
 export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>) {
-  /**
-   * Warns if encryption key is missing when secret key is provided to prevent breaking changes.
-   * Prepares users for a escalation to an error in a future major version.
-   */
   if (options.secretKey && !ENCRYPTION_KEY) {
+    // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
     logger.warnOnce(
       'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#server-side-options-propagation',
     );
