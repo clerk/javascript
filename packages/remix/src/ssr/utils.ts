@@ -116,3 +116,18 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
 export const wrapWithClerkState = (data: any) => {
   return { clerkState: { __internal_clerk_state: { ...data } } };
 };
+
+/**
+ * Patches request to avoid duplex issues with unidici
+ * For more information, see:
+ * https://github.com/nodejs/node/issues/46221
+ * https://github.com/whatwg/fetch/pull/1457
+ * @internal
+ */
+export const patchRequest = (request: Request) => {
+  const clonedRequest = request.clone();
+  if (clonedRequest.method !== 'GET' && clonedRequest.body !== null) {
+    (clonedRequest as unknown as { duplex: 'half' }).duplex = 'half';
+  }
+  return clonedRequest;
+};
