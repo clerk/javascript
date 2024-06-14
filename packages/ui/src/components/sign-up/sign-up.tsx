@@ -170,7 +170,10 @@ function SignUpComponentLoaded() {
                       <Card.Description>Enter the verification code sent to your phone</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: replace with element https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number */}
+                          {/* TODO: elements work
+                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
+                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
+                          */}
                           +1 (424) 424-4242{' '}
                           <SignUp.Action
                             navigate='start'
@@ -232,7 +235,10 @@ function SignUpComponentLoaded() {
                       <Card.Description>Enter the verification code sent to your email</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: replace with element https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number */}
+                          {/* TODO: elements work
+                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
+                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
+                          */}
                           alex.carpenter@clerk.dev{' '}
                           <SignUp.Action
                             navigate='start'
