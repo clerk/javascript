@@ -197,7 +197,6 @@ const DefaultMessages = Object.freeze({
   MissingPublishableKeyErrorMessage: `Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
   MissingSecretKeyErrorMessage: `Missing secretKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.`,
   MissingClerkProvider: `{{source}} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
-  MissingEncryptionKeyErrorMessage: `Missing encryption key. Set CLERK_ENCRYPTION_KEY when passing sensitive options to clerkMiddleware for secure data transmission. Learn more: https://clerk.com/docs/references/nextjs/clerk-middleware#clerk-middleware-options.`,
 });
 
 type MessageKeys = keyof typeof DefaultMessages;
