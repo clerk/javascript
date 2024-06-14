@@ -1,5 +1,6 @@
 import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
+import { logger } from '@clerk/shared';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
@@ -248,17 +249,22 @@ export function assertTokenSignature(token: string, key: string, signature?: str
  * Encrypt request data propagated between server requests.
  * @internal
  **/
-export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>): string {
+export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>) {
   /**
-   * If a secretKey is provided in the options, ENCRYPTION_KEY is required.
-   * If no secretKey is provided, ENCRYPTION_KEY falls back to SECRET_KEY.
-   * This setup ensures backward compatibility and simplifies use cases where sensitive options like `secretKey` aren't provided.
+   * Warns if encryption key is missing when secret key is provided to prevent breaking changes.
+   * Prepares users for a potential escalation to an error in a future major version.
    */
-  const key = options.secretKey
-    ? assertKey(ENCRYPTION_KEY, () => errorThrower.throwMissingEncryptionKeyError())
-    : ENCRYPTION_KEY ?? assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
+  if (options.secretKey && !ENCRYPTION_KEY) {
+    logger.warnOnce(
+      'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#server-side-options-propagation',
+    );
+    return;
+  }
 
-  return AES.encrypt(JSON.stringify(options), key).toString();
+  return AES.encrypt(
+    JSON.stringify(options),
+    ENCRYPTION_KEY ?? assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
+  ).toString();
 }
 
 /**
