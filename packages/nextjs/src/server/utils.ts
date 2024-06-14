@@ -278,7 +278,7 @@ export function decryptClerkRequestData(
   }
 
   try {
-    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY ?? SECRET_KEY);
+    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY || SECRET_KEY);
     const encoded = decryptedBytes.toString(encUtf8);
     return JSON.parse(encoded);
   } catch (err) {
