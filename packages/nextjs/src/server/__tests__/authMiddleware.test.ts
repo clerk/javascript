@@ -16,6 +16,7 @@ jest.mock('../constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
+    ENCRYPTION_KEY: 'encryption-key',
   };
 });
 
