@@ -157,6 +157,8 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
+    const clerkRequestData = encryptClerkRequestData({ secretKey, signInUrl, signUpUrl });
+
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
       [constants.Headers.AuthToken]: token || '',
@@ -164,7 +166,7 @@ export function decorateRequest(
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
-      [constants.Headers.ClerkRequestData]: encryptClerkRequestData({ secretKey, signInUrl, signUpUrl }),
+      ...(clerkRequestData ? { [constants.Headers.ClerkRequestData]: clerkRequestData } : {}),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
@@ -252,7 +254,7 @@ export function assertTokenSignature(token: string, key: string, signature?: str
 export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>) {
   /**
    * Warns if encryption key is missing when secret key is provided to prevent breaking changes.
-   * Prepares users for a potential escalation to an error in a future major version.
+   * Prepares users for a escalation to an error in a future major version.
    */
   if (options.secretKey && !ENCRYPTION_KEY) {
     logger.warnOnce(
