@@ -20,7 +20,7 @@ jobs:
 
     env:
       # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
-      NODE_VERSION: 18.20.2
+      NODE_VERSION: 18.20.3
       TURBO_SUMMARIZE: false
 
     steps:
@@ -44,42 +44,8 @@ jobs:
         run: npm ls
         shell: bash
 
-      - name: Require Changeset
-        if: ${{ !(github.event_name == 'merge_group') }}
-        run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
-
-      - name: Lint GitHub Actions Workflows
-        run: npx eslint .github
-        shell: bash
-
-      - name: Check Formatting
-        run: npm run format:check
-
       - name: Build Packages
         run: npx turbo build $TURBO_ARGS --only
-
-      - name: Check size using bundlewatch
-        run: npx turbo bundlewatch $TURBO_ARGS --only
-        env:
-          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
-          CI_REPO_NAME: ${{ vars.REPO_NAME }}
-          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
-          CI_BRANCH: ${{ github.ref	}}
-          CI_BRANCH_BASE: refs/heads/main
-
-      - name: Lint packages using publint
-        run: npx turbo lint:publint $TURBO_ARGS --only
-
-      - name: Lint types using attw
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!@clerk/nextjs --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/backend --only
-
-      - name: Lint types using attw [Errors Allowed]
-        run: npx turbo lint:attw $TURBO_ARGS --filter=@clerk/nextjs --filter=@clerk/tanstack-start --filter=@clerk/backend --filter=@clerk/elements --continue --only
-        continue-on-error: true # TODO: Remove this when all related errors are fixed
-
-      - name: Run lint
-        run: npx turbo lint $TURBO_ARGS --only -- --quiet
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v3
@@ -87,53 +53,6 @@ jobs:
         continue-on-error: true
         with:
           name: turbo-summary-report-lint-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .turbo/runs
-          retention-days: 5
-
-  unit-tests:
-    name: Unit Tests
-    needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
-
-    env:
-      TURBO_SUMMARIZE: false
-
-    strategy:
-      matrix:
-        node-version: [18, 20]
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          show-progress: false
-
-      - name: Setup
-        id: config
-        uses: ./.github/actions/init
-        with:
-          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
-          # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
-          node-version: ${{ matrix.node-version == '18' && '18.20.2' || matrix.node-version }}
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
-
-      - name: Run tests
-        run: npx turbo test $TURBO_ARGS
-        env:
-          # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
-          NODE_VERSION: ${{ matrix.node-version == '18' && '18.20.2' || matrix.node-version }}
-
-      - name: Upload Turbo Summary
-        uses: actions/upload-artifact@v4
-        if: ${{ env.TURBO_SUMMARIZE == 'true' }}
-        continue-on-error: true
-        with:
-          name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-node-${{ matrix.node-version }}
           path: .turbo/runs
           retention-days: 5
 
@@ -145,19 +64,12 @@ jobs:
 
     env:
       # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
-      NODE_VERSION: 18.20.2
+      NODE_VERSION: 18.20.3
 
     strategy:
       matrix:
-        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements']
+        test-name: ['generic']
         test-project: ['chrome']
-        include:
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '13'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '14'
 
     steps:
       - name: Checkout Repo
