@@ -109,6 +109,14 @@ jobs:
           publish-cmd: |
             if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
 
+      - name: Archive npm failure logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-logs
+          path: ~/.npm/_logs
+          retention-days: 1
+
       - name: Install @clerk/backend in /integration
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
