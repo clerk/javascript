@@ -4,9 +4,8 @@
 '@clerk/shared': minor
 ---
 
-Propagate Next.js middleware options to the application server, solving the following issues:
-- `auth` couldn't assert the session token signature due to not having access to `secretKey` passed as an option.
-- `auth.redirectToSignIn` doesn't redirect to `signInUrl` provided as option.
+Enables server-side options propagation for `clerkMiddleware` to the Next.js application server, allowing access for server-side helpers like `auth`. Options such as `signUpUrl`, `signInUrl`, and `secretKey` are securely encrypted using AES algorithm.
 
-`CLERK_ENCRYPTION_KEY` must be defined when providing `secretKey` as an option, in order to securely propagated this value
-between servers. For more information regarding options propagation, refer to https://clerk.com/docs/references/nextjs/clerk-middleware#server-side-options-propagation
+When using `secretKey`, `CLERK_ENCRYPTION_KEY` is required as the encryption key. If `secretKey` is not provided, `CLERK_SECRET_KEY` is used by default.
+
+For more information, refer to the documentation: https://clerk.com/docs/references/nextjs/clerk-middleware#server-side-options-propagation
