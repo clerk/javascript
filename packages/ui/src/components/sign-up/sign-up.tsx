@@ -180,7 +180,7 @@ function SignUpComponentLoaded() {
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-9 border border-transparent px-2.5 py-1.5 text-base font-medium'>
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-base font-medium'>
                                 Didn&apos;t recieve a code? Resend (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
                               </p>
@@ -227,13 +227,13 @@ function SignUpComponentLoaded() {
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-9 border border-transparent px-2.5 py-1.5 text-base font-medium'>
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-base font-medium'>
                                 Didn&apos;t recieve a code? Resend (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
                               </p>
                             )}
                           >
-                            <TextButton>Didn&apos;t recieve a code? Resend</TextButton>
+                            <TextButton type='button'>Didn&apos;t recieve a code? Resend</TextButton>
                           </SignUp.Action>
                         }
                       />
@@ -277,7 +277,7 @@ function SignUpComponentLoaded() {
                           );
                         }}
                       >
-                        <TextButton>Didn&apos;t recieve a link? Resend</TextButton>
+                        <TextButton type='button'>Didn&apos;t recieve a link? Resend</TextButton>
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
