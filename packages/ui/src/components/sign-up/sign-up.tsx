@@ -168,6 +168,24 @@ function SignUpComponentLoaded() {
                     <Card.Header>
                       <Card.Title>Verify your phone</Card.Title>
                       <Card.Description>Enter the verification code sent to your phone</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          {/* TODO: replace with element https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number */}
+                          +1 (424) 424-4242{' '}
+                          <SignUp.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Edit phone number'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignUp.Action>
+                        </span>
+                      </Card.Description>
                     </Card.Header>
                     <Card.Body>
                       <OTPField
@@ -212,6 +230,24 @@ function SignUpComponentLoaded() {
                     <Card.Header>
                       <Card.Title>Verify your email</Card.Title>
                       <Card.Description>Enter the verification code sent to your email</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          {/* TODO: replace with element https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number */}
+                          alex.carpenter@clerk.dev{' '}
+                          <SignUp.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Edit email address'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignUp.Action>
+                        </span>
+                      </Card.Description>
                     </Card.Header>
                     <Card.Body>
                       <OTPField
