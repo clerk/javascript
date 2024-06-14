@@ -223,8 +223,6 @@ export interface ErrorThrower {
 
   throwMissingSecretKeyError(): never;
 
-  throwMissingEncryptionKeyError(): never;
-
   throwMissingClerkProviderError(params: { source?: string }): never;
 
   throw(message: string): never;
@@ -281,10 +279,6 @@ export function buildErrorThrower({ packageName, customMessages }: ErrorThrowerO
 
     throwMissingSecretKeyError(): never {
       throw new Error(buildMessage(messages.MissingSecretKeyErrorMessage));
-    },
-
-    throwMissingEncryptionKeyError(): never {
-      throw new Error(buildMessage(messages.MissingEncryptionKeyErrorMessage));
     },
 
     throwMissingClerkProviderError(params: { source?: string }): never {
