@@ -1,4 +1,4 @@
-export const Logo = () => (
+export const ClerkLogo = () => (
   <svg
     className='h-3.5 w-12'
     fill='none'
