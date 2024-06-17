@@ -68,7 +68,9 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarn
   // ---------------------------
   // result = `results` set to format
   useEffect(() => {
-    if (!matchers || !files) return;
+    if (!matchers || !files) {
+      return;
+    }
     const allResults = {};
 
     Promise.all(
@@ -90,15 +92,20 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarn
             } else {
               matches = Array.from(content.matchAll(matcherConfig.matcher));
             }
-            if (matches.length < 1) return;
+            if (matches.length < 1) {
+              return;
+            }
 
             // for each match, add to `instances` array
             matches.map(match => {
-              if (noWarnings && matcherConfig.warning) return;
+              if (noWarnings && matcherConfig.warning) {
+                return;
+              }
 
               // create if not exists
-              if (!allResults[matcherConfig.title])
+              if (!allResults[matcherConfig.title]) {
                 allResults[matcherConfig.title] = { instances: [], ...matcherConfig };
+              }
 
               const position = indexToPosition(content, match.index, { oneBased: true });
               const fileRelative = path.relative(process.cwd(), file);
@@ -112,8 +119,9 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarn
                     i.file === fileRelative
                   );
                 }).length > 0
-              )
+              ) {
                 return;
+              }
 
               allResults[matcherConfig.title].instances.push({
                 sdk,
@@ -176,7 +184,7 @@ export default function Scan({ fromVersion, toVersion, sdks, dir, ignore, noWarn
       .catch(err => {
         console.error(err);
       });
-  }, [matchers, files, noWarnings]);
+  }, [matchers, files, noWarnings, disableTelemetry]);
 
   return complete ? (
     <>

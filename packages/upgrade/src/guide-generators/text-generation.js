@@ -64,7 +64,9 @@ export const accordionForCategory = partial((categories, options, { data }) => {
   const items = filterCategories(data, categories);
   options ||= {};
 
-  if (options.additionalItems) items.push(...[].concat(options.additionalItems));
+  if (options.additionalItems) {
+    items.push(...[].concat(options.additionalItems));
+  }
 
   return `<Accordion titles={[${items.map(i => `"${parseInline(i.title)}"`).join(', ')}]}>
 ${items.map(i => `  <AccordionPanel>${indent('\n' + i.content.trim(), 4)}\n  </AccordionPanel>`).join('\n')}

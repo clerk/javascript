@@ -1,4 +1,4 @@
-import { randomUUID, createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { readPackageSync } from 'read-pkg';
@@ -41,14 +41,18 @@ export default function guessFrameworks(dir, disableTelemetry) {
   const _uuid = md5(JSON.stringify(pkg));
 
   // no guessing if there are no deps
-  if (!pkg.dependencies && !pkg.devDependencies) return { guesses: [], _uuid };
+  if (!pkg.dependencies && !pkg.devDependencies) {
+    return { guesses: [], _uuid };
+  }
   const deps = pkg.dependencies ? Object.keys(pkg.dependencies) : [];
   const devDeps = pkg.devDependencies ? Object.keys(pkg.devDependencies) : [];
 
   return {
     _uuid,
     guesses: SDKS.reduce((m, { label, value }) => {
-      if (deps.includes(label) || devDeps.includes(label)) m.push({ label, value });
+      if (deps.includes(label) || devDeps.includes(label)) {
+        m.push({ label, value });
+      }
       return m;
     }, []),
   };

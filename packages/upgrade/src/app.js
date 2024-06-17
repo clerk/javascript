@@ -24,8 +24,11 @@ export default function App({
   const [sdkGuesses, setSdkGuesses] = useState([]);
   const [sdkGuessConfirmed, setSdkGuessConfirmed] = useState(false);
   const [sdkGuessAttempted, setSdkGuessAttempted] = useState(false);
+  // See comments below, can be enabled on next major
+  // eslint-disable-next-line no-unused-vars
   const [fromVersion, setFromVersion] = useState(_fromVersion);
   const [fromVersionGuessAttempted, setFromVersionGuessAttempted] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [toVersion, setToVersion] = useState(_toVersion);
   const [dir, setDir] = useState(_dir);
   const [ignore, setIgnore] = useState(_ignore);
@@ -41,9 +44,11 @@ export default function App({
 
   // We try to guess which SDK they are using
   if (isEmpty(sdks) && isEmpty(sdkGuesses) && !sdkGuessAttempted) {
-    if (!dir) return setDir(process.cwd());
+    if (!dir) {
+      return setDir(process.cwd());
+    }
     const { guesses, _uuid } = guessFrameworks(dir, disableTelemetry);
-    console.log({ guesses, _uuid })
+    console.log({ guesses, _uuid });
     setUuid(_uuid);
     setSdkGuesses(guesses);
     setSdkGuessAttempted(true);
@@ -113,7 +118,9 @@ export default function App({
             onChange={item => {
               setSdkGuessConfirmed(true);
               // if true, we were right so we set the sdk
-              if (item === 'yes') setSdks(sdkGuesses.map(guess => guess.value));
+              if (item === 'yes') {
+                setSdks(sdkGuesses.map(guess => guess.value));
+              }
             }}
           />
         </>

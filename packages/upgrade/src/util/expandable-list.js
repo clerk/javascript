@@ -48,7 +48,9 @@ export default function ExpandableList({ items, numberVisible = 10 }) {
       <Newline />
 
       {state.all.reduce((memo, item, idx) => {
-        if (idx < state.visible[0] || idx >= state.visible[1]) return memo;
+        if (idx < state.visible[0] || idx >= state.visible[1]) {
+          return memo;
+        }
 
         const locations = item.instances.map(
           instance => `${instance.file}:${instance.position.line}:${instance.position.column}`,
