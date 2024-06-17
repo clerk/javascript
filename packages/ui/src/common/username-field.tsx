@@ -19,12 +19,16 @@ export function UsernameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
+<<<<<<< HEAD
             {label}{' '}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
             ) : !props?.required ? (
               <Field.Optional>Optional</Field.Optional>
             ) : null}
+=======
+            {label} {alternativeFieldTrigger && <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>}
+>>>>>>> 5489624ab (implement dynamic fields)
           </Field.Label>
         </Common.Label>
         <Common.FieldState>
