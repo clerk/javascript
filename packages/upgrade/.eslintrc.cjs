@@ -5,8 +5,8 @@ module.exports = {
   parserOptions: {
     babelOptions: {
       parserOpts: {
-        plugins: ['jsx']
-      }
-    }
-  }
+        plugins: ['jsx'],
+      },
+    },
+  },
 };
