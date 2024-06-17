@@ -83,7 +83,7 @@ export const Input = React.forwardRef(function Input(
         // state
         {
           native:
-            'border-[--cl-field-input-border] hover:border-[--cl-field-input-border-active] focus-visible:border-[--cl-field-input-border-active] focus-visible:ring-[0.1875rem] focus-visible:ring-[--cl-field-input-ring]',
+            'border-[--cl-field-input-border] focus-visible:border-[--cl-field-input-border-active] focus-visible:ring-[0.1875rem] focus-visible:ring-[--cl-field-input-ring] hover:enabled:border-[--cl-field-input-border-active]',
           hover: 'border-[--cl-field-input-border-active]',
           'focus-visible': 'border-[--cl-field-input-border-active] ring-[0.1875rem] ring-[--cl-field-input-ring]',
         }[state],
@@ -115,12 +115,6 @@ export const Input = React.forwardRef(function Input(
             '[--cl-field-input-ring:theme(colors.warning.DEFAULT/0.2)]',
           ],
         }[intent],
-        // data-[invalid] overrides any currently-defined `intent`
-        [
-          'data-[invalid]:[--cl-field-input-border:theme(colors.danger.DEFAULT)]',
-          'data-[invalid]:[--cl-field-input-border-active:theme(colors.danger.DEFAULT)]',
-          'data-[invalid]:[--cl-field-input-ring:theme(colors.danger.DEFAULT/0.2)]',
-        ],
         className,
       )}
       {...props}
