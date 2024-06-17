@@ -4,6 +4,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 import type { EnvironmentResource } from '@clerk/types';
 
 import { EmailField } from '~/common/email-field';
+import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { LastNameField } from '~/common/last-name-field';
 import { OTPField } from '~/common/otp-field';
@@ -117,7 +118,14 @@ function SignUpComponentLoaded() {
                         />
                       ) : null}
 
-                      {phoneNumberEnabled ? (
+                      {emailAddressEnabled && !phoneNumberEnabled ? (
+                        <EmailField
+                          required={emailAddressRequired}
+                          disabled={isGlobalLoading}
+                        />
+                      ) : null}
+
+                      {phoneNumberEnabled && !emailAddressEnabled ? (
                         <PhoneNumberField
                           required={phoneNumberRequired}
                           disabled={isGlobalLoading}
@@ -125,10 +133,12 @@ function SignUpComponentLoaded() {
                         />
                       ) : null}
 
-                      {emailAddressEnabled ? (
-                        <EmailField
-                          required={emailAddressRequired}
+                      {emailAddressEnabled && phoneNumberEnabled ? (
+                        <EmailOrPhoneNumberField
+                          requiredEmail={emailAddressRequired}
+                          requiredPhoneNumber={phoneNumberRequired}
                           disabled={isGlobalLoading}
+                          locationBasedCountryIso={locationBasedCountryIso}
                         />
                       ) : null}
 
