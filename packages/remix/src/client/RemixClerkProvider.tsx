@@ -33,6 +33,7 @@ const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> |
  */
 type ClerkProviderPropsWithState = RemixClerkProviderProps & {
   clerkState: ClerkState;
+  spaMode?: boolean;
 };
 
 export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState): JSX.Element {
@@ -42,10 +43,13 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
     awaitableNavigateRef.current = awaitableNavigate;
   }, [awaitableNavigate]);
 
-  const { clerkState, ...restProps } = rest;
+  const { clerkState, spaMode, ...restProps } = rest;
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
-  assertValidClerkState(clerkState);
+  if (!spaMode) {
+    assertValidClerkState(clerkState);
+  }
+
   const {
     __clerk_ssr_state,
     __publishableKey,
@@ -68,7 +72,9 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
   } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
-    warnForSsr(clerkState);
+    if (!spaMode) {
+      warnForSsr(clerkState);
+    }
   }, []);
 
   React.useEffect(() => {
