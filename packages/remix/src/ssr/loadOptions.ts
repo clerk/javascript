@@ -8,10 +8,11 @@ import { isTruthy } from '@clerk/shared/underscore';
 import { noSecretKeyError, satelliteAndMissingProxyUrlAndDomain, satelliteAndMissingSignInUrl } from '../utils/errors';
 import { getEnvVariable } from '../utils/utils';
 import type { LoaderFunctionArgs, RootAuthLoaderOptions } from './types';
+import { patchRequest } from './utils';
 
 export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderOptions = {}) => {
   const { request, context } = args;
-  const clerkRequest = createClerkRequest(request);
+  const clerkRequest = createClerkRequest(patchRequest(request));
 
   // Fetch environment variables across Remix runtime.
   // 1. First check if the user passed the key in the getAuth function or the rootAuthLoader.
