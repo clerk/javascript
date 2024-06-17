@@ -120,7 +120,7 @@ runs:
 
     - name: Install NPM Dependencies
       if: steps.cache-node-modules.outputs.cache-hit != 'true' # Don't run if it's an **exact** match
-      run: mkdir node_modules && npm ci --audit=false --fund=false --prefer-offline
+      run: mkdir node_modules && npm ci --audit=false --fund=false --prefer-offline && npm prune
       shell: bash
 
     - name: Save node_modules

@@ -41,7 +41,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: List node_modules
-        run: npm ls
+        run: npm ls --package-lock-only
         shell: bash
 
       - name: Require Changeset
