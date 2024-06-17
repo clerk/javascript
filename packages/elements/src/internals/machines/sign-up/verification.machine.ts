@@ -136,8 +136,8 @@ export const SignUpVerificationMachine = setup({
   },
   actions: {
     resendableTick: assign(({ context }) => ({
-      resendable: context.resendableAfter === 0,
-      resendableAfter: context.resendableAfter > 0 ? context.resendableAfter - 1 : context.resendableAfter,
+      resendable: context.resendableAfter === 1,
+      resendableAfter: context.resendableAfter > 1 ? context.resendableAfter - 1 : context.resendableAfter,
     })),
     resendableReset: assign({
       resendable: false,
