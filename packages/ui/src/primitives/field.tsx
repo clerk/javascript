@@ -115,12 +115,6 @@ export const Input = React.forwardRef(function Input(
             '[--cl-field-input-ring:theme(colors.warning.DEFAULT/0.2)]',
           ],
         }[intent],
-        // data-[invalid] overrides any currently-defined `intent`
-        [
-          'data-[invalid]:[--cl-field-input-border:theme(colors.danger.DEFAULT)]',
-          'data-[invalid]:[--cl-field-input-border-active:theme(colors.danger.DEFAULT)]',
-          'data-[invalid]:[--cl-field-input-ring:theme(colors.danger.DEFAULT/0.2)]',
-        ],
         className,
       )}
       {...props}
