@@ -77,7 +77,7 @@ export function OTPField({
           </Common.FieldError>
         </Field.Root>
       </Common.Field>
-      {resend && <p className='text-gray-10 text-center text-base font-normal'>{resend}</p>}
+      {resend && resend}
     </div>
   );
 }
