@@ -1,11 +1,14 @@
-import { randomUUID } from 'crypto';
+import { randomUUID, createHash } from 'crypto';
 import fs from 'fs';
-import md5 from 'md5';
 import path from 'path';
 import { readPackageSync } from 'read-pkg';
 import tempDir from 'temp-dir';
 
 import SDKS from '../constants/sdks.js';
+
+function md5(data) {
+  return createHash('md5').update(data).digest('hex');
+}
 
 // Telemetry Note
 // --------------

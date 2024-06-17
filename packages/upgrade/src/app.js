@@ -43,6 +43,7 @@ export default function App({
   if (isEmpty(sdks) && isEmpty(sdkGuesses) && !sdkGuessAttempted) {
     if (!dir) return setDir(process.cwd());
     const { guesses, _uuid } = guessFrameworks(dir, disableTelemetry);
+    console.log({ guesses, _uuid })
     setUuid(_uuid);
     setSdkGuesses(guesses);
     setSdkGuessAttempted(true);
