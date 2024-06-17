@@ -3,23 +3,24 @@ import React from 'react';
 
 import * as Field from '../primitives/field';
 
-export function UsernameField({
+export function EmailOrUsernameField({
   alternativeFieldTrigger,
-  label = 'Username',
+  label = 'Email address or username',
   ...props
-}: { alternativeFieldTrigger?: React.ReactNode; label?: React.ReactNode } & Omit<
-  React.ComponentProps<typeof Common.Input>,
-  'type'
->) {
+}: {
+  alternativeFieldTrigger?: React.ReactNode;
+  label?: React.ReactNode;
+} & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field
-      name='username'
+      name='identifier'
       asChild
     >
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {label} {alternativeFieldTrigger && <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>}
+            {label}{' '}
+            {alternativeFieldTrigger && <span className='flex-grow self-end text-end'>{alternativeFieldTrigger}</span>}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>
