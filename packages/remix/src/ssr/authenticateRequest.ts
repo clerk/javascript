@@ -3,6 +3,7 @@ import type { AuthenticateRequestOptions, SignedInState, SignedOutState } from '
 import { AuthStatus } from '@clerk/backend/internal';
 
 import type { LoaderFunctionArgs } from './types';
+import { patchRequest } from './utils';
 
 export async function authenticateRequest(
   args: LoaderFunctionArgs,
@@ -23,7 +24,7 @@ export async function authenticateRequest(
     domain,
     publishableKey,
     userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
-  }).authenticateRequest(request, {
+  }).authenticateRequest(patchRequest(request), {
     audience,
     authorizedParties,
     signInUrl,
