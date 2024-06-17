@@ -16,6 +16,8 @@
   </strong>
 </p>
 
+<!-- TEST CI -->
+
 This repository contains all the Clerk JavaScript SDKs under the `@clerk` namespace. Visit [clerk.com](https://clerk.com) to signup for an account.
 
 [![chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
