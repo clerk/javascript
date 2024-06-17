@@ -50,6 +50,36 @@ export const Label = React.forwardRef(function Label(
   );
 });
 
+export const LabelEnd = React.forwardRef(function Label(
+  { className, children, ...props }: React.HTMLAttributes<HTMLSpanElement>,
+  forwardedRef: React.ForwardedRef<HTMLSpanElement>,
+) {
+  return (
+    <span
+      ref={forwardedRef}
+      {...props}
+      className={cn('flex-grow self-end text-end', className)}
+    >
+      {children}
+    </span>
+  );
+});
+
+export const Optional = React.forwardRef(function Optional(
+  { className, children, ...props }: React.ComponentProps<typeof LabelEnd>,
+  forwardedRef: React.ForwardedRef<React.ComponentRef<typeof LabelEnd>>,
+) {
+  return (
+    <LabelEnd
+      ref={forwardedRef}
+      {...props}
+      className={cn('text-gray-10 text-sm font-medium', className)}
+    >
+      {children}
+    </LabelEnd>
+  );
+});
+
 export const Input = React.forwardRef(function Input(
   {
     asChild,

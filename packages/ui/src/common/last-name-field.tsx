@@ -15,11 +15,7 @@ export function LastNameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {' '}
-            <span className='flex w-full items-baseline justify-between'>
-              <span>{label}</span>
-              {!props?.required && <span className='text-gray-10 text-sm font-medium'>Optional</span>}
-            </span>
+            {label} {!props?.required ? <Field.Optional>Optional</Field.Optional> : null}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>
