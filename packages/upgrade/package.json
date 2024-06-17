@@ -15,7 +15,6 @@
     "clean": "del-cli dist/*",
     "dev": "babel --out-dir=dist --watch src --copy-files",
     "lint": "eslint src/",
-    "lint:attw": "attw --pack .",
     "lint:publint": "publint"
   },
   "babel": {
