@@ -236,7 +236,7 @@ export function _SignInStart(): JSX.Element {
     }
     return {
       ...buildRequest(fields),
-      ...(hasPassword && { strategy: 'password' }),
+      ...(hasPassword && !userSettings.saml.enabled ? { strategy: 'password' } : {}),
     } as SignInCreateParams;
   };
 
