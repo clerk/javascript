@@ -173,18 +173,21 @@ function SignUpComponentLoaded() {
                       <OTPField
                         disabled={isGlobalLoading}
                         // TODO:
-                        // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
-                        // 2. Replace `button` with consolidated styles (tackled later)
+                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
-                          <>
-                            Didn&apos;t recieve a code?{' '}
-                            <button
-                              type='button'
-                              className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
-                            >
-                              Resend
-                            </button>
-                          </>
+                          <SignUp.Action
+                            asChild
+                            resend
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            fallback={({ resendableAfter }) => (
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                                Didn&apos;t recieve a code? Resend (
+                                <span className='tabular-nums'>{resendableAfter}</span>)
+                              </p>
+                            )}
+                          >
+                            <TextButton type='button'>Didn&apos;t recieve a code? Resend</TextButton>
+                          </SignUp.Action>
                         }
                       />
                       <Common.Loading scope='step:verifications'>
@@ -217,18 +220,21 @@ function SignUpComponentLoaded() {
                       <OTPField
                         disabled={isGlobalLoading}
                         // TODO:
-                        // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
-                        // 2. Replace `button` with consolidated styles (tackled later)
+                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
-                          <>
-                            Didn&apos;t recieve a code?{' '}
-                            <button
-                              type='button'
-                              className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
-                            >
-                              Resend
-                            </button>
-                          </>
+                          <SignUp.Action
+                            asChild
+                            resend
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            fallback={({ resendableAfter }) => (
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                                Didn&apos;t recieve a code? Resend (
+                                <span className='tabular-nums'>{resendableAfter}</span>)
+                              </p>
+                            )}
+                          >
+                            <TextButton type='button'>Didn&apos;t recieve a code? Resend</TextButton>
+                          </SignUp.Action>
                         }
                       />
                       <Common.Loading scope='step:verifications'>
@@ -264,14 +270,14 @@ function SignUpComponentLoaded() {
                         // eslint-disable-next-line react/no-unstable-nested-components
                         fallback={({ resendableAfter }) => {
                           return (
-                            <p className='text-gray-a11 focus-visible:ring-gray-a3 focus-visible:border-gray-a8 flex w-full items-center justify-center rounded-md border border-transparent bg-transparent bg-clip-padding px-2.5 py-1.5 text-base font-medium outline-none focus-visible:ring-[0.1875rem]'>
+                            <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
                               Didn&apos;t recieve a link? Resend (
                               <span className='tabular-nums'>{resendableAfter}</span>)
                             </p>
                           );
                         }}
                       >
-                        <TextButton>Didn&apos;t recieve a link? Resend</TextButton>
+                        <TextButton type='button'>Didn&apos;t recieve a link? Resend</TextButton>
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
