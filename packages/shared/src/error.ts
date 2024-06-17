@@ -188,6 +188,7 @@ export function isEmailLinkError(err: Error): err is EmailLinkError {
 export const EmailLinkErrorCode = {
   Expired: 'expired',
   Failed: 'failed',
+  ClientMismatch: 'client_mismatch',
 };
 
 const DefaultMessages = Object.freeze({

@@ -1,19 +1,30 @@
-import { joinURL } from '@clerk/shared';
+import { joinURL } from '@clerk/shared/url';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, not, or, sendTo, setup, stopChild } from 'xstate';
+import { and, assign, enqueueActions, fromPromise, not, or, raise, sendTo, setup } from 'xstate';
 
-import { SIGN_IN_DEFAULT_BASE_PATH, SIGN_UP_DEFAULT_BASE_PATH, SSO_CALLBACK_PATH_ROUTE } from '~/internals/constants';
+import {
+  ERROR_CODES,
+  ROUTING,
+  SIGN_IN_DEFAULT_BASE_PATH,
+  SIGN_UP_DEFAULT_BASE_PATH,
+  SSO_CALLBACK_PATH_ROUTE,
+} from '~/internals/constants';
 import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
+import { FormMachine } from '../form';
+import { SignInResetPasswordMachine } from './reset-password.machine';
 import type {
   SignInRouterContext,
   SignInRouterEvents,
   SignInRouterNextEvent,
   SignInRouterSchema,
 } from './router.types';
+import { SignInStartMachine } from './start.machine';
+import { SignInFirstFactorMachine, SignInSecondFactorMachine } from './verification.machine';
 
 export type TSignInRouterMachine = typeof SignInRouterMachine;
 
@@ -32,22 +43,40 @@ export const SignInRouterMachineId = 'SignInRouter';
 
 export const SignInRouterMachine = setup({
   actors: {
-    thirdParty: ThirdPartyMachine,
+    firstFactorMachine: SignInFirstFactorMachine,
+    formMachine: FormMachine,
+    resetPasswordMachine: SignInResetPasswordMachine,
+    startMachine: SignInStartMachine,
+    secondFactorMachine: SignInSecondFactorMachine,
+    thirdPartyMachine: ThirdPartyMachine,
+    webAuthnAutofillSupport: fromPromise(() => isWebAuthnAutofillSupported()),
   },
   actions: {
+    clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
-      if (!context.router) return;
-      if (!force && shouldUseVirtualRouting()) return;
-      if (context.exampleMode) return;
+      if (!context.router) {
+        return;
+      }
+      if (!force && shouldUseVirtualRouting()) {
+        return;
+      }
+      if (context.exampleMode) {
+        return;
+      }
 
       const resolvedPath = joinURL(context.router.basePath, path);
-      if (resolvedPath === context.router.pathname()) return;
+      if (resolvedPath === context.router.pathname()) {
+        return;
+      }
 
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
-    setActive({ context, event }) {
-      if (context.exampleMode) return;
+    raiseNext: raise({ type: 'NEXT' }),
+    setActive: enqueueActions(({ enqueue, check, context, event }) => {
+      if (check('isExampleMode')) {
+        return;
+      }
 
       const lastActiveSessionId = context.clerk.client.lastActiveSessionId;
       const createdSessionId = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn)
@@ -57,14 +86,52 @@ export const SignInRouterMachine = setup({
 
       const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignInUrl());
       void context.clerk.setActive({ session, beforeEmit });
-    },
+
+      enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
+    }),
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
-        if (error) return error;
+        if (error) {
+          return error;
+        }
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
-    resetError: assign({ error: undefined }),
+    setFormErrors: ({ context }, params: { error: Error }) =>
+      sendTo(context.formRef, {
+        type: 'ERRORS.SET',
+        error: params.error,
+      }),
+    setFormOAuthErrors: ({ context }) => {
+      const errorOrig = context.clerk.client.signIn.firstFactorVerification.error;
+
+      if (!errorOrig) {
+        return;
+      }
+
+      let error: ClerkElementsError;
+
+      switch (errorOrig.code) {
+        case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
+        case ERROR_CODES.OAUTH_ACCESS_DENIED:
+        case ERROR_CODES.NOT_ALLOWED_ACCESS:
+        case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
+        case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
+        case ERROR_CODES.USER_LOCKED:
+          error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
+          break;
+        default:
+          error = new ClerkElementsError(
+            'unable_to_complete',
+            'Unable to complete action at this time. If the problem persists please contact support.',
+          );
+      }
+
+      context.formRef.send({
+        type: 'ERRORS.SET',
+        error,
+      });
+    },
     transfer: ({ context }) => {
       const searchParams = new URLSearchParams({ __clerk_transfer: '1' });
       context.router?.push(`${context.signUpPath}?${searchParams}`);
@@ -73,6 +140,7 @@ export const SignInRouterMachine = setup({
   guards: {
     hasAuthenticatedViaClerkJS: ({ context }) =>
       Boolean(context.clerk.client.signIn.status === null && context.clerk.client.lastActiveSessionId),
+    hasOAuthError: ({ context }) => Boolean(context.clerk?.client?.signIn?.firstFactorVerification?.error),
     hasResource: ({ context }) => Boolean(context.clerk?.client?.signIn?.status),
 
     isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', not('isExampleMode')]),
@@ -109,10 +177,16 @@ export const SignInRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+      actions: sendTo(ThirdPartyMachineId, ({ context, event }) => ({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete: context.clerk.buildAfterSignInUrl(),
         },
       })),
     },
@@ -122,26 +196,19 @@ export const SignInRouterMachine = setup({
         params: { strategy: 'saml' },
       }),
     },
-    'NAVIGATE.PREVIOUS': '.Hist',
-    'NAVIGATE.START': '.Start',
-    'ROUTE.REGISTER': {
-      actions: enqueueActions(({ context, enqueue, event, self }) => {
-        const { id, logic, input } = event;
+    'FORM.ATTACH': {
+      description: 'Attach/re-attach the form to the router.',
+      actions: enqueueActions(({ enqueue, event }) => {
+        enqueue.assign({
+          formRef: event.formRef,
+        });
 
-        if (!self.getSnapshot().children[id]) {
-          // @ts-expect-error - This is valid (See: https://discord.com/channels/795785288994652170/1203714033190969405/1205595237293096960)
-          enqueue.spawnChild(logic, {
-            id,
-            systemId: id,
-            input: { basePath: context.router?.basePath, parent: self, ...input },
-            syncSnapshot: true, // Subscribes to the spawned actor and send back snapshot events
-          });
-        }
+        // Reset the current step, to reset the form reference.
+        enqueue.raise({ type: 'RESET.STEP' });
       }),
     },
-    'ROUTE.UNREGISTER': {
-      actions: stopChild(({ event }) => event.id),
-    },
+    'NAVIGATE.PREVIOUS': '.Hist',
+    'NAVIGATE.START': '.Start',
     LOADING: {
       actions: assign(({ event }) => ({
         loading: {
@@ -151,35 +218,45 @@ export const SignInRouterMachine = setup({
         },
       })),
     },
+    RESET: '.Idle',
   },
   states: {
     Idle: {
+      invoke: {
+        id: 'webAuthnAutofill',
+        src: 'webAuthnAutofillSupport',
+        onDone: {
+          actions: assign({ webAuthnAutofillSupport: ({ event }) => event.output }),
+        },
+      },
       on: {
         INIT: {
           actions: assign(({ event }) => ({
             clerk: event.clerk,
-            router: event.router,
-            signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
             exampleMode: event.exampleMode || false,
+            formRef: event.formRef,
             loading: {
               isLoading: false,
             },
+            router: event.router,
+            signUpPath: event.signUpPath || SIGN_UP_DEFAULT_BASE_PATH,
           })),
           target: 'Init',
         },
       },
     },
     Init: {
-      entry: enqueueActions(({ enqueue, self }) => {
+      entry: enqueueActions(({ context, enqueue, self }) => {
         if (!self.getSnapshot().children[ThirdPartyMachineId]) {
-          enqueue.spawnChild('thirdParty', {
+          enqueue.spawnChild('thirdPartyMachine', {
             id: ThirdPartyMachineId,
             systemId: ThirdPartyMachineId,
-            input: ({ context, self }) => ({
+            input: {
               basePath: context.router?.basePath ?? SIGN_IN_DEFAULT_BASE_PATH,
               flow: 'signIn',
+              formRef: context.formRef,
               parent: self,
-            }),
+            },
           });
         }
       }),
@@ -187,6 +264,10 @@ export const SignInRouterMachine = setup({
         {
           guard: 'needsCallback',
           target: 'Callback',
+        },
+        {
+          guard: 'isComplete',
+          actions: 'setActive',
         },
         {
           guard: 'isLoggedInAndSingleSession',
@@ -229,12 +310,34 @@ export const SignInRouterMachine = setup({
     },
     Start: {
       tags: 'route:start',
+      exit: 'clearFormErrors',
+      invoke: {
+        id: 'start',
+        src: 'startMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
+        'RESET.STEP': {
+          target: 'Start',
+          reenter: true,
+        },
+        'AUTHENTICATE.PASSKEY': {
+          actions: sendTo('start', ({ event }) => event),
+        },
+        'AUTHENTICATE.PASSKEY.AUTOFILL': {
+          actions: sendTo('start', ({ event }) => event),
+        },
         NEXT: [
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Start',
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -256,12 +359,26 @@ export const SignInRouterMachine = setup({
     },
     FirstFactor: {
       tags: 'route:first-factor',
+      invoke: {
+        id: 'firstFactor',
+        src: 'firstFactorMachine',
+        input: ({ context, self }) => ({
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
+        'RESET.STEP': {
+          target: 'FirstFactor',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Start',
           },
           {
             guard: 'statusNeedsSecondFactor',
@@ -299,7 +416,11 @@ export const SignInRouterMachine = setup({
         ChoosingStrategy: {
           tags: ['route:choose-strategy'],
           on: {
-            'NAVIGATE.PREVIOUS': 'Idle',
+            'NAVIGATE.PREVIOUS': {
+              description: 'Go to Idle, and also tell firstFactor to go to Pending',
+              target: 'Idle',
+              actions: sendTo('firstFactor', { type: 'NAVIGATE.PREVIOUS' }),
+            },
           },
         },
         ForgotPassword: {
@@ -312,12 +433,26 @@ export const SignInRouterMachine = setup({
     },
     SecondFactor: {
       tags: 'route:second-factor',
+      invoke: {
+        id: 'secondFactor',
+        src: 'secondFactorMachine',
+        input: ({ context, self }) => ({
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
+        'RESET.STEP': {
+          target: 'SecondFactor',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Start',
           },
           {
             guard: 'statusNeedsNewPassword',
@@ -329,12 +464,26 @@ export const SignInRouterMachine = setup({
     },
     ResetPassword: {
       tags: 'route:reset-password',
+      invoke: {
+        id: 'resetPassword',
+        src: 'resetPasswordMachine',
+        input: ({ context, self }) => ({
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
+        'RESET.STEP': {
+          target: 'ResetPassword',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isComplete',
             actions: 'setActive',
-            target: 'Start',
           },
           {
             guard: 'statusNeedsFirstFactor',
@@ -355,9 +504,13 @@ export const SignInRouterMachine = setup({
       on: {
         NEXT: [
           {
-            guard: or(['isComplete', 'hasAuthenticatedViaClerkJS']),
-            actions: 'setActive',
+            guard: 'hasOAuthError',
+            actions: ['setFormOAuthErrors', { type: 'navigateInternal', params: { force: true, path: '/' } }],
             target: 'Start',
+          },
+          {
+            guard: or(['isLoggedIn', 'isComplete', 'hasAuthenticatedViaClerkJS']),
+            actions: 'setActive',
           },
           {
             guard: 'statusNeedsIdentifier',
@@ -386,13 +539,13 @@ export const SignInRouterMachine = setup({
       on: {
         NEXT: {
           target: 'Start',
-          actions: 'resetError',
+          actions: 'clearFormErrors',
         },
       },
     },
     Hist: {
       type: 'history',
-      exit: 'resetError',
+      exit: 'clearFormErrors',
     },
   },
 });

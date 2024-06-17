@@ -1,4 +1,4 @@
-import { API_URL, API_VERSION, JWKS_CACHE_TTL_MS, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
+import { API_URL, API_VERSION, MAX_CACHE_LAST_UPDATED_AT_SECONDS } from '../constants';
 import {
   TokenVerificationError,
   TokenVerificationErrorAction,
@@ -26,19 +26,9 @@ function getCacheValues() {
   return Object.values(cache);
 }
 
-function setInCache(jwk: JsonWebKeyWithKid, jwksCacheTtlInMs: number) {
+function setInCache(jwk: JsonWebKeyWithKid, shouldExpire = true) {
   cache[jwk.kid] = jwk;
-  lastUpdatedAt = Date.now();
-
-  if (jwksCacheTtlInMs >= 0) {
-    setTimeout(() => {
-      if (jwk) {
-        delete cache[jwk.kid];
-      } else {
-        cache = {};
-      }
-    }, jwksCacheTtlInMs);
-  }
+  lastUpdatedAt = shouldExpire ? Date.now() : -1;
 }
 
 const LocalJwkKid = 'local';
@@ -83,7 +73,7 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
         n: modulus,
         e: 'AQAB',
       },
-      -1, // local key never expires in cache
+      false, // local key never expires in cache
     );
   }
 
@@ -92,6 +82,9 @@ export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
 
 export type LoadClerkJWKFromRemoteOptions = {
   kid: string;
+  /**
+   * @deprecated This cache TTL is deprecated and will be removed in the next major version. Specifying a cache TTL is now a no-op.
+   */
   jwksCacheTtlInMs?: number;
   skipJwksCache?: boolean;
   secretKey?: string;
@@ -108,7 +101,6 @@ export type LoadClerkJWKFromRemoteOptions = {
  * @param {Object} options
  * @param {string} options.kid - The id of the key that the JWT was signed with
  * @param {string} options.alg - The algorithm of the JWT
- * @param {number} options.jwksCacheTtlInMs - The TTL of the jwks cache (defaults to 1 hour)
  * @returns {JsonWebKey} key
  */
 export async function loadClerkJWKFromRemote({
@@ -116,11 +108,9 @@ export async function loadClerkJWKFromRemote({
   apiUrl = API_URL,
   apiVersion = API_VERSION,
   kid,
-  jwksCacheTtlInMs = JWKS_CACHE_TTL_MS,
   skipJwksCache,
 }: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  const needsFetch = !getFromCache(kid) || cacheHasExpired();
-  if (skipJwksCache || needsFetch) {
+  if (skipJwksCache || cacheHasExpired() || !getFromCache(kid)) {
     if (!secretKey) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,
@@ -139,7 +129,7 @@ export async function loadClerkJWKFromRemote({
       });
     }
 
-    keys.forEach(key => setInCache(key, jwksCacheTtlInMs));
+    keys.forEach(key => setInCache(key));
   }
 
   const jwk = getFromCache(kid);
@@ -152,11 +142,9 @@ export async function loadClerkJWKFromRemote({
       .join(', ');
 
     throw new TokenVerificationError({
-      action: TokenVerificationErrorAction.ContactSupport,
-      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT.${
-        jwkKeys ? ` The following kid is available: ${jwkKeys}` : ''
-      }`,
-      reason: TokenVerificationErrorReason.RemoteJWKMissing,
+      action: `Go to your Dashboard and validate your secret and public keys are correct. ${TokenVerificationErrorAction.ContactSupport} if the issue persists.`,
+      message: `Unable to find a signing key in JWKS that matches the kid='${kid}' of the provided session token. Please make sure that the __session cookie or the HTTP authorization header contain a Clerk-generated session JWT. The following kid is available: ${jwkKeys}`,
+      reason: TokenVerificationErrorReason.JWKKidMismatch,
     });
   }
 
@@ -208,7 +196,19 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
 }
 
 function cacheHasExpired() {
-  return Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
+  // If lastUpdatedAt is -1, it means that we're using a local JWKS and it never expires
+  if (lastUpdatedAt === -1) {
+    return false;
+  }
+
+  // If the cache has expired, clear the value so we don't attempt to make decisions based on stale data
+  const isExpired = Date.now() - lastUpdatedAt >= MAX_CACHE_LAST_UPDATED_AT_SECONDS * 1000;
+
+  if (isExpired) {
+    cache = {};
+  }
+
+  return isExpired;
 }
 
 type ErrorFields = {

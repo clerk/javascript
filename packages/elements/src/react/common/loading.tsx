@@ -1,3 +1,5 @@
+import { useClerk } from '@clerk/clerk-react';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { OAuthProvider, SamlStrategy } from '@clerk/types';
 import * as React from 'react';
 
@@ -27,7 +29,9 @@ type LoadingProps = {
 };
 
 function isSignInScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is LoadingScope<TSignInStep> {
-  if (!scope) return true;
+  if (!scope) {
+    return true;
+  }
 
   if (scope.startsWith('step:')) {
     return Object.prototype.hasOwnProperty.call(SIGN_IN_STEPS, scope.replace('step:', ''));
@@ -37,7 +41,9 @@ function isSignInScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is
 }
 
 function isSignUpScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is LoadingScope<TSignUpStep> {
-  if (!scope) return true;
+  if (!scope) {
+    return true;
+  }
 
   if (scope.startsWith('step:')) {
     return Object.prototype.hasOwnProperty.call(SIGN_UP_STEPS, scope.replace('step:', ''));
@@ -53,33 +59,37 @@ function isSignUpScope(scope: LoadingScope<TSignInStep | TSignUpStep>): scope is
  * @param {Function} children - A function that receives `isLoading` as an argument. `isLoading` is a boolean that indicates if the current scope is loading or not.
  *
  * @example
- * <SignIn>
- *   <Loading>
+ * <SignIn.Root>
+ *   <Clerk.Loading>
  *     {(isLoading) => isLoading && "Global loading..."}
- *   </Loading>
- * </SignIn>
+ *   </Clerk.Loading>
+ * </SignIn.Root>
  *
  * @example
- * <Step name="start">
- *  <Submit>
- *    <Loading>
+ * <SignIn.Step name="start">
+ *  <Clerk.Action submit>
+ *    <Clerk.Loading>
  *      {(isLoading) => isLoading ? "Start is loading..." : "Submit"}
- *    </Loading>
- *  </Submit>
- * </Step>
+ *    </Clerk.Loading>
+ *  </Clerk.Action>
+ * </SignIn.Step>
  *
  * @example
- * <Step name="start">
- *   <Loading scope="provider:google">
+ * <SignIn.Step name="start">
+ *   <Clerk.Loading scope="provider:google">
  *     {(isLoading) => (
- *       <Provider name="google" disabled={isLoading}>
+ *       <Clerk.Connection name="google" disabled={isLoading}>
  *         {isLoading ? "Loading..." : "Continue with Google"}
- *       </Provider>
+ *       </Clerk.Connection>
  *     )}
- *   </Loading>
- * </Step>
+ *   </Clerk.Loading>
+ * </SignIn.Step>
  */
 export function Loading({ children, scope }: LoadingProps) {
+  const clerk = useClerk();
+
+  clerk.telemetry?.record(eventComponentMounted('Elements_Loading', { scope: scope ?? false }));
+
   const signInRouterRef = SignInRouterCtx.useActorRef(true);
   const signUpRouterRef = SignUpRouterCtx.useActorRef(true);
 

@@ -55,7 +55,7 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
     const hasVerifiedExternalAccount = signUp.verifications?.externalAccount?.status == 'verified';
     const hasVerifiedWeb3Wallet = signUp.verifications?.web3Wallet?.status == 'verified';
 
-    if (hasEmailFilled || hasVerifiedEmail) {
+    if (hasEmailFilled && hasVerifiedEmail) {
       delete fields.emailAddress;
     }
 
@@ -82,7 +82,6 @@ export function minimizeFieldsForExistingSignup(fields: Fields, signUp: SignUpRe
     // Hide any non-required fields
     Object.entries(fields).forEach(([k, v]) => {
       if (v && !v.required) {
-        // @ts-ignore
         delete fields[k];
       }
     });

@@ -1,25 +1,32 @@
-import { joinURL } from '@clerk/shared';
+import { joinURL } from '@clerk/shared/url';
 import type { SignUpStatus, VerificationStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, log, not, or, sendTo, setup, spawnChild, stopChild } from 'xstate';
+import { and, assign, enqueueActions, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
+  ERROR_CODES,
+  ROUTING,
   SEARCH_PARAMS,
   SIGN_IN_DEFAULT_BASE_PATH,
   SIGN_UP_DEFAULT_BASE_PATH,
   SSO_CALLBACK_PATH_ROUTE,
 } from '~/internals/constants';
-import type { ClerkElementsError } from '~/internals/errors';
-import { ClerkElementsRuntimeError } from '~/internals/errors';
+import { ClerkElementsError, ClerkElementsRuntimeError } from '~/internals/errors';
 import { ThirdPartyMachine, ThirdPartyMachineId } from '~/internals/machines/third-party';
 import { shouldUseVirtualRouting } from '~/internals/machines/utils/next';
 
+import { SignUpContinueMachine } from './continue.machine';
 import type {
   SignUpRouterContext,
   SignUpRouterEvents,
   SignUpRouterNextEvent,
   SignUpRouterSchema,
 } from './router.types';
+import { SignUpStartMachine } from './start.machine';
+import { SignUpVerificationMachine } from './verification.machine';
+
+export const SignUpRouterMachineId = 'SignUpRouter';
+export type TSignUpRouterMachine = typeof SignUpRouterMachine;
 
 const isCurrentPath =
   (path: `/${string}`) =>
@@ -31,27 +38,41 @@ const needsStatus =
   ({ context, event }: { context: SignUpRouterContext; event?: SignUpRouterEvents }, _?: NonReducibleUnknown) =>
     (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk?.client?.signUp?.status === status;
 
-export const SignUpRouterMachineId = 'SignUpRouter';
-export type TSignUpRouterMachine = typeof SignUpRouterMachine;
-
 export const SignUpRouterMachine = setup({
   actors: {
-    thirdParty: ThirdPartyMachine,
+    continueMachine: SignUpContinueMachine,
+    startMachine: SignUpStartMachine,
+    thirdPartyMachine: ThirdPartyMachine,
+    verificationMachine: SignUpVerificationMachine,
   },
   actions: {
+    clearFormErrors: sendTo(({ context }) => context.formRef, { type: 'ERRORS.CLEAR' }),
     logUnknownError: snapshot => console.error('Unknown error:', snapshot),
     navigateInternal: ({ context }, { path, force = false }: { path: string; force?: boolean }) => {
-      if (!context.router) return;
-      if (!force && shouldUseVirtualRouting()) return;
-      if (context.exampleMode) return;
+      if (!context.router) {
+        return;
+      }
+      if (!force && shouldUseVirtualRouting()) {
+        return;
+      }
+      if (context.exampleMode) {
+        return;
+      }
 
       const resolvedPath = joinURL(context.router.basePath, path);
-      if (resolvedPath === context.router.pathname()) return;
+      if (resolvedPath === context.router.pathname()) {
+        return;
+      }
 
       context.router.shallowPush(resolvedPath);
     },
     navigateExternal: ({ context }, { path }: { path: string }) => context.router?.push(path),
-    setActive({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) {
+    raiseNext: raise({ type: 'NEXT' }),
+    setActive: ({ context, event }, params?: { sessionId?: string; useLastActiveSession?: boolean }) => {
+      if (context.exampleMode) {
+        return;
+      }
+
       const session =
         params?.sessionId ||
         (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
@@ -60,13 +81,45 @@ export const SignUpRouterMachine = setup({
       const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignUpUrl());
       void context.clerk.setActive({ session, beforeEmit });
     },
+    delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
     setError: assign({
       error: (_, { error }: { error?: ClerkElementsError }) => {
-        if (error) return error;
+        if (error) {
+          return error;
+        }
         return new ClerkElementsRuntimeError('Unknown error');
       },
     }),
-    resetError: assign({ error: undefined }),
+    setFormOAuthErrors: ({ context }) => {
+      const errorOrig = context.clerk.client.signIn.firstFactorVerification.error;
+
+      if (!errorOrig) {
+        return;
+      }
+
+      let error: ClerkElementsError;
+
+      switch (errorOrig.code) {
+        case ERROR_CODES.NOT_ALLOWED_TO_SIGN_UP:
+        case ERROR_CODES.OAUTH_ACCESS_DENIED:
+        case ERROR_CODES.NOT_ALLOWED_ACCESS:
+        case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
+        case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
+        case ERROR_CODES.USER_LOCKED:
+          error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
+          break;
+        default:
+          error = new ClerkElementsError(
+            'unable_to_complete',
+            'Unable to complete action at this time. If the problem persists please contact support.',
+          );
+      }
+
+      context.formRef.send({
+        type: 'ERRORS.SET',
+        error,
+      });
+    },
     transfer: ({ context }) => context.router?.push(context.clerk.buildSignInUrl()),
   },
   guards: {
@@ -78,7 +131,9 @@ export const SignUpRouterMachine = setup({
     hasCreatedSession: ({ context }) => Boolean(context.router?.searchParams().get(SEARCH_PARAMS.createdSession)),
     hasClerkStatus: ({ context }, params?: { status: VerificationStatus }) => {
       const value = context.router?.searchParams().get(SEARCH_PARAMS.status);
-      if (!params) return Boolean(value);
+      if (!params) {
+        return Boolean(value);
+      }
       return value === params.status;
     },
     hasClerkTransfer: ({ context }) => Boolean(context.router?.searchParams().get(SEARCH_PARAMS.transfer)),
@@ -121,10 +176,16 @@ export const SignUpRouterMachine = setup({
   initial: 'Idle',
   on: {
     'AUTHENTICATE.OAUTH': {
-      actions: sendTo(ThirdPartyMachineId, ({ event }) => ({
+      actions: sendTo(ThirdPartyMachineId, ({ context, event }) => ({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete: context.clerk.buildAfterSignUpUrl(),
         },
       })),
     },
@@ -134,26 +195,19 @@ export const SignUpRouterMachine = setup({
         params: { strategy: 'saml' },
       }),
     },
-    'NAVIGATE.PREVIOUS': '.Hist',
-    'NAVIGATE.START': '.Start',
-    'ROUTE.REGISTER': {
-      actions: enqueueActions(({ context, enqueue, event, self, system }) => {
-        const { id, logic, input } = event;
+    'FORM.ATTACH': {
+      description: 'Attach/re-attach the form to the router.',
+      actions: enqueueActions(({ enqueue, event }) => {
+        enqueue.assign({
+          formRef: event.formRef,
+        });
 
-        if (!system.get(id)) {
-          // @ts-expect-error - This is valid (See: https://discord.com/channels/795785288994652170/1203714033190969405/1205595237293096960)
-          enqueue.spawnChild(logic, {
-            id,
-            systemId: id,
-            input: { basePath: context.router?.basePath, parent: self, ...input },
-            syncSnapshot: true, // Subscribes to the spawned actor and send back snapshot events
-          });
-        }
+        // Reset the current step, to reset the form reference.
+        enqueue.raise({ type: 'RESET.STEP' });
       }),
     },
-    'ROUTE.UNREGISTER': {
-      actions: stopChild(({ event }) => event.id),
-    },
+    'NAVIGATE.PREVIOUS': '.Hist',
+    'NAVIGATE.START': '.Start',
     LOADING: {
       actions: assign(({ event }) => ({
         loading: {
@@ -163,6 +217,7 @@ export const SignUpRouterMachine = setup({
         },
       })),
     },
+    RESET: '.Idle',
   },
   states: {
     Idle: {
@@ -176,21 +231,26 @@ export const SignUpRouterMachine = setup({
               isLoading: false,
             },
             exampleMode: event.exampleMode || false,
+            formRef: event.formRef,
           })),
           target: 'Init',
         },
       },
     },
     Init: {
-      entry: spawnChild('thirdParty', {
-        id: ThirdPartyMachineId,
-        systemId: ThirdPartyMachineId,
-        input: ({ context, self }) => ({
-          basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
-          environment: context.clerk.__unstable__environment,
-          flow: 'signUp',
-          parent: self,
-        }),
+      entry: enqueueActions(({ context, enqueue, self }) => {
+        if (!self.getSnapshot().children[ThirdPartyMachineId]) {
+          enqueue.spawnChild('thirdPartyMachine', {
+            id: ThirdPartyMachineId,
+            systemId: ThirdPartyMachineId,
+            input: {
+              basePath: context.router?.basePath ?? SIGN_UP_DEFAULT_BASE_PATH,
+              flow: 'signUp',
+              formRef: context.formRef,
+              parent: self,
+            },
+          });
+        }
       }),
       always: [
         {
@@ -225,11 +285,28 @@ export const SignUpRouterMachine = setup({
     },
     Start: {
       tags: 'route:start',
+      exit: 'clearFormErrors',
+      invoke: {
+        id: 'start',
+        src: 'startMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
+        'RESET.STEP': {
+          target: 'Start',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsVerification',
@@ -246,11 +323,27 @@ export const SignUpRouterMachine = setup({
     },
     Continue: {
       tags: 'route:continue',
+      invoke: {
+        id: 'continue',
+        src: 'continueMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       on: {
+        'RESET.STEP': {
+          target: 'Continue',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsVerification',
@@ -262,13 +355,28 @@ export const SignUpRouterMachine = setup({
     },
     Verification: {
       tags: 'route:verification',
+      invoke: {
+        id: 'verification',
+        src: 'verificationMachine',
+        input: ({ context, self }) => ({
+          basePath: context.router?.basePath,
+          formRef: context.formRef,
+          parent: self,
+        }),
+        onDone: {
+          actions: 'raiseNext',
+        },
+      },
       always: [
         {
           guard: 'hasCreatedSession',
-          actions: ({ context }) => ({
-            type: 'setActive',
-            params: { sessionId: context.router?.searchParams().get(SEARCH_PARAMS.createdSession) },
-          }),
+          actions: [
+            ({ context }) => ({
+              type: 'setActive',
+              params: { sessionId: context.router?.searchParams().get(SEARCH_PARAMS.createdSession) },
+            }),
+            'delayedReset',
+          ],
         },
         {
           guard: { type: 'hasClerkStatus', params: { status: 'verified' } },
@@ -280,10 +388,14 @@ export const SignUpRouterMachine = setup({
         },
       ],
       on: {
+        'RESET.STEP': {
+          target: 'Verification',
+          reenter: true,
+        },
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             guard: 'statusNeedsContinue',
@@ -300,12 +412,12 @@ export const SignUpRouterMachine = setup({
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'delayedReset'],
           },
           {
             description: 'Handle a case where the user has already been authenticated via ClerkJS',
             guard: 'hasAuthenticatedViaClerkJS',
-            actions: { type: 'setActive', params: { useLastActiveSession: true } },
+            actions: [{ type: 'setActive', params: { useLastActiveSession: true } }, 'delayedReset'],
           },
           {
             guard: 'statusNeedsVerification',
@@ -329,13 +441,13 @@ export const SignUpRouterMachine = setup({
       on: {
         NEXT: {
           target: 'Start',
-          actions: 'resetError',
+          actions: 'clearFormErrors',
         },
       },
     },
     Hist: {
       type: 'history',
-      exit: 'resetError',
+      exit: 'clearFormErrors',
     },
   },
 });

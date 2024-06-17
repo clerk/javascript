@@ -42,7 +42,19 @@ export const constants = {
   /**
    * The version of the dependency to use, controlled programmatically.
    */
+  E2E_NPM_FORCE: process.env.E2E_NPM_FORCE,
+  /**
+   * The version of the dependency to use, controlled programmatically.
+   */
   E2E_NEXTJS_VERSION: process.env.E2E_NEXTJS_VERSION,
+  /**
+   * The version of the dependency to use, controlled programmatically.
+   */
+  E2E_REACT_VERSION: process.env.E2E_REACT_VERSION,
+  /**
+   * The version of the dependency to use, controlled programmatically.
+   */
+  E2E_REACT_DOM_VERSION: process.env.E2E_REACT_DOM_VERSION,
   /**
    * The version of the dependency to use, controlled programmatically.
    */

@@ -1,4 +1,4 @@
-import { useOrganizationList } from '@clerk/shared/react';
+import { useOrganizationList, useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
@@ -38,6 +38,37 @@ const useOrganizationListInView = () => {
     userSuggestions,
     ref,
   };
+};
+
+const CreateOrganizationButton = ({
+  onCreateOrganizationClick,
+}: {
+  onCreateOrganizationClick: React.MouseEventHandler;
+}) => {
+  const { user } = useUser();
+
+  if (!user?.createOrganizationEnabled) {
+    return null;
+  }
+
+  return (
+    <Action
+      elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
+      icon={Add}
+      label={localizationKeys('organizationList.action__createOrganization')}
+      onClick={onCreateOrganizationClick}
+      sx={t => ({
+        borderTopWidth: t.borderWidths.$normal,
+        borderTopStyle: t.borderStyles.$solid,
+        borderTopColor: t.colors.$neutralAlpha100,
+        padding: `${t.space.$5} ${t.space.$5}`,
+      })}
+      iconSx={t => ({
+        width: t.sizes.$9,
+        height: t.sizes.$6,
+      })}
+    />
+  );
 };
 
 export const OrganizationListPage = withCardStateProvider(() => {
@@ -118,7 +149,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasNextPage = userMemberships?.hasNextPage || userInvitations?.hasNextPage || userSuggestions?.hasNextPage;
 
-  const handleCreateOrganizationClicked = () => {
+  const onCreateOrganizationClick = () => {
     props.onCreateOrganizationClick();
   };
 
@@ -181,22 +212,7 @@ const OrganizationListPageList = (props: { onCreateOrganizationClick: () => void
 
             {(hasNextPage || isLoading) && <PreviewListSpinner ref={ref} />}
 
-            <Action
-              elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
-              icon={Add}
-              label={localizationKeys('organizationList.action__createOrganization')}
-              onClick={handleCreateOrganizationClicked}
-              sx={t => ({
-                borderTopWidth: t.borderWidths.$normal,
-                borderTopStyle: t.borderStyles.$solid,
-                borderTopColor: t.colors.$neutralAlpha100,
-                padding: `${t.space.$5} ${t.space.$5}`,
-              })}
-              iconSx={t => ({
-                width: t.sizes.$9,
-                height: t.sizes.$6,
-              })}
-            />
+            <CreateOrganizationButton onCreateOrganizationClick={onCreateOrganizationClick} />
           </Actions>
         </PreviewListItems>
       </Col>

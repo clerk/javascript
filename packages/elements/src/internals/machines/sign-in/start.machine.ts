@@ -1,5 +1,4 @@
 import type { SignInResource } from '@clerk/types';
-import type { ActorRefFrom } from 'xstate';
 import { fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
@@ -7,7 +6,7 @@ import type { FormFields } from '~/internals/machines/form';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
-import type { TSignInRouterMachine } from './router.machine';
+import type { SignInRouterMachineActorRef } from './router.types';
 import type { SignInStartSchema } from './start.types';
 
 export type TSignInStartMachine = typeof SignInStartMachine;
@@ -16,7 +15,15 @@ export const SignInStartMachineId = 'SignInStart';
 
 export const SignInStartMachine = setup({
   actors: {
-    attempt: fromPromise<SignInResource, { parent: ActorRefFrom<TSignInRouterMachine>; fields: FormFields }>(
+    attemptPasskey: fromPromise<
+      SignInResource,
+      { parent: SignInRouterMachineActorRef; flow: 'autofill' | 'discoverable' | undefined }
+    >(({ input: { parent, flow } }) => {
+      return parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey({
+        flow,
+      });
+    }),
+    attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const clerk = parent.getSnapshot().context.clerk;
 
@@ -38,6 +45,11 @@ export const SignInStartMachine = setup({
     ),
   },
   actions: {
+    sendToNext: ({ context, event }) => {
+      // @ts-expect-error -- We're calling this in onDone, and event.output exists on the actor done event
+      return context.parent.send({ type: 'NEXT', resource: event?.output });
+    },
+    sendToLoading,
     setFormErrors: sendTo(
       ({ context }) => context.formRef,
       ({ event }) => {
@@ -48,8 +60,6 @@ export const SignInStartMachine = setup({
         };
       },
     ),
-    sendToNext: ({ context }) => context.parent.send({ type: 'NEXT' }),
-    sendToLoading,
   },
   guards: {
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
@@ -60,7 +70,7 @@ export const SignInStartMachine = setup({
   context: ({ input }) => ({
     basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
     parent: input.parent,
-    formRef: input.form,
+    formRef: input.formRef,
     loadingStep: 'start',
   }),
   initial: 'Pending',
@@ -73,6 +83,16 @@ export const SignInStartMachine = setup({
           guard: not('isExampleMode'),
           target: 'Attempting',
           reenter: true,
+        },
+        'AUTHENTICATE.PASSKEY': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
+        'AUTHENTICATE.PASSKEY.AUTOFILL': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskeyAutoFill',
+          reenter: false,
         },
       },
     },
@@ -91,6 +111,54 @@ export const SignInStartMachine = setup({
         },
         onError: {
           actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
+    AttemptingPasskey: {
+      tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
+      invoke: {
+        id: 'attemptPasskey',
+        src: 'attemptPasskey',
+        input: ({ context }) => ({
+          parent: context.parent,
+          flow: 'discoverable',
+        }),
+        onDone: {
+          actions: ['sendToNext', 'sendToLoading'],
+        },
+        onError: {
+          actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
+    AttemptingPasskeyAutoFill: {
+      on: {
+        'AUTHENTICATE.PASSKEY': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
+        SUBMIT: {
+          guard: not('isExampleMode'),
+          target: 'Attempting',
+          reenter: true,
+        },
+      },
+      invoke: {
+        id: 'attemptPasskeyAutofill',
+        src: 'attemptPasskey',
+        input: ({ context }) => ({
+          parent: context.parent,
+          flow: 'autofill',
+        }),
+        onDone: {
+          actions: ['sendToNext'],
+        },
+        onError: {
+          actions: ['setFormErrors'],
           target: 'Pending',
         },
       },

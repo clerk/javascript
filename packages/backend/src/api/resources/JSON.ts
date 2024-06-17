@@ -1,5 +1,3 @@
-import type { SamlAccountJSON } from '@clerk/types';
-
 import type {
   InvitationStatus,
   OrganizationInvitationStatus,
@@ -23,6 +21,7 @@ export const ObjectType = {
   OrganizationMembership: 'organization_membership',
   PhoneNumber: 'phone_number',
   RedirectUrl: 'redirect_url',
+  SamlAccount: 'saml_account',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
   SignInToken: 'sign_in_token',
@@ -32,6 +31,7 @@ export const ObjectType = {
   Web3Wallet: 'web3_wallet',
   Token: 'token',
   TotalCount: 'total_count',
+  TestingToken: 'testing_token',
 } as const;
 
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
@@ -100,6 +100,17 @@ export interface ExternalAccountJSON extends ClerkResourceJSON {
   username: string | null;
   public_metadata?: Record<string, unknown> | null;
   label: string | null;
+  verification: VerificationJSON | null;
+}
+
+export interface SamlAccountJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.SamlAccount;
+  provider: string;
+  provider_user_id: string | null;
+  active: boolean;
+  email_address: string;
+  first_name: string;
+  last_name: string;
   verification: VerificationJSON | null;
 }
 
@@ -228,6 +239,7 @@ export interface SignInJSON extends ClerkResourceJSON {
 }
 
 export interface SignInTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.SignInToken;
   user_id: string;
   token: string;
   status: 'pending' | 'accepted' | 'revoked';
@@ -355,4 +367,10 @@ export interface AttributeMappingJSON {
   email_address: string;
   first_name: string;
   last_name: string;
+}
+
+export interface TestingTokenJSON {
+  object: typeof ObjectType.TestingToken;
+  token: string;
+  expires_at: number;
 }

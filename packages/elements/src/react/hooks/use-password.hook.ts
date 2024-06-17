@@ -20,7 +20,7 @@ type UsePasswordCallbacks = {
 export const usePassword = (callbacks?: UsePasswordCallbacks) => {
   const clerk = useClerk();
   const passwordSettings = clerk.__unstable__environment?.userSettings.passwordSettings as PasswordSettingsData;
-  const { disable_hibp, min_zxcvbn_strength, show_zxcvbn, ...config } = passwordSettings;
+  const { disable_hibp, min_zxcvbn_strength, show_zxcvbn, ...config } = passwordSettings || {};
 
   const {
     onValidationError = noop,

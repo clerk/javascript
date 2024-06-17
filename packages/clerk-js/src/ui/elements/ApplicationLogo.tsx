@@ -49,7 +49,8 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       sx={{
         display: loaded ? 'inline-block' : 'none',
         height: '100%',
-        width: 'auto',
+        width: '100%',
+        objectFit: 'contain',
       }}
     />
   );
@@ -61,7 +62,6 @@ export const ApplicationLogo = (props: ApplicationLogoProps) => {
       sx={[
         theme => ({
           height: getContainerHeightForImageRatio(imageRef, theme.sizes.$4),
-          objectFit: 'cover',
           justifyContent: 'center',
         }),
         props.sx,

@@ -57,6 +57,15 @@ export type UserService = {
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
 };
 
+/**
+ * This generates a random fictional number that can be verified using the 424242 code.
+ * Allowing 10^5 combinations should be enough entropy for e2e purposes.
+ * @see https://clerk.com/docs/testing/e2e-testing#phone-numbers
+ */
+function fakerPhoneNumber() {
+  return `+1###55501##`.replace(/#+/g, m => faker.string.numeric(m.length));
+}
+
 export const createUserService = (clerkClient: ClerkClient) => {
   const self: UserService = {
     createFakeUser: (options?: FakeUserOptions) => {
@@ -77,11 +86,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
         email,
         username: withUsername ? `${randomHash}_clerk_cookie` : undefined,
         password: withPassword ? `${email}${randomHash}` : undefined,
-        // this generates a random fictional number that can be verified
-        // using the 424242 code. Allowing 10^5 combinations should be enough
-        // entropy for e2e purposes
-        // https://clerk.com/docs/testing/e2e-testing#phone-numbers
-        phoneNumber: withPhoneNumber ? faker.phone.number('+1###55501##') : undefined,
+        phoneNumber: withPhoneNumber ? fakerPhoneNumber() : undefined,
         deleteIfExists: () => self.deleteIfExists({ email }),
       };
     },
@@ -97,10 +102,19 @@ export const createUserService = (clerkClient: ClerkClient) => {
       });
     },
     deleteIfExists: async (opts: { id?: string; email?: string }) => {
-      const id = opts.id || (await clerkClient.users.getUserList({ emailAddress: [opts.email] }))[0]?.id;
-      if (id) {
-        await clerkClient.users.deleteUser(id);
+      let id = opts.id;
+
+      if (!id) {
+        const { data: users } = await clerkClient.users.getUserList({ emailAddress: [opts.email] });
+        id = users[0]?.id;
       }
+
+      if (!id) {
+        console.log(`User "${opts.email}" does not exist!`);
+        return;
+      }
+
+      await clerkClient.users.deleteUser(id);
     },
     createFakeOrganization: async userId => {
       const name = faker.animal.dog();

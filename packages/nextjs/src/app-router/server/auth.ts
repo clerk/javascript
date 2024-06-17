@@ -1,5 +1,5 @@
 import type { AuthObject, RedirectFun } from '@clerk/backend/internal';
-import { createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
 
 import { buildClerkProps } from '../../server/buildClerkProps';
@@ -23,9 +23,15 @@ export const auth = (): Auth => {
   const clerkUrl = getAuthKeyFromRequest(request, 'ClerkUrl');
 
   const redirectToSignIn: RedirectFun<never> = (opts = {}) => {
+    const clerkRequest = createClerkRequest(request);
+    const devBrowserToken =
+      clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
+      clerkRequest.cookies.get(constants.Cookies.DevBrowser);
+
     return createRedirect({
       redirectAdapter: redirect,
-      baseUrl: createClerkRequest(request).clerkUrl.toString(),
+      devBrowserToken: devBrowserToken,
+      baseUrl: clerkRequest.clerkUrl.toString(),
       // TODO: Support runtime-value configuration of these options
       // via setting and reading headers from clerkMiddleware
       publishableKey: PUBLISHABLE_KEY,

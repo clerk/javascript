@@ -1,5 +1,3 @@
-// ---------------------------------- Events ---------------------------------- //
-
 import type {
   ClerkResource,
   LoadedClerk,
@@ -8,9 +6,10 @@ import type {
   SignInStrategy,
   Web3Strategy,
 } from '@clerk/types';
-import type { AnyActorLogic, InputFrom } from 'xstate';
+import type { ActorRefFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
+import type { TFormMachine } from '~/internals/machines/form';
 import type { ClerkRouter } from '~/react/router';
 
 // ---------------------------------- Events ---------------------------------- //
@@ -18,8 +17,11 @@ import type { ClerkRouter } from '~/react/router';
 export type BaseRouterLoadingStep = 'start' | 'verifications' | 'continue' | 'reset-password';
 
 export type BaseRouterNextEvent<T extends ClerkResource> = { type: 'NEXT'; resource?: T };
+export type BaseRouterFormAttachEvent = { type: 'FORM.ATTACH'; formRef: ActorRefFrom<TFormMachine> };
 export type BaseRouterPrevEvent = { type: 'NAVIGATE.PREVIOUS' };
 export type BaseRouterStartEvent = { type: 'NAVIGATE.START' };
+export type BaseRouterResetEvent = { type: 'RESET' };
+export type BaseRouterResetStepEvent = { type: 'RESET.STEP' };
 export type BaseRouterErrorEvent = { type: 'ERROR'; error: Error };
 export type BaseRouterTransferEvent = { type: 'TRANSFER' };
 export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
@@ -32,15 +34,6 @@ export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
       strategy: SignInStrategy | undefined;
     }
 ) & { type: 'LOADING'; isLoading: boolean };
-
-export type BaseRouterRouteRegisterEvent<TSystemId extends string, TLogic extends AnyActorLogic = AnyActorLogic> = {
-  type: 'ROUTE.REGISTER';
-  id: TSystemId;
-  logic: TLogic;
-  input: Omit<InputFrom<TLogic>, 'basePath' | 'clerk' | 'form' | 'router'>;
-};
-
-export type BaseRouterRouteUnregisterEvent<T extends string> = { type: 'ROUTE.UNREGISTER'; id: T };
 
 export type BaseRouterRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
 export type BaseRouterRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };

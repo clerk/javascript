@@ -1,5 +1,5 @@
-import { snakeToCamel } from '@clerk/shared';
-import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { isKnownError } from '@clerk/shared/error';
+import { snakeToCamel } from '@clerk/shared/underscore';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 
@@ -50,6 +50,8 @@ type FormMachineTypes = {
   context: FormMachineContext;
 };
 
+export type TFormMachine = typeof FormMachine;
+
 /**
  * A machine for managing form state.
  * This machine is used alongside our other, flow-specific machines and a reference to a spawned FormMachine actor is used in the flows to interact with the form state.
@@ -61,7 +63,9 @@ export const FormMachine = setup({
     }),
     setFieldFeedback: assign({
       fields: ({ context }, params: Pick<FieldDetails, 'name' | 'feedback'>) => {
-        if (!params.name) throw new Error('Field name is required');
+        if (!params.name) {
+          throw new Error('Field name is required');
+        }
 
         if (context.fields.has(params.name)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -84,7 +88,7 @@ export const FormMachine = setup({
   on: {
     'ERRORS.SET': {
       actions: enqueueActions(({ enqueue, event }) => {
-        if (isClerkAPIResponseError(event.error)) {
+        if (isKnownError(event.error)) {
           const fields: Record<string, ClerkElementsFieldError[]> = {};
           const globalErrors: ClerkElementsError[] = [];
 
@@ -131,7 +135,9 @@ export const FormMachine = setup({
     'FIELD.ADD': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.name) throw new Error('Field name is required');
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
 
           event.field.value = event.field.value || context.defaultValues.get(event.field.name) || undefined;
 
@@ -143,7 +149,9 @@ export const FormMachine = setup({
     'FIELD.UPDATE': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.name) throw new Error('Field name is required');
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
 
           if (context.fields.has(event.field.name)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -157,7 +165,9 @@ export const FormMachine = setup({
     'FIELD.REMOVE': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.name) throw new Error('Field name is required');
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
 
           context.fields.delete(event.field.name);
           return context.fields;
@@ -175,7 +185,9 @@ export const FormMachine = setup({
     'FIELD.FEEDBACK.CLEAR': {
       actions: assign({
         fields: ({ context, event }) => {
-          if (!event.field.name) throw new Error('Field name is required');
+          if (!event.field.name) {
+            throw new Error('Field name is required');
+          }
           if (context.fields.has(event.field.name)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             context.fields.get(event.field.name)!.feedback = undefined;

@@ -325,6 +325,11 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
       },
+      clientMismatch: {
+        subtitle:
+          'To continue, open the verification link on the device and browser from which you initiated the sign-in',
+        title: 'Verification link is invalid for this device',
+      },
     },
     forgotPassword: {
       formTitle: 'Reset password code',
@@ -426,6 +431,11 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to previous tab to continue',
         title: 'Successfully verified email',
       },
+      clientMismatch: {
+        subtitle:
+          'To continue, open the verification link on the device and browser from which you initiated the sign-up',
+        title: 'Verification link is invalid for this device',
+      },
     },
     phoneCode: {
       formSubtitle: 'Enter the verification code sent to your phone number',
@@ -442,6 +452,7 @@ export const enUS: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',

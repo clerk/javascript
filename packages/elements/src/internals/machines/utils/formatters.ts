@@ -1,4 +1,4 @@
-import { titleize } from '@clerk/shared';
+import { titleize } from '@clerk/shared/underscore';
 
 // TODO: ideally the derivation of these values lives in FAPI and comes back directly from the API
 

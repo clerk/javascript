@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "2.0.0",
+  "version": "2.4.4",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -84,7 +84,8 @@
     "es-MX",
     "bg-BG",
     "th-TH",
-    "hu-HU"
+    "hu-HU",
+    "sr-RS"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
@@ -94,16 +95,13 @@
     "generate": "tsc src/utils/generate.ts && node src/utils/generate.js && prettier --write src/*.ts",
     "lint": "eslint src/"
   },
+  "dependencies": {
+    "@clerk/types": "4.6.0"
+  },
   "devDependencies": {
-    "@clerk/types": "4.0.0",
-    "@types/node": "^18.17.0",
-    "eslint-config-custom": "*",
+    "@clerk/eslint-config-custom": "*",
     "tsup": "*",
     "typescript": "*"
-  },
-  "peerDependencies": {
-    "react": ">=18",
-    "react-dom": ">=18"
   },
   "engines": {
     "node": ">=18.17.0"

@@ -1,5 +1,3 @@
-import type { InstanceType } from '@clerk/types';
-
 export type TelemetryCollectorOptions = {
   /**
    * If true, telemetry will not be collected.
@@ -37,39 +35,4 @@ export type TelemetryCollectorOptions = {
    * The version of the SDK being used.
    */
   sdkVersion?: string;
-};
-
-export type TelemetryEvent = {
-  event: string;
-  /**
-   * publishableKey
-   */
-  pk?: string;
-  /**
-   * secretKey
-   */
-  sk?: string;
-  /**
-   * instanceType
-   */
-  it: InstanceType;
-  /**
-   * clerkVersion
-   */
-  cv: string;
-  /**
-   * SDK
-   */
-  sdk?: string;
-  /**
-   * SDK Version
-   */
-  sdkv?: string;
-  payload: Record<string, string | number | boolean>;
-};
-
-export type TelemetryEventRaw<Payload = TelemetryEvent['payload']> = {
-  event: TelemetryEvent['event'];
-  eventSamplingRate?: number;
-  payload: Payload;
 };

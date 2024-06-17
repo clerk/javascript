@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`cn 1`] = `
+"const Button: React.FC<ButtonProps> = ({ children, className }) => {
+    const buttonClasses = cn(
+      (something === 'flex' || 'flex') && "cl-222f930b",
+      ["cl-222f930b", "cl-222f930b"],
+      something === 'flex' || something === 'flex' ? (something ? "cl-222f930b" : "cl-222f930b") : "cl-222f930b",
+      className,
+    );
+    return <button className={buttonClasses}>{children}</button>;
+  };"
+`;

@@ -18,7 +18,6 @@ import type React from 'react';
 
 declare global {
   interface Window {
-    __clerk_frontend_api?: string;
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
@@ -56,6 +55,12 @@ export interface MountProps {
   updateProps: (props: any) => void;
   props?: any;
   customPagesPortals?: any[];
+}
+
+export interface OpenProps {
+  open: (props: any) => void;
+  close: () => void;
+  props?: any;
 }
 
 export interface HeadlessBrowserClerk extends Clerk {

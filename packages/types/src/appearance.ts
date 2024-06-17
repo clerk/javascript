@@ -255,6 +255,7 @@ export type ElementsConfig = {
   organizationSwitcherPopoverMain: WithOptions;
   organizationSwitcherPopoverActions: WithOptions;
   organizationSwitcherPopoverInvitationActions: WithOptions;
+  organizationSwitcherPopoverInvitationActionsBox: WithOptions;
   organizationSwitcherPopoverActionButton: WithOptions<
     'manageOrganization' | 'createOrganization' | 'switchOrganization'
   >;
@@ -351,6 +352,8 @@ export type ElementsConfig = {
   formattedPhoneNumber: WithOptions;
   formattedPhoneNumberFlag: WithOptions;
   formattedPhoneNumberText: WithOptions;
+
+  formattedDate: WithOptions<'tableCell'>;
 
   scrollBox: WithOptions;
 

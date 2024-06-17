@@ -1,0 +1,5 @@
+{
+  "main": "../dist/playwright/index.js",
+  "module": "../dist/playwright/index.mjs",
+  "types": "../dist/types/playwright/index.d.ts"
+}

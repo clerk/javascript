@@ -2,11 +2,11 @@ import { createActorContext } from '@xstate/react';
 import type { SnapshotFrom } from 'xstate';
 
 import { FormMachine } from '~/internals/machines/form';
-import { consoleInspector } from '~/internals/utils/inspector';
+import { inspect } from '~/internals/utils/inspector';
 
 export type SnapshotState = SnapshotFrom<typeof FormMachine>;
 
-const FormMachineContext = createActorContext(FormMachine, { inspect: consoleInspector });
+const FormMachineContext = createActorContext(FormMachine, { inspect });
 
 export const FormStoreProvider = FormMachineContext.Provider;
 export const useFormStore = FormMachineContext.useActorRef;

@@ -1,4 +1,3 @@
-import type { RequestState } from '@clerk/backend/internal';
 import { constants, debugRequestState } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 import type { AppLoadContext, defer } from '@remix-run/server-runtime';
@@ -6,6 +5,7 @@ import { json } from '@remix-run/server-runtime';
 import cookie from 'cookie';
 
 import { getEnvVariable } from '../utils/utils';
+import type { RequestStateWithRedirectUrls } from './types';
 
 export function isResponse(value: any): value is Response {
   return (
@@ -33,7 +33,7 @@ export function assertValidHandlerResult(val: any, error?: string): asserts val 
 
 export const injectRequestStateIntoResponse = async (
   response: Response,
-  requestState: RequestState,
+  requestState: RequestStateWithRedirectUrls,
   context: AppLoadContext,
 ) => {
   const clone = new Response(response.body, response);
@@ -45,7 +45,7 @@ export const injectRequestStateIntoResponse = async (
   // without setting the header, instead of using the `json()` helper
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
   headers.forEach((value, key) => {
-    clone.headers.set(key, value);
+    clone.headers.append(key, value);
   });
 
   return json({ ...(data || {}), ...clerkState }, clone);
@@ -53,7 +53,7 @@ export const injectRequestStateIntoResponse = async (
 
 export function injectRequestStateIntoDeferredData(
   data: ReturnType<typeof defer>,
-  requestState: RequestState,
+  requestState: RequestStateWithRedirectUrls,
   context: AppLoadContext,
 ) {
   const { clerkState, headers } = getResponseClerkState(requestState, context);
@@ -66,7 +66,7 @@ export function injectRequestStateIntoDeferredData(
 
     headers.forEach((value, key) => {
       // @ts-expect-error -- We are ensuring headers is defined above
-      data.init.headers.set(key, value);
+      data.init.headers.append(key, value);
     });
   }
 
@@ -78,7 +78,7 @@ export function injectRequestStateIntoDeferredData(
  *
  * @internal
  */
-export function getResponseClerkState(requestState: RequestState, context: AppLoadContext) {
+export function getResponseClerkState(requestState: RequestStateWithRedirectUrls, context: AppLoadContext) {
   const { reason, message, isSignedIn, ...rest } = requestState;
   const clerkState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
@@ -90,6 +90,10 @@ export function getResponseClerkState(requestState: RequestState, context: AppLo
     __signUpUrl: requestState.signUpUrl,
     __afterSignInUrl: requestState.afterSignInUrl,
     __afterSignUpUrl: requestState.afterSignUpUrl,
+    __signInForceRedirectUrl: requestState.signInForceRedirectUrl,
+    __signUpForceRedirectUrl: requestState.signUpForceRedirectUrl,
+    __signInFallbackRedirectUrl: requestState.signInFallbackRedirectUrl,
+    __signUpFallbackRedirectUrl: requestState.signUpFallbackRedirectUrl,
     __clerk_debug: debugRequestState(requestState),
     __clerkJSUrl: getEnvVariable('CLERK_JS', context),
     __clerkJSVersion: getEnvVariable('CLERK_JS_VERSION', context),
@@ -111,4 +115,19 @@ export function getResponseClerkState(requestState: RequestState, context: AppLo
  */
 export const wrapWithClerkState = (data: any) => {
   return { clerkState: { __internal_clerk_state: { ...data } } };
+};
+
+/**
+ * Patches request to avoid duplex issues with unidici
+ * For more information, see:
+ * https://github.com/nodejs/node/issues/46221
+ * https://github.com/whatwg/fetch/pull/1457
+ * @internal
+ */
+export const patchRequest = (request: Request) => {
+  const clonedRequest = request.clone();
+  if (clonedRequest.method !== 'GET' && clonedRequest.body !== null) {
+    (clonedRequest as unknown as { duplex: 'half' }).duplex = 'half';
+  }
+  return clonedRequest;
 };

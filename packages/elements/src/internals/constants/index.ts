@@ -1,8 +1,10 @@
 export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
 export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 
-export const SIGN_IN_DEFAULT_BASE_PATH = '/sign-in';
-export const SIGN_UP_DEFAULT_BASE_PATH = '/sign-up';
+export const SIGN_IN_DEFAULT_BASE_PATH =
+  process.env.CLERK_SIGN_IN_URL ?? process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? '/sign-in';
+export const SIGN_UP_DEFAULT_BASE_PATH =
+  process.env.CLERK_SIGN_UP_URL ?? process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? '/sign-up';
 
 // The version that Next added support for the window.history.pushState and replaceState APIs.
 // ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
@@ -24,3 +26,23 @@ export const SEARCH_PARAMS = {
 export const RESENDABLE_COUNTDOWN_DEFAULT = 60;
 
 export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
+
+// Pulled from: https://github.com/clerk/javascript/blob/c7d626292a9fd12ca0f1b31a1035e711b6e99531/packages/clerk-js/src/core/constants.ts#L15
+export const ERROR_CODES = {
+  FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',
+  FORM_PASSWORD_INCORRECT: 'form_password_incorrect',
+  INVALID_STRATEGY_FOR_USER: 'strategy_for_user_invalid',
+  NOT_ALLOWED_TO_SIGN_UP: 'not_allowed_to_sign_up',
+  OAUTH_ACCESS_DENIED: 'oauth_access_denied',
+  OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML: 'oauth_email_domain_reserved_by_saml',
+  NOT_ALLOWED_ACCESS: 'not_allowed_access',
+  SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
+  USER_LOCKED: 'user_locked',
+};
+
+export const ROUTING = {
+  path: 'path',
+  virtual: 'virtual',
+} as const;
+
+export type ROUTING = (typeof ROUTING)[keyof typeof ROUTING];

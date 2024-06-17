@@ -22,7 +22,6 @@ const extensions = [
   'plugin:react-hooks/recommended',
   'plugin:jsx-a11y/recommended',
   'plugin:import/react',
-  'prettier',
 ];
 
 module.exports = {

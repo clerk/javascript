@@ -14,6 +14,7 @@ export class RedirectUrlAPI extends AbstractAPI {
     return this.request<PaginatedResourceResponse<RedirectUrl[]>>({
       method: 'GET',
       path: basePath,
+      queryParams: { paginated: true },
     });
   }
 

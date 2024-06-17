@@ -1,6 +1,13 @@
 import type { Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
-import type { AuthObject } from '@clerk/backend/internal';
-import type { MultiDomainAndOrProxy } from '@clerk/types';
+import type { AuthObject, RequestState } from '@clerk/backend/internal';
+import type {
+  LegacyRedirectProps,
+  MultiDomainAndOrProxy,
+  SignInFallbackRedirectUrl,
+  SignInForceRedirectUrl,
+  SignUpFallbackRedirectUrl,
+  SignUpForceRedirectUrl,
+} from '@clerk/types';
 import type { DataFunctionArgs, LoaderFunction } from '@remix-run/server-runtime';
 
 export type GetAuthReturn = Promise<AuthObject>;
@@ -9,16 +16,38 @@ export type RootAuthLoaderOptions = {
   publishableKey?: string;
   jwtKey?: string;
   secretKey?: string;
+  /**
+   * @deprecated This option will be removed in the next major version.
+   * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
+   */
   loadUser?: boolean;
+  /**
+   * @deprecated This option will be removed in the next major version.
+   * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
+   */
   loadSession?: boolean;
+  /**
+   * @deprecated This option will be removed in the next major version.
+   * Use session token claims instead: https://clerk.com/docs/backend-requests/making/custom-session-token
+   */
   loadOrganization?: boolean;
   authorizedParties?: [];
   signInUrl?: string;
   signUpUrl?: string;
-  afterSignInUrl?: string;
-  afterSignUpUrl?: string;
 } & Pick<VerifyTokenOptions, 'audience'> &
-  MultiDomainAndOrProxy;
+  MultiDomainAndOrProxy &
+  SignInForceRedirectUrl &
+  SignInFallbackRedirectUrl &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps;
+
+export type RequestStateWithRedirectUrls = RequestState &
+  SignInForceRedirectUrl &
+  SignInFallbackRedirectUrl &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,

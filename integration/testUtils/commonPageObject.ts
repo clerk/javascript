@@ -18,6 +18,11 @@ export const common = ({ page }: TestArgs) => {
     enterTestOtpCode: async () => {
       return self.enterOtpCode('424242');
     },
+    // It's recommended to use .fill instead of .type
+    // @see https://playwright.dev/docs/api/class-keyboard#keyboard-type
+    fillTestOtpCode: async (name: string) => {
+      return page.getByRole('textbox', { name: name }).fill('424242');
+    },
     getIdentifierInput: () => {
       return page.locator('input[name=identifier]');
     },

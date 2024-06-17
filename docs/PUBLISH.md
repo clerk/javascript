@@ -6,9 +6,9 @@ _Note: Only Clerk employees can trigger the actions described below._
 
 We are using [changesets](https://github.com/changesets/changesets), so our CICD is using [`changesets/action`](https://github.com/changesets/action) to automate the release process when releasing stable package versions targeting the `@latest` tag.
 
-Every time a PR is merged into `main`, the changesets action parses all changesets found in `.changeset` and updates the "Version Packages" PR with the new package versions and the changelog for the next stable release.
+Every time a PR is merged into `main`, the changesets action parses all changesets found in `.changeset` and updates the "ci(repo): Version packages" PR with the new package versions and the changelog for the next stable release.
 
-To release a new stable version of all Clerk packages, find the "Version Packages" PR, verify the changes, and merge it.
+To release a new stable version of all Clerk packages, find the "ci(repo): Version packages" PR, verify the changes, and merge it.
 
 ## Publishing canary package versions (`@canary`)
 

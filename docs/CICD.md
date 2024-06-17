@@ -9,7 +9,7 @@ Every time a PR is merged into `main`, an automated canary release will happen. 
 
 ## Stable releases
 
-A stable release will be triggered every time the "Version Packages" PR is merged. Once versioning and publishing is done, the `clerk/javascript` repo will dispatch a workflow event, notifying other related Clerk repos of the new releases.
+A stable release will be triggered every time the "ci(repo): Version packages" PR is merged. Once versioning and publishing is done, the `clerk/javascript` repo will dispatch a workflow event, notifying other related Clerk repos of the new releases.
 
 Actions that will be triggered:
 

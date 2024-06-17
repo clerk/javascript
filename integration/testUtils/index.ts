@@ -44,7 +44,7 @@ export const createTestUtils = <
   Services = typeof services,
   PO = typeof pageObjects,
   BH = typeof browserHelpers,
-  FullReturn = { services: Services; po: PO; tabs: BH; page: EnchancedPage },
+  FullReturn = { services: Services; po: PO; tabs: BH; page: EnchancedPage; nexJsVersion: string },
   OnlyAppReturn = { services: Services },
 >(
   params: Params,
@@ -95,7 +95,14 @@ export const createTestUtils = <
     },
   };
 
-  return { page, services, po: pageObjects, tabs: browserHelpers } as any;
+  return {
+    page,
+    services,
+    po: pageObjects,
+    tabs: browserHelpers,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    nexJsVersion: process.env.E2E_NEXTJS_VERSION,
+  } as any;
 };
 
 export { testAgainstRunningApps } from './testAgainstRunningApps';

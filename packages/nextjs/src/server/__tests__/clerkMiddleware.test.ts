@@ -459,6 +459,34 @@ describe('clerkMiddleware(params)', () => {
       expect(clerkClient.authenticateRequest).toBeCalled();
     });
 
+    it('forwards headers from authenticateRequest when auth().protect() is called', async () => {
+      const req = mockRequest({
+        url: '/protected',
+        headers: new Headers({ [constants.Headers.SecFetchDest]: 'document' }),
+        appendDevBrowserCookie: true,
+      });
+
+      authenticateRequestMock.mockResolvedValueOnce({
+        publishableKey,
+        status: AuthStatus.SignedOut,
+        headers: new Headers({
+          'Set-Cookie': 'session=;',
+          'X-Clerk-Auth': '1',
+        }),
+        toAuth: () => ({ userId: null }),
+      });
+
+      const resp = await clerkMiddleware(auth => {
+        auth().protect();
+      })(req, {} as NextFetchEvent);
+
+      expect(resp?.status).toEqual(307);
+      expect(resp?.headers.get('X-Clerk-Auth')).toEqual('1');
+      expect(resp?.headers.get('Set-Cookie')).toEqual('session=;');
+      expect(resp?.headers.get('location')).toContain('sign-in');
+      expect(clerkClient.authenticateRequest).toBeCalled();
+    });
+
     it('redirects to unauthenticatedUrl when protect is called with the unauthenticatedUrl param, the user is signed out, and is a page request', async () => {
       const req = mockRequest({
         url: '/protected',

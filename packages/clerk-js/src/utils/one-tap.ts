@@ -15,9 +15,13 @@ interface InitializeProps {
   use_fedcm_for_prompt?: boolean;
 }
 
+interface PromptMomentNotification {
+  getMomentType: () => 'display' | 'skipped' | 'dismissed';
+}
+
 interface OneTapMethods {
   initialize: (params: InitializeProps) => void;
-  prompt: () => void;
+  prompt: (promptListener: (promptMomentNotification: PromptMomentNotification) => void) => void;
   cancel: () => void;
 }
 
@@ -31,7 +35,7 @@ interface Google {
 
 declare global {
   export interface Window {
-    google: Google;
+    google?: Google;
   }
 }
 
@@ -44,7 +48,7 @@ async function loadGIS() {
       clerkFailedToLoadThirdPartyScript('Google Identity Services');
     }
   }
-  return window.google;
+  return window.google as Google;
 }
 
 export { loadGIS };

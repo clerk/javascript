@@ -24,6 +24,8 @@ export const subpathNames = [
   'constants',
   'apiUrlFromPublishableKey',
   'telemetry',
+  'logger',
+  'webauthn',
 ];
 
 export const subpathFoldersBarrel = ['react'];

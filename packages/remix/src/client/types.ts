@@ -14,6 +14,10 @@ export type ClerkState = {
     __signUpUrl: string | undefined;
     __afterSignInUrl: string | undefined;
     __afterSignUpUrl: string | undefined;
+    __signInForceRedirectUrl: string | undefined;
+    __signUpForceRedirectUrl: string | undefined;
+    __signInFallbackRedirectUrl: string | undefined;
+    __signUpFallbackRedirectUrl: string | undefined;
     __clerk_debug: any;
     __clerkJSUrl: string | undefined;
     __clerkJSVersion: string | undefined;

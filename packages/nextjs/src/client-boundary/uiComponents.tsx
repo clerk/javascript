@@ -26,7 +26,7 @@ export {
   SignOutButton,
   SignUpButton,
   UserButton,
-  __experimental_GoogleOneTap,
+  GoogleOneTap,
 } from '@clerk/clerk-react';
 
 // The assignment of UserProfile with BaseUserProfile props is used
@@ -56,9 +56,9 @@ export const OrganizationProfile: typeof BaseOrganizationProfile = Object.assign
 );
 
 export const SignIn = (props: SignInProps) => {
-  return <BaseSignIn {...useEnforceCorrectRoutingProps('SignIn', props)} />;
+  return <BaseSignIn {...useEnforceCorrectRoutingProps('SignIn', props, false)} />;
 };
 
 export const SignUp = (props: SignUpProps) => {
-  return <BaseSignUp {...useEnforceCorrectRoutingProps('SignUp', props)} />;
+  return <BaseSignUp {...useEnforceCorrectRoutingProps('SignUp', props, false)} />;
 };

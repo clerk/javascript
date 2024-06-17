@@ -19,7 +19,7 @@ export class SessionAPI extends AbstractAPI {
     return this.request<PaginatedResourceResponse<Session[]>>({
       method: 'GET',
       path: basePath,
-      queryParams: params,
+      queryParams: { ...params, paginated: true },
     });
   }
 

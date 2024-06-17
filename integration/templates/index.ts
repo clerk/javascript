@@ -10,6 +10,7 @@ export const templates = {
   'react-vite': resolve(__dirname, './react-vite'),
   'express-vite': resolve(__dirname, './express-vite'),
   'remix-node': resolve(__dirname, './remix-node'),
+  'elements-next': resolve(__dirname, './elements-next'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {

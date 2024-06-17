@@ -14,7 +14,14 @@ const buttonStyle = {
   },
 };
 
+const shadowStyle = {
+  boxShadow: '3px 3px 0px #000',
+  border: '2px solid #000',
+};
+
 export const neobrutalism = experimental_createTheme({
+  //@ts-expect-error not public api
+  simpleStyles: true,
   variables: {
     colorPrimary: '#DF1B1B',
     colorShimmer: 'rgba(255,255,255,0.64)',
@@ -25,21 +32,21 @@ export const neobrutalism = experimental_createTheme({
     },
   },
   elements: {
-    card: {
+    cardBox: {
       boxShadow: '7px 7px 0px #000',
       border: '3px solid #000',
     },
+    card: {
+      borderRadius: '0',
+    },
+    headerSubtitle: { color: '#212126' },
     alternativeMethodsBlockButton: buttonStyle,
     socialButtonsIconButton: {
       ...buttonStyle,
     },
-    socialButtonsBlockButton: buttonStyle,
-    profileSectionPrimaryButton: buttonStyle,
-    formButtonPrimary: buttonStyle,
-    navbarButton: buttonStyle,
-    formFieldInput: {
-      boxShadow: '3px 3px 0px #000',
-      border: '2px solid #000',
+    selectButton: {
+      ...buttonStyle,
+      ...shadowStyle,
       transition: 'all 0.2s ease-in-out',
       '&:focus': {
         boxShadow: '4px 4px 0px #000',
@@ -47,15 +54,64 @@ export const neobrutalism = experimental_createTheme({
         transform: 'scale(1.01)',
       },
     },
+    socialButtonsBlockButton: { ...buttonStyle, color: '#212126' },
+    profileSectionPrimaryButton: buttonStyle,
+    profileSectionItem: { color: '#212126' },
+    avatarImageActionsUpload: buttonStyle,
+    menuButton: shadowStyle,
+    menuList: shadowStyle,
+    formButtonPrimary: buttonStyle,
+    navbarButton: buttonStyle,
+    formFieldAction: {
+      fontWeight: '700',
+    },
+    formFieldInput: {
+      ...shadowStyle,
+      transition: 'all 0.2s ease-in-out',
+      '&:focus': {
+        boxShadow: '4px 4px 0px #000',
+        border: '2px solid #000',
+        transform: 'scale(1.01)',
+      },
+      '&:hover': {
+        ...shadowStyle,
+        transform: 'scale(1.01)',
+      },
+    },
+    table: shadowStyle,
+    tableHead: {
+      color: '#212126',
+    },
     dividerLine: {
       background: '#000',
     },
+    dividerText: {
+      fontWeight: '700',
+      color: '#212126',
+    },
+    footer: {
+      background: '#fff',
+      '& div': {
+        color: '#212126',
+      },
+    },
+    footerActionText: {
+      color: '#212126',
+    },
     footerActionLink: {
-      fontWeight: '600',
-      borderBottom: '2px solid',
+      fontWeight: '700',
+      borderBottom: '3px solid',
       '&:focus': {
         boxShadow: 'none',
       },
+    },
+    actionCard: {
+      ...shadowStyle,
+    },
+    badge: {
+      border: '1px solid #000',
+      background: '#fff',
+      color: '#212126',
     },
   },
 });

@@ -16,3 +16,4 @@ packages/*/examples
 .yalc
 package-lock.json
 **/integration/templates/**/*
+commitlint.config.ts

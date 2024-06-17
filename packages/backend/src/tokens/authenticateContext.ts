@@ -38,7 +38,10 @@ class AuthenticateContext {
     return this.sessionTokenInCookie || this.sessionTokenInHeader;
   }
 
-  public constructor(private clerkRequest: ClerkRequest, options: AuthenticateRequestOptions) {
+  public constructor(
+    private clerkRequest: ClerkRequest,
+    options: AuthenticateRequestOptions,
+  ) {
     this.initHeaderValues();
     this.initCookieValues();
     this.initHandshakeValues();
@@ -48,10 +51,10 @@ class AuthenticateContext {
 
   private initHandshakeValues() {
     this.devBrowserToken =
-      this.clerkRequest.clerkUrl.searchParams.get(constants.Cookies.DevBrowser) ||
+      this.clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
       this.clerkRequest.cookies.get(constants.Cookies.DevBrowser);
     this.handshakeToken =
-      this.clerkRequest.clerkUrl.searchParams.get(constants.Cookies.Handshake) ||
+      this.clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.Handshake) ||
       this.clerkRequest.cookies.get(constants.Cookies.Handshake);
   }
 

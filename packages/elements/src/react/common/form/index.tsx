@@ -1,3 +1,6 @@
+import { useClerk } from '@clerk/clerk-react';
+import { logger } from '@clerk/shared/logger';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
@@ -18,11 +21,11 @@ import {
 } from '@radix-ui/react-form';
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
-import type { SetRequired, Simplify } from 'type-fest';
+import type { SetRequired } from 'type-fest';
 import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
-import { ClerkElementsFieldError } from '~/internals/errors';
+import { ClerkElementsFieldError, ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FieldDetails } from '~/internals/machines/form';
 import {
   fieldFeedbackSelector,
@@ -33,7 +36,10 @@ import {
   useFormStore,
 } from '~/internals/machines/form/form.context';
 import { usePassword } from '~/react/hooks/use-password.hook';
+import { SignInRouterCtx } from '~/react/sign-in/context';
+import { useSignInPasskeyAutofill } from '~/react/sign-in/context/router.context';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
+import { isReactFragment } from '~/react/utils/is-react-fragment';
 
 import type { OTPInputProps } from './otp';
 import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
@@ -67,11 +73,18 @@ const useFieldFeedback = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 };
 
 const determineInputTypeFromName = (name: FormFieldProps['name']) => {
-  if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword')
+  if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword') {
     return 'password' as const;
-  if (name === 'emailAddress') return 'email' as const;
-  if (name === 'phoneNumber') return 'tel' as const;
-  if (name === 'code') return 'otp' as const;
+  }
+  if (name === 'emailAddress') {
+    return 'email' as const;
+  }
+  if (name === 'phoneNumber') {
+    return 'tel' as const;
+  }
+  if (name === 'code') {
+    return 'otp' as const;
+  }
 
   return 'text' as const;
 };
@@ -169,7 +182,7 @@ const useInput = ({
   onFocus: onFocusProp,
   ...passthroughProps
 }: FormInputProps) => {
-  // Inputs can be used outside of a <Field> wrapper if desired, so safely destructure here
+  // Inputs can be used outside a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
   const name = inputName || fieldContext?.name;
   const { state: fieldState } = useFieldState({ name });
@@ -228,7 +241,9 @@ const useInput = ({
 
   // Register the field in the machine context
   React.useEffect(() => {
-    if (!name || ref.getSnapshot().context.fields.get(name)) return;
+    if (!name || ref.getSnapshot().context.fields.get(name)) {
+      return;
+    }
 
     ref.send({ type: 'FIELD.ADD', field: { name, value: initialValue } });
 
@@ -239,9 +254,13 @@ const useInput = ({
   const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
-      if (!name || initialValue) return;
+      if (!name || initialValue) {
+        return;
+      }
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
-      if (shouldValidatePassword) validatePassword(event.target.value);
+      if (shouldValidatePassword) {
+        validatePassword(event.target.value);
+      }
     },
     [ref, name, onChangeProp, initialValue, shouldValidatePassword, validatePassword],
   );
@@ -249,7 +268,9 @@ const useInput = ({
   const onBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onBlurProp?.(event);
-      if (shouldValidatePassword) validatePassword(event.target.value);
+      if (shouldValidatePassword) {
+        validatePassword(event.target.value);
+      }
     },
     [onBlurProp, shouldValidatePassword, validatePassword],
   );
@@ -257,13 +278,17 @@ const useInput = ({
   const onFocus = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onFocusProp?.(event);
-      if (shouldValidatePassword) validatePassword(event.target.value);
+      if (shouldValidatePassword) {
+        validatePassword(event.target.value);
+      }
     },
     [onFocusProp, shouldValidatePassword, validatePassword],
   );
 
   React.useEffect(() => {
-    if (!initialValue || !name) return;
+    if (!initialValue || !name) {
+      return;
+    }
     ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
   }, [name, ref, initialValue]);
 
@@ -375,18 +400,18 @@ type FormFieldProps = Omit<RadixFormFieldProps, 'children'> & {
  * @param {Function} children - A function that receives `state` as an argument. `state` is a union of `"success" | "error" | "idle" | "warning" | "info"`.
  *
  * @example
- * <Field name="emailAddress">
- *   <Label>Email</Label>
- *   <Input />
- * </Field>
+ * <Clerk.Field name="emailAddress">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input />
+ * </Clerk.Field>
  *
  * @example
- * <Field name="emailAddress">
+ * <Clerk.Field name="emailAddress">
  *  {(fieldState) => (
- *    <Label>Email</Label>
- *    <Input className={`text-${fieldState}`} />
+ *    <Clerk.Label>Email</Clerk.Label>
+ *    <Clerk.Input className={`text-${fieldState}`} />
  *  )}
- * </Field>
+ * </Clerk.Field>
  */
 const Field = React.forwardRef<FormFieldElement, FormFieldProps>(({ alwaysShow, ...rest }, forwardedRef) => {
   const formRef = useFormStore();
@@ -441,27 +466,27 @@ type FieldStateRenderFn = {
  *
  * @example
  *
- * <Field name="email">
- *  <Label>Email</Label>
- *  <FieldState>
+ * <Clerk.Field name="email">
+ *  <Clerk.Label>Email</Clerk.Label>
+ *  <Clerk.FieldState>
  *    {({ state }) => (
- *      <Input className={`text-${state}`} />
+ *      <Clerk.Input className={`text-${state}`} />
  *    )}
- *  </FieldState>
- * </Field>
+ *  </Clerk.FieldState>
+ * </Clerk.Field>
  *
  * @example
- * <Field name="password">
- *  <Label>Password</Label>
- *  <Input validatePassword />
- *  <FieldState>
+ * <Clerk.Field name="password">
+ *  <Clerk.Label>Password</Clerk.Label>
+ *  <Clerk.Input validatePassword />
+ *  <Clerk.FieldState>
  *    {({ state, message, codes }) => (
  *      <pre>Field state: {state}</pre>
  *      <pre>Field msg: {message}</pre>
  *      <pre>Pwd keys: {codes.join(', ')}</pre>
  *    )}
- *  </FieldState>
- * </Field>
+ *  </Clerk.FieldState>
+ * </Clerk.Field>
  */
 function FieldState({ children }: FieldStateRenderFn) {
   const field = useFieldContext();
@@ -487,11 +512,13 @@ const INPUT_NAME = 'ClerkElementsInput';
 type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
   validatePassword?: boolean;
 };
+
 type FormInputProps =
   | RadixFormControlProps
-  | ({ type: 'otp'; render: any } & Omit<OTPInputProps, 'asChild'>)
+  | ({ type: 'otp'; render: OTPInputProps['render'] } & Omit<OTPInputProps, 'asChild'>)
   | ({ type: 'otp'; render?: undefined } & OTPInputProps)
-  | ({ type: 'password' } & PasswordInputProps);
+  // Usecase: Toggle the visibility of the password input, therefore 'password' and 'text' are allowed
+  | ({ type: 'password' | 'text' } & PasswordInputProps);
 
 /**
  * Handles rendering of `<input>` elements within Clerk's flows. Supports special `type` prop values to render input types that are unique to authentication and user management flows. Additional props will be passed through to the `<input>` element.
@@ -500,35 +527,72 @@ type FormInputProps =
  * @param {string} [name] - Used to target a specific field by name when rendering outside of a `<Field>` component.
  *
  * @example
- * <Field name="identifier">
- *   <Label>Email</Label>
- *   <Input type="email" autoComplete="email" className="emailInput" />
- * </Field>
+ * <Clerk.Field name="identifier">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input type="email" autoComplete="email" className="emailInput" />
+ * </Clerk.Field>
  *
  * @param {Number} [length] - The length of the OTP input. Defaults to 6.
  * @param {Number} [passwordManagerOffset] - Password managers place their icon inside an `<input />`. This default behaviour is not desirable when you use the render prop to display N distinct element. With this prop you can increase the width of the `<input />` so that the icon is rendered outside the OTP inputs.
  * @param {string} [type] - Type of control to render. Supports a special `'otp'` type for one-time password inputs. If the wrapping `<Field>` component has `name='code'`, the type will default to `'otp'`. With the `'otp'` type, the input will have a pattern and length set to 6 by default and render a single `<input />` element.
  *
  * @example
- * <Field name="code">
- *   <Label>Email code</Label>
- *   <Input type="otp" />
- * </Field>
+ * <Clerk.Field name="code">
+ *   <Clerk.Label>Email code</Clerk.Label>
+ *   <Clerk.Input type="otp" />
+ * </Clerk.Field>
  *
  * @param {Function} [render] - Optionally, you can use a render prop that controls how each individual character is rendered. If no `render` prop is provided, a single text `<input />` will be rendered.
  *
  * @example
- * <Field name="code">
- *   <Label>Email code</Label>
- *   <Input
+ * <Clerk.Field name="code">
+ *   <Clerk.Label>Email code</Clerk.Label>
+ *   <Clerk.Input
  *     type="otp"
  *     render={({ value, status }) => <span data-status={status}>{value}</span>}
  *   />
- * </Field>
+ * </Clerk.Field>
  */
 const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
+    const clerk = useClerk();
     const field = useInput(props);
+
+    const hasPasskeyAutofillProp = Boolean(field.props.autoComplete?.includes('webauthn'));
+    const allowedTypeForPasskey = (['text', 'email', 'tel'] as FormInputProps['type'][]).includes(field.props.type);
+    const signInRouterRef = SignInRouterCtx.useActorRef(true);
+
+    clerk.telemetry?.record(
+      eventComponentMounted('Elements_Input', {
+        type: props.type ?? false,
+        // @ts-expect-error - Depending on type the props can be different
+        render: Boolean(props?.render),
+        // @ts-expect-error - Depending on type the props can be different
+        asChild: Boolean(props?.asChild),
+        // @ts-expect-error - Depending on type the props can be different
+        validatePassword: Boolean(props?.validatePassword),
+      }),
+    );
+
+    if (signInRouterRef && hasPasskeyAutofillProp && allowedTypeForPasskey) {
+      return (
+        <InputWithPasskeyAutofill
+          ref={forwardedRef}
+          {...props}
+        />
+      );
+    }
+
+    if (hasPasskeyAutofillProp && !allowedTypeForPasskey) {
+      logger.warnOnce(
+        `<Input autoComplete="webauthn"> can only be used with <Input type="text"> or <Input type="email">`,
+      );
+    } else if (hasPasskeyAutofillProp) {
+      logger.warnOnce(
+        `<Input autoComplete="webauthn"> can only be used inside <SignIn> in order to trigger a sign-in attempt, otherwise it will be ignored.`,
+      );
+    }
+
     return (
       <field.Element
         ref={forwardedRef}
@@ -539,6 +603,27 @@ const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputP
 );
 
 Input.displayName = INPUT_NAME;
+
+const InputWithPasskeyAutofill = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
+  (props: FormInputProps, forwardedRef) => {
+    const signInRouterRef = SignInRouterCtx.useActorRef(true);
+    const passkeyAutofillSupported = useSignInPasskeyAutofill();
+
+    React.useEffect(() => {
+      if (passkeyAutofillSupported) {
+        signInRouterRef?.send({ type: 'AUTHENTICATE.PASSKEY.AUTOFILL' });
+      }
+    }, [passkeyAutofillSupported, signInRouterRef]);
+
+    const field = useInput(props);
+    return (
+      <field.Element
+        ref={forwardedRef}
+        {...field.props}
+      />
+    );
+  },
+);
 
 /* -------------------------------------------------------------------------------------------------
  * Label
@@ -552,10 +637,10 @@ const LABEL_NAME = 'ClerkElementsLabel';
  * @param {boolean} [asChild] - If true, `<Label />` will render as its child element, passing along any necessary props.
  *
  * @example
- * <Field name="email">
- *   <Label>Email</Label>
- *   <Input />
- * </Field>
+ * <Clerk.Field name="email">
+ *   <Clerk.Label>Email</Clerk.Label>
+ *   <Clerk.Input />
+ * </Clerk.Field>
  */
 const Label = RadixLabel;
 
@@ -588,9 +673,9 @@ const FIELD_ERROR_NAME = 'ClerkElementsFieldError';
 
 type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
 
-type FormErrorPropsRenderFn = {
-  asChild?: never;
-  children?: (error: FormErrorRenderProps) => React.ReactNode;
+type FormErrorPropsAsChild = {
+  asChild?: true | never;
+  children?: React.ReactElement | ((error: FormErrorRenderProps) => React.ReactNode);
   code?: string;
 };
 
@@ -600,15 +685,7 @@ type FormErrorPropsStd = {
   code: string;
 };
 
-type FormErrorPropsAsChild = {
-  asChild?: true;
-  children: React.ReactElement;
-  code: string;
-};
-
-type FormErrorProps<T> = Simplify<
-  Omit<T, 'asChild' | 'children'> & (FormErrorPropsRenderFn | FormErrorPropsStd | FormErrorPropsAsChild)
->;
+type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> & (FormErrorPropsStd | FormErrorPropsAsChild);
 
 type FormGlobalErrorElement = React.ElementRef<'div'>;
 type FormGlobalErrorProps = FormErrorProps<React.ComponentPropsWithoutRef<'div'>>;
@@ -623,23 +700,23 @@ type FormFieldErrorProps = FormErrorProps<RadixFormMessageProps & { name?: strin
  * @param {boolean} [asChild] - If `true`, `<GlobalError>` will render as its child element, passing along any necessary props.
  *
  * @example
- * <SignIn>
- *   <GlobalError />
- * </SignIn>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError />
+ * </SignIn.Root>
  *
  * @example
- * <SignIn>
- *   <GlobalError code="user_locked">Your custom error message.</GlobalError>
- * </SignIn>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError code="user_locked">Your custom error message.</Clerk.GlobalError>
+ * </SignIn.Root>
  *
  * @example
- * <SignUp>
- *   <GlobalError>
+ * <SignIn.Root>
+ *   <Clerk.GlobalError>
  *     {({ message, code }) => (
  *       <span data-error-code={code}>{message}</span>
  *     )}
- *   </GlobalError>
- * </SignUp>
+ *   </Clerk.GlobalError>
+ * </SignIn.Root>
  */
 const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProps>(
   ({ asChild = false, children, code, ...rest }, forwardedRef) => {
@@ -653,6 +730,10 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
 
     const Comp = asChild ? Slot : 'div';
     const child = typeof children === 'function' ? children(error) : children;
+
+    if (isReactFragment(child)) {
+      throw new ClerkElementsRuntimeError('<GlobalError /> cannot render a Fragment as a child.');
+    }
 
     return (
       <Comp
@@ -673,21 +754,21 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
  * @param {Function} [children] - A function that receives `message` and `code` as arguments.
  *
  * @example
- * <Field name="email">
- *   <FieldError />
- * </Field>
+ * <Clerk.Field name="email">
+ *   <Clerk.FieldError />
+ * </Clerk.Field>
  *
  * @example
- * <Field name="email">
- *   <FieldError>
+ * <Clerk.Field name="email">
+ *   <Clerk.FieldError>
  *     {({ message, code }) => (
  *       <span data-error-code={code}>{message}</span>
  *     )}
- *   </FieldError>
- * </Field>
+ *   </Clerk.FieldError>
+ * </Clerk.Field>
  */
 const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
-  ({ children, code, name, ...rest }, forwardedRef) => {
+  ({ asChild = false, children, code, name, ...rest }, forwardedRef) => {
     const fieldContext = useFieldContext();
     const fieldName = fieldContext?.name || name;
     const { feedback } = useFieldFeedback({ name: fieldName });
@@ -702,8 +783,14 @@ const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
       return null;
     }
 
+    const Comp = asChild ? Slot : 'span';
     const child = typeof children === 'function' ? children(error) : children;
+
     // const forceMatch = code ? error.code === code : undefined; // TODO: Re-add when Radix Form is updated
+
+    if (isReactFragment(child)) {
+      throw new ClerkElementsRuntimeError('<FieldError /> cannot render a Fragment as a child.');
+    }
 
     return (
       <RadixFormMessage
@@ -711,8 +798,9 @@ const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
         // forceMatch={forceMatch}
         {...rest}
         ref={forwardedRef}
+        asChild
       >
-        {child || error.message}
+        <Comp>{child || error.message}</Comp>
       </RadixFormMessage>
     );
   },

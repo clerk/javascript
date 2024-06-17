@@ -13,7 +13,7 @@ type SignInFactorOneCodeFormProps = {
   cardSubtitle: LocalizationKey;
   inputLabel?: LocalizationKey;
   resendButton: LocalizationKey;
-  prepare: () => Promise<SignUpResource> | undefined;
+  prepare: () => Promise<SignUpResource | void> | undefined;
   attempt: (code: string) => Promise<SignUpResource>;
   safeIdentifier?: string | undefined | null;
 };

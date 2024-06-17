@@ -62,8 +62,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     socialButtonsVariant === 'blockButton'
       ? true
       : socialButtonsVariant === 'iconButton'
-      ? false
-      : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
+        ? false
+        : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
 
   const startOauth = (strategy: OAuthStrategy | Web3Strategy) => async () => {
     card.setLoading(strategy);
@@ -115,7 +115,9 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 ? localizationKeys('socialButtonsBlockButton', {
                     provider: strategyToDisplayData[strategy].name,
                   })
-                : undefined;
+                : localizationKeys('socialButtonsBlockButtonManyInView', {
+                    provider: strategyToDisplayData[strategy].name,
+                  });
 
             // When strategies break into 2 rows or more, use the first item of the first
             // row as reference for the width of the buttons in the second row and beyond

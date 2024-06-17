@@ -36,7 +36,7 @@ export const SignUpResend = React.forwardRef<SignUpResendElement, SignUpResendPr
     const ref = SignUpVerificationCtx.useActorRef(true);
 
     if (!ref) {
-      throw new Error('The resend action must be used within <Step name="verifications">.');
+      throw new Error('The resend action must be used within <SignUp.Step name="verifications">.');
     }
 
     const fallbackProps: SignUpResendFallbackProps = useSelector(

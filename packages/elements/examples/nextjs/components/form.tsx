@@ -13,9 +13,9 @@ function OTPInputSegment({ value, status }: { value: string; status: OTPInputSeg
           data-state={state}
           data-status={status}
           className={clsx(
-            'flex flex-col justify-center items-center h-12 w-10 rounded-lg border-2 bg-white border-[var(--border-color)] [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)] text-lg text-black self-stretch',
+            'flex h-12 w-10 flex-col items-center justify-center self-stretch rounded-lg border-2 border-[var(--border-color)] bg-white text-lg text-black [--border-color:theme(colors.gray.300)] data-[state="invalid"]:[--border-color:theme(colors.red.500)]',
             (status === 'cursor' || status === 'selected') &&
-              '[--border-color:theme(colors.purple.500)] shadow-[0_0_0_1px_theme(colors.purple.500)]',
+              'shadow-[0_0_0_1px_theme(colors.purple.500)] [--border-color:theme(colors.purple.500)]',
             status === 'selected' && 'bg-purple-100',
           )}
         >
@@ -65,7 +65,7 @@ export const CustomField = React.forwardRef<
       name={name}
       className='flex flex-col gap-4'
     >
-      <div className='flex gap-4 justify-between items-center'>
+      <div className='flex items-center justify-between gap-4'>
         <Label>{label}</Label>
         <Input
           name={name}
@@ -81,13 +81,13 @@ export const CustomField = React.forwardRef<
         ) : null}
       </div>
 
-      <FieldError className='block text-red-400 font-mono' />
+      <FieldError className='block font-mono text-red-400' />
       <FieldState>
         {({ state, codes, message }) => (
           <div>
-            <pre className='opacity-60 text-xs'>Field state: {state}</pre>
-            <pre className='opacity-60 text-xs'>Field msg: {message}</pre>
-            {name === 'password' ? <pre className='opacity-60 text-xs'>Pwd Keys: {codes?.join(', ')}</pre> : null}
+            <pre className='text-xs opacity-60'>Field state: {state}</pre>
+            <pre className='text-xs opacity-60'>Field msg: {message}</pre>
+            {name === 'password' ? <pre className='text-xs opacity-60'>Pwd Keys: {codes?.join(', ')}</pre> : null}
           </div>
         )}
       </FieldState>

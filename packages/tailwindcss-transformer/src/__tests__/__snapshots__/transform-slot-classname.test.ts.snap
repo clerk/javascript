@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`slot with className 1`] = `
+"const Button: React.FC<ButtonProps> = ({ children, className }) => {
+    return <div slot={<button className="cl-c2153e59">{children}</button>} />;
+  }"
+`;

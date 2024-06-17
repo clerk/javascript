@@ -26,13 +26,15 @@ export type SignUpCaptchaProps =
  *
  * If utilizing the `asChild` prop, the component must be a self-closing element or component. Any children passed to the immediate child component of <SignUp.Captcha> will be ignored.
  *
+ * @param {boolean} [asChild] - If true, `<Captcha />` will render as its child element, passing along any necessary props.
+ *
  * @example
  * <SignUp.Root>
  *   <SignUp.Step name="start">
  *     <SignUp.Captcha />
  *     <Clerk.Action submit>Sign Up</Clerk.Action>
  *   </SignUp.Step>
- * </SignIn>
+ * </SignUp.Root>
  *
  * @example
  * <SignUp.Root>
@@ -42,7 +44,7 @@ export type SignUpCaptchaProps =
  *     </SignUp.Captcha>
  *     <Clerk.Action submit>Sign Up</Clerk.Action>
  *   </SignUp.Step>
- * </SignIn>
+ * </SignUp.Root>
  */
 
 export const SignUpCaptcha = React.forwardRef<SignUpCaptchaElement, SignUpCaptchaProps>(
@@ -50,9 +52,7 @@ export const SignUpCaptcha = React.forwardRef<SignUpCaptchaElement, SignUpCaptch
     const ref = SignUpStartCtx.useActorRef(true);
 
     if (!ref) {
-      throw new ClerkElementsRuntimeError(
-        '<SignUp.Captcha> must be used within the <SignUp.Step name="start"> component.',
-      );
+      throw new ClerkElementsRuntimeError('<Captcha> must be used within the <SignUp.Step name="start"> component.');
     }
 
     const Comp = asChild ? Slot : 'div';

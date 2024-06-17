@@ -43,6 +43,9 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
       if (isEmailLinkError(err) && err.code === EmailLinkErrorCode.Expired) {
         status = 'expired';
       }
+      if (isEmailLinkError(err) && err.code === EmailLinkErrorCode.ClientMismatch) {
+        status = 'client_mismatch';
+      }
       setVerificationStatus(status);
     }
   };

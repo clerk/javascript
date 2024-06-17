@@ -15,6 +15,7 @@ export class AllowlistIdentifierAPI extends AbstractAPI {
     return this.request<PaginatedResourceResponse<AllowlistIdentifier[]>>({
       method: 'GET',
       path: basePath,
+      queryParams: { paginated: true },
     });
   }
 

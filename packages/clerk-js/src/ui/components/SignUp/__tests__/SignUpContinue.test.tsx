@@ -43,10 +43,27 @@ describe('SignUpContinue', () => {
       f.startSignUpWithEmailAddress();
     });
     render(<SignUpContinue />, { wrapper });
-    // Because the email address is already set, it should not be shown,
-    // as we're in PSU mode and it's not a missing field.
+    // This will have to be show if the email is already set but it is not verified
+    // because if the users tries to edit the email before the first one has verified
+    // the email field will be lost
+    expect(screen.queryByText(/email address/i)).toBeInTheDocument();
+    expect(screen.queryByText(/password/i)).toBeInTheDocument();
+  });
+
+  it('does not show email field if has been verified', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withEmailAddress({ required: true });
+      f.withPassword({ required: true });
+      f.startSignUpWithEmailAddress({
+        emailVerificationStatus: 'verified',
+      });
+    });
+    render(<SignUpContinue />, { wrapper });
+    // This will have to be show if the email is already set but it is not verified
+    // because if the users tries to edit the email before the first one has verified
+    // the email field will be lost
     expect(screen.queryByText(/email address/i)).not.toBeInTheDocument();
-    screen.getByText(/password/i);
+    expect(screen.queryByText(/password/i)).toBeInTheDocument();
   });
 
   it('shows the continue button', async () => {

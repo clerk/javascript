@@ -36,7 +36,10 @@ export class TokenCacheKey {
     return new TokenCacheKey(prefix, { audience, tokenId });
   }
 
-  constructor(public prefix: string, public data: TokenCacheKeyJSON) {
+  constructor(
+    public prefix: string,
+    public data: TokenCacheKeyJSON,
+  ) {
     this.prefix = prefix;
     this.data = data;
   }

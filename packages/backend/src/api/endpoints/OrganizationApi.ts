@@ -11,6 +11,7 @@ import type {
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { OrganizationMembershipRole } from '../resources/Enums';
 import { AbstractAPI } from './AbstractApi';
+import type { WithSign } from './util-types';
 
 const basePath = '/organizations';
 
@@ -22,16 +23,7 @@ type MetadataParams<TPublic = OrganizationPublicMetadata, TPrivate = Organizatio
 type GetOrganizationListParams = ClerkPaginationRequest<{
   includeMembersCount?: boolean;
   query?: string;
-  orderBy?:
-    | 'name'
-    | '+name'
-    | '-name'
-    | 'created_at'
-    | '+created_at'
-    | '-created_at'
-    | 'members_count'
-    | '+members_count'
-    | '-members_count';
+  orderBy?: WithSign<'name' | 'created_at' | 'members_count'>;
 }>;
 
 type CreateParams = {
@@ -59,6 +51,7 @@ type UpdateMetadataParams = MetadataParams;
 
 type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   organizationId: string;
+  orderBy?: WithSign<'phone_number' | 'email_address' | 'created_at' | 'first_name' | 'last_name' | 'username'>;
 }>;
 
 type CreateOrganizationMembershipParams = {

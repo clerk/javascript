@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  extends: ['custom/node', 'custom/typescript', 'custom/qunit'],
+  extends: ['@clerk/custom/node', '@clerk/custom/typescript', '@clerk/custom/qunit'],
   rules: {
     'import/no-unresolved': ['error', { ignore: ['^#'] }],
   },

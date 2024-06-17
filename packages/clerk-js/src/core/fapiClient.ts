@@ -1,8 +1,7 @@
 import { camelToSnake, isBrowserOnline, runWithExponentialBackOff } from '@clerk/shared';
 import type { Clerk, ClerkAPIErrorJSON, ClientJSON } from '@clerk/types';
-import qs from 'qs';
 
-import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil } from '../utils';
+import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
 import { clerkNetworkError } from './errors';
 
 export type HTTPMethod = 'CONNECT' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT' | 'TRACE';
@@ -31,10 +30,6 @@ export type FapiRequestCallback<T> = (
   request: FapiRequestInit,
   response?: FapiResponse<T>,
 ) => Promise<unknown | false> | unknown | false;
-
-const camelToSnakeEncoder: qs.IStringifyOptions['encoder'] = (str, defaultEncoder, _, type) => {
-  return type === 'key' ? camelToSnake(str) : defaultEncoder(str);
-};
 
 // TODO: Move to @clerk/types
 export interface FapiResponseJSON<T> {
@@ -120,12 +115,15 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     }
 
     // TODO: extract to generic helper
-    const objParams = [...searchParams.entries()].reduce((acc, [k, v]) => {
-      acc[k] = v.includes(',') ? v.split(',') : v;
-      return acc;
-    }, {} as FapiQueryStringParameters & Record<string, string | string[]>);
+    const objParams = [...searchParams.entries()].reduce(
+      (acc, [k, v]) => {
+        acc[k] = v.includes(',') ? v.split(',') : v;
+        return acc;
+      },
+      {} as FapiQueryStringParameters & Record<string, string | string[]>,
+    );
 
-    return qs.stringify(objParams, { addQueryPrefix: true, arrayFormat: 'repeat' });
+    return stringifyQueryParams(objParams);
   }
 
   function buildUrl(requestInit: FapiRequestInit): URL {
@@ -193,8 +191,14 @@ export function createFapiClient(clerkInstance: Clerk): FapiClient {
     // Currently, this is needed only for form-urlencoded, so that the values reach the server in the form
     // foo=bar&baz=bar&whatever=1
     // @ts-ignore
+
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
-      requestInit.body = qs.stringify(body, { encoder: camelToSnakeEncoder, indices: false });
+      // The native BodyInit type is too wide for our use case,
+      // so we're casting it to a more specific type here.
+      // This is covered by the test suite.
+      requestInit.body = body
+        ? stringifyQueryParams(body as any as Record<string, string>, { keyEncoder: camelToSnake })
+        : body;
     }
 
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);

@@ -17,7 +17,9 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
   const sponsorOrLinksExist = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
   const showSponsorAndLinks = isProfileFooter ? branded : sponsorOrLinksExist;
 
-  if (!children && !showSponsorAndLinks) return null;
+  if (!children && !showSponsorAndLinks) {
+    return null;
+  }
 
   const footerStyles = (t: InternalTheme) => ({
     '>:first-of-type': {
@@ -81,7 +83,9 @@ const CardFooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
 export const CardFooterLinks = React.memo((): JSX.Element | null => {
   const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
 
-  if (!helpPageUrl && !privacyPageUrl && !termsPageUrl) return null;
+  if (!helpPageUrl && !privacyPageUrl && !termsPageUrl) {
+    return null;
+  }
 
   return (
     <Flex

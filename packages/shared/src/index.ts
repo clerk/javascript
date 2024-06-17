@@ -30,5 +30,6 @@ export * from './proxy';
 export * from './underscore';
 export * from './url';
 export * from './object';
+export * from './logger';
 export { createWorkerTimers } from './workerTimers';
 export { DEV_BROWSER_JWT_KEY, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from './devBrowser';

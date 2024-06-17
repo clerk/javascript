@@ -1,13 +1,8 @@
 import { constants } from '@clerk/backend/internal';
-import { Request } from 'express';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import type { Request } from 'express';
 
 import { authenticateRequest } from '../authenticateRequest';
-
-const mockNext = jest.fn();
-
-afterEach(() => {
-  mockNext.mockReset();
-});
 
 const mockClerkClient = () => ({
   authenticateRequest: jest.fn(),

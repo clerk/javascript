@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
 
     env:
+      # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
+      NODE_VERSION: 18.20.2
       TURBO_SUMMARIZE: false
 
     steps:
@@ -32,6 +34,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          node-version: ${{ env.NODE_VERSION }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -43,7 +46,7 @@ jobs:
 
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
-        run: if [ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" ]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
+        run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
 
       - name: Lint GitHub Actions Workflows
         run: npx eslint .github
@@ -53,20 +56,30 @@ jobs:
         run: npm run format:check
 
       - name: Build Packages
-        run: npx turbo build $TURBO_ARGS --filter=!elements --only
+        run: npx turbo build $TURBO_ARGS --only
+
+      - name: Check size using bundlewatch
+        run: npx turbo bundlewatch $TURBO_ARGS --only
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+          CI_REPO_NAME: ${{ vars.REPO_NAME }}
+          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_BRANCH: ${{ github.ref	}}
+          CI_BRANCH_BASE: refs/heads/main
 
       - name: Lint packages using publint
-        run: npx turbo lint:publint $TURBO_ARGS --filter=!elements --only
+        run: npx turbo lint:publint $TURBO_ARGS --only
 
       - name: Lint types using attw
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!elements --filter=!backend --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=!@clerk/nextjs --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/backend --only
 
       - name: Lint types using attw [Errors Allowed]
-        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --filter=elements --continue --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=@clerk/nextjs --filter=@clerk/tanstack-start --filter=@clerk/backend --filter=@clerk/elements --continue --only
         continue-on-error: true # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
-        run: npx turbo lint $TURBO_ARGS --filter=!elements --only -- --quiet
+        run: npx turbo lint $TURBO_ARGS --only -- --quiet
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v3
@@ -101,16 +114,19 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          node-version: ${{ matrix.node-version }}
+          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
+          # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
+          node-version: ${{ matrix.node-version == '18' && '18.20.2' || matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run tests
-        run: npx turbo test $TURBO_ARGS --filter=!elements
+        run: npx turbo test $TURBO_ARGS
         env:
-          NODE_VERSION: ${{ matrix.node-version }}
+          # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
+          NODE_VERSION: ${{ matrix.node-version == '18' && '18.20.2' || matrix.node-version }}
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
@@ -125,12 +141,23 @@ jobs:
     name: Integration Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_MEDIUM || 'ubuntu-latest-m' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
+
+    env:
+      # TODO: Update once actions/init/action.yml isn't pinned to 18.20.2
+      NODE_VERSION: 18.20.2
 
     strategy:
       matrix:
-        test-name: ['generic', 'nextjs', 'express', 'quickstart', 'ap-flows']
+        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements']
         test-project: ['chrome']
+        include:
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '13'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '14'
 
     steps:
       - name: Checkout Repo
@@ -139,41 +166,63 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
+      - name: Task Status
+        id: task-status
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+        run: |
+          AFFECTED=0
+          (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
+          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
+
       - name: Setup
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: config
         uses: ./.github/actions/init
         with:
+          node-version: ${{ env.NODE_VERSION }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
       - name: Verdaccio
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --filter=!elements --only && npx changeset publish --no-git-tag; fi
+            if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
         run: npm init -y && npm install @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        id: integration-tests
         run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
-      # - name: Upload Integration Report for ${{ matrix.test-name }}
-      #   uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: integration-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
-      #     path: playwright-report/
-      #     retention-days: 1
+      - name: Upload test-results
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+          path: integration/test-results
+          retention-days: 1

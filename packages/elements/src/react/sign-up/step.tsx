@@ -1,3 +1,6 @@
+import { useClerk } from '@clerk/clerk-react';
+import { eventComponentMounted } from '@clerk/shared/telemetry';
+
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 
 import type { SignUpContinueProps } from './continue';
@@ -24,24 +27,22 @@ export type SignUpStepProps =
 /**
  * Render different steps of the sign-up flow. Initially the `'start'` step is rendered. Optionally, you can render additional fields in the `'continue'` step. Once a sign-up attempt has been created, `'verifications'` will be displayed.
  *
- * You typically want to place fields like username, password, or social providers in the `'start'` step. The `'continue'` step can hold inputs for username, firstname/lastname or other metadata. The `'verifications'` step is used to verify the user's information like an email verification. Once the user has been verified, the sign-up attempt will be completed.
+ * You typically want to place fields like username, password, or social providers in the `'start'` step. The `'continue'` step can hold inputs for username, first name/last name or other metadata. The `'verifications'` step is used to verify the user's information like an email verification. Once the user has been verified, the sign-up attempt will be completed.
  *
  * @param {string} name - Step name. Use `'start'`, `'continue'`, or `'verifications'`.
  *
  * @example
- * <SignUp>
- *  <Step name='start'>
- *    Enter email and password
- *  </Step>
- *  <Step name='continue'>
- *    Enter username and phone number
- *  </Step>
- *  <Step name='verifications'>
- *    Verify with email link
- *  </Step>
- * </SignUp>
+ * <SignUp.Root>
+ *  <SignUp.Step name='start' />
+ *  <SignUp.Step name='continue' />
+ *  <SignUp.Step name='verifications' />
+ * </SignUp.Root>
  */
 export function SignUpStep(props: SignUpStepProps) {
+  const clerk = useClerk();
+
+  clerk.telemetry?.record(eventComponentMounted('Elements_SignUpStep', { name: props.name }));
+
   switch (props.name) {
     case SIGN_UP_STEPS.start:
       return <SignUpStart {...props} />;

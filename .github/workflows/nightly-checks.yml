@@ -52,6 +52,9 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           E2E_NEXTJS_VERSION: 'canary'
+          E2E_REACT_VERSION: '19.0.0-beta-04b058868c-20240508'
+          E2E_REACT_DOM_VERSION: '19.0.0-beta-04b058868c-20240508'
+          E2E_NPM_FORCE: 'true'
 
       - name: Report Status
         if: always()

@@ -11,6 +11,7 @@ import type {
   OrganizationResource,
 } from '@clerk/types';
 
+import { eventMethodCalled } from '../../telemetry/events/method-called';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
@@ -134,6 +135,8 @@ export const useOrganization: UseOrganization = params => {
   });
 
   const clerk = useClerkInstanceContext();
+
+  clerk.telemetry?.record(eventMethodCalled('useOrganization'));
 
   const domainParams =
     typeof domainListParams === 'undefined'

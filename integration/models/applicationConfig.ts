@@ -54,6 +54,9 @@ export const applicationConfig = () => {
       scripts[name] = cmd;
       return self;
     },
+    /**
+     * Adds a dependency to the template's `package.json` file. If the version is undefined, the dependency is not added. If the dependency already exists, the version is overwritten.
+     */
     addDependency: (name: string, version: string | undefined) => {
       if (version) {
         dependencies.set(name, version);

@@ -78,7 +78,7 @@ const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
   }
 
   if (options.domain) {
-    obj['data-clerk-clerk-domain'] = options.domain;
+    obj['data-clerk-domain'] = options.domain;
   }
 
   return obj;

@@ -57,31 +57,30 @@ export const OTPInput = React.forwardRef<HTMLInputElement, OTPInputProps>(functi
 /**
  * Standard `<input />` element that receives the same props as the OTPInput component except for the render prop.
  */
-const OTPInputStandard = React.forwardRef<HTMLInputElement, Omit<OTPInputProps, 'render'>>(function OTPInput(
-  props,
-  ref,
-) {
-  const { length = OTP_LENGTH_DEFAULT, autoSubmit = false, ...rest } = props;
+const OTPInputStandard = React.forwardRef<HTMLInputElement, Omit<OTPInputProps, 'render'>>(
+  function OTPInput(props, ref) {
+    const { length = OTP_LENGTH_DEFAULT, autoSubmit = false, ...rest } = props;
 
-  const innerRef = React.useRef<HTMLInputElement>(null);
-  // This ensures we can access innerRef internally while still exposing it via the ref prop
-  React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
+    const innerRef = React.useRef<HTMLInputElement>(null);
+    // This ensures we can access innerRef internally while still exposing it via the ref prop
+    React.useImperativeHandle(ref, () => innerRef.current as HTMLInputElement, []);
 
-  // Fire the requestSubmit callback when the input has the required length and autoSubmit is enabled
-  React.useEffect(() => {
-    if (String(props.value).length === length && autoSubmit) {
-      innerRef.current?.form?.requestSubmit();
-    }
-  }, [props.value, length, autoSubmit]);
+    // Fire the requestSubmit callback when the input has the required length and autoSubmit is enabled
+    React.useEffect(() => {
+      if (String(props.value).length === length && autoSubmit) {
+        innerRef.current?.form?.requestSubmit();
+      }
+    }, [props.value, length, autoSubmit]);
 
-  return (
-    <RadixControl
-      ref={innerRef}
-      {...rest}
-      data-otp-input-standard
-    />
-  );
-});
+    return (
+      <RadixControl
+        ref={innerRef}
+        {...rest}
+        data-otp-input-standard
+      />
+    );
+  },
+);
 
 /**
  * A custom input component to handle accepting OTP codes. An invisible input element is used to capture input and handle native input
@@ -185,6 +184,7 @@ const OTPInputSegmented = React.forwardRef<HTMLInputElement, Required<Pick<OTPIn
           }}
           style={{
             ...inputStyle,
+            clipPath: `inset(0 calc(1ch + ${passwordManagerOffset}px) 0 0)`,
             width: `calc(100% + 1ch + ${passwordManagerOffset}px)`,
           }}
         />

@@ -1,7 +1,7 @@
 import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationMembershipRequestResource } from '@clerk/types';
 
-import { Button, Flex, localizationKeys, Td } from '../../customizables';
+import { Box, Button, descriptors, Flex, localizationKeys, Td } from '../../customizables';
 import { useCardState, UserPreview, withCardStateProvider } from '../../elements';
 import { handleError } from '../../utils';
 import { DataTable, RowContainer } from './MemberListTable';
@@ -84,7 +84,15 @@ const RequestRow = withCardStateProvider(
             user={{ primaryEmailAddress: { emailAddress: request.publicUserData.identifier } } as any}
           />
         </Td>
-        <Td>{request.createdAt.toLocaleDateString()}</Td>
+        <Td>
+          <Box
+            as='span'
+            elementDescriptor={descriptors.formattedDate}
+            elementId={descriptors.formattedDate.setId('tableCell')}
+          >
+            {request.createdAt.toLocaleDateString()}
+          </Box>
+        </Td>
 
         <Td>
           <AcceptRejectRequestButtons {...{ onAccept, onReject }} />

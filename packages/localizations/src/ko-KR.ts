@@ -653,10 +653,10 @@ export const koKR: LocalizationResource = {
     },
     mobileButton__menu: '메뉴',
     navbar: {
-      account: 'Profile',
+      account: '프로필',
       description: '계정 정보를 관리하세요.',
-      security: 'Security',
-      title: '게정',
+      security: '보안',
+      title: '계정',
     },
     passkeyScreen: {
       removeResource: {

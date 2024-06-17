@@ -117,7 +117,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await fakeUserWithPasword.deleteIfExists();
   });
 
-  test('cant sign in with wrong password', async ({ page, context }) => {
+  test('cannot sign in with wrong password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
@@ -130,7 +130,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.expect.toBeSignedOut();
   });
 
-  test('cant sign in with wrong password but can sign in with email', async ({ page, context }) => {
+  test('cannot sign in with wrong password but can sign in with email', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();

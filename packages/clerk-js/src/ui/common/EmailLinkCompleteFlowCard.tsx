@@ -24,6 +24,10 @@ const signInLocalizationKeys = {
     title: localizationKeys('signIn.emailLink.expired.title'),
     subtitle: localizationKeys('signIn.emailLink.expired.subtitle'),
   },
+  client_mismatch: {
+    title: localizationKeys('signIn.emailLink.clientMismatch.title'),
+    subtitle: localizationKeys('signIn.emailLink.clientMismatch.subtitle'),
+  },
 };
 
 const signUpLocalizationKeys = {
@@ -39,6 +43,10 @@ const signUpLocalizationKeys = {
   loading: {
     ...signInLocalizationKeys.loading,
     title: localizationKeys('signUp.emailLink.loading.title'),
+  },
+  client_mismatch: {
+    ...signInLocalizationKeys.client_mismatch,
+    subtitle: localizationKeys('signUp.emailLink.clientMismatch.subtitle'),
   },
 };
 

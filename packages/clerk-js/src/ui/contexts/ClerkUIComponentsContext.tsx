@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { OrganizationResource, UserResource } from '@clerk/types';
-import React, { useMemo } from 'react';
+import type { HandleOAuthCallbackParams, OrganizationResource, UserResource } from '@clerk/types';
+import React, { useCallback, useMemo } from 'react';
 
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_INITIAL_VALUE_KEYS } from '../../core/constants';
 import { buildURL, createDynamicParamParser } from '../../utils';
@@ -9,12 +9,12 @@ import { RedirectUrls } from '../../utils/redirectUrls';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import { useEnvironment, useOptions } from '../contexts';
 import type { NavbarRoute } from '../elements';
-import type { ParsedQs } from '../router';
+import type { ParsedQueryString } from '../router';
 import { useRouter } from '../router';
 import type {
   AvailableComponentCtx,
   CreateOrganizationCtx,
-  OneTapCtx,
+  GoogleOneTapCtx,
   OrganizationListCtx,
   OrganizationProfileCtx,
   OrganizationSwitcherCtx,
@@ -44,7 +44,7 @@ const getInitialValuesFromQueryParams = (queryString: string, params: string[]) 
 
 export type SignUpContextType = SignUpCtx & {
   navigateAfterSignUp: () => any;
-  queryParams: ParsedQs;
+  queryParams: ParsedQueryString;
   signInUrl: string;
   signUpUrl: string;
   secondFactorUrl: string;
@@ -91,8 +91,9 @@ export const useSignUpContext = (): SignUpContextType => {
   let signUpUrl = (ctx.routing === 'path' && ctx.path) || options.signUpUrl || displayConfig.signUpUrl;
   let signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
 
-  signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
-  signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
+  const preservedParams = redirectUrls.getPreservedSearchParams();
+  signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
 
   // TODO: Avoid building this url again to remove duplicate code. Get it from window.Clerk instead.
   const secondFactorUrl = buildURL({ base: signInUrl, hashPath: '/factor-two' }, { stringify: true });
@@ -114,7 +115,7 @@ export const useSignUpContext = (): SignUpContextType => {
 
 export type SignInContextType = SignInCtx & {
   navigateAfterSignIn: () => any;
-  queryParams: ParsedQs;
+  queryParams: ParsedQueryString;
   signUpUrl: string;
   signInUrl: string;
   signUpContinueUrl: string;
@@ -161,8 +162,10 @@ export const useSignInContext = (): SignInContextType => {
   let signInUrl = (ctx.routing === 'path' && ctx.path) || options.signInUrl || displayConfig.signInUrl;
   let signUpUrl = ctx.signUpUrl || options.signUpUrl || displayConfig.signUpUrl;
 
-  signInUrl = redirectUrls.appendPreservedPropsToUrl(signInUrl, queryParams);
-  signUpUrl = redirectUrls.appendPreservedPropsToUrl(signUpUrl, queryParams);
+  const preservedParams = redirectUrls.getPreservedSearchParams();
+  signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+  signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
 
   return {
@@ -200,7 +203,7 @@ type PagesType = {
 };
 
 export type UserProfileContextType = UserProfileCtx & {
-  queryParams: ParsedQs;
+  queryParams: ParsedQueryString;
   authQueryString: string | null;
   pages: PagesType;
 };
@@ -494,14 +497,85 @@ export const useCreateOrganizationContext = () => {
 };
 
 export const useGoogleOneTapContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as OneTapCtx;
+  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as GoogleOneTapCtx;
+  const options = useOptions();
+  const { displayConfig } = useEnvironment();
+  const { queryParams } = useRouter();
 
-  if (componentName !== 'OneTap') {
+  if (componentName !== 'GoogleOneTap') {
     throw new Error('Clerk: useGoogleOneTapContext called outside GoogleOneTap.');
   }
+
+  const generateCallbackUrls = useCallback(
+    (returnBackUrl: string): HandleOAuthCallbackParams => {
+      const redirectUrls = new RedirectUrls(
+        options,
+        {
+          ...ctx,
+          signInFallbackRedirectUrl: returnBackUrl,
+          signUpFallbackRedirectUrl: returnBackUrl,
+        },
+        queryParams,
+      );
+
+      let signUpUrl = options.signUpUrl || displayConfig.signUpUrl;
+      let signInUrl = options.signInUrl || displayConfig.signInUrl;
+
+      const preservedParams = redirectUrls.getPreservedSearchParams();
+      signInUrl = buildURL({ base: signInUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+      signUpUrl = buildURL({ base: signUpUrl, hashSearchParams: [queryParams, preservedParams] }, { stringify: true });
+
+      const signInForceRedirectUrl = redirectUrls.getAfterSignInUrl();
+      const signUpForceRedirectUrl = redirectUrls.getAfterSignUpUrl();
+
+      const signUpContinueUrl = buildURL(
+        {
+          base: signUpUrl,
+          hashPath: '/continue',
+          hashSearch: new URLSearchParams({
+            sign_up_force_redirect_url: signUpForceRedirectUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+
+      const firstFactorUrl = buildURL(
+        {
+          base: signInUrl,
+          hashPath: '/factor-one',
+          hashSearch: new URLSearchParams({
+            sign_in_force_redirect_url: signInForceRedirectUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+      const secondFactorUrl = buildURL(
+        {
+          base: signInUrl,
+          hashPath: '/factor-two',
+          hashSearch: new URLSearchParams({
+            sign_in_force_redirect_url: signInForceRedirectUrl,
+          }).toString(),
+        },
+        { stringify: true },
+      );
+
+      return {
+        signInUrl,
+        signUpUrl,
+        firstFactorUrl,
+        secondFactorUrl,
+        continueSignUpUrl: signUpContinueUrl,
+        signInForceRedirectUrl,
+        signUpForceRedirectUrl,
+      };
+    },
+    [ctx, displayConfig.signInUrl, displayConfig.signUpUrl, options, queryParams],
+  );
 
   return {
     ...ctx,
     componentName,
+    generateCallbackUrls,
   };
 };

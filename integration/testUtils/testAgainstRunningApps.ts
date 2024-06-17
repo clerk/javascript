@@ -10,6 +10,7 @@ import { parseEnvOptions } from '../scripts';
 
 type RunningAppsParams = {
   withEnv?: EnvironmentConfig | EnvironmentConfig[];
+  withPattern?: string[];
 };
 
 /**
@@ -20,12 +21,15 @@ type RunningAppsParams = {
  */
 const runningApps = (params: RunningAppsParams = {}) => {
   const withEnv = [params.withEnv].flat().filter(Boolean);
+  const withPattern = (params.withPattern || []).flat().filter(Boolean);
   const { appIds, appUrl, appPk, appSk, clerkApiUrl } = parseEnvOptions();
+
   if (appIds.length) {
     // if appIds are provided, we only return the apps with the given ids
     const filter = app => (withEnv.length ? withEnv.includes(app.env) : true);
-    return appConfigs.longRunningApps.getByPattern(appIds).filter(filter);
+    return appConfigs.longRunningApps.getByPattern(withPattern.length ? withPattern : appIds).filter(filter);
   }
+
   // if no appIds are provided, it means that the user is running an app manually
   // so, we return the app with the given env
   const env = environmentConfig()
@@ -33,11 +37,12 @@ const runningApps = (params: RunningAppsParams = {}) => {
     .setEnvVariable('private', 'CLERK_SECRET_KEY', appSk)
     .setEnvVariable('private', 'CLERK_API_URL', clerkApiUrl)
     .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', appPk);
+
   return [longRunningApplication({ id: 'standalone', env, serverUrl: appUrl, config: applicationConfig() })];
 };
 
-export const testAgainstRunningApps =
-  (runningAppsParams: RunningAppsParams) => (title: string, cb: (p: { app: Application }) => void) => {
+export function testAgainstRunningApps(runningAppsParams: RunningAppsParams) {
+  return (title: string, cb: (p: { app: Application }) => void) => {
     test.describe(title, () => {
       runningApps(runningAppsParams).forEach(app => {
         test.describe(`${app.name}`, () => {
@@ -46,3 +51,4 @@ export const testAgainstRunningApps =
       });
     });
   };
+}

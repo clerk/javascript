@@ -2,7 +2,7 @@ import { useOrganization, useUser } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/types';
 
 import { Protect } from '../../common/Gate';
-import { Badge, localizationKeys, Td, Text } from '../../customizables';
+import { Badge, Box, descriptors, localizationKeys, Td, Text } from '../../customizables';
 import { ThreeDotsMenu, useCardState, UserPreview } from '../../elements';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
 import { handleError } from '../../utils';
@@ -91,7 +91,15 @@ const MemberRow = (props: {
           badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
         />
       </Td>
-      <Td>{membership.createdAt.toLocaleDateString()}</Td>
+      <Td>
+        <Box
+          as='span'
+          elementDescriptor={descriptors.formattedDate}
+          elementId={descriptors.formattedDate.setId('tableCell')}
+        >
+          {membership.createdAt.toLocaleDateString()}
+        </Box>
+      </Td>
       <Td>
         <Protect
           permission={'org:sys_memberships:manage'}

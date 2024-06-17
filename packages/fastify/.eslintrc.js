@@ -1,4 +1,4 @@
 module.exports = {
   root: true,
-  extends: ['custom/node', 'custom/typescript', 'custom/jest'],
+  extends: ['@clerk/custom/node', '@clerk/custom/typescript', '@clerk/custom/jest'],
 };

@@ -1,5 +1,129 @@
 # Change Log
 
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`4ec3f63e2`](https://github.com/clerk/javascript/commit/4ec3f63e26d8d3725a7ba9bbf988a7776fe893ff)]:
+  - @clerk/shared@2.3.0
+
+## 1.2.2
+
+### Patch Changes
+
+- Set `@clerk/types` as a dependency for packages that had it as a dev dependency. ([#3450](https://github.com/clerk/javascript/pull/3450)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updated dependencies [[`86a27f693`](https://github.com/clerk/javascript/commit/86a27f6933de50c99b6bc354bf87ff5c2cfcaf38), [`02bed2e00`](https://github.com/clerk/javascript/commit/02bed2e00d3e0a4e1bb1698b13267faf6aeb31b3), [`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/shared@2.2.2
+  - @clerk/types@4.6.0
+
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`ff31f7255`](https://github.com/clerk/javascript/commit/ff31f725541d82caaa9c13cf42cf15f8ce3992f4), [`0e48fc210`](https://github.com/clerk/javascript/commit/0e48fc210cf0b5852052a21494a05f6e723101f5)]:
+  - @clerk/shared@2.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- Consume and expose the 'saml_accounts' property of the user resource ([#3405](https://github.com/clerk/javascript/pull/3405)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Updated dependencies [[`456b06849`](https://github.com/clerk/javascript/commit/456b068493b8679e1772819eea24d49aa1bc6556)]:
+  - @clerk/shared@2.2.0
+
+## 1.1.5
+
+### Patch Changes
+
+- Added missing phpass and bcrypt_sha256_django hashers to PasswordHasher type ([#3380](https://github.com/clerk/javascript/pull/3380)) by [@royanger](https://github.com/royanger)
+
+- Updated dependencies [[`ec84d51e7`](https://github.com/clerk/javascript/commit/ec84d51e705370273ffb82a0d7c94d90ba3de874)]:
+  - @clerk/shared@2.1.1
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`b27ca8366`](https://github.com/clerk/javascript/commit/b27ca8366a1d6ec1d7ce4a5be5005f1b1b017c20)]:
+  - @clerk/shared@2.1.0
+
+## 1.1.3
+
+### Patch Changes
+
+- Inherit verifyToken options from clerkClient. ([#3296](https://github.com/clerk/javascript/pull/3296)) by [@panteliselef](https://github.com/panteliselef)
+
+  The below code now works as expected: (requires CLERK_SECRET_KEY env var to have been set)
+
+  ```ts
+  import { clerkClient } from '@clerk/clerk-sdk-node';
+
+  // Use the default settings from the already instanciated clerkClient
+  clerkClient.verifyToken(token);
+  // or provide overrides the options
+  clerkClient.verifyToken(token, {
+    secretKey: 'xxxx',
+  });
+  ```
+
+## 1.1.2
+
+### Patch Changes
+
+- Fix bug in JWKS cache logic that caused a race condition resulting in no JWK being available. ([#3321](https://github.com/clerk/javascript/pull/3321)) by [@BRKalow](https://github.com/BRKalow)
+
+- Pass `devBrowserToken` to `createRedirect()` to ensure methods from `auth()` that trigger redirects correctly pass the dev browser token for URL-based session syncing. ([#3334](https://github.com/clerk/javascript/pull/3334)) by [@BRKalow](https://github.com/BRKalow)
+
+- Updated dependencies [[`1662aaae9`](https://github.com/clerk/javascript/commit/1662aaae965fcf36b13dba6b148e096ab6a1cd83), [`f70c885f7`](https://github.com/clerk/javascript/commit/f70c885f798f7ff513f6687f87c8a56daf26fa05), [`f5804a225`](https://github.com/clerk/javascript/commit/f5804a225e9d67cd315700f0ced0ff17b8b14e53)]:
+  - @clerk/shared@2.0.2
+
+## 1.1.1
+
+### Patch Changes
+
+- Fix the following `@clerk/backend` methods to populate their paginated responses: ([#3276](https://github.com/clerk/javascript/pull/3276)) by [@dimkl](https://github.com/dimkl)
+
+  - `clerkClient.allowListIndentifiers.getAllowlistIdentifierList()`
+  - `clerkClient.clients.getClientList()`
+  - `clerkClient.invitations.getInvitationList`
+  - `clerkClient.redirectUrls.getRedirectUrlList()`
+  - `clerkClient.sessions.getSessionList()`
+  - `clerkClient.users.getUserOauthAccessToken()`
+
+- Updated dependencies [[`a78bc447c`](https://github.com/clerk/javascript/commit/a78bc447c1aabaa41bcbaa2a8fe3c48f31275574), [`19cd42434`](https://github.com/clerk/javascript/commit/19cd42434450e568998336bf6d705e475122abbc)]:
+  - @clerk/shared@2.0.1
+
+## 1.1.0
+
+### Minor Changes
+
+- Updated types for `orderBy` in OrganizationApi and UserApi ([#3266](https://github.com/clerk/javascript/pull/3266)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `OrganizationAPI.getOrganizationMembershipList` now accepts `orderBy`
+    - Acceptable values `phone_number`, `+phone_number`, `-phone_number`, `email_address`, `+email_address`, `-email_address`, `created_at`, `+created_at`, `-created_at`, `first_name`, `+first_name`, `-first_name`
+  - `UserAPI.getUserList` expands the acceptable values of the `orderBy` to:
+    - `email_address`, `+email_address`, `-email_address`, `web3wallet`, `+web3wallet`, `-web3wallet`, `first_name`, `+first_name`, `-first_name`, `last_name`, `+last_name`, `-last_name`, `phone_number`, `+phone_number`, `-phone_number`, `username`, `+username`, `-username`
+
+- Add support for the Testing Tokens API ([#3258](https://github.com/clerk/javascript/pull/3258)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Fix infinite redirect loops for production instances with incorrect secret keys ([#3259](https://github.com/clerk/javascript/pull/3259)) by [@dimkl](https://github.com/dimkl)
+
+## 1.0.1
+
+### Patch Changes
+
+- Export all Webhook event types and related JSON types. The newly exported types are: `DeletedObjectJSON`, `EmailJSON`, `OrganizationInvitationJSON`, `OrganizationJSON`, `OrganizationMembershipJSON`, `SessionJSON`, `SMSMessageJSON`, `UserJSON`, `UserWebhookEvent`, `EmailWebhookEvent`, `SMSWebhookEvent`, `SessionWebhookEvent`, `OrganizationWebhookEvent`, `OrganizationMembershipWebhookEvent`, `OrganizationInvitationWebhookEvent` ([#3248](https://github.com/clerk/javascript/pull/3248)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Added missing 'organizationId' parameter to UserListParams ([#3240](https://github.com/clerk/javascript/pull/3240)) by [@royanger](https://github.com/royanger)
+
+  Moved last_active_at_since from UserCountParams to UserListParams
+
 ## 1.0.0
 
 ### Major Changes

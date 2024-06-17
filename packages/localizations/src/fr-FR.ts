@@ -216,7 +216,7 @@ export const frFR: LocalizationResource = {
       headerTitle__general: 'General',
       headerTitle__members: 'Membres',
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'Mettre à jour le profil',
         title: 'Organization Profile',
         uploadAction__title: 'Logo',
       },
@@ -667,10 +667,10 @@ export const frFR: LocalizationResource = {
     },
     mobileButton__menu: 'Menu',
     navbar: {
-      account: 'Profile',
-      description: 'Manage your account info.',
-      security: 'Security',
-      title: 'Account',
+      account: 'Compte',
+      description: 'Gérer votre compte.',
+      security: 'Sécurité',
+      title: 'Profil',
     },
     passkeyScreen: {
       removeResource: {
@@ -782,7 +782,7 @@ export const frFR: LocalizationResource = {
         title: 'Les numéros de téléphone',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'Mettre à jour le profil',
         title: 'Profil',
       },
       usernameSection: {

@@ -1,5 +1,80 @@
 # Change Log
 
+## 2.4.4
+
+### Patch Changes
+
+- Update profile primary button text and nav text in fr-FR & zh-CN ([#3494](https://github.com/clerk/javascript/pull/3494)) by [@youshengCode](https://github.com/youshengCode)
+
+- Set `@clerk/types` as a dependency for packages that had it as a dev dependency. ([#3450](https://github.com/clerk/javascript/pull/3450)) by [@desiprisg](https://github.com/desiprisg)
+
+- Updates on ko-KR localization ([#3454](https://github.com/clerk/javascript/pull/3454)) by [@jourmooney](https://github.com/jourmooney)
+
+- Add passkeys localizations for the `es-MX` locale ([#3453](https://github.com/clerk/javascript/pull/3453)) by [@HugoCL](https://github.com/HugoCL)
+
+- Updated dependencies [[`73e5d61e2`](https://github.com/clerk/javascript/commit/73e5d61e21ab3f77f3c8343bc63da0626466c7ac), [`b8e46328d`](https://github.com/clerk/javascript/commit/b8e46328da874859c4928f19f924219cd6520b11)]:
+  - @clerk/types@4.6.0
+
+## 2.4.3
+
+### Patch Changes
+
+- Review PT-BR localization: Adds missing keys, fixes some typos ([#3412](https://github.com/clerk/javascript/pull/3412)) by [@danilofuchs](https://github.com/danilofuchs)
+
+## 2.4.2
+
+### Patch Changes
+
+- Added missing translations for the Spanish (Spain) locale (es_ES). ([#3389](https://github.com/clerk/javascript/pull/3389)) by [@frankdavidcorona](https://github.com/frankdavidcorona)
+
+## 2.4.1
+
+### Patch Changes
+
+- Add missing es-ES localization keys ([#3382](https://github.com/clerk/javascript/pull/3382)) by [@frankdavidcorona](https://github.com/frankdavidcorona)
+
+## 2.4.0
+
+### Minor Changes
+
+- Add srRS localization ([#3338](https://github.com/clerk/javascript/pull/3338)) by [@paunovic5ar](https://github.com/paunovic5ar)
+
+- Added new keys for email link verification under `signIn.emailLink.clientMismatch` and `signUp.emailLink.clientMismatch` ([#3367](https://github.com/clerk/javascript/pull/3367)) by [@mzhong9723](https://github.com/mzhong9723)
+
+### Patch Changes
+
+- Update esMX language module ([#3372](https://github.com/clerk/javascript/pull/3372)) by [@Thiagoamaro2431](https://github.com/Thiagoamaro2431)
+
+## 2.3.1
+
+### Patch Changes
+
+- feat(localizations): Update PL translations ([#3342](https://github.com/clerk/javascript/pull/3342)) by [@dawid-grabowski](https://github.com/dawid-grabowski)
+
+- Add some phrases to it-IT localization ([#3314](https://github.com/clerk/javascript/pull/3314)) by [@ugoborghetti](https://github.com/ugoborghetti)
+
+## 2.3.0
+
+### Minor Changes
+
+- Allow localization of text in social buttons when many are listed. ([#3282](https://github.com/clerk/javascript/pull/3282)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.2.0
+
+### Minor Changes
+
+- Drop `react` and `react-dom` as peer dependencies since they are not necessary for this package. ([#3273](https://github.com/clerk/javascript/pull/3273)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.1.0
+
+### Minor Changes
+
+- Replace "email ID" with "email address" in `en-US.ts` for `signIn.forgotPassword.subtitle_email` ([#3242](https://github.com/clerk/javascript/pull/3242)) by [@panteliselef](https://github.com/panteliselef)
+
+- Remove experimental Passkeys APIs. This includes any API that is marked as experimental or has the `__experimental_` prefix. ([#3233](https://github.com/clerk/javascript/pull/3233)) by [@panteliselef](https://github.com/panteliselef)
+
+  This prepares the Passkeys release to move further along towards a beta release and eventual stable release.
+
 ## 2.0.0
 
 ### Major Changes

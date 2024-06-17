@@ -21,13 +21,13 @@ function CustomProvider({
       {isLoading => (
         <Clerk.Connection
           name={provider}
-          className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
+          className='relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border border-[rgb(37,37,37)] bg-[rgb(22,22,22)] text-sm text-[rgb(243,243,243)] transition-all duration-150 hover:border-[rgb(50,50,50)] hover:bg-[rgb(22,22,30)] [&>img]:opacity-80 [&>img]:grayscale [&>img]:hover:opacity-100 [&>img]:hover:grayscale-0'
           disabled={isLoading}
         >
           <Clerk.Icon
-            className={`absolute left-4 transition-all duration-200${provider === 'github' ? ' invert' : ''}`}
+            className={`absolute left-4 transition-all duration-200${provider === 'github' ? 'invert' : ''}`}
           />
-          <span className='leading-loose inline-flex justify-center items-center'>
+          <span className='inline-flex items-center justify-center leading-loose'>
             {isLoading ? (
               <>
                 <Spinner /> Loading...
@@ -46,7 +46,7 @@ function TextButton({ children, ...props }: ComponentProps<'button'>) {
   return (
     <button
       type='button'
-      className='m-0 py-3 px-6 text-sm font-medium text-zinc-400 transition-colors duration-150 hover:text-[rgb(204,204,204)] text-center w-full'
+      className='m-0 w-full px-6 py-3 text-center text-sm font-medium text-zinc-400 transition-colors duration-150 hover:text-[rgb(204,204,204)]'
       {...props}
     >
       {children}
@@ -58,7 +58,7 @@ function Button({ children, ...props }: ComponentProps<'button'>) {
   return (
     <button
       type='button'
-      className='text-[rgb(243,243,243)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)] [&>img]:opacity-80  [&>img]:hover:opacity-100 [&>img]:grayscale [&>img]:hover:grayscale-0 relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] text-sm transition-all duration-150'
+      className='relative flex h-14 w-full cursor-pointer items-center justify-center rounded-lg border border-[rgb(37,37,37)] bg-[rgb(22,22,22)] text-sm text-[rgb(243,243,243)] transition-all duration-150 hover:border-[rgb(50,50,50)] hover:bg-[rgb(22,22,30)] [&>img]:opacity-80 [&>img]:grayscale [&>img]:hover:opacity-100 [&>img]:hover:grayscale-0'
       {...props}
     >
       {children}
@@ -69,7 +69,7 @@ function Button({ children, ...props }: ComponentProps<'button'>) {
 function CustomSubmit({ children }: { children: string }) {
   return (
     <SignIn.Action
-      className='inline-flex px-7 py-3 justify-center transition rounded-lg focus:outline-none border items-center disabled:bg-[rgb(12,12,12)] focus:text-[rgb(255,255,255)] w-full duration-300 focus:!border-[rgb(37,37,37)] text-sm space-x-1.5 text-[rgb(160,160,160)] hover:text-[rgb(243,243,243)] disabled:text-[rgb(100,100,100)] select-none bg-[rgb(22,22,22)] hover:bg-[rgb(22,22,30)] border-[rgb(37,37,37)] hover:border-[rgb(50,50,50)]'
+      className='inline-flex w-full select-none items-center justify-center space-x-1.5 rounded-lg border border-[rgb(37,37,37)] bg-[rgb(22,22,22)] px-7 py-3 text-sm text-[rgb(160,160,160)] transition duration-300 hover:border-[rgb(50,50,50)] hover:bg-[rgb(22,22,30)] hover:text-[rgb(243,243,243)] focus:!border-[rgb(37,37,37)] focus:text-[rgb(255,255,255)] focus:outline-none disabled:bg-[rgb(12,12,12)] disabled:text-[rgb(100,100,100)]'
       submit
     >
       <Clerk.Loading>{isLoading => (isLoading ? <Spinner /> : children)}</Clerk.Loading>
@@ -98,7 +98,7 @@ export default function SignInPage() {
   return (
     <SignIn.Root
       fallback={
-        <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
+        <div className='flex h-dvh flex-col items-center justify-center gap-10 bg-zinc-950 text-white'>
           <div className='text-center'>
             <H1>Sign In</H1>
             <p className='text-base text-zinc-400'>
@@ -111,8 +111,8 @@ export default function SignInPage() {
               </Link>
             </p>
           </div>
-          <div className='flex flex-col items-center  gap-12 w-96'>
-            <Clerk.GlobalError className='block text-red-400 font-mono' />
+          <div className='flex w-96 flex-col items-center gap-12'>
+            <Clerk.GlobalError className='block font-mono text-red-400' />
 
             <div className='flex flex-col gap-2 self-stretch'>
               <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
@@ -122,19 +122,19 @@ export default function SignInPage() {
             {continueWithEmail ? (
               <>
                 <Clerk.Field
-                  className='flex flex-col gap-4 w-full'
+                  className='flex w-full flex-col gap-4'
                   name='identifier'
                 >
                   {fieldState => (
                     <>
                       <Clerk.Label className='sr-only'>Email</Clerk.Label>
                       <Clerk.Input
-                        className={`bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded w-full placeholder-[rgb(100,100,100)] px-4 py-2 ${
+                        className={`w-full rounded border border-[rgb(37,37,37)] bg-[rgb(12,12,12)] px-4 py-2 placeholder-[rgb(100,100,100)] ${
                           fieldState === 'invalid' && 'border-red-500'
                         }`}
                         placeholder='Enter your email address'
                       />
-                      <Clerk.FieldError className='block text-red-400 font-mono w-full' />
+                      <Clerk.FieldError className='block w-full font-mono text-red-400' />
                     </>
                   )}
                 </Clerk.Field>
@@ -148,7 +148,7 @@ export default function SignInPage() {
         </div>
       }
     >
-      <div className='h-dvh flex flex-col justify-center items-center bg-zinc-950 text-white gap-10'>
+      <div className='flex h-dvh flex-col items-center justify-center gap-10 bg-zinc-950 text-white'>
         <div className='text-center'>
           <H1>Sign In</H1>
           <p className='text-base text-zinc-400'>
@@ -162,35 +162,39 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <div className='absolute top-4 right-4'>
+        <div className='absolute right-4 top-4'>
           <Clerk.Loading>{isLoading => <span>Loading: {JSON.stringify(isLoading, null, 2)}</span>}</Clerk.Loading>
         </div>
 
         <SignIn.Step name='start'>
-          <div className='flex flex-col items-center  gap-12 w-96'>
-            <Clerk.GlobalError className='block text-red-400 font-mono' />
+          <div className='flex w-96 flex-col items-center gap-12'>
+            <Clerk.GlobalError className='block font-mono text-red-400' />
 
             <div className='flex flex-col gap-2 self-stretch'>
               <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
               <CustomProvider provider='google'>Continue with Google</CustomProvider>
             </div>
 
+            <SignIn.Passkey className='inline-flex w-full select-none items-center justify-center space-x-1.5 rounded-lg border border-[rgb(37,37,37)] bg-[rgb(22,22,22)] px-7 py-3 text-sm text-[rgb(160,160,160)] transition duration-300 hover:border-[rgb(50,50,50)] hover:bg-[rgb(22,22,30)] hover:text-[rgb(243,243,243)] focus:!border-[rgb(37,37,37)] focus:text-[rgb(255,255,255)] focus:outline-none disabled:bg-[rgb(12,12,12)] disabled:text-[rgb(100,100,100)]'>
+              <Clerk.Loading>{isLoading => (isLoading ? <Spinner /> : 'Use passkey instead')}</Clerk.Loading>
+            </SignIn.Passkey>
+
             {continueWithEmail ? (
               <>
                 <Clerk.Field
-                  className='flex flex-col gap-4 w-full'
+                  className='flex w-full flex-col gap-4'
                   name='identifier'
                 >
                   {fieldState => (
                     <>
                       <Clerk.Label className='sr-only'>Email</Clerk.Label>
                       <Clerk.Input
-                        className={`bg-[rgb(12,12,12)] border-[rgb(37,37,37)] border rounded w-full placeholder-[rgb(100,100,100)] px-4 py-2 ${
+                        className={`w-full rounded border border-[rgb(37,37,37)] bg-[rgb(12,12,12)] px-4 py-2 placeholder-[rgb(100,100,100)] ${
                           fieldState === 'invalid' && 'border-red-500'
                         }`}
                         placeholder='Enter your email address'
                       />
-                      <Clerk.FieldError className='block text-red-400 font-mono w-full' />
+                      <Clerk.FieldError className='block w-full font-mono text-red-400' />
                     </>
                   )}
                 </Clerk.Field>
@@ -203,79 +207,96 @@ export default function SignInPage() {
           </div>
         </SignIn.Step>
 
-        <SignIn.Step name='choose-strategy'>
-          <div className='flex flex-col items-center gap-6 w-96'>
-            <H3>CHOOSE STRATEGY:</H3>
+        <SignIn.Step
+          name='choose-strategy'
+          className='flex w-96 flex-col items-center gap-6'
+        >
+          <H3>CHOOSE STRATEGY:</H3>
 
-            <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
-            <CustomProvider provider='google'>Continue with Google</CustomProvider>
-            <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
+          <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+          <CustomProvider provider='google'>Continue with Google</CustomProvider>
+          <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='password'
-            >
-              <Button>Password</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='password'
+          >
+            <Button>Password</Button>
+          </SignIn.SupportedStrategy>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='phone_code'
-            >
-              <Button>Send a code to your phone</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='phone_code'
+          >
+            <Button>Send a code to your phone</Button>
+          </SignIn.SupportedStrategy>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='email_code'
-            >
-              <Button>Send a code to your email</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='passkey'
+          >
+            <Button>use passkey</Button>
+          </SignIn.SupportedStrategy>
 
-            <SignIn.Action
-              asChild
-              navigate='previous'
-            >
-              <TextButton>Go back</TextButton>
-            </SignIn.Action>
-          </div>
+          <SignIn.SupportedStrategy
+            asChild
+            name='email_code'
+          >
+            <Button>Send a code to your email</Button>
+          </SignIn.SupportedStrategy>
+
+          <SignIn.Action
+            asChild
+            navigate='previous'
+          >
+            <TextButton>Go back</TextButton>
+          </SignIn.Action>
         </SignIn.Step>
 
-        <SignIn.Step name='forgot-password'>
-          <div className='flex flex-col items-center gap-6 w-96'>
-            <H3>FORGOT PASSWORD:</H3>
+        <SignIn.Step
+          name='forgot-password'
+          className='flex w-96 flex-col items-center gap-6'
+        >
+          <H3>FORGOT PASSWORD:</H3>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='reset_password_email_code'
-            >
-              <Button>Reset your password via Email</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='reset_password_email_code'
+          >
+            <Button>Reset your password via Email</Button>
+          </SignIn.SupportedStrategy>
 
-            <SignIn.SupportedStrategy
-              asChild
-              name='reset_password_phone_code'
-            >
-              <Button>Reset your password via Phone</Button>
-            </SignIn.SupportedStrategy>
+          <SignIn.SupportedStrategy
+            asChild
+            name='reset_password_phone_code'
+          >
+            <Button>Reset your password via Phone</Button>
+          </SignIn.SupportedStrategy>
 
-            <p>Or</p>
+          <p>Or</p>
 
-            <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
-            <CustomProvider provider='google'>Continue with Google</CustomProvider>
+          <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
+          <CustomProvider provider='google'>Continue with Google</CustomProvider>
 
-            <SignIn.Action
-              asChild
-              navigate='previous'
-            >
-              <TextButton>Go back</TextButton>
-            </SignIn.Action>
-          </div>
+          <SignIn.Action
+            asChild
+            navigate='previous'
+          >
+            <TextButton>Go back</TextButton>
+          </SignIn.Action>
         </SignIn.Step>
 
         <SignIn.Step name='verifications'>
-          <div className='flex gap-6 flex-col'>
-            <Clerk.GlobalError className='block text-red-400 font-mono' />
+          <div className='flex flex-col gap-6'>
+            <Clerk.GlobalError className='block font-mono text-red-400' />
+
+            <SignIn.Strategy name='passkey'>
+              <P className='text-sm'>
+                Welcome back <SignIn.Salutation />!
+              </P>
+
+              <CustomSubmit>Continue with Passkey</CustomSubmit>
+            </SignIn.Strategy>
 
             <SignIn.Strategy name='password'>
               <P className='text-sm'>
@@ -373,7 +394,7 @@ export default function SignInPage() {
         </SignIn.Step>
 
         <SignIn.Step name='reset-password'>
-          <div className='flex flex-col items-center gap-6 w-96'>
+          <div className='flex w-96 flex-col items-center gap-6'>
             <H3>Reset your password</H3>
 
             <P className='text-sm'>Please reset your password to continue:</P>

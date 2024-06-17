@@ -73,7 +73,7 @@ export const UserPreview = (props: UserPreviewProps) => {
   const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
 
   const getAvatarSizes = (t: InternalTheme) =>
-    (({ xs: t.sizes.$5, sm: t.sizes.$8, md: t.sizes.$9, lg: t.sizes.$12 } as const)[size]);
+    (({ xs: t.sizes.$5, sm: t.sizes.$8, md: t.sizes.$9, lg: t.sizes.$12 }) as const)[size];
 
   const mainIdentifierSize =
     mainIdentifierVariant || ({ xs: 'subtitle', sm: 'caption', md: 'subtitle', lg: 'h1' } as const)[size];

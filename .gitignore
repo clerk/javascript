@@ -65,6 +65,7 @@ yalc.lock
 playground/*/build
 playground/*/public/build
 playground/*/.cache
+playground/custom
 
 # Examples & Playground apps dependency locks
 packages/*/examples/*/package-lock.json
