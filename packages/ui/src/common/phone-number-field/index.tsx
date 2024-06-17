@@ -89,7 +89,12 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {label} {alternativeFieldTrigger && <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>}
+            {label}{' '}
+            {alternativeFieldTrigger ? (
+              <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
+            ) : !props?.required ? (
+              <Field.Optional>Optional</Field.Optional>
+            ) : null}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>

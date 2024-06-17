@@ -65,6 +65,21 @@ export const LabelEnd = React.forwardRef(function Label(
   );
 });
 
+export const Optional = React.forwardRef(function Optional(
+  { className, children, ...props }: React.ComponentProps<typeof LabelEnd>,
+  forwardedRef: React.ForwardedRef<React.ComponentRef<typeof LabelEnd>>,
+) {
+  return (
+    <LabelEnd
+      ref={forwardedRef}
+      {...props}
+      className={cn('text-gray-10 text-sm font-medium', className)}
+    >
+      {children}
+    </LabelEnd>
+  );
+});
+
 export const Input = React.forwardRef(function Input(
   {
     asChild,
