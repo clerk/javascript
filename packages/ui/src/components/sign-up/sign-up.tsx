@@ -17,8 +17,8 @@ import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
+import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
-import { TextButton } from '~/primitives/text-button';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
 export function SignUpComponent() {
@@ -237,7 +237,7 @@ function SignUpComponentLoaded() {
                               </p>
                             )}
                           >
-                            <TextButton type='button'>Didn&apos;t recieve a code? Resend</TextButton>
+                            <LinkButton type='button'>Didn&apos;t recieve a code? Resend</LinkButton>
                           </SignUp.Action>
                         }
                       />
@@ -310,7 +310,7 @@ function SignUpComponentLoaded() {
                               </p>
                             )}
                           >
-                            <TextButton type='button'>Didn&apos;t recieve a code? Resend</TextButton>
+                            <LinkButton type='button'>Didn&apos;t recieve a code? Resend</LinkButton>
                           </SignUp.Action>
                         }
                       />
@@ -359,7 +359,7 @@ function SignUpComponentLoaded() {
                           );
                         }}
                       >
-                        <TextButton type='button'>Didn&apos;t recieve a link? Resend</TextButton>
+                        <LinkButton type='button'>Didn&apos;t recieve a link? Resend</LinkButton>
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
