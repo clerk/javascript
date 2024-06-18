@@ -21,12 +21,14 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   {
     alternativeFieldTrigger,
     label = 'Phone number',
+    hintText = 'Optional',
     locationBasedCountryIso,
     onChange,
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
     alternativeFieldTrigger?: React.ReactNode;
     label?: React.ReactNode;
+    hintText?: string;
     locationBasedCountryIso: CountryIso;
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
@@ -93,7 +95,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
             ) : !props?.required ? (
-              <Field.Optional>Optional</Field.Optional>
+              <Field.Hint>{hintText}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>

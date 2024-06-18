@@ -1,6 +1,78 @@
-//@ts-nocheck test
+import { enUS } from '@clerk/localizations';
 import { normalizeDate, titleize } from '@clerk/shared';
-import type { LocalizationResource } from '@clerk/types';
+import type { DeepRequired, LocalizationResource, PathValue, RecordToPath } from '@clerk/types';
+
+const defaultResource = enUS as DeepRequired<typeof enUS>;
+
+type Value = string | number | boolean | Date;
+type Whitespace = ' ' | '\t' | '\n' | '\r';
+
+type Trim<T> = T extends `${Whitespace}${infer Rest}`
+  ? Trim<Rest>
+  : T extends `${infer Rest}${Whitespace}`
+    ? Trim<Rest>
+    : T extends string
+      ? T
+      : never;
+
+type RemovePipeUtils<Text extends string> = Text extends `${infer Left}|titleize${infer Right}`
+  ? `${Left}${Right}`
+  : Text;
+
+type FindBlocks<Text> = Text extends `${string}{{${infer Right}`
+  ? ReadBlock<'', Right, ''> extends [infer Block, infer Tail]
+    ? [Block, ...FindBlocks<Tail>]
+    : never
+  : [];
+
+type TupleFindBlocks<T> = T extends readonly [infer First, ...infer Rest]
+  ? [...FindBlocks<First>, ...TupleFindBlocks<Rest>]
+  : [];
+
+type ReadBlock<
+  Block extends string,
+  Tail extends string,
+  Depth extends string,
+> = Tail extends `${infer L1}}}${infer R1}`
+  ? L1 extends `${infer L2}{{${infer R2}`
+    ? ReadBlock<`${Block}${L2}{{`, `${R2}}}${R1}`, `${Depth}+`>
+    : Depth extends `+${infer Rest}`
+      ? ReadBlock<`${Block}${L1}}}`, R1, Rest>
+      : [`${Block}${L1}`, R1]
+  : [];
+
+/** Parse block, return variables with types and recursively find nested blocks within */
+type ParseBlock<Block> = Block extends `${infer Name},${infer Format},${infer Rest}`
+  ? { [K in Trim<Name>]: VariableType<Trim<Format>> } & TupleParseBlock<TupleFindBlocks<FindBlocks<Rest>>>
+  : Block extends `${infer Name},${infer Format}`
+    ? { [K in Trim<Name>]: VariableType<Trim<Format>> }
+    : { [K in Trim<Block>]: Value };
+
+/** Parse block for each tuple entry */
+type TupleParseBlock<T> = T extends readonly [infer First, ...infer Rest]
+  ? ParseBlock<First> & TupleParseBlock<Rest>
+  : unknown;
+
+type VariableType<T extends string> = T extends 'number' | 'plural' | 'selectordinal'
+  ? number
+  : T extends 'date' | 'time'
+    ? Date
+    : Value;
+
+export type Tokens = Record<string, string>;
+
+type Token = keyof Tokens | string;
+type Modifier = { modifierName: keyof typeof MODIFIERS; params: string[] };
+type TokenExpression = { token: Token; modifiers: Modifier[] };
+
+type GetICUArgs<Text extends string, T extends RemovePipeUtils<Text>> = TupleParseBlock<
+  T extends readonly string[] ? TupleFindBlocks<T> : FindBlocks<T>
+>;
+
+type DefaultLocalizationKey = RecordToPath<typeof defaultResource>;
+type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<typeof defaultResource, P>;
+// @ts-ignore test
+type LocalizationKeyToParams<P extends DefaultLocalizationKey> = GetICUArgs<LocalizationKeyToValue<P>>;
 
 const readObjectPath = <O extends Record<string, any>>(obj: O, path: string) => {
   const props = (path || '').split('.');
@@ -110,8 +182,11 @@ const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens
 };
 
 export const makeLocalizeable = (resource: LocalizationResource) => {
-  return function (key: string, params?: any): string {
+  return function <Key extends DefaultLocalizationKey, Params extends LocalizationKeyToParams<Key>>(
+    key: Key,
+    params?: keyof Params extends never ? never : Params,
+  ): string {
     const base = readObjectPath(resource, key) as string;
-    return applyTokensToString(base || '', params);
+    return applyTokensToString(base || '', params || {});
   };
 };

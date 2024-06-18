@@ -1,11 +1,10 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
-import { enUS } from '@clerk/localizations';
+import { esES } from '@clerk/localizations';
 import type { EnvironmentResource } from '@clerk/types';
 
 import { EmailField } from '~/common/email-field';
-import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { LastNameField } from '~/common/last-name-field';
 import { OTPField } from '~/common/otp-field';
@@ -23,7 +22,7 @@ import { Seperator } from '~/primitives/seperator';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 import { makeLocalizeable } from '~/utils/makeLocalizable';
 
-const t = makeLocalizeable(enUS);
+const t = makeLocalizeable(esES);
 
 export function SignUpComponent() {
   return (
@@ -64,12 +63,12 @@ function SignUpComponentLoaded() {
                         alt={applicationName}
                       />
                     ) : null}
-                    <Card.Title>
-                      {t('organizationList.subtitle', {
-                        applicationName: 'YOLO',
+                    <Card.Title>{t('signUp.start.title')}</Card.Title>
+                    <Card.Description>
+                      {t('signUp.start.subtitle', {
+                        applicationName,
                       })}
-                    </Card.Title>
-                    <Card.Description>Welcome! Please fill in the details to get started.</Card.Description>
+                    </Card.Description>
                   </Card.Header>
                   <Card.Body>
                     <Common.GlobalError>
@@ -109,16 +108,20 @@ function SignUpComponentLoaded() {
                       })}
                     </Connection.Root>
 
-                    <Seperator>or</Seperator>
+                    <Seperator>{t('dividerText')}</Seperator>
 
                     <div className='flex flex-col gap-4'>
                       {firstNameEnabled && lastNameEnabled ? (
                         <div className='flex gap-4'>
                           <FirstNameField
+                            label={t('formFieldLabel__firstName')}
+                            hintText={t('formFieldHintText__optional')}
                             required={firstNameRequired}
                             disabled={isGlobalLoading}
                           />
                           <LastNameField
+                            label={t('formFieldLabel__lastName')}
+                            hintText={t('formFieldHintText__optional')}
                             required={lastNameRequired}
                             disabled={isGlobalLoading}
                           />
@@ -127,30 +130,27 @@ function SignUpComponentLoaded() {
 
                       {usernameEnabled ? (
                         <UsernameField
+                          label={t('formFieldLabel__username')}
+                          hintText={t('formFieldHintText__optional')}
                           required={usernameRequired}
                           disabled={isGlobalLoading}
                         />
                       ) : null}
 
-                      {emailAddressEnabled && !phoneNumberEnabled ? (
+                      {emailAddressEnabled ? (
                         <EmailField
+                          label={t('formFieldLabel__emailAddress')}
+                          hintText={t('formFieldHintText__optional')}
                           required={emailAddressRequired}
                           disabled={isGlobalLoading}
                         />
                       ) : null}
 
-                      {phoneNumberEnabled && !emailAddressEnabled ? (
+                      {phoneNumberEnabled ? (
                         <PhoneNumberField
+                          label={t('formFieldLabel__phoneNumber')}
+                          hintText={t('formFieldHintText__optional')}
                           required={phoneNumberRequired}
-                          disabled={isGlobalLoading}
-                          locationBasedCountryIso={locationBasedCountryIso}
-                        />
-                      ) : null}
-
-                      {emailAddressEnabled && phoneNumberEnabled ? (
-                        <EmailOrPhoneNumberField
-                          requiredEmail={emailAddressRequired}
-                          requiredPhoneNumber={phoneNumberRequired}
                           disabled={isGlobalLoading}
                           locationBasedCountryIso={locationBasedCountryIso}
                         />
@@ -158,6 +158,7 @@ function SignUpComponentLoaded() {
 
                       {passwordEnabled && passwordRequired ? (
                         <PasswordField
+                          label={t('formFieldLabel__password')}
                           required={passwordRequired}
                           disabled={isGlobalLoading}
                         />
@@ -176,7 +177,7 @@ function SignUpComponentLoaded() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading || isSubmitting}
                             >
-                              Continue
+                              {t('formButtonPrimary')}
                             </Button>
                           </SignUp.Action>
                         );
@@ -187,7 +188,8 @@ function SignUpComponentLoaded() {
                 <Card.Footer>
                   <Card.FooterAction>
                     <Card.FooterActionText>
-                      Have an account? <Card.FooterActionLink href='/sign-in'>Sign in</Card.FooterActionLink>
+                      {t('signUp.start.actionText')}{' '}
+                      <Card.FooterActionLink href='/sign-in'>{t('signUp.start.actionLink')}</Card.FooterActionLink>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>
@@ -199,8 +201,8 @@ function SignUpComponentLoaded() {
                 <Card.Content>
                   <SignUp.Strategy name='phone_code'>
                     <Card.Header>
-                      <Card.Title>Verify your phone</Card.Title>
-                      <Card.Description>Enter the verification code sent to your phone</Card.Description>
+                      <Card.Title>{t('signUp.phoneCode.title')}</Card.Title>
+                      <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
                           {/* TODO: elements work
@@ -240,12 +242,12 @@ function SignUpComponentLoaded() {
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
                               <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
-                                Didn&apos;t recieve a code? Resend (
+                                {t('signUp.phoneCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
                               </p>
                             )}
                           >
-                            <LinkButton type='button'>Didn&apos;t recieve a code? Resend</LinkButton>
+                            <LinkButton type='button'>{t('signUp.phoneCode.resendButton')}</LinkButton>
                           </SignUp.Action>
                         }
                       />
@@ -261,7 +263,7 @@ function SignUpComponentLoaded() {
                                 disabled={isGlobalLoading}
                                 icon={<Icon.CaretRight />}
                               >
-                                Continue
+                                {t('formButtonPrimary')}
                               </Button>
                             </SignUp.Action>
                           );
@@ -272,8 +274,8 @@ function SignUpComponentLoaded() {
 
                   <SignUp.Strategy name='email_code'>
                     <Card.Header>
-                      <Card.Title>Verify your email</Card.Title>
-                      <Card.Description>Enter the verification code sent to your email</Card.Description>
+                      <Card.Title>{t('signUp.emailCode.title')}</Card.Title>
+                      <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
                           {/* TODO: elements work
@@ -313,12 +315,12 @@ function SignUpComponentLoaded() {
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
                               <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
-                                Didn&apos;t recieve a code? Resend (
+                                {t('signUp.emailCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
                               </p>
                             )}
                           >
-                            <LinkButton type='button'>Didn&apos;t recieve a code? Resend</LinkButton>
+                            <LinkButton type='button'>{t('signUp.emailCode.resendButton')}</LinkButton>
                           </SignUp.Action>
                         }
                       />
@@ -334,7 +336,7 @@ function SignUpComponentLoaded() {
                                 disabled={isGlobalLoading}
                                 icon={<Icon.CaretRight />}
                               >
-                                Continue
+                                {t('formButtonPrimary')}
                               </Button>
                             </SignUp.Action>
                           );
@@ -345,8 +347,8 @@ function SignUpComponentLoaded() {
 
                   <SignUp.Strategy name='email_link'>
                     <Card.Header>
-                      <Card.Title>Verify your email</Card.Title>
-                      <Card.Description>Use the verification link sent to your email address</Card.Description>
+                      <Card.Title>{t('signUp.emailLink.title')}</Card.Title>
+                      <Card.Description>{t('signUp.emailLink.subtitle')}</Card.Description>
                     </Card.Header>
                     <Card.Body>
                       <Common.GlobalError>
@@ -361,13 +363,13 @@ function SignUpComponentLoaded() {
                         fallback={({ resendableAfter }) => {
                           return (
                             <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
-                              Didn&apos;t recieve a link? Resend (
+                              {t('signUp.emailLink.resendButton')} (
                               <span className='tabular-nums'>{resendableAfter}</span>)
                             </p>
                           );
                         }}
                       >
-                        <LinkButton type='button'>Didn&apos;t recieve a link? Resend</LinkButton>
+                        <LinkButton type='button'>{t('signUp.emailLink.resendButton')}</LinkButton>
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
@@ -380,8 +382,8 @@ function SignUpComponentLoaded() {
               <Card.Root>
                 <Card.Content>
                   <Card.Header>
-                    <Card.Title>Fill in missing fields</Card.Title>
-                    <Card.Description>Please fill in the remaining details to continue.</Card.Description>
+                    <Card.Title>{t('signUp.continue.title')}</Card.Title>
+                    <Card.Description>{t('signUp.continue.subtitle')}</Card.Description>
                   </Card.Header>
                   <Card.Body>
                     <Common.GlobalError>
@@ -393,10 +395,14 @@ function SignUpComponentLoaded() {
                       {firstNameEnabled && lastNameEnabled ? (
                         <div className='flex gap-4'>
                           <FirstNameField
+                            label={t('formFieldLabel__firstName')}
+                            hintText={t('formFieldHintText__optional')}
                             required={firstNameRequired}
                             disabled={isGlobalLoading}
                           />
                           <LastNameField
+                            label={t('formFieldLabel__lastName')}
+                            hintText={t('formFieldHintText__optional')}
                             required={lastNameRequired}
                             disabled={isGlobalLoading}
                           />
@@ -405,6 +411,8 @@ function SignUpComponentLoaded() {
 
                       {usernameEnabled ? (
                         <UsernameField
+                          label={t('formFieldLabel__username')}
+                          hintText={t('formFieldHintText__optional')}
                           required={usernameRequired}
                           disabled={isGlobalLoading}
                         />
@@ -412,6 +420,8 @@ function SignUpComponentLoaded() {
 
                       {phoneNumberEnabled ? (
                         <PhoneNumberField
+                          label={t('formFieldLabel__phoneNumber')}
+                          hintText={t('formFieldHintText__optional')}
                           required={phoneNumberRequired}
                           disabled={isGlobalLoading}
                           locationBasedCountryIso={locationBasedCountryIso}
@@ -420,6 +430,8 @@ function SignUpComponentLoaded() {
 
                       {emailAddressEnabled ? (
                         <EmailField
+                          label={t('formFieldLabel__emailAddress')}
+                          hintText={t('formFieldHintText__optional')}
                           required={emailAddressRequired}
                           disabled={isGlobalLoading}
                         />
@@ -427,6 +439,7 @@ function SignUpComponentLoaded() {
 
                       {passwordEnabled && passwordRequired ? (
                         <PasswordField
+                          label={t('formFieldLabel__password')}
                           required={passwordRequired}
                           disabled={isGlobalLoading}
                         />
@@ -445,7 +458,7 @@ function SignUpComponentLoaded() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading || isSubmitting}
                             >
-                              Continue
+                              {t('formButtonPrimary')}
                             </Button>
                           </SignUp.Action>
                         );
@@ -456,7 +469,8 @@ function SignUpComponentLoaded() {
                 <Card.Footer>
                   <Card.FooterAction>
                     <Card.FooterActionText>
-                      Have an account? <Card.FooterActionLink href='/sign-in'>Sign in</Card.FooterActionLink>
+                      {t('signUp.continue.actionText')}{' '}
+                      <Card.FooterActionLink href='/sign-in'>{t('signUp.continue.actionLink')}</Card.FooterActionLink>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>
