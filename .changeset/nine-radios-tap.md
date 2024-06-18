@@ -2,4 +2,4 @@
 "@clerk/clerk-js": patch
 ---
 
-Avoid sending password when saml is enabled.
+Bug fix: Skip password strategy for users who authenticate with SAML. 
