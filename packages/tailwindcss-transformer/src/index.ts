@@ -73,10 +73,10 @@ export function transform(code: string, ctx: { styleCache: StyleCache }) {
       }
       this.traverse(path);
     },
-    // visit cn function calls containing TW classes
+    // visit common concatenate function calls containing TW classes
     visitCallExpression(path) {
       const node = path.node;
-      if (node.callee.type === 'Identifier' && node.callee.name === 'cn') {
+      if (node.callee.type === 'Identifier' && ['cn', 'cx', 'cva', 'clsx'].includes(node.callee.name)) {
         visitNode(node, ctx);
       }
       this.traverse(path);
