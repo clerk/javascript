@@ -121,7 +121,8 @@ export function decorateRequest(
     secretKey,
     signInUrl,
     signUpUrl,
-  }: Pick<AuthenticateRequestOptions, 'signInUrl' | 'signUpUrl'> &
+    publishableKey,
+  }: Pick<AuthenticateRequestOptions, 'publishableKey' | 'signInUrl' | 'signUpUrl'> &
     Required<Pick<AuthenticateRequestOptions, 'secretKey'>>,
 ): Response {
   const { reason, message, status, token } = requestState;
@@ -157,7 +158,7 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    const clerkRequestData = encryptClerkRequestData({ secretKey, signInUrl, signUpUrl });
+    const clerkRequestData = encryptClerkRequestData({ secretKey, signInUrl, signUpUrl, publishableKey });
 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
