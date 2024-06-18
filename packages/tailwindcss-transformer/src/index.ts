@@ -38,7 +38,7 @@ function generateHashedClassName(value: string) {
   return 'cl-' + createHash('sha256').update(value, 'utf8').digest('hex').slice(0, 8);
 }
 
-function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }) {
+function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }, visitors?: recast.types.Visitor) {
   recast.visit(node, {
     visitStringLiteral(path) {
       if (clRegex.test(path.node.value)) {
@@ -58,6 +58,7 @@ function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }) 
       path.node.value = cn;
       return false;
     },
+    ...visitors,
   });
 }
 
@@ -68,16 +69,47 @@ export function transform(code: string, ctx: { styleCache: StyleCache }) {
     // visit className attributes containing TW classes
     visitJSXAttribute(path) {
       const node = path.node;
-      if (path.node.name.name === 'className') {
+      if (node.name.name === 'className') {
+        visitNode(node, ctx, {
+          // Stop traversal if we encounter a function call
+          // cn/cx/clsx/cva are handled by the `visitCallExpression` visitor
+          visitCallExpression() {
+            return false;
+          },
+        });
+      }
+      this.traverse(path);
+    },
+    // visit a `className` property within any object containing TW classes
+    visitObjectProperty(path) {
+      const node = path.node;
+      if (path.node.key.type === 'Identifier' && path.node.key.name === 'className') {
         visitNode(node, ctx);
       }
       this.traverse(path);
     },
-    // visit cn function calls containing TW classes
+    // visit function calls containing TW classes
     visitCallExpression(path) {
       const node = path.node;
-      if (node.callee.type === 'Identifier' && node.callee.name === 'cn') {
+      // `className` concatenation functions
+      if (node.callee.type === 'Identifier' && ['cn', 'cx', 'clsx'].includes(node.callee.name)) {
         visitNode(node, ctx);
+      }
+      // cva functions (note: only compatible with cva@1.0)
+      if (
+        node.callee.type === 'Identifier' &&
+        node.callee.name === 'cva' &&
+        node.arguments[0]?.type === 'ObjectExpression'
+      ) {
+        for (const property of node.arguments[0].properties) {
+          if (
+            property.type === 'ObjectProperty' &&
+            property.key.type === 'Identifier' &&
+            ['base', 'variants'].includes(property.key.name)
+          ) {
+            visitNode(property, ctx);
+          }
+        }
       }
       this.traverse(path);
     },

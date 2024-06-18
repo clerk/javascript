@@ -1,0 +1,218 @@
+### New Middleware architecture
+
+User and customer feedback about `authMiddleware()` has been clear in that Middleware logic was a often friction point. As such, in v5 you will find a completely new Middleware helper called [`clerkMiddleware()`](/docs/references/nextjs/clerk-middleware) that should alleviate the issues folks had with `authMiddleware()`.
+
+The primary change from the previous `authMiddleware()` is that `clerkMiddleware()` does not protect any routes by default, instead requiring the developer to add routes they would like to be protected by auth. This is a substantial contrast to the previous `authMiddleware()`, which protected all routes by default, requiring the developer to add exceptions. The API was also substantially simplified, and it has become easier to combine with other Middleware helpers smoothly as well.
+
+Here's an example that demonstrates route protection based on both authentication and authorization:
+
+```ts filename="middleware.ts"
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+
+const isDashboardRoute = createRouteMatcher(['/dashboard(.*)']);
+const isAdminRoute = createRouteMatcher(['/admin(.*)']);
+
+export default clerkMiddleware((auth, req) => {
+  // Restrict admin route to users with specific role
+  if (isAdminRoute(req)) auth().protect({ role: 'org:admin' });
+
+  // Restrict dashboard routes to logged in users
+  if (isDashboardRoute(req)) auth().protect();
+});
+
+export const config = {
+  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+};
+```
+
+A couple things to note here:
+
+- The `createRouteMatcher` helper makes it easy to define route groups that you can leverage inside the Middleware function and check in whichever order you'd like. Note that it can take an array of routes as well.
+- With `clerkMiddleware`, you're defining the routes you want **to be protected**, rather than the routes you don't want to be protected.
+- The [`auth().protect()`](https://clerk.com/docs/references/nextjs/auth#protect) helper is utilized heavily here, check out its docs for more info.
+
+See the [`clerkMiddleware()`](/docs/references/nextjs/clerk-middleware) docs for more information and detailed usage examples.
+
+#### Migrating to `clerkMiddleware()`
+
+Clerk strongly recommends migrating to the new `clerkMiddleware()` for an improved DX and access to all present and upcoming features, but also want to note that `authMiddleware()`, while deprecated, will continue to work in v5 and will not be removed until the next major version, so you do not _need_ to make any changes to your Middleware setup this version.
+
+The most basic migration will be updating the import and changing out the default export, then mirroring the previous behavior of protecting all routes as such:
+
+```diff
+- import { authMiddleware } from "@clerk/nextjs"
++ import { clerkMiddleware } from '@clerk/nextjs/server'
+
+- export default authMiddleware()
++ export default clerkMiddleware((auth) => auth().protect())
+
+  export const config = {
+    matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  }
+```
+
+Of course, in most cases you'll have a more complicated setup than this. You can find some examples below for how to migrate a few common use cases. Be sure to review the [`clerkMiddleware()` documentation](/docs/references/nextjs/clerk-middleware) if your specific use case is not mentioned.
+
+<Accordion titles={["Protecting all routes except one or more public paths", "Protecting a single route path", "Combining with other Middlewares (like i18n)", "Using the redirectToSignIn method"]} heading="h4">
+  <AccordionPanel>
+    By default, `clerkMiddleware()` treats all pages as public unless explicitly protected. If you prefer for it to operate the other way around (all pages are protected unless explicitly made public), you can reverse the middleware logic in this way:
+
+    Before:
+
+    ```ts filename="middleware.ts"
+    import { authMiddleware } from "@clerk/nextjs"
+
+    export default authMiddleware({
+      publicRoutes: ["/", "/contact"],
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+    After:
+
+    ```ts filename="middleware.ts"
+    import {
+      clerkMiddleware,
+      createRouteMatcher
+    } from "@clerk/nextjs/server"
+
+    const isPublicRoute = createRouteMatcher(["/", "/contact"])
+
+    export default clerkMiddleware((auth, req) => {
+      if (isPublicRoute(req)) return // if it's a public route, do nothing
+      auth().protect() // for any other route, require auth
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    An example can be seen below of code that ensures that all routes are public except everything under `/dashboard`.
+
+    Before:
+
+    ```ts filename="middleware.ts"
+    import { authMiddleware } from "@clerk/nextjs"
+
+    export default authMiddleware({
+      publicRoutes: (req) => !req.url.includes("/dashboard"),
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+    After:
+
+    ```ts filename="middleware.ts"
+    import {
+      clerkMiddleware,
+      createRouteMatcher
+    } from "@clerk/nextjs/server"
+
+    const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
+
+    export default clerkMiddleware((auth, request) => {
+      if (isDashboardRoute(request)) auth().protect()
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    You can call other Middlewares inside `clerkMiddleware()`, giving you more direct control over what is called where. An example would be [next-intl](https://next-intl-docs.vercel.app/) to add internationalization to your app.
+
+    Before:
+
+    ```ts filename="middleware.ts"
+    import { authMiddleware } from "@clerk/nextjs"
+    import createMiddleware from "next-intl/middleware"
+
+    const intlMiddleware = createMiddleware({
+      locales: ["en", "de"],
+      defaultLocale: "en",
+    })
+
+    export default authMiddleware({
+      beforeAuth: (req) => {
+        return intlMiddleware(req);
+      },
+      publicRoutes: ["((?!^/dashboard/).*)"],
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+    After:
+
+    ```ts filename="middleware.ts"
+    import {
+      clerkMiddleware,
+      createRouteMatcher
+    } from "@clerk/nextjs/server"
+    import createMiddleware from "next-intl/middleware"
+
+    const intlMiddleware = createMiddleware({
+      locales: ["en", "de"],
+      defaultLocale: "en",
+    })
+
+    const isDashboardRoute = createRouteMatcher(["/dashboard(.*)"])
+
+    export default clerkMiddleware((auth, request) => {
+      if (isDashboardRoute(request)) auth().protect()
+
+      return intlMiddleware(request)
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    You can now access `redirectToSignIn` from the `auth()` object, rather than importing at the top level.
+
+    Before:
+
+    ```ts filename="middleware.ts"
+    import { authMiddleware, redirectToSignIn } from "@clerk/nextjs"
+
+    export default authMiddleware({
+      if (someCondition) redirectToSignIn()
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+    After:
+
+    ```ts filename="middleware.ts"
+    import { clerkMiddleware } from "@clerk/nextjs/server"
+
+    export default clerkMiddleware((auth, req) => {
+      if (someCondition) auth().redirectToSignIn()
+    })
+
+    export const config = {
+      matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+    }
+    ```
+
+  </AccordionPanel>
+</Accordion>

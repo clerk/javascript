@@ -1,4 +1,4 @@
-import cn from 'clsx';
+import { cx } from 'cva';
 import * as React from 'react';
 
 import { Spinner } from './spinner';
@@ -61,7 +61,7 @@ export const Root = React.forwardRef<
       <div
         ref={forwardedRef}
         {...props}
-        className={cn(
+        className={cx(
           '-m-[calc(var(--cl-connection-gap)/2)] flex flex-wrap items-center justify-center [--cl-connection-gap:theme(spacing.2)]',
           className,
         )}
@@ -98,7 +98,7 @@ export const Button = React.forwardRef(function Button(
       <button
         ref={forwardedRef}
         {...props}
-        className={cn(
+        className={cx(
           'text-gray-12 border-gray-a6 shadow-gray-a3 focus-visible:ring-gray-a3 focus-visible:border-gray-a8 flex min-h-8 w-full min-w-0 items-center justify-center gap-2 rounded-md border bg-transparent bg-clip-padding px-2.5 py-1.5 text-base font-medium shadow-sm outline-none focus-visible:ring-[0.1875rem]',
           busy ? 'cursor-wait' : disabled ? 'disabled:cursor-not-allowed disabled:opacity-50' : 'hover:bg-gray-a2',
           className,
@@ -108,7 +108,7 @@ export const Button = React.forwardRef(function Button(
       >
         {icon ? <span className='text-base'>{busy ? <Spinner>Loading…</Spinner> : <span>{icon}</span>}</span> : null}
         <span
-          className={cn({
+          className={cx({
             'sr-only': textVisuallyHidden,
           })}
           aria-hidden={busy}

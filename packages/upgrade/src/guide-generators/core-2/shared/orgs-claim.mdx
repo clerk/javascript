@@ -1,0 +1,50 @@
+### Removed: `orgs` claim on JWT
+
+In the previous version of Clerk's SDKs, if you decode the session token that Clerk returns from the server, you'll currently find an `orgs` claim on it. It lists all the orgs associated with the given user. Now, Clerk returns the `org_id`, `org_slug`, and `org_role` of the **active** organization.
+
+The `orgs` claim was part of the `JwtPayload`. Here are a few examples of where the `JwtPayload` could be found.
+
+<Accordion titles={["Next.js", "Fastify", "@clerk/backend", "@clerk/clerk-sdk-node"]} heading="h5">
+  <AccordionPanel>
+    ```typescript filename="Next.js"
+    import { getAuth } from "@clerk/nextjs/server"
+    const claims: JwtPayload = getAuth(request).sessionClaims
+
+    import { getAuth } from "@clerk/ssr.server"
+    const claims: JwtPayload = (await getAuth(request)).sessionClaims
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    ```typescript filename="Fastify"
+    import { getAuth } from "@clerk/fastify"
+    const claims: JwtPayload = (await getAuth(request)).sessionClaims
+    ```
+  </AccordionPanel>
+  <AccordionPanel>
+    ```typescript filename="@clerk/backend"
+    import { createClerkClient } from "@clerk/backend"
+
+    const clerkClient = createClerkClient({ secretKey: "" })
+    const requestState = await clerkClient.authenticateRequest(
+      request,
+      { publishableKey: "" }
+    )
+    const claims: JwtPayload = requestState.toAuth().sessionClaims
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    ```typescript filename="@clerk/clerk-sdk-node"
+    import { clerkClient } from "@clerk/clerk-sdk-node"
+
+    router.use((...args) => clerkClient.expressRequireAuth()(...args))
+    router.get("/me", async (req, reply: Response) => {
+      return reply.json({ auth: req.auth })
+    })
+    ```
+
+  </AccordionPanel>
+</Accordion>
+
+If you would like to have your JWT return all of the user's organizations, you can create a [custom JWT template](/docs/backend-requests/making/jwt-templates) in your dashboard. Add `{ "orgs": "user.organizations" }` to it.

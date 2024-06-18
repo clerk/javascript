@@ -1,4 +1,4 @@
-import cn from 'clsx';
+import { cx } from 'cva';
 import * as React from 'react';
 
 type IconRef = SVGSVGElement;
@@ -15,7 +15,7 @@ function createIcon({ displayName, viewBox, path }: { displayName: string; viewB
         viewBox={viewBox}
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
-        className={cn('size-[1em]', rtlIcons.includes(displayName) && 'rtl:rotate-180', className)}
+        className={cx('size-[1em]', rtlIcons.includes(displayName) && 'rtl:rotate-180', className)}
         aria-hidden
         {...props}
       >

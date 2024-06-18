@@ -16,6 +16,7 @@ import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
+import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
@@ -129,13 +130,7 @@ export function SignInComponentLoaded() {
                       // 2. Replace `button` with consolidated styles (tackled later)
                       resend={
                         <>
-                          Didn&apos;t recieve a code?{' '}
-                          <button
-                            type='button'
-                            className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
-                          >
-                            Resend
-                          </button>
+                          Didn&apos;t recieve a code? <LinkButton>Resend</LinkButton>
                         </>
                       }
                     />

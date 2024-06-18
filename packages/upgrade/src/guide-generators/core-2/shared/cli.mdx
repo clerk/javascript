@@ -1,0 +1,22 @@
+## CLI upgrade helper
+
+Clerk now provides a `@clerk/upgrade` CLI tool that you can use to ease the upgrade process. The tool will scan your codebase and produce a list of changes you'll need to apply to your project. It should catch the vast majority of the changes needed for a successful upgrade to any SDK including Core 2. This can save you a lot of time reading through changes that don't apply to your project.
+
+To run the CLI tool, navigate to your project and run it in the terminal:
+
+<CodeBlockTabs type="installer" options={["npm", "yarn", "pnpm"]}>
+  ```bash filename="terminal"
+  npx @clerk/upgrade
+  ```
+
+```bash filename="terminal"
+yarn dlx @clerk/upgrade
+```
+
+```bash filename="terminal"
+pnpm dlx @clerk/upgrade
+```
+
+</CodeBlockTabs>
+
+If you are having trouble with `npx`, it's also possible to install directly with `npm i @clerk/upgrade -g`, and can then be run with the `clerk-upgrade` command.

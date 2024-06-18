@@ -12,12 +12,13 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { PROVIDERS } from '~/constants';
+import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
+import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
-import { TextButton } from '~/primitives/text-button';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
 export function SignUpComponent() {
@@ -35,12 +36,14 @@ function SignUpComponentLoaded() {
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
+  const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
   const { enabled: firstNameEnabled, required: firstNameRequired } = attributes['first_name'];
   const { enabled: lastNameEnabled, required: lastNameRequired } = attributes['last_name'];
   const { enabled: usernameEnabled, required: usernameRequired } = attributes['username'];
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = attributes['phone_number'];
   const { enabled: emailAddressEnabled, required: emailAddressRequired } = attributes['email_address'];
   const { enabled: passwordEnabled, required: passwordRequired } = attributes['password'];
+  const { applicationName, homeUrl, logoImageUrl } = displayConfig;
   return (
     <Common.Loading>
       {isGlobalLoading => {
@@ -50,10 +53,22 @@ function SignUpComponentLoaded() {
               <Card.Root>
                 <Card.Content>
                   <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
                     <Card.Title>Create your account</Card.Title>
                     <Card.Description>Welcome! Please fill in the details to get started.</Card.Description>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <Connection.Root>
                       {enabledConnections.map(c => {
                         const connection = PROVIDERS.find(provider => provider.id === c.provider);
@@ -201,6 +216,11 @@ function SignUpComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
                         // TODO:
@@ -217,7 +237,7 @@ function SignUpComponentLoaded() {
                               </p>
                             )}
                           >
-                            <TextButton type='button'>Didn&apos;t recieve a code? Resend</TextButton>
+                            <LinkButton type='button'>Didn&apos;t recieve a code? Resend</LinkButton>
                           </SignUp.Action>
                         }
                       />
@@ -269,6 +289,11 @@ function SignUpComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
                         // TODO:
@@ -285,7 +310,7 @@ function SignUpComponentLoaded() {
                               </p>
                             )}
                           >
-                            <TextButton type='button'>Didn&apos;t recieve a code? Resend</TextButton>
+                            <LinkButton type='button'>Didn&apos;t recieve a code? Resend</LinkButton>
                           </SignUp.Action>
                         }
                       />
@@ -316,6 +341,11 @@ function SignUpComponentLoaded() {
                       <Card.Description>Use the verification link sent to your email address</Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
                       <SignUp.Action
                         resend
                         asChild
@@ -329,7 +359,7 @@ function SignUpComponentLoaded() {
                           );
                         }}
                       >
-                        <TextButton type='button'>Didn&apos;t recieve a link? Resend</TextButton>
+                        <LinkButton type='button'>Didn&apos;t recieve a link? Resend</LinkButton>
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
@@ -346,6 +376,11 @@ function SignUpComponentLoaded() {
                     <Card.Description>Please fill in the remaining details to continue.</Card.Description>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='space-y-4'>
                       {firstNameEnabled && lastNameEnabled ? (
                         <div className='flex gap-4'>
