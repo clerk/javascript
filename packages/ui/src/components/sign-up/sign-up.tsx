@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 import { enUS } from '@clerk/localizations';
-import type { EnvironmentResource } from '@clerk/types';
+import type { ClerkOptions, EnvironmentResource } from '@clerk/types';
 
 import { EmailField } from '~/common/email-field';
 import { FirstNameField } from '~/common/first-name-field';
@@ -22,8 +22,6 @@ import { Seperator } from '~/primitives/seperator';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 import { makeLocalizeable } from '~/utils/makeLocalizable';
 
-const t = makeLocalizeable(enUS);
-
 export function SignUpComponent() {
   return (
     <SignUp.Root>
@@ -34,6 +32,7 @@ export function SignUpComponent() {
 
 function SignUpComponentLoaded() {
   const clerk = useClerk();
+  const t = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
     (clerk as any)?.__unstable__environment as EnvironmentResource,
   );
