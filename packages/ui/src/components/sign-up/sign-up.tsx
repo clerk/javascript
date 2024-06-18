@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import { enUS } from '@clerk/localizations';
 import type { EnvironmentResource } from '@clerk/types';
 
 import { EmailField } from '~/common/email-field';
@@ -20,6 +21,9 @@ import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
+import { makeLocalizeable } from '~/utils/makeLocalizable';
+
+const t = makeLocalizeable(enUS);
 
 export function SignUpComponent() {
   return (
@@ -60,7 +64,11 @@ function SignUpComponentLoaded() {
                         alt={applicationName}
                       />
                     ) : null}
-                    <Card.Title>Create your account</Card.Title>
+                    <Card.Title>
+                      {t('organizationList.subtitle', {
+                        applicationName: 'YOLO',
+                      })}
+                    </Card.Title>
                     <Card.Description>Welcome! Please fill in the details to get started.</Card.Description>
                   </Card.Header>
                   <Card.Body>
