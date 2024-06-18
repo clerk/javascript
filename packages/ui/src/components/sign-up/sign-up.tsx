@@ -4,6 +4,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 import type { EnvironmentResource } from '@clerk/types';
 
 import { EmailField } from '~/common/email-field';
+import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { LastNameField } from '~/common/last-name-field';
 import { OTPField } from '~/common/otp-field';
@@ -11,12 +12,13 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { PROVIDERS } from '~/constants';
+import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
+import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
-import { TextButton } from '~/primitives/text-button';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
 export function SignUpComponent() {
@@ -34,12 +36,14 @@ function SignUpComponentLoaded() {
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
+  const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
   const { enabled: firstNameEnabled, required: firstNameRequired } = attributes['first_name'];
   const { enabled: lastNameEnabled, required: lastNameRequired } = attributes['last_name'];
   const { enabled: usernameEnabled, required: usernameRequired } = attributes['username'];
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = attributes['phone_number'];
   const { enabled: emailAddressEnabled, required: emailAddressRequired } = attributes['email_address'];
   const { enabled: passwordEnabled, required: passwordRequired } = attributes['password'];
+  const { applicationName, homeUrl, logoImageUrl } = displayConfig;
   return (
     <Common.Loading>
       {isGlobalLoading => {
@@ -49,10 +53,22 @@ function SignUpComponentLoaded() {
               <Card.Root>
                 <Card.Content>
                   <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
                     <Card.Title>Create your account</Card.Title>
                     <Card.Description>Welcome! Please fill in the details to get started.</Card.Description>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <Connection.Root>
                       {enabledConnections.map(c => {
                         const connection = PROVIDERS.find(provider => provider.id === c.provider);
@@ -108,7 +124,14 @@ function SignUpComponentLoaded() {
                         />
                       ) : null}
 
-                      {phoneNumberEnabled ? (
+                      {emailAddressEnabled && !phoneNumberEnabled ? (
+                        <EmailField
+                          required={emailAddressRequired}
+                          disabled={isGlobalLoading}
+                        />
+                      ) : null}
+
+                      {phoneNumberEnabled && !emailAddressEnabled ? (
                         <PhoneNumberField
                           required={phoneNumberRequired}
                           disabled={isGlobalLoading}
@@ -116,10 +139,12 @@ function SignUpComponentLoaded() {
                         />
                       ) : null}
 
-                      {emailAddressEnabled ? (
-                        <EmailField
-                          required={emailAddressRequired}
+                      {emailAddressEnabled && phoneNumberEnabled ? (
+                        <EmailOrPhoneNumberField
+                          requiredEmail={emailAddressRequired}
+                          requiredPhoneNumber={phoneNumberRequired}
                           disabled={isGlobalLoading}
+                          locationBasedCountryIso={locationBasedCountryIso}
                         />
                       ) : null}
 
@@ -168,23 +193,52 @@ function SignUpComponentLoaded() {
                     <Card.Header>
                       <Card.Title>Verify your phone</Card.Title>
                       <Card.Description>Enter the verification code sent to your phone</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          {/* TODO: elements work
+                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
+                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
+                          */}
+                          +1 (424) 424-4242{' '}
+                          <SignUp.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Edit phone number'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignUp.Action>
+                        </span>
+                      </Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
                         // TODO:
-                        // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
-                        // 2. Replace `button` with consolidated styles (tackled later)
+                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
-                          <>
-                            Didn&apos;t recieve a code?{' '}
-                            <button
-                              type='button'
-                              className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
-                            >
-                              Resend
-                            </button>
-                          </>
+                          <SignUp.Action
+                            asChild
+                            resend
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            fallback={({ resendableAfter }) => (
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                                Didn&apos;t recieve a code? Resend (
+                                <span className='tabular-nums'>{resendableAfter}</span>)
+                              </p>
+                            )}
+                          >
+                            <LinkButton type='button'>Didn&apos;t recieve a code? Resend</LinkButton>
+                          </SignUp.Action>
                         }
                       />
                       <Common.Loading scope='step:verifications'>
@@ -212,23 +266,52 @@ function SignUpComponentLoaded() {
                     <Card.Header>
                       <Card.Title>Verify your email</Card.Title>
                       <Card.Description>Enter the verification code sent to your email</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          {/* TODO: elements work
+                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
+                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
+                          */}
+                          alex.carpenter@clerk.dev{' '}
+                          <SignUp.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Edit email address'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignUp.Action>
+                        </span>
+                      </Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
                         // TODO:
-                        // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
-                        // 2. Replace `button` with consolidated styles (tackled later)
+                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
-                          <>
-                            Didn&apos;t recieve a code?{' '}
-                            <button
-                              type='button'
-                              className='text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none hover:underline focus-visible:ring-2'
-                            >
-                              Resend
-                            </button>
-                          </>
+                          <SignUp.Action
+                            asChild
+                            resend
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            fallback={({ resendableAfter }) => (
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                                Didn&apos;t recieve a code? Resend (
+                                <span className='tabular-nums'>{resendableAfter}</span>)
+                              </p>
+                            )}
+                          >
+                            <LinkButton type='button'>Didn&apos;t recieve a code? Resend</LinkButton>
+                          </SignUp.Action>
                         }
                       />
                       <Common.Loading scope='step:verifications'>
@@ -258,20 +341,25 @@ function SignUpComponentLoaded() {
                       <Card.Description>Use the verification link sent to your email address</Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
                       <SignUp.Action
                         resend
                         asChild
                         // eslint-disable-next-line react/no-unstable-nested-components
                         fallback={({ resendableAfter }) => {
                           return (
-                            <p className='text-gray-a11 focus-visible:ring-gray-a3 focus-visible:border-gray-a8 flex w-full items-center justify-center rounded-md border border-transparent bg-transparent bg-clip-padding px-2.5 py-1.5 text-base font-medium outline-none focus-visible:ring-[0.1875rem]'>
+                            <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
                               Didn&apos;t recieve a link? Resend (
                               <span className='tabular-nums'>{resendableAfter}</span>)
                             </p>
                           );
                         }}
                       >
-                        <TextButton>Didn&apos;t recieve a link? Resend</TextButton>
+                        <LinkButton type='button'>Didn&apos;t recieve a link? Resend</LinkButton>
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
@@ -288,6 +376,11 @@ function SignUpComponentLoaded() {
                     <Card.Description>Please fill in the remaining details to continue.</Card.Description>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='space-y-4'>
                       {firstNameEnabled && lastNameEnabled ? (
                         <div className='flex gap-4'>
