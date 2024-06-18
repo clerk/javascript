@@ -92,7 +92,7 @@ export function transform(code: string, ctx: { styleCache: StyleCache }) {
       if (
         node.callee.type === 'Identifier' &&
         node.callee.name === 'cva' &&
-        node.arguments[0].type === 'ObjectExpression'
+        node.arguments[0]?.type === 'ObjectExpression'
       ) {
         for (const property of node.arguments[0].properties) {
           if (
