@@ -231,18 +231,33 @@ export function _SignInStart(): JSX.Element {
 
   const buildSignInParams = (fields: Array<FormControlState<string>>): SignInCreateParams => {
     const hasPassword = fields.some(f => f.name === 'password' && !!f.value);
-    if (!hasPassword) {
+
+    /**
+     * FAPI will return an error when password is submitted but the user's email matches requires SAML authentication.
+     * We need to strip password from the create request, and reconstruct it later.
+     */
+    if (!hasPassword || userSettings.saml.enabled) {
       fields = fields.filter(f => f.name !== 'password');
     }
     return {
       ...buildRequest(fields),
-      ...(hasPassword && !userSettings.saml.enabled ? { strategy: 'password' } : {}),
+      ...(hasPassword && !userSettings.saml.enabled && { strategy: 'password' }),
     } as SignInCreateParams;
   };
 
   const signInWithFields = async (...fields: Array<FormControlState<string>>) => {
     try {
-      const res = await signIn.create(buildSignInParams(fields));
+      const res = await signIn.create(buildSignInParams(fields)).then(signInResource => {
+        /**
+         * For SAML enabled instances, perform sign in with password only when it is allowed for the identified user.
+         */
+        const passwordField = fields.find(f => f.name === 'password')?.value;
+        if (!passwordField || signInResource.supportedFirstFactors.some(ff => ff.strategy === 'saml')) {
+          return signInResource;
+        }
+        return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
+      });
+
       switch (res.status) {
         case 'needs_identifier':
           // Check if we need to initiate a saml flow
