@@ -68,11 +68,12 @@ export const constants = {
    */
   E2E_CLERK_VERSION: process.env.E2E_CLERK_VERSION,
   /**
+   * Key used to encrypt request data for Next.js dynamic keys.
+   * @ref https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys
+   */
+  E2E_CLERK_ENCRYPTION_KEY: process.env.CLERK_ENCRYPTION_KEY,
+  /**
    * PK and SK pairs from the env to use for integration tests.
    */
   INTEGRATION_INSTANCE_KEYS: process.env.INTEGRATION_INSTANCE_KEYS,
-  /**
-   * Key used to encrypt request data for Next.js middleware options propagation.
-   */
-  CLERK_ENCRYPTION_KEY: process.env.CLERK_ENCRYPTION_KEY,
 } as const;
