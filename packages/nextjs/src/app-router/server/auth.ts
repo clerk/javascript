@@ -35,9 +35,7 @@ export const auth = (): Auth => {
       redirectAdapter: redirect,
       devBrowserToken: devBrowserToken,
       baseUrl: clerkRequest.clerkUrl.toString(),
-      // TODO: Support runtime-value configuration of these options
-      // via setting and reading headers from clerkMiddleware
-      publishableKey: PUBLISHABLE_KEY,
+      publishableKey: decryptedRequestData.publishableKey || PUBLISHABLE_KEY,
       signInUrl: decryptedRequestData.signInUrl || SIGN_IN_URL,
       signUpUrl: decryptedRequestData.signUpUrl || SIGN_UP_URL,
     }).redirectToSignIn({
