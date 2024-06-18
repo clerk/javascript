@@ -108,26 +108,13 @@ runs:
     - name: Setup NodeJS ${{ inputs.node-version }}
       uses: actions/setup-node@v4
       with:
+        cache: 'npm'
         node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
 
-    - name: Restore node_modules
-      id: cache-node-modules
-      uses: actions/cache/restore@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}-${{ inputs.node-version }}
-
     - name: Install NPM Dependencies
-      if: steps.cache-node-modules.outputs.cache-hit != 'true' # Don't run if it's an **exact** match
-      run: mkdir node_modules && npm ci --audit=false --fund=false --prefer-offline && npm prune
+      run: mkdir node_modules && npm ci --cache /home/runner/.npm --audit=false --fund=false --prefer-offline
       shell: bash
-
-    - name: Save node_modules
-      uses: actions/cache/save@v3
-      with:
-        path: node_modules
-        key: ${{ steps.cache-node-modules.outputs.cache-primary-key }}
 
     - name: Get Playwright Version
       if: inputs.playwright-enabled == 'true'
