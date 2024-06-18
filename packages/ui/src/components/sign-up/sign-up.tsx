@@ -32,6 +32,7 @@ export function SignUpComponent() {
 
 function SignUpComponentLoaded() {
   const clerk = useClerk();
+  // TODO: Replace `any` with proper types
   const t = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
     (clerk as any)?.__unstable__environment as EnvironmentResource,
