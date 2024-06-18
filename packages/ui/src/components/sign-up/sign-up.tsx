@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
-import { esES } from '@clerk/localizations';
+import { enUS } from '@clerk/localizations';
 import type { EnvironmentResource } from '@clerk/types';
 
 import { EmailField } from '~/common/email-field';
@@ -22,7 +22,7 @@ import { Seperator } from '~/primitives/seperator';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 import { makeLocalizeable } from '~/utils/makeLocalizable';
 
-const t = makeLocalizeable(esES);
+const t = makeLocalizeable(enUS);
 
 export function SignUpComponent() {
   return (
