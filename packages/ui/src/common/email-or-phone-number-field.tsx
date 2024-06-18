@@ -1,7 +1,8 @@
 import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
+import { ToggleButton } from 'react-aria-components';
 
-import { LinkToggleButton } from '~/primitives/link-button';
+import { linkButton } from '~/primitives/link-button';
 
 import { EmailField } from './email-field';
 import { PhoneNumberField } from './phone-number-field';
@@ -26,14 +27,14 @@ export function EmailOrPhoneNumberField({
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
   const toggle = (
-    <LinkToggleButton
+    <ToggleButton
       isSelected={showPhoneNumberField}
       onChange={setShowPhoneNumberField}
-      size='sm'
+      className={linkButton({ size: 'sm', disabled: props.disabled })}
     >
       <span className='sr-only'>{toggleDescription}</span>
       {showPhoneNumberField ? 'Use email' : 'Use phone'}
-    </LinkToggleButton>
+    </ToggleButton>
   );
 
   return showPhoneNumberField ? (
