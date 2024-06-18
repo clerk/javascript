@@ -220,9 +220,10 @@ describe('clerkMiddleware(params)', () => {
     expect(signInResp?.headers.get('a-custom-header')).toEqual('1');
   });
 
-  it('propagates middleware options to the next request', async () => {
+  it('propagates middleware dynamic keys to the next request', async () => {
     const options = {
       secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
+      publishableKey: 'pk_test_xxxxxxxxxxxxx',
       signInUrl: '/foo',
       signUpUrl: '/bar',
     };
