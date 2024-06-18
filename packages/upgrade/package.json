@@ -17,6 +17,11 @@
     "lint": "eslint src/",
     "lint:publint": "publint"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/upgrade"
+  },
   "babel": {
     "presets": [
       "@babel/preset-react"
