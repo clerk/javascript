@@ -73,11 +73,36 @@ export function transform(code: string, ctx: { styleCache: StyleCache }) {
       }
       this.traverse(path);
     },
-    // visit cn function calls containing TW classes
+    // visit a `className` property within any object containing TW classes
+    visitObjectProperty(path) {
+      const node = path.node;
+      if (path.node.key.type === 'Identifier' && path.node.key.name === 'className') {
+        visitNode(node, ctx);
+      }
+      this.traverse(path);
+    },
+    // visit function calls containing TW classes
     visitCallExpression(path) {
       const node = path.node;
-      if (node.callee.type === 'Identifier' && node.callee.name === 'cn') {
+      // `className` concatenation functions
+      if (node.callee.type === 'Identifier' && ['cn', 'cx', 'clsx'].includes(node.callee.name)) {
         visitNode(node, ctx);
+      }
+      // cva functions (note: only compatible with cva@1.0)
+      if (
+        node.callee.type === 'Identifier' &&
+        node.callee.name === 'cva' &&
+        node.arguments[0]?.type === 'ObjectExpression'
+      ) {
+        for (const property of node.arguments[0].properties) {
+          if (
+            property.type === 'ObjectProperty' &&
+            property.key.type === 'Identifier' &&
+            ['base', 'variants'].includes(property.key.name)
+          ) {
+            visitNode(property, ctx);
+          }
+        }
       }
       this.traverse(path);
     },
