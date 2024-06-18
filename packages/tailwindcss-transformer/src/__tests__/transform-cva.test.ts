@@ -32,12 +32,12 @@ test('cva', () => {
       },
     });
     
-    const Button: React.FC<ButtonProps> = ({ children, intent, size, className }) => {
-      return <button className={button({ intent, size, className: ['text-white', className] })}>{children}</button>
+    const Button: React.FC<ButtonProps> = ({ children, intent, size = 'sm', className }) => {
+      return <button className={button({ intent: 'primary', size, className: ['text-white', className] })}>{children}</button>
     }
     
     const ButtonLink: React.FC<LinkProps> = ({ children, intent, size, className }) => {
-      return <a className={button({ intent, size, className })}>{children}</a>
+      return <a className={button({ intent, size: 'sm', className })}>{children}</a>
     }`,
     {
       styleCache: new Map(),
