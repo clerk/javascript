@@ -348,7 +348,11 @@ function SignUpComponentLoaded() {
                   <SignUp.Strategy name='email_link'>
                     <Card.Header>
                       <Card.Title>{t('signUp.emailLink.title')}</Card.Title>
-                      <Card.Description>{t('signUp.emailLink.subtitle')}</Card.Description>
+                      <Card.Description>
+                        {t('signUp.emailLink.subtitle', {
+                          applicationName,
+                        })}
+                      </Card.Description>
                     </Card.Header>
                     <Card.Body>
                       <Common.GlobalError>
