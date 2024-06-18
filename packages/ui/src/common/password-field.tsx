@@ -1,5 +1,5 @@
 import * as Common from '@clerk/elements/common';
-import cn from 'clsx';
+import { cx } from 'cva';
 import React from 'react';
 
 import * as Field from '../primitives/field';
@@ -38,7 +38,7 @@ export function PasswordField({
                   //       safely ignore the TS error.
                   // @ts-expect-error – see above
                   validatePassword
-                  className={cn('pe-7', className)}
+                  className={cx('pe-7', className)}
                   onBlur={() => setTouched(true)}
                   {...props}
                   asChild
@@ -47,7 +47,7 @@ export function PasswordField({
                 </Common.Input>
                 <button
                   type='button'
-                  className={cn(
+                  className={cx(
                     'text-icon-sm text-gray-11 absolute end-1 top-1 aspect-square rounded-sm p-1 outline-none disabled:cursor-not-allowed disabled:opacity-50',
                     'hover:enabled:text-gray-12 hover:enabled:bg-gray-3',
                     'focus-visible:ring-default focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring-2',
