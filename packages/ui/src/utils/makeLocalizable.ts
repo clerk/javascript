@@ -59,7 +59,7 @@ type VariableType<T extends string> = T extends 'number' | 'plural' | 'selectord
     ? Date
     : Value;
 
-export type Tokens = Record<string, string>;
+type Tokens = Record<string, string>;
 
 type Token = keyof Tokens | string;
 type Modifier = { modifierName: keyof typeof MODIFIERS; params: string[] };
@@ -71,7 +71,7 @@ type GetICUArgs<Text extends string, T extends RemovePipeUtils<Text>> = TuplePar
 
 type DefaultLocalizationKey = RecordToPath<typeof defaultResource>;
 type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<typeof defaultResource, P>;
-// @ts-ignore test
+//@ts-ignore https://github.com/clerk/javascript/blob/5764e2911790051589bb5c4f3b1a2c79f7f30c7e/packages/clerk-js/src/ui/localization/localizationKeys.ts#L67
 type LocalizationKeyToParams<P extends DefaultLocalizationKey> = GetICUArgs<LocalizationKeyToValue<P>>;
 
 const readObjectPath = <O extends Record<string, any>>(obj: O, path: string) => {
@@ -180,6 +180,16 @@ const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens
   });
   return s;
 };
+
+/**
+ * Create a localizeable function that can be used to access localizations.
+ * @param resource - The localization resource to use.
+ * @returns A function that can be used to access localizations.
+ *
+ * @example
+ * const t = makeLocalizeable(enUS);
+ * t('welcome', { name: 'John' }); // => 'Welcome, John!'
+ */
 
 export const makeLocalizeable = (resource: LocalizationResource) => {
   return function <Key extends DefaultLocalizationKey, Params extends LocalizationKeyToParams<Key>>(
