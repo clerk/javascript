@@ -20,14 +20,14 @@ exports[`cva 1`] = `
       },
       compoundVariants: [
         {
-          intent: "cl-986a1b71",
-          size: "cl-c082456a",
+          intent: "primary",
+          size: "medium",
           className: "cl-d2cf63c7"
         },
       ],
       defaultVariants: {
-        intent: "cl-986a1b71",
-        size: "cl-c082456a",
+        intent: "primary",
+        size: "medium",
       },
     });
     
