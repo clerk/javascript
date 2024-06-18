@@ -38,7 +38,7 @@ function generateHashedClassName(value: string) {
   return 'cl-' + createHash('sha256').update(value, 'utf8').digest('hex').slice(0, 8);
 }
 
-function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }) {
+function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }, visitors?: recast.types.Visitor) {
   recast.visit(node, {
     visitStringLiteral(path) {
       if (clRegex.test(path.node.value)) {
@@ -58,6 +58,7 @@ function visitNode(node: recast.types.ASTNode, ctx: { styleCache: StyleCache }) 
       path.node.value = cn;
       return false;
     },
+    ...visitors,
   });
 }
 
@@ -68,8 +69,14 @@ export function transform(code: string, ctx: { styleCache: StyleCache }) {
     // visit className attributes containing TW classes
     visitJSXAttribute(path) {
       const node = path.node;
-      if (path.node.name.name === 'className') {
-        visitNode(node, ctx);
+      if (node.name.name === 'className') {
+        visitNode(node, ctx, {
+          // Stop traversal if we encounter a function call
+          // cn/cx/clsx/cva are handled by the `visitCallExpression` visitor
+          visitCallExpression() {
+            return false;
+          },
+        });
       }
       this.traverse(path);
     },
