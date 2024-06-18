@@ -153,7 +153,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
       setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
     }
 
-    decorateRequest(clerkRequest, handlerResult, requestState, { secretKey, signInUrl, signUpUrl });
+    decorateRequest(clerkRequest, handlerResult, requestState, { secretKey, signInUrl, signUpUrl, publishableKey });
 
     return handlerResult;
   };
