@@ -11,7 +11,7 @@ export const OrganizationProfileAvatarUploader = (
   const { organization, ...rest } = props;
 
   return (
-    <Col elementDescriptor={descriptors.organizationCreateAvatarContainer}>
+    <Col elementDescriptor={descriptors.organizationAvatarUploaderContainer}>
       <Text
         variant='subtitle'
         sx={t => ({

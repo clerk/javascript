@@ -3,4 +3,4 @@
 "@clerk/types": patch
 ---
 
-Add `organizationCreateAvatarContainer` descriptor for logo upload box inside "Create Organization" flow
+Add `organizationAvatarUploaderContainer` descriptor which is used e.g. for the logo upload box inside "Create Organization" flow
