@@ -61,6 +61,7 @@ const FieldAction = (
       isDisabled={isDisabled}
       colorScheme='primary'
       variant='buttonSmall'
+      href={'#'}
       onClick={e => {
         e.preventDefault();
         props.onClick?.(e);

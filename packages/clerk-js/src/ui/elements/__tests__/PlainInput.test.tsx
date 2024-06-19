@@ -120,7 +120,7 @@ describe('PlainInput', () => {
     expect(getByRole('link', { name: /take action/i })).toBeInTheDocument();
     expect(getByRole('link', { name: /take action/i })).not.toHaveAttribute('rel');
     expect(getByRole('link', { name: /take action/i })).not.toHaveAttribute('target');
-    expect(getByRole('link', { name: /take action/i })).toHaveAttribute('href', '');
+    expect(getByRole('link', { name: /take action/i })).toHaveAttribute('href', '#');
   });
 
   it('with error', async () => {
