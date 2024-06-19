@@ -1,7 +1,8 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
-import type { EnvironmentResource } from '@clerk/types';
+import { enUS } from '@clerk/localizations';
+import type { ClerkOptions, EnvironmentResource } from '@clerk/types';
 
 import { EmailField } from '~/common/email-field';
 import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
@@ -19,6 +20,7 @@ import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
+import { makeLocalizeable } from '~/utils/makeLocalizable';
 
 export function SignInComponent() {
   return (
@@ -30,6 +32,8 @@ export function SignInComponent() {
 
 export function SignInComponentLoaded() {
   const clerk = useClerk();
+  // TODO: Replace `any` with proper types
+  const t = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
     (clerk as any)?.__unstable__environment as EnvironmentResource,
   );
@@ -38,6 +42,7 @@ export function SignInComponentLoaded() {
   const { enabled: usernameEnabled } = attributes['username'];
   const { enabled: phoneNumberEnabled } = attributes['phone_number'];
   const { enabled: emailAddressEnabled } = attributes['email_address'];
+  const { enabled: passkeyEnabled } = attributes['passkey'];
 
   return (
     <Common.Loading>
@@ -135,7 +140,6 @@ export function SignInComponentLoaded() {
                       }
                     />
                   </div>
-
                   <SignIn.Action
                     submit
                     asChild
@@ -154,6 +158,27 @@ export function SignInComponentLoaded() {
                       }}
                     </Common.Loading>
                   </SignIn.Action>
+
+                  {
+                    // Note:
+                    // Currently this triggers the loading spinner for "Continue"
+                    // which is a little confusing. We could use a manual
+                    // setState on click, but we'll need to find a way to clean
+                    // up the state based on `isSubmitting`
+                    passkeyEnabled ? (
+                      <SignIn.Passkey asChild>
+                        <Common.Loading>
+                          {isSubmitting => {
+                            return (
+                              <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                {t('signIn.start.actionLink__use_passkey')}
+                              </LinkButton>
+                            );
+                          }}
+                        </Common.Loading>
+                      </SignIn.Passkey>
+                    ) : null
+                  }
                 </Card.Body>
               </Card.Content>
 

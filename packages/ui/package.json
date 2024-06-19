@@ -8,6 +8,11 @@
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/ui"
+  },
   "exports": {
     "./*": {
       "import": {
@@ -32,9 +37,9 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.2.4",
-    "@clerk/elements": "^0.6.0",
+    "@clerk/elements": "^0.7.0",
     "@clerk/shared": "^2.3.0",
-    "@clerk/types": "^4.5.1",
+    "@clerk/types": "^4.6.0",
     "@radix-ui/react-slot": "^1.0.2",
     "cmdk": "^1.0.0",
     "cva": "^1.0.0-beta.1",
