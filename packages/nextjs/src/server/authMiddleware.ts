@@ -135,7 +135,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
   const isApiRoute = createApiRoutes(options.apiRoutes);
   const defaultAfterAuth = createDefaultAfterAuth(isPublicRoute, isApiRoute, options);
 
-  clerkClient.telemetry.record(
+  clerkClient().telemetry.record(
     eventMethodCalled('authMiddleware', {
       publicRoutes: Boolean(options.publicRoutes),
       ignoredRoutes: Boolean(options.ignoredRoutes),
@@ -184,7 +184,7 @@ const authMiddleware: AuthMiddleware = (...args: unknown[]) => {
       return setHeader(beforeAuthRes, constants.Headers.AuthReason, 'before-auth-redirect');
     }
 
-    const requestState = await clerkClient.authenticateRequest(
+    const requestState = await clerkClient().authenticateRequest(
       clerkRequest,
       createAuthenticateRequestOptions(clerkRequest, options),
     );

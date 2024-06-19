@@ -91,7 +91,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
     signUpUrl,
   };
 
-  clerkClient.telemetry.record(
+  clerkClient().telemetry.record(
     eventMethodCalled('clerkMiddleware', {
       handler: Boolean(handler),
       satellite: Boolean(options.isSatellite),
@@ -104,7 +104,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
     logger.debug('options', options);
     logger.debug('url', () => clerkRequest.toJSON());
 
-    const requestState = await clerkClient.authenticateRequest(
+    const requestState = await clerkClient().authenticateRequest(
       clerkRequest,
       createAuthenticateRequestOptions(clerkRequest, options),
     );
