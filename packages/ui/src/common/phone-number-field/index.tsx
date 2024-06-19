@@ -1,6 +1,6 @@
 import * as Common from '@clerk/elements/common';
-import cn from 'clsx';
 import { Command } from 'cmdk';
+import { cx } from 'cva';
 import * as React from 'react';
 import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
@@ -21,12 +21,14 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   {
     alternativeFieldTrigger,
     label = 'Phone number',
+    hintText = 'Optional',
     locationBasedCountryIso,
     onChange,
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
     alternativeFieldTrigger?: React.ReactNode;
     label?: React.ReactNode;
+    hintText?: string;
     locationBasedCountryIso: CountryIso;
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
@@ -93,7 +95,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
             ) : !props?.required ? (
-              <Field.Optional>Optional</Field.Optional>
+              <Field.Hint>{hintText}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>
@@ -102,7 +104,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
             return (
               <div
                 ref={containerRef}
-                className={cn(
+                className={cx(
                   'text-gray-12 border-gray-a6 flex w-full rounded-md border bg-white bg-clip-padding text-base outline-none',
                   'focus-within:ring-[0.1875rem] has-[[data-field-input][disabled]]:cursor-not-allowed has-[[data-field-input][disabled]]:opacity-50',
                   // intent
