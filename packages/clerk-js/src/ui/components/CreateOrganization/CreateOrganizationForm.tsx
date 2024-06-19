@@ -134,42 +134,44 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
           onSubmit={onSubmit}
           sx={t => ({ gap: t.space.$6 })}
         >
-          <OrganizationProfileAvatarUploader
-            organization={{ name: nameField.value }}
-            onAvatarChange={async file => await setFile(file)}
-            onAvatarRemove={file ? onAvatarRemove : null}
-            avatarPreviewPlaceholder={
-              <IconButton
-                variant='ghost'
-                aria-label='Upload organization logo'
-                icon={
-                  <Icon
-                    size='md'
-                    icon={Upload}
-                    sx={t => ({
-                      color: t.colors.$colorTextSecondary,
-                      transitionDuration: t.transitionDuration.$controls,
-                    })}
-                  />
-                }
-                sx={t => ({
-                  width: t.sizes.$16,
-                  height: t.sizes.$16,
-                  borderRadius: t.radii.$md,
-                  borderWidth: t.borderWidths.$normal,
-                  borderStyle: t.borderStyles.$dashed,
-                  borderColor: t.colors.$neutralAlpha200,
-                  backgroundColor: t.colors.$neutralAlpha50,
-                  ':hover': {
+          <Col>
+            <OrganizationProfileAvatarUploader
+              organization={{ name: nameField.value }}
+              onAvatarChange={async file => await setFile(file)}
+              onAvatarRemove={file ? onAvatarRemove : null}
+              avatarPreviewPlaceholder={
+                <IconButton
+                  variant='ghost'
+                  aria-label='Upload organization logo'
+                  icon={
+                    <Icon
+                      size='md'
+                      icon={Upload}
+                      sx={t => ({
+                        color: t.colors.$colorTextSecondary,
+                        transitionDuration: t.transitionDuration.$controls,
+                      })}
+                    />
+                  }
+                  sx={t => ({
+                    width: t.sizes.$16,
+                    height: t.sizes.$16,
+                    borderRadius: t.radii.$md,
+                    borderWidth: t.borderWidths.$normal,
+                    borderStyle: t.borderStyles.$dashed,
+                    borderColor: t.colors.$neutralAlpha200,
                     backgroundColor: t.colors.$neutralAlpha50,
-                    svg: {
-                      transform: 'scale(1.2)',
+                    ':hover': {
+                      backgroundColor: t.colors.$neutralAlpha50,
+                      svg: {
+                        transform: 'scale(1.2)',
+                      },
                     },
-                  },
-                })}
-              />
-            }
-          />
+                  })}
+                />
+              }
+            />
+          </Col>
           <Form.ControlRow elementId={nameField.id}>
             <Form.PlainInput
               {...nameField.props}
