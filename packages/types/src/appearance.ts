@@ -290,6 +290,8 @@ export type ElementsConfig = {
   organizationPreviewMainIdentifier: WithOptions<OrganizationPreviewId>;
   organizationPreviewSecondaryIdentifier: WithOptions<OrganizationPreviewId>;
 
+  organizationCreateAvatarContainer: WithOptions;
+
   membersPageInviteButton: WithOptions;
 
   identityPreview: WithOptions;
