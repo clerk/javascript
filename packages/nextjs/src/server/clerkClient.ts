@@ -37,13 +37,17 @@ const clerkClientDefaultOptions = {
 const createClerkClientWithOptions: typeof createClerkClient = options =>
   createClerkClient({ ...clerkClientDefaultOptions, ...options });
 
+const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
+
 /**
  * @deprecated
  * This object is deprecated and will be removed in a future release. Please use `clerkClient()` as a function instead.
  */
-const clerkClientSingleton = new Proxy(createClerkClient(clerkClientDefaultOptions), {
-  get() {
+const clerkClientSingletonProxy = new Proxy(clerkClientSingleton, {
+  get(target, prop, receiver) {
     deprecated('clerkClient object', 'Use `clerkClient()` as a function instead.');
+
+    return Reflect.get(target, prop, receiver);
   },
 });
 
@@ -69,7 +73,7 @@ const clerkClientForRequest = () => {
 const clerkClient: ClerkClient & typeof clerkClientForRequest = Object.assign(
   clerkClientForRequest,
   // TODO SDK-1839 - Remove `clerkClient` singleton in the next major version of `@clerk/nextjs`
-  clerkClientSingleton,
+  clerkClientSingletonProxy,
 );
 
 export { clerkClient };
