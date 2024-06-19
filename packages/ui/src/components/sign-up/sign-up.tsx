@@ -4,6 +4,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 import { enUS } from '@clerk/localizations';
 import type { ClerkOptions, EnvironmentResource } from '@clerk/types';
 
+import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { LastNameField } from '~/common/last-name-field';
@@ -11,15 +12,12 @@ import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
-import { PROVIDERS } from '~/constants';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
-import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 import { makeLocalizeable } from '~/utils/makeLocalizable';
 
 export function SignUpComponent() {
@@ -34,9 +32,6 @@ function SignUpComponentLoaded() {
   const clerk = useClerk();
   // TODO: Replace `any` with proper types
   const t = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
-  const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
-    (clerk as any)?.__unstable__environment as EnvironmentResource,
-  );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
   const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
@@ -76,37 +71,7 @@ function SignUpComponentLoaded() {
                         return <Alert>{message}</Alert>;
                       }}
                     </Common.GlobalError>
-                    <Connection.Root>
-                      {enabledConnections.map(c => {
-                        const connection = PROVIDERS.find(provider => provider.id === c.provider);
-                        const iconKey = connection?.icon;
-                        const IconComponent = iconKey ? Icon[iconKey] : null;
-                        return (
-                          <Common.Loading
-                            key={c.provider}
-                            scope={`provider:${c.provider}`}
-                          >
-                            {isConnectionLoading => {
-                              return (
-                                <Common.Connection
-                                  name={c.provider}
-                                  asChild
-                                >
-                                  <Connection.Button
-                                    busy={isConnectionLoading}
-                                    disabled={isGlobalLoading || isConnectionLoading}
-                                    icon={IconComponent ? <IconComponent className='text-base' /> : null}
-                                    textVisuallyHidden={enabledConnections.length > 2}
-                                  >
-                                    {connection?.name || c.provider}
-                                  </Connection.Button>
-                                </Common.Connection>
-                              );
-                            }}
-                          </Common.Loading>
-                        );
-                      })}
-                    </Connection.Root>
+                    <Connections loading={isGlobalLoading} />
 
                     <Seperator>{t('dividerText')}</Seperator>
 
@@ -306,8 +271,6 @@ function SignUpComponentLoaded() {
                       </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
-                        // TODO:
-                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
                           <SignUp.Action
                             asChild

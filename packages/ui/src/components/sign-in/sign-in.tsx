@@ -1,24 +1,28 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
-import type { EnvironmentResource } from '@clerk/types';
+import { enUS } from '@clerk/localizations';
+import type { ClerkOptions, EnvironmentResource } from '@clerk/types';
 
+import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
 import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { EmailOrUsernameField } from '~/common/email-or-username-field';
 import { EmailOrUsernameOrPhoneNumberField } from '~/common/email-or-username-or-phone-number-field';
 import { OTPField } from '~/common/otp-field';
+import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
-import { PROVIDERS } from '~/constants';
+import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
+import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
+import { makeLocalizeable } from '~/utils/makeLocalizable';
 
 export function SignInComponent() {
   return (
@@ -30,142 +34,389 @@ export function SignInComponent() {
 
 export function SignInComponentLoaded() {
   const clerk = useClerk();
+  // TODO: Replace `any` with proper types
+  const t = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
     (clerk as any)?.__unstable__environment as EnvironmentResource,
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
+  const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
   const { enabled: usernameEnabled } = attributes['username'];
   const { enabled: phoneNumberEnabled } = attributes['phone_number'];
   const { enabled: emailAddressEnabled } = attributes['email_address'];
+  const { enabled: passkeyEnabled } = attributes['passkey'];
+  const { applicationName, logoImageUrl, homeUrl } = displayConfig;
+
+  const hasConnection = enabledConnections.length > 0;
+  const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
 
   return (
     <Common.Loading>
       {isGlobalLoading => {
         return (
-          <SignIn.Step name='start'>
-            <Card.Root>
-              <Card.Content>
-                <Card.Header>
-                  <Card.Title>Sign in to Acme Corp</Card.Title>
-                  <Card.Description>Welcome back! Please sign in to continue</Card.Description>
-                </Card.Header>
+          <>
+            <SignIn.Step name='start'>
+              <Card.Root>
+                <Card.Content>
+                  <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
+                    <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
+                    <Card.Description>{t('signIn.start.subtitle')}</Card.Description>
+                  </Card.Header>
 
-                <Card.Body>
-                  <Connection.Root>
-                    {enabledConnections.map(c => {
-                      const connection = PROVIDERS.find(provider => provider.id === c.provider);
-                      const iconKey = connection?.icon;
-                      const IconComponent = iconKey ? Icon[iconKey] : null;
-                      return (
-                        <Common.Connection
-                          key={c.provider}
-                          name={c.provider}
-                          asChild
-                        >
-                          <Common.Loading scope={`provider:${c.provider}`}>
-                            {isConnectionLoading => {
+                  <Card.Body>
+                    <Connections loading={isGlobalLoading} />
+
+                    {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
+
+                    {hasIdentifier ? (
+                      <div className='flex flex-col gap-4'>
+                        {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
+                          <EmailField disabled={isGlobalLoading} />
+                        ) : null}
+
+                        {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
+                          <UsernameField disabled={isGlobalLoading} />
+                        ) : null}
+
+                        {phoneNumberEnabled && !emailAddressEnabled && !usernameEnabled ? (
+                          <PhoneNumberField
+                            disabled={isGlobalLoading}
+                            locationBasedCountryIso={locationBasedCountryIso}
+                          />
+                        ) : null}
+
+                        {emailAddressEnabled && usernameEnabled && !phoneNumberEnabled ? (
+                          <EmailOrUsernameField disabled={isGlobalLoading} />
+                        ) : null}
+
+                        {emailAddressEnabled && phoneNumberEnabled && !usernameEnabled ? (
+                          <EmailOrPhoneNumberField
+                            disabled={isGlobalLoading}
+                            locationBasedCountryIso={locationBasedCountryIso}
+                          />
+                        ) : null}
+
+                        {usernameEnabled && phoneNumberEnabled && !emailAddressEnabled ? (
+                          <PhoneNumberOrUsernameField
+                            disabled={isGlobalLoading}
+                            locationBasedCountryIso={locationBasedCountryIso}
+                          />
+                        ) : null}
+
+                        {emailAddressEnabled && usernameEnabled && phoneNumberEnabled ? (
+                          <EmailOrUsernameOrPhoneNumberField
+                            disabled={isGlobalLoading}
+                            locationBasedCountryIso={locationBasedCountryIso}
+                          />
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    <SignIn.Action
+                      submit
+                      asChild
+                    >
+                      <Common.Loading>
+                        {isSubmitting => {
+                          return (
+                            <Button
+                              icon={<Icon.CaretRight />}
+                              busy={isSubmitting}
+                              disabled={isGlobalLoading || isSubmitting}
+                            >
+                              {t('formButtonPrimary')}
+                            </Button>
+                          );
+                        }}
+                      </Common.Loading>
+                    </SignIn.Action>
+
+                    {
+                      // Note:
+                      // Currently this triggers the loading spinner for "Continue"
+                      // which is a little confusing. We could use a manual
+                      // setState on click, but we'll need to find a way to clean
+                      // up the state based on `isSubmitting`
+                      passkeyEnabled ? (
+                        <SignIn.Passkey asChild>
+                          <Common.Loading>
+                            {isSubmitting => {
                               return (
-                                <Connection.Button
-                                  busy={isConnectionLoading}
-                                  disabled={isGlobalLoading || isConnectionLoading}
-                                  icon={IconComponent ? <IconComponent className='text-base' /> : null}
-                                  textVisuallyHidden={enabledConnections.length > 2}
-                                >
-                                  {connection?.name || c.provider}
-                                </Connection.Button>
+                                <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                  {t('signIn.start.actionLink__use_passkey')}
+                                </LinkButton>
                               );
                             }}
                           </Common.Loading>
-                        </Common.Connection>
-                      );
-                    })}
-                  </Connection.Root>
-                  <Seperator>or</Seperator>
-                  <div className='flex flex-col gap-4'>
-                    {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
-                      <EmailField disabled={isGlobalLoading} />
-                    ) : null}
+                        </SignIn.Passkey>
+                      ) : null
+                    }
+                  </Card.Body>
+                </Card.Content>
 
-                    {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
-                      <UsernameField disabled={isGlobalLoading} />
-                    ) : null}
+                <Card.Footer>
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.start.actionText')}{' '}
+                      <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                </Card.Footer>
+              </Card.Root>
+            </SignIn.Step>
 
-                    {phoneNumberEnabled && !emailAddressEnabled && !usernameEnabled ? (
-                      <PhoneNumberField
-                        disabled={isGlobalLoading}
-                        locationBasedCountryIso={locationBasedCountryIso}
-                      />
-                    ) : null}
-
-                    {emailAddressEnabled && usernameEnabled && !phoneNumberEnabled ? (
-                      <EmailOrUsernameField disabled={isGlobalLoading} />
-                    ) : null}
-
-                    {emailAddressEnabled && phoneNumberEnabled && !usernameEnabled ? (
-                      <EmailOrPhoneNumberField
-                        disabled={isGlobalLoading}
-                        locationBasedCountryIso={locationBasedCountryIso}
-                      />
-                    ) : null}
-
-                    {usernameEnabled && phoneNumberEnabled && !emailAddressEnabled ? (
-                      <PhoneNumberOrUsernameField
-                        disabled={isGlobalLoading}
-                        locationBasedCountryIso={locationBasedCountryIso}
-                      />
-                    ) : null}
-
-                    {emailAddressEnabled && usernameEnabled && phoneNumberEnabled ? (
-                      <EmailOrUsernameOrPhoneNumberField
-                        disabled={isGlobalLoading}
-                        locationBasedCountryIso={locationBasedCountryIso}
-                      />
-                    ) : null}
-
-                    <OTPField
-                      disabled={isGlobalLoading}
-                      // TODO:
-                      // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
-                      // 2. Replace `button` with consolidated styles (tackled later)
-                      resend={
-                        <>
-                          Didn&apos;t recieve a code? <LinkButton>Resend</LinkButton>
-                        </>
-                      }
-                    />
-                  </div>
-
-                  <SignIn.Action
-                    submit
-                    asChild
-                  >
-                    <Common.Loading>
-                      {isSubmitting => {
-                        return (
-                          <Button
-                            icon={<Icon.CaretRight />}
-                            busy={isSubmitting}
-                            disabled={isGlobalLoading || isSubmitting}
+            <SignIn.Step name='verifications'>
+              <Card.Root>
+                <Card.Content>
+                  <SignIn.Strategy name='password'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.password.title')}</Card.Title>
+                      <Card.Description>{t('signIn.password.subtitle')}</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignIn.SafeIdentifier />
+                          <SignIn.Action
+                            navigate='start'
+                            asChild
                           >
-                            Continue
-                          </Button>
-                        );
-                      }}
-                    </Common.Loading>
-                  </SignIn.Action>
-                </Card.Body>
-              </Card.Content>
+                            <button
+                              type='button'
+                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Edit email address'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignIn.Action>
+                        </span>
+                      </Card.Description>
+                    </Card.Header>
+                    <Card.Body>
+                      <PasswordField
+                        alternativeFieldTrigger={
+                          <SignIn.Action
+                            navigate='forgot-password'
+                            asChild
+                          >
+                            <LinkButton
+                              size='sm'
+                              disabled={isGlobalLoading}
+                            >
+                              {t('formFieldAction__forgotPassword')}
+                            </LinkButton>
+                          </SignIn.Action>
+                        }
+                      />
 
-              <Card.Footer>
-                <Card.FooterAction>
-                  <Card.FooterActionText>
-                    Don&apos;t have an account? <Card.FooterActionLink href='/sign-up'>Sign up</Card.FooterActionLink>
-                  </Card.FooterActionText>
-                </Card.FooterAction>
-              </Card.Footer>
-            </Card.Root>
-          </SignIn.Step>
+                      <SignIn.Action
+                        submit
+                        asChild
+                      >
+                        <Common.Loading>
+                          {isSubmitting => {
+                            return (
+                              <>
+                                <Button
+                                  icon={<Icon.CaretRight />}
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading || isSubmitting}
+                                >
+                                  {t('formButtonPrimary')}
+                                </Button>
+
+                                <SignIn.Action
+                                  navigate='start'
+                                  asChild
+                                >
+                                  <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                    {t('signIn.password.actionLink')}
+                                  </LinkButton>
+                                </SignIn.Action>
+                              </>
+                            );
+                          }}
+                        </Common.Loading>
+                      </SignIn.Action>
+                    </Card.Body>
+                  </SignIn.Strategy>
+
+                  <SignIn.Strategy name='reset_password_email_code'>
+                    <Card.Header>
+                      <Card.Title>{t('signIn.forgotPassword.title')}</Card.Title>
+                      <Card.Description>{t('signIn.forgotPassword.subtitle_email')}</Card.Description>
+                      <Card.Description>
+                        <SignIn.SafeIdentifier />
+                      </Card.Description>
+                    </Card.Header>
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+                      <OTPField
+                        disabled={isGlobalLoading}
+                        resend={
+                          <SignIn.Action
+                            asChild
+                            resend
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            fallback={({ resendableAfter }) => (
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                                {t('signIn.forgotPassword.resendButton')} (
+                                <span className='tabular-nums'>{resendableAfter}</span>)
+                              </p>
+                            )}
+                          >
+                            <LinkButton type='button'>{t('signIn.forgotPassword.resendButton')}</LinkButton>
+                          </SignIn.Action>
+                        }
+                      />
+                      <Common.Loading scope='step:verifications'>
+                        {isSubmitting => {
+                          return (
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading}
+                                icon={<Icon.CaretRight />}
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignIn.Action>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
+                </Card.Content>
+                <Card.Footer />
+              </Card.Root>
+            </SignIn.Step>
+
+            <SignIn.Step name='forgot-password'>
+              <Card.Root>
+                <Card.Content>
+                  <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
+                    <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
+                  </Card.Header>
+                  <Card.Body>
+                    <div className='flex flex-col justify-center gap-4'>
+                      <SignIn.SupportedStrategy
+                        name='reset_password_email_code'
+                        asChild
+                      >
+                        <Button>{t('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword')}</Button>
+                      </SignIn.SupportedStrategy>
+
+                      <Seperator>{t('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}</Seperator>
+
+                      <div className='flex flex-col gap-2'>
+                        <Connections loading={isGlobalLoading} />
+
+                        <SignIn.SupportedStrategy
+                          name='reset_password_email_code'
+                          asChild
+                        >
+                          <SecondaryButton icon={<Icon.Envelope />}>
+                            {t('signIn.alternativeMethods.blockButton__emailCode', {
+                              identifier: SignIn.SafeIdentifier,
+                            })}
+                          </SecondaryButton>
+                        </SignIn.SupportedStrategy>
+                      </div>
+
+                      <SignIn.Action
+                        navigate='start'
+                        asChild
+                      >
+                        <LinkButton>{t('backButton')}</LinkButton>
+                      </SignIn.Action>
+                    </div>
+                  </Card.Body>
+                </Card.Content>
+                <Card.Footer />
+              </Card.Root>
+            </SignIn.Step>
+
+            <SignIn.Step name='reset-password'>
+              <Card.Root>
+                <Card.Content>
+                  <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
+                    <Card.Title>{t('signIn.resetPassword.title')}</Card.Title>
+                  </Card.Header>
+                  <Card.Body>
+                    <div className='flex flex-col justify-center gap-4'>
+                      <PasswordField
+                        name='password'
+                        label={t('formFieldLabel__newPassword')}
+                      />
+                      <PasswordField
+                        name='confirmPassword'
+                        label={t('formFieldLabel__confirmPassword')}
+                      />
+
+                      <SignIn.Action
+                        submit
+                        asChild
+                      >
+                        <Common.Loading>
+                          {isSubmitting => {
+                            return (
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading || isSubmitting}
+                              >
+                                {t('signIn.resetPassword.formButtonPrimary')}
+                              </Button>
+                            );
+                          }}
+                        </Common.Loading>
+                      </SignIn.Action>
+                      <SignIn.Action
+                        navigate='start'
+                        asChild
+                      >
+                        <LinkButton>{t('backButton')}</LinkButton>
+                      </SignIn.Action>
+                    </div>
+                  </Card.Body>
+                </Card.Content>
+                <Card.Footer />
+              </Card.Root>
+            </SignIn.Step>
+          </>
         );
       }}
     </Common.Loading>
