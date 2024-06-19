@@ -65,7 +65,7 @@ export const LabelEnd = React.forwardRef(function Label(
   );
 });
 
-export const Optional = React.forwardRef(function Optional(
+export const Hint = React.forwardRef(function Hint(
   { className, children, ...props }: React.ComponentProps<typeof LabelEnd>,
   forwardedRef: React.ForwardedRef<React.ComponentRef<typeof LabelEnd>>,
 ) {

@@ -14,7 +14,8 @@ export function EmailOrPhoneNumberField({
   locationBasedCountryIso,
   requiredEmail,
   requiredPhoneNumber,
-  toggleDescription = 'Toggle between email and phone.',
+  toggleLabelEmail = 'Use email',
+  toggleLabelPhoneNumber = 'Use phone',
   ...props
 }: {
   labelEmail?: React.ReactNode;
@@ -22,7 +23,8 @@ export function EmailOrPhoneNumberField({
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
   requiredEmail?: boolean;
   requiredPhoneNumber?: boolean;
-  toggleDescription?: string;
+  toggleLabelEmail?: string;
+  toggleLabelPhoneNumber?: string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'required' | 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
@@ -32,8 +34,7 @@ export function EmailOrPhoneNumberField({
       onChange={setShowPhoneNumberField}
       className={linkButton({ size: 'sm', disabled: props.disabled })}
     >
-      <span className='sr-only'>{toggleDescription}</span>
-      {showPhoneNumberField ? 'Use email' : 'Use phone'}
+      {showPhoneNumberField ? toggleLabelEmail : toggleLabelPhoneNumber}
     </ToggleButton>
   );
 
