@@ -306,8 +306,6 @@ function SignUpComponentLoaded() {
                       </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
-                        // TODO:
-                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
                           <SignUp.Action
                             asChild

@@ -39,10 +39,12 @@ export function SignInComponentLoaded() {
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
+  const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
   const { enabled: usernameEnabled } = attributes['username'];
   const { enabled: phoneNumberEnabled } = attributes['phone_number'];
   const { enabled: emailAddressEnabled } = attributes['email_address'];
   const { enabled: passkeyEnabled } = attributes['passkey'];
+  const { applicationName, logoImageUrl, homeUrl } = displayConfig;
 
   return (
     <Common.Loading>
@@ -52,8 +54,15 @@ export function SignInComponentLoaded() {
             <Card.Root>
               <Card.Content>
                 <Card.Header>
-                  <Card.Title>Sign in to Acme Corp</Card.Title>
-                  <Card.Description>Welcome back! Please sign in to continue</Card.Description>
+                  {logoImageUrl ? (
+                    <Card.Logo
+                      href={homeUrl}
+                      src={logoImageUrl}
+                      alt={applicationName}
+                    />
+                  ) : null}
+                  <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
+                  <Card.Description>{t('signIn.start.subtitle')}</Card.Description>
                 </Card.Header>
 
                 <Card.Body>
@@ -86,7 +95,9 @@ export function SignInComponentLoaded() {
                       );
                     })}
                   </Connection.Root>
-                  <Seperator>or</Seperator>
+
+                  <Seperator>{t('dividerText')}</Seperator>
+
                   <div className='flex flex-col gap-4'>
                     {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
                       <EmailField disabled={isGlobalLoading} />
@@ -130,13 +141,21 @@ export function SignInComponentLoaded() {
 
                     <OTPField
                       disabled={isGlobalLoading}
-                      // TODO:
-                      // 1. Replace `button` with `SignIn.Action` when `exampleMode` is removed
-                      // 2. Replace `button` with consolidated styles (tackled later)
                       resend={
-                        <>
-                          Didn&apos;t recieve a code? <LinkButton>Resend</LinkButton>
-                        </>
+                        // TODO: Implement within `verification` step later
+                        // <SignIn.Action
+                        //   asChild
+                        //   resend
+                        //   // eslint-disable-next-line react/no-unstable-nested-components
+                        //   fallback={({ resendableAfter }) => (
+                        //     <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                        //       {t('signUp.emailCode.resendButton')} (
+                        //       <span className='tabular-nums'>{resendableAfter}</span>)
+                        //     </p>
+                        //   )}
+                        // >
+                        <LinkButton type='button'>{t('signUp.emailCode.resendButton')}</LinkButton>
+                        // </SignIn.Action>
                       }
                     />
                   </div>
@@ -152,7 +171,7 @@ export function SignInComponentLoaded() {
                             busy={isSubmitting}
                             disabled={isGlobalLoading || isSubmitting}
                           >
-                            Continue
+                            {t('formButtonPrimary')}
                           </Button>
                         );
                       }}
@@ -185,7 +204,8 @@ export function SignInComponentLoaded() {
               <Card.Footer>
                 <Card.FooterAction>
                   <Card.FooterActionText>
-                    Don&apos;t have an account? <Card.FooterActionLink href='/sign-up'>Sign up</Card.FooterActionLink>
+                    {t('signIn.start.actionText')}{' '}
+                    <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
                   </Card.FooterActionText>
                 </Card.FooterAction>
               </Card.Footer>
