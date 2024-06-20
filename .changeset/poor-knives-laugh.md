@@ -3,4 +3,4 @@
 '@clerk/nextjs': patch
 ---
 
-Support handshake in iframes
+Fixes a bug where Clerk's Handshake mechanism would not run when an application is rendered in an iframe.
