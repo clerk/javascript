@@ -166,7 +166,7 @@ describe('isProductionFromSecretKey(key)', () => {
   });
 });
 
-describe('getCookieSuffix(publishableKey)', () => {
+describe('getCookieSuffix(publishableKey, subtle?)', () => {
   const cases: Array<[string, string]> = [
     ['pk_live_Y2xlcmsuY2xlcmsuZGV2JA', '1Z8AzTQD'],
     ['pk_test_Y2xlcmsuY2xlcmsuZGV2JA', 'QvfNY2dr'],

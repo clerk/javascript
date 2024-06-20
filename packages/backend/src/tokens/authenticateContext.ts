@@ -2,6 +2,7 @@ import type { Jwt } from '@clerk/types';
 
 import { constants } from '../constants';
 import { decodeJwt } from '../jwt/verifyJwt';
+import runtime from '../runtime';
 import { assertValidPublishableKey } from '../util/optionsAssertions';
 import { getCookieSuffix, getSuffixedCookieName, parsePublishableKey } from '../util/shared';
 import type { ClerkRequest } from './clerkRequest';
@@ -247,6 +248,8 @@ export const createAuthenticateContext = async (
   clerkRequest: ClerkRequest,
   options: AuthenticateRequestOptions,
 ): Promise<AuthenticateContext> => {
-  const cookieSuffix = options.publishableKey ? await getCookieSuffix(options.publishableKey) : '';
+  const cookieSuffix = options.publishableKey
+    ? await getCookieSuffix(options.publishableKey, runtime.crypto.subtle)
+    : '';
   return new AuthenticateContext(cookieSuffix, clerkRequest, options);
 };
