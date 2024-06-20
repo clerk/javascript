@@ -2,6 +2,7 @@ import type QUnit from 'qunit';
 import sinon from 'sinon';
 
 import { createCookieHeader, createJwt, mockJwtPayload, pkLive, pkTest } from '../../fixtures';
+import runtime from '../../runtime';
 import { getCookieSuffix } from '../../util/shared';
 import { createAuthenticateContext } from '../authenticateContext';
 import { createClerkRequest } from '../clerkRequest';
@@ -221,20 +222,20 @@ export default (QUnit: QUnit) => {
 
   // Added these tests to verify that the generated sha-1 is the same as the one used in cookie assignment
   // Tests copied from packages/shared/src/__tests__/keys.test.ts
-  module('getCookieSuffix(publishableKey)', () => {
+  module('getCookieSuffix(publishableKey, subtle)', () => {
     test('given `pk_live_Y2xlcmsuY2xlcmsuZGV2JA` pk, returns `1Z8AzTQD` cookie suffix', async assert => {
-      assert.equal(await getCookieSuffix('pk_live_Y2xlcmsuY2xlcmsuZGV2JA'), '1Z8AzTQD');
+      assert.equal(await getCookieSuffix('pk_live_Y2xlcmsuY2xlcmsuZGV2JA', runtime.crypto.subtle), '1Z8AzTQD');
     });
 
     test('given `pk_test_Y2xlcmsuY2xlcmsuZGV2JA` pk, returns `QvfNY2dr` cookie suffix', async assert => {
-      assert.equal(await getCookieSuffix('pk_test_Y2xlcmsuY2xlcmsuZGV2JA'), 'QvfNY2dr');
+      assert.equal(await getCookieSuffix('pk_test_Y2xlcmsuY2xlcmsuZGV2JA', runtime.crypto.subtle), 'QvfNY2dr');
     });
 
     test('omits special characters from the cookie suffix', async assert => {
       const pk = 'pk_test_ZW5vdWdoLWFscGFjYS04Mi5jbGVyay5hY2NvdW50cy5sY2xjbGVyay5jb20k';
-      assert.equal(await getCookieSuffix(pk), 'jtYvyt_H');
+      assert.equal(await getCookieSuffix(pk, runtime.crypto.subtle), 'jtYvyt_H');
       const pk2 = 'pk_test_eHh4eHh4LXhhYWFhYS1hYS5jbGVyay5hY2NvdW50cy5sY2xjbGVyay5jb20k';
-      assert.equal(await getCookieSuffix(pk2), 'tZJdb-5s');
+      assert.equal(await getCookieSuffix(pk2, runtime.crypto.subtle), 'tZJdb-5s');
     });
   });
 };
