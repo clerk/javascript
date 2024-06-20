@@ -9,6 +9,7 @@ const ERROR_NAME = 'email_address';
 export function EmailField({
   alternativeFieldTrigger,
   label = 'Email address',
+  name = FIELD_NAME,
   hintText = 'Optional',
   error,
   ...props
@@ -20,7 +21,7 @@ export function EmailField({
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field
-      name={FIELD_NAME}
+      name={name}
       asChild
     >
       <Field.Root>
