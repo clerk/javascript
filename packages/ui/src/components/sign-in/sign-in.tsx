@@ -74,14 +74,16 @@ export function SignInComponentLoaded() {
                         const iconKey = connection?.icon;
                         const IconComponent = iconKey ? Icon[iconKey] : null;
                         return (
-                          <Common.Connection
+                          <Common.Loading
                             key={c.provider}
-                            name={c.provider}
-                            asChild
+                            scope={`provider:${c.provider}`}
                           >
-                            <Common.Loading scope={`provider:${c.provider}`}>
-                              {isConnectionLoading => {
-                                return (
+                            {isConnectionLoading => {
+                              return (
+                                <Common.Connection
+                                  name={c.provider}
+                                  asChild
+                                >
                                   <Connection.Button
                                     busy={isConnectionLoading}
                                     disabled={isGlobalLoading || isConnectionLoading}
@@ -90,16 +92,14 @@ export function SignInComponentLoaded() {
                                   >
                                     {connection?.name || c.provider}
                                   </Connection.Button>
-                                );
-                              }}
-                            </Common.Loading>
-                          </Common.Connection>
+                                </Common.Connection>
+                              );
+                            }}
+                          </Common.Loading>
                         );
                       })}
                     </Connection.Root>
-
                     <Seperator>{t('dividerText')}</Seperator>
-
                     <div className='flex flex-col gap-4'>
                       {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
                         <EmailField disabled={isGlobalLoading} />
@@ -141,13 +141,13 @@ export function SignInComponentLoaded() {
                         />
                       ) : null}
                     </div>
-                    <SignIn.Action
-                      submit
-                      asChild
-                    >
-                      <Common.Loading>
-                        {isSubmitting => {
-                          return (
+                    <Common.Loading>
+                      {isSubmitting => {
+                        return (
+                          <SignIn.Action
+                            submit
+                            asChild
+                          >
                             <Button
                               icon={<Icon.CaretRight />}
                               busy={isSubmitting}
@@ -155,10 +155,10 @@ export function SignInComponentLoaded() {
                             >
                               {t('formButtonPrimary')}
                             </Button>
-                          );
-                        }}
-                      </Common.Loading>
-                    </SignIn.Action>
+                          </SignIn.Action>
+                        );
+                      }}
+                    </Common.Loading>
 
                     {
                       // Note:
@@ -167,17 +167,20 @@ export function SignInComponentLoaded() {
                       // setState on click, but we'll need to find a way to clean
                       // up the state based on `isSubmitting`
                       passkeyEnabled ? (
-                        <SignIn.Passkey asChild>
-                          <Common.Loading>
-                            {isSubmitting => {
-                              return (
-                                <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                        <Common.Loading>
+                          {isSubmitting => {
+                            return (
+                              <SignIn.Passkey asChild>
+                                <LinkButton
+                                  type='button'
+                                  disabled={isGlobalLoading || isSubmitting}
+                                >
                                   {t('signIn.start.actionLink__use_passkey')}
                                 </LinkButton>
-                              );
-                            }}
-                          </Common.Loading>
-                        </SignIn.Passkey>
+                              </SignIn.Passkey>
+                            );
+                          }}
+                        </Common.Loading>
                       ) : null
                     }
                   </Card.Body>
