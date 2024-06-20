@@ -18,6 +18,9 @@ import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
 type SignUpFlowProviderProps = {
   children: React.ReactNode;
   exampleMode?: boolean;
+  /**
+   * Fallback markup to render while Clerk is loading
+   */
   fallback?: React.ReactNode;
   isRootPath: boolean;
 };
@@ -70,11 +73,7 @@ function SignUpFlowProvider({ children, exampleMode, fallback, isRootPath }: Sig
   );
 }
 
-export type SignUpRootProps = SignUpFlowProviderProps & {
-  /**
-   * Fallback markup to render while Clerk is loading
-   */
-  fallback?: React.ReactNode;
+export type SignUpRootProps = Omit<SignUpFlowProviderProps, 'isRootPath'> & {
   /**
    * The base path for your sign-up route.
    * Will be automatically inferred in Next.js.

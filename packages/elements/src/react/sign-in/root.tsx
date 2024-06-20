@@ -18,6 +18,9 @@ import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
 type SignInFlowProviderProps = {
   children: React.ReactNode;
   exampleMode?: boolean;
+  /**
+   * Fallback markup to render while Clerk is loading
+   */
   fallback?: React.ReactNode;
   isRootPath: boolean;
 };
@@ -71,11 +74,7 @@ function SignInFlowProvider({ children, exampleMode, fallback, isRootPath }: Sig
   );
 }
 
-export type SignInRootProps = SignInFlowProviderProps & {
-  /**
-   * Fallback markup to render while Clerk is loading
-   */
-  fallback?: React.ReactNode;
+export type SignInRootProps = Omit<SignInFlowProviderProps, 'isRootPath'> & {
   /**
    * The base path for your sign-in route.
    * Will be automatically inferred in Next.js.
