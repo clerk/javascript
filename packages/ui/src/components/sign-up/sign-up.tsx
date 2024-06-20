@@ -439,6 +439,7 @@ function SignUpComponentLoaded() {
                           hintText={t('formFieldHintText__optional')}
                           required={emailAddressRequired}
                           disabled={isGlobalLoading}
+                          error={translateError}
                         />
                       ) : null}
 
