@@ -356,7 +356,8 @@ const useInput = ({
 const FORM_NAME = 'ClerkElementsForm';
 
 type FormElement = React.ElementRef<typeof RadixForm>;
-type FormProps = SetRequired<RadixFormProps, 'children'> & {
+type FormProps = Omit<RadixFormProps, 'children'> & {
+  children: React.ReactNode;
   flowActor?: BaseActorRef<{ type: 'SUBMIT' }>;
 };
 
