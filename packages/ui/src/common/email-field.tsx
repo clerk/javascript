@@ -17,7 +17,7 @@ export function EmailField({
   alternativeFieldTrigger?: React.ReactNode;
   label?: React.ReactNode;
   hintText?: string;
-  error: (message: string, code: string, name: string) => string;
+  error?: (message: string, code: string, name: string) => string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field
@@ -50,7 +50,7 @@ export function EmailField({
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{error(message, code, ERROR_NAME)}</Field.Message>;
+            return <Field.Message intent='error'>{error ? error(message, code, ERROR_NAME) : message}</Field.Message>;
           }}
         </Common.FieldError>
       </Field.Root>
