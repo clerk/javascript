@@ -166,6 +166,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationPreviewMainIdentifier',
   'organizationPreviewSecondaryIdentifier',
 
+  'organizationAvatarUploaderContainer',
+
   'membersPageInviteButton',
 
   'identityPreview',
