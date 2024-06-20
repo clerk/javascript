@@ -1,5 +1,25 @@
 # @clerk/elements
 
+## 0.8.0
+
+### Minor Changes
+
+- The `path` prop on the `<SignIn.Root>` and `<SignUp.Root>` component is now automatically inferred. Previously, the default values were `/sign-in` and `/sign-up`, on other routes you had to explicitly define your route. ([#3557](https://github.com/clerk/javascript/pull/3557)) by [@LekoArts](https://github.com/LekoArts)
+
+  The new heuristic for determining the path where `<SignIn.Root>` and `<SignUp.Root>` are mounted is:
+
+  1. `path` prop
+  2. Automatically inferred
+  3. If it can't be inferred, fallback to `CLERK_SIGN_IN_URL` and `CLERK_SIGN_UP_URL` env var
+  4. Fallback to `/sign-in` and `/sign-up`
+
+### Patch Changes
+
+- Render the resendable button at the 0 tick ([#3575](https://github.com/clerk/javascript/pull/3575)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`1273b04ec`](https://github.com/clerk/javascript/commit/1273b04ecf1866b59ef59a74abe31dbcc726da2c)]:
+  - @clerk/types@4.6.1
+
 ## 0.7.0
 
 ### Minor Changes
@@ -18,9 +38,11 @@
   - `<SignIn.Action passkey />`
 
     ```tsx
-    <SignIn.Step name='start'>
+    <SignIn.Step name="start">
       <SignIn.Passkey>
-        <Clerk.Loading>{isLoading => (isLoading ? <Spinner /> : 'Use passkey instead')}.</Clerk.Loading>
+        <Clerk.Loading>
+          {(isLoading) => (isLoading ? <Spinner /> : "Use passkey instead")}.
+        </Clerk.Loading>
       </SignIn.Passkey>
     </SignIn.Step>
     ```
@@ -28,10 +50,7 @@
   - `<SignIn.SupportedStrategy name='passkey'>`
 
     ```tsx
-    <SignIn.SupportedStrategy
-      asChild
-      name='passkey'
-    >
+    <SignIn.SupportedStrategy asChild name="passkey">
       <Button>use passkey</Button>
     </SignIn.SupportedStrategy>
     ```
@@ -39,8 +58,8 @@
   - `<SignIn.Strategy name='passkey'>`
 
     ```tsx
-    <SignIn.Strategy name='passkey'>
-      <p className='text-sm'>
+    <SignIn.Strategy name="passkey">
+      <p className="text-sm">
         Welcome back <SignIn.Salutation />!
       </p>
 
@@ -50,12 +69,12 @@
 
   - Passkey Autofill
     ```tsx
-    <SignIn.Step name='start'>
-      <Clerk.Field name='identifier'>
-        <Clerk.Label className='sr-only'>Email</Clerk.Label>
+    <SignIn.Step name="start">
+      <Clerk.Field name="identifier">
+        <Clerk.Label className="sr-only">Email</Clerk.Label>
         <Clerk.Input
-          autoComplete='webauthn'
-          placeholder='Enter your email address'
+          autoComplete="webauthn"
+          placeholder="Enter your email address"
         />
         <Clerk.FieldError />
       </Clerk.Field>
@@ -466,7 +485,7 @@
 - Add `<Step>` component which can be used instead of `<Start>`, `<Continue>` and `<Verifications>` like this:
   ```tsx
   // You can also use name="continue" or name="verifications"
-  <Step name='start'>Contents</Step>
+  <Step name="start">Contents</Step>
   ```
 
 ## 0.1.10
