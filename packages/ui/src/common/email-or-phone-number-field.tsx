@@ -9,6 +9,7 @@ import { PhoneNumberField } from './phone-number-field';
 
 export function EmailOrPhoneNumberField({
   className,
+  name = undefined,
   labelEmail = 'Email address',
   labelPhoneNumber = 'Phone number',
   locationBasedCountryIso,
@@ -44,11 +45,13 @@ export function EmailOrPhoneNumberField({
       locationBasedCountryIso={locationBasedCountryIso}
       alternativeFieldTrigger={toggle}
       required={requiredPhoneNumber}
+      name={name}
       {...props}
     />
   ) : (
     <EmailField
       {...props}
+      name={name}
       label={labelEmail}
       alternativeFieldTrigger={toggle}
       required={requiredEmail}

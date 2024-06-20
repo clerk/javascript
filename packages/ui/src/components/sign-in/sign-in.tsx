@@ -102,15 +102,22 @@ export function SignInComponentLoaded() {
                     <Seperator>{t('dividerText')}</Seperator>
                     <div className='flex flex-col gap-4'>
                       {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
-                        <EmailField disabled={isGlobalLoading} />
+                        <EmailField
+                          name='identifier'
+                          disabled={isGlobalLoading}
+                        />
                       ) : null}
 
                       {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
-                        <UsernameField disabled={isGlobalLoading} />
+                        <UsernameField
+                          name='identifier'
+                          disabled={isGlobalLoading}
+                        />
                       ) : null}
 
                       {phoneNumberEnabled && !emailAddressEnabled && !usernameEnabled ? (
                         <PhoneNumberField
+                          name='identifier'
                           disabled={isGlobalLoading}
                           locationBasedCountryIso={locationBasedCountryIso}
                         />
@@ -122,6 +129,7 @@ export function SignInComponentLoaded() {
 
                       {emailAddressEnabled && phoneNumberEnabled && !usernameEnabled ? (
                         <EmailOrPhoneNumberField
+                          name='identifier'
                           disabled={isGlobalLoading}
                           locationBasedCountryIso={locationBasedCountryIso}
                         />
@@ -129,6 +137,7 @@ export function SignInComponentLoaded() {
 
                       {usernameEnabled && phoneNumberEnabled && !emailAddressEnabled ? (
                         <PhoneNumberOrUsernameField
+                          name='identifier'
                           disabled={isGlobalLoading}
                           locationBasedCountryIso={locationBasedCountryIso}
                         />

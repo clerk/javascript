@@ -6,6 +6,7 @@ import * as Field from '../primitives/field';
 export function EmailField({
   alternativeFieldTrigger,
   label = 'Email address',
+  name = 'emailAddress',
   hintText = 'Optional',
   ...props
 }: { alternativeFieldTrigger?: React.ReactNode; label?: React.ReactNode; hintText?: string } & Omit<
@@ -14,7 +15,7 @@ export function EmailField({
 >) {
   return (
     <Common.Field
-      name='emailAddress'
+      name={name}
       asChild
     >
       <Field.Root>
