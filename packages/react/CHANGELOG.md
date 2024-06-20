@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.2.5
+
+### Patch Changes
+
+- Updated dependencies [[`1273b04ec`](https://github.com/clerk/javascript/commit/1273b04ecf1866b59ef59a74abe31dbcc726da2c)]:
+  - @clerk/types@4.6.1
+  - @clerk/shared@2.3.1
+
 ## 5.2.4
 
 ### Patch Changes
@@ -67,8 +75,10 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async response => {
-      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+    callback: async (response) => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
+        token: response.credential,
+      });
       await Clerk.handleGoogleOneTapCallback(signInOrUp, {
         signInForceRedirectUrl: window.location.href,
       });
@@ -80,9 +90,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async response => {
-      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
-      if (signInOrUp.status === 'complete') {
+    callback: async (response) => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
+        token: response.credential,
+      });
+      if (signInOrUp.status === "complete") {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -180,13 +192,13 @@
   Before:
 
   ```jsx
-  import { SignOutButton } from '@clerk/clerk-react';
+  import { SignOutButton } from "@clerk/clerk-react";
 
   export const Signout = () => {
     return (
       <SignOutButton
         signOutCallback={() => {
-          window.location.href = '/your-path';
+          window.location.href = "/your-path";
         }}
       >
         <button>Sign Out</button>
@@ -198,11 +210,11 @@
   After:
 
   ```jsx
-  import { SignOutButton } from '@clerk/clerk-react';
+  import { SignOutButton } from "@clerk/clerk-react";
 
   export const Signout = () => {
     return (
-      <SignOutButton redirectUrl='/your-path'>
+      <SignOutButton redirectUrl="/your-path">
         <button>Sign Out</button>
       </SignOutButton>
     );
@@ -374,8 +386,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: '';
-    role: 'admin' | 'basic_member' | 'guest_member';
+    permission: "";
+    role: "admin" | "basic_member" | "guest_member";
   }
   ```
 
@@ -876,8 +888,8 @@
   export {};
 
   interface ClerkAuthorization {
-    permission: '';
-    role: 'admin' | 'basic_member' | 'guest_member';
+    permission: "";
+    role: "admin" | "basic_member" | "guest_member";
   }
   ```
 
@@ -910,13 +922,13 @@
   Before:
 
   ```jsx
-  import { SignOutButton } from '@clerk/clerk-react';
+  import { SignOutButton } from "@clerk/clerk-react";
 
   export const Signout = () => {
     return (
       <SignOutButton
         signOutCallback={() => {
-          window.location.href = '/your-path';
+          window.location.href = "/your-path";
         }}
       >
         <button>Sign Out</button>
@@ -928,11 +940,11 @@
   After:
 
   ```jsx
-  import { SignOutButton } from '@clerk/clerk-react';
+  import { SignOutButton } from "@clerk/clerk-react";
 
   export const Signout = () => {
     return (
-      <SignOutButton redirectUrl='/your-path'>
+      <SignOutButton redirectUrl="/your-path">
         <button>Sign Out</button>
       </SignOutButton>
     );
@@ -957,24 +969,29 @@
 
     ```typescript
     // Before
-    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
+    import { __internal__setErrorThrowerOptions } from "@clerk/clerk-react";
     // After
-    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+    import { setErrorThrowerOptions } from "@clerk/clerk-react/internal";
 
     // Before
-    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    import {
+      isClerkAPIResponseError,
+      isEmailLinkError,
+      isKnownError,
+      isMetamaskError,
+    } from "@clerk/clerk-react";
     // After
     import {
       isClerkAPIResponseError,
       isEmailLinkError,
       isKnownError,
       isMetamaskError,
-    } from '@clerk/clerk-react/errors';
+    } from "@clerk/clerk-react/errors";
 
     // Before
-    import { MultisessionAppSupport } from '@clerk/clerk-react';
+    import { MultisessionAppSupport } from "@clerk/clerk-react";
     // After
-    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+    import { MultisessionAppSupport } from "@clerk/clerk-react/internal";
     ```
 
   - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:
@@ -1270,19 +1287,15 @@
   ```tsx
   <UserProfile>
     <UserProfile.Page
-      label='Custom Page'
-      url='custom'
+      label="Custom Page"
+      url="custom"
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </UserProfile.Page>
-    <UserProfile.Link
-      label='External'
-      url='/home'
-      labelIcon={<Icon />}
-    />
-    <UserProfile.Page label='account' />
-    <UserProfile.Page label='security' />
+    <UserProfile.Link label="External" url="/home" labelIcon={<Icon />} />
+    <UserProfile.Page label="account" />
+    <UserProfile.Page label="security" />
   </UserProfile>
   ```
 
@@ -1295,19 +1308,19 @@
   ```tsx
   <OrganizationProfile>
     <OrganizationProfile.Page
-      label='Custom Page'
-      url='custom'
+      label="Custom Page"
+      url="custom"
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </OrganizationProfile.Page>
     <OrganizationProfile.Link
-      label='External'
-      url='/home'
+      label="External"
+      url="/home"
       labelIcon={<Icon />}
     />
-    <OrganizationProfile.Page label='members' />
-    <OrganizationProfile.Page label='settings' />
+    <OrganizationProfile.Page label="members" />
+    <OrganizationProfile.Page label="settings" />
   </OrganizationProfile>
   ```
 
