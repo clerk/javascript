@@ -2,6 +2,7 @@ import type { ClerkClient } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared';
+import type { NextRequest } from 'next/server';
 
 import { buildRequestLike } from '../app-router/server/utils';
 import {
@@ -16,6 +17,7 @@ import {
   TELEMETRY_DEBUG,
   TELEMETRY_DISABLED,
 } from './constants';
+import type { ClerkRequestData } from './utils';
 import { decryptClerkRequestData, getHeader } from './utils';
 
 const clerkClientDefaultOptions = {
@@ -32,6 +34,24 @@ const clerkClientDefaultOptions = {
     disabled: TELEMETRY_DISABLED,
     debug: TELEMETRY_DEBUG,
   },
+};
+
+type ClerkClientStore = Partial<{
+  requestData: ClerkRequestData;
+}>;
+
+export const clerkClientStorage = new AsyncLocalStorage();
+
+export const createClerkClientStore = (request?: NextRequest): ClerkClientStore => {
+  if (!request) {
+    return {};
+  }
+
+  const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
+
+  return {
+    requestData: decryptClerkRequestData(encryptedRequestData),
+  };
 };
 
 const createClerkClientWithOptions: typeof createClerkClient = options =>
@@ -52,18 +72,25 @@ const clerkClientSingletonProxy = new Proxy(clerkClientSingleton, {
 });
 
 /**
- * Constructs a BAPI client with keys passed dynamically to a request.
+ * Constructs a BAPI client that accesses request data within the runtime.
  * Necessary if middleware dynamic keys are used.
  */
 const clerkClientForRequest = () => {
-  const request = buildRequestLike();
-  const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
-  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+  let requestData: ClerkRequestData | undefined;
 
-  if (decryptedRequestData.secretKey || decryptedRequestData.publishableKey) {
+  const clerkClientStore = clerkClientStorage.getStore() as ClerkClientStore;
+  if (clerkClientStore) {
+    requestData = clerkClientStore.requestData;
+  } else {
+    const request = buildRequestLike();
+    const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
+    requestData = decryptClerkRequestData(encryptedRequestData);
+  }
+
+  if (requestData?.secretKey || requestData?.publishableKey) {
     return createClerkClientWithOptions({
-      secretKey: decryptedRequestData.secretKey,
-      publishableKey: decryptedRequestData.publishableKey,
+      secretKey: requestData.secretKey,
+      publishableKey: requestData.publishableKey,
     });
   }
 

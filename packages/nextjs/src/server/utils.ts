@@ -248,12 +248,14 @@ export function assertTokenSignature(token: string, key: string, signature?: str
   }
 }
 
+export type ClerkRequestData = Partial<AuthenticateRequestOptions>;
+
 /**
  * Encrypt request data propagated between server requests.
  * @internal
  **/
-export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>) {
-  if (options.secretKey && !ENCRYPTION_KEY) {
+export function encryptClerkRequestData(requestData: ClerkRequestData) {
+  if (requestData.secretKey && !ENCRYPTION_KEY) {
     // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
     logger.warnOnce(
       'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#server-side-options-propagation',
@@ -262,7 +264,7 @@ export function encryptClerkRequestData(options: Partial<AuthenticateRequestOpti
   }
 
   return AES.encrypt(
-    JSON.stringify(options),
+    JSON.stringify(requestData),
     ENCRYPTION_KEY ?? assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
   ).toString();
 }
@@ -271,9 +273,7 @@ export function encryptClerkRequestData(options: Partial<AuthenticateRequestOpti
  * Decrypt request data propagated between server requests.
  * @internal
  */
-export function decryptClerkRequestData(
-  encryptedRequestData?: string | undefined | null,
-): Partial<AuthenticateRequestOptions> {
+export function decryptClerkRequestData(encryptedRequestData?: string | undefined | null): ClerkRequestData {
   if (!encryptedRequestData) {
     return {};
   }
