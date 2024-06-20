@@ -5,8 +5,9 @@ import * as Field from '../primitives/field';
 
 export function FirstNameField({
   label = 'First name',
+  hintText = 'Optional',
   ...props
-}: { label?: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+}: { label?: React.ReactNode; hintText?: string } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field
       name='firstName'
@@ -15,10 +16,7 @@ export function FirstNameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            <span className='flex w-full items-baseline justify-between'>
-              <span>{label}</span>
-              {!props?.required && <span className='text-gray-10 text-sm font-medium'>Optional</span>}
-            </span>
+            {label} {!props?.required ? <Field.Hint>{hintText}</Field.Hint> : null}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>

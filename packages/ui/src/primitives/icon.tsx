@@ -1,4 +1,4 @@
-import cn from 'clsx';
+import { cx } from 'cva';
 import * as React from 'react';
 
 type IconRef = SVGSVGElement;
@@ -15,7 +15,7 @@ function createIcon({ displayName, viewBox, path }: { displayName: string; viewB
         viewBox={viewBox}
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
-        className={cn('size-[1em]', rtlIcons.includes(displayName) && 'rtl:rotate-180', className)}
+        className={cx('size-[1em]', rtlIcons.includes(displayName) && 'rtl:rotate-180', className)}
         aria-hidden
         {...props}
       >
@@ -689,6 +689,17 @@ export const Checkmark = createIcon({
       strokeWidth='1.25'
       strokeLinecap='round'
       strokeLinejoin='round'
+    />
+  ),
+});
+
+export const PencilUnderlined = createIcon({
+  displayName: 'IconPencilUnderlined',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      fill='currentColor'
+      d='M13.098 5.108c-.418.419-.628.628-.847.669-.22.04-.364-.104-.652-.392l-.984-.984c-.288-.288-.432-.432-.392-.652.04-.22.25-.428.669-.847l.226-.227c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-.227.226ZM4.16 13.688l-1.206.223c-.5.092-.75.138-.876.011-.127-.126-.08-.376.011-.876l.223-1.206c.04-.217.06-.325.118-.43.058-.105.15-.196.33-.377l5.554-5.554c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-5.554 5.553c-.181.182-.272.273-.377.331-.105.058-.213.078-.43.118ZM8.75 12.5a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z'
     />
   ),
 });

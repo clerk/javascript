@@ -1,5 +1,5 @@
 import { Slot } from '@radix-ui/react-slot';
-import cn from 'clsx';
+import { cx } from 'cva';
 import * as React from 'react';
 
 import * as Icon from './icon';
@@ -14,7 +14,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn(
+      className={cx(
         'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
         'flex flex-col gap-2',
         className,
@@ -38,7 +38,7 @@ export const Label = React.forwardRef(function Label(
     <label
       ref={forwardedRef}
       {...props}
-      className={cn(
+      className={cx(
         visuallyHidden
           ? 'sr-only'
           : 'text-gray-12 flex items-center gap-x-1 text-base font-medium opacity-[--cl-field-label-opacity,1]',
@@ -47,6 +47,36 @@ export const Label = React.forwardRef(function Label(
     >
       {children}
     </label>
+  );
+});
+
+export const LabelEnd = React.forwardRef(function Label(
+  { className, children, ...props }: React.HTMLAttributes<HTMLSpanElement>,
+  forwardedRef: React.ForwardedRef<HTMLSpanElement>,
+) {
+  return (
+    <span
+      ref={forwardedRef}
+      {...props}
+      className={cx('flex-grow self-end text-end', className)}
+    >
+      {children}
+    </span>
+  );
+});
+
+export const Hint = React.forwardRef(function Hint(
+  { className, children, ...props }: React.ComponentProps<typeof LabelEnd>,
+  forwardedRef: React.ForwardedRef<React.ComponentRef<typeof LabelEnd>>,
+) {
+  return (
+    <LabelEnd
+      ref={forwardedRef}
+      {...props}
+      className={cx('text-gray-10 text-sm font-medium', className)}
+    >
+      {children}
+    </LabelEnd>
   );
 });
 
@@ -72,7 +102,7 @@ export const Input = React.forwardRef(function Input(
     <Comp
       data-field-input=''
       ref={forwardedRef}
-      className={cn(
+      className={cx(
         'text-gray-12 relative flex min-w-0 rounded-md border bg-white bg-clip-padding px-2.5 py-1.5 text-base outline-none',
         'disabled:cursor-not-allowed disabled:opacity-50',
         // variant
@@ -83,7 +113,7 @@ export const Input = React.forwardRef(function Input(
         // state
         {
           native:
-            'border-[--cl-field-input-border] hover:border-[--cl-field-input-border-active] focus-visible:border-[--cl-field-input-border-active] focus-visible:ring-[0.1875rem] focus-visible:ring-[--cl-field-input-ring]',
+            'border-[--cl-field-input-border] focus-visible:border-[--cl-field-input-border-active] focus-visible:ring-[0.1875rem] focus-visible:ring-[--cl-field-input-ring] hover:enabled:border-[--cl-field-input-border-active]',
           hover: 'border-[--cl-field-input-border-active]',
           'focus-visible': 'border-[--cl-field-input-border-active] ring-[0.1875rem] ring-[--cl-field-input-ring]',
         }[state],
@@ -115,12 +145,6 @@ export const Input = React.forwardRef(function Input(
             '[--cl-field-input-ring:theme(colors.warning.DEFAULT/0.2)]',
           ],
         }[intent],
-        // data-[invalid] overrides any currently-defined `intent`
-        [
-          'data-[invalid]:[--cl-field-input-border:theme(colors.danger.DEFAULT)]',
-          'data-[invalid]:[--cl-field-input-border-active:theme(colors.danger.DEFAULT)]',
-          'data-[invalid]:[--cl-field-input-ring:theme(colors.danger.DEFAULT/0.2)]',
-        ],
         className,
       )}
       {...props}
@@ -140,7 +164,7 @@ export const Message = React.forwardRef<
     <p
       ref={forwardedRef}
       {...props}
-      className={cn(
+      className={cx(
         'flex gap-x-1 text-base',
         {
           start: 'justify-start',

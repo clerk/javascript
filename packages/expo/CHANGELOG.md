@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`757be5c0b`](https://github.com/clerk/javascript/commit/757be5c0bfb62d9cb8402604a6876dc717099548), [`1273b04ec`](https://github.com/clerk/javascript/commit/1273b04ecf1866b59ef59a74abe31dbcc726da2c), [`352afca8a`](https://github.com/clerk/javascript/commit/352afca8a2122046956adf869a3b51a70df72318), [`569810222`](https://github.com/clerk/javascript/commit/5698102225664246862c41aec1d0df82d0671321), [`ef0b56b4a`](https://github.com/clerk/javascript/commit/ef0b56b4a3391a231648969eff3feeda742db413), [`4b7044f79`](https://github.com/clerk/javascript/commit/4b7044f794d0d5dcf59e3fa695c473ea32e94a2e)]:
+  - @clerk/clerk-js@5.7.1
+  - @clerk/types@4.6.1
+  - @clerk/clerk-react@5.2.5
+  - @clerk/shared@2.3.1
+
 ## 1.2.1
 
 ### Patch Changes
@@ -877,24 +887,29 @@
 
     ```typescript
     // Before
-    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
+    import { __internal__setErrorThrowerOptions } from "@clerk/clerk-react";
     // After
-    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+    import { setErrorThrowerOptions } from "@clerk/clerk-react/internal";
 
     // Before
-    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    import {
+      isClerkAPIResponseError,
+      isEmailLinkError,
+      isKnownError,
+      isMetamaskError,
+    } from "@clerk/clerk-react";
     // After
     import {
       isClerkAPIResponseError,
       isEmailLinkError,
       isKnownError,
       isMetamaskError,
-    } from '@clerk/clerk-react/errors';
+    } from "@clerk/clerk-react/errors";
 
     // Before
-    import { MultisessionAppSupport } from '@clerk/clerk-react';
+    import { MultisessionAppSupport } from "@clerk/clerk-react";
     // After
-    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+    import { MultisessionAppSupport } from "@clerk/clerk-react/internal";
     ```
 
   - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:

@@ -5,6 +5,7 @@ const ALLOWED_PROTOCOLS = [
   'https:',
   // Refers to https://wails.io/
   'wails:',
+  'chrome-extension:',
 ];
 
 export function windowNavigate(to: URL | string): void {

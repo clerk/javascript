@@ -1,0 +1,98 @@
+### Changes to top-level exports
+
+As part of this release, some of the top-level exports of `@clerk/nextjs` have been changed in order to improve bundle size and tree-shaking efficiency. These changes have resulted in a ~75% reduction in build size for middleware bundles. However, you will likely need to make some changes to import paths as a result.
+
+<Callout type='info'>
+  Use [the CLI tool](#cli-upgrade-helper) to automatically find occurences of imports that need to be changed.
+</Callout>
+
+<Accordion titles={["@clerk/nextjs/server", "@clerk/nextjs/errors", "@clerk/nextjs/app-beta", "@clerk/nextjs/ssr", "@clerk/nextjs/edge-middleware", "@clerk/nextjs/edge-middlewarefiles", "@clerk/nextjs/api"]}>
+  <AccordionPanel>
+    Previously these exports have been exported both from `@clerk/nextjs` and `@clerk/nextjs/server`. As of v5 they are only exported from the latter. Going forward, the expectation can be that any imports that are intended to run within react on the client side, will come from `@clerk/nextjs` and imports that are intended to run on the server, will come from `@clerk/nextjs/server`.
+
+    ```diff
+      import {
+        auth,
+        currentUser,
+        authMiddleware,
+        buildClerkProps,
+        verifyToken,
+        verifyJwt,
+        decodeJwt,
+        signJwt,
+        constants,
+        redirect,
+        createAuthenticateRequest,
+        createIsomorphicRequest,
+    - } from "@clerk/nextjs"
+    + } from "@clerk/nextjs/server"
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    Exports related to errors are now under `@clerk/nextjs/errors`.
+
+    ```diff
+      import {
+        isClerkAPIResponseError,
+        isEmailLinkError,
+        isKnownError,
+        isMetamaskError,
+        EmailLinkErrorCode,
+    - } from "@clerk/nextjs"
+    + } from "@clerk/nextjs/errors"
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    The `@clerk/nextjs` import will work with both the app and pages router.
+
+    ```diff
+    - import { } from "@clerk/nextjs/app-beta"
+    + import { } from "@clerk/nextjs"
+    ```
+
+    Some behavior may have changed between Clerk's beta and the stable release. Please check on your end if behavior stayed the same.
+
+  </AccordionPanel>
+  <AccordionPanel>
+    The top-level exports support SSR by default now.
+
+    ```diff
+    - import { } from "@clerk/nextjs/ssr"
+    + import { } from "@clerk/nextjs"
+    ```
+
+  </AccordionPanel>
+  <AccordionPanel>
+    ```diff
+    - import { } from "@clerk/nextjs/edge-middleware"
+    + import { } from "@clerk/nextjs"
+    ```
+  </AccordionPanel>
+  <AccordionPanel>
+    ```diff
+    - import { } from "@clerk/nextjs/edge-middlewarefiles"
+    + import { } from "@clerk/nextjs"
+    ```
+  </AccordionPanel>
+  <AccordionPanel>
+    The `@clerk/nextjs/api` subpath was removed completely. It re-exported helpers from `@clerk/clerk-sdk-node` and its types. If you relied on these, import from `@clerk/clerk-sdk-node` directly instead.
+
+    ```diff
+      import type {
+        ClerkMiddleware,
+        ClerkMiddlewareOptions,
+        LooseAuthProp,
+        RequireAuthProp,
+        StrictAuthProp,
+        WithAuthProp
+    - } from "@clerk/nextjs/api"
+    + } from "@clerk/clerk-sdk-node"
+
+    - import { requireAuth, withAuth } from "@clerk/nextjs/api"
+    + import { requireAuth, withAuth } from "@clerk/clerk-sdk-node"
+    ```
+
+  </AccordionPanel>
+</Accordion>

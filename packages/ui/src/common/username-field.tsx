@@ -4,9 +4,14 @@ import React from 'react';
 import * as Field from '../primitives/field';
 
 export function UsernameField({
+  alternativeFieldTrigger,
   label = 'Username',
+  hintText = 'Optional',
   ...props
-}: { label?: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+}: { alternativeFieldTrigger?: React.ReactNode; label?: React.ReactNode; hintText?: string } & Omit<
+  React.ComponentProps<typeof Common.Input>,
+  'type'
+>) {
   return (
     <Common.Field
       name='username'
@@ -15,10 +20,12 @@ export function UsernameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            <span className='flex w-full items-baseline justify-between'>
-              <span>{label}</span>
-              {!props?.required && <span className='text-gray-10 text-sm font-medium'>Optional</span>}
-            </span>
+            {label}{' '}
+            {alternativeFieldTrigger ? (
+              <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
+            ) : !props?.required ? (
+              <Field.Hint>{hintText}</Field.Hint>
+            ) : null}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>

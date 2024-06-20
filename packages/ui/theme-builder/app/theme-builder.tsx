@@ -1,5 +1,5 @@
 'use client';
-import cn from 'clsx';
+import { cx } from 'cva';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -253,13 +253,13 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             </div>
           </aside>
           <figure
-            className={cn('relative isolate grid w-full flex-1 place-content-center overflow-y-auto', {
+            className={cx('relative isolate grid w-full flex-1 place-content-center overflow-y-auto', {
               'bg-neutral-50': appearance === 'light',
               'dark bg-neutral-950': appearance === 'dark',
             })}
           >
             <div
-              className={cn(
+              className={cx(
                 'absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),var(--line-color)),linear-gradient(to_right,transparent_calc(56px-1px),_var(--line-color))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]',
                 {
                   '[--line-color:theme(colors.neutral.400)]': appearance === 'light',
