@@ -140,8 +140,10 @@ class AuthenticateContext {
     const suffixedSession = this.getSuffixedCookie(constants.Cookies.Session) || '';
     const session = this.getCookie(constants.Cookies.Session) || '';
 
-    // If there is no suffixed cookies use un-suffixed
-    if (!suffixedClientUat && !suffixedSession) {
+    // In the case of malformed session cookies (eg missing the iss claim), we should
+    // use the un-suffixed cookies to return signed-out state instead of triggering
+    // handshake
+    if (session && !this.tokenHasIssuer(session)) {
       return false;
     }
 
@@ -149,6 +151,11 @@ class AuthenticateContext {
     // instance, then we must trust suffixed
     if (session && !this.tokenBelongsToInstance(session)) {
       return true;
+    }
+
+    // If there is no suffixed cookies use un-suffixed
+    if (!suffixedClientUat && !suffixedSession) {
+      return false;
     }
 
     const { data: sessionData } = decodeJwt(session);
@@ -206,6 +213,14 @@ class AuthenticateContext {
     }
 
     return true;
+  }
+
+  private tokenHasIssuer(token: string): boolean {
+    const { data, errors } = decodeJwt(token);
+    if (errors) {
+      return false;
+    }
+    return !!data.payload.iss;
   }
 
   private tokenBelongsToInstance(token: string): boolean {
