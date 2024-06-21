@@ -164,7 +164,10 @@ export function SignInComponentLoaded() {
                           {isSubmitting => {
                             return (
                               <SignIn.Passkey asChild>
-                                <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                <LinkButton
+                                  type='button'
+                                  disabled={isGlobalLoading || isSubmitting}
+                                >
                                   {t('signIn.start.actionLink__use_passkey')}
                                 </LinkButton>
                               </SignIn.Passkey>
