@@ -37,12 +37,12 @@ function SignUpComponentLoaded() {
     (clerk as any)?.__unstable__environment as EnvironmentResource,
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
-  const { t, translateError } = useLocalizations();
+  const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
-  const { enabled: emailAddressEnabled, required: emailAddressRequired } = useAttributes('email_address');
+  const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
   const { applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
 
@@ -400,15 +400,7 @@ function SignUpComponentLoaded() {
                         />
                       ) : null}
 
-                      {emailAddressEnabled ? (
-                        <EmailField
-                          label={t('formFieldLabel__emailAddress')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={emailAddressRequired}
-                          disabled={isGlobalLoading}
-                          error={translateError}
-                        />
-                      ) : null}
+                      <EmailField disabled={isGlobalLoading} />
 
                       {passwordEnabled && passwordRequired ? (
                         <PasswordField
