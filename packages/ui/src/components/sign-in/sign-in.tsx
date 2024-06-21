@@ -80,28 +80,37 @@ export function SignInComponentLoaded() {
                       <div className='flex flex-col gap-4'>
                         {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
                           <EmailField
+                            name='identifier'
                             disabled={isGlobalLoading}
                             error={translateError}
                           />
                         ) : null}
 
                         {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
-                          <UsernameField disabled={isGlobalLoading} />
+                          <UsernameField
+                            name='identifier'
+                            disabled={isGlobalLoading}
+                          />
                         ) : null}
 
                         {phoneNumberEnabled && !emailAddressEnabled && !usernameEnabled ? (
                           <PhoneNumberField
+                            name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                           />
                         ) : null}
 
                         {emailAddressEnabled && usernameEnabled && !phoneNumberEnabled ? (
-                          <EmailOrUsernameField disabled={isGlobalLoading} />
+                          <EmailOrUsernameField
+                            name='identifier'
+                            disabled={isGlobalLoading}
+                          />
                         ) : null}
 
                         {emailAddressEnabled && phoneNumberEnabled && !usernameEnabled ? (
                           <EmailOrPhoneNumberField
+                            name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                           />
@@ -109,6 +118,7 @@ export function SignInComponentLoaded() {
 
                         {usernameEnabled && phoneNumberEnabled && !emailAddressEnabled ? (
                           <PhoneNumberOrUsernameField
+                            name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                           />
@@ -116,6 +126,7 @@ export function SignInComponentLoaded() {
 
                         {emailAddressEnabled && usernameEnabled && phoneNumberEnabled ? (
                           <EmailOrUsernameOrPhoneNumberField
+                            name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                           />
@@ -123,13 +134,13 @@ export function SignInComponentLoaded() {
                       </div>
                     ) : null}
 
-                    <SignIn.Action
-                      submit
-                      asChild
-                    >
-                      <Common.Loading>
-                        {isSubmitting => {
-                          return (
+                    <Common.Loading>
+                      {isSubmitting => {
+                        return (
+                          <SignIn.Action
+                            submit
+                            asChild
+                          >
                             <Button
                               icon={<Icon.CaretRight />}
                               busy={isSubmitting}
@@ -137,10 +148,10 @@ export function SignInComponentLoaded() {
                             >
                               {t('formButtonPrimary')}
                             </Button>
-                          );
-                        }}
-                      </Common.Loading>
-                    </SignIn.Action>
+                          </SignIn.Action>
+                        );
+                      }}
+                    </Common.Loading>
 
                     {
                       // Note:
@@ -149,17 +160,17 @@ export function SignInComponentLoaded() {
                       // setState on click, but we'll need to find a way to clean
                       // up the state based on `isSubmitting`
                       passkeyEnabled ? (
-                        <SignIn.Passkey asChild>
-                          <Common.Loading>
-                            {isSubmitting => {
-                              return (
+                        <Common.Loading>
+                          {isSubmitting => {
+                            return (
+                              <SignIn.Passkey asChild>
                                 <LinkButton disabled={isGlobalLoading || isSubmitting}>
                                   {t('signIn.start.actionLink__use_passkey')}
                                 </LinkButton>
-                              );
-                            }}
-                          </Common.Loading>
-                        </SignIn.Passkey>
+                              </SignIn.Passkey>
+                            );
+                          }}
+                        </Common.Loading>
                       ) : null
                     }
                   </Card.Body>
@@ -225,14 +236,14 @@ export function SignInComponentLoaded() {
                         }
                       />
 
-                      <SignIn.Action
-                        submit
-                        asChild
-                      >
-                        <Common.Loading>
-                          {isSubmitting => {
-                            return (
-                              <>
+                      <Common.Loading>
+                        {isSubmitting => {
+                          return (
+                            <>
+                              <SignIn.Action
+                                submit
+                                asChild
+                              >
                                 <Button
                                   icon={<Icon.CaretRight />}
                                   busy={isSubmitting}
@@ -240,20 +251,20 @@ export function SignInComponentLoaded() {
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
+                              </SignIn.Action>
 
-                                <SignIn.Action
-                                  navigate='start'
-                                  asChild
-                                >
-                                  <LinkButton disabled={isGlobalLoading || isSubmitting}>
-                                    {t('signIn.password.actionLink')}
-                                  </LinkButton>
-                                </SignIn.Action>
-                              </>
-                            );
-                          }}
-                        </Common.Loading>
-                      </SignIn.Action>
+                              <SignIn.Action
+                                navigate='start'
+                                asChild
+                              >
+                                <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                  {t('signIn.password.actionLink')}
+                                </LinkButton>
+                              </SignIn.Action>
+                            </>
+                          );
+                        }}
+                      </Common.Loading>
                     </Card.Body>
                   </SignIn.Strategy>
 
@@ -390,29 +401,32 @@ export function SignInComponentLoaded() {
                         label={t('formFieldLabel__confirmPassword')}
                       />
 
-                      <SignIn.Action
-                        submit
-                        asChild
-                      >
-                        <Common.Loading>
-                          {isSubmitting => {
-                            return (
-                              <Button
-                                busy={isSubmitting}
-                                disabled={isGlobalLoading || isSubmitting}
+                      <Common.Loading>
+                        {isSubmitting => {
+                          return (
+                            <>
+                              <SignIn.Action
+                                submit
+                                asChild
                               >
-                                {t('signIn.resetPassword.formButtonPrimary')}
-                              </Button>
-                            );
-                          }}
-                        </Common.Loading>
-                      </SignIn.Action>
-                      <SignIn.Action
-                        navigate='start'
-                        asChild
-                      >
-                        <LinkButton>{t('backButton')}</LinkButton>
-                      </SignIn.Action>
+                                <Button
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading || isSubmitting}
+                                >
+                                  {t('signIn.resetPassword.formButtonPrimary')}
+                                </Button>
+                              </SignIn.Action>
+
+                              <SignIn.Action
+                                navigate='start'
+                                asChild
+                              >
+                                <LinkButton>{t('backButton')}</LinkButton>
+                              </SignIn.Action>
+                            </>
+                          );
+                        }}
+                      </Common.Loading>
                     </div>
                   </Card.Body>
                 </Card.Content>
