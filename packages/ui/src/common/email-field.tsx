@@ -14,6 +14,9 @@ export function EmailField({
   label,
   name = DEFAULT_FIELD_NAME,
   hintText,
+  enabled,
+  error,
+  required,
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
@@ -23,11 +26,12 @@ export function EmailField({
   error?: (message: string, code: string, name: string) => string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t, translateError } = useLocalizations();
-  const { enabled, required } = useAttributes('email_address');
+  const { enabled: attributeEnabled, required: attributeRequired } = useAttributes('email_address');
+
   const renderLabel = label ? label : t('formFieldLabel__emailAddress');
-  const renderError = props.error ? props.error : translateError;
-  const isEnabled = props.enabled !== undefined ? props.enabled : enabled;
-  const isRequired = props.required !== undefined ? props.required : required;
+  const renderError = error ? error : translateError;
+  const isEnabled = enabled !== undefined ? enabled : attributeEnabled;
+  const isRequired = required !== undefined ? required : attributeRequired;
   const renderHintText = () => {
     if (hintText) {
       return hintText;
@@ -40,6 +44,7 @@ export function EmailField({
   if (!isEnabled) {
     return null;
   }
+
   return (
     <Common.Field
       name={name}
