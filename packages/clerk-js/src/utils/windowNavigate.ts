@@ -1,6 +1,6 @@
 export const CLERK_BEFORE_UNLOAD_EVENT = 'clerk:beforeunload';
 
-const ALLOWED_PROTOCOLS = [
+export const ALLOWED_PROTOCOLS = [
   'http:',
   'https:',
   // Refers to https://wails.io/
