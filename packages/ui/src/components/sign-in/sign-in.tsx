@@ -1,8 +1,7 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
-import { enUS } from '@clerk/localizations';
-import type { ClerkOptions, EnvironmentResource } from '@clerk/types';
+import type { EnvironmentResource } from '@clerk/types';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -14,6 +13,9 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
+import { useAttributes } from '~/hooks/use-attributes';
+import { useDisplayConfig } from '~/hooks/use-display-config';
+import { useLocalizations } from '~/hooks/use-localizations';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -22,7 +24,6 @@ import { LinkButton } from '~/primitives/link-button';
 import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
-import { makeLocalizeable } from '~/utils/makeLocalizable';
 
 export function SignInComponent() {
   return (
@@ -34,19 +35,16 @@ export function SignInComponent() {
 
 export function SignInComponentLoaded() {
   const clerk = useClerk();
-  // TODO: Replace `any` with proper types
-  const { t, translateError } = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
     (clerk as any)?.__unstable__environment as EnvironmentResource,
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
-  const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
-  const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
-  const { enabled: usernameEnabled } = attributes['username'];
-  const { enabled: phoneNumberEnabled } = attributes['phone_number'];
-  const { enabled: emailAddressEnabled } = attributes['email_address'];
-  const { enabled: passkeyEnabled } = attributes['passkey'];
-  const { applicationName, logoImageUrl, homeUrl } = displayConfig;
+  const { t, translateError } = useLocalizations();
+  const { enabled: usernameEnabled } = useAttributes('username');
+  const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
+  const { enabled: emailAddressEnabled } = useAttributes('email_address');
+  const { enabled: passkeyEnabled } = useAttributes('passkey');
+  const { applicationName, logoImageUrl, homeUrl } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
