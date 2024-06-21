@@ -1,8 +1,7 @@
 import type { ClerkClient } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
-import { deprecated } from '@clerk/shared';
-import type { NextRequest } from 'next/server';
+import { deprecated } from '@clerk/shared/deprecated';
 
 import { buildRequestLike } from '../app-router/server/utils';
 import {
@@ -36,23 +35,7 @@ const clerkClientDefaultOptions = {
   },
 };
 
-type ClerkClientStore = Partial<{
-  requestData: ClerkRequestData;
-}>;
-
-export const clerkClientStorage = new AsyncLocalStorage();
-
-export const createClerkClientStore = (request?: NextRequest): ClerkClientStore => {
-  if (!request) {
-    return {};
-  }
-
-  const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
-
-  return {
-    requestData: decryptClerkRequestData(encryptedRequestData),
-  };
-};
+export const clerkClientStorage = new AsyncLocalStorage<ClerkRequestData>();
 
 const createClerkClientWithOptions: typeof createClerkClient = options =>
   createClerkClient({ ...clerkClientDefaultOptions, ...options });
@@ -61,7 +44,7 @@ const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
 
 /**
  * @deprecated
- * This object is deprecated and will be removed in a future release. Please use `clerkClient()` as a function instead.
+ * This singleton is deprecated and will be removed in a future release. Please use `clerkClient()` as a function instead.
  */
 const clerkClientSingletonProxy = new Proxy(clerkClientSingleton, {
   get(target, prop, receiver) {
@@ -78,10 +61,16 @@ const clerkClientSingletonProxy = new Proxy(clerkClientSingleton, {
 const clerkClientForRequest = () => {
   let requestData: ClerkRequestData | undefined;
 
-  const clerkClientStore = clerkClientStorage.getStore() as ClerkClientStore;
+  /**
+   * For BAPI client usage inside middleware runtime, fallbacks to AsyncLocalStorage to access request data
+   */
+  const clerkClientStore = clerkClientStorage.getStore();
   if (clerkClientStore) {
-    requestData = clerkClientStore.requestData;
+    requestData = clerkClientStore;
   } else {
+    /**
+     * For BAPI usage from application server, fallbacks to access request data via `NextRequest`
+     */
     const request = buildRequestLike();
     const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
     requestData = decryptClerkRequestData(encryptedRequestData);

@@ -12,7 +12,7 @@ import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { clerkClient, clerkClientStorage, createClerkClientStore } from './clerkClient';
+import { clerkClient, clerkClientStorage } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
 import type { AuthProtect } from './protect';
@@ -70,23 +70,27 @@ interface ClerkMiddleware {
 }
 
 export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', logger => (...args: unknown[]): any => {
+  const [handler, params] = parseHandlerAndOptions(args);
+  if (params.debug) {
+    logger.enable();
+  }
   const [request, event] = parseRequestAndEvent(args);
 
-  const store = createClerkClientStore(request);
+  const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
+    errorThrower.throwMissingPublishableKeyError(),
+  );
+  const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
+  const signInUrl = params.signInUrl || SIGN_IN_URL;
+  const signUpUrl = params.signUpUrl || SIGN_UP_URL;
 
-  return clerkClientStorage.run(store, () => {
-    const [handler, params] = parseHandlerAndOptions(args);
-    if (params.debug) {
-      logger.enable();
-    }
+  const dynamicKeys = {
+    secretKey,
+    signInUrl,
+    signUpUrl,
+    publishableKey,
+  };
 
-    const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
-      errorThrower.throwMissingPublishableKeyError(),
-    );
-    const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
-    const signInUrl = params.signInUrl || SIGN_IN_URL;
-    const signUpUrl = params.signUpUrl || SIGN_UP_URL;
-
+  return clerkClientStorage.run(dynamicKeys, () => {
     const options = {
       ...params,
       publishableKey,
@@ -135,7 +139,11 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
 
       let handlerResult: Response = NextResponse.next();
       try {
-        handlerResult = (await handler?.(() => authObjWithMethods, request, event)) || handlerResult;
+        handlerResult =
+          (await clerkClientStorage.run(
+            dynamicKeys,
+            async () => await handler?.(() => authObjWithMethods, request, event),
+          )) || handlerResult;
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, requestState);
       }
@@ -157,7 +165,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
         setRequestHeadersOnNextResponse(handlerResult, clerkRequest, { [constants.Headers.EnableDebug]: 'true' });
       }
 
-      decorateRequest(clerkRequest, handlerResult, requestState, { secretKey, signInUrl, signUpUrl, publishableKey });
+      decorateRequest(clerkRequest, handlerResult, requestState, dynamicKeys);
 
       return handlerResult;
     };
