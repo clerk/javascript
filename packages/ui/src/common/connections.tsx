@@ -7,7 +7,7 @@ import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
-export function Connections(props: { loading?: boolean }) {
+export function Connections(props: { disabled?: boolean }) {
   const clerk = useClerk();
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
     (clerk as any)?.__unstable__environment as EnvironmentResource,
@@ -31,7 +31,7 @@ export function Connections(props: { loading?: boolean }) {
                 return (
                   <Connection.Button
                     busy={isConnectionLoading}
-                    disabled={props?.loading || isConnectionLoading}
+                    disabled={props?.disabled || isConnectionLoading}
                     icon={IconComponent ? <IconComponent className='text-base' /> : null}
                     textVisuallyHidden={enabledConnections.length > 2}
                   >

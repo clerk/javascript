@@ -79,7 +79,7 @@ function SignUpComponentLoaded() {
                       }}
                     </Common.GlobalError>
 
-                    <Connections loading={isGlobalLoading} />
+                    <Connections disabled={isGlobalLoading} />
 
                     {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
 

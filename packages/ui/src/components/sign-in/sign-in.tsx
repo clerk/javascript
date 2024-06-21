@@ -39,7 +39,7 @@ export function SignInComponentLoaded() {
     (clerk as any)?.__unstable__environment as EnvironmentResource,
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
-  const { t, translateError } = useLocalizations();
+  const { t } = useLocalizations();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
@@ -70,7 +70,7 @@ export function SignInComponentLoaded() {
                   </Card.Header>
 
                   <Card.Body>
-                    <Connections loading={isGlobalLoading} />
+                    <Connections disabled={isGlobalLoading} />
 
                     {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
 
@@ -80,7 +80,6 @@ export function SignInComponentLoaded() {
                           <EmailField
                             name='identifier'
                             disabled={isGlobalLoading}
-                            error={translateError}
                           />
                         ) : null}
 
