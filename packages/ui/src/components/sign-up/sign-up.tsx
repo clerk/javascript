@@ -31,7 +31,7 @@ export function SignUpComponent() {
 function SignUpComponentLoaded() {
   const clerk = useClerk();
   // TODO: Replace `any` with proper types
-  const t = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
+  const { t, translateError } = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
   const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
@@ -108,6 +108,7 @@ function SignUpComponentLoaded() {
                           hintText={t('formFieldHintText__optional')}
                           required={emailAddressRequired}
                           disabled={isGlobalLoading}
+                          error={translateError}
                         />
                       ) : null}
 
@@ -401,6 +402,7 @@ function SignUpComponentLoaded() {
                           hintText={t('formFieldHintText__optional')}
                           required={emailAddressRequired}
                           disabled={isGlobalLoading}
+                          error={translateError}
                         />
                       ) : null}
 

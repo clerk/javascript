@@ -69,14 +69,6 @@ export default function SignUpPage() {
                 <Clerk.Icon />
                 Sign In with Google
               </Clerk.Connection>
-
-              <Clerk.Connection
-                name='metamask'
-                className='flex items-center justify-center gap-4 rounded bg-white px-4 py-3 text-sm text-[#161616] shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
-              >
-                <Clerk.Icon />
-                Sign In with Metamask
-              </Clerk.Connection>
             </div>
 
             <Hr />
@@ -141,14 +133,6 @@ export default function SignUpPage() {
               >
                 <Clerk.Icon />
                 Sign In with Google
-              </Clerk.Connection>
-
-              <Clerk.Connection
-                name='metamask'
-                className='flex items-center justify-center gap-4 rounded bg-white px-4 py-3 text-sm text-[#161616] shadow-sm ring-1 ring-black/[0.06] transition-all hover:bg-opacity-80'
-              >
-                <Clerk.Icon />
-                Sign In with Metamask
               </Clerk.Connection>
             </div>
 

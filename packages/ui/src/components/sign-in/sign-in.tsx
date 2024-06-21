@@ -35,7 +35,7 @@ export function SignInComponent() {
 export function SignInComponentLoaded() {
   const clerk = useClerk();
   // TODO: Replace `any` with proper types
-  const t = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
+  const { t, translateError } = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
   const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
     (clerk as any)?.__unstable__environment as EnvironmentResource,
   );
@@ -79,7 +79,10 @@ export function SignInComponentLoaded() {
                     {hasIdentifier ? (
                       <div className='flex flex-col gap-4'>
                         {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
-                          <EmailField disabled={isGlobalLoading} />
+                          <EmailField
+                            disabled={isGlobalLoading}
+                            error={translateError}
+                          />
                         ) : null}
 
                         {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
@@ -277,12 +280,12 @@ export function SignInComponentLoaded() {
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
                               <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
-                                {t('signIn.forgotPassword.resendButton')} (
+                                {t('signIn.phoneCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
                               </p>
                             )}
                           >
-                            <LinkButton type='button'>{t('signIn.forgotPassword.resendButton')}</LinkButton>
+                            <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
                           </SignIn.Action>
                         }
                       />
