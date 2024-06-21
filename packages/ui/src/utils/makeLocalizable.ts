@@ -181,22 +181,42 @@ const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens
   return s;
 };
 
-/**
- * Create a localizeable function that can be used to access localizations.
- * @param resource - The localization resource to use.
- * @returns A function that can be used to access localizations.
- *
- * @example
- * const t = makeLocalizeable(enUS);
- * t('welcome', { name: 'John' }); // => 'Welcome, John!'
- */
-
 export const makeLocalizeable = (resource: LocalizationResource) => {
-  return function <Key extends DefaultLocalizationKey, Params extends LocalizationKeyToParams<Key>>(
+  /**
+   * Retrieves a localized string corresponding to the provided key and applies the given parameters to it.
+   *
+   * @template Key - A type extending DefaultLocalizationKey representing the localization key.
+   * @template Params - A type extending LocalizationKeyToParams<Key> representing the parameters for the localization key.
+   * @param {Key} key - The localization key to retrieve the corresponding string.
+   * @param {Params} [params] - The parameters to apply to the localized string. If the parameters are not required, this can be omitted.
+   * @returns {string} - The localized string with applied parameters.
+   * @example
+   * t('formFieldLabel__emailAddress')
+   */
+  const t = <Key extends DefaultLocalizationKey, Params extends LocalizationKeyToParams<Key>>(
     key: Key,
     params?: keyof Params extends never ? never : Params,
-  ): string {
+  ): string => {
     const base = readObjectPath(resource, key) as string;
     return applyTokensToString(base || '', params || {});
+  };
+
+  /**
+   * Translates an error message based on the provided code and name.
+   *
+   * @param {string} message - The default error message.
+   * @param {string} code - The error code used to fetch the translated message.
+   * @param {string} name - The param name. e.g. email_address
+   * @returns {string} The translated error message or the default message if no translation is found.
+   * @example
+   * translateError('Invalid email address', 'form_param_format_invalid', 'email_address')
+   */
+  const translateError = (message: string, code: string, name: string) => {
+    return t(`unstable__errors.${code}__${name}` as any) || t(`unstable__errors.${code}` as any) || message;
+  };
+
+  return {
+    t,
+    translateError,
   };
 };

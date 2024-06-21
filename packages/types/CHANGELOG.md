@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.6.1
+
+### Patch Changes
+
+- Add `organizationAvatarUploaderContainer` descriptor which is used e.g. for the logo upload box inside "Create Organization" flow ([#3596](https://github.com/clerk/javascript/pull/3596)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 4.6.0
 
 ### Minor Changes
@@ -50,8 +56,10 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async response => {
-      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+    callback: async (response) => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
+        token: response.credential,
+      });
       await Clerk.handleGoogleOneTapCallback(signInOrUp, {
         signInForceRedirectUrl: window.location.href,
       });
@@ -63,9 +71,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async response => {
-      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
-      if (signInOrUp.status === 'complete') {
+    callback: async (response) => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
+        token: response.credential,
+      });
+      if (signInOrUp.status === "complete") {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -103,8 +113,8 @@
 
   ```tsx
   <__experimental_GoogleOneTap
-    signInForceRedirectUrl=''
-    signUpForceRedirectUrl=''
+    signInForceRedirectUrl=""
+    signUpForceRedirectUrl=""
   />
   ```
 
@@ -345,8 +355,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: '';
-    role: 'admin' | 'basic_member' | 'guest_member';
+    permission: "";
+    role: "admin" | "basic_member" | "guest_member";
   }
   ```
 
@@ -685,8 +695,8 @@
   export {};
 
   interface ClerkAuthorization {
-    permission: '';
-    role: 'admin' | 'basic_member' | 'guest_member';
+    permission: "";
+    role: "admin" | "basic_member" | "guest_member";
   }
   ```
 
@@ -955,19 +965,15 @@
   ```tsx
   <UserProfile>
     <UserProfile.Page
-      label='Custom Page'
-      url='custom'
+      label="Custom Page"
+      url="custom"
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </UserProfile.Page>
-    <UserProfile.Link
-      label='External'
-      url='/home'
-      labelIcon={<Icon />}
-    />
-    <UserProfile.Page label='account' />
-    <UserProfile.Page label='security' />
+    <UserProfile.Link label="External" url="/home" labelIcon={<Icon />} />
+    <UserProfile.Page label="account" />
+    <UserProfile.Page label="security" />
   </UserProfile>
   ```
 
@@ -980,19 +986,19 @@
   ```tsx
   <OrganizationProfile>
     <OrganizationProfile.Page
-      label='Custom Page'
-      url='custom'
+      label="Custom Page"
+      url="custom"
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </OrganizationProfile.Page>
     <OrganizationProfile.Link
-      label='External'
-      url='/home'
+      label="External"
+      url="/home"
       labelIcon={<Icon />}
     />
-    <OrganizationProfile.Page label='members' />
-    <OrganizationProfile.Page label='settings' />
+    <OrganizationProfile.Page label="members" />
+    <OrganizationProfile.Page label="settings" />
   </OrganizationProfile>
   ```
 
