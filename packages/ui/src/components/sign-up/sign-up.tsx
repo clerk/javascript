@@ -4,6 +4,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 import { enUS } from '@clerk/localizations';
 import type { ClerkOptions, EnvironmentResource } from '@clerk/types';
 
+import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { LastNameField } from '~/common/last-name-field';
@@ -11,11 +12,9 @@ import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
-import { PROVIDERS } from '~/constants';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
@@ -47,6 +46,10 @@ function SignUpComponentLoaded() {
   const { enabled: emailAddressEnabled, required: emailAddressRequired } = attributes['email_address'];
   const { enabled: passwordEnabled, required: passwordRequired } = attributes['password'];
   const { applicationName, homeUrl, logoImageUrl } = displayConfig;
+
+  const hasConnection = enabledConnections.length > 0;
+  const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
+
   return (
     <Common.Loading>
       {isGlobalLoading => {
@@ -76,114 +79,89 @@ function SignUpComponentLoaded() {
                         return <Alert>{message}</Alert>;
                       }}
                     </Common.GlobalError>
-                    <Connection.Root>
-                      {enabledConnections.map(c => {
-                        const connection = PROVIDERS.find(provider => provider.id === c.provider);
-                        const iconKey = connection?.icon;
-                        const IconComponent = iconKey ? Icon[iconKey] : null;
-                        return (
-                          <Common.Loading
-                            key={c.provider}
-                            scope={`provider:${c.provider}`}
-                          >
-                            {isConnectionLoading => {
-                              return (
-                                <Common.Connection
-                                  name={c.provider}
-                                  asChild
-                                >
-                                  <Connection.Button
-                                    busy={isConnectionLoading}
-                                    disabled={isGlobalLoading || isConnectionLoading}
-                                    icon={IconComponent ? <IconComponent className='text-base' /> : null}
-                                    textVisuallyHidden={enabledConnections.length > 2}
-                                  >
-                                    {connection?.name || c.provider}
-                                  </Connection.Button>
-                                </Common.Connection>
-                              );
-                            }}
-                          </Common.Loading>
-                        );
-                      })}
-                    </Connection.Root>
 
-                    <Seperator>{t('dividerText')}</Seperator>
+                    <Connections loading={isGlobalLoading} />
 
-                    <div className='flex flex-col gap-4'>
-                      {firstNameEnabled && lastNameEnabled ? (
-                        <div className='flex gap-4'>
-                          <FirstNameField
-                            label={t('formFieldLabel__firstName')}
+                    {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
+
+                    {hasIdentifier ? (
+                      <div className='flex flex-col gap-4'>
+                        {firstNameEnabled && lastNameEnabled ? (
+                          <div className='flex gap-4'>
+                            <FirstNameField
+                              label={t('formFieldLabel__firstName')}
+                              hintText={t('formFieldHintText__optional')}
+                              required={firstNameRequired}
+                              disabled={isGlobalLoading}
+                            />
+                            <LastNameField
+                              label={t('formFieldLabel__lastName')}
+                              hintText={t('formFieldHintText__optional')}
+                              required={lastNameRequired}
+                              disabled={isGlobalLoading}
+                            />
+                          </div>
+                        ) : null}
+
+                        {usernameEnabled ? (
+                          <UsernameField
+                            label={t('formFieldLabel__username')}
                             hintText={t('formFieldHintText__optional')}
-                            required={firstNameRequired}
+                            required={usernameRequired}
                             disabled={isGlobalLoading}
                           />
-                          <LastNameField
-                            label={t('formFieldLabel__lastName')}
+                        ) : null}
+
+                        {emailAddressEnabled ? (
+                          <EmailField
+                            label={t('formFieldLabel__emailAddress')}
                             hintText={t('formFieldHintText__optional')}
-                            required={lastNameRequired}
+                            required={emailAddressRequired}
+                            disabled={isGlobalLoading}
+                            error={translateError}
+                          />
+                        ) : null}
+
+                        {phoneNumberEnabled ? (
+                          <PhoneNumberField
+                            label={t('formFieldLabel__phoneNumber')}
+                            hintText={t('formFieldHintText__optional')}
+                            required={phoneNumberRequired}
+                            disabled={isGlobalLoading}
+                            locationBasedCountryIso={locationBasedCountryIso}
+                          />
+                        ) : null}
+
+                        {passwordEnabled && passwordRequired ? (
+                          <PasswordField
+                            label={t('formFieldLabel__password')}
+                            required={passwordRequired}
                             disabled={isGlobalLoading}
                           />
-                        </div>
-                      ) : null}
+                        ) : null}
+                      </div>
+                    ) : null}
 
-                      {usernameEnabled ? (
-                        <UsernameField
-                          label={t('formFieldLabel__username')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={usernameRequired}
-                          disabled={isGlobalLoading}
-                        />
-                      ) : null}
-
-                      {emailAddressEnabled ? (
-                        <EmailField
-                          label={t('formFieldLabel__emailAddress')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={emailAddressRequired}
-                          disabled={isGlobalLoading}
-                          error={translateError}
-                        />
-                      ) : null}
-
-                      {phoneNumberEnabled ? (
-                        <PhoneNumberField
-                          label={t('formFieldLabel__phoneNumber')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={phoneNumberRequired}
-                          disabled={isGlobalLoading}
-                          locationBasedCountryIso={locationBasedCountryIso}
-                        />
-                      ) : null}
-
-                      {passwordEnabled && passwordRequired ? (
-                        <PasswordField
-                          label={t('formFieldLabel__password')}
-                          required={passwordRequired}
-                          disabled={isGlobalLoading}
-                        />
-                      ) : null}
-                    </div>
-
-                    <Common.Loading scope='step:start'>
-                      {isSubmitting => {
-                        return (
-                          <SignUp.Action
-                            submit
-                            asChild
-                          >
-                            <Button
-                              icon={<Icon.CaretRight />}
-                              busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                    {hasConnection || hasIdentifier ? (
+                      <Common.Loading scope='step:start'>
+                        {isSubmitting => {
+                          return (
+                            <SignUp.Action
+                              submit
+                              asChild
                             >
-                              {t('formButtonPrimary')}
-                            </Button>
-                          </SignUp.Action>
-                        );
-                      }}
-                    </Common.Loading>
+                              <Button
+                                icon={<Icon.CaretRight />}
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading || isSubmitting}
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignUp.Action>
+                          );
+                        }}
+                      </Common.Loading>
+                    ) : null}
                   </Card.Body>
                 </Card.Content>
                 <Card.Footer>
