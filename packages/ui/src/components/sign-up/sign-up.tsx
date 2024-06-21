@@ -1,7 +1,6 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
-import type { EnvironmentResource } from '@clerk/types';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -13,6 +12,7 @@ import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
+import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
@@ -20,7 +20,6 @@ import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
-import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
 export function SignUpComponent() {
   return (
@@ -32,10 +31,7 @@ export function SignUpComponent() {
 
 function SignUpComponentLoaded() {
   const clerk = useClerk();
-  // TODO: Replace `any` with proper types
-  const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
-    (clerk as any)?.__unstable__environment as EnvironmentResource,
-  );
+  const enabledConnections = useEnabledConnections();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
