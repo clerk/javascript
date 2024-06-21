@@ -111,15 +111,7 @@ function SignUpComponentLoaded() {
                           />
                         ) : null}
 
-                        {emailAddressEnabled ? (
-                          <EmailField
-                            label={t('formFieldLabel__emailAddress')}
-                            hintText={t('formFieldHintText__optional')}
-                            required={emailAddressRequired}
-                            disabled={isGlobalLoading}
-                            error={translateError}
-                          />
-                        ) : null}
+                        <EmailField disabled={isGlobalLoading} />
 
                         {phoneNumberEnabled ? (
                           <PhoneNumberField
