@@ -24,11 +24,11 @@ export function EmailField({
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t, translateError } = useLocalizations();
   const { enabled, required } = useAttributes('email_address');
-  const renderedLabel = label ? label : t('formFieldLabel__emailAddress');
+  const renderLabel = label ? label : t('formFieldLabel__emailAddress');
   const renderError = props.error ? props.error : translateError;
   const isEnabled = props.enabled !== undefined ? props.enabled : enabled;
   const isRequired = props.required !== undefined ? props.required : required;
-  const renderedHintText = () => {
+  const renderHintText = () => {
     if (hintText) {
       return hintText;
     }
@@ -48,11 +48,11 @@ export function EmailField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {renderedLabel}
+            {renderLabel}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
-            ) : renderedHintText ? (
-              <Field.Hint>{renderedHintText()}</Field.Hint>
+            ) : renderHintText ? (
+              <Field.Hint>{renderHintText()}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>
