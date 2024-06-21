@@ -39,7 +39,7 @@ export function SignInComponentLoaded() {
     (clerk as any)?.__unstable__environment as EnvironmentResource,
   );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
-  const { t, translateError } = useLocalizations();
+  const { t } = useLocalizations();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
@@ -66,11 +66,11 @@ export function SignInComponentLoaded() {
                       />
                     ) : null}
                     <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
-                    <Card.Description>{t('signIn.start.subtitle')}</Card.Description>
+                    <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                   </Card.Header>
 
                   <Card.Body>
-                    <Connections loading={isGlobalLoading} />
+                    <Connections disabled={isGlobalLoading} />
 
                     {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
 
@@ -80,7 +80,6 @@ export function SignInComponentLoaded() {
                           <EmailField
                             name='identifier'
                             disabled={isGlobalLoading}
-                            error={translateError}
                           />
                         ) : null}
 
@@ -351,7 +350,7 @@ export function SignInComponentLoaded() {
                       <Seperator>{t('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}</Seperator>
 
                       <div className='flex flex-col gap-2'>
-                        <Connections loading={isGlobalLoading} />
+                        <Connections disabled={isGlobalLoading} />
 
                         <SignIn.SupportedStrategy
                           name='reset_password_email_code'
