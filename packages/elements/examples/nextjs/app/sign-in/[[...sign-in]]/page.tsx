@@ -130,7 +130,7 @@ export default function SignInPage() {
                       <Clerk.Label className='sr-only'>Email</Clerk.Label>
                       <Clerk.Input
                         className={`w-full rounded border border-[rgb(37,37,37)] bg-[rgb(12,12,12)] px-4 py-2 placeholder-[rgb(100,100,100)] ${
-                          fieldState === 'invalid' && 'border-red-500'
+                          fieldState === 'error' && 'border-red-500'
                         }`}
                         placeholder='Enter your email address'
                       />
@@ -190,9 +190,10 @@ export default function SignInPage() {
                       <Clerk.Label className='sr-only'>Email</Clerk.Label>
                       <Clerk.Input
                         className={`w-full rounded border border-[rgb(37,37,37)] bg-[rgb(12,12,12)] px-4 py-2 placeholder-[rgb(100,100,100)] ${
-                          fieldState === 'invalid' && 'border-red-500'
+                          fieldState === 'error' && 'border-red-500'
                         }`}
                         placeholder='Enter your email address'
+                        type='email'
                       />
                       <Clerk.FieldError className='block w-full font-mono text-red-400' />
                     </>
