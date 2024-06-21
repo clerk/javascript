@@ -96,6 +96,7 @@ const SignInVerificationMachine = setup({
       if (process.env.NODE_ENV === 'development') {
         if (
           !clerk.client.signIn.supportedFirstFactors.every(factor =>
+            // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
             context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
           )
         ) {
@@ -123,8 +124,24 @@ const SignInVerificationMachine = setup({
           );
         }
 
+        // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
+        // This type should also probably be SignInFirstFactor['strategy'] instead of SignInFactor['strategy'] !!!
+        const strategiesUsedButNotActivated = Array.from(context.registeredStrategies).filter(
+          strategy =>
+            !clerk.client.signIn.supportedFirstFactors.some(
+              supported => (supported.strategy as unknown as SignInFactor) === strategy,
+            ),
+        ) as unknown as Array<SignInFactor['strategy']>;
+
+        if (strategiesUsedButNotActivated.length > 0) {
+          console.warn(
+            `Clerk: These rendered strategies are not configured for your instance: ${strategiesUsedButNotActivated.join(', ')}. If this is unexpected, make sure to enable them in your Clerk dashboard: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username`,
+          );
+        }
+
         if (
           context.currentFactor?.strategy &&
+          // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
           !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
         ) {
           throw new ClerkElementsRuntimeError(
