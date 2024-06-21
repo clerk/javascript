@@ -18,6 +18,7 @@ import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
+import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 import { makeLocalizeable } from '~/utils/makeLocalizable';
 
 export function SignUpComponent() {
@@ -32,6 +33,9 @@ function SignUpComponentLoaded() {
   const clerk = useClerk();
   // TODO: Replace `any` with proper types
   const { t, translateError } = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
+  const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
+    (clerk as any)?.__unstable__environment as EnvironmentResource,
+  );
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
   const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
@@ -42,6 +46,10 @@ function SignUpComponentLoaded() {
   const { enabled: emailAddressEnabled, required: emailAddressRequired } = attributes['email_address'];
   const { enabled: passwordEnabled, required: passwordRequired } = attributes['password'];
   const { applicationName, homeUrl, logoImageUrl } = displayConfig;
+
+  const hasConnection = enabledConnections.length > 0;
+  const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
+
   return (
     <Common.Loading>
       {isGlobalLoading => {
@@ -71,84 +79,89 @@ function SignUpComponentLoaded() {
                         return <Alert>{message}</Alert>;
                       }}
                     </Common.GlobalError>
+
                     <Connections loading={isGlobalLoading} />
 
-                    <Seperator>{t('dividerText')}</Seperator>
+                    {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
 
-                    <div className='flex flex-col gap-4'>
-                      {firstNameEnabled && lastNameEnabled ? (
-                        <div className='flex gap-4'>
-                          <FirstNameField
-                            label={t('formFieldLabel__firstName')}
+                    {hasIdentifier ? (
+                      <div className='flex flex-col gap-4'>
+                        {firstNameEnabled && lastNameEnabled ? (
+                          <div className='flex gap-4'>
+                            <FirstNameField
+                              label={t('formFieldLabel__firstName')}
+                              hintText={t('formFieldHintText__optional')}
+                              required={firstNameRequired}
+                              disabled={isGlobalLoading}
+                            />
+                            <LastNameField
+                              label={t('formFieldLabel__lastName')}
+                              hintText={t('formFieldHintText__optional')}
+                              required={lastNameRequired}
+                              disabled={isGlobalLoading}
+                            />
+                          </div>
+                        ) : null}
+
+                        {usernameEnabled ? (
+                          <UsernameField
+                            label={t('formFieldLabel__username')}
                             hintText={t('formFieldHintText__optional')}
-                            required={firstNameRequired}
+                            required={usernameRequired}
                             disabled={isGlobalLoading}
                           />
-                          <LastNameField
-                            label={t('formFieldLabel__lastName')}
+                        ) : null}
+
+                        {emailAddressEnabled ? (
+                          <EmailField
+                            label={t('formFieldLabel__emailAddress')}
                             hintText={t('formFieldHintText__optional')}
-                            required={lastNameRequired}
+                            required={emailAddressRequired}
+                            disabled={isGlobalLoading}
+                            error={translateError}
+                          />
+                        ) : null}
+
+                        {phoneNumberEnabled ? (
+                          <PhoneNumberField
+                            label={t('formFieldLabel__phoneNumber')}
+                            hintText={t('formFieldHintText__optional')}
+                            required={phoneNumberRequired}
+                            disabled={isGlobalLoading}
+                            locationBasedCountryIso={locationBasedCountryIso}
+                          />
+                        ) : null}
+
+                        {passwordEnabled && passwordRequired ? (
+                          <PasswordField
+                            label={t('formFieldLabel__password')}
+                            required={passwordRequired}
                             disabled={isGlobalLoading}
                           />
-                        </div>
-                      ) : null}
+                        ) : null}
+                      </div>
+                    ) : null}
 
-                      {usernameEnabled ? (
-                        <UsernameField
-                          label={t('formFieldLabel__username')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={usernameRequired}
-                          disabled={isGlobalLoading}
-                        />
-                      ) : null}
-
-                      {emailAddressEnabled ? (
-                        <EmailField
-                          label={t('formFieldLabel__emailAddress')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={emailAddressRequired}
-                          disabled={isGlobalLoading}
-                          error={translateError}
-                        />
-                      ) : null}
-
-                      {phoneNumberEnabled ? (
-                        <PhoneNumberField
-                          label={t('formFieldLabel__phoneNumber')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={phoneNumberRequired}
-                          disabled={isGlobalLoading}
-                          locationBasedCountryIso={locationBasedCountryIso}
-                        />
-                      ) : null}
-
-                      {passwordEnabled && passwordRequired ? (
-                        <PasswordField
-                          label={t('formFieldLabel__password')}
-                          required={passwordRequired}
-                          disabled={isGlobalLoading}
-                        />
-                      ) : null}
-                    </div>
-
-                    <Common.Loading scope='step:start'>
-                      {isSubmitting => {
-                        return (
-                          <SignUp.Action
-                            submit
-                            asChild
-                          >
-                            <Button
-                              icon={<Icon.CaretRight />}
-                              busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                    {hasConnection || hasIdentifier ? (
+                      <Common.Loading scope='step:start'>
+                        {isSubmitting => {
+                          return (
+                            <SignUp.Action
+                              submit
+                              asChild
                             >
-                              {t('formButtonPrimary')}
-                            </Button>
-                          </SignUp.Action>
-                        );
-                      }}
-                    </Common.Loading>
+                              <Button
+                                icon={<Icon.CaretRight />}
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading || isSubmitting}
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignUp.Action>
+                          );
+                        }}
+                      </Common.Loading>
+                    ) : null}
                   </Card.Body>
                 </Card.Content>
                 <Card.Footer>
