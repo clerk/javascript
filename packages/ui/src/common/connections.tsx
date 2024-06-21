@@ -1,17 +1,12 @@
-import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
-import type { EnvironmentResource } from '@clerk/types';
 
 import { PROVIDERS } from '~/constants';
+import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
-import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
 
 export function Connections(props: { disabled?: boolean }) {
-  const clerk = useClerk();
-  const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
-    (clerk as any)?.__unstable__environment as EnvironmentResource,
-  );
+  const enabledConnections = useEnabledConnections();
   const hasConnection = enabledConnections.length > 0;
 
   return hasConnection ? (
