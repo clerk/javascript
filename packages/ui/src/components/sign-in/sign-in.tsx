@@ -66,7 +66,7 @@ export function SignInComponentLoaded() {
                       />
                     ) : null}
                     <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
-                    <Card.Description>{t('signIn.start.subtitle')}</Card.Description>
+                    <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                   </Card.Header>
 
                   <Card.Body>

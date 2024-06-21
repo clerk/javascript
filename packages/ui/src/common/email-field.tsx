@@ -20,10 +20,12 @@ export function EmailField({
   label?: React.ReactNode;
   hintText?: string;
   enabled?: boolean;
+  error?: (message: string, code: string, name: string) => string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t, translateError } = useLocalizations();
   const { enabled, required } = useAttributes('email_address');
   const renderedLabel = label ? label : t('formFieldLabel__emailAddress');
+  const renderError = props.error ? props.error : translateError;
   const isEnabled = props.enabled !== undefined ? props.enabled : enabled;
   const isRequired = props.required !== undefined ? props.required : required;
   const renderedHintText = () => {
@@ -70,7 +72,7 @@ export function EmailField({
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{translateError(message, code, DEFAULT_ERROR_NAME)}</Field.Message>;
+            return <Field.Message intent='error'>{renderError(message, code, DEFAULT_ERROR_NAME)}</Field.Message>;
           }}
         </Common.FieldError>
       </Field.Root>
