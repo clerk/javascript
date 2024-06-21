@@ -350,7 +350,7 @@ export function SignInComponentLoaded() {
                       <Seperator>{t('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}</Seperator>
 
                       <div className='flex flex-col gap-2'>
-                        <Connections loading={isGlobalLoading} />
+                        <Connections disabled={isGlobalLoading} />
 
                         <SignIn.SupportedStrategy
                           name='reset_password_email_code'
