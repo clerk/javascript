@@ -93,6 +93,7 @@ const SignInVerificationMachine = setup({
       }
 
       if (
+        process.env.NODE_ENV === 'development' &&
         !clerk.client.signIn.supportedFirstFactors.every(factor =>
           context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
         )
@@ -107,6 +108,7 @@ const SignInVerificationMachine = setup({
       }
 
       if (
+        process.env.NODE_ENV === 'development' &&
         clerk.client.signIn.supportedSecondFactors &&
         !clerk.client.signIn.supportedSecondFactors.every(factor =>
           context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),

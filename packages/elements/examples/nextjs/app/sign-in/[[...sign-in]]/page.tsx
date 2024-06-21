@@ -215,7 +215,6 @@ export default function SignInPage() {
 
           <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
           <CustomProvider provider='google'>Continue with Google</CustomProvider>
-          <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
           <SignIn.SupportedStrategy
             asChild
@@ -387,7 +386,7 @@ export default function SignInPage() {
 
           <SignIn.Action
             asChild
-            navigate='choose-strategy'
+            navigate='asdf'
           >
             <TextButton>Use another method</TextButton>
           </SignIn.Action>
