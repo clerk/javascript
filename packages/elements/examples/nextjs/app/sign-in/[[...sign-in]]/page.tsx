@@ -387,7 +387,7 @@ export default function SignInPage() {
 
           <SignIn.Action
             asChild
-            navigate='asdf'
+            navigate='choose-strategy'
           >
             <TextButton>Use another method</TextButton>
           </SignIn.Action>
