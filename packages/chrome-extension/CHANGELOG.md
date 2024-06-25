@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.1.0
+
+### Minor Changes
+
+- Poll for active session changes allowing for synchronizing newly authenticated users after the extension has been opened. ([#3616](https://github.com/clerk/javascript/pull/3616)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`2bef41ab0`](https://github.com/clerk/javascript/commit/2bef41ab05e212cc986c0891fa065037df936a8d)]:
+  - @clerk/clerk-js@5.7.2
+
 ## 1.0.19
 
 ### Patch Changes
