@@ -6,10 +6,12 @@ import * as Field from '../primitives/field';
 import * as Icon from '../primitives/icon';
 
 export function PasswordField({
+  alternativeFieldTrigger,
   className,
   label = 'Password',
+  name = 'password',
   ...props
-}: { label?: React.ReactNode } & Omit<
+}: { alternativeFieldTrigger?: React.ReactNode; name?: 'password' | 'confirmPassword'; label?: React.ReactNode } & Omit<
   React.ComponentProps<typeof Common.Input>,
   'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'
 >) {
@@ -18,12 +20,15 @@ export function PasswordField({
 
   return (
     <Common.Field
-      name='password'
+      name={name}
       asChild
     >
       <Field.Root>
         <Common.Label asChild>
-          <Field.Label>{label}</Field.Label>
+          <Field.Label>
+            {label}
+            {alternativeFieldTrigger ? <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd> : null}
+          </Field.Label>
         </Common.Label>
         <Common.FieldState>
           {({ state }) => {

@@ -1,9 +1,8 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
-import { enUS } from '@clerk/localizations';
-import type { ClerkOptions, EnvironmentResource } from '@clerk/types';
 
+import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { LastNameField } from '~/common/last-name-field';
@@ -11,16 +10,16 @@ import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
-import { PROVIDERS } from '~/constants';
+import { useAttributes } from '~/hooks/use-attributes';
+import { useDisplayConfig } from '~/hooks/use-display-config';
+import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useLocalizations } from '~/hooks/use-localizations';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
-import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
-import { getEnabledSocialConnectionsFromEnvironment } from '~/utils/getEnabledSocialConnectionsFromEnvironment';
-import { makeLocalizeable } from '~/utils/makeLocalizable';
 
 export function SignUpComponent() {
   return (
@@ -32,21 +31,20 @@ export function SignUpComponent() {
 
 function SignUpComponentLoaded() {
   const clerk = useClerk();
-  // TODO: Replace `any` with proper types
-  const t = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
-  const enabledConnections = getEnabledSocialConnectionsFromEnvironment(
-    (clerk as any)?.__unstable__environment as EnvironmentResource,
-  );
+  const enabledConnections = useEnabledConnections();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
-  const attributes = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.userSettings.attributes;
-  const displayConfig = ((clerk as any)?.__unstable__environment as EnvironmentResource)?.displayConfig;
-  const { enabled: firstNameEnabled, required: firstNameRequired } = attributes['first_name'];
-  const { enabled: lastNameEnabled, required: lastNameRequired } = attributes['last_name'];
-  const { enabled: usernameEnabled, required: usernameRequired } = attributes['username'];
-  const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = attributes['phone_number'];
-  const { enabled: emailAddressEnabled, required: emailAddressRequired } = attributes['email_address'];
-  const { enabled: passwordEnabled, required: passwordRequired } = attributes['password'];
-  const { applicationName, homeUrl, logoImageUrl } = displayConfig;
+  const { t } = useLocalizations();
+  const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
+  const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
+  const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
+  const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
+  const { enabled: emailAddressEnabled } = useAttributes('email_address');
+  const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
+  const { applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
+
+  const hasConnection = enabledConnections.length > 0;
+  const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
+
   return (
     <Common.Loading>
       {isGlobalLoading => {
@@ -76,113 +74,81 @@ function SignUpComponentLoaded() {
                         return <Alert>{message}</Alert>;
                       }}
                     </Common.GlobalError>
-                    <Connection.Root>
-                      {enabledConnections.map(c => {
-                        const connection = PROVIDERS.find(provider => provider.id === c.provider);
-                        const iconKey = connection?.icon;
-                        const IconComponent = iconKey ? Icon[iconKey] : null;
-                        return (
-                          <Common.Loading
-                            key={c.provider}
-                            scope={`provider:${c.provider}`}
-                          >
-                            {isConnectionLoading => {
-                              return (
-                                <Common.Connection
-                                  name={c.provider}
-                                  asChild
-                                >
-                                  <Connection.Button
-                                    busy={isConnectionLoading}
-                                    disabled={isGlobalLoading || isConnectionLoading}
-                                    icon={IconComponent ? <IconComponent className='text-base' /> : null}
-                                    textVisuallyHidden={enabledConnections.length > 2}
-                                  >
-                                    {connection?.name || c.provider}
-                                  </Connection.Button>
-                                </Common.Connection>
-                              );
-                            }}
-                          </Common.Loading>
-                        );
-                      })}
-                    </Connection.Root>
 
-                    <Seperator>{t('dividerText')}</Seperator>
+                    <Connections disabled={isGlobalLoading} />
 
-                    <div className='flex flex-col gap-4'>
-                      {firstNameEnabled && lastNameEnabled ? (
-                        <div className='flex gap-4'>
-                          <FirstNameField
-                            label={t('formFieldLabel__firstName')}
+                    {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
+
+                    {hasIdentifier ? (
+                      <div className='flex flex-col gap-4'>
+                        {firstNameEnabled && lastNameEnabled ? (
+                          <div className='flex gap-4'>
+                            <FirstNameField
+                              label={t('formFieldLabel__firstName')}
+                              hintText={t('formFieldHintText__optional')}
+                              required={firstNameRequired}
+                              disabled={isGlobalLoading}
+                            />
+                            <LastNameField
+                              label={t('formFieldLabel__lastName')}
+                              hintText={t('formFieldHintText__optional')}
+                              required={lastNameRequired}
+                              disabled={isGlobalLoading}
+                            />
+                          </div>
+                        ) : null}
+
+                        {usernameEnabled ? (
+                          <UsernameField
+                            label={t('formFieldLabel__username')}
                             hintText={t('formFieldHintText__optional')}
-                            required={firstNameRequired}
+                            required={usernameRequired}
                             disabled={isGlobalLoading}
                           />
-                          <LastNameField
-                            label={t('formFieldLabel__lastName')}
+                        ) : null}
+
+                        <EmailField disabled={isGlobalLoading} />
+
+                        {phoneNumberEnabled ? (
+                          <PhoneNumberField
+                            label={t('formFieldLabel__phoneNumber')}
                             hintText={t('formFieldHintText__optional')}
-                            required={lastNameRequired}
+                            required={phoneNumberRequired}
+                            disabled={isGlobalLoading}
+                            locationBasedCountryIso={locationBasedCountryIso}
+                          />
+                        ) : null}
+
+                        {passwordEnabled && passwordRequired ? (
+                          <PasswordField
+                            label={t('formFieldLabel__password')}
+                            required={passwordRequired}
                             disabled={isGlobalLoading}
                           />
-                        </div>
-                      ) : null}
+                        ) : null}
+                      </div>
+                    ) : null}
 
-                      {usernameEnabled ? (
-                        <UsernameField
-                          label={t('formFieldLabel__username')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={usernameRequired}
-                          disabled={isGlobalLoading}
-                        />
-                      ) : null}
-
-                      {emailAddressEnabled ? (
-                        <EmailField
-                          label={t('formFieldLabel__emailAddress')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={emailAddressRequired}
-                          disabled={isGlobalLoading}
-                        />
-                      ) : null}
-
-                      {phoneNumberEnabled ? (
-                        <PhoneNumberField
-                          label={t('formFieldLabel__phoneNumber')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={phoneNumberRequired}
-                          disabled={isGlobalLoading}
-                          locationBasedCountryIso={locationBasedCountryIso}
-                        />
-                      ) : null}
-
-                      {passwordEnabled && passwordRequired ? (
-                        <PasswordField
-                          label={t('formFieldLabel__password')}
-                          required={passwordRequired}
-                          disabled={isGlobalLoading}
-                        />
-                      ) : null}
-                    </div>
-
-                    <Common.Loading scope='step:start'>
-                      {isSubmitting => {
-                        return (
-                          <SignUp.Action
-                            submit
-                            asChild
-                          >
-                            <Button
-                              icon={<Icon.CaretRight />}
-                              busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                    {hasConnection || hasIdentifier ? (
+                      <Common.Loading scope='step:start'>
+                        {isSubmitting => {
+                          return (
+                            <SignUp.Action
+                              submit
+                              asChild
                             >
-                              {t('formButtonPrimary')}
-                            </Button>
-                          </SignUp.Action>
-                        );
-                      }}
-                    </Common.Loading>
+                              <Button
+                                icon={<Icon.CaretRight />}
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading || isSubmitting}
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignUp.Action>
+                          );
+                        }}
+                      </Common.Loading>
+                    ) : null}
                   </Card.Body>
                 </Card.Content>
                 <Card.Footer>
@@ -306,8 +272,6 @@ function SignUpComponentLoaded() {
                       </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
-                        // TODO:
-                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
                           <SignUp.Action
                             asChild
@@ -432,14 +396,7 @@ function SignUpComponentLoaded() {
                         />
                       ) : null}
 
-                      {emailAddressEnabled ? (
-                        <EmailField
-                          label={t('formFieldLabel__emailAddress')}
-                          hintText={t('formFieldHintText__optional')}
-                          required={emailAddressRequired}
-                          disabled={isGlobalLoading}
-                        />
-                      ) : null}
+                      <EmailField disabled={isGlobalLoading} />
 
                       {passwordEnabled && passwordRequired ? (
                         <PasswordField

@@ -33,8 +33,7 @@ runs:
       run: |
         nohup ./node_modules/.bin/verdaccio --config ./verdaccio.publish.yaml & echo "VERDACCIO_PID=$!" >> $GITHUB_ENV
         sleep 5
-        ./node_modules/.bin/npm-cli-adduser -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
-        ./node_modules/.bin/npm-cli-login -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
+        npm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
 
     - name: Publish to Verdaccio
       shell: bash
@@ -48,5 +47,4 @@ runs:
       shell: bash
       run: |
         nohup ./node_modules/.bin/verdaccio --config ./verdaccio.install.yaml & sleep 5
-        ./node_modules/.bin/npm-cli-adduser -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
-        ./node_modules/.bin/npm-cli-login -u ${{ inputs.auth-user }} -p ${{ inputs.auth-password }} -e ${{ inputs.auth-email }} -r ${{ inputs.registry }}
+        npm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
