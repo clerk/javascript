@@ -3,7 +3,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "lib": ["es6", "dom"],
-    "jsx": "react",
+    "jsx": "react-jsx",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "importHelpers": true,
