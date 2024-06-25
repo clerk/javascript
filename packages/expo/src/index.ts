@@ -17,6 +17,8 @@ export {
 
 export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
 
+export { LocalAuthProvider as __experimental_LocalAuthProvider } from './experimental';
+
 /**
  * @deprecated Use `getClerkInstance()` instead.
  */
