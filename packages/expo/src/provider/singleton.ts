@@ -61,6 +61,7 @@ export function getClerkInstance(options?: BuildClerkOptions): HeadlessBrowserCl
     const saveToken = tokenCache.saveToken;
     __internal_clerk = clerk = new Clerk(publishableKey);
 
+    // @ts-expect-error - This is an internal API
     __internal_clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
       // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
       requestInit.credentials = 'omit';
@@ -71,6 +72,7 @@ export function getClerkInstance(options?: BuildClerkOptions): HeadlessBrowserCl
       (requestInit.headers as Headers).set('authorization', jwt || '');
     });
 
+    // @ts-expect-error - This is an internal API
     __internal_clerk.__unstable__onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
       const authHeader = response.headers.get('authorization');
       if (authHeader) {
