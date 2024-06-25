@@ -228,7 +228,7 @@ describe('authMiddleware(params)', () => {
       })(mockRequest({ url: '/ignored' }), {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
-      expect(clerkClient.authenticateRequest).not.toBeCalled();
+      expect(clerkClient().authenticateRequest).not.toBeCalled();
       expect(beforeAuthSpy).not.toBeCalled();
       expect(afterAuthSpy).not.toBeCalled();
     });
@@ -243,7 +243,7 @@ describe('authMiddleware(params)', () => {
       })(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
       expect(beforeAuthSpy).toBeCalled();
       expect(afterAuthSpy).toBeCalled();
     });
@@ -310,7 +310,7 @@ describe('authMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get('x-clerk-auth-reason')).toEqual('skip');
-      expect(clerkClient.authenticateRequest).not.toBeCalled();
+      expect(clerkClient().authenticateRequest).not.toBeCalled();
       expect(afterAuthSpy).not.toBeCalled();
     });
 
@@ -322,7 +322,7 @@ describe('authMiddleware(params)', () => {
       })(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
 
       expect(resp?.status).toEqual(200);
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
       expect(afterAuthSpy).toBeCalled();
     });
 
@@ -335,7 +335,7 @@ describe('authMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/custom-redirect');
-      expect(clerkClient.authenticateRequest).not.toBeCalled();
+      expect(clerkClient().authenticateRequest).not.toBeCalled();
       expect(afterAuthSpy).not.toBeCalled();
     });
 
@@ -358,7 +358,7 @@ describe('authMiddleware(params)', () => {
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get('x-before-auth-header')).toEqual('before');
       expect(resp?.headers.get('x-after-auth-header')).toEqual('after');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
   });
 
@@ -372,7 +372,7 @@ describe('authMiddleware(params)', () => {
       expect(resp?.headers.get('location')).toEqual(
         'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
       );
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('uses authenticateRequest result as auth', async () => {
@@ -383,7 +383,7 @@ describe('authMiddleware(params)', () => {
 
       await authMiddleware({ afterAuth: afterAuthSpy })(req, event);
 
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
       expect(afterAuthSpy).toBeCalledWith(
         {
           userId: null,
@@ -421,7 +421,7 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
-    expect(clerkClient.authenticateRequest).toBeCalled();
+    expect(clerkClient().authenticateRequest).toBeCalled();
   });
 
   it('appends the Dev Browser JWT to the search when cookie __clerk_db_jwt exists and location is an Account Portal URL', async () => {
@@ -433,7 +433,7 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__clerk_db_jwt=test_jwt',
     );
-    expect(clerkClient.authenticateRequest).toBeCalled();
+    expect(clerkClient().authenticateRequest).toBeCalled();
   });
 
   it('does NOT append the Dev Browser JWT if x-clerk-redirect-to header is not set', async () => {
@@ -443,7 +443,7 @@ describe('Dev Browser JWT when redirecting to cross origin', function () {
 
     expect(resp?.status).toEqual(307);
     expect(resp?.headers.get('location')).toEqual('https://google.com/');
-    expect(clerkClient.authenticateRequest).toBeCalled();
+    expect(clerkClient().authenticateRequest).toBeCalled();
   });
 });
 

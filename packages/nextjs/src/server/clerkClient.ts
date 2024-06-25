@@ -48,7 +48,9 @@ const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
  */
 const clerkClientSingletonProxy = new Proxy(clerkClientSingleton, {
   get(target, prop, receiver) {
-    deprecated('clerkClient object', 'Use `clerkClient()` as a function instead.');
+    if (Object.getPrototypeOf(target) === Object.getPrototypeOf(clerkClientSingleton)) {
+      deprecated('clerkClient object', 'Use `clerkClient()` as a function instead.');
+    }
 
     return Reflect.get(target, prop, receiver);
   },
@@ -83,7 +85,7 @@ const clerkClientForRequest = () => {
     });
   }
 
-  return clerkClient;
+  return clerkClientSingleton;
 };
 
 const clerkClient: ClerkClient & typeof clerkClientForRequest = Object.assign(
