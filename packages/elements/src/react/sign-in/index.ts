@@ -4,6 +4,7 @@ import 'client-only';
 export { SignInRoot as SignIn, SignInRoot as Root } from './root';
 export { SignInStep as Step } from './step';
 export { SignInAction as Action } from './action';
+export { SignInPasskey as Passkey } from './passkey';
 export { SignInSupportedStrategy as SupportedStrategy } from './choose-strategy';
 
 export {

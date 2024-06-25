@@ -69,10 +69,10 @@ jobs:
         run: npx turbo lint:publint $TURBO_ARGS --only
 
       - name: Lint types using attw
-        run: npx turbo lint:attw $TURBO_ARGS --filter=!nextjs --filter=!elements --filter=!backend --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=!@clerk/nextjs --filter=!@clerk/tanstack-start --filter=!@clerk/elements --filter=!@clerk/backend --only
 
       - name: Lint types using attw [Errors Allowed]
-        run: npx turbo lint:attw $TURBO_ARGS --filter=nextjs --filter=backend --filter=elements --continue --only
+        run: npx turbo lint:attw $TURBO_ARGS --filter=@clerk/nextjs --filter=@clerk/tanstack-start --filter=@clerk/backend --filter=@clerk/elements --continue --only
         continue-on-error: true # TODO: Remove this when all related errors are fixed
 
       - name: Run lint
@@ -111,6 +111,7 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
+          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
@@ -135,7 +136,7 @@ jobs:
     name: Integration Tests
     needs: formatting-linting
     runs-on: ${{ vars.RUNNER_MEDIUM || 'ubuntu-latest-m' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     strategy:
       matrix:
@@ -156,7 +157,21 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
+      - name: Task Status
+        id: task-status
+        env:
+          E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+        run: |
+          AFFECTED=0
+          (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
+          echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
+
       - name: Setup
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: config
         uses: ./.github/actions/init
         with:
@@ -166,26 +181,31 @@ jobs:
           playwright-enabled: true
 
       - name: Verdaccio
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
             if [ "$(npm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else npx turbo build $TURBO_ARGS --only && npx changeset publish --no-git-tag; fi
 
       - name: Install @clerk/backend in /integration
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
         run: npm init -y && npm install @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
       - name: Run Integration Tests
+        if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
         run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
-          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
+          E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
+          E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 

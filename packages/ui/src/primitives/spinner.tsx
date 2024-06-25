@@ -1,4 +1,4 @@
-import cn from 'clsx';
+import { cx } from 'cva';
 import { forwardRef, type HTMLAttributes } from 'react';
 
 const SIZE = 16;
@@ -36,7 +36,7 @@ export const Spinner = forwardRef(function Spinner(
   return (
     <span
       ref={ref}
-      className={cn('relative isolate text-current size-[1em] block', className)}
+      className={cx('relative isolate block size-[1em] text-current', className)}
     >
       <span className='sr-only'>{children}</span>
 
@@ -53,7 +53,7 @@ export const Spinner = forwardRef(function Spinner(
         aria-hidden
       >
         <g
-          className={cn(
+          className={cx(
             'motion-safe:origin-[--spinner-origin]',
             'motion-safe:will-change-transform',
             'motion-safe:animate-spin',
@@ -108,7 +108,7 @@ export const Spinner = forwardRef(function Spinner(
         </g>
 
         <circle
-          className={cn(
+          className={cx(
             'size-full',
             'motion-safe:origin-[--spinner-origin]',
             'motion-safe:will-change-transform',

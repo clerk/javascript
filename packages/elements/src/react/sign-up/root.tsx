@@ -1,4 +1,4 @@
-import { ClerkLoaded, ClerkLoading, useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import { useEffect } from 'react';
@@ -13,16 +13,22 @@ import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react
 import { SignUpRouterCtx } from '~/react/sign-up/context';
 
 import { Form } from '../common/form';
+import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
 
 type SignUpFlowProviderProps = {
   children: React.ReactNode;
   exampleMode?: boolean;
+  /**
+   * Fallback markup to render while Clerk is loading
+   */
+  fallback?: React.ReactNode;
+  isRootPath: boolean;
 };
 
 const actor = createActor(SignUpRouterMachine, { inspect });
 actor.start();
 
-function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) {
+function SignUpFlowProvider({ children, exampleMode, fallback, isRootPath }: SignUpFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
   const formRef = useFormStore();
@@ -57,14 +63,26 @@ function SignUpFlowProvider({ children, exampleMode }: SignUpFlowProviderProps) 
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clerk, exampleMode, formRef?.id, !!router]);
+  }, [clerk, exampleMode, formRef?.id, !!router, clerk.loaded]);
 
-  return isReady ? <SignUpRouterCtx.Provider actorRef={actor}>{children}</SignUpRouterCtx.Provider> : null;
+  return (
+    <SignUpRouterCtx.Provider actorRef={actor}>
+      {isRootPath && !isReady && fallback ? <Form>{fallback}</Form> : null}
+      {clerk.loaded && isReady ? children : null}
+    </SignUpRouterCtx.Provider>
+  );
 }
 
-export type SignUpRootProps = SignUpFlowProviderProps & {
-  fallback?: React.ReactNode;
+export type SignUpRootProps = Omit<SignUpFlowProviderProps, 'isRootPath'> & {
+  /**
+   * The base path for your sign-up route.
+   * Will be automatically inferred in Next.js.
+   * @example `/sign-up`
+   */
   path?: string;
+  /**
+   * If you want to render Clerk Elements in e.g. a modal, use the `virtual` routing mode.
+   */
   routing?: ROUTING;
 };
 
@@ -72,8 +90,9 @@ export type SignUpRootProps = SignUpFlowProviderProps & {
  * Root component for the sign-up flow. It sets up providers and state management for its children.
  * Must wrap all sign-up related components.
  *
- * @param {string} path - The root path the sign-up flow is mounted at. Default: `/sign-up`
+ * @param {string} path - The root path the sign-up flow is mounted at. Will be automatically inferred in Next.js. You can set it to `/sign-up` for example.
  * @param {React.ReactNode} fallback - Fallback markup to render while Clerk is loading. Default: `null`
+ * @param {string} routing - If you want to render Clerk Elements in e.g. a modal, use the `'virtual'` routing mode. Default: `'path'`
  *
  * @example
  * import * as SignUp from "@clerk/elements/sign-up"
@@ -85,18 +104,21 @@ export type SignUpRootProps = SignUpFlowProviderProps & {
  */
 export function SignUpRoot({
   children,
-  exampleMode,
+  exampleMode = false,
   fallback = null,
-  path = SIGN_UP_DEFAULT_BASE_PATH,
-  routing,
+  path: pathProp,
+  routing = ROUTING.path,
 }: SignUpRootProps): JSX.Element | null {
   const clerk = useClerk();
+  const inferredPath = usePathnameWithoutCatchAll();
+  const path = pathProp || inferredPath || SIGN_UP_DEFAULT_BASE_PATH;
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignUpRoot', {
-      path,
+      exampleMode,
       fallback: Boolean(fallback),
-      exampleMode: Boolean(exampleMode),
+      path,
+      routing,
     }),
   );
 
@@ -110,13 +132,12 @@ export function SignUpRoot({
       router={router}
     >
       <FormStoreProvider>
-        <SignUpFlowProvider exampleMode={exampleMode}>
-          {isRootPath ? (
-            <ClerkLoading>
-              <Form>{fallback}</Form>
-            </ClerkLoading>
-          ) : null}
-          <ClerkLoaded>{children}</ClerkLoaded>
+        <SignUpFlowProvider
+          exampleMode={exampleMode}
+          fallback={fallback}
+          isRootPath={isRootPath}
+        >
+          {children}
         </SignUpFlowProvider>
       </FormStoreProvider>
     </Router>

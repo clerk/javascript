@@ -1,0 +1,10 @@
+### After sign up/in/out default value change
+
+Defining redirect URLs for after sign up, in, and/or out via the Clerk dashboard has been removed in Core 2. In your Clerk dashboard, under "paths", there is a section called "Component paths", where URLs could be defined that had a deprecation warning. In Core 2, this functionality has been removed, and specifying redirect paths via the dashboard will no longer work. If you need to pass a redirect URL for after sign in/up/out, there are [a few different ways this can be done](https://clerk.com/docs/account-portal/custom-redirects), from environment variables to middleware to supplying them directly to the relevant components.
+
+As part of this change, the default URL for each of these props has been set to `/`, so if you are passing `/` explicitly to any one of the above props, that line is no longer necessary and can be removed.
+
+```diff
+- <UserButton afterSignOutUrl='/' />
++ <UserButton />
+```

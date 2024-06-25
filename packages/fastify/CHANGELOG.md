@@ -1,5 +1,22 @@
 # Change Log
 
+## 1.0.15
+
+### Patch Changes
+
+- Updated dependencies [[`1273b04ec`](https://github.com/clerk/javascript/commit/1273b04ecf1866b59ef59a74abe31dbcc726da2c)]:
+  - @clerk/types@4.6.1
+  - @clerk/backend@1.2.4
+  - @clerk/shared@2.3.1
+
+## 1.0.14
+
+### Patch Changes
+
+- Updated dependencies [[`4ec3f63e2`](https://github.com/clerk/javascript/commit/4ec3f63e26d8d3725a7ba9bbf988a7776fe893ff)]:
+  - @clerk/shared@2.3.0
+  - @clerk/backend@1.2.3
+
 ## 1.0.13
 
 ### Patch Changes
@@ -132,7 +149,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from '@clerk/backend/internal';
+    } from "@clerk/backend/internal";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -169,28 +186,34 @@
       Token,
       User,
       Verification,
-    } from '@clerk/backend';
+    } from "@clerk/backend";
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    import type {
+      Organization,
+      Session,
+      User,
+      WebhookEvent,
+      WebhookEventType,
+    } from "@clerk/backend";
     ```
 - 02976d494: (Note: This is only relevant if, in the unlikely case, you are using `Clerk` from `@clerk/fastify` directly. If not, you can safely ignore this change.)
 
   Remove the named `Clerk` import from `@clerk/fastify` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from '@clerk/fastify';
-  const clerk = Clerk({ secretKey: '...' });
+  import { Clerk } from "@clerk/fastify";
+  const clerk = Clerk({ secretKey: "..." });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from '@clerk/fastify';
-  const clerk = createClerkClient({ secretKey: '...' });
+  import { createClerkClient } from "@clerk/fastify";
+  const clerk = createClerkClient({ secretKey: "..." });
   ```
 
 ### Minor Changes
@@ -754,7 +777,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from '@clerk/backend/internal';
+    } from "@clerk/backend/internal";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -793,13 +816,19 @@
       Token,
       User,
       Verification,
-    } from '@clerk/backend';
+    } from "@clerk/backend";
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    import type {
+      Organization,
+      Session,
+      User,
+      WebhookEvent,
+      WebhookEventType,
+    } from "@clerk/backend";
     ```
 
 ### Patch Changes
@@ -825,15 +854,15 @@
   Remove the named `Clerk` import from `@clerk/fastify` and import `createClerkClient` instead. The latter is a factory method to create a Clerk client instance for you. This update aligns usage across our SDKs and will enable us to ship DX improvements better in the future.
 
   ```js
-  import { Clerk } from '@clerk/fastify';
-  const clerk = Clerk({ secretKey: '...' });
+  import { Clerk } from "@clerk/fastify";
+  const clerk = Clerk({ secretKey: "..." });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from '@clerk/fastify';
-  const clerk = createClerkClient({ secretKey: '...' });
+  import { createClerkClient } from "@clerk/fastify";
+  const clerk = createClerkClient({ secretKey: "..." });
   ```
 
 ### Patch Changes

@@ -54,6 +54,14 @@ export type AttemptSecondFactorInput = {
   currentFactor: SignInSecondFactor | null;
 };
 
+const isNonPreperableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
+  if (!strategy) {
+    return false;
+  }
+
+  return ['passkey', 'password'].includes(strategy);
+};
+
 export const SignInVerificationMachineId = 'SignInVerification';
 
 const SignInVerificationMachine = setup({
@@ -155,7 +163,7 @@ Please open an issue if you continue to run into this issue.`);
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
-    isNeverResendable: ({ context }) => context.currentFactor?.strategy === 'password',
+    isNeverResendable: ({ context }) => isNonPreperableStrategy(context.currentFactor?.strategy),
   },
   delays: SignInVerificationDelays,
   types: {} as SignInVerificationSchema,
@@ -358,7 +366,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
       const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
-      if (!params?.strategy || params.strategy === 'password' || !needsPrepare) {
+      if (isNonPreperableStrategy(params?.strategy) || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
@@ -378,6 +386,9 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       const password = fields.get('password')?.value as string | undefined;
 
       switch (strategy) {
+        case 'passkey': {
+          return await parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey();
+        }
         case 'password': {
           assertIsDefined(password, 'Password');
 

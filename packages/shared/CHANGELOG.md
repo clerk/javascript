@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`1273b04ec`](https://github.com/clerk/javascript/commit/1273b04ecf1866b59ef59a74abe31dbcc726da2c)]:
+  - @clerk/types@4.6.1
+
+## 2.3.0
+
+### Minor Changes
+
+- Move `isWebAuthnSupported`, `isWebAuthnAutofillSupported`, `isWebAuthnPlatformAuthenticatorSupported` to `@clerk/shared/webauthn`. ([#3472](https://github.com/clerk/javascript/pull/3472)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 2.2.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "extends": ["//"],
-  "pipeline": {
+  "tasks": {
     "build": {
       "inputs": [
         "*.d.ts",
@@ -13,7 +13,7 @@
         "tsconfig.declarations.json",
         "tsup.config.ts",
 
-        "!**/**/*.test.*",
+        "!**/*.test.*",
         "!**/test/**",
         "!**/tests/**",
         "!**/__tests__/**",

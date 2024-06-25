@@ -116,11 +116,11 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole } = render(<Field actionLabel={'take action'} />, { wrapper });
-    expect(getByRole('link', { name: /take action/i })).toBeInTheDocument();
-    expect(getByRole('link', { name: /take action/i })).not.toHaveAttribute('rel');
-    expect(getByRole('link', { name: /take action/i })).not.toHaveAttribute('target');
-    expect(getByRole('link', { name: /take action/i })).toHaveAttribute('href', '');
+    const { getByText } = render(<Field actionLabel={'take action'} />, { wrapper });
+    expect(getByText(/take action/i, { selector: 'a' })).toBeInTheDocument();
+    expect(getByText(/take action/i, { selector: 'a' })).not.toHaveAttribute('rel');
+    expect(getByText(/take action/i, { selector: 'a' })).not.toHaveAttribute('target');
+    expect(getByText(/take action/i, { selector: 'a' })).toHaveAttribute('href', '');
   });
 
   it('with error', async () => {

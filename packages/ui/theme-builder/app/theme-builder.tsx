@@ -1,7 +1,6 @@
 'use client';
-import { SignIn } from '@clerk/ui/sign-in';
-import { SignUp } from '@clerk/ui/sign-up';
-import cn from 'clsx';
+import { cx } from 'cva';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { ColorPicker } from './color-picker';
@@ -21,13 +20,9 @@ const radiusDefault = '0.375rem';
 const spacingUnitDefault = '1rem';
 const fontSizeDefault = '0.8125rem';
 
-const componnents = {
-  SignIn: <SignIn />,
-  SignUp: <SignUp />,
-};
-type Component = keyof typeof componnents;
-
-export function ThemeBuilder() {
+export function ThemeBuilder({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [dir, setDir] = useState('ltr');
   const [appearance, setAppearance] = useState('light');
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
@@ -39,7 +34,6 @@ export function ThemeBuilder() {
   const [radius, setRadius] = useState(radiusDefault);
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [fontSize, setFontSize] = useState(fontSizeDefault);
-  const [selectedComponent, setSelectedComponent] = useState<Component>('SignIn');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
@@ -81,18 +75,25 @@ export function ThemeBuilder() {
         }}
       />
       <div className='flex h-dvh flex-col overflow-hidden'>
-        <header className='flex shrink-0 h-16 justify-end border-b items-center px-4'>
+        <header className='flex h-16 shrink-0 items-center justify-end border-b px-4'>
           <div className='inline-flex items-center gap-x-2 text-xs'>
             <label htmlFor='component'>Component</label>
             <div className='relative'>
               <select
                 name='component'
                 id='component'
-                onChange={e => setSelectedComponent(e.target.value as Component)}
-                className='relative bg-neutral-100 border rounded py-1 text-xs pl-1.5 pr-5 appearance-none after:absolute after:right-1.5 after:size-2 after:bg-red-200 after:top-1'
+                defaultValue={pathname}
+                onChange={e => router.push(e.target.value)}
+                className='relative appearance-none rounded border bg-neutral-100 py-1 pl-1.5 pr-5 text-xs after:absolute after:right-1.5 after:top-1 after:size-2 after:bg-red-200'
               >
-                <option value='SignIn'>Sign In</option>
-                <option value='SignUp'>Sign Up</option>
+                <option
+                  value='/'
+                  disabled
+                >
+                  Select
+                </option>
+                <option value='/sign-in'>Sign In</option>
+                <option value='/sign-up'>Sign Up</option>
               </select>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -100,7 +101,7 @@ export function ThemeBuilder() {
                 viewBox='0 0 24 24'
                 strokeWidth='1.5'
                 stroke='currentColor'
-                className='size-2.5 absolute top-1/2 right-1.5 -translate-y-1/2 pointer-events-none user-select-none'
+                className='user-select-none pointer-events-none absolute right-1.5 top-1/2 size-2.5 -translate-y-1/2'
                 aria-hidden
               >
                 <path
@@ -113,7 +114,7 @@ export function ThemeBuilder() {
           </div>
         </header>
         <div className='flex flex-1'>
-          <aside className='relative isolate flex h-full w-[17rem] p-4 shrink-0 flex-col border-e bg-white'>
+          <aside className='relative isolate flex h-full w-[17rem] shrink-0 flex-col border-e bg-white p-4'>
             <div className='space-y-4'>
               <ToggleGroup
                 items={[
@@ -197,7 +198,7 @@ export function ThemeBuilder() {
                   id='radius'
                   value={radius}
                   onChange={e => setRadius(e.target.value)}
-                  className='w-full text-xs rounded border p-2'
+                  className='w-full rounded border p-2 text-xs'
                 />
               </div>
               <div>
@@ -211,7 +212,7 @@ export function ThemeBuilder() {
                   id='spacing-unit'
                   value={spacingUnit}
                   onChange={e => setSpacingUnit(e.target.value)}
-                  className='w-full text-xs rounded border p-2'
+                  className='w-full rounded border p-2 text-xs'
                 />
               </div>
               <div>
@@ -225,7 +226,7 @@ export function ThemeBuilder() {
                   id='font-size'
                   value={fontSize}
                   onChange={e => setFontSize(e.target.value)}
-                  className='w-full text-xs rounded border p-2'
+                  className='w-full rounded border p-2 text-xs'
                 />
               </div>
             </div>
@@ -252,13 +253,13 @@ export function ThemeBuilder() {
             </div>
           </aside>
           <figure
-            className={cn('relative isolate w-full flex-1 overflow-y-auto grid place-content-center', {
+            className={cx('relative isolate grid w-full flex-1 place-content-center overflow-y-auto', {
               'bg-neutral-50': appearance === 'light',
-              'bg-neutral-950 dark': appearance === 'dark',
+              'dark bg-neutral-950': appearance === 'dark',
             })}
           >
             <div
-              className={cn(
+              className={cx(
                 'absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),var(--line-color)),linear-gradient(to_right,transparent_calc(56px-1px),_var(--line-color))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]',
                 {
                   '[--line-color:theme(colors.neutral.400)]': appearance === 'light',
@@ -267,7 +268,7 @@ export function ThemeBuilder() {
               )}
               aria-hidden='true'
             />
-            {componnents[selectedComponent]}
+            {children}
           </figure>
         </div>
       </div>

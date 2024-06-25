@@ -1,4 +1,4 @@
-import cn from 'clsx';
+import { cx } from 'cva';
 import * as React from 'react';
 
 export const Seperator = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
@@ -7,8 +7,8 @@ export const Seperator = React.forwardRef<HTMLParagraphElement, React.HTMLAttrib
       <p
         ref={forwardedRef}
         {...props}
-        className={cn(
-          'flex items-center gap-x-3 before:flex-1 before:h-px before:bg-gray-a6 after:flex-1 after:h-px after:bg-gray-a6 text-gray-a11 text-base',
+        className={cx(
+          'before:bg-gray-a6 after:bg-gray-a6 text-gray-a11 flex items-center gap-x-3 text-base before:h-px before:flex-1 after:h-px after:flex-1',
           className,
         )}
       >

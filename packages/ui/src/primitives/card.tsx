@@ -1,7 +1,7 @@
-import cn from 'clsx';
+import { cx } from 'cva';
 import * as React from 'react';
 
-import { Logo } from './logo';
+import { ClerkLogo } from './clerk-logo';
 
 export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
   { children, className, ...props },
@@ -11,8 +11,8 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn(
-        'bg-gray-2 rounded-xl w-96 relative overflow-hidden border border-gray-a6 shadow-xl shadow-gray-a5 bg-clip-padding',
+      className={cx(
+        'bg-gray-2 border-gray-a6 shadow-gray-a5 relative w-96 overflow-hidden rounded-xl border bg-clip-padding shadow-xl',
         className,
       )}
     >
@@ -29,8 +29,8 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
     <div
       ref={forwardedRef}
       {...props}
-      className={cn(
-        'bg-gray-surface -mx-px -mt-px shadow-sm shadow-gray-a3 py-8 px-10 space-y-8 relative rounded-[inherit] border border-gray-a6',
+      className={cx(
+        'bg-gray-surface shadow-gray-a3 border-gray-a6 relative -mx-px -mt-px flex flex-col gap-8 rounded-[inherit] border px-10 py-8 shadow-sm',
         className,
       )}
     >
@@ -47,11 +47,32 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('text-center space-y-space-1', className)}
+      className={cx('flex flex-col gap-1 text-center', className)}
     >
       {children}
     </div>
   );
+});
+
+export const Logo = React.forwardRef(function Logo(
+  {
+    className,
+    href,
+    ...props
+  }: React.ImgHTMLAttributes<HTMLImageElement> & {
+    href?: string;
+  },
+  forwardedRef: React.ForwardedRef<HTMLImageElement>,
+) {
+  const img = (
+    <img
+      crossOrigin='anonymous'
+      ref={forwardedRef}
+      {...props}
+      className={cx('max-h-24 max-w-24 object-contain', className)}
+    />
+  );
+  return <div className='mb-4 flex justify-center'>{href ? <a href={href}>{img}</a> : img}</div>;
 });
 
 export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function Title(
@@ -62,7 +83,7 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
     <h2
       ref={forwardedRef}
       {...props}
-      className={cn('text-lg leading-medium font-bold text-gray-12', className)}
+      className={cx('leading-medium text-gray-12 text-lg font-bold', className)}
     >
       {children}
     </h2>
@@ -75,7 +96,7 @@ export const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttrib
       <p
         ref={forwardedRef}
         {...props}
-        className={cn('text-base text-gray-a11', className)}
+        className={cx('text-gray-a11 text-base', className)}
       >
         {children}
       </p>
@@ -91,7 +112,7 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('rounded-lg space-y-6', className)}
+      className={cx('flex flex-col gap-6 rounded-lg', className)}
     >
       {children}
     </div>
@@ -106,11 +127,11 @@ export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     <div
       ref={forwardedRef}
       {...props}
-      className={cn('grid', className)}
+      className={cx('grid', className)}
     >
       {children}
-      <div className='py-4 px-6 border-t border-gray-a6 grid place-content-center'>
-        <p className='text-sm inline-flex items-center gap-x-1 text-gray-a11'>
+      <div className='grid place-content-center px-6 py-4'>
+        <p className='text-gray-a11 inline-flex items-center gap-x-1 text-sm'>
           Secured by{' '}
           <a
             aria-label='Clerk logo'
@@ -118,7 +139,7 @@ export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
             target='_blank'
             rel='noopener'
           >
-            <Logo />
+            <ClerkLogo />
           </a>
         </p>
       </div>
@@ -132,7 +153,7 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
       <div
         ref={forwardedRef}
         {...props}
-        className={cn('px-6 py-4', className)}
+        className={cx('border-gray-a6 border-b px-6 py-4', className)}
       >
         {children}
       </div>
@@ -146,7 +167,7 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
       <p
         ref={forwardedRef}
         {...props}
-        className={cn('text-gray-a11 text-base text-center', className)}
+        className={cx('text-gray-a11 text-center text-base', className)}
       >
         {children}
       </p>
@@ -160,7 +181,7 @@ export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.Anchor
       <a
         ref={forwardedRef}
         {...props}
-        className={cn('text-accent-a10 text-base font-medium hover:underline', className)}
+        className={cx('text-accent-a10 text-base font-medium hover:underline', className)}
       >
         {children}
       </a>

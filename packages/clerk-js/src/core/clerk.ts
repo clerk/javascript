@@ -60,6 +60,7 @@ import type {
 
 import type { MountComponentRenderer } from '../ui/Components';
 import {
+  ALLOWED_PROTOCOLS,
   buildURL,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
@@ -782,8 +783,10 @@ export class Clerk implements ClerkInterface {
 
     let toURL = new URL(to, window.location.href);
 
-    if (toURL.protocol !== 'http:' && toURL.protocol !== 'https:') {
-      console.warn('Clerk: Not a valid protocol. Redirecting to /');
+    if (!ALLOWED_PROTOCOLS.includes(toURL.protocol)) {
+      console.warn(
+        `Clerk: "${toURL.protocol}" is not a valid protocol. Redirecting to "/" instead. If you think this is a mistake, please open an issue.`,
+      );
       toURL = new URL('/', window.location.href);
     }
 

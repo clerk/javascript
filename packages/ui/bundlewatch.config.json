@@ -1,0 +1,6 @@
+{
+  "files": [
+    { "path": "./dist/components/sign-in.js", "maxSize": "80kB" },
+    { "path": "./dist/components/sign-up.js", "maxSize": "80kB" }
+  ]
+}

@@ -1,5 +1,6 @@
-import { ClerkLoaded, ClerkLoading, useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/clerk-react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
+import { useSelector } from '@xstate/react';
 import React, { useEffect } from 'react';
 import { createActor } from 'xstate';
 
@@ -12,19 +13,26 @@ import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
+import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
 
 type SignInFlowProviderProps = {
   children: React.ReactNode;
   exampleMode?: boolean;
+  /**
+   * Fallback markup to render while Clerk is loading
+   */
+  fallback?: React.ReactNode;
+  isRootPath: boolean;
 };
 
 const actor = createActor(SignInRouterMachine, { inspect });
 actor.start();
 
-function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) {
+function SignInFlowProvider({ children, exampleMode, fallback, isRootPath }: SignInFlowProviderProps) {
   const clerk = useClerk();
   const router = useClerkRouter();
   const formRef = useFormStore();
+  const isReady = useSelector(actor, state => state.value !== 'Idle');
 
   useEffect(() => {
     if (!clerk || !router) {
@@ -56,19 +64,26 @@ function SignInFlowProvider({ children, exampleMode }: SignInFlowProviderProps) 
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clerk, exampleMode, formRef?.id, !!router]);
+  }, [clerk, exampleMode, formRef?.id, !!router, clerk.loaded]);
 
-  return <SignInRouterCtx.Provider actorRef={actor}>{children}</SignInRouterCtx.Provider>;
+  return (
+    <SignInRouterCtx.Provider actorRef={actor}>
+      {isRootPath && !isReady && fallback ? <Form>{fallback}</Form> : null}
+      {clerk.loaded && isReady ? children : null}
+    </SignInRouterCtx.Provider>
+  );
 }
 
-export type SignInRootProps = SignInFlowProviderProps & {
-  fallback?: React.ReactNode;
+export type SignInRootProps = Omit<SignInFlowProviderProps, 'isRootPath'> & {
   /**
-   * The base path for your sign-in route. Defaults to `/sign-in`.
-   *
-   * TODO: re-use usePathnameWithoutCatchAll from the next SDK
+   * The base path for your sign-in route.
+   * Will be automatically inferred in Next.js.
+   * @example `/sign-in`
    */
   path?: string;
+  /**
+   * If you want to render Clerk Elements in e.g. a modal, use the `virtual` routing mode.
+   */
   routing?: ROUTING;
 };
 
@@ -76,8 +91,9 @@ export type SignInRootProps = SignInFlowProviderProps & {
  * Root component for the sign-in flow. It sets up providers and state management for its children.
  * Must wrap all sign-in related components.
  *
- * @param {string} path - The root path the sign-in flow is mounted at. Default: `/sign-in`
+ * @param {string} path - The root path the sign-in flow is mounted at. Will be automatically inferred in Next.js. You can set it to `/sign-in` for example.
  * @param {React.ReactNode} fallback - Fallback markup to render while Clerk is loading. Default: `null`
+ * @param {string} routing - If you want to render Clerk Elements in e.g. a modal, use the `'virtual'` routing mode. Default: `'path'`
  *
  * @example
  * import * as SignIn from "@clerk/elements/sign-in"
@@ -89,18 +105,21 @@ export type SignInRootProps = SignInFlowProviderProps & {
  */
 export function SignInRoot({
   children,
-  exampleMode,
+  exampleMode = false,
   fallback = null,
-  path = SIGN_IN_DEFAULT_BASE_PATH,
-  routing,
+  path: pathProp,
+  routing = ROUTING.path,
 }: SignInRootProps): JSX.Element | null {
   const clerk = useClerk();
+  const inferredPath = usePathnameWithoutCatchAll();
+  const path = pathProp || inferredPath || SIGN_IN_DEFAULT_BASE_PATH;
 
   clerk.telemetry?.record(
     eventComponentMounted('Elements_SignInRoot', {
-      exampleMode: Boolean(exampleMode),
+      exampleMode,
       fallback: Boolean(fallback),
       path,
+      routing,
     }),
   );
 
@@ -114,13 +133,12 @@ export function SignInRoot({
       router={router}
     >
       <FormStoreProvider>
-        <SignInFlowProvider exampleMode={exampleMode}>
-          {isRootPath ? (
-            <ClerkLoading>
-              <Form>{fallback}</Form>
-            </ClerkLoading>
-          ) : null}
-          <ClerkLoaded>{children}</ClerkLoaded>
+        <SignInFlowProvider
+          exampleMode={exampleMode}
+          fallback={fallback}
+          isRootPath={isRootPath}
+        >
+          {children}
         </SignInFlowProvider>
       </FormStoreProvider>
     </Router>

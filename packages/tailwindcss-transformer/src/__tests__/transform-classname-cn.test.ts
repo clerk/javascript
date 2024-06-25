@@ -1,10 +1,18 @@
 import { transform } from '../index';
 
-test('className with cn', () => {
+test('className with cn/cx/clsx', () => {
   const result = transform(
-    `const Button: React.FC<ButtonProps> = ({ children, className }) => {
-    return <button className={cn('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')}>{children}</button>
-  }`,
+    `const ButtonCn: React.FC<ButtonProps> = ({ children, className }) => {
+      return <button className={cn('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')}>{children}</button>
+    }
+  
+    const ButtonCx: React.FC<ButtonProps> = ({ children, className }) => {
+      return <button className={cx('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')}>{children}</button>
+    }
+    
+    const ButtonClsx: React.FC<ButtonProps> = ({ children, className }) => {
+      return <button className={clsx('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded')}>{children}</button>
+    }`,
     {
       styleCache: new Map(),
     },

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.2.2",
+  "version": "2.3.1",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -69,7 +69,8 @@
     "apiUrlFromPublishableKey",
     "scripts",
     "telemetry",
-    "logger"
+    "logger",
+    "webauthn"
   ],
   "scripts": {
     "build": "tsup",
@@ -88,7 +89,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/types": "4.6.0",
+    "@clerk/types": "4.6.1",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
     "std-env": "^3.7.0",
