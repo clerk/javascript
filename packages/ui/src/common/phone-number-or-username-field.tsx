@@ -9,6 +9,7 @@ import { UsernameField } from './username-field';
 
 export function PhoneNumberOrUsernameField({
   className,
+  name = undefined,
   labelPhoneNumber = 'Phone number',
   labelUsername = 'Username',
   locationBasedCountryIso,
@@ -36,11 +37,13 @@ export function PhoneNumberOrUsernameField({
   return showUsernameField ? (
     <UsernameField
       {...props}
+      name={name}
       label={labelUsername}
       alternativeFieldTrigger={toggle}
     />
   ) : (
     <PhoneNumberField
+      name={name}
       label={labelPhoneNumber}
       locationBasedCountryIso={locationBasedCountryIso}
       alternativeFieldTrigger={toggle}
