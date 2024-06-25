@@ -2,9 +2,9 @@ import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/c
 import { Clerk } from '@clerk/clerk-js/headless';
 import type { HeadlessBrowserClerk } from '@clerk/clerk-react';
 
+import { MemoryTokenCache } from '../caches/MemoryTokenCache';
 import type { TokenCache } from '../caches/types';
-import { MemoryTokenCache } from './cache/MemoryTokenCache';
-import { errorThrower } from './errorThrower';
+import { errorThrower } from '../errorThrower';
 
 Clerk.sdkMetadata = {
   name: PACKAGE_NAME,
@@ -61,7 +61,6 @@ export function getClerkInstance(options?: BuildClerkOptions): HeadlessBrowserCl
     const saveToken = tokenCache.saveToken;
     __internal_clerk = clerk = new Clerk(publishableKey);
 
-    // @ts-expect-error
     __internal_clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
       // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
       requestInit.credentials = 'omit';
@@ -72,7 +71,6 @@ export function getClerkInstance(options?: BuildClerkOptions): HeadlessBrowserCl
       (requestInit.headers as Headers).set('authorization', jwt || '');
     });
 
-    // @ts-expect-error
     __internal_clerk.__unstable__onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
       const authHeader = response.headers.get('authorization');
       if (authHeader) {
