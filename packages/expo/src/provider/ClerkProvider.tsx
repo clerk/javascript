@@ -6,15 +6,13 @@ import React from 'react';
 import type { TokenCache } from '../caches/types';
 import { isNative } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
-import { buildClerk } from './singleton';
-import { isNative } from './utils/runtime';
 
 export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider> & {
   tokenCache?: TokenCache;
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const { children, tokenCache, publishableKey, ...rest } = props;
+  const { children, tokenCache, publishableKey, key, ...rest } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   return (
@@ -23,7 +21,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
       // See JS-598 for additional context.
       key={key}
       {...rest}
-      publishableKey={key}
+      publishableKey={pk}
       Clerk={isNative() ? getClerkInstance({ publishableKey: pk, tokenCache }) : null}
       standardBrowser={!isNative()}
     >

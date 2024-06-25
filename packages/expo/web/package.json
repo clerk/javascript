@@ -1,0 +1,6 @@
+{
+  "main": "./dist/web/index.js",
+  "source": "./src/web/index.js",
+  "react-native": "./src/web/index.ts",
+  "types": "dist/web/index.d.ts"
+}

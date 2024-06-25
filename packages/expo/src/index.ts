@@ -6,7 +6,7 @@ export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskErro
  * @deprecated Use `getClerkInstance()` instead.
  */
 export { clerk as Clerk } from './provider/singleton';
-export { getClerkInstance } from './singleton';
+export { getClerkInstance } from './provider/singleton';
 
 export * from './provider/ClerkProvider';
 export * from './hooks';
