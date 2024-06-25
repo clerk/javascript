@@ -714,7 +714,7 @@ export class Clerk implements ClerkInterface {
 
     // If this.session exists, then signOut was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
-    const shouldSignOutSession = this.session && newSession === null;
+    const shouldSignOutSession = newSession === null;
     if (shouldSignOutSession) {
       this.#broadcastSignOutEvent();
       eventBus.dispatch(events.TokenUpdate, { token: null });
@@ -732,7 +732,7 @@ export class Clerk implements ClerkInterface {
     }
 
     // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
-    await newSession?.getToken();
+    await newSession?.getToken({ skipCache: true });
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.

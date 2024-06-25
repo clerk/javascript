@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 
 import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
@@ -13,6 +13,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const card = useCardState();
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
   const { user } = useUser();
+  const { setActive } = useClerk();
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
 
@@ -38,12 +39,17 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
       }
 
       await user.delete();
-
-      // TODO: Investigate if we need to call `setActive` with {session: null}
       if (otherSessions.length === 0) {
-        return navigateAfterSignOut();
+        return setActive({
+          session: null,
+          beforeEmit: navigateAfterSignOut,
+        });
       }
-      await navigateAfterMultiSessionSingleSignOutUrl();
+
+      return setActive({
+        session: null,
+        beforeEmit: navigateAfterMultiSessionSingleSignOutUrl,
+      });
     } catch (e) {
       handleError(e, [], card.setError);
     }
