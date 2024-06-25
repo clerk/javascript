@@ -96,7 +96,7 @@ export function createDevBrowser({ cookieSuffix, frontendApi, fapiClient }: Crea
     }
 
     const data = await response.json();
-    setDevBrowserJWT(data?.token);
+    setDevBrowserJWT(data?.id);
   }
 
   return {
