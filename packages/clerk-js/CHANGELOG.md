@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.7.2
+
+### Patch Changes
+
+- Correctly use updated protocol verification in all code paths ([#3605](https://github.com/clerk/javascript/pull/3605)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`72888323b`](https://github.com/clerk/javascript/commit/72888323ba5effb53bbd50456dc9bfb5895c5b5a)]:
+  - @clerk/localizations@2.4.6
+
 ## 5.7.1
 
 ### Patch Changes

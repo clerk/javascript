@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.6
+
+### Patch Changes
+
+- Add Italian localizations ([#3608](https://github.com/clerk/javascript/pull/3608)) by [@mazzasaverio](https://github.com/mazzasaverio)
+
 ## 2.4.5
 
 ### Patch Changes
