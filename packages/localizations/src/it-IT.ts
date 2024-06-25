@@ -50,7 +50,8 @@ export const itIT: LocalizationResource = {
   formFieldError__notMatchingPasswords: 'Le password non coincidono.',
   formFieldError__verificationLinkExpired: 'Il link di verifica è scaduto. Per favore richiedi un nuovo link.',
   formFieldHintText__optional: 'Opzionale',
-  formFieldHintText__slug: 'Uno slug è un identificativo leggibile dall’uomo che deve essere univoco. Spesso viene usato negli URL.',
+  formFieldHintText__slug:
+    'Uno slug è un identificativo leggibile dall’uomo che deve essere univoco. Spesso viene usato negli URL.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Elimina account',
   formFieldInputPlaceholder__emailAddress: '',
@@ -199,7 +200,7 @@ export const itIT: LocalizationResource = {
         menuAction__verify: 'Verifica',
         primaryButton: 'Aggiungi dominio',
         subtitle:
-          'Consenti agli utenti di unirsi automaticamente all\'organizzazione oppure di richiedere di unirsi in base a un dominio email verificato.',
+          "Consenti agli utenti di unirsi automaticamente all'organizzazione oppure di richiedere di unirsi in base a un dominio email verificato.",
         title: 'Domini verificati',
       },
       successMessage: "L'organizzazione é stata aggiornata.",
@@ -216,7 +217,7 @@ export const itIT: LocalizationResource = {
       headerTitle__members: 'Membri',
       profileSection: {
         primaryButton: '',
-        title: 'Profilo dell\'organizzazione',
+        title: "Profilo dell'organizzazione",
         uploadAction__title: 'Logo',
       },
     },
@@ -229,17 +230,17 @@ export const itIT: LocalizationResource = {
       },
       enrollmentTab: {
         automaticInvitationOption__description:
-          'Gli utenti sono automaticamente invitati a unirsi all\'organizzazione quando si registrano e possono unirsi in qualsiasi momento.',
+          "Gli utenti sono automaticamente invitati a unirsi all'organizzazione quando si registrano e possono unirsi in qualsiasi momento.",
         automaticInvitationOption__label: 'Inviti automatici',
         automaticSuggestionOption__description:
-          'Gli utenti ricevono un suggerimento per richiedere di unirsi, ma devono essere approvati da un amministratore prima di poter accedere all\'organizzazione.',
+          "Gli utenti ricevono un suggerimento per richiedere di unirsi, ma devono essere approvati da un amministratore prima di poter accedere all'organizzazione.",
         automaticSuggestionOption__label: 'Suggerimenti automatici',
         calloutInfoLabel: 'La modifica della modalità di iscrizione influenzerà solo i nuovi utenti.',
         calloutInvitationCountLabel: 'Inviti in sospeso inviati agli utenti: {{count}}',
         calloutSuggestionCountLabel: 'Suggerimenti in sospeso inviati agli utenti: {{count}}',
-        manualInvitationOption__description: 'Gli utenti possono essere invitati manualmente solo all\'organizzazione.',
+        manualInvitationOption__description: "Gli utenti possono essere invitati manualmente solo all'organizzazione.",
         manualInvitationOption__label: 'Nessuna iscrizione automatica',
-        subtitle: 'Scegli come gli utenti di questo dominio possono unirsi all\'organizzazione.',
+        subtitle: "Scegli come gli utenti di questo dominio possono unirsi all'organizzazione.",
       },
       start: {
         headerTitle__danger: 'Pericolo',
@@ -253,7 +254,8 @@ export const itIT: LocalizationResource = {
       formTitle: 'Codice di verifica',
       resendButton: 'Non hai ricevuto un codice? Reinvia',
       subtitle: 'Il dominio {{domainName}} deve essere verificato tramite email.',
-      subtitleVerificationCodeScreen: 'È stato inviato un codice di verifica a {{emailAddress}}. Inserisci il codice per continuare.',
+      subtitleVerificationCodeScreen:
+        'È stato inviato un codice di verifica a {{emailAddress}}. Inserisci il codice per continuare.',
       title: 'Verifica dominio',
     },
   },
@@ -274,7 +276,7 @@ export const itIT: LocalizationResource = {
     accountSwitcher: {
       action__addAccount: 'Aggiungi account',
       action__signOutAll: 'Disconnettiti da tutti gli account',
-      subtitle: 'Seleziona l\'account con cui desideri continuare.',
+      subtitle: "Seleziona l'account con cui desideri continuare.",
       title: 'Scegli un account',
     },
     alternativeMethods: {
@@ -334,7 +336,7 @@ export const itIT: LocalizationResource = {
       verifiedSwitchTab: {
         subtitle: 'Ritorna alla scheda originaria per continuare',
         subtitleNewTab: 'Ritorna sulla nuova scheda aperta per continuare',
-        titleNewTab: 'Accedi da un\'altra scheda',
+        titleNewTab: "Accedi da un'altra scheda",
       },
     },
     forgotPassword: {
@@ -351,7 +353,7 @@ export const itIT: LocalizationResource = {
       title: 'Hai dimenticato la password?',
     },
     noAvailableMethods: {
-      message: 'Impossibile procedere con l\'accesso. Non ci sono strumenti di autenticazione disponibili.',
+      message: "Impossibile procedere con l'accesso. Non ci sono strumenti di autenticazione disponibili.",
       subtitle: 'Si è verificato un errore',
       title: 'Impossibile accedere',
     },
@@ -465,7 +467,7 @@ export const itIT: LocalizationResource = {
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '',
     form_param_format_invalid: '',
-    form_param_format_invalid__email_address: 'L\'indirizzo email deve essere un indirizzo email valido.',
+    form_param_format_invalid__email_address: "L'indirizzo email deve essere un indirizzo email valido.",
     form_param_format_invalid__phone_number: 'Il numero di telefono deve essere in un formato internazionale valido',
     form_param_max_length_exceeded__first_name: 'Il nome non deve superare i 256 caratteri.',
     form_param_max_length_exceeded__last_name: 'Il cognome non deve superare i 256 caratteri.',
@@ -485,7 +487,8 @@ export const itIT: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: 'Una chiave di accesso è già registrata con questo dispositivo.',
     passkey_not_supported: 'Le chiavi di accesso non sono supportate su questo dispositivo.',
-    passkey_pa_not_supported: 'La registrazione richiede un autenticatore di piattaforma ma il dispositivo non lo supporta.',
+    passkey_pa_not_supported:
+      'La registrazione richiede un autenticatore di piattaforma ma il dispositivo non lo supporta.',
     passkey_registration_cancelled: 'La registrazione della chiave di accesso è stata annullata o è scaduta.',
     passkey_retrieval_cancelled: 'La verifica della chiave di accesso è stata annullata o è scaduta.',
     passwordComplexity: {
@@ -632,7 +635,7 @@ export const itIT: LocalizationResource = {
       successMessage1:
         'Quando accedi, dovrai inserire un codice di verifica inviato a questo numero di telefono come passaggio aggiuntivo.',
       successMessage2:
-        'Salva questi codici di backup e conservali in un luogo sicuro. Se perdi l\'accesso al tuo dispositivo di autenticazione, puoi utilizzare i codici di backup per accedere.',
+        "Salva questi codici di backup e conservali in un luogo sicuro. Se perdi l'accesso al tuo dispositivo di autenticazione, puoi utilizzare i codici di backup per accedere.",
       successTitle: 'Verifica codice SMS abilitata',
       title: 'Aggiungi verifica tramite SMS',
     },
@@ -705,7 +708,8 @@ export const itIT: LocalizationResource = {
       imageFormDestructiveActionSubtitle: 'Rimuovi immagine',
       imageFormSubtitle: 'Carica immagine',
       imageFormTitle: 'Immagine di profilo',
-      readonly: 'Le informazioni del tuo profilo sono state fornite dalla connessione aziendale e non possono essere modificate.',
+      readonly:
+        'Le informazioni del tuo profilo sono state fornite dalla connessione aziendale e non possono essere modificate.',
       successMessage: 'Il tuo profile é stato aggiornato.',
       title: 'Aggiorna profilo',
     },
