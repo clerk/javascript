@@ -22,26 +22,36 @@ test.describe('dynamic keys @nextjs', () => {
             auth().protect();
           }
         }, {
+          secretKey: process.env.CLERK_DYNAMIC_SECRET_KEY,
           signInUrl: '/foobar'
         });
 
         export const config = {
-          matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+          matcher: ['/((?!.*\\\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
         };`,
       )
       .addFile(
         'src/app/protected/page.tsx',
-        () => `
+        () => `import { SignedIn, SignedOut } from '@clerk/nextjs';
+
 export default function Page({ children }: { children: React.ReactNode }) {
   return (
-    <p>Protected</p>
+    <div>
+     <SignedIn>
+      Signed in
+    </SignedIn>
+
+    <SignedOut>
+      Signed out
+    </SignedOut>
+    </div>
   );
 }
       `,
       )
       .commit();
     await app.setup();
-    await app.withEnv(appConfigs.envs.withEmailCodes);
+    await app.withEnv(appConfigs.envs.withDynamicKeys);
     await app.dev();
   });
 
@@ -51,10 +61,13 @@ export default function Page({ children }: { children: React.ReactNode }) {
 
   test('redirects to `signInUrl` on `auth.protect`', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
+
     await u.page.goToStart();
+
     await u.po.expect.toBeSignedOut();
 
     await u.page.goToRelative('/protected');
+
     await u.page.waitForURL(/foobar/);
   });
 });
