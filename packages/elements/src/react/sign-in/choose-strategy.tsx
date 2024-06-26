@@ -1,10 +1,10 @@
-import type { SignInFactor, SignInFirstFactor, SignInStrategy as TSignInStrategy } from '@clerk/types';
+import type { SignInFactor, SignInStrategy as TSignInStrategy } from '@clerk/types';
 import { Slot } from '@radix-ui/react-slot';
 import { useSelector } from '@xstate/react';
 import * as React from 'react';
 import type { ActorRefFrom } from 'xstate';
 
-import type { TSignInFirstFactorMachine } from '~/internals/machines/sign-in';
+import type { TSignInFirstFactorMachine, TSignInSecondFactorMachine } from '~/internals/machines/sign-in';
 import { SignInRouterSystemId } from '~/internals/machines/sign-in';
 
 import { useActiveTags } from '../hooks';
@@ -43,7 +43,19 @@ export const SignInChooseStrategyCtx = createContextForDomValidation('SignInChoo
 
 export function SignInChooseStrategy({ children, ...props }: SignInChooseStrategyProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:choose-strategy'], ActiveTagsMode.all);
+  const activeStateFirstFactor = useActiveTags(
+    routerRef,
+    ['route:first-factor', 'route:choose-strategy'],
+    ActiveTagsMode.all,
+  );
+
+  const activeStateSecondFactor = useActiveTags(
+    routerRef,
+    ['route:second-factor', 'route:choose-strategy'],
+    ActiveTagsMode.all,
+  );
+
+  const activeState = activeStateFirstFactor || activeStateSecondFactor;
 
   return activeState ? (
     <SignInChooseStrategyCtx.Provider>
@@ -68,7 +80,7 @@ const SUPPORTED_STRATEGY_NAME = 'SignInSupportedStrategy';
 export type SignInSupportedStrategyElement = React.ElementRef<'button'>;
 export type SignInSupportedStrategyProps = {
   asChild?: boolean;
-  name: Exclude<SignInFirstFactor['strategy'], `oauth_${string}` | 'saml'>;
+  name: Exclude<SignInFactor['strategy'], `oauth_${string}` | 'saml'>;
   children: React.ReactNode;
 };
 
@@ -93,10 +105,14 @@ export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyE
     const snapshot = routerRef.getSnapshot();
 
     const supportedFirstFactors = snapshot.context.clerk.client.signIn.supportedFirstFactors;
-    const factor = supportedFirstFactors.find(factor => name === factor.strategy);
+    const supportedSecondFactors = snapshot.context.clerk.client.signIn.supportedSecondFactors;
+    const factor = [...supportedFirstFactors, ...supportedSecondFactors].find(factor => name === factor.strategy);
 
-    const currentFirstFactor = useSelector(
-      snapshot.children[SignInRouterSystemId.firstFactor] as unknown as ActorRefFrom<TSignInFirstFactorMachine>,
+    const currentFactor = useSelector(
+      (snapshot.children[SignInRouterSystemId.firstFactor] ||
+        snapshot.children[SignInRouterSystemId.secondFactor]) as unknown as ActorRefFrom<
+        TSignInFirstFactorMachine | TSignInSecondFactorMachine
+      >,
       state => state?.context.currentFactor?.strategy,
     );
 
@@ -106,7 +122,7 @@ export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyE
     );
 
     // Don't render if the current factor is the same as the one we're trying to render
-    if (currentFirstFactor === name) {
+    if (currentFactor === name) {
       return null;
     }
 
