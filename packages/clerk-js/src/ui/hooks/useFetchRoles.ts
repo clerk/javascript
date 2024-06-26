@@ -13,7 +13,10 @@ const getRolesParams = {
 };
 export const useFetchRoles = (enabled = true) => {
   const { organization } = useOrganization();
-  const { data, isLoading } = useFetch(enabled ? organization?.getRoles : undefined, getRolesParams);
+  const { data, isLoading } = useFetch(enabled && !!organization?.id ? organization?.getRoles : undefined, {
+    ...getRolesParams,
+    orgId: organization?.id,
+  });
 
   return {
     isLoading,
