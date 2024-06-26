@@ -1,6 +1,5 @@
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isNetworkError } from '@clerk/shared/error';
-import { getCookieSuffix } from '@clerk/shared/keys';
 import type { Clerk, EnvironmentResource } from '@clerk/types';
 
 import { clerkCoreErrorTokenRefreshFailed, clerkMissingDevBrowserJwt } from '../errors';
@@ -10,6 +9,7 @@ import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
 import type { SessionCookieHandler } from './cookies/session';
 import { createSessionCookie } from './cookies/session';
+import { getCookieSuffix } from './cookieSuffix';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
 import { SessionCookiePoller } from './SessionCookiePoller';
