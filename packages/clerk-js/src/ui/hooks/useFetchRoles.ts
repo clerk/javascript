@@ -1,4 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
+import type { GetRolesParams } from '@clerk/types';
 
 import { useLocalizations } from '../localization';
 import { customRoleLocalizationKey, roleLocalizationKey } from '../utils';
@@ -13,7 +14,8 @@ const getRolesParams = {
 };
 export const useFetchRoles = (enabled = true) => {
   const { organization } = useOrganization();
-  const { data, isLoading } = useFetch(enabled && !!organization?.id ? organization?.getRoles : undefined, {
+  const getRoles = ({ pageSize, initialPage }: GetRolesParams) => organization!.getRoles({ pageSize, initialPage });
+  const { data, isLoading } = useFetch(enabled && !!organization?.id ? getRoles : undefined, {
     ...getRolesParams,
     orgId: organization?.id,
   });
