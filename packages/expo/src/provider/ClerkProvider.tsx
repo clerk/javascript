@@ -10,6 +10,11 @@ export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider>
   tokenCache?: TokenCache;
 };
 
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+};
+
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   const { children, tokenCache, publishableKey, ...rest } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
@@ -21,6 +26,7 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
       key={pk}
       {...rest}
       publishableKey={pk}
+      sdkMetadata={SDK_METADATA}
       Clerk={isNative() ? getClerkInstance({ publishableKey: pk, tokenCache }) : null}
       standardBrowser={!isNative()}
     >
