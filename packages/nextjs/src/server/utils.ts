@@ -117,13 +117,7 @@ export function decorateRequest(
   req: ClerkRequest,
   res: Response,
   requestState: RequestState,
-  {
-    secretKey,
-    signInUrl,
-    signUpUrl,
-    publishableKey,
-  }: Pick<AuthenticateRequestOptions, 'publishableKey' | 'signInUrl' | 'signUpUrl'> &
-    Required<Pick<AuthenticateRequestOptions, 'secretKey'>>,
+  requestData?: AuthenticateRequestOptions,
 ): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
@@ -158,12 +152,12 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
-    const clerkRequestData = encryptClerkRequestData({ secretKey, signInUrl, signUpUrl, publishableKey });
+    const clerkRequestData = encryptClerkRequestData(requestData);
 
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
       [constants.Headers.AuthToken]: token || '',
-      [constants.Headers.AuthSignature]: token ? createTokenSignature(token, secretKey) : '',
+      [constants.Headers.AuthSignature]: token ? createTokenSignature(token, requestData?.secretKey ?? SECRET_KEY) : '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
@@ -252,17 +246,22 @@ export function assertTokenSignature(token: string, key: string, signature?: str
  * Encrypt request data propagated between server requests.
  * @internal
  **/
-export function encryptClerkRequestData(options: Partial<AuthenticateRequestOptions>) {
-  if (options.secretKey && !ENCRYPTION_KEY) {
+export function encryptClerkRequestData(requestData?: Partial<AuthenticateRequestOptions>) {
+  if (!requestData || !Object.values(requestData).length) {
+    return;
+  }
+
+  if (requestData.secretKey && !ENCRYPTION_KEY) {
     // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
     logger.warnOnce(
       'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#server-side-options-propagation',
     );
+
     return;
   }
 
   return AES.encrypt(
-    JSON.stringify(options),
+    JSON.stringify(requestData),
     ENCRYPTION_KEY ?? assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
   ).toString();
 }
