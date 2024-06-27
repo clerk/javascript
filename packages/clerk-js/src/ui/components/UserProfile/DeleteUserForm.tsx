@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 
 import { useSignOutContext } from '../../contexts';
 import { Col, localizationKeys, Text, useLocalizations } from '../../customizables';
@@ -15,6 +15,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
   const { user } = useUser();
   const { t } = useLocalizations();
   const { otherSessions } = useMultipleSessions({ user });
+  const { setActive, client } = useClerk();
 
   const confirmationField = useFormControl('deleteConfirmation', '', {
     type: 'text',
@@ -37,13 +38,17 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
         throw Error('user is not defined');
       }
 
+      // Store the session so it can be ended after the user is deleted
+      const session = client.lastActiveSessionId;
       await user.delete();
-
       // TODO: Investigate if we need to call `setActive` with {session: null}
-      if (otherSessions.length === 0) {
-        return navigateAfterSignOut();
-      }
-      await navigateAfterMultiSessionSingleSignOutUrl();
+      const navigationCallback = otherSessions.length === 0
+        ? navigateAfterSignOut
+        : navigateAfterMultiSessionSingleSignOutUrl;
+      return await setActive({
+        session,
+        beforeEmit: navigateAfterSignOut,
+      });
     } catch (e) {
       handleError(e, [], card.setError);
     }
