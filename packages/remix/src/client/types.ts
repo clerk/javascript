@@ -39,3 +39,11 @@ export type RemixClerkProviderProps = Without<ClerkProviderProps, 'publishableKe
   publishableKey?: string;
   children: React.ReactNode;
 };
+
+declare global {
+  interface Window {
+    __remixContext: {
+      isSpaMode?: boolean;
+    };
+  }
+}

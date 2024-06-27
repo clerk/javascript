@@ -82,3 +82,14 @@ export const satelliteAndMissingProxyUrlAndDomain = createErrorMessage(
 export const satelliteAndMissingSignInUrl = createErrorMessage(`
 Invalid signInUrl. A satellite application requires a signInUrl for development instances.
 Check if signInUrl is missing from your configuration or if it is not an absolute URL.`);
+
+export const publishableKeyMissingErrorInSpaMode = createErrorMessage(`
+You're trying to use Clerk in Remix SPA Mode without providing a Publishable Key.
+Please provide a publishableKey in the options of the ClerkApp component.
+
+Example:
+
+export default ClerkApp(App, {
+  publishableKey: 'pk_test_XXX'
+});
+`);

@@ -33,20 +33,20 @@ const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> |
  */
 type ClerkProviderPropsWithState = RemixClerkProviderProps & {
   clerkState: ClerkState;
-  spaMode?: boolean;
 };
 
 export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
+  const isSpaMode = window.__remixContext?.isSpaMode;
 
   React.useEffect(() => {
     awaitableNavigateRef.current = awaitableNavigate;
   }, [awaitableNavigate]);
 
-  const { clerkState, spaMode, ...restProps } = rest;
+  const { clerkState, ...restProps } = rest;
   ReactClerkProvider.displayName = 'ReactClerkProvider';
 
-  if (!spaMode) {
+  if (!isSpaMode) {
     assertValidClerkState(clerkState);
   }
 
@@ -72,7 +72,7 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
   } = clerkState?.__internal_clerk_state || {};
 
   React.useEffect(() => {
-    if (!spaMode) {
+    if (!isSpaMode) {
       warnForSsr(clerkState);
     }
   }, []);
@@ -82,9 +82,9 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
   }, []);
 
   const mergedProps = {
-    publishableKey: __publishableKey as any,
-    proxyUrl: __proxyUrl as any,
-    domain: __domain as any,
+    publishableKey: __publishableKey,
+    proxyUrl: __proxyUrl,
+    domain: __domain,
     isSatellite: __isSatellite,
     signInUrl: __signInUrl,
     signUpUrl: __signUpUrl,

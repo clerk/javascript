@@ -1,7 +1,7 @@
 import type { AppLoadContext } from '@remix-run/server-runtime';
 
 import type { ClerkState } from '../client/types';
-import { invalidClerkStatePropError, noClerkStateError } from './errors';
+import { invalidClerkStatePropError, noClerkStateError, publishableKeyMissingErrorInSpaMode } from './errors';
 
 export function warnForSsr(val: ClerkState | undefined) {
   if (!val || !val.__internal_clerk_state) {
@@ -21,6 +21,12 @@ export function assertValidClerkState(val: any): asserts val is ClerkState | und
   }
   if (!!val && !val.__internal_clerk_state) {
     throw new Error(invalidClerkStatePropError);
+  }
+}
+
+export function assertPublishableKeyInSpaMode(key: any): asserts key is string {
+  if (!key || typeof key !== 'string') {
+    throw new Error(publishableKeyMissingErrorInSpaMode);
   }
 }
 

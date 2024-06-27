@@ -1,24 +1,27 @@
 import { useLoaderData } from '@remix-run/react';
 import React from 'react';
 
+import { assertPublishableKeyInSpaMode } from '../utils';
 import { ClerkProvider } from './RemixClerkProvider';
 import type { RemixClerkProviderProps } from './types';
 
-type SpaModeOptions = { spaMode: true; publishableKey: string } | { spaMode?: false; publishableKey?: string };
-
 type ClerkAppOptions = Partial<
-  Omit<RemixClerkProviderProps, 'routerPush' | 'routerReplace' | 'children' | 'clerkState' | 'publishableKey'>
-> &
-  SpaModeOptions;
+  Omit<RemixClerkProviderProps, 'routerPush' | 'routerReplace' | 'children' | 'clerkState'>
+>;
 
 export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
   return () => {
     let clerkState;
+    const isSpaMode = window.__remixContext?.isSpaMode;
 
     // Don't use `useLoaderData` to fetch the clerk state if we're in SPA mode
-    if (!opts?.spaMode) {
+    if (!isSpaMode) {
       const loaderData = useLoaderData<{ clerkState: any }>();
       clerkState = loaderData.clerkState;
+    }
+
+    if (isSpaMode) {
+      assertPublishableKeyInSpaMode(opts.publishableKey);
     }
 
     return (
