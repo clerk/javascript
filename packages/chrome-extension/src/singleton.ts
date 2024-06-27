@@ -4,10 +4,10 @@ import { DEV_BROWSER_JWT_KEY } from '@clerk/shared';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
-import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION, STORAGE_KEY_CLIENT_JWT } from './constants';
+import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
 import type { GetClientCookieParams } from './utils/cookies';
-import { getClientCookie } from './utils/cookies';
-import { assertPublishableKey, errorLogger } from './utils/errors';
+import { assertPublishableKey } from './utils/errors';
+import { JWTHandler } from './utils/jwt-handler';
 import { getValidPossibleManifestHosts, validateHostPermissionExistence, validateManifest } from './utils/manifest';
 import { BrowserStorageCache, type StorageCache } from './utils/storage';
 
@@ -53,16 +53,9 @@ export async function buildClerk({
         name: DEV_BROWSER_JWT_KEY,
       };
 
-  // Get client cookie from browser
-  const clientCookie = await getClientCookie(getClientCookieParams).catch(errorLogger);
-
-  // Create StorageCache key
-  const CACHE_KEY = storageCache.createKey(key.frontendApi, STORAGE_KEY_CLIENT_JWT);
-
-  // Set client cookie in StorageCache
-  if (clientCookie) {
-    await storageCache.set(CACHE_KEY, clientCookie.value).catch(errorLogger);
-  }
+  // Set up JWT handler and attempt to get JWT from storage on initialization
+  const jwt = JWTHandler(storageCache, { ...getClientCookieParams, frontendApi: key.frontendApi });
+  void jwt.poll();
 
   // Create Clerk instance
   clerk = new Clerk(publishableKey);
@@ -73,9 +66,9 @@ export async function buildClerk({
     requestInit.credentials = 'omit';
     requestInit.url?.searchParams.append('_is_native', '1');
 
-    const jwt = await storageCache.get(CACHE_KEY);
+    const currentJWT = await jwt.get();
 
-    (requestInit.headers as Headers).set('authorization', jwt || '');
+    (requestInit.headers as Headers).set('authorization', currentJWT || '');
   });
 
   // Store updated JWT in StorageCache on Clerk responses
@@ -84,7 +77,7 @@ export async function buildClerk({
     const authHeader = response.headers.get('authorization');
 
     if (authHeader) {
-      await storageCache.set(CACHE_KEY, authHeader);
+      await jwt.set(authHeader);
     }
   });
 

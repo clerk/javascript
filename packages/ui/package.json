@@ -1,12 +1,17 @@
 {
   "name": "@clerk/ui",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "private": true,
   "license": "MIT",
   "author": {
     "name": "Clerk, Inc.",
     "email": "support@clerk.com",
     "url": "git+https://github.com/clerk/javascript.git"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/ui"
   },
   "exports": {
     "./*": {
@@ -31,12 +36,13 @@
     "bundlewatch": "npx bundlewatch --config bundlewatch.config.json"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.2.4",
-    "@clerk/elements": "^0.6.0",
-    "@clerk/types": "^4.5.1",
-    "@radix-ui/react-slot": "^1.0.2",
-    "clsx": "^2.1.1",
+    "@clerk/clerk-react": "*",
+    "@clerk/elements": "*",
+    "@clerk/shared": "*",
+    "@clerk/types": "*",
+    "@radix-ui/react-slot": "^1.1.0",
     "cmdk": "^1.0.0",
+    "cva": "^1.0.0-beta.1",
     "react-aria-components": "^1.2.1"
   },
   "devDependencies": {

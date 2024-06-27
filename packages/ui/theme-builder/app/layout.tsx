@@ -2,7 +2,7 @@ import './globals.css';
 import '../../dist/styles.css';
 
 import { ClerkProvider } from '@clerk/nextjs';
-import clsx from 'clsx';
+import { cx } from 'cva';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
@@ -26,7 +26,7 @@ export default function RootLayout({
         lang='en'
         className='h-full'
       >
-        <body className={clsx(inter.className, 'flex min-h-full flex-col')}>
+        <body className={cx(inter.className, 'flex min-h-full flex-col')}>
           <ThemeBuilder>{children}</ThemeBuilder>
         </body>
       </html>

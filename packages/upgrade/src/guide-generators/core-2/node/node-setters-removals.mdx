@@ -1,0 +1,34 @@
+### Clerk client setters removed in favor of `createClerkClient` options
+
+The following setter methods have been removed in the lastest version. If you were using any of these functions, their functionality can be replaced by instead passing the correponding option to `createClerkClient`.
+
+- `setClerkApiVersion`
+- `setClerkHttpOptions`
+- `setClerkServerApiUrl`
+- `setClerkApiKey`
+
+Code example:
+
+```diff
+  import {
+     clerkClient,
+-    setClerkApiKey,
+-    setClerkApiVersion,
+-    setClerkHttpOptions,
+-    setClerkServerApiUrl
+} from "@clerk/clerk-sdk-node"
+
+- setClerkApiKey("...")
+- setClerkApiVersion("...")
+- setClerkHttpOptions("...")
+- setClerkServerApiUrl("...")
+
+  const clerkClient = createClerkClient({
++     secretKey: "..."
++     apiVersion: "..."
++     httpOptions: "..."
++     serverApiUrl: "..."
+  })
+
+  await clerkClient.users.getUser(userId);
+```

@@ -1,4 +1,4 @@
-import cn from 'clsx';
+import { cx } from 'cva';
 import * as React from 'react';
 
 import * as Icon from './icon';
@@ -13,7 +13,7 @@ export const Alert = React.forwardRef<
     <div
       ref={forwardedRef}
       {...props}
-      className={cn(
+      className={cx(
         'leading-small rounded-md border px-4 py-3 text-base',
         {
           warning: 'text-warning bg-warning/10 border-warning/20',

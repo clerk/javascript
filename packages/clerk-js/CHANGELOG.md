@@ -1,5 +1,37 @@
 # Change Log
 
+## 5.7.2
+
+### Patch Changes
+
+- Correctly use updated protocol verification in all code paths ([#3605](https://github.com/clerk/javascript/pull/3605)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`72888323b`](https://github.com/clerk/javascript/commit/72888323ba5effb53bbd50456dc9bfb5895c5b5a)]:
+  - @clerk/localizations@2.4.6
+
+## 5.7.1
+
+### Patch Changes
+
+- Bug fix: Skip password strategy for users who authenticate with SAML. ([#3578](https://github.com/clerk/javascript/pull/3578)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `organizationAvatarUploaderContainer` descriptor which is used e.g. for the logo upload box inside "Create Organization" flow ([#3596](https://github.com/clerk/javascript/pull/3596)) by [@LekoArts](https://github.com/LekoArts)
+
+- Remove the qs library and use the native URLSearchParams API instead. ([#3430](https://github.com/clerk/javascript/pull/3430)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Allow chrome-extension: protocol in validation ([#3584](https://github.com/clerk/javascript/pull/3584)) by [@LekoArts](https://github.com/LekoArts)
+
+- In a previous release the protocol validation for window navigation was added ([ref](https://github.com/clerk/javascript/commit/b91e0ef4036d215da09d144f85b0a5ef2afe6cba)). Since then only `http:` and `https:` were allowed. ([#3564](https://github.com/clerk/javascript/pull/3564)) by [@LekoArts](https://github.com/LekoArts)
+
+  With this release `wails:` is also supported again. If you think that the mentioned commit introduced a regression for you and your protocol should be supported, please open an issue.
+
+- Add the `title` attribute to `<OrganizationPreview>` component so that truncated organization names can be previewed e.g. through hovering ([#3522](https://github.com/clerk/javascript/pull/3522)) by [@davemo](https://github.com/davemo)
+
+- Updated dependencies [[`1273b04ec`](https://github.com/clerk/javascript/commit/1273b04ecf1866b59ef59a74abe31dbcc726da2c)]:
+  - @clerk/types@4.6.1
+  - @clerk/localizations@2.4.5
+  - @clerk/shared@2.3.1
+
 ## 5.7.0
 
 ### Minor Changes
@@ -101,8 +133,10 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async response => {
-      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
+    callback: async (response) => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
+        token: response.credential,
+      });
       await Clerk.handleGoogleOneTapCallback(signInOrUp, {
         signInForceRedirectUrl: window.location.href,
       });
@@ -114,9 +148,11 @@
 
   ```tsx
   google.accounts.id.initialize({
-    callback: async response => {
-      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({ token: response.credential });
-      if (signInOrUp.status === 'complete') {
+    callback: async (response) => {
+      const signInOrUp = await Clerk.authenticateWithGoogleOneTap({
+        token: response.credential,
+      });
+      if (signInOrUp.status === "complete") {
         await Clerk.setActive({
           session: signInOrUp.createdSessionId,
         });
@@ -187,8 +223,8 @@
 
   ```tsx
   <__experimental_GoogleOneTap
-    signInForceRedirectUrl=''
-    signUpForceRedirectUrl=''
+    signInForceRedirectUrl=""
+    signUpForceRedirectUrl=""
   />
   ```
 
@@ -323,10 +359,7 @@
   Example that will throw an error:
 
   ```tsx
-  <SignIn
-    routing='hash'
-    path='/sign-in'
-  />
+  <SignIn routing="hash" path="/sign-in" />
   ```
 
 - c2a090513: Change the minimal Node.js version required by Clerk to `18.17.0`.
@@ -560,8 +593,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: '';
-    role: 'admin' | 'basic_member' | 'guest_member';
+    permission: "";
+    role: "admin" | "basic_member" | "guest_member";
   }
   ```
 
@@ -1514,8 +1547,8 @@
   ```ts
   // clerk.d.ts
   interface ClerkAuthorization {
-    permission: '';
-    role: 'admin' | 'basic_member' | 'guest_member';
+    permission: "";
+    role: "admin" | "basic_member" | "guest_member";
   }
   ```
 
@@ -1672,10 +1705,7 @@
   Example that will throw an error:
 
   ```tsx
-  <SignIn
-    routing='hash'
-    path='/sign-in'
-  />
+  <SignIn routing="hash" path="/sign-in" />
   ```
 
 ### Minor Changes
@@ -1939,19 +1969,15 @@
   ```tsx
   <UserProfile>
     <UserProfile.Page
-      label='Custom Page'
-      url='custom'
+      label="Custom Page"
+      url="custom"
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </UserProfile.Page>
-    <UserProfile.Link
-      label='External'
-      url='/home'
-      labelIcon={<Icon />}
-    />
-    <UserProfile.Page label='account' />
-    <UserProfile.Page label='security' />
+    <UserProfile.Link label="External" url="/home" labelIcon={<Icon />} />
+    <UserProfile.Page label="account" />
+    <UserProfile.Page label="security" />
   </UserProfile>
   ```
 
@@ -1964,19 +1990,19 @@
   ```tsx
   <OrganizationProfile>
     <OrganizationProfile.Page
-      label='Custom Page'
-      url='custom'
+      label="Custom Page"
+      url="custom"
       labelIcon={<CustomIcon />}
     >
       <MyCustomPageContent />
     </OrganizationProfile.Page>
     <OrganizationProfile.Link
-      label='External'
-      url='/home'
+      label="External"
+      url="/home"
       labelIcon={<Icon />}
     />
-    <OrganizationProfile.Page label='members' />
-    <OrganizationProfile.Page label='settings' />
+    <OrganizationProfile.Page label="members" />
+    <OrganizationProfile.Page label="settings" />
   </OrganizationProfile>
   ```
 

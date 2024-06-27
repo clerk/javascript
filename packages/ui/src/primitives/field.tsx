@@ -1,5 +1,5 @@
 import { Slot } from '@radix-ui/react-slot';
-import cn from 'clsx';
+import { cx } from 'cva';
 import * as React from 'react';
 
 import * as Icon from './icon';
@@ -14,7 +14,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cn(
+      className={cx(
         'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
         'flex flex-col gap-2',
         className,
@@ -38,7 +38,7 @@ export const Label = React.forwardRef(function Label(
     <label
       ref={forwardedRef}
       {...props}
-      className={cn(
+      className={cx(
         visuallyHidden
           ? 'sr-only'
           : 'text-gray-12 flex items-center gap-x-1 text-base font-medium opacity-[--cl-field-label-opacity,1]',
@@ -58,14 +58,14 @@ export const LabelEnd = React.forwardRef(function Label(
     <span
       ref={forwardedRef}
       {...props}
-      className={cn('flex-grow self-end text-end', className)}
+      className={cx('flex-grow self-end text-end', className)}
     >
       {children}
     </span>
   );
 });
 
-export const Optional = React.forwardRef(function Optional(
+export const Hint = React.forwardRef(function Hint(
   { className, children, ...props }: React.ComponentProps<typeof LabelEnd>,
   forwardedRef: React.ForwardedRef<React.ComponentRef<typeof LabelEnd>>,
 ) {
@@ -73,7 +73,7 @@ export const Optional = React.forwardRef(function Optional(
     <LabelEnd
       ref={forwardedRef}
       {...props}
-      className={cn('text-gray-10 text-sm font-medium', className)}
+      className={cx('text-gray-10 text-sm font-medium', className)}
     >
       {children}
     </LabelEnd>
@@ -102,7 +102,7 @@ export const Input = React.forwardRef(function Input(
     <Comp
       data-field-input=''
       ref={forwardedRef}
-      className={cn(
+      className={cx(
         'text-gray-12 relative flex min-w-0 rounded-md border bg-white bg-clip-padding px-2.5 py-1.5 text-base outline-none',
         'disabled:cursor-not-allowed disabled:opacity-50',
         // variant
@@ -164,7 +164,7 @@ export const Message = React.forwardRef<
     <p
       ref={forwardedRef}
       {...props}
-      className={cn(
+      className={cx(
         'flex gap-x-1 text-base',
         {
           start: 'justify-start',

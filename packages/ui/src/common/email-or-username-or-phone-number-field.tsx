@@ -1,13 +1,15 @@
 import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
+import { ToggleButton } from 'react-aria-components';
 
-import { LinkToggleButton } from '~/primitives/link-button';
+import { linkButton } from '~/primitives/link-button';
 
 import { EmailOrUsernameField } from './email-or-username-field';
 import { PhoneNumberField } from './phone-number-field';
 
 export function EmailOrUsernameOrPhoneNumberField({
   className,
+  name = undefined,
   labelEmailOrUsername = 'Email address or username',
   labelPhoneNumber = 'Phone number',
   locationBasedCountryIso,
@@ -26,19 +28,20 @@ export function EmailOrUsernameOrPhoneNumberField({
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
   const toggle = (
-    <LinkToggleButton
+    <ToggleButton
       isSelected={showPhoneNumberField}
       onChange={setShowPhoneNumberField}
-      size='sm'
+      className={linkButton({ size: 'sm', disabled: props.disabled })}
     >
       <span className='sr-only'>{toggleDescription}</span>
       {showPhoneNumberField ? 'Use email or username' : 'Use phone'}
-    </LinkToggleButton>
+    </ToggleButton>
   );
 
   return showPhoneNumberField ? (
     <PhoneNumberField
       label={labelPhoneNumber}
+      name={name}
       locationBasedCountryIso={locationBasedCountryIso}
       alternativeFieldTrigger={toggle}
       required={requiredPhoneNumber}
@@ -47,6 +50,7 @@ export function EmailOrUsernameOrPhoneNumberField({
   ) : (
     <EmailOrUsernameField
       {...props}
+      name={name}
       label={labelEmailOrUsername}
       alternativeFieldTrigger={toggle}
       required={requiredEmailOrUsername}

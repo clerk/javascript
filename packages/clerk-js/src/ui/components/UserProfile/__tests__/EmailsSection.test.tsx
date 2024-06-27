@@ -58,7 +58,11 @@ describe('EmailSection', () => {
       await userEvent.click(getByRole('button', { name: 'Add email address' }));
       await waitFor(() => getByRole('heading', { name: /Add email address/i }));
 
-      fixtures.clerk.user?.createEmailAddress.mockReturnValueOnce(Promise.resolve({} as any));
+      fixtures.clerk.user?.createEmailAddress.mockReturnValueOnce(
+        Promise.resolve({
+          prepareVerification: jest.fn().mockReturnValueOnce(Promise.resolve({} as any)),
+        } as any),
+      );
 
       await userEvent.type(getByLabelText(/email address/i), 'test+2@clerk.com');
       await userEvent.click(getByRole('button', { name: /add$/i }));

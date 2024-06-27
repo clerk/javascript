@@ -6,14 +6,16 @@ import * as Field from '../primitives/field';
 export function UsernameField({
   alternativeFieldTrigger,
   label = 'Username',
+  name = 'username',
+  hintText = 'Optional',
   ...props
-}: { alternativeFieldTrigger?: React.ReactNode; label?: React.ReactNode } & Omit<
+}: { alternativeFieldTrigger?: React.ReactNode; label?: React.ReactNode; hintText?: string } & Omit<
   React.ComponentProps<typeof Common.Input>,
   'type'
 >) {
   return (
     <Common.Field
-      name='username'
+      name={name}
       asChild
     >
       <Field.Root>
@@ -23,7 +25,7 @@ export function UsernameField({
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
             ) : !props?.required ? (
-              <Field.Optional>Optional</Field.Optional>
+              <Field.Hint>{hintText}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>

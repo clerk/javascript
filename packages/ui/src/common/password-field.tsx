@@ -1,15 +1,17 @@
 import * as Common from '@clerk/elements/common';
-import cn from 'clsx';
+import { cx } from 'cva';
 import React from 'react';
 
 import * as Field from '../primitives/field';
 import * as Icon from '../primitives/icon';
 
 export function PasswordField({
+  alternativeFieldTrigger,
   className,
   label = 'Password',
+  name = 'password',
   ...props
-}: { label?: React.ReactNode } & Omit<
+}: { alternativeFieldTrigger?: React.ReactNode; name?: 'password' | 'confirmPassword'; label?: React.ReactNode } & Omit<
   React.ComponentProps<typeof Common.Input>,
   'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'
 >) {
@@ -18,12 +20,15 @@ export function PasswordField({
 
   return (
     <Common.Field
-      name='password'
+      name={name}
       asChild
     >
       <Field.Root>
         <Common.Label asChild>
-          <Field.Label>{label}</Field.Label>
+          <Field.Label>
+            {label}
+            {alternativeFieldTrigger ? <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd> : null}
+          </Field.Label>
         </Common.Label>
         <Common.FieldState>
           {({ state }) => {
@@ -38,7 +43,7 @@ export function PasswordField({
                   //       safely ignore the TS error.
                   // @ts-expect-error – see above
                   validatePassword
-                  className={cn('pe-7', className)}
+                  className={cx('pe-7', className)}
                   onBlur={() => setTouched(true)}
                   {...props}
                   asChild
@@ -47,7 +52,7 @@ export function PasswordField({
                 </Common.Input>
                 <button
                   type='button'
-                  className={cn(
+                  className={cx(
                     'text-icon-sm text-gray-11 absolute end-1 top-1 aspect-square rounded-sm p-1 outline-none disabled:cursor-not-allowed disabled:opacity-50',
                     'hover:enabled:text-gray-12 hover:enabled:bg-gray-3',
                     'focus-visible:ring-default focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring-2',
