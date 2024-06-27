@@ -8,7 +8,7 @@ import { generateConfig, getJwksFromSecretKey } from '../testUtils/handshake';
 
 const PORT = 4199;
 
-test.skip('Client handshake @generic', () => {
+test.describe('Client handshake @generic', () => {
   test.describe.configure({ mode: 'serial' });
 
   let app: Application;
