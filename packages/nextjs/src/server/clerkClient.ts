@@ -2,7 +2,7 @@ import type { ClerkClient } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
-import { deprecated } from '@clerk/shared/deprecated';
+import { deprecated } from '@clerk/shared';
 
 import { buildRequestLike } from '../app-router/server/utils';
 import {
@@ -40,21 +40,12 @@ export const clerkClientStorage = new AsyncLocalStorage<Partial<AuthenticateRequ
 const createClerkClientWithOptions: typeof createClerkClient = options =>
   createClerkClient({ ...clerkClientDefaultOptions, ...options });
 
-const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
-
 /**
  * @deprecated
  * This singleton is deprecated and will be removed in a future release. Please use `clerkClient()` as a function instead.
  */
-const clerkClientSingletonProxy = new Proxy(clerkClientSingleton, {
-  get(target, prop, receiver) {
-    if (Object.getPrototypeOf(target) === Object.getPrototypeOf(clerkClientSingleton)) {
-      deprecated('clerkClient object', 'Use `clerkClient()` as a function instead.');
-    }
-
-    return Reflect.get(target, prop, receiver);
-  },
-});
+// SDK-1839 TODO -Remove clerkClient singleton in the next @clerk/nextjs major version
+const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
 
 /**
  * Constructs a BAPI client that accesses request data within the runtime.
@@ -88,10 +79,15 @@ const clerkClientForRequest = () => {
   return clerkClientSingleton;
 };
 
-const clerkClient: ClerkClient & typeof clerkClientForRequest = Object.assign(
-  clerkClientForRequest,
-  // TODO SDK-1839 - Remove `clerkClient` singleton in the next major version of `@clerk/nextjs`
-  clerkClientSingletonProxy,
+const clerkClient: ClerkClient & typeof clerkClientForRequest = new Proxy(
+  Object.assign(clerkClientForRequest, clerkClientSingleton),
+  {
+    get(target, prop: string, receiver) {
+      deprecated('clerkClient', 'Please use `clerkClient()` as a function instead.');
+
+      return Reflect.get(target, prop, receiver);
+    },
+  },
 );
 
 export { clerkClient };
