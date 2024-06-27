@@ -82,9 +82,9 @@ export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState
   }, []);
 
   const mergedProps = {
-    publishableKey: __publishableKey,
-    proxyUrl: __proxyUrl,
-    domain: __domain,
+    publishableKey: __publishableKey as any,
+    proxyUrl: __proxyUrl as any,
+    domain: __domain as any,
     isSatellite: __isSatellite,
     signInUrl: __signInUrl,
     signUpUrl: __signUpUrl,
