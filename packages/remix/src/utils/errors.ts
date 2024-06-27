@@ -85,7 +85,7 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 
 export const publishableKeyMissingErrorInSpaMode = createErrorMessage(`
 You're trying to use Clerk in Remix SPA Mode without providing a Publishable Key.
-Please provide a publishableKey in the options of the ClerkApp component.
+Please provide the publishableKey option on the ClerkApp component.
 
 Example:
 
