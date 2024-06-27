@@ -2,26 +2,34 @@ import { expect, test } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
-import type { FakeUser } from '../testUtils';
 import { createTestUtils } from '../testUtils';
 
 test.describe('dynamic keys @nextjs', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
-  let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
     app = await appConfigs.next.appRouter
       .clone()
       .addFile(
         'src/middleware.ts',
-        () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+        () => `import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+        import { NextResponse } from 'next/server'
 
         const isProtectedRoute = createRouteMatcher(['/protected']);
+        const shouldFetchBapi = createRouteMatcher(['/fetch-bapi-from-middleware']);
 
-        export default clerkMiddleware((auth, request) => {
+        export default clerkMiddleware(async (auth, request) => {
           if (isProtectedRoute(request)) {
             auth().protect();
+          }
+
+          if (shouldFetchBapi(request)){
+            const count = await clerkClient().users.getCount();
+
+            if (count){
+              return NextResponse.redirect(new URL('/users-count', request.url))
+            }
           }
         }, {
           secretKey: process.env.CLERK_DYNAMIC_SECRET_KEY,
@@ -33,31 +41,24 @@ test.describe('dynamic keys @nextjs', () => {
         };`,
       )
       .addFile(
-        'src/app/current-user/page.tsx',
-        () => `import { currentUser } from '@clerk/nextjs/server'
+        'src/app/users-count/page.tsx',
+        () => `import { clerkClient } from '@clerk/nextjs/server'
 
         export default async function Page(){
-          const user = await currentUser()
+          const count = await clerkClient().users.getCount()
 
-          return <p>{user ? <p>{user.firstName}</p> : <p>User not found</p>}</p>
+          return <p>Users count: {count}</p>
         }
         `,
       )
       .commit();
 
     await app.setup();
-
-    await app.withEnv(appConfigs.envs.withCustomRoles);
-    const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser();
-    await m.services.users.createBapiUser(fakeUser);
-
     await app.withEnv(appConfigs.envs.withDynamicKeys);
     await app.dev();
   });
 
   test.afterAll(async () => {
-    await fakeUser.deleteIfExists();
     await app.teardown();
   });
 
@@ -81,29 +82,20 @@ test.describe('dynamic keys @nextjs', () => {
 
   test('resolves auth signature with `secretKey` on `auth().protect()`', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-
-    await u.page.goToStart();
-    await u.po.expect.toBeSignedOut();
-
     await u.page.goToRelative('/page-protected');
-
     await u.page.waitForURL(/foobar/);
   });
 
   test('calls `clerkClient` with dynamic keys from application runtime', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/users-count');
+    await expect(u.page.getByText(/Users count/i)).toBeVisible();
+  });
 
-    await u.page.goToStart();
-    await u.po.expect.toBeSignedOut();
-    await u.page.goToRelative('/current-user');
-
-    await expect(u.page.getByText(/User not found/i)).toBeVisible();
-
-    await u.po.signIn.goTo();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
-
-    await u.page.goToRelative('/current-user');
-    await expect(u.page.getByText(/User not found/i)).toBeVisible();
+  test('calls `clerkClient` with dynamic keys from middleware runtime', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/fetch-bapi-from-middleware');
+    await u.page.waitForAppUrl('/users-count');
+    await expect(u.page.getByText(/Users count/i)).toBeVisible();
   });
 });
