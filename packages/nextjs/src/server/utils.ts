@@ -254,7 +254,7 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
   if (requestData.secretKey && !ENCRYPTION_KEY) {
     // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
     logger.warnOnce(
-      'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#server-side-options-propagation',
+      'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys',
     );
 
     return;

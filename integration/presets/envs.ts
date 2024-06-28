@@ -29,7 +29,8 @@ const withEmailCodes = environmentConfig()
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY);
 
 const withEmailLinks = environmentConfig()
   .setId('withEmailLinks')
@@ -85,8 +86,7 @@ const withDynamicKeys = withEmailCodes
   .clone()
   .setId('withDynamicKeys')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
-  .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', envKeys['with-email-codes'].sk)
-  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', envKeys['with-email-codes'].sk);
 
 export const envs = {
   withEmailCodes,

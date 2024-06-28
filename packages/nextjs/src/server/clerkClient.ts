@@ -1,6 +1,5 @@
 import type { ClerkClient } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
 
@@ -50,21 +49,15 @@ const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
  * Necessary if middleware dynamic keys are used.
  */
 const clerkClientForRequest = () => {
-  let requestData: Partial<AuthenticateRequestOptions> | undefined;
+  let requestData;
 
-  /**
-   * For BAPI client usage inside middleware runtime, fallbacks to AsyncLocalStorage to access request data
-   */
-  const store = clerkMiddlewareRequestDataStore.getStore();
-  if (store) {
-    requestData = store;
-  } else {
-    /**
-     * For BAPI usage from application server, fallbacks to access request data via `NextRequest`
-     */
+  try {
     const request = buildRequestLike();
     const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
     requestData = decryptClerkRequestData(encryptedRequestData);
+  } catch (err) {
+    // When outside of middleware runtime, fallbacks to access request data from `NextRequest`
+    requestData = clerkMiddlewareRequestDataStore.getStore();
   }
 
   if (requestData?.secretKey || requestData?.publishableKey) {
