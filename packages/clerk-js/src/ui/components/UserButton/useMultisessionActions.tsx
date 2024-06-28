@@ -1,8 +1,9 @@
-import { useClerk, useSessionList } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type { ActiveSessionResource, UserButtonProps, UserResource } from '@clerk/types';
 
 import { windowNavigate } from '../../../utils/windowNavigate';
 import { useCardState } from '../../elements';
+import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { useRouter } from '../../router';
 import { sleep } from '../../utils';
 
@@ -19,10 +20,8 @@ type UseMultisessionActionsParams = {
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useClerk();
   const card = useCardState();
-  const { sessions } = useSessionList();
+  const { activeSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
-  const activeSessions = sessions?.filter(s => s.status === 'active') as ActiveSessionResource[];
-  const otherSessions = activeSessions.filter(s => s.user?.id !== opts.user?.id);
 
   const handleSignOutSessionClicked = (session: ActiveSessionResource) => () => {
     if (otherSessions.length === 0) {
