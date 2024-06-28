@@ -14,10 +14,10 @@ const authenticateRequestMock = jest.fn().mockResolvedValue({
 
 jest.mock('../clerkClient', () => {
   return {
-    clerkClient: {
+    clerkClient: () => ({
       authenticateRequest: authenticateRequestMock,
       telemetry: { record: jest.fn() },
-    },
+    }),
   };
 });
 

@@ -7,12 +7,13 @@ import type {
 } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import { AsyncLocalStorage } from 'async_hooks';
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { isRedirect, serverRedirectWithAuth, setHeader } from '../utils';
 import { withLogger } from '../utils/debugLogger';
-import { clerkClient, clerkClientStorage } from './clerkClient';
+import { clerkClient } from './clerkClient';
 import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import { errorThrower } from './errorThrower';
 import type { AuthProtect } from './protect';
@@ -69,6 +70,8 @@ interface ClerkMiddleware {
   (request: NextMiddlewareRequestParam, event: NextMiddlewareEvtParam): NextMiddlewareReturn;
 }
 
+export const clerkMiddlewareRequestDataStore = new AsyncLocalStorage<Partial<AuthenticateRequestOptions>>();
+
 export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', logger => (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
@@ -91,7 +94,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
     signUpUrl,
   };
 
-  return clerkClientStorage.run(options, () => {
+  return clerkMiddlewareRequestDataStore.run(options, () => {
     clerkClient().telemetry.record(
       eventMethodCalled('clerkMiddleware', {
         handler: Boolean(handler),
@@ -133,7 +136,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
       let handlerResult: Response = NextResponse.next();
       try {
         handlerResult =
-          (await clerkClientStorage.run(
+          (await clerkMiddlewareRequestDataStore.run(
             options,
             async () => await handler?.(() => authObjWithMethods, request, event),
           )) || handlerResult;
