@@ -23,7 +23,7 @@ type StringifyQueryParamsOptions = {
 
 export const stringifyQueryParams = (
   params:
-    | Record<string, string | undefined | null | object | Array<string | undefined | null>>
+    | Record<string, string | undefined | null | object | boolean | Array<string | undefined | null>>
     | null
     | undefined
     | string,
@@ -48,7 +48,7 @@ export const stringifyQueryParams = (
     } else if (typeof value === 'object' && value !== null) {
       queryParams.append(encodedKey, JSON.stringify(value));
     } else {
-      queryParams.append(encodedKey, value || '');
+      queryParams.append(encodedKey, value ?? '');
     }
   });
 
