@@ -80,7 +80,7 @@ export const getEnvVariable = (name: string, context: AppLoadContext | undefined
   return '';
 };
 
-export const getSpaMode = (): boolean => {
+export const inSpaMode = (): boolean => {
   if (typeof window !== 'undefined' && typeof window.__remixContext?.isSpaMode !== 'undefined') {
     return window.__remixContext.isSpaMode;
   }

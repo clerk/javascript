@@ -1,7 +1,7 @@
 import { useLoaderData } from '@remix-run/react';
 import React from 'react';
 
-import { assertPublishableKeyInSpaMode, getSpaMode } from '../utils';
+import { assertPublishableKeyInSpaMode, inSpaMode } from '../utils';
 import { ClerkProvider } from './RemixClerkProvider';
 import type { RemixClerkProviderProps } from './types';
 
@@ -12,7 +12,7 @@ type ClerkAppOptions = Partial<
 export function ClerkApp(App: () => JSX.Element, opts: ClerkAppOptions = {}) {
   return () => {
     let clerkState;
-    const isSpaMode = getSpaMode();
+    const isSpaMode = inSpaMode();
 
     // Don't use `useLoaderData` to fetch the clerk state if we're in SPA mode
     if (!isSpaMode) {

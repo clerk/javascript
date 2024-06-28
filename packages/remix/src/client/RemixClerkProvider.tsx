@@ -1,7 +1,7 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 
-import { assertValidClerkState, getSpaMode, warnForSsr } from '../utils';
+import { assertValidClerkState, inSpaMode, warnForSsr } from '../utils';
 import { ClerkRemixOptionsProvider } from './RemixOptionsContext';
 import type { ClerkState, RemixClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
@@ -37,7 +37,7 @@ type ClerkProviderPropsWithState = RemixClerkProviderProps & {
 
 export function ClerkProvider({ children, ...rest }: ClerkProviderPropsWithState): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
-  const isSpaMode = getSpaMode();
+  const isSpaMode = inSpaMode();
 
   React.useEffect(() => {
     awaitableNavigateRef.current = awaitableNavigate;
