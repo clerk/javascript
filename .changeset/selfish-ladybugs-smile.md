@@ -3,4 +3,6 @@
 '@clerk/types': minor
 ---
 
-Deprecate `afterSignOutUrl` from UserButton.
+Deprecate `afterSignOutUrl` and `afterMultiSessionSingleSignOutUrl` from UserButton.
+
+Developers can now configure these directly in `ClerkProvider` and have them work properly without in UserButton, UserProfile and in impersonation mode.
