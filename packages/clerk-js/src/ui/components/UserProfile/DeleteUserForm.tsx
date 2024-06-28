@@ -42,12 +42,11 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
       const session = client.lastActiveSessionId;
       await user.delete();
       // TODO: Investigate if we need to call `setActive` with {session: null}
-      const navigationCallback = otherSessions.length === 0
-        ? navigateAfterSignOut
-        : navigateAfterMultiSessionSingleSignOutUrl;
+      const navigationCallback =
+        otherSessions.length === 0 ? navigateAfterSignOut : navigateAfterMultiSessionSingleSignOutUrl;
       return await setActive({
         session,
-        beforeEmit: navigateAfterSignOut,
+        beforeEmit: navigationCallback,
       });
     } catch (e) {
       handleError(e, [], card.setError);
