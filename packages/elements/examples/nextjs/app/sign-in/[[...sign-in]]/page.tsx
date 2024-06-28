@@ -216,7 +216,6 @@ export default function SignInPage() {
 
           <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
           <CustomProvider provider='google'>Continue with Google</CustomProvider>
-          <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
           <SignIn.SupportedStrategy
             asChild
