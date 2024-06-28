@@ -65,6 +65,10 @@ describe('stringifyQueryParams(object)', () => {
     expect(stringifyQueryParams({ test: 'ena=duo' })).toBe('test=ena%3Dduo');
   });
 
+  it('handles false value', () => {
+    expect(stringifyQueryParams({ test: false, boo: true })).toBe('test=false&boo=true');
+  });
+
   it('converts an object to querystring when key is camelCase', () => {
     expect(stringifyQueryParams({ barFoo: '1' }, { keyEncoder: camelToSnake })).toBe('bar_foo=1');
     expect(stringifyQueryParams({ unsafeMetadata: { bar: '1' } }, { keyEncoder: camelToSnake })).toBe(
