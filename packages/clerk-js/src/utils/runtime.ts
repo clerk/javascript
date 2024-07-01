@@ -10,14 +10,9 @@ export function usesHttps() {
   return inBrowser() && window.location.protocol === 'https:';
 }
 
-function isCypress() {
-  return typeof window !== 'undefined' && typeof (window as any).Cypress !== 'undefined';
-}
-
 export function inIframe() {
   // checks if the current window is an iframe
-  // excludes the case where the current window runs in a Cypress test
-  return inBrowser() && window.self !== window.top && !isCypress();
+  return inBrowser() && window.self !== window.top;
 }
 
 export function inCrossOriginIframe() {
