@@ -45,13 +45,13 @@ export function SignInChooseStrategy({ children, ...props }: SignInChooseStrateg
   const routerRef = SignInRouterCtx.useActorRef();
   const activeStateFirstFactor = useActiveTags(
     routerRef,
-    ['route:first-factor', 'route:choose-strategy'],
+    ['step:verifications', 'step:first-factor', 'step:choose-strategy'],
     ActiveTagsMode.all,
   );
 
   const activeStateSecondFactor = useActiveTags(
     routerRef,
-    ['route:second-factor', 'route:choose-strategy'],
+    ['step:verifications', 'step:second-factor', 'step:choose-strategy'],
     ActiveTagsMode.all,
   );
 
@@ -66,7 +66,7 @@ export function SignInChooseStrategy({ children, ...props }: SignInChooseStrateg
 
 export function SignInForgotPassword({ children, ...props }: SignInForgotPasswordProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, ['route:first-factor', 'route:forgot-password'], ActiveTagsMode.all);
+  const activeState = useActiveTags(routerRef, ['step:first-factor', 'step:forgot-password'], ActiveTagsMode.all);
 
   return activeState ? (
     <SignInChooseStrategyCtx.Provider>
@@ -104,11 +104,9 @@ export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyE
     const routerRef = SignInRouterCtx.useActorRef();
     const snapshot = routerRef.getSnapshot();
 
-    const supportedFirstFactors = snapshot.context.clerk.client.signIn.supportedFirstFactors;
-    const supportedSecondFactors = snapshot.context.clerk.client.signIn.supportedSecondFactors;
-    const factor = [...(supportedFirstFactors ?? []), ...(supportedSecondFactors ?? [])].find(
-      factor => name === factor.strategy,
-    );
+    const supportedFirstFactors = snapshot.context.clerk.client.signIn.supportedFirstFactors || [];
+    const supportedSecondFactors = snapshot.context.clerk.client.signIn.supportedSecondFactors || [];
+    const factor = [...supportedFirstFactors, ...supportedSecondFactors].find(factor => name === factor.strategy);
 
     const currentFactor = useSelector(
       (snapshot.children[SignInRouterSystemId.firstFactor] ||
