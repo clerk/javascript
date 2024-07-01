@@ -264,4 +264,51 @@ export default function Page() {
       state: 'visible',
     });
   });
+
+  test('can delete account', async ({ page, context }) => {
+    const m = createTestUtils({ app });
+    const delFakeUser = m.services.users.createFakeUser({
+      withUsername: true,
+      fictionalEmail: true,
+      withPhoneNumber: true,
+    });
+    await m.services.users.createBapiUser({
+      ...delFakeUser,
+      username: undefined,
+      phoneNumber: undefined,
+    });
+
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: delFakeUser.email, password: delFakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+    await u.po.userProfile.switchToSecurityTab();
+
+    await u.page
+      .getByRole('button', {
+        name: /delete account/i,
+      })
+      .click();
+
+    await u.page.locator('input[name=deleteConfirmation]').fill('Delete account');
+
+    await u.page
+      .getByRole('button', {
+        name: /delete account/i,
+      })
+      .click();
+
+    await u.po.expect.toBeSignedOut();
+
+    await u.page.waitForAppUrl('/');
+
+    // Make sure that the session cookie is deleted
+    const sessionCookieList = (await u.page.context().cookies()).filter(cookie => cookie.name === '__session');
+
+    expect(sessionCookieList.length).toBe(0);
+  });
 });
