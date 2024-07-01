@@ -3,7 +3,7 @@ import { createClerkClient } from '@clerk/backend';
 import { constants } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
 
-import { buildRequestLike } from '../app-router/server/utils';
+import { buildRequestLike, isPrerenderingBailout } from '../app-router/server/utils';
 import { clerkMiddlewareRequestDataStore } from './clerkMiddleware';
 import {
   API_URL,
@@ -51,21 +51,20 @@ const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
 const clerkClientForRequest = () => {
   let requestData;
 
-  const middlewareStore = clerkMiddlewareRequestDataStore.getStore();
-  if (Object.values(middlewareStore ?? {}).length) {
-    requestData = middlewareStore;
-  } else {
-    // When outside of middleware runtime, fallbacks to access request data from `NextRequest`
+  try {
     const request = buildRequestLike();
     const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
     requestData = decryptClerkRequestData(encryptedRequestData);
+  } catch (err) {
+    if (err && isPrerenderingBailout(err)) {
+      throw err;
+    }
   }
 
-  if (requestData?.secretKey || requestData?.publishableKey) {
-    return createClerkClientWithOptions({
-      secretKey: requestData.secretKey,
-      publishableKey: requestData.publishableKey,
-    });
+  // Fallbacks between options from `NextRequest` on application server and middleware runtime store
+  const options = Object.values(requestData ?? {}).length ? requestData : clerkMiddlewareRequestDataStore.getStore();
+  if (options?.secretKey || options?.publishableKey) {
+    return createClerkClientWithOptions(options);
   }
 
   return clerkClientSingleton;
