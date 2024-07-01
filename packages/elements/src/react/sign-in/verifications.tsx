@@ -34,7 +34,7 @@ function SignInStrategiesProvider({
 }: SignInVerificationsProps & { actorRef: ActorRefFrom<TSignInFirstFactorMachine | TSignInSecondFactorMachine> }) {
   const routerRef = SignInRouterCtx.useActorRef();
   const current = useSelector(actorRef, strategiesSelector);
-  const isChoosingAltStrategy = useActiveTags(routerRef, ['route:choose-strategy', 'route:forgot-password']);
+  const isChoosingAltStrategy = useActiveTags(routerRef, ['step:choose-strategy', 'step:forgot-password']);
   const isActive = useCallback((name: string) => (current ? matchStrategy(current, name) : false), [current]);
 
   return (
@@ -97,13 +97,13 @@ export function SignInStrategy({ children, name }: SignInStrategyProps) {
  */
 export function SignInVerifications(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const { activeTags: activeRoutes } = useActiveTags(routerRef, ['route:first-factor', 'route:second-factor']);
+  const { activeTags: activeRoutes } = useActiveTags(routerRef, ['step:first-factor', 'step:second-factor']);
 
-  if (activeRoutes.has('route:first-factor')) {
+  if (activeRoutes.has('step:first-factor')) {
     return <SignInFirstFactorInner {...props} />;
   }
 
-  if (activeRoutes.has('route:second-factor')) {
+  if (activeRoutes.has('step:second-factor')) {
     return <SignInSecondFactorInner {...props} />;
   }
 
@@ -119,7 +119,7 @@ export function SignInVerifications(props: SignInVerificationsProps) {
  */
 export function SignInFirstFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, 'route:first-factor');
+  const activeState = useActiveTags(routerRef, 'step:first-factor');
 
   return activeState ? <SignInFirstFactorInner {...props} /> : null;
 }
@@ -133,7 +133,7 @@ export function SignInFirstFactor(props: SignInVerificationsProps) {
  */
 export function SignInSecondFactor(props: SignInVerificationsProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, 'route:second-factor');
+  const activeState = useActiveTags(routerRef, 'step:second-factor');
 
   return activeState ? <SignInSecondFactorInner {...props} /> : null;
 }

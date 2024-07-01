@@ -31,7 +31,7 @@ export const SignUpVerificationCtx = createContextFromActorRef<TSignUpVerificati
  */
 export function SignUpVerifications(props: SignUpVerificationsProps) {
   const ref = SignUpRouterCtx.useActorRef();
-  const activeState = useActiveTags(ref, 'route:verification');
+  const activeState = useActiveTags(ref, 'step:verification');
 
   return activeState ? <SignUpVerifyInner {...props} /> : null;
 }

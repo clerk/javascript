@@ -309,7 +309,7 @@ export const SignInRouterMachine = setup({
       ],
     },
     Start: {
-      tags: 'route:start',
+      tags: ['step:start'],
       exit: 'clearFormErrors',
       invoke: {
         id: 'start',
@@ -358,7 +358,7 @@ export const SignInRouterMachine = setup({
       },
     },
     FirstFactor: {
-      tags: 'route:first-factor',
+      tags: ['step:first-factor', 'step:verifications'],
       invoke: {
         id: 'firstFactor',
         src: 'firstFactorMachine',
@@ -414,7 +414,7 @@ export const SignInRouterMachine = setup({
           },
         },
         ChoosingStrategy: {
-          tags: ['route:choose-strategy'],
+          tags: ['step:choose-strategy'],
           on: {
             'NAVIGATE.PREVIOUS': {
               description: 'Go to Idle, and also tell firstFactor to go to Pending',
@@ -424,7 +424,7 @@ export const SignInRouterMachine = setup({
           },
         },
         ForgotPassword: {
-          tags: ['route:forgot-password'],
+          tags: ['step:forgot-password'],
           on: {
             'NAVIGATE.PREVIOUS': 'Idle',
           },
@@ -432,7 +432,7 @@ export const SignInRouterMachine = setup({
       },
     },
     SecondFactor: {
-      tags: 'route:second-factor',
+      tags: ['step:second-factor', 'step:verifications'],
       invoke: {
         id: 'secondFactor',
         src: 'secondFactorMachine',
@@ -478,7 +478,7 @@ export const SignInRouterMachine = setup({
           },
         },
         ChoosingStrategy: {
-          tags: ['route:choose-strategy'],
+          tags: ['step:choose-strategy'],
           on: {
             'NAVIGATE.PREVIOUS': {
               description: 'Go to Idle, and also tell firstFactor to go to Pending',
@@ -490,7 +490,7 @@ export const SignInRouterMachine = setup({
       },
     },
     ResetPassword: {
-      tags: 'route:reset-password',
+      tags: ['step:reset-password'],
       invoke: {
         id: 'resetPassword',
         src: 'resetPasswordMachine',
@@ -526,7 +526,7 @@ export const SignInRouterMachine = setup({
       },
     },
     Callback: {
-      tags: 'route:callback',
+      tags: ['step:callback'],
       entry: sendTo(ThirdPartyMachineId, { type: 'CALLBACK' }),
       on: {
         NEXT: [
@@ -562,7 +562,7 @@ export const SignInRouterMachine = setup({
       },
     },
     Error: {
-      tags: 'route:error',
+      tags: ['step:error'],
       on: {
         NEXT: {
           target: 'Start',

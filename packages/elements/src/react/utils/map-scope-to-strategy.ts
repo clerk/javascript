@@ -2,6 +2,10 @@ import type { OAuthProvider, SamlStrategy, SignInStrategy } from '@clerk/types';
 
 type Strategy = OAuthProvider | SamlStrategy | 'metamask';
 
+export function isProviderStrategyScope(value: string): value is Strategy {
+  return value.startsWith('provider:');
+}
+
 export function mapScopeToStrategy<T extends `provider:${Strategy}`>(scope: T): SignInStrategy {
   if (scope === 'provider:metamask') {
     return 'web3_metamask_signature';
