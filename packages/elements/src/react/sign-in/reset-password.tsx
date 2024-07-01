@@ -11,7 +11,7 @@ export const SignInResetPasswordCtx = createContextFromActorRef<TSignInResetPass
 
 export function SignInResetPassword(props: SignInResetPasswordProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, 'route:reset-password');
+  const activeState = useActiveTags(routerRef, 'step:reset-password');
 
   return activeState ? <SignInResetPasswordInner {...props} /> : null;
 }

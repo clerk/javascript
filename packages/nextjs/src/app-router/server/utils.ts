@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-const isPrerenderingBailout = (e: unknown) => {
+export const isPrerenderingBailout = (e: unknown) => {
   if (!(e instanceof Error) || !('message' in e)) {
     return false;
   }
