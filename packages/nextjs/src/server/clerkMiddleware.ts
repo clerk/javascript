@@ -135,11 +135,10 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
 
       let handlerResult: Response = NextResponse.next();
       try {
-        handlerResult =
-          (await clerkMiddlewareRequestDataStore.run(
-            options,
-            async () => await handler?.(() => authObjWithMethods, request, event),
-          )) || handlerResult;
+        const userHandlerResult = await clerkMiddlewareRequestDataStore.run(options, async () =>
+          handler?.(() => authObjWithMethods, request, event),
+        );
+        handlerResult = userHandlerResult || handlerResult;
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, requestState);
       }

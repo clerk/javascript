@@ -51,13 +51,14 @@ const clerkClientSingleton = createClerkClient(clerkClientDefaultOptions);
 const clerkClientForRequest = () => {
   let requestData;
 
-  try {
+  const middlewareStore = clerkMiddlewareRequestDataStore.getStore();
+  if (Object.values(middlewareStore ?? {}).length) {
+    requestData = middlewareStore;
+  } else {
+    // When outside of middleware runtime, fallbacks to access request data from `NextRequest`
     const request = buildRequestLike();
     const encryptedRequestData = getHeader(request, constants.Headers.ClerkRequestData);
     requestData = decryptClerkRequestData(encryptedRequestData);
-  } catch (err) {
-    // When outside of middleware runtime, fallbacks to access request data from `NextRequest`
-    requestData = clerkMiddlewareRequestDataStore.getStore();
   }
 
   if (requestData?.secretKey || requestData?.publishableKey) {
