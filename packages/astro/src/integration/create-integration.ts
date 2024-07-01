@@ -19,7 +19,7 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
   ): AstroIntegration => {
     const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl } = params || {};
 
-    // This are not provided when the "bundled" integration is used
+    // These are not provided when the "bundled" integration is used
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
     const clerkJSVariant = (params as any)?.clerkJSVariant as string | undefined;
     const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
