@@ -40,7 +40,6 @@
     "client",
     "server",
     "internal",
-    "stores",
     "components",
     "env.d.ts"
   ],
@@ -65,10 +64,6 @@
       "types": "./dist/client/hotload.d.ts",
       "import": "./dist/client/hotload.js"
     },
-    "./stores": {
-      "types": "./dist/stores/index.d.ts",
-      "import": "./dist/stores/index.js"
-    },
     "./integration": {
       "types": "./dist/integration/index.d.ts",
       "import": "./dist/integration/index.js"
@@ -88,10 +83,6 @@
     "./server": {
       "types": "./dist/server/index.d.ts",
       "import": "./dist/server/index.js"
-    },
-    "./v0": {
-      "types": "./dist/v0/index.d.ts",
-      "import": "./dist/v0/index.js"
     },
     "./hotload": {
       "types": "./dist/hotload.d.ts",
