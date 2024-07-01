@@ -54,17 +54,17 @@
     "@clerk/shared": "2.3.2",
     "@clerk/types": "4.7.0",
     "@emotion/cache": "11.11.0",
-    "@emotion/react": "11.11.1",
-    "@floating-ui/react": "0.25.4",
+    "@emotion/react": "11.11.4",
+    "@floating-ui/react": "0.26.18",
     "@formkit/auto-animate": "^0.8.1",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
-    "browser-tabs-lock": "1.2.15",
+    "browser-tabs-lock": "1.3.0",
     "copy-to-clipboard": "3.3.3",
-    "core-js": "3.26.1",
+    "core-js": "3.37.1",
     "dequal": "2.0.3",
     "qrcode.react": "3.1.0",
-    "regenerator-runtime": "0.13.11"
+    "regenerator-runtime": "0.14.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
