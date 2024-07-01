@@ -1,5 +1,5 @@
 import { createIntegration } from './create-integration';
 
 export default createIntegration({
-  mode: 'bundled',
+  mode: 'hotload',
 });

@@ -5,7 +5,7 @@
  * injectScript('before-hydration', `...`)
  */
 
-import { createClerkInstance } from '../client/hotload';
+import { createClerkInstance } from '../client/bundled';
 import { createInjectionScriptRunner } from './create-injection-script-runner';
 
 const runInjectionScript = createInjectionScriptRunner(createClerkInstance);

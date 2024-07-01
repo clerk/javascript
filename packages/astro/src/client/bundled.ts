@@ -1,35 +1,30 @@
-import { waitForClerkScript } from '../internal/utils/loadClerkJSScript';
+import { Clerk } from '@clerk/clerk-js';
+
 import { $clerk, $csrState } from '../stores/internal';
-import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
+import type { AstroClerkCreateInstanceParams, AstroClerkUpdateOptions } from '../types';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
+import type { CreateClerkInstanceInternalFn } from './types';
 
-let initOptions: AstroClerkIntegrationParams | undefined;
+let initOptions: AstroClerkCreateInstanceParams | undefined;
 
 /**
  * Prevents firing clerk.load multiple times
  */
-export const createClerkInstance = runOnce(createClerkInstanceInternal);
+export const createClerkInstance: CreateClerkInstanceInternalFn = runOnce(createClerkInstanceInternal);
 
-export async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams) {
-  let clerkJSInstance = window.Clerk;
+export function createClerkInstanceInternal(options?: AstroClerkCreateInstanceParams) {
+  let clerkJSInstance = window.Clerk as unknown as Clerk;
   if (!clerkJSInstance) {
-    await waitForClerkScript();
-
-    if (!window.Clerk) {
-      throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
-    }
-    clerkJSInstance = window.Clerk;
-  }
-
-  if (!$clerk.get()) {
+    clerkJSInstance = new Clerk(options!.publishableKey);
     // @ts-ignore
     $clerk.set(clerkJSInstance);
+    // @ts-ignore
+    window.Clerk = clerkJSInstance;
   }
 
   initOptions = options;
-  // TODO: Update Clerk type from @clerk/types to include this method
-  return (clerkJSInstance as any)
+  return clerkJSInstance
     .load(options)
     .then(() => {
       $csrState.setKey('isLoaded', true);
@@ -51,8 +46,8 @@ export function updateClerkOptions(options: AstroClerkUpdateOptions) {
   if (!clerk) {
     throw new Error('Missing clerk instance');
   }
-  // TODO: Update Clerk type from @clerk/types to include this method
-  void (clerk as any).__unstable__updateProps({
+  //@ts-ignore
+  clerk.__unstable__updateProps({
     options: { ...initOptions, ...options },
     appearance: { ...initOptions?.appearance, ...options.appearance },
   });

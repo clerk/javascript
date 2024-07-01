@@ -40,10 +40,10 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
             logger.error('Invalid value for clerkJSVariant. Acceptable values are `"headless"`, `""`, and `undefined`');
           }
 
-          const defaultHotLoadImportPath = `${packageName}/internal/hotload`;
+          const defaultBundledImportPath = `${packageName}/internal/bundled`;
 
           const buildImportPath =
-            mode === 'hotload' ? defaultHotLoadImportPath : defaultHotLoadImportPath.replace('/hotload', '');
+            mode === 'bundled' ? defaultBundledImportPath : defaultBundledImportPath.replace('/bundled', '');
 
           // Set params as envs do backend code has access to them
           updateConfig({

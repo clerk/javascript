@@ -36,7 +36,7 @@
   },
   "files": [
     "dist",
-    "hotload",
+    "bundled",
     "client",
     "server",
     "internal",
@@ -60,33 +60,33 @@
       "types": "./dist/client/index.d.ts",
       "import": "./dist/client/index.js"
     },
-    "./client/hotload": {
-      "types": "./dist/client/hotload.d.ts",
-      "import": "./dist/client/hotload.js"
+    "./client/bundled": {
+      "types": "./dist/client/bundled.d.ts",
+      "import": "./dist/client/bundled.js"
     },
     "./integration": {
       "types": "./dist/integration/index.d.ts",
       "import": "./dist/integration/index.js"
     },
-    "./integration/hotload": {
-      "types": "./dist/integration/hotload.d.ts",
-      "import": "./dist/integration/hotload.js"
+    "./integration/bundled": {
+      "types": "./dist/integration/bundled.d.ts",
+      "import": "./dist/integration/bundled.js"
     },
     "./internal": {
       "types": "./dist/internal/index.d.ts",
       "import": "./dist/internal/index.js"
     },
-    "./internal/hotload": {
-      "types": "./dist/internal/hotload.d.ts",
-      "import": "./dist/internal/hotload.js"
+    "./internal/bundled": {
+      "types": "./dist/internal/bundled.d.ts",
+      "import": "./dist/internal/bundled.js"
     },
     "./server": {
       "types": "./dist/server/index.d.ts",
       "import": "./dist/server/index.js"
     },
-    "./hotload": {
-      "types": "./dist/hotload.d.ts",
-      "import": "./dist/hotload.js"
+    "./bundled": {
+      "types": "./dist/bundled.d.ts",
+      "import": "./dist/bundled.js"
     },
     "./env": "./env.d.ts",
     "./components/control": "./components/control/index.ts",
