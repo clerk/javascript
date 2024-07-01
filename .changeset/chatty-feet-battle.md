@@ -2,4 +2,4 @@
 "@clerk/clerk-js": patch
 ---
 
-Fix bug where session cookie wasn't cleared after account deletion
+Bug fix: Clear session cookie after a user deletes their account
