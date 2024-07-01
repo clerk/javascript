@@ -1,0 +1,15 @@
+---
+import type { UserButtonProps } from "@clerk/types";
+type Props = UserButtonProps
+
+import { UserButton as UserButtonReact } from "astro-clerk-auth/client/react";
+
+const props = {
+  ...Astro.props,
+}
+---
+
+<UserButtonReact
+  client:load
+  {...props}
+/>

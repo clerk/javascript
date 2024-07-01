@@ -1,0 +1,36 @@
+---
+import type { OrganizationProfileProps } from "@clerk/types";
+type Props = OrganizationProfileProps
+
+import { customAlphabet, urlAlphabet } from "nanoid";
+
+const safeId = customAlphabet(urlAlphabet, 10)();
+
+const props = {
+  ...Astro.props,
+}
+---
+
+<div id={`clerk-organization-profile-${safeId}`}></div>
+
+<script is:inline define:vars={{ props: Astro.props, safeId }}>
+  const setOrCreatePropMap = ({ category, id, props }) => {
+    if (!window.__astro_clerk_component_props) {
+      window.__astro_clerk_component_props = new Map();
+    }
+
+    if (!window.__astro_clerk_component_props.has(category)) {
+      const _ = new Map();
+      _.set(id, props);
+      window.__astro_clerk_component_props.set(category, _);
+    }
+
+    window.__astro_clerk_component_props.get(category)?.set(id, props);
+  };
+
+  setOrCreatePropMap({
+    category: "organization-profile",
+    id: `clerk-organization-profile-${safeId}`,
+    props,
+  });
+</script>

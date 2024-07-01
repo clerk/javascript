@@ -1,0 +1,16 @@
+---
+import type { OrganizationSwitcherProps } from "@clerk/types";
+type Props = OrganizationSwitcherProps
+
+import type { AstroBuiltinProps } from 'astro';
+import { OrganizationSwitcher as OrganizationSwitcherReact } from "astro-clerk-auth/client/react";
+
+const props = {
+  ...Astro.props,
+}
+---
+
+<OrganizationSwitcherReact
+  client:load
+  {...props}
+/>
