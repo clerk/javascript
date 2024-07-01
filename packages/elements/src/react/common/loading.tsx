@@ -11,11 +11,8 @@ import { SignInRouterCtx } from '~/react/sign-in/context';
 import type { TSignInStep } from '~/react/sign-in/step';
 import { SIGN_IN_STEPS } from '~/react/sign-in/step';
 import { SignUpRouterCtx } from '~/react/sign-up/context';
-import { SignUpContinueCtx } from '~/react/sign-up/continue';
-import { SignUpStartCtx } from '~/react/sign-up/start';
 import type { TSignUpStep } from '~/react/sign-up/step';
 import { SIGN_UP_STEPS } from '~/react/sign-up/step';
-import { SignUpVerificationCtx } from '~/react/sign-up/verifications';
 import { isProviderStrategyScope, mapScopeToStrategy } from '~/react/utils/map-scope-to-strategy';
 
 type Strategy = OAuthProvider | SamlStrategy | 'metamask';
@@ -175,54 +172,26 @@ type SignUpLoadingProps = {
 
 function SignUpLoading({ children, scope, routerRef }: SignUpLoadingProps) {
   const [isLoading, { step: loadingStep, strategy }] = useLoading(routerRef);
+  const tags = useSelector(routerRef, s => s.tags);
 
-  let computedScope: LoadingScope<TSignUpStep>;
+  const isStepLoading = (step: TSignUpStep) => isLoading && loadingStep === step;
+  const isInferredStepLoading = (step: TSignUpStep) => tags.has(`step:${step}`) && isStepLoading(step);
 
-  // Figure out if the component is inside a `<Step>` component
-  const startCtx = SignUpStartCtx.useActorRef(true);
-  const continueCtx = SignUpContinueCtx.useActorRef(true);
-  const verificationsCtx = SignUpVerificationCtx.useActorRef(true);
+  let loadingResult = false;
 
-  if (scope) {
-    computedScope = scope;
+  if (scope === 'global') {
+    // Global Loading Scope
+    loadingResult = isLoading;
+  } else if (scope && isProviderStrategyScope(scope)) {
+    // Provider-Specific Loading Scope
+    loadingResult = isLoading && loadingStep === undefined && strategy === mapScopeToStrategy(scope);
+  } else if (scope) {
+    loadingResult = isStepLoading(scope.replace('step:', '') as TSignUpStep);
   } else {
-    let inferredScope: LoadingScope<TSignUpStep>;
-
-    if (startCtx) {
-      inferredScope = `step:start`;
-    } else if (continueCtx) {
-      inferredScope = `step:continue`;
-    } else if (verificationsCtx) {
-      inferredScope = `step:verifications`;
-    } else {
-      inferredScope = `global`;
-    }
-
-    computedScope = inferredScope;
+    // Inferred Loading Scope
+    loadingResult =
+      isInferredStepLoading('start') || isInferredStepLoading('continue') || isInferredStepLoading('verifications');
   }
 
-  // Determine loading states based on the step
-  const isStartLoading = isLoading && loadingStep === 'start';
-  const isVerificationsLoading = isLoading && loadingStep === 'verifications';
-  const isContinueLoading = isLoading && loadingStep === 'continue';
-  const isStrategyLoading = isLoading && loadingStep === undefined && strategy !== undefined;
-
-  let returnValue: boolean;
-
-  if (computedScope === 'global') {
-    returnValue = isLoading;
-  } else if (computedScope === 'step:start') {
-    returnValue = isStartLoading;
-  } else if (computedScope === 'step:verifications') {
-    returnValue = isVerificationsLoading;
-  } else if (computedScope === 'step:continue') {
-    returnValue = isContinueLoading;
-  } else if (computedScope.startsWith('provider:')) {
-    const computedStrategy = mapScopeToStrategy(computedScope);
-    returnValue = isStrategyLoading && strategy === computedStrategy;
-  } else {
-    throw new ClerkElementsRuntimeError(`Invalid scope "${computedScope}" used for <Loading>`);
-  }
-
-  return children(returnValue);
+  return children(loadingResult);
 }
