@@ -19,11 +19,7 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
   ): AstroIntegration => {
     const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl } = params || {};
 
-<<<<<<< HEAD
     // These are not provided when the "bundled" integration is used
-=======
-    // This are not provided when the "bundled" integration is used
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
     const clerkJSVariant = (params as any)?.clerkJSVariant as string | undefined;
     const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
@@ -44,28 +40,18 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
             logger.error('Invalid value for clerkJSVariant. Acceptable values are `"headless"`, `""`, and `undefined`');
           }
 
-<<<<<<< HEAD
           const defaultBundledImportPath = `${packageName}/internal/bundled`;
 
           const buildImportPath =
             mode === 'bundled' ? defaultBundledImportPath : defaultBundledImportPath.replace('/bundled', '');
-=======
-          const defaultHotLoadImportPath = `${packageName}/internal/hotload`;
-
-          const buildImportPath =
-            mode === 'hotload' ? defaultHotLoadImportPath : defaultHotLoadImportPath.replace('/hotload', '');
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 
           // Set params as envs do backend code has access to them
           updateConfig({
             vite: {
               define: {
-<<<<<<< HEAD
                 /**
                  * Convert the integration params to environment variable in order for be readable from the server
                  */
-=======
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
                 ...buildEnvVarFromOption(signInUrl, 'PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL'),
                 ...buildEnvVarFromOption(signUpUrl, 'PUBLIC_ASTRO_APP_CLERK_SIGN_UP_URL'),
                 ...buildEnvVarFromOption(isSatellite, 'PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE'),
@@ -96,7 +82,6 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
           });
 
           /**
-<<<<<<< HEAD
            * ------------- Script Injection --------------------------
            * Below we are injecting the same script twice. `runInjectionScript` is build in such way in order to instanciate and load Clerk only once.
            * We need both scripts in order to support applications with or without UI frameworks.
@@ -105,10 +90,6 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
           /**
            * The above script will run before client frameworks like React hydrate.
            * This makes sure that we have initialized a Clerk instance and populated stores in order to avoid hydration issues.
-=======
-           * The above script will run before client frameworks like React hydrate.
-           * This makes sure that we have initialized a Clerk instance and populated stores in order to avoid hydration issues
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
            */
           injectScript(
             'before-hydration',

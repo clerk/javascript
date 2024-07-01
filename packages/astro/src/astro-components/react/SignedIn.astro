@@ -1,11 +1,6 @@
 ---
-<<<<<<< HEAD
-import { SignedIn as SignedInReact } from "@clerk/astro/client/react";
-=======
-import { SignedIn as SignedInReact } from "astro-clerk-auth/client/react";
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
+const { userId } = Astro.locals.auth()
 ---
 
-<SignedInReact client:load>
-  <slot/>
-</SignedInReact>
+
+{ userId ? <slot /> : null }
