@@ -61,8 +61,8 @@ const clerkClientForRequest = () => {
     }
   }
 
-  // Fallbacks between options from `NextRequest` on application server and middleware runtime store
-  const options = Object.values(requestData ?? {}).length ? requestData : clerkMiddlewareRequestDataStore.getStore();
+  // Fallbacks between options from middleware runtime and `NextRequest` from application server
+  const options = clerkMiddlewareRequestDataStore.getStore() ?? requestData;
   if (options?.secretKey || options?.publishableKey) {
     return createClerkClientWithOptions(options);
   }

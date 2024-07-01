@@ -262,7 +262,7 @@ export function encryptClerkRequestData(requestData?: Partial<AuthenticateReques
 
   return AES.encrypt(
     JSON.stringify(requestData),
-    ENCRYPTION_KEY ?? assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
+    ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
   ).toString();
 }
 
