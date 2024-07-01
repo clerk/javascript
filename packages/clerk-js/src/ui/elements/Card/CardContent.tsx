@@ -12,6 +12,7 @@ import {
 import { Close } from '../../icons';
 import { type PropsOfComponent } from '../../styledSystem';
 import { useCardState, useFlowMetadata } from '../contexts';
+import { DevModeNotice, DevModeOverlay } from '../DevModeNotice';
 import { IconButton } from '../IconButton';
 import { useUnsafeModalContext } from '../Modal';
 import { CardAlert } from './CardAlert';
@@ -53,6 +54,8 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
       ref={ref}
       {...rest}
     >
+      <DevModeOverlay />
+
       {toggle && (
         <IconButton
           elementDescriptor={descriptors.modalCloseButton}
@@ -79,6 +82,16 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
         <CardAlert variant={'warning'}>{t(localizationKeys('maintenanceMode'))}</CardAlert>
       )}
       {children}
+
+      <DevModeNotice
+        sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+        }}
+      />
     </Flex>
   );
 });
