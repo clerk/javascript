@@ -460,6 +460,33 @@ export const SignInRouterMachine = setup({
             target: 'ResetPassword',
           },
         ],
+        'STRATEGY.UPDATE': {
+          description: 'Send event to verification machine to update the current strategy.',
+          actions: sendTo('secondFactor', ({ event }) => event),
+          target: '.Idle',
+        },
+      },
+      initial: 'Idle',
+      states: {
+        Idle: {
+          on: {
+            'NAVIGATE.CHOOSE_STRATEGY': {
+              description: 'Navigate to choose strategy screen.',
+              actions: sendTo('secondFactor', ({ event }) => event),
+              target: 'ChoosingStrategy',
+            },
+          },
+        },
+        ChoosingStrategy: {
+          tags: ['route:choose-strategy'],
+          on: {
+            'NAVIGATE.PREVIOUS': {
+              description: 'Go to Idle, and also tell firstFactor to go to Pending',
+              target: 'Idle',
+              actions: sendTo('secondFactor', { type: 'NAVIGATE.PREVIOUS' }),
+            },
+          },
+        },
       },
     },
     ResetPassword: {

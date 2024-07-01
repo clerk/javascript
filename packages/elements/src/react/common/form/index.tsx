@@ -73,6 +73,9 @@ const determineInputTypeFromName = (name: FormFieldProps['name']) => {
   if (name === 'code') {
     return 'otp' as const;
   }
+  if (name === 'backup_code') {
+    return 'backup_code' as const;
+  }
 
   return 'text' as const;
 };
@@ -199,11 +202,12 @@ const useInput = ({
 }: FormInputProps) => {
   // Inputs can be used outside a <Field> wrapper if desired, so safely destructure here
   const fieldContext = useFieldContext();
-  const name = inputName || fieldContext?.name;
+  const rawName = inputName || fieldContext?.name;
+  const name = rawName === 'backup_code' ? 'code' : rawName; // `backup_code` is a special case of `code`
   const { state: fieldState } = useFieldState({ name });
   const validity = useValidityStateContext();
 
-  if (!name) {
+  if (!rawName || !name) {
     throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
   }
 
@@ -248,7 +252,7 @@ const useInput = ({
   });
   const value = useFormSelector(fieldValueSelector(name));
   const hasValue = Boolean(value);
-  const type = inputType ?? determineInputTypeFromName(name);
+  const type = inputType ?? determineInputTypeFromName(rawName);
   let shouldValidatePassword = false;
 
   if (type === 'password' || type === 'text') {
@@ -308,10 +312,6 @@ const useInput = ({
     ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
   }, [name, ref, initialValue]);
 
-  if (!name) {
-    throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
-  }
-
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;
 
@@ -337,8 +337,13 @@ const useInput = ({
       type: 'text',
       spellCheck: false,
     };
-  }
-  if (type === 'password' && shouldValidatePassword) {
+  } else if (type === 'backup_code') {
+    props = {
+      autoComplete: 'off',
+      type: 'text',
+      spellCheck: false,
+    };
+  } else if (type === 'password' && shouldValidatePassword) {
     props = {
       'data-has-passed-validation': hasPassedValiation ? true : undefined,
     };
@@ -798,7 +803,8 @@ const GlobalError = React.forwardRef<FormGlobalErrorElement, FormGlobalErrorProp
 const FieldError = React.forwardRef<FormFieldErrorElement, FormFieldErrorProps>(
   ({ asChild = false, children, code, name, ...rest }, forwardedRef) => {
     const fieldContext = useFieldContext();
-    const fieldName = fieldContext?.name || name;
+    const rawFieldName = fieldContext?.name || name;
+    const fieldName = rawFieldName === 'backup_code' ? 'code' : rawFieldName;
     const { feedback } = useFieldFeedback({ name: fieldName });
 
     if (!(feedback?.type === 'error')) {
