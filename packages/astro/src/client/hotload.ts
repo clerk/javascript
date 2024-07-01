@@ -23,6 +23,7 @@ export async function createClerkInstanceInternal(options?: AstroClerkIntegratio
   }
 
   if (!$clerk.get()) {
+    // @ts-ignore
     $clerk.set(clerkJSInstance);
   }
 
