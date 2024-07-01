@@ -263,7 +263,11 @@ function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
       return authAsyncStorage.getStore();
     }
 
+<<<<<<< HEAD
     /**
+=======
+    /**a
+>>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
      * When this runs on the client, during hydration, we want to grab the content the store.
      */
     return get();

@@ -3,11 +3,21 @@ import { pathToRegexp } from 'path-to-regexp';
 
 type WithPathPatternWildcard<T = string> = `${T & string}(.*)`;
 
+<<<<<<< HEAD
 type RouteMatcherRoutes = Autocomplete<WithPathPatternWildcard>;
 
 export type RouteMatcherParam = Array<RegExp | RouteMatcherRoutes> | RegExp | RouteMatcherRoutes;
 
 // TODO-SHARED: This can be moved to @clerk/shared as an identical implementation exists in @clerk/nextjs
+=======
+type RouteMatcherWithNextTypedRoutes = Autocomplete<WithPathPatternWildcard>;
+
+export type RouteMatcherParam =
+  | Array<RegExp | RouteMatcherWithNextTypedRoutes>
+  | RegExp
+  | RouteMatcherWithNextTypedRoutes;
+
+>>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 /**
  * Returns a function that accepts a `Request` object and returns whether the request matches the list of
  * predefined routes that can be passed in as the first argument.

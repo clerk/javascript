@@ -24,8 +24,12 @@ const runOnce = (onFirst: CreateClerkInstanceInternalFn) => {
       });
     }
     /**
+<<<<<<< HEAD
      * Probably html streaming has delayed the component from mounting immediately.
      * In Astro, js modules will start executing only after html streaming has ended.
+=======
+     * Probably html streaming has delayed the component from mounting immediately
+>>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
      */
     hasRun = true;
     return onFirst(params);

@@ -1,6 +1,9 @@
 const FAILED_TO_FIND_CLERK_SCRIPT = 'Clerk: Failed find clerk-js script';
 
+<<<<<<< HEAD
 // TODO-SHARED: Something similar exists inside clerk-react
+=======
+>>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const waitForClerkScript = () => {
   return new Promise((resolve, reject) => {
     const script = document.querySelector('script[data-clerk-script]');
