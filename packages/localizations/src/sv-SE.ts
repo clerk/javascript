@@ -32,12 +32,10 @@ export const svSE: LocalizationResource = {
   },
   dates: {
     lastDay: "Igår klockan {{ date | timeString('sv-SE') }}",
-    next6Days:
-      "{{ date | weekday('sv-SE','long') }} klockan {{ date | timeString('sv-SE') }}",
+    next6Days: "{{ date | weekday('sv-SE','long') }} klockan {{ date | timeString('sv-SE') }}",
     nextDay: "Imorgon klockan {{ date | timeString('sv-SE') }}",
     numeric: "{{ date | numeric('sv-SE') }}",
-    previous6Days:
-      "Senaste {{ date | weekday('sv-SE','long') }} klockan {{ date | timeString('sv-SE') }}",
+    previous6Days: "Senaste {{ date | weekday('sv-SE','long') }} klockan {{ date | timeString('sv-SE') }}",
     sameDay: "Idag klockan {{ date | timeString('sv-SE') }}",
   },
   dividerText: 'eller',
@@ -50,11 +48,9 @@ export const svSE: LocalizationResource = {
   formFieldAction__forgotPassword: 'Glömt lösenord?',
   formFieldError__matchingPasswords: 'Lösenorden matchar.',
   formFieldError__notMatchingPasswords: 'Lösenorden matchar inte.',
-  formFieldError__verificationLinkExpired:
-    'Verifieringslänken har löpt ut. Vänligen begär en ny länk.',
+  formFieldError__verificationLinkExpired: 'Verifieringslänken har löpt ut. Vänligen begär en ny länk.',
   formFieldHintText__optional: 'Valfritt',
-  formFieldHintText__slug:
-    'En slug är ett läsbart ID som måste vara unikt. Det används ofta i URL:er.',
+  formFieldHintText__slug: 'En slug är ett läsbart ID som måste vara unikt. Det används ofta i URL:er.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Radera konto',
   formFieldInputPlaceholder__emailAddress: '',
@@ -70,8 +66,7 @@ export const svSE: LocalizationResource = {
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
-  formFieldLabel__automaticInvitations:
-    'Enable automatic invitations for this domain',
+  formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Reserv-kod',
   formFieldLabel__confirmDeletion: 'Confirmation',
   formFieldLabel__confirmPassword: 'Bekräfta lösenord',
@@ -83,8 +78,7 @@ export const svSE: LocalizationResource = {
   formFieldLabel__lastName: 'Efternamn',
   formFieldLabel__newPassword: 'Nytt lösenord',
   formFieldLabel__organizationDomain: 'Domain',
-  formFieldLabel__organizationDomainDeletePending:
-    'Delete pending invitations and suggestions',
+  formFieldLabel__organizationDomainDeletePending: 'Delete pending invitations and suggestions',
   formFieldLabel__organizationDomainEmailAddress: 'Verification email address',
   formFieldLabel__organizationDomainEmailAddressDescription:
     'Enter an email address under this domain to receive a code and verify this domain.',
@@ -126,8 +120,7 @@ export const svSE: LocalizationResource = {
       title: 'Lägg till domän',
     },
     invitePage: {
-      detailsTitle__inviteFailed:
-        'Inbjudningarna kunde inte skickas. Åtgärda följande och försök igen:',
+      detailsTitle__inviteFailed: 'Inbjudningarna kunde inte skickas. Åtgärda följande och försök igen:',
       formButtonPrimary__continue: 'Skicka inbjudningar',
       selectDropdown__role: 'Select role',
       subtitle: 'Bjud in nya medlemmar till denna organisation',
@@ -184,16 +177,14 @@ export const svSE: LocalizationResource = {
     profilePage: {
       dangerSection: {
         deleteOrganization: {
-          actionDescription:
-            'Skriv "{{organizationName}}" nedan för att fortsätta.',
+          actionDescription: 'Skriv "{{organizationName}}" nedan för att fortsätta.',
           messageLine1: 'Är du säker på att du vill radera denna organisation?',
           messageLine2: 'Denna åtgärd är permanent och kan inte ångras.',
           successMessage: 'Du har raderat organisationen.',
           title: 'Radera organisation',
         },
         leaveOrganization: {
-          actionDescription:
-            'Skriv "{{organizationName}}" nedan för att fortsätta.',
+          actionDescription: 'Skriv "{{organizationName}}" nedan för att fortsätta.',
           messageLine1:
             'Är du säker på att du vill lämna denna organisation? Du kommer att förlora åtkomst till organisationen och dess applikationer.',
           messageLine2: 'Denna åtgärd är permanent och oåterkallelig.',
@@ -216,8 +207,7 @@ export const svSE: LocalizationResource = {
     },
     removeDomainPage: {
       messageLine1: 'E-postdomänen {{domain}} kommer att tas bort.',
-      messageLine2:
-        'Användare kommer inte att kunna gå med i organisationen automatiskt efter detta.',
+      messageLine2: 'Användare kommer inte att kunna gå med i organisationen automatiskt efter detta.',
       successMessage: '{{domain}} har tagits bort.',
       title: 'Ta bort domän',
     },
@@ -232,11 +222,9 @@ export const svSE: LocalizationResource = {
     },
     verifiedDomainPage: {
       dangerTab: {
-        calloutInfoLabel:
-          'Att ta bort denna domän kommer att påverka inbjudna användare.',
+        calloutInfoLabel: 'Att ta bort denna domän kommer att påverka inbjudna användare.',
         removeDomainActionLabel__remove: 'Ta bort domän',
-        removeDomainSubtitle:
-          'Ta bort denna domän från dina verifierade domäner',
+        removeDomainSubtitle: 'Ta bort denna domän från dina verifierade domäner',
         removeDomainTitle: 'Ta bort domän',
       },
       enrollmentTab: {
@@ -246,24 +234,18 @@ export const svSE: LocalizationResource = {
         automaticSuggestionOption__description:
           'Användare får ett förslag om att begära att få gå med, men måste godkännas av en administratör innan de kan gå med i organisationen.',
         automaticSuggestionOption__label: 'Automatiska förslag',
-        calloutInfoLabel:
-          'Att ändra registreringsläget kommer endast att påverka nya användare.',
-        calloutInvitationCountLabel:
-          'Väntande inbjudningar skickade till användare: {{count}}',
-        calloutSuggestionCountLabel:
-          'Väntande förslag skickade till användare: {{count}}',
-        manualInvitationOption__description:
-          'Användare kan endast bjudas in manuellt till organisationen.',
+        calloutInfoLabel: 'Att ändra registreringsläget kommer endast att påverka nya användare.',
+        calloutInvitationCountLabel: 'Väntande inbjudningar skickade till användare: {{count}}',
+        calloutSuggestionCountLabel: 'Väntande förslag skickade till användare: {{count}}',
+        manualInvitationOption__description: 'Användare kan endast bjudas in manuellt till organisationen.',
         manualInvitationOption__label: 'Ingen automatisk registrering',
-        subtitle:
-          'Välj hur användare från denna domän kan gå med i organisationen.',
+        subtitle: 'Välj hur användare från denna domän kan gå med i organisationen.',
       },
       start: {
         headerTitle__danger: 'Fara',
         headerTitle__enrollment: 'Registreringsalternativ',
       },
-      subtitle:
-        'Domänen {{domain}} är nu verifierad. Fortsätt genom att välja registreringsläge.',
+      subtitle: 'Domänen {{domain}} är nu verifierad. Fortsätt genom att välja registreringsläge.',
       title: 'Uppdatera {{domain}}',
     },
     verifyDomainPage: {
@@ -312,8 +294,7 @@ export const svSE: LocalizationResource = {
           'Om du har problem med att logga in på ditt konto, kontakta oss via e-post så hjälper vi dig att återställa åtkomsten så snabbt som möjligt.',
         title: 'Få hjälp',
       },
-      subtitle:
-        'Har du problem? Du kan använda någon av dessa metoder för att logga in.',
+      subtitle: 'Har du problem? Du kan använda någon av dessa metoder för att logga in.',
       title: 'Använd en annan metod',
     },
     backupCodeMfa: {
@@ -335,8 +316,7 @@ export const svSE: LocalizationResource = {
         subtitle: 'Återgå till ursprungliga fliken för att fortsätta.',
         title: 'Denna verifieringslänk är ogiltig',
       },
-      formSubtitle:
-        'Använd verifieringslänken som skickades till din e-postadress',
+      formSubtitle: 'Använd verifieringslänken som skickades till din e-postadress',
       formTitle: 'Verifieringslänk',
       loading: {
         subtitle: 'Du kommer att omdirigeras snart',
@@ -354,8 +334,7 @@ export const svSE: LocalizationResource = {
       },
       verifiedSwitchTab: {
         subtitle: 'Återgå till ursprungliga fliken för att fortsätta',
-        subtitleNewTab:
-          'Återgå till den nyligen öppnade fliken för att fortsätta',
+        subtitleNewTab: 'Återgå till den nyligen öppnade fliken för att fortsätta',
         titleNewTab: 'Loggade in på annan flik',
       },
     },
@@ -373,8 +352,7 @@ export const svSE: LocalizationResource = {
       title: 'Glömt lösenord?',
     },
     noAvailableMethods: {
-      message:
-        'Kan inte fortsätta med inloggning. Det finns ingen tillgänglig autentiseringsfaktor.',
+      message: 'Kan inte fortsätta med inloggning. Det finns ingen tillgänglig autentiseringsfaktor.',
       subtitle: 'Ett fel inträffade',
       title: 'Kan inte logga in',
     },
@@ -404,15 +382,12 @@ export const svSE: LocalizationResource = {
     },
     resetPassword: {
       formButtonPrimary: 'Återställ lösenord',
-      requiredMessage:
-        'Av säkerhetsskäl är det nödvändigt att återställa ditt lösenord.',
-      successMessage:
-        'Ditt lösenord har ändrats framgångsrikt. Loggar in dig, var god vänta en stund.',
+      requiredMessage: 'Av säkerhetsskäl är det nödvändigt att återställa ditt lösenord.',
+      successMessage: 'Ditt lösenord har ändrats framgångsrikt. Loggar in dig, var god vänta en stund.',
       title: 'Ange nytt lösenord',
     },
     resetPasswordMfa: {
-      detailsLabel:
-        'Vi behöver verifiera din identitet innan vi återställer ditt lösenord.',
+      detailsLabel: 'Vi behöver verifiera din identitet innan vi återställer ditt lösenord.',
     },
     start: {
       actionLink: 'Skapa konto',
@@ -440,16 +415,14 @@ export const svSE: LocalizationResource = {
       title: 'Fyll i nödvändiga fält',
     },
     emailCode: {
-      formSubtitle:
-        'Ange verifieringskoden som skickades till din e-postadress',
+      formSubtitle: 'Ange verifieringskoden som skickades till din e-postadress',
       formTitle: 'Verifieringskod',
       resendButton: 'Skicka koden igen',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Verifiera din e-post',
     },
     emailLink: {
-      formSubtitle:
-        'Använd verifieringslänken som skickades till din e-postadress',
+      formSubtitle: 'Använd verifieringslänken som skickades till din e-postadress',
       formTitle: 'Verifieringslänk',
       loading: {
         title: 'Registrerar...',
@@ -467,8 +440,7 @@ export const svSE: LocalizationResource = {
       },
     },
     phoneCode: {
-      formSubtitle:
-        'Ange verifieringskoden som skickades till ditt telefonnummer',
+      formSubtitle: 'Ange verifieringskoden som skickades till ditt telefonnummer',
       formTitle: 'Verifieringskod',
       resendButton: 'Skicka koden igen',
       subtitle: 'för att fortsätta till {{applicationName}}',
@@ -494,32 +466,23 @@ export const svSE: LocalizationResource = {
     form_identifier_exists__username: 'Användarnamnet finns redan.',
     form_identifier_not_found: 'Identifieraren hittades inte.',
     form_param_format_invalid: 'Formatet är ogiltigt.',
-    form_param_format_invalid__email_address:
-      'E-postadressen måste vara en giltig e-postadress.',
-    form_param_format_invalid__phone_number:
-      'Telefonnumret måste vara i ett giltigt internationellt format.',
-    form_param_max_length_exceeded__first_name:
-      'Förnamnet får inte överskrida 256 tecken.',
-    form_param_max_length_exceeded__last_name:
-      'Efternamnet får inte överskrida 256 tecken.',
-    form_param_max_length_exceeded__name:
-      'Namnet får inte överskrida 256 tecken.',
+    form_param_format_invalid__email_address: 'E-postadressen måste vara en giltig e-postadress.',
+    form_param_format_invalid__phone_number: 'Telefonnumret måste vara i ett giltigt internationellt format.',
+    form_param_max_length_exceeded__first_name: 'Förnamnet får inte överskrida 256 tecken.',
+    form_param_max_length_exceeded__last_name: 'Efternamnet får inte överskrida 256 tecken.',
+    form_param_max_length_exceeded__name: 'Namnet får inte överskrida 256 tecken.',
     form_param_nil: 'Parametern får inte vara tom.',
     form_password_incorrect: 'Lösenordet är felaktigt.',
     form_password_length_too_short: 'Lösenordet är för kort.',
-    form_password_not_strong_enough:
-      'Ditt lösenord är inte tillräckligt starkt.',
+    form_password_not_strong_enough: 'Ditt lösenord är inte tillräckligt starkt.',
     form_password_pwned: 'Lösenordet har läckt i tidigare dataintrång.',
-    form_password_pwned__sign_in:
-      'Lösenordet har läckt, vänligen logga in för att ändra det.',
+    form_password_pwned__sign_in: 'Lösenordet har läckt, vänligen logga in för att ändra det.',
     form_password_size_in_bytes_exceeded:
       'Ditt lösenord har överskridit det maximala antalet tillåtna bytes, vänligen förkorta det eller ta bort några specialtecken.',
     form_password_validation_failed: 'Felaktigt lösenord',
-    form_username_invalid_character:
-      'Användarnamnet innehåller ogiltiga tecken.',
+    form_username_invalid_character: 'Användarnamnet innehåller ogiltiga tecken.',
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',
-    identification_deletion_failed:
-      'Du kan inte ta bort din sista identifiering.',
+    identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
     not_allowed_access: 'Åtkomst nekad.',
     passkey_already_exists: 'Passnyckeln finns redan.',
     passkey_not_supported: 'Passnyckel stöds inte.',
@@ -535,11 +498,9 @@ export const svSE: LocalizationResource = {
       requireUppercase: 'Kräver stora bokstäver',
       sentencePrefix: 'Lösenordet måste innehålla',
     },
-    phone_number_exists:
-      'Detta telefonnummer är taget. Vänligen prova ett annat.',
+    phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     zxcvbn: {
-      couldBeStronger:
-        'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
+      couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
       goodPassword: 'Ditt lösenord uppfyller alla nödvändiga krav.',
       notEnough: 'Ditt lösenord är inte tillräckligt starkt.',
       suggestions: {
@@ -549,12 +510,9 @@ export const svSE: LocalizationResource = {
         capitalization: 'Använd stor bokstav för mer än det första tecknet.',
         dates: 'Undvik datum och år som är associerade med dig.',
         l33t: "Undvik förutsägbara bokstavsersättningar som '@' för 'a'.",
-        longerKeyboardPattern:
-          'Använd längre tangentbordsmönster och ändra skrivrättning flera gånger.',
-        noNeed:
-          'Du kan skapa starka lösenord utan att använda symboler, siffror eller stora bokstäver.',
-        pwned:
-          'Om du använder detta lösenord någon annanstans bör du ändra det.',
+        longerKeyboardPattern: 'Använd längre tangentbordsmönster och ändra skrivrättning flera gånger.',
+        noNeed: 'Du kan skapa starka lösenord utan att använda symboler, siffror eller stora bokstäver.',
+        pwned: 'Om du använder detta lösenord någon annanstans bör du ändra det.',
         recentYears: 'Undvik de senaste åren.',
         repeated: 'Undvik upprepade ord och tecken.',
         reverseWords: 'Undvik omvänd stavning av vanliga ord.',
@@ -565,22 +523,18 @@ export const svSE: LocalizationResource = {
         common: 'Detta är ett vanligt använt lösenord.',
         commonNames: 'Vanliga namn och efternamn är lätta att gissa.',
         dates: 'Datum är lätta att gissa.',
-        extendedRepeat:
-          'Upprepade teckenmönster som "abcabcabc" är lätta att gissa.',
+        extendedRepeat: 'Upprepade teckenmönster som "abcabcabc" är lätta att gissa.',
         keyPattern: 'Korta tangentbordsmönster är lätta att gissa.',
         namesByThemselves: 'Enskilda namn eller efternamn är lätta att gissa.',
-        pwned:
-          'Ditt lösenord har exponerats genom ett dataintrång på internet.',
+        pwned: 'Ditt lösenord har exponerats genom ett dataintrång på internet.',
         recentYears: 'Senaste åren är lätta att gissa.',
         sequences: 'Vanliga teckenföljder som "abc" är lätta att gissa.',
         similarToCommon: 'Detta liknar ett vanligt använt lösenord.',
         simpleRepeat: 'Upprepade tecken som "aaa" är lätta att gissa.',
-        straightRow:
-          'Raka rader av tangenter på ditt tangentbord är lätta att gissa.',
+        straightRow: 'Raka rader av tangenter på ditt tangentbord är lätta att gissa.',
         topHundred: 'Detta är ett ofta använt lösenord.',
         topTen: 'Detta är ett mycket använt lösenord.',
-        userInputs:
-          'Det bör inte finnas några personliga eller sidrelaterade data.',
+        userInputs: 'Det bör inte finnas några personliga eller sidrelaterade data.',
         wordByItself: 'Enskilda ord är lätta att gissa.',
       },
     },
@@ -610,8 +564,7 @@ export const svSE: LocalizationResource = {
     },
     connectedAccountPage: {
       formHint: 'Välj en leverantör för att ansluta ditt konto.',
-      formHint__noAccounts:
-        'Det finns inga tillgängliga externa kontoleverantörer.',
+      formHint__noAccounts: 'Det finns inga tillgängliga externa kontoleverantörer.',
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
         messageLine2:
@@ -632,28 +585,22 @@ export const svSE: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint:
-          'Ett e-postmeddelande med en verifieringskod kommer att skickas till denna e-postadress.',
+        formHint: 'Ett e-postmeddelande med en verifieringskod kommer att skickas till denna e-postadress.',
         formSubtitle: 'Ange verifieringskoden som skickats till {{identifier}}',
         formTitle: 'Verifieringskod',
         resendButton: 'Skicka kod igen',
-        successMessage:
-          'E-postadressen {{identifier}} har lagts till i ditt konto.',
+        successMessage: 'E-postadressen {{identifier}} har lagts till i ditt konto.',
       },
       emailLink: {
-        formHint:
-          'Ett e-postmeddelande med en verifieringslänk kommer att skickas till denna e-postadress.',
-        formSubtitle:
-          'Klicka på verifieringslänken i e-postmeddelandet som skickats till {{identifier}}',
+        formHint: 'Ett e-postmeddelande med en verifieringslänk kommer att skickas till denna e-postadress.',
+        formSubtitle: 'Klicka på verifieringslänken i e-postmeddelandet som skickats till {{identifier}}',
         formTitle: 'Verifieringslänk',
         resendButton: 'Skicka länken igen',
-        successMessage:
-          'E-postadressen {{identifier}} har lagts till i ditt konto.',
+        successMessage: 'E-postadressen {{identifier}} har lagts till i ditt konto.',
       },
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
-        messageLine2:
-          'Du kommer inte längre att kunna logga in med denna e-postadress.',
+        messageLine2: 'Du kommer inte längre att kunna logga in med denna e-postadress.',
         successMessage: '{{emailAddress}} har tagits bort från ditt konto.',
         title: 'Ta bort e-postadress',
       },
@@ -674,16 +621,12 @@ export const svSE: LocalizationResource = {
       backButton: 'Use existing number',
       primaryButton__addPhoneNumber: 'Lägg till ett telefonnummer',
       removeResource: {
-        messageLine1:
-          '{{identifier}} kommer inte längre att ta emot verifieringskoder vid inloggning.',
-        messageLine2:
-          'Ditt konto kan vara mindre säkert. Är du säker på att du vill fortsätta?',
-        successMessage:
-          'SMS-kod tvåstegsverifiering har tagits bort för {{mfaPhoneCode}}',
+        messageLine1: '{{identifier}} kommer inte längre att ta emot verifieringskoder vid inloggning.',
+        messageLine2: 'Ditt konto kan vara mindre säkert. Är du säker på att du vill fortsätta?',
+        successMessage: 'SMS-kod tvåstegsverifiering har tagits bort för {{mfaPhoneCode}}',
         title: 'Ta bort tvåstegsverifiering',
       },
-      subtitle__availablePhoneNumbers:
-        'Välj ett telefonnummer att registrera för SMS-kod tvåstegsverifiering.',
+      subtitle__availablePhoneNumbers: 'Välj ett telefonnummer att registrera för SMS-kod tvåstegsverifiering.',
       subtitle__unavailablePhoneNumbers:
         'Det finns inga tillgängliga telefonnummer att registrera för SMS-kod tvåstegsverifiering.',
       successMessage1:
@@ -699,27 +642,22 @@ export const svSE: LocalizationResource = {
         buttonUnableToScan__nonPrimary: 'Kan inte skanna QR-kod?',
         infoText__ableToScan:
           'Konfigurera en ny inloggningsmetod i din autentiseringsapp och skanna följande QR-kod för att länka den till ditt konto.',
-        infoText__unableToScan:
-          'Konfigurera en ny inloggningsmetod i din autentiseringsapp och ange nyckeln nedan.',
+        infoText__unableToScan: 'Konfigurera en ny inloggningsmetod i din autentiseringsapp och ange nyckeln nedan.',
         inputLabel__unableToScan1:
           'Se till att tidsbaserade eller engångslösenord är aktiverade och slutför sedan länkningen till ditt konto.',
         inputLabel__unableToScan2:
           'Alternativt, om din autentiseringsapp stödjer TOTP URI kan du också kopiera hela URI.',
       },
       removeResource: {
-        messageLine1:
-          'Verifieringskoder från denna autentiseringsapp kommer inte längre att krävas vid inloggning.',
-        messageLine2:
-          'Ditt konto kan vara mindre säkert. Är du säker på att du vill fortsätta?',
-        successMessage:
-          'Tvåstegsverifiering via autentiseringsapp har tagits bort.',
+        messageLine1: 'Verifieringskoder från denna autentiseringsapp kommer inte längre att krävas vid inloggning.',
+        messageLine2: 'Ditt konto kan vara mindre säkert. Är du säker på att du vill fortsätta?',
+        successMessage: 'Tvåstegsverifiering via autentiseringsapp har tagits bort.',
         title: 'Ta bort tvåstegsverifiering',
       },
       successMessage:
         'Tvåstegsverifiering är nu aktiverat. Vid inloggning behöver du ange en verifieringskod från denna autentiseringsapp som ett extra steg.',
       title: 'Lägg till autentiseringsapp',
-      verifySubtitle:
-        'Ange verifieringskoden genererad av din autentiseringsapp',
+      verifySubtitle: 'Ange verifieringskoden genererad av din autentiseringsapp',
       verifyTitle: 'Verifieringskod',
     },
     mobileButton__menu: 'Meny',
@@ -743,19 +681,16 @@ export const svSE: LocalizationResource = {
       readonly:
         'Ditt lösenord kan för närvarande inte redigeras eftersom du endast kan logga in via företagsanslutningen.',
       successMessage__set: 'Ditt lösenord har angetts.',
-      successMessage__signOutOfOtherSessions:
-        'Alla andra enheter har loggats ut.',
+      successMessage__signOutOfOtherSessions: 'Alla andra enheter har loggats ut.',
       successMessage__update: 'Ditt lösenord har uppdaterats.',
       title__set: 'Ange lösenord',
       title__update: 'Byt lösenord',
     },
     phoneNumberPage: {
-      infoText:
-        'Ett textmeddelande med en verifieringslänk kommer att skickas till detta telefonnummer.',
+      infoText: 'Ett textmeddelande med en verifieringslänk kommer att skickas till detta telefonnummer.',
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
-        messageLine2:
-          'Du kommer inte längre att kunna logga in med detta telefonnummer.',
+        messageLine2: 'Du kommer inte längre att kunna logga in med detta telefonnummer.',
         successMessage: '{{phoneNumber}} har tagits bort från ditt konto.',
         title: 'Ta bort telefonnummer',
       },
@@ -765,13 +700,11 @@ export const svSE: LocalizationResource = {
       verifyTitle: 'Verifiera telefonnummer',
     },
     profilePage: {
-      fileDropAreaHint:
-        'Ladda upp en JPG, PNG, GIF, eller WEBP bild som är mindre än 10 MB',
+      fileDropAreaHint: 'Ladda upp en JPG, PNG, GIF, eller WEBP bild som är mindre än 10 MB',
       imageFormDestructiveActionSubtitle: 'Ta bort bild',
       imageFormSubtitle: 'Ladda upp bild',
       imageFormTitle: 'Profilbild',
-      readonly:
-        'Din profilinformation har tillhandahållits av företagsanslutningen och kan inte redigeras.',
+      readonly: 'Din profilinformation har tillhandahållits av företagsanslutningen och kan inte redigeras.',
       successMessage: 'Din profil har uppdaterats.',
       title: 'Uppdatera profil',
     },
@@ -866,15 +799,12 @@ export const svSE: LocalizationResource = {
     web3WalletPage: {
       removeResource: {
         messageLine1: '{{identifier}} kommer att tas bort från detta konto.',
-        messageLine2:
-          'Du kommer inte längre att kunna logga in med denna web3-plånbok.',
+        messageLine2: 'Du kommer inte längre att kunna logga in med denna web3-plånbok.',
         successMessage: '{{web3Wallet}} har tagits bort från ditt konto.',
         title: 'Ta bort web3-plånbok',
       },
-      subtitle__availableWallets:
-        'Välj en web3-plånbok att ansluta till ditt konto.',
-      subtitle__unavailableWallets:
-        'Det finns inga tillgängliga web3-plånböcker.',
+      subtitle__availableWallets: 'Välj en web3-plånbok att ansluta till ditt konto.',
+      subtitle__unavailableWallets: 'Det finns inga tillgängliga web3-plånböcker.',
       successMessage: 'Plånboken har lagts till i ditt konto.',
       title: 'Lägg till web3-plånbok',
     },
