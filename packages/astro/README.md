@@ -1,55 +1,104 @@
-# astro-clerk-auth
+<p align="center">
+  <a href="https://clerk.com?utm_source=github&utm_medium=clerk_nextjs" target="_blank" rel="noopener noreferrer">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://images.clerk.com/static/logo-dark-mode-400x400.png">
+      <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
+    </picture>
+  </a>
+  <br />
+</p>
 
-Community package that integrates [Clerk](https://clerk.com/) with [Astro](https://astro.build/)
+# @clerk/astro
 
-## Live Demo
+<div align="center">
 
-[Online Demo](https://astro-clerk.elef.codes/)
+[![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
 
-## Report Issues
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/astro/CHANGELOG.md)
+·
+[Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
+·
+[Request a Feature](https://feedback.clerk.com/roadmap)
+·
+[Ask a Question](https://github.com/clerk/javascript/discussions)
 
-If you are experiencing issues please submit them via the [Issues page in GH](https://github.com/panteliselef/astro-with-clerk-auth/issues). As this SDK is not officially suppported by Clerk or Astro, contacting them directly for issues regarding this package might cause your requests to be unanswered.
+</div>
 
-## Install package
+---
 
-Add `astro-clerk-auth` as a dependency
+## Overview
+
+Clerk is the easiest way to add authentication and user management to your Astro application. Add sign up, sign in, and profile management to your Astro application in minutes.
+
+## Getting Started
+
+### Prerequisites
+
+- Astro 3.2 or later
+- Node.js `>=20` or later
+
+### Installation
+
+Add `@clerk/astro` as a dependency
 
 **With npm**
 
 ```sh
-npm install astro-clerk-auth
+npm install @clerk/astro
 ```
 
 **With yarn**
 
 ```sh
-yarn add astro-clerk-auth
+yarn add @clerk/astro
 ```
 
 **With pnpm**
 
 ```sh
-pnpm add astro-clerk-auth
+pnpm add @clerk/astro
 ```
 
-## Set environment variables
+### Build
+
+To build the package locally with the TypeScript compiler, run:
 
 ```sh
-PUBLIC_ASTRO_APP_CLERK_PUBLISHABLE_KEY=pk_test_xxxxxxxx
-CLERK_SECRET_KEY=sk_test_xxxxxxx
+npm run build
+```
+
+To build the package in watch mode, run the following:
+
+```sh
+npm run dev
+```
+
+## Report Issues
+
+If you are experiencing issues please submit them via the [Issues page in GH](https://github.com/panteliselef/astro-with-clerk-auth/issues). As this SDK is not officially suppported by Clerk or Astro, contacting them directly for issues regarding this package might cause your requests to be unanswered.
+
+## Usage
+
+### Set environment variables
+
+```sh
+PUBLIC_ASTRO_APP_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
+CLERK_SECRET_KEY=sk_(test|live)_xxxxxxx
 
 PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL=/sign-in # update this if sign in page exists on another path
 PUBLIC_ASTRO_APP_CLERK_SIGN_UP_URL=/sign-up # update this if sign up page exists on another path
 ```
 
-## Update `env.d.ts`
+### Update `env.d.ts`
 
 ```ts
 /// <reference types="astro/client" />
-/// <reference types="astro-clerk-auth/env" />
+/// <reference types="@clerk/astro/env" />
 ```
 
-## Add integrations
+### Add integrations
 
 - Add the `clerk` integration in your `astro.config.mjs` file.
 - (Optional) Install the `@astrojs/react` and add the `react` in your `astro.config.mjs` file. You only need to perform this action if you are planing to use react with your project or the React features that provided by `astro-clerk-auth`. [Instructions](https://docs.astro.build/en/guides/integrations-guide/react/)
@@ -62,7 +111,7 @@ Example configuration file
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import node from '@astrojs/node';
-import clerk from 'astro-clerk-auth';
+import clerk from '@clerk/astro';
 
 export default defineConfig({
   integrations: [
@@ -79,14 +128,14 @@ export default defineConfig({
 });
 ```
 
-## Add a middleware file
+### Add a middleware file
 
 This step is required in order to use SSR or any control component. Create a `middleware.ts` file inside the `src/` directory.
 
 **Simple use**
 
 ```ts
-import { clerkMiddleware } from 'astro-clerk-auth/server';
+import { clerkMiddleware } from '@clerk/astro/server';
 
 export const onRequest = clerkMiddleware();
 ```
@@ -134,7 +183,7 @@ export const onRequest = clerkMiddleware((auth, context, next) => {
 });
 ```
 
-## Use Clerk UI Components
+### Use Clerk UI Components
 
 Supported components
 
@@ -151,10 +200,10 @@ All of the above can be used with React or Vanilla JS. The only difference is th
 
 ```ts
 // Import UserProfile build with React (requires `@astro/react`)
-import { UserProfile } from 'astro-clerk-auth/components/react';
+import { UserProfile } from '@clerk/astro/components/react';
 
 // Import UserButton build with vanilla JS
-import { UserProfile } from 'astro-clerk-auth/components/interactive';
+import { UserProfile } from '@clerk/astro/components/interactive';
 ```
 
 Pages that include a Clerk UI component need to be wrapped with `ClerkLayout`, as shown above.
@@ -171,10 +220,10 @@ All of the above can be used with React or only on server. The only difference i
 
 ```ts
 // Import Protect build with React (requires `@astro/react`)
-import { Protect } from 'astro-clerk-auth/components/react';
+import { Protect } from '@clerk/astro/components/react';
 
 // Import SignedIn build server side code
-import { SignedIn } from 'astro-clerk-auth/components/control';
+import { SignedIn } from '@clerk/astro/components/control';
 ```
 
 ### Protect your API Routes
@@ -200,11 +249,9 @@ export const GET: APIRoute = async ({ locals }) => {
 };
 ```
 
-## Use Astro.locals
+### Use Astro.locals
 
 - Use `Astro.locals.auth()` to retrieve the [Authentication Object](https://clerk.com/docs/references/nextjs/authentication-object#authentication-object)
-
-## Deep dive
 
 ### Use Clerk react hooks
 
@@ -212,7 +259,7 @@ Example SignedIn React component that **supports SSR**
 
 ```tsx
 import type { PropsWithChildren } from 'react';
-import { useAuth } from 'astro-clerk-auth/client/react';
+import { useAuth } from '@clerk/astro/client/react';
 
 export function SignedIn(props: PropsWithChildren) {
   const { userId } = useAuth();
@@ -231,7 +278,7 @@ Warning: **SSR not supported**
 ```tsx
 import type { PropsWithChildren } from 'react';
 import { useStore } from '@nanostores/react';
-import { $authStore } from 'astro-clerk-auth/client/stores';
+import { $authStore } from '@clerk/astro/client/stores';
 
 export function SignedOut(props: PropsWithChildren) {
   const { userId } = useStore($authStore);
@@ -248,7 +295,7 @@ export function SignedOut(props: PropsWithChildren) {
 Example Header react component that uses Clerk components
 
 ```tsx
-import { SignedIn, SignedOut, UserButton } from 'astro-clerk-auth/client/react';
+import { SignedIn, SignedOut, UserButton } from '@clerk/astro/client/react';
 
 export function Header() {
   return (
@@ -275,8 +322,8 @@ In order to use headless mode with this package, change your Astro configuration
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import node from "@astrojs/node";
-- import clerk from "astro-clerk-auth";
-+ import clerk from "astro-clerk-auth/hotload";
+- import clerk from "@clerk/astro";
++ import clerk from "@clerk/astro/hotload";
 
 export default defineConfig({
   integrations: [
@@ -291,3 +338,32 @@ export default defineConfig({
   }),
 });
 ```
+
+## Support
+
+You can get in touch with us in any of the following ways:
+
+- Join our official community [Discord server](https://clerk.com/discord)
+- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
+- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_nextjs)
+
+## Contributing
+
+We're open to all community contributions! If you'd like to contribute in any way, please
+read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md))
+.
+
+## Security
+
+`@clerk/astro` follows good practices of security, but 100% security cannot be assured.
+
+`@clerk/astro` is provided **"as is"** without any **warranty**. Use at your own risk.
+
+_For more information and to report security issues, please refer to
+our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
+
+## License
+
+This project is licensed under the **MIT license**.
+
+See [LICENSE](https://github.com/clerk/javascript/blob/main/packages/nextjs/LICENSE) for more information.

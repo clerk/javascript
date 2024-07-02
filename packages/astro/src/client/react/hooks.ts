@@ -263,7 +263,7 @@ function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
       return authAsyncStorage.getStore();
     }
 
-    /**a
+    /**
      * When this runs on the client, during hydration, we want to grab the content the store.
      */
     return get();
