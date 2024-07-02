@@ -7,6 +7,7 @@ export { itIT } from './it-IT';
 export { ptBR } from './pt-BR';
 export { ptPT } from './pt-PT';
 export { esES } from './es-ES';
+export { fiFI } from './fi-FI';
 export { ruRU } from './ru-RU';
 export { svSE } from './sv-SE';
 export { trTR } from './tr-TR';
