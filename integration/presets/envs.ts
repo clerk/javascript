@@ -29,7 +29,8 @@ const withEmailCodes = environmentConfig()
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY);
 
 const withEmailLinks = environmentConfig()
   .setId('withEmailLinks')
@@ -81,6 +82,12 @@ const withAPCore2ClerkV4 = environmentConfig()
   .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['core-2-all-enabled'].sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['core-2-all-enabled'].pk);
 
+const withDynamicKeys = withEmailCodes
+  .clone()
+  .setId('withDynamicKeys')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
+  .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', envKeys['with-email-codes'].sk);
+
 export const envs = {
   withEmailCodes,
   withEmailLinks,
@@ -90,4 +97,5 @@ export const envs = {
   withAPCore1ClerkV4,
   withAPCore2ClerkLatest,
   withAPCore2ClerkV4,
+  withDynamicKeys,
 } as const;

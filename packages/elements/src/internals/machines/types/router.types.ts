@@ -14,7 +14,14 @@ import type { ClerkRouter } from '~/react/router';
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type BaseRouterLoadingStep = 'start' | 'verifications' | 'continue' | 'reset-password';
+export type BaseRouterLoadingStep =
+  | 'start'
+  | 'verifications'
+  | 'continue'
+  | 'reset-password'
+  | 'forgot-password'
+  | 'choose-strategy'
+  | 'error';
 
 export type BaseRouterNextEvent<T extends ClerkResource> = { type: 'NEXT'; resource?: T };
 export type BaseRouterFormAttachEvent = { type: 'FORM.ATTACH'; formRef: ActorRefFrom<TFormMachine> };

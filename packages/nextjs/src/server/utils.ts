@@ -1,15 +1,19 @@
 import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
+import { logger } from '@clerk/shared';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
+import AES from 'crypto-js/aes';
+import encUtf8 from 'crypto-js/enc-utf8';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { constants as nextConstants } from '../constants';
-import { DOMAIN, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
-import { authSignatureInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import { DOMAIN, ENCRYPTION_KEY, IS_SATELLITE, PROXY_URL, SECRET_KEY, SIGN_IN_URL } from './constants';
+import { authSignatureInvalid, encryptionKeyInvalid, missingDomainAndProxy, missingSignInUrlInDev } from './errors';
+import { errorThrower } from './errorThrower';
 import type { RequestLike } from './types';
 
 export function setCustomAttributeOnRequest(req: RequestLike, key: string, value: string): void {
@@ -113,7 +117,7 @@ export function decorateRequest(
   req: ClerkRequest,
   res: Response,
   requestState: RequestState,
-  secretKey: string,
+  requestData?: AuthenticateRequestOptions,
 ): Response {
   const { reason, message, status, token } = requestState;
   // pass-through case, convert to next()
@@ -148,13 +152,16 @@ export function decorateRequest(
   }
 
   if (rewriteURL) {
+    const clerkRequestData = encryptClerkRequestData(requestData);
+
     setRequestHeadersOnNextResponse(res, req, {
       [constants.Headers.AuthStatus]: status,
       [constants.Headers.AuthToken]: token || '',
-      [constants.Headers.AuthSignature]: token ? createTokenSignature(token, secretKey) : '',
+      [constants.Headers.AuthSignature]: token ? createTokenSignature(token, requestData?.secretKey ?? SECRET_KEY) : '',
       [constants.Headers.AuthMessage]: message || '',
       [constants.Headers.AuthReason]: reason || '',
       [constants.Headers.ClerkUrl]: req.clerkUrl.toString(),
+      ...(clerkRequestData ? { [constants.Headers.ClerkRequestData]: clerkRequestData } : {}),
     });
     res.headers.set(nextConstants.Headers.NextRewrite, rewriteURL.href);
   }
@@ -232,5 +239,49 @@ export function assertTokenSignature(token: string, key: string, signature?: str
   const expectedSignature = createTokenSignature(token, key);
   if (expectedSignature !== signature) {
     throw new Error(authSignatureInvalid);
+  }
+}
+
+/**
+ * Encrypt request data propagated between server requests.
+ * @internal
+ **/
+export function encryptClerkRequestData(requestData?: Partial<AuthenticateRequestOptions>) {
+  if (!requestData || !Object.values(requestData).length) {
+    return;
+  }
+
+  if (requestData.secretKey && !ENCRYPTION_KEY) {
+    // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
+    logger.warnOnce(
+      'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys',
+    );
+
+    return;
+  }
+
+  return AES.encrypt(
+    JSON.stringify(requestData),
+    ENCRYPTION_KEY || assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError()),
+  ).toString();
+}
+
+/**
+ * Decrypt request data propagated between server requests.
+ * @internal
+ */
+export function decryptClerkRequestData(
+  encryptedRequestData?: string | undefined | null,
+): Partial<AuthenticateRequestOptions> {
+  if (!encryptedRequestData) {
+    return {};
+  }
+
+  try {
+    const decryptedBytes = AES.decrypt(encryptedRequestData, ENCRYPTION_KEY || SECRET_KEY);
+    const encoded = decryptedBytes.toString(encUtf8);
+    return JSON.parse(encoded);
+  } catch (err) {
+    throw new Error(encryptionKeyInvalid);
   }
 }

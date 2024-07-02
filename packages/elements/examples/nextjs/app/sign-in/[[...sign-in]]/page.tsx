@@ -233,6 +233,20 @@ export default function SignInPage() {
 
           <SignIn.SupportedStrategy
             asChild
+            name='backup_code'
+          >
+            <Button>Use a backup code</Button>
+          </SignIn.SupportedStrategy>
+
+          <SignIn.SupportedStrategy
+            asChild
+            name='totp'
+          >
+            <Button>MFA</Button>
+          </SignIn.SupportedStrategy>
+
+          <SignIn.SupportedStrategy
+            asChild
             name='passkey'
           >
             <Button>use passkey</Button>
@@ -350,6 +364,36 @@ export default function SignInPage() {
                 label='Phone Code'
                 name='code'
               />
+
+              <CustomSubmit>Verify</CustomSubmit>
+            </SignIn.Strategy>
+
+            <SignIn.Strategy name='totp'>
+              <P className='text-sm'>Please enter your authenticator code...</P>
+
+              <CustomField
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                label='Authenticator Code'
+                name='code'
+              />
+
+              <Clerk.FieldError className='block w-full font-mono text-red-400' />
+
+              <CustomSubmit>Verify</CustomSubmit>
+            </SignIn.Strategy>
+
+            <SignIn.Strategy name='backup_code'>
+              <P className='text-sm'>Please enter your backup code...</P>
+
+              <CustomField
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                label='Backup Code'
+                name='backup_code'
+              />
+
+              <Clerk.FieldError className='block w-full font-mono text-red-400' />
 
               <CustomSubmit>Verify</CustomSubmit>
             </SignIn.Strategy>

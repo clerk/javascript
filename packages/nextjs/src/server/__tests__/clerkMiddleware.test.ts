@@ -14,17 +14,20 @@ const authenticateRequestMock = jest.fn().mockResolvedValue({
 
 jest.mock('../clerkClient', () => {
   return {
-    clerkClient: {
+    clerkClient: () => ({
       authenticateRequest: authenticateRequestMock,
       telemetry: { record: jest.fn() },
-    },
+    }),
   };
 });
 
 // used to assert the mock
+import assert from 'assert';
+
 import { clerkClient } from '../clerkClient';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { createRouteMatcher } from '../routeMatcher';
+import { decryptClerkRequestData } from '../utils';
 
 /**
  * Disable console warnings about config matchers
@@ -44,6 +47,7 @@ jest.mock('../constants', () => {
   return {
     PUBLISHABLE_KEY: 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
     SECRET_KEY: 'sk_test_xxxxxxxxxxxxxxxxxx',
+    ENCRYPTION_KEY: 'encryption-key',
   };
 });
 
@@ -216,6 +220,25 @@ describe('clerkMiddleware(params)', () => {
     expect(signInResp?.headers.get('a-custom-header')).toEqual('1');
   });
 
+  it('propagates middleware dynamic keys to the next request', async () => {
+    const options = {
+      secretKey: 'sk_test_xxxxxxxxxxxxxxxxxx',
+      publishableKey: 'pk_test_xxxxxxxxxxxxx',
+      signInUrl: '/foo',
+      signUpUrl: '/bar',
+    };
+    const resp = await clerkMiddleware(options)(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+    expect(resp?.status).toEqual(200);
+
+    const requestData = resp?.headers.get('x-middleware-request-x-clerk-request-data');
+    assert.ok(requestData);
+
+    const decryptedData = decryptClerkRequestData(requestData);
+
+    expect(resp?.headers.get('x-middleware-request-x-clerk-request-data')).toBeDefined();
+    expect(decryptedData).toEqual(options);
+  });
+
   describe('auth().redirectToSignIn()', () => {
     it('redirects to sign-in url when redirectToSignIn is called and the request is a page request', async () => {
       const req = mockRequest({
@@ -230,7 +253,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('redirects to sign-in url when redirectToSignIn is called with the correct returnBackUrl', async () => {
@@ -247,7 +270,7 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toContain('/protected');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('redirects to sign-in url with redirect_url set to the  provided returnBackUrl param', async () => {
@@ -266,7 +289,7 @@ describe('clerkMiddleware(params)', () => {
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toEqual(
         'https://www.clerk.com/hello',
       );
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('redirects to sign-in url without a redirect_url when returnBackUrl is null', async () => {
@@ -283,7 +306,7 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
       expect(new URL(resp!.headers.get('location')!).searchParams.get('redirect_url')).toBeNull();
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
   });
 
@@ -308,7 +331,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('does not redirect to sign-in url when protect is called, the user is signed in and the request is a page request', async () => {
@@ -331,7 +354,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get('location')).toBeFalsy();
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('throws a not found error when protect is called, the user is signed out, and is not a page request', async () => {
@@ -354,7 +377,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('throws a not found error when protect is called with RBAC params the user does not fulfill, and is a page request', async () => {
@@ -377,7 +400,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(200);
       expect(resp?.headers.get(constants.Headers.AuthReason)).toContain('protect-rewrite');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('redirects to unauthenticatedUrl when protect is called with the redirectUrl param, the user is signed out, and is a page request', async () => {
@@ -401,7 +424,7 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/hello');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('redirects to unauthorizedUrl when protect is called with the redirectUrl param, the user does not fulfill the RBAC params, and is a page request', async () => {
@@ -431,7 +454,7 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toEqual('https://www.clerk.com/discover');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
   });
 
@@ -456,7 +479,7 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('sign-in');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('forwards headers from authenticateRequest when auth().protect() is called', async () => {
@@ -484,7 +507,7 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.headers.get('X-Clerk-Auth')).toEqual('1');
       expect(resp?.headers.get('Set-Cookie')).toEqual('session=;');
       expect(resp?.headers.get('location')).toContain('sign-in');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('redirects to unauthenticatedUrl when protect is called with the unauthenticatedUrl param, the user is signed out, and is a page request', async () => {
@@ -511,7 +534,7 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('https://www.clerk.com/unauthenticatedUrl');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
 
     it('redirects to unauthorizedUrl when protect is called with the unauthorizedUrl param, the user is signed in but does not have permissions, and is a page request', async () => {
@@ -541,7 +564,7 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.status).toEqual(307);
       expect(resp?.headers.get('location')).toContain('https://www.clerk.com/unauthorizedUrl');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
-      expect(clerkClient.authenticateRequest).toBeCalled();
+      expect(clerkClient().authenticateRequest).toBeCalled();
     });
   });
 });
@@ -569,7 +592,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
-    expect(clerkClient.authenticateRequest).toBeCalled();
+    expect(clerkClient().authenticateRequest).toBeCalled();
   });
 
   it('appends the Dev Browser JWT to the search when cookie __clerk_db_jwt exists and location is an Account Portal URL', async () => {
@@ -593,7 +616,7 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected&__clerk_db_jwt=test_jwt',
     );
-    expect(clerkClient.authenticateRequest).toBeCalled();
+    expect(clerkClient().authenticateRequest).toBeCalled();
   });
 
   it('does NOT append the Dev Browser JWT if x-clerk-redirect-to header is not set (user-returned redirect)', async () => {
@@ -619,6 +642,6 @@ describe('Dev Browser JWT when redirecting to cross origin for page requests', f
     expect(resp?.headers.get('location')).toEqual(
       'https://accounts.included.katydid-92.lcl.dev/sign-in?redirect_url=https%3A%2F%2Fwww.clerk.com%2Fprotected',
     );
-    expect(clerkClient.authenticateRequest).toBeCalled();
+    expect(clerkClient().authenticateRequest).toBeCalled();
   });
 });
