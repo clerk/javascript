@@ -81,13 +81,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     decorateAstroLocal(context.request, context, requestState);
 
     /**
-<<<<<<< HEAD
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.
      * This currently powers the `useAuth()` React hook and any other hook or Component that depends on it.
-=======
-     * For React component, in order to avoid hydration errors populate SSR store and do not depend on the component being wrapped ClerkLayout.
-     * For now this is only needed for control components like SignedIn/SignedOut
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
      */
     return authAsyncStorage.run(context.locals.auth(), async () => {
       /**
@@ -118,11 +113,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   return astroMiddleware;
 };
 
-<<<<<<< HEAD
 // TODO-SHARED: Duplicate from '@clerk/nextjs'
-=======
-// Duplicate from '@clerk/nextjs'
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 const parseHandlerAndOptions = (args: unknown[]) => {
   return [
     typeof args[0] === 'function' ? args[0] : undefined,
@@ -132,11 +123,7 @@ const parseHandlerAndOptions = (args: unknown[]) => {
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
 
-<<<<<<< HEAD
 // TODO-SHARED: Duplicate from '@clerk/nextjs'
-=======
-// Duplicate from '@clerk/nextjs'
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const createAuthenticateRequestOptions = (
   clerkRequest: ClerkRequest,
   options: ClerkAstroMiddlewareOptions,
@@ -152,11 +139,7 @@ export const createAuthenticateRequestOptions = (
   };
 };
 
-<<<<<<< HEAD
 // TODO-SHARED: Duplicate from '@clerk/nextjs'
-=======
-// Duplicate from '@clerk/nextjs'
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const decorateResponseWithObservabilityHeaders = (res: Response, requestState: RequestState): Response => {
   requestState.message && res.headers.set(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
   requestState.reason && res.headers.set(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
@@ -164,11 +147,7 @@ export const decorateResponseWithObservabilityHeaders = (res: Response, requestS
   return res;
 };
 
-<<<<<<< HEAD
 // TODO-SHARED: Duplicate from '@clerk/nextjs'
-=======
-// Duplicate from '@clerk/nextjs'
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const handleMultiDomainAndProxy = (
   clerkRequest: ClerkRequest,
   opts: AuthenticateRequestOptions,
@@ -210,46 +189,25 @@ export const handleMultiDomainAndProxy = (
   };
 };
 
-<<<<<<< HEAD
-=======
-// Duplicate from '@clerk/nextjs'
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const missingDomainAndProxy = `
 Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl.
 
 1) With middleware
-<<<<<<< HEAD
    e.g. export default clerkMiddleware({domain:'YOUR_DOMAIN',isSatellite:true});
 2) With environment variables e.g.
    PUBLIC_ASTRO_APP_CLERK_DOMAIN='YOUR_DOMAIN'
    PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'
    `;
 
-=======
-   e.g. export default authMiddleware({domain:'YOUR_DOMAIN',isSatellite:true});
-2) With environment variables e.g.
-   NEXT_PUBLIC_CLERK_DOMAIN='YOUR_DOMAIN'
-   NEXT_PUBLIC_CLERK_IS_SATELLITE='true'
-   `;
-
-// Duplicate from '@clerk/nextjs'
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const missingSignInUrlInDev = `
 Invalid signInUrl. A satellite application requires a signInUrl for development instances.
 Check if signInUrl is missing from your configuration or if it is not an absolute URL
 
 1) With middleware
-<<<<<<< HEAD
    e.g. export default clerkMiddleware({signInUrl:'SOME_URL', isSatellite:true});
 2) With environment variables e.g.
    PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL='SOME_URL'
    PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'`;
-=======
-   e.g. export default authMiddleware({signInUrl:'SOME_URL', isSatellite:true});
-2) With environment variables e.g.
-   NEXT_PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
-   NEXT_PUBLIC_CLERK_IS_SATELLITE='true'`;
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 
 function decorateAstroLocal(req: Request, context: APIContext, requestState: RequestState) {
   const { reason, message, status, token } = requestState;
@@ -275,12 +233,7 @@ async function decorateRequest(
 
   /**
    * Populate every page with the authObject. This allows for SSR to work properly
-<<<<<<< HEAD
    * without sucrificing DX and having developers wrap each page with a Layout that would handle this.
-=======
-   * without the developer having to wrap manually each page with `ClerkLayout.astro`
-   * ^ ClerkLayout is still needed in order to populate the ssrState store, but it not responsible for passing the data to a page.
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
    */
   if (res.headers.get('content-type') === 'text/html') {
     const reader = res.body?.getReader();
@@ -359,11 +312,7 @@ const createMiddlewareRedirectToSignIn = (
   };
 };
 
-<<<<<<< HEAD
 // Handle errors thrown by redirectToSignIn() calls,
-=======
-// Handle errors thrown by protect() and redirectToSignIn() calls,
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 // as we want to align the APIs between middleware, pages and route handlers
 // Normally, middleware requires to explicitly return a response, but we want to
 // avoid discrepancies between the APIs as it's easy to miss the `return` statement
