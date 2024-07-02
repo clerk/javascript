@@ -8,8 +8,8 @@ module.exports = {
     {
       files: ['./env.d.ts'],
       rules: {
-        '@typescript-eslint/consistent-type-imports': 'off'
-      }
-    }
-  ]
+        '@typescript-eslint/consistent-type-imports': 'off',
+      },
+    },
+  ],
 };
