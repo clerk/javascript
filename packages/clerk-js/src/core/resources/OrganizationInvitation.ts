@@ -22,13 +22,13 @@ export class OrganizationInvitation extends BaseResource implements Organization
 
   static async create(
     organizationId: string,
-    { emailAddress, role }: CreateOrganizationInvitationParams,
+    { emailAddress, role, redirectUrl }: CreateOrganizationInvitationParams,
   ): Promise<OrganizationInvitationResource> {
     const json = (
       await BaseResource._fetch<OrganizationInvitationJSON>({
         path: `/organizations/${organizationId}/invitations`,
         method: 'POST',
-        body: { email_address: emailAddress, role } as any,
+        body: { email_address: emailAddress, role, ...(redirectUrl ? { redirect_url: redirectUrl } : {}) } as any,
       })
     )?.response as unknown as OrganizationInvitationJSON;
     return new OrganizationInvitation(json);

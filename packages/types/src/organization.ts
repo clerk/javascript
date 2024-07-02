@@ -89,6 +89,7 @@ export interface InviteMemberParams {
 export interface InviteMembersParams {
   emailAddresses: string[];
   role: OrganizationCustomRoleKey;
+  redirectUrl?: string;
 }
 
 export interface UpdateMembershipParams {
