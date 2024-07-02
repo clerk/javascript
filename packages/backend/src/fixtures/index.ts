@@ -1,3 +1,5 @@
+import { base64url } from '../util/rfc4648';
+
 export const mockJwt =
   'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FjY291bnRzLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsImV4cCI6MTY2NjY0ODMxMCwiaWF0IjoxNjY2NjQ4MjUwLCJpc3MiOiJodHRwczovL2NsZXJrLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsIm5iZiI6MTY2NjY0ODI0MCwic2lkIjoic2Vzc18yR2JEQjRlbk5kQ2E1dlMxenBDM1h6Zzl0SzkiLCJzdWIiOiJ1c2VyXzJHSXBYT0VwVnlKdzUxcmtabjlLbW5jNlN4ciJ9.n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
 
@@ -6,6 +8,9 @@ export const mockInvalidSignatureJwt =
 
 export const mockMalformedJwt =
   'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjE2NjY2NDgyNTB9.n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
+
+const mockJwtSignature =
+  'n1Usc-DLDftqA0Xb-_2w8IGs4yjCmwc5RngwbSRvwevuZOIuRoeHmE2sgCdEvjfJEa7ewL6EVGVcM557TWPW--g_J1XQPwBy8tXfz7-S73CEuyRFiR97L2AHRdvRtvGtwR-o6l8aHaFxtlmfWbQXfg4kFJz2UGe9afmh3U9-f_4JOZ5fa3mI98UMy1-bo20vjXeWQ9aGrqaxHQxjnzzC-1Kpi5LdPvhQ16H0dPB8MHRTSM5TAuLKTpPV7wqixmbtcc2-0k6b9FKYZNqRVTaIyV-lifZloBvdzlfOF8nW1VVH_fx-iW5Q3hovHFcJIULHEC1kcAYTubbxzpgeVQepGg';
 
 export const mockJwtHeader = {
   alg: 'RS256',
@@ -137,3 +142,28 @@ export const publicJwks = {
 // this jwt has be signed with the keys above. The payload is mockJwtPayload and the header is mockJwtHeader
 export const signedJwt =
   'eyJhbGciOiJSUzI1NiIsImtpZCI6Imluc18yR0lvUWhiVXB5MGhYN0IyY1ZrdVRNaW5Yb0QiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwczovL2FjY291bnRzLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsImV4cCI6MTY2NjY0ODMxMCwiaWF0IjoxNjY2NjQ4MjUwLCJpc3MiOiJodHRwczovL2NsZXJrLmluc3BpcmVkLnB1bWEtNzQubGNsLmRldiIsIm5iZiI6MTY2NjY0ODI0MCwic2lkIjoic2Vzc18yR2JEQjRlbk5kQ2E1dlMxenBDM1h6Zzl0SzkiLCJzdWIiOiJ1c2VyXzJHSXBYT0VwVnlKdzUxcmtabjlLbW5jNlN4ciJ9.j3rB92k32WqbQDkFB093H4GoQsBVLH4HLGF6ObcwUaVGiHC8SEu6T31FuPf257SL8A5sSGtWWM1fqhQpdLohgZb_hbJswGBuYI-Clxl9BtpIRHbWFZkLBIj8yS9W9aVtD3fWBbF6PHx7BY1udio-rbGWg1YAOZNtVcxF02p-MvX-8XIK92Vwu3Un5zyfCoVIg__qo3Xntzw3tznsZ4XDe212c6kVz1R_L1d5DKjeWXpjUPAS_zFeZSIJEQLf4JNr4JCY38tfdnc3ajfDA3p36saf1XwmTdWXQKCXi75c2TJAXROs3Pgqr5Kw_5clygoFuxN5OEMhFWFSnvIBdi3M6w';
+
+export const pkTest = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
+export const pkLive = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
+
+type CreateJwt = (opts?: { header?: any; payload?: any; signature?: string }) => string;
+export const createJwt: CreateJwt = ({ header, payload, signature = mockJwtSignature } = {}) => {
+  const encoder = new TextEncoder();
+
+  const stringifiedHeader = JSON.stringify({ ...mockJwtHeader, ...header });
+  const stringifiedPayload = JSON.stringify({ ...mockJwtPayload, ...payload });
+
+  return [
+    base64url.stringify(encoder.encode(stringifiedHeader), { pad: false }),
+    base64url.stringify(encoder.encode(stringifiedPayload), { pad: false }),
+    signature,
+  ].join('.');
+};
+
+export function createCookieHeader(cookies: Record<string, string>): string {
+  return Object.keys(cookies)
+    .reduce((result: string[], cookieName: string) => {
+      return [...result, `${cookieName}=${cookies[cookieName]}`];
+    }, [])
+    .join('; ');
+}

@@ -109,3 +109,18 @@ export function isDevelopmentFromSecretKey(apiKey: string): boolean {
 export function isProductionFromSecretKey(apiKey: string): boolean {
   return apiKey.startsWith('live_') || apiKey.startsWith('sk_live_');
 }
+
+export async function getCookieSuffix(
+  publishableKey: string,
+  subtle: SubtleCrypto = globalThis.crypto.subtle,
+): Promise<string> {
+  const data = new TextEncoder().encode(publishableKey);
+  const digest = await subtle.digest('sha-1', data);
+  const stringDigest = String.fromCharCode(...new Uint8Array(digest));
+  // Base 64 Encoding with URL and Filename Safe Alphabet: https://datatracker.ietf.org/doc/html/rfc4648#section-5
+  return isomorphicBtoa(stringDigest).replace(/\+/gi, '-').replace(/\//gi, '_').substring(0, 8);
+}
+
+export const getSuffixedCookieName = (cookieName: string, cookieSuffix: string): string => {
+  return `${cookieName}_${cookieSuffix}`;
+};

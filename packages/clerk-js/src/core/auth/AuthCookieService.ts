@@ -9,6 +9,7 @@ import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
 import type { SessionCookieHandler } from './cookies/session';
 import { createSessionCookie } from './cookies/session';
+import { getCookieSuffix } from './cookieSuffix';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
 import { SessionCookiePoller } from './SessionCookiePoller';
@@ -39,9 +40,15 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private devBrowser: DevBrowser;
 
-  constructor(
+  public static async create(clerk: Clerk, fapiClient: FapiClient) {
+    const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
+    return new AuthCookieService(clerk, fapiClient, cookieSuffix);
+  }
+
+  private constructor(
     private clerk: Clerk,
     fapiClient: FapiClient,
+    cookieSuffix: string,
   ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
@@ -52,11 +59,12 @@ export class AuthCookieService {
     this.refreshTokenOnVisibilityChange();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie();
-    this.sessionCookie = createSessionCookie();
+    this.clientUat = createClientUatCookie(cookieSuffix);
+    this.sessionCookie = createSessionCookie(cookieSuffix);
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
+      cookieSuffix,
     });
   }
 
