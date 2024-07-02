@@ -1,0 +1,50 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types'
+import type { SignUpProps } from "@clerk/types";
+type Props<Tag extends HTMLTag> = Polymorphic<SignUpProps & { as: Tag; id?: string; mode?: 'redirect' | 'modal' }>
+
+import { customAlphabet, urlAlphabet } from "nanoid";
+
+const safeId = customAlphabet(urlAlphabet, 10)();
+
+const { as: Element = 'button', id = safeId, ...props } = Astro.props
+---
+
+<Element id={id}>
+  <slot />
+</Element >
+
+<script is:inline define:vars={{ props, safeId }}>
+  const btn = document.querySelector(`#${safeId}`);
+
+  btn.addEventListener("click", () => {
+    const {
+      fallbackRedirectUrl,
+      forceRedirectUrl,
+      signInFallbackRedirectUrl,
+      signInForceRedirectUrl,
+      mode,
+      unsafeMetadata,
+    } = props;
+
+    const opts = {
+      fallbackRedirectUrl,
+      forceRedirectUrl,
+      signInFallbackRedirectUrl,
+      signInForceRedirectUrl,
+      unsafeMetadata,
+    };
+
+    const clerk = window.Clerk
+
+    if (mode === 'modal') {
+      return clerk.openSignUp(opts);
+    }
+
+    return clerk.redirectToSignUp({
+      ...opts,
+      signUpFallbackRedirectUrl: fallbackRedirectUrl,
+      signUpForceRedirectUrl: forceRedirectUrl,
+    });
+  });
+</script>

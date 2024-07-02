@@ -1,0 +1,24 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types'
+type Props<Tag extends HTMLTag> = Polymorphic<{ as: Tag; id?: string; mode?: 'redirect' | 'modal' }>
+
+import { customAlphabet, urlAlphabet } from "nanoid";
+
+const safeId = customAlphabet(urlAlphabet, 10)();
+
+const { as: Element = 'button', id = safeId, ...props } = Astro.props
+---
+
+<Element id={id}>
+  <slot />
+</Element >
+
+<script is:inline define:vars={{ props, safeId }}>
+  const btn = document.querySelector(`#${safeId}`);
+
+  btn.addEventListener("click", () => {
+    const { redirectUrl } = props;
+
+    window.Clerk.signOut({ redirectUrl })
+  });
+</script>
