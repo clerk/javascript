@@ -1,6 +1,6 @@
 import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
 // TODO: This import shouldn't be part of @clerk/types
-import { OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types';
+import { WEB3_PROVIDERS } from '@clerk/types';
 
 import { iconImageUrl } from '../common/constants';
 import { useEnvironment } from '../contexts/EnvironmentContext';
@@ -22,31 +22,41 @@ type ThirdPartyProviderToDataMap = {
   };
 };
 
-const oauthStrategies = OAUTH_PROVIDERS.map(p => p.strategy);
-
-const providerToDisplayData: ThirdPartyProviderToDataMap = fromEntries(
-  [...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
+const web3ProviderToDisplayData: ThirdPartyProviderToDataMap = fromEntries(
+  WEB3_PROVIDERS.map(p => {
     return [p.provider, { strategy: p.strategy, name: p.name, iconUrl: iconImageUrl(p.provider) }];
   }),
 ) as ThirdPartyProviderToDataMap;
 
-const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
-  [...OAUTH_PROVIDERS, ...WEB3_PROVIDERS].map(p => {
+const web3StrategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
+  WEB3_PROVIDERS.map(p => {
     return [p.strategy, { id: p.provider, name: p.name, iconUrl: iconImageUrl(p.provider) }];
   }),
 ) as ThirdPartyStrategyToDataMap;
 
 export const useEnabledThirdPartyProviders = () => {
-  const { socialProviderStrategies, web3FirstFactors, authenticatableSocialStrategies } = useEnvironment().userSettings;
+  const { socialProviderStrategies, web3FirstFactors, social } = useEnvironment().userSettings;
+  const providerToDisplayData = { ...web3ProviderToDisplayData};
+  const strategyToDisplayData = { ...web3StrategyToDisplayData };
 
-  // Filter out any OAuth strategies that are not yet known, they are not included in our types.
-  const knownSocialProviderStrategies = socialProviderStrategies.filter(s => oauthStrategies.includes(s));
-  const knownAuthenticatableSocialStrategies = authenticatableSocialStrategies.filter(s => oauthStrategies.includes(s));
+  for (const provider of Object.values(social)) {
+    const providerID = provider.strategy.replace("oauth_", "") as "google";
+    strategyToDisplayData[provider.strategy] = {
+      iconUrl: provider.logo_url as string,
+      name: provider.name,
+      id: providerID,
+    };
+    providerToDisplayData[providerID] = {
+      iconUrl: provider.logo_url as string,
+      name: provider.name,
+      strategy: provider.strategy,
+    };
+  }
 
   return {
-    strategies: [...knownSocialProviderStrategies, ...web3FirstFactors],
+    strategies: [...socialProviderStrategies, ...web3FirstFactors],
     web3Strategies: [...web3FirstFactors],
-    authenticatableOauthStrategies: [...knownAuthenticatableSocialStrategies],
+    authenticatableOauthStrategies: [...socialProviderStrategies],
     strategyToDisplayData: strategyToDisplayData,
     providerToDisplayData: providerToDisplayData,
   };
