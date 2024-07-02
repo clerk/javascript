@@ -37,3 +37,31 @@ export const withClerk = <P extends { clerk: LoadedClerk | undefined | null }>(
 export type WithClerkProp<T = unknown> = T & {
   clerk: LoadedClerk | undefined | null;
 };
+
+export const assertSingleChild =
+  (children: React.ReactNode) =>
+  (name: 'SignInButton' | 'SignUpButton' | 'SignOutButton' | 'SignInWithMetamaskButton') => {
+    try {
+      return React.Children.only(children);
+    } catch (e) {
+      return `You've passed multiple children components to <${name}/>. You can only pass a single child component or text.`;
+    }
+  };
+
+export const normalizeWithDefaultValue = (children: React.ReactNode | undefined, defaultText: string) => {
+  if (!children) {
+    children = defaultText;
+  }
+  if (typeof children === 'string') {
+    children = <button type='button'>{children}</button>;
+  }
+  return children;
+};
+
+export const safeExecute =
+  (cb: unknown) =>
+  (...args: any) => {
+    if (cb && typeof cb === 'function') {
+      return cb(...args);
+    }
+  };

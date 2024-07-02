@@ -1,0 +1,15 @@
+---
+import type { SignOutButtonProps } from "@clerk/astro/client/react";
+type Props = SignOutButtonProps
+
+import { SignOutButton as SignOutButtonReact } from "@clerk/astro/client/react";
+
+const props = {
+  ...Astro.props
+}
+---
+
+<SignOutButtonReact
+  client:load
+  {...props}
+/>

@@ -1,0 +1,15 @@
+---
+import type { SignInButtonProps } from "@clerk/astro/client/react";
+type Props = SignInButtonProps
+
+import { SignInButton as SignInButtonReact } from "@clerk/astro/client/react";
+
+const props = {
+  ...Astro.props
+}
+---
+
+<SignInButtonReact
+  client:load
+  {...props}
+/>

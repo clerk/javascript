@@ -20,3 +20,9 @@ export { default as SignedIn } from './SignedIn.astro';
 export { default as SignedOut } from './SignedOut.astro';
 // @ts-ignore
 export { default as Protect } from './Protect.astro';
+// @ts-ignore
+export { default as SignInButton } from './SignInButton.astro';
+// @ts-ignore
+export { default as SignOutButton } from './SignOutButton.astro';
+// @ts-ignore
+export { default as SignUpButton } from './SignUpButton.astro';
