@@ -55,13 +55,10 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
   };
 };
 
+// TODO: Once docs for astro land, update the following message with this line
+// "For more details, see <link-to-docs>"
 const authAuthHeaderMissing = (helperName = 'auth') =>
-  `Clerk: ${helperName}() was called but Clerk can't detect usage of authMiddleware(). Please ensure the following:
-    - authMiddleware() is used in your Next.js Middleware.
-    - Your Middleware matcher is configured to match this route or page.
-    - If you are using the src directory, make sure the Middleware file is inside of it.
-    
-    For more details, see https://clerk.com/docs/quickstarts/get-started-with-nextjs
+  `Clerk: ${helperName}() was called but Clerk can't detect usage of clerkMiddleware(). Please ensure that the clerkMiddleware() is used in your Astro Middleware.
     `;
 
 export const getAuth = createGetAuth({
