@@ -66,7 +66,11 @@ export function SignInChooseStrategy({ children, ...props }: SignInChooseStrateg
 
 export function SignInForgotPassword({ children, ...props }: SignInForgotPasswordProps) {
   const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, ['step:first-factor', 'step:forgot-password'], ActiveTagsMode.all);
+  const activeState = useActiveTags(
+    routerRef,
+    ['step:verifications', 'step:first-factor', 'step:forgot-password'],
+    ActiveTagsMode.all,
+  );
 
   return activeState ? (
     <SignInChooseStrategyCtx.Provider>
