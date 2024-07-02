@@ -12,6 +12,7 @@ export const templates = {
   'remix-node': resolve(__dirname, './remix-node'),
   'elements-next': resolve(__dirname, './elements-next'),
   'astro-node': resolve(__dirname, './astro-node'),
+  'expo-web': resolve(__dirname, './expo-web'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {

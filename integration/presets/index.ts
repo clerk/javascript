@@ -1,5 +1,6 @@
 import { astro } from './astro';
 import { elements } from './elements';
+import { expo } from './expo';
 import { envs, instanceKeys } from './envs';
 import { express } from './express';
 import { createLongRunningApps } from './longRunningApps';
@@ -15,6 +16,7 @@ export const appConfigs = {
   react,
   remix,
   elements,
+  expo,
   astro,
   secrets: {
     instanceKeys,
