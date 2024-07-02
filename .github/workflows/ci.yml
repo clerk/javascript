@@ -206,6 +206,7 @@ jobs:
           E2E_CLERK_VERSION: 'latest'
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
+          E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 

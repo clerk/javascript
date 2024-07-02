@@ -9,5 +9,5 @@ export async function currentUser(): Promise<User | null> {
     return null;
   }
 
-  return clerkClient.users.getUser(userId);
+  return clerkClient().users.getUser(userId);
 }
