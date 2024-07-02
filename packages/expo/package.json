@@ -23,9 +23,24 @@
   },
   "license": "MIT",
   "author": "Clerk",
-  "main": "dist/index.js",
-  "source": "src/index.js",
-  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./web": {
+      "types": "./dist/web/index.d.ts",
+      "react-native": "./src/web/index.ts",
+      "import": "./dist/web/index.js",
+      "require": "./dist/web/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "source": "./src/index.js",
+  "react-native": "./src/index.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -44,6 +59,7 @@
     "@clerk/shared": "2.3.2",
     "@clerk/types": "4.7.0",
     "base-64": "^1.0.0",
+    "react": "^18.2.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "2.4.1"
   },
@@ -51,10 +67,11 @@
     "@clerk/eslint-config-custom": "*",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
-    "@types/react": "*",
-    "@types/react-dom": "*",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "expo-auth-session": "^5.4.0",
     "expo-web-browser": "^12.8.2",
+    "react-native": "^0.74.2",
     "typescript": "*"
   },
   "peerDependencies": {

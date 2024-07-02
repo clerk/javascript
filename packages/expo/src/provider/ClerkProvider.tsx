@@ -1,15 +1,18 @@
-import './polyfills';
+import '../polyfills';
 
-import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
-import React from 'react';
 
-import type { TokenCache } from './cache';
-import { isReactNative } from './runtime';
+import type { TokenCache } from '../caches/types';
+import { isNative } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 
-export type ClerkProviderProps = ClerkReactProviderProps & {
+export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider> & {
   tokenCache?: TokenCache;
+};
+
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
@@ -23,8 +26,9 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
       key={pk}
       {...rest}
       publishableKey={pk}
-      Clerk={getClerkInstance({ publishableKey: pk, tokenCache })}
-      standardBrowser={!isReactNative()}
+      sdkMetadata={SDK_METADATA}
+      Clerk={isNative() ? getClerkInstance({ publishableKey: pk, tokenCache }) : null}
+      standardBrowser={!isNative()}
     >
       {children}
     </ClerkReactProvider>
