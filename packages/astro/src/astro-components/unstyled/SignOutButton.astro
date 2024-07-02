@@ -6,12 +6,12 @@ import { customAlphabet, urlAlphabet } from "nanoid";
 
 const safeId = customAlphabet(urlAlphabet, 10)();
 
-const { as: Element = 'button', id = safeId, ...props } = Astro.props
+const { as: Tag = 'button', id = safeId, ...props } = Astro.props
 ---
 
-<Element id={id}>
+<Tag id={id}>
   <slot />
-</Element >
+</Tag >
 
 <script is:inline define:vars={{ props, safeId }}>
   const btn = document.querySelector(`#${safeId}`);
