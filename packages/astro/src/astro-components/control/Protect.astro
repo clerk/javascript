@@ -1,0 +1,38 @@
+---
+import {
+  CheckAuthorizationWithCustomPermissions,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
+} from "@clerk/types";
+
+type Props =
+  | {
+      condition?: never;
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+    }
+  | {
+      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+      role?: never;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+    };
+
+const { has, userId } = Astro.locals.auth();
+const isUnauthorized =
+  !userId ||
+  (typeof Astro.props.condition === "function" &&
+    !Astro.props.condition(has)) ||
+  ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
+---
+
+{isUnauthorized ? <slot name="fallback" /> : <slot />}

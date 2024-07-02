@@ -1,0 +1,15 @@
+---
+import type { SignInProps } from "@clerk/types";
+type Props = SignInProps
+
+import { SignIn as SignInReact } from "@clerk/astro/client/react";
+
+const props = {
+  ...Astro.props
+}
+---
+
+<SignInReact
+  client:load
+  {...props}
+/>

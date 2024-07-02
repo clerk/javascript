@@ -1,0 +1,32 @@
+---
+import type { UserProfileProps } from "@clerk/types";
+type Props = UserProfileProps;
+
+import { customAlphabet, urlAlphabet } from "nanoid";
+
+const safeId = customAlphabet(urlAlphabet, 10)();
+---
+
+<div id={`clerk-user-profile-${safeId}`}></div>
+
+<script is:inline define:vars={{ props: Astro.props, safeId }}>
+  const setOrCreatePropMap = ({ category, id, props }) => {
+    if (!window.__astro_clerk_component_props) {
+      window.__astro_clerk_component_props = new Map();
+    }
+
+    if (!window.__astro_clerk_component_props.has(category)) {
+      const _ = new Map();
+      _.set(id, props);
+      window.__astro_clerk_component_props.set(category, _);
+    }
+
+    window.__astro_clerk_component_props.get(category)?.set(id, props);
+  };
+
+  setOrCreatePropMap({
+    category: "user-profile",
+    id: `clerk-user-profile-${safeId}`,
+    props,
+  });
+</script>

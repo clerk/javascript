@@ -1,0 +1,37 @@
+---
+import type { SignInProps } from "@clerk/types";
+type Props = SignInProps;
+
+import { customAlphabet, urlAlphabet } from "nanoid";
+
+const safeId = customAlphabet(urlAlphabet, 10)();
+
+const props = {
+  ...Astro.props
+}
+---
+
+<div id={`clerk-sign-in-${safeId}`}></div>
+
+<script is:inline define:vars={{ props: Astro.props, safeId }}>
+  const setOrCreatePropMap = ({ category, id, props }) => {
+    if (!window.__astro_clerk_component_props) {
+      window.__astro_clerk_component_props = new Map();
+    }
+
+    if (!window.__astro_clerk_component_props.has(category)) {
+      const a = new Map();
+      a.set(id, props);
+      window.__astro_clerk_component_props.set(category, a);
+    }
+
+    window.__astro_clerk_component_props.get(category)?.set(id, props);
+  };
+
+
+  setOrCreatePropMap({
+    category: "sign-in",
+    id: `clerk-sign-in-${safeId}`,
+    props,
+  });
+</script>
