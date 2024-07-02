@@ -10,6 +10,7 @@ export const subpathNames = [
   'en-US',
   'es-ES',
   'fr-FR',
+  "fi-FI",
   'he-IL',
   'it-IT',
   'ja-JP',
