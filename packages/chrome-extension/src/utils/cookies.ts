@@ -5,10 +5,19 @@ export type GetClientCookieParams = {
   name: string;
 };
 
+function isSingleHost(urls: string | string[]): urls is string {
+  return typeof urls === 'string';
+}
+
+function ensureFormattedUrl(url: string): string {
+  return url.startsWith('http') ? url : `https://${url}`;
+}
+
 export async function getClientCookie({ urls, name }: GetClientCookieParams) {
   // Handle single host request
-  if (typeof urls === 'string') {
-    return browser.cookies.get({ url: urls, name });
+  if (isSingleHost(urls)) {
+    const url = ensureFormattedUrl(urls);
+    return await browser.cookies.get({ url, name });
   }
 
   // Handle multi-host request
