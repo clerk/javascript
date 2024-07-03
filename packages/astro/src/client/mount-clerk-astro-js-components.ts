@@ -1,5 +1,8 @@
 import { $clerk } from '../stores/internal';
 
+/**
+ * Loop through any Astro component that has requested to mount a UI component and mount it with its respective props.
+ */
 const mountAllClerkAstroJSComponents = () => {
   const mountFns = {
     'organization-list': 'mountOrganizationList',

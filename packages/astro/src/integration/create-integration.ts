@@ -49,6 +49,9 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
           updateConfig({
             vite: {
               define: {
+                /**
+                 * Convert the integration params to environment variable in order for be readable from the server
+                 */
                 ...buildEnvVarFromOption(signInUrl, 'PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL'),
                 ...buildEnvVarFromOption(signUpUrl, 'PUBLIC_ASTRO_APP_CLERK_SIGN_UP_URL'),
                 ...buildEnvVarFromOption(isSatellite, 'PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE'),
@@ -79,8 +82,14 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
           });
 
           /**
+           * ------------- Script Injection --------------------------
+           * Below we are injecting the same script twice. `runInjectionScript` is build in such way in order to instanciate and load Clerk only once.
+           * We need both scripts in order to support applications with or without UI frameworks.
+           */
+
+          /**
            * The above script will run before client frameworks like React hydrate.
-           * This makes sure that we have initialized a Clerk instance and populated stores in order to avoid hydration issues
+           * This makes sure that we have initialized a Clerk instance and populated stores in order to avoid hydration issues.
            */
           injectScript(
             'before-hydration',

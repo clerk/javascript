@@ -1,5 +1,8 @@
 import type { AstroClerkIntegrationParams } from '../types';
 
+/**
+ * @internal
+ */
 const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publishableKey?: string }) => {
   const {
     signInUrl: paramSignIn,

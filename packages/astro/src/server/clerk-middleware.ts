@@ -81,8 +81,8 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     decorateAstroLocal(context.request, context, requestState);
 
     /**
-     * For React component, in order to avoid hydration errors populate SSR store and do not depend on the component being wrapped ClerkLayout.
-     * For now this is only needed for control components like SignedIn/SignedOut
+     * ALS is crucial for guaranteeing SSR in UI frameworks like React.
+     * This currently powers the `useAuth()` React hook and any other hook or Component that depends on it.
      */
     return authAsyncStorage.run(context.locals.auth(), async () => {
       /**
@@ -113,7 +113,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   return astroMiddleware;
 };
 
-// Duplicate from '@clerk/nextjs'
+// TODO-SHARED: Duplicate from '@clerk/nextjs'
 const parseHandlerAndOptions = (args: unknown[]) => {
   return [
     typeof args[0] === 'function' ? args[0] : undefined,
@@ -123,7 +123,7 @@ const parseHandlerAndOptions = (args: unknown[]) => {
 
 type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticateRequest'];
 
-// Duplicate from '@clerk/nextjs'
+// TODO-SHARED: Duplicate from '@clerk/nextjs'
 export const createAuthenticateRequestOptions = (
   clerkRequest: ClerkRequest,
   options: ClerkAstroMiddlewareOptions,
@@ -139,7 +139,7 @@ export const createAuthenticateRequestOptions = (
   };
 };
 
-// Duplicate from '@clerk/nextjs'
+// TODO-SHARED: Duplicate from '@clerk/nextjs'
 export const decorateResponseWithObservabilityHeaders = (res: Response, requestState: RequestState): Response => {
   requestState.message && res.headers.set(constants.Headers.AuthMessage, encodeURIComponent(requestState.message));
   requestState.reason && res.headers.set(constants.Headers.AuthReason, encodeURIComponent(requestState.reason));
@@ -147,7 +147,7 @@ export const decorateResponseWithObservabilityHeaders = (res: Response, requestS
   return res;
 };
 
-// Duplicate from '@clerk/nextjs'
+// TODO-SHARED: Duplicate from '@clerk/nextjs'
 export const handleMultiDomainAndProxy = (
   clerkRequest: ClerkRequest,
   opts: AuthenticateRequestOptions,
@@ -189,7 +189,6 @@ export const handleMultiDomainAndProxy = (
   };
 };
 
-// Duplicate from '@clerk/nextjs'
 export const missingDomainAndProxy = `
 Missing domain and proxyUrl. A satellite application needs to specify a domain or a proxyUrl.
 
@@ -200,7 +199,6 @@ Missing domain and proxyUrl. A satellite application needs to specify a domain o
    PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'
    `;
 
-// Duplicate from '@clerk/nextjs'
 export const missingSignInUrlInDev = `
 Invalid signInUrl. A satellite application requires a signInUrl for development instances.
 Check if signInUrl is missing from your configuration or if it is not an absolute URL
@@ -235,8 +233,7 @@ async function decorateRequest(
 
   /**
    * Populate every page with the authObject. This allows for SSR to work properly
-   * without the developer having to wrap manually each page with `ClerkLayout.astro`
-   * ^ ClerkLayout is still needed in order to populate the ssrState store, but it not responsible for passing the data to a page.
+   * without sucrificing DX and having developers wrap each page with a Layout that would handle this.
    */
   if (res.headers.get('content-type') === 'text/html') {
     const reader = res.body?.getReader();
@@ -315,7 +312,7 @@ const createMiddlewareRedirectToSignIn = (
   };
 };
 
-// Handle errors thrown by protect() and redirectToSignIn() calls,
+// Handle errors thrown by redirectToSignIn() calls,
 // as we want to align the APIs between middleware, pages and route handlers
 // Normally, middleware requires to explicitly return a response, but we want to
 // avoid discrepancies between the APIs as it's easy to miss the `return` statement

@@ -3,6 +3,12 @@ import { $initialState } from '../stores/internal';
 import type { AstroClerkIntegrationParams } from '../types';
 import { mergeEnvVarsWithParams } from './merge-env-vars-with-params';
 
+/**
+ * @internal
+ * Before initializing Clerk do:
+ * 1) Populate stores with the authentication state during SSR.
+ * 2) Merge the environment variables from the server context with the ones from the integration.
+ */
 function createInjectionScriptRunner(creator: CreateClerkInstanceInternalFn) {
   async function runner(astroClerkOptions?: AstroClerkIntegrationParams) {
     const ssrDataContainer = document.getElementById('__CLERK_ASTRO_DATA__');

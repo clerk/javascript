@@ -2,6 +2,10 @@ import type { APIContext } from 'astro';
 
 type ContextOrLocals = APIContext | APIContext['locals'];
 
+/**
+ * @internal
+ * Isomorphic handler for reading environemnt variables defined from Vite or are injected in the request context (CF Pages)
+ */
 function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: ContextOrLocals): string | undefined {
   const locals = 'locals' in contextOrLocals ? contextOrLocals.locals : contextOrLocals;
 
@@ -12,6 +16,9 @@ function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: Contex
   return import.meta.env[envVarName];
 }
 
+/**
+ * @internal
+ */
 function getSafeEnv(context: ContextOrLocals) {
   return {
     domain: getContextEnvVar('PUBLIC_ASTRO_APP_CLERK_DOMAIN', context),
@@ -30,6 +37,7 @@ function getSafeEnv(context: ContextOrLocals) {
 }
 
 /**
+ * @internal
  * This should be used in order to pass environment variables from the server safely to the client.
  * When running an application with `wrangler pages dev` client side environment variables are not attached to `import.meta.env.*`
  * This is not the case when deploying to cloudflare pages directly

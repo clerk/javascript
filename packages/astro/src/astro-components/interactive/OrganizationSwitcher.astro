@@ -14,6 +14,10 @@ const props = {
 <div id={`clerk-organization-switcher-${safeId}`}></div>
 
 <script is:inline define:vars={{ props: Astro.props, safeId }}>
+  /**
+   * Store the id and the props for the Astro component in order to mount the correct UI component once clerk is loaded.
+   * The above is handled by `mountAllClerkAstroJSComponents`.
+   */
   const setOrCreatePropMap = ({ category, id, props }) => {
     if (!window.__astro_clerk_component_props) {
       window.__astro_clerk_component_props = new Map();

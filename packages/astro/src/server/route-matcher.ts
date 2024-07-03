@@ -3,13 +3,11 @@ import { pathToRegexp } from 'path-to-regexp';
 
 type WithPathPatternWildcard<T = string> = `${T & string}(.*)`;
 
-type RouteMatcherWithNextTypedRoutes = Autocomplete<WithPathPatternWildcard>;
+type RouteMatcherRoutes = Autocomplete<WithPathPatternWildcard>;
 
-export type RouteMatcherParam =
-  | Array<RegExp | RouteMatcherWithNextTypedRoutes>
-  | RegExp
-  | RouteMatcherWithNextTypedRoutes;
+export type RouteMatcherParam = Array<RegExp | RouteMatcherRoutes> | RegExp | RouteMatcherRoutes;
 
+// TODO-SHARED: This can be moved to @clerk/shared as an identical implementation exists in @clerk/nextjs
 /**
  * Returns a function that accepts a `Request` object and returns whether the request matches the list of
  * predefined routes that can be passed in as the first argument.
