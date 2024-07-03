@@ -1,5 +1,18 @@
 # Change Log
 
+## 4.2.0
+
+### Minor Changes
+
+- Add support for Remix SPA Mode ([#3580](https://github.com/clerk/javascript/pull/3580)) by [@anagstef](https://github.com/anagstef)
+
+### Patch Changes
+
+- Fix issues caused by modifying duplex property on Request when it was already defined ([#3645](https://github.com/clerk/javascript/pull/3645)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`f1847b70b`](https://github.com/clerk/javascript/commit/f1847b70b2327bd490faf1f3eed1aa5639d54993)]:
+  - @clerk/backend@1.3.0
+
 ## 4.1.3
 
 ### Patch Changes
