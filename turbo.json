@@ -25,7 +25,8 @@
     "VERCEL",
     "VITE_CLERK_*",
     "EXPO_PUBLIC_CLERK_*",
-    "REACT_APP_CLERK_*"
+    "REACT_APP_CLERK_*",
+    "MODE"
   ],
   "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
   "tasks": {
