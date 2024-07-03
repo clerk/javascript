@@ -84,6 +84,7 @@ type IsomorphicLoadedClerk = Without<
   | 'buildAfterSignUpUrl'
   | 'buildAfterSignInUrl'
   | 'buildAfterSignOutUrl'
+  | 'buildAfterMultiSessionSingleSignOutUrl'
   | 'buildUrlWithAuth'
   | 'handleRedirectCallback'
   | 'handleGoogleOneTapCallback'
@@ -576,7 +577,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  __unstable__updateProps = (props: any): any => {
+  __unstable__updateProps = (props: any): void => {
     void this.#waitForClerkJS().then(clerkjs => {
       // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
       if (clerkjs && '__unstable__updateProps' in clerkjs) {
