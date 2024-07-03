@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.1.2
+
+### Patch Changes
+
+- Ensure client cookie URLs resolve appropriately ([#3658](https://github.com/clerk/javascript/pull/3658)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`427fcdeaa`](https://github.com/clerk/javascript/commit/427fcdeaaba4e77273be29b4d7cca43f9aa18693)]:
+  - @clerk/clerk-react@5.2.7
+
 ## 1.1.1
 
 ### Patch Changes
