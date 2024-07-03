@@ -133,6 +133,8 @@ type IsomorphicLoadedClerk = Without<
   buildAfterSignUpUrl: () => string | void;
   // TODO: Align return type
   buildAfterSignOutUrl: () => string | void;
+  // TODO: Align return type
+  buildAfterMultiSessionSingleSignOutUrl: () => string | void;
   // TODO: Align optional props
   mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
   mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
@@ -307,6 +309,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback();
     } else {
       this.premountMethodCalls.set('buildAfterSignOutUrl', callback);
+    }
+  };
+
+  buildAfterMultiSessionSingleSignOutUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildAfterMultiSessionSingleSignOutUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildAfterMultiSessionSingleSignOutUrl', callback);
     }
   };
 
