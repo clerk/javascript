@@ -11,7 +11,7 @@ export const SignUpStartCtx = createContextFromActorRef<TSignUpStartMachine>('Si
 
 export function SignUpStart(props: SignUpStartProps) {
   const routerRef = SignUpRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, 'route:start');
+  const activeState = useActiveTags(routerRef, 'step:start');
 
   return activeState ? <SignUpStartInner {...props} /> : null;
 }
