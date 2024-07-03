@@ -24,17 +24,29 @@ describe('isomorphicClerk', () => {
     const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
     (isomorphicClerk as any).clerkjs = dummyClerkJS as any;
 
-    isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'dark' } });
-    isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'light' } });
-    isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'purple' } });
+    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'dark' } });
+    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'light' } });
+    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'purple' } });
+    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'yellow' } });
+    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'red' } });
+    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'blue' } });
+    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'green' } });
     expect(propsHistory).toEqual([]);
 
+    jest.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
     isomorphicClerk.emitLoaded();
+    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'white' } });
     await jest.runAllTimersAsync();
+
     expect(propsHistory).toEqual([
       { appearance: { baseTheme: 'dark' } },
       { appearance: { baseTheme: 'light' } },
       { appearance: { baseTheme: 'purple' } },
+      { appearance: { baseTheme: 'yellow' } },
+      { appearance: { baseTheme: 'red' } },
+      { appearance: { baseTheme: 'blue' } },
+      { appearance: { baseTheme: 'green' } },
+      { appearance: { baseTheme: 'white' } },
     ]);
   });
 });

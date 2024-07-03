@@ -72,11 +72,11 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   const isomorphicClerk = React.useMemo(() => IsomorphicClerk.getOrCreateInstance(options), []);
 
   React.useEffect(() => {
-    isomorphicClerk.__unstable__updateProps({ appearance: options.appearance });
+    void isomorphicClerk.__unstable__updateProps({ appearance: options.appearance });
   }, [options.appearance]);
 
   React.useEffect(() => {
-    isomorphicClerk.__unstable__updateProps({ options });
+    void isomorphicClerk.__unstable__updateProps({ options });
   }, [options.localization]);
 
   React.useEffect(() => {
