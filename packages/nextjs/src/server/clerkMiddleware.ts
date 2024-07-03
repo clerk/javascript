@@ -7,7 +7,6 @@ import type {
 } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import { AsyncLocalStorage } from 'async_hooks';
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
