@@ -10,14 +10,11 @@ const safeId = customAlphabet(urlAlphabet, 10)();
 <div id={`clerk-user-button-${safeId}`}></div>
 
 <script is:inline define:vars={{ props: Astro.props, safeId }}>
-<<<<<<< HEAD
   // TODO-CLEANUP: Find a way to remove this duplicate and have a single origin for this script
   /**
    * Store the id and the props for the Astro component in order to mount the correct UI component once clerk is loaded.
    * The above is handled by `mountAllClerkAstroJSComponents`.
    */
-=======
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
   const setOrCreatePropMap = ({ category, id, props }) => {
     if (!window.__astro_clerk_component_props) {
       window.__astro_clerk_component_props = new Map();
@@ -37,8 +34,4 @@ const safeId = customAlphabet(urlAlphabet, 10)();
     id: `clerk-user-button-${safeId}`,
     props,
   });
-<<<<<<< HEAD
 </script>
-=======
-</script>
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)

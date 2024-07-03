@@ -3,7 +3,6 @@ import { computed } from 'nanostores';
 import { $clerk, $csrState, $initialState } from './internal';
 import { deriveState } from './utils';
 
-<<<<<<< HEAD
 /**
  * A client side store that is prepopulated with the authentication context during SSR.
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
@@ -13,8 +12,6 @@ import { deriveState } from './utils';
  *
  * $authStore.subscribe((auth) => console.log(auth.userId))
  */
-=======
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const $authStore = computed([$csrState, $initialState], (state, initialState) => {
   return deriveState(
     state.isLoaded,
@@ -28,7 +25,6 @@ export const $authStore = computed([$csrState, $initialState], (state, initialSt
   );
 });
 
-<<<<<<< HEAD
 /**
  * A client side store that is populated after clerk-js has loaded.
  * The store returns back the authenticated user or `null`.
@@ -39,15 +35,12 @@ export const $authStore = computed([$csrState, $initialState], (state, initialSt
  *
  * $userStore.subscribe((user) => console.log(user.id))
  */
-=======
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const $userStore = computed([$authStore], auth => auth.user);
 // TODO: on mounted subscriber log telemetry
 // onMount($userStore, () => {
 //   // isomorphicClerk.telemetry?.record(eventMethodCalled('useSignIn'));
 // });
 
-<<<<<<< HEAD
 /**
  * A client side store that is populated after clerk-js has loaded.
  * The store returns the session of the authenticated user or `null`.
@@ -130,12 +123,4 @@ export const $signInStore = computed([$clientStore], client => client?.signIn);
  *
  * $signUpStore.subscribe((signUp) => console.log(signUp.status))
  */
-=======
-export const $sessionStore = computed([$authStore], auth => auth.session);
-export const $organizationStore = computed([$authStore], auth => auth.organization);
-export const $clientStore = computed([$csrState], csr => csr.client);
-export const $clerkStore = computed([$clerk], clerk => clerk);
-export const $sessionListStore = computed([$clientStore], client => client?.sessions);
-export const $signInStore = computed([$clientStore], client => client?.signIn);
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 export const $signUpStore = computed([$clientStore], client => client?.signUp);

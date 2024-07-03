@@ -6,10 +6,7 @@ import { DEV_BROWSER_JWT_KEY, isDevelopmentFromSecretKey, setDevBrowserJWTInURL 
 import { getSafeEnv } from './get-safe-env';
 import type { AstroMiddlewareContextParam } from './types';
 
-<<<<<<< HEAD
 // TODO-SHARED: This exists in @clerk/nextjs
-=======
->>>>>>> 956f8a51b (feat(astro): Introduce Astro SDK)
 /**
  * Grabs the dev browser JWT from cookies and appends it to the redirect URL when redirecting to cross-origin.
  */
