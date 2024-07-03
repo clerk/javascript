@@ -18,9 +18,8 @@ export {
 export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
 
 export {
-  // LocalAuthProvider as __experimental_LocalAuthProvider,
-  LocalAuthCredentialsProvider as __experimental_LocalAuthCredentialsProvider,
-  useLocalAuthCredentials as __experimental_useLocalAuthCredentials,
+  LocalCredentialsProvider as __experimental_LocalCredentialsProvider,
+  useLocalCredentials as __experimental_useLocalCredentials,
 } from './experimental';
 
 /**

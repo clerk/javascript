@@ -4,37 +4,37 @@ import * as SecureStore from 'expo-secure-store';
 import type { PropsWithChildren } from 'react';
 import React, { createContext, useContext, useState } from 'react';
 
-type LocalAuthCredentials = {
+type LocalCredentials = {
   identifier: string;
   password: string;
 };
 
 export const LocalAuthContext = createContext<{
-  setLocalAuthCredentials: (creds: LocalAuthCredentials) => Promise<void>;
-  hasLocalAuthCredentials: boolean;
-  clearLocalAuthAccount: () => void;
-  authenticateWithLocalAccount: () => Promise<SignInResource>;
+  setCredentials: (creds: LocalCredentials) => Promise<void>;
+  hasCredentials: boolean;
+  clearCredentials: () => void;
+  authenticate: () => Promise<SignInResource>;
 }>({
   // @ts-expect-error Initial value cannot return what the type expects
-  setLocalAuthCredentials: () => {},
-  hasLocalAuthCredentials: false,
-  clearLocalAuthAccount: () => {},
+  setCredentials: () => {},
+  hasCredentials: false,
+  clearCredentials: () => {},
   // @ts-expect-error Initial value cannot return what the type expects
-  authenticateWithLocalAccount: () => {},
+  authenticate: () => {},
 });
 
-export const useLocalAuthCredentials = () => {
+export const useLocalCredentials = () => {
   return useContext(LocalAuthContext);
 };
 
-export function LocalAuthCredentialsProvider(props: PropsWithChildren): JSX.Element {
+export function LocalCredentialsProvider(props: PropsWithChildren): JSX.Element {
   const { isLoaded, signIn } = useSignIn();
   const { publishableKey } = useClerk();
   const key = `__clerk_local_auth_${publishableKey}_identifier`;
   const pkey = `__clerk_local_auth_${publishableKey}_password`;
   const [hasLocalAuthCredentials, setHasLocalAuthCredentials] = useState(!!SecureStore.getItem(key));
 
-  const setLocalAuthCredentials = async (creds: LocalAuthCredentials) => {
+  const setCredentials = async (creds: LocalCredentials) => {
     if (!SecureStore.canUseBiometricAuthentication()) {
       return;
     }
@@ -46,12 +46,12 @@ export function LocalAuthCredentialsProvider(props: PropsWithChildren): JSX.Elem
     setHasLocalAuthCredentials(true);
   };
 
-  const clearLocalAuthAccount = async () => {
+  const clearCredentials = async () => {
     await Promise.all([SecureStore.deleteItemAsync(key), SecureStore.deleteItemAsync(pkey)]);
     setHasLocalAuthCredentials(false);
   };
 
-  const authenticateWithLocalAccount = async () => {
+  const authenticate = async () => {
     if (!isLoaded) {
       throw 'not loaded';
     }
@@ -77,10 +77,10 @@ export function LocalAuthCredentialsProvider(props: PropsWithChildren): JSX.Elem
   return (
     <LocalAuthContext.Provider
       value={{
-        setLocalAuthCredentials,
-        hasLocalAuthCredentials,
-        clearLocalAuthAccount,
-        authenticateWithLocalAccount,
+        setCredentials,
+        hasCredentials: hasLocalAuthCredentials,
+        clearCredentials,
+        authenticate,
       }}
     >
       {props.children}

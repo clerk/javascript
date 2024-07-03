@@ -5,28 +5,15 @@ import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
 import type { TokenCache } from './cache';
-// import { LocalAuthProvider } from './experimental/LocalAuth';
 import { isReactNative } from './runtime';
 import { getClerkInstance } from './singleton';
 
 export type ClerkProviderProps = ClerkReactProviderProps & {
   tokenCache?: TokenCache;
-  // localAuth?: {
-  //   lockTimeout?: number;
-  //   inactiveScreen?: React.ReactNode;
-  //   onLockTimeOutReached?: () => void;
-  //   lockTimeOutScreen?: React.FunctionComponent<{ authenticateWithBiometrics: () => Promise<boolean> }>;
-  // };
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
-  const {
-    children,
-    tokenCache,
-    publishableKey,
-    // localAuth,
-    ...rest
-  } = props;
+  const { children, tokenCache, publishableKey, ...rest } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
 
   return (

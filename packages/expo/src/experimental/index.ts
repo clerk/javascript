@@ -1,2 +1,1 @@
-// export { LocalAuthProvider } from './LocalAuth';
-export { LocalAuthCredentialsProvider, useLocalAuthCredentials } from './LocalAuthCredentials';
+export { LocalCredentialsProvider, useLocalCredentials } from './LocalCredentials';
