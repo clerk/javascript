@@ -1,4 +1,5 @@
-import { computed } from 'nanostores';
+import { eventMethodCalled } from '@clerk/shared/dist/telemetry';
+import { computed, onMount, type Store } from 'nanostores';
 
 import { $clerk, $csrState, $initialState } from './internal';
 import { deriveState } from './utils';
@@ -36,10 +37,6 @@ export const $authStore = computed([$csrState, $initialState], (state, initialSt
  * $userStore.subscribe((user) => console.log(user.id))
  */
 export const $userStore = computed([$authStore], auth => auth.user);
-// TODO: on mounted subscriber log telemetry
-// onMount($userStore, () => {
-//   // isomorphicClerk.telemetry?.record(eventMethodCalled('useSignIn'));
-// });
 
 /**
  * A client side store that is populated after clerk-js has loaded.
@@ -124,3 +121,19 @@ export const $signInStore = computed([$clientStore], client => client?.signIn);
  * $signUpStore.subscribe((signUp) => console.log(signUp.status))
  */
 export const $signUpStore = computed([$clientStore], client => client?.signUp);
+
+/**
+ * Records a telemetry event when a store is used to match React hooks telemetry.
+ *
+ * @param {Store} store - The nanostore instance to monitor.
+ * @param {string} method - The name of the method associated with the store usage.
+ */
+const recordTelemetryEvent = (store: Store, method: string) => {
+  onMount(store, () => {
+    $clerk.get()?.telemetry?.record(eventMethodCalled(method));
+  });
+};
+
+recordTelemetryEvent($signInStore, '$signInStore');
+recordTelemetryEvent($signUpStore, '$signUpStore');
+recordTelemetryEvent($organizationStore, '$organizationStore');
