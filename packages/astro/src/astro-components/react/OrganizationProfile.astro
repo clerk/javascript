@@ -1,0 +1,16 @@
+---
+import type { OrganizationProfileProps } from "@clerk/types";
+type Props = OrganizationProfileProps
+
+import type { AstroBuiltinProps } from 'astro';
+import { OrganizationProfile as OrganizationProfileReact } from "@clerk/astro/client/react";
+
+const props = {
+  ...Astro.props,
+}
+---
+
+<OrganizationProfileReact
+  client:load
+  {...props}
+/>

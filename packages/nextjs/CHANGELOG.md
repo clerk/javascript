@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.2.2
+
+### Patch Changes
+
+- Fixes Next.js build warnings (https://github.com/clerk/javascript/issues/3660) where `AsyncLocalStorage` and `MessageEvent` were being imported as Node.js modules on the edge runtime. ([#3661](https://github.com/clerk/javascript/pull/3661)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 5.2.1
 
 ### Patch Changes
