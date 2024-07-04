@@ -1,4 +1,4 @@
-import { eventMethodCalled } from '@clerk/shared/dist/telemetry';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { computed, onMount, type Store } from 'nanostores';
 
 import { $clerk, $csrState, $initialState } from './internal';
