@@ -26,10 +26,10 @@ console.log('clerkExpoPath:', clerkExpoPath, 'clerkMonorepoPath:', clerkMonorepo
 const config = {
   ...getDefaultConfig(__dirname),
   ...(clerkExpoPath
-    ? {}
-    : {
+    ? {
         watchFolders: [clerkMonorepoPath],
-      }),
+      }
+    : {}),
   resolver: {
     sourceExts: ['js', 'json', 'ts', 'tsx', 'cjs', 'mjs'],
     unstable_enableSymlinks: !!clerkExpoPath,
