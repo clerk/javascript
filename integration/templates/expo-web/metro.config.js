@@ -25,30 +25,22 @@ console.log('clerkExpoPath:', clerkExpoPath, 'clerkMonorepoPath:', clerkMonorepo
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = {
   ...getDefaultConfig(__dirname),
-  ...(clerkExpoPath
-    ? {
-        watchFolders: [clerkMonorepoPath],
-      }
-    : {}),
+  watchFolders: [clerkMonorepoPath],
   resolver: {
     sourceExts: ['js', 'json', 'ts', 'tsx', 'cjs', 'mjs'],
     unstable_enableSymlinks: !!clerkExpoPath,
     unstable_enablePackageExports: !!clerkExpoPath,
-    ...(clerkExpoPath && {
-      nodeModulesPaths: [
-        path.resolve(__dirname, 'node_modules'),
-        `${clerkMonorepoPath}/node_modules`,
-        `${clerkExpoPath}/node_modules`,
-      ],
-    }),
+    nodeModulesPaths: [
+      path.resolve(__dirname, 'node_modules'),
+      clerkExpoPath && `${clerkMonorepoPath}/node_modules`,
+      clerkExpoPath && `${clerkExpoPath}/node_modules`,
+    ],
     // This is a workaround for a to prevent multiple versions of react and react-native from being loaded.
     // https://github.com/expo/expo/pull/26209
-    ...(clerkExpoPath && {
-      blockList: [
-        new RegExp(`${clerkMonorepoPath}/node_modules/react`),
-        new RegExp(`${clerkMonorepoPath}/node_modules/react-native`),
-      ],
-    }),
+    blockList: [
+      clerkExpoPath && new RegExp(`${clerkMonorepoPath}/node_modules/react`),
+      clerkExpoPath && new RegExp(`${clerkMonorepoPath}/node_modules/react-native`),
+    ],
   },
 };
 
