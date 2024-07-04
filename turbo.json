@@ -201,7 +201,7 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:expoWeb": {
-      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/expo#build", "^@clerk/clerk-react#build"],
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/clerk-expo#build", "^@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
