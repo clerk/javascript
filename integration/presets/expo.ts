@@ -1,4 +1,3 @@
-import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 
@@ -12,7 +11,7 @@ const expoWeb = applicationConfig()
   .addScript('dev', 'npm run dev')
   .addScript('build', 'npm run build')
   .addScript('serve', 'npm run start')
-  .addDependency('@clerk/clerk-expo', constants.E2E_CLERK_VERSION || clerkExpoLocal);
+  .addDependency('@clerk/clerk-expo', clerkExpoLocal);
 
 export const expo = {
   expoWeb,
