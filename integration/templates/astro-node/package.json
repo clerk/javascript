@@ -9,17 +9,11 @@
     "preview": "astro preview --port $PORT",
     "astro": "astro"
   },
-  "devDependencies": {
-    "vite": "^5.3.3"
-  },
   "dependencies": {
     "@astrojs/check": "^0.7.0",
     "@astrojs/react": "^3.6.0",
     "@astrojs/tailwind": "^5.1.0",
     "@astrojs/node": "^8.3.2",
-    "@clerk/astro": "0.0.1-canary.v7ae5681",
-    "@clerk/localizations": "^2.4.6",
-    "@clerk/types": "^4.6.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "astro": "^4.11.5",

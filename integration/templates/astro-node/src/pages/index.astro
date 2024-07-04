@@ -5,7 +5,6 @@ import SignOutButton from "../lib/astro-components/SignOutButton.astro";
 
 import { SignedIn, SignedOut } from "@clerk/astro/components/react";
 import { OrganizationSwitcher } from "@clerk/astro/components/interactive";
-import Install from "../components/Install.astro";
 ---
 
 <Layout title="Welcome to Astro.">
@@ -22,8 +21,6 @@ import Install from "../components/Install.astro";
     />
     <SignOutButton />
   </SignedIn>
-
-  <Install />
 
   <div class="h-12"></div>
 
