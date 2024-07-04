@@ -66,7 +66,7 @@ export const application = (
 
       const proc = run(scripts.dev, {
         cwd: appDirPath,
-        env: { PORT: port.toString(), RCT_METRO_PORT: port.toString() },
+        env: { PORT: port.toString() },
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
@@ -101,7 +101,7 @@ export const application = (
       // it's not using the log function. See the dev() method above
       const proc = run(scripts.serve, {
         cwd: appDirPath,
-        env: { PORT: port.toString(), RCT_METRO_PORT: port.toString() },
+        env: { PORT: port.toString() },
       });
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       await waitForIdleProcess(proc);
