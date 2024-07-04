@@ -6,10 +6,14 @@ import { customAlphabet, urlAlphabet } from "nanoid";
 
 const safeId = customAlphabet(urlAlphabet, 10)();
 
-const { as: Tag = 'button', id = safeId, ...props } = Astro.props
+const {
+  as: Tag = 'button',
+  id = safeId,
+  ...props
+} = Astro.props
 ---
 
-<Tag id={id}>
+<Tag {...props} id={id}>
   <slot />
 </Tag >
 
