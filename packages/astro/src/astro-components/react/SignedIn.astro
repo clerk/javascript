@@ -1,6 +1,7 @@
 ---
-const { userId } = Astro.locals.auth()
+import { SignedIn as SignedInReact } from "@clerk/astro/client/react";
 ---
 
-
-{ userId ? <slot /> : null }
+<SignedInReact client:load>
+  <slot/>
+</SignedInReact>

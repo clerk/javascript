@@ -1,13 +1,16 @@
 ---
-import { ProtectComponentDefaultProps } from "../../types";
+import type { ProtectComponentDefaultProps } from "../../types";
 type Props = ProtectComponentDefaultProps
+import { Protect as ProtectReact } from "@clerk/astro/client/react";
 
-const { has, userId } = Astro.locals.auth();
-const isUnauthorized =
-  !userId ||
-  (typeof Astro.props.condition === "function" &&
-    !Astro.props.condition(has)) ||
-  ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
+const props = {
+  ...Astro.props,
+}
 ---
 
-{isUnauthorized ? <slot name="fallback" /> : <slot />}
+<ProtectReact client:load {...props}>
+  <Fragment slot="fallback">
+    <slot name="fallback"/>
+  </Fragment>
+  <slot/>
+</ProtectReact>
