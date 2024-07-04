@@ -10,43 +10,40 @@ const safeId = customAlphabet(urlAlphabet, 10)();
 const {
   as: Tag = 'button',
   id = safeId,
-  ...props
+  forceRedirectUrl,
+  fallbackRedirectUrl,
+  signUpFallbackRedirectUrl,
+  signUpForceRedirectUrl,
+  mode,
+  ...elementProps
 } = Astro.props
+
+const signInOptions = {
+  forceRedirectUrl,
+  fallbackRedirectUrl,
+  signUpFallbackRedirectUrl,
+  signUpForceRedirectUrl,
+};
 ---
 
-<Tag {...props} id={id}>
+<Tag {...elementProps} id={id}>
   <slot />
 </Tag >
 
-<script is:inline define:vars={{ props, safeId }}>
+<script is:inline define:vars={{ signInOptions, mode, safeId }}>
   const btn = document.querySelector(`#${safeId}`);
 
   btn.addEventListener("click", () => {
-    const {
-      forceRedirectUrl,
-      fallbackRedirectUrl,
-      signUpFallbackRedirectUrl,
-      signUpForceRedirectUrl,
-      mode
-    } = props;
-
-    const opts = {
-      forceRedirectUrl,
-      fallbackRedirectUrl,
-      signUpFallbackRedirectUrl,
-      signUpForceRedirectUrl,
-    };
-
     const clerk = window.Clerk
 
     if (mode === 'modal') {
-      return clerk.openSignIn(opts);
+      return clerk.openSignIn(signInOptions);
     }
 
     return clerk.redirectToSignIn({
-      ...opts,
-      signInFallbackRedirectUrl: fallbackRedirectUrl,
-      signInForceRedirectUrl: forceRedirectUrl,
+      ...signInOptions,
+      signInFallbackRedirectUrl: signInOptions.fallbackRedirectUrl,
+      signInForceRedirectUrl: signInOptions.forceRedirectUrl,
     });
   });
 </script>
