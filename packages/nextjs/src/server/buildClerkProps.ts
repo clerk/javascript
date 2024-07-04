@@ -1,6 +1,7 @@
 import type { Organization, Session, User } from '@clerk/backend';
 import {
   AuthStatus,
+  constants,
   makeAuthObjectSerializable,
   signedInAuthObject,
   signedOutAuthObject,
@@ -10,7 +11,7 @@ import { decodeJwt } from '@clerk/backend/jwt';
 
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';
 import type { RequestLike } from './types';
-import { getAuthKeyFromRequest, injectSSRStateIntoObject } from './utils';
+import { decryptClerkRequestData, getAuthKeyFromRequest, getHeader, injectSSRStateIntoObject } from './utils';
 
 type BuildClerkPropsInitState = { user?: User | null; session?: Session | null; organization?: Organization | null };
 
@@ -38,8 +39,11 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
   const authMessage = getAuthKeyFromRequest(req, 'AuthMessage');
   const authReason = getAuthKeyFromRequest(req, 'AuthReason');
 
+  const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
+  const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
+
   const options = {
-    secretKey: SECRET_KEY,
+    secretKey: decryptedRequestData.secretKey || SECRET_KEY,
     apiUrl: API_URL,
     apiVersion: API_VERSION,
     authStatus,

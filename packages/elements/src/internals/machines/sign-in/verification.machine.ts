@@ -1,3 +1,4 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   AttemptFirstFactorParams,
   EmailCodeAttempt,
@@ -168,14 +169,17 @@ const SignInVerificationMachine = setup({
       },
     ),
     setConsoleError: ({ event }) => {
-      if (process.env.NODE_ENV === 'development') {
-        assertActorEventError(event);
-
-        throw new ClerkElementsRuntimeError(`Unable to fulfill the prepare or attempt request for the sign-in verification.
-Error: ${event.error.message}
-
-Please open an issue if you continue to run into this issue.`);
+      if (process.env.NODE_ENV !== 'development') {
+        return;
       }
+
+      assertActorEventError(event);
+
+      const error = isClerkAPIResponseError(event.error) ? event.error.errors[0].longMessage : event.error.message;
+
+      console.error(`Unable to fulfill the prepare or attempt request for the sign-in verification.
+      Error: ${error}
+      Please open an issue if you continue to run into this issue.`);
     },
   },
   guards: {

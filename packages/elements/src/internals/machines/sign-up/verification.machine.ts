@@ -275,6 +275,7 @@ export const SignUpVerificationMachine = setup({
       states: {
         Preparing: {
           tags: ['state:preparing', 'state:loading'],
+          exit: 'resendableReset',
           invoke: {
             id: 'prepareEmailLinkVerification',
             src: 'prepare',
@@ -363,6 +364,7 @@ export const SignUpVerificationMachine = setup({
       states: {
         Preparing: {
           tags: ['state:preparing', 'state:loading'],
+          exit: 'resendableReset',
           invoke: {
             id: 'prepareEmailAddressCodeVerification',
             src: 'prepare',
@@ -384,6 +386,10 @@ export const SignUpVerificationMachine = setup({
                 ],
               },
             ],
+            onError: {
+              actions: 'setFormErrors',
+              target: 'Pending',
+            },
           },
         },
         Pending: {
@@ -456,6 +462,7 @@ export const SignUpVerificationMachine = setup({
       states: {
         Preparing: {
           tags: ['state:preparing', 'state:loading'],
+          exit: 'resendableReset',
           invoke: {
             id: 'preparePhoneCodeVerification',
             src: 'prepare',
