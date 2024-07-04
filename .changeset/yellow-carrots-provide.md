@@ -2,4 +2,4 @@
 "@clerk/nextjs": patch
 ---
 
-Fixes Next.js build issue (https://github.com/clerk/javascript/issues/3660) where `AsyncLocalStorage` was being imported as Node.js module instead of using the global polyfill available for the edge runtime.
+Fixes Next.js build warnings (https://github.com/clerk/javascript/issues/3660) where `AsyncLocalStorage` and `MessageEvent` were being imported as Node.js modules on the edge runtime.
