@@ -45,7 +45,7 @@ export async function buildClerk({
   // Set up cookie params based on environment
   const getClientCookieParams: GetClientCookieParams = isProd
     ? {
-        urls: key.frontendApi,
+        urls: `https://${key.frontendApi}`,
         name: CLIENT_JWT_KEY,
       }
     : {
