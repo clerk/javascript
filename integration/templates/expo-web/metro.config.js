@@ -34,11 +34,13 @@ const config = {
     sourceExts: ['js', 'json', 'ts', 'tsx', 'cjs', 'mjs'],
     unstable_enableSymlinks: !!clerkExpoPath,
     unstable_enablePackageExports: !!clerkExpoPath,
-    nodeModulesPaths: [
-      path.resolve(__dirname, 'node_modules'),
-      clerkExpoPath && `${clerkMonorepoPath}/node_modules`,
-      clerkExpoPath && `${clerkExpoPath}/node_modules`,
-    ],
+    ...(clerkExpoPath && {
+      nodeModulesPaths: [
+        path.resolve(__dirname, 'node_modules'),
+        `${clerkMonorepoPath}/node_modules`,
+        `${clerkExpoPath}/node_modules`,
+      ],
+    }),
     // This is a workaround for a to prevent multiple versions of react and react-native from being loaded.
     // https://github.com/expo/expo/pull/26209
     ...(clerkExpoPath && {
