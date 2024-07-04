@@ -11,7 +11,4 @@ export default defineConfig({
     mode: 'standalone',
   }),
   integrations: [clerk(), react(), tailwind()],
-  server: {
-    port: Number(process.env.PORT),
-  },
 });

@@ -19,6 +19,7 @@ export type LongRunningApplicationParams = {
   config: ApplicationConfig;
   env: EnvironmentConfig;
   serverUrl?: string;
+  port?: number;
 };
 
 /**
@@ -34,10 +35,12 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
   const config = params.config.clone().setName(name);
   let app: Application;
   let pid: number;
-  let port = getPort(params.serverUrl);
+  let port = params.port || getPort(params.serverUrl);
   let serverUrl: string = params.serverUrl;
   let appDir: string;
   let env: EnvironmentConfig = params.env;
+
+  console.log('port before', port);
 
   const readFromStateFile = () => {
     if (!stateFile.getLongRunningApps() || [port, serverUrl, pid, appDir, env].filter(Boolean).length === 0) {
@@ -59,7 +62,8 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
         app = await config.commit();
         await app.withEnv(params.env);
         await app.setup();
-        const { port, serverUrl, pid } = await app.dev({ detached: true });
+        const { port, serverUrl, pid } = await app.dev({ port: params.port, detached: true });
+        console.log('port after', port);
         stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir: app.appDir, env: params.env.toJson() });
       },
       // will be called by global.teardown.ts
