@@ -16,8 +16,7 @@ test.describe('basic expo web @expoWeb', () => {
 
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
-    await app.build();
-    await app.serve();
+    await app.dev();
 
     const u = createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser({
