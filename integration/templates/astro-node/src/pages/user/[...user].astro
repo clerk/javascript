@@ -1,0 +1,15 @@
+---
+import { UserProfile } from "@clerk/astro/components/interactive";
+import Layout from "../../layouts/Layout.astro";
+import Protected from "../../layouts/Protected.astro";
+import UserJSON from "../../components/UserJSON.astro";
+---
+
+<Layout title="Welcome to Astro.">
+  <Protected>
+    <div class="w-full flex justify-center">
+      <UserProfile path="/user" routing="path" />
+    </div>
+    <UserJSON />
+  </Protected>
+</Layout>
