@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "start": "astro dev",
+    "start": "astro dev --port $PORT",
     "build": "astro check && astro build",
-    "preview": "astro preview",
+    "preview": "astro preview --port $PORT",
     "astro": "astro"
   },
   "dependencies": {
