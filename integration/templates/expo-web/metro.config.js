@@ -41,10 +41,12 @@ const config = {
     ],
     // This is a workaround for a to prevent multiple versions of react and react-native from being loaded.
     // https://github.com/expo/expo/pull/26209
-    blockList: [
-      clerkExpoPath && new RegExp(`${clerkMonorepoPath}/node_modules/react`),
-      clerkExpoPath && new RegExp(`${clerkMonorepoPath}/node_modules/react-native`),
-    ],
+    ...(clerkExpoPath && {
+      blockList: [
+        new RegExp(`${clerkMonorepoPath}/node_modules/react`),
+        new RegExp(`${clerkMonorepoPath}/node_modules/react-native`),
+      ],
+    }),
   },
 };
 
