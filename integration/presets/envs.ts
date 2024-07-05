@@ -32,8 +32,6 @@ const withEmailCodes = environmentConfig()
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY);
 
-const withEmailCodesAstro = withEmailCodes.clone();
-
 const withEmailLinks = environmentConfig()
   .setId('withEmailLinks')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
@@ -95,7 +93,6 @@ export const envs = {
   withEmailCodes,
   withEmailLinks,
   withCustomRoles,
-  withEmailCodesAstro,
   withEmailCodesQuickstart,
   withAPCore1ClerkLatest,
   withAPCore1ClerkV4,
