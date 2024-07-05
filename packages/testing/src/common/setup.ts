@@ -1,7 +1,7 @@
+import { createClerkClient } from '@clerk/backend';
 import { isProductionFromSecretKey, parsePublishableKey } from '@clerk/shared';
 import dotenv from 'dotenv';
 
-import { TESTING_TOKEN_API_URL } from './constants';
 import type { ClerkSetupOptions, ClerkSetupReturn } from './types';
 
 export const fetchEnvVars = async (options?: ClerkSetupOptions): Promise<ClerkSetupReturn> => {
@@ -41,29 +41,16 @@ export const fetchEnvVars = async (options?: ClerkSetupOptions): Promise<ClerkSe
       );
     }
 
-    const options = {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${secretKey}`,
-        'Content-Type': 'application/json',
-      },
-    };
-
     log('Fetching testing token from Clerk Backend API...');
 
-    const apiUrl = process.env.CLERK_API_URL;
-    const testingTokenApiUrl = apiUrl ? `${apiUrl}/v1/testing_tokens` : TESTING_TOKEN_API_URL;
-
-    await fetch(testingTokenApiUrl, options)
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        testingToken = data.token;
-      })
-      .catch(reason => {
-        throw new Error('Failed to fetch testing token from Clerk API. Error: ' + reason);
-      });
+    try {
+      const clerkClient = createClerkClient({ secretKey });
+      const tokenData = await clerkClient.testingTokens.createTestingToken();
+      testingToken = tokenData.token;
+    } catch (err) {
+      console.error('Failed to fetch testing token from Clerk API.');
+      throw err;
+    }
   }
 
   return {
