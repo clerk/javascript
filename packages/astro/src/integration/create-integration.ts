@@ -4,7 +4,7 @@ import type { AstroIntegration } from 'astro';
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
 
-const buildEnvVarFromOption = (valueToBeStored: unknown, envName: string) => {
+const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
   return valueToBeStored ? { [`import.meta.env.${envName}`]: JSON.stringify(valueToBeStored) } : {};
 };
 
@@ -63,16 +63,16 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
                 /**
                  * Convert the integration params to environment variable in order for be readable from the server
                  */
-                ...buildEnvVarFromOption(signInUrl, 'PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL'),
-                ...buildEnvVarFromOption(signUpUrl, 'PUBLIC_ASTRO_APP_CLERK_SIGN_UP_URL'),
-                ...buildEnvVarFromOption(isSatellite, 'PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE'),
-                ...buildEnvVarFromOption(proxyUrl, 'PUBLIC_ASTRO_APP_CLERK_PROXY_URL'),
-                ...buildEnvVarFromOption(domain, 'PUBLIC_ASTRO_APP_CLERK_DOMAIN'),
-                ...buildEnvVarFromOption(domain, 'PUBLIC_ASTRO_APP_CLERK_DOMAIN'),
-                ...buildEnvVarFromOption(domain, 'PUBLIC_ASTRO_APP_CLERK_DOMAIN'),
-                ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_ASTRO_APP_CLERK_JS_URL'),
-                ...buildEnvVarFromOption(clerkJSVariant, 'PUBLIC_ASTRO_APP_CLERK_JS_VARIANT'),
-                ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_ASTRO_APP_CLERK_JS_VERSION'),
+                ...buildEnvVarFromOption(signInUrl, 'PUBLIC_CLERK_SIGN_IN_URL'),
+                ...buildEnvVarFromOption(signUpUrl, 'PUBLIC_CLERK_SIGN_UP_URL'),
+                ...buildEnvVarFromOption(isSatellite, 'PUBLIC_CLERK_IS_SATELLITE'),
+                ...buildEnvVarFromOption(proxyUrl, 'PUBLIC_CLERK_PROXY_URL'),
+                ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
+                ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
+                ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
+                ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
+                ...buildEnvVarFromOption(clerkJSVariant, 'PUBLIC_CLERK_JS_VARIANT'),
+                ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
                 __HOTLOAD__: mode === 'hotload',
               },
 
