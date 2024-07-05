@@ -2,7 +2,7 @@
 import type { OrganizationListProps } from "@clerk/types";
 type Props = OrganizationListProps
 
-import InteractiveUI from './InteractiveUI.astro'
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
 ---
 
-<InteractiveUI {...Astro.props} component="organization-list" />
+<InternalUIComponentRenderer {...Astro.props} component="organization-list" />

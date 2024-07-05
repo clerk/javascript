@@ -2,7 +2,7 @@
 import type { OrganizationProfileProps } from "@clerk/types";
 type Props = OrganizationProfileProps
 
-import InteractiveUI from './InteractiveUI.astro'
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
 ---
 
-<InteractiveUI {...Astro.props} component="organization-profile" />
+<InternalUIComponentRenderer {...Astro.props} component="organization-profile" />
