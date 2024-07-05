@@ -1,7 +1,7 @@
 {
   "name": "@clerk/astro",
   "description": "Clerk SDK for Astro",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "license": "MIT",
   "author": "Clerk",
@@ -28,9 +28,9 @@
   },
   "scripts": {
     "dev": "tsup --watch --onSuccess \"npm run build:dts\"",
-    "build": "tsup --onSuccess \"npm run build:dts\"",
+    "build": "tsup --onSuccess \"npm run build:dts\" && npm run copy:components",
     "build:dts": "tsc --emitDeclarationOnly --declaration",
-    "postbuild": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/",
+    "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
