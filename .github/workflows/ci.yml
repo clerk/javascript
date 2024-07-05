@@ -197,6 +197,10 @@ jobs:
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
+      - name: Rebuild @clerk/astro
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        run: npx turbo build $TURBO_ARGS --filter='@clerk/astro' --force
+
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
