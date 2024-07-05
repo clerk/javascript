@@ -1,0 +1,22 @@
+---
+import {
+  OrganizationSwitcher,
+  OrganizationProfile,
+} from "@clerk/astro/components/interactive";
+import Layout from "../layouts/Layout.astro";
+import Streaming from "../layouts/Streaming.astro";
+---
+
+<Layout title="Welcome to Astro.">
+  <Streaming />
+  <div class="w-full flex justify-center flex-col">
+    <OrganizationSwitcher
+      appearance={{
+        elements: {
+          organizationSwitcherTrigger: "text-white",
+        },
+      }}
+    />
+    <OrganizationProfile />
+  </div>
+</Layout>

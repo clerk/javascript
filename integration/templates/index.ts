@@ -11,6 +11,7 @@ export const templates = {
   'express-vite': resolve(__dirname, './express-vite'),
   'remix-node': resolve(__dirname, './remix-node'),
   'elements-next': resolve(__dirname, './elements-next'),
+  'astro-node': resolve(__dirname, './astro-node'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {
