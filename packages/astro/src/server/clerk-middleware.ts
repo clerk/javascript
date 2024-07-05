@@ -2,6 +2,7 @@ import type { ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, AuthObject, ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { handleValueOrFn, isDevelopmentFromSecretKey, isHttpOrHttps } from '@clerk/shared';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { APIContext } from 'astro';
 
 // @ts-ignore
@@ -59,6 +60,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
 
   const astroMiddleware: AstroMiddleware = async (context, next) => {
     const clerkRequest = createClerkRequest(context.request);
+
+    clerkClient(context).telemetry.record(
+      eventMethodCalled('clerkMiddleware', {
+        handler: Boolean(handler),
+        satellite: Boolean(options.isSatellite),
+        proxy: Boolean(options.proxyUrl),
+      }),
+    );
 
     const requestState = await clerkClient(context).authenticateRequest(
       clerkRequest,
