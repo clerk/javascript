@@ -140,7 +140,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements']
+        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements', 'astro']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'
@@ -196,6 +196,10 @@ jobs:
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
+
+      - name: Copy components @clerk/astro
+        if: ${{ matrix.test-name == 'astro' }}
+        run: cd packages/astro && npm run copy:components
 
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
