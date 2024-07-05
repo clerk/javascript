@@ -5,8 +5,6 @@ interface Props {
 
 const { title } = Astro.props;
 
-import { Image } from "astro:assets";
-import logo from "../assets/Clerk-Purple-Logo.png";
 import { SignedIn, SignedOut } from "@clerk/astro/components/control";
 import { UserButton } from "@clerk/astro/components/interactive";
 import { LanguagePicker } from "../components/LanguagePicker";
@@ -28,12 +26,7 @@ import { LanguagePicker } from "../components/LanguagePicker";
         <div class="flex h-16 items-center justify-between">
           <div class="md:flex md:items-center md:gap-12">
             <a class="block text-teal-600" href="/">
-              <span class="sr-only">Home</span>
-              <Image
-                src={logo}
-                alt="A bird sitting on a nest of eggs."
-                width="100"
-              />
+              <span>Home</span>
             </a>
           </div>
 

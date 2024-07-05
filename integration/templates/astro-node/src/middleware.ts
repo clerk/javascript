@@ -1,31 +1,4 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/astro/server';
-// import { defineMiddleware, sequence } from "astro:middleware";
-
-// export const onRequest = clerkMiddleware();
-
-/**
- * 1. Support options
- */
-// export const onRequest = clerkMiddleware();
-
-/**
- * 2. Support chaining
- */
-// const greeting = defineMiddleware(async (context, next) => {
-//   console.log("greeting request");
-//   console.log(context.locals.auth());
-//   const response = await next();
-//   console.log("greeting response");
-//   return response;
-// });
-
-// export const onRequest = sequence(
-//   clerkMiddleware({
-//     // TODO: This does not work
-//     afterSignInUrl: "/wow",
-//   }),
-//   greeting,
-// );
 
 const unautorized = () =>
   new Response(JSON.stringify({ error: 'unathorized access' }), {
