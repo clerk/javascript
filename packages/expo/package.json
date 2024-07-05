@@ -59,7 +59,7 @@
     "expo-secure-store": "^13.0.1",
     "react-native": "^0.74.2",
     "react-native-mmkv": "^2.12.2",
-    "react": ">=18",
+    "react": "18.2.0",
     "typescript": "*"
   },
   "peerDependencies": {
