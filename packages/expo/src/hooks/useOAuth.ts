@@ -3,6 +3,8 @@ import type { OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 
+import { errorThrower } from '../utils/errors';
+
 export type UseOAuthFlowParams = {
   strategy: OAuthStrategy;
   redirectUrl?: string;
@@ -25,7 +27,7 @@ export type StartOAuthFlowReturnType = {
 export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
   const { strategy } = useOAuthParams || {};
   if (!strategy) {
-    throw new Error('Missing oauth strategy');
+    throw errorThrower.throw('Missing oauth strategy');
   }
 
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
