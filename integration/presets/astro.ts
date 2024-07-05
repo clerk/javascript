@@ -8,7 +8,7 @@ const clerkLocalizationLocal = `file:${process.cwd()}/packages/localizations`;
 const astroNode = applicationConfig()
   .setName('astro-node')
   .useTemplate(templates['astro-node'])
-  .setEnvFormatter('public', key => `PUBLIC_ASTRO_APP_${key}`)
+  .setEnvFormatter('public', key => `PUBLIC_${key}`)
   .addScript('setup', 'npm i')
   .addScript('dev', 'npm run dev')
   .addScript('build', 'npm run build')
