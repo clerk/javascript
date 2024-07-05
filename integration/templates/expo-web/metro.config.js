@@ -20,8 +20,6 @@ const getClerkExpoPath = () => {
 const clerkExpoPath = getClerkExpoPath();
 const clerkMonorepoPath = clerkExpoPath?.replace(/\/packages\/expo$/, '');
 
-console.log('clerkExpoPath:', clerkExpoPath, 'clerkMonorepoPath:', clerkMonorepoPath);
-
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = {
   ...getDefaultConfig(__dirname),

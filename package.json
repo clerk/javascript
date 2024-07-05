@@ -39,7 +39,7 @@
     "test:integration:generic": "E2E_APP_ID=react.vite.*,next.appRouter.withEmailCodes npm run test:integration:base -- --grep @generic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* npm run test:integration:base -- --grep @nextjs",
     "test:integration:astro": "E2E_APP_ID=astro.* npm run test:integration:base -- --grep @astro",
-    "test:integration:expoWeb": "npm run test:integration:base -- --grep @expoWeb",
+    "test:integration:expoWeb": "E2E_APP_ID=expo.expoWeb npm run test:integration:base -- --grep @expoWeb",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* npm run test:integration:base -- --grep @quickstart",
     "test:integration:sessions": "npm run test:integration:base -- --grep @sessions",
     "test:integration:remix": "echo 'placeholder'",

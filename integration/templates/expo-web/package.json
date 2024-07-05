@@ -6,8 +6,7 @@
     "dev": "RCT_METRO_PORT=$PORT expo start --web --port $PORT",
     "build": "expo export -p web",
     "start": "npx serve dist --single",
-    "lint": "expo lint",
-    "setup": "npm i && expo install"
+    "lint": "expo lint"
   },
   "jest": {
     "preset": "jest-expo"

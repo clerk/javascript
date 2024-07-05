@@ -12,7 +12,8 @@ export default function Index() {
       }}
     >
       <SignedIn>
-        Hello <UserButton />
+        <Text>You are signed in!</Text>
+        <UserButton />
       </SignedIn>
       <SignedOut>
         <Text>You are signed out</Text>
