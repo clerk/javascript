@@ -18,6 +18,7 @@ const createClerkClientWithOptions: CreateClerkClientWithOptions = (context, opt
     sdkMetadata: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,
+      // eslint-disable-next-line turbo/no-undeclared-env-vars
       environment: import.meta.env.MODE,
     },
     ...options,

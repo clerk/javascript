@@ -30,6 +30,7 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
       sdkMetadata: {
         version: packageVersion,
         name: packageName,
+        // eslint-disable-next-line turbo/no-undeclared-env-vars
         environment: import.meta.env.MODE,
       },
     };
