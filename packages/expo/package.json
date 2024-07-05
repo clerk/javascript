@@ -54,12 +54,11 @@
     "@types/react": "*",
     "@types/react-dom": "*",
     "expo-auth-session": "^5.4.0",
-    "expo-web-browser": "^12.8.2",
     "expo-local-authentication": "^14.0.1",
     "expo-secure-store": "^13.0.1",
-    "react-native": "^0.74.2",
-    "react-native-mmkv": "^2.12.2",
+    "expo-web-browser": "^12.8.2",
     "react": "18.2.0",
+    "react-native": "^0.74.2",
     "typescript": "*"
   },
   "peerDependencies": {
@@ -68,9 +67,8 @@
     "expo-secure-store": ">=12",
     "expo-web-browser": ">=12.5.0",
     "react": ">=18",
-    "react-native-mmkv": ">=2.12",
-    "react-native": ">=0.74",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "react-native": ">=0.74"
   },
   "engines": {
     "node": ">=18.17.0"
