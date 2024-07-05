@@ -216,7 +216,6 @@ export default function SignInPage() {
 
           <CustomProvider provider='github'>Continue with GitHub</CustomProvider>
           <CustomProvider provider='google'>Continue with Google</CustomProvider>
-          <CustomProvider provider='metamask'>Continue with Metamask</CustomProvider>
 
           <SignIn.SupportedStrategy
             asChild
@@ -230,6 +229,20 @@ export default function SignInPage() {
             name='phone_code'
           >
             <Button>Send a code to your phone</Button>
+          </SignIn.SupportedStrategy>
+
+          <SignIn.SupportedStrategy
+            asChild
+            name='backup_code'
+          >
+            <Button>Use a backup code</Button>
+          </SignIn.SupportedStrategy>
+
+          <SignIn.SupportedStrategy
+            asChild
+            name='totp'
+          >
+            <Button>MFA</Button>
           </SignIn.SupportedStrategy>
 
           <SignIn.SupportedStrategy
@@ -351,6 +364,36 @@ export default function SignInPage() {
                 label='Phone Code'
                 name='code'
               />
+
+              <CustomSubmit>Verify</CustomSubmit>
+            </SignIn.Strategy>
+
+            <SignIn.Strategy name='totp'>
+              <P className='text-sm'>Please enter your authenticator code...</P>
+
+              <CustomField
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                label='Authenticator Code'
+                name='code'
+              />
+
+              <Clerk.FieldError className='block w-full font-mono text-red-400' />
+
+              <CustomSubmit>Verify</CustomSubmit>
+            </SignIn.Strategy>
+
+            <SignIn.Strategy name='backup_code'>
+              <P className='text-sm'>Please enter your backup code...</P>
+
+              <CustomField
+                // eslint-disable-next-line jsx-a11y/no-autofocus
+                autoFocus
+                label='Backup Code'
+                name='backup_code'
+              />
+
+              <Clerk.FieldError className='block w-full font-mono text-red-400' />
 
               <CustomSubmit>Verify</CustomSubmit>
             </SignIn.Strategy>

@@ -20,16 +20,16 @@ import type {
 
 // ---------------------------------- Tags ---------------------------------- //
 
-export const SignUpRouterRoutes = {
-  start: 'route:start',
-  continue: 'route:continue',
-  verification: 'route:verification',
-  callback: 'route:callback',
-  error: 'route:error',
+export const SignUpRouterSteps = {
+  start: 'step:start',
+  continue: 'step:continue',
+  verification: 'step:verification',
+  callback: 'step:callback',
+  error: 'step:error',
 } as const;
 
-export type SignUpRouterRoutes = keyof typeof SignUpRouterRoutes;
-export type SignUpRouterTags = (typeof SignUpRouterRoutes)[keyof typeof SignUpRouterRoutes];
+export type SignUpRouterSteps = keyof typeof SignUpRouterSteps;
+export type SignUpRouterTags = (typeof SignUpRouterSteps)[keyof typeof SignUpRouterSteps];
 
 // ---------------------------------- Children ---------------------------------- //
 

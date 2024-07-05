@@ -1,0 +1,37 @@
+---
+import type { UserButtonProps } from "@clerk/types";
+type Props = UserButtonProps;
+
+import { customAlphabet, urlAlphabet } from "nanoid";
+
+const safeId = customAlphabet(urlAlphabet, 10)();
+---
+
+<div id={`clerk-user-button-${safeId}`}></div>
+
+<script is:inline define:vars={{ props: Astro.props, safeId }}>
+  // TODO-CLEANUP: Find a way to remove this duplicate and have a single origin for this script
+  /**
+   * Store the id and the props for the Astro component in order to mount the correct UI component once clerk is loaded.
+   * The above is handled by `mountAllClerkAstroJSComponents`.
+   */
+  const setOrCreatePropMap = ({ category, id, props }) => {
+    if (!window.__astro_clerk_component_props) {
+      window.__astro_clerk_component_props = new Map();
+    }
+
+    if (!window.__astro_clerk_component_props.has(category)) {
+      const _ = new Map();
+      _.set(id, props);
+      window.__astro_clerk_component_props.set(category, _);
+    }
+
+    window.__astro_clerk_component_props.get(category)?.set(id, props);
+  };
+
+  setOrCreatePropMap({
+    category: "user-button",
+    id: `clerk-user-button-${safeId}`,
+    props,
+  });
+</script>

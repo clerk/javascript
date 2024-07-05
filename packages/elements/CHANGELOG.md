@@ -1,5 +1,79 @@
 # @clerk/elements
 
+## 0.10.1
+
+## 0.10.0
+
+### Minor Changes
+
+- Add `backup_code` verification strategy ([#3627](https://github.com/clerk/javascript/pull/3627)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```tsx
+  <SignIn.Step name='choose-strategy'>
+    <SignIn.SupportedStrategy name='backup_code'>Use a backup code</SignIn.SupportedStrategy>
+  <SignIn.Step>
+  ```
+
+  ```tsx
+  <SignIn.Step name='verifications'>
+    <SignIn.Strategy name='backup_code'>
+      <Clerk.Field name="backup_code">
+        <Clerk.Label>Code:</Clerk.Label>
+        <Clerk.Input />
+        <Clerk.FieldError />
+      </Clerk.Field>
+
+      <Clerk.Action submit>Continue</Clerk.Action>
+    </SignIn.Strategy>
+  <SignIn.Step>
+  ```
+
+### Patch Changes
+
+- Addresses the issue where sign-in factors were not properly falling back to empty arrays. ([#3647](https://github.com/clerk/javascript/pull/3647)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Refactors sign-up loading logic to be in-line with sign-in ([#3648](https://github.com/clerk/javascript/pull/3648)) by [@tmilewski](https://github.com/tmilewski)
+
+- Ensure Sign Up resending resets upon being triggered ([#3652](https://github.com/clerk/javascript/pull/3652)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fixes persistent loading states within the `forgot-password` step ([#3648](https://github.com/clerk/javascript/pull/3648)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fix Sign In forgot-password step not rendering ([#3653](https://github.com/clerk/javascript/pull/3653)) by [@tmilewski](https://github.com/tmilewski)
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`d6b5006c4`](https://github.com/clerk/javascript/commit/d6b5006c4cc1b6f07bb3a6832b4ec6e65ea15814)]:
+  - @clerk/types@4.7.0
+
+## 0.9.1
+
+### Patch Changes
+
+- Add a development-only warning for cases when a user renders a `<Strategy>` component that isn't activated for their Clerk instance. As this can be intended behavior (e.g. build out a full example and let user enable/disable stuff solely in the dashboard) the warning can safely be ignored if necessary. ([#3609](https://github.com/clerk/javascript/pull/3609)) by [@LekoArts](https://github.com/LekoArts)
+
+## 0.9.0
+
+### Minor Changes
+
+- Improve `<FieldState>` and re-organize some data attributes related to validity states. These changes might be breaking changes for you. ([#3594](https://github.com/clerk/javascript/pull/3594)) by [@LekoArts](https://github.com/LekoArts)
+
+  Overview of changes:
+
+  - `<form>` no longer has `data-valid` and `data-invalid` attributes. If there are global errors (same heuristics as `<GlobalError>`) then a `data-global-error` attribute will be present.
+  - Fixed a bug where `<Field>` could contain `data-valid` and `data-invalid` at the same time.
+  - The field state (accessible through e.g. `<FieldState>`) now also incorporates the field's [ValidityState](https://developer.mozilla.org/en-US/docs/Web/API/ValidityState) into its output. If the `ValidityState` is invalid, the field state will be an `error`. You can access this information in three places:
+    1. `<FieldState>`
+    2. `data-state` attribute on `<Input>`
+    3. `<Field>{(state) => <p>Field's state is {state}</p>}</Field>`
+
+### Patch Changes
+
+- Fix Sign In & Sign Up root fallbacks not rendering as expected ([#3601](https://github.com/clerk/javascript/pull/3601)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update all Radix dependencies to their June 19, 2024 release ([#3606](https://github.com/clerk/javascript/pull/3606)) by [@LekoArts](https://github.com/LekoArts)
+
 ## 0.8.0
 
 ### Minor Changes

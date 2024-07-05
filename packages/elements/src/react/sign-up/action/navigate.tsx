@@ -42,7 +42,9 @@ export const SignUpNavigate = React.forwardRef<SignUpNavigateElement, SignUpNavi
       if (actorRef.getSnapshot().can({ type })) {
         actorRef.send({ type });
       } else {
-        console.warn('Invalid navigation event.'); // TODO: Add better handling
+        console.warn(
+          `Clerk: <SignUp.Action navigate="${to}"> is an invalid navigation event. You can only navigate to: ${Object.keys(SignUpNavigationEventMap).join(', ')}.`,
+        );
       }
     }, [actorRef, to]);
 

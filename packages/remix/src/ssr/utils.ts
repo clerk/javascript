@@ -126,7 +126,8 @@ export const wrapWithClerkState = (data: any) => {
  */
 export const patchRequest = (request: Request) => {
   const clonedRequest = request.clone();
-  if (clonedRequest.method !== 'GET' && clonedRequest.body !== null) {
+  // If duplex is not set, set it to 'half' to avoid duplex issues with unidici
+  if (clonedRequest.method !== 'GET' && clonedRequest.body !== null && !('duplex' in clonedRequest)) {
     (clonedRequest as unknown as { duplex: 'half' }).duplex = 'half';
   }
   return clonedRequest;

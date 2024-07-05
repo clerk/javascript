@@ -1,5 +1,33 @@
 # Change Log
 
+## 5.8.0
+
+### Minor Changes
+
+- Deprecate `afterSignOutUrl` and `afterMultiSessionSingleSignOutUrl` from UserButton. ([#3544](https://github.com/clerk/javascript/pull/3544)) by [@panteliselef](https://github.com/panteliselef)
+
+  Developers can now configure these directly in `ClerkProvider` and have them work properly without in UserButton, UserProfile and in impersonation mode.
+
+### Patch Changes
+
+- Bug fix: Requests failing due to incorrect parsing of value `false` when content type is `x-www-form-urlencoded` ([#3630](https://github.com/clerk/javascript/pull/3630)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- When organization changes, display/fetch the corresponding organization roles. ([#3624](https://github.com/clerk/javascript/pull/3624)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`d6b5006c4`](https://github.com/clerk/javascript/commit/d6b5006c4cc1b6f07bb3a6832b4ec6e65ea15814)]:
+  - @clerk/types@4.7.0
+  - @clerk/localizations@2.4.7
+  - @clerk/shared@2.3.2
+
+## 5.7.2
+
+### Patch Changes
+
+- Correctly use updated protocol verification in all code paths ([#3605](https://github.com/clerk/javascript/pull/3605)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`72888323b`](https://github.com/clerk/javascript/commit/72888323ba5effb53bbd50456dc9bfb5895c5b5a)]:
+  - @clerk/localizations@2.4.6
+
 ## 5.7.1
 
 ### Patch Changes

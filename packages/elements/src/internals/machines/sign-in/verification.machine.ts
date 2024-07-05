@@ -1,3 +1,4 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   AttemptFirstFactorParams,
   EmailCodeAttempt,
@@ -92,49 +93,66 @@ const SignInVerificationMachine = setup({
         return;
       }
 
-      if (
-        !clerk.client.signIn.supportedFirstFactors.every(factor =>
-          context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
-        )
-      ) {
-        console.warn(
-          `Clerk: Your instance is configured to support these strategies: ${clerk.client.signIn.supportedFirstFactors
-            .map((factor: any) => factor.strategy)
-            .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
-            ', ',
-          )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
-        );
-      }
+      // Only show these warnings in development!
+      if (process.env.NODE_ENV === 'development') {
+        if (
+          !clerk.client.signIn.supportedFirstFactors.every(factor =>
+            // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
+            context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
+          )
+        ) {
+          console.warn(
+            `Clerk: Your instance is configured to support these strategies: ${clerk.client.signIn.supportedFirstFactors
+              .map(factor => factor.strategy)
+              .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
+              ', ',
+            )}. Make sure to render a <Strategy> component for each supported strategy. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+          );
+        }
 
-      if (
-        clerk.client.signIn.supportedSecondFactors &&
-        !clerk.client.signIn.supportedSecondFactors.every(factor =>
-          context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
-        )
-      ) {
-        console.warn(
-          `Clerk: Your instance is configured to support these 2FA strategies: ${[
-            ...clerk.client.signIn.supportedSecondFactors,
-          ]
-            .map(f => f.strategy)
-            .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
-            ', ',
-          )}. Before deploying your app, make sure to render a <Strategy> component for each supported strategy. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
-        );
-      }
+        if (
+          clerk.client.signIn.supportedSecondFactors &&
+          !clerk.client.signIn.supportedSecondFactors.every(factor =>
+            context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
+          )
+        ) {
+          console.warn(
+            `Clerk: Your instance is configured to support these 2FA strategies: ${clerk.client.signIn.supportedSecondFactors
+              .map(f => f.strategy)
+              .join(', ')}, but the rendered strategies are: ${Array.from(context.registeredStrategies).join(
+              ', ',
+            )}. Make sure to render a <Strategy> component for each supported strategy. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+          );
+        }
 
-      if (
-        process.env.NODE_ENV === 'development' &&
-        context.currentFactor?.strategy &&
-        !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
-      ) {
-        throw new ClerkElementsRuntimeError(
-          `Your sign-in attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. For more information, visit the documentation: https://clerk.com/docs/elements/reference/sign-in#strategy`,
-        );
-      } else if (process.env.NODE_ENV === 'development' && !context.currentFactor?.strategy) {
-        throw new ClerkElementsRuntimeError(
-          'Unable to determine an authentication strategy to verify. This means your instance is misconfigured. Visit the Clerk Dashboard and verify that your instance has authentication strategies enabled: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username',
-        );
+        // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
+        // This type should also probably be SignInFirstFactor['strategy'] instead of SignInFactor['strategy'] !!!
+        const strategiesUsedButNotActivated = Array.from(context.registeredStrategies).filter(
+          strategy =>
+            !clerk.client.signIn.supportedFirstFactors.some(
+              supported => (supported.strategy as unknown as SignInFactor) === strategy,
+            ),
+        ) as unknown as Array<SignInFactor['strategy']>;
+
+        if (strategiesUsedButNotActivated.length > 0) {
+          console.warn(
+            `Clerk: These rendered strategies are not configured for your instance: ${strategiesUsedButNotActivated.join(', ')}. If this is unexpected, make sure to enable them in your Clerk dashboard: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username`,
+          );
+        }
+
+        if (
+          context.currentFactor?.strategy &&
+          // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
+          !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
+        ) {
+          throw new ClerkElementsRuntimeError(
+            `Your sign-in attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
+          );
+        } else if (!context.currentFactor?.strategy) {
+          throw new ClerkElementsRuntimeError(
+            'Unable to determine an authentication strategy to verify. This means your instance is misconfigured. Visit the Clerk Dashboard and verify that your instance has authentication strategies enabled: https://dashboard.clerk.com/last-active?path=/user-authentication/email-phone-username',
+          );
+        }
       }
     },
     sendToNext: ({ context, event }) =>
@@ -151,14 +169,17 @@ const SignInVerificationMachine = setup({
       },
     ),
     setConsoleError: ({ event }) => {
-      if (process.env.NODE_ENV === 'development') {
-        assertActorEventError(event);
-
-        throw new ClerkElementsRuntimeError(`Unable to fulfill the prepare or attempt request for the sign-in verification.
-Error: ${event.error.message}
-
-Please open an issue if you continue to run into this issue.`);
+      if (process.env.NODE_ENV !== 'development') {
+        return;
       }
+
+      assertActorEventError(event);
+
+      const error = isClerkAPIResponseError(event.error) ? event.error.errors[0].longMessage : event.error.message;
+
+      console.error(`Unable to fulfill the prepare or attempt request for the sign-in verification.
+      Error: ${error}
+      Please open an issue if you continue to run into this issue.`);
     },
   },
   guards: {

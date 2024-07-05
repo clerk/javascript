@@ -1,9 +1,10 @@
-import { useClerk, useSession } from '@clerk/shared/react';
+import { useClerk, useSession, useUser } from '@clerk/shared/react';
+import type { ActiveSessionResource } from '@clerk/types';
 import type { PointerEventHandler } from 'react';
 import React, { useEffect, useRef } from 'react';
 
 import { getFullName, getIdentifier } from '../../../utils/user';
-import { withCoreUserGuard } from '../../contexts';
+import { useSignOutContext, withCoreUserGuard } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Col,
@@ -17,6 +18,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { Portal } from '../../elements/Portal';
+import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { Eye } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { InternalThemeProvider, mqu } from '../../styledSystem';
@@ -59,7 +61,17 @@ type FabContentProps = { title: LocalizationKey; signOutText: LocalizationKey };
 
 const FabContent = ({ title, signOutText }: FabContentProps) => {
   const { session } = useSession();
+  const { user } = useUser();
   const { signOut } = useClerk();
+  const { otherSessions } = useMultipleSessions({ user });
+  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+
+  const handleSignOutSessionClicked = (session: ActiveSessionResource) => () => {
+    if (otherSessions.length === 0) {
+      return signOut(navigateAfterSignOut);
+    }
+    return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session.id });
+  };
 
   return (
     <Col
@@ -88,10 +100,10 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
           },
         })}
         localizationKey={signOutText}
-        onClick={async () => {
+        onClick={
           // clerk-js has been loaded at this point so we can safely access session
-          await signOut({ sessionId: session!.id });
-        }}
+          handleSignOutSessionClicked(session!)
+        }
       />
     </Col>
   );
