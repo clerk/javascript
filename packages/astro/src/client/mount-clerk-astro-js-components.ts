@@ -15,9 +15,10 @@ const mountAllClerkAstroJSComponents = () => {
   } as const;
 
   Object.entries(mountFns).forEach(([category, mountFn]) => {
-    const elementsOfCategory = document.querySelectorAll(`[id^="clerk-${category}"]`);
+    const elementsOfCategory = document.querySelectorAll(`[data-clerk-id^="clerk-${category}"]`);
     elementsOfCategory.forEach(el => {
-      const props = window.__astro_clerk_component_props?.get(category)?.get(el.id);
+      const clerkId = el.getAttribute('data-clerk-id');
+      const props = window.__astro_clerk_component_props?.get(category)?.get(clerkId!);
       if (el) {
         $clerk.get()?.[mountFn](el as HTMLDivElement, props);
       }
