@@ -1,6 +1,7 @@
+import type { ClerkOptions } from '@clerk/types';
 import type { AstroIntegration } from 'astro';
 
-import { name as packageName } from '../../package.json';
+import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
 
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
@@ -23,6 +24,16 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
     const clerkJSVariant = (params as any)?.clerkJSVariant as string | undefined;
     const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
+
+    const internalParams: ClerkOptions = {
+      ...params,
+      sdkMetadata: {
+        version: packageVersion,
+        name: packageName,
+        // eslint-disable-next-line turbo/no-undeclared-env-vars
+        environment: import.meta.env.MODE,
+      },
+    };
 
     return {
       name: '@clerk/astro/integration',
@@ -96,7 +107,7 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
             `
             ${command === 'dev' ? `console.log('${packageName}',"Initialize Clerk: before-hydration")` : ''}
             import { runInjectionScript } from "${buildImportPath}";
-            await runInjectionScript(${JSON.stringify(params)});`,
+            await runInjectionScript(${JSON.stringify(internalParams)});`,
           );
 
           /**
@@ -110,7 +121,7 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
             `
             ${command === 'dev' ? `console.log("${packageName}","Initialize Clerk: page")` : ''}
             import { runInjectionScript } from "${buildImportPath}";
-            await runInjectionScript(${JSON.stringify(params)});`,
+            await runInjectionScript(${JSON.stringify(internalParams)});`,
           );
         },
       },
