@@ -4,6 +4,7 @@ import type {
   EmailCodeAttempt,
   PasswordAttempt,
   PhoneCodeAttempt,
+  PrepareFirstFactorParams,
   PrepareSecondFactorParams,
   ResetPasswordEmailCodeAttempt,
   ResetPasswordPhoneCodeAttempt,
@@ -34,7 +35,7 @@ export type DetermineStartingFactorInput = {
   parent: SignInRouterMachineActorRef;
 };
 
-export type PrepareFirstFactorInput = WithParams<SignInFirstFactor | null> & {
+export type PrepareFirstFactorInput = WithParams<PrepareFirstFactorParams> & {
   parent: SignInRouterMachineActorRef;
   resendable: boolean;
 };
@@ -235,7 +236,7 @@ const SignInVerificationMachine = setup({
         input: ({ context }) => ({
           parent: context.parent,
           resendable: context.resendable,
-          params: context.currentFactor as SignInFirstFactor | null,
+          params: context.currentFactor as PrepareFirstFactorParams,
         }),
         onDone: {
           actions: 'resendableReset',
@@ -333,7 +334,7 @@ const SignInVerificationMachine = setup({
         src: 'attempt',
         input: ({ context }) => ({
           parent: context.parent,
-          currentFactor: context.currentFactor as SignInFirstFactor,
+          currentFactor: context.currentFactor as SignInFirstFactor | null,
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
