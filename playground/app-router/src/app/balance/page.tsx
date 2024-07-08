@@ -6,7 +6,7 @@ import { ClientButton } from '../balance-2fa/button';
 export default function Page() {
   return (
     <>
-      <h1>My balance:</h1>
+      <h1>My balance 1fa:</h1>
 
       <Protect
         assurance={{ level: 'firstFactor', maxAge: '1m' }}

@@ -225,7 +225,7 @@ const createHasAuthorization = (options: {
 
     const final = [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
 
-    console.log(final ? 'You are authorized' : 'You are NOT authorized', stepUpAuthorization, orgAuthorization);
+    console.log(final ? 'You are authorized' : 'You are NOT authorized', stepUpAuthorization, orgAuthorization, fva);
 
     return final;
   };

@@ -1,6 +1,6 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs';
+import { ClerkProvider, UserButton } from '@clerk/nextjs';
 import { Links } from '@/common/Links';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -19,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Links />
           <div style={{ margin: '1rem', padding: '1rem', border: '1px solid green' }}>
             <h2>Root layout</h2>
+            <UserButton />
             {children}
           </div>
         </body>

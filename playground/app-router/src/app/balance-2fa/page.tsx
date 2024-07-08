@@ -6,7 +6,7 @@ import { ClientButton } from './button';
 export default function Page() {
   return (
     <>
-      <h1>My balance:</h1>
+      <h1>My balance 2fa:</h1>
 
       <Protect
         assurance={{ level: 'secondFactor', maxAge: '1m' }}
@@ -16,7 +16,7 @@ export default function Page() {
 
             <button
               popovertarget='mypopover'
-              class='primary'
+              className='primary'
             >
               Withdraw
             </button>
@@ -28,7 +28,7 @@ export default function Page() {
               <button
                 popovertarget='mypopover'
                 popovertargetaction='hide'
-                class='icon'
+                className='icon'
               >
                 ❌
               </button>
