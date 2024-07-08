@@ -25,15 +25,6 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
     const clerkJSVariant = (params as any)?.clerkJSVariant as string | undefined;
     const clerkJSVersion = (params as any)?.clerkJSVersion as string | undefined;
 
-    const internalParams: ClerkOptions = {
-      ...params,
-      sdkMetadata: {
-        version: packageVersion,
-        name: packageName,
-        // environment: import.meta.env.MODE,
-      },
-    };
-
     return {
       name: '@clerk/astro/integration',
       hooks: {
@@ -49,6 +40,15 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
           if (typeof clerkJSVariant !== 'undefined' && clerkJSVariant !== 'headless' && clerkJSVariant !== '') {
             logger.error('Invalid value for clerkJSVariant. Acceptable values are `"headless"`, `""`, and `undefined`');
           }
+
+          const internalParams: ClerkOptions = {
+            ...params,
+            sdkMetadata: {
+              version: packageVersion,
+              name: packageName,
+              environment: command === 'dev' ? 'development' : 'production',
+            },
+          };
 
           const defaultBundledImportPath = `${packageName}/internal/bundled`;
 
