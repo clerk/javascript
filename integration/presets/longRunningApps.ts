@@ -24,6 +24,16 @@ export const createLongRunningApps = () => {
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
     { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
     { id: 'astro.node.withEmailCodes', config: astro.node, env: envs.withEmailCodes },
+    {
+      id: 'next.appRouter.multipleApps.prod.1',
+      config: next.appRouter.clone().setServerUrl('https://multiple-apps.dev'),
+      env: envs.multipleAppsSameDomainProd1,
+    },
+    {
+      id: 'next.appRouter.multipleApps.prod.2',
+      config: next.appRouter.clone().setServerUrl('https://stg.multiple-apps.dev'),
+      env: envs.multipleAppsSameDomainProd2,
+    },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

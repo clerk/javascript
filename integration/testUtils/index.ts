@@ -37,6 +37,16 @@ const createExpectPageObject = ({ page }: TestArgs) => {
   };
 };
 
+const createClerkUtils = ({ page }: TestArgs) => {
+  return {
+    getClientSideUser: () => {
+      return page.evaluate(() => {
+        return window.Clerk?.user;
+      });
+    },
+  };
+};
+
 type CreateAppPageObjectArgs = { page: Page; context: BrowserContext; browser: Browser };
 
 export const createTestUtils = <
@@ -72,6 +82,7 @@ export const createTestUtils = <
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     userButton: createUserButtonPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
+    clerk: createClerkUtils(testArgs),
   };
 
   const browserHelpers = {
