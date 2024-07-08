@@ -176,6 +176,12 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
+    "//#test:integration:astro": {
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
     "//#test:integration:elements": {
       "dependsOn": [
         "^@clerk/clerk-js#build",
