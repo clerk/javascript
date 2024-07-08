@@ -38,6 +38,7 @@ export type WithClerkProp<T = unknown> = T & {
   clerk: LoadedClerk | undefined | null;
 };
 
+// TODO-SHARED: Duplicate from @clerk/clerk-react
 export const assertSingleChild =
   (children: React.ReactNode) =>
   (name: 'SignInButton' | 'SignUpButton' | 'SignOutButton' | 'SignInWithMetamaskButton') => {
@@ -48,6 +49,7 @@ export const assertSingleChild =
     }
   };
 
+// TODO-SHARED: Duplicate from @clerk/clerk-react
 export const normalizeWithDefaultValue = (children: React.ReactNode | undefined, defaultText: string) => {
   if (!children) {
     children = defaultText;
