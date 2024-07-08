@@ -34,6 +34,7 @@ export type SignedInAuthObject = {
   orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
+  fva: [number, number];
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -51,6 +52,7 @@ export type SignedOutAuthObject = {
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
+  fva: null;
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -86,6 +88,7 @@ export function signedInAuthObject(
     org_slug: orgSlug,
     org_permissions: orgPermissions,
     sub: userId,
+    fva,
   } = sessionClaims;
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
@@ -103,8 +106,9 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     orgPermissions,
+    fva,
     getToken,
-    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
+    has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId, fva }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
@@ -122,6 +126,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
+    fva: null,
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
@@ -163,33 +168,65 @@ const createGetToken: CreateGetToken = params => {
   };
 };
 
+const stringsToNumbers: { [key in '1m' | '10m' | '1h' | '4h' | '1d' | '1w']: number } = {
+  '1m': 1,
+  '10m': 10,
+  '1h': 60,
+  '4h': 240, //4 * 60,
+  '1d': 1440, //24 * 60,
+  '1w': 10080, //7 * 24 * 60,
+};
+
 const createHasAuthorization = (options: {
   userId: string;
   orgId: string | undefined;
   orgRole: string | undefined;
   orgPermissions: string[] | undefined;
+  fva: [number, number] | undefined;
 }): CheckAuthorizationWithCustomPermissions => {
-  const { orgId, orgRole, userId, orgPermissions } = options;
+  const { orgId, orgRole, userId, orgPermissions, fva } = options;
 
   return params => {
-    if (!params?.permission && !params?.role) {
-      throw new Error(
-        'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
-      );
-    }
+    // if (!params?.permission && !params?.role) {
+    //   throw new Error(
+    //     'Missing parameters. `has` from `auth` or `getAuth` requires a permission or role key to be passed. Example usage: `has({permission: "org:posts:edit"`',
+    //   );
+    // }
 
-    if (!orgId || !userId || !orgRole || !orgPermissions) {
+    let orgAuthorization = null;
+    let stepUpAuthorization = null;
+
+    if (!userId) {
       return false;
     }
 
-    if (params.permission) {
-      return orgPermissions.includes(params.permission);
+    if (params.role || params.permission) {
+      const missingOrgs = !orgId || !orgRole || !orgPermissions;
+
+      if (params.permission && !missingOrgs) {
+        orgAuthorization = orgPermissions.includes(params.permission);
+      }
+
+      if (params.role && !missingOrgs) {
+        orgAuthorization = orgRole === params.role;
+      }
     }
 
-    if (params.role) {
-      return orgRole === params.role;
+    if (params.assurance && fva) {
+      if (params.assurance.level === 'firstFactor') {
+        stepUpAuthorization = stringsToNumbers[params.assurance.maxAge] > fva[0];
+      } else if (params.assurance.level === 'secondFactor') {
+        stepUpAuthorization = stringsToNumbers[params.assurance.maxAge] > fva[1];
+      } else {
+        stepUpAuthorization =
+          stringsToNumbers[params.assurance.maxAge] > fva[0] && stringsToNumbers[params.assurance.maxAge] > fva[1];
+      }
     }
 
-    return false;
+    const final = [orgAuthorization, stepUpAuthorization].filter(Boolean).some(a => a === true);
+
+    console.log(final ? 'You are authorized' : 'You are NOT authorized', stepUpAuthorization, orgAuthorization);
+
+    return final;
   };
 };

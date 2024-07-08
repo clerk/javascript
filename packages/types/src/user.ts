@@ -110,6 +110,10 @@ export interface UserResource extends ClerkResource {
   disableTOTP: () => Promise<DeletedObjectResource>;
   createBackupCode: () => Promise<BackupCodeResource>;
 
+  verifySession: () => Promise<unknown>;
+  verifySessionAttemptFirstFactor: (params: { password: string }) => Promise<unknown>;
+  verifySessionAttemptSecondFactor: (params: { code: string }) => Promise<unknown>;
+
   get verifiedExternalAccounts(): ExternalAccountResource[];
 
   get unverifiedExternalAccounts(): ExternalAccountResource[];

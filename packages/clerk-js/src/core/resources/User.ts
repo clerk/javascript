@@ -239,6 +239,38 @@ export class User extends BaseResource implements UserResource {
     return this._baseDelete({ path: '/me' });
   };
 
+  verifySession = () => {
+    return BaseResource._fetch({
+      method: 'POST',
+      path: `/me/sessions/${User.clerk.session?.id}/verify`,
+      body: {
+        level: 'L1.firstFactor',
+      } as any,
+    });
+  };
+
+  verifySessionAttemptFirstFactor = ({ password }: { password: string }) => {
+    return BaseResource._fetch({
+      method: 'POST',
+      path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_first_factor`,
+      body: {
+        strategy: 'password',
+        password,
+      } as any,
+    });
+  };
+
+  verifySessionAttemptSecondFactor = ({ code }: { code: string }) => {
+    return BaseResource._fetch({
+      method: 'POST',
+      path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_second_factor`,
+      body: {
+        strategy: 'totp',
+        code,
+      } as any,
+    });
+  };
+
   getSessions = async (): Promise<SessionWithActivities[]> => {
     if (this.cachedSessionsWithActivities) {
       return this.cachedSessionsWithActivities;

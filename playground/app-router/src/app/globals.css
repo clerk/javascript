@@ -75,3 +75,54 @@ a {
     color-scheme: dark;
   }
 }
+
+
+
+
+#mypopover {
+  border: none;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  max-width: 250px;
+  left:50%;
+}
+
+button.icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  filter: grayscale();
+  outline: 0;
+}
+
+#mypopover::backdrop {
+  background-color: #0005;
+}
+
+#mypopover h3 {
+  margin-top: 0;
+}
+
+#mypopover p {
+  color: #666;
+}
+
+#mypopover button.primary {
+  width: 100%;
+}
+
+button.primary {
+  background-color: rgb(20, 115, 230);
+  padding: 0.8rem 2rem;
+  border-radius: 0.6rem;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+button.primary:hover {
+  background-color: rgb(13, 102, 208);
+}

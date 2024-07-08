@@ -11,6 +11,9 @@ export const Links = () => {
           <Link href={'/sign-up' as any}>Sign up</Link>
           <Link href={'/protected' as any}>Protected (auth())</Link>
           <Link href={'/action' as any}>Server action</Link>
+          <Link href={'/balance' as any}>My Balance</Link>
+          <Link href={'/balance-mfa' as any}>My Balance MFA</Link>
+          <Link href={'/balance-2fa' as any}>My Balance 2FA</Link>
         </div>
       </div>
       <div>

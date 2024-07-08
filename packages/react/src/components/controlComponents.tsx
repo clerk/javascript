@@ -77,6 +77,10 @@ export type ProtectProps = React.PropsWithChildren<
         permission?: never;
       }
   ) & {
+    assurance?: {
+      level: 'firstFactor' | 'secondFactor' | 'multiFactor';
+      maxAge: '10m' | '1h' | '4h' | '1d' | '1w';
+    };
     fallback?: React.ReactNode;
   }
 >;
@@ -126,7 +130,8 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
     return unauthorized;
   }
 
-  if (restAuthorizedParams.role || restAuthorizedParams.permission) {
+  if (restAuthorizedParams.role || restAuthorizedParams.permission || restAuthorizedParams.assurance) {
+    // @ts-expect-error
     if (has(restAuthorizedParams)) {
       return authorized;
     }
