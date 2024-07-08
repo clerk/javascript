@@ -271,6 +271,9 @@ async function decorateRequest(
           const index = findClosingHeadTagIndex(chunk, closingHeadTag);
           const isClosingHeadTagFound = index !== -1;
 
+          /**
+           * Hijack html response to position `__CLERK_ASTRO_DATA__` before the closing `head` html tag
+           */
           if (isClosingHeadTagFound) {
             controller.enqueue(chunk.slice(0, index));
             controller.enqueue(clerkAstroData);
