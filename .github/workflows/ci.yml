@@ -140,7 +140,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements']
+        test-name: ['generic', 'express', 'quickstart', 'ap-flows', 'elements', 'sessions']
         test-project: ['chrome']
         include:
           - test-name: 'nextjs'
@@ -197,6 +197,27 @@ jobs:
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
 
+      - name: Write all ENV certificates to files in integration/certs
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        uses: actions/github-script@v7
+        working-directory: ./integration/certs
+        env:
+          INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
+        with:
+            script: |
+                const fs = require('fs');
+                const path = require('path');
+                const certs = JSON.parse(process.env.INTEGRATION_CERTS);
+                for (const [name, cert] of Object.entries(certs)) {
+                  // write file to current dir
+                    fs.writeFileSync(path.join(__dirname, name), cert, 'utf8');
+                }
+
+      - name: LS certs
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ./integration/certs
+        run: ls -la && cat sessions-key.pem
+
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
@@ -209,6 +230,7 @@ jobs:
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
+          NODE_EXTRA_CA_CERTS: ${{ secrets.INTEGRATION_ROOT_CA }}
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}

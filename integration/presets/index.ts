@@ -1,5 +1,5 @@
 import { elements } from './elements';
-import { envs } from './envs';
+import { envs, instanceKeys } from './envs';
 import { express } from './express';
 import { createLongRunningApps } from './longRunningApps';
 import { next } from './next';
@@ -14,4 +14,7 @@ export const appConfigs = {
   react,
   remix,
   elements,
+  secrets: {
+    instanceKeys,
+  },
 } as const;
