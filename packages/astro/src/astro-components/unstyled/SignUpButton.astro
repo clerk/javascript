@@ -1,7 +1,7 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
 import type { SignUpProps } from "@clerk/types";
-type Props<Tag extends HTMLTag> = Polymorphic<SignUpProps & { as: Tag; id?: string; mode?: 'redirect' | 'modal' }>
+type Props<Tag extends HTMLTag> = Polymorphic<SignUpProps & { as: Tag; mode?: 'redirect' | 'modal' }>
 
 import { customAlphabet, urlAlphabet } from "nanoid";
 
@@ -9,7 +9,6 @@ const safeId = customAlphabet(urlAlphabet, 10)();
 
 const {
   as: Tag = 'button',
-  id = safeId,
   fallbackRedirectUrl,
   forceRedirectUrl,
   signInFallbackRedirectUrl,
@@ -28,12 +27,12 @@ const signUpOptions = {
 }
 ---
 
-<Tag {...elementProps} id={id}>
+<Tag {...elementProps} data-clerk-unstyled-id={safeId}>
   <slot>Sign up</slot>
 </Tag >
 
 <script is:inline define:vars={{ signUpOptions, mode, safeId }}>
-  const btn = document.querySelector(`#${safeId}`);
+  const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
 
   btn.addEventListener("click", () => {
     const clerk = window.Clerk
