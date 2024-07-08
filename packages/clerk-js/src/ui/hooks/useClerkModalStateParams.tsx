@@ -17,7 +17,9 @@ export const useClerkModalStateParams = () => {
     setState({ startPath: '', path: '', componentName: '', socialProvider: '' });
   };
 
-  const removeQueryParam = () => removeClerkQueryParam(CLERK_MODAL_STATE);
+  const removeQueryParam = () => {
+    removeClerkQueryParam(CLERK_MODAL_STATE);
+  };
 
   return {
     urlStateParam: { ...state, clearUrlStateParam },

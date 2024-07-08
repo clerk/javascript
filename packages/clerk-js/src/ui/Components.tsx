@@ -285,8 +285,8 @@ const Components = (props: ComponentsProps) => {
       flowName={'userProfile'}
       onClose={() => componentsControls.closeModal('userProfile')}
       onExternalNavigate={() => componentsControls.closeModal('userProfile')}
-      startPath={buildVirtualRouterUrl({ base: '/user', path: urlStateParam?.path })}
-      componentName={'SignUpModal'}
+      startPath={buildVirtualRouterUrl({ base: '/user', path: userProfileModal?.path || urlStateParam?.path })}
+      componentName={'UserProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
     >

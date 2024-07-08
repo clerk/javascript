@@ -19,6 +19,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
   const {
     handleAddAccountClicked,
     handleManageAccountClicked,
+    handleUserProfileActionClicked,
     handleSessionClicked,
     handleSignOutAllClicked,
     handleSignOutSessionClicked,
@@ -47,6 +48,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             <SingleSessionActions
               handleManageAccountClicked={handleManageAccountClicked}
               handleSignOutSessionClicked={handleSignOutSessionClicked}
+              handleUserProfileActionClicked={(path: string) => handleUserProfileActionClicked(path)}
               session={session}
             />
           ) : (

@@ -6,6 +6,7 @@ import { useCardState } from '../../elements';
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { useRouter } from '../../router';
 import { sleep } from '../../utils';
+import { useClerkModalStateParams } from '../../hooks';
 
 type UseMultisessionActionsParams = {
   user: UserResource | null | undefined;
@@ -22,6 +23,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const card = useCardState();
   const { activeSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
+  const { setUrlStateParam, urlStateParam } = useClerkModalStateParams();
 
   const handleSignOutSessionClicked = (session: ActiveSessionResource) => () => {
     if (otherSessions.length === 0) {
@@ -41,8 +43,21 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
         })();
       });
     }
-
     openUserProfile(opts.userProfileProps);
+    return opts.actionCompleteCallback?.();
+  };
+
+  const handleUserProfileActionClicked = (path: string) => {
+    if (opts.userProfileMode === 'navigation') {
+      return navigate(opts.userProfileUrl || '').finally(() => {
+        void (async () => {
+          await sleep(300);
+          opts.actionCompleteCallback?.();
+        })();
+      });
+    }
+    openUserProfile({ ...opts.userProfileProps, path: path });
+
     return opts.actionCompleteCallback?.();
   };
 
@@ -66,6 +81,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   return {
     handleSignOutSessionClicked,
     handleManageAccountClicked,
+    handleUserProfileActionClicked,
     handleSignOutAllClicked,
     handleSessionClicked,
     handleAddAccountClicked,
