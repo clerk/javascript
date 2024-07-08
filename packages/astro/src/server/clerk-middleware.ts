@@ -228,6 +228,16 @@ function decorateAstroLocal(req: Request, context: APIContext, requestState: Req
   context.locals.currentUser = createCurrentUser(req, context);
 }
 
+/**
+ * Find the index of the closing head tag in the chunk.
+ *
+ * Note: This implementation uses a simple approach that works for most of our
+ * current use cases.
+ */
+function findClosingHeadTagIndex(chunk: Uint8Array, endHeadTag: Uint8Array) {
+  return chunk.findIndex((_, i) => endHeadTag.every((value, j) => value === chunk[i + j]));
+}
+
 async function decorateRequest(
   locals: APIContext['locals'],
   res: Response,
@@ -245,48 +255,39 @@ async function decorateRequest(
    * without sucrificing DX and having developers wrap each page with a Layout that would handle this.
    */
   if (res.headers.get('content-type') === 'text/html') {
-    const reader = res.body?.getReader();
-    const stream = new ReadableStream({
-      async start(controller) {
-        let { value, done } = await reader!.read();
-        const encoder = new TextEncoder();
-        const decoder = new TextDecoder();
-        while (!done) {
-          const decodedValue = decoder.decode(value);
+    const encoder = new TextEncoder();
+    const closingHeadTag = encoder.encode('</head>');
+    const clerkAstroData = encoder.encode(
+      `<script id="__CLERK_ASTRO_DATA__" type="application/json">${JSON.stringify(locals.auth())}</script>\n`,
+    );
+    const clerkSafeEnvVariables = encoder.encode(
+      `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${JSON.stringify(getClientSafeEnv(locals))}</script>\n`,
+    );
+    const hotloadScript = encoder.encode(buildClerkHotloadScript(locals));
 
-          /**
-           * Hijack html response to position `__CLERK_ASTRO_DATA__` before the closing `head` html tag
-           */
-          if (decodedValue.includes('</head>')) {
-            const [p1, p2] = decodedValue.split('</head>');
-            controller.enqueue(encoder.encode(p1));
-            controller.enqueue(
-              encoder.encode(
-                `<script id="__CLERK_ASTRO_DATA__" type="application/json">${JSON.stringify(locals.auth())}</script>\n`,
-              ),
-            );
+    const stream = res.body!.pipeThrough(
+      new TransformStream({
+        transform(chunk, controller) {
+          const index = findClosingHeadTagIndex(chunk, closingHeadTag);
+          const isClosingHeadTagFound = index !== -1;
 
-            controller.enqueue(
-              encoder.encode(
-                `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${JSON.stringify(getClientSafeEnv(locals))}</script>\n`,
-              ),
-            );
+          if (isClosingHeadTagFound) {
+            controller.enqueue(chunk.slice(0, index));
+            controller.enqueue(clerkAstroData);
+            controller.enqueue(clerkSafeEnvVariables);
 
             if (__HOTLOAD__) {
-              controller.enqueue(encoder.encode(buildClerkHotloadScript(locals)));
+              controller.enqueue(hotloadScript);
             }
 
-            controller.enqueue(encoder.encode('</head>'));
-            controller.enqueue(encoder.encode(p2));
+            controller.enqueue(closingHeadTag);
+            controller.enqueue(chunk.slice(index + closingHeadTag.length));
           } else {
-            controller.enqueue(value);
+            controller.enqueue(chunk);
           }
-
-          ({ value, done } = await reader!.read());
-        }
-        controller.close();
-      },
-    });
+        },
+      }),
+    );
 
     const modifiedResponse = new Response(stream, {
       status: res.status,
