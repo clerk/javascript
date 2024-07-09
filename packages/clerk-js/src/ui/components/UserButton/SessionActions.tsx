@@ -9,13 +9,12 @@ import type { ThemableCssProp } from '../../styledSystem';
 
 type SingleSessionActionsProps = {
   handleManageAccountClicked: () => Promise<unknown> | void;
-  handleUserProfileActionClicked: (path: string) => Promise<unknown> | void;
   handleSignOutSessionClicked: (session: ActiveSessionResource) => () => Promise<unknown> | void;
   session: ActiveSessionResource;
 };
 
 export const SingleSessionActions = (props: SingleSessionActionsProps) => {
-  const { handleManageAccountClicked, handleUserProfileActionClicked, handleSignOutSessionClicked, session } = props;
+  const { handleManageAccountClicked, handleSignOutSessionClicked, session } = props;
 
   return (
     <Actions
@@ -38,23 +37,6 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
         icon={CogFilled}
         label={localizationKeys('userButton.action__manageAccount')}
         onClick={handleManageAccountClicked}
-        sx={t => ({
-          borderTopWidth: t.borderWidths.$normal,
-          borderTopStyle: t.borderStyles.$solid,
-          borderTopColor: t.colors.$neutralAlpha100,
-          padding: `${t.space.$4} ${t.space.$5}`,
-        })}
-      />
-      <Action
-        elementDescriptor={descriptors.userButtonPopoverActionButton}
-        elementId={descriptors.userButtonPopoverActionButton.setId('manageAccount')}
-        iconBoxElementDescriptor={descriptors.userButtonPopoverActionButtonIconBox}
-        iconBoxElementId={descriptors.userButtonPopoverActionButtonIconBox.setId('manageAccount')}
-        iconElementDescriptor={descriptors.userButtonPopoverActionButtonIcon}
-        iconElementId={descriptors.userButtonPopoverActionButtonIcon.setId('manageAccount')}
-        icon={CogFilled}
-        label={localizationKeys('test')}
-        onClick={() => handleUserProfileActionClicked('/custom')}
         sx={t => ({
           borderTopWidth: t.borderWidths.$normal,
           borderTopStyle: t.borderStyles.$solid,
