@@ -1,0 +1,21 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": [
+        "*.d.ts",
+        "**/package.json",
+        "src/**",
+        "tsconfig.json",
+        "tsup.config.ts",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!CHANGELOG.md",
+        "!dist/**",
+        "!node_modules/**"
+      ],
+      "outputs": ["dist/**", "components/**"]
+    }
+  }
+}
