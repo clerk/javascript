@@ -5,7 +5,7 @@ import { appConfigs } from '../presets';
 import { createTestUtils } from '../testUtils';
 
 test.describe('dynamic keys @nextjs', () => {
-  test.describe.configure({ mode: 'parallel' });
+  test.describe.configure({ mode: 'serial' });
   let app: Application;
 
   test.beforeAll(async () => {
@@ -60,12 +60,6 @@ test.describe('dynamic keys @nextjs', () => {
 
   test.afterAll(async () => {
     await app.teardown();
-  });
-
-  test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.signOut();
-    await u.page.context().clearCookies();
   });
 
   test('redirects to `signInUrl` on `auth().protect()`', async ({ page, context }) => {
