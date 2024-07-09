@@ -1,8 +1,8 @@
+import { deriveState } from '@clerk/shared/deriveState';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import { computed, onMount, type Store } from 'nanostores';
 
 import { $clerk, $csrState, $initialState } from './internal';
-import { deriveState } from './utils';
 
 /**
  * A client side store that is prepopulated with the authentication context during SSR.
