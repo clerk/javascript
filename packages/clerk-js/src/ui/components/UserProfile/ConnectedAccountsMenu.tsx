@@ -2,6 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
+import { InitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState } from '../../elements';
@@ -61,36 +62,42 @@ export const AddConnectedAccount = () => {
       triggerLocalizationKey={localizationKeys('userProfile.start.connectedAccountsSection.primaryButton')}
       id='connectedAccounts'
     >
-      {unconnectedStrategies.map(strategy => (
-        <ProfileSection.ActionMenuItem
-          key={strategy}
-          id={strategyToDisplayData[strategy].id}
-          onClick={() => connect(strategy)}
-          isDisabled={card.isLoading}
-          variant='ghost'
-          isLoading={card.loadingMetadata === strategy}
-          focusRing={false}
-          closeAfterClick={false}
-          localizationKey={localizationKeys('userProfile.connectedAccountPage.socialButtonsBlockButton', {
-            provider: strategyToDisplayData[strategy].name,
-          })}
-          sx={t => ({
-            justifyContent: 'start',
-            gap: t.space.$2,
-          })}
-          leftIcon={
-            <Image
-              isLoading={card.loadingMetadata === strategy}
-              isDisabled={card.isLoading}
-              elementDescriptor={descriptors.providerIcon}
-              elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
-              src={strategyToDisplayData[strategy].iconUrl}
-              alt={`Connect ${strategyToDisplayData[strategy].name} account`}
-              sx={theme => ({ width: theme.sizes.$4 })}
-            />
-          }
-        />
-      ))}
+      {unconnectedStrategies.map(strategy => {
+        const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
+          <Image
+            isLoading={card.loadingMetadata === strategy}
+            isDisabled={card.isLoading}
+            elementDescriptor={descriptors.providerIcon}
+            elementId={descriptors.providerIcon.setId(strategyToDisplayData[strategy].id)}
+            src={strategyToDisplayData[strategy].iconUrl}
+            alt={`Connect ${strategyToDisplayData[strategy].name} account`}
+            sx={theme => ({ width: theme.sizes.$4 })}
+          />
+        ) : (
+          <InitialIcon initials={strategyToDisplayData[strategy].name[0]} />
+        );
+
+        return (
+          <ProfileSection.ActionMenuItem
+            key={strategy}
+            id={strategyToDisplayData[strategy].id}
+            onClick={() => connect(strategy)}
+            isDisabled={card.isLoading}
+            variant='ghost'
+            isLoading={card.loadingMetadata === strategy}
+            focusRing={false}
+            closeAfterClick={false}
+            localizationKey={localizationKeys('userProfile.connectedAccountPage.socialButtonsBlockButton', {
+              provider: strategyToDisplayData[strategy].name,
+            })}
+            sx={t => ({
+              justifyContent: 'start',
+              gap: t.space.$2,
+            })}
+            leftIcon={imageOrInitial}
+          />
+        );
+      })}
     </ProfileSection.ActionMenu>
   );
 };

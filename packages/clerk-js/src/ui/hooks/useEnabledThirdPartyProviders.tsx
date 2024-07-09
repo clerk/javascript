@@ -37,16 +37,43 @@ const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
 ) as ThirdPartyStrategyToDataMap;
 
 export const useEnabledThirdPartyProviders = () => {
-  const { socialProviderStrategies, web3FirstFactors, authenticatableSocialStrategies } = useEnvironment().userSettings;
+  const { socialProviderStrategies, web3FirstFactors, authenticatableSocialStrategies, social } =
+    useEnvironment().userSettings;
 
   // Filter out any OAuth strategies that are not yet known, they are not included in our types.
   const knownSocialProviderStrategies = socialProviderStrategies.filter(s => oauthStrategies.includes(s));
+  const customSocialProviderStrategies = socialProviderStrategies.filter(
+    s => !oauthStrategies.includes(s) && s.startsWith('oauth_custom_'),
+  );
+
   const knownAuthenticatableSocialStrategies = authenticatableSocialStrategies.filter(s => oauthStrategies.includes(s));
+  const customAuthenticatableSocialStrategies = authenticatableSocialStrategies.filter(
+    s => !oauthStrategies.includes(s) && s.startsWith('oauth_custom_'),
+  );
+
+  customSocialProviderStrategies.map(s => {
+    const providerName = s.replace('oauth_', '') as OAuthProvider;
+
+    providerToDisplayData[providerName] = {
+      strategy: s,
+      name: social[s].name,
+      iconUrl: social[s].logo_url || '',
+    };
+  });
+
+  customAuthenticatableSocialStrategies.map(s => {
+    const providerId = s.replace('oauth_', '') as OAuthProvider;
+    strategyToDisplayData[s] = {
+      id: providerId,
+      iconUrl: social[s].logo_url || '',
+      name: social[s].name,
+    };
+  });
 
   return {
-    strategies: [...knownSocialProviderStrategies, ...web3FirstFactors],
+    strategies: [...knownSocialProviderStrategies, ...web3FirstFactors, ...customSocialProviderStrategies],
     web3Strategies: [...web3FirstFactors],
-    authenticatableOauthStrategies: [...knownAuthenticatableSocialStrategies],
+    authenticatableOauthStrategies: [...knownAuthenticatableSocialStrategies, ...customAuthenticatableSocialStrategies],
     strategyToDisplayData: strategyToDisplayData,
     providerToDisplayData: providerToDisplayData,
   };

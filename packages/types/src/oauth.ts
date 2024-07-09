@@ -36,6 +36,7 @@ export type SlackOauthProvider = 'slack';
 export type LinearOauthProvider = 'linear';
 export type XOauthProvider = 'x';
 export type EnstallOauthProvider = 'enstall';
+export type CustomOauthProvider = `custom_${string}`;
 
 export type OAuthProvider =
   | FacebookOauthProvider
@@ -64,7 +65,8 @@ export type OAuthProvider =
   | SlackOauthProvider
   | LinearOauthProvider
   | XOauthProvider
-  | EnstallOauthProvider;
+  | EnstallOauthProvider
+  | CustomOauthProvider;
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {

@@ -2,6 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
+import { InitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
@@ -9,7 +10,7 @@ import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
-import type { PropsOfComponent } from '../../styledSystem';
+import { type PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
@@ -59,17 +60,24 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
               ? error
               : localizationKeys('userProfile.start.connectedAccountsSection.subtitle__reauthorize');
 
+            const ImageOrInitial = () =>
+              providerToDisplayData[account.provider].iconUrl ? (
+                <Image
+                  elementDescriptor={[descriptors.providerIcon]}
+                  elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
+                  alt={providerToDisplayData[account.provider].name}
+                  src={providerToDisplayData[account.provider].iconUrl}
+                  sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
+                />
+              ) : (
+                <InitialIcon initials={providerToDisplayData[account.provider].name[0]} />
+              );
+
             return (
               <Action.Root key={account.id}>
                 <ProfileSection.Item id='connectedAccounts'>
                   <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
-                    <Image
-                      elementDescriptor={[descriptors.providerIcon]}
-                      elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
-                      alt={providerToDisplayData[account.provider].name}
-                      src={providerToDisplayData[account.provider].iconUrl}
-                      sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
-                    />
+                    <ImageOrInitial />
                     <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
                       <Flex
                         gap={2}
