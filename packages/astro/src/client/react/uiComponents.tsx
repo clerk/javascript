@@ -8,7 +8,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
 } from '@clerk/types';
-import React, { createElement } from 'react';
+import React from 'react';
 
 import { withClerk, type WithClerkProp } from './utils';
 
@@ -23,7 +23,8 @@ export interface MountProps {
   unmount: ((node: HTMLDivElement) => void) | undefined;
   updateProps?: (props: any) => void;
   props?: any;
-  customPagesPortals?: any[];
+  // TODO: Support custom pages
+  // customPagesPortals?: any[];
 }
 
 const isMountProps = (props: any): props is MountProps => {
@@ -79,8 +80,9 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
     return (
       <>
         <div ref={this.portalRef} />
-        {isMountProps(this.props) &&
-          this.props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}
+        {/*TODO: Support custom pages*/}
+        {/*{isMountProps(this.props) &&*/}
+        {/*  this.props?.customPagesPortals?.map((portal, index) => createElement(portal, { key: index }))}*/}
       </>
     );
   }
