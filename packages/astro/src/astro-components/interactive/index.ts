@@ -14,3 +14,5 @@ export { default as OrganizationProfile } from './OrganizationProfile.astro';
 export { default as OrganizationSwitcher } from './OrganizationSwitcher.astro';
 // @ts-ignore
 export { default as OrganizationList } from './OrganizationList.astro';
+// @ts-ignore
+export { default as GoogleOneTap } from './GoogleOneTap.astro';
