@@ -6,6 +6,7 @@ const buildUrl = (
   _targetUrl: string | URL,
   _returnBackUrl?: string | URL | null,
   _devBrowserToken?: string | null,
+  asHash = false,
 ) => {
   if (_baseUrl === '') {
     return legacyBuildUrl(_targetUrl.toString(), _returnBackUrl?.toString());
@@ -15,13 +16,25 @@ const buildUrl = (
   const returnBackUrl = _returnBackUrl ? new URL(_returnBackUrl, baseUrl) : undefined;
   const res = new URL(_targetUrl, baseUrl);
 
+  const sp = new URLSearchParams();
+
   if (returnBackUrl) {
-    res.searchParams.set('redirect_url', returnBackUrl.toString());
+    sp.set('redirect_url', returnBackUrl.toString());
   }
   // For cross-origin redirects, we need to pass the dev browser token for URL session syncing
   if (_devBrowserToken && baseUrl.hostname !== res.hostname) {
-    res.searchParams.set(constants.QueryParameters.DevBrowser, _devBrowserToken);
+    sp.set(constants.QueryParameters.DevBrowser, _devBrowserToken);
   }
+
+  if (asHash) {
+    // clerk-js expects to read this format.
+    res.hash = '/?' + sp.toString();
+  } else {
+    sp.forEach((value, key) => {
+      res.searchParams.set(key, value);
+    });
+  }
+
   return res.toString();
 };
 
@@ -68,7 +81,7 @@ const buildAccountsBaseUrl = (frontendApi?: string) => {
 };
 
 type RedirectAdapter<RedirectReturn> = (url: string) => RedirectReturn;
-type RedirectToParams = { returnBackUrl?: string | URL | null };
+type RedirectToParams = { returnBackUrl?: string | URL | null; asHash?: boolean };
 export type RedirectFun<ReturnType> = (params?: RedirectToParams) => ReturnType;
 
 /**
@@ -93,23 +106,35 @@ export const createRedirect: CreateRedirect = params => {
   const isDevelopment = parsedPublishableKey?.instanceType === 'development';
   const accountsBaseUrl = buildAccountsBaseUrl(frontendApi);
 
-  const redirectToSignUp = ({ returnBackUrl }: RedirectToParams = {}) => {
+  const redirectToSignUp = ({ returnBackUrl, asHash = false }: RedirectToParams = {}) => {
     if (!signUpUrl && !accountsBaseUrl) {
       errorThrower.throwMissingPublishableKeyError();
     }
     const accountsSignUpUrl = `${accountsBaseUrl}/sign-up`;
     return redirectAdapter(
-      buildUrl(baseUrl, signUpUrl || accountsSignUpUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
+      buildUrl(
+        baseUrl,
+        signUpUrl || accountsSignUpUrl,
+        returnBackUrl,
+        isDevelopment ? params.devBrowserToken : null,
+        asHash,
+      ),
     );
   };
 
-  const redirectToSignIn = ({ returnBackUrl }: RedirectToParams = {}) => {
+  const redirectToSignIn = ({ returnBackUrl, asHash = false }: RedirectToParams = {}) => {
     if (!signInUrl && !accountsBaseUrl) {
       errorThrower.throwMissingPublishableKeyError();
     }
     const accountsSignInUrl = `${accountsBaseUrl}/sign-in`;
     return redirectAdapter(
-      buildUrl(baseUrl, signInUrl || accountsSignInUrl, returnBackUrl, isDevelopment ? params.devBrowserToken : null),
+      buildUrl(
+        baseUrl,
+        signInUrl || accountsSignInUrl,
+        returnBackUrl,
+        isDevelopment ? params.devBrowserToken : null,
+        asHash,
+      ),
     );
   };
 

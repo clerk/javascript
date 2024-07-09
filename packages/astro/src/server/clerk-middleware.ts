@@ -342,7 +342,7 @@ const handleControlFlowErrors = (
         signInUrl: requestState.signInUrl,
         signUpUrl: requestState.signUpUrl,
         publishableKey: getSafeEnv(context).pk!,
-      }).redirectToSignIn({ returnBackUrl: e.returnBackUrl });
+      }).redirectToSignIn({ returnBackUrl: e.returnBackUrl, asHash: true });
     default:
       throw e;
   }
