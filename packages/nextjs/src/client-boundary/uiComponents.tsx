@@ -3,17 +3,10 @@
 import {
   CreateOrganization as BaseCreateOrganization,
   OrganizationProfile as BaseOrganizationProfile,
-  SignIn as BaseSignIn,
   SignUp as BaseSignUp,
   UserProfile as BaseUserProfile,
 } from '@clerk/clerk-react';
-import type {
-  CreateOrganizationProps,
-  OrganizationProfileProps,
-  SignInProps,
-  SignUpProps,
-  UserProfileProps,
-} from '@clerk/types';
+import type { CreateOrganizationProps, OrganizationProfileProps, SignUpProps, UserProfileProps } from '@clerk/types';
 import React from 'react';
 
 import { useEnforceCorrectRoutingProps } from './hooks/useEnforceRoutingProps';
@@ -55,9 +48,9 @@ export const OrganizationProfile: typeof BaseOrganizationProfile = Object.assign
   { ...BaseOrganizationProfile },
 );
 
-export const SignIn = (props: SignInProps) => {
-  return <BaseSignIn {...useEnforceCorrectRoutingProps('SignIn', props, false)} />;
-};
+// export const SignIn = (props: SignInProps) => {
+//   return <BaseSignIn {...useEnforceCorrectRoutingProps('SignIn', props, false)} />;
+// };
 
 export const SignUp = (props: SignUpProps) => {
   return <BaseSignUp {...useEnforceCorrectRoutingProps('SignUp', props, false)} />;

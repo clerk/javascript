@@ -22,7 +22,7 @@ export {
   OrganizationList,
   OrganizationProfile,
   OrganizationSwitcher,
-  SignIn,
+  // SignIn,
   SignInButton,
   SignInWithMetamaskButton,
   SignOutButton,
