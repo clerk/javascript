@@ -1,3 +1,4 @@
+import { astro } from './astro';
 import { elements } from './elements';
 import { envs } from './envs';
 import { express } from './express';
@@ -14,4 +15,5 @@ export const appConfigs = {
   react,
   remix,
   elements,
+  astro,
 } as const;

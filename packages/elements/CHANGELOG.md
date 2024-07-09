@@ -1,5 +1,52 @@
 # @clerk/elements
 
+## 0.10.1
+
+## 0.10.0
+
+### Minor Changes
+
+- Add `backup_code` verification strategy ([#3627](https://github.com/clerk/javascript/pull/3627)) by [@tmilewski](https://github.com/tmilewski)
+
+  ```tsx
+  <SignIn.Step name='choose-strategy'>
+    <SignIn.SupportedStrategy name='backup_code'>Use a backup code</SignIn.SupportedStrategy>
+  <SignIn.Step>
+  ```
+
+  ```tsx
+  <SignIn.Step name='verifications'>
+    <SignIn.Strategy name='backup_code'>
+      <Clerk.Field name="backup_code">
+        <Clerk.Label>Code:</Clerk.Label>
+        <Clerk.Input />
+        <Clerk.FieldError />
+      </Clerk.Field>
+
+      <Clerk.Action submit>Continue</Clerk.Action>
+    </SignIn.Strategy>
+  <SignIn.Step>
+  ```
+
+### Patch Changes
+
+- Addresses the issue where sign-in factors were not properly falling back to empty arrays. ([#3647](https://github.com/clerk/javascript/pull/3647)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Refactors sign-up loading logic to be in-line with sign-in ([#3648](https://github.com/clerk/javascript/pull/3648)) by [@tmilewski](https://github.com/tmilewski)
+
+- Ensure Sign Up resending resets upon being triggered ([#3652](https://github.com/clerk/javascript/pull/3652)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fixes persistent loading states within the `forgot-password` step ([#3648](https://github.com/clerk/javascript/pull/3648)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fix Sign In forgot-password step not rendering ([#3653](https://github.com/clerk/javascript/pull/3653)) by [@tmilewski](https://github.com/tmilewski)
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`d6b5006c4`](https://github.com/clerk/javascript/commit/d6b5006c4cc1b6f07bb3a6832b4ec6e65ea15814)]:
+  - @clerk/types@4.7.0
+
 ## 0.9.1
 
 ### Patch Changes

@@ -284,7 +284,7 @@ export const SignUpRouterMachine = setup({
       ],
     },
     Start: {
-      tags: 'route:start',
+      tags: ['step:start'],
       exit: 'clearFormErrors',
       invoke: {
         id: 'start',
@@ -322,7 +322,7 @@ export const SignUpRouterMachine = setup({
       },
     },
     Continue: {
-      tags: 'route:continue',
+      tags: ['step:continue'],
       invoke: {
         id: 'continue',
         src: 'continueMachine',
@@ -354,7 +354,7 @@ export const SignUpRouterMachine = setup({
       },
     },
     Verification: {
-      tags: 'route:verification',
+      tags: ['step:verification'],
       invoke: {
         id: 'verification',
         src: 'verificationMachine',
@@ -406,7 +406,7 @@ export const SignUpRouterMachine = setup({
       },
     },
     Callback: {
-      tags: 'route:callback',
+      tags: ['step:callback'],
       entry: sendTo(ThirdPartyMachineId, { type: 'CALLBACK' }),
       on: {
         NEXT: [
@@ -437,7 +437,7 @@ export const SignUpRouterMachine = setup({
       },
     },
     Error: {
-      tags: 'route:error',
+      tags: ['step:error'],
       on: {
         NEXT: {
           target: 'Start',

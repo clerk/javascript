@@ -22,19 +22,20 @@ import type { SignInVerificationFactorUpdateEvent } from './verification.types';
 
 // ---------------------------------- Tags ---------------------------------- //
 
-export const SignInRouterRoutes = {
-  start: 'route:start',
-  firstFactor: 'route:first-factor',
-  secondFactor: 'route:second-factor',
-  callback: 'route:callback',
-  error: 'route:error',
-  forgotPassword: 'route:forgot-password',
-  resetPassword: 'route:reset-password',
-  chooseStrategy: 'route:choose-strategy',
+export const SignInRouterSteps = {
+  start: 'step:start',
+  verifications: 'step:verifications',
+  firstFactor: 'step:first-factor',
+  secondFactor: 'step:second-factor',
+  callback: 'step:callback',
+  error: 'step:error',
+  forgotPassword: 'step:forgot-password',
+  resetPassword: 'step:reset-password',
+  chooseStrategy: 'step:choose-strategy',
 } as const;
 
-export type SignInRouterRoutes = keyof typeof SignInRouterRoutes;
-export type SignInRouterTags = (typeof SignInRouterRoutes)[keyof typeof SignInRouterRoutes];
+export type SignInRouterSteps = keyof typeof SignInRouterSteps;
+export type SignInRouterTags = (typeof SignInRouterSteps)[keyof typeof SignInRouterSteps];
 
 // ---------------------------------- Children ---------------------------------- //
 
@@ -60,7 +61,9 @@ export type SignInRouterTransferEvent = BaseRouterTransferEvent;
 export type SignInRouterRedirectEvent = BaseRouterRedirectEvent;
 export type SignInRouterResetEvent = BaseRouterResetEvent;
 export type SignInRouterResetStepEvent = BaseRouterResetStepEvent;
-export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<'start' | 'verifications' | 'reset-password'>;
+export type SignInRouterLoadingEvent = BaseRouterLoadingEvent<
+  'start' | 'verifications' | 'reset-password' | 'forgot-password' | 'choose-strategy'
+>;
 export type SignInRouterSetClerkEvent = BaseRouterSetClerkEvent;
 export type SignInRouterSubmitEvent = { type: 'SUBMIT' };
 export type SignInRouterPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };

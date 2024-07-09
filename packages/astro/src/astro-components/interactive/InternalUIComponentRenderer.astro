@@ -1,0 +1,40 @@
+---
+interface Props {
+  [key: string]: unknown
+  component: 'sign-in' | 'sign-up' | 'organization-list' | 'organization-profile' | 'organization-switcher' | 'user-button' | 'user-profile' | 'google-one-tap'
+}
+
+import { customAlphabet, urlAlphabet } from "nanoid";
+
+const safeId = customAlphabet(urlAlphabet, 10)();
+
+const { component, ...props } = Astro.props
+---
+
+<div data-clerk-id={`clerk-${component}-${safeId}`}></div>
+
+<script is:inline define:vars={{ props, component, safeId }}>
+  /**
+   * Store the id and the props for the Astro component in order to mount the correct UI component once clerk is loaded.
+   * The above is handled by `mountAllClerkAstroJSComponents`.
+   */
+  const setOrCreatePropMap = ({ category, id, props }) => {
+    if (!window.__astro_clerk_component_props) {
+      window.__astro_clerk_component_props = new Map();
+    }
+
+    if (!window.__astro_clerk_component_props.has(category)) {
+      const _ = new Map();
+      _.set(id, props);
+      window.__astro_clerk_component_props.set(category, _);
+    }
+
+    window.__astro_clerk_component_props.get(category)?.set(id, props);
+  };
+
+  setOrCreatePropMap({
+    category: component,
+    id: `clerk-${component}-${safeId}`,
+    props,
+  });
+</script>

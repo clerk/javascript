@@ -1,0 +1,8 @@
+---
+import type { UserProfileProps } from "@clerk/types";
+type Props = UserProfileProps
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
+---
+
+<InternalUIComponentRenderer {...Astro.props} component="user-profile" />

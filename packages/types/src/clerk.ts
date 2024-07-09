@@ -20,6 +20,7 @@ import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
+  AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
   LegacyRedirectProps,
   RedirectOptions,
@@ -388,6 +389,11 @@ export interface Clerk {
   buildAfterSignOutUrl(): string;
 
   /**
+   * Returns the configured afterMultiSessionSingleSignOutUrl of the instance.
+   */
+  buildAfterMultiSessionSingleSignOutUrl(): string;
+
+  /**
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
    *
@@ -564,7 +570,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   LegacyRedirectProps &
-  AfterSignOutUrl & {
+  AfterSignOutUrl &
+  AfterMultiSessionSingleSignOutUrl & {
     appearance?: Appearance;
     localization?: LocalizationResource;
     polling?: boolean;
@@ -879,11 +886,13 @@ export type UserButtonProps = UserButtonProfileMode & {
   defaultOpen?: boolean;
   /**
    * Full URL or path to navigate after sign out is complete
+   * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
    */
   afterSignOutUrl?: string;
   /**
    * Full URL or path to navigate after signing out the current user is complete.
    * This option applies to multi-session applications.
+   * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
    */
   afterMultiSessionSingleSignOutUrl?: string;
   /**

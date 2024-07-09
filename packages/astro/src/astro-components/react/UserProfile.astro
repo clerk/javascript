@@ -1,0 +1,16 @@
+---
+import type { UserProfileProps } from "@clerk/types";
+type Props = UserProfileProps
+
+import type { AstroBuiltinProps } from 'astro';
+import { UserProfile as UserProfileReact } from "@clerk/astro/client/react";
+
+const props = {
+  ...Astro.props,
+}
+---
+
+<UserProfileReact
+  client:load
+  {...props}
+/>
