@@ -81,7 +81,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withEmailCodes'] })('test ast
   test('redirects to sign-in when unauthenticated', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/user');
-    await u.page.waitForURL(`${app.serverUrl}/sign-in#/?redirect_url=${encodeURIComponent(`${app.serverUrl}/user`)}`);
+    await u.page.waitForURL(`${app.serverUrl}/sign-in?redirect_url=${encodeURIComponent(`${app.serverUrl}/user`)}`);
     await u.po.signIn.waitForMounted();
   });
 });
