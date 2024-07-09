@@ -26,20 +26,17 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "react-native": "./src/index.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.js"
     },
     "./web": {
       "types": "./dist/web/index.d.ts",
-      "react-native": "./src/web/index.ts",
       "import": "./dist/web/index.js",
       "require": "./dist/web/index.js"
     }
   },
   "main": "./dist/index.js",
   "source": "./src/index.js",
-  "react-native": "./src/index.ts",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
