@@ -14,7 +14,8 @@
         "!CHANGELOG.md",
         "!dist/**",
         "!node_modules/**"
-      ]
+      ],
+      "outputs": ["dist/**", "components/**"]
     }
   }
 }

@@ -179,7 +179,7 @@
     "//#test:integration:astro": {
       "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build", "^@clerk/astro#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
+      "inputs": ["integration/**", "packages/astro/dist/**", "packages/astro/components/**"],
       "outputLogs": "new-only"
     },
     "//#test:integration:elements": {
