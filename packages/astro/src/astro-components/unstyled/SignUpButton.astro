@@ -1,7 +1,7 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
 import type { SignUpProps } from "@clerk/types";
-type Props<Tag extends HTMLTag> = Polymorphic<SignUpProps & { as: Tag; mode?: 'redirect' | 'modal' }>
+type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<SignUpProps & { as: Tag; mode?: 'redirect' | 'modal' }>
 
 import { customAlphabet, urlAlphabet } from "nanoid";
 

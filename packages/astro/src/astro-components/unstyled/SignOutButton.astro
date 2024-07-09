@@ -1,6 +1,6 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
-type Props<Tag extends HTMLTag> = Polymorphic<{ as: Tag; redirectUrl?: string }>
+type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{ as: Tag; redirectUrl?: string }>
 
 import { customAlphabet, urlAlphabet } from "nanoid";
 
