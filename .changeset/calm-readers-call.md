@@ -5,4 +5,4 @@
 ---
 
 Support reading / writing / removing  suffixed/un-suffixed cookies from `@clerk/clerk-js` and `@clerk/backend`.
-Everyone of `__session`, `__clerk_db_jwt` and `__client_uat` cookies will also be set with a suffix  to support multiple apps on the same domain.
+The `__session`, `__clerk_db_jwt` and `__client_uat` cookies will now include a suffix derived from the instance's publishakeKey. The cookie name suffixes are used to prevent cookie collisions, effectively enabling support for multiple Clerk applications running on the same domain.
