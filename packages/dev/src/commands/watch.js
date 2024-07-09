@@ -11,7 +11,7 @@ import { getMonorepoRoot } from '../utils/getMonorepoRoot.js';
  * @param {boolean | undefined} args.js If `true`, only spawn the builder for `@clerk/clerk-js`.
  * @returns {Promise<void>}
  */
-export async function watch({ js = false }) {
+export async function watch({ js }) {
   const { dependencies, devDependencies } = await getDependencies(join(process.cwd(), 'package.json'));
   const clerkPackages = Object.keys(await getClerkPackages());
 
@@ -46,11 +46,13 @@ export async function watch({ js = false }) {
     });
   }
 
-  if (process.platform === 'darwin') {
-    spawn('osascript', [
-      '-e',
-      `tell app "Terminal" to do script "cd ${cwd} && turbo run dev --filter=@clerk/clerk-js -- --env devOrigin=http://localhost:4000"`,
-    ]);
+  if (typeof js === 'undefined') {
+    if (process.platform === 'darwin') {
+      spawn('osascript', [
+        '-e',
+        `tell app "Terminal" to do script "cd ${cwd} && turbo run dev --filter=@clerk/clerk-js -- --env devOrigin=http://localhost:4000"`,
+      ]);
+    }
   }
 
   return new Promise((resolve, reject) => {

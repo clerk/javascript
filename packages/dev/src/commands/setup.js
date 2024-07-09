@@ -74,8 +74,10 @@ function buildEnvFile(envConfiguration) {
 
 /**
  * Performs framework configuration tasks necessary for local development with the monorepo packages.
+ * @param {object} args
+ * @param {boolean | undefined} args.js If `false`, do not customize the clerkJSUrl.
  */
-export async function setup() {
+export async function setup({ js = true }) {
   const config = await getConfiguration();
   const instance = await getInstanceConfiguration(config);
 
@@ -88,7 +90,7 @@ export async function setup() {
         buildEnvFile({
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: instance.publishableKey,
           CLERK_SECRET_KEY: instance.secretKey,
-          NEXT_PUBLIC_CLERK_JS_URL: 'http://localhost:4000/npm/clerk.browser.js',
+          ...(js ? { NEXT_PUBLIC_CLERK_JS_URL: 'http://localhost:4000/npm/clerk.browser.js' } : {}),
         }),
       );
       break;
@@ -113,10 +115,12 @@ export async function setup() {
         }),
       );
 
-      console.log('Adding clerkJSUrl to ClerkProvider...');
-      const res = await applyCodemod('add-clerkjsurl-to-provider.cjs', [process.cwd()]);
-      if (res.ok === 0) {
-        console.warn('warning: could not find a ClerkProvider to edit. Please add clerkJSUrl manually.');
+      if (js) {
+        console.log('Adding clerkJSUrl to ClerkProvider...');
+        const res = await applyCodemod('add-clerkjsurl-to-provider.cjs', [process.cwd()]);
+        if (res.ok === 0) {
+          console.warn('warning: could not find a ClerkProvider to edit. Please add clerkJSUrl manually.');
+        }
       }
       break;
     }
