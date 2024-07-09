@@ -59,6 +59,7 @@
     "isomorphicAtob",
     "isomorphicBtoa",
     "keys",
+    "loadClerkJsScript",
     "loadScript",
     "localStorageBroadcastChannel",
     "poller",

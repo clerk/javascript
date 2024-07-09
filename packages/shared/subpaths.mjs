@@ -16,6 +16,7 @@ export const subpathNames = [
   'isomorphicAtob',
   'isomorphicBtoa',
   'keys',
+  'loadClerkJsScript',
   'loadScript',
   'localStorageBroadcastChannel',
   'poller',
