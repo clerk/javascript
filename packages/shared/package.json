@@ -51,6 +51,7 @@
     "cookie",
     "date",
     "deprecated",
+    "deriveState",
     "error",
     "file",
     "globs",
