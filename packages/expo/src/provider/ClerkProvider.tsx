@@ -1,9 +1,10 @@
 import '../polyfills';
 
 import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import * as WebBrowser from 'expo-web-browser';
 
 import type { TokenCache } from '../caches/types';
-import { isNative } from '../utils/runtime';
+import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 
 export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider> & {
@@ -18,6 +19,11 @@ const SDK_METADATA = {
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   const { children, tokenCache, publishableKey, ...rest } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
+
+  if (isWeb()) {
+    // This is needed in order for useOAuth to work correctly on web.
+    WebBrowser.maybeCompleteAuthSession();
+  }
 
   return (
     <ClerkReactProvider
