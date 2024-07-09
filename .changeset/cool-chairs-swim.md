@@ -2,4 +2,4 @@
 "@clerk/astro": patch
 ---
 
-Add support for Google One Tap as an Astro or React UI Component.
+Add an Astro component and a React UI Component for Google One Tap.
