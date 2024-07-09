@@ -3,7 +3,6 @@ import type {
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationSwitcherProps,
-  SignInProps,
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
@@ -88,16 +87,16 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
   }
 }
 
-export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
-  return (
-    <Portal
-      mount={clerk?.mountSignIn}
-      unmount={clerk?.unmountSignIn}
-      updateProps={(clerk as any)?.__unstable__updateProps}
-      props={props}
-    />
-  );
-}, 'SignIn');
+// export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
+//   return (
+//     <Portal
+//       mount={clerk?.mountSignIn}
+//       unmount={clerk?.unmountSignIn}
+//       updateProps={(clerk as any)?.__unstable__updateProps}
+//       props={props}
+//     />
+//   );
+// }, 'SignIn');
 
 export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>) => {
   return (
