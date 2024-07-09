@@ -23,6 +23,14 @@ describe('deriveState', () => {
   it('uses CSR state when clerkLoaded', () => {
     const result = deriveState(true, mockResources, undefined);
     expect(result.userId).toBe(mockInitialState.userId);
+    expect(result.sessionId).toBe(mockInitialState.sessionId);
     expect(result.orgId).toBe(mockInitialState.orgId);
+  });
+
+  it('handles !clerkLoaded and undefined initialState', () => {
+    const result = deriveState(false, {} as Resources, undefined);
+    expect(result.userId).toBeUndefined();
+    expect(result.sessionId).toBeUndefined();
+    expect(result.orgId).toBeUndefined();
   });
 });
