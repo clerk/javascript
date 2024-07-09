@@ -1,6 +1,7 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
-type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{ as: Tag; redirectUrl?: string }>
+import type { SignOutOptions } from '@clerk/types';
+type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{ as: Tag; } & SignOutOptions>
 
 import { customAlphabet, urlAlphabet } from "nanoid";
 
@@ -8,7 +9,8 @@ const safeId = customAlphabet(urlAlphabet, 10)();
 
 const {
   as: Tag = 'button',
-  redirectUrl,
+  redirectUrl = '/',
+  sessionId,
   ...elementProps
 } = Astro.props
 ---
@@ -17,10 +19,10 @@ const {
   <slot>Sign out</slot>
 </Tag >
 
-<script is:inline define:vars={{ redirectUrl, safeId }}>
+<script is:inline define:vars={{ redirectUrl, sessionId, safeId }}>
   const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
 
   btn.addEventListener("click", () => {
-    window.Clerk.signOut({ redirectUrl })
+    window.Clerk.signOut({ redirectUrl, sessionId })
   });
 </script>

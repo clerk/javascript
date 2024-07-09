@@ -4,22 +4,20 @@ import React from 'react';
 import type { WithClerkProp } from './utils';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute, withClerk } from './utils';
 
-export type SignOutButtonProps = {
-  redirectUrl?: string;
-  signOutOptions?: SignOutOptions;
+export type SignOutButtonProps = SignOutOptions & {
   children?: React.ReactNode;
 };
 
 export const SignOutButton = withClerk(
   ({ clerk, children, ...props }: React.PropsWithChildren<WithClerkProp<SignOutButtonProps>>) => {
-    const { redirectUrl = '/', signOutOptions, ...rest } = props;
+    const { redirectUrl = '/', sessionId, ...rest } = props;
 
     children = normalizeWithDefaultValue(children, 'Sign out');
     const child = assertSingleChild(children)('SignOutButton');
 
-    const clickHandler = () => clerk?.signOut({ redirectUrl });
+    const clickHandler = () => clerk?.signOut({ redirectUrl, sessionId });
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {
-      await safeExecute((child as any).props.onClick)(e);
+      await safeExecute(child.props.onClick)(e);
       return clickHandler();
     };
 
