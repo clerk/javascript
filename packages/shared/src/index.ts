@@ -17,6 +17,7 @@ export * from './color';
 export * from './constants';
 export * from './date';
 export * from './deprecated';
+export { deriveState } from './deriveState';
 export * from './error';
 export * from './file';
 export { handleValueOrFn } from './handleValueOrFn';
