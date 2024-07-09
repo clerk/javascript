@@ -13,10 +13,10 @@ import { expect, test } from '@playwright/test';
 import { getPort } from '../../scripts';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
-import { prepareApplication } from './utils';
+import { getEnvForMultiAppInstance, prepareApplication } from './utils';
 
 test.describe('switching instances on localhost same port @sessions', () => {
-  test.describe.configure({ mode: 'serial' });
+  test.describe.configure({ mode: 'serial', timeout: 5 * 60 * 1000 });
   const fakeUsers: FakeUser[] = [];
 
   test.afterAll(async () => {
@@ -27,32 +27,34 @@ test.describe('switching instances on localhost same port @sessions', () => {
     // We need both apps to run on the same port
     const port = await getPort();
     // Create app and user for the 1st app
-    let app = await prepareApplication('sessions-dev-1', port);
+    const { app } = await prepareApplication('sessions-dev-1', port);
     let page = await context.newPage();
-    let u = createTestUtils({ app: app.app, page: page, context });
+    let u = createTestUtils({ app, page, context });
     let fakeUser = u.services.users.createFakeUser();
     fakeUsers.push(fakeUser);
+
     await u.services.users.createBapiUser(fakeUser);
 
-    await u.po.signIn.goTo();
+    await u.po.signIn.goTo({ timeout: 30000 });
     await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
     await u.po.expect.toBeSignedIn();
     expect((await u.po.clerk.getClientSideUser()).primaryEmailAddress.emailAddress).toBe(fakeUser.email);
-    await app.app.teardown();
+    await app.stop();
 
     // Create app and user for the 2nd app with a different instance key
-    app = await prepareApplication('sessions-dev-2', port);
+    await app.withEnv(getEnvForMultiAppInstance('sessions-dev-2'));
+    await app.dev({ port });
+
     page = await context.newPage();
-    u = createTestUtils({ app: app.app, page: page, context });
+    u = createTestUtils({ app, page, context });
     fakeUser = u.services.users.createFakeUser();
     fakeUsers.push(fakeUser);
     await u.services.users.createBapiUser(fakeUser);
-    await u.page.pause();
 
-    await u.po.signIn.goTo();
+    await u.po.signIn.goTo({ timeout: 30000 });
     await u.po.signIn.signInWithEmailAndInstantPassword(fakeUser);
     await u.po.expect.toBeSignedIn();
     expect((await u.po.clerk.getClientSideUser()).primaryEmailAddress.emailAddress).toBe(fakeUser.email);
-    await app.app.teardown();
+    await app.teardown();
   });
 });

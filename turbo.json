@@ -27,7 +27,7 @@
     "EXPO_PUBLIC_CLERK_*",
     "REACT_APP_CLERK_*"
   ],
-  "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
+  "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN", "ACTIONS_RUNNER_DEBUG", "ACTIONS_STEP_DEBUG"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

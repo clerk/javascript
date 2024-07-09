@@ -1,7 +1,6 @@
 import http from 'node:http';
 import type { createServer as _createServer, Server, ServerOptions } from 'node:https';
 import https from 'node:https';
-import * as process from 'node:process';
 
 import { default as httpProxy } from 'http-proxy';
 
@@ -19,7 +18,7 @@ export const createProxyServer = (opts: ProxyServerOptions) => {
   const usingSSL = !!opts.ssl;
   const createServer: typeof _createServer = usingSSL ? https.createServer.bind(https) : http.createServer.bind(http);
 
-  return createServer({ ca: process.env.NODE_EXTRA_CA_CERTS, ...opts.ssl }, (req, res) => {
+  return createServer(opts.ssl, (req, res) => {
     const hostHeader = req.headers.host || '';
     if (opts.targets[hostHeader]) {
       proxy.web(req, res, { target: opts.targets[hostHeader] });

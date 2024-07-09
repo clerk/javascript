@@ -37,10 +37,6 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: List node_modules
-        run: npm ls
-        shell: bash
-
       - name: Require Changeset
         if: ${{ !(github.event_name == 'merge_group') }}
         run: if [[ "${{ github.event.pull_request.user.login }}" = "clerk-cookie" || "${{ github.event.pull_request.user.login }}" = "renovate[bot]" ]]; then echo 'Skipping' && exit 0; else npx changeset status --since=origin/main; fi
@@ -135,7 +131,7 @@ jobs:
   integration-tests:
     name: Integration Tests
     needs: formatting-linting
-    runs-on: ${{ vars.RUNNER_MEDIUM || 'ubuntu-latest-m' }}
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
     strategy:
@@ -157,6 +153,15 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
+      - name: Setup
+        id: config
+        uses: ./.github/actions/init
+        with:
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          playwright-enabled: true
+
       - name: Task Status
         id: task-status
         env:
@@ -169,16 +174,6 @@ jobs:
           AFFECTED=0
           (npx turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
-
-      - name: Setup
-        if: ${{ steps.task-status.outputs.affected == '1' }}
-        id: config
-        uses: ./.github/actions/init
-        with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true
 
       - name: Verdaccio
         if: ${{ steps.task-status.outputs.affected == '1' }}
@@ -204,28 +199,30 @@ jobs:
       - name: Write all ENV certificates to files in integration/certs
         if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/github-script@v7
-        working-directory: ./integration/certs
         env:
           INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
+          INTEGRATION_ROOT_CA: '${{secrets.INTEGRATION_ROOT_CA}}'
         with:
             script: |
                 const fs = require('fs');
                 const path = require('path');
+                const rootCa = process.env.INTEGRATION_ROOT_CA;
+                console.log('rootCa', rootCa);
+                fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', 'rootCA.pem'), rootCa);
                 const certs = JSON.parse(process.env.INTEGRATION_CERTS);
                 for (const [name, cert] of Object.entries(certs)) {
-                  // write file to current dir
-                    fs.writeFileSync(path.join(__dirname, name), cert, 'utf8');
+                    fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', name), cert);
                 }
 
       - name: LS certs
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration/certs
-        run: ls -la && cat sessions-key.pem
+        run: ls -la && pwd
 
       - name: Run Integration Tests
         if: ${{ steps.task-status.outputs.affected == '1' }}
         id: integration-tests
-        run: npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
+        run: sudo --preserve-env npx turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS --only -- --project=${{ matrix.test-project }}
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
@@ -234,7 +231,8 @@ jobs:
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
-          NODE_EXTRA_CA_CERTS: ${{ secrets.INTEGRATION_ROOT_CA }}
+          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
+
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}

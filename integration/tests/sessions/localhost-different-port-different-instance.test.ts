@@ -50,6 +50,9 @@ test.describe('multiple apps running on localhost using different Clerk instance
     await u[0].po.expect.toBeSignedIn();
     const tab0User = await u[0].po.clerk.getClientSideUser();
 
+    // make sure that the backend user now matches the user we signed in with on the client
+    expect((await u[0].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab0User.id);
+
     // Check that the cookies are set as expected
     let tab0Cookies = (await u[0].page.cookies()).raw();
     // 1 base cookie, 1 suffixed
@@ -62,14 +65,16 @@ test.describe('multiple apps running on localhost using different Clerk instance
     await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
     await u[1].po.expect.toBeSignedIn();
 
+    const tab1User = await u[1].po.clerk.getClientSideUser();
+    expect(tab0User.id).not.toEqual(tab1User.id);
+    // make sure that the backend user now matches the user we signed in with on the client
+    expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab1User.id);
+
     // Get the cookies again, now we have the cookies from the new tab as well
     tab0Cookies = (await u[0].page.cookies()).raw();
     expect(tab0Cookies.filter(c => c.name.startsWith('__session'))).toHaveLength(3);
     expect(tab0Cookies.filter(c => c.name.startsWith('__clerk_db_jwt'))).toHaveLength(3);
     expect(tab0Cookies.filter(c => c.name.startsWith('__client_uat'))).toHaveLength(3);
-
-    const tab1User = await u[1].po.clerk.getClientSideUser();
-    expect(tab0User.id).not.toEqual(tab1User.id);
 
     // Reload tab 0 and make sure that the original user is still signed in
     // This tests that signing-in from the second tab did not interfere with the original session

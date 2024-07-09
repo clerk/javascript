@@ -90,6 +90,8 @@ test.describe('multiple apps same domain for production instances @sessions', ()
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUser);
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
+      // make sure that the backend user now matches the user we signed in with on the client
+      expect((await u[0].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab0User.id);
 
       // Check that the cookies are set as expected
       const tab0Cookies = await u[0].page.cookies();
@@ -111,6 +113,8 @@ test.describe('multiple apps same domain for production instances @sessions', ()
 
       // make sure we're signed in using the same user
       expect(tab0User.id).toEqual(tab1User.id);
+      // make sure that the backend user now matches the user we signed in with on the client
+      expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab1User.id);
 
       const tab1Cookies = await u[1].page.cookies();
 
@@ -213,6 +217,8 @@ test.describe('multiple apps same domain for production instances @sessions', ()
       await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
       await u[0].po.expect.toBeSignedIn();
       const tab0User = await u[0].po.clerk.getClientSideUser();
+      // make sure that the backend user now matches the user we signed in with on the client
+      expect((await u[0].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab0User.id);
 
       // Check that the cookies are set as expected
       const tab0Cookies = await u[0].page.cookies();
@@ -234,8 +240,9 @@ test.describe('multiple apps same domain for production instances @sessions', ()
       await u[1].po.signIn.goTo();
       await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
       await u[1].po.expect.toBeSignedIn();
-
       const tab1User = await u[1].po.clerk.getClientSideUser();
+      // make sure that the backend user now matches the user we signed in with on the client
+      expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab1User.id);
       // We have two different users at this point
       expect(tab0User.id).not.toEqual(tab1User.id);
 
