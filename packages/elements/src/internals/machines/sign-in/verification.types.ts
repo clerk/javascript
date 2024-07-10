@@ -3,6 +3,7 @@ import type { SignInFactor } from '@clerk/types';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
+import type { SignInStrategyName } from '~/internals/machines/shared';
 
 import type { SignInRouterMachineActorRef } from './router.types';
 
@@ -21,8 +22,8 @@ export type SignInVerificationTags =
 export type SignInVerificationSubmitEvent = { type: 'SUBMIT' };
 export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
 export type SignInVerificationRetryEvent = { type: 'RETRY' };
-export type SignInVerificationStrategyRegisterEvent = { type: 'STRATEGY.REGISTER'; factor: SignInFactor };
-export type SignInVerificationStrategyUnregisterEvent = { type: 'STRATEGY.UNREGISTER'; factor: SignInFactor };
+export type SignInVerificationStrategyRegisterEvent = { type: 'STRATEGY.REGISTER'; factor: SignInStrategyName };
+export type SignInVerificationStrategyUnregisterEvent = { type: 'STRATEGY.UNREGISTER'; factor: SignInStrategyName };
 
 export type SignInVerificationEvents =
   | ErrorActorEvent
@@ -47,7 +48,7 @@ export interface SignInVerificationContext {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
   loadingStep: 'verifications';
-  registeredStrategies: Set<SignInFactor>;
+  registeredStrategies: Set<SignInStrategyName>;
   resendable: boolean;
   resendableAfter: number;
 }
