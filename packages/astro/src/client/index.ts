@@ -1,4 +1,5 @@
-import { waitForClerkScript } from '../internal/utils/loadClerkJSScript';
+import { loadClerkJsScript } from '@clerk/shared';
+
 import { $clerk, $csrState } from '../stores/internal';
 import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
@@ -14,7 +15,7 @@ export const createClerkInstance = runOnce(createClerkInstanceInternal);
 export async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams) {
   let clerkJSInstance = window.Clerk;
   if (!clerkJSInstance) {
-    await waitForClerkScript();
+    await loadClerkJsScript(options as any);
 
     if (!window.Clerk) {
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');

@@ -8,7 +8,6 @@ import type { APIContext } from 'astro';
 // @ts-ignore
 import { authAsyncStorage } from '#async-local-storage';
 
-import { buildClerkHotloadScript } from './build-clerk-hotload-script';
 import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
 import { getAuth } from './get-auth';
@@ -263,7 +262,6 @@ async function decorateRequest(
     const clerkSafeEnvVariables = encoder.encode(
       `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${JSON.stringify(getClientSafeEnv(locals))}</script>\n`,
     );
-    const hotloadScript = encoder.encode(buildClerkHotloadScript(locals));
 
     const stream = res.body!.pipeThrough(
       new TransformStream({
@@ -278,10 +276,6 @@ async function decorateRequest(
             controller.enqueue(chunk.slice(0, index));
             controller.enqueue(clerkAstroData);
             controller.enqueue(clerkSafeEnvVariables);
-
-            if (__HOTLOAD__) {
-              controller.enqueue(hotloadScript);
-            }
 
             controller.enqueue(closingHeadTag);
             controller.enqueue(chunk.slice(index + closingHeadTag.length));

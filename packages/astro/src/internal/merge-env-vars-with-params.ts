@@ -15,12 +15,18 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
   } = params || {};
 
   return {
-    signInUrl: paramSignIn || import.meta.env.PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL,
-    signUpUrl: paramSignUp || import.meta.env.PUBLIC_ASTRO_APP_CLERK_SIGN_UP_URL,
-    isSatellite: paramSatellite || import.meta.env.PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE,
-    proxyUrl: paramProxy || import.meta.env.PUBLIC_ASTRO_APP_CLERK_PROXY_URL,
-    domain: paramDomain || import.meta.env.PUBLIC_ASTRO_APP_CLERK_DOMAIN,
-    publishableKey: paramPublishableKey || import.meta.env.PUBLIC_ASTRO_APP_CLERK_PUBLISHABLE_KEY || '',
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    signInUrl: paramSignIn || import.meta.env.PUBLIC_CLERK_SIGN_IN_URL,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    signUpUrl: paramSignUp || import.meta.env.PUBLIC_CLERK_SIGN_UP_URL,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    isSatellite: paramSatellite || import.meta.env.PUBLIC_CLERK_IS_SATELLITE,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    proxyUrl: paramProxy || import.meta.env.PUBLIC_CLERK_PROXY_URL,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    domain: paramDomain || import.meta.env.PUBLIC_CLERK_DOMAIN,
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    publishableKey: paramPublishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
     ...rest,
   };
 };
