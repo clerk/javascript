@@ -9,12 +9,12 @@ describe('deriveState', () => {
     orgId: 'org_2U330vGHg3llBga8Oi0fzzeNAaG',
   } as InitialState;
 
-  const mockResources: Resources = {
-    client: {} as Resources['client'],
-    user: { id: mockInitialState.userId } as Resources['user'],
-    session: { id: mockInitialState.sessionId } as Resources['session'],
-    organization: { id: mockInitialState.orgId } as Resources['organization'],
-  };
+  const mockResources = {
+    client: {},
+    user: { id: mockInitialState.userId },
+    session: { id: mockInitialState.sessionId },
+    organization: { id: mockInitialState.orgId },
+  } as Resources;
 
   it('uses SSR state when !clerkLoaded and initialState is provided', () => {
     expect(deriveState(false, {} as Resources, mockInitialState)).toEqual(mockInitialState);
