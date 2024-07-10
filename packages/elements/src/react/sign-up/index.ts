@@ -6,3 +6,8 @@ export { SignUpStep as Step } from './step';
 export { SignUpAction as Action } from './action';
 export { SignUpStrategy as Strategy } from './verifications';
 export { SignUpCaptcha as Captcha } from './captcha';
+
+export {
+  SignUpEmailAddressIdentifier as EmailAddressIdentifier,
+  SignUpPhoneNumberIdentifier as PhoneNumberIdentifier,
+} from './identifiers';

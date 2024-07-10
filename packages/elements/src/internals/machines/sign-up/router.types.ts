@@ -1,5 +1,5 @@
 import type { SignUpResource } from '@clerk/types';
-import type { ActorRefFrom, SnapshotFrom, StateMachine } from 'xstate';
+import type { ActorRefFrom, MachineSnapshot, StateMachine } from 'xstate';
 
 import type { TFormMachine } from '~/internals/machines/form';
 import type {
@@ -131,4 +131,12 @@ export type SignInRouterMachineActorRef = ActorRefFrom<TSignUpRouterParentMachin
 
 // ---------------------------------- Snapshot ---------------------------------- //
 
-export type SignUpRouterSnapshot = SnapshotFrom<TSignUpRouterParentMachine>;
+export type SignUpRouterSnapshot = MachineSnapshot<
+  SignUpRouterContext,
+  SignUpRouterEvents,
+  SignUpRouterChildren,
+  SignUpRouterStateValue,
+  SignUpRouterTags,
+  SignUpRouterOuptut,
+  any // TMeta - Introduced in XState 5.12.x
+>;

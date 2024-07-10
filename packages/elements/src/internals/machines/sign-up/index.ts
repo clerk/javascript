@@ -3,6 +3,8 @@ export { SignUpRouterMachine, SignUpRouterMachineId } from './router.machine';
 export { SignUpStartMachine, SignUpStartMachineId } from './start.machine';
 export { SignUpVerificationMachine, SignUpVerificationMachineId } from './verification.machine';
 
+export { SignUpEmailAddressIdentifierSelector, SignUpPhoneNumberIdentifierSelector } from './router.selectors';
+
 export type { TSignUpContinueMachine } from './continue.machine';
 export type { TSignUpRouterMachine } from './router.machine';
 export type { TSignUpStartMachine } from './start.machine';
