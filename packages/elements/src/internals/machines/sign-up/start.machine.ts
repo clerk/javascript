@@ -1,5 +1,5 @@
 import type { SignUpResource } from '@clerk/types';
-import { fromPromise, not, sendTo, setup } from 'xstate';
+import { enqueueActions, fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form';
@@ -14,6 +14,12 @@ import type { SignUpStartSchema } from './start.types';
 export type TSignUpStartMachine = typeof SignUpStartMachine;
 
 export const SignUpStartMachineId = 'SignUpStart';
+
+type PrefillFieldsKeys = keyof Pick<
+  SignUpResource,
+  'username' | 'firstName' | 'lastName' | 'emailAddress' | 'phoneNumber'
+>;
+const PREFILL_FIELDS: PrefillFieldsKeys[] = ['firstName', 'lastName', 'emailAddress', 'username', 'phoneNumber'];
 
 export const SignUpStartMachine = setup({
   actors: {
@@ -56,6 +62,19 @@ export const SignUpStartMachine = setup({
     Pending: {
       tags: ['state:pending'],
       description: 'Waiting for user input',
+      entry: [
+        enqueueActions(({ context, enqueue }) => {
+          PREFILL_FIELDS.forEach(field => {
+            enqueue.sendTo(context.formRef, {
+              type: 'FIELD.ADD',
+              field: {
+                name: field,
+                value: context.parent.getSnapshot().context.clerk?.client?.signUp?.[field] || '',
+              },
+            });
+          });
+        }),
+      ],
       on: {
         SUBMIT: {
           guard: not('isExampleMode'),

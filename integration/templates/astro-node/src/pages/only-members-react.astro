@@ -1,11 +1,11 @@
 ---
-import { Protect } from "@clerk/astro/components/react";
+import { Protect } from "@clerk/astro/client/react";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Page is only accessible by members">
   <div class="w-full flex justify-center flex-col">
-    <Protect role="basic_member">
+    <Protect client:load role="basic_member">
       <Fragment slot="fallback">
         <h1 class="text-2xl text-center">Not a member</h1>
         <a
