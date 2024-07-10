@@ -70,10 +70,22 @@ export const useEnabledThirdPartyProviders = () => {
     };
   });
 
+  const authenticatableOauthStrategies = [
+    ...knownAuthenticatableSocialStrategies,
+    ...customAuthenticatableSocialStrategies,
+  ];
+
+  // Sort the authenticatableOauthStrategies by name
+  authenticatableOauthStrategies.sort((a, b) => {
+    const aName = a.replace(/^oauth_custom_|^oauth_/, '');
+    const bName = b.replace(/^oauth_custom_|^oauth_/, '');
+    return aName.localeCompare(bName);
+  });
+
   return {
     strategies: [...knownSocialProviderStrategies, ...web3FirstFactors, ...customSocialProviderStrategies],
     web3Strategies: [...web3FirstFactors],
-    authenticatableOauthStrategies: [...knownAuthenticatableSocialStrategies, ...customAuthenticatableSocialStrategies],
+    authenticatableOauthStrategies,
     strategyToDisplayData: strategyToDisplayData,
     providerToDisplayData: providerToDisplayData,
   };
