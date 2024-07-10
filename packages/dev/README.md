@@ -21,6 +21,12 @@ npm install --global turbo
 clerk-dev init
 ```
 
+If you need to use a specific instance, you can add additional instances to the `~/.config/clerk/dev.json` file and switch between them with:
+
+```sh
+clerk-dev set-instance instanceName
+```
+
 Run the following in your primary checkout of `clerk/javascript`.
 
 ```sh

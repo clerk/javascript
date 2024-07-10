@@ -2,6 +2,7 @@ import { Command } from 'commander';
 
 import { config } from './commands/config.js';
 import { init } from './commands/init.js';
+import { setInstance } from './commands/set-instance.js';
 import { setRoot } from './commands/set-root.js';
 import { setup } from './commands/setup.js';
 import { watch } from './commands/watch.js';
@@ -32,6 +33,14 @@ export default function cli() {
     )
     .action(async () => {
       await setRoot();
+    });
+
+  program
+    .command('set-instance')
+    .description('Set the active instance to the provided instance name')
+    .argument('<name>', 'name of instance listed in dev.json')
+    .action(async instance => {
+      await setInstance({ instance });
     });
 
   program
