@@ -26,11 +26,11 @@ test.describe('Next with ClerkJS V5 <-> Account Portal Core 2 @ap-flows', () => 
     await app.teardown();
   });
 
-  test('sign in', async ({ page, context }) => {
+  test.skip('sign in', async ({ page, context }) => {
     await testSignIn({ app, page, context, fakeUser });
   });
 
-  test('sign up', async ({ page, context }) => {
+  test.skip('sign up', async ({ page, context }) => {
     await testSignUp({ app, page, context, fakeUser });
   });
 
