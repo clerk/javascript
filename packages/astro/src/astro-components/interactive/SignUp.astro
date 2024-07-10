@@ -1,0 +1,8 @@
+---
+import type { SignUpProps } from "@clerk/types";
+type Props = SignUpProps
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro'
+---
+
+<InternalUIComponentRenderer {...Astro.props} component="sign-up" />

@@ -1,5 +1,34 @@
 # Change Log
 
+## 1.1.2
+
+### Patch Changes
+
+- Ensure client cookie URLs resolve appropriately ([#3658](https://github.com/clerk/javascript/pull/3658)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`427fcdeaa`](https://github.com/clerk/javascript/commit/427fcdeaaba4e77273be29b4d7cca43f9aa18693)]:
+  - @clerk/clerk-react@5.2.7
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`d6b5006c4`](https://github.com/clerk/javascript/commit/d6b5006c4cc1b6f07bb3a6832b4ec6e65ea15814), [`3dc5b3d6c`](https://github.com/clerk/javascript/commit/3dc5b3d6cef2bd661d0588a007850660c5b969b8), [`3b2d7d977`](https://github.com/clerk/javascript/commit/3b2d7d9778ecfe4ef9f03c4ff73ce2e0b60e2eae)]:
+  - @clerk/clerk-js@5.8.0
+  - @clerk/clerk-react@5.2.6
+  - @clerk/shared@2.3.2
+
+## 1.1.0
+
+### Minor Changes
+
+- Poll for active session changes allowing for synchronizing newly authenticated users after the extension has been opened. ([#3616](https://github.com/clerk/javascript/pull/3616)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`2bef41ab0`](https://github.com/clerk/javascript/commit/2bef41ab05e212cc986c0891fa065037df936a8d)]:
+  - @clerk/clerk-js@5.7.2
+
 ## 1.0.19
 
 ### Patch Changes

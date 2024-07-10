@@ -21,6 +21,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   {
     alternativeFieldTrigger,
     label = 'Phone number',
+    name = 'phoneNumber',
     hintText = 'Optional',
     locationBasedCountryIso,
     onChange,
@@ -85,7 +86,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
 
   return (
     <Common.Field
-      name='phoneNumber'
+      name={name}
       asChild
     >
       <Field.Root>

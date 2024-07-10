@@ -4,9 +4,10 @@ import type React from 'react';
 import { useCallback } from 'react';
 import type { ActorRef } from 'xstate';
 
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { SignInRouterEvents } from '~/internals/machines/sign-in';
 import type { SignUpRouterEvents } from '~/internals/machines/sign-up';
-import type { UseThirdPartyProviderReturn } from '~/react/common/providers';
+import type { UseThirdPartyProviderReturn } from '~/react/common/connections';
 import {
   getEnabledThirdPartyProviders,
   isAuthenticatableOauthStrategy,
@@ -53,8 +54,10 @@ export const useThirdPartyProvider = <
   );
 
   if (isProviderEnabled === false) {
-    console.error(
-      `Please ensure that ${provider} is enabled for your project. Go to your Clerk dashboard and navigate to "User & Authentication" > "Social Connections" to enable it.`,
+    const dashboardPath = `https://dashboard.clerk.com/last-active?path=/user-authentication/${provider === 'metamask' ? 'web3' : 'social-connections'}`;
+
+    throw new ClerkElementsRuntimeError(
+      `You have used <Connection name="${provider}"> which isn't enabled for your project. Enable ${details.name} in your Clerk dashboard: ${dashboardPath}`,
     );
   }
 

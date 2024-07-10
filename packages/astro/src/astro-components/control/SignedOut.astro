@@ -1,0 +1,6 @@
+---
+const { userId } = Astro.locals.auth()
+---
+
+
+{ !userId ? <slot /> : null }

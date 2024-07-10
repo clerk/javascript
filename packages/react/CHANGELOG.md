@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.2.7
+
+### Patch Changes
+
+- Fix race condition on updating ClerkProvider props before ClerkJS has loaded ([#3655](https://github.com/clerk/javascript/pull/3655)) by [@anagstef](https://github.com/anagstef)
+
+## 5.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`d6b5006c4`](https://github.com/clerk/javascript/commit/d6b5006c4cc1b6f07bb3a6832b4ec6e65ea15814)]:
+  - @clerk/types@4.7.0
+  - @clerk/shared@2.3.2
+
 ## 5.2.5
 
 ### Patch Changes

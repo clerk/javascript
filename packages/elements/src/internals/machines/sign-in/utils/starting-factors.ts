@@ -1,7 +1,7 @@
 // These utilities are ported from: packages/clerk-js/src/ui/components/SignIn/utils.ts
 // They should be functionally identical.
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
-import type { PreferredSignInStrategy, SignInFactor } from '@clerk/types';
+import type { PreferredSignInStrategy, SignInFactor, SignInFirstFactor, SignInSecondFactor } from '@clerk/types';
 
 const ORDER_WHEN_PASSWORD_PREFERRED = ['passkey', 'password', 'email_link', 'email_code', 'phone_code'] as const;
 const ORDER_WHEN_OTP_PREFERRED = ['email_link', 'email_code', 'phone_code', 'passkey', 'password'] as const;
@@ -14,10 +14,10 @@ const findFactorForIdentifier = (i: string | null) => (f: SignInFactor) => {
 // The algorithm can be found at
 // https://www.notion.so/clerkdev/Implement-sign-in-alt-methods-e6e60ffb644645b3a0553b50556468ce
 export function determineStartingSignInFactor(
-  firstFactors: SignInFactor[],
+  firstFactors: SignInFirstFactor[],
   identifier: string | null,
   preferredSignInStrategy?: PreferredSignInStrategy,
-): SignInFactor | null {
+) {
   if (!firstFactors || firstFactors.length === 0) {
     return null;
   }
@@ -27,7 +27,7 @@ export function determineStartingSignInFactor(
     : determineStrategyWhenOTPIsPreferred(firstFactors, identifier);
 }
 
-function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
+function findPasskeyStrategy(factors: SignInFirstFactor[]) {
   if (isWebAuthnSupported()) {
     const passkeyFactor = factors.find(({ strategy }) => strategy === 'passkey');
 
@@ -38,10 +38,7 @@ function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
   return null;
 }
 
-function determineStrategyWhenPasswordIsPreferred(
-  factors: SignInFactor[],
-  identifier: string | null,
-): SignInFactor | null {
+function determineStrategyWhenPasswordIsPreferred(factors: SignInFirstFactor[], identifier: string | null) {
   const passkeyFactor = findPasskeyStrategy(factors);
   if (passkeyFactor) {
     return passkeyFactor;
@@ -69,7 +66,7 @@ function determineStrategyWhenPasswordIsPreferred(
   return null;
 }
 
-function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier: string | null): SignInFactor | null {
+function determineStrategyWhenOTPIsPreferred(factors: SignInFirstFactor[], identifier: string | null) {
   const passkeyFactor = findPasskeyStrategy(factors);
   if (passkeyFactor) {
     return passkeyFactor;
@@ -97,7 +94,7 @@ function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier
 }
 
 // The priority of second factors is: TOTP -> Phone code -> any other factor
-export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[]): SignInFactor | null {
+export function determineStartingSignInSecondFactor(secondFactors: SignInSecondFactor[]) {
   if (!secondFactors || secondFactors.length === 0) {
     return null;
   }

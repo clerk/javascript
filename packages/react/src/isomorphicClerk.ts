@@ -84,6 +84,7 @@ type IsomorphicLoadedClerk = Without<
   | 'buildAfterSignUpUrl'
   | 'buildAfterSignInUrl'
   | 'buildAfterSignOutUrl'
+  | 'buildAfterMultiSessionSingleSignOutUrl'
   | 'buildUrlWithAuth'
   | 'handleRedirectCallback'
   | 'handleGoogleOneTapCallback'
@@ -132,6 +133,8 @@ type IsomorphicLoadedClerk = Without<
   buildAfterSignUpUrl: () => string | void;
   // TODO: Align return type
   buildAfterSignOutUrl: () => string | void;
+  // TODO: Align return type
+  buildAfterMultiSessionSingleSignOutUrl: () => string | void;
   // TODO: Align optional props
   mountUserButton: (node: HTMLDivElement, props: UserButtonProps) => void;
   mountOrganizationList: (node: HTMLDivElement, props: OrganizationListProps) => void;
@@ -309,6 +312,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  buildAfterMultiSessionSingleSignOutUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildAfterMultiSessionSingleSignOutUrl() || '';
+    if (this.clerkjs && this.#loaded) {
+      return callback();
+    } else {
+      this.premountMethodCalls.set('buildAfterMultiSessionSingleSignOutUrl', callback);
+    }
+  };
+
   buildUserProfileUrl = (): string | void => {
     const callback = () => this.clerkjs?.buildUserProfileUrl() || '';
     if (this.clerkjs && this.#loaded) {
@@ -356,9 +368,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   #waitForClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk> {
     return new Promise<HeadlessBrowserClerk | BrowserClerk>(resolve => {
-      if (this.#loaded) {
-        resolve(this.clerkjs!);
-      }
       this.addOnLoaded(() => resolve(this.clerkjs!));
     });
   }
@@ -579,12 +588,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  __unstable__updateProps = (props: any): any => {
+  __unstable__updateProps = async (props: any): Promise<void> => {
+    const clerkjs = await this.#waitForClerkJS();
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
-    if (this.clerkjs && '__unstable__updateProps' in this.clerkjs) {
-      (this.clerkjs as any).__unstable__updateProps(props);
-    } else {
-      return undefined;
+    if (clerkjs && '__unstable__updateProps' in clerkjs) {
+      return (clerkjs as any).__unstable__updateProps(props);
     }
   };
 

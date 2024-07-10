@@ -128,6 +128,7 @@ describe('OrganizationSwitcher', () => {
         f.withOrganizations();
         f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1', 'Org2'] });
       });
+      fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
       fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
         Promise.resolve({

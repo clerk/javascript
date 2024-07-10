@@ -60,6 +60,7 @@ import type {
 
 import type { MountComponentRenderer } from '../ui/Components';
 import {
+  ALLOWED_PROTOCOLS,
   buildURL,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
@@ -731,7 +732,10 @@ export class Clerk implements ClerkInterface {
     }
 
     // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
-    await newSession?.getToken();
+    const token = await newSession?.getToken();
+    if (!token) {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
@@ -782,8 +786,10 @@ export class Clerk implements ClerkInterface {
 
     let toURL = new URL(to, window.location.href);
 
-    if (toURL.protocol !== 'http:' && toURL.protocol !== 'https:') {
-      console.warn('Clerk: Not a valid protocol. Redirecting to /');
+    if (!ALLOWED_PROTOCOLS.includes(toURL.protocol)) {
+      console.warn(
+        `Clerk: "${toURL.protocol}" is not a valid protocol. Redirecting to "/" instead. If you think this is a mistake, please open an issue.`,
+      );
       toURL = new URL('/', window.location.href);
     }
 
@@ -865,6 +871,14 @@ export class Clerk implements ClerkInterface {
     }
 
     return this.buildUrlWithAuth(this.#options.afterSignOutUrl);
+  }
+
+  public buildAfterMultiSessionSingleSignOutUrl(): string {
+    if (!this.#options.afterMultiSessionSingleSignOutUrl) {
+      return this.buildAfterSignOutUrl();
+    }
+
+    return this.buildUrlWithAuth(this.#options.afterMultiSessionSingleSignOutUrl);
   }
 
   public buildCreateOrganizationUrl(): string {

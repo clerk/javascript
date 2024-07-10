@@ -5,6 +5,7 @@ export type ClerkFieldId =
   | 'code'
   | 'confirmPassword'
   | 'currentPassword'
+  | 'backup_code' // special case of `code`
   | 'emailAddress'
   | 'firstName'
   | 'identifier'

@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.4.7
+
+### Patch Changes
+
+- Updated dependencies [[`d6b5006c4`](https://github.com/clerk/javascript/commit/d6b5006c4cc1b6f07bb3a6832b4ec6e65ea15814)]:
+  - @clerk/types@4.7.0
+
+## 2.4.6
+
+### Patch Changes
+
+- Add Italian localizations ([#3608](https://github.com/clerk/javascript/pull/3608)) by [@mazzasaverio](https://github.com/mazzasaverio)
+
 ## 2.4.5
 
 ### Patch Changes

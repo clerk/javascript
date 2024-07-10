@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.7.0
+
+### Minor Changes
+
+- Deprecate `afterSignOutUrl` and `afterMultiSessionSingleSignOutUrl` from UserButton. ([#3544](https://github.com/clerk/javascript/pull/3544)) by [@panteliselef](https://github.com/panteliselef)
+
+  Developers can now configure these directly in `ClerkProvider` and have them work properly without in UserButton, UserProfile and in impersonation mode.
+
 ## 4.6.1
 
 ### Patch Changes
