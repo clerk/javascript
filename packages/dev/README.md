@@ -33,6 +33,12 @@ Run the following in your primary checkout of `clerk/javascript`.
 clerk-dev set-root
 ```
 
+If you need to open the configuration file, set the environment variable `EDITOR` or `VISUAL` to the path to your editor and run:
+
+```sh
+clerk-dev config
+```
+
 ## Per-Project Setup
 
 ```sh
