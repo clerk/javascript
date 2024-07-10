@@ -122,7 +122,7 @@ runs:
         restore-keys: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-
 
     - name: Install NPM Dependencies
-      if: steps.cache-npm.outputs.cache-hit != 'true'
+      # if: steps.cache-npm.outputs.cache-hit != 'true'
       run: npm ci --prefer-offline --audit=false --fund=false  --verbose
       shell: bash
 
