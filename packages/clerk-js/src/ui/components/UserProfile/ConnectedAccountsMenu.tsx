@@ -2,7 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
-import { InitialIcon } from '../../common';
+import { ProviderInitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState } from '../../elements';
@@ -74,7 +74,12 @@ export const AddConnectedAccount = () => {
             sx={theme => ({ width: theme.sizes.$4 })}
           />
         ) : (
-          <InitialIcon initials={strategyToDisplayData[strategy].name[0]} />
+          <ProviderInitialIcon
+            id={strategyToDisplayData[strategy].id}
+            value={strategyToDisplayData[strategy].name}
+            isLoading={card.loadingMetadata === strategy}
+            isDisabled={card.isLoading}
+          />
         );
 
         return (

@@ -4,7 +4,7 @@ export * from './CalloutWithAction';
 export * from './forms';
 export * from './Gate';
 export * from './InfiniteListSpinner';
-export * from './InitialIcon';
+export * from './ProviderInitialIcon';
 export * from './redirects';
 export * from './verification';
 export * from './withRedirect';

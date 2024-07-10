@@ -2,7 +2,7 @@ import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
 
-import { InitialIcon } from '../common';
+import { ProviderInitialIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
 import {
   Button,
@@ -138,7 +138,12 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
               />
             ) : (
-              <InitialIcon initials={strategyToDisplayData[strategy].name[0]} />
+              <ProviderInitialIcon
+                id={strategyToDisplayData[strategy].id}
+                value={strategyToDisplayData[strategy].name}
+                isLoading={card.loadingMetadata === strategy}
+                isDisabled={card.isLoading}
+              />
             );
 
             return (

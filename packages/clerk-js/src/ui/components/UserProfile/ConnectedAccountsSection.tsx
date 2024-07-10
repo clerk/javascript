@@ -2,7 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/types';
 
 import { appendModalState } from '../../../utils';
-import { InitialIcon } from '../../common';
+import { ProviderInitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
@@ -70,7 +70,10 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                   sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
                 />
               ) : (
-                <InitialIcon initials={providerToDisplayData[account.provider].name[0]} />
+                <ProviderInitialIcon
+                  id={account.provider}
+                  value={providerToDisplayData[account.provider].name}
+                />
               );
 
             return (
