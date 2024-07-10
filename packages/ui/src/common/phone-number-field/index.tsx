@@ -75,6 +75,23 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   };
 
   React.useEffect(callOnChangeProp, [numberWithCode, onChange]);
+
+  // When the value is prefilled when returning to the start step from the verification step
+  // we need to parse the value and set the country and number
+  React.useEffect(() => {
+    const inputValue = inputRef.current?.value;
+    if (!inputValue) {
+      return;
+    }
+    if (inputValue.includes('+')) {
+      setNumberAndIso(inputValue);
+      setSelectedCountry(countryOptions.find(c => c.iso === iso) || countryOptions[0]);
+    } else {
+      setNumber(inputValue);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   React.useEffect(() => {
     if (isOpen) {
       commandInputRef.current?.focus();
