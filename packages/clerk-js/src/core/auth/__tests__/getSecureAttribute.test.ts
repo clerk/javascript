@@ -20,6 +20,15 @@ describe('getSecureAttribute', () => {
     expect(getSecureAttribute('None')).toBe(true);
   });
 
+  it('returns false if the protocol is not https and the SameSite is not None', () => {
+    windowSpy.mockImplementation(() => ({
+      location: new URL('http://www.clerk.com'),
+      safari: undefined,
+      isSecureContext: undefined,
+    }));
+    expect(getSecureAttribute('Lax')).toBe(false);
+  });
+
   it('returns false if the protocol is not https and the browser is Safari', () => {
     windowSpy.mockImplementation(() => ({
       location: new URL('http://www.clerk.com'),
@@ -72,5 +81,14 @@ describe('getSecureAttribute', () => {
       isSecureContext: undefined,
     }));
     expect(getSecureAttribute('None')).toBe(false);
+  });
+
+  it('returns false in case window.safari is undefined and isSecureContext is true on localhost for Lax cookie', () => {
+    windowSpy.mockImplementation(() => ({
+      location: new URL('http://localhost'),
+      safari: undefined,
+      isSecureContext: true,
+    }));
+    expect(getSecureAttribute('Lax')).toBe(false);
   });
 });

@@ -9,6 +9,11 @@ export const getSecureAttribute = (sameSite: SameSiteAttributeType): boolean => 
     return true;
   }
 
+  // If the cookie is not SameSite=None, then the Secure attribute is not required
+  if (sameSite !== 'None') {
+    return false;
+  }
+
   // This is because Safari does not support the Secure attribute on localhost
   if (typeof (window as any).safari !== 'undefined') {
     return false;
@@ -21,5 +26,5 @@ export const getSecureAttribute = (sameSite: SameSiteAttributeType): boolean => 
     return window.isSecureContext;
   }
 
-  return window.location.hostname === 'localhost' && sameSite === 'None';
+  return window.location.hostname === 'localhost';
 };
