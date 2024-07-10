@@ -45,6 +45,12 @@ clerk-dev config
 clerk-dev setup
 ```
 
+If you do not want to customize the `clerkJSUrl`, pass `--no-js`.
+
+```sh
+clerk-dev setup --no-js
+```
+
 ## Running
 
 ```sh
@@ -55,4 +61,10 @@ clerk-dev watch
 
 ```sh
 clerk-dev watch --js
+```
+
+If you do not want to spawn the watcher for `@clerk/clerk-js`, you can instead pass `--no-js`.
+
+```sh
+clerk-dev watch --no-js
 ```
