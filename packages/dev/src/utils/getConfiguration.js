@@ -21,7 +21,7 @@ import { join } from 'node:path';
 export const CONFIG_FILE = join(homedir(), '.config', 'clerk', 'dev.json');
 
 /**
- *
+ * Gets the contents of the clerk-dev configuration file.
  * @returns {Promise<Configuration>}
  */
 export async function getConfiguration() {

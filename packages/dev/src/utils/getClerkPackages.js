@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path';
 import { glob } from 'glob';
 
 /**
- *
+ * Generates an object with keys of package names and values of absolute paths to the package folder.
  * @returns {Promise<Record<string, string>>}
  */
 export async function getClerkPackages() {

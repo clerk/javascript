@@ -7,7 +7,8 @@ export function getCLIRoot() {
 }
 
 /**
- *
+ * Gets the `root` property of the clerk-dev configuration file, falling back to the folder containing the source
+ * for the running instance of clerk-dev.
  * @returns {Promise<string>}
  */
 export async function getMonorepoRoot() {

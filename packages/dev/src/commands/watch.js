@@ -47,6 +47,8 @@ export async function watch({ js }) {
   }
 
   if (typeof js === 'undefined') {
+    // On macOS, we spawn a new Terminal.app instance containing the watcher for clerk-js. This is because clerk-js is
+    // not declared as a dependency for any other packages, so Turborepo is unable to automatically start it.
     if (process.platform === 'darwin') {
       spawn('osascript', [
         '-e',

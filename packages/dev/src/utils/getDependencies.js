@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 /**
- *
+ * Gets the `dependencies` and `devDependencies` entries of the provided package.json.
  * @param {string} pathToPackageJSON
  * @returns {Promise<{ dependencies?: Record<string, string>, devDependencies?: Record<string, string>}>}
  */
