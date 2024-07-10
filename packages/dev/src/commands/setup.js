@@ -11,19 +11,19 @@ import { getConfiguration } from '../utils/getConfiguration.js';
 import { getDependencies } from '../utils/getDependencies.js';
 
 /**
- *
+ * Returns `true` if the cwd contains a file named `filename`, otherwise returns `false`.
  * @param {string} filename
- * @returns
+ * @returns {boolean}
  */
 function hasFile(filename) {
   return existsSync(join(process.cwd(), filename));
 }
 
 /**
- *
+ * Returns `true` if `packages` contains a `dependency` key, otherwise `false`.
  * @param {Record<string, string> | undefined} packages
  * @param {string} dependency
- * @returns
+ * @returns {boolean}
  */
 function hasPackage(packages, dependency) {
   if (!packages) {
@@ -32,6 +32,10 @@ function hasPackage(packages, dependency) {
   return dependency in packages;
 }
 
+/**
+ * Returns a string corresponding to the framework detected in the cwd.
+ * @returns {Promise<string>}
+ */
 async function detectFramework() {
   const { dependencies, devDependencies } = await getDependencies(join(process.cwd(), 'package.json'));
 
@@ -54,9 +58,9 @@ async function detectFramework() {
 }
 
 /**
- *
+ * Returns the active instance of the provided `configuration`.
  * @param {import('../utils/getConfiguration.js').Configuration} configuration
- * @returns
+ * @returns {Promise<import('../utils/getConfiguration.js').InstanceConfiguration>}
  */
 async function getInstanceConfiguration(configuration) {
   const { activeInstance, instances } = configuration;
@@ -64,9 +68,9 @@ async function getInstanceConfiguration(configuration) {
 }
 
 /**
- *
+ * Generates a .env file string.
  * @param {Record<string, string>} envConfiguration
- * @returns
+ * @returns {string}
  */
 function buildEnvFile(envConfiguration) {
   return (
@@ -77,9 +81,9 @@ function buildEnvFile(envConfiguration) {
 }
 
 /**
- *
+ * Parses the file at `filename` with dotenv.
  * @param {string} filename
- * @returns
+ * @returns {Promise<import('dotenv').DotenvParseOutput>}
  */
 async function readEnvFile(filename) {
   const contents = await readFile(filename, 'utf-8');
@@ -88,6 +92,24 @@ async function readEnvFile(filename) {
 }
 
 /**
+ * Write the provided `config` to the .env file at `filename`, merging with any existing entries.
+ * @param {string} filename
+ * @param {Record<string, string>} config
+ */
+async function mergeEnvFiles(filename, config) {
+  const envFileExists = hasFile(filename);
+  const existingEnv = envFileExists ? await readEnvFile(filename) : {};
+  await writeFile(
+    join(process.cwd(), filename),
+    buildEnvFile({
+      ...existingEnv,
+      ...config,
+    }),
+  );
+}
+
+/**
+ * Installs the monorepo versions of the Clerk dependencies listed in the `package.json` file of the cwd.
  * @returns {Promise<void>}
  */
 async function linkDependencies() {
@@ -140,41 +162,26 @@ export async function setup({ js = true }) {
   switch (framework) {
     case 'nextjs': {
       console.log('Next.js detected, writing environment variables to .env.local...');
-      const existingEnv = await readEnvFile('.env.local');
-      await writeFile(
-        join(process.cwd(), '.env.local'),
-        buildEnvFile({
-          ...existingEnv,
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: instance.publishableKey,
-          CLERK_SECRET_KEY: instance.secretKey,
-          ...(js ? { NEXT_PUBLIC_CLERK_JS_URL: 'http://localhost:4000/npm/clerk.browser.js' } : {}),
-        }),
-      );
+      await mergeEnvFiles('.env.local', {
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: instance.publishableKey,
+        CLERK_SECRET_KEY: instance.secretKey,
+        ...(js ? { NEXT_PUBLIC_CLERK_JS_URL: 'http://localhost:4000/npm/clerk.browser.js' } : {}),
+      });
       break;
     }
     case 'remix': {
       console.log('Remix detected, writing environment variables to .env...');
-      const existingEnv = await readEnvFile('.env');
-      await writeFile(
-        join(process.cwd(), '.env'),
-        buildEnvFile({
-          ...existingEnv,
-          CLERK_PUBLISHABLE_KEY: instance.publishableKey,
-          CLERK_SECRET_KEY: instance.secretKey,
-        }),
-      );
+      await mergeEnvFiles('.env', {
+        CLERK_PUBLISHABLE_KEY: instance.publishableKey,
+        CLERK_SECRET_KEY: instance.secretKey,
+      });
       break;
     }
     case 'vite': {
       console.log('Vite detected, writing environment variables to .env...');
-      const existingEnv = await readEnvFile('.env');
-      await writeFile(
-        join(process.cwd(), '.env'),
-        buildEnvFile({
-          ...existingEnv,
-          VITE_CLERK_PUBLISHABLE_KEY: instance.publishableKey,
-        }),
-      );
+      await mergeEnvFiles('.env', {
+        VITE_CLERK_PUBLISHABLE_KEY: instance.publishableKey,
+      });
 
       if (js) {
         console.log('Adding clerkJSUrl to ClerkProvider...');
