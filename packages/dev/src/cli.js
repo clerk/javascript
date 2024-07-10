@@ -2,7 +2,6 @@ import { Command } from 'commander';
 
 import { config } from './commands/config.js';
 import { init } from './commands/init.js';
-import { install } from './commands/install.js';
 import { setRoot } from './commands/set-root.js';
 import { setup } from './commands/setup.js';
 import { watch } from './commands/watch.js';
@@ -36,17 +35,10 @@ export default function cli() {
     });
 
   program
-    .command('install')
-    .description(
-      'Install the monorepo versions of Clerk packages listed in the package.json file of the current working directory',
-    )
-    .action(async () => {
-      await install();
-    });
-
-  program
     .command('setup')
-    .description('Perform framework configuration for the current working directory')
+    .description(
+      'Install the monorepo versions of Clerk packages listed in the package.json file and perform framework configuration for the current working directory',
+    )
     .option('--no-js', 'do not customize the clerkJSUrl')
     .action(async ({ js }) => {
       await setup({ js });

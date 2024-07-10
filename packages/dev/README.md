@@ -30,7 +30,6 @@ clerk-dev set-root
 ## Per-Project Setup
 
 ```sh
-clerk-dev install
 clerk-dev setup
 ```
 
