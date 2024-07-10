@@ -3,6 +3,7 @@ import { addYears } from '@clerk/shared/date';
 import { getSuffixedCookieName } from '@clerk/shared/keys';
 
 import { inCrossOriginIframe } from '../../../utils';
+import { getSecureAttribute } from '../getSecureAttribute';
 
 const SESSION_COOKIE_NAME = '__session';
 
@@ -28,7 +29,7 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
   const set = (token: string) => {
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
-    const secure = window.location.protocol === 'https:';
+    const secure = getSecureAttribute(sameSite);
 
     suffixedSessionCookie.set(token, { expires, sameSite, secure });
     sessionCookie.set(token, { expires, sameSite, secure });

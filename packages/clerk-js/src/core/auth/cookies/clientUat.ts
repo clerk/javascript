@@ -5,6 +5,7 @@ import type { ClientResource } from '@clerk/types';
 
 import { inCrossOriginIframe } from '../../../utils';
 import { getCookieDomain } from '../getCookieDomain';
+import { getSecureAttribute } from '../getSecureAttribute';
 
 const CLIENT_UAT_COOKIE_NAME = '__client_uat';
 
@@ -31,7 +32,7 @@ export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHand
   const set = (client: ClientResource | undefined) => {
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Strict';
-    const secure = window.location.protocol === 'https:';
+    const secure = getSecureAttribute(sameSite);
     const domain = getCookieDomain();
 
     // '0' indicates the user is signed out
