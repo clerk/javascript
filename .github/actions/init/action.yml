@@ -117,8 +117,8 @@ runs:
       uses: actions/cache/restore@v4
       id: cache-npm
       with:
-        path: ./node_modules
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('**/package-lock.json') }}-v3
+        path: /home/runner/.npm
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('**/package-lock.json') }}-v4
         restore-keys: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-
 
     - name: Install NPM Dependencies
@@ -131,7 +131,7 @@ runs:
       if: steps.cache-npm.outputs.cache-hit != 'true'
       with:
         path: ./node_modules
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('**/package-lock.json') }}-v3
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-node-modules-${{ hashFiles('**/package-lock.json') }}-v4
 
     - name: Get Playwright Version
       if: inputs.playwright-enabled == 'true'
