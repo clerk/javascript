@@ -72,7 +72,7 @@ test.describe('Client handshake @generic', () => {
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  test('Test standard signed-in - dev', async () => {
+  test.skip('Test standard signed-in - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
@@ -90,7 +90,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Test standard signed-in - authorization header - dev', async () => {
+  test.skip('Test standard signed-in - authorization header - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });

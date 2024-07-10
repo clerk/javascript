@@ -20,7 +20,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withEmailCodes'] })('test ast
 
   test('Clerk client loads on first visit and Sign In button renders', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    await u.page.goToStart();
+    await u.page.goToAppHome();
 
     await u.page.waitForClerkJsLoaded();
 
