@@ -46,7 +46,7 @@
     "react-aria-components": "^1.2.1"
   },
   "devDependencies": {
-    "@clerk/eslint-config-custom": "^0.0.2",
+    "@clerk/eslint-config-custom": "*",
     "@clerk/tailwindcss-transformer": "*",
     "concurrently": "^8.2.2"
   }
