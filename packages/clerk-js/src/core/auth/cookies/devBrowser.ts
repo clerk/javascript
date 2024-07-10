@@ -3,6 +3,7 @@ import { addYears } from '@clerk/shared/date';
 import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
 
 import { inCrossOriginIframe } from '../../../utils';
+import { getSecureAttribute } from '../getSecureAttribute';
 
 export type DevBrowserCookieHandler = {
   set: (jwt: string) => void;
@@ -24,7 +25,7 @@ export const createDevBrowserCookie = (): DevBrowserCookieHandler => {
   const set = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
-    const secure = window.location.protocol === 'https:';
+    const secure = getSecureAttribute(sameSite);
 
     return devBrowserCookie.set(jwt, {
       expires,
