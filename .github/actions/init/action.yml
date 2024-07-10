@@ -111,7 +111,7 @@ runs:
 
     - name: NPM debug
       shell: bash
-      run: npm config ls
+      run: npm config ls -l
 
     - name: Restore node_modules
       uses: actions/cache/restore@v4
