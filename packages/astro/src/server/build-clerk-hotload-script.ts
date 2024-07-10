@@ -1,4 +1,4 @@
-import { clerkJsScriptUrl } from '@clerk/shared/loadClerkJsScript';
+import { buildClerkJsScriptAttributes, clerkJsScriptUrl } from '@clerk/shared/loadClerkJsScript';
 import type { APIContext } from 'astro';
 
 import { getSafeEnv } from './get-safe-env';
@@ -7,6 +7,7 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   const publishableKey = getSafeEnv(locals).pk!;
   const proxyUrl = getSafeEnv(locals).proxyUrl!;
   const domain = getSafeEnv(locals).domain!;
+
   const scriptSrc = clerkJsScriptUrl({
     clerkJSUrl: getSafeEnv(locals).clerkJsUrl,
     clerkJSVariant: getSafeEnv(locals).clerkJsVariant,
@@ -15,14 +16,22 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
     proxyUrl,
     publishableKey,
   });
+
+  const attributes = buildClerkJsScriptAttributes({
+    publishableKey,
+    proxyUrl,
+    domain,
+  });
+  const attributesString = Object.entries(attributes)
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(' ');
+
   return `
   <script src="${scriptSrc}"
   data-clerk-script
   async
   crossOrigin='anonymous'
-  ${publishableKey ? `data-clerk-publishable-key="${publishableKey}"` : ``}
-  ${proxyUrl ? `data-clerk-proxy-url="${proxyUrl}"` : ``}
-  ${domain ? `data-clerk-domain="${domain}"` : ``}
+  ${attributesString}
   ></script>\n`;
 }
 
