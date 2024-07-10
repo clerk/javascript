@@ -46,11 +46,18 @@ export function JWTHandler(store: StorageCache, { frontendApi, ...cookieParams }
   };
 
   /**
+   * Removes the JWT value to the active store.
+   */
+  const clear = async () => {
+    await store.remove(CACHE_KEY);
+  };
+
+  /**
    * Polls for the synced session JWT via the get() function.
    *
    * @param delayInMs: Polling delay in milliseconds (default: 1500ms)
    */
-  const poll = async (delayInMs: number = 1500) => {
+  const poll = async (delayInMs = 1500) => {
     const { run, stop } = Poller({ delayInMs });
 
     void run(async () => {
@@ -62,5 +69,5 @@ export function JWTHandler(store: StorageCache, { frontendApi, ...cookieParams }
     });
   };
 
-  return { get, poll, set };
+  return { clear, get, poll, set };
 }

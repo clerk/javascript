@@ -55,6 +55,11 @@ export async function buildClerk({
 
   // Set up JWT handler and attempt to get JWT from storage on initialization
   const jwt = JWTHandler(storageCache, { ...getClientCookieParams, frontendApi: key.frontendApi });
+
+  // Clear JWT on initial load
+  await jwt.clear();
+
+  // Poll for new JWT
   void jwt.poll();
 
   // Create Clerk instance
