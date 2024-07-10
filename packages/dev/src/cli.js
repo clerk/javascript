@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 
+import { config } from './commands/config.js';
 import { init } from './commands/init.js';
 import { install } from './commands/install.js';
 import { setRoot } from './commands/set-root.js';
@@ -16,6 +17,13 @@ export default function cli() {
     .description('Perform initial one-time machine setup')
     .action(async () => {
       await init();
+    });
+
+  program
+    .command('config')
+    .description('Open the clerk-dev config file in EDITOR or VISUAL')
+    .action(async () => {
+      await config();
     });
 
   program
