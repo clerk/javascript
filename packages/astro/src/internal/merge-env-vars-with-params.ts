@@ -14,6 +14,8 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     ...rest
   } = params || {};
 
+  // We have an eslint config that requires us to declare env variables in the turbo.json file.
+  // We're skipping/disabling it below as we use it only for the Astro integration.
   return {
     // eslint-disable-next-line turbo/no-undeclared-env-vars
     signInUrl: paramSignIn || import.meta.env.PUBLIC_CLERK_SIGN_IN_URL,

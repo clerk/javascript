@@ -7,6 +7,8 @@ import { runOnce } from './run-once';
 
 let initOptions: AstroClerkIntegrationParams | undefined;
 
+const HARDCODED_LATEST_CLERK_JS_VERSION = '5';
+
 /**
  * Prevents firing clerk.load multiple times
  */
@@ -15,7 +17,10 @@ export const createClerkInstance = runOnce(createClerkInstanceInternal);
 export async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams) {
   let clerkJSInstance = window.Clerk;
   if (!clerkJSInstance) {
-    await loadClerkJsScript(options as any);
+    await loadClerkJsScript({
+      clerkJSVersion: HARDCODED_LATEST_CLERK_JS_VERSION,
+      ...(options as any),
+    });
 
     if (!window.Clerk) {
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
@@ -24,13 +29,11 @@ export async function createClerkInstanceInternal(options?: AstroClerkIntegratio
   }
 
   if (!$clerk.get()) {
-    // @ts-ignore
     $clerk.set(clerkJSInstance);
   }
 
   initOptions = options;
-  // TODO: Update Clerk type from @clerk/types to include this method
-  return (clerkJSInstance as any)
+  return clerkJSInstance
     .load(options)
     .then(() => {
       $csrState.setKey('isLoaded', true);

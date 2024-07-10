@@ -17,9 +17,7 @@ export function createClerkInstanceInternal(options?: AstroClerkCreateInstancePa
   let clerkJSInstance = window.Clerk as unknown as Clerk;
   if (!clerkJSInstance) {
     clerkJSInstance = new Clerk(options!.publishableKey);
-    // @ts-ignore
     $clerk.set(clerkJSInstance);
-    // @ts-ignore
     window.Clerk = clerkJSInstance;
   }
 
