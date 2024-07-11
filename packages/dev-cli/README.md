@@ -6,7 +6,7 @@
 git clone --single-branch --branch ds.feat/clerk-dev-cli https://github.com/clerk/javascript clerk-dev-cli
 cd clerk-dev-cli
 npm install
-npm install --global ./packages/dev
+npm install --global ./packages/dev-cli
 ```
 
 If you haven't already, install `turbo` globally.
@@ -19,18 +19,19 @@ npm install --global turbo
 
 After installing `@clerk/dev` globally, you'll need to initialise a configuration file and tell the CLI where to find your local copy of the `clerk/javascript` repository.
 
-1. Initialise the configuration file which will be located at `~/.config/clerk/dev.json`:
+1.  Initialise the configuration file which will be located at `~/.config/clerk/dev.json`:
 
-		```shell
-		clerk-dev init
-		```
-2. Navigate to your local clone of `clerk/javascript` and run `set-root`:
+        ```shell
+        clerk-dev init
+        ```
 
-		```shell
-		clerk-dev set-root
-		```
+2.  Navigate to your local clone of `clerk/javascript` and run `set-root`:
 
-You're all set now to run the day-to-day commands 🎉 
+        ```shell
+        clerk-dev set-root
+        ```
+
+You're all set now to run the day-to-day commands 🎉
 
 ## Adding instances & changing the configuration
 

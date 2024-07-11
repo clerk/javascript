@@ -1,5 +1,5 @@
 {
-  "name": "@clerk/dev",
+  "name": "@clerk/dev-cli",
   "private": true,
   "version": "1.0.0",
   "license": "MIT",
