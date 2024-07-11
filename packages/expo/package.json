@@ -70,6 +70,14 @@
     "react-dom": ">=18",
     "react-native": ">=0.74"
   },
+  "peerDependenciesMeta": {
+    "expo-secure-store": {
+      "optional": true
+    },
+    "expo-local-authentication": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": ">=18.17.0"
   },
