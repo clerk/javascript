@@ -9,6 +9,7 @@ import { LastNameField } from '~/common/last-name-field';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
+import { parsePhoneString } from '~/common/phone-number-field/utils';
 import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
@@ -42,6 +43,8 @@ function SignUpComponentLoaded() {
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
   const { applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
 
+  const signUpEmailAddress = clerk.client.signUp.emailAddress;
+  const { formattedNumberWithCode: signUpPhoneNumber } = parsePhoneString(clerk.client.signUp.phoneNumber || '');
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
 
@@ -171,11 +174,7 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: elements work
-                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
-                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
-                          */}
-                          +1 (424) 424-4242{' '}
+                          {signUpPhoneNumber}
                           <SignUp.Action
                             navigate='start'
                             asChild
@@ -244,11 +243,7 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: elements work
-                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
-                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
-                          */}
-                          alex.carpenter@clerk.dev{' '}
+                          {signUpEmailAddress}
                           <SignUp.Action
                             navigate='start'
                             asChild
