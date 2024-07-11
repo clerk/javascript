@@ -732,7 +732,10 @@ export class Clerk implements ClerkInterface {
     }
 
     // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
-    await newSession?.getToken();
+    const token = await newSession?.getToken();
+    if (!token) {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
