@@ -47,11 +47,15 @@ clerk-dev set-instance yourName
 
 ## Per-Project Setup
 
+In each project you'd like to use with the monorepo versions of Clerk packages, `clerk-dev` can perform one-time framework setup such as installing the monorepo versions of packages and configuring the framework to use your Clerk keys.
+
+To perform framework setup, run:
+
 ```sh
 clerk-dev setup
 ```
 
-If you do not want to customize the `clerkJSUrl`, pass `--no-js`.
+If you aren't working on `@clerk/clerk-js`, and do not want to customize the `clerkJSUrl`, pass `--no-js`.
 
 ```sh
 clerk-dev setup --no-js
@@ -59,15 +63,20 @@ clerk-dev setup --no-js
 
 ## Running
 
+Once your project has been configured to use the monorepo versions of your dependencies, you can start the watchers for each dependency by running:
+
 ```sh
 clerk-dev watch
 ```
 
-**Note:** On macOS, this command will automatically spawn a new Terminal.app window running the dev task for `clerk-js`. On other operating systems, you will need to run the following command in a new terminal:
+This will run the `build` task for any `@clerk/*` packages in the `package.json` of the current working directory, including any of their dependencies.
 
-```sh
-clerk-dev watch --js
-```
+> [!NOTE]
+> On macOS, this command will automatically spawn a new Terminal.app window running the dev task for `clerk-js`. On other operating systems, you will need to run the following command in a new terminal:
+>
+> ```sh
+> clerk-dev watch --js
+> ```
 
 If you do not want to spawn the watcher for `@clerk/clerk-js`, you can instead pass `--no-js`.
 
