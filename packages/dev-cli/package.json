@@ -17,7 +17,7 @@
   "dependencies": {
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
-    "glob": "^10.4.2",
+    "globby": "^14.0.2",
     "jscodeshift": "^0.16.1"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, posix, resolve } from 'node:path';
 
-import { glob } from 'glob';
+import { globby } from 'globby';
 
 /**
  * Generates an object with keys of package names and values of absolute paths to the package folder.
@@ -11,9 +11,7 @@ export async function getClerkPackages() {
   const monorepoRoot = resolve(join(import.meta.dirname, '..', '..', '..', '..'));
   /** @type {Record<string, string>} */
   const packages = {};
-  const clerkPackages = await glob(join(monorepoRoot, 'packages', '*', 'package.json'), {
-    ignore: '**/node_modules/**',
-  });
+  const clerkPackages = await globby([posix.join(monorepoRoot, 'packages', '*', 'package.json'), '!*node_modules*']);
   for (const packageJSON of clerkPackages) {
     const { name } = JSON.parse(await readFile(packageJSON, 'utf-8'));
     if (name) {
