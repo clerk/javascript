@@ -274,7 +274,7 @@ const useInput = ({
   const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
-      if (!name || initialValue) {
+      if (!name) {
         return;
       }
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
@@ -282,7 +282,7 @@ const useInput = ({
         validatePassword(event.target.value);
       }
     },
-    [ref, name, onChangeProp, initialValue, shouldValidatePassword, validatePassword],
+    [ref, name, onChangeProp, shouldValidatePassword, validatePassword],
   );
 
   const onBlur = React.useCallback(
