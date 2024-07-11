@@ -12,15 +12,14 @@ type Identifier = RequireExactlyOne<Identifiers>;
 
 export function SignUpIdentifier({ emailAddress, phoneNumber }: Identifier) {
   const { client } = useClerk();
-  const signUpEmailAddress = client.signUp.emailAddress;
-  const { formattedNumberWithCode: signUpPhoneNumber } = parsePhoneString(client.signUp.phoneNumber || '');
 
   if (emailAddress) {
-    return <span>{signUpEmailAddress}</span>;
+    return <span>{client.signUp.emailAddress}</span>;
   }
 
   if (phoneNumber) {
-    return <span>{signUpPhoneNumber}</span>;
+    const { formattedNumberWithCode } = parsePhoneString(client.signUp.phoneNumber || '');
+    return <span>{formattedNumberWithCode}</span>;
   }
 
   return null;
