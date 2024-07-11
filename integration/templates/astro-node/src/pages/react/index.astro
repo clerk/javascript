@@ -1,16 +1,16 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import Layout from "../../layouts/react/Layout.astro";
 import Card from "../../components/Card.astro";
 import SignOutButton from "../../lib/astro-components/SignOutButton.astro";
 
-import { SignedIn, SignedOut } from "@clerk/astro/client/react";
-import { OrganizationSwitcher } from "@clerk/astro/components/interactive";
+import { SignedIn, SignedOut, OrganizationSwitcher } from "@clerk/astro/client/react";
 ---
 
 <Layout title="Welcome to Astro.">
   <h1>Welcome to <span class="text-gradient">Astro</span> + React</h1>
   <SignedIn client:load>
     <OrganizationSwitcher
+      client:load
       appearance={{
         elements: {
           organizationPreview__organizationSwitcherTrigger: "text-white",

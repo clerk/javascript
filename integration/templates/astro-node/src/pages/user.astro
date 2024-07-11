@@ -1,15 +1,12 @@
 ---
 import { UserProfile } from "@clerk/astro/components/interactive";
 import Layout from "../layouts/Layout.astro";
-import Protected from "../layouts/Protected.astro";
 import StreamUser from "../components/StreamUser.astro";
 ---
 
 <Layout title="Welcome to Astro.">
-  <Protected>
-    <div class="w-full flex justify-center">
-      <UserProfile />
-    </div>
-    <StreamUser />
-  </Protected>
+  <div class="w-full flex justify-center">
+    <UserProfile />
+  </div>
+  <StreamUser />
 </Layout>

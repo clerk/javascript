@@ -26,7 +26,7 @@ testAgainstRunningApps({
 
   test('only admin', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    await u.page.goToRelative('/sign-in');
+    await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
@@ -40,7 +40,7 @@ testAgainstRunningApps({
 
   test('only member', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    await u.page.goToRelative('/sign-in#/?redirect_url=/react/only-members');
+    await u.page.goToRelative('/react/sign-in#/?redirect_url=/react/only-members');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();

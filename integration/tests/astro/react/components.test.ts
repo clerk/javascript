@@ -20,11 +20,47 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })(
       await app.teardown();
     });
 
+    test('render user button', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.page.waitForAppUrl('/react');
+      await u.po.expect.toBeSignedIn();
+
+      await u.po.userButton.waitForMounted();
+      await u.po.userButton.toggleTrigger();
+      await u.po.userButton.waitForPopover();
+
+      await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
+
+      await u.po.userButton.triggerManageAccount();
+      await u.po.userProfile.waitForUserProfileModal();
+
+      await expect(u.page.getByText(/profile details/i)).toBeVisible();
+    });
+
+    test('render user profile with streamed data', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+      await u.po.userButton.waitForMounted();
+      await u.page.goToRelative('/react/user');
+      await u.po.userProfile.waitForMounted();
+
+      await expect(u.page.getByText(`My name is: ${fakeUser.firstName}`)).toBeVisible();
+
+      // Streams data from Astro.locals.currentUser()
+      await expect(u.page.getByText(`"firstName":"${fakeUser.firstName}"`)).toBeVisible();
+    });
+
     test('SignedIn, SignedOut SSR', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/react');
       await expect(u.page.getByText('Go to this page to log in')).toBeVisible();
-      await u.page.goToRelative('/sign-in#/?redirect_url=/react');
+      await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
