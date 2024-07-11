@@ -1,5 +1,7 @@
 # `clerk-dev` CLI
 
+The `clerk-dev` CLI is a tool designed to simplify the process of iterating on packages within the `clerk/javascript` repository within sample applications, such as customer reproductions. It allows for the installation of the monorepo versions of packages, and supports features such as hot module reloading for increased development velocity.
+
 ## Installation
 
 ```sh
