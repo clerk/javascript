@@ -31,10 +31,10 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
   await u.page.getByRole('button', { name: /Sign in/i }).click();
   await u.po.signIn.waitForMounted();
 
-  // Check that the DevBrowser JWT between localhost and AP is the same
   const accountPortalURL = page.url();
   // Check that we are in Account Portal
   expect(accountPortalURL).toContain('.accounts.dev');
+  // Check that the DevBrowser JWT between localhost and AP is the same
   const accountPortalDbJwt = await context
     .cookies(accountPortalURL)
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);

@@ -130,7 +130,7 @@ jobs:
 
   integration-tests:
     name: Integration Tests
-    needs: formatting-linting
+#    needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
@@ -191,11 +191,11 @@ jobs:
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && npm init -y && npm install @clerk/clerk-js
-      
+
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
         run: cd packages/astro && npm run copy:components
-      
+
       - name: Write all ENV certificates to files in integration/certs
         if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/github-script@v7

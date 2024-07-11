@@ -47,7 +47,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
       return page.waitForSelector('.cl-rootBox', { state: 'attached' });
     },
     waitForAppUrl: async (relativePath: string) => {
-      return page.waitForURL(new URL(relativePath, page.url()).toString());
+      return page.waitForURL(new URL(relativePath, app.serverUrl).toString());
     },
     /**
      * Get the cookies for the URL the page is currently at.
