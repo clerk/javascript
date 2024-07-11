@@ -66,6 +66,7 @@
     "proxy",
     "underscore",
     "url",
+    "versionSelector",
     "react",
     "constants",
     "apiUrlFromPublishableKey",

@@ -4,6 +4,7 @@ import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
 import { addClerkPrefix } from './url';
+import { versionSelector } from './versionSelector';
 
 const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
 const MISSING_PUBLISHABLE_KEY_ERROR =
@@ -68,7 +69,8 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
-  return `https://${scriptHost}/npm/@clerk/clerk-js@${clerkJSVersion}/dist/clerk.${variant}browser.js`;
+  const version = versionSelector(clerkJSVersion);
+  return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 
 const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
