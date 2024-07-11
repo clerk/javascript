@@ -15,28 +15,31 @@ If you haven't already, install `turbo` globally.
 npm install --global turbo
 ```
 
-## Initial One-Time Setup
+## First time setup
 
-```sh
-clerk-dev init
-```
+After installing `@clerk/dev` globally, you'll need to initialise a configuration file and tell the CLI where to find your local copy of the `clerk/javascript` repository.
 
-If you need to use a specific instance, you can add additional instances to the `~/.config/clerk/dev.json` file and switch between them with:
+1. Initialise the configuration file which will be located at `~/.config/clerk/dev.json`:
 
-```sh
-clerk-dev set-instance instanceName
-```
+		```shell
+		clerk-dev init
+		```
+2. Navigate to your local clone of `clerk/javascript` and run `set-root`:
 
-Run the following in your primary checkout of `clerk/javascript`.
+		```shell
+		clerk-dev set-root
+		```
 
-```sh
-clerk-dev set-root
-```
+You're all set now to run the day-to-day commands 🎉 
 
-If you need to open the configuration file, set the environment variable `EDITOR` or `VISUAL` to the path to your editor and run:
+## Adding instances & changing the configuration
 
-```sh
-clerk-dev config
+During the first time setup a `~/.config/clerk/dev.json` file was created. Its object contains a `activeInstance` and `instances` key. You can add additional instances by adding a new key to the `instances` object.
+
+You can use the `set-instance` command to switch between `activeInstance` afterwards:
+
+```shell
+clerk-dev set-instance yourName
 ```
 
 ## Per-Project Setup
