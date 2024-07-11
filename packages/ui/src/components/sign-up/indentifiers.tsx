@@ -1,16 +1,14 @@
 import { useClerk } from '@clerk/clerk-react';
 
 import { parsePhoneString } from '~/common/phone-number-field/utils';
+import type { RequireExactlyOne } from '~/types/utils';
 
-type Identifier =
-  | {
-      emailAddress: boolean;
-      phoneNumber?: never;
-    }
-  | {
-      emailAddress?: never;
-      phoneNumber: boolean;
-    };
+type Identifiers = {
+  emailAddress: boolean;
+  phoneNumber: boolean;
+};
+
+type Identifier = RequireExactlyOne<Identifiers>;
 
 export function SignUpIdentifier({ emailAddress, phoneNumber }: Identifier) {
   const { client } = useClerk();
