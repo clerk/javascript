@@ -437,10 +437,7 @@ export function SignInComponentLoaded() {
                           })}
                         </SecondaryButton>
                       </SignIn.SupportedStrategy>
-                      {
-                        // This might not be visible, and we're aware of it
-                        // See SDK-1873
-                      }
+
                       <SignIn.SupportedStrategy
                         name='email_code'
                         asChild
