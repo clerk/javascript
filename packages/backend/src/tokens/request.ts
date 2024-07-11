@@ -47,7 +47,8 @@ function isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: str
   const { accept, secFetchDest } = authenticateContext;
 
   // NOTE: we could also check sec-fetch-mode === navigate here, but according to the spec, sec-fetch-dest: document should indicate that the request is the data of a user navigation.
-  if (secFetchDest === 'document') {
+  // Also, we check for 'iframe' because it's the value set when a doc request is made by an iframe.
+  if (secFetchDest === 'document' || secFetchDest === 'iframe') {
     return true;
   }
 
