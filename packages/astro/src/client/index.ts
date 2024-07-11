@@ -1,4 +1,4 @@
-import { loadClerkJsScript } from '@clerk/shared';
+import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 
 import { $clerk, $csrState } from '../stores/internal';
 import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
