@@ -23,6 +23,7 @@ export const subpathNames = [
   'proxy',
   'underscore',
   'url',
+  'versionSelector',
   'constants',
   'apiUrlFromPublishableKey',
   'telemetry',

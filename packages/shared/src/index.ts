@@ -31,6 +31,7 @@ export * from './poller';
 export * from './proxy';
 export * from './underscore';
 export * from './url';
+export { versionSelector } from './versionSelector';
 export * from './object';
 export * from './logger';
 export { createWorkerTimers } from './workerTimers';
