@@ -117,6 +117,7 @@ function SignUpComponentLoaded() {
                             hintText={t('formFieldHintText__optional')}
                             required={phoneNumberRequired}
                             disabled={isGlobalLoading}
+                            initPhoneWithCode={clerk.client.signUp.phoneNumber || ''}
                             locationBasedCountryIso={locationBasedCountryIso}
                           />
                         ) : null}
