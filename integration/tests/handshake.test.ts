@@ -72,10 +72,8 @@ test.describe('Client handshake @generic', () => {
     await new Promise<void>(resolve => jwksServer.close(() => resolve()));
   });
 
-  test.skip('Test standard signed-in - dev', async () => {
-    const config = generateConfig({
-      mode: 'test',
-    });
+  test('Test standard signed-in - dev', async () => {
+    const config = generateConfig({ mode: 'test' });
     const { token, claims } = config.generateToken({ state: 'active' });
     const clientUat = claims.iat;
     const res = await fetch(app.serverUrl + '/', {
@@ -90,7 +88,7 @@ test.describe('Client handshake @generic', () => {
     expect(res.status).toBe(200);
   });
 
-  test.skip('Test standard signed-in - authorization header - dev', async () => {
+  test('Test standard signed-in - authorization header - dev', async () => {
     const config = generateConfig({
       mode: 'test',
     });
