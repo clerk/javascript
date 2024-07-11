@@ -49,8 +49,9 @@ export default function cli() {
       'Install the monorepo versions of Clerk packages listed in the package.json file and perform framework configuration for the current working directory',
     )
     .option('--no-js', 'do not customize the clerkJSUrl')
-    .action(async ({ js }) => {
-      await setup({ js });
+    .option('--skip-install', 'only perform framework configuration; do not install monorepo versions of packages')
+    .action(async ({ js, skipInstall }) => {
+      await setup({ js, skipInstall });
     });
 
   program

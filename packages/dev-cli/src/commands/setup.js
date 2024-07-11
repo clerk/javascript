@@ -150,10 +150,13 @@ async function linkDependencies() {
  * directory, and performs framework configuration tasks necessary for local development with the monorepo packages.
  * @param {object} args
  * @param {boolean | undefined} args.js If `false`, do not customize the clerkJSUrl.
+ * @param {boolean | undefined} args.skipInstall If `true`, do not install monorepo versions of packages.
  */
-export async function setup({ js = true }) {
-  console.log('Installing monorepo versions of Clerk packages from package.json...');
-  await linkDependencies();
+export async function setup({ js = true, skipInstall = false }) {
+  if (!skipInstall) {
+    console.log('Installing monorepo versions of Clerk packages from package.json...');
+    await linkDependencies();
+  }
 
   const config = await getConfiguration();
   const instance = await getInstanceConfiguration(config);

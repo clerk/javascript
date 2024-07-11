@@ -61,6 +61,12 @@ If you aren't working on `@clerk/clerk-js`, and do not want to customize the `cl
 clerk-dev setup --no-js
 ```
 
+If you want to skip the installation of monorepo versions of packages, pass `--skip-install`.
+
+```sh
+clerk-dev setup --skip-install
+```
+
 ## Running
 
 Once your project has been configured to use the monorepo versions of your dependencies, you can start the watchers for each dependency by running:
