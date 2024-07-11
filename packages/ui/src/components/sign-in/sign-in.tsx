@@ -322,6 +322,26 @@ export function SignInComponentLoaded() {
               </Card.Root>
             </SignIn.Step>
 
+            <SignIn.Step name='choose-strategy'>
+              <Card.Root>
+                <Card.Content>
+                  <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
+                    <Card.Title>{t('signIn.alternativeMethods.title')}</Card.Title>
+                    <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
+                  </Card.Header>
+                  <Card.Body />
+                </Card.Content>
+                <Card.Footer />
+              </Card.Root>
+            </SignIn.Step>
+
             <SignIn.Step name='forgot-password'>
               <Card.Root>
                 <Card.Content>
