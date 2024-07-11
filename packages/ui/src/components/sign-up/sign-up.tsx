@@ -9,7 +9,6 @@ import { LastNameField } from '~/common/last-name-field';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
-import { parsePhoneString } from '~/common/phone-number-field/utils';
 import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
@@ -21,6 +20,8 @@ import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
+
+import { SignUpIdentifier } from './indentifiers';
 
 export function SignUpComponent() {
   return (
@@ -43,8 +44,6 @@ function SignUpComponentLoaded() {
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
   const { applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
 
-  const signUpEmailAddress = clerk.client.signUp.emailAddress;
-  const { formattedNumberWithCode: signUpPhoneNumber } = parsePhoneString(clerk.client.signUp.phoneNumber || '');
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
 
@@ -174,7 +173,7 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {signUpPhoneNumber}
+                          <SignUpIdentifier phoneNumber />
                           <SignUp.Action
                             navigate='start'
                             asChild
@@ -243,7 +242,7 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {signUpEmailAddress}
+                          <SignUpIdentifier emailAddress />
                           <SignUp.Action
                             navigate='start'
                             asChild
