@@ -11,3 +11,5 @@ import { createInjectionScriptRunner } from './create-injection-script-runner';
 const runInjectionScript = createInjectionScriptRunner(createClerkInstance);
 
 export { runInjectionScript };
+
+export { generateSafeId } from './utils/generateSafeId';

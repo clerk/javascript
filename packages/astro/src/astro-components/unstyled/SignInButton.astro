@@ -3,9 +3,9 @@ import type { HTMLTag, Polymorphic } from 'astro/types'
 import type { SignInProps } from "@clerk/types";
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<SignInProps & { as: Tag; mode?: 'redirect' | 'modal' }>
 
-import { customAlphabet, urlAlphabet } from "nanoid";
+import { generateSafeId } from '@clerk/astro/internal';
 
-const safeId = customAlphabet(urlAlphabet, 10)();
+const safeId = generateSafeId();
 
 const {
   as: Tag = 'button',
