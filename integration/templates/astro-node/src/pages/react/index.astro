@@ -1,15 +1,15 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Card from "../components/Card.astro";
-import SignOutButton from "../lib/astro-components/SignOutButton.astro";
+import Layout from "../../layouts/Layout.astro";
+import Card from "../../components/Card.astro";
+import SignOutButton from "../../lib/astro-components/SignOutButton.astro";
 
-import { SignedIn, SignedOut } from "@clerk/astro/components/control";
+import { SignedIn, SignedOut } from "@clerk/astro/client/react";
 import { OrganizationSwitcher } from "@clerk/astro/components/interactive";
 ---
 
 <Layout title="Welcome to Astro.">
-  <h1>Welcome to <span class="text-gradient">Astro</span></h1>
-  <SignedIn>
+  <h1>Welcome to <span class="text-gradient">Astro</span> + React</h1>
+  <SignedIn client:load>
     <OrganizationSwitcher
       appearance={{
         elements: {
@@ -24,8 +24,13 @@ import { OrganizationSwitcher } from "@clerk/astro/components/interactive";
 
   <div class="h-12"></div>
 
+  <p class="instructions">
+    To get started, open the directory <code>src/pages</code> in your project.<br
+    />
+    <strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
+  </p>
   <ul role="list" class="link-card-grid">
-    <SignedOut>
+    <SignedOut client:load>
       <Card
         href="/sign-in"
         title="Log in"
@@ -37,7 +42,7 @@ import { OrganizationSwitcher } from "@clerk/astro/components/interactive";
         body="Supercharge your project with new frameworks and libraries."
       />
     </SignedOut>
-    <SignedIn>
+    <SignedIn client:load>
       <Card
         href="/user"
         title="User Profile"
