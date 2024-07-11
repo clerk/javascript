@@ -265,6 +265,89 @@ export function SignInComponentLoaded() {
                     </Card.Body>
                   </SignIn.Strategy>
 
+                  <SignIn.Strategy name='email_code'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.emailCode.title')}</Card.Title>
+                      <Card.Description>{t('signIn.emailCode.subtitle', { applicationName })}</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignIn.SafeIdentifier />
+                          <SignIn.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Edit email address'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignIn.Action>
+                        </span>
+                      </Card.Description>
+                    </Card.Header>
+
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+                      <OTPField
+                        disabled={isGlobalLoading}
+                        resend={
+                          <SignIn.Action
+                            asChild
+                            resend
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            fallback={({ resendableAfter }) => (
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                                {t('signIn.emailCode.resendButton')} (
+                                <span className='tabular-nums'>{resendableAfter}</span>)
+                              </p>
+                            )}
+                          >
+                            <LinkButton type='button'>{t('signIn.emailCode.resendButton')}</LinkButton>
+                          </SignIn.Action>
+                        }
+                      />
+                      <Common.Loading scope='step:verifications'>
+                        {isSubmitting => {
+                          return (
+                            <div className='flex flex-col gap-4'>
+                              <SignIn.Action
+                                submit
+                                asChild
+                              >
+                                <Button
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  icon={<Icon.CaretRight />}
+                                >
+                                  {t('formButtonPrimary')}
+                                </Button>
+                              </SignIn.Action>
+                              <SignIn.Action
+                                asChild
+                                navigate='choose-strategy'
+                              >
+                                <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                              </SignIn.Action>
+                            </div>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
+
                   <SignIn.Strategy name='reset_password_email_code'>
                     <Card.Header>
                       <Card.Title>{t('signIn.forgotPassword.title')}</Card.Title>
