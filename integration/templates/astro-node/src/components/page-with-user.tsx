@@ -1,5 +1,5 @@
 import React, { type PropsWithChildren, useSyncExternalStore } from 'react';
-import { UserProfile } from '@clerk/astro/client/react';
+import { UserProfile } from '@clerk/astro/react';
 import { $userStore } from '@clerk/astro/client/stores';
 
 export function PageWithUser({ children }: PropsWithChildren) {

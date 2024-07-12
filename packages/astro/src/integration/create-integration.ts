@@ -14,10 +14,8 @@ type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
   clerkJSVersion?: string;
 };
 
-function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: P) {
-  return (
-    params?: P['mode'] extends 'hotload' ? HotloadAstroClerkIntegrationParams : AstroClerkIntegrationParams,
-  ): AstroIntegration => {
+function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() {
+  return (params?: Params): AstroIntegration => {
     const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl } = params || {};
 
     // These are not provided when the "bundled" integration is used
@@ -50,10 +48,7 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
             },
           };
 
-          const defaultBundledImportPath = `${packageName}/internal/bundled`;
-
-          const buildImportPath =
-            mode === 'bundled' ? defaultBundledImportPath : defaultBundledImportPath.replace('/bundled', '');
+          const buildImportPath = `${packageName}/internal`;
 
           // Set params as envs do backend code has access to them
           updateConfig({
@@ -72,7 +67,6 @@ function createIntegration<P extends { mode: 'hotload' | 'bundled' }>({ mode }: 
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
                 ...buildEnvVarFromOption(clerkJSVariant, 'PUBLIC_CLERK_JS_VARIANT'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
-                __HOTLOAD__: mode === 'hotload',
               },
 
               ssr: {
