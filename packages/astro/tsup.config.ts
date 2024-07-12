@@ -9,7 +9,6 @@ export default defineConfig(() => {
     entry: [
       './src/index.ts',
       './src/react/index.ts',
-      './src/client/stores/index.ts',
       './src/client/index.ts',
       './src/server/index.ts',
       './src/internal/index.ts',
