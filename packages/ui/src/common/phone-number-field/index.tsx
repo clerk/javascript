@@ -36,8 +36,8 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
-  const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const [isOpen, setOpen] = React.useState(false);
+  const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const commandListRef = React.useRef<HTMLDivElement>(null);
@@ -48,19 +48,11 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     locationBasedCountryIso,
   });
 
-  const callOnChangeProp = () => {
-    // Quick and dirty way to match this component's public API
-    // with every other Input component, so we can use the same helpers
-    // without worrying about the underlying implementation details
-    onChange?.({ target: { value: numberWithCode } } as any);
-  };
-
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const inputValue = e.clipboardData.getData('text');
     if (inputValue.includes('+')) {
       setNumberAndIso(inputValue);
-      setSelectedCountry(countryOptions.find(c => c.iso === iso) || countryOptions[0]);
     } else {
       setNumber(inputValue);
     }
@@ -70,21 +62,29 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     const inputValue = e.target.value;
     if (inputValue.includes('+')) {
       setNumberAndIso(inputValue);
-      setSelectedCountry(countryOptions.find(c => c.iso === iso) || countryOptions[0]);
     } else {
       setNumber(inputValue);
     }
   };
 
-  React.useEffect(callOnChangeProp, [numberWithCode, onChange]);
-  React.useEffect(() => {
-    if (isOpen) {
-      commandInputRef.current?.focus();
-      setTimeout(() => {
-        commandListRef.current?.querySelector('[data-checked=true]')?.scrollIntoView({ block: 'start' });
-      }, 0);
-    }
-  }, [isOpen]);
+  React.useEffect(
+    function syncSelectedCountry() {
+      setSelectedCountry(countryOptions.find(c => c.iso === iso) || countryOptions[0]);
+    },
+    [iso],
+  );
+
+  React.useEffect(
+    function scrollActiveCommandItemIntoView() {
+      if (isOpen) {
+        commandInputRef.current?.focus();
+        setTimeout(() => {
+          commandListRef.current?.querySelector('[data-checked=true]')?.scrollIntoView({ block: 'start' });
+        }, 0);
+      }
+    },
+    [isOpen],
+  );
 
   return (
     <Common.Field
@@ -162,7 +162,6 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                               <Command.Item
                                 key={iso}
                                 onSelect={() => {
-                                  setSelectedCountry(countryOptions[index]);
                                   setIso(iso);
                                   setOpen(false);
                                 }}
@@ -193,8 +192,12 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   +{selectedCountry.code}
                 </button>
                 <Common.Input
+                  value={numberWithCode}
+                  className='hidden'
+                />
+                <input
                   ref={mergeRefs([forwardedRef, inputRef])}
-                  type='telephone'
+                  type='tel'
                   maxLength={25}
                   value={formattedNumber}
                   onPaste={handlePaste}
