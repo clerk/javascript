@@ -12,7 +12,7 @@ interface Props extends SignOutOptions {
 </script>
 
 <script>
-  import { $clerkStore } from "@clerk/astro/client/stores";
+  import { $clerkStore } from "@clerk/astro/client";
 
   const button = document.querySelector(
     "[data-sign-out-button]",

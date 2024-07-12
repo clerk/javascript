@@ -5,7 +5,7 @@
  * injectScript('before-hydration', `...`)
  */
 
-import { createClerkInstance } from '../client';
+import { createClerkInstance } from './create-clerk-instance';
 import { createInjectionScriptRunner } from './create-injection-script-runner';
 
 const runInjectionScript = createInjectionScriptRunner(createClerkInstance);

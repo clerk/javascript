@@ -279,9 +279,7 @@ async function decorateRequest(
             controller.enqueue(clerkAstroData);
             controller.enqueue(clerkSafeEnvVariables);
 
-            if (__HOTLOAD__) {
-              controller.enqueue(hotloadScript);
-            }
+            controller.enqueue(hotloadScript);
 
             controller.enqueue(closingHeadTag);
             controller.enqueue(chunk.slice(index + closingHeadTag.length));
