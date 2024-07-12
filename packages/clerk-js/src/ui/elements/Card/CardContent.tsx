@@ -10,7 +10,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { Close } from '../../icons';
-import { type PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { useCardState, useFlowMetadata } from '../contexts';
 import { DevModeNotice, DevModeOverlay } from '../DevModeNotice';
 import { IconButton } from '../IconButton';
@@ -25,6 +25,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
   const { maintenanceMode } = useEnvironment();
   const card = useCardState();
   const { t } = useLocalizations();
+  const { isDevelopmentOrStaging } = useEnvironment();
 
   return (
     <Flex
@@ -44,7 +45,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           boxShadow: t.shadows.$cardContentShadow,
           borderRadius: t.radii.$lg,
           position: 'relative',
-          padding: `${t.space.$8} ${t.space.$10}`,
+          padding: `${t.space.$8} ${t.space.$10} ${isDevelopmentOrStaging() ? t.space.$12 : t.space.$8} ${t.space.$10}`,
           justifyContent: 'center',
           alignContent: 'center',
         }),
@@ -84,13 +85,14 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
       {children}
 
       <DevModeNotice
-        sx={{
+        sx={t => ({
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
           textAlign: 'center',
-        }}
+          padding: t.space.$3,
+        })}
       />
     </Flex>
   );

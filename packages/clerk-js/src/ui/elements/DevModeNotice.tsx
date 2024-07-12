@@ -39,7 +39,6 @@ export const DevModeNotice = (props: DevModeNoticeProps) => {
         t => ({
           color: t.colors.$warning500,
           fontWeight: t.fontWeights.$semibold,
-          whiteSpace: 'nowrap',
           padding: t.space.$1x5,
         }),
         sx,

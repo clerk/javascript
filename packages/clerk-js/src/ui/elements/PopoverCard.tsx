@@ -5,7 +5,7 @@ import { Col, Flex, Flow, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, common } from '../styledSystem';
 import { colors } from '../utils';
-import { Card } from '.';
+import { Card, DevModeOverlay } from '.';
 
 const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Content>>((props, ref) => {
   return (
@@ -87,9 +87,18 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
       ]}
       {...rest}
     >
+      <DevModeOverlay />
       {children}
 
-      {shouldShowTagOrLinks && <Card.ClerkAndPagesTag withFooterPages />}
+      {shouldShowTagOrLinks && (
+        <Card.ClerkAndPagesTag
+          withFooterPages
+          withDevModeNotice
+          devModeNoticeSx={t => ({
+            padding: t.space.$none,
+          })}
+        />
+      )}
     </Col>
   );
 };

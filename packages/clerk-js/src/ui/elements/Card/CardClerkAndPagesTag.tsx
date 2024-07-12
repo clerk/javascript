@@ -3,19 +3,23 @@ import React from 'react';
 import { useEnvironment } from '../../contexts';
 import { Col, Flex, Icon, Link, Text } from '../../customizables';
 import { LogoMark } from '../../icons';
-import type { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import { DevModeNotice } from '../DevModeNotice';
 import { Card } from '.';
 
 export const CardClerkAndPagesTag = React.memo(
   React.forwardRef<
     HTMLDivElement,
-    PropsOfComponent<typeof Flex> & { withFooterPages?: boolean; withDevModeNotice?: boolean }
+    PropsOfComponent<typeof Flex> & {
+      withFooterPages?: boolean;
+      withDevModeNotice?: boolean;
+      devModeNoticeSx?: ThemableCssProp;
+    }
   >((props, ref) => {
-    const { sx, withFooterPages = false, withDevModeNotice = false, ...rest } = props;
+    const { sx, withFooterPages = false, withDevModeNotice = false, devModeNoticeSx, ...rest } = props;
     const { displayConfig } = useEnvironment();
 
-    if (!(displayConfig.branded || withFooterPages)) {
+    if (!(displayConfig.branded || withFooterPages) && !withDevModeNotice) {
       return null;
     }
 
@@ -62,7 +66,7 @@ export const CardClerkAndPagesTag = React.memo(
           {withFooterPages && <Card.FooterLinks />}
         </Flex>
 
-        {withDevModeNotice && <DevModeNotice />}
+        {withDevModeNotice && <DevModeNotice sx={devModeNoticeSx} />}
       </Col>
     );
   }),
