@@ -306,7 +306,7 @@ const useInput = ({
   );
 
   React.useEffect(() => {
-    if (!initialValue || !name) {
+    if (!name) {
       return;
     }
     ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
