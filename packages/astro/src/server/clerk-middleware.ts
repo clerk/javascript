@@ -204,8 +204,8 @@ Missing domain and proxyUrl. A satellite application needs to specify a domain o
 1) With middleware
    e.g. export default clerkMiddleware({domain:'YOUR_DOMAIN',isSatellite:true});
 2) With environment variables e.g.
-   PUBLIC_ASTRO_APP_CLERK_DOMAIN='YOUR_DOMAIN'
-   PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'
+   PUBLIC_CLERK_DOMAIN='YOUR_DOMAIN'
+   PUBLIC_CLERK_IS_SATELLITE='true'
    `;
 
 export const missingSignInUrlInDev = `
@@ -215,8 +215,8 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 1) With middleware
    e.g. export default clerkMiddleware({signInUrl:'SOME_URL', isSatellite:true});
 2) With environment variables e.g.
-   PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL='SOME_URL'
-   PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'`;
+   PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
+   PUBLIC_CLERK_IS_SATELLITE='true'`;
 
 function decorateAstroLocal(req: Request, context: APIContext, requestState: RequestState) {
   const { reason, message, status, token } = requestState;

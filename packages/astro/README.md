@@ -80,11 +80,11 @@ npm run dev
 ### Set environment variables
 
 ```sh
-PUBLIC_ASTRO_APP_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
+PUBLIC_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
 CLERK_SECRET_KEY=sk_(test|live)_xxxxxxx
 
-PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL=/sign-in # update this if sign in page exists on another path
-PUBLIC_ASTRO_APP_CLERK_SIGN_UP_URL=/sign-up # update this if sign up page exists on another path
+PUBLIC_CLERK_SIGN_IN_URL=/sign-in # update this if sign in page exists on another path
+PUBLIC_CLERK_SIGN_UP_URL=/sign-up # update this if sign up page exists on another path
 ```
 
 ### Update `env.d.ts`
