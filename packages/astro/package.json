@@ -67,13 +67,7 @@
       "import": "./dist/server/index.js"
     },
     "./env": "./env.d.ts",
-    "./components/control": "./components/control/index.ts",
-    "./components/control/*": "./components/control/*",
-    "./components/interactive": "./components/interactive/index.ts",
-    "./components/interactive/*": "./components/interactive/*",
-    "./components/unstyled": "./components/unstyled/index.ts",
-    "./components/unstyled/*": "./components/unstyled/*",
-    "./components/*": "./components/*",
+    "./components": "./components/index.ts",
     "./package.json": "./package.json"
   },
   "imports": {

@@ -4,6 +4,7 @@ module.exports = {
   rules: {
     'import/no-unresolved': ['error', { ignore: ['^#'] }],
   },
+  ignorePatterns: ['src/astro-components/index.ts'],
   overrides: [
     {
       files: ['./env.d.ts'],
