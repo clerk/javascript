@@ -6,7 +6,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['./env.d.ts'],
+      files: ['./env.d.ts', 'src/astro-components/*/*.d.ts'],
       rules: {
         '@typescript-eslint/consistent-type-imports': 'off',
       },
