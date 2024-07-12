@@ -74,7 +74,6 @@
     "./components/unstyled": "./components/unstyled/index.ts",
     "./components/unstyled/*": "./components/unstyled/*",
     "./components/*": "./components/*",
-    "./components": "./components/index.ts",
     "./package.json": "./package.json"
   },
   "imports": {
