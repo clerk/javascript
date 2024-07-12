@@ -4,9 +4,9 @@ interface Props {
   component: 'sign-in' | 'sign-up' | 'organization-list' | 'organization-profile' | 'organization-switcher' | 'user-button' | 'user-profile' | 'google-one-tap'
 }
 
-import { customAlphabet, urlAlphabet } from "nanoid";
+import { generateSafeId } from '@clerk/astro/internal';
 
-const safeId = customAlphabet(urlAlphabet, 10)();
+const safeId = generateSafeId();
 
 const { component, ...props } = Astro.props
 ---
