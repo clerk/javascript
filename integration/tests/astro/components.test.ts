@@ -87,7 +87,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
   test('SignedIn, SignedOut SSR', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    await u.page.goToStart();
+    await u.page.goToAppHome();
     await expect(u.page.getByText('Go to this page to log in')).toBeVisible();
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
