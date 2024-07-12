@@ -10,6 +10,7 @@ import { mergeRefs } from '~/utils/merge-refs';
 
 import { type CountryIso, IsoToCountryMap } from './data';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
+import { parsePhoneString } from './utils';
 
 const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
   return {
@@ -43,7 +44,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   const commandListRef = React.useRef<HTMLDivElement>(null);
   const commandInputRef = React.useRef<HTMLInputElement>(null);
   const contentWidth = containerRef.current?.clientWidth || 0;
-  const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
+  const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber } = useFormattedPhoneNumber({
     initPhoneWithCode,
     locationBasedCountryIso,
   });
@@ -59,8 +60,9 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     e.preventDefault();
     const inputValue = e.clipboardData.getData('text');
     if (inputValue.includes('+')) {
+      const { iso: newIso } = parsePhoneString(inputValue);
       setNumberAndIso(inputValue);
-      setSelectedCountry(countryOptions.find(c => c.iso === iso) || countryOptions[0]);
+      setSelectedCountry(countryOptions.find(c => c.iso === newIso) || countryOptions[0]);
     } else {
       setNumber(inputValue);
     }
@@ -69,8 +71,9 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     if (inputValue.includes('+')) {
+      const { iso: newIso } = parsePhoneString(inputValue);
       setNumberAndIso(inputValue);
-      setSelectedCountry(countryOptions.find(c => c.iso === iso) || countryOptions[0]);
+      setSelectedCountry(countryOptions.find(c => c.iso === newIso) || countryOptions[0]);
     } else {
       setNumber(inputValue);
     }
@@ -193,8 +196,12 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   +{selectedCountry.code}
                 </button>
                 <Common.Input
+                  value={numberWithCode}
+                  className='hidden'
+                />
+                <input
                   ref={mergeRefs([forwardedRef, inputRef])}
-                  type='telephone'
+                  type='tel'
                   maxLength={25}
                   value={formattedNumber}
                   onPaste={handlePaste}
