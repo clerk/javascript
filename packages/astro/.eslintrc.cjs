@@ -4,9 +4,10 @@ module.exports = {
   rules: {
     'import/no-unresolved': ['error', { ignore: ['^#'] }],
   },
+  ignorePatterns: ['src/astro-components/index.ts'],
   overrides: [
     {
-      files: ['./env.d.ts', 'src/astro-components/*/*.d.ts'],
+      files: ['./env.d.ts'],
       rules: {
         '@typescript-eslint/consistent-type-imports': 'off',
       },
