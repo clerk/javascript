@@ -193,7 +193,7 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 
 const useInput = ({
   name: inputName,
-  value: initialValue,
+  value: providedValue,
   type: inputType,
   onChange: onChangeProp,
   onBlur: onBlurProp,
@@ -265,7 +265,7 @@ const useInput = ({
       return;
     }
 
-    ref.send({ type: 'FIELD.ADD', field: { name, value: initialValue } });
+    ref.send({ type: 'FIELD.ADD', field: { name, value: providedValue } });
 
     return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -309,8 +309,8 @@ const useInput = ({
     if (!name) {
       return;
     }
-    ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
-  }, [name, ref, initialValue]);
+    ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
+  }, [name, ref, providedValue]);
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;
