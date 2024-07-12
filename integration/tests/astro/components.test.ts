@@ -96,4 +96,20 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await expect(u.page.getByText('Go to this page to see your profile')).toBeVisible();
     await expect(u.page.getByText('Sign out!')).toBeVisible();
   });
+
+  test('test updateClerkOptions by changing localization on the fly', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    const selectElement = await u.page.$('select');
+    const selectedOption = await selectElement.evaluate(el => (el as any).options[(el as any).selectedIndex].text);
+    if (selectedOption !== 'English') {
+      throw new Error('English option is not selected by default');
+    }
+
+    await expect(u.page.getByText('Welcome back! Please sign in to continue')).toBeVisible();
+    await selectElement.selectOption({ label: 'French' });
+
+    await expect(u.page.getByText('pour continuer vers')).toBeVisible();
+  });
 });
