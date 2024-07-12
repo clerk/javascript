@@ -35,6 +35,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     test('can sign in and user button renders', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
+
+      await u.page.pause();
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
       await u.po.signIn.setPassword(fakeUser.password);

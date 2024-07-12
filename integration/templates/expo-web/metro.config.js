@@ -26,8 +26,6 @@ const config = {
   watchFolders: [clerkMonorepoPath],
   resolver: {
     sourceExts: ['js', 'json', 'ts', 'tsx', 'cjs', 'mjs'],
-    unstable_enableSymlinks: !!clerkExpoPath,
-    unstable_enablePackageExports: !!clerkExpoPath,
     nodeModulesPaths: [
       path.resolve(__dirname, 'node_modules'),
       clerkExpoPath && `${clerkMonorepoPath}/node_modules`,
