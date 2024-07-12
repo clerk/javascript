@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-import type { FakeUser } from '../testUtils';
-import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import type { FakeUser } from '../../testUtils';
+import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
-testAgainstRunningApps({ withPattern: ['astro.node.withEmailCodes'] })('test astro @astro', ({ app }) => {
+testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic flows for @astro', ({ app }) => {
   test.describe.configure({ mode: 'parallel' });
   let fakeUser: FakeUser;
 
@@ -64,7 +64,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withEmailCodes'] })('test ast
     await expect(u.page.getByText(/profile details/i)).toBeVisible();
   });
 
-  test('render user profile', async ({ page, context }) => {
+  test('render user profile with streamed data', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -83,5 +83,17 @@ testAgainstRunningApps({ withPattern: ['astro.node.withEmailCodes'] })('test ast
     await u.page.goToRelative('/user');
     await u.page.waitForURL(`${app.serverUrl}/sign-in?redirect_url=${encodeURIComponent(`${app.serverUrl}/user`)}`);
     await u.po.signIn.waitForMounted();
+  });
+
+  test('SignedIn, SignedOut SSR', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToStart();
+    await expect(u.page.getByText('Go to this page to log in')).toBeVisible();
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+    await expect(u.page.getByText('Go to this page to see your profile')).toBeVisible();
+    await expect(u.page.getByText('Sign out!')).toBeVisible();
   });
 });

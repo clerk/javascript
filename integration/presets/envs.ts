@@ -44,8 +44,6 @@ const withEmailLinks = environmentConfig()
 const withCustomRoles = environmentConfig()
   .setId('withCustomRoles')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  // Temporarily use the stage api until the custom roles feature is released to prod
-  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-custom-roles'].sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-custom-roles'].pk)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')

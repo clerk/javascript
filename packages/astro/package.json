@@ -113,7 +113,6 @@
     "@clerk/clerk-js": "5.8.1",
     "@clerk/shared": "2.3.2",
     "@clerk/types": "4.7.0",
-    "@nanostores/react": "0.7.2",
     "nanoid": "5.0.7",
     "nanostores": "0.10.3",
     "path-to-regexp": "6.2.2"

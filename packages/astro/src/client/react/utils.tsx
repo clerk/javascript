@@ -1,9 +1,17 @@
 import type { LoadedClerk } from '@clerk/types';
-import { useStore } from '@nanostores/react';
-import { computed } from 'nanostores';
+import { computed, type Store, type StoreValue } from 'nanostores';
 import React from 'react';
 
 import { $clerk, $csrState } from '../../stores/internal';
+
+/**
+ * This implementation of `useStore` is an alternative solution to the hook exported by nanostores
+ * Reference: https://github.com/nanostores/react/blob/main/index.js
+ */
+function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
+  const get = store.get.bind(store);
+  return React.useSyncExternalStore(store.listen, get, get);
+}
 
 export const withClerk = <P extends { clerk: LoadedClerk | undefined | null }>(
   Component: React.ComponentType<P>,
