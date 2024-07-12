@@ -398,7 +398,7 @@ export const deDE: LocalizationResource = {
       actionLink: 'Anmelden',
       actionLink__use_email: 'E-mail nutzen',
       actionLink__use_email_username: 'E-mail oder Benutzernamen nutzen',
-      actionLink__use_passkey: 'Stattdessen Passkey verwenden',
+      actionLink__use_passkey: 'Passkey nutzen',
       actionLink__use_phone: 'Mobiltelefon nutzen',
       actionLink__use_username: 'Benutzername nutzen',
       actionText: 'Kein Account?',
@@ -465,10 +465,10 @@ export const deDE: LocalizationResource = {
     captcha_unavailable:
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
     form_code_incorrect: '',
-    form_identifier_exists: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine Andere.',
-    form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine Andere.',
-    form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
-    form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen Anderen.',
+    form_identifier_exists: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
+    form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
+    form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
+    form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
@@ -482,7 +482,7 @@ export const deDE: LocalizationResource = {
     form_password_not_strong_enough: 'Passwort nicht stark genug',
     form_password_pwned:
       'Das gewählte Passwort wurde bei einem Datenleck im Internet gefunden. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort',
-    form_password_pwned__sign_in: 'Dieses Passwort wurde in einem Datenlecks gefunden und kann nicht verwendet werden. Bitte setzen Sie Ihr Passwort zurück.',
+    form_password_pwned__sign_in: 'Dieses Passwort wurde in einem Datenleck gefunden und kann nicht verwendet werden. Bitte setzen Sie Ihr Passwort zurück.',
     form_password_size_in_bytes_exceeded:
       'Das Passwort hat die maximale Anzahl an Bytes überschritten. Bitte kürzen oder Sonderzeichen entfernen.',
     form_password_validation_failed: 'Falsches Passwort',
@@ -493,8 +493,8 @@ export const deDE: LocalizationResource = {
     passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
     passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
     passkey_pa_not_supported: 'Die Registrierung erfordert einen Plattformauthentifikator, der vom Gerät nicht unterstützt wird.',
-    passkey_registration_cancelled: 'Die Passkey-Registrierung wurde abgebrochen oder die Zeit wurde überschritten.',
-    passkey_retrieval_cancelled: 'Passkey verification was cancelled or timed out.',
+    passkey_registration_cancelled: 'Die Passkey-Registrierung wurde abgebrochen oder das Zeitlimit wurde überschritten.',
+    passkey_retrieval_cancelled: 'Die Passkey-Registrierung wurde abgebrochen oder das Zeitlimit wurde überschritten.',
     passwordComplexity: {
       maximumLength: 'weniger als {{length}} Zeichen lang sein',
       minimumLength: 'mindestens {{length}} Zeichen lang sein',
