@@ -49,13 +49,6 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     locationBasedCountryIso,
   });
 
-  const callOnChangeProp = () => {
-    // Quick and dirty way to match this component's public API
-    // with every other Input component, so we can use the same helpers
-    // without worrying about the underlying implementation details
-    onChange?.({ target: { value: numberWithCode } } as any);
-  };
-
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const inputValue = e.clipboardData.getData('text');
@@ -79,7 +72,6 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     }
   };
 
-  React.useEffect(callOnChangeProp, [numberWithCode, onChange]);
   React.useEffect(() => {
     if (isOpen) {
       commandInputRef.current?.focus();
