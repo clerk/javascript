@@ -23,6 +23,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     label = 'Phone number',
     name = 'phoneNumber',
     hintText = 'Optional',
+    initPhoneWithCode = '',
     locationBasedCountryIso,
     onChange,
     ...props
@@ -30,6 +31,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     alternativeFieldTrigger?: React.ReactNode;
     label?: React.ReactNode;
     hintText?: string;
+    initPhoneWithCode?: string;
     locationBasedCountryIso: CountryIso;
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
@@ -42,7 +44,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   const commandInputRef = React.useRef<HTMLInputElement>(null);
   const contentWidth = containerRef.current?.clientWidth || 0;
   const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
-    initPhoneWithCode: selectedCountry.iso,
+    initPhoneWithCode,
     locationBasedCountryIso,
   });
 
