@@ -19,7 +19,11 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
       try {
         // When testing applications using real domains we want to manually navigate to the domain first
         // and not follow serverUrl (localhost) by default, as this is usually proxied
-        url = new URL(path, page.url());
+        if (page.url().includes('about:blank')) {
+          url = new URL(path, app.serverUrl);
+        } else {
+          url = new URL(path, page.url());
+        }
       } catch (e) {
         // However, in most tests we don't need to manually navigate to the domain
         // as the test is using a localhost app directly
