@@ -1,5 +1,14 @@
 # @clerk/testing
 
+## 1.1.10
+
+### Patch Changes
+
+- Use `@clerk/backend` package to fetch tokens ([#3667](https://github.com/clerk/javascript/pull/3667)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`5642b2616`](https://github.com/clerk/javascript/commit/5642b26167a6eb1aca68777d782a9686edacfd37)]:
+  - @clerk/backend@1.3.1
+
 ## 1.1.9
 
 ### Patch Changes
