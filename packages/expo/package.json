@@ -36,10 +36,11 @@
     }
   },
   "main": "./dist/index.js",
-  "source": "./src/index.js",
-  "types": "dist/index.d.ts",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "web"
   ],
   "scripts": {
     "build": "tsup",
