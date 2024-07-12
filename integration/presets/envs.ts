@@ -44,8 +44,6 @@ const withEmailLinks = base
 const withCustomRoles = base
   .clone()
   .setId('withCustomRoles')
-  // Temporarily use the stage api until the custom roles feature is released to prod
-  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-custom-roles').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-custom-roles').pk);
 

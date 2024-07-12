@@ -23,7 +23,7 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouter.withCustomRoles', config: next.appRouter, env: envs.withCustomRoles },
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
     { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
-    { id: 'astro.node.withEmailCodes', config: astro.node, env: envs.withEmailCodes },
+    { id: 'astro.node.withCustomRoles', config: astro.node, env: envs.withCustomRoles },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

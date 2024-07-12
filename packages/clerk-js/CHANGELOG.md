@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.8.1
+
+### Patch Changes
+
+- Bug fix: Clear session cookie after a user deletes their account ([#3628](https://github.com/clerk/javascript/pull/3628)) by [@octoper](https://github.com/octoper)
+
+- Set the localhost cookies with the Secure attribute ([#3604](https://github.com/clerk/javascript/pull/3604)) by [@anagstef](https://github.com/anagstef)
+
 ## 5.8.0
 
 ### Minor Changes
