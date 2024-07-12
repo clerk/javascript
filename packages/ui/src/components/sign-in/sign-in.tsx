@@ -251,7 +251,7 @@ export function SignInComponentLoaded() {
                               </SignIn.Action>
 
                               <SignIn.Action
-                                navigate='start'
+                                navigate='choose-strategy'
                                 asChild
                               >
                                 <LinkButton disabled={isGlobalLoading || isSubmitting}>
@@ -335,6 +335,7 @@ export function SignInComponentLoaded() {
                                   {t('formButtonPrimary')}
                                 </Button>
                               </SignIn.Action>
+
                               <SignIn.Action
                                 asChild
                                 navigate='choose-strategy'
@@ -405,6 +406,62 @@ export function SignInComponentLoaded() {
               </Card.Root>
             </SignIn.Step>
 
+            <SignIn.Step name='choose-strategy'>
+              <Card.Root>
+                <Card.Content>
+                  <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
+                    <Card.Title>{t('signIn.alternativeMethods.title')}</Card.Title>
+                    <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
+                  </Card.Header>
+                  <Card.Body>
+                    <div className='flex flex-col gap-2'>
+                      <Connections disabled={isGlobalLoading} />
+
+                      {
+                        // To be implemented in SDKI-72
+                      }
+                      <SignIn.SupportedStrategy
+                        name='email_link'
+                        asChild
+                      >
+                        <SecondaryButton icon={<Icon.LinkSm />}>
+                          {t('signIn.alternativeMethods.blockButton__emailLink', {
+                            identifier: SignIn.SafeIdentifier,
+                          })}
+                        </SecondaryButton>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='email_code'
+                        asChild
+                      >
+                        <SecondaryButton icon={<Icon.Envelope />}>
+                          {t('signIn.alternativeMethods.blockButton__emailCode', {
+                            identifier: SignIn.SafeIdentifier,
+                          })}
+                        </SecondaryButton>
+                      </SignIn.SupportedStrategy>
+                    </div>
+
+                    <SignIn.Action
+                      navigate='previous'
+                      asChild
+                    >
+                      <LinkButton>{t('backButton')}</LinkButton>
+                    </SignIn.Action>
+                  </Card.Body>
+                </Card.Content>
+                <Card.Footer />
+              </Card.Root>
+            </SignIn.Step>
+
             <SignIn.Step name='forgot-password'>
               <Card.Root>
                 <Card.Content>
@@ -431,6 +488,20 @@ export function SignInComponentLoaded() {
 
                       <div className='flex flex-col gap-2'>
                         <Connections disabled={isGlobalLoading} />
+
+                        {
+                          // To be implemented in SDKI-72
+                        }
+                        <SignIn.SupportedStrategy
+                          name='email_link'
+                          asChild
+                        >
+                          <SecondaryButton icon={<Icon.LinkSm />}>
+                            {t('signIn.alternativeMethods.blockButton__emailLink', {
+                              identifier: SignIn.SafeIdentifier,
+                            })}
+                          </SecondaryButton>
+                        </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='reset_password_email_code'

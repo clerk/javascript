@@ -506,6 +506,48 @@ export const CheckmarkCircleSm = createIcon({
   ),
 });
 
+export const Checkmark = createIcon({
+  displayName: 'IconCheckmark',
+  viewBox: '0 0 10 10',
+  path: (
+    <path
+      d='m1 6 3 3 5-8'
+      stroke='currentColor'
+      strokeWidth='1.25'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  ),
+});
+
+export const ChevronUpDown = createIcon({
+  displayName: 'IconChevronUpDown',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      fill='currentColor'
+      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
+    />
+  ),
+});
+
+export const Envelope = createIcon({
+  displayName: 'IconEnvelope',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        fill='currentColor'
+        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
+      />
+      <path
+        fill='currentColor'
+        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
+      />
+    </>
+  ),
+});
+
 export const ExclamationOctagonSm = createIcon({
   displayName: 'IconExclamationOctagonSm',
   viewBox: '0 0 16 16',
@@ -651,42 +693,14 @@ export const InformationLegacy = createIcon({
   ),
 });
 
-export const Envelope = createIcon({
-  displayName: 'IconEnvelope',
-  viewBox: '0 0 16 16',
-  path: (
-    <>
-      <path
-        fill='currentColor'
-        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
-      />
-      <path
-        fill='currentColor'
-        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
-      />
-    </>
-  ),
-});
-
-export const ChevronUpDown = createIcon({
-  displayName: 'IconChevronUpDown',
+export const LinkSm = createIcon({
+  displayName: 'IconLinkSm',
   viewBox: '0 0 16 16',
   path: (
     <path
-      fill='currentColor'
-      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
-    />
-  ),
-});
-
-export const Checkmark = createIcon({
-  displayName: 'IconCheckmark',
-  viewBox: '0 0 10 10',
-  path: (
-    <path
-      d='m1 6 3 3 5-8'
+      d='M7.75 3.7891L7.86522 3.67388C9.09706 2.44204 11.0943 2.44204 12.3261 3.67388C13.558 4.90572 13.558 6.90294 12.3261 8.13478L12.2109 8.25M6.75 9.25L9.25 6.75M8.25 12.2109L8.13478 12.3261C6.90294 13.558 4.90572 13.558 3.67388 12.3261C2.44204 11.0943 2.44204 9.09706 3.67388 7.86522L3.78911 7.75'
       stroke='currentColor'
-      strokeWidth='1.25'
+      strokeWidth={1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
     />
