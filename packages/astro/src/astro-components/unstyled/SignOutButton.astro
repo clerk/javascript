@@ -1,0 +1,28 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types'
+import type { SignOutOptions } from '@clerk/types';
+type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{ as: Tag; } & SignOutOptions>
+
+import { generateSafeId } from '@clerk/astro/internal';
+
+const safeId = generateSafeId();
+
+const {
+  as: Tag = 'button',
+  redirectUrl = '/',
+  sessionId,
+  ...elementProps
+} = Astro.props
+---
+
+<Tag {...elementProps} data-clerk-unstyled-id={safeId}>
+  <slot>Sign out</slot>
+</Tag >
+
+<script is:inline define:vars={{ redirectUrl, sessionId, safeId }}>
+  const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
+
+  btn.addEventListener("click", () => {
+    window.Clerk.signOut({ redirectUrl, sessionId })
+  });
+</script>

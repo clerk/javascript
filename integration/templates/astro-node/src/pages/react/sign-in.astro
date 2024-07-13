@@ -1,0 +1,10 @@
+---
+import { SignIn } from "@clerk/astro/react";
+import Layout from "../../layouts/react/Layout.astro";
+---
+
+<Layout title="Welcome to Astro.">
+  <div class="w-full flex justify-center">
+    <SignIn client:load />
+  </div>
+</Layout>

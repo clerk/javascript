@@ -6,7 +6,7 @@ import { common } from './commonPageObject';
 export type EnchancedPage = ReturnType<typeof createAppPageObject>;
 export type TestArgs = { page: EnchancedPage; context: BrowserContext; browser: Browser };
 
-export type Sections = 'profile' | 'emailAddresses' | 'username' | 'phoneNumbers';
+export type Sections = 'profile' | 'emailAddresses' | 'username' | 'phoneNumbers' | 'danger';
 
 export const createUserProfileComponentPageObject = (testArgs: TestArgs) => {
   const { page } = testArgs;
