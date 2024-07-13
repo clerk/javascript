@@ -2,7 +2,6 @@ import { useClerk, useSignIn, useUser } from '@clerk/clerk-react';
 import type { SignInResource } from '@clerk/types';
 import { AuthenticationType, isEnrolledAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
 import {
-  canUseBiometricAuthentication,
   deleteItemAsync,
   getItem,
   getItemAsync,
@@ -144,7 +143,7 @@ export function LocalCredentialsProvider(props: PropsWithChildren): JSX.Element 
   const biometryType = hasEnrolledBiometric ? authenticationType : null;
 
   const setCredentials = async (creds: LocalCredentials) => {
-    if (!canUseBiometricAuthentication()) {
+    if (!(await isEnrolledAsync())) {
       return;
     }
 
