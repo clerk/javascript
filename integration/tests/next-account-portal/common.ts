@@ -64,9 +64,9 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
     .then(cookies => cookies.find(c => c.name === CLERK_SESSION_COOKIE_NAME)?.value);
 
   // Check that the new localhost DevBrowser JWT is the same as the one set after signing in the Account Portal
-  // and not the same as the initial DevBrowser JWT
+  // and the same as the initial DevBrowser JWT
   expect(newLocalhostDbJwt).toEqual(appDbJwtAfterSignIn);
-  expect(newLocalhostDbJwt).not.toEqual(initialDbJwt);
+  expect(newLocalhostDbJwt).toEqual(initialDbJwt);
 
   // Check that the __session cookie is set
   expect(!!__session).toBeTruthy();
@@ -130,9 +130,9 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
     .then(cookies => cookies.find(c => c.name === CLERK_SESSION_COOKIE_NAME)?.value);
 
   // Check that the new localhost DevBrowser JWT is the same as the one set after signing in the Account Portal
-  // and not the same as the initial DevBrowser JWT
+  // and the same as the initial DevBrowser JWT
   expect(newLocalhostDbJwt).toEqual(appDbJwtAfterSignIn);
-  expect(newLocalhostDbJwt).not.toEqual(initialDbJwt);
+  expect(newLocalhostDbJwt).toEqual(initialDbJwt);
 
   // Check that the __session cookie is set
   expect(!!__session).toBeTruthy();

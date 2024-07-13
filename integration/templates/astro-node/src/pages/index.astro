@@ -1,10 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
-import SignOutButton from "../lib/astro-components/SignOutButton.astro";
 
-import { SignedIn, SignedOut } from "@clerk/astro/components/react";
-import { OrganizationSwitcher } from "@clerk/astro/components/interactive";
+import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from "@clerk/astro/components";
 ---
 
 <Layout title="Welcome to Astro.">
@@ -19,22 +17,17 @@ import { OrganizationSwitcher } from "@clerk/astro/components/interactive";
       }}
       afterSelectOrganizationUrl="/organization"
     />
-    <SignOutButton />
+    <SignOutButton>Sign out!</SignOutButton>
   </SignedIn>
 
   <div class="h-12"></div>
 
-  <p class="instructions">
-    To get started, open the directory <code>src/pages</code> in your project.<br
-    />
-    <strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
-  </p>
   <ul role="list" class="link-card-grid">
     <SignedOut>
       <Card
         href="/sign-in"
         title="Log in"
-        body="Learn how Astro works and explore the official API docs."
+        body="Go to this page to log in"
       />
       <Card
         href="/sign-up"
@@ -46,7 +39,7 @@ import { OrganizationSwitcher } from "@clerk/astro/components/interactive";
       <Card
         href="/user"
         title="User Profile"
-        body="Learn how Astro works and explore the official API docs."
+        body="Go to this page to see your profile"
       />
       <Card
         href="/organization"

@@ -21,6 +21,8 @@ import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
 
+import { SignUpIdentifier } from './indentifiers';
+
 export function SignUpComponent() {
   return (
     <SignUp.Root>
@@ -115,6 +117,7 @@ function SignUpComponentLoaded() {
                             hintText={t('formFieldHintText__optional')}
                             required={phoneNumberRequired}
                             disabled={isGlobalLoading}
+                            initPhoneWithCode={clerk.client.signUp.phoneNumber || ''}
                             locationBasedCountryIso={locationBasedCountryIso}
                           />
                         ) : null}
@@ -171,11 +174,7 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: elements work
-                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
-                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
-                          */}
-                          +1 (424) 424-4242{' '}
+                          <SignUpIdentifier phoneNumber />
                           <SignUp.Action
                             navigate='start'
                             asChild
@@ -244,11 +243,7 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: elements work
-                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
-                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
-                          */}
-                          alex.carpenter@clerk.dev{' '}
+                          <SignUpIdentifier emailAddress />
                           <SignUp.Action
                             navigate='start'
                             asChild

@@ -80,11 +80,11 @@ npm run dev
 ### Set environment variables
 
 ```sh
-PUBLIC_ASTRO_APP_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
+PUBLIC_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
 CLERK_SECRET_KEY=sk_(test|live)_xxxxxxx
 
-PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL=/sign-in # update this if sign in page exists on another path
-PUBLIC_ASTRO_APP_CLERK_SIGN_UP_URL=/sign-up # update this if sign up page exists on another path
+PUBLIC_CLERK_SIGN_IN_URL=/sign-in # update this if sign in page exists on another path
+PUBLIC_CLERK_SIGN_UP_URL=/sign-up # update this if sign up page exists on another path
 ```
 
 ### Update `env.d.ts`
@@ -196,7 +196,7 @@ All of the above can be used with React or Vanilla JS. The only difference is th
 
 ```ts
 // Import UserProfile build with React (requires `@astro/react`)
-import { UserProfile } from '@clerk/astro/components/react';
+import { UserProfile } from '@clerk/astro/client/react';
 
 // Import UserButton build with vanilla JS
 import { UserProfile } from '@clerk/astro/components/interactive';
@@ -216,7 +216,7 @@ All of the above can be used with React or only on server. The only difference i
 
 ```ts
 // Import Protect build with React (requires `@astro/react`)
-import { Protect } from '@clerk/astro/components/react';
+import { Protect } from '@clerk/astro/client/react';
 
 // Import SignedIn build server side code
 import { SignedIn } from '@clerk/astro/components/control';
