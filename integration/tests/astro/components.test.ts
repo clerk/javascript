@@ -96,4 +96,69 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await expect(u.page.getByText('Go to this page to see your profile')).toBeVisible();
     await expect(u.page.getByText('Sign out!')).toBeVisible();
   });
+
+  test('SignInButton renders and respects props', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.page.goToRelative('/buttons');
+    await u.po.expect.toBeSignedOut();
+    await u.page.waitForClerkJsLoaded();
+
+    await u.page.getByRole('button', { name: /Sign in/i }).click();
+
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+
+    await u.page.waitForAppUrl('/user');
+
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('SignUpButton renders and respects props', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    const fakeUser = u.services.users.createFakeUser({
+      fictionalEmail: true,
+      withPhoneNumber: true,
+      withUsername: true,
+    });
+
+    await u.page.goToRelative('/buttons');
+    await u.page.waitForClerkJsLoaded();
+
+    await u.page.getByRole('button', { name: /Sign up/i }).click();
+
+    await u.po.signUp.waitForMounted();
+
+    // Fill in sign up form
+    await u.po.signUp.signUpWithEmailAndPassword({
+      email: fakeUser.email,
+      password: fakeUser.password,
+    });
+
+    // Verify email
+    await u.po.signUp.enterTestOtpCode();
+
+    await u.page.waitForAppUrl('/user');
+
+    // Check if user is signed in
+    await u.po.expect.toBeSignedIn();
+
+    await fakeUser.deleteIfExists();
+  });
+
+  test('test updateClerkOptions by changing localization on the fly', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    const selectElement = await u.page.$('select');
+    const selectedOption = await selectElement.evaluate(el => (el as any).options[(el as any).selectedIndex].text);
+    if (selectedOption !== 'English') {
+      throw new Error('English option is not selected by default');
+    }
+
+    await expect(u.page.getByText('Welcome back! Please sign in to continue')).toBeVisible();
+    await selectElement.selectOption({ label: 'French' });
+
+    await expect(u.page.getByText('pour continuer vers')).toBeVisible();
+  });
 });
