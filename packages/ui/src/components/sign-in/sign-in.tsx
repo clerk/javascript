@@ -226,6 +226,7 @@ export function SignInComponentLoaded() {
                             <LinkButton
                               size='sm'
                               disabled={isGlobalLoading}
+                              type='button'
                             >
                               {t('formFieldAction__forgotPassword')}
                             </LinkButton>
