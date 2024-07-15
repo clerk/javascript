@@ -21,6 +21,8 @@ export type OAuthProviderSettings = {
   required: boolean;
   authenticatable: boolean;
   strategy: OAuthStrategy;
+  name: string;
+  logo_url: string | null;
 };
 
 export type AttributeDataJSON = {
