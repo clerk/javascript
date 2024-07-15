@@ -51,7 +51,7 @@ export function isWeb3Strategy(
   strategy: any,
   available: EnabledThirdPartyProviders['web3Strategies'],
 ): strategy is Web3Strategy {
-  return available.includes(strategy);
+  return available.includes(strategy.startsWith('web3_') ? strategy : `web3_${strategy}_signature`);
 }
 
 export function isAuthenticatableOauthStrategy(

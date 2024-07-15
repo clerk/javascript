@@ -1,29 +1,14 @@
-import {
-  type AuthObject,
-  AuthStatus,
-  type SignedInAuthObject,
-  signedInAuthObject,
-  type SignedOutAuthObject,
-  signedOutAuthObject,
-} from '@clerk/backend/internal';
+import { type AuthObject, AuthStatus, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import type { APIContext } from 'astro';
 
 import { getSafeEnv } from './get-safe-env';
 import { getAuthKeyFromRequest } from './utils';
 
-type AuthObjectWithoutResources<T extends AuthObject> = Omit<T, 'user' | 'organization' | 'session'>;
-
-export type GetAuthReturn =
-  | AuthObjectWithoutResources<SignedInAuthObject>
-  | AuthObjectWithoutResources<SignedOutAuthObject>;
+export type GetAuthReturn = AuthObject;
 
 export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: string }) => {
-  return (
-    req: Request,
-    locals: APIContext['locals'],
-    opts?: { secretKey?: string },
-  ): AuthObjectWithoutResources<SignedInAuthObject> | AuthObjectWithoutResources<SignedOutAuthObject> => {
+  return (req: Request, locals: APIContext['locals'], opts?: { secretKey?: string }): GetAuthReturn => {
     // When the auth status is set, we trust that the middleware has already run
     // Then, we don't have to re-verify the JWT here,
     // we can just strip out the claims manually.
@@ -62,5 +47,5 @@ const authAuthHeaderMissing = (helperName = 'auth') =>
     `;
 
 export const getAuth = createGetAuth({
-  noAuthStatusMessage: authAuthHeaderMissing('getAuth'),
+  noAuthStatusMessage: authAuthHeaderMissing(),
 });
