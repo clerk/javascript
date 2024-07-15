@@ -16,14 +16,16 @@ export function Connections(props: { disabled?: boolean }) {
         const iconKey = connection?.icon;
         const IconComponent = iconKey ? Icon[iconKey] : null;
         return (
-          <Common.Connection
+          <Common.Loading
             key={c.provider}
-            name={c.provider}
-            asChild
+            scope={`provider:${c.provider}`}
           >
-            <Common.Loading scope={`provider:${c.provider}`}>
-              {isConnectionLoading => {
-                return (
+            {isConnectionLoading => {
+              return (
+                <Common.Connection
+                  name={c.provider}
+                  asChild
+                >
                   <Connection.Button
                     busy={isConnectionLoading}
                     disabled={props?.disabled || isConnectionLoading}
@@ -32,10 +34,10 @@ export function Connections(props: { disabled?: boolean }) {
                   >
                     {connection?.name || c.provider}
                   </Connection.Button>
-                );
-              }}
-            </Common.Loading>
-          </Common.Connection>
+                </Common.Connection>
+              );
+            }}
+          </Common.Loading>
         );
       })}
     </Connection.Root>
