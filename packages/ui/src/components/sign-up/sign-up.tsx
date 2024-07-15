@@ -182,7 +182,7 @@ function SignUpComponentLoaded() {
                             <button
                               type='button'
                               className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
-                              aria-label='Edit phone number'
+                              aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
                             </button>
@@ -251,7 +251,7 @@ function SignUpComponentLoaded() {
                             <button
                               type='button'
                               className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
-                              aria-label='Edit email address'
+                              aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
                             </button>
