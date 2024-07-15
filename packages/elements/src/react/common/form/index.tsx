@@ -193,7 +193,7 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 
 const useInput = ({
   name: inputName,
-  value: initialValue,
+  value: providedValue,
   type: inputType,
   onChange: onChangeProp,
   onBlur: onBlurProp,
@@ -265,7 +265,7 @@ const useInput = ({
       return;
     }
 
-    ref.send({ type: 'FIELD.ADD', field: { name, value: initialValue } });
+    ref.send({ type: 'FIELD.ADD', field: { name, value: providedValue } });
 
     return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -274,7 +274,7 @@ const useInput = ({
   const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
-      if (!name || initialValue) {
+      if (!name) {
         return;
       }
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
@@ -282,7 +282,7 @@ const useInput = ({
         validatePassword(event.target.value);
       }
     },
-    [ref, name, onChangeProp, initialValue, shouldValidatePassword, validatePassword],
+    [ref, name, onChangeProp, shouldValidatePassword, validatePassword],
   );
 
   const onBlur = React.useCallback(
@@ -306,11 +306,11 @@ const useInput = ({
   );
 
   React.useEffect(() => {
-    if (!initialValue || !name) {
+    if (!name) {
       return;
     }
-    ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
-  }, [name, ref, initialValue]);
+    ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
+  }, [name, ref, providedValue]);
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;
