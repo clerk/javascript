@@ -2,4 +2,4 @@
 "@clerk/astro": patch
 ---
 
-Introduce Clerk loaded and loading React components
+Introduce `<ClerkLoaded/>` and `<ClerkLoading/>` React components
