@@ -4,7 +4,7 @@ import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy 
 import { appendModalState } from '../../../utils';
 import { ProviderInitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
-import { Badge, Box, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { Badge, Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -57,7 +57,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
             const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
             const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
             const errorMessage = !reauthorizationRequired
-              ? error
+              ? localizationKeys('unstable__errors.external_account_missing_refresh_token')
               : localizationKeys('userProfile.start.connectedAccountsSection.subtitle__reauthorize');
 
             const ImageOrInitial = () =>
@@ -98,7 +98,7 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                         </Text>
                         {(error || reauthorizationRequired) && (
                           <Badge
-                            colorScheme='danger'
+                            colorScheme='warning'
                             localizationKey={localizationKeys('badge__requiresAction')}
                           />
                         )}
@@ -109,11 +109,26 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
                   <ConnectedAccountMenu account={account} />
                 </ProfileSection.Item>
                 {(error || reauthorizationRequired) && (
-                  <Text
-                    colorScheme='danger'
-                    sx={t => ({ padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$8x5}` })}
-                    localizationKey={errorMessage}
-                  />
+                  <>
+                    <Text
+                      colorScheme='secondary'
+                      sx={t => ({
+                        padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$8x5}`,
+                        display: 'inline-block',
+                      })}
+                      localizationKey={errorMessage}
+                    />
+
+                    <Button
+                      sx={{
+                        display: 'inline-block',
+                      }}
+                      variant='ghost'
+                      localizationKey={localizationKeys(
+                        'userProfile.start.connectedAccountsSection.actionLabel__connectionFailed',
+                      )}
+                    />
+                  </>
                 )}
 
                 <Action.Open value='remove'>

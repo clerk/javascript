@@ -750,6 +750,7 @@ type UnstableErrors = WithParamName<{
   form_identifier_exists__phone_number: LocalizationValue;
   form_password_not_strong_enough: LocalizationValue;
   form_password_size_in_bytes_exceeded: LocalizationValue;
+  external_account_missing_refresh_token: LocalizationValue;
   passwordComplexity: {
     sentencePrefix: LocalizationValue;
     minimumLength: LocalizationValue;
