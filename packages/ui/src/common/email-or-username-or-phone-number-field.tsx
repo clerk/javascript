@@ -31,7 +31,7 @@ export function EmailOrUsernameOrPhoneNumberField({
     <ToggleButton
       isSelected={showPhoneNumberField}
       onChange={setShowPhoneNumberField}
-      className={linkButton({ size: 'sm', disabled: props.disabled })}
+      className={linkButton({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
       <span className='sr-only'>{toggleDescription}</span>
       {showPhoneNumberField ? 'Use email or username' : 'Use phone'}
