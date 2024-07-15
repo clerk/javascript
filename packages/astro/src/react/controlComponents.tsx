@@ -1,7 +1,7 @@
 import type { CheckAuthorizationWithCustomPermissions } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
 
-import type { ProtectComponentDefaultProps } from '../../types';
+import type { ProtectComponentDefaultProps } from '../types';
 import { useAuth } from './hooks';
 
 export function SignedOut(props: PropsWithChildren) {

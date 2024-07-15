@@ -1,30 +1,35 @@
-import { Clerk } from '@clerk/clerk-js';
-
+import { waitForClerkScript } from '../internal/utils/loadClerkJSScript';
 import { $clerk, $csrState } from '../stores/internal';
-import type { AstroClerkCreateInstanceParams, AstroClerkUpdateOptions } from '../types';
+import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
-import type { CreateClerkInstanceInternalFn } from './types';
 
-let initOptions: AstroClerkCreateInstanceParams | undefined;
+let initOptions: AstroClerkIntegrationParams | undefined;
 
 /**
  * Prevents firing clerk.load multiple times
  */
-export const createClerkInstance: CreateClerkInstanceInternalFn = runOnce(createClerkInstanceInternal);
+const createClerkInstance = runOnce(createClerkInstanceInternal);
 
-export function createClerkInstanceInternal(options?: AstroClerkCreateInstanceParams) {
-  let clerkJSInstance = window.Clerk as unknown as Clerk;
+async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams) {
+  let clerkJSInstance = window.Clerk;
   if (!clerkJSInstance) {
-    clerkJSInstance = new Clerk(options!.publishableKey);
+    await waitForClerkScript();
+
+    if (!window.Clerk) {
+      throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+    }
+    clerkJSInstance = window.Clerk;
+  }
+
+  if (!$clerk.get()) {
     // @ts-ignore
     $clerk.set(clerkJSInstance);
-    // @ts-ignore
-    window.Clerk = clerkJSInstance;
   }
 
   initOptions = options;
-  return clerkJSInstance
+  // TODO: Update Clerk type from @clerk/types to include this method
+  return (clerkJSInstance as any)
     .load(options)
     .then(() => {
       $csrState.setKey('isLoaded', true);
@@ -41,14 +46,16 @@ export function createClerkInstanceInternal(options?: AstroClerkCreateInstancePa
     .catch(() => {});
 }
 
-export function updateClerkOptions(options: AstroClerkUpdateOptions) {
+function updateClerkOptions(options: AstroClerkUpdateOptions) {
   const clerk = $clerk.get();
   if (!clerk) {
     throw new Error('Missing clerk instance');
   }
-  //@ts-ignore
-  clerk.__unstable__updateProps({
+  // TODO: Update Clerk type from @clerk/types to include this method
+  void (clerk as any).__unstable__updateProps({
     options: { ...initOptions, ...options },
     appearance: { ...initOptions?.appearance, ...options.appearance },
   });
 }
+
+export { createClerkInstance, updateClerkOptions };

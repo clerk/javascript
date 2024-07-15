@@ -1,1 +1,3 @@
-export { default } from './integration';
+import { createIntegration } from './integration/create-integration';
+
+export default createIntegration();

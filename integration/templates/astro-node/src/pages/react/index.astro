@@ -1,9 +1,8 @@
 ---
 import Layout from "../../layouts/react/Layout.astro";
 import Card from "../../components/Card.astro";
-import SignOutButton from "../../lib/astro-components/SignOutButton.astro";
 
-import { SignedIn, SignedOut, OrganizationSwitcher } from "@clerk/astro/client/react";
+import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from "@clerk/astro/react";
 ---
 
 <Layout title="Welcome to Astro.">
@@ -19,7 +18,7 @@ import { SignedIn, SignedOut, OrganizationSwitcher } from "@clerk/astro/client/r
       }}
       afterSelectOrganizationUrl="/organization"
     />
-    <SignOutButton />
+    <SignOutButton client:load>Sign out!</SignOutButton>
   </SignedIn>
 
   <div class="h-12"></div>
