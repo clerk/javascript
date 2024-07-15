@@ -72,7 +72,20 @@ export const Logo = React.forwardRef(function Logo(
       className={cx('max-h-24 max-w-24 object-contain', className)}
     />
   );
-  return <div className='mb-4 flex justify-center'>{href ? <a href={href}>{img}</a> : img}</div>;
+  return (
+    <div className='mb-4 flex justify-center'>
+      {href ? (
+        <a
+          href={href}
+          className='focus-visible:ring-default outline-none focus-visible:ring-[0.125rem]'
+        >
+          {img}
+        </a>
+      ) : (
+        img
+      )}
+    </div>
+  );
 });
 
 export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function Title(
