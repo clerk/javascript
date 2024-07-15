@@ -8,7 +8,7 @@ const unautorized = () =>
 /**
  * 3. Support handler
  */
-const isProtectedPage = createRouteMatcher(['/user(.*)', '/discover(.*)', /^\/organization/]);
+const isProtectedPage = createRouteMatcher(['/user(.*)', '/discover(.*)']);
 
 const isProtectedApiRoute = createRouteMatcher(['/api/protected(.*)']);
 
@@ -27,6 +27,9 @@ export const onRequest = clerkMiddleware((auth, context, next) => {
   }
 
   if (!auth().orgId && requestURL.pathname !== '/discover' && requestURL.pathname === '/organization') {
+    if (!auth().userId) {
+      return next();
+    }
     const searchParams = new URLSearchParams({
       redirectUrl: requestURL.href,
     });
