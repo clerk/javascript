@@ -35,13 +35,14 @@ export function SignInComponent() {
 export function SignInComponentLoaded() {
   const clerk = useClerk();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
+  console.log(clerk);
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passkeyEnabled } = useAttributes('passkey');
-  const { applicationName, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
@@ -173,7 +174,7 @@ export function SignInComponentLoaded() {
                   </Card.Body>
                 </Card.Content>
 
-                <Card.Footer>
+                <Card.Footer branded={branded}>
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.start.actionText')}{' '}
@@ -402,7 +403,7 @@ export function SignInComponentLoaded() {
                     </Card.Body>
                   </SignIn.Strategy>
                 </Card.Content>
-                <Card.Footer />
+                <Card.Footer branded={branded} />
               </Card.Root>
             </SignIn.Step>
 
@@ -458,7 +459,7 @@ export function SignInComponentLoaded() {
                     </SignIn.Action>
                   </Card.Body>
                 </Card.Content>
-                <Card.Footer />
+                <Card.Footer branded={branded} />
               </Card.Root>
             </SignIn.Step>
 
@@ -524,7 +525,7 @@ export function SignInComponentLoaded() {
                     </div>
                   </Card.Body>
                 </Card.Content>
-                <Card.Footer />
+                <Card.Footer branded={branded} />
               </Card.Root>
             </SignIn.Step>
 
@@ -581,7 +582,7 @@ export function SignInComponentLoaded() {
                     </div>
                   </Card.Body>
                 </Card.Content>
-                <Card.Footer />
+                <Card.Footer branded={branded} />
               </Card.Root>
             </SignIn.Step>
           </>
