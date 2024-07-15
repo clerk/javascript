@@ -4,7 +4,9 @@ declare namespace App {
     authStatus: string;
     authMessage: string | null;
     authReason: string | null;
-    auth: () => import('@clerk/astro/server').GetAuthReturn;
+    auth: () => import('@clerk/astro/server').GetAuthReturn & {
+      redirectToSignIn: import('@clerk/backend/internal').RedirectFun<Response>;
+    };
     currentUser: () => Promise<import('@clerk/astro/server').User | null>;
   }
 }
