@@ -2,7 +2,7 @@ import type { LoadedClerk } from '@clerk/types';
 import { computed, type Store, type StoreValue } from 'nanostores';
 import React from 'react';
 
-import { $clerk, $csrState } from '../../stores/internal';
+import { $clerk, $csrState } from '../stores/internal';
 
 /**
  * This implementation of `useStore` is an alternative solution to the hook exported by nanostores

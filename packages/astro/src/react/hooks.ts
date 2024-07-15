@@ -12,8 +12,8 @@ import { useCallback, useSyncExternalStore } from 'react';
 // @ts-ignore
 import { authAsyncStorage } from '#async-local-storage';
 
-import { $authStore } from '../../stores/external';
-import { $clerk, $csrState } from '../../stores/internal';
+import { $authStore } from '../stores/external';
+import { $clerk, $csrState } from '../stores/internal';
 
 type CheckAuthorizationSignedOut = undefined;
 type CheckAuthorizationWithoutOrgOrUser = (params?: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
