@@ -4,13 +4,13 @@ import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy 
 import { appendModalState } from '../../../utils';
 import { ProviderInitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
-import { Badge, Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { Box, Button, descriptors, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import { useRouter } from '../../router';
-import { type PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { handleError } from '../../utils';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
 import { RemoveConnectedAccountForm } from './RemoveResourceForm';
@@ -30,8 +30,6 @@ const RemoveConnectedAccountScreen = (props: RemoveConnectedAccountScreenProps) 
 export const ConnectedAccountsSection = withCardStateProvider(() => {
   const { user } = useUser();
   const card = useCardState();
-  const { providerToDisplayData } = useEnabledThirdPartyProviders();
-  const { additionalOAuthScopes } = useUserProfileContext();
 
   if (!user) {
     return null;
@@ -51,94 +49,12 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
       <Card.Alert>{card.error}</Card.Alert>
       <Action.Root>
         <ProfileSection.ItemList id='connectedAccounts'>
-          {accounts.map(account => {
-            const label = account.username || account.emailAddress;
-            const error = account.verification?.error?.longMessage;
-            const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
-            const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
-            const errorMessage = !reauthorizationRequired
-              ? localizationKeys('unstable__errors.external_account_missing_refresh_token')
-              : localizationKeys('userProfile.start.connectedAccountsSection.subtitle__reauthorize');
-
-            const ImageOrInitial = () =>
-              providerToDisplayData[account.provider].iconUrl ? (
-                <Image
-                  elementDescriptor={[descriptors.providerIcon]}
-                  elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
-                  alt={providerToDisplayData[account.provider].name}
-                  src={providerToDisplayData[account.provider].iconUrl}
-                  sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
-                />
-              ) : (
-                <ProviderInitialIcon
-                  id={account.provider}
-                  value={providerToDisplayData[account.provider].name}
-                />
-              );
-
-            return (
-              <Action.Root key={account.id}>
-                <ProfileSection.Item id='connectedAccounts'>
-                  <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
-                    <ImageOrInitial />
-                    <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                      <Flex
-                        gap={2}
-                        center
-                      >
-                        <Text sx={t => ({ color: t.colors.$colorText })}>{`${
-                          providerToDisplayData[account.provider].name
-                        }`}</Text>
-                        <Text
-                          truncate
-                          as='span'
-                          colorScheme='secondary'
-                        >
-                          {label ? `• ${label}` : ''}
-                        </Text>
-                        {(error || reauthorizationRequired) && (
-                          <Badge
-                            colorScheme='warning'
-                            localizationKey={localizationKeys('badge__requiresAction')}
-                          />
-                        )}
-                      </Flex>
-                    </Box>
-                  </Flex>
-
-                  <ConnectedAccountMenu account={account} />
-                </ProfileSection.Item>
-                {(error || reauthorizationRequired) && (
-                  <>
-                    <Text
-                      colorScheme='secondary'
-                      sx={t => ({
-                        padding: `${t.sizes.$none} ${t.sizes.$4} ${t.sizes.$1x5} ${t.sizes.$8x5}`,
-                        display: 'inline-block',
-                      })}
-                      localizationKey={errorMessage}
-                    />
-
-                    <Button
-                      sx={{
-                        display: 'inline-block',
-                      }}
-                      variant='ghost'
-                      localizationKey={localizationKeys(
-                        'userProfile.start.connectedAccountsSection.actionLabel__connectionFailed',
-                      )}
-                    />
-                  </>
-                )}
-
-                <Action.Open value='remove'>
-                  <Action.Card variant='destructive'>
-                    <RemoveConnectedAccountScreen accountId={account.id} />
-                  </Action.Card>
-                </Action.Open>
-              </Action.Root>
-            );
-          })}
+          {accounts.map(account => (
+            <ConnectedAccount
+              key={account.id}
+              account={account}
+            />
+          ))}
         </ProfileSection.ItemList>
 
         <AddConnectedAccount />
@@ -147,21 +63,33 @@ export const ConnectedAccountsSection = withCardStateProvider(() => {
   );
 });
 
-const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource }) => {
-  const card = useCardState();
-  const { user } = useUser();
-  const { navigate } = useRouter();
-  const { open } = useActionContext();
-  const error = account.verification?.error?.longMessage;
+const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => {
   const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
+  const { navigate } = useRouter();
+  const { user } = useUser();
+  const card = useCardState();
+
+  if (!user) {
+    return null;
+  }
+
   const isModal = mode === 'modal';
+  const { providerToDisplayData } = useEnabledThirdPartyProviders();
+  const label = account.username || account.emailAddress;
+  // TODO: any other FAPI codes
+  const errorCodesForReconnect = ['external_account_missing_refresh_token'];
+  const fallbackErrorMessage = account.verification?.error?.longMessage;
   const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
   const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
-  const actionLabel = !reauthorizationRequired
-    ? localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__connectionFailed')
-    : localizationKeys('userProfile.start.connectedAccountsSection.actionLabel__reauthorize');
+  const shouldDisplayReconnect =
+    errorCodesForReconnect.includes(account.verification?.error?.code || '') || reauthorizationRequired;
 
-  const handleOnClick = async () => {
+  const connectedAccountErrorMessage = shouldDisplayReconnect
+    ? // @ts-ignore `localizationKeys` is strictly typed
+      localizationKeys(`unstable__errors.${account.verification.error.code}`)
+    : fallbackErrorMessage;
+
+  const reconnect = async () => {
     const redirectUrl = isModal ? appendModalState({ url: window.location.href, componentName }) : window.location.href;
 
     try {
@@ -169,10 +97,6 @@ const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource })
       if (reauthorizationRequired) {
         response = await account.reauthorize({ additionalScopes, redirectUrl });
       } else {
-        if (!user) {
-          throw Error('user is not defined');
-        }
-
         response = await user.createExternalAccount({
           strategy: account.verification!.strategy as OAuthStrategy,
           redirectUrl,
@@ -186,14 +110,101 @@ const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource })
     }
   };
 
+  const ImageOrInitial = () =>
+    providerToDisplayData[account.provider].iconUrl ? (
+      <Image
+        elementDescriptor={[descriptors.providerIcon]}
+        elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
+        alt={providerToDisplayData[account.provider].name}
+        src={providerToDisplayData[account.provider].iconUrl}
+        sx={theme => ({ width: theme.sizes.$4, flexShrink: 0 })}
+      />
+    ) : (
+      <ProviderInitialIcon
+        id={account.provider}
+        value={providerToDisplayData[account.provider].name}
+      />
+    );
+
+  return (
+    <Action.Root key={account.id}>
+      <ProfileSection.Item id='connectedAccounts'>
+        <Flex sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}>
+          <ImageOrInitial />
+          <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+            <Flex
+              gap={2}
+              center
+            >
+              <Text sx={t => ({ color: t.colors.$colorText })}>{`${
+                providerToDisplayData[account.provider].name
+              }`}</Text>
+              <Text
+                truncate
+                as='span'
+                colorScheme='secondary'
+              >
+                {label ? `• ${label}` : ''}
+              </Text>
+            </Flex>
+          </Box>
+        </Flex>
+
+        <ConnectedAccountMenu />
+      </ProfileSection.Item>
+      {shouldDisplayReconnect && (
+        <Box
+          sx={t => ({
+            padding: `${t.sizes.$none} ${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$8x5}`,
+          })}
+        >
+          <Text
+            colorScheme='secondary'
+            sx={t => ({
+              paddingRight: t.sizes.$1x5,
+              display: 'inline-block',
+            })}
+            localizationKey={connectedAccountErrorMessage}
+          />
+
+          <Button
+            sx={{
+              display: 'inline-block',
+            }}
+            onClick={reconnect}
+            variant='link'
+            localizationKey={localizationKeys(
+              'userProfile.start.connectedAccountsSection.actionLabel__connectionFailed',
+            )}
+          />
+        </Box>
+      )}
+
+      {account.verification?.error?.code && !shouldDisplayReconnect && (
+        <Text
+          colorScheme='danger'
+          sx={t => ({
+            padding: `${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$1x5} ${t.sizes.$8x5}`,
+          })}
+        >
+          {fallbackErrorMessage}
+        </Text>
+      )}
+
+      <Action.Open value='remove'>
+        <Action.Card variant='destructive'>
+          <RemoveConnectedAccountScreen accountId={account.id} />
+        </Action.Card>
+      </Action.Open>
+    </Action.Root>
+  );
+};
+
+const ConnectedAccountMenu = () => {
+  const { open } = useActionContext();
+
   const actions = (
     [
-      error || reauthorizationRequired
-        ? {
-            label: actionLabel,
-            onClick: handleOnClick,
-          }
-        : null,
       {
         label: localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle'),
         isDestructive: true,

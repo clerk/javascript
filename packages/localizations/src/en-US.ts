@@ -458,7 +458,8 @@ export const enUS: LocalizationResource = {
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
-    external_account_missing_refresh_token: 'This account has been disconnected',
+
+    external_account_missing_refresh_token: 'This account has been disconnected.',
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_exists__email_address: 'This email address is taken. Please try another.',
@@ -721,8 +722,8 @@ export const enUS: LocalizationResource = {
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Remove',
         primaryButton: 'Connect account',
-        subtitle__reauthorize:
-          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
+        // subtitle__reauthorize:
+        //   'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Connected accounts',
       },
       dangerSection: {
