@@ -3,7 +3,7 @@ import '../polyfills';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import * as WebBrowser from 'expo-web-browser';
 
-import type { TokenCache } from '../caches/types';
+import type { TokenCache } from '../cache/types';
 import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 
