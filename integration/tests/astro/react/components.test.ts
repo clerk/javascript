@@ -72,10 +72,10 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })(
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/utility');
       await expect(u.page.getByText('Clerk is loading')).toBeVisible();
-      await expect(u.page.getByText('Clerk is loaded')).not.toBeVisible();
+      await expect(u.page.getByText('Clerk is loaded')).toBeHidden();
       await u.page.waitForClerkJsLoaded();
       await expect(u.page.getByText('Clerk is loaded')).toBeVisible();
-      await expect(u.page.getByText('Clerk is loading')).not.toBeVisible();
+      await expect(u.page.getByText('Clerk is loading')).toBeHidden();
     });
   },
 );

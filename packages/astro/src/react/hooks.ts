@@ -243,7 +243,7 @@ export const useAuth: UseAuth = () => {
  * This implementation of `useStore` is an alternative solution to the hook exported by nanostores
  * Reference: https://github.com/nanostores/react/blob/main/index.js
  */
-export function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
+function useStore<T extends Store, SV extends StoreValue<T>>(store: T): SV {
   const get = store.get.bind(store);
 
   return useSyncExternalStore<SV>(store.listen, get, () => {

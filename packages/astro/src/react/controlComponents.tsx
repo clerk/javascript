@@ -1,12 +1,13 @@
 import type { CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams } from '@clerk/types';
+import { computed } from 'nanostores';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { $csrState } from '../stores/internal';
+import { $clerkStore } from '../client';
 import type { ProtectComponentDefaultProps } from '../types';
-import { useAuth, useStore } from './hooks';
+import { useAuth } from './hooks';
 import type { WithClerkProp } from './utils';
-import { withClerk } from './utils';
+import { useStore, withClerk } from './utils';
 
 export function SignedOut(props: PropsWithChildren) {
   const { userId } = useAuth();
@@ -25,8 +26,10 @@ export function SignedIn(props: PropsWithChildren) {
   return props.children;
 }
 
+const $isLoadingClerkStore = computed($clerkStore, clerk => clerk?.loaded);
+
 export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
-  const { isLoaded } = useStore($csrState);
+  const isLoaded = useStore($isLoadingClerkStore);
   if (!isLoaded) {
     return null;
   }
@@ -34,7 +37,7 @@ export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX
 };
 
 export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
-  const { isLoaded } = useStore($csrState);
+  const isLoaded = useStore($isLoadingClerkStore);
   if (isLoaded) {
     return null;
   }
