@@ -67,5 +67,13 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })(
       await expect(u.page.getByText('Go to this page to see your profile')).toBeVisible();
       await expect(u.page.getByText('Sign out!')).toBeVisible();
     });
+
+    test('render content based on Clerk loaded status', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.goToRelative('/utility');
+      await expect(u.page.getByText('Clerk is loading')).toBeVisible();
+      await u.page.waitForClerkJsLoaded();
+      await expect(u.page.getByText('Clerk is loaded')).toBeVisible();
+    });
   },
 );
