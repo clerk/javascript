@@ -2,4 +2,4 @@
 "@clerk/astro": patch
 ---
 
-Add custom OAuth flow component for Astro and React
+Introduce `<AuthenticateWithRedirectCallback/>` as an Astro and as a React component
