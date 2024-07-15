@@ -42,7 +42,7 @@ function SignUpComponentLoaded() {
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
-  const { applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
+  const { applicationName, branded, homeUrl, logoImageUrl } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
@@ -154,7 +154,7 @@ function SignUpComponentLoaded() {
                     ) : null}
                   </Card.Body>
                 </Card.Content>
-                <Card.Footer>
+                <Card.Footer branded={branded}>
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signUp.start.actionText')}{' '}
@@ -337,7 +337,7 @@ function SignUpComponentLoaded() {
                     </Card.Body>
                   </SignUp.Strategy>
                 </Card.Content>
-                <Card.Footer />
+                <Card.Footer branded={branded} />
               </Card.Root>
             </SignUp.Step>
 
@@ -422,7 +422,7 @@ function SignUpComponentLoaded() {
                     </Common.Loading>
                   </Card.Body>
                 </Card.Content>
-                <Card.Footer>
+                <Card.Footer branded={branded}>
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signUp.continue.actionText')}{' '}
