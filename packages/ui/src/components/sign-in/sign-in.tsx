@@ -208,7 +208,7 @@ export function SignInComponentLoaded() {
                             <button
                               type='button'
                               className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
-                              aria-label='Edit email address'
+                              aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
                             </button>
@@ -287,7 +287,7 @@ export function SignInComponentLoaded() {
                             <button
                               type='button'
                               className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
-                              aria-label='Edit email address'
+                              aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
                             </button>
@@ -347,6 +347,60 @@ export function SignInComponentLoaded() {
                           );
                         }}
                       </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
+
+                  <SignIn.Strategy name='email_link'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.emailLink.title')}</Card.Title>
+                      <Card.Description>{t('signIn.emailLink.formSubtitle', { applicationName })}</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignIn.SafeIdentifier />
+                          <SignIn.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Start again'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignIn.Action>
+                        </span>
+                      </Card.Description>
+                    </Card.Header>
+
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+                      <SignIn.Action
+                        asChild
+                        resend
+                        // eslint-disable-next-line react/no-unstable-nested-components
+                        fallback={({ resendableAfter }) => (
+                          <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                            {t('signIn.emailLink.resendButton')} (
+                            <span className='tabular-nums'>{resendableAfter}</span>)
+                          </p>
+                        )}
+                      >
+                        <LinkButton type='button'>{t('signIn.emailLink.resendButton')}</LinkButton>
+                      </SignIn.Action>
+
+                      <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
                     </Card.Body>
                   </SignIn.Strategy>
 
@@ -425,9 +479,6 @@ export function SignInComponentLoaded() {
                     <div className='flex flex-col gap-2'>
                       <Connections disabled={isGlobalLoading} />
 
-                      {
-                        // To be implemented in SDKI-72
-                      }
                       <SignIn.SupportedStrategy
                         name='email_link'
                         asChild
