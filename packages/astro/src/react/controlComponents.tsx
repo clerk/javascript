@@ -2,8 +2,9 @@ import type { CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
+import { $csrState } from '../stores/internal';
 import type { ProtectComponentDefaultProps } from '../types';
-import { useAuth } from './hooks';
+import { useAuth, useStore } from './hooks';
 import type { WithClerkProp } from './utils';
 import { withClerk } from './utils';
 
@@ -23,6 +24,22 @@ export function SignedIn(props: PropsWithChildren) {
   }
   return props.children;
 }
+
+export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+  const { isLoaded } = useStore($csrState);
+  if (!isLoaded) {
+    return null;
+  }
+  return <>{children}</>;
+};
+
+export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
+  const { isLoaded } = useStore($csrState);
+  if (isLoaded) {
+    return null;
+  }
+  return <>{children}</>;
+};
 
 export type ProtectProps = React.PropsWithChildren<
   ProtectComponentDefaultProps & {
