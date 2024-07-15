@@ -3,7 +3,7 @@ import { computed } from 'nanostores';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { $clerkStore } from '../client';
+import { $clerkStore } from '../stores/external';
 import type { ProtectComponentDefaultProps } from '../types';
 import { useAuth } from './hooks';
 import type { WithClerkProp } from './utils';
