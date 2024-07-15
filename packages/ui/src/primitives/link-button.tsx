@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'cva';
 import * as React from 'react';
 
 export const linkButton = cva({
-  base: 'text-accent-9 focus-visible:ring-default -mx-0.5 rounded-sm px-0.5 font-medium outline-none focus-visible:ring-[0.125rem]',
+  base: 'text-accent-9 -mx-0.5 rounded-sm px-0.5 font-medium outline-none',
   variants: {
     busy: {
       false: null,
@@ -11,6 +11,12 @@ export const linkButton = cva({
     disabled: {
       false: null,
       true: 'disabled:cursor-not-allowed disabled:opacity-50',
+    },
+    // Override native behaviour for third-party packages
+    // e.g. react-aria-components
+    focusVisible: {
+      native: 'focus-visible:ring-default focus-visible:ring-[0.125rem]',
+      'data-attribute': 'data-[focus-visible]:ring-default data-[focus-visible]:ring-[0.125rem]',
     },
     size: {
       sm: 'text-sm',
@@ -27,6 +33,7 @@ export const linkButton = cva({
   defaultVariants: {
     busy: false,
     disabled: false,
+    focusVisible: 'native',
     size: 'base',
   },
 });
