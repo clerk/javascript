@@ -120,12 +120,14 @@ export const LazyImpersonationFabProvider = (
 ) => {
   return (
     <Suspense>
-      <AppearanceProvider
-        globalAppearance={props.globalAppearance}
-        appearanceKey={'impersonationFab'}
-      >
-        {props.children}
-      </AppearanceProvider>
+      <VirtualRouter startPath=''>
+        <AppearanceProvider
+          globalAppearance={props.globalAppearance}
+          appearanceKey={'impersonationFab'}
+        >
+          {props.children}
+        </AppearanceProvider>
+      </VirtualRouter>
     </Suspense>
   );
 };
