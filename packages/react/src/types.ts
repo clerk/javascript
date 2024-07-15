@@ -86,11 +86,23 @@ type ButtonProps = {
   children?: React.ReactNode;
 };
 
+// https://github.com/sindresorhus/type-fest/blob/main/source/require-one-or-none.d.ts
+type RequireExactlyOne<ObjectType, KeysType extends keyof ObjectType = keyof ObjectType> = {
+  [Key in KeysType]: Required<Pick<ObjectType, Key>> & Partial<Record<Exclude<KeysType, Key>, never>>;
+}[KeysType] &
+  Omit<ObjectType, KeysType>;
+
+type RequireNone<KeysType extends PropertyKey> = Partial<Record<KeysType, never>>;
+
+type RequireOneOrNone<ObjectType, KeysType extends keyof ObjectType = keyof ObjectType> = (
+  | RequireExactlyOne<ObjectType, KeysType>
+  | RequireNone<KeysType>
+) &
+  Omit<ObjectType, KeysType>;
+
 export type SignInButtonProps = ButtonProps &
-  Pick<
-    SignInProps,
-    'fallbackRedirectUrl' | 'forceRedirectUrl' | 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'
-  >;
+  RequireOneOrNone<SignInProps, 'fallbackRedirectUrl' | 'forceRedirectUrl'> &
+  RequireOneOrNone<SignInProps, 'signUpForceRedirectUrl' | 'signUpFallbackRedirectUrl'>;
 
 export type SignUpButtonProps = {
   unsafeMetadata?: SignUpUnsafeMetadata;
