@@ -1,7 +1,7 @@
-import type { CreateClerkInstanceInternalFn } from '../client/types';
 import { $initialState } from '../stores/internal';
 import type { AstroClerkIntegrationParams } from '../types';
 import { mergeEnvVarsWithParams } from './merge-env-vars-with-params';
+import type { CreateClerkInstanceInternalFn } from './types';
 
 /**
  * @internal

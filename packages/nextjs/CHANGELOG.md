@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.2.3
+
+### Patch Changes
+
+- Fixes a bug where Clerk's Handshake mechanism would not run when an application is rendered in an iframe. ([#3555](https://github.com/clerk/javascript/pull/3555)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`5642b2616`](https://github.com/clerk/javascript/commit/5642b26167a6eb1aca68777d782a9686edacfd37)]:
+  - @clerk/backend@1.3.1
+
 ## 5.2.2
 
 ### Patch Changes

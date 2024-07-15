@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.10.2
+
+### Patch Changes
+
+- Prefill populated fields when navigating back to the start step from the verify step ([#3685](https://github.com/clerk/javascript/pull/3685)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.10.1
 
 ## 0.10.0
