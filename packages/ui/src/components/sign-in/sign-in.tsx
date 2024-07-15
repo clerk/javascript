@@ -35,7 +35,6 @@ export function SignInComponent() {
 export function SignInComponentLoaded() {
   const clerk = useClerk();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
-  console.log(clerk);
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
   const { enabled: usernameEnabled } = useAttributes('username');
