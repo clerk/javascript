@@ -510,7 +510,20 @@ export function SignInComponentLoaded() {
                     </SignIn.Action>
                   </Card.Body>
                 </Card.Content>
-                <Card.Footer branded={branded} />
+                <Card.Footer branded={branded}>
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.alternativeMethods.actionText')}{' '}
+                      <Card.FooterActionLink
+                        // To be implemented in SDKI-115
+                        href='#'
+                      >
+                        {' '}
+                        {t('signIn.alternativeMethods.actionLink')}
+                      </Card.FooterActionLink>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                </Card.Footer>
               </Card.Root>
             </SignIn.Step>
 
@@ -576,7 +589,20 @@ export function SignInComponentLoaded() {
                     </div>
                   </Card.Body>
                 </Card.Content>
-                <Card.Footer branded={branded} />
+                <Card.Footer branded={branded}>
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.alternativeMethods.actionText')}{' '}
+                      <Card.FooterActionLink
+                        // To be implemented in SDKI-115
+                        href='#'
+                      >
+                        {' '}
+                        {t('signIn.alternativeMethods.actionLink')}
+                      </Card.FooterActionLink>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                </Card.Footer>
               </Card.Root>
             </SignIn.Step>
 
