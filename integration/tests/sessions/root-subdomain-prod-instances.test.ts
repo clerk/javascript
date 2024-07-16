@@ -20,7 +20,7 @@ const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
  * that listens to port 443. We can't run them in parallel because they would conflict with each other, unless
  * we use more custom domains to avoid collision.
  */
-test.describe('multiple apps same domain for production instances @sessions', () => {
+test.describe('root and subdomain production apps @sessions', () => {
   test.describe.configure({ mode: 'serial' });
 
   /**
@@ -230,7 +230,7 @@ test.describe('multiple apps same domain for production instances @sessions', ()
       expect(tab0Cookies.get('__session')).toBeDefined();
       expect(tab0Cookies.get('__session').domain).toEqual(hosts[0]);
 
-      // ensure that only 2 client_uat cookies (base and suffixed variant) is visible in this root domain
+      // ensure that only 2 client_uat cookies (base and suffixed variant) are visible here
       expect([...tab0Cookies.values()].filter(c => c.name.startsWith('__client_uat')).length).toEqual(2);
       expect(tab0Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0]);
 
@@ -255,15 +255,10 @@ test.describe('multiple apps same domain for production instances @sessions', ()
       expect(tab1Cookies.get('__session')).toBeDefined();
       expect(tab1Cookies.get('__session').domain).toEqual(hosts[1]);
 
-      // ensure that all client_uat cookies (base and suffixed variant set on all subdomains) are visible in this root domain
-      expect(tab1Cookies.raw().filter(c => c.name.startsWith('__client_uat')).length).toEqual(4);
-      // a __client_uat and a __client_uat_* cookie should be set on the sub domain
-      expect(
-        tab1Cookies
-          .raw()
-          .filter(c => c.name.startsWith('__client_uat'))
-          .filter(c => c.domain === `.${hosts[1]}`).length,
-      ).toEqual(2);
+      // ensure that all client_uat cookies are still set on the root domain
+      expect(tab1Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0]);
+      // we have 3 client_uat cookies here: 1 base and 2 suffixed variants
+      expect(tab1Cookies.raw().filter(c => c.name.startsWith('__client_uat')).length).toEqual(3);
     });
 
     test('signing out from the root domains does not affect the sub domain', async ({ context }) => {
