@@ -1,13 +1,8 @@
 ---
-import { ClerkLoaded, ClerkLoading } from '@clerk/astro/react';
+import { Visibility } from "../components/Visibility";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Utility">
-    <ClerkLoading client:load>
-      <div>Clerk is loading</div>
-    </ClerkLoading>
-    <ClerkLoaded client:load>
-        <div>Clerk is loaded</div>
-    </ClerkLoaded>
+    <Visibility client:load />
 </Layout>
