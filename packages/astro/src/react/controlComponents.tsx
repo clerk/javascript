@@ -3,7 +3,7 @@ import { computed } from 'nanostores';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { $clerkStore } from '../stores/external';
+import { $csrState } from '../stores/internal';
 import type { ProtectComponentDefaultProps } from '../types';
 import { useAuth } from './hooks';
 import type { WithClerkProp } from './utils';
@@ -26,7 +26,7 @@ export function SignedIn(props: PropsWithChildren) {
   return props.children;
 }
 
-const $isLoadingClerkStore = computed($clerkStore, clerk => clerk?.loaded);
+const $isLoadingClerkStore = computed($csrState, state => state.isLoaded);
 
 export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
   const isLoaded = useStore($isLoadingClerkStore);
