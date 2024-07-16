@@ -1,6 +1,7 @@
 import { waitForClerkScript } from '../internal/utils/loadClerkJSScript';
 import { $clerk, $csrState } from '../stores/internal';
 import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
+import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
 
@@ -35,6 +36,7 @@ async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams
       $csrState.setKey('isLoaded', true);
 
       mountAllClerkAstroJSComponents();
+      invokeClerkAstroJSFunctions();
 
       clerkJSInstance.addListener(payload => {
         $csrState.setKey('client', payload.client);
