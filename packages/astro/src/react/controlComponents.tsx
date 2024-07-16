@@ -32,7 +32,7 @@ const $isLoadingClerkStore = computed($csrState, state => state.isLoaded);
  * It is not guaranteed that hydration will occur before clerk-js has loaded. If Clerk is loaded by the time a React component hydrates,
  * then we **hydration error** will be thrown for any control component that renders conditionally.
  *
- * This hook ensures that`isLoaded` will always be false on the first render,
+ * This hook ensures that `isLoaded` will always be false on the first render,
  * preventing potential hydration errors and race conditions.
  */
 const useSafeIsLoaded = () => {
