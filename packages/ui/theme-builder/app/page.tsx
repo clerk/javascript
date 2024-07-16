@@ -1,29 +1,40 @@
-import { SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignOutButton } from '@clerk/nextjs';
+import { cva } from 'cva';
+import Link from 'next/link';
 
-function Button({ children }: { children: React.ReactNode }) {
-  return (
-    <button className='relative isolate rounded border bg-white bg-gradient-to-b from-white to-neutral-50 px-2.5 py-1 text-sm font-medium'>
-      {children}
-    </button>
-  );
-}
+const button = cva({
+  base: [
+    'relative isolate',
+    'text-sm text-center font-medium',
+    'px-2.5 py-1',
+    'border bg-white bg-gradient-to-b from-white to-neutral-50',
+    'rounded',
+  ],
+});
 
 export default function Home() {
   return (
     <div className='relative'>
       <SignedIn>
         <SignOutButton>
-          <Button>Sign out</Button>
+          <button className={button()}>Sign out</button>
         </SignOutButton>
       </SignedIn>
       <SignedOut>
         <div className='flex flex-col gap-4'>
-          <SignInButton>
-            <Button>Sign in</Button>
-          </SignInButton>
-          <SignUpButton>
-            <Button>Sign up</Button>
-          </SignUpButton>
+          <Link
+            href='/sign-in'
+            className={button()}
+          >
+            Sign in
+          </Link>
+
+          <Link
+            href='/sign-up'
+            className={button()}
+          >
+            Sign up
+          </Link>
         </div>
       </SignedOut>
     </div>
