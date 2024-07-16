@@ -13,6 +13,7 @@ import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
@@ -34,6 +35,7 @@ export function SignUpComponent() {
 function SignUpComponentLoaded() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
+  const { isDevelopmentOrStaging } = useEnvironment();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
@@ -46,6 +48,7 @@ function SignUpComponentLoaded() {
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
+  const isDev = isDevelopmentOrStaging();
 
   return (
     <Common.Loading>
@@ -153,6 +156,7 @@ function SignUpComponentLoaded() {
                       </Common.Loading>
                     ) : null}
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded}>
                   <Card.FooterAction>
@@ -353,6 +357,7 @@ function SignUpComponentLoaded() {
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded} />
               </Card.Root>
@@ -438,6 +443,7 @@ function SignUpComponentLoaded() {
                       }}
                     </Common.Loading>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded}>
                   <Card.FooterAction>
