@@ -42,7 +42,7 @@ type ClerkAstroMiddlewareHandler = (
   next: AstroMiddlewareNextParam,
 ) => AstroMiddlewareReturn;
 
-type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
+type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions;
 
 /**
  * Middleware for Astro that handles authentication and authorization with Clerk.
