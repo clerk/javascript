@@ -1,5 +1,13 @@
 # @clerk/elements
 
+## 0.10.4
+
+### Patch Changes
+
+- Fix issue where default field values were being set and clearing field errors. ([#3736](https://github.com/clerk/javascript/pull/3736)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Fix issue where resendable UI in the email_link verification step was not updating on click.
+
 ## 0.10.3
 
 ### Patch Changes
