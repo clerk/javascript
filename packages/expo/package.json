@@ -72,11 +72,11 @@
     "typescript": "*"
   },
   "peerDependencies": {
-    "expo-auth-session": ">=4",
+    "expo-auth-session": ">=4.0.3",
     "expo-web-browser": ">=12.5.0",
     "react": ">=18",
     "react-dom": ">=18",
-    "react-native": ">=0.73"
+    "react-native": ">=0.72"
   },
   "engines": {
     "node": ">=18.17.0"
