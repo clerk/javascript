@@ -1,0 +1,42 @@
+---
+import type { HandleOAuthCallbackParams } from '@clerk/types';
+
+type Props = HandleOAuthCallbackParams
+
+import { generateSafeId } from '@clerk/astro/internal';
+
+const safeId = generateSafeId();
+
+// TODO: Move this to a prop when we implement more control components.
+const functionName = 'handleRedirectCallback';
+---
+
+<div data-clerk-function-id={`clerk-${functionName}-${safeId}`}></div>
+
+<script is:inline define:vars={{ props: Astro.props, functionName, safeId }}>
+  /**
+   * Store the id and the props for the Astro component in order to invoice the correct Clerk function once clerk is loaded.
+   * The above is handled by `invokeClerkAstroJSFunctions`.
+   *
+   * TODO: This should be moved to a separate file once we implement more control components.
+   */
+  const setOrCreatePropMap = ({ functionName, id, props }) => {
+    if (!window.__astro_clerk_function_props) {
+      window.__astro_clerk_function_props = new Map();
+    }
+
+    if (!window.__astro_clerk_function_props.has(functionName)) {
+      const _ = new Map();
+      _.set(id, props);
+      window.__astro_clerk_function_props.set(functionName, _);
+    }
+
+    window.__astro_clerk_function_props.get(functionName)?.set(id, props);
+  };
+
+  setOrCreatePropMap({
+    functionName,
+    id: safeId,
+    props,
+  });
+</script>

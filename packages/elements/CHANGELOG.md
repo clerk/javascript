@@ -1,5 +1,16 @@
 # @clerk/elements
 
+## 0.10.3
+
+### Patch Changes
+
+- Ensure updated provided values to controlled inputs are sent to the machine ([#3702](https://github.com/clerk/javascript/pull/3702)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix isWeb3Strategy check to account for prefix and suffix ([#3708](https://github.com/clerk/javascript/pull/3708)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`0935cfce9`](https://github.com/clerk/javascript/commit/0935cfce9b69cb584886625267ddbc5367f7ae18)]:
+  - @clerk/types@4.8.0
+
 ## 0.10.2
 
 ### Patch Changes

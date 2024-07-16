@@ -20,6 +20,7 @@ type AstroClerkCreateInstanceParams = AstroClerkIntegrationParams & { publishabl
 declare global {
   interface Window {
     __astro_clerk_component_props: Map<string, Map<string, Record<string, unknown>>>;
+    __astro_clerk_function_props: Map<string, Map<string, Record<string, unknown>>>;
   }
 }
 

@@ -1,5 +1,6 @@
 import type { Clerk } from '@clerk/clerk-js';
 
+import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import type { CreateClerkInstanceInternalFn } from './types';
 
@@ -19,6 +20,7 @@ const runOnce = (onFirst: CreateClerkInstanceInternalFn) => {
 
         if (clerkJSInstance.loaded) {
           mountAllClerkAstroJSComponents();
+          invokeClerkAstroJSFunctions();
         }
         return res(clerkJSInstance.loaded);
       });
