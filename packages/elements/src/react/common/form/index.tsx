@@ -261,7 +261,7 @@ const useInput = ({
 
   // Register the field in the machine context
   React.useEffect(() => {
-    if (!name || ref.getSnapshot().context.fields.get(name)) {
+    if (!name) {
       return;
     }
 
@@ -309,7 +309,10 @@ const useInput = ({
     if (!name) {
       return;
     }
-    ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
+
+    if (providedValue !== undefined) {
+      ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
+    }
   }, [name, ref, providedValue]);
 
   // TODO: Implement clerk-js utils
