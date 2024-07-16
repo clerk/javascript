@@ -11,6 +11,7 @@ import type { UseThirdPartyProviderReturn } from '~/react/common/connections';
 import {
   getEnabledThirdPartyProviders,
   isAuthenticatableOauthStrategy,
+  isWeb3Strategy,
   providerToDisplayData,
 } from '~/utils/third-party-strategies';
 
@@ -24,7 +25,10 @@ const useIsProviderEnabled = (provider: OAuthProvider | Web3Provider): boolean |
 
   const data = getEnabledThirdPartyProviders(clerk.__unstable__environment);
 
-  return isAuthenticatableOauthStrategy(provider, data.authenticatableOauthStrategies);
+  return (
+    isAuthenticatableOauthStrategy(provider, data.authenticatableOauthStrategies) ||
+    isWeb3Strategy(provider, data.web3Strategies)
+  );
 };
 
 export const useThirdPartyProvider = <
