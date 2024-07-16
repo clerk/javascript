@@ -29,7 +29,7 @@ export function SignedIn(props: PropsWithChildren) {
 const $isLoadingClerkStore = computed($csrState, state => state.isLoaded);
 
 /*
- * This hooks ensures that the loading state is always shown on the first render,
+ * This hook ensures that the Clerk loading state is always shown on the first render,
  * preventing potential hydration mismatches and race conditions.
  *
  */
