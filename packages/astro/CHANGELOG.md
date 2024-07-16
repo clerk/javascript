@@ -1,5 +1,53 @@
 # @clerk/astro
 
+## 0.0.3
+
+### Patch Changes
+
+- Update existing env variables that is still using `PUBLIC_ASTRO_APP` prefix to `PUBLIC_`. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Move `@clerk/astro/components/*` to `@clerk/astro/components` by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  ```diff
+  - import { UserProfile } from "@clerk/astro/components/interactive"
+  + import { UserProfile } from "@clerk/astro/components"
+
+  - import { Protect } from "@clerk/astro/components/control"
+  + import { Protect } from "@clerk/astro/components"
+
+  - import { SignInButton } from "@clerk/astro/components/unstyled"
+  + import { SignInButton } from "@clerk/astro/components"
+  ```
+
+- Simplify submodules and drop the `bunlded` variant. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  Moved
+
+  - `@clerk/astro/client/react` to `@clerk/astro/react`
+  - `@clerk/astro/client/stores` to `@clerk/astro/client`
+    Dropped
+  - `@clerk/astro/bundled`
+  - `@clerk/astro/client/bundled`
+  - `@clerk/astro/internal/bundled`
+  - `@clerk/astro/integration`
+  - `@clerk/astro/integration/bundled`
+
+- Support `Astro.locals.auth().redirectToSignIn()` by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  This allows for redirectingToSignIn at the page level
+
+- Add a reusable ID generation function by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Remove `@nanostores/react` from depedency. by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Introduce `<AuthenticateWithRedirectCallback/>` as an Astro and as a React component by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7), [`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7)]:
+  - @clerk/clerk-js@5.9.0
+  - @clerk/types@4.8.0
+  - @clerk/backend@1.3.2
+  - @clerk/shared@2.3.3
+
 ## 0.0.2
 
 ### Patch Changes
