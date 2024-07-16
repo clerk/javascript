@@ -1,10 +1,10 @@
 import type { ClerkOptions } from '@clerk/types';
 
-import { waitForClerkScript } from '../internal/utils/loadClerkJSScript';
 import { $clerk, $csrState } from '../stores/internal';
 import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
+import { waitForClerkScript } from './utils/loadClerkJSScript';
 
 let initOptions: ClerkOptions | undefined;
 
@@ -32,9 +32,7 @@ async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams
   initOptions = {
     ...options,
     routerPush: to => window.history.pushState(history.state, '', to),
-    routerReplace(to) {
-      window.history.replaceState(history.state, '', to);
-    },
+    routerReplace: to => window.history.replaceState(history.state, '', to),
   };
 
   // TODO: Update Clerk type from @clerk/types to include this method
