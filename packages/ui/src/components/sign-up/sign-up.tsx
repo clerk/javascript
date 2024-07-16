@@ -312,6 +312,23 @@ function SignUpComponentLoaded() {
                           applicationName,
                         })}
                       </Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignUpIdentifier emailAddress />
+                          <SignUp.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Start again'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignUp.Action>
+                        </span>
+                      </Card.Description>
                     </Card.Header>
                     <Card.Body>
                       <Common.GlobalError>
