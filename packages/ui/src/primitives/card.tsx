@@ -3,15 +3,16 @@ import * as React from 'react';
 
 import { ClerkLogo } from './clerk-logo';
 
-export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
-  { children, className, ...props },
-  forwardedRef,
+export const Root = React.forwardRef(function CardRoot(
+  { children, className, ...props }: React.HTMLAttributes<HTMLDivElement>,
+  forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div
       ref={forwardedRef}
       {...props}
       className={cx(
+        '[--card-body-padding:theme(spacing.10)]',
         'bg-gray-2 border-gray-a6 shadow-gray-a5 relative w-96 overflow-hidden rounded-xl border bg-clip-padding shadow-xl',
         className,
       )}
@@ -30,7 +31,7 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       ref={forwardedRef}
       {...props}
       className={cx(
-        'bg-gray-surface shadow-gray-a3 border-gray-a6 relative -mx-px -mt-px flex flex-col gap-8 rounded-[inherit] border px-10 py-8 shadow-sm',
+        'bg-gray-surface shadow-gray-a3 border-gray-a6 relative -m-px flex flex-col gap-8 rounded-[inherit] border p-[--card-body-padding] shadow-sm',
         className,
       )}
     >
@@ -47,7 +48,7 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
     <div
       ref={forwardedRef}
       {...props}
-      className={cx('flex flex-col gap-1 text-center', className)}
+      className={cx('z-1 flex flex-col gap-1 text-center', className)}
     >
       {children}
     </div>
@@ -73,7 +74,7 @@ export const Logo = React.forwardRef(function Logo(
     />
   );
   return (
-    <div className='mb-4 flex justify-center'>
+    <div className='z-1 mb-4 flex justify-center'>
       {href ? (
         <a
           href={href}
@@ -125,9 +126,37 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={forwardedRef}
       {...props}
-      className={cx('flex flex-col gap-6 rounded-lg', className)}
+      className={cx('z-1 flex flex-col gap-6 rounded-lg', className)}
     >
       {children}
+    </div>
+  );
+});
+
+export const Banner = React.forwardRef(function CardBanner(
+  { children, className, ...props }: React.HTMLAttributes<HTMLParagraphElement>,
+  forwardedRef: React.ForwardedRef<HTMLParagraphElement>,
+) {
+  return (
+    <div className={cx('absolute inset-0 isolate')}>
+      <div
+        className={cx(
+          'pointer-events-none absolute inset-0 w-full',
+          // manually nudge the radius by `1px` for a snug fit
+          'rounded-b-[calc(theme(borderRadius.xl)-0.0625rem)]',
+          '[background-image:repeating-linear-gradient(-45deg,theme(colors.orange.50),_theme(colors.orange.50)_6px,_theme(colors.orange.100/0.75)_6px,_theme(colors.orange.100/0.75)_12px)]',
+          '[mask-image:linear-gradient(to_top,_black,transparent_8rem)]',
+        )}
+      />
+      <div className='absolute inset-x-0 bottom-0 z-10 flex h-[--card-body-padding] w-full items-center justify-center'>
+        <p
+          ref={forwardedRef}
+          className={cx('text-sm font-medium text-orange-500', className)}
+          {...props}
+        >
+          {children}
+        </p>
+      </div>
     </div>
   );
 });

@@ -15,6 +15,7 @@ import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
@@ -36,6 +37,7 @@ export function SignInComponentLoaded() {
   const clerk = useClerk();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const enabledConnections = useEnabledConnections();
+  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
@@ -45,6 +47,7 @@ export function SignInComponentLoaded() {
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
+  const isDev = isDevelopmentOrStaging();
 
   return (
     <Common.Loading>
@@ -171,6 +174,7 @@ export function SignInComponentLoaded() {
                       ) : null
                     }
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
 
                 <Card.Footer branded={branded}>
@@ -456,6 +460,7 @@ export function SignInComponentLoaded() {
                       </Common.Loading>
                     </Card.Body>
                   </SignIn.Strategy>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded} />
               </Card.Root>
@@ -509,8 +514,22 @@ export function SignInComponentLoaded() {
                       <LinkButton>{t('backButton')}</LinkButton>
                     </SignIn.Action>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer branded={branded} />
+                <Card.Footer branded={branded}>
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.alternativeMethods.actionText')}{' '}
+                      <Card.FooterActionLink
+                        // To be implemented in SDKI-115
+                        href='#'
+                      >
+                        {' '}
+                        {t('signIn.alternativeMethods.actionLink')}
+                      </Card.FooterActionLink>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                </Card.Footer>
               </Card.Root>
             </SignIn.Step>
 
@@ -575,8 +594,22 @@ export function SignInComponentLoaded() {
                       </SignIn.Action>
                     </div>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer branded={branded} />
+                <Card.Footer branded={branded}>
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.alternativeMethods.actionText')}{' '}
+                      <Card.FooterActionLink
+                        // To be implemented in SDKI-115
+                        href='#'
+                      >
+                        {' '}
+                        {t('signIn.alternativeMethods.actionLink')}
+                      </Card.FooterActionLink>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                </Card.Footer>
               </Card.Root>
             </SignIn.Step>
 
@@ -632,6 +665,7 @@ export function SignInComponentLoaded() {
                       </Common.Loading>
                     </div>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded} />
               </Card.Root>
