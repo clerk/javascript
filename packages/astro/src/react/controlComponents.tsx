@@ -1,13 +1,13 @@
 import type { CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams } from '@clerk/types';
 import { computed } from 'nanostores';
 import type { PropsWithChildren } from 'react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { $csrState } from '../stores/internal';
 import type { ProtectComponentDefaultProps } from '../types';
 import { useAuth } from './hooks';
 import type { WithClerkProp } from './utils';
-import { useStore, withClerk } from './utils';
+import { withClerk } from './utils';
 
 export function SignedOut(props: PropsWithChildren) {
   const { userId } = useAuth();
@@ -28,19 +28,42 @@ export function SignedIn(props: PropsWithChildren) {
 
 const $isLoadingClerkStore = computed($csrState, state => state.isLoaded);
 
+/*
+ * This hooks ensures that the loading state is always shown on the first render,
+ * preventing potential hydration mismatches and race conditions.
+ *
+ */
+const useForceFirstRenderValue = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const unsub = $isLoadingClerkStore.subscribe(() => {
+      setIsLoaded(true);
+    });
+
+    return () => unsub();
+  }, []);
+
+  return isLoaded;
+};
+
 export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
-  const isLoaded = useStore($isLoadingClerkStore);
+  const isLoaded = useForceFirstRenderValue();
+
   if (!isLoaded) {
     return null;
   }
+
   return <>{children}</>;
 };
 
 export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
-  const isLoaded = useStore($isLoadingClerkStore);
+  const isLoaded = useForceFirstRenderValue();
+
   if (isLoaded) {
     return null;
   }
+
   return <>{children}</>;
 };
 
