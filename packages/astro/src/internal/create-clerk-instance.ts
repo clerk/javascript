@@ -8,6 +8,36 @@ import { waitForClerkScript } from './utils/loadClerkJSScript';
 
 let initOptions: ClerkOptions | undefined;
 
+// TODO-SHARED: copied from `clerk-js`
+export const CLERK_BEFORE_UNLOAD_EVENT = 'clerk:beforeunload';
+export const ALLOWED_PROTOCOLS = ['http:', 'https:'];
+
+function windowNavigate(to: URL | string): void {
+  let toURL = new URL(to, window.location.href);
+
+  if (!ALLOWED_PROTOCOLS.includes(toURL.protocol)) {
+    console.warn(
+      `Clerk: "${toURL.protocol}" is not a valid protocol. Redirecting to "/" instead. If you think this is a mistake, please open an issue.`,
+    );
+    toURL = new URL('/', window.location.href);
+  }
+
+  window.dispatchEvent(new CustomEvent(CLERK_BEFORE_UNLOAD_EVENT));
+  window.location.href = toURL.href;
+}
+
+function createNavigationHandler(
+  windowNav: typeof window.history.pushState | typeof window.history.replaceState,
+): Exclude<ClerkOptions['routerPush'], undefined> | Exclude<ClerkOptions['routerReplace'], undefined> {
+  return (to, metadata) => {
+    if (metadata?.__internal_metadata?.navigationType === 'internal') {
+      windowNav(history.state, '', to);
+    } else {
+      windowNavigate(to);
+    }
+  };
+}
+
 /**
  * Prevents firing clerk.load multiple times
  */
@@ -31,8 +61,8 @@ async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams
 
   initOptions = {
     ...options,
-    routerPush: to => window.history.pushState(history.state, '', to),
-    routerReplace: to => window.history.replaceState(history.state, '', to),
+    routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
+    routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
   };
 
   // TODO: Update Clerk type from @clerk/types to include this method
