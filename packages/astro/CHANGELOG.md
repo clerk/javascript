@@ -1,53 +1,5 @@
 # @clerk/astro
 
-## 0.0.3
-
-### Patch Changes
-
-- Update existing env variables that is still using `PUBLIC_ASTRO_APP` prefix to `PUBLIC_`. ([#3707](https://github.com/clerk/javascript/pull/3707)) by [@wobsoriano](https://github.com/wobsoriano)
-
-- Move `@clerk/astro/components/*` to `@clerk/astro/components` ([#3705](https://github.com/clerk/javascript/pull/3705)) by [@panteliselef](https://github.com/panteliselef)
-
-  ```diff
-  - import { UserProfile } from "@clerk/astro/components/interactive"
-  + import { UserProfile } from "@clerk/astro/components"
-
-  - import { Protect } from "@clerk/astro/components/control"
-  + import { Protect } from "@clerk/astro/components"
-
-  - import { SignInButton } from "@clerk/astro/components/unstyled"
-  + import { SignInButton } from "@clerk/astro/components"
-  ```
-
-- Simplify submodules and drop the `bunlded` variant. ([#3701](https://github.com/clerk/javascript/pull/3701)) by [@panteliselef](https://github.com/panteliselef)
-
-  Moved
-
-  - `@clerk/astro/client/react` to `@clerk/astro/react`
-  - `@clerk/astro/client/stores` to `@clerk/astro/client`
-    Dropped
-  - `@clerk/astro/bundled`
-  - `@clerk/astro/client/bundled`
-  - `@clerk/astro/internal/bundled`
-  - `@clerk/astro/integration`
-  - `@clerk/astro/integration/bundled`
-
-- Support `Astro.locals.auth().redirectToSignIn()` ([#3711](https://github.com/clerk/javascript/pull/3711)) by [@panteliselef](https://github.com/panteliselef)
-
-  This allows for redirectingToSignIn at the page level
-
-- Add a reusable ID generation function ([#3698](https://github.com/clerk/javascript/pull/3698)) by [@wobsoriano](https://github.com/wobsoriano)
-
-- Remove `@nanostores/react` from depedency. ([#3693](https://github.com/clerk/javascript/pull/3693)) by [@panteliselef](https://github.com/panteliselef)
-
-- Introduce `<AuthenticateWithRedirectCallback/>` as an Astro and as a React component ([#3719](https://github.com/clerk/javascript/pull/3719)) by [@wobsoriano](https://github.com/wobsoriano)
-
-- Updated dependencies [[`d11873579`](https://github.com/clerk/javascript/commit/d118735794ea24842498f67b304821656eb6dd52), [`0935cfce9`](https://github.com/clerk/javascript/commit/0935cfce9b69cb584886625267ddbc5367f7ae18)]:
-  - @clerk/clerk-js@5.9.0
-  - @clerk/types@4.8.0
-  - @clerk/backend@1.3.2
-  - @clerk/shared@2.3.3
-
 ## 0.0.2
 
 ### Patch Changes

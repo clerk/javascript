@@ -1,16 +1,5 @@
 # @clerk/testing
 
-## 1.1.11
-
-### Patch Changes
-
-- Remove the experimental console warning from Cypress integration. ([#3704](https://github.com/clerk/javascript/pull/3704)) by [@anagstef](https://github.com/anagstef)
-
-- Updated dependencies [[`0935cfce9`](https://github.com/clerk/javascript/commit/0935cfce9b69cb584886625267ddbc5367f7ae18)]:
-  - @clerk/types@4.8.0
-  - @clerk/backend@1.3.2
-  - @clerk/shared@2.3.3
-
 ## 1.1.10
 
 ### Patch Changes
