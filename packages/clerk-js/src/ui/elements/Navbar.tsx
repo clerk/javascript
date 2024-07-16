@@ -46,6 +46,7 @@ export const NavBar = (props: NavBarProps) => {
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
   const { t } = useLocalizations();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
   const router = useRouter();
 
   const handleNavigate = (route: NavbarRoute) => {
@@ -62,7 +63,7 @@ export const NavBar = (props: NavBarProps) => {
       if (route.path === '/') {
         // TODO: this is needed to correctly handle navigations
         // when the component is opened as a modal
-        await navigate(router.indexPath);
+        await navigateToFlowStart();
       } else {
         await navigate(route?.path);
       }
