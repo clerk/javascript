@@ -72,7 +72,20 @@ export const Logo = React.forwardRef(function Logo(
       className={cx('max-h-24 max-w-24 object-contain', className)}
     />
   );
-  return <div className='mb-4 flex justify-center'>{href ? <a href={href}>{img}</a> : img}</div>;
+  return (
+    <div className='mb-4 flex justify-center'>
+      {href ? (
+        <a
+          href={href}
+          className='focus-visible:ring-default outline-none focus-visible:ring-[0.125rem]'
+        >
+          {img}
+        </a>
+      ) : (
+        img
+      )}
+    </div>
+  );
 });
 
 export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function Title(
@@ -119,32 +132,34 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   );
 });
 
-export const Footer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Footer(
-  { children, className, ...props },
-  forwardedRef,
+export const Footer = React.forwardRef(function Footer(
+  { branded = true, children, className, ...props }: { branded?: boolean } & React.HTMLAttributes<HTMLDivElement>,
+  forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  return (
+  return branded || children ? (
     <div
       ref={forwardedRef}
       {...props}
       className={cx('grid', className)}
     >
       {children}
-      <div className='grid place-content-center px-6 py-4'>
-        <p className='text-gray-a11 inline-flex items-center gap-x-1 text-sm'>
-          Secured by{' '}
-          <a
-            aria-label='Clerk logo'
-            href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
-            target='_blank'
-            rel='noopener'
-          >
-            <ClerkLogo />
-          </a>
-        </p>
-      </div>
+      {branded ? (
+        <div className='grid place-content-center px-6 py-4'>
+          <p className='text-gray-a11 inline-flex items-center gap-x-1 text-sm'>
+            Secured by{' '}
+            <a
+              aria-label='Clerk logo'
+              href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
+              target='_blank'
+              rel='noopener'
+            >
+              <ClerkLogo />
+            </a>
+          </p>
+        </div>
+      ) : null}
     </div>
-  );
+  ) : null;
 });
 
 export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -153,7 +168,7 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
       <div
         ref={forwardedRef}
         {...props}
-        className={cx('border-gray-a6 border-b px-6 py-4', className)}
+        className={cx('border-gray-a6 border-b px-6 py-4 last-of-type:border-b-transparent', className)}
       >
         {children}
       </div>
