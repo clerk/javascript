@@ -29,11 +29,13 @@ export function SignedIn(props: PropsWithChildren) {
 const $isLoadingClerkStore = computed($csrState, state => state.isLoaded);
 
 /*
- * This hook ensures that the Clerk loading state is always shown on the first render,
- * preventing potential hydration mismatches and race conditions.
+ * It is not guaranteed that hydration will occur before clerk-js has loaded. If Clerk is loaded by the time a React component hydrates,
+ * then we **hydration error** will be thrown for any control component that renders conditionally.
  *
+ * This hook ensures that`isLoaded` will always be false on the first render,
+ * preventing potential hydration errors and race conditions.
  */
-const useForceFirstRenderValue = () => {
+const useSafeIsLoaded = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -47,8 +49,8 @@ const useForceFirstRenderValue = () => {
   return isLoaded;
 };
 
-export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
-  const isLoaded = useForceFirstRenderValue();
+export const ClerkLoaded = ({ children }: React.PropsWithChildren): JSX.Element | null => {
+  const isLoaded = useSafeIsLoaded();
 
   if (!isLoaded) {
     return null;
@@ -57,8 +59,8 @@ export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>): JSX
   return <>{children}</>;
 };
 
-export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
-  const isLoaded = useForceFirstRenderValue();
+export const ClerkLoading = ({ children }: React.PropsWithChildren): JSX.Element | null => {
+  const isLoaded = useSafeIsLoaded();
 
   if (isLoaded) {
     return null;
