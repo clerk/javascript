@@ -1,8 +1,11 @@
-import type { CheckAuthorizationWithCustomPermissions } from '@clerk/types';
+import type { CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
+import React from 'react';
 
 import type { ProtectComponentDefaultProps } from '../types';
 import { useAuth } from './hooks';
+import type { WithClerkProp } from './utils';
+import { withClerk } from './utils';
 
 export function SignedOut(props: PropsWithChildren) {
   const { userId } = useAuth();
@@ -83,3 +86,17 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
    */
   return authorized;
 };
+
+/**
+ * Use `<AuthenticateWithRedirectCallback/>` to complete a custom OAuth flow.
+ */
+export const AuthenticateWithRedirectCallback = withClerk(
+  ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
+    React.useEffect(() => {
+      void clerk?.handleRedirectCallback(handleRedirectCallbackParams);
+    }, []);
+
+    return null;
+  },
+  'AuthenticateWithRedirectCallback',
+);
