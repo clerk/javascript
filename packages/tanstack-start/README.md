@@ -121,26 +121,26 @@ function RootDocument({ children }: { children: React.ReactNode }) { ... }
 
 Also you will need to make on more modification to `app/ssr.tsx`:
 
-- Wrap the `createRequestHandler` with `createClerkHandler`
+- Wrap the `createStartHandler` with `createClerkHandler`
 
 ```tsx
-import { createRequestHandler, defaultStreamHandler } from '@tanstack/start/server';
+import { createStartHandler, defaultStreamHandler } from '@tanstack/start/server';
 import { getRouterManifest } from '@tanstack/start/router-manifest';
 import { createRouter } from './router';
 import { createClerkHandler } from '@clerk/tanstack-start/server';
 
-const handler = createRequestHandler({
+const handler = createStartHandler({
   createRouter,
   getRouterManifest,
 });
 
 const clerkHandler = createClerkHandler(handler);
+
 /*
  * // You can also override Clerk options by passing an object as second argument
  * const clerkHandler = createClerkHandler(handler, {
  *   afterSignInUrl: '/dashboard',
  * });
- *
  */
 
 export default clerkHandler(defaultStreamHandler);
