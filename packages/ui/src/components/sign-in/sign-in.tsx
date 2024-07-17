@@ -10,6 +10,7 @@ import { EmailOrUsernameOrPhoneNumberField } from '~/common/email-or-username-or
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
+import { parsePhoneString } from '~/common/phone-number-field/utils';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
@@ -24,6 +25,7 @@ import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
+import { isPhoneNumber } from '~/utils/is-phone-number';
 
 export function SignInComponent() {
   return (
@@ -204,7 +206,14 @@ export function SignInComponentLoaded() {
                       <Card.Description>{t('signIn.password.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          <SignIn.SafeIdentifier />
+                          <SignIn.SafeIdentifier
+                            transform={val => {
+                              if (!isPhoneNumber(val)) {
+                                return parsePhoneString(val).formattedNumberWithCode;
+                              }
+                              return val;
+                            }}
+                          />
                           <SignIn.Action
                             navigate='start'
                             asChild
