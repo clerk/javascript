@@ -1,5 +1,15 @@
 # @clerk/astro
 
+## 1.0.0
+
+### Major Changes
+
+- Introduce the official Clerk SDK for Astro. ([#3743](https://github.com/clerk/javascript/pull/3743)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Allow for client side navigation inside UI components and improves the UX while navigating in components with path routing. ([#3734](https://github.com/clerk/javascript/pull/3734)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 0.0.4
 
 ### Patch Changes
