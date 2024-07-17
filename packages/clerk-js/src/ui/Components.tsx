@@ -302,7 +302,10 @@ const Components = (props: ComponentsProps) => {
       flowName={'organizationProfile'}
       onClose={() => componentsControls.closeModal('organizationProfile')}
       onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
-      startPath={buildVirtualRouterUrl({ base: '/organizationProfile', path: urlStateParam?.path })}
+      startPath={buildVirtualRouterUrl({
+        base: '/organizationProfile',
+        path: organizationProfileModal?.path || urlStateParam?.path,
+      })}
       componentName={'OrganizationProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}

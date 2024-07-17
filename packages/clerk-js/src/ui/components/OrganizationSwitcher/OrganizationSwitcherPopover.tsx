@@ -88,13 +88,15 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       return openCreateOrganization({ afterCreateOrganizationUrl, skipInvitationScreen });
     };
 
-    const handleManageOrganizationClicked = () => {
+    const handleManageOrganizationClicked = (path?: string) => {
       close();
       if (organizationProfileMode === 'navigation') {
         return navigateOrganizationProfile();
       }
+
       return openOrganizationProfile({
         ...organizationProfileProps,
+        ...(path && { path }),
         afterLeaveOrganizationUrl,
         //@ts-expect-error
         __unstable_manageBillingUrl,
@@ -112,7 +114,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
         iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
         icon={CogFilled}
-        onClick={handleManageOrganizationClicked}
+        onClick={() => handleManageOrganizationClicked()}
         trailing={<NotificationCountBadgeManageButton />}
       />
     );
@@ -127,7 +129,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
-        onClick={handleManageOrganizationClicked}
+        onClick={() => handleManageOrganizationClicked()}
         trailing={<NotificationCountBadgeManageButton />}
       />
     );

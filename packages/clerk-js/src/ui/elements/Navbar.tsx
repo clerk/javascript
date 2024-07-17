@@ -45,8 +45,8 @@ export const NavBar = (props: NavBarProps) => {
   const { contentRef, title, description, routes, header } = props;
   const { close } = useNavbarContext();
   const { navigate } = useRouter();
-  const { t } = useLocalizations();
   const { navigateToFlowStart } = useNavigateToFlowStart();
+  const { t } = useLocalizations();
   const router = useRouter();
 
   const handleNavigate = (route: NavbarRoute) => {
