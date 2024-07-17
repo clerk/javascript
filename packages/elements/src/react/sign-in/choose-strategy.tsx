@@ -10,7 +10,7 @@ import { SignInRouterSystemId } from '~/internals/machines/sign-in';
 import { useActiveTags } from '../hooks';
 import { ActiveTagsMode } from '../hooks/use-active-tags.hook';
 import { createContextForDomValidation } from '../utils/create-context-for-dom-validation';
-import { SignInRouterCtx } from './context';
+import { SignInRouterCtx, SignInStrategyContext } from './context';
 
 // --------------------------------- HELPERS ---------------------------------
 
@@ -134,14 +134,16 @@ export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyE
     const defaultProps = asChild ? {} : { type: 'button' as const };
 
     return factor ? (
-      <Comp
-        {...defaultProps}
-        {...rest}
-        ref={forwardedRef}
-        onClick={sendUpdateStrategyEvent}
-      >
-        {children || factor.strategy}
-      </Comp>
+      <SignInStrategyContext.Provider value={{ strategy: name }}>
+        <Comp
+          {...defaultProps}
+          {...rest}
+          ref={forwardedRef}
+          onClick={sendUpdateStrategyEvent}
+        >
+          {children || factor.strategy}
+        </Comp>
+      </SignInStrategyContext.Provider>
     ) : null;
   },
 );

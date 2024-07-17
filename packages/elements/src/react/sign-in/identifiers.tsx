@@ -1,6 +1,8 @@
-import { SignInSafeIdentifierSelector, SignInSalutationSelector } from '~/internals/machines/sign-in';
+import { useMemo } from 'react';
 
-import { SignInRouterCtx } from './context';
+import { SignInSafeIdentifierSelectorForStrategy, SignInSalutationSelector } from '~/internals/machines/sign-in';
+
+import { SignInRouterCtx, useSignInStrategy } from './context';
 
 /**
  * Render an identifier that has been provided by the user during a sign-in attempt. Renders a `string` (or empty string if it can't find an identifier).
@@ -11,8 +13,16 @@ import { SignInRouterCtx } from './context';
  *  <p>We've sent a code to <SignIn.SafeIdentifier />.</p>
  * </SignIn.Strategy>
  */
-export function SignInSafeIdentifier(): string {
-  return SignInRouterCtx.useSelector(SignInSafeIdentifierSelector);
+export function SignInSafeIdentifier({ transform }: { transform?: (s: string) => string }): string {
+  const strategy = useSignInStrategy();
+  const selector = useMemo(() => SignInSafeIdentifierSelectorForStrategy(strategy), [strategy]);
+  const safeIdentifier = SignInRouterCtx.useSelector(selector);
+
+  if (transform) {
+    return transform(safeIdentifier);
+  }
+
+  return safeIdentifier;
 }
 
 /**

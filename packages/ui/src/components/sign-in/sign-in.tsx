@@ -489,9 +489,13 @@ export function SignInComponentLoaded() {
                         asChild
                       >
                         <SecondaryButton icon={<Icon.LinkSm />}>
-                          {t('signIn.alternativeMethods.blockButton__emailLink', {
-                            identifier: SignIn.SafeIdentifier,
-                          })}
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__emailLink', {
+                                identifier,
+                              })
+                            }
+                          />
                         </SecondaryButton>
                       </SignIn.SupportedStrategy>
 
@@ -500,9 +504,13 @@ export function SignInComponentLoaded() {
                         asChild
                       >
                         <SecondaryButton icon={<Icon.Envelope />}>
-                          {t('signIn.alternativeMethods.blockButton__emailCode', {
-                            identifier: SignIn.SafeIdentifier,
-                          })}
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__emailCode', {
+                                identifier,
+                              })
+                            }
+                          />
                         </SecondaryButton>
                       </SignIn.SupportedStrategy>
                     </div>
@@ -568,9 +576,13 @@ export function SignInComponentLoaded() {
                           asChild
                         >
                           <SecondaryButton icon={<Icon.LinkSm />}>
-                            {t('signIn.alternativeMethods.blockButton__emailLink', {
-                              identifier: SignIn.SafeIdentifier,
-                            })}
+                            <SignIn.SafeIdentifier
+                              transform={(identifier: string) =>
+                                t('signIn.alternativeMethods.blockButton__emailLink', {
+                                  identifier,
+                                })
+                              }
+                            />
                           </SecondaryButton>
                         </SignIn.SupportedStrategy>
 
@@ -579,9 +591,13 @@ export function SignInComponentLoaded() {
                           asChild
                         >
                           <SecondaryButton icon={<Icon.Envelope />}>
-                            {t('signIn.alternativeMethods.blockButton__emailCode', {
-                              identifier: SignIn.SafeIdentifier,
-                            })}
+                            <SignIn.SafeIdentifier
+                              transform={(identifier: string) =>
+                                t('signIn.alternativeMethods.blockButton__emailCode', {
+                                  identifier,
+                                })
+                              }
+                            />
                           </SecondaryButton>
                         </SignIn.SupportedStrategy>
                       </div>
