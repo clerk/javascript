@@ -359,9 +359,11 @@ export const SignUpRouterMachine = setup({
         id: 'verification',
         src: 'verificationMachine',
         input: ({ context, self }) => ({
+          attributes: context.clerk.__unstable__environment?.userSettings.attributes,
           basePath: context.router?.basePath,
           formRef: context.formRef,
           parent: self,
+          resource: context.clerk.client.signUp,
         }),
         onDone: {
           actions: 'raiseNext',

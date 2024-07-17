@@ -93,7 +93,7 @@ export const SignUpVerificationMachine = setup({
 
               // Short-circuit if the sign-up resource is already complete
               if (signInStatus === 'complete') {
-                return sendBack({ type: `EMAIL_LINK.VERIFIED`, resource });
+                return sendBack({ type: 'EMAIL_LINK.VERIFIED', resource });
               }
 
               switch (verificationStatus) {
@@ -105,13 +105,13 @@ export const SignUpVerificationMachine = setup({
                 }
                 case 'failed': {
                   sendBack({
-                    type: `EMAIL_LINK.FAILED`,
+                    type: 'EMAIL_LINK.FAILED',
                     error: new ClerkElementsError('email-link-verification-failed', 'Email verification failed'),
                     resource,
                   });
                   break;
                 }
-                case 'unverified':
+                // case 'unverified':
                 default:
                   return;
               }
@@ -170,12 +170,7 @@ export const SignUpVerificationMachine = setup({
     isStrategyEnabled: (
       { context },
       { attribute, strategy }: { attribute: Attribute; strategy: VerificationStrategy },
-    ) =>
-      Boolean(
-        context.parent
-          .getSnapshot()
-          .context.clerk.__unstable__environment?.userSettings.attributes[attribute].verifications.includes(strategy),
-      ),
+    ) => Boolean(context.attributes?.[attribute].verifications.includes(strategy)),
     shouldVerifyPhoneCode: shouldVerify('phone_number'),
     shouldVerifyEmailLink: shouldVerify('email_address', 'email_link'),
     shouldVerifyEmailCode: shouldVerify('email_address', 'email_code'),
@@ -186,13 +181,14 @@ export const SignUpVerificationMachine = setup({
   id: SignUpVerificationMachineId,
   initial: 'Init',
   context: ({ input }) => ({
+    attributes: input.attributes,
     basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
     loadingStep: 'verifications',
     formRef: input.formRef,
     parent: input.parent,
     resendable: false,
     resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
-    resource: input.parent.getSnapshot().context.clerk.client.signUp,
+    resource: input.resource,
   }),
   on: {
     NEXT: [

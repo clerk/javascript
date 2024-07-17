@@ -75,13 +75,13 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@xstate/react": "^4.1.1",
     "client-only": "^0.0.1",
-    "xstate": "^5.13.0"
+    "xstate": "^5.15.0"
   },
   "devDependencies": {
     "@clerk/clerk-react": "5.2.8",
     "@clerk/eslint-config-custom": "*",
     "@clerk/shared": "2.3.3",
-    "@statelyai/inspect": "^0.3.1",
+    "@statelyai/inspect": "^0.4.0",
     "@types/node": "^18.19.33",
     "@types/react": "*",
     "@types/react-dom": "*",
