@@ -4,6 +4,7 @@ import { cx } from 'cva';
 import * as React from 'react';
 import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
+import { useLocalizations } from '~/hooks/use-localizations';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { mergeRefs } from '~/utils/merge-refs';
@@ -36,6 +37,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
+  const { translateError } = useLocalizations();
   const [isOpen, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -210,6 +212,11 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
             );
           }}
         </Common.FieldState>
+        <Common.FieldError asChild>
+          {({ message, code }) => {
+            return <Field.Message intent='error'>{translateError(message, code, 'phone_number')}</Field.Message>;
+          }}
+        </Common.FieldError>
       </Field.Root>
     </Common.Field>
   );
