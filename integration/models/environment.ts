@@ -7,7 +7,6 @@ export type EnvironmentConfig = {
   get id(): string;
   setId(newId: string): EnvironmentConfig;
   setEnvVariable(type: keyof EnvironmentVariables, name: string, value: any): EnvironmentConfig;
-  removeEnvVariable(type: keyof EnvironmentVariables, name: string): EnvironmentConfig;
   get publicVariables(): EnvironmentVariables['public'];
   get privateVariables(): EnvironmentVariables['private'];
   toJson(): { public: Record<string, string>; private: Record<string, string> };
@@ -32,10 +31,6 @@ export const environmentConfig = () => {
     },
     setEnvVariable: (type, name, value) => {
       envVars[type].set(name, value);
-      return self;
-    },
-    removeEnvVariable: (type, name) => {
-      envVars[type].delete(name);
       return self;
     },
     get publicVariables() {

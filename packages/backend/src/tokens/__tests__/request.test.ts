@@ -9,8 +9,8 @@ import { AuthErrorReason, type AuthReason, AuthStatus, type RequestState } from 
 import { authenticateRequest } from '../request';
 import type { AuthenticateRequestOptions } from '../types';
 
-const PK_TEST = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
-const PK_LIVE = 'pk_live_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
+const PK_TEST = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
+const PK_LIVE = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 
 function assertSignedOut(
   assert,
@@ -362,7 +362,7 @@ export default (QUnit: QUnit) => {
       const requestState = await authenticateRequest(
         mockRequestWithCookies(),
         mockOptions({
-          publishableKey: 'pk_live_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA',
+          publishableKey: 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA',
           secretKey: 'live_deadbeef',
         }),
       );

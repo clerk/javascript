@@ -65,7 +65,7 @@ test.describe('dynamic keys @nextjs', () => {
   test('redirects to `signInUrl` on `auth().protect()`', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
-    await u.page.goToStart();
+    await u.page.goToAppHome();
 
     await u.po.expect.toBeSignedOut();
 
