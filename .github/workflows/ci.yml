@@ -130,7 +130,7 @@ jobs:
 
   integration-tests:
     name: Integration Tests
-#    needs: formatting-linting
+    needs: formatting-linting
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_LONG && fromJSON(vars.TIMEOUT_MINUTES_LONG) || 15 }}
 
