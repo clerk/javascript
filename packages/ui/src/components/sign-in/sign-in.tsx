@@ -70,6 +70,12 @@ export function SignInComponentLoaded() {
                   </Card.Header>
 
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Connections disabled={isGlobalLoading} />
 
                     {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
@@ -221,6 +227,12 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+
                       <PasswordField
                         alternativeFieldTrigger={
                           <SignIn.Action
@@ -481,6 +493,11 @@ export function SignInComponentLoaded() {
                     <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col gap-2'>
                       <Connections disabled={isGlobalLoading} />
 
@@ -547,6 +564,11 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col justify-center gap-4'>
                       <SignIn.SupportedStrategy
                         name='reset_password_email_code'
@@ -627,6 +649,11 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.resetPassword.title')}</Card.Title>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col justify-center gap-4'>
                       <PasswordField
                         name='password'
