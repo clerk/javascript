@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import * as React from 'react';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -17,6 +18,7 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { useSupportEmail } from '~/hooks/use-support-email';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -25,15 +27,75 @@ import { LinkButton } from '~/primitives/link-button';
 import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
 
+function useShowHelp() {
+  const [showHelp, setShowHelp] = React.useState(true);
+  return { showHelp, setShowHelp };
+}
+
 export function SignInComponent() {
+  const { showHelp, setShowHelp } = useShowHelp();
+
   return (
     <SignIn.Root>
-      <SignInComponentLoaded />
+      {showHelp ? (
+        <SignInGetHelp
+          showHelp={showHelp}
+          setShowHelp={setShowHelp}
+        />
+      ) : (
+        <SignInComponentLoaded
+          showHelp={showHelp}
+          setShowHelp={setShowHelp}
+        />
+      )}{' '}
     </SignIn.Root>
   );
 }
 
-export function SignInComponentLoaded() {
+function SignInGetHelp(props: ReturnType<typeof useShowHelp>) {
+  const { t } = useLocalizations();
+  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { isDevelopmentOrStaging } = useEnvironment();
+  const isDev = isDevelopmentOrStaging();
+  const supportEmail = useSupportEmail();
+
+  // ! TODO remove
+  console.log({ supportEmail });
+
+  return (
+    <Card.Root>
+      <Card.Content>
+        <Card.Header>
+          {logoImageUrl ? (
+            <Card.Logo
+              href={homeUrl}
+              src={logoImageUrl}
+              alt={applicationName}
+            />
+          ) : null}
+          <Card.Title>{t('signIn.alternativeMethods.getHelp.title')}</Card.Title>
+          <Card.Description>{t('signIn.alternativeMethods.getHelp.content')}</Card.Description>
+        </Card.Header>
+        <Card.Body>
+          <div className='flex flex-col gap-4'>
+            {
+              // !!!!! TODO FIX FUNCTIONALITY/SWITCH TO LINK
+              // requires refactoring button to output cva function? maybe link and button? or just `href` prop idk
+              // mailto:
+            }
+            <Button icon={<Icon.CaretRight />}>Email support</Button>
+
+            <LinkButton onClick={() => props.setShowHelp(false)}>{t('backButton')}</LinkButton>
+          </div>
+        </Card.Body>
+        {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
+        <Card.Footer branded={branded} />
+      </Card.Content>
+    </Card.Root>
+  );
+}
+
+export function SignInComponentLoaded(props: ReturnType<typeof useShowHelp>) {
   const clerk = useClerk();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const enabledConnections = useEnabledConnections();
@@ -520,13 +582,10 @@ export function SignInComponentLoaded() {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.alternativeMethods.actionText')}{' '}
-                      <Card.FooterActionLink
-                        // To be implemented in SDKI-115
-                        href='#'
-                      >
+                      <Card.FooterActionButton onClick={() => props.setShowHelp(true)}>
                         {' '}
                         {t('signIn.alternativeMethods.actionLink')}
-                      </Card.FooterActionLink>
+                      </Card.FooterActionButton>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>
@@ -600,13 +659,10 @@ export function SignInComponentLoaded() {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.alternativeMethods.actionText')}{' '}
-                      <Card.FooterActionLink
-                        // To be implemented in SDKI-115
-                        href='#'
-                      >
+                      <Card.FooterActionButton onClick={() => props.setShowHelp(true)}>
                         {' '}
                         {t('signIn.alternativeMethods.actionLink')}
-                      </Card.FooterActionLink>
+                      </Card.FooterActionButton>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>

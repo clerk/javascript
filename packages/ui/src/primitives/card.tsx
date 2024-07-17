@@ -1,4 +1,4 @@
-import { cx } from 'cva';
+import { cva, cx } from 'cva';
 import * as React from 'react';
 
 import { ClerkLogo } from './clerk-logo';
@@ -219,13 +219,36 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
   },
 );
 
+// ! TODO
+// align polymorphism ideas
+
+const footerActionButton = cva({
+  base: 'appearance-none text-accent-a10 text-base font-medium hover:underline',
+});
+
+export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
+  function FooterActionButton({ children, className, type = 'button', ...props }, forwardedRef) {
+    return (
+      <button
+        ref={forwardedRef}
+        className={footerActionButton({ className })}
+        // eslint-disable-next-line react/button-has-type
+        type={type}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  },
+);
+
 export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
   function FooterActionLink({ children, className, ...props }, forwardedRef) {
     return (
       <a
         ref={forwardedRef}
+        className={footerActionButton({ className })}
         {...props}
-        className={cx('text-accent-a10 text-base font-medium hover:underline', className)}
       >
         {children}
       </a>
