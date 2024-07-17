@@ -72,9 +72,15 @@ export type AttemptVerificationInput = {
 
 export const SignUpVerificationMachine = setup({
   actors: {
-    prepare: fromPromise<SignUpResource, PrepareVerificationInput>(({ input: { params, parent } }) =>
-      parent.getSnapshot().context.clerk.client.signUp.prepareVerification(params),
-    ),
+    prepare: fromPromise<SignUpResource, PrepareVerificationInput>(({ input: { params, parent } }) => {
+      const clerk = parent.getSnapshot().context.clerk;
+
+      if (params.strategy === 'email_link' && params.redirectUrl) {
+        params.redirectUrl = clerk.buildUrlWithAuth(params.redirectUrl);
+      }
+
+      return clerk.client.signUp.prepareVerification(params);
+    }),
     attempt: fromPromise<SignUpResource, AttemptVerificationInput>(async ({ input: { params, parent } }) =>
       parent.getSnapshot().context.clerk.client.signUp.attemptVerification(params),
     ),
@@ -280,9 +286,7 @@ export const SignUpVerificationMachine = setup({
               parent: context.parent,
               params: {
                 strategy: 'email_link',
-                redirectUrl: context.parent
-                  .getSnapshot()
-                  .context.clerk.buildUrlWithAuth(`${context.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`),
+                redirectUrl: `${context.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`,
               },
             }),
             onDone: {
