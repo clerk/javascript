@@ -1,5 +1,11 @@
 # @clerk/astro
 
+## 0.0.4
+
+### Patch Changes
+
+- Introduce `<ClerkLoaded/>` and `<ClerkLoading/>` React components ([#3724](https://github.com/clerk/javascript/pull/3724)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.0.3
 
 ### Patch Changes
