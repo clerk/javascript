@@ -27,40 +27,49 @@ import { LinkButton } from '~/primitives/link-button';
 import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
 
-function useShowHelp() {
-  const [showHelp, setShowHelp] = React.useState(true);
-  return { showHelp, setShowHelp };
-}
-
+/**
+ * Implementation Details:
+ *
+ * - For now we use a private context to switch between the "Get help" view and
+ *   `SignIn.Step`s. Initially, this ternary was used within the relevant steps,
+ *   but it lead to React rendering errors. Lifting the state and component here
+ *   seemed to reolve those issues.
+ * - We plan to revisit this again in https://linear.app/clerk/issue/SDKI-115;
+ *   where we'll consider its integration within Elements, as well as ensure
+ *   bulletproof a11y.
+ */
 export function SignInComponent() {
-  const { showHelp, setShowHelp } = useShowHelp();
+  const [showHelp, setShowHelp] = React.useState(false);
 
   return (
-    <SignIn.Root>
-      {showHelp ? (
-        <SignInGetHelp
-          showHelp={showHelp}
-          setShowHelp={setShowHelp}
-        />
-      ) : (
-        <SignInComponentLoaded
-          showHelp={showHelp}
-          setShowHelp={setShowHelp}
-        />
-      )}{' '}
-    </SignIn.Root>
+    <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
+      <SignIn.Root>{showHelp ? <SignInGetHelp /> : <SignInComponentLoaded />}</SignIn.Root>
+    </GetHelpContext.Provider>
   );
 }
 
-function SignInGetHelp(props: ReturnType<typeof useShowHelp>) {
+interface GetHelp {
+  showHelp: boolean;
+  setShowHelp: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const GetHelpContext = React.createContext<GetHelp | null>(null);
+
+const useGetHelp = () => {
+  const context = React.useContext(GetHelpContext);
+  if (!context) {
+    throw new Error('useGetHelp must be used within GetHelpContext.Provider');
+  }
+  return context;
+};
+
+function SignInGetHelp() {
   const { t } = useLocalizations();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { isDevelopmentOrStaging } = useEnvironment();
   const isDev = isDevelopmentOrStaging();
   const supportEmail = useSupportEmail();
-
-  // ! TODO remove
-  console.log({ supportEmail });
+  const { setShowHelp } = useGetHelp();
 
   return (
     <Card.Root>
@@ -78,24 +87,25 @@ function SignInGetHelp(props: ReturnType<typeof useShowHelp>) {
         </Card.Header>
         <Card.Body>
           <div className='flex flex-col gap-4'>
-            {
-              // !!!!! TODO FIX FUNCTIONALITY/SWITCH TO LINK
-              // requires refactoring button to output cva function? maybe link and button? or just `href` prop idk
-              // mailto:
-            }
-            <Button icon={<Icon.CaretRight />}>Email support</Button>
+            <Button
+              as='a'
+              href={`mailto:${supportEmail}`}
+              icon={<Icon.CaretRight />}
+            >
+              Email support
+            </Button>
 
-            <LinkButton onClick={() => props.setShowHelp(false)}>{t('backButton')}</LinkButton>
+            <LinkButton onClick={() => setShowHelp(false)}>{t('backButton')}</LinkButton>
           </div>
         </Card.Body>
         {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
-        <Card.Footer branded={branded} />
       </Card.Content>
+      <Card.Footer branded={branded} />
     </Card.Root>
   );
 }
 
-export function SignInComponentLoaded(props: ReturnType<typeof useShowHelp>) {
+export function SignInComponentLoaded() {
   const clerk = useClerk();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const enabledConnections = useEnabledConnections();
@@ -106,6 +116,7 @@ export function SignInComponentLoaded(props: ReturnType<typeof useShowHelp>) {
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passkeyEnabled } = useAttributes('passkey');
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { setShowHelp } = useGetHelp();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
@@ -582,10 +593,13 @@ export function SignInComponentLoaded(props: ReturnType<typeof useShowHelp>) {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.alternativeMethods.actionText')}{' '}
-                      <Card.FooterActionButton onClick={() => props.setShowHelp(true)}>
+                      <Card.FooterActionLink
+                        as='button'
+                        onClick={() => setShowHelp(true)}
+                      >
                         {' '}
                         {t('signIn.alternativeMethods.actionLink')}
-                      </Card.FooterActionButton>
+                      </Card.FooterActionLink>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>
@@ -659,10 +673,13 @@ export function SignInComponentLoaded(props: ReturnType<typeof useShowHelp>) {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.alternativeMethods.actionText')}{' '}
-                      <Card.FooterActionButton onClick={() => props.setShowHelp(true)}>
+                      <Card.FooterActionLink
+                        as='button'
+                        onClick={() => setShowHelp(true)}
+                      >
                         {' '}
                         {t('signIn.alternativeMethods.actionLink')}
-                      </Card.FooterActionButton>
+                      </Card.FooterActionLink>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>

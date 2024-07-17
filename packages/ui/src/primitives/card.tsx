@@ -1,6 +1,9 @@
 import { cva, cx } from 'cva';
 import * as React from 'react';
 
+import type { DistributiveOmit } from '~/types/utils';
+import { fixedForwardRef } from '~/utils/fixed-forward-ref';
+
 import { ClerkLogo } from './clerk-logo';
 
 export const Root = React.forwardRef(function CardRoot(
@@ -219,39 +222,31 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
   },
 );
 
-// ! TODO
-// align polymorphism ideas
+const DEFAULT_FOOTER_ACTION_LINK_ELEMENT = 'a';
 
-const footerActionButton = cva({
+const footerActionLink = cva({
   base: 'appearance-none text-accent-a10 text-base font-medium hover:underline',
 });
 
-export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-  function FooterActionButton({ children, className, type = 'button', ...props }, forwardedRef) {
-    return (
-      <button
-        ref={forwardedRef}
-        className={footerActionButton({ className })}
-        // eslint-disable-next-line react/button-has-type
-        type={type}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  },
-);
+function UnwrappedFooterActionLink<TAs extends React.ElementType>({
+  as,
+  children,
+  className,
+  ...props
+}: DistributiveOmit<
+  React.ComponentPropsWithRef<React.ElementType extends TAs ? typeof DEFAULT_FOOTER_ACTION_LINK_ELEMENT : TAs>,
+  'as' | 'disabled'
+> & { as?: TAs }) {
+  const Element = as || DEFAULT_FOOTER_ACTION_LINK_ELEMENT;
 
-export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
-  function FooterActionLink({ children, className, ...props }, forwardedRef) {
-    return (
-      <a
-        ref={forwardedRef}
-        className={footerActionButton({ className })}
-        {...props}
-      >
-        {children}
-      </a>
-    );
-  },
-);
+  return (
+    <Element
+      className={footerActionLink({ className })}
+      {...props}
+    >
+      {children}
+    </Element>
+  );
+}
+
+export const FooterActionLink = fixedForwardRef(UnwrappedFooterActionLink);
