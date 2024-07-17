@@ -80,6 +80,7 @@ export function SignInComponentLoaded() {
                           <EmailField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -87,6 +88,7 @@ export function SignInComponentLoaded() {
                           <UsernameField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -95,6 +97,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -102,6 +105,7 @@ export function SignInComponentLoaded() {
                           <EmailOrUsernameField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -110,6 +114,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -118,6 +123,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -126,6 +132,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
                       </div>
