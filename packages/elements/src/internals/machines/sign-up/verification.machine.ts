@@ -247,6 +247,7 @@ export const SignUpVerificationMachine = setup({
       tags: ['verification:method:email', 'verification:category:link', 'verification:email_link'],
       initial: 'Preparing',
       on: {
+        RETRY: '.Preparing',
         'EMAIL_LINK.RESTART': {
           target: '.Attempting',
           reenter: true,
@@ -303,7 +304,6 @@ export const SignUpVerificationMachine = setup({
           tags: ['state:pending'],
           on: {
             NEXT: 'Preparing',
-            RETRY: 'Preparing',
           },
         },
         Attempting: {
