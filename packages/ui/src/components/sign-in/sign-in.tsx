@@ -49,7 +49,7 @@ export function SignInComponentLoaded() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = isDevelopmentOrStaging();
-  const resetPasswordFactor = useResetPasswordFactor();
+  const isPasswordResetSupported = useResetPasswordFactor();
 
   return (
     <Common.Loading>
@@ -225,7 +225,7 @@ export function SignInComponentLoaded() {
                     <Card.Body>
                       <PasswordField
                         alternativeFieldTrigger={
-                          resetPasswordFactor ? (
+                          isPasswordResetSupported ? (
                             <SignIn.Action
                               navigate='forgot-password'
                               asChild
