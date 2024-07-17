@@ -239,8 +239,9 @@ test.describe('root and subdomain production apps @sessions', () => {
       // The client_uat cookie should always be set on etld+1
       expect(tab0Cookies.get('__client_uat_*').domain).toEqual('.' + hosts[0]);
 
-      await u[1].page.goto(`https://${hosts[1]}`);
+      u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
       await u[1].po.expect.toBeSignedOut();
+      expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
 
       await u[1].po.signIn.goTo();
       await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);

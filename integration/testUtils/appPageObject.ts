@@ -13,7 +13,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
         // do not fail the test if interstitial is returned (401)
       }
     },
-    goToRelative: async (path: string, opts: { searchParams?: URLSearchParams; timeout?: number } = {}) => {
+    goToRelative: (path: string, opts: { searchParams?: URLSearchParams; timeout?: number } = {}) => {
       let url: URL;
 
       try {
@@ -35,7 +35,7 @@ export const createAppPageObject = (testArgs: { page: Page }, app: Application) 
       if (opts.searchParams) {
         url.search = opts.searchParams.toString();
       }
-      await page.goto(url.toString(), { timeout: opts.timeout ?? 10000 });
+      return page.goto(url.toString(), { timeout: opts.timeout ?? 10000 });
     },
     waitForClerkJsLoaded: async () => {
       return page.waitForFunction(() => {
