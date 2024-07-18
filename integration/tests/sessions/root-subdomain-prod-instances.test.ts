@@ -16,11 +16,6 @@ import { prepareApplication } from './utils';
  * we use more custom domains to avoid collision.
  */
 test.describe('root and subdomain production apps @sessions', () => {
-  const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
-    cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
-    key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
-  };
-
   test.describe.configure({ mode: 'serial' });
 
   /**
@@ -58,6 +53,12 @@ test.describe('root and subdomain production apps @sessions', () => {
         // second app using the same instance keys
         prepareApplication('sessions-prod-1'),
       ]);
+
+      // TODO: Move this into createProxyServer
+      const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
+        cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
+        key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
+      };
 
       server = createProxyServer({
         ssl,
@@ -186,6 +187,12 @@ test.describe('root and subdomain production apps @sessions', () => {
 
     test.beforeAll(async () => {
       apps = await Promise.all([prepareApplication('sessions-prod-1'), prepareApplication('sessions-prod-2')]);
+
+      // TODO: Move this into createProxyServer
+      const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
+        cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
+        key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
+      };
 
       server = createProxyServer({
         ssl,
