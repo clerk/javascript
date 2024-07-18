@@ -127,6 +127,7 @@ function SignUpComponentLoaded() {
 
                         {passwordEnabled && passwordRequired ? (
                           <PasswordField
+                            validatePassword
                             label={t('formFieldLabel__password')}
                             required={passwordRequired}
                             disabled={isGlobalLoading}
@@ -419,6 +420,7 @@ function SignUpComponentLoaded() {
 
                       {passwordEnabled && passwordRequired ? (
                         <PasswordField
+                          validatePassword
                           label={t('formFieldLabel__password')}
                           required={passwordRequired}
                           disabled={isGlobalLoading}

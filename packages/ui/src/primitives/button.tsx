@@ -31,11 +31,11 @@ export const Button = React.forwardRef(function Button(
       disabled={busy || disabled}
     >
       {busy ? (
-        <Spinner className='shrink-0 text-[1.125rem]'>Loading…</Spinner>
+        <Spinner className='min-w-0 shrink-0 text-[1.125rem]'>Loading…</Spinner>
       ) : (
         <>
-          {children}
-          {icon && <span className='ms-2 shrink-0 text-[0.625rem] opacity-60'>{icon}</span>}
+          <span className='min-w-0 truncate'>{children}</span>
+          {icon && <span className='ms-2 min-w-0 shrink-0 text-[0.625rem] opacity-60'>{icon}</span>}
         </>
       )}
     </button>

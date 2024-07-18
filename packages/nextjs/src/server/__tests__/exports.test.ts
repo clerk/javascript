@@ -1,3 +1,5 @@
+jest.mock('server-only', () => null);
+
 import * as publicExports from '../index';
 
 describe('/server public exports', () => {

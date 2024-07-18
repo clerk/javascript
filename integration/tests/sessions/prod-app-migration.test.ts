@@ -10,11 +10,6 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { getEnvForMultiAppInstance } from './utils';
 
-const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
-  cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
-  key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
-};
-
 test.describe('root and subdomain production apps @manual-run', () => {
   test.describe.configure({ mode: 'serial' });
 
@@ -50,6 +45,10 @@ test.describe('root and subdomain production apps @manual-run', () => {
 
       // Prepare the proxy server tha maps from the prod domain to the local apps
       // We don't need to restart this one as the serverUrl will be the same for both apps
+      const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
+        cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
+        key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
+      };
       server = createProxyServer({ ssl, targets: { [host]: apps[0].serverUrl } });
 
       const page = await context.newPage();
