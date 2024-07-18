@@ -16,6 +16,8 @@ import { buildRequestLike } from './utils';
 type Auth = AuthObject & { protect: AuthProtect; redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
 export const auth = (): Auth => {
+  require('server-only');
+
   const request = buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
