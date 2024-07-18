@@ -64,19 +64,19 @@
     "@clerk/eslint-config-custom": "*",
     "@types/base-64": "^1.0.2",
     "@types/node": "^20.11.24",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/react": "*",
+    "@types/react-dom": "*",
     "expo-auth-session": "^5.4.0",
     "expo-web-browser": "^12.8.2",
-    "react-native": "^0.74.2",
+    "react-native": "^0.73.9",
     "typescript": "*"
   },
   "peerDependencies": {
-    "expo-auth-session": ">=4.0.3",
+    "expo-auth-session": ">=5",
     "expo-web-browser": ">=12.5.0",
+    "react-native": ">=0.73",
     "react": ">=18",
-    "react-dom": ">=18",
-    "react-native": ">=0.72"
+    "react-dom": ">=18"
   },
   "engines": {
     "node": ">=18.17.0"
