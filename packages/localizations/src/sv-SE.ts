@@ -307,6 +307,10 @@ export const svSE: LocalizationResource = {
       title: 'Kontrollera din e-post',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Återgå till ursprungliga fliken för att fortsätta.',
         title: 'Denna verifieringslänk har upphört att gälla',
@@ -421,6 +425,10 @@ export const svSE: LocalizationResource = {
       title: 'Verifiera din e-post',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Använd verifieringslänken som skickades till din e-postadress',
       formTitle: 'Verifieringslänk',
       loading: {
@@ -453,6 +461,7 @@ export const svSE: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -716,6 +725,7 @@ export const svSE: LocalizationResource = {
         actionLabel__reauthorize: 'Autorisera nu',
         destructiveActionTitle: 'Ta bort',
         primaryButton: 'Anslut konto',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Anslutna konton',

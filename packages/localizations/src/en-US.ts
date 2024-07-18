@@ -296,6 +296,11 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle:
+          'To continue, open the verification link on the device and browser from which you initiated the sign-in',
+        title: 'Verification link is invalid for this device',
+      },
       expired: {
         subtitle: 'Return to the original tab to continue.',
         title: 'This verification link has expired',
@@ -324,11 +329,6 @@ export const enUS: LocalizationResource = {
         subtitle: 'Return to original tab to continue',
         subtitleNewTab: 'Return to the newly opened tab to continue',
         titleNewTab: 'Signed in on other tab',
-      },
-      clientMismatch: {
-        subtitle:
-          'To continue, open the verification link on the device and browser from which you initiated the sign-in',
-        title: 'Verification link is invalid for this device',
       },
     },
     forgotPassword: {
@@ -415,6 +415,11 @@ export const enUS: LocalizationResource = {
       title: 'Verify your email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle:
+          'To continue, open the verification link on the device and browser from which you initiated the sign-up',
+        title: 'Verification link is invalid for this device',
+      },
       formSubtitle: 'Use the verification link sent to your email address',
       formTitle: 'Verification link',
       loading: {
@@ -430,11 +435,6 @@ export const enUS: LocalizationResource = {
         subtitle: 'Return to the newly opened tab to continue',
         subtitleNewTab: 'Return to previous tab to continue',
         title: 'Successfully verified email',
-      },
-      clientMismatch: {
-        subtitle:
-          'To continue, open the verification link on the device and browser from which you initiated the sign-up',
-        title: 'Verification link is invalid for this device',
       },
     },
     phoneCode: {
@@ -720,9 +720,9 @@ export const enUS: LocalizationResource = {
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Remove',
         primaryButton: 'Connect account',
+        subtitle__disconnected: 'This account has been disconnected.',
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
-        subtitle__disconnected: 'This account has been disconnected.',
         title: 'Connected accounts',
       },
       dangerSection: {

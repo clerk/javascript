@@ -311,6 +311,10 @@ export const deDE: LocalizationResource = {
       title: 'Überprüfen Sie Ihren Posteingang',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Kehren Sie zum ursprünglichen Tab zurück, um fortzufahren.',
         title: 'Dieser Bestätigungslink ist abgelaufen',
@@ -426,6 +430,10 @@ export const deDE: LocalizationResource = {
       title: 'Bestätigen Sie Ihre E-Mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Verwenden Sie den an Ihre E-Mail-Adresse gesendeten Bestätigungslink',
       formTitle: 'Bestätigungslink',
       loading: {
@@ -458,6 +466,7 @@ export const deDE: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Anmeldung aufgrund fehlgeschlagener Sicherheitsüberprüfung nicht erfolgreich. Bitte versuchen Sie es erneut oder kontaktieren Sie uns für weitere Unterstützung.',
@@ -727,6 +736,7 @@ export const deDE: LocalizationResource = {
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Entfernen',
         primaryButton: 'Konto verbinden',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Verbundene Konten',

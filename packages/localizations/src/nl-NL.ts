@@ -307,6 +307,10 @@ export const nlNL: LocalizationResource = {
       title: 'Check je e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Ga naar de oorspronkelijke tab om verder te gaan.',
         title: 'Deze verificatielink is verlopen',
@@ -421,6 +425,10 @@ export const nlNL: LocalizationResource = {
       title: 'Bevestig je e-mailadres',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Gebruik de verificatielink die verzonden is naar je e-mailadres',
       formTitle: 'Verificatielink',
       loading: {
@@ -453,6 +461,7 @@ export const nlNL: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -716,6 +725,7 @@ export const nlNL: LocalizationResource = {
         actionLabel__reauthorize: 'Authoriseer nu',
         destructiveActionTitle: 'Verwijderen',
         primaryButton: 'Verbind een account',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Aangesloten accounts',

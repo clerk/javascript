@@ -307,6 +307,10 @@ export const plPL: LocalizationResource = {
       title: 'Sprawdź swoją pocztę e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Powróć do oryginalnej karty, aby kontynuować.',
         title: 'Ten link weryfikacyjny wygasł',
@@ -421,6 +425,10 @@ export const plPL: LocalizationResource = {
       title: 'Zweryfikuj swój adres e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Użyj linku weryfikacyjnego wysłanego na Twój adres e-mail',
       formTitle: 'Link weryfikacyjny',
       loading: {
@@ -453,6 +461,7 @@ export const plPL: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -674,7 +683,6 @@ export const plPL: LocalizationResource = {
         messageLine1: undefined,
         title: undefined,
       },
-
       subtitle__rename: undefined,
       title__rename: undefined,
     },
@@ -720,6 +728,7 @@ export const plPL: LocalizationResource = {
         actionLabel__reauthorize: 'Autoryzuj teraz',
         destructiveActionTitle: 'Odłącz',
         primaryButton: 'Połącz konto',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Połączone konta',
