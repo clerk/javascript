@@ -1,5 +1,5 @@
 import type { SignUpResource } from '@clerk/types';
-import { enqueueActions, fromPromise, not, sendTo, setup } from 'xstate';
+import { fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_UP_DEFAULT_BASE_PATH } from '~/internals/constants';
 import type { FormFields } from '~/internals/machines/form';
@@ -44,6 +44,21 @@ export const SignUpStartMachine = setup({
         };
       },
     ),
+    setDefaultFormValues: ({ context }) => {
+      const signUp = context.parent.getSnapshot().context.clerk.client.signUp;
+      const prefilledDefaultValues = new Map();
+
+      for (const key of PREFILL_FIELDS) {
+        if (key in signUp) {
+          prefilledDefaultValues.set(key, signUp[key]);
+        }
+      }
+
+      context.formRef.send({
+        type: 'PREFILL_DEFAULT_VALUES',
+        defaultValues: prefilledDefaultValues,
+      });
+    },
   },
   guards: {
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
@@ -57,24 +72,12 @@ export const SignUpStartMachine = setup({
     parent: input.parent,
     loadingStep: 'start',
   }),
+  entry: 'setDefaultFormValues',
   initial: 'Pending',
   states: {
     Pending: {
       tags: ['state:pending'],
       description: 'Waiting for user input',
-      entry: [
-        enqueueActions(({ context, enqueue }) => {
-          PREFILL_FIELDS.forEach(field => {
-            enqueue.sendTo(context.formRef, {
-              type: 'FIELD.ADD',
-              field: {
-                name: field,
-                value: context.parent.getSnapshot().context.clerk?.client?.signUp?.[field] || '',
-              },
-            });
-          });
-        }),
-      ],
       on: {
         SUBMIT: {
           guard: not('isExampleMode'),

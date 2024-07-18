@@ -17,77 +17,75 @@ const getInstanceKeys = () => {
   if (!keys) {
     throw new Error('Missing instance keys. Is your env or .keys.json file populated?');
   }
-  return keys;
+  return new Map(Object.entries(keys));
 };
 
-const envKeys = getInstanceKeys();
+export const instanceKeys = getInstanceKeys();
 
-const withEmailCodes = environmentConfig()
+const base = environmentConfig()
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+
+const withEmailCodes = base
+  .clone()
   .setId('withEmailCodes')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-codes'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk)
-  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
-  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
-  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY);
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
+  .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
-const withEmailLinks = environmentConfig()
+const withEmailLinks = base
+  .clone()
   .setId('withEmailLinks')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-links'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-links'].pk)
-  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
-  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-links').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-links').pk);
 
-const withCustomRoles = environmentConfig()
+const withCustomRoles = base
+  .clone()
   .setId('withCustomRoles')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-custom-roles'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-custom-roles'].pk)
-  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
-  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-custom-roles').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-custom-roles').pk);
 
 const withEmailCodesQuickstart = withEmailCodes
   .clone()
-  .removeEnvVariable('public', 'CLERK_SIGN_IN_URL')
-  .removeEnvVariable('public', 'CLERK_SIGN_UP_URL');
+  .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '');
 
 const withAPCore1ClerkLatest = environmentConfig()
   .setId('withAPCore1ClerkLatest')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-codes'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
 
 const withAPCore1ClerkV4 = environmentConfig()
   .setId('withAPCore1ClerkV4')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['with-email-codes'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['with-email-codes'].pk);
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
 
 const withAPCore2ClerkLatest = environmentConfig()
   .setId('withAPCore2ClerkLatest')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['core-2-all-enabled'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['core-2-all-enabled'].pk)
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('core-2-all-enabled').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('core-2-all-enabled').pk)
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
 
 const withAPCore2ClerkV4 = environmentConfig()
   .setId('withAPCore2ClerkV4')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', envKeys['core-2-all-enabled'].sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', envKeys['core-2-all-enabled'].pk);
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('core-2-all-enabled').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('core-2-all-enabled').pk);
 
 const withDynamicKeys = withEmailCodes
   .clone()
   .setId('withDynamicKeys')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
-  .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', envKeys['with-email-codes'].sk);
+  .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', instanceKeys.get('with-email-codes').sk);
 
 export const envs = {
+  base,
   withEmailCodes,
   withEmailLinks,
   withCustomRoles,

@@ -577,6 +577,10 @@ This is why you created the `.keys.json` file in the [initial setup](#initial-se
 
 They keys defined in `.keys.json.sample` correspond with the Clerk instances in the **Integration testing** organization.
 
+### Test isolation
+
+Before writing tests, it's important to understand how Playwright handles test isolation. Refer to the [Playwright documentation](https://playwright.dev/docs/browser-contexts) for more details.
+
 > [!NOTE]
 > The test suite also uses these environment variables to run some tests:
 >

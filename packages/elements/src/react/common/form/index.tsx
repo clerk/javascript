@@ -261,7 +261,7 @@ const useInput = ({
 
   // Register the field in the machine context
   React.useEffect(() => {
-    if (!name || ref.getSnapshot().context.fields.get(name)) {
+    if (!name) {
       return;
     }
 
@@ -298,7 +298,11 @@ const useInput = ({
   const onFocus = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onFocusProp?.(event);
-      if (shouldValidatePassword) {
+      // Check for relatedTarget to avoid validating password when the input
+      // is programticallly focused after form submission. Avoids the issue
+      // where an error message would get removed and the success validation
+      // was shown immediately.
+      if (shouldValidatePassword && Boolean(event.relatedTarget)) {
         validatePassword(event.target.value);
       }
     },
@@ -309,7 +313,10 @@ const useInput = ({
     if (!name) {
       return;
     }
-    ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
+
+    if (providedValue !== undefined) {
+      ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
+    }
   }, [name, ref, providedValue]);
 
   // TODO: Implement clerk-js utils

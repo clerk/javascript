@@ -1,7 +1,7 @@
 {
   "name": "@clerk/astro",
   "description": "Clerk SDK for Astro",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "type": "module",
   "license": "MIT",
   "author": "Clerk",
