@@ -11,7 +11,16 @@ type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>
 
 type AstroClerkIntegrationParams = Without<
   ClerkOptions,
-  'isSatellite' | 'sdkMetadata' | 'telemetry' | 'standardBrowser' | 'selectInitialSession'
+  | 'isSatellite'
+  | 'sdkMetadata'
+  | 'telemetry'
+  | 'standardBrowser'
+  | 'selectInitialSession'
+  | 'routerReplace'
+  | 'routerDebug'
+  | 'routerPush'
+  | 'polling'
+  | 'touchSession'
 > &
   MultiDomainAndOrProxyPrimitives;
 

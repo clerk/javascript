@@ -18,6 +18,7 @@ export const common: PlaywrightTestConfig = {
   workers: process.env.CI ? '50%' : '70%',
   reporter: process.env.CI ? 'line' : 'list',
   use: {
+    ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
     bypassCSP: true, // We probably need to limit this to specific tests
   },
@@ -25,6 +26,7 @@ export const common: PlaywrightTestConfig = {
 
 export default defineConfig({
   ...common,
+
   projects: [
     {
       name: 'setup',

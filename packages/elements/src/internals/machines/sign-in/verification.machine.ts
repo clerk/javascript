@@ -378,7 +378,6 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       }
 
       assertIsDefined(params, 'First factor params');
-
       return await clerk.client.signIn.prepareFirstFactor(params);
     }),
     attempt: fromPromise(async ({ input }) => {

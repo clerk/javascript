@@ -19,6 +19,7 @@ import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useSupportEmail } from '~/hooks/use-support-email';
+import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -122,6 +123,7 @@ export function SignInComponentLoaded() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = isDevelopmentOrStaging();
+  const isPasswordResetSupported = useResetPasswordFactor();
 
   return (
     <Common.Loading>
@@ -144,6 +146,12 @@ export function SignInComponentLoaded() {
                   </Card.Header>
 
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Connections disabled={isGlobalLoading} />
 
                     {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
@@ -154,6 +162,7 @@ export function SignInComponentLoaded() {
                           <EmailField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -161,6 +170,7 @@ export function SignInComponentLoaded() {
                           <UsernameField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -169,6 +179,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -176,6 +187,7 @@ export function SignInComponentLoaded() {
                           <EmailOrUsernameField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -184,6 +196,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -192,6 +205,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -200,6 +214,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
                       </div>
@@ -295,20 +310,28 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+
                       <PasswordField
                         alternativeFieldTrigger={
-                          <SignIn.Action
-                            navigate='forgot-password'
-                            asChild
-                          >
-                            <LinkButton
-                              size='sm'
-                              disabled={isGlobalLoading}
-                              type='button'
+                          isPasswordResetSupported ? (
+                            <SignIn.Action
+                              navigate='forgot-password'
+                              asChild
                             >
-                              {t('formFieldAction__forgotPassword')}
-                            </LinkButton>
-                          </SignIn.Action>
+                              <LinkButton
+                                size='sm'
+                                disabled={isGlobalLoading}
+                                type='button'
+                              >
+                                {t('formFieldAction__forgotPassword')}
+                              </LinkButton>
+                            </SignIn.Action>
+                          ) : null
                         }
                       />
 
@@ -555,6 +578,11 @@ export function SignInComponentLoaded() {
                     <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col gap-2'>
                       <Connections disabled={isGlobalLoading} />
 
@@ -618,6 +646,11 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col justify-center gap-4'>
                       <SignIn.SupportedStrategy
                         name='reset_password_email_code'
@@ -695,6 +728,11 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.resetPassword.title')}</Card.Title>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col justify-center gap-4'>
                       <PasswordField
                         name='password'
