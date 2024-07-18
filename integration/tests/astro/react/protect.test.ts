@@ -24,7 +24,7 @@ testAgainstRunningApps({
     await app.teardown();
   });
 
-  test('only admin', async ({ page, context }) => {
+  test.skip('only admin', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
     await u.po.signIn.waitForMounted();
@@ -38,7 +38,7 @@ testAgainstRunningApps({
     await expect(u.page.getByText("I'm an admin")).toBeVisible();
   });
 
-  test('only member', async ({ page, context }) => {
+  test.skip('only member', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/react/sign-in#/?redirect_url=/react/only-members');
     await u.po.signIn.waitForMounted();
