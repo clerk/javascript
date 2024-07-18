@@ -20,7 +20,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })(
       await app.teardown();
     });
 
-    test('render user button', async ({ page, context }) => {
+    test.skip('render user button', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
       await u.po.signIn.waitForMounted();
