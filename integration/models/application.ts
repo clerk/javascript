@@ -110,7 +110,7 @@ export const application = (
       await Promise.all(cleanupFns.map(fn => fn()));
       cleanupFns.splice(0, cleanupFns.length);
       state.serverUrl = '';
-      return new Promise(res => setTimeout(res, 2000));
+      return new Promise(res => setTimeout(res, 17000));
     },
     teardown: async () => {
       logger.info('Tearing down...');
