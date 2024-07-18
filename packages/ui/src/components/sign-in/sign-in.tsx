@@ -822,6 +822,7 @@ export function SignInComponentLoaded() {
                     </Common.GlobalError>
                     <div className='flex flex-col justify-center gap-4'>
                       <PasswordField
+                        validatePassword
                         name='password'
                         label={t('formFieldLabel__newPassword')}
                       />
