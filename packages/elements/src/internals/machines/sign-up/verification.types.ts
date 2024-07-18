@@ -1,5 +1,5 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { SignUpResource } from '@clerk/types';
+import type { Attributes, SignUpResource } from '@clerk/types';
 import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
@@ -63,9 +63,11 @@ export type SignUpVerificationEvents =
 // ---------------------------------- Input ---------------------------------- //
 
 export type SignUpVerificationInput = {
+  attributes: Attributes | undefined;
   basePath?: string;
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
+  resource: SignUpResource;
 };
 
 // ---------------------------------- Delays ---------------------------------- //
@@ -80,6 +82,7 @@ export type SignUpVerificationDelays = keyof typeof SignUpVerificationDelays;
 // ---------------------------------- Context ---------------------------------- //
 
 export interface SignUpVerificationContext {
+  attributes: Attributes | undefined;
   basePath: string;
   resource: SignUpResource;
   error?: Error | ClerkAPIResponseError;

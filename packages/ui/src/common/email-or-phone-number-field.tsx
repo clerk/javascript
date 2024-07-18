@@ -13,8 +13,6 @@ export function EmailOrPhoneNumberField({
   labelEmail = 'Email address',
   labelPhoneNumber = 'Phone number',
   locationBasedCountryIso,
-  requiredEmail,
-  requiredPhoneNumber,
   toggleLabelEmail = 'Use email',
   toggleLabelPhoneNumber = 'Use phone',
   ...props
@@ -22,11 +20,9 @@ export function EmailOrPhoneNumberField({
   labelEmail?: React.ReactNode;
   labelPhoneNumber?: React.ReactNode;
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
-  requiredEmail?: boolean;
-  requiredPhoneNumber?: boolean;
   toggleLabelEmail?: string;
   toggleLabelPhoneNumber?: string;
-} & Omit<React.ComponentProps<typeof Common.Input>, 'required' | 'type'>) {
+} & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
   const toggle = (
@@ -44,7 +40,6 @@ export function EmailOrPhoneNumberField({
       label={labelPhoneNumber}
       locationBasedCountryIso={locationBasedCountryIso}
       alternativeFieldTrigger={toggle}
-      required={requiredPhoneNumber}
       name={name}
       {...props}
     />
@@ -54,7 +49,6 @@ export function EmailOrPhoneNumberField({
       name={name}
       label={labelEmail}
       alternativeFieldTrigger={toggle}
-      required={requiredEmail}
     />
   );
 }

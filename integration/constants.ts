@@ -4,6 +4,7 @@ import * as path from 'node:path';
 
 export const constants = {
   TMP_DIR: path.join(os.tmpdir(), '.temp_integration'),
+  CERTS_DIR: path.join(process.cwd(), 'integration/certs'),
   APPS_STATE_FILE: path.join(os.tmpdir(), '.temp_integration', 'state.json'),
   /**
    * A URL to a running app that will be used to run the tests against.

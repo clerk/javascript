@@ -38,7 +38,7 @@ export type FakeUser = {
   firstName: string;
   lastName: string;
   email: string;
-  password?: string;
+  password: string;
   username?: string;
   phoneNumber?: string;
   deleteIfExists: () => Promise<void>;
@@ -70,7 +70,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
   const self: UserService = {
     createFakeUser: (options?: FakeUserOptions) => {
       const {
-        fictionalEmail = false,
+        fictionalEmail = true,
         withPassword = true,
         withPhoneNumber = false,
         withUsername = false,

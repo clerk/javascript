@@ -25,7 +25,12 @@ export const createLogger = (opts: CreateLoggerOptions) => {
   const prefixColor = color || getRandomChalkColor();
   return {
     info: (msg: string) => {
-      if (process.env.DEBUG) {
+      if (
+        process.env.E2E_DEBUG === 'true' ||
+        process.env.E2E_DEBUG === '1' ||
+        process.env.ACTIONS_STEP_DEBUG ||
+        process.env.ACTIONS_RUNNER_DEBUG
+      ) {
         console.info(`${chalk[prefixColor](`[${prefix}]`)} ${msg}`);
       }
     },

@@ -18,7 +18,7 @@ type TestParams = {
 export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) => {
   const u = createTestUtils({ app, page, context });
   // Begin in localhost
-  await u.page.goToStart();
+  await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
   await u.po.expect.toBeSignedOut();
 
@@ -31,10 +31,10 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
   await u.page.getByRole('button', { name: /Sign in/i }).click();
   await u.po.signIn.waitForMounted();
 
-  // Check that the DevBrowser JWT between localhost and AP is the same
   const accountPortalURL = page.url();
   // Check that we are in Account Portal
   expect(accountPortalURL).toContain('.accounts.dev');
+  // Check that the DevBrowser JWT between localhost and AP is the same
   const accountPortalDbJwt = await context
     .cookies(accountPortalURL)
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);
@@ -83,7 +83,7 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
   const tempUser = u.services.users.createFakeUser({ fictionalEmail: true });
 
   // Begin in localhost
-  await u.page.goToStart();
+  await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
   await u.po.expect.toBeSignedOut();
 
@@ -151,7 +151,7 @@ export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
   const u = createTestUtils({ app, page, context });
 
   // Begin in localhost
-  await u.page.goToStart();
+  await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
   await u.po.expect.toBeSignedOut();
 

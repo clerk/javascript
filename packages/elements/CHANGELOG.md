@@ -1,5 +1,24 @@
 # @clerk/elements
 
+## 0.10.4
+
+### Patch Changes
+
+- Fix issue where default field values were being set and clearing field errors. ([#3736](https://github.com/clerk/javascript/pull/3736)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Fix issue where resendable UI in the email_link verification step was not updating on click.
+
+## 0.10.3
+
+### Patch Changes
+
+- Ensure updated provided values to controlled inputs are sent to the machine by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix isWeb3Strategy check to account for prefix and suffix by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7)]:
+  - @clerk/types@4.8.0
+
 ## 0.10.2
 
 ### Patch Changes

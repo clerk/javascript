@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import * as React from 'react';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -15,7 +16,10 @@ import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
+import { useSupportEmail } from '~/hooks/use-support-email';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -24,11 +28,82 @@ import { LinkButton } from '~/primitives/link-button';
 import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
 
+/**
+ * Implementation Details:
+ *
+ * - For now we use a private context to switch between the "Get help" view and
+ *   `SignIn.Step`s. Initially, this ternary was used within the relevant steps,
+ *   but it lead to React rendering errors. Lifting the state and component here
+ *   seemed to reolve those issues.
+ * - We plan to revisit this again in https://linear.app/clerk/issue/SDKI-115;
+ *   where we'll consider its integration within Elements, as well as ensure
+ *   bulletproof a11y.
+ */
 export function SignInComponent() {
+  const [showHelp, setShowHelp] = React.useState(false);
+
   return (
-    <SignIn.Root>
-      <SignInComponentLoaded />
-    </SignIn.Root>
+    <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
+      <SignIn.Root>{showHelp ? <SignInGetHelp /> : <SignInComponentLoaded />}</SignIn.Root>
+    </GetHelpContext.Provider>
+  );
+}
+
+interface GetHelp {
+  showHelp: boolean;
+  setShowHelp: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const GetHelpContext = React.createContext<GetHelp | null>(null);
+
+const useGetHelp = () => {
+  const context = React.useContext(GetHelpContext);
+  if (!context) {
+    throw new Error('useGetHelp must be used within GetHelpContext.Provider');
+  }
+  return context;
+};
+
+function SignInGetHelp() {
+  const { t } = useLocalizations();
+  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { isDevelopmentOrStaging } = useEnvironment();
+  const isDev = isDevelopmentOrStaging();
+  const supportEmail = useSupportEmail();
+  const { setShowHelp } = useGetHelp();
+
+  return (
+    <Card.Root>
+      <Card.Content>
+        <Card.Header>
+          {logoImageUrl ? (
+            <Card.Logo
+              href={homeUrl}
+              src={logoImageUrl}
+              alt={applicationName}
+            />
+          ) : null}
+          <Card.Title>{t('signIn.alternativeMethods.getHelp.title')}</Card.Title>
+          <Card.Description>{t('signIn.alternativeMethods.getHelp.content')}</Card.Description>
+        </Card.Header>
+        <Card.Body>
+          <div className='flex flex-col gap-4'>
+            <Button
+              onClick={() => {
+                window.location.href = `mailto:${supportEmail}`;
+              }}
+              icon={<Icon.CaretRight />}
+            >
+              Email support
+            </Button>
+
+            <LinkButton onClick={() => setShowHelp(false)}>{t('backButton')}</LinkButton>
+          </div>
+        </Card.Body>
+        {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
+      </Card.Content>
+      <Card.Footer branded={branded} />
+    </Card.Root>
   );
 }
 
@@ -36,15 +111,19 @@ export function SignInComponentLoaded() {
   const clerk = useClerk();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const enabledConnections = useEnabledConnections();
+  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passkeyEnabled } = useAttributes('passkey');
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { setShowHelp } = useGetHelp();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
+  const isDev = isDevelopmentOrStaging();
+  const isPasswordResetSupported = useResetPasswordFactor();
 
   return (
     <Common.Loading>
@@ -67,6 +146,12 @@ export function SignInComponentLoaded() {
                   </Card.Header>
 
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Connections disabled={isGlobalLoading} />
 
                     {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
@@ -77,6 +162,7 @@ export function SignInComponentLoaded() {
                           <EmailField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -84,6 +170,7 @@ export function SignInComponentLoaded() {
                           <UsernameField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -92,6 +179,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -99,6 +187,7 @@ export function SignInComponentLoaded() {
                           <EmailOrUsernameField
                             name='identifier'
                             disabled={isGlobalLoading}
+                            required
                           />
                         ) : null}
 
@@ -107,6 +196,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -115,6 +205,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
 
@@ -123,6 +214,7 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
+                            required
                           />
                         ) : null}
                       </div>
@@ -171,6 +263,7 @@ export function SignInComponentLoaded() {
                       ) : null
                     }
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
 
                 <Card.Footer branded={branded}>
@@ -217,19 +310,28 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
                     <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+
                       <PasswordField
                         alternativeFieldTrigger={
-                          <SignIn.Action
-                            navigate='forgot-password'
-                            asChild
-                          >
-                            <LinkButton
-                              size='sm'
-                              disabled={isGlobalLoading}
+                          isPasswordResetSupported ? (
+                            <SignIn.Action
+                              navigate='forgot-password'
+                              asChild
                             >
-                              {t('formFieldAction__forgotPassword')}
-                            </LinkButton>
-                          </SignIn.Action>
+                              <LinkButton
+                                size='sm'
+                                disabled={isGlobalLoading}
+                                type='button'
+                              >
+                                {t('formFieldAction__forgotPassword')}
+                              </LinkButton>
+                            </SignIn.Action>
+                          ) : null
                         }
                       />
 
@@ -316,6 +418,93 @@ export function SignInComponentLoaded() {
                             )}
                           >
                             <LinkButton type='button'>{t('signIn.emailCode.resendButton')}</LinkButton>
+                          </SignIn.Action>
+                        }
+                      />
+                      <Common.Loading scope='step:verifications'>
+                        {isSubmitting => {
+                          return (
+                            <div className='flex flex-col gap-4'>
+                              <SignIn.Action
+                                submit
+                                asChild
+                              >
+                                <Button
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  icon={<Icon.CaretRight />}
+                                >
+                                  {t('formButtonPrimary')}
+                                </Button>
+                              </SignIn.Action>
+
+                              <SignIn.Action
+                                asChild
+                                navigate='choose-strategy'
+                              >
+                                <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                              </SignIn.Action>
+                            </div>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
+
+                  <SignIn.Strategy name='phone_code'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.phoneCode.title')}</Card.Title>
+                      <Card.Description>{t('signIn.phoneCode.subtitle', { applicationName })}</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignIn.SafeIdentifier
+                          // TODO: uncomment once https://github.com/clerk/javascript/pull/3749 is merged
+                          // transform={formatSafeIdentifier}
+                          />
+                          <SignIn.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Start again'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignIn.Action>
+                        </span>
+                      </Card.Description>
+                    </Card.Header>
+
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+                      <OTPField
+                        disabled={isGlobalLoading}
+                        resend={
+                          <SignIn.Action
+                            asChild
+                            resend
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            fallback={({ resendableAfter }) => (
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                                {t('signIn.phoneCode.resendButton')} (
+                                <span className='tabular-nums'>{resendableAfter}</span>)
+                              </p>
+                            )}
+                          >
+                            <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
                           </SignIn.Action>
                         }
                       />
@@ -455,6 +644,7 @@ export function SignInComponentLoaded() {
                       </Common.Loading>
                     </Card.Body>
                   </SignIn.Strategy>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded} />
               </Card.Root>
@@ -475,6 +665,11 @@ export function SignInComponentLoaded() {
                     <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col gap-2'>
                       <Connections disabled={isGlobalLoading} />
 
@@ -508,8 +703,19 @@ export function SignInComponentLoaded() {
                       <LinkButton>{t('backButton')}</LinkButton>
                     </SignIn.Action>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer branded={branded} />
+                <Card.Footer branded={branded}>
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.alternativeMethods.actionText')}{' '}
+                      <Card.FooterActionButton onClick={() => setShowHelp(true)}>
+                        {' '}
+                        {t('signIn.alternativeMethods.actionLink')}
+                      </Card.FooterActionButton>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                </Card.Footer>
               </Card.Root>
             </SignIn.Step>
 
@@ -527,6 +733,11 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col justify-center gap-4'>
                       <SignIn.SupportedStrategy
                         name='reset_password_email_code'
@@ -574,8 +785,19 @@ export function SignInComponentLoaded() {
                       </SignIn.Action>
                     </div>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer branded={branded} />
+                <Card.Footer branded={branded}>
+                  <Card.FooterAction>
+                    <Card.FooterActionText>
+                      {t('signIn.alternativeMethods.actionText')}{' '}
+                      <Card.FooterActionButton onClick={() => setShowHelp(true)}>
+                        {' '}
+                        {t('signIn.alternativeMethods.actionLink')}
+                      </Card.FooterActionButton>
+                    </Card.FooterActionText>
+                  </Card.FooterAction>
+                </Card.Footer>
               </Card.Root>
             </SignIn.Step>
 
@@ -593,8 +815,14 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.resetPassword.title')}</Card.Title>
                   </Card.Header>
                   <Card.Body>
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
                     <div className='flex flex-col justify-center gap-4'>
                       <PasswordField
+                        validatePassword
                         name='password'
                         label={t('formFieldLabel__newPassword')}
                       />
@@ -631,6 +859,7 @@ export function SignInComponentLoaded() {
                       </Common.Loading>
                     </div>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded} />
               </Card.Root>

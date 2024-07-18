@@ -1,5 +1,28 @@
 # Change Log
 
+## 5.9.0
+
+### Minor Changes
+
+- Added support for Custom OAuth providers by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Updated strategy types to include `CustomOAuthStrategy`:
+    - Added the `CustomOAuthStrategy` type with the value `oauth_custom_${string}`
+    - Modified `OAuthStrategy` to include `CustomOAuthStrategy`:
+      `export type OAuthStrategy = `oauth\_${OAuthProvider}` | CustomOAuthStrategy;`
+  - Added the `CustomOauthProvider` type with value `custom_${string}` and extended `OAuthProvider` type to include `CustomOauthProvider`
+  - Added support for displaying provider initials when `logo_url` is null for custom OAuth providers
+  - Created new `ProviderInitialIcon` internal component in order to display custom oauth provider initials if provider `logo_url` is null
+
+### Patch Changes
+
+- Bug Fix: Navigation during signing out requires a router which was missing from the ImpersonationFab by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7)]:
+  - @clerk/types@4.8.0
+  - @clerk/localizations@2.4.8
+  - @clerk/shared@2.3.3
+
 ## 5.8.1
 
 ### Patch Changes

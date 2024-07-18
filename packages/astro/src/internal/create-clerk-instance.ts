@@ -1,10 +1,34 @@
-import { waitForClerkScript } from '../internal/utils/loadClerkJSScript';
+import type { ClerkOptions } from '@clerk/types';
+
 import { $clerk, $csrState } from '../stores/internal';
 import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
+import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
+import { waitForClerkScript } from './utils/loadClerkJSScript';
 
-let initOptions: AstroClerkIntegrationParams | undefined;
+let initOptions: ClerkOptions | undefined;
+
+// TODO-SHARED: copied from `clerk-js`
+export const CLERK_BEFORE_UNLOAD_EVENT = 'clerk:beforeunload';
+
+function windowNavigate(to: URL | string): void {
+  const toURL = new URL(to, window.location.href);
+  window.dispatchEvent(new CustomEvent(CLERK_BEFORE_UNLOAD_EVENT));
+  window.location.href = toURL.href;
+}
+
+function createNavigationHandler(
+  windowNav: typeof window.history.pushState | typeof window.history.replaceState,
+): Exclude<ClerkOptions['routerPush'], undefined> | Exclude<ClerkOptions['routerReplace'], undefined> {
+  return (to, metadata) => {
+    if (metadata?.__internal_metadata?.navigationType === 'internal') {
+      windowNav(history.state, '', to);
+    } else {
+      windowNavigate(to);
+    }
+  };
+}
 
 /**
  * Prevents firing clerk.load multiple times
@@ -27,14 +51,20 @@ async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams
     $clerk.set(clerkJSInstance);
   }
 
-  initOptions = options;
+  initOptions = {
+    ...options,
+    routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
+    routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
+  };
+
   // TODO: Update Clerk type from @clerk/types to include this method
   return (clerkJSInstance as any)
-    .load(options)
+    .load(initOptions)
     .then(() => {
       $csrState.setKey('isLoaded', true);
 
       mountAllClerkAstroJSComponents();
+      invokeClerkAstroJSFunctions();
 
       clerkJSInstance.addListener(payload => {
         $csrState.setKey('client', payload.client);
