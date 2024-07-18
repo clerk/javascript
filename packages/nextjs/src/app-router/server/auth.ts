@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { AuthObject, RedirectFun } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
