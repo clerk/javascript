@@ -205,11 +205,7 @@ export function SignInComponentLoaded() {
                       <Card.Description>{t('signIn.password.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          <SignIn.SafeIdentifier
-                            transform={val => {
-                              return formatSafeIdentifier(val) || val;
-                            }}
-                          />
+                          <SignIn.SafeIdentifier transform={formatSafeIdentifier} />
                           <SignIn.Action
                             navigate='start'
                             asChild
