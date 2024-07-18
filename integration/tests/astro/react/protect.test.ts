@@ -6,7 +6,7 @@ import { createTestUtils, testAgainstRunningApps } from '../../../testUtils';
 testAgainstRunningApps({
   withPattern: ['astro.node.withCustomRoles'],
 })('protect @astro with react', ({ app }) => {
-  test.describe.configure({ mode: 'parallel' });
+  test.describe.configure({ mode: 'serial' });
 
   let fakeAdmin: FakeUser;
   let fakeOrganization: FakeOrganization;
