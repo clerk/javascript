@@ -27,6 +27,25 @@ const RemoveConnectedAccountScreen = (props: RemoveConnectedAccountScreenProps) 
   );
 };
 
+const errorCodesForReconnect = [
+  /**
+   * Some Oauth providers will generate a refresh token only the first time the user gives consent to the app.
+   */
+  'external_account_missing_refresh_token',
+  /**
+   * Provider is experiencing an issue currently.
+   */
+  'oauth_fetch_user_error',
+  /**
+   * Provider is experiencing an issue currently (same as above).
+   */
+  'oauth_token_exchange_error',
+  /**
+   * User's associated email address is required to be verified, because it was initially created as unverified.
+   */
+  'external_account_email_address_verification_required',
+];
+
 export const ConnectedAccountsSection = withCardStateProvider(() => {
   const { user } = useUser();
   const card = useCardState();
@@ -76,8 +95,6 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const isModal = mode === 'modal';
   const { providerToDisplayData } = useEnabledThirdPartyProviders();
   const label = account.username || account.emailAddress;
-  // TODO: any other FAPI codes
-  const errorCodesForReconnect = ['external_account_missing_refresh_token'];
   const fallbackErrorMessage = account.verification?.error?.longMessage;
   const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
   const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
@@ -85,8 +102,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
     errorCodesForReconnect.includes(account.verification?.error?.code || '') || reauthorizationRequired;
 
   const connectedAccountErrorMessage = shouldDisplayReconnect
-    ? // @ts-ignore `localizationKeys` is strictly typed
-      localizationKeys(`unstable__errors.${account.verification.error.code}`)
+    ? localizationKeys(`userProfile.start.connectedAccountsSection.subtitle__disconnected`)
     : fallbackErrorMessage;
 
   const reconnect = async () => {

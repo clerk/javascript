@@ -327,8 +327,15 @@ type _LocalizationResource = {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
+        /**
+         * @deprecated UserProfile now only uses `actionLabel__connectionFailed`.
+         */
         actionLabel__reauthorize: LocalizationValue;
+        /**
+         * @deprecated UserProfile now uses `subtitle__disconnected`.
+         */
         subtitle__reauthorize: LocalizationValue;
+        subtitle__disconnected: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
       };
       enterpriseAccountsSection: {
@@ -750,7 +757,6 @@ type UnstableErrors = WithParamName<{
   form_identifier_exists__phone_number: LocalizationValue;
   form_password_not_strong_enough: LocalizationValue;
   form_password_size_in_bytes_exceeded: LocalizationValue;
-  external_account_missing_refresh_token: LocalizationValue;
   passwordComplexity: {
     sentencePrefix: LocalizationValue;
     minimumLength: LocalizationValue;
