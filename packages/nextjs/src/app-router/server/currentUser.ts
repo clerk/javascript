@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { User } from '@clerk/backend';
 
 import { clerkClient } from '../../server/clerkClient';
