@@ -1,5 +1,3 @@
-import 'server-only';
-
 import type { AuthObject, RedirectFun } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { notFound, redirect } from 'next/navigation';
@@ -16,6 +14,8 @@ import { buildRequestLike } from './utils';
 type Auth = AuthObject & { protect: AuthProtect; redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
 export const auth = (): Auth => {
+  require('server-only');
+
   const request = buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
