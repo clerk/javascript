@@ -73,6 +73,7 @@
     "@clerk/types": "4.8.0",
     "crypto-js": "4.2.0",
     "path-to-regexp": "6.2.2",
+    "server-only": "0.0.1",
     "tslib": "2.4.1"
   },
   "devDependencies": {

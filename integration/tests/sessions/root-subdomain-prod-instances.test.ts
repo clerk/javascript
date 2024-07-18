@@ -10,11 +10,6 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { prepareApplication } from './utils';
 
-const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
-  cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
-  key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
-};
-
 /**
  * These two suites need to run in serial mode because they are both using a local proxy server
  * that listens to port 443. We can't run them in parallel because they would conflict with each other, unless
@@ -58,6 +53,12 @@ test.describe('root and subdomain production apps @sessions', () => {
         // second app using the same instance keys
         prepareApplication('sessions-prod-1'),
       ]);
+
+      // TODO: Move this into createProxyServer
+      const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
+        cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
+        key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
+      };
 
       server = createProxyServer({
         ssl,
@@ -186,6 +187,12 @@ test.describe('root and subdomain production apps @sessions', () => {
 
     test.beforeAll(async () => {
       apps = await Promise.all([prepareApplication('sessions-prod-1'), prepareApplication('sessions-prod-2')]);
+
+      // TODO: Move this into createProxyServer
+      const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
+        cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
+        key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
+      };
 
       server = createProxyServer({
         ssl,
