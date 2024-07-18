@@ -35,7 +35,7 @@ export function SignUpComponent() {
 function SignUpComponentLoaded() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
-  const { isDevelopmentOrStaging } = useEnvironment();
+  const { isDevelopmentOrStaging, userSettings } = useEnvironment();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
@@ -134,6 +134,8 @@ function SignUpComponentLoaded() {
                         ) : null}
                       </div>
                     ) : null}
+
+                    {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
 
                     {hasConnection || hasIdentifier ? (
                       <Common.Loading scope='step:start'>
