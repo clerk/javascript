@@ -24,6 +24,7 @@ import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
+import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
 export function SignInComponent() {
   return (
@@ -204,7 +205,11 @@ export function SignInComponentLoaded() {
                       <Card.Description>{t('signIn.password.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          <SignIn.SafeIdentifier />
+                          <SignIn.SafeIdentifier
+                            transform={val => {
+                              return formatSafeIdentifier(val) || val;
+                            }}
+                          />
                           <SignIn.Action
                             navigate='start'
                             asChild
