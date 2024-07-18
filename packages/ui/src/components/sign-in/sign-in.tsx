@@ -88,8 +88,9 @@ function SignInGetHelp() {
         <Card.Body>
           <div className='flex flex-col gap-4'>
             <Button
-              as='a'
-              href={`mailto:${supportEmail}`}
+              onClick={() => {
+                window.location.href = `mailto:${supportEmail}`;
+              }}
               icon={<Icon.CaretRight />}
             >
               Email support
@@ -593,13 +594,10 @@ export function SignInComponentLoaded() {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.alternativeMethods.actionText')}{' '}
-                      <Card.FooterActionLink
-                        as='button'
-                        onClick={() => setShowHelp(true)}
-                      >
+                      <Card.FooterActionButton onClick={() => setShowHelp(true)}>
                         {' '}
                         {t('signIn.alternativeMethods.actionLink')}
-                      </Card.FooterActionLink>
+                      </Card.FooterActionButton>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>
@@ -673,13 +671,10 @@ export function SignInComponentLoaded() {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.alternativeMethods.actionText')}{' '}
-                      <Card.FooterActionLink
-                        as='button'
-                        onClick={() => setShowHelp(true)}
-                      >
+                      <Card.FooterActionButton onClick={() => setShowHelp(true)}>
                         {' '}
                         {t('signIn.alternativeMethods.actionLink')}
-                      </Card.FooterActionLink>
+                      </Card.FooterActionButton>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>
