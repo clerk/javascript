@@ -20,7 +20,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })(
       await app.teardown();
     });
 
-    test.skip('render user button', async ({ page, context }) => {
+    test('render user button', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
       await u.po.signIn.waitForMounted();
@@ -40,7 +40,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })(
       await expect(u.page.getByText(/profile details/i)).toBeVisible();
     });
 
-    test.skip('render user profile with streamed data', async ({ page, context }) => {
+    test('render user profile with streamed data', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
       await u.po.signIn.waitForMounted();
@@ -56,7 +56,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })(
       await expect(u.page.getByText(`"firstName":"${fakeUser.firstName}"`)).toBeVisible();
     });
 
-    test.skip('SignedIn, SignedOut SSR', async ({ page, context }) => {
+    test('SignedIn, SignedOut SSR', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/react');
       await expect(u.page.getByText('Go to this page to log in')).toBeVisible();
@@ -68,7 +68,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })(
       await expect(u.page.getByText('Sign out!')).toBeVisible();
     });
 
-    test.skip('render content based on Clerk loaded status', async ({ page, context }) => {
+    test('render content based on Clerk loaded status', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToRelative('/utility');
       await expect(u.page.getByText('Clerk is loading')).toBeVisible();
