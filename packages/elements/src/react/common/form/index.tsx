@@ -197,6 +197,7 @@ const useInput = ({
   type: inputType,
   onChange: onChangeProp,
   onBlur: onBlurProp,
+  onFocus: onFocusProp,
   ...passthroughProps
 }: FormInputProps) => {
   // Inputs can be used outside a <Field> wrapper if desired, so safely destructure here
@@ -294,6 +295,20 @@ const useInput = ({
     [onBlurProp, shouldValidatePassword, validatePassword],
   );
 
+  const onFocus = React.useCallback(
+    (event: React.FocusEvent<HTMLInputElement>) => {
+      onFocusProp?.(event);
+      // Check for relatedTarget to avoid validating password when the input
+      // is programticallly focused after form submission. Avoids the issue
+      // where an error message would get removed and the success validation
+      // was shown immediately.
+      if (shouldValidatePassword && Boolean(event.relatedTarget)) {
+        validatePassword(event.target.value);
+      }
+    },
+    [onFocusProp, shouldValidatePassword, validatePassword],
+  );
+
   React.useEffect(() => {
     if (!name) {
       return;
@@ -352,6 +367,7 @@ const useInput = ({
       value: value ?? '',
       onChange,
       onBlur,
+      onFocus,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
       'data-state': enrichFieldState(validity, fieldState),
