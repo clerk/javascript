@@ -1,5 +1,10 @@
 ---
-'@clerk/clerk-expo': minor
+'@clerk/clerk-expo': major
 ---
 
-Expo Web support
+# Breaking changes
+- Started requiring `react-native >= 0.73`
+
+# Features
+- Expo Web support has been added
+- Prebuilt components for Web platforms
