@@ -298,7 +298,11 @@ const useInput = ({
   const onFocus = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onFocusProp?.(event);
-      if (shouldValidatePassword) {
+      // Check for relatedTarget to avoid validating password when the input
+      // is programticallly focused after form submission. Avoids the issue
+      // where an error message would get removed and the success validation
+      // was shown immediately.
+      if (shouldValidatePassword && Boolean(event.relatedTarget)) {
         validatePassword(event.target.value);
       }
     },
