@@ -10,12 +10,12 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { getEnvForMultiAppInstance } from './utils';
 
-const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
-  cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
-  key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
-};
-
 test.describe('root and subdomain production apps @manual-run', () => {
+  const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
+    cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
+    key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
+  };
+
   test.describe.configure({ mode: 'serial' });
 
   test.describe('multiple apps same domain for production instances', () => {

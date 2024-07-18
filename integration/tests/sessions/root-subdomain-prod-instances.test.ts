@@ -10,17 +10,17 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { prepareApplication } from './utils';
 
-const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
-  cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
-  key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
-};
-
 /**
  * These two suites need to run in serial mode because they are both using a local proxy server
  * that listens to port 443. We can't run them in parallel because they would conflict with each other, unless
  * we use more custom domains to avoid collision.
  */
 test.describe('root and subdomain production apps @sessions', () => {
+  const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
+    cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
+    key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
+  };
+
   test.describe.configure({ mode: 'serial' });
 
   /**
