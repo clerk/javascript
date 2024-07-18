@@ -18,8 +18,8 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
-import { useSupportEmail } from '~/hooks/use-support-email';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
+import { useSupportEmail } from '~/hooks/use-support-email';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -735,6 +735,7 @@ export function SignInComponentLoaded() {
                     </Common.GlobalError>
                     <div className='flex flex-col justify-center gap-4'>
                       <PasswordField
+                        validatePassword
                         name='password'
                         label={t('formFieldLabel__newPassword')}
                       />

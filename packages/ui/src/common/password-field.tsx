@@ -11,10 +11,12 @@ export function PasswordField({
   label = 'Password',
   name = 'password',
   ...props
-}: { alternativeFieldTrigger?: React.ReactNode; name?: 'password' | 'confirmPassword'; label?: React.ReactNode } & Omit<
-  React.ComponentProps<typeof Common.Input>,
-  'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'
->) {
+}: {
+  alternativeFieldTrigger?: React.ReactNode;
+  validatePassword?: boolean;
+  name?: 'password' | 'confirmPassword';
+  label?: React.ReactNode;
+} & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>) {
   const [type, setType] = React.useState('password');
   const [touched, setTouched] = React.useState(false);
 
@@ -36,13 +38,6 @@ export function PasswordField({
               <div className='relative'>
                 <Common.Input
                   type={type}
-                  // note: we set `type` to `text` to show the password, but our
-                  //       mutually exclusive prop `validatePassword` requires a
-                  //      `type` of `password`. `validatePassword` does however
-                  //       behave as expected when `type` is `text`, so we can
-                  //       safely ignore the TS error.
-                  // @ts-expect-error – see above
-                  validatePassword
                   className={cx('pe-7', className)}
                   onBlur={() => setTouched(true)}
                   {...props}
