@@ -8,17 +8,26 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
 
   let fakeAdmin: FakeUser;
   let fakeOrganization: FakeOrganization;
+  let fakeAdmin2: FakeUser;
+  let fakeOrganization2: FakeOrganization;
 
   test.beforeAll(async () => {
     const m = createTestUtils({ app });
     fakeAdmin = m.services.users.createFakeUser();
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
+
+    fakeAdmin2 = m.services.users.createFakeUser();
+    const admin2 = await m.services.users.createBapiUser(fakeAdmin2);
+    fakeOrganization2 = await m.services.users.createFakeOrganization(admin2.id);
   });
 
   test.afterAll(async () => {
     await fakeOrganization.delete();
     await fakeAdmin.deleteIfExists();
+
+    await fakeOrganization2.delete();
+    await fakeAdmin2.deleteIfExists();
     await app.teardown();
   });
 
@@ -174,6 +183,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
     await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.expectPersonalAccount();
     await u.po.organizationSwitcher.toggleTrigger();
     await u.page.locator('.cl-organizationSwitcherPreviewButton').click();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
@@ -264,5 +274,30 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.page.waitForURL(
       `${app.serverUrl}/sign-in?redirect_url=${encodeURIComponent(`${app.serverUrl}/organization`)}`,
     );
+  });
+
+  // ---- protect
+  test('only admin', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin2.email, password: fakeAdmin2.password });
+    await u.po.expect.toBeSignedIn();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.expectPersonalAccount();
+    await u.po.organizationSwitcher.toggleTrigger();
+    await u.page.locator('.cl-organizationSwitcherPreviewButton').click();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+    await u.page.goToRelative('/only-admins');
+    await expect(u.page.getByText("I'm an admin")).toBeVisible();
+  });
+
+  test('only member', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in#/?redirect_url=/only-members');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin2.email, password: fakeAdmin2.password });
+    await u.po.expect.toBeSignedIn();
+    await expect(u.page.getByText('Not a member')).toBeVisible();
   });
 });
