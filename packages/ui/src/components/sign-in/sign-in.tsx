@@ -18,8 +18,8 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
-import { useSupportEmail } from '~/hooks/use-support-email';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
+import { useSupportEmail } from '~/hooks/use-support-email';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -418,6 +418,93 @@ export function SignInComponentLoaded() {
                             )}
                           >
                             <LinkButton type='button'>{t('signIn.emailCode.resendButton')}</LinkButton>
+                          </SignIn.Action>
+                        }
+                      />
+                      <Common.Loading scope='step:verifications'>
+                        {isSubmitting => {
+                          return (
+                            <div className='flex flex-col gap-4'>
+                              <SignIn.Action
+                                submit
+                                asChild
+                              >
+                                <Button
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  icon={<Icon.CaretRight />}
+                                >
+                                  {t('formButtonPrimary')}
+                                </Button>
+                              </SignIn.Action>
+
+                              <SignIn.Action
+                                asChild
+                                navigate='choose-strategy'
+                              >
+                                <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                              </SignIn.Action>
+                            </div>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
+
+                  <SignIn.Strategy name='phone_code'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.phoneCode.title')}</Card.Title>
+                      <Card.Description>{t('signIn.phoneCode.subtitle', { applicationName })}</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignIn.SafeIdentifier
+                          // TODO: uncomment once https://github.com/clerk/javascript/pull/3749 is merged
+                          // transform={formatSafeIdentifier}
+                          />
+                          <SignIn.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Start again'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignIn.Action>
+                        </span>
+                      </Card.Description>
+                    </Card.Header>
+
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+                      <OTPField
+                        disabled={isGlobalLoading}
+                        resend={
+                          <SignIn.Action
+                            asChild
+                            resend
+                            // eslint-disable-next-line react/no-unstable-nested-components
+                            fallback={({ resendableAfter }) => (
+                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                                {t('signIn.phoneCode.resendButton')} (
+                                <span className='tabular-nums'>{resendableAfter}</span>)
+                              </p>
+                            )}
+                          >
+                            <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
                           </SignIn.Action>
                         }
                       />
