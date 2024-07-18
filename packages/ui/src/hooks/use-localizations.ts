@@ -1,11 +1,11 @@
-import { useClerk } from '@clerk/clerk-react';
 import { enUS } from '@clerk/localizations';
-import type { ClerkOptions } from '@clerk/types';
 
 import { makeLocalizeable } from '~/utils/makeLocalizable';
 
+import { useOptions } from './use-options';
+
 export function useLocalizations() {
-  const clerk = useClerk();
-  const { t, translateError } = makeLocalizeable(((clerk as any)?.options as ClerkOptions)?.localization || enUS);
+  const options = useOptions();
+  const { t, translateError } = makeLocalizeable(options?.localization || enUS);
   return { t, translateError };
 }

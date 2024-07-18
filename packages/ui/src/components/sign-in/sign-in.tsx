@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import * as React from 'react';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -17,6 +18,7 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { useSupportEmail } from '~/hooks/use-support-email';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
@@ -26,11 +28,82 @@ import { LinkButton } from '~/primitives/link-button';
 import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
 
+/**
+ * Implementation Details:
+ *
+ * - For now we use a private context to switch between the "Get help" view and
+ *   `SignIn.Step`s. Initially, this ternary was used within the relevant steps,
+ *   but it lead to React rendering errors. Lifting the state and component here
+ *   seemed to reolve those issues.
+ * - We plan to revisit this again in https://linear.app/clerk/issue/SDKI-115;
+ *   where we'll consider its integration within Elements, as well as ensure
+ *   bulletproof a11y.
+ */
 export function SignInComponent() {
+  const [showHelp, setShowHelp] = React.useState(false);
+
   return (
-    <SignIn.Root>
-      <SignInComponentLoaded />
-    </SignIn.Root>
+    <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
+      <SignIn.Root>{showHelp ? <SignInGetHelp /> : <SignInComponentLoaded />}</SignIn.Root>
+    </GetHelpContext.Provider>
+  );
+}
+
+interface GetHelp {
+  showHelp: boolean;
+  setShowHelp: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const GetHelpContext = React.createContext<GetHelp | null>(null);
+
+const useGetHelp = () => {
+  const context = React.useContext(GetHelpContext);
+  if (!context) {
+    throw new Error('useGetHelp must be used within GetHelpContext.Provider');
+  }
+  return context;
+};
+
+function SignInGetHelp() {
+  const { t } = useLocalizations();
+  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { isDevelopmentOrStaging } = useEnvironment();
+  const isDev = isDevelopmentOrStaging();
+  const supportEmail = useSupportEmail();
+  const { setShowHelp } = useGetHelp();
+
+  return (
+    <Card.Root>
+      <Card.Content>
+        <Card.Header>
+          {logoImageUrl ? (
+            <Card.Logo
+              href={homeUrl}
+              src={logoImageUrl}
+              alt={applicationName}
+            />
+          ) : null}
+          <Card.Title>{t('signIn.alternativeMethods.getHelp.title')}</Card.Title>
+          <Card.Description>{t('signIn.alternativeMethods.getHelp.content')}</Card.Description>
+        </Card.Header>
+        <Card.Body>
+          <div className='flex flex-col gap-4'>
+            <Button
+              onClick={() => {
+                window.location.href = `mailto:${supportEmail}`;
+              }}
+              icon={<Icon.CaretRight />}
+            >
+              Email support
+            </Button>
+
+            <LinkButton onClick={() => setShowHelp(false)}>{t('backButton')}</LinkButton>
+          </div>
+        </Card.Body>
+        {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
+      </Card.Content>
+      <Card.Footer branded={branded} />
+    </Card.Root>
   );
 }
 
@@ -45,6 +118,7 @@ export function SignInComponentLoaded() {
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passkeyEnabled } = useAttributes('passkey');
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { setShowHelp } = useGetHelp();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
@@ -548,13 +622,10 @@ export function SignInComponentLoaded() {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.alternativeMethods.actionText')}{' '}
-                      <Card.FooterActionLink
-                        // To be implemented in SDKI-115
-                        href='#'
-                      >
+                      <Card.FooterActionButton onClick={() => setShowHelp(true)}>
                         {' '}
                         {t('signIn.alternativeMethods.actionLink')}
-                      </Card.FooterActionLink>
+                      </Card.FooterActionButton>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>
@@ -633,13 +704,10 @@ export function SignInComponentLoaded() {
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signIn.alternativeMethods.actionText')}{' '}
-                      <Card.FooterActionLink
-                        // To be implemented in SDKI-115
-                        href='#'
-                      >
+                      <Card.FooterActionButton onClick={() => setShowHelp(true)}>
                         {' '}
                         {t('signIn.alternativeMethods.actionLink')}
-                      </Card.FooterActionLink>
+                      </Card.FooterActionButton>
                     </Card.FooterActionText>
                   </Card.FooterAction>
                 </Card.Footer>
