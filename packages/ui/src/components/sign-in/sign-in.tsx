@@ -17,6 +17,7 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -48,6 +49,7 @@ export function SignInComponentLoaded() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = isDevelopmentOrStaging();
+  const isPasswordResetSupported = useResetPasswordFactor();
 
   return (
     <Common.Loading>
@@ -223,18 +225,20 @@ export function SignInComponentLoaded() {
                     <Card.Body>
                       <PasswordField
                         alternativeFieldTrigger={
-                          <SignIn.Action
-                            navigate='forgot-password'
-                            asChild
-                          >
-                            <LinkButton
-                              size='sm'
-                              disabled={isGlobalLoading}
-                              type='button'
+                          isPasswordResetSupported ? (
+                            <SignIn.Action
+                              navigate='forgot-password'
+                              asChild
                             >
-                              {t('formFieldAction__forgotPassword')}
-                            </LinkButton>
-                          </SignIn.Action>
+                              <LinkButton
+                                size='sm'
+                                disabled={isGlobalLoading}
+                                type='button'
+                              >
+                                {t('formFieldAction__forgotPassword')}
+                              </LinkButton>
+                            </SignIn.Action>
+                          ) : null
                         }
                       />
 
