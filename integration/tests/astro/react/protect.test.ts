@@ -24,10 +24,6 @@ testAgainstRunningApps({
     await app.teardown();
   });
 
-  // test('dummy test', async ({ page, context }) => {
-  //   createTestUtils({ app, page, context });
-  // });
-  //
   test('only admin', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/react/sign-in#/?redirect_url=/react');
@@ -42,12 +38,12 @@ testAgainstRunningApps({
     await expect(u.page.getByText("I'm an admin")).toBeVisible();
   });
 
-  // test('only member', async ({ page, context }) => {
-  //   const u = createTestUtils({ app, page, context });
-  //   await u.page.goToRelative('/react/sign-in#/?redirect_url=/react/only-members');
-  //   await u.po.signIn.waitForMounted();
-  //   await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
-  //   await u.po.expect.toBeSignedIn();
-  //   await expect(u.page.getByText('Not a member')).toBeVisible();
-  // });
+  test('only member', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/react/sign-in#/?redirect_url=/react/only-members');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+    await expect(u.page.getByText('Not a member')).toBeVisible();
+  });
 });
