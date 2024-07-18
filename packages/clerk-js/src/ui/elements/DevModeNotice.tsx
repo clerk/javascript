@@ -18,7 +18,7 @@ export const DevModeOverlay = () => {
         inset: 0,
         position: 'absolute',
         background: `repeating-linear-gradient(-45deg,${t.colors.$warningAlpha100},${t.colors.$warningAlpha100} 6px,${t.colors.$warningAlpha150} 6px,${t.colors.$warningAlpha150} 12px)`,
-        maskImage: 'linear-gradient(transparent 60%, black)',
+        maskImage: 'linear-gradient(transparent 50%, black)',
       })}
     />
   );

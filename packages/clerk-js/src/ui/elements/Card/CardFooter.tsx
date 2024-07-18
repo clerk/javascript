@@ -5,6 +5,7 @@ import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../
 import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
 import { common, mqu } from '../../styledSystem';
 import { colors } from '../../utils';
+import { DevModeOverlay } from '../DevModeNotice';
 import { Card } from '.';
 
 type CardFooterProps = PropsOfComponent<typeof Flex> & {
@@ -45,6 +46,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       elementDescriptor={descriptors.footer}
       sx={[
         t => ({
+          position: 'relative',
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
           background: common.mergedColorsBackground(
@@ -62,9 +64,16 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       {...rest}
       ref={ref}
     >
+      <DevModeOverlay />
+
       {children}
 
-      {showSponsorAndLinks && <Card.ClerkAndPagesTag withFooterPages={!isProfileFooter} />}
+      <Card.ClerkAndPagesTag
+        withFooterPages={showSponsorAndLinks && !isProfileFooter}
+        devModeNoticeSx={t => ({
+          padding: t.space.$none,
+        })}
+      />
     </Flex>
   );
 });

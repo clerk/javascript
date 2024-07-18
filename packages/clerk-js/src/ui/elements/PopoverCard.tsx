@@ -90,15 +90,12 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
       <DevModeOverlay />
       {children}
 
-      {shouldShowTagOrLinks && (
-        <Card.ClerkAndPagesTag
-          withFooterPages
-          withDevModeNotice
-          devModeNoticeSx={t => ({
-            padding: t.space.$none,
-          })}
-        />
-      )}
+      <Card.ClerkAndPagesTag
+        withFooterPages={!!shouldShowTagOrLinks}
+        devModeNoticeSx={t => ({
+          padding: t.space.$none,
+        })}
+      />
     </Col>
   );
 };

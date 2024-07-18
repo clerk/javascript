@@ -12,12 +12,12 @@ export const CardClerkAndPagesTag = React.memo(
     HTMLDivElement,
     PropsOfComponent<typeof Flex> & {
       withFooterPages?: boolean;
-      withDevModeNotice?: boolean;
       devModeNoticeSx?: ThemableCssProp;
     }
   >((props, ref) => {
-    const { sx, withFooterPages = false, withDevModeNotice = false, devModeNoticeSx, ...rest } = props;
-    const { displayConfig } = useEnvironment();
+    const { sx, withFooterPages = false, devModeNoticeSx, ...rest } = props;
+    const { displayConfig, isDevelopmentOrStaging } = useEnvironment();
+    const withDevModeNotice = isDevelopmentOrStaging();
 
     if (!(displayConfig.branded || withFooterPages) && !withDevModeNotice) {
       return null;
@@ -26,7 +26,7 @@ export const CardClerkAndPagesTag = React.memo(
     return (
       <Col
         sx={t => ({
-          gap: t.space.$2,
+          gap: displayConfig.branded || withFooterPages ? t.space.$2 : 0,
           marginLeft: 'auto',
           marginRight: 'auto',
           width: '100%',
@@ -34,39 +34,40 @@ export const CardClerkAndPagesTag = React.memo(
           alignItems: 'center',
         })}
       >
-        <Flex
-          sx={[
-            t => ({
-              ':has(div:only-child)': {
-                justifyContent: 'center',
+        {(displayConfig.branded || withFooterPages) && (
+          <Flex
+            sx={[
+              {
+                ':has(div:only-child)': {
+                  justifyContent: 'center',
+                },
+                justifyContent: 'space-between',
+                width: '100%',
               },
-              justifyContent: 'space-between',
-              width: '100%',
-              padding: `0 ${t.space.$8}`,
-            }),
-            sx,
-          ]}
-          {...rest}
-          ref={ref}
-        >
-          {displayConfig.branded && (
-            <Flex
-              gap={1}
-              align='center'
-              justify='center'
-              sx={t => ({ color: t.colors.$colorTextSecondary })}
-            >
-              <>
-                <Text variant='buttonSmall'>Secured by</Text>
-                <LogoMarkIconLink />
-              </>
-            </Flex>
-          )}
+              sx,
+            ]}
+            {...rest}
+            ref={ref}
+          >
+            {displayConfig.branded && (
+              <Flex
+                gap={1}
+                align='center'
+                justify='center'
+                sx={t => ({ color: t.colors.$colorTextSecondary })}
+              >
+                <>
+                  <Text variant='buttonSmall'>Secured by</Text>
+                  <LogoMarkIconLink />
+                </>
+              </Flex>
+            )}
 
-          {withFooterPages && <Card.FooterLinks />}
-        </Flex>
+            {withFooterPages && <Card.FooterLinks />}
+          </Flex>
+        )}
 
-        {withDevModeNotice && <DevModeNotice sx={devModeNoticeSx} />}
+        <DevModeNotice sx={devModeNoticeSx} />
       </Col>
     );
   }),
