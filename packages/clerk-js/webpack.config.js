@@ -255,7 +255,7 @@ const devConfig = ({ mode, env }) => {
   const variant = env.variant || variants.clerkBrowser;
   // accept an optional devOrigin environment option to change the origin of the dev server.
   // By default we use https://js.lclclerk.com which is what our local dev proxy looks for.
-  const devUrl = new URL(env.devOrigin || 'http://localhost:4000');
+  const devUrl = new URL(env.devOrigin || 'https://js.lclclerk.com');
 
   const commonForDev = () => {
     return {
