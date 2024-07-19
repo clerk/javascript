@@ -75,6 +75,7 @@ const createDebug = (data: AuthObjectDebugData | undefined) => {
  */
 export function signedInAuthObject(
   authenticateContext: AuthenticateContext,
+  sessionToken: string,
   sessionClaims: JwtPayload,
 ): SignedInAuthObject {
   const {
@@ -89,7 +90,7 @@ export function signedInAuthObject(
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
     sessionId,
-    sessionToken: authenticateContext.sessionToken || '',
+    sessionToken,
     fetcher: async (...args) => (await apiClient.sessions.getToken(...args)).jwt,
   });
 
@@ -104,7 +105,7 @@ export function signedInAuthObject(
     orgPermissions,
     getToken,
     has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
-    debug: createDebug({ ...authenticateContext }),
+    debug: createDebug({ ...authenticateContext, sessionToken }),
   };
 }
 

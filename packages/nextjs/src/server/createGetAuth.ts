@@ -55,8 +55,9 @@ export const createGetAuth = ({
         const jwt = decodeJwt(authToken as string);
 
         logger.debug('JWT debug', jwt.raw.text);
-        // @ts-expect-error - TODO @nikos: Align types
-        return signedInAuthObject({ ...options, sessionToken: jwt.raw.text }, jwt.payload);
+
+        // @ts-expect-error - TODO: Align types
+        return signedInAuthObject(options, jwt.raw.text, jwt.payload);
       }
 
       return signedOutAuthObject(options);

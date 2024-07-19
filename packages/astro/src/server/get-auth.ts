@@ -36,7 +36,7 @@ export const createGetAuth = ({ noAuthStatusMessage }: { noAuthStatusMessage: st
 
     const jwt = decodeJwt(authToken as string);
     // @ts-expect-error - TODO: Align types
-    return signedInAuthObject({ ...options, sessionToken: jwt.raw.text }, jwt.payload);
+    return signedInAuthObject(options, jwt.raw.text, jwt.payload);
   };
 };
 

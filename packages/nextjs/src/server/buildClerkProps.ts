@@ -57,8 +57,8 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
   } else {
     const jwt = decodeJwt(authToken as string);
 
-    // @ts-expect-error - TODO @nikos: Align types
-    authObject = signedInAuthObject({ ...options, sessionToken: jwt.raw.text }, jwt.payload);
+    // @ts-expect-error - TODO: Align types
+    authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
   }
 
   const sanitizedAuthObject = makeAuthObjectSerializable(stripPrivateDataFromObject({ ...authObject, ...initState }));
