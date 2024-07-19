@@ -62,6 +62,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         },
         layout: {
           animations,
+          helpPageUrl: 'https://www.google.com',
+          privacyPageUrl: 'https://www.google.com',
         },
       }}
       {...pageProps}

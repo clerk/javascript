@@ -179,7 +179,6 @@ const NavbarContainer = (
         sx={{
           width: 'fit-content',
         }}
-        withDevModeNotice
       />
     </Col>
   );
