@@ -43,7 +43,6 @@ declare global {
        * @param signInParams.password - The user's password. Required only if the strategy is 'password'.
        *
        * @example
-       * ```ts
        *  it("sign in", () => {
        *     cy.visit(`/`);
        *     cy.clerkSignIn({ strategy: 'phone_code', identifier: '+15555550100' });
@@ -58,7 +57,6 @@ declare global {
        * @param signOutOptions - A SignOutOptions object.
        *
        * @example
-       * ```ts
        *  it("sign out", () => {
        *     cy.visit(`/`);
        *     cy.clerkSignIn({ strategy: 'phone_code', identifier: '+15555550100' });
