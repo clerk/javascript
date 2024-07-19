@@ -4,7 +4,7 @@ import { DEV_BROWSER_JWT_KEY } from '@clerk/shared';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
-import { CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
+import { AUTH_HEADER, CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
 import type { GetClientCookieParams } from './utils/cookies';
 import { assertPublishableKey } from './utils/errors';
 import { JWTHandler } from './utils/jwt-handler';
@@ -64,17 +64,22 @@ export async function buildClerk({
   // @ts-expect-error - Clerk doesn't expose this unstable method publicly
   clerk.__unstable__onBeforeRequest(async requestInit => {
     requestInit.credentials = 'omit';
-    requestInit.url?.searchParams.append('_is_native', '1');
 
     const currentJWT = await jwt.get();
 
-    (requestInit.headers as Headers).set('authorization', currentJWT || '');
+    if (isProd) {
+      requestInit.url?.searchParams.append('_is_native', '1');
+      (requestInit.headers as Headers).set('authorization', currentJWT || '');
+    } else {
+      requestInit.url?.searchParams.append('__clerk_db_jwt', currentJWT);
+    }
   });
 
   // Store updated JWT in StorageCache on Clerk responses
   // @ts-expect-error - Clerk doesn't expose this unstable method publicly
   clerk.__unstable__onAfterResponse(async (_, response) => {
-    const authHeader = response.headers.get('authorization');
+    const authHeaderkey = isProd ? AUTH_HEADER.production : AUTH_HEADER.development;
+    const authHeader = response.headers.get(authHeaderkey);
 
     if (authHeader) {
       await jwt.set(authHeader);
