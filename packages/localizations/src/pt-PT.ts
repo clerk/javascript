@@ -307,6 +307,10 @@ export const ptPT: LocalizationResource = {
       title: 'Verifique o seu e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Retorne para a aba original para continuar',
         title: 'Este link de verificação expirou',
@@ -421,6 +425,10 @@ export const ptPT: LocalizationResource = {
       title: 'Verifique o seu e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Utilize o link enviado no seu e-mail',
       formTitle: 'Link de verificação',
       loading: {
@@ -453,6 +461,7 @@ export const ptPT: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Não foi possível inscrever-se devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
@@ -718,6 +727,7 @@ export const ptPT: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Contas conectadas',

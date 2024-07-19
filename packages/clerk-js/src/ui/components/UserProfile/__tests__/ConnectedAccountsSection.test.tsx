@@ -33,6 +33,56 @@ const withConnections = createFixtures.config(f => {
   });
 });
 
+const withReconnectableConnection = createFixtures.config(f => {
+  f.withSocialProvider({ provider: 'google' });
+  f.withUser({
+    external_accounts: [
+      {
+        provider: 'google',
+        email_address: 'test@clerk.com',
+        verification: {
+          error: {
+            code: 'external_account_missing_refresh_token',
+            message: '',
+          },
+        } as any,
+      },
+    ],
+  });
+});
+
+const withReconnectableConnectionAdditionalScopes = createFixtures.config(f => {
+  f.withSocialProvider({ provider: 'google' });
+  f.withUser({
+    external_accounts: [
+      {
+        provider: 'google',
+        email_address: 'test@clerk.com',
+        approved_scopes: 'some_approved_scope',
+      },
+    ],
+  });
+});
+
+const withNonReconnectableConnection = createFixtures.config(f => {
+  f.withSocialProvider({ provider: 'google' });
+  f.withUser({
+    external_accounts: [
+      {
+        provider: 'google',
+        email_address: 'test@clerk.com',
+        verification: {
+          error: {
+            code: 'any_other_error',
+            message: 'Remove and',
+            long_message: 'Remove and try again.',
+          },
+        } as any,
+      },
+    ],
+  });
+});
+
 describe('ConnectedAccountsSection ', () => {
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(withoutConnections);
@@ -82,6 +132,89 @@ describe('ConnectedAccountsSection ', () => {
         strategy: 'oauth_google',
         additionalScopes: [],
       });
+    });
+  });
+
+  describe('Recover from issues', () => {
+    it('Missing refresh token needs reconnection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withReconnectableConnection);
+
+      fixtures.clerk.user?.createExternalAccount.mockResolvedValue({
+        verification: {},
+      } as any);
+
+      const { userEvent, getByText, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+      const item = getByText(/google/i);
+
+      // Still displays a remove button
+      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove/i });
+      // Close the menu
+      await userEvent.click(getByText('Connected accounts'));
+
+      getByText('This account has been disconnected.');
+      getByRole('button', { name: /reconnect/i });
+      await userEvent.click(getByRole('button', { name: /reconnect/i }));
+      expect(fixtures.clerk.user?.createExternalAccount).toHaveBeenCalled();
+    });
+
+    it('Additional scopes need reconnection', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(withReconnectableConnectionAdditionalScopes);
+
+      props.setProps({
+        componentName: 'UserProfile',
+        additionalOAuthScopes: {
+          google: ['some_scope'],
+        },
+      });
+
+      fixtures.clerk.user?.externalAccounts[0].reauthorize.mockResolvedValue({
+        verification: {},
+      } as any);
+
+      const { userEvent, getByText, getByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+      const item = getByText(/google/i);
+
+      // Still displays a remove button
+      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove/i });
+      // Close the menu
+      await userEvent.click(getByText('Connected accounts'));
+
+      getByText('This account has been disconnected.');
+      getByRole('button', { name: /reconnect/i });
+      await userEvent.click(getByRole('button', { name: /reconnect/i }));
+      expect(fixtures.clerk.user?.externalAccounts[0].reauthorize).toHaveBeenCalled();
+    });
+
+    it('Unrecoverable errors', async () => {
+      const { wrapper } = await createFixtures(withNonReconnectableConnection);
+      const { userEvent, getByText, getByRole, queryByRole } = render(<ConnectedAccountsSection />, { wrapper });
+
+      const item = getByText(/google/i);
+
+      // Still displays a remove button
+      const menuButton = item.parentElement?.parentElement?.parentElement?.parentElement?.children?.[1];
+      await act(async () => {
+        await userEvent.click(menuButton!);
+      });
+
+      getByRole('menuitem', { name: /remove/i });
+      // Close the menu
+      await userEvent.click(getByText('Connected accounts'));
+
+      getByText('Remove and try again.');
+      expect(queryByRole('button', { name: /reconnect/i })).not.toBeInTheDocument();
     });
   });
 

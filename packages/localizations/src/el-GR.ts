@@ -308,6 +308,10 @@ export const elGR: LocalizationResource = {
       title: 'Ελέγξτε το email σας',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Επιστροφή στην αρχική καρτέλα για να συνεχίσετε.',
         title: 'Αυτός ο σύνδεσμος επαλήθευσης έχει λήξει',
@@ -423,6 +427,10 @@ export const elGR: LocalizationResource = {
       title: 'Επαληθεύστε το email σας',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που απεστάλη στη διεύθυνση email σας',
       formTitle: 'Σύνδεσμος επαλήθευσης',
       loading: {
@@ -455,6 +463,7 @@ export const elGR: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Η εγγραφή απέτυχε λόγω αποτυχημένων ελέγχων ασφαλείας. Ανανεώστε τη σελίδα για να δοκιμάσετε ξανά ή επικοινωνήστε με το κέντρο υποστήριξης για περισσότερη βοήθεια.',
@@ -727,6 +736,7 @@ export const elGR: LocalizationResource = {
         actionLabel__reauthorize: 'Εξουσιοδοτήστε τώρα',
         destructiveActionTitle: 'Αφαίρεση',
         primaryButton: 'Σύνδεση λογαριασμού',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Συνδεδεμένοι λογαριασμοί',

@@ -308,6 +308,10 @@ export const frFR: LocalizationResource = {
       title: 'Vérifiez votre messagerie',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: "Retournez à l'onglet d'origine pour continuer",
         title: 'Ce lien de vérification a expiré',
@@ -423,6 +427,10 @@ export const frFR: LocalizationResource = {
       title: 'Vérifiez votre e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Utilisez le lien de vérification envoyé à votre adresse e-mail',
       formTitle: 'lien de vérification',
       loading: {
@@ -455,6 +463,7 @@ export const frFR: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
@@ -723,6 +732,7 @@ export const frFR: LocalizationResource = {
         actionLabel__reauthorize: 'Authorize now',
         destructiveActionTitle: 'Retirer',
         primaryButton: 'Connecter le compte',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Comptes connectés',

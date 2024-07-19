@@ -327,8 +327,15 @@ type _LocalizationResource = {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
+        /**
+         * @deprecated UserProfile now only uses `actionLabel__connectionFailed`.
+         */
         actionLabel__reauthorize: LocalizationValue;
+        /**
+         * @deprecated UserProfile now uses `subtitle__disconnected`.
+         */
         subtitle__reauthorize: LocalizationValue;
+        subtitle__disconnected: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
       };
       enterpriseAccountsSection: {
