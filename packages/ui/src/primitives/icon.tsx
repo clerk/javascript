@@ -693,6 +693,20 @@ export const InformationLegacy = createIcon({
   ),
 });
 
+export const LockSm = createIcon({
+  displayName: 'IconLockSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M5.25 7.75H3.75V11.25C3.75 12.3546 4.64543 13.25 5.75 13.25H10.25C11.3546 13.25 12.25 12.3546 12.25 11.25V7.75H10.75M5.25 7.75V5.5C5.25 3.98122 6.48122 2.75 8 2.75V2.75C9.51878 2.75 10.75 3.98122 10.75 5.5V7.75M5.25 7.75H10.75'
+      stroke='currentColor'
+      strokeWidth={1.5}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  ),
+});
+
 export const LinkSm = createIcon({
   displayName: 'IconLinkSm',
   viewBox: '0 0 16 16',
@@ -714,6 +728,21 @@ export const PencilUnderlined = createIcon({
     <path
       fill='currentColor'
       d='M13.098 5.108c-.418.419-.628.628-.847.669-.22.04-.364-.104-.652-.392l-.984-.984c-.288-.288-.432-.432-.392-.652.04-.22.25-.428.669-.847l.226-.227c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-.227.226ZM4.16 13.688l-1.206.223c-.5.092-.75.138-.876.011-.127-.126-.08-.376.011-.876l.223-1.206c.04-.217.06-.325.118-.43.058-.105.15-.196.33-.377l5.554-5.554c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-5.554 5.553c-.181.182-.272.273-.377.331-.105.058-.213.078-.43.118ZM8.75 12.5a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z'
+    />
+  ),
+});
+
+// Note: this will be replaced
+// https://linear.app/clerk/issue/DES-1140
+export const SMSSm = createIcon({
+  displayName: 'IconSMSSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      fill='currentColor'
+      fillRule='evenodd'
+      d='M14.4 4v6.4a1.6 1.6 0 0 1-1.6 1.6h-4l-4 3.2V12H3.2a1.6 1.6 0 0 1-1.6-1.6V4a1.6 1.6 0 0 1 1.6-1.6h9.6A1.6 1.6 0 0 1 14.4 4ZM5.6 6.4H4V8h1.6V6.4Zm1.6 0h1.6V8H7.2V6.4Zm4.8 0h-1.6V8H12V6.4Z'
+      clipRule='evenodd'
     />
   ),
 });
