@@ -18,7 +18,6 @@ export function PasswordField({
   label?: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>) {
   const [type, setType] = React.useState('password');
-  const [touched, setTouched] = React.useState(false);
 
   return (
     <Common.Field
@@ -39,7 +38,6 @@ export function PasswordField({
                 <Common.Input
                   type={type}
                   className={cx('pe-7', className)}
-                  onBlur={() => setTouched(true)}
                   {...props}
                   asChild
                 >
@@ -63,30 +61,22 @@ export function PasswordField({
             );
           }}
         </Common.FieldState>
-        <Common.FieldError asChild>
-          {({ message }) => {
-            return <Field.Message intent='error'>{message}</Field.Message>;
-          }}
-        </Common.FieldError>
-        <Common.FieldState>
-          {({ state, message }) => {
-            if (state === 'idle') {
-              return;
-            }
-
-            // Confirm success states immediately
-            if (state === 'success') {
+        {props.validatePassword ? (
+          <Common.FieldState>
+            {({ state, message }) => {
+              if (state === 'idle') {
+                return;
+              }
               return <Field.Message intent={state}>{message}</Field.Message>;
-            }
-
-            // Show errors and warnings only if the field has been interacted with
-            if (!touched) {
-              return;
-            }
-
-            return <Field.Message intent={state}>{message}</Field.Message>;
-          }}
-        </Common.FieldState>
+            }}
+          </Common.FieldState>
+        ) : (
+          <Common.FieldError asChild>
+            {({ message }) => {
+              return <Field.Message intent='error'>{message}</Field.Message>;
+            }}
+          </Common.FieldError>
+        )}
       </Field.Root>
     </Common.Field>
   );
