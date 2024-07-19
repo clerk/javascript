@@ -720,6 +720,10 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
+    if (session?.lastActiveToken) {
+      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+    }
+
     await onBeforeSetActive();
 
     //1. setLastActiveSession to passed user session (add a param).
@@ -755,6 +759,7 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#setAccessors(newSession);
+
     this.#emit();
     await onAfterSetActive();
     this.#resetComponentsState();
