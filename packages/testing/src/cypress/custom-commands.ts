@@ -176,7 +176,7 @@ const signInWithCode = async (
     if (signInAttempt.status === 'complete') {
       await setActive({ session: signInAttempt.createdSessionId });
     } else {
-      throw new Error(`Failed to signing in. Status is ${signInAttempt.status}`);
+      throw new Error(`Failed to sign in. Status is ${signInAttempt.status}`);
     }
   } else {
     throw new Error(`${strategy} is not enabled.`);

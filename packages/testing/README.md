@@ -130,7 +130,7 @@ it("sign up", () => {
 
 ## Cypress Custom commands
 
-This package also provides custom commands to sign-in/sign-out with Clerk in your Cypress tests without having to interact with the UI.
+This package also provides custom commands to sign in/sign out with Clerk in your Cypress tests without having to interact with the UI.
 To use these commands, you must import them in your `cypress/support/commands.ts` file.
 
 ```ts
