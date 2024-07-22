@@ -9,4 +9,5 @@ export const [AuthContext, useAuthContext] = createContextAndHook<{
   orgRole: OrganizationCustomRoleKey | null | undefined;
   orgSlug: string | null | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | null | undefined;
+  fva: [number | null, number | null];
 }>('AuthContext');

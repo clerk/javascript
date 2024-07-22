@@ -20,4 +20,5 @@ export type InitialState = Serializable<{
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   organization: OrganizationResource | undefined;
+  fva: [number | null, number | null];
 }>;

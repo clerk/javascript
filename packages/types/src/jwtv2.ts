@@ -102,7 +102,7 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   org_permissions?: OrganizationCustomPermissionKey[];
 
   // TODO: Can it be undefined ?
-  fva: [number, number];
+  fva: [number | null, number | null];
 
   /**
    * Any other JWT Claim Set member.

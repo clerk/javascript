@@ -100,6 +100,7 @@ export interface SessionJSON extends ClerkResourceJSON {
   object: 'session';
   id: string;
   status: SessionStatus;
+  factor_verification_age: [number | null, number | null];
   expire_at: number;
   abandon_at: number;
   last_active_at: number;

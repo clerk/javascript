@@ -34,7 +34,7 @@ export type SignedInAuthObject = {
   orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-  fva: [number, number];
+  fva: [number | null, number | null];
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -52,7 +52,7 @@ export type SignedOutAuthObject = {
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
-  fva: null;
+  fva: [null, null];
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -126,7 +126,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
-    fva: null,
+    fva: [null, null],
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
@@ -182,7 +182,7 @@ const createHasAuthorization = (options: {
   orgId: string | undefined;
   orgRole: string | undefined;
   orgPermissions: string[] | undefined;
-  fva: [number, number] | undefined;
+  fva: [number | null, number | null] | undefined;
 }): CheckAuthorizationWithCustomPermissions => {
   const { orgId, orgRole, userId, orgPermissions, fva } = options;
 
@@ -213,13 +213,15 @@ const createHasAuthorization = (options: {
     }
 
     if (params.assurance && fva) {
+      const hasValidFactorOne = fva[0] !== null ? stringsToNumbers[params.assurance.maxAge] > fva[0] : false;
+      const hasValidFactorTwo = fva[1] !== null ? stringsToNumbers[params.assurance.maxAge] > fva[1] : false;
+
       if (params.assurance.level === 'firstFactor') {
-        stepUpAuthorization = stringsToNumbers[params.assurance.maxAge] > fva[0];
+        stepUpAuthorization = hasValidFactorOne;
       } else if (params.assurance.level === 'secondFactor') {
-        stepUpAuthorization = stringsToNumbers[params.assurance.maxAge] > fva[1];
+        stepUpAuthorization = hasValidFactorTwo;
       } else {
-        stepUpAuthorization =
-          stringsToNumbers[params.assurance.maxAge] > fva[0] && stringsToNumbers[params.assurance.maxAge] > fva[1];
+        stepUpAuthorization = hasValidFactorOne && hasValidFactorTwo;
       }
     }
 

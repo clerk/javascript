@@ -22,6 +22,7 @@ export type CheckAuthorizationParamsWithCustomPermissions = (
       role?: never;
       permission: OrganizationCustomPermissionKey;
     }
+  | { role?: never; permission?: never }
 ) & {
   assurance?: {
     level: 'firstFactor' | 'secondFactor' | 'multiFactor';
@@ -40,6 +41,10 @@ type CheckAuthorizationParams = (
       role?: never;
       permission: OrganizationPermissionKey;
     }
+  | {
+      role?: never;
+      permission?: never;
+    }
 ) & {
   assurance?: {
     level: 'firstFactor' | 'secondFactor' | 'multiFactor';
@@ -52,6 +57,7 @@ export interface SessionResource extends ClerkResource {
   status: SessionStatus;
   expireAt: Date;
   abandonAt: Date;
+  factorVerificationAge: [number | null, number | null];
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;
