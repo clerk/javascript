@@ -18,6 +18,7 @@ export function PasswordField({
   label?: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>) {
   const [type, setType] = React.useState('password');
+  const id = React.useId();
 
   return (
     <Common.Field
@@ -39,6 +40,7 @@ export function PasswordField({
                   type={type}
                   className={cx('pe-7', className)}
                   {...props}
+                  aria-describedby={props.validatePassword && state !== 'idle' ? id : undefined}
                   asChild
                 >
                   <Field.Input intent={state} />
@@ -67,7 +69,14 @@ export function PasswordField({
               if (state === 'idle') {
                 return;
               }
-              return <Field.Message intent={state}>{message}</Field.Message>;
+              return (
+                <Field.Message
+                  id={id}
+                  intent={state}
+                >
+                  {message}
+                </Field.Message>
+              );
             }}
           </Common.FieldState>
         ) : (
