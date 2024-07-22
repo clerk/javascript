@@ -673,6 +673,13 @@ export type SignUpRedirectOptions = RedirectOptions &
     initialValues?: SignUpInitialValues;
   };
 
+/**
+ * OrganizationIdentifier uniquely identifies an organization within an instance
+ */
+export type OrganizationIdentifier =
+  | { id: string; slug?: never } // Via id
+  | { id?: never; slug: string }; // Via slug
+
 export type SetActiveParams = {
   /**
    * The session resource or session id (string version) to be set as active.
@@ -681,10 +688,16 @@ export type SetActiveParams = {
   session?: ActiveSessionResource | string | null;
 
   /**
-   * The organization resource or organization id (string version) to be set as active in the current session.
+   * @deprecated The organization resource or organization id (string version) to be set as active in the current session.
    * If `null`, the currently active organization is removed as active.
    */
   organization?: OrganizationResource | string | null;
+
+  /**
+   * The organization, identified via slug or ID, to be set as active in the current session.
+   * If `null`, the currently active organization is removed as active.
+   */
+  organizationIdentifier?: OrganizationIdentifier | null;
 
   /**
    * Callback run just before the active session and/or organization is set to the passed object.
