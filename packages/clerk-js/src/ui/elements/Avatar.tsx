@@ -38,7 +38,7 @@ export const Avatar = (props: AvatarProps) => {
       <Image
         elementDescriptor={[imageElementDescriptor, descriptors.avatarImage]}
         title={title}
-        alt={title}
+        alt={`${title}'s logo`}
         src={imageUrl || ''}
         sx={{ objectFit: 'cover', width: '100%', height: '100%' }}
         onError={() => setError(true)}
