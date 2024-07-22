@@ -10,6 +10,7 @@ import type {
   SignUpTheme,
   UserButtonTheme,
   UserProfileTheme,
+  UserVerificationTheme,
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
@@ -139,6 +140,10 @@ export interface Clerk {
    * Closes the Clerk SignIn modal.
    */
   closeSignIn: () => void;
+
+  openUserVerification: (props?: UserVerificationProps) => void;
+
+  closeUserVerification: () => void;
 
   /**
    * Opens the Google One Tap component.
@@ -749,6 +754,20 @@ interface TransferableOption {
 }
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
+
+export type UserVerificationProps = RoutingOptions & {
+  afterVerification?: () => void;
+  afterVerificationUrl?: string;
+
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvided (if one is provided)
+   */
+  appearance?: UserVerificationTheme;
+};
+
+export type UserVerificationModalProps = WithoutRouting<UserVerificationProps>;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 

@@ -373,6 +373,26 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
+  public openUserVerification = (props?: SignInProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
+          code: 'cannot_render_user_missing',
+        });
+      }
+      return;
+    }
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'UserVerification' })
+      .then(controls => controls.openModal('userVerification', props || {}));
+  };
+
+  public closeUserVerification = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
+  };
+
   public openSignUp = (props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (sessionExistsAndSingleSessionModeEnabled(this, this.environment)) {
