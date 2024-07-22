@@ -57,7 +57,7 @@ export class SignIn extends BaseResource implements SignInResource {
   status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] = [];
-  supportedSecondFactors: SignInSecondFactor[] = [];
+  supportedSecondFactors: SignInSecondFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
@@ -339,7 +339,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
       this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[];
-      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[];
+      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
