@@ -11,6 +11,7 @@ import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
 import {
   SignInRouterCtx,
+  SignInStrategyContext,
   StrategiesContext,
   useSignInFirstFactorStep,
   useSignInSecondFactorStep,
@@ -86,7 +87,9 @@ export function SignInStrategy({ children, name }: SignInStrategyProps) {
     };
   }, [factorCtx, name]);
 
-  return active ? <>{children}</> : null;
+  return active ? (
+    <SignInStrategyContext.Provider value={{ strategy: name }}>{children}</SignInStrategyContext.Provider>
+  ) : null;
 }
 
 /**
