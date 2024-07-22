@@ -193,9 +193,11 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 
 const useInput = ({
   name: inputName,
+  defaultValue,
   value: providedValue,
-  type: inputType,
   defaultChecked,
+  checked: providedChecked,
+  type: inputType,
   onChange: onChangeProp,
   onBlur: onBlurProp,
   onFocus: onFocusProp,
@@ -265,9 +267,10 @@ const useInput = ({
     if (!name) {
       return;
     }
-
-    ref.send({ type: 'FIELD.ADD', field: { name, checked: defaultChecked, value: providedValue } });
-
+    ref.send({
+      type: 'FIELD.ADD',
+      field: { name, checked: defaultChecked || providedChecked, value: defaultValue || providedValue },
+    });
     return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -314,7 +317,11 @@ const useInput = ({
     if (providedValue !== undefined) {
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
     }
-  }, [name, ref, providedValue]);
+
+    if (providedChecked !== undefined) {
+      ref.send({ type: 'FIELD.UPDATE', field: { name, checked: providedChecked } });
+    }
+  }, [name, ref, providedValue, providedChecked]);
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;
@@ -365,7 +372,6 @@ const useInput = ({
       onChange,
       onBlur,
       onFocus,
-      defaultChecked,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
       'data-state': enrichFieldState(validity, fieldState),
