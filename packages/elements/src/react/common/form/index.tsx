@@ -94,6 +94,16 @@ const enrichFieldState = (validity: ValidityState | undefined, fieldState: Field
  * Hooks
  * -----------------------------------------------------------------------------------------------*/
 
+function usePrevious<T>(value: T): T | undefined {
+  const ref = React.useRef<T>();
+
+  React.useEffect(() => {
+    ref.current = value;
+  }, [value]);
+
+  return ref.current;
+}
+
 const useGlobalErrors = () => {
   const errors = useFormSelector(globalErrorsSelector);
 
@@ -251,6 +261,7 @@ const useInput = ({
     },
   });
   const value = useFormSelector(fieldValueSelector(name));
+  const prevValue = usePrevious(value);
   const hasValue = Boolean(value);
   const type = inputType ?? determineInputTypeFromName(rawName);
   let shouldValidatePassword = false;
@@ -288,21 +299,21 @@ const useInput = ({
   const onBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onBlurProp?.(event);
-      if (shouldValidatePassword) {
+      if (shouldValidatePassword && event.target.value !== prevValue) {
         validatePassword(event.target.value);
       }
     },
-    [onBlurProp, shouldValidatePassword, validatePassword],
+    [onBlurProp, shouldValidatePassword, validatePassword, prevValue],
   );
 
   const onFocus = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onFocusProp?.(event);
-      if (shouldValidatePassword) {
+      if (shouldValidatePassword && event.target.value !== prevValue) {
         validatePassword(event.target.value);
       }
     },
-    [onFocusProp, shouldValidatePassword, validatePassword],
+    [onFocusProp, shouldValidatePassword, validatePassword, prevValue],
   );
 
   React.useEffect(() => {
