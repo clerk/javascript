@@ -645,7 +645,12 @@ export function SignInComponentLoaded() {
                         <LinkButton type='button'>{t('signIn.emailLink.resendButton')}</LinkButton>
                       </SignIn.Action>
 
-                      <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                      <SignIn.Action
+                        navigate='choose-strategy'
+                        asChild
+                      >
+                        <LinkButton>{t('backButton')}</LinkButton>
+                      </SignIn.Action>
                     </Card.Body>
                   </SignIn.Strategy>
 
@@ -802,12 +807,31 @@ export function SignInComponentLoaded() {
                         </SecondaryButton>
                       </SignIn.SupportedStrategy>
 
+                      <SignIn.SupportedStrategy
+                        name='phone_code'
+                        asChild
+                      >
+                        <SecondaryButton icon={<Icon.SMSSm />}>
+                          {t('signIn.alternativeMethods.blockButton__phoneCode', {
+                            // Correct masked identifier to be added in SDKI-117
+                            identifier: SignIn.SafeIdentifier,
+                          })}
+                        </SecondaryButton>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='password'
+                        asChild
+                      >
+                        <SecondaryButton icon={<Icon.LockSm />}>
+                          {t('signIn.alternativeMethods.blockButton__password')}
+                        </SecondaryButton>
+                      </SignIn.SupportedStrategy>
+
                       {
-                        // When this is merged https://github.com/clerk/javascript/pull/3767
-                        // Delete these two lines and ensure these buttons are the last optios
-                      }
-                      {
-                        // Only for use within `choose-strategy`, not `forgot-password`
+                        // `SupportedStrategy`s that are only intended for use
+                        // within `choose-strategy`, not the `forgot-password`
+                        // `Step
                       }
                       <SignIn.SupportedStrategy
                         name='totp'
@@ -879,9 +903,6 @@ export function SignInComponentLoaded() {
                       <div className='flex flex-col gap-2'>
                         <Connections disabled={isGlobalLoading} />
 
-                        {
-                          // To be implemented in SDKI-72
-                        }
                         <SignIn.SupportedStrategy
                           name='email_link'
                           asChild
@@ -901,6 +922,27 @@ export function SignInComponentLoaded() {
                             {t('signIn.alternativeMethods.blockButton__emailCode', {
                               identifier: SignIn.SafeIdentifier,
                             })}
+                          </SecondaryButton>
+                        </SignIn.SupportedStrategy>
+
+                        <SignIn.SupportedStrategy
+                          name='phone_code'
+                          asChild
+                        >
+                          <SecondaryButton icon={<Icon.SMSSm />}>
+                            {t('signIn.alternativeMethods.blockButton__phoneCode', {
+                              // Correct masked identifier to be added in SDKI-117
+                              identifier: SignIn.SafeIdentifier,
+                            })}
+                          </SecondaryButton>
+                        </SignIn.SupportedStrategy>
+
+                        <SignIn.SupportedStrategy
+                          name='password'
+                          asChild
+                        >
+                          <SecondaryButton icon={<Icon.LockSm />}>
+                            {t('signIn.alternativeMethods.blockButton__password')}
                           </SecondaryButton>
                         </SignIn.SupportedStrategy>
                       </div>
