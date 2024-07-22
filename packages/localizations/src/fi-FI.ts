@@ -38,7 +38,8 @@ export const fiFI: LocalizationResource = {
   formFieldError__notMatchingPasswords: 'Salasanat eivät täsmää.',
   formFieldError__verificationLinkExpired: 'Vahvistuslinkki on vanhentunut. Pyydä uusi linkki.',
   formFieldHintText__optional: 'Valinnainen',
-  formFieldHintText__slug: 'Slug on luettava tunniste, joka on oltava yksilöllinen. Sitä käytetään usein URL-osoitteissa.',
+  formFieldHintText__slug:
+    'Slug on luettava tunniste, joka on oltava yksilöllinen. Sitä käytetään usein URL-osoitteissa.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: '',
@@ -81,8 +82,7 @@ export const fiFI: LocalizationResource = {
     action__signOut: 'Kirjaudu ulos',
     title: 'Kirjautuneena käyttäjänä {{identifier}}',
   },
-  maintenanceMode:
-    "Olemme tällä hetkellä huoltotilassa, mutta älä huoli, se ei kestä kauempaa kuin muutama minuutti.",
+  maintenanceMode: 'Olemme tällä hetkellä huoltotilassa, mutta älä huoli, se ei kestä kauempaa kuin muutama minuutti.',
   membershipRole__admin: 'Ylläpitäjä',
   membershipRole__basicMember: 'Jäsen',
   membershipRole__guestMember: 'Vieras',
@@ -242,7 +242,8 @@ export const fiFI: LocalizationResource = {
       formTitle: 'Vahvistuskoodi',
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
       subtitle: 'Verkkotunnus {{domainName}} on vahvistettava sähköpostitse.',
-      subtitleVerificationCodeScreen: 'Vahvistuskoodi lähetettiin osoitteeseen {{emailAddress}}. Syötä koodi jatkaaksesi.',
+      subtitleVerificationCodeScreen:
+        'Vahvistuskoodi lähetettiin osoitteeseen {{emailAddress}}. Syötä koodi jatkaaksesi.',
       title: 'Vahvista verkkotunnus',
     },
   },
@@ -326,8 +327,7 @@ export const fiFI: LocalizationResource = {
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
       clientMismatch: {
-        subtitle:
-          'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
+        subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
         title: 'Vahvistuslinkki on virheellinen tälle laitteelle',
       },
     },
@@ -350,7 +350,8 @@ export const fiFI: LocalizationResource = {
       title: 'Ei voi kirjautua',
     },
     passkey: {
-      subtitle: 'Käyttämällä pääsyavaintasi vahvistat, että olet se joka väität olevasi. Laite voi pyytää sormenjälkeäsi, kasvojasi tai näytön lukitusta.',
+      subtitle:
+        'Käyttämällä pääsyavaintasi vahvistat, että olet se joka väität olevasi. Laite voi pyytää sormenjälkeäsi, kasvojasi tai näytön lukitusta.',
       title: 'Käytä pääsyavaintasi',
     },
     password: {
@@ -405,14 +406,14 @@ export const fiFI: LocalizationResource = {
       actionLink: 'Kirjaudu sisään',
       actionText: 'Onko sinulla jo tili?',
       subtitle: 'Täytä loput tiedot jatkaaksesi.',
-      title: 'Täytä puuttuvat kentät.'
+      title: 'Täytä puuttuvat kentät.',
     },
     emailCode: {
       formSubtitle: 'Syötä sähköpostiisi lähetetty koodi',
       formTitle: 'Vahvistuskoodi',
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
       subtitle: 'Syötä sähköpostiisi lähetetty koodi jatkaaksesi.',
-      title: 'Tarkista sähköpostisi'
+      title: 'Tarkista sähköpostisi',
     },
     emailLink: {
       formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
@@ -447,7 +448,7 @@ export const fiFI: LocalizationResource = {
       actionLink: 'Kirjaudu sisään',
       actionText: 'Onko sinulla jo tili?',
       subtitle: 'Tervetuloa! Luo tili jatkaaksesi.',
-      title: 'Luo tili'
+      title: 'Luo tili',
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
@@ -475,7 +476,8 @@ export const fiFI: LocalizationResource = {
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_pwned: 'Salasana on ollut osallisena tietovuodossa. Valitse toinen salasana.',
     form_password_pwned__sign_in: 'Salasana on ollut osallisena tietovuodossa. Vaihdathan salasanasi.',
-    form_password_size_in_bytes_exceeded: 'Salasanasi on ylittänyt sallitun tavumäärän, lyhennä sitä tai poista joitain erikoismerkkejä.',
+    form_password_size_in_bytes_exceeded:
+      'Salasanasi on ylittänyt sallitun tavumäärän, lyhennä sitä tai poista joitain erikoismerkkejä.',
     form_password_validation_failed: 'Väärä salasana.',
     form_username_invalid_character: '',
     form_username_invalid_length: '',
@@ -534,7 +536,7 @@ export const fiFI: LocalizationResource = {
         userInputs: 'Salasana perustuu käyttäjän syötteisiin.',
         wordByItself: 'Yksittäinen sana on helppo arvata.',
       },
-    }
+    },
   },
   userButton: {
     action__addAccount: 'Lisää tili',
@@ -549,10 +551,13 @@ export const fiFI: LocalizationResource = {
       actionLabel__download: 'Lataa .txt',
       actionLabel__print: 'Tulosta',
       infoText1: 'Varakoodit otetaan käyttöön tälle tilille.',
-      infoText2: 'Pidä varakoodit salassa ja säilytä ne turvallisesti. Voit luoda uudelleen varakoodit, jos epäilet, että ne ovat vaarantuneet.',
+      infoText2:
+        'Pidä varakoodit salassa ja säilytä ne turvallisesti. Voit luoda uudelleen varakoodit, jos epäilet, että ne ovat vaarantuneet.',
       subtitle__codelist: 'Säilytä varakoodit turvallisessa paikassa ja pidä ne salassa.',
-      successMessage: 'Varakoodit ovat nyt käytössä. Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi. Jokaista koodia voi käyttää vain kerran.',
-      successSubtitle: 'Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi.',
+      successMessage:
+        'Varakoodit ovat nyt käytössä. Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi. Jokaista koodia voi käyttää vain kerran.',
+      successSubtitle:
+        'Voit käyttää jotakin näistä kirjautuaksesi tilillesi, jos menetät käyttöoikeuden todennuslaitteeseesi.',
       title: 'Lisää varakoodin vahvistus',
       title__codelist: 'Varakoodit',
     },
@@ -568,7 +573,7 @@ export const fiFI: LocalizationResource = {
       },
       socialButtonsBlockButton: '{{provider|titleize}}',
       successMessage: 'Palveluntarjoaja on lisätty tilillesi',
-      title: 'Lisää yhdistetty tili'
+      title: 'Lisää yhdistetty tili',
     },
     deletePage: {
       actionDescription: 'Kirjoita "Delete account" poistaaksesi tilisi.',
@@ -579,20 +584,18 @@ export const fiFI: LocalizationResource = {
     },
     emailAddressPage: {
       emailCode: {
-        formHint:
-          'Vahvistuskoodin sisältävä sähköposti lähetetään tähän sähköpostiosoitteeseen.',
+        formHint: 'Vahvistuskoodin sisältävä sähköposti lähetetään tähän sähköpostiosoitteeseen.',
         formSubtitle: 'Syötä sähköpostiisi {{identifier}} lähetetty koodi',
         formTitle: 'Vahvistuskoodi',
         resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
-        successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.'
+        successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.',
       },
       emailLink: {
-        formHint:
-          'Vahvistuslinkki lähetetään tähän sähköpostiosoitteeseen.',
+        formHint: 'Vahvistuslinkki lähetetään tähän sähköpostiosoitteeseen.',
         formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
         formTitle: 'Vahvistuslinkki',
         resendButton: 'Et saanut linkkiä? Lähetä uudelleen',
-        successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.'
+        successMessage: 'Sähköpostiosoitteesi {{identifier}} on nyt lisätty tilillesi.',
       },
       removeResource: {
         messageLine1: '{{identifier}} poistetaan tililtäsi.',
@@ -602,7 +605,7 @@ export const fiFI: LocalizationResource = {
         title: 'Poista sähköpostiosoite',
       },
       title: 'Lisää sähköpostiosoite',
-      verifyTitle: 'Vahvista sähköpostiosoite'
+      verifyTitle: 'Vahvista sähköpostiosoite',
     },
     formButtonPrimary__add: 'Lisää',
     formButtonPrimary__continue: 'Jatka',
@@ -612,7 +615,7 @@ export const fiFI: LocalizationResource = {
     formButtonReset: 'Peruuta',
     mfaPage: {
       formHint: 'Valitse todennusmenetelmä.',
-      title: 'Lisää kaksivaiheinen todennus'
+      title: 'Lisää kaksivaiheinen todennus',
     },
     mfaPhoneCodePage: {
       backButton: 'Käytä olemassa olevaa numeroa',
@@ -621,7 +624,7 @@ export const fiFI: LocalizationResource = {
         messageLine1: '{{identifier}} ei enää vastaanota vahvistuskoodeja kirjautuessaan sisään.',
         messageLine2: 'Tilisi ei ehkä ole yhtä turvallinen. Haluatko varmasti jatkaa?',
         successMessage: 'SMS-koodin kaksivaiheinen todennus on poistettu {{mfaPhoneCode}}',
-        title: 'Poista kaksivaiheinen todennus'
+        title: 'Poista kaksivaiheinen todennus',
       },
       subtitle__availablePhoneNumbers:
         'Valitse olemassa oleva puhelinnumero rekisteröityäksesi SMS-koodin kaksivaiheiseen todennukseen tai lisää uusi.',
@@ -632,7 +635,7 @@ export const fiFI: LocalizationResource = {
       successMessage2:
         'Tallenna nämä varakoodit ja säilytä ne jossain turvallisessa paikassa. Jos menetät pääsyn todennuslaitteeseesi, voit käyttää varakoodeja kirjautuaksesi sisään.',
       successTitle: 'SMS-koodin todennus on otettu käyttöön',
-      title: 'Lisää SMS-koodin todennus'
+      title: 'Lisää SMS-koodin todennus',
     },
     mfaTOTPPage: {
       authenticatorApp: {
@@ -650,28 +653,28 @@ export const fiFI: LocalizationResource = {
         messageLine1: 'Tämän todennussovelluksen avulla ei enää tarvita vahvistuskoodia kirjautuessasi sisään.',
         messageLine2: 'Tilisi ei ehkä ole yhtä turvallinen. Haluatko varmasti jatkaa?',
         successMessage: 'Kaksivaiheinen todennus todennussovelluksen avulla on poistettu.',
-        title: 'Poista kaksivaiheinen todennus'
+        title: 'Poista kaksivaiheinen todennus',
       },
       successMessage:
         'Kaksivaiheinen todennus on nyt otettu käyttöön. Kirjautuessasi sinun on annettava vahvistuskoodi tästä todennussovelluksesta lisävaiheena.',
       title: 'Lisää todennussovellus',
       verifySubtitle: 'Syötä todennuskoodi, jonka todennussovelluksesi on luonut',
-      verifyTitle: 'Vahvistuskoodi'
+      verifyTitle: 'Vahvistuskoodi',
     },
     mobileButton__menu: 'Valikko',
     navbar: {
       account: 'Profiili',
       description: 'Hallitse tilisi tietoja',
       security: 'Turvallisuus',
-      title: 'Tili'
+      title: 'Tili',
     },
     passkeyScreen: {
       removeResource: {
         messageLine1: '{{name}} poistetaan tililtäsi.',
-        title: 'Poista pääsyavain'
+        title: 'Poista pääsyavain',
       },
       subtitle__rename: 'Voit muuttaa pääsyavaimen nimeä helpottaaksesi sen löytämistä.',
-      title__rename: 'Nimeä pääsyavain uudelleen'
+      title__rename: 'Nimeä pääsyavain uudelleen',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
@@ -681,7 +684,7 @@ export const fiFI: LocalizationResource = {
       successMessage__signOutOfOtherSessions: 'Kaikki muut laitteet on kirjattu ulos.',
       successMessage__update: 'Salasanasi on päivitetty.',
       title__set: 'Aseta salasana',
-      title__update: 'Päivitä salasana'
+      title__update: 'Päivitä salasana',
     },
     phoneNumberPage: {
       infoText:
@@ -691,12 +694,12 @@ export const fiFI: LocalizationResource = {
         messageLine2:
           'Tämä ei poista puhelinnumeroasi, mutta et voi enää käyttää sitä kirjautumiseen tai muihin toimintoihin tämän tilin kautta.',
         successMessage: '{{phoneNumber}} on poistettu tililtäsi.',
-        title: 'Poista puhelinnumero'
+        title: 'Poista puhelinnumero',
       },
       successMessage: 'Puhelinnumerosi {{identifier}} on nyt lisätty tilillesi.',
       title: 'Lisää puhelinnumero',
       verifySubtitle: 'Syötä puhelimeesi lähetetty vahvistuskoodi: {{identifier}}',
-      verifyTitle: 'Vahvista puhelinnumero'
+      verifyTitle: 'Vahvista puhelinnumero',
     },
     profilePage: {
       fileDropAreaHint: 'Suositeltu koko 1:1, enintään 10 Mt.',
@@ -705,12 +708,12 @@ export const fiFI: LocalizationResource = {
       imageFormTitle: 'Profiilikuva',
       readonly: 'Profiilitietosi on annettu yrityksen yhteyden kautta eikä niitä voi muuttaa.',
       successMessage: 'Profiilisi on päivitetty.',
-      title: 'Päivitä profiili'
+      title: 'Päivitä profiili',
     },
     start: {
       activeDevicesSection: {
         destructiveAction: 'Kirjaudu ulos laitteesta',
-        title: 'Aktiiviset laitteet'
+        title: 'Aktiiviset laitteet',
       },
       connectedAccountsSection: {
         actionLabel__connectionFailed: 'Yritä uudelleen',
@@ -719,11 +722,11 @@ export const fiFI: LocalizationResource = {
         primaryButton: 'Yhdistä tili',
         subtitle__reauthorize:
           'Tarvittavat käyttöoikeudet on päivitetty, ja saatat kokea rajoitettua toiminnallisuutta. Valtuuta tämä sovellus välttääksesi mahdolliset ongelmat.',
-        title: 'Yhdistetyt tilit'
+        title: 'Yhdistetyt tilit',
       },
       dangerSection: {
         deleteAccountButton: 'Poista tili',
-        title: 'Poista tili'
+        title: 'Poista tili',
       },
       emailAddressesSection: {
         destructiveAction: 'Poista sähköpostiosoite',
@@ -731,10 +734,10 @@ export const fiFI: LocalizationResource = {
         detailsAction__primary: 'Viimeistele vahvistus',
         detailsAction__unverified: 'Vahvista sähköpostiosoite',
         primaryButton: 'Lisää sähköpostiosoite',
-        title: 'Sähköpostiosoitteet'
+        title: 'Sähköpostiosoitteet',
       },
       enterpriseAccountsSection: {
-        title: 'Yritystilit'
+        title: 'Yritystilit',
       },
       headerTitle__account: 'Tili',
       headerTitle__security: 'Turvallisuus',
@@ -744,7 +747,7 @@ export const fiFI: LocalizationResource = {
           headerTitle: 'Varakoodit',
           subtitle__regenerate:
             'Hanki uusi sarja turvallisia varakoodeja. Aiemmat varakoodit poistetaan eivätkä ne ole enää käytettävissä.',
-          title__regenerate: 'Luo uudet varakoodit'
+          title__regenerate: 'Luo uudet varakoodit',
         },
         phoneCode: {
           actionLabel__setDefault: 'Aseta oletukseksi',
@@ -765,7 +768,7 @@ export const fiFI: LocalizationResource = {
       passwordSection: {
         primaryButton__setPassword: 'Aseta salasana',
         primaryButton__updatePassword: 'Päivitä salasana',
-        title: 'Salasana'
+        title: 'Salasana',
       },
       phoneNumbersSection: {
         destructiveAction: 'Poista puhelinnumero',
@@ -773,40 +776,39 @@ export const fiFI: LocalizationResource = {
         detailsAction__primary: 'Viimeistele vahvistus',
         detailsAction__unverified: 'Vahvista puhelinnumero',
         primaryButton: 'Lisää puhelinnumero',
-        title: 'Puhelinnumerot'
+        title: 'Puhelinnumerot',
       },
       profileSection: {
         primaryButton: 'Päivitä profiili',
-        title: 'Profiili'
+        title: 'Profiili',
       },
       usernameSection: {
         primaryButton__setUsername: 'Aseta käyttäjänimi',
         primaryButton__updateUsername: 'Päivitä käyttäjänimi',
-        title: 'Käyttäjänimi'
+        title: 'Käyttäjänimi',
       },
       web3WalletsSection: {
         destructiveAction: 'Poista lompakko',
         primaryButton: 'Web3-lompakot',
-        title: 'Web3-lompakot'
+        title: 'Web3-lompakot',
       },
     },
     usernamePage: {
       successMessage: 'Käyttäjänimesi on päivitetty.',
       title__set: 'Aseta käyttäjänimi',
-      title__update: 'Päivitä käyttäjänimi'
+      title__update: 'Päivitä käyttäjänimi',
     },
     web3WalletPage: {
       removeResource: {
         messageLine1: '{{identifier}} poistetaan tililtäsi.',
         messageLine2: 'Et voi enää kirjautua sisään tällä web3-lompakolla.',
         successMessage: '{{web3Wallet}} on poistettu tililtäsi.',
-        title: 'Poista web3-lompakko'
+        title: 'Poista web3-lompakko',
       },
       subtitle__availableWallets: 'Valitse web3-lompakko yhdistääksesi tilisi.',
-      subtitle__unavailableWallets:
-        'Ei ole käytettävissä olevia web3-lompakoita yhdistääksesi tilisi.',
+      subtitle__unavailableWallets: 'Ei ole käytettävissä olevia web3-lompakoita yhdistääksesi tilisi.',
       successMessage: 'Web3-lompakko on lisätty tilillesi.',
-      title: 'Lisää web3-lompakko'
-    }
-  }
-} as const
+      title: 'Lisää web3-lompakko',
+    },
+  },
+} as const;
