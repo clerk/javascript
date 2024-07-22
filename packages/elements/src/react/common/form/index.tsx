@@ -270,6 +270,17 @@ const useInput = ({
     return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const getInputValue = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (inputType === 'checkbox') {
+        return event.target.checked.toString();
+      }
+
+      return event.target.value;
+    },
+    [inputType],
+  );
+
   // Register the onChange handler for field updates to persist to the machine context
   const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -277,12 +288,12 @@ const useInput = ({
       if (!name) {
         return;
       }
-      ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
+      ref.send({ type: 'FIELD.UPDATE', field: { name, value: getInputValue(event) } });
       if (shouldValidatePassword) {
         validatePassword(event.target.value);
       }
     },
-    [ref, name, onChangeProp, shouldValidatePassword, validatePassword],
+    [ref, name, onChangeProp, shouldValidatePassword, validatePassword, getInputValue],
   );
 
   const onBlur = React.useCallback(
