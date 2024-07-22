@@ -195,6 +195,7 @@ const useInput = ({
   name: inputName,
   value: providedValue,
   type: inputType,
+  defaultChecked,
   onChange: onChangeProp,
   onBlur: onBlurProp,
   onFocus: onFocusProp,
@@ -265,21 +266,10 @@ const useInput = ({
       return;
     }
 
-    ref.send({ type: 'FIELD.ADD', field: { name, value: providedValue } });
+    ref.send({ type: 'FIELD.ADD', field: { name, checked: defaultChecked, value: providedValue } });
 
     return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const getInputValue = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (inputType === 'checkbox') {
-        return event.target.checked.toString();
-      }
-
-      return event.target.value;
-    },
-    [inputType],
-  );
 
   // Register the onChange handler for field updates to persist to the machine context
   const onChange = React.useCallback(
@@ -288,12 +278,12 @@ const useInput = ({
       if (!name) {
         return;
       }
-      ref.send({ type: 'FIELD.UPDATE', field: { name, value: getInputValue(event) } });
+      ref.send({ type: 'FIELD.UPDATE', field: { name, checked: event.target.checked, value: event.target.value } });
       if (shouldValidatePassword) {
         validatePassword(event.target.value);
       }
     },
-    [ref, name, onChangeProp, shouldValidatePassword, validatePassword, getInputValue],
+    [ref, name, onChangeProp, shouldValidatePassword, validatePassword],
   );
 
   const onBlur = React.useCallback(
@@ -375,6 +365,7 @@ const useInput = ({
       onChange,
       onBlur,
       onFocus,
+      defaultChecked,
       'data-hidden': shouldBeHidden ? true : undefined,
       'data-has-value': hasValue ? true : undefined,
       'data-state': enrichFieldState(validity, fieldState),

@@ -18,9 +18,7 @@ export const SignInResetPasswordMachine = setup({
     attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const password = (fields.get('password')?.value as string) || '';
-        const signOutOfOtherSessions = fields.get('signOutOfOtherSessions')?.value
-          ? (Boolean(fields.get('signOutOfOtherSessions')?.value) as boolean)
-          : false;
+        const signOutOfOtherSessions = fields.get('signOutOfOtherSessions')?.checked;
         return parent.getSnapshot().context.clerk.client.signIn.resetPassword({ password, signOutOfOtherSessions });
       },
     ),

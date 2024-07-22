@@ -3,6 +3,7 @@ import type { FieldStates } from '~/react/common/form/types';
 import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
 
 export type FormDefaultValues = Map<string, FieldDetails['value']>;
+export type FormDefaultCheckeds = Map<string, FieldDetails['checked']>;
 
 interface FeedbackBase {
   codes?: Array<ErrorMessagesKey>;
@@ -21,6 +22,7 @@ export interface FeedbackOtherType extends FeedbackBase {
 export type FieldDetails = {
   name?: string;
   value?: string | readonly string[] | number;
+  checked?: boolean;
   feedback?: FeedbackErrorType | FeedbackOtherType;
 };
 

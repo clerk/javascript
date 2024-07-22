@@ -5,10 +5,11 @@ import { assign, enqueueActions, setup } from 'xstate';
 
 import { ClerkElementsError, ClerkElementsFieldError } from '~/internals/errors';
 
-import type { FieldDetails, FormDefaultValues, FormFields } from './form.types';
+import type { FieldDetails, FormDefaultCheckeds, FormDefaultValues, FormFields } from './form.types';
 
 export interface FormMachineContext extends MachineContext {
   defaultValues: FormDefaultValues;
+  defaultCheckeds: FormDefaultCheckeds;
   errors: ClerkElementsError[];
   fields: FormFields;
   hidden?: Set<string>;
@@ -19,7 +20,7 @@ export interface FormMachineContext extends MachineContext {
 }
 
 export type FormMachineEvents =
-  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'value'> }
+  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'value' | 'checked'> }
   | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'name'> }
   | {
       type: 'MARK_AS_PROGRESSIVE';
@@ -35,7 +36,7 @@ export type FormMachineEvents =
   | { type: 'UNMARK_AS_PROGRESSIVE' }
   | {
       type: 'FIELD.UPDATE';
-      field: Pick<FieldDetails, 'name' | 'value'>;
+      field: Pick<FieldDetails, 'name' | 'value' | 'checked'>;
     }
   | { type: 'ERRORS.SET'; error: any }
   | { type: 'ERRORS.CLEAR' }
@@ -85,6 +86,7 @@ export const FormMachine = setup({
   id: 'Form',
   context: () => ({
     defaultValues: new Map(),
+    defaultCheckeds: new Map(),
     errors: [],
     fields: new Map(),
     progressive: false,
@@ -144,6 +146,7 @@ export const FormMachine = setup({
           }
 
           event.field.value = event.field.value || context.defaultValues.get(event.field.name) || undefined;
+          event.field.checked = event.field.checked || context.defaultCheckeds.get(event.field.name) || undefined;
 
           context.fields.set(event.field.name, event.field);
           return context.fields;
@@ -158,6 +161,8 @@ export const FormMachine = setup({
           }
 
           if (context.fields.has(event.field.name)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            context.fields.get(event.field.name)!.checked = event.field.checked;
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             context.fields.get(event.field.name)!.value = event.field.value;
           }
