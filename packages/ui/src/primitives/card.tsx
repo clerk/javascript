@@ -144,8 +144,8 @@ export const Banner = React.forwardRef(function CardBanner(
           'pointer-events-none absolute inset-0 w-full',
           // manually nudge the radius by `1px` for a snug fit
           'rounded-b-[calc(theme(borderRadius.xl)-0.0625rem)]',
-          '[background-image:repeating-linear-gradient(-45deg,theme(colors.orange.50),_theme(colors.orange.50)_6px,_theme(colors.orange.100/0.75)_6px,_theme(colors.orange.100/0.75)_12px)]',
-          '[mask-image:linear-gradient(to_top,_black,transparent_8rem)]',
+          '[background-image:repeating-linear-gradient(-45deg,theme(colors.orange.50),theme(colors.orange.50)_6px,theme(colors.orange.100/0.75)_6px,theme(colors.orange.100/0.75)_12px)]',
+          '[mask-image:linear-gradient(to_top,black,transparent_128px)]',
         )}
       />
       <div className='absolute inset-x-0 bottom-0 z-10 flex h-[--card-body-padding] w-full items-center justify-center'>

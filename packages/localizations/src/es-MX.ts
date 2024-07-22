@@ -96,7 +96,6 @@ export const esMX: LocalizationResource = {
     title: 'Registrado como {{identifier}}',
   },
   maintenanceMode: 'Actualmente estamos en mantenimiento, pero no te preocupes, no debería llevar más de unos minutos.',
-
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
   membershipRole__guestMember: 'Invitado',
@@ -312,6 +311,10 @@ export const esMX: LocalizationResource = {
       title: 'Revise su correo electrónico',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Regresa a la pestaña original para continuar.',
         title: 'Este enlace de verificación ha expirado',
@@ -355,7 +358,6 @@ export const esMX: LocalizationResource = {
       label__alternativeMethods: 'O, inicia sesión con otro método',
       title: '¿Olvidaste tu contraseña?',
     },
-
     noAvailableMethods: {
       message: 'No se puede continuar con el inicio de sesión. No hay ningún factor de autenticación disponible.',
       subtitle: 'Ocurrió un error',
@@ -429,6 +431,10 @@ export const esMX: LocalizationResource = {
       title: 'Verifique su correo electrónico',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Utilice el enlace de verificación enviado a su dirección de correo electrónico',
       formTitle: 'Enlace de verificación',
       loading: {
@@ -461,6 +467,7 @@ export const esMX: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'El registro falló debido a fallos en la validación de seguridad. Por favor, recargue la página o contáctenos para obtener más asistencia.',
@@ -729,6 +736,7 @@ export const esMX: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizar ahora',
         destructiveActionTitle: 'Quitar',
         primaryButton: 'Conectar cuenta',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'Los permisos requeridos han sido actualizados, y podría experimentar limitaciones. Por favor, autorice de nuevo esta aplicación para evitar cualquier problema',
         title: 'Cuentas conectadas',

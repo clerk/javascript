@@ -307,6 +307,10 @@ export const srRS: LocalizationResource = {
       title: 'Proveri svoj e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Vrati se na originalni tab da nastaviš.',
         title: 'Ovaj verifikacioni link je istekao',
@@ -422,6 +426,10 @@ export const srRS: LocalizationResource = {
       title: 'Verifikuj svoj e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Koristi verifikacioni link poslat na tvoju e-mail adresu',
       formTitle: 'Verifikacioni link',
       loading: {
@@ -456,28 +464,25 @@ export const srRS: LocalizationResource = {
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
-    form_code_incorrect: 'Uneti kod je netačan.',
-    form_identifier_exists: 'Ovaj identifikator je već u upotrebi.',
-    form_identifier_not_found: 'Identifikator nije pronađen.',
-    form_param_format_invalid: 'Format parametra je nevažeći.',
-    form_password_incorrect: 'Lozinka je netačna.',
-    form_password_length_too_short: 'Lozinka je prekratka.',
-    form_username_invalid_character: 'Korisničko ime sadrži nevažeće karaktere.',
-    form_username_invalid_length: 'Dužina korisničkog imena nije validna.',
-    not_allowed_access: 'Pristup nije dozvoljen.',
-    form_param_nil: 'Parametar ne može biti prazan.',
     captcha_invalid:
       'Registracija neuspešna zbog neuspelog sigurnosnog proveravanja. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     captcha_unavailable:
       'Registracija neuspešna zbog neuspelog proveravanja bota. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
+    form_code_incorrect: 'Uneti kod je netačan.',
+    form_identifier_exists: 'Ovaj identifikator je već u upotrebi.',
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušaj sa drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušaj sa drugim.',
+    form_identifier_not_found: 'Identifikator nije pronađen.',
+    form_param_format_invalid: 'Format parametra je nevažeći.',
     form_param_format_invalid__email_address: 'E-mail adresa mora biti važeća e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u važećem međunarodnom formatu',
     form_param_max_length_exceeded__first_name: 'Ime ne sme premašiti 256 karaktera.',
     form_param_max_length_exceeded__last_name: 'Prezime ne sme premašiti 256 karaktera.',
     form_param_max_length_exceeded__name: 'Naziv ne sme premašiti 256 karaktera.',
+    form_param_nil: 'Parametar ne može biti prazan.',
+    form_password_incorrect: 'Lozinka je netačna.',
+    form_password_length_too_short: 'Lozinka je prekratka.',
     form_password_not_strong_enough: 'Tvoja lozinka nije dovoljno jaka.',
     form_password_pwned:
       'Ova lozinka je pronađena kao deo kompromitovanih podataka i ne može se koristiti, molimo pokušaj sa drugom lozinkom.',
@@ -486,7 +491,10 @@ export const srRS: LocalizationResource = {
     form_password_size_in_bytes_exceeded:
       'Tvoja lozinka je premašila maksimalni dozvoljeni broj bajtova, molimo skrati je ili ukloni neke specijalne znakove.',
     form_password_validation_failed: 'Neispravna lozinka',
+    form_username_invalid_character: 'Korisničko ime sadrži nevažeće karaktere.',
+    form_username_invalid_length: 'Dužina korisničkog imena nije validna.',
     identification_deletion_failed: 'Ne možeš obrisati svoju poslednju identifikaciju.',
+    not_allowed_access: 'Pristup nije dozvoljen.',
     passkey_already_exists: 'Ključ za prolaz je već registrovan sa ovim uređajem.',
     passkey_not_supported: 'Ključevi za prolaz nisu podržani na ovom uređaju.',
     passkey_pa_not_supported: 'Registracija zahteva platformski autentifikator, ali uređaj to ne podržava.',
@@ -721,6 +729,7 @@ export const srRS: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizuj sada',
         destructiveActionTitle: 'Ukloni',
         primaryButton: 'Poveži nalog',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'Potrebna ovlašćenja su ažurirana, i možda doživljavaš ograničenu funkcionalnost. Molimo re-autorizuj ovu aplikaciju da izbegneš bilo kakve probleme',
         title: 'Povezani nalozi',

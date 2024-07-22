@@ -308,6 +308,10 @@ export const ptBR: LocalizationResource = {
       title: 'Verifique seu e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: 'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o login',
+        title: 'Link de verificação é inválido para este dispositivo',
+      },
       expired: {
         subtitle: 'Retorne para a aba original para continuar',
         title: 'Este link de verificação expirou',
@@ -336,10 +340,6 @@ export const ptBR: LocalizationResource = {
         subtitle: 'Retorne para a aba original para continuar',
         subtitleNewTab: 'Retorne para a nova aba que foi aberta para continuar',
         titleNewTab: 'Conectado em outra aba',
-      },
-      clientMismatch: {
-        subtitle: 'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o login',
-        title: 'Link de verificação é inválido para este dispositivo',
       },
     },
     forgotPassword: {
@@ -427,6 +427,11 @@ export const ptBR: LocalizationResource = {
       title: 'Verifique seu e-mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle:
+          'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o cadastro',
+        title: 'Link de verificação é inválido para este dispositivo',
+      },
       formSubtitle: 'Utilize o link enviado no seu e-mail',
       formTitle: 'Link de verificação',
       loading: {
@@ -442,11 +447,6 @@ export const ptBR: LocalizationResource = {
         subtitle: 'Retorne para a nova aba que foi aberta para continuar',
         subtitleNewTab: 'Retorne para a aba anterior para continuar',
         title: 'E-mail verificado com sucesso',
-      },
-      clientMismatch: {
-        subtitle:
-          'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o cadastro',
-        title: 'Link de verificação é inválido para este dispositivo',
       },
     },
     phoneCode: {
@@ -464,6 +464,7 @@ export const ptBR: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
@@ -731,6 +732,7 @@ export const ptBR: LocalizationResource = {
         actionLabel__reauthorize: 'Reautorizar agora',
         destructiveActionTitle: 'Remover',
         primaryButton: 'Conectar conta',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'Os escopos necessários foram atualizados, e você pode estar experimentado funcionalidades limitadas. Por favor, reautorize esta aplicação para evitar outros problemas',
         title: 'Contas conectadas',
