@@ -8,6 +8,7 @@ import type {
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
+  UserVerificationProps,
 } from '@clerk/types';
 
 export type {
@@ -20,6 +21,7 @@ export type {
   OrganizationProfileProps,
   CreateOrganizationProps,
   OrganizationListProps,
+  UserVerificationProps,
 };
 
 export type AvailableComponentProps =
@@ -30,12 +32,18 @@ export type AvailableComponentProps =
   | OrganizationSwitcherProps
   | OrganizationProfileProps
   | CreateOrganizationProps
-  | OrganizationListProps;
+  | OrganizationListProps
+  | UserVerificationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
+  mode?: ComponentMode;
+};
+
+export type UserVerificationCtx = UserVerificationProps & {
+  componentName: 'UserVerification';
   mode?: ComponentMode;
 };
 
@@ -83,6 +91,7 @@ export type AvailableComponentCtx =
   | SignUpCtx
   | UserButtonCtx
   | UserProfileCtx
+  | UserVerificationCtx
   | OrganizationProfileCtx
   | CreateOrganizationCtx
   | OrganizationSwitcherCtx

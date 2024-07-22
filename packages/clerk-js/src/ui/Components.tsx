@@ -28,6 +28,7 @@ import {
   SignInModal,
   SignUpModal,
   UserProfileModal,
+  UserVerificationModal,
 } from './lazyModules/components';
 import {
   LazyComponentRenderer,
@@ -55,13 +56,27 @@ export type ComponentControls = {
     props?: unknown;
   }) => void;
   openModal: <
-    T extends 'googleOneTap' | 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization',
+    T extends
+      | 'googleOneTap'
+      | 'signIn'
+      | 'signUp'
+      | 'userProfile'
+      | 'organizationProfile'
+      | 'createOrganization'
+      | 'userVerification',
   >(
     modal: T,
     props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
   ) => void;
   closeModal: (
-    modal: 'googleOneTap' | 'signIn' | 'signUp' | 'userProfile' | 'organizationProfile' | 'createOrganization',
+    modal:
+      | 'googleOneTap'
+      | 'signIn'
+      | 'signUp'
+      | 'userProfile'
+      | 'organizationProfile'
+      | 'createOrganization'
+      | 'userVerification',
   ) => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
@@ -88,6 +103,7 @@ interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
+  userVerificationModal: null | SignInProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
@@ -164,6 +180,7 @@ const Components = (props: ComponentsProps) => {
     signInModal: null,
     signUpModal: null,
     userProfileModal: null,
+    userVerificationModal: null,
     organizationProfileModal: null,
     createOrganizationModal: null,
     nodes: new Map(),
@@ -175,6 +192,7 @@ const Components = (props: ComponentsProps) => {
     signInModal,
     signUpModal,
     userProfileModal,
+    userVerificationModal,
     organizationProfileModal,
     createOrganizationModal,
     nodes,
@@ -297,6 +315,23 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedUserVerificationModal = (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'userVerification'}
+      componentAppearance={userProfileModal?.appearance}
+      flowName={'userVerification'}
+      onClose={() => componentsControls.closeModal('userVerification')}
+      onExternalNavigate={() => componentsControls.closeModal('userVerification')}
+      startPath={buildVirtualRouterUrl({ base: '/user-verification', path: urlStateParam?.path })}
+      componentName={'UserVerificationModal'}
+      modalContainerSx={{ alignItems: 'center' }}
+      modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+    >
+      <UserVerificationModal {...userVerificationModal} />
+    </LazyModalRenderer>
+  );
+
   const mountedOrganizationProfileModal = (
     <LazyModalRenderer
       globalAppearance={state.appearance}
@@ -359,6 +394,7 @@ const Components = (props: ComponentsProps) => {
         {signInModal && mountedSignInModal}
         {signUpModal && mountedSignUpModal}
         {userProfileModal && mountedUserProfileModal}
+        {userVerificationModal && mountedUserVerificationModal}
         {organizationProfileModal && mountedOrganizationProfileModal}
         {createOrganizationModal && mountedCreateOrganizationModal}
         {state.impersonationFab && (
