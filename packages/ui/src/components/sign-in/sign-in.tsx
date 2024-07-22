@@ -27,6 +27,7 @@ import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { SecondaryButton } from '~/primitives/secondary-button';
 import { Seperator } from '~/primitives/seperator';
+import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
 /**
  * Implementation Details:
@@ -293,7 +294,7 @@ export function SignInComponentLoaded() {
                       <Card.Description>{t('signIn.password.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          <SignIn.SafeIdentifier />
+                          <SignIn.SafeIdentifier transform={formatSafeIdentifier} />
                           <SignIn.Action
                             navigate='start'
                             asChild
@@ -683,9 +684,13 @@ export function SignInComponentLoaded() {
                         asChild
                       >
                         <SecondaryButton icon={<Icon.LinkSm />}>
-                          {t('signIn.alternativeMethods.blockButton__emailLink', {
-                            identifier: SignIn.SafeIdentifier,
-                          })}
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__emailLink', {
+                                identifier,
+                              })
+                            }
+                          />
                         </SecondaryButton>
                       </SignIn.SupportedStrategy>
 
@@ -694,9 +699,13 @@ export function SignInComponentLoaded() {
                         asChild
                       >
                         <SecondaryButton icon={<Icon.Envelope />}>
-                          {t('signIn.alternativeMethods.blockButton__emailCode', {
-                            identifier: SignIn.SafeIdentifier,
-                          })}
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__emailCode', {
+                                identifier,
+                              })
+                            }
+                          />
                         </SecondaryButton>
                       </SignIn.SupportedStrategy>
 
@@ -782,9 +791,13 @@ export function SignInComponentLoaded() {
                           asChild
                         >
                           <SecondaryButton icon={<Icon.LinkSm />}>
-                            {t('signIn.alternativeMethods.blockButton__emailLink', {
-                              identifier: SignIn.SafeIdentifier,
-                            })}
+                            <SignIn.SafeIdentifier
+                              transform={(identifier: string) =>
+                                t('signIn.alternativeMethods.blockButton__emailLink', {
+                                  identifier,
+                                })
+                              }
+                            />
                           </SecondaryButton>
                         </SignIn.SupportedStrategy>
 
@@ -793,9 +806,13 @@ export function SignInComponentLoaded() {
                           asChild
                         >
                           <SecondaryButton icon={<Icon.Envelope />}>
-                            {t('signIn.alternativeMethods.blockButton__emailCode', {
-                              identifier: SignIn.SafeIdentifier,
-                            })}
+                            <SignIn.SafeIdentifier
+                              transform={(identifier: string) =>
+                                t('signIn.alternativeMethods.blockButton__emailCode', {
+                                  identifier,
+                                })
+                              }
+                            />
                           </SecondaryButton>
                         </SignIn.SupportedStrategy>
 
