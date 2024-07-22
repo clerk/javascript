@@ -3,6 +3,7 @@ import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 import * as React from 'react';
 
+import { BackupCodeField } from '~/common/backup-code-field';
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
 import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
@@ -368,6 +369,140 @@ export function SignInComponentLoaded() {
                     </Card.Body>
                   </SignIn.Strategy>
 
+                  <SignIn.Strategy name='passkey'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.passkey.title')}</Card.Title>
+                      <Card.Description>{t('signIn.passkey.subtitle')}</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignIn.SafeIdentifier />
+                          <SignIn.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Start again'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignIn.Action>
+                        </span>
+                      </Card.Description>
+                    </Card.Header>
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+
+                      <Common.Loading>
+                        {isSubmitting => {
+                          return (
+                            <>
+                              {
+                                // Note:
+                                // 1. Currently this triggers the loading
+                                //    spinner for "Continue" which is a little
+                                //    confusing. We could use a manual setState
+                                //    on click, but we'll need to find a way to
+                                //    clean up the state based on `isSubmitting`
+                                // 2. This button doesn't currently work; it's
+                                //    being tracked here:
+                                //    https://linear.app/clerk/issue/SDKI-172
+                              }
+
+                              <SignIn.Passkey asChild>
+                                <Button
+                                  type='button'
+                                  icon={<Icon.CaretRight />}
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading || isSubmitting}
+                                >
+                                  {t('formButtonPrimary')}
+                                </Button>
+                              </SignIn.Passkey>
+
+                              <SignIn.Action
+                                navigate='choose-strategy'
+                                asChild
+                              >
+                                <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                  {t('footerActionLink__useAnotherMethod')}
+                                </LinkButton>
+                              </SignIn.Action>
+                            </>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
+
+                  <SignIn.Strategy name='backup_code'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.backupCodeMfa.title')}</Card.Title>
+                      <Card.Description>{t('signIn.backupCodeMfa.subtitle')}</Card.Description>
+                    </Card.Header>
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+
+                      <BackupCodeField label={t('formFieldLabel__backupCode')} />
+
+                      <Common.Loading>
+                        {isSubmitting => {
+                          return (
+                            <>
+                              <SignIn.Action
+                                submit
+                                asChild
+                              >
+                                <Button
+                                  icon={<Icon.CaretRight />}
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading || isSubmitting}
+                                >
+                                  {t('formButtonPrimary')}
+                                </Button>
+                              </SignIn.Action>
+
+                              <SignIn.Action
+                                navigate='choose-strategy'
+                                asChild
+                              >
+                                <LinkButton
+                                  disabled={isGlobalLoading || isSubmitting}
+                                  type='button'
+                                >
+                                  {t('footerActionLink__useAnotherMethod')}
+                                </LinkButton>
+                              </SignIn.Action>
+                            </>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
+
                   <SignIn.Strategy name='email_code'>
                     <Card.Header>
                       {logoImageUrl ? (
@@ -650,6 +785,56 @@ export function SignInComponentLoaded() {
                       </Common.Loading>
                     </Card.Body>
                   </SignIn.Strategy>
+
+                  <SignIn.Strategy name='totp'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.totpMfa.formTitle')}</Card.Title>
+                      <Card.Description>{t('signIn.totpMfa.subtitle', { applicationName })}</Card.Description>
+                    </Card.Header>
+
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+                      <OTPField disabled={isGlobalLoading} />
+                      <Common.Loading scope='step:verifications'>
+                        {isSubmitting => {
+                          return (
+                            <div className='flex flex-col gap-4'>
+                              <SignIn.Action
+                                submit
+                                asChild
+                              >
+                                <Button
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  icon={<Icon.CaretRight />}
+                                >
+                                  {t('formButtonPrimary')}
+                                </Button>
+                              </SignIn.Action>
+
+                              <SignIn.Action
+                                asChild
+                                navigate='choose-strategy'
+                              >
+                                <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                              </SignIn.Action>
+                            </div>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
                   {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded} />
@@ -722,12 +907,40 @@ export function SignInComponentLoaded() {
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
+                        name='passkey'
+                        asChild
+                      >
+                        <SecondaryButton icon={<Icon.FingerprintSm />}>
+                          {t('signIn.alternativeMethods.blockButton__passkey')}
+                        </SecondaryButton>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
                         name='password'
                         asChild
                       >
                         <SecondaryButton icon={<Icon.LockSm />}>
                           {t('signIn.alternativeMethods.blockButton__password')}
                         </SecondaryButton>
+                      </SignIn.SupportedStrategy>
+
+                      {
+                        // `SupportedStrategy`s that are only intended for use
+                        // within `choose-strategy`, not the `forgot-password`
+                        // `Step
+                      }
+                      <SignIn.SupportedStrategy
+                        name='totp'
+                        asChild
+                      >
+                        <SecondaryButton>{t('signIn.alternativeMethods.blockButton__totp')}</SecondaryButton>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='backup_code'
+                        asChild
+                      >
+                        <SecondaryButton>{t('signIn.alternativeMethods.blockButton__backupCode')}</SecondaryButton>
                       </SignIn.SupportedStrategy>
                     </div>
 
@@ -825,6 +1038,15 @@ export function SignInComponentLoaded() {
                               // Correct masked identifier to be added in SDKI-117
                               identifier: SignIn.SafeIdentifier,
                             })}
+                          </SecondaryButton>
+                        </SignIn.SupportedStrategy>
+
+                        <SignIn.SupportedStrategy
+                          name='passkey'
+                          asChild
+                        >
+                          <SecondaryButton icon={<Icon.FingerprintSm />}>
+                            {t('signIn.alternativeMethods.blockButton__passkey')}
                           </SecondaryButton>
                         </SignIn.SupportedStrategy>
 
