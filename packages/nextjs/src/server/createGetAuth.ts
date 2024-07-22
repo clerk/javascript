@@ -56,7 +56,7 @@ export const createGetAuth = ({
 
         logger.debug('JWT debug', jwt.raw.text);
 
-        // @ts-expect-error - TODO: Align types
+        // @ts-expect-error - TODO @nikos: Align types
         return signedInAuthObject(options, jwt.raw.text, jwt.payload);
       }
 

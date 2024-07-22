@@ -57,7 +57,7 @@ export const buildClerkProps: BuildClerkProps = (req, initState = {}) => {
   } else {
     const jwt = decodeJwt(authToken as string);
 
-    // @ts-expect-error - TODO: Align types
+    // @ts-expect-error - TODO @nikos: Align types
     authObject = signedInAuthObject(options, jwt.raw.text, jwt.payload);
   }
 
