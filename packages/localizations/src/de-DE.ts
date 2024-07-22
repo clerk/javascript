@@ -97,7 +97,7 @@ export const deDE: LocalizationResource = {
     title: 'Angemeldet als {{identifier}}',
   },
   maintenanceMode:
-    "Wir führen derzeit Wartungsarbeiten durch, aber keine Sorge, es sollte nicht länger als ein paar Minuten dauern.",
+    'Wir führen derzeit Wartungsarbeiten durch, aber keine Sorge, es sollte nicht länger als ein paar Minuten dauern.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Mitglied',
   membershipRole__guestMember: 'Gast',
@@ -361,7 +361,8 @@ export const deDE: LocalizationResource = {
       title: 'Anmeldung nicht möglich',
     },
     passkey: {
-      subtitle: "Die Verwendung Ihres Passkeys bestätigt, dass Sie es sind. Ihr Gerät kann nach Ihrem Fingerabdruck, Ihrem Gesicht oder der Bildschirmsperre fragen.",
+      subtitle:
+        'Die Verwendung Ihres Passkeys bestätigt, dass Sie es sind. Ihr Gerät kann nach Ihrem Fingerabdruck, Ihrem Gesicht oder der Bildschirmsperre fragen.',
       title: 'Verwenden Sie Ihren Passkey',
     },
     password: {
@@ -407,7 +408,8 @@ export const deDE: LocalizationResource = {
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',
-      subtitle: 'Um fortzufahren, geben Sie bitte den Verifizierungscode ein, der von Ihrer Authenticator-App generiert wurde.',
+      subtitle:
+        'Um fortzufahren, geben Sie bitte den Verifizierungscode ein, der von Ihrer Authenticator-App generiert wurde.',
       title: 'Bestätigung in zwei Schritten',
     },
   },
@@ -482,7 +484,8 @@ export const deDE: LocalizationResource = {
     form_password_not_strong_enough: 'Passwort nicht stark genug',
     form_password_pwned:
       'Das gewählte Passwort wurde bei einem Datenleck im Internet gefunden. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort',
-    form_password_pwned__sign_in: 'Dieses Passwort wurde in einem Datenleck gefunden und kann nicht verwendet werden. Bitte setzen Sie Ihr Passwort zurück.',
+    form_password_pwned__sign_in:
+      'Dieses Passwort wurde in einem Datenleck gefunden und kann nicht verwendet werden. Bitte setzen Sie Ihr Passwort zurück.',
     form_password_size_in_bytes_exceeded:
       'Das Passwort hat die maximale Anzahl an Bytes überschritten. Bitte kürzen oder Sonderzeichen entfernen.',
     form_password_validation_failed: 'Falsches Passwort',
@@ -492,8 +495,10 @@ export const deDE: LocalizationResource = {
     not_allowed_access: '',
     passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
     passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
-    passkey_pa_not_supported: 'Die Registrierung erfordert einen Plattformauthentifikator, der vom Gerät nicht unterstützt wird.',
-    passkey_registration_cancelled: 'Die Passkey-Registrierung wurde abgebrochen oder das Zeitlimit wurde überschritten.',
+    passkey_pa_not_supported:
+      'Die Registrierung erfordert einen Plattformauthentifikator, der vom Gerät nicht unterstützt wird.',
+    passkey_registration_cancelled:
+      'Die Passkey-Registrierung wurde abgebrochen oder das Zeitlimit wurde überschritten.',
     passkey_retrieval_cancelled: 'Die Passkey-Registrierung wurde abgebrochen oder das Zeitlimit wurde überschritten.',
     passwordComplexity: {
       maximumLength: 'weniger als {{length}} Zeichen lang sein',
