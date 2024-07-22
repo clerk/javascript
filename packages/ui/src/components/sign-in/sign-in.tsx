@@ -368,6 +368,84 @@ export function SignInComponentLoaded() {
                     </Card.Body>
                   </SignIn.Strategy>
 
+                  <SignIn.Strategy name='passkey'>
+                    <Card.Header>
+                      {logoImageUrl ? (
+                        <Card.Logo
+                          href={homeUrl}
+                          src={logoImageUrl}
+                          alt={applicationName}
+                        />
+                      ) : null}
+                      <Card.Title>{t('signIn.passkey.title')}</Card.Title>
+                      <Card.Description>{t('signIn.passkey.subtitle')}</Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignIn.SafeIdentifier />
+                          <SignIn.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Start again'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignIn.Action>
+                        </span>
+                      </Card.Description>
+                    </Card.Header>
+                    <Card.Body>
+                      <Common.GlobalError>
+                        {({ message }) => {
+                          return <Alert>{message}</Alert>;
+                        }}
+                      </Common.GlobalError>
+
+                      <Common.Loading>
+                        {isSubmitting => {
+                          return (
+                            <>
+                              {
+                                // Note:
+                                // 1. Currently this triggers the loading
+                                //    spinner for "Continue" which is a little
+                                //    confusing. We could use a manual setState
+                                //    on click, but we'll need to find a way to
+                                //    clean up the state based on `isSubmitting`
+                                // 2. This button doesn't currently work; it's
+                                //    being tracked here:
+                                //    https://linear.app/clerk/issue/SDKI-172
+                              }
+
+                              <SignIn.Passkey asChild>
+                                <Button
+                                  type='button'
+                                  icon={<Icon.CaretRight />}
+                                  busy={isSubmitting}
+                                  disabled={isGlobalLoading || isSubmitting}
+                                >
+                                  {t('formButtonPrimary')}
+                                </Button>
+                              </SignIn.Passkey>
+
+                              <SignIn.Action
+                                navigate='choose-strategy'
+                                asChild
+                              >
+                                <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                  {t('footerActionLink__useAnotherMethod')}
+                                </LinkButton>
+                              </SignIn.Action>
+                            </>
+                          );
+                        }}
+                      </Common.Loading>
+                    </Card.Body>
+                  </SignIn.Strategy>
+
                   <SignIn.Strategy name='backup_code'>
                     <Card.Header>
                       {logoImageUrl ? (
@@ -820,6 +898,15 @@ export function SignInComponentLoaded() {
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
+                        name='passkey'
+                        asChild
+                      >
+                        <SecondaryButton icon={<Icon.FingerprintSm />}>
+                          {t('signIn.alternativeMethods.blockButton__passkey')}
+                        </SecondaryButton>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
                         name='password'
                         asChild
                       >
@@ -934,6 +1021,15 @@ export function SignInComponentLoaded() {
                               // Correct masked identifier to be added in SDKI-117
                               identifier: SignIn.SafeIdentifier,
                             })}
+                          </SecondaryButton>
+                        </SignIn.SupportedStrategy>
+
+                        <SignIn.SupportedStrategy
+                          name='passkey'
+                          asChild
+                        >
+                          <SecondaryButton icon={<Icon.FingerprintSm />}>
+                            {t('signIn.alternativeMethods.blockButton__passkey')}
                           </SecondaryButton>
                         </SignIn.SupportedStrategy>
 
