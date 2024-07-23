@@ -111,7 +111,8 @@ function SignInGetHelp() {
 
 export function SignInComponentLoaded() {
   const clerk = useClerk();
-  const locationBasedCountryIso = (clerk as any)?.__internal_country;
+  // TODO to fix IsomorphicClerk
+  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
   const enabledConnections = useEnabledConnections();
   const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();

@@ -36,7 +36,8 @@ function SignUpComponentLoaded() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
   const { isDevelopmentOrStaging, userSettings } = useEnvironment();
-  const locationBasedCountryIso = (clerk as any)?.__internal_country;
+  // TODO to fix IsomorphicClerk
+  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
