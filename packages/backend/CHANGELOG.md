@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.4.1
+
+### Patch Changes
+
+- Handle the scenario where FAPI returns unsuffixed cookies without throwing a handshake ([#3789](https://github.com/clerk/javascript/pull/3789)) by [@dimkl](https://github.com/dimkl)
+
 ## 1.4.0
 
 ### Minor Changes
