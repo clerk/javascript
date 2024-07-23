@@ -5,10 +5,7 @@ The `clerk-dev` CLI is a tool designed to simplify the process of iterating on p
 ## Installation
 
 ```sh
-git clone --single-branch --branch ds.feat/clerk-dev-cli https://github.com/clerk/javascript clerk-dev-cli
-cd clerk-dev-cli
-npm install
-npm install --global ./packages/dev-cli
+npm install --global @clerk/dev-cli
 ```
 
 If you haven't already, install `turbo` globally.
