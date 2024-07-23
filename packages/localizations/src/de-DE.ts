@@ -64,7 +64,7 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__organizationDomain: '',
   formFieldInputPlaceholder__organizationDomainEmailAddress: '',
   formFieldInputPlaceholder__organizationName: '',
-  formFieldInputPlaceholder__organizationSlug: '',
+  formFieldInputPlaceholder__organizationSlug: 'my-org',
   formFieldInputPlaceholder__password: '',
   formFieldInputPlaceholder__phoneNumber: '',
   formFieldInputPlaceholder__username: '',
@@ -86,7 +86,7 @@ export const deDE: LocalizationResource = {
     'Geben Sie eine E-Mail-Adresse dieser Domain ein, um einen Code zu erhalten und diese Domain zu verifizieren.',
   formFieldLabel__organizationName: 'Organisationsname',
   formFieldLabel__organizationSlug: 'Slug',
-  formFieldLabel__passkeyName: undefined,
+  formFieldLabel__passkeyName: 'Name des Passkeys',
   formFieldLabel__password: 'Passwort',
   formFieldLabel__phoneNumber: 'Telefonnummer',
   formFieldLabel__role: 'Rolle',
@@ -96,7 +96,8 @@ export const deDE: LocalizationResource = {
     action__signOut: 'Ausloggen',
     title: 'Angemeldet als {{identifier}}',
   },
-  maintenanceMode: undefined,
+  maintenanceMode:
+    'Wir führen derzeit Wartungsarbeiten durch, aber keine Sorge, es sollte nicht länger als ein paar Minuten dauern.',
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Mitglied',
   membershipRole__guestMember: 'Gast',
@@ -125,7 +126,7 @@ export const deDE: LocalizationResource = {
       detailsTitle__inviteFailed:
         'Die Einladungen konnten nicht versendet werden. Beheben Sie Folgendes und versuchen Sie es erneut:',
       formButtonPrimary__continue: 'Einladungen verschicken',
-      selectDropdown__role: 'Select role',
+      selectDropdown__role: 'Rolle wählen',
       subtitle: 'Laden Sie neue Mitglieder zu dieser Organisation ein',
       successMessage: 'Einladungen erfolgreich versendet',
       title: 'Mitglieder einladen',
@@ -276,10 +277,10 @@ export const deDE: LocalizationResource = {
   paginationRowText__of: 'von',
   signIn: {
     accountSwitcher: {
-      action__addAccount: 'Add account',
-      action__signOutAll: 'Sign out of all accounts',
-      subtitle: 'Select the account with which you wish to continue.',
-      title: 'Choose an account',
+      action__addAccount: 'Konto hinzufügen',
+      action__signOutAll: 'Von allen Konten abmelden',
+      subtitle: 'Wählen Sie das Konto, mit dem Sie fortfahren möchten.',
+      title: 'Wählen Sie ein Konto',
     },
     alternativeMethods: {
       actionLink: 'Hilfe',
@@ -287,7 +288,7 @@ export const deDE: LocalizationResource = {
       blockButton__backupCode: 'Verwenden Sie einen Backup-Code',
       blockButton__emailCode: 'Code an {{identifier}} senden',
       blockButton__emailLink: 'Link senden an {{identifier}}',
-      blockButton__passkey: undefined,
+      blockButton__passkey: 'Melden Sie sich mit Ihrem Passkey an',
       blockButton__password: 'Melden Sie sich mit Ihrem Passwort an',
       blockButton__phoneCode: 'Code an {{identifier}} senden',
       blockButton__totp: 'Verwenden Sie Ihre Authentifizierungs-App',
@@ -311,6 +312,10 @@ export const deDE: LocalizationResource = {
       title: 'Überprüfen Sie Ihren Posteingang',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Kehren Sie zum ursprünglichen Tab zurück, um fortzufahren.',
         title: 'Dieser Bestätigungslink ist abgelaufen',
@@ -360,8 +365,9 @@ export const deDE: LocalizationResource = {
       title: 'Anmeldung nicht möglich',
     },
     passkey: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle:
+        'Die Verwendung Ihres Passkeys bestätigt, dass Sie es sind. Ihr Gerät kann nach Ihrem Fingerabdruck, Ihrem Gesicht oder der Bildschirmsperre fragen.',
+      title: 'Verwenden Sie Ihren Passkey',
     },
     password: {
       actionLink: 'Verwenden Sie eine andere Methode',
@@ -369,7 +375,7 @@ export const deDE: LocalizationResource = {
       title: 'Geben Sie Ihr Passwort ein',
     },
     passwordPwned: {
-      title: undefined,
+      title: 'Passwort kompromittiert',
     },
     phoneCode: {
       formTitle: 'Bestätigungscode',
@@ -380,7 +386,7 @@ export const deDE: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: 'Bestätigungscode',
       resendButton: 'Code erneut senden',
-      subtitle: '',
+      subtitle: 'Um fortzufahren, geben Sie bitte den Bestätigungscode ein, der an Ihre Telefonnummer gesendet wurde',
       title: 'Schau auf dein Telefon',
     },
     resetPassword: {
@@ -397,7 +403,7 @@ export const deDE: LocalizationResource = {
       actionLink: 'Anmelden',
       actionLink__use_email: 'E-mail nutzen',
       actionLink__use_email_username: 'E-mail oder Benutzernamen nutzen',
-      actionLink__use_passkey: undefined,
+      actionLink__use_passkey: 'Passkey nutzen',
       actionLink__use_phone: 'Mobiltelefon nutzen',
       actionLink__use_username: 'Benutzername nutzen',
       actionText: 'Kein Account?',
@@ -406,7 +412,8 @@ export const deDE: LocalizationResource = {
     },
     totpMfa: {
       formTitle: 'Bestätigungscode',
-      subtitle: '',
+      subtitle:
+        'Um fortzufahren, geben Sie bitte den Verifizierungscode ein, der von Ihrer Authenticator-App generiert wurde.',
       title: 'Bestätigung in zwei Schritten',
     },
   },
@@ -426,6 +433,10 @@ export const deDE: LocalizationResource = {
       title: 'Bestätigen Sie Ihre E-Mail',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Verwenden Sie den an Ihre E-Mail-Adresse gesendeten Bestätigungslink',
       formTitle: 'Bestätigungslink',
       loading: {
@@ -458,16 +469,17 @@ export const deDE: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Anmeldung aufgrund fehlgeschlagener Sicherheitsüberprüfung nicht erfolgreich. Bitte versuchen Sie es erneut oder kontaktieren Sie uns für weitere Unterstützung.',
     captcha_unavailable:
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
     form_code_incorrect: '',
-    form_identifier_exists: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine Andere.',
-    form_identifier_exists__email_address: undefined,
-    form_identifier_exists__phone_number: undefined,
-    form_identifier_exists__username: undefined,
+    form_identifier_exists: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
+    form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
+    form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
+    form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
@@ -480,20 +492,23 @@ export const deDE: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'Passwort nicht stark genug',
     form_password_pwned:
-      'Das gewählte Passwort wurde durch eine Datenpanne im Internet offengelegt. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort',
-    form_password_pwned__sign_in: undefined,
+      'Das gewählte Passwort wurde bei einem Datenleck im Internet gefunden. Wählen Sie aus Sicherheitsgründen bitte ein anderes Passwort',
+    form_password_pwned__sign_in:
+      'Dieses Passwort wurde in einem Datenleck gefunden und kann nicht verwendet werden. Bitte setzen Sie Ihr Passwort zurück.',
     form_password_size_in_bytes_exceeded:
       'Das Passwort hat die maximale Anzahl an Bytes überschritten. Bitte kürzen oder Sonderzeichen entfernen.',
     form_password_validation_failed: 'Falsches Passwort',
     form_username_invalid_character: '',
     form_username_invalid_length: '',
-    identification_deletion_failed: '',
+    identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
     not_allowed_access: '',
-    passkey_already_exists: undefined,
-    passkey_not_supported: undefined,
-    passkey_pa_not_supported: undefined,
-    passkey_registration_cancelled: undefined,
-    passkey_retrieval_cancelled: undefined,
+    passkey_already_exists: 'Auf diesem Gerät ist bereits ein Passkey registriert.',
+    passkey_not_supported: 'Passkeys werden auf diesem Gerät nicht unterstützt.',
+    passkey_pa_not_supported:
+      'Die Registrierung erfordert einen Plattformauthentifikator, der vom Gerät nicht unterstützt wird.',
+    passkey_registration_cancelled:
+      'Die Passkey-Registrierung wurde abgebrochen oder das Zeitlimit wurde überschritten.',
+    passkey_retrieval_cancelled: 'Die Passkey-Registrierung wurde abgebrochen oder das Zeitlimit wurde überschritten.',
     passwordComplexity: {
       maximumLength: 'weniger als {{length}} Zeichen lang sein',
       minimumLength: 'mindestens {{length}} Zeichen lang sein',
@@ -611,20 +626,20 @@ export const deDE: LocalizationResource = {
         title: 'E-Mail-Adresse entfernen',
       },
       title: 'E-Mail-Adresse hinzufügen',
-      verifyTitle: 'Verify email address',
+      verifyTitle: 'E-Mail Adresse verifizieren',
     },
     formButtonPrimary__add: 'Add',
     formButtonPrimary__continue: 'Fortsetzen',
     formButtonPrimary__finish: 'Fertig',
-    formButtonPrimary__remove: 'Remove',
-    formButtonPrimary__save: 'Save',
+    formButtonPrimary__remove: 'Entfernen',
+    formButtonPrimary__save: 'Speichern',
     formButtonReset: 'Zurücksetzen',
     mfaPage: {
       formHint: 'Wählen Sie eine Methode aus.',
       title: 'Aktivieren Sie Zweifaktor-Authentifizierung',
     },
     mfaPhoneCodePage: {
-      backButton: 'Use existing number',
+      backButton: 'Vorhandene Nummer verwenden',
       primaryButton__addPhoneNumber: 'Fügen Sie eine Telefonnummer hinzu',
       removeResource: {
         messageLine1: '{{identifier}} erhält bei der Anmeldung keine Bestätigungscodes mehr.',
@@ -678,15 +693,15 @@ export const deDE: LocalizationResource = {
     },
     passkeyScreen: {
       removeResource: {
-        messageLine1: undefined,
-        title: undefined,
+        messageLine1: '{{name}} wird von diesem Konto entfernt.',
+        title: 'Passkey entfernen',
       },
-      subtitle__rename: undefined,
-      title__rename: undefined,
+      subtitle__rename: 'Sie können den Namen des Passkeys ändern, um ihn leichter zu finden.',
+      title__rename: 'Passkey umbenennen',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
-        'It is recommended to sign out of all other devices which may have used your old password.',
+        'Es wird empfohlen, sich von allen anderen Geräten abzumelden, die möglicherweise Ihr altes Passwort verwendet haben.',
       readonly:
         'Ihr Passwort kann derzeit nicht geändert werden, da Sie sich nur über die Enterprise-Verbindung anmelden können.',
       successMessage__set: 'Ihr Passwort wurde festgelegt.',
@@ -724,9 +739,10 @@ export const deDE: LocalizationResource = {
       },
       connectedAccountsSection: {
         actionLabel__connectionFailed: 'Versuchen Sie es nochmal',
-        actionLabel__reauthorize: 'Authorize now',
+        actionLabel__reauthorize: 'Jetzt autorisieren',
         destructiveActionTitle: 'Entfernen',
         primaryButton: 'Konto verbinden',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Verbundene Konten',
@@ -744,7 +760,7 @@ export const deDE: LocalizationResource = {
         title: 'E-Mail-Adressen',
       },
       enterpriseAccountsSection: {
-        title: 'Enterprise accounts',
+        title: 'Unternehmens-Konten',
       },
       headerTitle__account: 'Konto',
       headerTitle__security: 'Sicherheit',
@@ -768,9 +784,9 @@ export const deDE: LocalizationResource = {
         },
       },
       passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
+        menuAction__destructive: 'Entfernen',
+        menuAction__rename: 'Umbenennen',
+        title: 'Passkeys',
       },
       passwordSection: {
         primaryButton__setPassword: 'Passwort festlegen',

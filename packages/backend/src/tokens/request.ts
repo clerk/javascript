@@ -1,16 +1,15 @@
-import { parsePublishableKey } from '@clerk/shared/keys';
-
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
 import { decodeJwt } from '../jwt/verifyJwt';
-import { assertValidSecretKey } from '../util/assertValidSecretKey';
+import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
 import type { AuthenticateContext } from './authenticateContext';
 import { createAuthenticateContext } from './authenticateContext';
 import type { RequestState } from './authStatus';
 import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
+import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import type { AuthenticateRequestOptions } from './types';
 import { verifyToken } from './verify';
@@ -48,7 +47,8 @@ function isRequestEligibleForHandshake(authenticateContext: { secFetchDest?: str
   const { accept, secFetchDest } = authenticateContext;
 
   // NOTE: we could also check sec-fetch-mode === navigate here, but according to the spec, sec-fetch-dest: document should indicate that the request is the data of a user navigation.
-  if (secFetchDest === 'document') {
+  // Also, we check for 'iframe' because it's the value set when a doc request is made by an iframe.
+  if (secFetchDest === 'document' || secFetchDest === 'iframe') {
     return true;
   }
 
@@ -63,7 +63,7 @@ export async function authenticateRequest(
   request: Request,
   options: AuthenticateRequestOptions,
 ): Promise<RequestState> {
-  const authenticateContext = createAuthenticateContext(createClerkRequest(request), options);
+  const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
   assertValidSecretKey(authenticateContext.secretKey);
 
   if (authenticateContext.isSatellite) {
@@ -86,12 +86,13 @@ export async function authenticateRequest(
 
   function buildRedirectToHandshake() {
     const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
-    const frontendApiNoProtocol = pk.frontendApi.replace(/http(s)?:\/\//, '');
+    const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
+    url.searchParams.append('suffixed_cookies', authenticateContext.suffixedCookies.toString());
 
-    if (pk?.instanceType === 'development' && authenticateContext.devBrowserToken) {
+    if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
     }
 
@@ -110,12 +111,12 @@ export async function authenticateRequest(
     let sessionToken = '';
     cookiesToSet.forEach((x: string) => {
       headers.append('Set-Cookie', x);
-      if (x.startsWith(`${constants.Cookies.Session}=`)) {
-        sessionToken = x.split(';')[0].substring(10);
+      if (getCookieName(x).startsWith(constants.Cookies.Session)) {
+        sessionToken = getCookieValue(x);
       }
     });
 
-    if (instanceType === 'development') {
+    if (authenticateContext.instanceType === 'development') {
       const newUrl = new URL(authenticateContext.clerkUrl);
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
@@ -132,7 +133,7 @@ export async function authenticateRequest(
     }
 
     if (
-      instanceType === 'development' &&
+      authenticateContext.instanceType === 'development' &&
       (error?.reason === TokenVerificationErrorReason.TokenExpired ||
         error?.reason === TokenVerificationErrorReason.TokenNotActiveYet)
     ) {
@@ -177,14 +178,6 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, reason, message, new Headers());
   }
 
-  const pk = parsePublishableKey(options.publishableKey, {
-    fatal: true,
-    proxyUrl: options.proxyUrl,
-    domain: options.domain,
-  });
-
-  const instanceType = pk.instanceType;
-
   async function authenticateRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
 
@@ -220,7 +213,7 @@ ${error.getFullMessage()}`,
         // If for some reason the handshake token is invalid or stale, we ignore it and continue trying to authenticate the request.
         // Worst case, the handshake will trigger again and return a refreshed token.
         if (error instanceof TokenVerificationError) {
-          if (instanceType === 'development') {
+          if (authenticateContext.instanceType === 'development') {
             if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
               throw new Error(
                 `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`,
@@ -249,7 +242,7 @@ ${error.getFullMessage()}`,
      * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
      */
     if (
-      instanceType === 'development' &&
+      authenticateContext.instanceType === 'development' &&
       authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser)
     ) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserSync, '');
@@ -258,12 +251,12 @@ ${error.getFullMessage()}`,
     /**
      * Begin multi-domain sync flows
      */
-    if (instanceType === 'production' && isRequestEligibleForMultiDomainSync) {
+    if (authenticateContext.instanceType === 'production' && isRequestEligibleForMultiDomainSync) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '');
     }
 
     // Multi-domain development sync flow
-    if (instanceType === 'development' && isRequestEligibleForMultiDomainSync) {
+    if (authenticateContext.instanceType === 'development' && isRequestEligibleForMultiDomainSync) {
       // initiate MD sync
 
       // signInUrl exists, checked at the top of `authenticateRequest`
@@ -281,7 +274,7 @@ ${error.getFullMessage()}`,
     const redirectUrl = new URL(authenticateContext.clerkUrl).searchParams.get(
       constants.QueryParameters.ClerkRedirectUrl,
     );
-    if (instanceType === 'development' && !authenticateContext.isSatellite && redirectUrl) {
+    if (authenticateContext.instanceType === 'development' && !authenticateContext.isSatellite && redirectUrl) {
       // Dev MD sync from primary, redirect back to satellite w/ dev browser query param
       const redirectBackToSatelliteUrl = new URL(redirectUrl);
 
@@ -300,7 +293,7 @@ ${error.getFullMessage()}`,
      * End multi-domain sync flows
      */
 
-    if (instanceType === 'development' && !hasDevBrowserToken) {
+    if (authenticateContext.instanceType === 'development' && !hasDevBrowserToken) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserMissing, '');
     }
 

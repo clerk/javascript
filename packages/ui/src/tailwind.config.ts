@@ -70,6 +70,9 @@ const config = {
       spacing: {
         ...generateSpaceScale(),
       },
+      zIndex: {
+        1: '1',
+      },
       colors: {
         accent: {
           ...generateColorScale('accent'),

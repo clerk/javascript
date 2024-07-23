@@ -169,6 +169,7 @@ export type ElementsConfig = {
   socialButtonsBlockButton: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
   socialButtonsBlockButtonText: WithOptions<OAuthProvider | Web3Provider>;
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
+  socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider, LoadingState>;
 
   enterpriseButtonsProviderIcon: WithOptions<SamlIdpSlug, LoadingState>;
 

@@ -1,5 +1,11 @@
 import type { ClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, AuthObject, ClerkRequest, RequestState } from '@clerk/backend/internal';
+import type {
+  AuthenticateRequestOptions,
+  AuthObject,
+  ClerkRequest,
+  RedirectFun,
+  RequestState,
+} from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { handleValueOrFn, isDevelopmentFromSecretKey, isHttpOrHttps } from '@clerk/shared';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
@@ -36,7 +42,7 @@ type ClerkAstroMiddlewareHandler = (
   next: AstroMiddlewareNextParam,
 ) => AstroMiddlewareReturn;
 
-type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
+type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions;
 
 /**
  * Middleware for Astro that handles authentication and authorization with Clerk.
@@ -87,7 +93,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
     const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
 
-    decorateAstroLocal(context.request, context, requestState);
+    decorateAstroLocal(clerkRequest, context, requestState);
 
     /**
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.
@@ -204,8 +210,8 @@ Missing domain and proxyUrl. A satellite application needs to specify a domain o
 1) With middleware
    e.g. export default clerkMiddleware({domain:'YOUR_DOMAIN',isSatellite:true});
 2) With environment variables e.g.
-   PUBLIC_ASTRO_APP_CLERK_DOMAIN='YOUR_DOMAIN'
-   PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'
+   PUBLIC_CLERK_DOMAIN='YOUR_DOMAIN'
+   PUBLIC_CLERK_IS_SATELLITE='true'
    `;
 
 export const missingSignInUrlInDev = `
@@ -215,17 +221,41 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 1) With middleware
    e.g. export default clerkMiddleware({signInUrl:'SOME_URL', isSatellite:true});
 2) With environment variables e.g.
-   PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL='SOME_URL'
-   PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'`;
+   PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
+   PUBLIC_CLERK_IS_SATELLITE='true'`;
 
-function decorateAstroLocal(req: Request, context: APIContext, requestState: RequestState) {
+function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, requestState: RequestState) {
   const { reason, message, status, token } = requestState;
   context.locals.authToken = token;
   context.locals.authStatus = status;
   context.locals.authMessage = message;
   context.locals.authReason = reason;
-  context.locals.auth = () => getAuth(req, context.locals);
-  context.locals.currentUser = createCurrentUser(req, context);
+  context.locals.auth = () => {
+    const authObject = getAuth(clerkRequest, context.locals);
+
+    const clerkUrl = clerkRequest.clerkUrl;
+
+    const redirectToSignIn: RedirectFun<Response> = (opts = {}) => {
+      const devBrowserToken =
+        clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
+        clerkRequest.cookies.get(constants.Cookies.DevBrowser);
+
+      return createRedirect({
+        redirectAdapter,
+        devBrowserToken: devBrowserToken,
+        baseUrl: clerkUrl.toString(),
+        publishableKey: getSafeEnv(context).pk!,
+        signInUrl: requestState.signInUrl,
+        signUpUrl: requestState.signUpUrl,
+      }).redirectToSignIn({
+        returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
+      });
+    };
+
+    return Object.assign(authObject, { redirectToSignIn });
+  };
+
+  context.locals.currentUser = createCurrentUser(clerkRequest, context);
 }
 
 /**
@@ -279,9 +309,7 @@ async function decorateRequest(
             controller.enqueue(clerkAstroData);
             controller.enqueue(clerkSafeEnvVariables);
 
-            if (__HOTLOAD__) {
-              controller.enqueue(hotloadScript);
-            }
+            controller.enqueue(hotloadScript);
 
             controller.enqueue(closingHeadTag);
             controller.enqueue(chunk.slice(index + closingHeadTag.length));

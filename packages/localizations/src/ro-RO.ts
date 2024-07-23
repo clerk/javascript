@@ -310,6 +310,10 @@ export const roRO: LocalizationResource = {
       title: 'Verifică-ți e-mailul',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Reveniți la tab-ul inițial pentru a continua.',
         title: 'Acest link de verificare a expirat',
@@ -425,6 +429,10 @@ export const roRO: LocalizationResource = {
       title: 'Verificați-vă e-mailul',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Utilizați link-ul de verificare trimis la adresa dvs. de e-mail',
       formTitle: 'Link de verificare',
       loading: {
@@ -457,6 +465,7 @@ export const roRO: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Continuați cu {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Înscrierea a eșuat din cauza unor validări de securitate nereușite. Vă rugăm să reîmprospătați pagina pentru a încerca din nou sau contactați serviciul de asistență pentru mai multă asistență.',
@@ -729,6 +738,7 @@ export const roRO: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizați acum',
         destructiveActionTitle: 'Eliminați',
         primaryButton: 'Conectați-vă contul',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Conturi conectate',

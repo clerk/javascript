@@ -26,8 +26,10 @@ export const SecondaryButton = React.forwardRef(function SecondaryButton(
       )}
       disabled={busy || disabled}
     >
-      {icon ? <span className='text-base'>{busy ? <Spinner>Loading…</Spinner> : <span>{icon}</span>}</span> : null}
-      {children}
+      {icon ? (
+        <span className='min-w-0 text-base'>{busy ? <Spinner>Loading…</Spinner> : <span>{icon}</span>}</span>
+      ) : null}
+      <span className='min-w-0 truncate'>{children}</span>
     </button>
   );
 });

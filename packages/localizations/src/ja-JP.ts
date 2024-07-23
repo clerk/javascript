@@ -308,6 +308,10 @@ export const jaJP: LocalizationResource = {
       title: 'メールを確認',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: '元のタブに戻って続行してください。',
         title: 'この検証リンクは期限切れです',
@@ -423,6 +427,10 @@ export const jaJP: LocalizationResource = {
       title: 'メールアドレスを確認',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'メールアドレスに送信された確認リンクを使用してください',
       formTitle: '確認リンク',
       loading: {
@@ -455,6 +463,7 @@ export const jaJP: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'セキュリティ検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートセンターに連絡した上でサポートを受けてください。',
@@ -716,6 +725,7 @@ export const jaJP: LocalizationResource = {
         actionLabel__reauthorize: '今すぐ認証',
         destructiveActionTitle: '削除',
         primaryButton: 'アカウントを連携する',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           '必要なスコープが更新され、機能が制限されている可能性があります。問題を避けるために、このアプリケーションを再認証してください。',
         title: '連携アカウント',

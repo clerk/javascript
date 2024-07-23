@@ -304,6 +304,10 @@ export const koKR: LocalizationResource = {
       title: '이메일을 확인하세요',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: '계속하려면 원래 탭으로 돌아가세요.',
         title: '이 인증 링크는 만료되었습니다',
@@ -418,6 +422,10 @@ export const koKR: LocalizationResource = {
       title: '이메일 인증',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: '이메일 주소로 전송된 인증 링크를 사용합니다.',
       formTitle: '인증 링크',
       loading: {
@@ -450,6 +458,7 @@ export const koKR: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}로 계속하기',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -708,6 +717,7 @@ export const koKR: LocalizationResource = {
         actionLabel__reauthorize: '지금 인증하기',
         destructiveActionTitle: '제거',
         primaryButton: '계정 연결하기',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: '연결된 계정',

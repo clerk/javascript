@@ -2,6 +2,7 @@ import type { OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
 
+import { ProviderInitialIcon } from '../common';
 import type { LocalizationKey } from '../customizables';
 import {
   Button,
@@ -126,6 +127,25 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 ? firstStrategyRef
                 : null;
 
+            const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
+              <Image
+                elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
+                elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
+                isLoading={card.loadingMetadata === strategy}
+                isDisabled={card.isLoading}
+                src={strategyToDisplayData[strategy].iconUrl}
+                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
+              />
+            ) : (
+              <ProviderInitialIcon
+                id={strategyToDisplayData[strategy].id}
+                value={strategyToDisplayData[strategy].name}
+                isLoading={card.loadingMetadata === strategy}
+                isDisabled={card.isLoading}
+              />
+            );
+
             return (
               <ButtonElement
                 key={strategy}
@@ -136,17 +156,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 isDisabled={card.isLoading}
                 label={label}
                 textLocalizationKey={localizedText}
-                icon={
-                  <Image
-                    elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
-                    elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
-                    isLoading={card.loadingMetadata === strategy}
-                    isDisabled={card.isLoading}
-                    src={strategyToDisplayData[strategy].iconUrl}
-                    alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
-                    sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
-                  />
-                }
+                icon={imageOrInitial}
               />
             );
           })}

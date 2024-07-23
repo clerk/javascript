@@ -121,6 +121,7 @@ const isServerActionRequest = (req: Request) => {
 const isPageRequest = (req: Request): boolean => {
   return (
     req.headers.get(constants.Headers.SecFetchDest) === 'document' ||
+    req.headers.get(constants.Headers.SecFetchDest) === 'iframe' ||
     req.headers.get(constants.Headers.Accept)?.includes('text/html') ||
     isAppRouterInternalNavigation(req) ||
     isPagesRouterInternalNavigation(req)

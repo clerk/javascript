@@ -94,6 +94,16 @@ const enrichFieldState = (validity: ValidityState | undefined, fieldState: Field
  * Hooks
  * -----------------------------------------------------------------------------------------------*/
 
+function usePrevious<T>(value: T): T | undefined {
+  const ref = React.useRef<T>();
+
+  React.useEffect(() => {
+    ref.current = value;
+  }, [value]);
+
+  return ref.current;
+}
+
 const useGlobalErrors = () => {
   const errors = useFormSelector(globalErrorsSelector);
 
@@ -193,7 +203,7 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 
 const useInput = ({
   name: inputName,
-  value: initialValue,
+  value: providedValue,
   type: inputType,
   onChange: onChangeProp,
   onBlur: onBlurProp,
@@ -251,6 +261,7 @@ const useInput = ({
     },
   });
   const value = useFormSelector(fieldValueSelector(name));
+  const prevValue = usePrevious(value);
   const hasValue = Boolean(value);
   const type = inputType ?? determineInputTypeFromName(rawName);
   let shouldValidatePassword = false;
@@ -261,11 +272,11 @@ const useInput = ({
 
   // Register the field in the machine context
   React.useEffect(() => {
-    if (!name || ref.getSnapshot().context.fields.get(name)) {
+    if (!name) {
       return;
     }
 
-    ref.send({ type: 'FIELD.ADD', field: { name, value: initialValue } });
+    ref.send({ type: 'FIELD.ADD', field: { name, value: providedValue } });
 
     return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -274,7 +285,7 @@ const useInput = ({
   const onChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeProp?.(event);
-      if (!name || initialValue) {
+      if (!name) {
         return;
       }
       ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
@@ -282,35 +293,38 @@ const useInput = ({
         validatePassword(event.target.value);
       }
     },
-    [ref, name, onChangeProp, initialValue, shouldValidatePassword, validatePassword],
+    [ref, name, onChangeProp, shouldValidatePassword, validatePassword],
   );
 
   const onBlur = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onBlurProp?.(event);
-      if (shouldValidatePassword) {
+      if (shouldValidatePassword && event.target.value !== prevValue) {
         validatePassword(event.target.value);
       }
     },
-    [onBlurProp, shouldValidatePassword, validatePassword],
+    [onBlurProp, shouldValidatePassword, validatePassword, prevValue],
   );
 
   const onFocus = React.useCallback(
     (event: React.FocusEvent<HTMLInputElement>) => {
       onFocusProp?.(event);
-      if (shouldValidatePassword) {
+      if (shouldValidatePassword && event.target.value !== prevValue) {
         validatePassword(event.target.value);
       }
     },
-    [onFocusProp, shouldValidatePassword, validatePassword],
+    [onFocusProp, shouldValidatePassword, validatePassword, prevValue],
   );
 
   React.useEffect(() => {
-    if (!initialValue || !name) {
+    if (!name) {
       return;
     }
-    ref.send({ type: 'FIELD.UPDATE', field: { name, value: initialValue } });
-  }, [name, ref, initialValue]);
+
+    if (providedValue !== undefined) {
+      ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
+    }
+  }, [name, ref, providedValue]);
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;

@@ -1,5 +1,31 @@
 # Change Log
 
+## 4.9.0
+
+### Minor Changes
+
+- - Introduced `subtitle__disconnected` under `userProfile.start.connectedAccountsSection` ([#3723](https://github.com/clerk/javascript/pull/3723)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Deprecated `userProfile.start.connectedAccountsSection.actionLabel__reauthorize` and `userProfile.start.connectedAccountsSection.subtitle__reauthorize`
+
+### Patch Changes
+
+- Update types to account for null second factors ([#3780](https://github.com/clerk/javascript/pull/3780)) by [@dstaley](https://github.com/dstaley)
+
+## 4.8.0
+
+### Minor Changes
+
+- Added support for Custom OAuth providers by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Updated strategy types to include `CustomOAuthStrategy`:
+    - Added the `CustomOAuthStrategy` type with the value `oauth_custom_${string}`
+    - Modified `OAuthStrategy` to include `CustomOAuthStrategy`:
+      `export type OAuthStrategy = `oauth\_${OAuthProvider}` | CustomOAuthStrategy;`
+  - Added the `CustomOauthProvider` type with value `custom_${string}` and extended `OAuthProvider` type to include `CustomOauthProvider`
+  - Added support for displaying provider initials when `logo_url` is null for custom OAuth providers
+  - Created new `ProviderInitialIcon` internal component in order to display custom oauth provider initials if provider `logo_url` is null
+
 ## 4.7.0
 
 ### Minor Changes

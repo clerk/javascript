@@ -30,7 +30,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign out 
     await mainTab.po.expect.toBeSignedIn();
 
     await mainTab.tabs.runInNewTab(async m => {
-      await m.page.goToStart();
+      await m.page.goToAppHome();
 
       await m.page.waitForClerkJsLoaded();
 

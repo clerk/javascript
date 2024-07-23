@@ -1,5 +1,53 @@
 # @clerk/elements
 
+## 0.10.5
+
+### Patch Changes
+
+- Reverts [addition of relatedTarget check](https://github.com/clerk/javascript/pull/3762) in onFocus event handler which prevented fieldstate info from render on focus. ([#3770](https://github.com/clerk/javascript/pull/3770)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Handle call to `hasTags` on undefined `state` ([#3738](https://github.com/clerk/javascript/pull/3738)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fixes issue where an invalid password field was immediately being refocused after submission causing the validation to run and show the success state. ([#3762](https://github.com/clerk/javascript/pull/3762)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Pass resource directly to machine over getSnapshot to avoid empty context ([#3738](https://github.com/clerk/javascript/pull/3738)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fix issue where password field validation was incorrectly showing successful field state due to input being refocused on invalid form submission ([#3778](https://github.com/clerk/javascript/pull/3778)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Update XState from 5.13.x to 5.15.x ([#3738](https://github.com/clerk/javascript/pull/3738)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update types to account for null second factors ([#3780](https://github.com/clerk/javascript/pull/3780)) by [@dstaley](https://github.com/dstaley)
+
+- Add support for `transform` prop on `SignIn.SafeIdentifier` and determine identifier based on strategy ([#3749](https://github.com/clerk/javascript/pull/3749)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`b2788f67b`](https://github.com/clerk/javascript/commit/b2788f67b75cce17af1a2f91a984bb826a5a42e1), [`86c75e50c`](https://github.com/clerk/javascript/commit/86c75e50cba9c4efb480672f1b8c6a6fff4ef477)]:
+  - @clerk/types@4.9.0
+
+## 0.10.4
+
+### Patch Changes
+
+- Fix issue where default field values were being set and clearing field errors. ([#3736](https://github.com/clerk/javascript/pull/3736)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Fix issue where resendable UI in the email_link verification step was not updating on click.
+
+## 0.10.3
+
+### Patch Changes
+
+- Ensure updated provided values to controlled inputs are sent to the machine by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Fix isWeb3Strategy check to account for prefix and suffix by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7)]:
+  - @clerk/types@4.8.0
+
+## 0.10.2
+
+### Patch Changes
+
+- Prefill populated fields when navigating back to the start step from the verify step ([#3685](https://github.com/clerk/javascript/pull/3685)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.10.1
 
 ## 0.10.0

@@ -306,6 +306,10 @@ export const csCZ: LocalizationResource = {
       title: 'Zkontrolujte svůj email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Vraťte se do původního okna pro pokračování.',
         title: 'Tento ověřovací odkaz vypršel',
@@ -420,6 +424,10 @@ export const csCZ: LocalizationResource = {
       title: 'Ověřte svůj email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Použijte ověřovací odkaz poslaný na vaši emailovou adresu',
       formTitle: 'Ověřovací odkaz',
       loading: {
@@ -452,6 +460,7 @@ export const csCZ: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -716,6 +725,7 @@ export const csCZ: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizovat nyní',
         destructiveActionTitle: 'Odstranit',
         primaryButton: 'Připojit účet',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Připojené účty',

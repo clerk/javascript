@@ -1,3 +1,7 @@
+import { webcrypto } from 'node:crypto';
+
+import { TextDecoder, TextEncoder } from 'util';
+
 const navigatorMock = {};
 
 Object.defineProperty(navigatorMock, 'userAgent', {
@@ -32,3 +36,10 @@ Object.defineProperty(global.window, 'navigator', {
   value: navigatorMock,
   writable: true,
 });
+
+// polyfill TextDecoder, TextEncoder for jsdom >= 16
+Object.assign(global, { TextDecoder, TextEncoder });
+
+// polyfill using webcrypto.subtle to fix issue with missing crypto.subtle
+// @ts-ignore
+globalThis.crypto.subtle = webcrypto.subtle;

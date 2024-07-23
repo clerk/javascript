@@ -307,7 +307,7 @@ export default function Page() {
     await u.page.waitForAppUrl('/');
 
     // Make sure that the session cookie is deleted
-    const sessionCookieList = (await u.page.context().cookies()).filter(cookie => cookie.name === '__session');
+    const sessionCookieList = (await u.page.context().cookies()).filter(cookie => cookie.name.startsWith('__session'));
 
     expect(sessionCookieList.length).toBe(0);
   });

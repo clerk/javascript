@@ -28,6 +28,10 @@ export type FormMachineEvents =
       optional: string[];
       required: string[];
     }
+  | {
+      type: 'PREFILL_DEFAULT_VALUES';
+      defaultValues: FormDefaultValues;
+    }
   | { type: 'UNMARK_AS_PROGRESSIVE' }
   | {
       type: 'FIELD.UPDATE';
@@ -230,6 +234,13 @@ export const FormMachine = setup({
         optional: undefined,
         progressive: false,
         required: undefined,
+      }),
+    },
+    PREFILL_DEFAULT_VALUES: {
+      actions: assign(({ event }) => {
+        return {
+          defaultValues: event.defaultValues,
+        };
       }),
     },
   },

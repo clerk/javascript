@@ -51,17 +51,18 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
             gap={3}
           >
             <Col gap={2}>
-              {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
-                <ArrowBlockButton
-                  textLocalizationKey={getButtonLabel(factor)}
-                  elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                  textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
-                  arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
-                  key={i}
-                  isDisabled={card.isLoading}
-                  onClick={() => onFactorSelected(factor)}
-                />
-              ))}
+              {supportedSecondFactors &&
+                supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
+                  <ArrowBlockButton
+                    textLocalizationKey={getButtonLabel(factor)}
+                    elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                    textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                    arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
+                    key={i}
+                    isDisabled={card.isLoading}
+                    onClick={() => onFactorSelected(factor)}
+                  />
+                ))}
             </Col>
             <Card.Action elementId='alternativeMethods'>
               {onBackLinkClick && (

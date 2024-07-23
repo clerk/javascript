@@ -13,6 +13,7 @@ import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
@@ -20,6 +21,8 @@ import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link-button';
 import { Seperator } from '~/primitives/seperator';
+
+import { SignUpIdentifier } from './indentifiers';
 
 export function SignUpComponent() {
   return (
@@ -32,6 +35,7 @@ export function SignUpComponent() {
 function SignUpComponentLoaded() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
+  const { isDevelopmentOrStaging, userSettings } = useEnvironment();
   const locationBasedCountryIso = (clerk as any)?.__internal_country;
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
@@ -40,10 +44,11 @@ function SignUpComponentLoaded() {
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
-  const { applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
+  const { applicationName, branded, homeUrl, logoImageUrl } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
+  const isDev = isDevelopmentOrStaging();
 
   return (
     <Common.Loading>
@@ -115,12 +120,14 @@ function SignUpComponentLoaded() {
                             hintText={t('formFieldHintText__optional')}
                             required={phoneNumberRequired}
                             disabled={isGlobalLoading}
+                            initPhoneWithCode={clerk.client.signUp.phoneNumber || ''}
                             locationBasedCountryIso={locationBasedCountryIso}
                           />
                         ) : null}
 
                         {passwordEnabled && passwordRequired ? (
                           <PasswordField
+                            validatePassword
                             label={t('formFieldLabel__password')}
                             required={passwordRequired}
                             disabled={isGlobalLoading}
@@ -128,6 +135,8 @@ function SignUpComponentLoaded() {
                         ) : null}
                       </div>
                     ) : null}
+
+                    {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
 
                     {hasConnection || hasIdentifier ? (
                       <Common.Loading scope='step:start'>
@@ -150,8 +159,9 @@ function SignUpComponentLoaded() {
                       </Common.Loading>
                     ) : null}
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer>
+                <Card.Footer branded={branded}>
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signUp.start.actionText')}{' '}
@@ -171,11 +181,7 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: elements work
-                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
-                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
-                          */}
-                          +1 (424) 424-4242{' '}
+                          <SignUpIdentifier phoneNumber />
                           <SignUp.Action
                             navigate='start'
                             asChild
@@ -183,7 +189,7 @@ function SignUpComponentLoaded() {
                             <button
                               type='button'
                               className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
-                              aria-label='Edit phone number'
+                              aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
                             </button>
@@ -244,11 +250,7 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: elements work
-                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
-                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
-                          */}
-                          alex.carpenter@clerk.dev{' '}
+                          <SignUpIdentifier emailAddress />
                           <SignUp.Action
                             navigate='start'
                             asChild
@@ -256,7 +258,7 @@ function SignUpComponentLoaded() {
                             <button
                               type='button'
                               className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
-                              aria-label='Edit email address'
+                              aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
                             </button>
@@ -317,6 +319,23 @@ function SignUpComponentLoaded() {
                           applicationName,
                         })}
                       </Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignUpIdentifier emailAddress />
+                          <SignUp.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              aria-label='Start again'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignUp.Action>
+                        </span>
+                      </Card.Description>
                     </Card.Header>
                     <Card.Body>
                       <Common.GlobalError>
@@ -341,8 +360,9 @@ function SignUpComponentLoaded() {
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer />
+                <Card.Footer branded={branded} />
               </Card.Root>
             </SignUp.Step>
 
@@ -400,6 +420,7 @@ function SignUpComponentLoaded() {
 
                       {passwordEnabled && passwordRequired ? (
                         <PasswordField
+                          validatePassword
                           label={t('formFieldLabel__password')}
                           required={passwordRequired}
                           disabled={isGlobalLoading}
@@ -426,8 +447,9 @@ function SignUpComponentLoaded() {
                       }}
                     </Common.Loading>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer>
+                <Card.Footer branded={branded}>
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signUp.continue.actionText')}{' '}

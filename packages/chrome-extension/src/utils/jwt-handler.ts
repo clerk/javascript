@@ -11,7 +11,7 @@ type JWTHandlerParams = GetClientCookieParams & {
 };
 
 export function JWTHandler(store: StorageCache, { frontendApi, ...cookieParams }: JWTHandlerParams) {
-  const CACHE_KEY = store.createKey(frontendApi, STORAGE_KEY_CLIENT_JWT);
+  const CACHE_KEY = store.createKey(frontendApi, STORAGE_KEY_CLIENT_JWT, 'v2');
 
   /**
    * Sets the JWT value to the active
@@ -26,23 +26,17 @@ export function JWTHandler(store: StorageCache, { frontendApi, ...cookieParams }
    * If not set, attempt to get it from the synced session and save for later use.
    */
   const get = async () => {
-    // Get current JWT from StorageCache
-    const currentJWT = await store.get<string>(CACHE_KEY);
-
-    if (currentJWT) {
-      // Return current JWT, if it exists
-      return currentJWT;
-    }
-
     // Get client cookie from browser
     const syncedJWT = await getClientCookie(cookieParams).catch(errorLogger);
 
     if (syncedJWT) {
       // Set client cookie in StorageCache
       await set(syncedJWT.value);
+      return syncedJWT.value;
     }
 
-    return syncedJWT?.value;
+    // Get current JWT from StorageCache
+    return await store.get<string>(CACHE_KEY);
   };
 
   /**

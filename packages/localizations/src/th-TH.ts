@@ -305,6 +305,10 @@ export const thTH: LocalizationResource = {
       title: 'ตรวจสอบอีเมลของคุณ',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'กลับไปที่แท็บเดิมเพื่อดำเนินการต่อ',
         title: 'ลิงก์การตรวจสอบนี้หมดอายุ',
@@ -419,6 +423,10 @@ export const thTH: LocalizationResource = {
       title: 'ยืนยันอีเมลของคุณ',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'ใช้ลิงค์ยืนยันที่ส่งไปยังที่อยู่อีเมลของคุณ',
       formTitle: 'ลิงค์ยืนยัน',
       loading: {
@@ -451,6 +459,7 @@ export const thTH: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบความปลอดภัยไม่ผ่าน กรุณารีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
@@ -713,6 +722,7 @@ export const thTH: LocalizationResource = {
         actionLabel__reauthorize: 'อนุญาตตอนนี้',
         destructiveActionTitle: 'ลบ',
         primaryButton: 'เชื่อมต่อบัญชี',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'ขอบเขตที่ต้องการได้รับการอัปเดตและคุณอาจประสบปัญหาการใช้งานจำกัด กรุณาอนุญาตแอปพลิเคชันนี้อีกครั้งเพื่อหลีกเลี่ยงปัญหา',
         title: 'บัญชีที่เชื่อมต่อ',

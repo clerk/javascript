@@ -1,5 +1,6 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+import { getSuffixedCookieName } from '@clerk/shared/keys';
 import type { ClientResource } from '@clerk/types';
 
 import { inCrossOriginIframe } from '../../../utils';
@@ -19,11 +20,13 @@ export type ClientUatCookieHandler = {
  * The cookie is used as hint from the Clerk Backend packages to identify
  * if the user is authenticated or not.
  */
-export const createClientUatCookie = (): ClientUatCookieHandler => {
+export const createClientUatCookie = (cookieSuffix: string): ClientUatCookieHandler => {
   const clientUatCookie = createCookieHandler(CLIENT_UAT_COOKIE_NAME);
+  const suffixedClientUatCookie = createCookieHandler(getSuffixedCookieName(CLIENT_UAT_COOKIE_NAME, cookieSuffix));
 
   const get = (): number => {
-    return parseInt(clientUatCookie.get() || '0', 10);
+    const value = suffixedClientUatCookie.get() || clientUatCookie.get();
+    return parseInt(value || '0', 10);
   };
 
   const set = (client: ClientResource | undefined) => {
@@ -41,14 +44,11 @@ export const createClientUatCookie = (): ClientUatCookieHandler => {
     }
 
     // Removes any existing cookies without a domain specified to ensure the change doesn't break existing sessions.
+    suffixedClientUatCookie.remove();
     clientUatCookie.remove();
 
-    return clientUatCookie.set(val, {
-      expires,
-      sameSite,
-      domain,
-      secure,
-    });
+    suffixedClientUatCookie.set(val, { expires, sameSite, domain, secure });
+    clientUatCookie.set(val, { expires, sameSite, domain, secure });
   };
 
   return {

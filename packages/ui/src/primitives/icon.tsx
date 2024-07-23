@@ -506,6 +506,48 @@ export const CheckmarkCircleSm = createIcon({
   ),
 });
 
+export const Checkmark = createIcon({
+  displayName: 'IconCheckmark',
+  viewBox: '0 0 10 10',
+  path: (
+    <path
+      d='m1 6 3 3 5-8'
+      stroke='currentColor'
+      strokeWidth='1.25'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  ),
+});
+
+export const ChevronUpDown = createIcon({
+  displayName: 'IconChevronUpDown',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      fill='currentColor'
+      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
+    />
+  ),
+});
+
+export const Envelope = createIcon({
+  displayName: 'IconEnvelope',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        fill='currentColor'
+        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
+      />
+      <path
+        fill='currentColor'
+        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
+      />
+    </>
+  ),
+});
+
 export const ExclamationOctagonSm = createIcon({
   displayName: 'IconExclamationOctagonSm',
   viewBox: '0 0 16 16',
@@ -621,6 +663,20 @@ export const EyeSlashSm = createIcon({
   ),
 });
 
+export const FingerprintSm = createIcon({
+  displayName: 'FingerprintSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M4.58626 12.2271C4.70362 11.9655 4.81109 11.6999 4.90929 11.4292M9.67045 13.25C9.86213 12.749 9.98778 12.1841 10.1278 11.669M5.92223 3.22618C6.69944 2.87571 7.56005 2.71414 8.42317 2.75666C9.28629 2.79919 10.1236 3.04441 10.8563 3.46927C11.589 3.89414 12.1931 4.48469 12.6119 5.18543C13.0306 5.88617 13.2502 6.67407 13.25 7.47508C13.25 8.51981 13.1611 9.54529 12.9902 10.5455L12.4545 13.25M2.75 9.85168C2.9495 9.08924 3.05512 8.29361 3.05512 7.47508C3.05512 6.44763 3.40903 5.49631 4.01062 4.72128M8.15256 7.47451C8.15449 9.45894 7.723 11.4233 6.88636 13.25M5.54575 8.63636C5.58396 8.25402 5.60353 7.86676 5.60353 7.47508C5.60353 6.84864 5.87205 6.24786 6.35003 5.8049C6.82801 5.36194 7.47629 5.11309 8.15225 5.11309C8.82821 5.11309 9.47649 5.36194 9.95447 5.8049C10.4324 6.24786 10.701 6.84864 10.701 7.47508C10.701 7.76243 10.6936 8.04805 10.6781 8.33196L10.4957 9.44176'
+      stroke='currentColor'
+      strokeWidth={1.5}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  ),
+});
+
 export const InformationLegacy = createIcon({
   displayName: 'IconInformationLegacy',
   viewBox: '0 0 20 20',
@@ -651,42 +707,28 @@ export const InformationLegacy = createIcon({
   ),
 });
 
-export const Envelope = createIcon({
-  displayName: 'IconEnvelope',
-  viewBox: '0 0 16 16',
-  path: (
-    <>
-      <path
-        fill='currentColor'
-        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
-      />
-      <path
-        fill='currentColor'
-        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
-      />
-    </>
-  ),
-});
-
-export const ChevronUpDown = createIcon({
-  displayName: 'IconChevronUpDown',
+export const LockSm = createIcon({
+  displayName: 'IconLockSm',
   viewBox: '0 0 16 16',
   path: (
     <path
-      fill='currentColor'
-      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
+      d='M5.25 7.75H3.75V11.25C3.75 12.3546 4.64543 13.25 5.75 13.25H10.25C11.3546 13.25 12.25 12.3546 12.25 11.25V7.75H10.75M5.25 7.75V5.5C5.25 3.98122 6.48122 2.75 8 2.75V2.75C9.51878 2.75 10.75 3.98122 10.75 5.5V7.75M5.25 7.75H10.75'
+      stroke='currentColor'
+      strokeWidth={1.5}
+      strokeLinecap='round'
+      strokeLinejoin='round'
     />
   ),
 });
 
-export const Checkmark = createIcon({
-  displayName: 'IconCheckmark',
-  viewBox: '0 0 10 10',
+export const LinkSm = createIcon({
+  displayName: 'IconLinkSm',
+  viewBox: '0 0 16 16',
   path: (
     <path
-      d='m1 6 3 3 5-8'
+      d='M7.75 3.7891L7.86522 3.67388C9.09706 2.44204 11.0943 2.44204 12.3261 3.67388C13.558 4.90572 13.558 6.90294 12.3261 8.13478L12.2109 8.25M6.75 9.25L9.25 6.75M8.25 12.2109L8.13478 12.3261C6.90294 13.558 4.90572 13.558 3.67388 12.3261C2.44204 11.0943 2.44204 9.09706 3.67388 7.86522L3.78911 7.75'
       stroke='currentColor'
-      strokeWidth='1.25'
+      strokeWidth={1.5}
       strokeLinecap='round'
       strokeLinejoin='round'
     />
@@ -700,6 +742,21 @@ export const PencilUnderlined = createIcon({
     <path
       fill='currentColor'
       d='M13.098 5.108c-.418.419-.628.628-.847.669-.22.04-.364-.104-.652-.392l-.984-.984c-.288-.288-.432-.432-.392-.652.04-.22.25-.428.669-.847l.226-.227c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-.227.226ZM4.16 13.688l-1.206.223c-.5.092-.75.138-.876.011-.127-.126-.08-.376.011-.876l.223-1.206c.04-.217.06-.325.118-.43.058-.105.15-.196.33-.377l5.554-5.554c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-5.554 5.553c-.181.182-.272.273-.377.331-.105.058-.213.078-.43.118ZM8.75 12.5a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z'
+    />
+  ),
+});
+
+// Note: this will be replaced
+// https://linear.app/clerk/issue/DES-1140
+export const SMSSm = createIcon({
+  displayName: 'IconSMSSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      fill='currentColor'
+      fillRule='evenodd'
+      d='M14.4 4v6.4a1.6 1.6 0 0 1-1.6 1.6h-4l-4 3.2V12H3.2a1.6 1.6 0 0 1-1.6-1.6V4a1.6 1.6 0 0 1 1.6-1.6h9.6A1.6 1.6 0 0 1 14.4 4ZM5.6 6.4H4V8h1.6V6.4Zm1.6 0h1.6V8H7.2V6.4Zm4.8 0h-1.6V8H12V6.4Z'
+      clipRule='evenodd'
     />
   ),
 });
