@@ -37,6 +37,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
+  UserVerificationProps,
   Without,
 } from '@clerk/types';
 
@@ -102,6 +103,7 @@ type IsomorphicLoadedClerk = Without<
   | 'mountSignUp'
   | 'mountSignIn'
   | 'mountUserProfile'
+  | 'mountUserVerification'
   | 'client'
 > & {
   // TODO: Align return type and parms
@@ -145,6 +147,7 @@ type IsomorphicLoadedClerk = Without<
   mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
+  mountUserVerification: (node: HTMLDivElement, props: UserVerificationProps) => void;
   client: ClientResource | undefined;
 };
 
@@ -154,6 +157,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
+  private preopenUserVerification?: null | UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -167,7 +171,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountCreateOrganizationNodes = new Map<HTMLDivElement, CreateOrganizationProps>();
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
+  private premountUserVerificationNodes = new Map<HTMLDivElement, UserVerificationProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
+
   private loadedListeners: Array<() => void> = [];
 
   #loaded = false;
@@ -490,6 +496,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openUserProfile(this.preopenUserProfile);
     }
 
+    if (this.preopenUserVerification !== null) {
+      clerkjs.openUserVerification(this.preopenUserVerification);
+    }
+
     if (this.preopenOneTap !== null) {
       clerkjs.openGoogleOneTap(this.preopenOneTap);
     }
@@ -512,6 +522,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountUserProfileNodes.forEach((props: UserProfileProps, node: HTMLDivElement) => {
       clerkjs.mountUserProfile(node, props);
+    });
+
+    this.premountUserVerificationNodes.forEach((props: UserVerificationProps, node: HTMLDivElement) => {
+      clerkjs.mountUserVerification(node, props);
     });
 
     this.premountUserButtonNodes.forEach((props: UserButtonProps, node: HTMLDivElement) => {
@@ -625,6 +639,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  openUserVerification = (props?: UserVerificationProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.openUserVerification(props);
+    } else {
+      this.preopenUserVerification = props;
+    }
+  };
+
+  closeUserVerification = (): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.closeUserVerification();
+    } else {
+      this.preopenUserVerification = null;
+    }
+  };
+
   openGoogleOneTap = (props?: GoogleOneTapProps): void => {
     if (this.clerkjs && this.#loaded) {
       this.clerkjs.openGoogleOneTap(props);
@@ -718,6 +748,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountSignIn(node);
     } else {
       this.premountSignInNodes.delete(node);
+    }
+  };
+
+  mountUserVerification = (node: HTMLDivElement, props: UserVerificationProps): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.mountUserVerification(node, props);
+    } else {
+      this.premountUserVerificationNodes.set(node, props);
+    }
+  };
+
+  unmountUserVerification = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.#loaded) {
+      this.clerkjs.unmountUserVerification(node);
+    } else {
+      this.premountUserVerificationNodes.delete(node);
     }
   };
 

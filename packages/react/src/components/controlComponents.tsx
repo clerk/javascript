@@ -131,7 +131,6 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
   }
 
   if (restAuthorizedParams.role || restAuthorizedParams.permission || restAuthorizedParams.assurance) {
-    // @ts-expect-error
     if (has(restAuthorizedParams)) {
       return authorized;
     }

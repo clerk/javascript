@@ -53,7 +53,6 @@ export function Protect(props: ProtectProps): React.JSX.Element | null {
   }
 
   if (restAuthorizedParams.role || restAuthorizedParams.permission || restAuthorizedParams.assurance) {
-    // @ts-expect-error
     if (has(restAuthorizedParams)) {
       return authorized;
     }
