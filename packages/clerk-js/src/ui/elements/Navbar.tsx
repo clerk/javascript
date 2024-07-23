@@ -65,7 +65,7 @@ export const NavBar = (props: NavBarProps) => {
         // when the component is opened as a modal
         await navigateToFlowStart();
       } else {
-        await navigate(route?.path);
+        await navigate(route.path);
       }
     }
   };
