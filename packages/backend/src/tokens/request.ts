@@ -90,7 +90,7 @@ export async function authenticateRequest(
 
     const url = new URL(`https://${frontendApiNoProtocol}/v1/client/handshake`);
     url.searchParams.append('redirect_url', redirectUrl?.href || '');
-    url.searchParams.append('suffixed_cookies', authenticateContext.suffixedCookies.toString());
+    url.searchParams.append('suffixed_cookies', 'true');
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
