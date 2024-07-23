@@ -1,9 +1,15 @@
 {
   "name": "@clerk/dev-cli",
-  "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "license": "MIT",
   "type": "module",
+  "author": "Clerk",
+  "homepage": "https://clerk.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/dev-cli"
+  },
   "main": "bin/cli.js",
   "bin": {
     "clerk-dev": "bin/cli.js"
