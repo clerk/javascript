@@ -20,8 +20,23 @@ export const globalErrorsSelector = (state: SnapshotState) => state.context.erro
 /**
  * Selects if a specific field has a value
  */
-export const fieldValueSelector = (name: string | undefined) => (state: SnapshotState) =>
-  name ? state.context.fields.get(name)?.value : '';
+export const fieldValueSelector = (name: string | undefined) => (state: SnapshotState) => {
+  if (!name) {
+    return '';
+  }
+
+  const field = state.context.fields.get(name);
+
+  if (!field) {
+    return '';
+  }
+
+  if ('value' in field) {
+    return field.value ?? '';
+  }
+
+  return '';
+};
 
 /**
  * Selects if a specific field has a value
