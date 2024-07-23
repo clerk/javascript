@@ -3,7 +3,6 @@ import { appConfigs } from '../../presets';
 export const getEnvForMultiAppInstance = (envKey: string) => {
   return appConfigs.envs.base
     .clone()
-    .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
     .setEnvVariable('private', 'CLERK_SECRET_KEY', appConfigs.secrets.instanceKeys.get(envKey).sk)
     .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', appConfigs.secrets.instanceKeys.get(envKey).pk);
 };
