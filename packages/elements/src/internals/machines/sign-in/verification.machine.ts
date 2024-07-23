@@ -18,7 +18,7 @@ import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
 import { RESENDABLE_COUNTDOWN_DEFAULT } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
-import type { FormFields } from '~/internals/machines/form';
+import type { FieldDetailsWithValue, FormFields } from '~/internals/machines/form';
 import type { SignInStrategyName, WithParams } from '~/internals/machines/shared';
 import { sendToLoading } from '~/internals/machines/shared';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
@@ -366,7 +366,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       );
     }),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input as PrepareFirstFactorInput;
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
@@ -429,7 +429,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
           break;
         }
         case 'web3_metamask_signature': {
-          const signature = fields.get('signature')?.value as string | undefined;
+          const signature = (fields.get('signature') as FieldDetailsWithValue)?.value as string | undefined;
           assertIsDefined(signature, 'Web3 Metamask signature');
 
           attemptParams = {
@@ -479,7 +479,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
     attempt: fromPromise(async ({ input }) => {
       const { fields, parent, currentFactor } = input as AttemptSecondFactorInput;
 
-      const code = fields.get('code')?.value as string;
+      const code = (fields.get('code') as FieldDetailsWithValue)?.value as string;
 
       assertIsDefined(currentFactor, 'Current factor');
       assertIsDefined(code, 'Code');
