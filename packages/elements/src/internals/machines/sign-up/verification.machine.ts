@@ -21,6 +21,7 @@ import type { WithParams } from '~/internals/machines/shared';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
+import type { FieldDetailsWithValue } from '../form';
 import type { SignInRouterMachineActorRef } from './router.types';
 import {
   type SignUpVerificationContext,
@@ -442,7 +443,9 @@ export const SignUpVerificationMachine = setup({
               parent: context.parent,
               params: {
                 strategy: 'email_code',
-                code: (context.formRef.getSnapshot().context.fields.get('code')?.value as string) || '',
+                code:
+                  ((context.formRef.getSnapshot().context.fields.get('code') as FieldDetailsWithValue)
+                    ?.value as string) || '',
               },
             }),
             onDone: {
@@ -541,7 +544,9 @@ export const SignUpVerificationMachine = setup({
               parent: context.parent,
               params: {
                 strategy: 'phone_code',
-                code: (context.formRef.getSnapshot().context.fields.get('code')?.value as string) || '',
+                code:
+                  ((context.formRef.getSnapshot().context.fields.get('code') as FieldDetailsWithValue)
+                    ?.value as string) || '',
               },
             }),
             onDone: {

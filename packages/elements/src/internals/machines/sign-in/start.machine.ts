@@ -2,7 +2,7 @@ import type { SignInResource } from '@clerk/types';
 import { fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
-import type { FormFields } from '~/internals/machines/form';
+import type { FieldDetailsWithValue, FormFields } from '~/internals/machines/form';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
@@ -27,8 +27,8 @@ export const SignInStartMachine = setup({
       ({ input: { fields, parent } }) => {
         const clerk = parent.getSnapshot().context.clerk;
 
-        const password = fields.get('password');
-        const identifier = fields.get('identifier');
+        const password = fields.get('password') as FieldDetailsWithValue;
+        const identifier = fields.get('identifier') as FieldDetailsWithValue;
 
         const passwordParams = password?.value
           ? {
