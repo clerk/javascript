@@ -45,7 +45,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     return opts.actionCompleteCallback?.();
   };
 
-  const handleUserProfileActionClicked = (path?: string) => {
+  const handleUserProfileActionClicked = (__experimental_startPath?: string) => {
     if (opts.userProfileMode === 'navigation') {
       return navigate(opts.userProfileUrl || '').finally(() => {
         void (async () => {
@@ -56,7 +56,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     }
     openUserProfile({
       ...opts.userProfileProps,
-      ...(path && { path }),
+      ...(__experimental_startPath && { __experimental_startPath }),
     });
 
     return opts.actionCompleteCallback?.();
