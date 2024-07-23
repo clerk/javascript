@@ -1678,7 +1678,7 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    this.#pageLifecycle?.onPageVisible(() => {
+    this.#pageLifecycle?.onPageFocus(() => {
       if (this.session) {
         void this.#touchLastActiveSession(this.session);
       }
