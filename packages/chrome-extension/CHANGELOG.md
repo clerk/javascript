@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.1.6
+
+### Patch Changes
+
+- Appropriately handle fulfilled, but null, cookie promises ([#3788](https://github.com/clerk/javascript/pull/3788)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies []:
+  - @clerk/clerk-js@5.10.1
+
 ## 1.1.5
 
 ### Patch Changes

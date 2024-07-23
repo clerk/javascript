@@ -1,5 +1,13 @@
 # @clerk/astro
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`045fb93cb`](https://github.com/clerk/javascript/commit/045fb93cbf577ca84e5b95fc6dfaacde67693be2)]:
+  - @clerk/backend@1.4.1
+  - @clerk/clerk-js@5.10.1
+
 ## 1.0.1
 
 ### Patch Changes

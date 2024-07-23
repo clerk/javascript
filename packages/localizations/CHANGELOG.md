@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.5.1
+
+### Patch Changes
+
+- Update german translations for passkeys ([#3695](https://github.com/clerk/javascript/pull/3695)) by [@navid-rji](https://github.com/navid-rji)
+
 ## 2.5.0
 
 ### Minor Changes
