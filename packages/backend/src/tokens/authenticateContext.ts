@@ -213,6 +213,14 @@ class AuthenticateContext {
       }
     }
 
+    // If a suffixed session cookie exists but the corresponding client_uat cookie is missing, fallback to using
+    // unsuffixed cookies.
+    // This handles the scenario where an app has been deployed using an SDK version that supports suffixed
+    // cookies, but FAPI for its Clerk instance has the feature disabled (eg: if we need to temporarily disable the feature).
+    if (!suffixedClientUat && suffixedSession) {
+      return false;
+    }
+
     return true;
   }
 
