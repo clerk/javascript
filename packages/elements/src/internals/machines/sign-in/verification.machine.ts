@@ -388,8 +388,8 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       let attemptParams: AttemptFirstFactorParams;
 
       const strategy = currentFactor.strategy;
-      const code = fields.get('code')?.value as string | undefined;
-      const password = fields.get('password')?.value as string | undefined;
+      const code = (fields.get('code') as FieldDetailsWithValue)?.value as string | undefined;
+      const password = (fields.get('password') as FieldDetailsWithValue)?.value as string | undefined;
 
       switch (strategy) {
         case 'passkey': {
