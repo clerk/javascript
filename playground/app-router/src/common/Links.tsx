@@ -14,6 +14,9 @@ export const Links = () => {
           <Link href={'/balance' as any}>My Balance</Link>
           <Link href={'/balance-mfa' as any}>My Balance MFA</Link>
           <Link href={'/balance-2fa' as any}>My Balance 2FA</Link>
+          <Link href={'/balance-2fa-user-verification' as any}>My Balance 2FA User Verification</Link>
+          <Link href={'/balance-2fa-user-verification-nav' as any}>My Balance 2FA User Verification Nav</Link>
+          <Link href={'/balance-2fa-user-verification-in-modal' as any}>My Balance 2FA User Verification In Modal</Link>
         </div>
       </div>
       <div>

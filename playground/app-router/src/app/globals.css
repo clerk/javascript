@@ -83,8 +83,8 @@ a {
   border: none;
   padding: 1.5rem;
   border-radius: 1rem;
-  max-width: 250px;
-  left:50%;
+  /* max-width: 250px; */
+  /* left:50%; */
 }
 
 button.icon {

@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { Protect } from '@clerk/nextjs';
+import { Protect, UserVerification } from '@clerk/nextjs';
 import React from 'react';
 import { StepUp } from '../StepUp';
 import { ClientButton } from './button';
@@ -34,7 +34,7 @@ export default function Page() {
               >
                 ❌
               </button>
-              <StepUp level='L2.secondFactor' />
+              <UserVerification />
             </dialog>
           </>
         }
