@@ -19,7 +19,7 @@ export interface FormMachineContext extends MachineContext {
 }
 
 export type FormMachineEvents =
-  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'value'> }
+  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'type' | 'value' | 'checked'> }
   | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'name'> }
   | {
       type: 'MARK_AS_PROGRESSIVE';
@@ -35,7 +35,7 @@ export type FormMachineEvents =
   | { type: 'UNMARK_AS_PROGRESSIVE' }
   | {
       type: 'FIELD.UPDATE';
-      field: Pick<FieldDetails, 'name' | 'value'>;
+      field: Pick<FieldDetails, 'name' | 'value' | 'checked'>;
     }
   | { type: 'ERRORS.SET'; error: any }
   | { type: 'ERRORS.CLEAR' }
@@ -160,6 +160,8 @@ export const FormMachine = setup({
           if (context.fields.has(event.field.name)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             context.fields.get(event.field.name)!.value = event.field.value;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            context.fields.get(event.field.name)!.checked = event.field.checked;
           }
 
           return context.fields;

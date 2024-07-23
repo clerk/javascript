@@ -20,7 +20,9 @@ export interface FeedbackOtherType extends FeedbackBase {
 
 export type FieldDetails = {
   name?: string;
+  type: React.HTMLInputTypeAttribute;
   value?: string | readonly string[] | number;
+  checked?: boolean;
   feedback?: FeedbackErrorType | FeedbackOtherType;
 };
 

@@ -3,9 +3,9 @@ import { fieldsToSignUpParams } from '../fields-to-params';
 describe('fieldsToSignUpParams', () => {
   it('converts form fields to sign up params', () => {
     const fields = new Map([
-      ['firstName', { value: 'John' }],
-      ['emailAddress', { value: 'john@example.com' }],
-      ['password', { value: 'password123' }],
+      ['firstName', { type: 'text', value: 'John' }],
+      ['emailAddress', { type: 'text', value: 'john@example.com' }],
+      ['password', { type: 'text', value: 'password123' }],
     ]);
 
     const params = fieldsToSignUpParams(fields);
@@ -19,9 +19,9 @@ describe('fieldsToSignUpParams', () => {
 
   it('ignores undefined values', () => {
     const fields = new Map([
-      ['firstName', { value: 'John' }],
-      ['emailAddress', { value: undefined }],
-      ['password', { value: 'password123' }],
+      ['firstName', { type: 'text', value: 'John' }],
+      ['emailAddress', { type: 'text', value: undefined }],
+      ['password', { type: 'text', value: 'password123' }],
     ]);
 
     const params = fieldsToSignUpParams(fields);
@@ -34,9 +34,9 @@ describe('fieldsToSignUpParams', () => {
 
   it('ignores non-sign-up keys', () => {
     const fields = new Map([
-      ['firstName', { value: 'John' }],
-      ['foo', { value: 'bar' }],
-      ['bar', { value: 'foo' }],
+      ['firstName', { type: 'text', value: 'John' }],
+      ['foo', { type: 'text', value: 'bar' }],
+      ['bar', { type: 'text', value: 'foo' }],
     ]);
 
     const params = fieldsToSignUpParams(fields);

@@ -204,6 +204,7 @@ const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 const useInput = ({
   name: inputName,
   value: providedValue,
+  checked: providedChecked,
   type: inputType,
   onChange: onChangeProp,
   onBlur: onBlurProp,
@@ -264,10 +265,15 @@ const useInput = ({
   const prevValue = usePrevious(value);
   const hasValue = Boolean(value);
   const type = inputType ?? determineInputTypeFromName(rawName);
+  let nativeFieldType = type;
   let shouldValidatePassword = false;
 
   if (type === 'password' || type === 'text') {
     shouldValidatePassword = Boolean((passthroughProps as PasswordInputProps).validatePassword);
+  }
+
+  if (nativeFieldType === 'otp' || nativeFieldType === 'backup_code') {
+    nativeFieldType = 'text';
   }
 
   // Register the field in the machine context
@@ -276,7 +282,10 @@ const useInput = ({
       return;
     }
 
-    ref.send({ type: 'FIELD.ADD', field: { name, value: providedValue } });
+    ref.send({
+      type: 'FIELD.ADD',
+      field: { name, type: nativeFieldType, value: providedValue, checked: providedChecked },
+    });
 
     return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -288,7 +297,7 @@ const useInput = ({
       if (!name) {
         return;
       }
-      ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value } });
+      ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value, checked: event.target.checked } });
       if (shouldValidatePassword) {
         validatePassword(event.target.value);
       }
@@ -321,10 +330,13 @@ const useInput = ({
       return;
     }
 
-    if (providedValue !== undefined) {
-      ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue } });
+    if (
+      (type === 'checkbox' && providedChecked !== undefined) ||
+      (type !== 'checkbox' && providedValue !== undefined)
+    ) {
+      ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue, checked: providedChecked } });
     }
-  }, [name, ref, providedValue]);
+  }, [name, type, ref, providedValue, providedChecked]);
 
   // TODO: Implement clerk-js utils
   const shouldBeHidden = false;
