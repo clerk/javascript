@@ -225,33 +225,18 @@ export function SignInComponentLoaded() {
                     <Common.Loading>
                       {isSubmitting => {
                         return (
-                          <>
-                            <SignIn.Action
-                              submit
-                              asChild
+                          <SignIn.Action
+                            submit
+                            asChild
+                          >
+                            <Button
+                              icon={<Icon.CaretRight />}
+                              busy={isSubmitting}
+                              disabled={isGlobalLoading || isSubmitting}
                             >
-                              <Button
-                                icon={<Icon.CaretRight />}
-                                busy={isSubmitting}
-                                disabled={isGlobalLoading || isSubmitting}
-                              >
-                                ContinueContinueContinueContinueContinue
-                              </Button>
-                            </SignIn.Action>
-                            <SignIn.Action
-                              submit
-                              asChild
-                            >
-                              <Button
-                                busy={isSubmitting}
-                                disabled={isGlobalLoading || isSubmitting}
-                                icon={<Icon.CaretRight />}
-                                intent='secondary'
-                              >
-                                ContinueContinueContinueContinueContinue
-                              </Button>
-                            </SignIn.Action>
-                          </>
+                              {t('formButtonPrimary')}
+                            </Button>
+                          </SignIn.Action>
                         );
                       }}
                     </Common.Loading>
@@ -317,7 +302,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -404,7 +389,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -538,7 +523,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -625,7 +610,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -709,7 +694,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />

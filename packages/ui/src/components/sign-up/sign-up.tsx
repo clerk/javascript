@@ -189,7 +189,7 @@ function SignUpComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -258,7 +258,7 @@ function SignUpComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -329,7 +329,7 @@ function SignUpComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />

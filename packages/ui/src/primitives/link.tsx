@@ -15,8 +15,8 @@ export const link = cva({
     // Override native behaviour for third-party packages
     // e.g. react-aria-components
     focusVisible: {
-      native: 'focus-visible:ring-default',
-      'data-attribute': 'data-[focus-visible]:ring-default',
+      native: 'focus-visible:ring',
+      'data-attribute': 'data-[focus-visible]:ring',
     },
     size: {
       sm: 'text-sm',

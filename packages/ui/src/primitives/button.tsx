@@ -11,7 +11,7 @@ const button = cva({
     'px-3 py-1.5',
     'inline-flex w-full items-center justify-center gap-2',
     'border rounded-md',
-    'outline-none focus-visible:ring-default',
+    'outline-none focus-visible:ring',
     '*:min-w-0',
   ],
   variants: {
@@ -20,17 +20,13 @@ const button = cva({
         'text-accent-contrast bg-accent-9 border-accent-9 shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
         'before:absolute before:inset-0 before:rounded-[calc(theme(borderRadius.md)-1px)] before:shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
         'after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:rounded-[calc(theme(borderRadius.md)-1px)] after:bg-gradient-to-b after:from-white/10 after:to-transparent',
-        // ! TODO
-        // could clash, explore
-        'focus-visible:ring-gray-a9',
+        'focus-visible:ring-accent-a7',
       ],
       secondary: [
         'bg-clip-padding',
         'text-gray-12 border-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
-        'focus-visible:border-gray-a8 focus-visible:ring-gray-a3',
+        'focus-visible:border-gray-a8 focus-visible:ring-accent-a3',
       ],
-      // ! TODO
-      ghost: [],
     },
     busy: {
       false: null,

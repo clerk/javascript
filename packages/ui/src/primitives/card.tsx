@@ -78,7 +78,7 @@ export const Logo = React.forwardRef(function Logo(
       {href ? (
         <a
           href={href}
-          className='focus-visible:ring-default outline-none'
+          className='outline-none focus-visible:ring'
         >
           {img}
         </a>
