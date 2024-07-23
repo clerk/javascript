@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -89,7 +89,7 @@
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@clerk/types": "4.8.0",
+    "@clerk/types": "4.9.0",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
     "std-env": "^3.7.0",
