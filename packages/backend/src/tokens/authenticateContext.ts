@@ -213,10 +213,10 @@ class AuthenticateContext {
       }
     }
 
-    // In case of incorrectly setup suffixed cookies (session exists but client_uat missing)
-    // let's use the un-suffixed cookies to keep the existing behavior.
-    // This case can be reproduced for production instances when new ClerkJS and backend SDK
-    // are used but the FF in FAPI is disabled
+    // If a suffixed session cookie exists but the corresponding client_uat cookie is missing, fallback to using
+    // unsuffixed cookies.
+    // This handle the scenario where an app has been deployed using an SDK version that supports suffixed
+    // cookies, but FAPI for its Clerk instance has the feature disabled (eg: if we need to temporarily disable the feature).
     if (!suffixedClientUat && suffixedSession) {
       return false;
     }
