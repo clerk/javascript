@@ -216,6 +216,9 @@ export interface Clerk {
    */
   unmountSignIn: (targetNode: HTMLDivElement) => void;
 
+  mountUserVerification: (targetNode: HTMLDivElement, props?: UserVerificationProps) => void;
+  unmountUserVerification: (targetNode: HTMLDivElement) => void;
+
   /**
    * Mounts a sign up flow component at the target element.
    *

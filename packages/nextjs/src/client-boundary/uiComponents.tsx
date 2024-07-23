@@ -26,6 +26,7 @@ export {
   SignOutButton,
   SignUpButton,
   UserButton,
+  UserVerification,
   GoogleOneTap,
 } from '@clerk/clerk-react';
 

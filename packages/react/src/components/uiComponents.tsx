@@ -10,6 +10,7 @@ import type {
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
+  UserVerificationProps,
   Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
@@ -258,6 +259,20 @@ export const UserButton: UserButtonExportType = Object.assign(_UserButton, {
   Action: MenuAction,
   Link: MenuLink,
 });
+
+export const UserVerification = withClerk(
+  ({ clerk, ...props }: WithClerkProp<PropsWithChildren<UserVerificationProps>>) => {
+    return (
+      <Portal
+        mount={clerk.mountUserVerification}
+        unmount={clerk.unmountUserVerification}
+        updateProps={(clerk as any).__unstable__updateProps}
+        props={props}
+      />
+    );
+  },
+  'UserVerification',
+);
 
 export function OrganizationProfilePage({ children }: PropsWithChildren<OrganizationProfilePageProps>) {
   logErrorInDevMode(organizationProfilePageRenderedError);
