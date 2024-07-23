@@ -12,6 +12,12 @@ export default (QUnit: QUnit) => {
       assert.strictEqual(authObject.headers.get('x-clerk-auth-reason'), null);
       assert.strictEqual(authObject.headers.get('x-clerk-auth-message'), null);
     });
+
+    test('authObject returned by toAuth() returns the token passed', async assert => {
+      const signedInAuthObject = signedIn({} as any, { sid: 'sid' } as any, undefined, 'token').toAuth();
+      const token = await signedInAuthObject.getToken();
+      assert.strictEqual(token, 'token');
+    });
   });
 
   module('signed-out', () => {

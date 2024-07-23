@@ -81,7 +81,7 @@ export function signedIn(
   headers: Headers = new Headers(),
   token: string,
 ): SignedInState {
-  const authObject = signedInAuthObject(authenticateContext, sessionClaims);
+  const authObject = signedInAuthObject(authenticateContext, token, sessionClaims);
   return {
     status: AuthStatus.SignedIn,
     reason: null,
