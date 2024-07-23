@@ -2,7 +2,7 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
-import { linkButton } from '~/primitives/link-button';
+import { link } from '~/primitives/link';
 
 import { EmailField } from './email-field';
 import { PhoneNumberField } from './phone-number-field';
@@ -29,7 +29,7 @@ export function EmailOrPhoneNumberField({
     <ToggleButton
       isSelected={showPhoneNumberField}
       onChange={setShowPhoneNumberField}
-      className={linkButton({ size: 'sm', disabled: props.disabled })}
+      className={link({ size: 'sm', disabled: props.disabled })}
     >
       {showPhoneNumberField ? toggleLabelEmail : toggleLabelPhoneNumber}
     </ToggleButton>

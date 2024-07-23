@@ -2,7 +2,7 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
-import { linkButton } from '~/primitives/link-button';
+import { link } from '~/primitives/link';
 
 import { EmailOrUsernameField } from './email-or-username-field';
 import { PhoneNumberField } from './phone-number-field';
@@ -27,7 +27,7 @@ export function EmailOrUsernameOrPhoneNumberField({
     <ToggleButton
       isSelected={showPhoneNumberField}
       onChange={setShowPhoneNumberField}
-      className={linkButton({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
+      className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
       <span className='sr-only'>{toggleDescription}</span>
       {showPhoneNumberField ? 'Use email or username' : 'Use phone'}
