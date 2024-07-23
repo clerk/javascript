@@ -3,12 +3,14 @@ import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import { useUserVerification } from '../../contexts';
 import { Flow } from '../../customizables';
 import { VerificationCodeCard, type VerificationCodeCardProps } from '../../elements';
+import { useRouter } from '../../router';
 
 export function UserVerificationFactorTwoTOTP(): JSX.Element {
-  const { afterVerification, routing } = useUserVerification();
+  const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
   const { user } = useUser();
   const { setActive, closeUserVerification } = useClerk();
   const { session } = useSession();
+  const { navigate } = useRouter();
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     user
@@ -19,7 +21,6 @@ export function UserVerificationFactorTwoTOTP(): JSX.Element {
         await resolve();
         await session?.getToken({ skipCache: true });
         await setActive({ session: session?.id });
-        console.log('www', afterVerification);
 
         if (routing === 'virtual') {
           /**
@@ -29,6 +30,10 @@ export function UserVerificationFactorTwoTOTP(): JSX.Element {
            */
           afterVerification?.();
           closeUserVerification();
+        } else {
+          if (afterVerificationUrl) {
+            await navigate(afterVerificationUrl);
+          }
         }
       })
       .catch(err => reject(err));

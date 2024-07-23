@@ -8,11 +8,12 @@ export function _UserVerificationFactorTwo(): JSX.Element {
   const { user } = useUser();
   // const card = useCardState();
 
-  const { isLoading } = useFetch(user?.verifySession, undefined, {
+  const { isLoading, data } = useFetch(user?.verifySession, undefined, {
+    throttleTime: 300,
     staleTime: 2000,
   });
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return <LoadingCard />;
   }
 
