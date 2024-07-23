@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.9.0
+
+### Minor Changes
+
+- - Introduced `subtitle__disconnected` under `userProfile.start.connectedAccountsSection` ([#3723](https://github.com/clerk/javascript/pull/3723)) by [@panteliselef](https://github.com/panteliselef)
+
+  - Deprecated `userProfile.start.connectedAccountsSection.actionLabel__reauthorize` and `userProfile.start.connectedAccountsSection.subtitle__reauthorize`
+
+### Patch Changes
+
+- Update types to account for null second factors ([#3780](https://github.com/clerk/javascript/pull/3780)) by [@dstaley](https://github.com/dstaley)
+
 ## 4.8.0
 
 ### Minor Changes

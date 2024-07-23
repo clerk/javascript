@@ -1,5 +1,21 @@
 # Change Log
 
+## 5.2.5
+
+### Patch Changes
+
+- Fixes regression on `@clerk/nextjs/server` (introduced on https://github.com/clerk/javascript/pull/3758) where `server-only` module was being resolved in runtimes without `react-server` available, such as `getAuth` on `getServerSideProps`. ([#3761](https://github.com/clerk/javascript/pull/3761)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Return build-time error if `auth` and `currentUser` server-side helpers are imported into Client Components. ([#3758](https://github.com/clerk/javascript/pull/3758)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Stop throwing "Error: Clerk: auth() was called but Clerk can't detect usage of authMiddleware()." errors when no user action is needed by removing sourcemaps for all Clerk-bundled server actions. ([#3773](https://github.com/clerk/javascript/pull/3773)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`b87f7b9e1`](https://github.com/clerk/javascript/commit/b87f7b9e163756fd43789bc7b7344d2eb24015ec), [`b2788f67b`](https://github.com/clerk/javascript/commit/b2788f67b75cce17af1a2f91a984bb826a5a42e1), [`86c75e50c`](https://github.com/clerk/javascript/commit/86c75e50cba9c4efb480672f1b8c6a6fff4ef477)]:
+  - @clerk/backend@1.4.0
+  - @clerk/shared@2.4.0
+  - @clerk/types@4.9.0
+  - @clerk/clerk-react@5.2.9
+
 ## 5.2.4
 
 ### Patch Changes
