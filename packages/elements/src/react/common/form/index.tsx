@@ -27,7 +27,7 @@ import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
 import { ClerkElementsFieldError, ClerkElementsRuntimeError } from '~/internals/errors';
-import type { FieldDetails } from '~/internals/machines/form';
+import type { FieldDetails, FieldDetailsWithValue } from '~/internals/machines/form';
 import {
   fieldFeedbackSelector,
   fieldHasValueSelector,
@@ -267,10 +267,17 @@ const useInput = ({
     if (!name) {
       return;
     }
-    ref.send({
-      type: 'FIELD.ADD',
-      field: { name, checked: defaultChecked || providedChecked, value: defaultValue || providedValue },
-    });
+    if (type === 'checkbox') {
+      ref.send({
+        type: 'FIELD.ADD',
+        field: { name, type: 'checkbox', checked: defaultChecked || providedChecked },
+      });
+    } else {
+      ref.send({
+        type: 'FIELD.ADD',
+        field: { name, type: inputType as FieldDetailsWithValue['type'], value: defaultValue || providedValue },
+      });
+    }
     return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
   }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
 

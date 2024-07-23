@@ -5,22 +5,27 @@ import { assign, enqueueActions, setup } from 'xstate';
 
 import { ClerkElementsError, ClerkElementsFieldError } from '~/internals/errors';
 
-import type { FieldDetails, FormDefaultCheckeds, FormDefaultValues, FormFields } from './form.types';
+import type {
+  FieldDetails,
+  FieldDetailsWithChecked,
+  FieldDetailsWithValue,
+  FormDefaultCheckeds,
+  FormDefaultValues,
+  FormFields,
+} from './form.types';
 
 export interface FormMachineContext extends MachineContext {
   defaultValues: FormDefaultValues;
   defaultCheckeds: FormDefaultCheckeds;
   errors: ClerkElementsError[];
   fields: FormFields;
-  hidden?: Set<string>;
-  missing?: Set<string>;
-  optional?: Set<string>;
+  ptional?: Set<string>;
   progressive: boolean;
   required?: Set<string>;
 }
 
 export type FormMachineEvents =
-  | { type: 'FIELD.ADD'; field: Pick<FieldDetails, 'name' | 'value' | 'checked'> }
+  | { type: 'FIELD.ADD'; field: FieldDetails }
   | { type: 'FIELD.REMOVE'; field: Pick<FieldDetails, 'name'> }
   | {
       type: 'MARK_AS_PROGRESSIVE';
@@ -36,7 +41,7 @@ export type FormMachineEvents =
   | { type: 'UNMARK_AS_PROGRESSIVE' }
   | {
       type: 'FIELD.UPDATE';
-      field: Pick<FieldDetails, 'name' | 'value' | 'checked'>;
+      field: Partial<FieldDetails> & Pick<FieldDetails, 'name'>;
     }
   | { type: 'ERRORS.SET'; error: any }
   | { type: 'ERRORS.CLEAR' }
@@ -145,10 +150,14 @@ export const FormMachine = setup({
             throw new Error('Field name is required');
           }
 
-          event.field.value = event.field.value || context.defaultValues.get(event.field.name) || undefined;
-          event.field.checked = event.field.checked || context.defaultCheckeds.get(event.field.name) || undefined;
+          if (event.field.type === 'checkbox') {
+            event.field.checked = event.field.checked || context.defaultCheckeds.get(event.field.name) || undefined;
+          } else {
+            event.field.value = event.field.value || context.defaultValues.get(event.field.name) || undefined;
+          }
 
           context.fields.set(event.field.name, event.field);
+
           return context.fields;
         },
       }),
@@ -160,11 +169,13 @@ export const FormMachine = setup({
             throw new Error('Field name is required');
           }
 
-          if (context.fields.has(event.field.name)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.name)!.checked = event.field.checked;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            context.fields.get(event.field.name)!.value = event.field.value;
+          const existingField = context.fields.get(event.field.name);
+          if (existingField) {
+            if (event.field.type === 'checkbox' && 'checked' in event.field) {
+              (existingField as FieldDetailsWithChecked).checked = event.field.checked;
+            } else if ('value' in event.field) {
+              (existingField as FieldDetailsWithValue).value = event.field.value;
+            }
           }
 
           return context.fields;

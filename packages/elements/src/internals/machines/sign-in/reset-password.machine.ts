@@ -2,7 +2,7 @@ import type { SignInResource } from '@clerk/types';
 import type { DoneActorEvent } from 'xstate';
 import { fromPromise, sendTo, setup } from 'xstate';
 
-import type { FormFields } from '~/internals/machines/form';
+import type { FieldDetailsWithChecked, FieldDetailsWithValue, FormFields } from '~/internals/machines/form';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
 
@@ -17,8 +17,9 @@ export const SignInResetPasswordMachine = setup({
   actors: {
     attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
-        const password = (fields.get('password')?.value as string) || '';
-        const signOutOfOtherSessions = fields.get('signOutOfOtherSessions')?.checked || false;
+        const password = ((fields.get('password') as FieldDetailsWithValue)?.value as string) || '';
+        const signOutOfOtherSessions =
+          (fields.get('signOutOfOtherSessions') as FieldDetailsWithChecked)?.checked || false;
         return parent.getSnapshot().context.clerk.client.signIn.resetPassword({ password, signOutOfOtherSessions });
       },
     ),
