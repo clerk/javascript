@@ -19,7 +19,9 @@ export interface FormMachineContext extends MachineContext {
   defaultCheckeds: FormDefaultCheckeds;
   errors: ClerkElementsError[];
   fields: FormFields;
-  ptional?: Set<string>;
+  hidden?: Set<string>;
+  missing?: Set<string>;
+  optional?: Set<string>;
   progressive: boolean;
   required?: Set<string>;
 }
