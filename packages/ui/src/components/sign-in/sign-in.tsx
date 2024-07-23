@@ -25,8 +25,7 @@ import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
-import { LinkButton } from '~/primitives/link-button';
-import { SecondaryButton } from '~/primitives/secondary-button';
+import { LinkButton } from '~/primitives/link';
 import { Seperator } from '~/primitives/seperator';
 import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
@@ -226,18 +225,33 @@ export function SignInComponentLoaded() {
                     <Common.Loading>
                       {isSubmitting => {
                         return (
-                          <SignIn.Action
-                            submit
-                            asChild
-                          >
-                            <Button
-                              icon={<Icon.CaretRight />}
-                              busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                          <>
+                            <SignIn.Action
+                              submit
+                              asChild
                             >
-                              {t('formButtonPrimary')}
-                            </Button>
-                          </SignIn.Action>
+                              <Button
+                                icon={<Icon.CaretRight />}
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading || isSubmitting}
+                              >
+                                ContinueContinueContinueContinueContinue
+                              </Button>
+                            </SignIn.Action>
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading || isSubmitting}
+                                icon={<Icon.CaretRight />}
+                                intent='secondary'
+                              >
+                                ContinueContinueContinueContinueContinue
+                              </Button>
+                            </SignIn.Action>
+                          </>
                         );
                       }}
                     </Common.Loading>
@@ -869,7 +883,10 @@ export function SignInComponentLoaded() {
                         name='email_link'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.LinkSm />}>
+                        <Button
+                          intent='secondary'
+                          icon={<Icon.LinkSm />}
+                        >
                           <SignIn.SafeIdentifier
                             transform={(identifier: string) =>
                               t('signIn.alternativeMethods.blockButton__emailLink', {
@@ -877,14 +894,17 @@ export function SignInComponentLoaded() {
                               })
                             }
                           />
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='email_code'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.Envelope />}>
+                        <Button
+                          intent='secondary'
+                          icon={<Icon.Envelope />}
+                        >
                           <SignIn.SafeIdentifier
                             transform={(identifier: string) =>
                               t('signIn.alternativeMethods.blockButton__emailCode', {
@@ -892,37 +912,46 @@ export function SignInComponentLoaded() {
                               })
                             }
                           />
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='phone_code'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.SMSSm />}>
+                        <Button
+                          intent='secondary'
+                          icon={<Icon.SMSSm />}
+                        >
                           {t('signIn.alternativeMethods.blockButton__phoneCode', {
                             // Correct masked identifier to be added in SDKI-117
                             identifier: SignIn.SafeIdentifier,
                           })}
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='passkey'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.FingerprintSm />}>
+                        <Button
+                          intent='secondary'
+                          icon={<Icon.FingerprintSm />}
+                        >
                           {t('signIn.alternativeMethods.blockButton__passkey')}
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='password'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.LockSm />}>
+                        <Button
+                          intent='secondary'
+                          icon={<Icon.LockSm />}
+                        >
                           {t('signIn.alternativeMethods.blockButton__password')}
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       {
@@ -934,14 +963,14 @@ export function SignInComponentLoaded() {
                         name='totp'
                         asChild
                       >
-                        <SecondaryButton>{t('signIn.alternativeMethods.blockButton__totp')}</SecondaryButton>
+                        <Button intent='secondary'>{t('signIn.alternativeMethods.blockButton__totp')}</Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='backup_code'
                         asChild
                       >
-                        <SecondaryButton>{t('signIn.alternativeMethods.blockButton__backupCode')}</SecondaryButton>
+                        <Button intent='secondary'>{t('signIn.alternativeMethods.blockButton__backupCode')}</Button>
                       </SignIn.SupportedStrategy>
                     </div>
 
@@ -1004,7 +1033,10 @@ export function SignInComponentLoaded() {
                           name='email_link'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.LinkSm />}>
+                          <Button
+                            intent='secondary'
+                            icon={<Icon.LinkSm />}
+                          >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
                                 t('signIn.alternativeMethods.blockButton__emailLink', {
@@ -1012,14 +1044,17 @@ export function SignInComponentLoaded() {
                                 })
                               }
                             />
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='reset_password_email_code'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.Envelope />}>
+                          <Button
+                            intent='secondary'
+                            icon={<Icon.Envelope />}
+                          >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
                                 t('signIn.alternativeMethods.blockButton__emailCode', {
@@ -1027,37 +1062,46 @@ export function SignInComponentLoaded() {
                                 })
                               }
                             />
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='phone_code'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.SMSSm />}>
+                          <Button
+                            intent='secondary'
+                            icon={<Icon.SMSSm />}
+                          >
                             {t('signIn.alternativeMethods.blockButton__phoneCode', {
                               // Correct masked identifier to be added in SDKI-117
                               identifier: SignIn.SafeIdentifier,
                             })}
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='passkey'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.FingerprintSm />}>
+                          <Button
+                            intent='secondary'
+                            icon={<Icon.FingerprintSm />}
+                          >
                             {t('signIn.alternativeMethods.blockButton__passkey')}
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='password'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.LockSm />}>
+                          <Button
+                            intent='secondary'
+                            icon={<Icon.LockSm />}
+                          >
                             {t('signIn.alternativeMethods.blockButton__password')}
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
                       </div>
 

@@ -94,6 +94,11 @@ const config = {
           DEFAULT: 'hsl(var(--cl-color-warning))',
         },
       },
+      ringWidth: {
+        // note: it's not possible to use `DEFAULT` with `ringWidth`
+        //       therefore we'll need to use `ring-default`
+        default: '0.125rem',
+      },
       ringColor: {
         // note: it's not possible to use `DEFAULT` with `ringColor`
         //       therefore we'll need to use `ring-default`

@@ -19,7 +19,7 @@ import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
-import { LinkButton } from '~/primitives/link-button';
+import { LinkButton } from '~/primitives/link';
 import { Seperator } from '~/primitives/seperator';
 
 import { SignUpIdentifier } from './indentifiers';
