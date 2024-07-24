@@ -605,10 +605,7 @@ export function SignInComponentLoaded() {
                       <Card.Description>{t('signIn.phoneCode.subtitle', { applicationName })}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          <SignIn.SafeIdentifier
-                          // TODO: uncomment once https://github.com/clerk/javascript/pull/3749 is merged
-                          // transform={formatSafeIdentifier}
-                          />
+                          <SignIn.SafeIdentifier transform={formatSafeIdentifier} />
                           <SignIn.Action
                             navigate='start'
                             asChild
@@ -916,10 +913,13 @@ export function SignInComponentLoaded() {
                           intent='secondary'
                           iconStart={<Icon.SMSSm />}
                         >
-                          {t('signIn.alternativeMethods.blockButton__phoneCode', {
-                            // Correct masked identifier to be added in SDKI-117
-                            identifier: SignIn.SafeIdentifier,
-                          })}
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__phoneCode', {
+                                identifier,
+                              })
+                            }
+                          />
                         </Button>
                       </SignIn.SupportedStrategy>
 
@@ -1058,20 +1058,18 @@ export function SignInComponentLoaded() {
                           </Button>
                         </SignIn.SupportedStrategy>
 
-                        <SignIn.SupportedStrategy
-                          name='phone_code'
-                          asChild
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.SMSSm />}
                         >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.SMSSm />}
-                          >
-                            {t('signIn.alternativeMethods.blockButton__phoneCode', {
-                              // Correct masked identifier to be added in SDKI-117
-                              identifier: SignIn.SafeIdentifier,
-                            })}
-                          </Button>
-                        </SignIn.SupportedStrategy>
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__phoneCode', {
+                                identifier,
+                              })
+                            }
+                          />
+                        </Button>
 
                         <SignIn.SupportedStrategy
                           name='passkey'
