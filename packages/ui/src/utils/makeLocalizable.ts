@@ -1,6 +1,6 @@
 import { enUS } from '@clerk/localizations';
 import { normalizeDate, titleize } from '@clerk/shared';
-import type { DeepRequired, LocalizationResource, PathValue, RecordToPath } from '@clerk/types';
+import type { DeepRequired, LocalizationResource, PasswordSettingsData, PathValue, RecordToPath } from '@clerk/types';
 
 const defaultResource = enUS as DeepRequired<typeof enUS>;
 
@@ -219,4 +219,88 @@ export const makeLocalizeable = (resource: LocalizationResource) => {
     t,
     translateError,
   };
+};
+
+export type ComplexityErrors = {
+  [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]?: boolean;
+};
+
+export type UsePasswordComplexityConfig = Omit<
+  PasswordSettingsData,
+  'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'
+>;
+
+function listFormatSupportedLocalesOf(locale?: string | string[]) {
+  if (!locale) {
+    return false;
+  }
+  const locales = Array.isArray(locale) ? locale : [locale];
+  return (Intl as any).ListFormat.supportedLocalesOf(locales).length === locales.length;
+}
+
+/**
+ * Intl.ListFormat was introduced in 2021
+ * It is recommended to first check for browser support before using it
+ */
+export function canUseListFormat(locale: string | undefined) {
+  return 'ListFormat' in Intl && listFormatSupportedLocalesOf(locale);
+}
+export const addFullStop = (string: string | undefined) => {
+  return !string ? '' : string.endsWith('.') ? string : `${string}.`;
+};
+
+export const createListFormat = (message: string[], locale: string) => {
+  let messageWithPrefix: string;
+  if (canUseListFormat(locale)) {
+    const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
+    messageWithPrefix = formatter.format(message);
+  } else {
+    messageWithPrefix = message.join(', ');
+  }
+
+  return messageWithPrefix;
+};
+
+const errorMessages: Record<keyof Omit<ComplexityErrors, 'allowed_special_characters'>, [string, string] | string> = {
+  max_length: ['unstable__errors.passwordComplexity.maximumLength', 'length'],
+  min_length: ['unstable__errors.passwordComplexity.minimumLength', 'length'],
+  require_numbers: 'unstable__errors.passwordComplexity.requireNumbers',
+  require_lowercase: 'unstable__errors.passwordComplexity.requireLowercase',
+  require_uppercase: 'unstable__errors.passwordComplexity.requireUppercase',
+  require_special_char: 'unstable__errors.passwordComplexity.requireSpecialCharacter',
+};
+
+export const translatePasswordError = ({
+  config,
+  failedValidations,
+  locale,
+  t,
+}: {
+  config: UsePasswordComplexityConfig;
+  failedValidations: string[];
+  locale: string;
+  t: ReturnType<typeof makeLocalizeable>['t'];
+}) => {
+  if (!failedValidations || Object.keys(failedValidations).length === 0) {
+    return '';
+  }
+
+  // show min length error first by itself
+  const hasMinLengthError = failedValidations?.includes('min_length') || false;
+
+  const messages = failedValidations
+    .filter(k => (hasMinLengthError ? k === 'min_length' : true))
+    .map(k => {
+      const localizedKey = errorMessages[k as keyof typeof errorMessages];
+      if (Array.isArray(localizedKey)) {
+        const [lk, attr] = localizedKey;
+        return t(lk as any, { [attr]: config[k as keyof UsePasswordComplexityConfig] });
+      }
+      console.log({ localizedKey, t: t(localizedKey as any), k });
+      return t(localizedKey as any);
+    });
+
+  const messageWithPrefix = createListFormat(messages, locale);
+
+  return addFullStop(`${t('unstable__errors.passwordComplexity.sentencePrefix')} ${messageWithPrefix}`);
 };

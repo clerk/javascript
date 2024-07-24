@@ -9,11 +9,13 @@ import { generatePasswordErrorText } from '../utils/generate-password-error-text
 // This hook should mimic the already existing usePassword hook in the clerk-js package
 // @see packages/clerk-js/src/ui/hooks/usePassword.ts
 
+export type PasswordConfig = Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>;
+
 type UsePasswordCallbacks = {
-  onValidationError?: (error: string | undefined, keys: ErrorMessagesKey[]) => void;
+  onValidationError?: (error: string | undefined, keys: ErrorMessagesKey[], config: PasswordConfig) => void;
   onValidationSuccess?: () => void;
-  onValidationWarning?: (warning: string, keys: string[]) => void;
-  onValidationInfo?: (info: string, keys: ErrorMessagesKey[]) => void;
+  onValidationWarning?: (warning: string, keys: string[], config: PasswordConfig) => void;
+  onValidationInfo?: (info: string, keys: ErrorMessagesKey[], config: PasswordConfig) => void;
   onValidationComplexity?: (b: boolean) => void;
 };
 
@@ -43,10 +45,9 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
           });
 
           if (res.complexity?.min_length) {
-            return onValidationInfo(message, keys);
+            return onValidationInfo(message, keys, config);
           }
-
-          return onValidationError(message, keys);
+          return onValidationError(message, keys, config);
         }
       }
 
@@ -56,7 +57,7 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
       if (res?.strength?.state === 'fail') {
         const keys = res.strength.keys;
         const error = keys.map(key => get(zxcvbnKeys, key)).join(' ');
-        return onValidationError(error, keys);
+        return onValidationError(error, keys, config);
       }
 
       /**
@@ -65,7 +66,7 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
       if (res?.strength?.state === 'pass') {
         const keys = res.strength.keys;
         const error = keys.map(key => get(zxcvbnKeys, key)).join(' ');
-        return onValidationWarning(error, keys);
+        return onValidationWarning(error, keys, config);
       }
 
       /**
@@ -73,7 +74,7 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
        */
       return onValidationSuccess();
     },
-    [callbacks],
+    [callbacks, config],
   );
 
   const validatePassword = React.useMemo(() => {

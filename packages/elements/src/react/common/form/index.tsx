@@ -36,6 +36,7 @@ import {
   useFormSelector,
   useFormStore,
 } from '~/internals/machines/form/form.context';
+import type { PasswordConfig } from '~/react/hooks/use-password.hook';
 import { usePassword } from '~/react/hooks/use-password.hook';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 import { useSignInPasskeyAutofill } from '~/react/sign-in/context/router.context';
@@ -233,7 +234,7 @@ const useInput = ({
         field: { name, feedback: { type: 'success', message: 'Your password meets all the necessary requirements.' } },
       });
     },
-    onValidationError: (error, keys) => {
+    onValidationError: (error, keys, config) => {
       if (error) {
         ref.send({
           type: 'FIELD.FEEDBACK.SET',
@@ -243,21 +244,30 @@ const useInput = ({
               type: 'error',
               message: new ClerkElementsFieldError('password-validation-error', error),
               codes: keys,
+              config,
             },
           },
         });
       }
     },
-    onValidationWarning: (warning, keys) =>
+    onValidationWarning: (warning, keys, config) =>
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'warning', message: warning, codes: keys } },
+        field: { name, feedback: { type: 'warning', message: warning, codes: keys, config } },
       }),
-    onValidationInfo: (info, keys) => {
+    onValidationInfo: (info, keys, config) => {
       // TODO: If input is not focused, make this info an error
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'info', message: info, codes: keys } },
+        field: {
+          name,
+          feedback: {
+            type: 'info',
+            message: info,
+            codes: keys,
+            config,
+          },
+        },
       });
     },
   });
@@ -514,6 +524,7 @@ type FieldStateRenderFn = {
     state: FieldStates;
     message: string | undefined;
     codes: ErrorMessagesKey[] | undefined;
+    config?: PasswordConfig;
   }) => React.ReactNode;
 };
 
@@ -554,8 +565,10 @@ function FieldState({ children }: FieldStateRenderFn) {
 
   const message = feedback?.message instanceof ClerkElementsFieldError ? feedback.message.message : feedback?.message;
   const codes = feedback?.codes;
+  // TODO: Remove casting as PasswordConfig when we have a better way to handle this
+  const config = feedback && 'config' in feedback ? (feedback?.config as PasswordConfig) : undefined;
 
-  const fieldState = { state: enrichFieldState(validity, state), message, codes };
+  const fieldState = { state: enrichFieldState(validity, state), message, codes, config };
 
   return children(fieldState);
 }
