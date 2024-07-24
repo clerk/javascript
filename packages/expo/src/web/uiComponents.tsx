@@ -18,7 +18,7 @@ import { Platform } from 'react-native';
 import { errorThrower } from '../utils/errors';
 
 const ErrorComponent = (componentName: string) => {
-  throw errorThrower.throw(`${componentName} component is not supported in the native environments.`);
+  errorThrower.throw(`${componentName} component is not supported in the native environments.`);
 };
 
 function WrapComponent<T extends { displayName: string }>(component: T) {
