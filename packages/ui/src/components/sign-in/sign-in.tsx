@@ -423,9 +423,11 @@ export function SignInComponentLoaded() {
                                 //    https://linear.app/clerk/issue/SDKI-172
                               }
 
-                              <SignIn.Passkey asChild>
+                              <SignIn.Action
+                                submit
+                                asChild
+                              >
                                 <Button
-                                  type='button'
                                   busy={isSubmitting}
                                   disabled={isGlobalLoading}
                                   iconEnd={<Icon.CaretRightLegacy />}
@@ -433,7 +435,7 @@ export function SignInComponentLoaded() {
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
-                              </SignIn.Passkey>
+                              </SignIn.Action>
 
                               <SignIn.Action
                                 navigate='choose-strategy'
