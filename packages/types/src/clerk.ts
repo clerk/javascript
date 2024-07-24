@@ -816,6 +816,7 @@ export type UserProfileProps = RoutingOptions & {
    * Provide custom pages and links to be rendered inside the UserProfile.
    */
   customPages?: CustomPage[];
+  __experimental_startPath?: string;
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -836,6 +837,7 @@ export type OrganizationProfileProps = RoutingOptions & {
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
   customPages?: CustomPage[];
+  __experimental_startPath?: string;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
