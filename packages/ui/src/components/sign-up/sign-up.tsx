@@ -19,7 +19,7 @@ import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
-import { LinkButton } from '~/primitives/link-button';
+import { LinkButton } from '~/primitives/link';
 import { Seperator } from '~/primitives/seperator';
 
 import { SignUpIdentifier } from './indentifiers';
@@ -148,9 +148,10 @@ function SignUpComponentLoaded() {
                               asChild
                             >
                               <Button
-                                icon={<Icon.CaretRight />}
                                 busy={isSubmitting}
-                                disabled={isGlobalLoading || isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -189,7 +190,7 @@ function SignUpComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -234,7 +235,8 @@ function SignUpComponentLoaded() {
                               <Button
                                 busy={isSubmitting}
                                 disabled={isGlobalLoading}
-                                icon={<Icon.CaretRight />}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -258,7 +260,7 @@ function SignUpComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -301,7 +303,8 @@ function SignUpComponentLoaded() {
                               <Button
                                 busy={isSubmitting}
                                 disabled={isGlobalLoading}
-                                icon={<Icon.CaretRight />}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -329,7 +332,7 @@ function SignUpComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -437,9 +440,10 @@ function SignUpComponentLoaded() {
                             asChild
                           >
                             <Button
-                              icon={<Icon.CaretRight />}
                               busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                              disabled={isGlobalLoading}
+                              iconEnd={<Icon.CaretRightLegacy />}
+                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>

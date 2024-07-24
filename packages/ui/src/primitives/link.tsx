@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'cva';
 import * as React from 'react';
 
-export const linkButton = cva({
+export const link = cva({
   base: 'text-accent-9 -mx-0.5 rounded-sm px-0.5 font-medium outline-none',
   variants: {
     busy: {
@@ -15,8 +15,8 @@ export const linkButton = cva({
     // Override native behaviour for third-party packages
     // e.g. react-aria-components
     focusVisible: {
-      native: 'focus-visible:ring-default focus-visible:ring-[0.125rem]',
-      'data-attribute': 'data-[focus-visible]:ring-default data-[focus-visible]:ring-[0.125rem]',
+      native: 'focus-visible:ring',
+      'data-attribute': 'data-[focus-visible]:ring',
     },
     size: {
       sm: 'text-sm',
@@ -46,19 +46,18 @@ export const LinkButton = React.forwardRef(function LinkButton(
     disabled,
     size,
     ...props
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    busy?: VariantProps<typeof linkButton>['busy'];
-    size?: VariantProps<typeof linkButton>['size'];
-  },
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> &
+    // Omit types supplied via ButtonHTMLAttributes
+    Omit<VariantProps<typeof link>, 'disabled'>,
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
   return (
     // eslint-disable-next-line react/button-has-type
     <button
       ref={forwardedRef}
-      {...props}
-      className={linkButton({ busy, disabled, size, className })}
+      className={link({ busy, disabled, size, className })}
       disabled={busy || disabled}
+      {...props}
     >
       {children}
     </button>

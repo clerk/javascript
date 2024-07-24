@@ -25,8 +25,7 @@ import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
-import { LinkButton } from '~/primitives/link-button';
-import { SecondaryButton } from '~/primitives/secondary-button';
+import { LinkButton } from '~/primitives/link';
 import { Seperator } from '~/primitives/seperator';
 import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
@@ -94,7 +93,7 @@ function SignInGetHelp() {
               onClick={() => {
                 window.location.href = `mailto:${supportEmail}`;
               }}
-              icon={<Icon.CaretRight />}
+              iconEnd={<Icon.CaretRightLegacy />}
             >
               Email support
             </Button>
@@ -231,9 +230,10 @@ export function SignInComponentLoaded() {
                             asChild
                           >
                             <Button
-                              icon={<Icon.CaretRight />}
                               busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                              disabled={isGlobalLoading}
+                              iconEnd={<Icon.CaretRightLegacy />}
+                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -303,7 +303,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -347,9 +347,10 @@ export function SignInComponentLoaded() {
                                 asChild
                               >
                                 <Button
-                                  icon={<Icon.CaretRight />}
                                   busy={isSubmitting}
-                                  disabled={isGlobalLoading || isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -390,7 +391,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -425,9 +426,10 @@ export function SignInComponentLoaded() {
                               <SignIn.Passkey asChild>
                                 <Button
                                   type='button'
-                                  icon={<Icon.CaretRight />}
                                   busy={isSubmitting}
-                                  disabled={isGlobalLoading || isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -478,9 +480,10 @@ export function SignInComponentLoaded() {
                                 asChild
                               >
                                 <Button
-                                  icon={<Icon.CaretRight />}
                                   busy={isSubmitting}
-                                  disabled={isGlobalLoading || isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -524,7 +527,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -569,7 +572,8 @@ export function SignInComponentLoaded() {
                                 <Button
                                   busy={isSubmitting}
                                   disabled={isGlobalLoading}
-                                  icon={<Icon.CaretRight />}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -611,7 +615,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -656,7 +660,8 @@ export function SignInComponentLoaded() {
                                 <Button
                                   busy={isSubmitting}
                                   disabled={isGlobalLoading}
-                                  icon={<Icon.CaretRight />}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -695,7 +700,7 @@ export function SignInComponentLoaded() {
                           >
                             <button
                               type='button'
-                              className='text-accent-9 focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
+                              className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                               aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
@@ -776,7 +781,8 @@ export function SignInComponentLoaded() {
                               <Button
                                 busy={isSubmitting}
                                 disabled={isGlobalLoading}
-                                icon={<Icon.CaretRight />}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -818,7 +824,8 @@ export function SignInComponentLoaded() {
                                 <Button
                                   busy={isSubmitting}
                                   disabled={isGlobalLoading}
-                                  icon={<Icon.CaretRight />}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -869,7 +876,10 @@ export function SignInComponentLoaded() {
                         name='email_link'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.LinkSm />}>
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.LinkSm />}
+                        >
                           <SignIn.SafeIdentifier
                             transform={(identifier: string) =>
                               t('signIn.alternativeMethods.blockButton__emailLink', {
@@ -877,14 +887,17 @@ export function SignInComponentLoaded() {
                               })
                             }
                           />
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='email_code'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.Envelope />}>
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.Envelope />}
+                        >
                           <SignIn.SafeIdentifier
                             transform={(identifier: string) =>
                               t('signIn.alternativeMethods.blockButton__emailCode', {
@@ -892,37 +905,46 @@ export function SignInComponentLoaded() {
                               })
                             }
                           />
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='phone_code'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.SMSSm />}>
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.SMSSm />}
+                        >
                           {t('signIn.alternativeMethods.blockButton__phoneCode', {
                             // Correct masked identifier to be added in SDKI-117
                             identifier: SignIn.SafeIdentifier,
                           })}
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='passkey'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.FingerprintSm />}>
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.FingerprintSm />}
+                        >
                           {t('signIn.alternativeMethods.blockButton__passkey')}
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='password'
                         asChild
                       >
-                        <SecondaryButton icon={<Icon.LockSm />}>
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.LockSm />}
+                        >
                           {t('signIn.alternativeMethods.blockButton__password')}
-                        </SecondaryButton>
+                        </Button>
                       </SignIn.SupportedStrategy>
 
                       {
@@ -934,14 +956,14 @@ export function SignInComponentLoaded() {
                         name='totp'
                         asChild
                       >
-                        <SecondaryButton>{t('signIn.alternativeMethods.blockButton__totp')}</SecondaryButton>
+                        <Button intent='secondary'>{t('signIn.alternativeMethods.blockButton__totp')}</Button>
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='backup_code'
                         asChild
                       >
-                        <SecondaryButton>{t('signIn.alternativeMethods.blockButton__backupCode')}</SecondaryButton>
+                        <Button intent='secondary'>{t('signIn.alternativeMethods.blockButton__backupCode')}</Button>
                       </SignIn.SupportedStrategy>
                     </div>
 
@@ -1004,7 +1026,10 @@ export function SignInComponentLoaded() {
                           name='email_link'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.LinkSm />}>
+                          <Button
+                            intent='secondary'
+                            iconStart={<Icon.LinkSm />}
+                          >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
                                 t('signIn.alternativeMethods.blockButton__emailLink', {
@@ -1012,14 +1037,17 @@ export function SignInComponentLoaded() {
                                 })
                               }
                             />
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='reset_password_email_code'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.Envelope />}>
+                          <Button
+                            intent='secondary'
+                            iconStart={<Icon.Envelope />}
+                          >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
                                 t('signIn.alternativeMethods.blockButton__emailCode', {
@@ -1027,37 +1055,46 @@ export function SignInComponentLoaded() {
                                 })
                               }
                             />
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='phone_code'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.SMSSm />}>
+                          <Button
+                            intent='secondary'
+                            iconStart={<Icon.SMSSm />}
+                          >
                             {t('signIn.alternativeMethods.blockButton__phoneCode', {
                               // Correct masked identifier to be added in SDKI-117
                               identifier: SignIn.SafeIdentifier,
                             })}
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='passkey'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.FingerprintSm />}>
+                          <Button
+                            intent='secondary'
+                            iconStart={<Icon.FingerprintSm />}
+                          >
                             {t('signIn.alternativeMethods.blockButton__passkey')}
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
 
                         <SignIn.SupportedStrategy
                           name='password'
                           asChild
                         >
-                          <SecondaryButton icon={<Icon.LockSm />}>
+                          <Button
+                            intent='secondary'
+                            iconStart={<Icon.LockSm />}
+                          >
                             {t('signIn.alternativeMethods.blockButton__password')}
-                          </SecondaryButton>
+                          </Button>
                         </SignIn.SupportedStrategy>
                       </div>
 

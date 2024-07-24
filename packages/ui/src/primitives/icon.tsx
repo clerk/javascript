@@ -5,7 +5,7 @@ type IconRef = SVGSVGElement;
 type IconProps = Omit<React.HTMLAttributes<IconRef>, 'viewBox'>;
 
 // Icons that need to be rotated 180deg in RTL mode
-const rtlIcons = ['IconCaretRight'];
+const rtlIcons = ['IconCaretRightLegacy'];
 
 function createIcon({ displayName, viewBox, path }: { displayName: string; viewBox: string; path: React.ReactNode }) {
   const Icon = React.forwardRef(function ({ className, ...props }: IconProps, ref: React.ForwardedRef<IconRef>) {
@@ -466,12 +466,12 @@ export const Xero = createIcon({
 /* UI
   ============================================ */
 
-export const CaretRight = createIcon({
-  displayName: 'IconCaretRight',
-  viewBox: '0 0 10 10',
+export const CaretRightLegacy = createIcon({
+  displayName: 'IconCaretRightLegacy',
+  viewBox: '0 0 16 16',
   path: (
     <path
-      d='M7.25 5L3.75 2.75V7.25L7.25 5Z'
+      d='M10.6667 8L6 5V11L10.6667 8Z'
       fill='currentColor'
       stroke='currentColor'
       strokeWidth='1.5'
