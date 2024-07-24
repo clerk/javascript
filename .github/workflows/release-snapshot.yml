@@ -41,6 +41,11 @@ jobs:
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
 
+      - name: Ensure stable PR
+        uses: ./.github/actions/ensure-stable-pr
+        with:
+          cmd: '!snapshot'
+
       - name: Setup
         id: config
         uses: ./.github/actions/init
