@@ -26,13 +26,11 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./web": {
       "types": "./dist/web/index.d.ts",
-      "import": "./dist/web/index.js",
-      "require": "./dist/web/index.js"
+      "default": "./dist/web/index.js"
     }
   },
   "main": "./dist/index.js",
