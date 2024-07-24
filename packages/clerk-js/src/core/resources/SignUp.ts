@@ -275,6 +275,9 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this;
   }
 
+  /**
+   * We delegate bot detection to the following providers, instead of relying on turnstile exclusively
+   */
   protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
     if (
       params.strategy === 'oauth_google' ||
