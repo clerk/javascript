@@ -71,7 +71,13 @@ export class SignUp extends BaseResource implements SignUpResource {
     const { captchaSiteKey, canUseCaptcha, captchaURL, captchaWidgetType, captchaProvider, captchaPublicKeyInvisible } =
       retrieveCaptchaInfo(SignUp.clerk);
 
-    if (canUseCaptcha && captchaSiteKey && captchaURL && captchaPublicKeyInvisible) {
+    if (
+      !this.shouldBypassCaptchaForAttempt(params) &&
+      canUseCaptcha &&
+      captchaSiteKey &&
+      captchaURL &&
+      captchaPublicKeyInvisible
+    ) {
       try {
         const { captchaToken, captchaWidgetTypeUsed } = await getCaptchaToken({
           siteKey: captchaSiteKey,
@@ -89,6 +95,10 @@ export class SignUp extends BaseResource implements SignUpResource {
           throw new ClerkRuntimeError(e.message, { code: 'captcha_unavailable' });
         }
       }
+    }
+
+    if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
+      paramsWithCaptcha.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
     }
 
     return this._basePost({
@@ -263,5 +273,16 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.web3wallet = data.web3_wallet;
     }
     return this;
+  }
+
+  protected shouldBypassCaptchaForAttempt(params: SignUpCreateParams) {
+    if (params.strategy === 'oauth_google') {
+      return true;
+    }
+    if (params.transfer && SignUp.clerk.client?.signIn.firstFactorVerification.strategy === 'oauth_google') {
+      return true;
+    }
+
+    return false;
   }
 }
