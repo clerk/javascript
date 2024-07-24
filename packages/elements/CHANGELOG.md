@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.10.6
+
+### Patch Changes
+
+- Add support for checkbox input usage and `signOutOfOtherSessions` functionality ([#3791](https://github.com/clerk/javascript/pull/3791)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.10.5
 
 ### Patch Changes

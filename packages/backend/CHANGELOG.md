@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.4.2
+
+### Patch Changes
+
+- Fix `getToken` returning `null` when signing in. ([#3764](https://github.com/clerk/javascript/pull/3764)) by [@anagstef](https://github.com/anagstef)
+
 ## 1.4.1
 
 ### Patch Changes
