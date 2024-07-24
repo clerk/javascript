@@ -187,39 +187,33 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
         return await baseNextMiddleware(request, event);
       }
 
+      if (ephemeralMode) {
+        const params = Object.fromEntries(request.nextUrl.searchParams);
+        ephemeralPublishableKey = params[constants.QueryParameters.EphemeralPublishableKey];
+        ephemeralSecretKey = params[constants.QueryParameters.EphemeralSecretKey];
+      }
+
+      let handlerResult: NextResponse | undefined;
+
       try {
-        if (ephemeralMode) {
-          const params = Object.fromEntries(request.nextUrl.searchParams);
-          const queryEphemeralPublishableKey = params[constants.QueryParameters.EphemeralPublishableKey];
-          const queryEphemeralSecretKey = params[constants.QueryParameters.EphemeralSecretKey];
-
-          if (queryEphemeralPublishableKey && ephemeralPublishableKey !== queryEphemeralPublishableKey) {
-            ephemeralPublishableKey = queryEphemeralPublishableKey;
-          }
-          if (queryEphemeralSecretKey && ephemeralSecretKey !== queryEphemeralSecretKey) {
-            ephemeralSecretKey = queryEphemeralSecretKey;
-          }
-        }
-
-        const handlerResult = (await baseNextMiddleware(request, event)) as NextResponse;
-
-        if (ephemeralMode) {
-          // TODO: Set the cookie expiry to the same as the key
-          handlerResult.cookies.set(constants.Cookies.EphemeralPublishableKey, ephemeralPublishableKey || '');
-          handlerResult.cookies.set(constants.Cookies.EphemeralSecretKey, ephemeralSecretKey || '');
-        } else {
-          handlerResult.cookies.delete(constants.Cookies.EphemeralPublishableKey);
-          handlerResult.cookies.delete(constants.Cookies.EphemeralSecretKey);
-        }
-
-        return handlerResult;
+        handlerResult = (await baseNextMiddleware(request, event)) as NextResponse;
       } catch (e: any) {
         // And this is a clerkKeyError, return a no-op to allow the ClerkProvider to fetch the keys
-        if (isClerkKeyError(e)) {
-          return null;
+        if (!isClerkKeyError(e)) {
+          throw e;
         }
-        throw e;
       }
+
+      if (ephemeralMode) {
+        // TODO: Set the cookie expiry to the same as the key
+        handlerResult?.cookies?.set(constants.Cookies.EphemeralPublishableKey, ephemeralPublishableKey || '');
+        handlerResult?.cookies?.set(constants.Cookies.EphemeralSecretKey, ephemeralSecretKey || '');
+      } else {
+        handlerResult?.cookies?.delete(constants.Cookies.EphemeralPublishableKey);
+        handlerResult?.cookies?.delete(constants.Cookies.EphemeralSecretKey);
+      }
+
+      return handlerResult;
     };
 
     // If we have a request and event, we're being called as a middleware directly
