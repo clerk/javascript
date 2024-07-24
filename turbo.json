@@ -200,7 +200,7 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:expoWeb": {
+    "//#test:integration:expo-web": {
       "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/clerk-expo#build", "^@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],

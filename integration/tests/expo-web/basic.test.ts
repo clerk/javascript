@@ -5,7 +5,7 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
-  'basic tests for expo web @expoWeb',
+  'basic tests for expo web @expo-web',
   ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 
