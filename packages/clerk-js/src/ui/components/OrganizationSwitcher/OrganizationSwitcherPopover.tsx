@@ -96,7 +96,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
 
       return openOrganizationProfile({
         ...organizationProfileProps,
-        ...(path && { path }),
+        ...(__experimental_startPath && { __experimental_startPath }),
         afterLeaveOrganizationUrl,
         //@ts-expect-error
         __unstable_manageBillingUrl,
