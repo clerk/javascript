@@ -13,12 +13,16 @@ export function PhoneNumberOrUsernameField({
   labelPhoneNumber = 'Phone number',
   labelUsername = 'Username',
   locationBasedCountryIso,
+  toggleLabelPhoneNumber = 'Use phone',
+  toggleLabelUsername = 'Use username',
   toggleDescription = 'Toggle between phone and username.',
   ...props
 }: {
   labelUsername?: React.ReactNode;
   labelPhoneNumber?: React.ReactNode;
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
+  toggleLabelPhoneNumber?: string;
+  toggleLabelUsername?: string;
   toggleDescription?: string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showUsernameField, setShowUsernameField] = React.useState(false);
@@ -30,7 +34,7 @@ export function PhoneNumberOrUsernameField({
       className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
       <span className='sr-only'>{toggleDescription}</span>
-      {showUsernameField ? 'Use phone' : 'Use username'}
+      {showUsernameField ? toggleLabelPhoneNumber : toggleLabelUsername}
     </ToggleButton>
   );
 

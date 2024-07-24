@@ -12,12 +12,16 @@ export function EmailOrUsernameOrPhoneNumberField({
   name = undefined,
   labelEmailOrUsername = 'Email address or username',
   labelPhoneNumber = 'Phone number',
+  toggleLabelEmailOrUsername = 'Use email or username',
+  toggleLabelPhoneNumber = 'Use phone',
   locationBasedCountryIso,
   toggleDescription = 'Toggle between email or username, and phone.',
   ...props
 }: {
   labelEmailOrUsername?: React.ReactNode;
   labelPhoneNumber?: React.ReactNode;
+  toggleLabelEmailOrUsername?: string;
+  toggleLabelPhoneNumber?: string;
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
   toggleDescription?: string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
@@ -30,7 +34,7 @@ export function EmailOrUsernameOrPhoneNumberField({
       className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
       <span className='sr-only'>{toggleDescription}</span>
-      {showPhoneNumberField ? 'Use email or username' : 'Use phone'}
+      {showPhoneNumberField ? toggleLabelEmailOrUsername : toggleLabelPhoneNumber}
     </ToggleButton>
   );
 

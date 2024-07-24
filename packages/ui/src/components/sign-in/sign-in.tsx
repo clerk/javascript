@@ -163,6 +163,7 @@ export function SignInComponentLoaded() {
                         {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
                           <EmailField
                             name='identifier'
+                            label={t('formFieldLabel__emailAddress')}
                             disabled={isGlobalLoading}
                             required
                           />
@@ -171,6 +172,7 @@ export function SignInComponentLoaded() {
                         {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
                           <UsernameField
                             name='identifier'
+                            label={t('formFieldLabel__username')}
                             disabled={isGlobalLoading}
                             required
                           />
@@ -179,6 +181,7 @@ export function SignInComponentLoaded() {
                         {phoneNumberEnabled && !emailAddressEnabled && !usernameEnabled ? (
                           <PhoneNumberField
                             name='identifier'
+                            label={t('formFieldLabel__phoneNumber')}
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                             required
@@ -188,6 +191,7 @@ export function SignInComponentLoaded() {
                         {emailAddressEnabled && usernameEnabled && !phoneNumberEnabled ? (
                           <EmailOrUsernameField
                             name='identifier'
+                            label={t('formFieldLabel__emailAddress_username')}
                             disabled={isGlobalLoading}
                             required
                           />
@@ -196,6 +200,10 @@ export function SignInComponentLoaded() {
                         {emailAddressEnabled && phoneNumberEnabled && !usernameEnabled ? (
                           <EmailOrPhoneNumberField
                             name='identifier'
+                            labelEmail={t('formFieldLabel__emailAddress')}
+                            toggleLabelEmail={t('signIn.start.actionLink__use_email')}
+                            labelPhoneNumber={t('formFieldLabel__phoneNumber')}
+                            toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                             required
@@ -205,6 +213,10 @@ export function SignInComponentLoaded() {
                         {usernameEnabled && phoneNumberEnabled && !emailAddressEnabled ? (
                           <PhoneNumberOrUsernameField
                             name='identifier'
+                            labelPhoneNumber={t('formFieldLabel__phoneNumber')}
+                            toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
+                            labelUsername={t('formFieldLabel__username')}
+                            toggleLabelUsername={t('signIn.start.actionLink__use_username')}
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                             required
@@ -214,6 +226,10 @@ export function SignInComponentLoaded() {
                         {emailAddressEnabled && usernameEnabled && phoneNumberEnabled ? (
                           <EmailOrUsernameOrPhoneNumberField
                             name='identifier'
+                            labelEmailOrUsername={t('formFieldLabel__emailAddress_username')}
+                            toggleLabelEmailOrUsername={t('signIn.start.actionLink__use_email_username')}
+                            labelPhoneNumber={t('formFieldLabel__phoneNumber')}
+                            toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                             required
