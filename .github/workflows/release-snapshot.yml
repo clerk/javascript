@@ -55,7 +55,7 @@ jobs:
               owner: 'clerk',
               repo: 'javascript',
               pull_number: context.issue.number,
-            }).data;
+            });
 
             const prLastUpdated = new Date(pr.updated_at);
 
