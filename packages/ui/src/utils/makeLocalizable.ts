@@ -285,6 +285,14 @@ export const translatePasswordError = ({
     return '';
   }
 
+  // Because we perform strength validations only if complexity validations have passed, the presence of the string
+  // zxcvbn in any of the failedValidations indicates that _all_ of the validations are from zxcvbn. Thus, we need to
+  // concat the localized strings together since they are each individual complete sentences.
+  const hasStrengthErrors = failedValidations.some(v => v.includes('zxcvbn'));
+  if (hasStrengthErrors) {
+    return failedValidations.map(v => t(v as any)).join(' ');
+  }
+
   // show min length error first by itself
   const hasMinLengthError = failedValidations?.includes('min_length') || false;
 
