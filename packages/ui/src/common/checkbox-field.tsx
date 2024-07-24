@@ -17,7 +17,7 @@ export function CheckboxField({
       asChild
     >
       <Field.Root>
-        <span className='flex gap-2'>
+        <div className='flex gap-2'>
           <Common.Input
             type='checkbox'
             asChild
@@ -29,7 +29,7 @@ export function CheckboxField({
           <Common.Label asChild>
             <Field.Label>{label}</Field.Label>
           </Common.Label>
-        </span>
+        </div>
 
         <Common.FieldError asChild>
           {({ message }) => {
