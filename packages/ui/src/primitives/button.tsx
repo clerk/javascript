@@ -56,13 +56,19 @@ export const Button = React.forwardRef(function Button(
     children,
     className,
     disabled,
-    icon,
+    iconStart,
+    iconEnd,
     intent,
     type = 'button',
+    spinnerWhenBusy,
     ...props
   }: React.ButtonHTMLAttributes<HTMLButtonElement> &
     // Omit types supplied via ButtonHTMLAttributes
-    Omit<VariantProps<typeof button>, 'disabled'> & { icon?: React.ReactNode },
+    Omit<VariantProps<typeof button>, 'disabled'> & {
+      spinnerWhenBusy?: boolean;
+      iconStart?: React.ReactNode;
+      iconEnd?: React.ReactNode;
+    },
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
   return (
@@ -74,12 +80,13 @@ export const Button = React.forwardRef(function Button(
       type={type}
       {...props}
     >
-      {busy ? (
+      {busy && spinnerWhenBusy ? (
         <Spinner className='shrink-0 text-[1.125rem]'>Loading…</Spinner>
       ) : (
         <>
-          <span className='truncate'>{children}</span>
-          {icon && <span className='shrink-0 text-[0.625rem] text-inherit opacity-60'>{icon}</span>}
+          {iconStart ? <span className='shrink-0 text-inherit opacity-60'>{iconStart}</span> : null}
+          {children ? <span className='truncate'>{children}</span> : null}
+          {iconEnd ? <span className='shrink-0 text-inherit opacity-60'>{iconEnd}</span> : null}
         </>
       )}
     </button>

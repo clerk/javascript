@@ -148,9 +148,10 @@ function SignUpComponentLoaded() {
                               asChild
                             >
                               <Button
-                                icon={<Icon.CaretRight />}
                                 busy={isSubmitting}
-                                disabled={isGlobalLoading || isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -234,7 +235,8 @@ function SignUpComponentLoaded() {
                               <Button
                                 busy={isSubmitting}
                                 disabled={isGlobalLoading}
-                                icon={<Icon.CaretRight />}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -301,7 +303,8 @@ function SignUpComponentLoaded() {
                               <Button
                                 busy={isSubmitting}
                                 disabled={isGlobalLoading}
-                                icon={<Icon.CaretRight />}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -437,9 +440,10 @@ function SignUpComponentLoaded() {
                             asChild
                           >
                             <Button
-                              icon={<Icon.CaretRight />}
                               busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                              disabled={isGlobalLoading}
+                              iconEnd={<Icon.CaretRightLegacy />}
+                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>

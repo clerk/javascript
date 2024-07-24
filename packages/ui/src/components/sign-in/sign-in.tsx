@@ -93,7 +93,7 @@ function SignInGetHelp() {
               onClick={() => {
                 window.location.href = `mailto:${supportEmail}`;
               }}
-              icon={<Icon.CaretRight />}
+              iconEnd={<Icon.CaretRightLegacy />}
             >
               Email support
             </Button>
@@ -230,9 +230,10 @@ export function SignInComponentLoaded() {
                             asChild
                           >
                             <Button
-                              icon={<Icon.CaretRight />}
                               busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                              disabled={isGlobalLoading}
+                              iconEnd={<Icon.CaretRightLegacy />}
+                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -346,9 +347,10 @@ export function SignInComponentLoaded() {
                                 asChild
                               >
                                 <Button
-                                  icon={<Icon.CaretRight />}
                                   busy={isSubmitting}
-                                  disabled={isGlobalLoading || isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -424,9 +426,10 @@ export function SignInComponentLoaded() {
                               <SignIn.Passkey asChild>
                                 <Button
                                   type='button'
-                                  icon={<Icon.CaretRight />}
                                   busy={isSubmitting}
-                                  disabled={isGlobalLoading || isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -477,9 +480,10 @@ export function SignInComponentLoaded() {
                                 asChild
                               >
                                 <Button
-                                  icon={<Icon.CaretRight />}
                                   busy={isSubmitting}
-                                  disabled={isGlobalLoading || isSubmitting}
+                                  disabled={isGlobalLoading}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -568,7 +572,8 @@ export function SignInComponentLoaded() {
                                 <Button
                                   busy={isSubmitting}
                                   disabled={isGlobalLoading}
-                                  icon={<Icon.CaretRight />}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -655,7 +660,8 @@ export function SignInComponentLoaded() {
                                 <Button
                                   busy={isSubmitting}
                                   disabled={isGlobalLoading}
-                                  icon={<Icon.CaretRight />}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -775,7 +781,8 @@ export function SignInComponentLoaded() {
                               <Button
                                 busy={isSubmitting}
                                 disabled={isGlobalLoading}
-                                icon={<Icon.CaretRight />}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -817,7 +824,8 @@ export function SignInComponentLoaded() {
                                 <Button
                                   busy={isSubmitting}
                                   disabled={isGlobalLoading}
-                                  icon={<Icon.CaretRight />}
+                                  iconEnd={<Icon.CaretRightLegacy />}
+                                  spinnerWhenBusy
                                 >
                                   {t('formButtonPrimary')}
                                 </Button>
@@ -870,7 +878,7 @@ export function SignInComponentLoaded() {
                       >
                         <Button
                           intent='secondary'
-                          icon={<Icon.LinkSm />}
+                          iconStart={<Icon.LinkSm />}
                         >
                           <SignIn.SafeIdentifier
                             transform={(identifier: string) =>
@@ -888,7 +896,7 @@ export function SignInComponentLoaded() {
                       >
                         <Button
                           intent='secondary'
-                          icon={<Icon.Envelope />}
+                          iconStart={<Icon.Envelope />}
                         >
                           <SignIn.SafeIdentifier
                             transform={(identifier: string) =>
@@ -906,7 +914,7 @@ export function SignInComponentLoaded() {
                       >
                         <Button
                           intent='secondary'
-                          icon={<Icon.SMSSm />}
+                          iconStart={<Icon.SMSSm />}
                         >
                           {t('signIn.alternativeMethods.blockButton__phoneCode', {
                             // Correct masked identifier to be added in SDKI-117
@@ -921,7 +929,7 @@ export function SignInComponentLoaded() {
                       >
                         <Button
                           intent='secondary'
-                          icon={<Icon.FingerprintSm />}
+                          iconStart={<Icon.FingerprintSm />}
                         >
                           {t('signIn.alternativeMethods.blockButton__passkey')}
                         </Button>
@@ -933,7 +941,7 @@ export function SignInComponentLoaded() {
                       >
                         <Button
                           intent='secondary'
-                          icon={<Icon.LockSm />}
+                          iconStart={<Icon.LockSm />}
                         >
                           {t('signIn.alternativeMethods.blockButton__password')}
                         </Button>
@@ -1020,7 +1028,7 @@ export function SignInComponentLoaded() {
                         >
                           <Button
                             intent='secondary'
-                            icon={<Icon.LinkSm />}
+                            iconStart={<Icon.LinkSm />}
                           >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
@@ -1038,7 +1046,7 @@ export function SignInComponentLoaded() {
                         >
                           <Button
                             intent='secondary'
-                            icon={<Icon.Envelope />}
+                            iconStart={<Icon.Envelope />}
                           >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
@@ -1056,7 +1064,7 @@ export function SignInComponentLoaded() {
                         >
                           <Button
                             intent='secondary'
-                            icon={<Icon.SMSSm />}
+                            iconStart={<Icon.SMSSm />}
                           >
                             {t('signIn.alternativeMethods.blockButton__phoneCode', {
                               // Correct masked identifier to be added in SDKI-117
@@ -1071,7 +1079,7 @@ export function SignInComponentLoaded() {
                         >
                           <Button
                             intent='secondary'
-                            icon={<Icon.FingerprintSm />}
+                            iconStart={<Icon.FingerprintSm />}
                           >
                             {t('signIn.alternativeMethods.blockButton__passkey')}
                           </Button>
@@ -1083,7 +1091,7 @@ export function SignInComponentLoaded() {
                         >
                           <Button
                             intent='secondary'
-                            icon={<Icon.LockSm />}
+                            iconStart={<Icon.LockSm />}
                           >
                             {t('signIn.alternativeMethods.blockButton__password')}
                           </Button>
