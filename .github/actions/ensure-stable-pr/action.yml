@@ -13,7 +13,7 @@ runs:
         CMD: ${{ inputs.cmd }}
       with:
         script: |
-          const prLastUpdated = new Date(github.pull_request.updated_at);
+          const prLastUpdated = new Date(github.pull_request.pushed_at);
           const commentCreated = new Date(github.issue_comment.created_at);
 
           if (prLastUpdated > commentCreated) {
