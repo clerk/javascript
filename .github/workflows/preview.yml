@@ -61,7 +61,7 @@ jobs:
 
             const pr = await github.rest.pulls.get({
               owner: 'clerk',
-              repo 'javascript',
+              repo: 'javascript',
               pull_number: context.issue.number,
             });
 
