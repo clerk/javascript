@@ -27,7 +27,7 @@ export type StartOAuthFlowReturnType = {
 export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
   const { strategy } = useOAuthParams || {};
   if (!strategy) {
-    throw errorThrower.throw('Missing oauth strategy');
+    return errorThrower.throw('Missing oauth strategy');
   }
 
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();

@@ -57,7 +57,7 @@
     "@clerk/shared": "2.4.0",
     "@clerk/types": "4.9.0",
     "base-64": "^1.0.0",
-    "react-native-url-polyfill": "^2.0.0",
+    "react-native-url-polyfill": "2.0.0",
     "tslib": "2.4.1"
   },
   "devDependencies": {
