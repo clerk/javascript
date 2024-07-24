@@ -4,6 +4,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
+import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { LastNameField } from '~/common/last-name-field';
 import { OTPField } from '~/common/otp-field';
@@ -43,7 +44,7 @@ function SignUpComponentLoaded() {
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
-  const { enabled: emailAddressEnabled } = useAttributes('email_address');
+  const { enabled: emailAddressEnabled, required: emailAddressRequired } = useAttributes('email_address');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
   const { applicationName, branded, homeUrl, logoImageUrl } = useDisplayConfig();
 
@@ -113,18 +114,24 @@ function SignUpComponentLoaded() {
                           />
                         ) : null}
 
-                        <EmailField disabled={isGlobalLoading} />
+                        {emailAddressEnabled && !emailAddressRequired && phoneNumberEnabled && !phoneNumberRequired ? (
+                          <EmailOrPhoneNumberField locationBasedCountryIso={locationBasedCountryIso} />
+                        ) : (
+                          <>
+                            <EmailField disabled={isGlobalLoading} />
 
-                        {phoneNumberEnabled ? (
-                          <PhoneNumberField
-                            label={t('formFieldLabel__phoneNumber')}
-                            hintText={t('formFieldHintText__optional')}
-                            required={phoneNumberRequired}
-                            disabled={isGlobalLoading}
-                            initPhoneWithCode={clerk.client.signUp.phoneNumber || ''}
-                            locationBasedCountryIso={locationBasedCountryIso}
-                          />
-                        ) : null}
+                            {phoneNumberEnabled ? (
+                              <PhoneNumberField
+                                label={t('formFieldLabel__phoneNumber')}
+                                hintText={t('formFieldHintText__optional')}
+                                required={phoneNumberRequired}
+                                disabled={isGlobalLoading}
+                                initPhoneWithCode={clerk.client.signUp.phoneNumber || ''}
+                                locationBasedCountryIso={locationBasedCountryIso}
+                              />
+                            ) : null}
+                          </>
+                        )}
 
                         {passwordEnabled && passwordRequired ? (
                           <PasswordField
