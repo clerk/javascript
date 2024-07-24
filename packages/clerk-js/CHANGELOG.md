@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.73.4
+
+### Patch Changes
+
+- Adjust how we pass captcha tokens to the Clerk API when signing in with Google, Microsoft, and Apple ([#3817](https://github.com/clerk/javascript/pull/3817)) by [@hhsnopek](https://github.com/hhsnopek)
+
 ## 4.73.3
 
 ### Patch Changes
