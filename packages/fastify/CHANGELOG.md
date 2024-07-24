@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.0.22
+
+### Patch Changes
+
+- Updated dependencies [[`d465d7069`](https://github.com/clerk/javascript/commit/d465d70696bf26270cb2efbf4695ca49016fcb96)]:
+  - @clerk/backend@1.4.2
+
 ## 1.0.21
 
 ### Patch Changes
