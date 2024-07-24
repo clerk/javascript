@@ -52,6 +52,7 @@ export class AuthCookieService {
   ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
+      // TODO: only update session cookie from active tab
       this.updateSessionCookie(token && token.getRawString());
       this.setClientUatCookieForDevelopmentInstances();
     });
