@@ -69,7 +69,7 @@ jobs:
             const prLastPushed = new Date(pr.pushed_at);
 
             if (prLastPushed > commentCreated) {
-              core.setFailed("The PR has been updated since !preview was initiated. Please review the changes and re-run the !preview command.');
+              core.setFailed("The PR has been updated since !preview was initiated. Please review the changes and re-run the !preview command.");
             }
 
       - name: Setup
