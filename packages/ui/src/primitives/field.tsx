@@ -15,6 +15,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
       ref={forwardedRef}
       {...props}
       className={cx(
+        'has-[[data-field-checkbox]]:[--cl-field-label-cursor:pointer]',
         'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
         'flex flex-col gap-2',
         className,
@@ -41,7 +42,11 @@ export const Label = React.forwardRef(function Label(
       className={cx(
         visuallyHidden
           ? 'sr-only'
-          : 'text-gray-12 flex items-center gap-x-1 text-base font-medium opacity-[--cl-field-label-opacity,1]',
+          : [
+              'text-gray-12 flex items-center gap-x-1 text-base font-medium opacity-[--cl-field-label-opacity,1]',
+              'cursor-[--cl-field-label-cursor,auto]',
+            ],
+
         className,
       )}
     >
@@ -77,6 +82,21 @@ export const Hint = React.forwardRef(function Hint(
     >
       {children}
     </LabelEnd>
+  );
+});
+
+export const Checkbox = React.forwardRef(function FieldCheckbox(
+  props: React.InputHTMLAttributes<HTMLInputElement>,
+  forwardedRef: React.ForwardedRef<HTMLInputElement>,
+) {
+  return (
+    <input
+      ref={forwardedRef}
+      type='checkbox'
+      data-field-checkbox
+      className={cx('accent-accent-9 mt-[0.1875em] size-3 cursor-pointer')}
+      {...props}
+    />
   );
 });
 

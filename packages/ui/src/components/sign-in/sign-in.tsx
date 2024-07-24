@@ -4,6 +4,7 @@ import * as SignIn from '@clerk/elements/sign-in';
 import * as React from 'react';
 
 import { BackupCodeField } from '~/common/backup-code-field';
+import { CheckboxField } from '~/common/checkbox-field';
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
 import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
@@ -1141,21 +1142,28 @@ export function SignInComponentLoaded() {
                         return <Alert>{message}</Alert>;
                       }}
                     </Common.GlobalError>
-                    <div className='flex flex-col justify-center gap-4'>
-                      <PasswordField
-                        validatePassword
-                        name='password'
-                        label={t('formFieldLabel__newPassword')}
-                      />
-                      <PasswordField
-                        name='confirmPassword'
-                        label={t('formFieldLabel__confirmPassword')}
-                      />
+                    <div className='flex flex-col justify-center gap-6'>
+                      <div className='flex flex-col justify-center gap-4'>
+                        <PasswordField
+                          validatePassword
+                          name='password'
+                          label={t('formFieldLabel__newPassword')}
+                        />
+                        <PasswordField
+                          name='confirmPassword'
+                          label={t('formFieldLabel__confirmPassword')}
+                        />
 
+                        <CheckboxField
+                          name='signOutOfOtherSessions'
+                          label={t('formFieldLabel__signOutOfOtherSessions')}
+                          defaultChecked
+                        />
+                      </div>
                       <Common.Loading>
                         {isSubmitting => {
                           return (
-                            <>
+                            <div className='flex flex-col justify-center gap-4'>
                               <SignIn.Action
                                 submit
                                 asChild
@@ -1163,6 +1171,7 @@ export function SignInComponentLoaded() {
                                 <Button
                                   busy={isSubmitting}
                                   disabled={isGlobalLoading || isSubmitting}
+                                  spinnerWhenBusy
                                 >
                                   {t('signIn.resetPassword.formButtonPrimary')}
                                 </Button>
@@ -1174,7 +1183,7 @@ export function SignInComponentLoaded() {
                               >
                                 <LinkButton>{t('backButton')}</LinkButton>
                               </SignIn.Action>
-                            </>
+                            </div>
                           );
                         }}
                       </Common.Loading>
