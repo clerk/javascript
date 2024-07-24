@@ -49,8 +49,8 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
+            console.dir(context);
             const commentCreated = new Date(context.payload.comment.created_at);
-            // const prLastUpdated = new Date(context.comment.issue.updated_at);
 
             const pr = await github.rest.pulls.get({
               owner: 'clerk',
