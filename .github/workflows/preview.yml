@@ -56,20 +56,17 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
-            console.dir(context);
             const commentCreated = new Date(context.payload.comment.created_at);
 
             const pr = await github.rest.pulls.get({
               owner: 'clerk',
               repo: 'javascript',
               pull_number: context.issue.number,
-            });
+            }).data;
 
-            console.log(pr);
+            const prLastUpdated = new Date(pr.updated_at);
 
-            const prLastPushed = new Date(pr.pushed_at);
-
-            if (prLastPushed > commentCreated) {
+            if (prLastUpdated > commentCreated) {
               core.setFailed("The PR has been updated since !preview was initiated. Please review the changes and re-run the !preview command.");
             }
 
