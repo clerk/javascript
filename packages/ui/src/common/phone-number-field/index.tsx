@@ -40,6 +40,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   const { translateError } = useLocalizations();
   const [isOpen, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
+  const id = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const commandListRef = React.useRef<HTMLDivElement>(null);
@@ -95,7 +96,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     >
       <Field.Root>
         <Common.Label asChild>
-          <Field.Label>
+          <Field.Label htmlFor={id}>
             {label}{' '}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
@@ -200,6 +201,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                 <input
                   ref={mergeRefs([forwardedRef, inputRef])}
                   type='tel'
+                  id={id}
                   maxLength={25}
                   value={formattedNumber}
                   onPaste={handlePaste}

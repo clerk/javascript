@@ -31,7 +31,7 @@ export const Label = React.forwardRef(function Label(
     children,
     visuallyHidden,
     ...props
-  }: React.HTMLAttributes<HTMLLabelElement> & { visuallyHidden?: boolean },
+  }: React.HTMLAttributes<HTMLLabelElement> & { htmlFor?: string; visuallyHidden?: boolean },
   forwardedRef: React.ForwardedRef<HTMLLabelElement>,
 ) {
   return (
