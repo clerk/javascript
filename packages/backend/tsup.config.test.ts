@@ -16,7 +16,7 @@ export default defineConfig(overrideOptions => {
       PACKAGE_VERSION: `"0.0.0-test"`,
       __DEV__: `${isWatch}`,
     },
-    external: ['#crypto'],
+    external: ['#crypto', '#ephemeral'],
     clean: true,
     minify: false,
     tsconfig: 'tsconfig.test.json',

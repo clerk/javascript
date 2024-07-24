@@ -8,6 +8,7 @@ import type {
   RequestState,
 } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { isClerkKeyError } from '@clerk/shared';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -80,14 +81,12 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
     logger.enable();
   }
 
-  const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
-    errorThrower.throwMissingPublishableKeyError(),
-  );
-  const secretKey = assertKey(params.secretKey || SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
+  const publishableKey = params.publishableKey || PUBLISHABLE_KEY;
+  const secretKey = params.secretKey || SECRET_KEY;
   const signInUrl = params.signInUrl || SIGN_IN_URL;
   const signUpUrl = params.signUpUrl || SIGN_UP_URL;
 
-  const options = {
+  const runOptions = {
     ...params,
     publishableKey,
     secretKey,
@@ -95,16 +94,33 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
     signUpUrl,
   };
 
-  return clerkMiddlewareRequestDataStore.run(options, () => {
+  const ephemeralMode = process.env.NODE_ENV === 'development' && (!params.publishableKey || !params.secretKey);
+  let ephemeralPublishableKey: string | undefined;
+  let ephemeralSecretKey: string | undefined;
+
+  return clerkMiddlewareRequestDataStore.run(runOptions, () => {
     clerkClient().telemetry.record(
       eventMethodCalled('clerkMiddleware', {
         handler: Boolean(handler),
-        satellite: Boolean(options.isSatellite),
-        proxy: Boolean(options.proxyUrl),
+        satellite: Boolean(runOptions.isSatellite),
+        proxy: Boolean(runOptions.proxyUrl),
       }),
     );
 
-    const nextMiddleware: NextMiddleware = async (request, event) => {
+    const baseNextMiddleware: NextMiddleware = async (request, event) => {
+      const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY || ephemeralPublishableKey || '', () =>
+        errorThrower.throwMissingPublishableKeyError(),
+      );
+      const secretKey = assertKey(params.secretKey || SECRET_KEY || ephemeralSecretKey || '', () =>
+        errorThrower.throwMissingSecretKeyError(),
+      );
+
+      const options = {
+        ...runOptions,
+        publishableKey,
+        secretKey,
+      };
+
       const clerkRequest = createClerkRequest(request);
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
@@ -164,6 +180,46 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
       decorateRequest(clerkRequest, handlerResult, requestState, params);
 
       return handlerResult;
+    };
+
+    const nextMiddleware: NextMiddleware = async (request, event) => {
+      if (process.env.NODE_ENV !== 'development') {
+        return await baseNextMiddleware(request, event);
+      }
+
+      try {
+        if (ephemeralMode) {
+          const params = Object.fromEntries(request.nextUrl.searchParams);
+          const queryEphemeralPublishableKey = params[constants.QueryParameters.EphemeralPublishableKey];
+          const queryEphemeralSecretKey = params[constants.QueryParameters.EphemeralSecretKey];
+
+          if (queryEphemeralPublishableKey && ephemeralPublishableKey !== queryEphemeralPublishableKey) {
+            ephemeralPublishableKey = queryEphemeralPublishableKey;
+          }
+          if (queryEphemeralSecretKey && ephemeralSecretKey !== queryEphemeralSecretKey) {
+            ephemeralSecretKey = queryEphemeralSecretKey;
+          }
+        }
+
+        const handlerResult = (await baseNextMiddleware(request, event)) as NextResponse;
+
+        if (ephemeralMode) {
+          // TODO: Set the cookie expiry to the same as the key
+          handlerResult.cookies.set(constants.Cookies.EphemeralPublishableKey, ephemeralPublishableKey || '');
+          handlerResult.cookies.set(constants.Cookies.EphemeralSecretKey, ephemeralSecretKey || '');
+        } else {
+          handlerResult.cookies.delete(constants.Cookies.EphemeralPublishableKey);
+          handlerResult.cookies.delete(constants.Cookies.EphemeralSecretKey);
+        }
+
+        return handlerResult;
+      } catch (e: any) {
+        // And this is a clerkKeyError, return a no-op to allow the ClerkProvider to fetch the keys
+        if (isClerkKeyError(e)) {
+          return null;
+        }
+        throw e;
+      }
     };
 
     // If we have a request and event, we're being called as a middleware directly

@@ -9,6 +9,8 @@ exports[`constants from environment variables 1`] = `
     "DevBrowser": "__clerk_db_jwt",
     "Handshake": "__clerk_handshake",
     "Session": "__session",
+    "EphemeralPublishableKey": "__clerk_ephemeral_publishable_key",
+    "EphemeralSecretKey": "__clerk_ephemeral_secret_key",
   },
   "Headers": {
     "Accept": "accept",
