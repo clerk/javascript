@@ -13,7 +13,6 @@ type AstroClerkIntegrationParams = Without<
   ClerkOptions,
   | 'isSatellite'
   | 'sdkMetadata'
-  | 'telemetry'
   | 'standardBrowser'
   | 'selectInitialSession'
   | 'routerReplace'

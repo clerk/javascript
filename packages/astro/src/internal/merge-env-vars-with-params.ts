@@ -1,3 +1,5 @@
+import { isTruthy } from '@clerk/shared/underscore';
+
 import type { AstroClerkIntegrationParams } from '../types';
 
 /**
@@ -11,6 +13,7 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     proxyUrl: paramProxy,
     domain: paramDomain,
     publishableKey: paramPublishableKey,
+    telemetry: paramTelemetry,
     ...rest
   } = params || {};
 
@@ -21,6 +24,10 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     proxyUrl: paramProxy || import.meta.env.PUBLIC_CLERK_PROXY_URL,
     domain: paramDomain || import.meta.env.PUBLIC_CLERK_DOMAIN,
     publishableKey: paramPublishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
+    telemetry: paramTelemetry || {
+      disabled: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DISABLED),
+      debug: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DEBUG),
+    },
     ...rest,
   };
 };

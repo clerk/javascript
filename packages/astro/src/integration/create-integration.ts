@@ -50,12 +50,12 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
 
           const buildImportPath = `${packageName}/internal`;
 
-          // Set params as envs do backend code has access to them
+          // Set params as envs so backend code has access to them
           updateConfig({
             vite: {
               define: {
                 /**
-                 * Convert the integration params to environment variable in order for be readable from the server
+                 * Convert the integration params to environment variable in order for it to be readable from the server
                  */
                 ...buildEnvVarFromOption(signInUrl, 'PUBLIC_CLERK_SIGN_IN_URL'),
                 ...buildEnvVarFromOption(signUpUrl, 'PUBLIC_CLERK_SIGN_UP_URL'),
