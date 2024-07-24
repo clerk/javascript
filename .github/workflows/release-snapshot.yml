@@ -50,7 +50,6 @@ jobs:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const commentCreated = new Date(context.payload.comment.created_at);
-            // const prLastUpdated = new Date(context.comment.issue.updated_at);
 
             const pr = await github.rest.pulls.get({
               owner: 'clerk',
