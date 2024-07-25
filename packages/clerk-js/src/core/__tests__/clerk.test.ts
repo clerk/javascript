@@ -335,15 +335,53 @@ describe('Clerk singleton', () => {
         return Promise.resolve();
       });
 
-      await sut.setActive({ organization: { id: 'org-id' } as Organization, beforeEmit: beforeEmitMock });
+      await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
 
       await waitFor(() => {
         expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
         expect(mockSession.touch).toHaveBeenCalled();
         expect(mockSession.getToken).toHaveBeenCalled();
-        expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
+        expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
         expect(beforeEmitMock).toBeCalledWith(mockSession);
         expect(sut.session).toMatchObject(mockSession);
+      });
+    });
+
+    it('sets active organization by slug', async () => {
+      const mockSession2 = {
+        id: '1',
+        status: 'active',
+        user: {
+          organizationMemberships: [
+            {
+              id: 'orgmem_id',
+              organization: {
+                id: 'org_id',
+                slug: 'some-org-slug',
+              },
+            },
+          ],
+        },
+        touch: jest.fn(),
+        getToken: jest.fn(),
+      };
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession2] }));
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+
+      mockSession2.touch.mockImplementationOnce(() => {
+        sut.session = mockSession2 as any;
+        return Promise.resolve();
+      });
+      mockSession2.getToken.mockImplementation(() => 'mocked-token');
+
+      await sut.setActive({ organization: 'some-org-slug' });
+
+      await waitFor(() => {
+        expect(mockSession2.touch).toHaveBeenCalled();
+        expect(mockSession2.getToken).toHaveBeenCalled();
+        expect((mockSession2 as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
+        expect(sut.session).toMatchObject(mockSession2);
       });
     });
 
@@ -365,11 +403,11 @@ describe('Clerk singleton', () => {
           return Promise.resolve();
         });
 
-        await sut.setActive({ organization: { id: 'org-id' } as Organization, beforeEmit: beforeEmitMock });
+        await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
 
         expect(executionOrder).toEqual(['session.touch', 'before emit']);
         expect(mockSession.touch).toHaveBeenCalled();
-        expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
+        expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
         expect(mockSession.getToken).toBeCalled();
         expect(beforeEmitMock).toBeCalledWith(mockSession);
         expect(sut.session).toMatchObject(mockSession);
@@ -1892,12 +1930,12 @@ describe('Clerk singleton', () => {
       BaseResource._fetch = jest.fn().mockResolvedValue({});
       const sut = new Clerk(developmentPublishableKey);
 
-      await sut.getOrganization('some-org-id');
+      await sut.getOrganization('org_id');
 
       // @ts-expect-error - Mocking a protected method
       expect(BaseResource._fetch).toHaveBeenCalledWith({
         method: 'GET',
-        path: '/organizations/some-org-id',
+        path: '/organizations/org_id',
       });
     });
   });
