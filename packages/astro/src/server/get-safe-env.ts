@@ -1,10 +1,11 @@
+import { isTruthy } from '@clerk/shared/underscore';
 import type { APIContext } from 'astro';
 
 type ContextOrLocals = APIContext | APIContext['locals'];
 
 /**
  * @internal
- * Isomorphic handler for reading environemnt variables defined from Vite or are injected in the request context (CF Pages)
+ * Isomorphic handler for reading environment variables defined from Vite or are injected in the request context (CF Pages)
  */
 function getContextEnvVar(envVarName: keyof InternalEnv, contextOrLocals: ContextOrLocals): string | undefined {
   const locals = 'locals' in contextOrLocals ? contextOrLocals.locals : contextOrLocals;
@@ -33,6 +34,8 @@ function getSafeEnv(context: ContextOrLocals) {
     clerkJsVersion: getContextEnvVar('PUBLIC_CLERK_JS_VERSION', context),
     apiVersion: getContextEnvVar('CLERK_API_VERSION', context),
     apiUrl: getContextEnvVar('CLERK_API_URL', context),
+    telemetryDisabled: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DISABLED', context)),
+    telemetryDebug: isTruthy(getContextEnvVar('PUBLIC_CLERK_TELEMETRY_DEBUG', context)),
   };
 }
 

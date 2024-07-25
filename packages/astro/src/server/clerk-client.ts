@@ -21,6 +21,10 @@ const createClerkClientWithOptions: CreateClerkClientWithOptions = (context, opt
       // eslint-disable-next-line turbo/no-undeclared-env-vars
       environment: import.meta.env.MODE,
     },
+    telemetry: {
+      disabled: getSafeEnv(context).telemetryDisabled,
+      debug: getSafeEnv(context).telemetryDebug,
+    },
     ...options,
   });
 
