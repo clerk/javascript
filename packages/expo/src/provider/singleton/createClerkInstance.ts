@@ -3,13 +3,8 @@ import type { Clerk } from '@clerk/clerk-js/headless';
 import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
 
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
-import type { TokenCache } from '../../cache/types';
 import { errorThrower } from '../../errorThrower';
-
-type BuildClerkOptions = {
-  publishableKey?: string;
-  tokenCache?: TokenCache;
-};
+import type { BuildClerkOptions } from './types';
 
 const KEY = '__clerk_client_jwt';
 
