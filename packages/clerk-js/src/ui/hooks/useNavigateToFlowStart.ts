@@ -3,7 +3,8 @@ import { useRouter } from '../router';
 export const useNavigateToFlowStart = () => {
   const router = useRouter();
   const navigateToFlowStart = async () => {
-    const to = '/' + router.basePath + router.flowStartPath;
+    const to = router.indexPath;
+
     if (to !== router.currentPath) {
       return router.navigate(to);
     }
