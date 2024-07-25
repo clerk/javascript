@@ -3,4 +3,4 @@
 "@clerk/types": patch
 ---
 
-Support opening the userProfileModal and organizationProfileModal to specific navigation items through the userButton and organizationSwitcher.
+Add support for opening the `UserProfileModal` and `OrganizationProfileModal` to specific navigation items through the `UserButton` and `OrganizationSwitcher`.
