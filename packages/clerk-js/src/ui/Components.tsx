@@ -128,7 +128,7 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
           void preloadComponent(preloadHint);
         }
         componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
-          createRoot(clerkRoot).render(
+          createRoot(clerkRoot!).render(
             <Components
               clerk={clerk}
               environment={environment}
