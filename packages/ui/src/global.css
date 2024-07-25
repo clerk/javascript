@@ -18,7 +18,7 @@
 }
 
 :where(:root) {
-  --cl-font-family: inherit;
+  --cl-font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
   --cl-color-danger: 0 84% 60%;
   --cl-color-success: 142 71% 45%;
   --cl-color-warning: 25 95% 53%;
