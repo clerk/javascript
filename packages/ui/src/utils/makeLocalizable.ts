@@ -1,3 +1,5 @@
+// This file contains code originally found in packages/clerk-js/src/ui/localization and modified for use within UI.
+
 import { enUS } from '@clerk/localizations';
 import { normalizeDate, titleize } from '@clerk/shared';
 import type { DeepRequired, LocalizationResource, PasswordSettingsData, PathValue, RecordToPath } from '@clerk/types';
