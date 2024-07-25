@@ -565,8 +565,7 @@ function FieldState({ children }: FieldStateRenderFn) {
 
   const message = feedback?.message instanceof ClerkElementsFieldError ? feedback.message.message : feedback?.message;
   const codes = feedback?.codes;
-  // TODO: Remove casting as PasswordConfig when we have a better way to handle this
-  const config = feedback && 'config' in feedback ? (feedback?.config as PasswordConfig) : undefined;
+  const config = feedback && 'config' in feedback ? feedback?.config : undefined;
 
   const fieldState = { state: enrichFieldState(validity, state), message, codes, config };
 
