@@ -69,11 +69,10 @@ export function PasswordField({
         </Common.FieldState>
         {props.validatePassword ? (
           <Common.FieldState>
-            {({ state, message, codes, config }) => {
+            {({ state, codes, config }) => {
               if (state === 'idle') {
                 return;
               }
-              console.log(codes);
               if (state === 'success') {
                 return (
                   <Field.Message

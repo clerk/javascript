@@ -304,7 +304,6 @@ export const translatePasswordError = ({
         const [lk, attr] = localizedKey;
         return t(lk as any, { [attr]: config[k as keyof UsePasswordComplexityConfig] });
       }
-      console.log({ localizedKey, t: t(localizedKey as any), k });
       return t(localizedKey as any);
     });
 
