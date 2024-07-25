@@ -5,7 +5,6 @@ import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../
 import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
 import { common, mqu } from '../../styledSystem';
 import { colors } from '../../utils';
-import { DevModeOverlay } from '../DevModeNotice';
 import { Card } from '.';
 
 type CardFooterProps = PropsOfComponent<typeof Flex> & {
@@ -13,12 +12,14 @@ type CardFooterProps = PropsOfComponent<typeof Flex> & {
 };
 export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((props, ref) => {
   const { children, isProfileFooter = false, sx, ...rest } = props;
-  const { branded } = useEnvironment().displayConfig;
+  const { displayConfig, isDevelopmentOrStaging } = useEnvironment();
+  const { branded } = displayConfig;
+  const withDevModeNotice = isDevelopmentOrStaging();
   const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
   const sponsorOrLinksExist = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
   const showSponsorAndLinks = isProfileFooter ? branded : sponsorOrLinksExist;
 
-  if (!children && !showSponsorAndLinks) {
+  if (!children && !(showSponsorAndLinks || withDevModeNotice)) {
     return null;
   }
 
@@ -46,7 +47,6 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       elementDescriptor={descriptors.footer}
       sx={[
         t => ({
-          position: 'relative',
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
           background: common.mergedColorsBackground(
@@ -64,8 +64,6 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
       {...rest}
       ref={ref}
     >
-      <DevModeOverlay />
-
       {children}
 
       <Card.ClerkAndPagesTag
@@ -73,6 +71,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
         devModeNoticeSx={t => ({
           padding: t.space.$none,
         })}
+        withDevOverlay
       />
     </Flex>
   );
