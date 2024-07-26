@@ -27,7 +27,7 @@ import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link';
-import { Seperator } from '~/primitives/seperator';
+import { Separator } from '~/primitives/separator';
 import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
 /**
@@ -157,7 +157,7 @@ export function SignInComponentLoaded() {
 
                     <Connections disabled={isGlobalLoading} />
 
-                    {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
+                    {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
 
                     {hasIdentifier ? (
                       <div className='flex flex-col gap-4'>
@@ -1036,7 +1036,7 @@ export function SignInComponentLoaded() {
                         <Button>{t('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword')}</Button>
                       </SignIn.SupportedStrategy>
 
-                      <Seperator>{t('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}</Seperator>
+                      <Separator>{t('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}</Separator>
 
                       <div className='flex flex-col gap-2'>
                         <Connections disabled={isGlobalLoading} />
