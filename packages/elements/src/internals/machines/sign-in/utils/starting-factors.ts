@@ -9,6 +9,7 @@ import type {
   SignInStrategy,
 } from '@clerk/types';
 
+// Factor sorting - https://github.com/clerk/javascript/blob/5764e2911790051589bb5c4f3b1a2c79f7f30c7e/packages/clerk-js/src/ui/utils/factorSorting.ts
 const makeSortingOrderMap = <T extends string>(arr: T[]): Record<T, number> =>
   arr.reduce(
     (acc, k, i) => {
@@ -27,25 +28,11 @@ const STRATEGY_SORT_ORDER_PASSWORD_PREF = makeSortingOrderMap([
 ] as SignInStrategy[]);
 
 const STRATEGY_SORT_ORDER_OTP_PREF = makeSortingOrderMap([
-  'email_link',
   'email_code',
+  'email_link',
   'phone_code',
   'passkey',
   'password',
-] as SignInStrategy[]);
-
-const STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS = makeSortingOrderMap([
-  'email_link',
-  'email_code',
-  'phone_code',
-  'passkey',
-  'password',
-] as SignInStrategy[]);
-
-const STRATEGY_SORT_ORDER_BACKUP_CODE_PREF = makeSortingOrderMap([
-  'totp',
-  'phone_code',
-  'backup_code',
 ] as SignInStrategy[]);
 
 const makeSortingFunction =
@@ -59,10 +46,8 @@ const makeSortingFunction =
     return orderA - orderB;
   };
 
-export const passwordPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_PASSWORD_PREF);
-export const otpPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_OTP_PREF);
-export const backupCodePrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_BACKUP_CODE_PREF);
-export const allStrategiesButtonsComparator = makeSortingFunction(STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS);
+const passwordPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_PASSWORD_PREF);
+const otpPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_OTP_PREF);
 
 const findFactorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
