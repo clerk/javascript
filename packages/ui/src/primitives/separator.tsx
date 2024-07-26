@@ -1,8 +1,8 @@
 import { cx } from 'cva';
 import * as React from 'react';
 
-export const Seperator = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  function Seperator({ children, className, ...props }, forwardedRef) {
+export const Separator = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  function Separator({ children, className, ...props }, forwardedRef) {
     return (
       <p
         ref={forwardedRef}
