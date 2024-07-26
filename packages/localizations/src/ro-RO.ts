@@ -459,6 +459,8 @@ export const roRO: LocalizationResource = {
     },
     start: {
       actionLink: 'Conectați-vă',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Aveți un cont?',
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Creați-vă un cont',

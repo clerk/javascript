@@ -452,6 +452,8 @@ export const zhTW: LocalizationResource = {
     },
     start: {
       actionLink: '登錄',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: '已經有帳戶了？',
       subtitle: '繼續使用 {{applicationName}}',
       title: '創建您的帳戶',

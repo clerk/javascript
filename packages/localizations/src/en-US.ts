@@ -446,8 +446,8 @@ export const enUS: LocalizationResource = {
     },
     start: {
       actionLink: 'Sign in',
-      actionLink__use_phone: 'Use phone instead',
       actionLink__use_email: 'Use email instead',
+      actionLink__use_phone: 'Use phone instead',
       actionText: 'Already have an account?',
       subtitle: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',

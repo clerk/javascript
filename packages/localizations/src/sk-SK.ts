@@ -455,6 +455,8 @@ export const skSK: LocalizationResource = {
     },
     start: {
       actionLink: 'Prihlásiť sa',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Máte účet?',
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Vytvorte si účet',

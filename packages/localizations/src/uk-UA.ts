@@ -455,6 +455,8 @@ export const ukUA: LocalizationResource = {
     },
     start: {
       actionLink: 'Увійти',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Уже є акаунт?',
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Створіть Ваш акаунт',

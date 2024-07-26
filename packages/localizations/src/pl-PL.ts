@@ -455,6 +455,8 @@ export const plPL: LocalizationResource = {
     },
     start: {
       actionLink: 'Zaloguj się',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Masz już konto?',
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Utwórz swoje konto',

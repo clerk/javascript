@@ -458,6 +458,8 @@ export const mnMN: LocalizationResource = {
     },
     start: {
       actionLink: 'Нэвтрэх',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Бүртгэлтэй юу?',
       subtitle: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
       title: 'Бүртгэл үүсгэх',

@@ -455,6 +455,8 @@ export const nlNL: LocalizationResource = {
     },
     start: {
       actionLink: 'Inloggen',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Heb je al een account?',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Maak je account aan',

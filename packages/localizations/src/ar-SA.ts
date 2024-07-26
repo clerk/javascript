@@ -454,6 +454,8 @@ export const arSA: LocalizationResource = {
     },
     start: {
       actionLink: 'تسجيل الدخول',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'لديك حساب بالفعل؟',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'أنشاء حساب جديد',

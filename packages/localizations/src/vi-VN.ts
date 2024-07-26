@@ -455,6 +455,8 @@ export const viVN: LocalizationResource = {
     },
     start: {
       actionLink: 'Đăng nhập',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Đã có tài khoản?',
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Tạo tài khoản của bạn',

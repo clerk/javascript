@@ -455,6 +455,8 @@ export const trTR: LocalizationResource = {
     },
     start: {
       actionLink: 'Giriş yap',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Hesabınız var mı?',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Hesap oluştur',

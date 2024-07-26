@@ -452,6 +452,8 @@ export const koKR: LocalizationResource = {
     },
     start: {
       actionLink: '로그인하기',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: '계정이 있으신가요?',
       subtitle: '환영합니다! 아래 정보를 입력해주세요.',
       title: '계정 만들기',
