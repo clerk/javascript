@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.10.2
+
+### Patch Changes
+
+- Add support for opening the `UserProfileModal` and `OrganizationProfileModal` to specific navigation items through the `UserButton` and `OrganizationSwitcher`. ([#3732](https://github.com/clerk/javascript/pull/3732)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Adjust how we pass captcha tokens to the Clerk API when signing in with Google, Microsoft, and Apple ([#3806](https://github.com/clerk/javascript/pull/3806)) by [@BRKalow](https://github.com/BRKalow)
+
+- Add `signUp.start.actionLink__use_email` and `signUp.start.actionLink__use_phone` localization keys. ([#3826](https://github.com/clerk/javascript/pull/3826)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`b48689705`](https://github.com/clerk/javascript/commit/b48689705f9fc2251d2f24addec7a0d0b1da0fe1), [`4e61f8d27`](https://github.com/clerk/javascript/commit/4e61f8d2770907f48a53d530187a7b6de09f107e)]:
+  - @clerk/types@4.9.1
+  - @clerk/localizations@2.5.2
+  - @clerk/shared@2.4.1
+
 ## 5.10.1
 
 ### Patch Changes

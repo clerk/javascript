@@ -1,5 +1,11 @@
 # @clerk/dev-cli
 
+## 0.0.3
+
+### Patch Changes
+
+- Fix a bug where `clerk-dev init` would error if the config directory did not already exist. ([#3804](https://github.com/clerk/javascript/pull/3804)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 0.0.2
 
 ### Patch Changes

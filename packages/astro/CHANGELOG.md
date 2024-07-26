@@ -1,5 +1,19 @@
 # @clerk/astro
 
+## 1.0.4
+
+### Patch Changes
+
+- Introduce option to opt-out of telemetry data collection ([#3808](https://github.com/clerk/javascript/pull/3808)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Allow the handler of `clerkMiddleware` to return undefined. When undefined is returned, `clerkMiddleware` implicitly calls `await next()`. ([#3792](https://github.com/clerk/javascript/pull/3792)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b48689705`](https://github.com/clerk/javascript/commit/b48689705f9fc2251d2f24addec7a0d0b1da0fe1), [`17bbe0199`](https://github.com/clerk/javascript/commit/17bbe01994beb9c5e53355cc692a5d71ddf4cc8c), [`4e61f8d27`](https://github.com/clerk/javascript/commit/4e61f8d2770907f48a53d530187a7b6de09f107e)]:
+  - @clerk/clerk-js@5.10.2
+  - @clerk/types@4.9.1
+  - @clerk/backend@1.4.3
+  - @clerk/shared@2.4.1
+
 ## 1.0.3
 
 ### Patch Changes

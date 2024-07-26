@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.20
+
+### Patch Changes
+
+- Updated dependencies [[`b48689705`](https://github.com/clerk/javascript/commit/b48689705f9fc2251d2f24addec7a0d0b1da0fe1)]:
+  - @clerk/types@4.9.1
+  - @clerk/backend@1.4.3
+  - @clerk/shared@2.4.1
+
 ## 5.0.19
 
 ### Patch Changes
