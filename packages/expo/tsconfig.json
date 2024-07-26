@@ -3,7 +3,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "lib": ["es6", "dom"],
-    "jsx": "react",
+    "jsx": "react-jsx",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "importHelpers": true,
@@ -20,7 +20,8 @@
     "allowJs": true,
     "target": "ES2019",
     "noEmitOnError": false,
-    "incremental": true
+    "incremental": true,
+    "moduleSuffixes": [".ios", ".android", ".native", ""]
   },
   "include": ["src"]
 }

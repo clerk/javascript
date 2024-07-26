@@ -5,8 +5,11 @@ export const common = ({ page }: TestArgs) => {
     continue: () => {
       return page.getByRole('button', { name: 'Continue', exact: true }).click();
     },
+    setEmailAddress: (val: string) => {
+      return self.getEmailAddressInput().fill(val);
+    },
     setPassword: (val: string) => {
-      return page.locator('input[name=password]').fill(val);
+      return self.getPasswordInput().fill(val);
     },
     setPasswordConfirmation: (val: string) => {
       return page.locator('input[name=confirmPassword]').fill(val);
