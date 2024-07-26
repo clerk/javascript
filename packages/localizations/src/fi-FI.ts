@@ -1,3 +1,15 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const fiFI: LocalizationResource = {
@@ -297,6 +309,10 @@ export const fiFI: LocalizationResource = {
       title: 'Tarkista sähköpostisi',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
+        title: 'Vahvistuslinkki on virheellinen tälle laitteelle',
+      },
       expired: {
         subtitle: 'Palaa alkuperäiseen välilehteen jatkaaksesi.',
         title: 'Tämä vahvistuslinkki on vanhentunut',
@@ -325,10 +341,6 @@ export const fiFI: LocalizationResource = {
         subtitle: 'Palaa alkuperäiseen välilehteen jatkaaksesi',
         subtitleNewTab: 'Palaa uuteen välilehteen jatkaaksesi',
         titleNewTab: 'Kirjautunut toiseen välilehteen',
-      },
-      clientMismatch: {
-        subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
-        title: 'Vahvistuslinkki on virheellinen tälle laitteelle',
       },
     },
     forgotPassword: {
@@ -416,6 +428,10 @@ export const fiFI: LocalizationResource = {
       title: 'Tarkista sähköpostisi',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit rekisteröitymisen',
+        title: 'Vahvistuslinkki on virheellinen tälle laitteelle',
+      },
       formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
       formTitle: 'Vahvistuslinkki',
       loading: {
@@ -432,10 +448,6 @@ export const fiFI: LocalizationResource = {
         subtitleNewTab: 'Palaa uuteen välilehteen jatkaaksesi',
         title: 'Rekisteröitynyt toiseen välilehteen',
       },
-      clientMismatch: {
-        subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit rekisteröitymisen',
-        title: 'Vahvistuslinkki on virheellinen tälle laitteelle',
-      },
     },
     phoneCode: {
       formSubtitle: 'Syötä puhelimeesi lähetetty koodi',
@@ -446,6 +458,8 @@ export const fiFI: LocalizationResource = {
     },
     start: {
       actionLink: 'Kirjaudu sisään',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Onko sinulla jo tili?',
       subtitle: 'Tervetuloa! Luo tili jatkaaksesi.',
       title: 'Luo tili',
@@ -720,6 +734,7 @@ export const fiFI: LocalizationResource = {
         actionLabel__reauthorize: 'Valtuuta nyt',
         destructiveActionTitle: 'Poista',
         primaryButton: 'Yhdistä tili',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'Tarvittavat käyttöoikeudet on päivitetty, ja saatat kokea rajoitettua toiminnallisuutta. Valtuuta tämä sovellus välttääksesi mahdolliset ongelmat.',
         title: 'Yhdistetyt tilit',

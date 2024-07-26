@@ -457,6 +457,8 @@ export const huHU: LocalizationResource = {
     },
     start: {
       actionLink: 'Bejelentkezés',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Van már fiókod?',
       subtitle: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       title: 'Fiók létrehozása',

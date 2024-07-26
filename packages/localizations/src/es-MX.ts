@@ -461,6 +461,8 @@ export const esMX: LocalizationResource = {
     },
     start: {
       actionLink: 'Acceder',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: '¿Tienes una cuenta?',
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Crea tu cuenta',

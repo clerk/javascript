@@ -457,6 +457,8 @@ export const jaJP: LocalizationResource = {
     },
     start: {
       actionLink: 'サインイン',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'アカウントをお持ちですか？',
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'アカウントを作成',

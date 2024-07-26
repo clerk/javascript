@@ -457,6 +457,8 @@ export const bgBG: LocalizationResource = {
     },
     start: {
       actionLink: 'Влезте',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Вече имате акаунт?',
       subtitle: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',

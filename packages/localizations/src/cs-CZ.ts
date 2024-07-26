@@ -454,6 +454,8 @@ export const csCZ: LocalizationResource = {
     },
     start: {
       actionLink: 'Přihlásit se',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Máte účet?',
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Vytvořte si účet',

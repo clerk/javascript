@@ -459,6 +459,8 @@ export const ruRU: LocalizationResource = {
     },
     start: {
       actionLink: 'Войти',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Уже есть аккаунт?',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Ваш аккаунт',
