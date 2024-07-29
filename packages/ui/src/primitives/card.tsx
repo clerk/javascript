@@ -174,7 +174,7 @@ export const Footer = React.forwardRef(function Footer(
       {children}
       {branded ? (
         <div className='grid place-content-center px-6 py-4'>
-          <p className='text-gray-a11 inline-flex items-center gap-x-1 text-sm'>
+          <p className='text-gray-a11 inline-flex items-center gap-x-1 text-sm font-medium'>
             Secured by{' '}
             <a
               aria-label='Clerk logo'

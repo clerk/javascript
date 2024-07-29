@@ -214,18 +214,19 @@ function SignUpComponentLoaded() {
                       </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
-                        // TODO:
-                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
                           <SignUp.Action
                             asChild
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                              <LinkButton
+                                type='button'
+                                disabled
+                              >
                                 {t('signUp.phoneCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
-                              </p>
+                              </LinkButton>
                             )}
                           >
                             <LinkButton type='button'>{t('signUp.phoneCode.resendButton')}</LinkButton>
@@ -290,10 +291,13 @@ function SignUpComponentLoaded() {
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                              <LinkButton
+                                type='button'
+                                disabled
+                              >
                                 {t('signUp.emailCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
-                              </p>
+                              </LinkButton>
                             )}
                           >
                             <LinkButton type='button'>{t('signUp.emailCode.resendButton')}</LinkButton>
@@ -360,10 +364,13 @@ function SignUpComponentLoaded() {
                         // eslint-disable-next-line react/no-unstable-nested-components
                         fallback={({ resendableAfter }) => {
                           return (
-                            <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                            <LinkButton
+                              type='button'
+                              disabled
+                            >
                               {t('signUp.emailLink.resendButton')} (
                               <span className='tabular-nums'>{resendableAfter}</span>)
-                            </p>
+                            </LinkButton>
                           );
                         }}
                       >
