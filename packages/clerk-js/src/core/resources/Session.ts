@@ -98,7 +98,7 @@ export class Session extends BaseResource implements SessionResource {
       const activeOrganizationPermissions = activeMembership?.permissions;
       const activeOrganizationRole = activeMembership?.role;
 
-      const missingOrgs = activeMembership;
+      const missingOrgs = !activeMembership;
 
       if (params.permission && !missingOrgs) {
         orgAuthorization = activeOrganizationPermissions!.includes(params.permission);
