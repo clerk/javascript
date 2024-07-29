@@ -1,7 +1,17 @@
 import type { FloatingContext, ReferenceType } from '@floating-ui/react';
-import { FloatingFocusManager, FloatingNode, FloatingOverlay, FloatingPortal } from '@floating-ui/react';
+import {
+  FloatingFocusManager,
+  FloatingNode,
+  FloatingOverlay as _FloatingOverlay,
+  FloatingPortal,
+} from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
+
+import { descriptors } from '../customizables';
+import { makeCustomizable } from '../customizables/makeCustomizable';
+
+const FloatingOverlay = makeCustomizable(_FloatingOverlay, {});
 
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;
@@ -41,7 +51,12 @@ export const Popover = (props: PopoverProps) => {
         <FloatingPortal>
           {isOpen && (
             <>
-              {overlay ? <FloatingOverlay lockScroll={lockScroll} /> : null}
+              {overlay ? (
+                <FloatingOverlay
+                  elementDescriptor={descriptors.popoverOverlay}
+                  lockScroll={lockScroll}
+                />
+              ) : null}
               <FloatingFocusManager
                 context={context}
                 initialFocus={initialFocus}

@@ -339,6 +339,8 @@ export type ElementsConfig = {
   modalContent: WithOptions;
   modalCloseButton: WithOptions;
 
+  popoverOverlay: WithOptions;
+
   profileSection: WithOptions<ProfileSectionId>;
   profileSectionItemList: WithOptions<ProfileSectionId>;
   profileSectionItem: WithOptions<ProfileSectionId>;
