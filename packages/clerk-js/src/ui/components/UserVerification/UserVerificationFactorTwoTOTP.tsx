@@ -42,8 +42,11 @@ export function UserVerificationFactorTwoTOTP(): JSX.Element {
   return (
     <Flow.Part part='totp2Fa'>
       <VerificationCodeCard
+        // @ts-expect-error
         cardTitle={'Verification required'}
+        // @ts-expect-error
         cardSubtitle={'In order to make changes, please verify it’s really you by entering the password.'}
+        // @ts-expect-error
         inputLabel={'Verification code'}
         onCodeEntryFinishedAction={action}
         profileImageUrl={user?.imageUrl}

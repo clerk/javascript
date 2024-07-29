@@ -1,15 +1,20 @@
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import React from 'react';
 
+import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Card, Form, Header, useCardState } from '../../elements';
+import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
 
 export function UserVerificationFactorOnePasswordCard(): JSX.Element {
   const { user } = useUser();
   const card = useCardState();
+  const supportEmail = useSupportEmail();
   const { session } = useSession();
   const { setActive } = useClerk();
+  const { navigate } = useRouter();
 
   const passwordControl = useFormControl('password', '', {
     type: 'password',
@@ -23,17 +28,18 @@ export function UserVerificationFactorOnePasswordCard(): JSX.Element {
       ?.verifySessionAttemptFirstFactor({
         password: passwordControl.value,
       })
-      .then(async () => {
-        await session?.getToken({ skipCache: true });
-        await setActive({ session: session?.id });
-        //   switch (res.status) {
-        //     case 'complete':
-        //       return setActive({ session: res.createdSessionId, beforeEmit: navigateAfterSignIn });
-        //     case 'needs_second_factor':
-        //       return navigate('../factor-two');
-        //     default:
-        //       return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        //   }
+      .then(async res => {
+        // await session?.getToken({ skipCache: true });
+        // await setActive({ session: session?.id });
+        switch (res.status) {
+          case 'complete':
+            await session?.getToken({ skipCache: true });
+            return setActive({ session: session?.id });
+          case 'needs_second_factor':
+            return navigate('../factor-two');
+          default:
+            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
+        }
       })
       .catch(err => handleError(err, [passwordControl], card.setError));
   };

@@ -762,6 +762,8 @@ export type UserVerificationProps = RoutingOptions & {
   afterVerification?: () => void;
   afterVerificationUrl?: string;
 
+  level?: 'L1.firstFactor' | 'L2.secondFactor' | 'L3.multiFactor';
+
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

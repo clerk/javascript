@@ -243,7 +243,8 @@ export const useUserProfileContext = (): UserProfileContextType => {
 export type UserVerificationContextType = UserVerificationCtx;
 
 export const useUserVerification = (): UserVerificationContextType => {
-  const { componentName, afterVerification, afterVerificationUrl, ...ctx } = React.useContext(ComponentContext) || {};
+  const { componentName, afterVerification, afterVerificationUrl, ...ctx } = (React.useContext(ComponentContext) ||
+    {}) as UserVerificationCtx;
 
   if (componentName !== 'UserVerification') {
     throw new Error('Clerk: useUserVerificationContext called outside of the mounted UserProfile component.');
