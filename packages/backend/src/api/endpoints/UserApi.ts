@@ -2,7 +2,7 @@ import type { ClerkPaginationRequest, OAuthProvider } from '@clerk/types';
 
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
-import type { OauthAccessToken, OrganizationMembership, User } from '../resources';
+import type { DeletedObjectJSON, OauthAccessToken, ObjectType, OrganizationMembership, User } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
@@ -180,7 +180,7 @@ export class UserAPI extends AbstractAPI {
 
   public async deleteUser(userId: string) {
     this.requireId(userId);
-    return this.request<User>({
+    return this.request<DeletedObjectJSON<typeof ObjectType.User>>({
       method: 'DELETE',
       path: joinPaths(basePath, userId),
     });

@@ -9,6 +9,7 @@ import type {
 export const ObjectType = {
   AllowlistIdentifier: 'allowlist_identifier',
   Client: 'client',
+  Domain: 'domain',
   Email: 'email',
   EmailAddress: 'email_address',
   ExternalAccount: 'external_account',
@@ -328,12 +329,12 @@ export interface Web3WalletJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
 }
 
-export interface DeletedObjectJSON {
-  object: string;
+export type DeletedObjectJSON<TObjectType extends string = string> = {
+  object: TObjectType;
   id?: string;
   slug?: string;
   deleted: boolean;
-}
+};
 
 export interface PaginatedResponseJSON {
   data: object[];

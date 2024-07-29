@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import type { DeletedObject, EmailAddress } from '../resources';
+import type { DeletedObjectJSON, EmailAddress, ObjectType } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/email_addresses';
@@ -47,7 +47,7 @@ export class EmailAddressAPI extends AbstractAPI {
   public async deleteEmailAddress(emailAddressId: string) {
     this.requireId(emailAddressId);
 
-    return this.request<DeletedObject>({
+    return this.request<DeletedObjectJSON<typeof ObjectType.EmailAddress>>({
       method: 'DELETE',
       path: joinPaths(basePath, emailAddressId),
     });
