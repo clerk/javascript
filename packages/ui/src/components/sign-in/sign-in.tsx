@@ -570,10 +570,13 @@ export function SignInComponentLoaded() {
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                              <LinkButton
+                                type='button'
+                                disabled
+                              >
                                 {t('signIn.emailCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
-                              </p>
+                              </LinkButton>
                             )}
                           >
                             <LinkButton type='button'>{t('signIn.emailCode.resendButton')}</LinkButton>
@@ -655,10 +658,13 @@ export function SignInComponentLoaded() {
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                              <LinkButton
+                                type='button'
+                                disabled
+                              >
                                 {t('signIn.phoneCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
-                              </p>
+                              </LinkButton>
                             )}
                           >
                             <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
@@ -737,10 +743,13 @@ export function SignInComponentLoaded() {
                         resend
                         // eslint-disable-next-line react/no-unstable-nested-components
                         fallback={({ resendableAfter }) => (
-                          <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                          <LinkButton
+                            type='button'
+                            disabled
+                          >
                             {t('signIn.emailLink.resendButton')} (
                             <span className='tabular-nums'>{resendableAfter}</span>)
-                          </p>
+                          </LinkButton>
                         )}
                       >
                         <LinkButton type='button'>{t('signIn.emailLink.resendButton')}</LinkButton>
@@ -777,10 +786,13 @@ export function SignInComponentLoaded() {
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                              <LinkButton
+                                type='button'
+                                disabled
+                              >
                                 {t('signIn.phoneCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
-                              </p>
+                              </LinkButton>
                             )}
                           >
                             <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
