@@ -895,6 +895,16 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   defaultOpen?: boolean;
   /**
+   * Renders an element to block pointer events behind the popover.
+   * @default false
+   */
+  overlay?: boolean;
+  /**
+   * Whether the <body> is prevented from scrolling while the overlay is rendered.
+   * @default false
+   */
+  lockScroll?: boolean;
+  /**
    * Full URL or path to navigate after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
    */
@@ -949,6 +959,16 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
+    /**
+     * Renders an element to block pointer events behind the popover.
+     * @default false
+     */
+    overlay?: boolean;
+    /**
+     * Whether the <body> is prevented from scrolling while the overlay is rendered.
+     * @default false
+     */
+    lockScroll?: boolean;
     /**
      * By default, users can switch between organization and their personal account.
      * This option controls whether OrganizationSwitcher will include the user's personal account

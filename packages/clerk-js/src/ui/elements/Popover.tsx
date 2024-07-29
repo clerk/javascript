@@ -1,5 +1,5 @@
 import type { FloatingContext, ReferenceType } from '@floating-ui/react';
-import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui/react';
+import { FloatingFocusManager, FloatingNode, FloatingOverlay, FloatingPortal } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
@@ -10,23 +10,46 @@ type PopoverProps = PropsWithChildren<{
   initialFocus?: number | React.MutableRefObject<HTMLElement | null>;
   order?: Array<'reference' | 'floating' | 'content'>;
   portal?: boolean;
+  /**
+   * Renders an element to block pointer events behind a floating element.
+   * @default false
+   */
+  overlay?: boolean;
+  /**
+   * Whether the <body> is prevented from scrolling while the overlay is rendered.
+   * @default false
+   */
+  lockScroll?: boolean;
 }>;
 
 export const Popover = (props: PopoverProps) => {
-  const { context, initialFocus, order = ['reference', 'content'], nodeId, isOpen, portal = true, children } = props;
+  const {
+    context,
+    initialFocus,
+    order = ['reference', 'content'],
+    nodeId,
+    isOpen,
+    portal = true,
+    children,
+    overlay = false,
+    lockScroll = false,
+  } = props;
 
   if (portal) {
     return (
       <FloatingNode id={nodeId}>
         <FloatingPortal>
           {isOpen && (
-            <FloatingFocusManager
-              context={context}
-              initialFocus={initialFocus}
-              order={order}
-            >
-              <>{children}</>
-            </FloatingFocusManager>
+            <>
+              {overlay ? <FloatingOverlay lockScroll={lockScroll} /> : null}
+              <FloatingFocusManager
+                context={context}
+                initialFocus={initialFocus}
+                order={order}
+              >
+                <>{children}</>
+              </FloatingFocusManager>
+            </>
           )}
         </FloatingPortal>
       </FloatingNode>
@@ -36,13 +59,16 @@ export const Popover = (props: PopoverProps) => {
   return (
     <FloatingNode id={nodeId}>
       {isOpen && (
-        <FloatingFocusManager
-          context={context}
-          initialFocus={initialFocus}
-          order={order}
-        >
-          <>{children}</>
-        </FloatingFocusManager>
+        <>
+          {overlay ? <FloatingOverlay lockScroll={lockScroll} /> : null}
+          <FloatingFocusManager
+            context={context}
+            initialFocus={initialFocus}
+            order={order}
+          >
+            <>{children}</>
+          </FloatingFocusManager>
+        </>
       )}
     </FloatingNode>
   );
