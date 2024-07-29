@@ -8,7 +8,7 @@ import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
 const _UserButton = withFloatingTree(() => {
-  const { defaultOpen } = useUserButtonContext();
+  const { defaultOpen, portal } = useUserButtonContext();
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
     placement: 'bottom-end',
@@ -33,6 +33,7 @@ const _UserButton = withFloatingTree(() => {
         nodeId={nodeId}
         context={context}
         isOpen={isOpen}
+        portal={portal}
       >
         <UserButtonPopover
           id={userButtonMenuId}

@@ -895,6 +895,11 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   defaultOpen?: boolean;
   /**
+   * By default, the popover will be rendered outside of the app root and into the body.
+   * @default true
+   */
+  portal?: boolean;
+  /**
    * Full URL or path to navigate after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
    */
@@ -949,6 +954,11 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
+    /**
+     * By default, the popover will be rendered outside of the app root and into the body.
+     * @default true
+     */
+    portal?: boolean;
     /**
      * By default, users can switch between organization and their personal account.
      * This option controls whether OrganizationSwitcher will include the user's personal account
