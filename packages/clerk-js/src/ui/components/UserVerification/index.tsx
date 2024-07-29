@@ -6,18 +6,27 @@ import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
 import { UserVerificationFactorOne } from './UserVerificationFactorOne';
 import { UserVerificationFactorTwo } from './UserVerificationFactorTwo';
+import { withUserVerificationSession } from './useUserVerificationSession';
+
+function UserVerificationRoutesInner(): JSX.Element {
+  return (
+    <Switch>
+      <Route path='factor-two'>
+        <UserVerificationFactorTwo />
+      </Route>
+      <Route index>
+        <UserVerificationFactorOne />
+      </Route>
+    </Switch>
+  );
+}
+
+const UserVerificationInner: React.ComponentType = withUserVerificationSession(UserVerificationRoutesInner);
 
 function UserVerificationRoutes(): JSX.Element {
   return (
-    <Flow.Root flow='signIn'>
-      <Switch>
-        <Route path='factor-two'>
-          <UserVerificationFactorOne />
-        </Route>
-        <Route index>
-          <UserVerificationFactorTwo />
-        </Route>
-      </Switch>
+    <Flow.Root flow='userVerification'>
+      <UserVerificationInner />
     </Flow.Root>
   );
 }

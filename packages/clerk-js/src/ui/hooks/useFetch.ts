@@ -61,6 +61,12 @@ const useCache = <K = any, V = any>(
   };
 };
 
+/**
+ *
+ * @param fetcher If fetcher is undefined no action will be performed
+ * @param params
+ * @param options
+ */
 export const useFetch = <K, T>(
   fetcher: ((...args: any) => Promise<T>) | undefined,
   params: K,

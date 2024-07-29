@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import { Children, cloneElement, isValidElement, type PropsWithChildren, useState } from 'react';
+import { Children, cloneElement, isValidElement, type PropsWithChildren } from 'react';
 
 import { useProtect } from '../../common';
 import { useActionContext } from './ActionRoot';
@@ -12,11 +12,7 @@ type ActionTriggerProps = PropsWithChildren<{
 export const ActionTrigger = (props: ActionTriggerProps) => {
   const { children, value, protect = false } = props;
   const { active, open } = useActionContext();
-  const [
-    ,
-    //clicked,
-    setClicked,
-  ] = useState(false);
+
   const clerk = useClerk();
 
   const isVerified = useProtect({
@@ -31,16 +27,6 @@ export const ActionTrigger = (props: ActionTriggerProps) => {
     throw new Error('Children of ActionTrigger must be a valid element');
   }
 
-  // useEffect(() => {
-  //   const h = async () => {
-  //     await validChildren.props.onClick?.();
-  //     return open(value);
-  //   };
-  //   if (isVerified && clicked) {
-  //     void h();
-  //   }
-  // }, [clicked, isVerified, open, validChildren.props, value]);
-
   if (active === value) {
     return null;
   }
@@ -53,8 +39,8 @@ export const ActionTrigger = (props: ActionTriggerProps) => {
         await validChildren.props.onClick?.();
         return open(value);
       }
-      setClicked(true);
       clerk.openUserVerification({
+        level: 'L2.secondFactor',
         afterVerification: async () => {
           await validChildren.props.onClick?.();
           return open(value);

@@ -11,6 +11,7 @@ import type {
   SignInProps,
   SignUpProps,
   UserProfileProps,
+  UserVerificationProps,
 } from '@clerk/types';
 import React, { Suspense } from 'react';
 
@@ -66,7 +67,13 @@ export type ComponentControls = {
       | 'userVerification',
   >(
     modal: T,
-    props: T extends 'signIn' ? SignInProps : T extends 'signUp' ? SignUpProps : UserProfileProps,
+    props: T extends 'signIn'
+      ? SignInProps
+      : T extends 'signUp'
+        ? SignUpProps
+        : T extends 'userVerification'
+          ? UserVerificationProps
+          : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -103,7 +110,7 @@ interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
-  userVerificationModal: null | SignInProps;
+  userVerificationModal: null | UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;

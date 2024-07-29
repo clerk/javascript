@@ -57,6 +57,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
+  UserVerificationProps,
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -374,7 +375,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
-  public openUserVerification = (props?: SignInProps): void => {
+  public openUserVerification = (props?: UserVerificationProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
@@ -504,7 +505,7 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public mountUserVerification = (node: HTMLDivElement, props?: SignInProps): void => {
+  public mountUserVerification = (node: HTMLDivElement, props?: UserVerificationProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {

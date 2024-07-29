@@ -19,6 +19,8 @@ import type {
   PhoneNumberResource,
   RemoveUserPasswordParams,
   SamlAccountResource,
+  SessionVerificationJSON,
+  SessionVerificationResource,
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
@@ -50,6 +52,7 @@ import {
   UserOrganizationInvitation,
   Web3Wallet,
 } from './internal';
+import { SessionVerification } from './SessionVerification';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';
@@ -239,36 +242,56 @@ export class User extends BaseResource implements UserResource {
     return this._baseDelete({ path: '/me' });
   };
 
-  verifySession = () => {
-    return BaseResource._fetch({
-      method: 'POST',
-      path: `/me/sessions/${User.clerk.session?.id}/verify`,
-      body: {
-        level: 'L1.firstFactor',
-      } as any,
-    });
+  verifySession = async ({
+    level,
+  }: {
+    level: 'L1.firstFactor' | 'L2.secondFactor' | 'L3.multiFactor';
+  }): Promise<SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify`,
+        body: {
+          level,
+        } as any,
+      })
+    )?.response as unknown as SessionVerificationJSON;
+
+    return new SessionVerification(json);
   };
 
-  verifySessionAttemptFirstFactor = ({ password }: { password: string }) => {
-    return BaseResource._fetch({
-      method: 'POST',
-      path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_first_factor`,
-      body: {
-        strategy: 'password',
-        password,
-      } as any,
-    });
+  verifySessionAttemptFirstFactor = async ({
+    password,
+  }: {
+    password: string;
+  }): Promise<SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_first_factor`,
+        body: {
+          strategy: 'password',
+          password,
+        } as any,
+      })
+    )?.response as unknown as SessionVerificationJSON;
+
+    return new SessionVerification(json);
   };
 
-  verifySessionAttemptSecondFactor = ({ code }: { code: string }) => {
-    return BaseResource._fetch({
-      method: 'POST',
-      path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_second_factor`,
-      body: {
-        strategy: 'totp',
-        code,
-      } as any,
-    });
+  verifySessionAttemptSecondFactor = async ({ code }: { code: string }): Promise<SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_second_factor`,
+        body: {
+          strategy: 'totp',
+          code,
+        } as any,
+      })
+    )?.response as unknown as SessionVerificationJSON;
+
+    return new SessionVerification(json);
   };
 
   getSessions = async (): Promise<SessionWithActivities[]> => {

@@ -14,6 +14,7 @@ import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
 import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
+import type { SessionVerificationResource } from './sessionVerification';
 import type { OAuthStrategy } from './strategies';
 import type { TOTPResource } from './totp';
 import type { UserOrganizationInvitationResource } from './userOrganizationInvitation';
@@ -110,9 +111,11 @@ export interface UserResource extends ClerkResource {
   disableTOTP: () => Promise<DeletedObjectResource>;
   createBackupCode: () => Promise<BackupCodeResource>;
 
-  verifySession: () => Promise<unknown>;
-  verifySessionAttemptFirstFactor: (params: { password: string }) => Promise<unknown>;
-  verifySessionAttemptSecondFactor: (params: { code: string }) => Promise<unknown>;
+  verifySession: (params: {
+    level: 'L1.firstFactor' | 'L2.secondFactor' | 'L3.multiFactor';
+  }) => Promise<SessionVerificationResource>;
+  verifySessionAttemptFirstFactor: (params: { password: string }) => Promise<SessionVerificationResource>;
+  verifySessionAttemptSecondFactor: (params: { code: string }) => Promise<SessionVerificationResource>;
 
   get verifiedExternalAccounts(): ExternalAccountResource[];
 
