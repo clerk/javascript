@@ -115,10 +115,20 @@ function SignUpComponentLoaded() {
                         ) : null}
 
                         {emailAddressEnabled && !emailAddressRequired && phoneNumberEnabled && !phoneNumberRequired ? (
-                          <EmailOrPhoneNumberField locationBasedCountryIso={locationBasedCountryIso} />
+                          <EmailOrPhoneNumberField
+                            labelEmail={t('formFieldLabel__emailAddress')}
+                            labelPhoneNumber={t('formFieldLabel__phoneNumber')}
+                            hintText={t('formFieldHintText__optional')}
+                            toggleLabelEmail={t('signUp.start.actionLink__use_email')}
+                            toggleLabelPhoneNumber={t('signUp.start.actionLink__use_phone')}
+                            locationBasedCountryIso={locationBasedCountryIso}
+                          />
                         ) : (
                           <>
-                            <EmailField disabled={isGlobalLoading} />
+                            <EmailField
+                              label={t('formFieldLabel__emailAddress')}
+                              disabled={isGlobalLoading}
+                            />
 
                             {phoneNumberEnabled ? (
                               <PhoneNumberField
@@ -213,6 +223,7 @@ function SignUpComponentLoaded() {
                         }}
                       </Common.GlobalError>
                       <OTPField
+                        label={t('signUp.phoneCode.formTitle')}
                         disabled={isGlobalLoading}
                         resend={
                           <SignUp.Action
@@ -284,6 +295,7 @@ function SignUpComponentLoaded() {
                         }}
                       </Common.GlobalError>
                       <OTPField
+                        label={t('signUp.emailCode.formTitle')}
                         disabled={isGlobalLoading}
                         resend={
                           <SignUp.Action
@@ -434,7 +446,10 @@ function SignUpComponentLoaded() {
                         />
                       ) : null}
 
-                      <EmailField disabled={isGlobalLoading} />
+                      <EmailField
+                        label={t('formFieldLabel__emailAddress')}
+                        disabled={isGlobalLoading}
+                      />
 
                       {passwordEnabled && passwordRequired ? (
                         <PasswordField

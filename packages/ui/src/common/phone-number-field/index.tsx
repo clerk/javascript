@@ -21,17 +21,17 @@ const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
 export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   {
     alternativeFieldTrigger,
-    label = 'Phone number',
+    label,
     name = 'phoneNumber',
-    hintText = 'Optional',
+    hintText,
     initPhoneWithCode = '',
     locationBasedCountryIso,
     onChange,
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
     alternativeFieldTrigger?: React.ReactNode;
-    label?: React.ReactNode;
-    hintText?: string;
+    label: React.ReactNode;
+    hintText: React.ReactNode;
     initPhoneWithCode?: string;
     locationBasedCountryIso: CountryIso;
   },

@@ -4,11 +4,11 @@ import React from 'react';
 import * as Field from '../primitives/field';
 
 export function OTPField({
-  label = 'One-time password',
+  label,
   resend,
   ...props
 }: React.ComponentProps<typeof Common.Input> & {
-  label?: React.ReactNode;
+  label: React.ReactNode;
   resend?: React.ReactNode;
 }) {
   return (

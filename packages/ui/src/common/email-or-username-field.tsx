@@ -5,11 +5,11 @@ import * as Field from '../primitives/field';
 
 export function EmailOrUsernameField({
   alternativeFieldTrigger,
-  label = 'Email address or username',
+  label,
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
-  label?: React.ReactNode;
+  label: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field

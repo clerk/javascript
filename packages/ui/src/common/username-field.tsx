@@ -5,11 +5,11 @@ import * as Field from '../primitives/field';
 
 export function UsernameField({
   alternativeFieldTrigger,
-  label = 'Username',
+  label,
   name = 'username',
-  hintText = 'Optional',
+  hintText,
   ...props
-}: { alternativeFieldTrigger?: React.ReactNode; label?: React.ReactNode; hintText?: string } & Omit<
+}: { alternativeFieldTrigger?: React.ReactNode; label: React.ReactNode; hintText: React.ReactNode } & Omit<
   React.ComponentProps<typeof Common.Input>,
   'type'
 >) {

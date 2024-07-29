@@ -8,14 +8,14 @@ import * as Icon from '../primitives/icon';
 export function PasswordField({
   alternativeFieldTrigger,
   className,
-  label = 'Password',
+  label,
   name = 'password',
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
   validatePassword?: boolean;
   name?: 'password' | 'confirmPassword';
-  label?: React.ReactNode;
+  label: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>) {
   const [type, setType] = React.useState('password');
   const id = React.useId();

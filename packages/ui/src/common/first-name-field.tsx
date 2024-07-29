@@ -4,10 +4,10 @@ import React from 'react';
 import * as Field from '../primitives/field';
 
 export function FirstNameField({
-  label = 'First name',
-  hintText = 'Optional',
+  label,
+  hintText,
   ...props
-}: { label?: React.ReactNode; hintText?: string } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+}: { label: React.ReactNode; hintText: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field
       name='firstName'

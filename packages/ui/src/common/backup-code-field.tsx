@@ -4,9 +4,9 @@ import React from 'react';
 import * as Field from '../primitives/field';
 
 export function BackupCodeField({
-  label = 'Backup code',
+  label,
   ...props
-}: { label?: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+}: { label: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   return (
     <Common.Field
       name='backup_code'

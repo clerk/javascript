@@ -10,20 +10,22 @@ import { UsernameField } from './username-field';
 export function PhoneNumberOrUsernameField({
   className,
   name = undefined,
-  labelPhoneNumber = 'Phone number',
-  labelUsername = 'Username',
+  labelPhoneNumber,
+  labelUsername,
+  hintText,
   locationBasedCountryIso,
-  toggleLabelPhoneNumber = 'Use phone',
-  toggleLabelUsername = 'Use username',
-  toggleDescription = 'Toggle between phone and username.',
+  toggleLabelPhoneNumber,
+  toggleLabelUsername,
+  toggleDescription,
   ...props
 }: {
-  labelUsername?: React.ReactNode;
-  labelPhoneNumber?: React.ReactNode;
+  labelUsername: React.ReactNode;
+  labelPhoneNumber: React.ReactNode;
+  hintText: React.ReactNode;
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
-  toggleLabelPhoneNumber?: string;
-  toggleLabelUsername?: string;
-  toggleDescription?: string;
+  toggleLabelPhoneNumber: React.ReactNode;
+  toggleLabelUsername: React.ReactNode;
+  toggleDescription: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showUsernameField, setShowUsernameField] = React.useState(false);
 
@@ -43,12 +45,14 @@ export function PhoneNumberOrUsernameField({
       {...props}
       name={name}
       label={labelUsername}
+      hintText={hintText}
       alternativeFieldTrigger={toggle}
     />
   ) : (
     <PhoneNumberField
       name={name}
       label={labelPhoneNumber}
+      hintText={hintText}
       locationBasedCountryIso={locationBasedCountryIso}
       alternativeFieldTrigger={toggle}
       {...props}

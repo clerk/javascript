@@ -15,6 +15,7 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
+import { LOCALIZATION_NEEDED } from '~/constants';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -174,6 +175,7 @@ export function SignInComponentLoaded() {
                           <UsernameField
                             name='identifier'
                             label={t('formFieldLabel__username')}
+                            hintText={t('formFieldHintText__optional')}
                             disabled={isGlobalLoading}
                             required
                           />
@@ -183,6 +185,7 @@ export function SignInComponentLoaded() {
                           <PhoneNumberField
                             name='identifier'
                             label={t('formFieldLabel__phoneNumber')}
+                            hintText={t('formFieldHintText__optional')}
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                             required
@@ -202,6 +205,7 @@ export function SignInComponentLoaded() {
                           <EmailOrPhoneNumberField
                             name='identifier'
                             labelEmail={t('formFieldLabel__emailAddress')}
+                            hintText={t('formFieldHintText__optional')}
                             toggleLabelEmail={t('signIn.start.actionLink__use_email')}
                             labelPhoneNumber={t('formFieldLabel__phoneNumber')}
                             toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
@@ -216,8 +220,10 @@ export function SignInComponentLoaded() {
                             name='identifier'
                             labelPhoneNumber={t('formFieldLabel__phoneNumber')}
                             toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
+                            hintText={t('formFieldHintText__optional')}
                             labelUsername={t('formFieldLabel__username')}
                             toggleLabelUsername={t('signIn.start.actionLink__use_username')}
+                            toggleDescription={LOCALIZATION_NEEDED.formFieldAccessibleLabel__phoneOrUsername}
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                             required
@@ -228,9 +234,11 @@ export function SignInComponentLoaded() {
                           <EmailOrUsernameOrPhoneNumberField
                             name='identifier'
                             labelEmailOrUsername={t('formFieldLabel__emailAddress_username')}
-                            toggleLabelEmailOrUsername={t('signIn.start.actionLink__use_email_username')}
                             labelPhoneNumber={t('formFieldLabel__phoneNumber')}
+                            toggleLabelEmailOrUsername={t('signIn.start.actionLink__use_email_username')}
+                            hintText={t('formFieldHintText__optional')}
                             toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
+                            toggleDescription={LOCALIZATION_NEEDED.formFieldAccessibleLabel__emailOrUsernameOrPhone}
                             disabled={isGlobalLoading}
                             locationBasedCountryIso={locationBasedCountryIso}
                             required
@@ -337,6 +345,7 @@ export function SignInComponentLoaded() {
                       </Common.GlobalError>
 
                       <PasswordField
+                        label={t('formFieldLabel__password')}
                         alternativeFieldTrigger={
                           isPasswordResetSupported ? (
                             <SignIn.Action
@@ -563,6 +572,7 @@ export function SignInComponentLoaded() {
                         }}
                       </Common.GlobalError>
                       <OTPField
+                        label={t('signIn.emailCode.formTitle')}
                         disabled={isGlobalLoading}
                         resend={
                           <SignIn.Action
@@ -651,6 +661,7 @@ export function SignInComponentLoaded() {
                         }}
                       </Common.GlobalError>
                       <OTPField
+                        label={t('signIn.phoneCode.formTitle')}
                         disabled={isGlobalLoading}
                         resend={
                           <SignIn.Action
@@ -779,6 +790,7 @@ export function SignInComponentLoaded() {
                         }}
                       </Common.GlobalError>
                       <OTPField
+                        label={t('signIn.forgotPassword.formTitle')}
                         disabled={isGlobalLoading}
                         resend={
                           <SignIn.Action
@@ -840,7 +852,10 @@ export function SignInComponentLoaded() {
                           return <Alert>{message}</Alert>;
                         }}
                       </Common.GlobalError>
-                      <OTPField disabled={isGlobalLoading} />
+                      <OTPField
+                        label={t('signIn.totpMfa.formTitle')}
+                        disabled={isGlobalLoading}
+                      />
                       <Common.Loading scope='step:verifications'>
                         {isSubmitting => {
                           return (

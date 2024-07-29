@@ -20,8 +20,8 @@ export function EmailField({
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
-  label?: React.ReactNode;
-  hintText?: string;
+  label: React.ReactNode;
+  hintText?: React.ReactNode;
   enabled?: boolean;
   error?: (message: string, code: string, name: string) => string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
