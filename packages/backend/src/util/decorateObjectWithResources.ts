@@ -1,6 +1,7 @@
+import type { AuthObject } from '@clerk/types';
+
 import type { CreateBackendApiOptions, Organization, Session, User } from '../api';
 import { createBackendApiClient } from '../api';
-import type { AuthObject } from '../tokens/authObjects';
 
 type DecorateAuthWithResourcesOptions = {
   loadSession?: boolean;
