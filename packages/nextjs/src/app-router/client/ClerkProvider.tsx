@@ -8,7 +8,7 @@ import { ClerkNextOptionsProvider } from '../../client-boundary/NextOptionsConte
 import type { NextClerkProviderProps } from '../../types';
 import { ClerkJSScript } from '../../utils/clerk-js-script';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { invalidateCacheAction } from '../server-actions/invalidateCache';
+import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
@@ -61,7 +61,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
           if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
             router.refresh();
           } else {
-            invalidateCacheAction();
+            void invalidateCacheAction();
           }
         });
       });

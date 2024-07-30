@@ -308,6 +308,10 @@ export const nbNO: LocalizationResource = {
       title: 'Sjekk e-posten din',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Gå tilbake til den opprinnelige fanen for å fortsette.',
         title: 'Denne verifiseringslenken er utløpt',
@@ -423,6 +427,10 @@ export const nbNO: LocalizationResource = {
       title: 'Verifiser e-posten din',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Bruk verifiseringslenken som er sendt til e-postadressen din',
       formTitle: 'Verifiseringslenke',
       loading: {
@@ -449,12 +457,15 @@ export const nbNO: LocalizationResource = {
     },
     start: {
       actionLink: 'Logg inn',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Har du allerede en konto?',
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Opprett kontoen din',
     },
   },
   socialButtonsBlockButton: 'Fortsett med {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Registreringen mislyktes på grunn av mislykkede sikkerhetsvalideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
@@ -721,6 +732,7 @@ export const nbNO: LocalizationResource = {
         actionLabel__reauthorize: 'Autoriser nå',
         destructiveActionTitle: 'Fjern',
         primaryButton: 'Koble til konto',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Tilkoblede kontoer',

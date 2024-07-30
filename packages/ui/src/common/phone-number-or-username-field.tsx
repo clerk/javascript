@@ -2,7 +2,7 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
-import { linkButton } from '~/primitives/link-button';
+import { link } from '~/primitives/link';
 
 import { PhoneNumberField } from './phone-number-field';
 import { UsernameField } from './username-field';
@@ -13,12 +13,16 @@ export function PhoneNumberOrUsernameField({
   labelPhoneNumber = 'Phone number',
   labelUsername = 'Username',
   locationBasedCountryIso,
+  toggleLabelPhoneNumber = 'Use phone',
+  toggleLabelUsername = 'Use username',
   toggleDescription = 'Toggle between phone and username.',
   ...props
 }: {
   labelUsername?: React.ReactNode;
   labelPhoneNumber?: React.ReactNode;
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
+  toggleLabelPhoneNumber?: string;
+  toggleLabelUsername?: string;
   toggleDescription?: string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showUsernameField, setShowUsernameField] = React.useState(false);
@@ -27,10 +31,10 @@ export function PhoneNumberOrUsernameField({
     <ToggleButton
       isSelected={showUsernameField}
       onChange={setShowUsernameField}
-      className={linkButton({ size: 'sm', disabled: props.disabled })}
+      className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
       <span className='sr-only'>{toggleDescription}</span>
-      {showUsernameField ? 'Use phone' : 'Use username'}
+      {showUsernameField ? toggleLabelPhoneNumber : toggleLabelUsername}
     </ToggleButton>
   );
 

@@ -5,9 +5,9 @@ import type {
   PasswordAttempt,
   PhoneCodeAttempt,
   PrepareFirstFactorParams,
+  PrepareSecondFactorParams,
   ResetPasswordEmailCodeAttempt,
   ResetPasswordPhoneCodeAttempt,
-  SignInFactor,
   SignInFirstFactor,
   SignInResource,
   SignInSecondFactor,
@@ -19,7 +19,7 @@ import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 import { RESENDABLE_COUNTDOWN_DEFAULT } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
-import type { WithParams } from '~/internals/machines/shared';
+import type { SignInStrategyName, WithParams } from '~/internals/machines/shared';
 import { sendToLoading } from '~/internals/machines/shared';
 import { determineStartingSignInFactor, determineStartingSignInSecondFactor } from '~/internals/machines/sign-in/utils';
 import { assertActorEventError, assertIsDefined } from '~/internals/machines/utils/assert';
@@ -35,11 +35,11 @@ export type DetermineStartingFactorInput = {
   parent: SignInRouterMachineActorRef;
 };
 
-export type PrepareFirstFactorInput = WithParams<SignInFirstFactor | null> & {
+export type PrepareFirstFactorInput = WithParams<PrepareFirstFactorParams> & {
   parent: SignInRouterMachineActorRef;
   resendable: boolean;
 };
-export type PrepareSecondFactorInput = WithParams<SignInSecondFactor | null> & {
+export type PrepareSecondFactorInput = WithParams<PrepareSecondFactorParams> & {
   parent: SignInRouterMachineActorRef;
   resendable: boolean;
 };
@@ -67,8 +67,8 @@ export const SignInVerificationMachineId = 'SignInVerification';
 
 const SignInVerificationMachine = setup({
   actors: {
-    determineStartingFactor: fromPromise<SignInFactor | null, DetermineStartingFactorInput>(() =>
-      Promise.reject(new ClerkElementsRuntimeError('Actor `determineStartingFactor` must be overridden')),
+    determineStartingFactor: fromPromise<SignInFirstFactor | SignInSecondFactor | null, DetermineStartingFactorInput>(
+      () => Promise.reject(new ClerkElementsRuntimeError('Actor `determineStartingFactor` must be overridden')),
     ),
     prepare: fromPromise<SignInResource, PrepareFirstFactorInput | PrepareSecondFactorInput>(() =>
       Promise.reject(new ClerkElementsRuntimeError('Actor `prepare` must be overridden')),
@@ -96,10 +96,7 @@ const SignInVerificationMachine = setup({
       // Only show these warnings in development!
       if (process.env.NODE_ENV === 'development') {
         if (
-          !clerk.client.signIn.supportedFirstFactors.every(factor =>
-            // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
-            context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
-          )
+          !clerk.client.signIn.supportedFirstFactors.every(factor => context.registeredStrategies.has(factor.strategy))
         ) {
           console.warn(
             `Clerk: Your instance is configured to support these strategies: ${clerk.client.signIn.supportedFirstFactors
@@ -112,9 +109,7 @@ const SignInVerificationMachine = setup({
 
         if (
           clerk.client.signIn.supportedSecondFactors &&
-          !clerk.client.signIn.supportedSecondFactors.every(factor =>
-            context.registeredStrategies.has(factor.strategy as unknown as SignInFactor),
-          )
+          !clerk.client.signIn.supportedSecondFactors.every(factor => context.registeredStrategies.has(factor.strategy))
         ) {
           console.warn(
             `Clerk: Your instance is configured to support these 2FA strategies: ${clerk.client.signIn.supportedSecondFactors
@@ -125,14 +120,9 @@ const SignInVerificationMachine = setup({
           );
         }
 
-        // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
-        // This type should also probably be SignInFirstFactor['strategy'] instead of SignInFactor['strategy'] !!!
         const strategiesUsedButNotActivated = Array.from(context.registeredStrategies).filter(
-          strategy =>
-            !clerk.client.signIn.supportedFirstFactors.some(
-              supported => (supported.strategy as unknown as SignInFactor) === strategy,
-            ),
-        ) as unknown as Array<SignInFactor['strategy']>;
+          strategy => !clerk.client.signIn.supportedFirstFactors.some(supported => supported.strategy === strategy),
+        );
 
         if (strategiesUsedButNotActivated.length > 0) {
           console.warn(
@@ -140,11 +130,7 @@ const SignInVerificationMachine = setup({
           );
         }
 
-        if (
-          context.currentFactor?.strategy &&
-          // TODO: These "as SignInFactor" assertions are incorrect, factor.strategy is SignInFactor['strategy']. This needs to be fixed together with SignInVerificationStrategyRegisterEvent and SignInStrategy React component
-          !context.registeredStrategies.has(context.currentFactor?.strategy as unknown as SignInFactor)
-        ) {
+        if (context.currentFactor?.strategy && !context.registeredStrategies.has(context.currentFactor?.strategy)) {
           throw new ClerkElementsRuntimeError(
             `Your sign-in attempt is missing a ${context.currentFactor?.strategy} strategy. Make sure <Strategy name="${context.currentFactor?.strategy}"> is rendered in your flow. More information: https://clerk.com/docs/elements/reference/sign-in#strategy`,
           );
@@ -195,7 +181,7 @@ const SignInVerificationMachine = setup({
     formRef: input.formRef,
     loadingStep: 'verifications',
     parent: input.parent,
-    registeredStrategies: new Set<SignInFactor>(),
+    registeredStrategies: new Set<SignInStrategyName>(),
     resendable: false,
     resendableAfter: RESENDABLE_COUNTDOWN_DEFAULT,
   }),
@@ -250,7 +236,7 @@ const SignInVerificationMachine = setup({
         input: ({ context }) => ({
           parent: context.parent,
           resendable: context.resendable,
-          params: context.currentFactor as SignInFirstFactor | null,
+          params: context.currentFactor as PrepareFirstFactorParams,
         }),
         onDone: {
           actions: 'resendableReset',
@@ -348,7 +334,7 @@ const SignInVerificationMachine = setup({
         src: 'attempt',
         input: ({ context }) => ({
           parent: context.parent,
-          currentFactor: context.currentFactor as SignInFirstFactor,
+          currentFactor: context.currentFactor as SignInFirstFactor | null,
           fields: context.formRef.getSnapshot().context.fields,
         }),
         onDone: {
@@ -380,7 +366,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       );
     }),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input;
+      const { params, parent, resendable } = input as PrepareFirstFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
@@ -392,8 +378,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       }
 
       assertIsDefined(params, 'First factor params');
-
-      return await clerk.client.signIn.prepareFirstFactor(params as PrepareFirstFactorParams);
+      return await clerk.client.signIn.prepareFirstFactor(params);
     }),
     attempt: fromPromise(async ({ input }) => {
       const { currentFactor, fields, parent } = input as AttemptFirstFactorInput;

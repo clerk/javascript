@@ -298,6 +298,10 @@ export const zhCN: LocalizationResource = {
       title: '查看您的电子邮件',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: '返回原始标签页继续。',
         title: '此验证链接已过期',
@@ -412,6 +416,10 @@ export const zhCN: LocalizationResource = {
       title: '验证您的电子邮件',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: '使用发送到您的电子邮件地址的验证链接',
       formTitle: '验证链接',
       loading: {
@@ -438,12 +446,15 @@ export const zhCN: LocalizationResource = {
     },
     start: {
       actionLink: '登录',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: '已经有账户了？',
       subtitle: '继续使用 {{applicationName}}',
       title: '创建您的账户',
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     captcha_unavailable:
@@ -697,6 +708,7 @@ export const zhCN: LocalizationResource = {
         actionLabel__reauthorize: '立即授权',
         destructiveActionTitle: '移除',
         primaryButton: '连接账户',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: '已连接的账户',

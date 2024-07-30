@@ -311,6 +311,10 @@ export const ruRU: LocalizationResource = {
       title: 'Проверьте Вашу почту',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Вернитесь на начальную вкладку, чтобы продолжить.',
         title: 'Эта верификационная ссылка истекла',
@@ -425,6 +429,10 @@ export const ruRU: LocalizationResource = {
       title: 'Верифицируйте Вашу почту',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Используйте верификационную ссылку, оправленную Вам на почту',
       formTitle: 'Верификационная ссылка',
       loading: {
@@ -451,12 +459,15 @@ export const ruRU: LocalizationResource = {
     },
     start: {
       actionLink: 'Войти',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Уже есть аккаунт?',
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Ваш аккаунт',
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -722,6 +733,7 @@ export const ruRU: LocalizationResource = {
         actionLabel__reauthorize: 'Авторизовать сейчас',
         destructiveActionTitle: 'Удалить',
         primaryButton: 'Подключить аккаунт',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Подключенные аккаунты',

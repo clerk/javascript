@@ -1,0 +1,116 @@
+---
+import Layout from "../../layouts/react/Layout.astro";
+import Card from "../../components/Card.astro";
+
+import { SignedIn, SignedOut, SignOutButton, OrganizationSwitcher } from "@clerk/astro/react";
+---
+
+<Layout title="Welcome to Astro.">
+  <h1>Welcome to <span class="text-gradient">Astro</span> + React</h1>
+  <SignedIn client:load>
+    <OrganizationSwitcher
+      client:load
+      appearance={{
+        elements: {
+          organizationPreview__organizationSwitcherTrigger: "text-white",
+          organizationSwitcherTriggerIcon: "text-white",
+        },
+      }}
+      afterSelectOrganizationUrl="/organization"
+    />
+    <SignOutButton client:load>Sign out!</SignOutButton>
+  </SignedIn>
+
+  <div class="h-12"></div>
+
+  <p class="instructions">
+    To get started, open the directory <code>src/pages</code> in your project.<br
+    />
+    <strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
+  </p>
+  <ul role="list" class="link-card-grid">
+    <SignedOut client:load>
+      <Card
+        href="/sign-in"
+        title="Log in"
+        body="Go to this page to log in"
+      />
+      <Card
+        href="/sign-up"
+        title="Create account"
+        body="Supercharge your project with new frameworks and libraries."
+      />
+    </SignedOut>
+    <SignedIn client:load>
+      <Card
+        href="/user"
+        title="User Profile"
+        body="Go to this page to see your profile"
+      />
+      <Card
+        href="/organization"
+        title="Active Organization"
+        body="Learn how Astro works and explore the official API docs."
+      />
+      <Card
+        href="/discover"
+        title="Discover Organization"
+        body="Learn how Astro works and explore the official API docs."
+      />
+      <Card
+        href="/only-admins"
+        title="For admins"
+        body={"Learn how Astro works and explore the official API docs."}
+      />
+      <Card
+        href="/only-members"
+        title="For members"
+        body="Learn how Astro works and explore the official API docs."
+      />
+    </SignedIn>
+  </ul>
+</Layout>
+
+<style>
+  h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 1em;
+  }
+  .text-gradient {
+    background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 400%;
+    background-position: 0%;
+  }
+  .instructions {
+    margin-bottom: 2rem;
+    border: 1px solid rgba(var(--accent-light), 25%);
+    background: linear-gradient(
+      rgba(var(--accent-dark), 66%),
+      rgba(var(--accent-dark), 33%)
+    );
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+  .instructions code {
+    font-size: 0.8em;
+    font-weight: bold;
+    background: rgba(var(--accent-light), 12%);
+    color: rgb(var(--accent-light));
+    border-radius: 4px;
+    padding: 0.3em 0.4em;
+  }
+  .instructions strong {
+    color: rgb(var(--accent-light));
+  }
+  .link-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
+    gap: 2rem;
+    padding: 0;
+  }
+</style>

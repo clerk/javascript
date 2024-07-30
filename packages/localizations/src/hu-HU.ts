@@ -308,6 +308,10 @@ export const huHU: LocalizationResource = {
       title: 'Ellenőrizd az emailed',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Menj vissza az eredeti lapra a folytatáshoz.',
         title: 'Ez a megerősítő link lejárt',
@@ -423,6 +427,10 @@ export const huHU: LocalizationResource = {
       title: 'Email megerősítése',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Használd a  visszaigazoló linket, amit a emailben kaptál',
       formTitle: 'Visszaigazoló link',
       loading: {
@@ -449,12 +457,15 @@ export const huHU: LocalizationResource = {
     },
     start: {
       actionLink: 'Bejelentkezés',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Van már fiókod?',
       subtitle: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       title: 'Fiók létrehozása',
     },
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Biztonsági okokból a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
@@ -724,6 +735,7 @@ export const huHU: LocalizationResource = {
         actionLabel__reauthorize: 'Engedélyezd most',
         destructiveActionTitle: 'Eltávolítás',
         primaryButton: 'Fiók összekötése',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'A szükséges hatáskörök megváltozták, előfordulhat, hogy limitált funkcionalitást tapasztalhatsz. Kérlek, újra engedélyezd az alkalmazást, hogy elkerüld a hibákat.',
         title: 'Kapcsolt fiókok',

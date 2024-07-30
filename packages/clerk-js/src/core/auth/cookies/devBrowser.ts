@@ -1,8 +1,10 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
 import { DEV_BROWSER_JWT_KEY } from '@clerk/shared/devBrowser';
+import { getSuffixedCookieName } from '@clerk/shared/keys';
 
 import { inCrossOriginIframe } from '../../../utils';
+import { getSecureAttribute } from '../getSecureAttribute';
 
 export type DevBrowserCookieHandler = {
   set: (jwt: string) => void;
@@ -16,24 +18,25 @@ export type DevBrowserCookieHandler = {
  * The cookie is used to authenticate FAPI requests and pass
  * authentication from AP to the app.
  */
-export const createDevBrowserCookie = (): DevBrowserCookieHandler => {
+export const createDevBrowserCookie = (cookieSuffix: string): DevBrowserCookieHandler => {
   const devBrowserCookie = createCookieHandler(DEV_BROWSER_JWT_KEY);
+  const suffixedDevBrowserCookie = createCookieHandler(getSuffixedCookieName(DEV_BROWSER_JWT_KEY, cookieSuffix));
 
-  const get = () => devBrowserCookie.get();
+  const get = () => suffixedDevBrowserCookie.get() || devBrowserCookie.get();
 
   const set = (jwt: string) => {
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
-    const secure = window.location.protocol === 'https:';
+    const secure = getSecureAttribute(sameSite);
 
-    return devBrowserCookie.set(jwt, {
-      expires,
-      sameSite,
-      secure,
-    });
+    suffixedDevBrowserCookie.set(jwt, { expires, sameSite, secure });
+    devBrowserCookie.set(jwt, { expires, sameSite, secure });
   };
 
-  const remove = () => devBrowserCookie.remove();
+  const remove = () => {
+    suffixedDevBrowserCookie.remove();
+    devBrowserCookie.remove();
+  };
 
   return {
     get,

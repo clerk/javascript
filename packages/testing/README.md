@@ -89,7 +89,7 @@ test("sign up", async ({ page }) => {
 
 ### Cypress
 
-⚠️ **Please note:** Support for Cypress is still experimental. Be aware that there are limitations and potential issues at this stage. Please open an issue with a minimal reproduction so that these issues can be fixed. Thanks!
+⚠️ **Please note:** Its intended usage is for **end-to-end** testing only. This package does not support unit testing with Cypress.
 
 Firstly, add your Clerk keys (`CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`) to your environment variables file (e.g. `.env.local` or `.env.`).
 You can find these keys in your Clerk Dashboard.
@@ -125,6 +125,102 @@ it("sign up", () => {
 
   cy.visit('/sign-up');
   ...
+});
+```
+
+## Cypress Custom commands
+
+This package also provides custom commands to sign in/sign out with Clerk in your Cypress tests without having to interact with the UI.
+To use these commands, you must import them in your `cypress/support/commands.ts` file.
+
+```ts
+// cypress/support/commands.ts
+/// <reference types="cypress" />
+import { addClerkCommands } from '@clerk/testing/cypress';
+addClerkCommands({ Cypress, cy });
+
+export {};
+```
+
+### `cy.clerkSignIn`
+
+The `cy.clerkSignIn` command is used to sign in a user using Clerk. This custom command supports only the following first factor strategies:
+
+- Password
+- Phone code
+- Email code
+
+**Note:** Multi-factor authentication is not supported.
+
+This helper internally uses the `setupClerkTestingToken`, so you don't need to call it separately.
+
+**Prerequisites**
+
+- You must call `cy.visit` before calling this command.
+- Navigate to a non-protected page that loads Clerk before using this command.
+
+**Parameters**
+
+- `signInParams`: The sign-in object.
+  - `strategy`: The sign-in strategy. Supported strategies are `'password'`, `'phone_code'`, and `'email_code'`.
+  - `identifier`: The user's identifier. This could be a username, a phone number, or an email.
+  - `password`: The user's password. This is required only if the strategy is `'password'`.
+
+**Strategy Specifics**
+
+- **Password:** The command will sign in the user using the provided password and identifier.
+- **Phone Code:** You must have a user with a test phone number as an identifier (e.g., `+15555550100`).
+- **Email Code:** You must have a user with a test email as an identifier (e.g., `your_email+clerk_test@example.com`).
+
+**Example**
+
+```ts
+it('sign in', () => {
+  cy.visit(`/`);
+  cy.clerkSignIn({ strategy: 'phone_code', identifier: '+15555550100' });
+  cy.visit('/protected');
+});
+```
+
+### `cy.clerkSignOut`
+
+The `cy.clerkSignOut` command is used to sign out the current user using Clerk.
+
+**Prerequisites**
+
+- You must call `cy.visit` before calling this command.
+- Navigate to a page that loads Clerk before using this command.
+
+**Parameters**
+
+- `signOutOptions`: A `SignOutOptions` object.
+
+**Example**
+
+```ts
+it('sign out', () => {
+  cy.visit(`/`);
+  cy.clerkSignIn({ strategy: 'phone_code', identifier: '+15555550100' });
+  cy.visit('/protected');
+  cy.clerkSignOut();
+});
+```
+
+### `cy.clerkLoaded`
+
+The `cy.clerkLoaded` command asserts that Clerk has been loaded.
+
+**Prerequisites**
+
+- You must call `cy.visit` before calling this command.
+- Navigate to a page that loads Clerk before using this command.
+
+**Example**
+
+```ts
+it('check Clerk loaded', () => {
+  cy.visit(`/`);
+  cy.clerkLoaded();
 });
 ```
 

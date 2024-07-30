@@ -307,6 +307,10 @@ export const skSK: LocalizationResource = {
       title: 'Skontrolujte svoj email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Vráťte sa do pôvodného okna pre pokračovanie.',
         title: 'Tento overovací odkaz vypršal',
@@ -421,6 +425,10 @@ export const skSK: LocalizationResource = {
       title: 'Overte svoj email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Použite overovací odkaz poslaný na vašu emailovú adresu',
       formTitle: 'Overovací odkaz',
       loading: {
@@ -447,12 +455,15 @@ export const skSK: LocalizationResource = {
     },
     start: {
       actionLink: 'Prihlásiť sa',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Máte účet?',
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Vytvorte si účet',
     },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -717,6 +728,7 @@ export const skSK: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizovať teraz',
         destructiveActionTitle: 'Odstrániť',
         primaryButton: 'Pripojiť účet',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Pripojené účty',

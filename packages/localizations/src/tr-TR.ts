@@ -307,6 +307,10 @@ export const trTR: LocalizationResource = {
       title: 'E-posta kutunuzu kontrol edin',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Devam etmek için en baştaki sekmeye dönün',
         title: 'Bu doğruşlama bağlantısının süresi dolmuş',
@@ -421,6 +425,10 @@ export const trTR: LocalizationResource = {
       title: 'E-posta adresinizi doğrulayın',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'E-posta adresinize gönderdiğimiz doğrulama bağlantısına tıklayın',
       formTitle: 'Doğrulama bağlantısı',
       loading: {
@@ -447,12 +455,15 @@ export const trTR: LocalizationResource = {
     },
     start: {
       actionLink: 'Giriş yap',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Hesabınız var mı?',
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Hesap oluştur',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -718,6 +729,7 @@ export const trTR: LocalizationResource = {
         actionLabel__reauthorize: 'Yetkilendir',
         destructiveActionTitle: 'Kaldır',
         primaryButton: 'Hesap bağla',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Bağlı hesaplar',

@@ -1,7 +1,9 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+import { getSuffixedCookieName } from '@clerk/shared/keys';
 
 import { inCrossOriginIframe } from '../../../utils';
+import { getSecureAttribute } from '../getSecureAttribute';
 
 const SESSION_COOKIE_NAME = '__session';
 
@@ -15,21 +17,22 @@ export type SessionCookieHandler = {
  * The cookie is used by the Clerk backend SDKs to identify
  * the authenticated user.
  */
-export const createSessionCookie = (): SessionCookieHandler => {
+export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler => {
   const sessionCookie = createCookieHandler(SESSION_COOKIE_NAME);
+  const suffixedSessionCookie = createCookieHandler(getSuffixedCookieName(SESSION_COOKIE_NAME, cookieSuffix));
 
-  const remove = () => sessionCookie.remove();
+  const remove = () => {
+    suffixedSessionCookie.remove();
+    sessionCookie.remove();
+  };
 
   const set = (token: string) => {
     const expires = addYears(Date.now(), 1);
     const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
-    const secure = window.location.protocol === 'https:';
+    const secure = getSecureAttribute(sameSite);
 
-    return sessionCookie.set(token, {
-      expires,
-      sameSite,
-      secure,
-    });
+    suffixedSessionCookie.set(token, { expires, sameSite, secure });
+    sessionCookie.set(token, { expires, sameSite, secure });
   };
 
   return {

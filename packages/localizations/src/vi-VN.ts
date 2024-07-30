@@ -307,6 +307,10 @@ export const viVN: LocalizationResource = {
       title: 'Kiểm tra email của bạn',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Quay trở lại cửa sổ gốc để tiếp tục.',
         title: 'Liên kết xác minh này đã hết hạn',
@@ -421,6 +425,10 @@ export const viVN: LocalizationResource = {
       title: 'Xác minh email của bạn',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Sử dụng liên kết xác minh đã được gửi đến địa chỉ email của bạn',
       formTitle: 'Liên kết xác minh',
       loading: {
@@ -447,12 +455,15 @@ export const viVN: LocalizationResource = {
     },
     start: {
       actionLink: 'Đăng nhập',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Đã có tài khoản?',
       subtitle: 'để tiếp tục với {{applicationName}}',
       title: 'Tạo tài khoản của bạn',
     },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Đăng ký không thành công do không vượt qua các xác thực bảo mật. Vui lòng làm mới trang và thử lại hoặc liên hệ hỗ trợ để được trợ giúp thêm.',
@@ -718,6 +729,7 @@ export const viVN: LocalizationResource = {
         actionLabel__reauthorize: 'Xác thực ngay',
         destructiveActionTitle: 'Xóa',
         primaryButton: 'Kết nối tài khoản',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Tài khoản đã kết nối',

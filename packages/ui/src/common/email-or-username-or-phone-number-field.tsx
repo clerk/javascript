@@ -2,7 +2,7 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
-import { linkButton } from '~/primitives/link-button';
+import { link } from '~/primitives/link';
 
 import { EmailOrUsernameField } from './email-or-username-field';
 import { PhoneNumberField } from './phone-number-field';
@@ -12,17 +12,17 @@ export function EmailOrUsernameOrPhoneNumberField({
   name = undefined,
   labelEmailOrUsername = 'Email address or username',
   labelPhoneNumber = 'Phone number',
+  toggleLabelEmailOrUsername = 'Use email or username',
+  toggleLabelPhoneNumber = 'Use phone',
   locationBasedCountryIso,
-  requiredEmailOrUsername,
-  requiredPhoneNumber,
   toggleDescription = 'Toggle between email or username, and phone.',
   ...props
 }: {
   labelEmailOrUsername?: React.ReactNode;
   labelPhoneNumber?: React.ReactNode;
+  toggleLabelEmailOrUsername?: string;
+  toggleLabelPhoneNumber?: string;
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
-  requiredEmailOrUsername?: boolean;
-  requiredPhoneNumber?: boolean;
   toggleDescription?: string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
@@ -31,10 +31,10 @@ export function EmailOrUsernameOrPhoneNumberField({
     <ToggleButton
       isSelected={showPhoneNumberField}
       onChange={setShowPhoneNumberField}
-      className={linkButton({ size: 'sm', disabled: props.disabled })}
+      className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
       <span className='sr-only'>{toggleDescription}</span>
-      {showPhoneNumberField ? 'Use email or username' : 'Use phone'}
+      {showPhoneNumberField ? toggleLabelEmailOrUsername : toggleLabelPhoneNumber}
     </ToggleButton>
   );
 
@@ -44,7 +44,6 @@ export function EmailOrUsernameOrPhoneNumberField({
       name={name}
       locationBasedCountryIso={locationBasedCountryIso}
       alternativeFieldTrigger={toggle}
-      required={requiredPhoneNumber}
       {...props}
     />
   ) : (
@@ -53,7 +52,6 @@ export function EmailOrUsernameOrPhoneNumberField({
       name={name}
       label={labelEmailOrUsername}
       alternativeFieldTrigger={toggle}
-      required={requiredEmailOrUsername}
     />
   );
 }

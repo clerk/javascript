@@ -135,7 +135,7 @@ export function factorHasLocalStrategy(factor: SignInFactor | undefined | null):
 }
 
 // The priority of second factors is: TOTP -> Phone code -> any other factor
-export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[]): SignInFactor | null {
+export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[] | null): SignInFactor | null {
   if (!secondFactors || secondFactors.length === 0) {
     return null;
   }

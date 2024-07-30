@@ -38,6 +38,9 @@ const config = {
     backgroundOpacity: false,
   },
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  future: {
+    respectDefaultRingColorOpacity: true,
+  },
   theme: {
     extend: {
       fontFamily: {
@@ -70,6 +73,9 @@ const config = {
       spacing: {
         ...generateSpaceScale(),
       },
+      zIndex: {
+        1: '1',
+      },
       colors: {
         accent: {
           ...generateColorScale('accent'),
@@ -91,10 +97,11 @@ const config = {
           DEFAULT: 'hsl(var(--cl-color-warning))',
         },
       },
+      ringWidth: {
+        DEFAULT: '0.125rem',
+      },
       ringColor: {
-        // note: it's not possible to use `DEFAULT` with `ringColor`
-        //       therefore we'll need to use `ring-default`
-        default: 'var(--cl-accent-a9)',
+        DEFAULT: 'var(--cl-accent-a9)',
       },
       animation: {
         spin: 'cl-spin linear infinite',

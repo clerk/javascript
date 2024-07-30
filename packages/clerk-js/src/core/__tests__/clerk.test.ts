@@ -156,6 +156,7 @@ describe('Clerk singleton', () => {
       user: {},
       touch: jest.fn(),
       getToken: jest.fn(),
+      lastActiveToken: { getRawString: () => 'mocked-token' },
     };
     let evenBusSpy;
 
@@ -241,6 +242,19 @@ describe('Clerk singleton', () => {
       const sut = new Clerk(productionPublishableKey);
       await sut.load();
       await sut.setActive({ session: null });
+    });
+
+    it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
+      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
+
+      (window as any).__unstable__onBeforeSetActive = () => {
+        expect(evenBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
+      };
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+      await sut.setActive({ session: mockSession as any as ActiveSessionResource });
     });
 
     it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {

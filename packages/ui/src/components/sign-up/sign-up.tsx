@@ -4,6 +4,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
+import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { FirstNameField } from '~/common/first-name-field';
 import { LastNameField } from '~/common/last-name-field';
 import { OTPField } from '~/common/otp-field';
@@ -13,13 +14,16 @@ import { UsernameField } from '~/common/username-field';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
+import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
-import { LinkButton } from '~/primitives/link-button';
-import { Seperator } from '~/primitives/seperator';
+import { LinkButton } from '~/primitives/link';
+import { Separator } from '~/primitives/separator';
+
+import { SignUpIdentifier } from './indentifiers';
 
 export function SignUpComponent() {
   return (
@@ -32,18 +36,21 @@ export function SignUpComponent() {
 function SignUpComponentLoaded() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
-  const locationBasedCountryIso = (clerk as any)?.__internal_country;
+  const { isDevelopmentOrStaging, userSettings } = useEnvironment();
+  // TODO to fix IsomorphicClerk
+  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
-  const { enabled: emailAddressEnabled } = useAttributes('email_address');
+  const { enabled: emailAddressEnabled, required: emailAddressRequired } = useAttributes('email_address');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
-  const { applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
+  const { applicationName, branded, homeUrl, logoImageUrl } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
+  const isDev = isDevelopmentOrStaging();
 
   return (
     <Common.Loading>
@@ -77,7 +84,7 @@ function SignUpComponentLoaded() {
 
                     <Connections disabled={isGlobalLoading} />
 
-                    {hasConnection && hasIdentifier ? <Seperator>{t('dividerText')}</Seperator> : null}
+                    {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
 
                     {hasIdentifier ? (
                       <div className='flex flex-col gap-4'>
@@ -107,20 +114,28 @@ function SignUpComponentLoaded() {
                           />
                         ) : null}
 
-                        <EmailField disabled={isGlobalLoading} />
+                        {emailAddressEnabled && !emailAddressRequired && phoneNumberEnabled && !phoneNumberRequired ? (
+                          <EmailOrPhoneNumberField locationBasedCountryIso={locationBasedCountryIso} />
+                        ) : (
+                          <>
+                            <EmailField disabled={isGlobalLoading} />
 
-                        {phoneNumberEnabled ? (
-                          <PhoneNumberField
-                            label={t('formFieldLabel__phoneNumber')}
-                            hintText={t('formFieldHintText__optional')}
-                            required={phoneNumberRequired}
-                            disabled={isGlobalLoading}
-                            locationBasedCountryIso={locationBasedCountryIso}
-                          />
-                        ) : null}
+                            {phoneNumberEnabled ? (
+                              <PhoneNumberField
+                                label={t('formFieldLabel__phoneNumber')}
+                                hintText={t('formFieldHintText__optional')}
+                                required={phoneNumberRequired}
+                                disabled={isGlobalLoading}
+                                initPhoneWithCode={clerk.client.signUp.phoneNumber || ''}
+                                locationBasedCountryIso={locationBasedCountryIso}
+                              />
+                            ) : null}
+                          </>
+                        )}
 
                         {passwordEnabled && passwordRequired ? (
                           <PasswordField
+                            validatePassword
                             label={t('formFieldLabel__password')}
                             required={passwordRequired}
                             disabled={isGlobalLoading}
@@ -128,6 +143,8 @@ function SignUpComponentLoaded() {
                         ) : null}
                       </div>
                     ) : null}
+
+                    {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
 
                     {hasConnection || hasIdentifier ? (
                       <Common.Loading scope='step:start'>
@@ -138,9 +155,10 @@ function SignUpComponentLoaded() {
                               asChild
                             >
                               <Button
-                                icon={<Icon.CaretRight />}
                                 busy={isSubmitting}
-                                disabled={isGlobalLoading || isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -150,8 +168,9 @@ function SignUpComponentLoaded() {
                       </Common.Loading>
                     ) : null}
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer>
+                <Card.Footer branded={branded}>
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signUp.start.actionText')}{' '}
@@ -171,19 +190,15 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: elements work
-                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
-                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
-                          */}
-                          +1 (424) 424-4242{' '}
+                          <SignUpIdentifier phoneNumber />
                           <SignUp.Action
                             navigate='start'
                             asChild
                           >
                             <button
                               type='button'
-                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
-                              aria-label='Edit phone number'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
+                              aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
                             </button>
@@ -199,18 +214,19 @@ function SignUpComponentLoaded() {
                       </Common.GlobalError>
                       <OTPField
                         disabled={isGlobalLoading}
-                        // TODO:
-                        // 1. Replace `button` with consolidated styles (tackled later)
                         resend={
                           <SignUp.Action
                             asChild
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                              <LinkButton
+                                type='button'
+                                disabled
+                              >
                                 {t('signUp.phoneCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
-                              </p>
+                              </LinkButton>
                             )}
                           >
                             <LinkButton type='button'>{t('signUp.phoneCode.resendButton')}</LinkButton>
@@ -227,7 +243,8 @@ function SignUpComponentLoaded() {
                               <Button
                                 busy={isSubmitting}
                                 disabled={isGlobalLoading}
-                                icon={<Icon.CaretRight />}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -244,19 +261,15 @@ function SignUpComponentLoaded() {
                       <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                       <Card.Description>
                         <span className='flex items-center justify-center gap-2'>
-                          {/* TODO: elements work
-                                    1. https://linear.app/clerk/issue/SDK-1830/add-signup-elements-for-accessing-email-address-and-phone-number
-                                    2. https://linear.app/clerk/issue/SDK-1831/pre-populate-emailphone-number-fields-when-navigating-back-to-the
-                          */}
-                          alex.carpenter@clerk.dev{' '}
+                          <SignUpIdentifier emailAddress />
                           <SignUp.Action
                             navigate='start'
                             asChild
                           >
                             <button
                               type='button'
-                              className='focus-visible:ring-default size-4 rounded-sm outline-none focus-visible:ring-2'
-                              aria-label='Edit email address'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
+                              aria-label='Start again'
                             >
                               <Icon.PencilUnderlined />
                             </button>
@@ -278,10 +291,13 @@ function SignUpComponentLoaded() {
                             resend
                             // eslint-disable-next-line react/no-unstable-nested-components
                             fallback={({ resendableAfter }) => (
-                              <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                              <LinkButton
+                                type='button'
+                                disabled
+                              >
                                 {t('signUp.emailCode.resendButton')} (
                                 <span className='tabular-nums'>{resendableAfter}</span>)
-                              </p>
+                              </LinkButton>
                             )}
                           >
                             <LinkButton type='button'>{t('signUp.emailCode.resendButton')}</LinkButton>
@@ -298,7 +314,8 @@ function SignUpComponentLoaded() {
                               <Button
                                 busy={isSubmitting}
                                 disabled={isGlobalLoading}
-                                icon={<Icon.CaretRight />}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
                               >
                                 {t('formButtonPrimary')}
                               </Button>
@@ -317,6 +334,23 @@ function SignUpComponentLoaded() {
                           applicationName,
                         })}
                       </Card.Description>
+                      <Card.Description>
+                        <span className='flex items-center justify-center gap-2'>
+                          <SignUpIdentifier emailAddress />
+                          <SignUp.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <button
+                              type='button'
+                              className='size-4 rounded-sm outline-none focus-visible:ring'
+                              aria-label='Start again'
+                            >
+                              <Icon.PencilUnderlined />
+                            </button>
+                          </SignUp.Action>
+                        </span>
+                      </Card.Description>
                     </Card.Header>
                     <Card.Body>
                       <Common.GlobalError>
@@ -330,10 +364,13 @@ function SignUpComponentLoaded() {
                         // eslint-disable-next-line react/no-unstable-nested-components
                         fallback={({ resendableAfter }) => {
                           return (
-                            <p className='text-gray-11 border border-transparent px-2.5 py-1.5 text-center text-base font-medium'>
+                            <LinkButton
+                              type='button'
+                              disabled
+                            >
                               {t('signUp.emailLink.resendButton')} (
                               <span className='tabular-nums'>{resendableAfter}</span>)
-                            </p>
+                            </LinkButton>
                           );
                         }}
                       >
@@ -341,8 +378,9 @@ function SignUpComponentLoaded() {
                       </SignUp.Action>
                     </Card.Body>
                   </SignUp.Strategy>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer />
+                <Card.Footer branded={branded} />
               </Card.Root>
             </SignUp.Step>
 
@@ -400,6 +438,7 @@ function SignUpComponentLoaded() {
 
                       {passwordEnabled && passwordRequired ? (
                         <PasswordField
+                          validatePassword
                           label={t('formFieldLabel__password')}
                           required={passwordRequired}
                           disabled={isGlobalLoading}
@@ -415,9 +454,10 @@ function SignUpComponentLoaded() {
                             asChild
                           >
                             <Button
-                              icon={<Icon.CaretRight />}
                               busy={isSubmitting}
-                              disabled={isGlobalLoading || isSubmitting}
+                              disabled={isGlobalLoading}
+                              iconEnd={<Icon.CaretRightLegacy />}
+                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -426,8 +466,9 @@ function SignUpComponentLoaded() {
                       }}
                     </Common.Loading>
                   </Card.Body>
+                  {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
-                <Card.Footer>
+                <Card.Footer branded={branded}>
                   <Card.FooterAction>
                     <Card.FooterActionText>
                       {t('signUp.continue.actionText')}{' '}

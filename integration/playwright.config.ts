@@ -1,5 +1,4 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import os from 'node:os';
 
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { defineConfig, devices } from '@playwright/test';
@@ -7,8 +6,6 @@ import { config } from 'dotenv';
 import * as path from 'path';
 
 config({ path: path.resolve(__dirname, '.env.local') });
-
-const numAvailableWorkers = os.cpus().length - 1;
 
 export const common: PlaywrightTestConfig = {
   testDir: './tests',
@@ -18,9 +15,10 @@ export const common: PlaywrightTestConfig = {
   retries: process.env.CI ? 2 : 0,
   timeout: 90000,
   maxFailures: process.env.CI ? 1 : undefined,
-  workers: process.env.CI ? numAvailableWorkers : '70%',
+  workers: process.env.CI ? '50%' : '70%',
   reporter: process.env.CI ? 'line' : 'list',
   use: {
+    ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
     bypassCSP: true, // We probably need to limit this to specific tests
   },
@@ -28,6 +26,7 @@ export const common: PlaywrightTestConfig = {
 
 export default defineConfig({
   ...common,
+
   projects: [
     {
       name: 'setup',

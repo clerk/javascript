@@ -55,6 +55,10 @@ export function useActiveTags<TActor extends AnyActorRef, TTag extends TaggedAct
     (prev, next) => prev.tags === next.tags,
   );
 
+  if (!state) {
+    return false;
+  }
+
   if (typeof tags === 'string') {
     return state.hasTag(tags);
   }

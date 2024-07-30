@@ -304,6 +304,10 @@ export const heIL: LocalizationResource = {
       title: 'בדוק את הדוא"ל שלך',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'חזור לכרטיסייה המקורית להמשך.',
         title: 'קישור האימות הזה פג תוקף',
@@ -418,6 +422,10 @@ export const heIL: LocalizationResource = {
       title: 'אמת את כתובת הדוא"ל שלך',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'השתמש בקישור האימות שנשלח לכתובת הדוא"ל שלך',
       formTitle: 'קישור לאימות',
       loading: {
@@ -444,12 +452,15 @@ export const heIL: LocalizationResource = {
     },
     start: {
       actionLink: 'התחבר',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'יש לך חשבון?',
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'צור את החשבון שלך',
     },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -707,6 +718,7 @@ export const heIL: LocalizationResource = {
         actionLabel__reauthorize: 'אשר עכשיו',
         destructiveActionTitle: 'הסר',
         primaryButton: 'חבר חשבון',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'חשבונות מחוברים',

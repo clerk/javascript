@@ -2,7 +2,7 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
-import { linkButton } from '~/primitives/link-button';
+import { link } from '~/primitives/link';
 
 import { EmailField } from './email-field';
 import { PhoneNumberField } from './phone-number-field';
@@ -13,8 +13,6 @@ export function EmailOrPhoneNumberField({
   labelEmail = 'Email address',
   labelPhoneNumber = 'Phone number',
   locationBasedCountryIso,
-  requiredEmail,
-  requiredPhoneNumber,
   toggleLabelEmail = 'Use email',
   toggleLabelPhoneNumber = 'Use phone',
   ...props
@@ -22,18 +20,16 @@ export function EmailOrPhoneNumberField({
   labelEmail?: React.ReactNode;
   labelPhoneNumber?: React.ReactNode;
   locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
-  requiredEmail?: boolean;
-  requiredPhoneNumber?: boolean;
   toggleLabelEmail?: string;
   toggleLabelPhoneNumber?: string;
-} & Omit<React.ComponentProps<typeof Common.Input>, 'required' | 'type'>) {
+} & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showPhoneNumberField, setShowPhoneNumberField] = React.useState(false);
 
   const toggle = (
     <ToggleButton
       isSelected={showPhoneNumberField}
       onChange={setShowPhoneNumberField}
-      className={linkButton({ size: 'sm', disabled: props.disabled })}
+      className={link({ size: 'sm', disabled: props.disabled })}
     >
       {showPhoneNumberField ? toggleLabelEmail : toggleLabelPhoneNumber}
     </ToggleButton>
@@ -44,7 +40,6 @@ export function EmailOrPhoneNumberField({
       label={labelPhoneNumber}
       locationBasedCountryIso={locationBasedCountryIso}
       alternativeFieldTrigger={toggle}
-      required={requiredPhoneNumber}
       name={name}
       {...props}
     />
@@ -54,7 +49,6 @@ export function EmailOrPhoneNumberField({
       name={name}
       label={labelEmail}
       alternativeFieldTrigger={toggle}
-      required={requiredEmail}
     />
   );
 }

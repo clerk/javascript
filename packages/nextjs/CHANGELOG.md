@@ -1,5 +1,64 @@
 # Change Log
 
+## 5.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`b48689705`](https://github.com/clerk/javascript/commit/b48689705f9fc2251d2f24addec7a0d0b1da0fe1)]:
+  - @clerk/types@4.9.1
+  - @clerk/backend@1.4.3
+  - @clerk/clerk-react@5.2.10
+  - @clerk/shared@2.4.1
+
+## 5.2.7
+
+### Patch Changes
+
+- Updated dependencies [[`d465d7069`](https://github.com/clerk/javascript/commit/d465d70696bf26270cb2efbf4695ca49016fcb96)]:
+  - @clerk/backend@1.4.2
+
+## 5.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`045fb93cb`](https://github.com/clerk/javascript/commit/045fb93cbf577ca84e5b95fc6dfaacde67693be2)]:
+  - @clerk/backend@1.4.1
+
+## 5.2.5
+
+### Patch Changes
+
+- Fixes regression on `@clerk/nextjs/server` (introduced on https://github.com/clerk/javascript/pull/3758) where `server-only` module was being resolved in runtimes without `react-server` available, such as `getAuth` on `getServerSideProps`. ([#3761](https://github.com/clerk/javascript/pull/3761)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Return build-time error if `auth` and `currentUser` server-side helpers are imported into Client Components. ([#3758](https://github.com/clerk/javascript/pull/3758)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Stop throwing "Error: Clerk: auth() was called but Clerk can't detect usage of authMiddleware()." errors when no user action is needed by removing sourcemaps for all Clerk-bundled server actions. ([#3773](https://github.com/clerk/javascript/pull/3773)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`b87f7b9e1`](https://github.com/clerk/javascript/commit/b87f7b9e163756fd43789bc7b7344d2eb24015ec), [`b2788f67b`](https://github.com/clerk/javascript/commit/b2788f67b75cce17af1a2f91a984bb826a5a42e1), [`86c75e50c`](https://github.com/clerk/javascript/commit/86c75e50cba9c4efb480672f1b8c6a6fff4ef477)]:
+  - @clerk/backend@1.4.0
+  - @clerk/shared@2.4.0
+  - @clerk/types@4.9.0
+  - @clerk/clerk-react@5.2.9
+
+## 5.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7)]:
+  - @clerk/types@4.8.0
+  - @clerk/backend@1.3.2
+  - @clerk/clerk-react@5.2.8
+  - @clerk/shared@2.3.3
+
+## 5.2.3
+
+### Patch Changes
+
+- Fixes a bug where Clerk's Handshake mechanism would not run when an application is rendered in an iframe. ([#3555](https://github.com/clerk/javascript/pull/3555)) by [@anagstef](https://github.com/anagstef)
+
+- Updated dependencies [[`5642b2616`](https://github.com/clerk/javascript/commit/5642b26167a6eb1aca68777d782a9686edacfd37)]:
+  - @clerk/backend@1.3.1
+
 ## 5.2.2
 
 ### Patch Changes

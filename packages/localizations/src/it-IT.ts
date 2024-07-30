@@ -309,6 +309,10 @@ export const itIT: LocalizationResource = {
       title: 'Controlla la tua email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Ritorna alla scheda originaria per continuare',
         title: 'Questo link di verifica è scaduto',
@@ -423,6 +427,10 @@ export const itIT: LocalizationResource = {
       title: 'Verifica la tua email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Usa il link di verifica inviato al tuo indirizzo email',
       formTitle: 'Link di verifica',
       loading: {
@@ -449,12 +457,15 @@ export const itIT: LocalizationResource = {
     },
     start: {
       actionLink: 'Accedi',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Hai giá un account?',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',
     },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Registrazione non riuscita a causa di fallite convalide di sicurezza. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
@@ -723,6 +734,7 @@ export const itIT: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizza ora',
         destructiveActionTitle: 'Rimuovi',
         primaryButton: 'Collega account',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'Gli ambiti richiesti sono stati aggiornati e potresti riscontrare funzionalità limitate. Per favore, ri-autorizza questa applicazione per evitare problemi.',
         title: 'Account collegati',

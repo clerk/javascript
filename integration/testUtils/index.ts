@@ -1,5 +1,6 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
-import type { Browser, BrowserContext, Page } from '@playwright/test';
+import type { Browser, BrowserContext, Page, Response } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import type { Application } from '../models/application';
 import { createAppPageObject } from './appPageObject';
@@ -24,6 +25,13 @@ const createClerkClient = (app: Application) => {
 
 const createExpectPageObject = ({ page }: TestArgs) => {
   return {
+    toBeHandshake: async (res: Response) => {
+      // Travel the redirect chain until we find the handshake header
+      // TODO: Loop through the redirects until we find a handshake header, or timeout trying
+      const redirect = await res.request().redirectedFrom().redirectedFrom().redirectedFrom().response();
+      expect(redirect.status()).toBe(307);
+      expect(redirect.headers()['x-clerk-auth-status']).toContain('handshake');
+    },
     toBeSignedOut: () => {
       return page.waitForFunction(() => {
         return !window.Clerk?.user;
@@ -32,6 +40,16 @@ const createExpectPageObject = ({ page }: TestArgs) => {
     toBeSignedIn: async () => {
       return page.waitForFunction(() => {
         return !!window.Clerk?.user;
+      });
+    },
+  };
+};
+
+const createClerkUtils = ({ page }: TestArgs) => {
+  return {
+    getClientSideUser: () => {
+      return page.evaluate(() => {
+        return window.Clerk?.user;
       });
     },
   };
@@ -72,6 +90,7 @@ export const createTestUtils = <
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     userButton: createUserButtonPageObject(testArgs),
     expect: createExpectPageObject(testArgs),
+    clerk: createClerkUtils(testArgs),
   };
 
   const browserHelpers = {

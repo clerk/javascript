@@ -8,11 +8,11 @@ import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 import { ToggleGroup } from './toggle-group';
 
-const lightAccentDefault = '#2F3037';
+const lightAccentDefault = '#6C47FF';
 const lightGrayDefault = '#2f3037';
 const lightBackgroundDefault = '#fff';
 
-const darkAccentDefault = '#2F3037';
+const darkAccentDefault = '#6C47FF';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 
@@ -82,7 +82,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               <select
                 name='component'
                 id='component'
-                defaultValue={pathname}
+                value={pathname}
                 onChange={e => router.push(e.target.value)}
                 className='relative appearance-none rounded border bg-neutral-100 py-1 pl-1.5 pr-5 text-xs after:absolute after:right-1.5 after:top-1 after:size-2 after:bg-red-200'
               >

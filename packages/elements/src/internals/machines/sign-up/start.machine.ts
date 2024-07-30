@@ -15,6 +15,12 @@ export type TSignUpStartMachine = typeof SignUpStartMachine;
 
 export const SignUpStartMachineId = 'SignUpStart';
 
+type PrefillFieldsKeys = keyof Pick<
+  SignUpResource,
+  'username' | 'firstName' | 'lastName' | 'emailAddress' | 'phoneNumber'
+>;
+const PREFILL_FIELDS: PrefillFieldsKeys[] = ['firstName', 'lastName', 'emailAddress', 'username', 'phoneNumber'];
+
 export const SignUpStartMachine = setup({
   actors: {
     attempt: fromPromise<SignUpResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
@@ -38,6 +44,21 @@ export const SignUpStartMachine = setup({
         };
       },
     ),
+    setDefaultFormValues: ({ context }) => {
+      const signUp = context.parent.getSnapshot().context.clerk.client.signUp;
+      const prefilledDefaultValues = new Map();
+
+      for (const key of PREFILL_FIELDS) {
+        if (key in signUp) {
+          prefilledDefaultValues.set(key, signUp[key]);
+        }
+      }
+
+      context.formRef.send({
+        type: 'PREFILL_DEFAULT_VALUES',
+        defaultValues: prefilledDefaultValues,
+      });
+    },
   },
   guards: {
     isExampleMode: ({ context }) => Boolean(context.parent.getSnapshot().context.exampleMode),
@@ -51,6 +72,7 @@ export const SignUpStartMachine = setup({
     parent: input.parent,
     loadingStep: 'start',
   }),
+  entry: 'setDefaultFormValues',
   initial: 'Pending',
   states: {
     Pending: {

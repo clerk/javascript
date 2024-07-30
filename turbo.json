@@ -17,7 +17,7 @@
     "CLERK_*",
     "GATSBY_CLERK_*",
     "NEXT_PUBLIC_CLERK_*",
-    "PUBLIC_ASTRO_APP_CLERK_*",
+    "PUBLIC_CLERK_*",
     "NODE_ENV",
     "NODE_VERSION",
     "NPM_VERSION",
@@ -27,7 +27,7 @@
     "EXPO_PUBLIC_CLERK_*",
     "REACT_APP_CLERK_*"
   ],
-  "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN"],
+  "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN", "ACTIONS_RUNNER_DEBUG", "ACTIONS_STEP_DEBUG"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -177,8 +177,15 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:astro": {
-      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build"],
+      "cache": false,
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build", "^@clerk/astro#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:sessions": {
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/backend#build", "^@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
@@ -189,6 +196,12 @@
         "^@clerk/nextjs#build",
         "^@clerk/elements#build"
       ],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:expo-web": {
+      "dependsOn": ["^@clerk/clerk-js#build", "^@clerk/clerk-expo#build", "^@clerk/clerk-react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"

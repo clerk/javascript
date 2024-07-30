@@ -160,7 +160,7 @@ export class Clerk implements ClerkInterface {
   #publishableKey: string = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
-  #authService: AuthCookieService | null = null;
+  #authService?: AuthCookieService;
   #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
@@ -720,6 +720,10 @@ export class Clerk implements ClerkInterface {
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
 
+    if (session?.lastActiveToken) {
+      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+    }
+
     await onBeforeSetActive();
 
     //1. setLastActiveSession to passed user session (add a param).
@@ -732,7 +736,10 @@ export class Clerk implements ClerkInterface {
     }
 
     // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
-    await newSession?.getToken();
+    const token = await newSession?.getToken();
+    if (!token) {
+      eventBus.dispatch(events.TokenUpdate, { token: null });
+    }
 
     //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
     //   undefined, then wait for beforeEmit to complete before emitting the new session.
@@ -752,6 +759,7 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#setAccessors(newSession);
+
     this.#emit();
     await onAfterSetActive();
     this.#resetComponentsState();
@@ -1515,7 +1523,7 @@ export class Clerk implements ClerkInterface {
   };
 
   #loadInStandardBrowser = async (): Promise<boolean> => {
-    this.#authService = new AuthCookieService(this, this.#fapiClient);
+    this.#authService = await AuthCookieService.create(this, this.#fapiClient);
 
     /**
      * 1. Multi-domain SSO handling

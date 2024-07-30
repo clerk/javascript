@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Configuration",
+  "definitions": {
+    "Configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$schema": { "type": "string" },
+        "root": {
+          "anyOf": [{ "type": "string" }, { "type": "null" }]
+        },
+        "activeInstance": {
+          "type": "string"
+        },
+        "instances": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/InstanceConfiguration"
+          }
+        }
+      },
+      "required": ["root", "activeInstance", "instances"],
+      "title": "Configuration"
+    },
+    "InstanceConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "secretKey": {
+          "type": "string"
+        },
+        "publishableKey": {
+          "type": "string"
+        },
+        "fapiUrl": {
+          "type": "string"
+        },
+        "bapiUrl": {
+          "type": "string"
+        }
+      },
+      "required": ["secretKey", "publishableKey", "fapiUrl", "bapiUrl"],
+      "title": "InstanceConfiguration"
+    }
+  }
+}

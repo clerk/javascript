@@ -25,7 +25,7 @@ export async function getClientCookie({ urls, name }: GetClientCookieParams) {
   const cookieResults = await Promise.allSettled(cookiePromises);
 
   for (const cookie of cookieResults) {
-    if (cookie.status === 'fulfilled') {
+    if (cookie.status === 'fulfilled' && cookie.value) {
       return cookie.value;
     }
   }

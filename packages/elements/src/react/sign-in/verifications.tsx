@@ -1,4 +1,4 @@
-import type { SignInFactor, SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
+import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
 import { useSelector } from '@xstate/react';
 import { useCallback, useEffect } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';
@@ -11,6 +11,7 @@ import { Form } from '~/react/common/form';
 import { useActiveTags } from '~/react/hooks';
 import {
   SignInRouterCtx,
+  SignInStrategyContext,
   StrategiesContext,
   useSignInFirstFactorStep,
   useSignInSecondFactorStep,
@@ -76,17 +77,19 @@ export function SignInStrategy({ children, name }: SignInStrategyProps) {
 
   useEffect(() => {
     if (factorCtx) {
-      factorCtx.send({ type: 'STRATEGY.REGISTER', factor: name as unknown as SignInFactor });
+      factorCtx.send({ type: 'STRATEGY.REGISTER', factor: name });
     }
 
     return () => {
       if (factorCtx?.getSnapshot().status === 'active') {
-        factorCtx.send({ type: 'STRATEGY.UNREGISTER', factor: name as unknown as SignInFactor });
+        factorCtx.send({ type: 'STRATEGY.UNREGISTER', factor: name });
       }
     };
   }, [factorCtx, name]);
 
-  return active ? <>{children}</> : null;
+  return active ? (
+    <SignInStrategyContext.Provider value={{ strategy: name }}>{children}</SignInStrategyContext.Provider>
+  ) : null;
 }
 
 /**

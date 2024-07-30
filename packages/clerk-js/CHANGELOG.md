@@ -1,5 +1,81 @@
 # Change Log
 
+## 5.10.2
+
+### Patch Changes
+
+- Add support for opening the `UserProfileModal` and `OrganizationProfileModal` to specific navigation items through the `UserButton` and `OrganizationSwitcher`. ([#3732](https://github.com/clerk/javascript/pull/3732)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Adjust how we pass captcha tokens to the Clerk API when signing in with Google, Microsoft, and Apple ([#3806](https://github.com/clerk/javascript/pull/3806)) by [@BRKalow](https://github.com/BRKalow)
+
+- Add `signUp.start.actionLink__use_email` and `signUp.start.actionLink__use_phone` localization keys. ([#3826](https://github.com/clerk/javascript/pull/3826)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`b48689705`](https://github.com/clerk/javascript/commit/b48689705f9fc2251d2f24addec7a0d0b1da0fe1), [`4e61f8d27`](https://github.com/clerk/javascript/commit/4e61f8d2770907f48a53d530187a7b6de09f107e)]:
+  - @clerk/types@4.9.1
+  - @clerk/localizations@2.5.2
+  - @clerk/shared@2.4.1
+
+## 5.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`24465035c`](https://github.com/clerk/javascript/commit/24465035c6f044ec76c31deeedc2fce0a19cad88)]:
+  - @clerk/localizations@2.5.1
+
+## 5.10.0
+
+### Minor Changes
+
+- Support reading / writing / removing suffixed/un-suffixed cookies from `@clerk/clerk-js` and `@clerk/backend`. by [@dimkl](https://github.com/dimkl)
+
+  The `__session`, `__clerk_db_jwt` and `__client_uat` cookies will now include a suffix derived from the instance's publishakeKey. The cookie name suffixes are used to prevent cookie collisions, effectively enabling support for multiple Clerk applications running on the same domain.
+
+- Improve UX in ConnectedAccounts by converting the error into a useful, user-friendly message with a visible way to take action. ([#3723](https://github.com/clerk/javascript/pull/3723)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Update the image alt attribute to fix accessibility issues reported by Lighthouse. ([#3775](https://github.com/clerk/javascript/pull/3775)) by [@vignesh-gupta](https://github.com/vignesh-gupta)
+
+- Set `session` and `client_uat` before invalidating cache during `setActive()` flow ([#3774](https://github.com/clerk/javascript/pull/3774)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Update types to account for null second factors ([#3780](https://github.com/clerk/javascript/pull/3780)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`b87f7b9e1`](https://github.com/clerk/javascript/commit/b87f7b9e163756fd43789bc7b7344d2eb24015ec), [`b2788f67b`](https://github.com/clerk/javascript/commit/b2788f67b75cce17af1a2f91a984bb826a5a42e1), [`6e8a5037c`](https://github.com/clerk/javascript/commit/6e8a5037cd4265d579afa1fa6bda282721fc2ece), [`b2788f67b`](https://github.com/clerk/javascript/commit/b2788f67b75cce17af1a2f91a984bb826a5a42e1), [`5fa7208cf`](https://github.com/clerk/javascript/commit/5fa7208cfb13fd88f38ef0a987a536caa559c1db), [`86c75e50c`](https://github.com/clerk/javascript/commit/86c75e50cba9c4efb480672f1b8c6a6fff4ef477)]:
+  - @clerk/shared@2.4.0
+  - @clerk/localizations@2.5.0
+  - @clerk/types@4.9.0
+
+## 5.9.0
+
+### Minor Changes
+
+- Added support for Custom OAuth providers by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Updated strategy types to include `CustomOAuthStrategy`:
+    - Added the `CustomOAuthStrategy` type with the value `oauth_custom_${string}`
+    - Modified `OAuthStrategy` to include `CustomOAuthStrategy`:
+      `export type OAuthStrategy = `oauth\_${OAuthProvider}` | CustomOAuthStrategy;`
+  - Added the `CustomOauthProvider` type with value `custom_${string}` and extended `OAuthProvider` type to include `CustomOauthProvider`
+  - Added support for displaying provider initials when `logo_url` is null for custom OAuth providers
+  - Created new `ProviderInitialIcon` internal component in order to display custom oauth provider initials if provider `logo_url` is null
+
+### Patch Changes
+
+- Bug Fix: Navigation during signing out requires a router which was missing from the ImpersonationFab by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7)]:
+  - @clerk/types@4.8.0
+  - @clerk/localizations@2.4.8
+  - @clerk/shared@2.3.3
+
+## 5.8.1
+
+### Patch Changes
+
+- Bug fix: Clear session cookie after a user deletes their account ([#3628](https://github.com/clerk/javascript/pull/3628)) by [@octoper](https://github.com/octoper)
+
+- Set the localhost cookies with the Secure attribute ([#3604](https://github.com/clerk/javascript/pull/3604)) by [@anagstef](https://github.com/anagstef)
+
 ## 5.8.0
 
 ### Minor Changes

@@ -309,6 +309,10 @@ export const esES: LocalizationResource = {
       title: 'Revise su correo electrónico',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Regrese a la pestaña original para continuar.',
         title: 'Este enlace de verificación ha expirado',
@@ -423,6 +427,10 @@ export const esES: LocalizationResource = {
       title: 'Verifique su correo electrónico',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Utilice el enlace de verificación enviado a su dirección de correo electrónico',
       formTitle: 'Enlace de verificación',
       loading: {
@@ -449,12 +457,15 @@ export const esES: LocalizationResource = {
     },
     start: {
       actionLink: 'Entrar',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: '¿Tienes una cuenta?',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Crea tu cuenta',
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Registro fallido debido a validaciones de seguridad fallidas. Por favor, actualice la página para intentarlo de nuevo o comuníquese con el soporte para más asistencia.',
@@ -723,6 +734,7 @@ export const esES: LocalizationResource = {
         actionLabel__reauthorize: 'Autorizar ahora',
         destructiveActionTitle: 'Quitar',
         primaryButton: 'Conectar cuenta',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'Los permisos necesarios han sido actualizados, y podría estar experimentando funcionalidad limitada. Por favor, reautorice esta aplicación para evitar problemas.',
         title: 'Cuentas conectadas',

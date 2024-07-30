@@ -147,7 +147,7 @@ describe('ProfileSection', () => {
       });
       render(<UserProfileSection />, { wrapper });
 
-      screen.getByRole('img', { name: 'F L' });
+      screen.getByRole('img', { name: "F L's logo" });
     });
 
     it('clicking "Remove image" calls the appropriate function', async () => {

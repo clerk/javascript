@@ -1,11 +1,53 @@
 // These utilities are ported from: packages/clerk-js/src/ui/components/SignIn/utils.ts
 // They should be functionally identical.
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
-import type { PreferredSignInStrategy, SignInFactor } from '@clerk/types';
+import type {
+  PreferredSignInStrategy,
+  SignInFactor,
+  SignInFirstFactor,
+  SignInSecondFactor,
+  SignInStrategy,
+} from '@clerk/types';
 
-const ORDER_WHEN_PASSWORD_PREFERRED = ['passkey', 'password', 'email_link', 'email_code', 'phone_code'] as const;
-const ORDER_WHEN_OTP_PREFERRED = ['email_link', 'email_code', 'phone_code', 'passkey', 'password'] as const;
-// const ORDER_ALL_STRATEGIES = ['email_link', 'email_code', 'phone_code', 'password'] as const;
+// Factor sorting - https://github.com/clerk/javascript/blob/5764e2911790051589bb5c4f3b1a2c79f7f30c7e/packages/clerk-js/src/ui/utils/factorSorting.ts
+const makeSortingOrderMap = <T extends string>(arr: T[]): Record<T, number> =>
+  arr.reduce(
+    (acc, k, i) => {
+      acc[k] = i;
+      return acc;
+    },
+    {} as Record<T, number>,
+  );
+
+const STRATEGY_SORT_ORDER_PASSWORD_PREF = makeSortingOrderMap([
+  'passkey',
+  'password',
+  'email_link',
+  'email_code',
+  'phone_code',
+] as SignInStrategy[]);
+
+const STRATEGY_SORT_ORDER_OTP_PREF = makeSortingOrderMap([
+  'email_code',
+  'email_link',
+  'phone_code',
+  'passkey',
+  'password',
+] as SignInStrategy[]);
+
+const makeSortingFunction =
+  (sortingMap: Record<SignInStrategy, number>) =>
+  (a: SignInFactor, b: SignInFactor): number => {
+    const orderA = sortingMap[a.strategy];
+    const orderB = sortingMap[b.strategy];
+    if (orderA === undefined || orderB === undefined) {
+      return 0;
+    }
+    return orderA - orderB;
+  };
+
+const passwordPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_PASSWORD_PREF);
+const otpPrefFactorComparator = makeSortingFunction(STRATEGY_SORT_ORDER_OTP_PREF);
 
 const findFactorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
@@ -14,10 +56,10 @@ const findFactorForIdentifier = (i: string | null) => (f: SignInFactor) => {
 // The algorithm can be found at
 // https://www.notion.so/clerkdev/Implement-sign-in-alt-methods-e6e60ffb644645b3a0553b50556468ce
 export function determineStartingSignInFactor(
-  firstFactors: SignInFactor[],
+  firstFactors: SignInFirstFactor[],
   identifier: string | null,
   preferredSignInStrategy?: PreferredSignInStrategy,
-): SignInFactor | null {
+) {
   if (!firstFactors || firstFactors.length === 0) {
     return null;
   }
@@ -27,7 +69,7 @@ export function determineStartingSignInFactor(
     : determineStrategyWhenOTPIsPreferred(firstFactors, identifier);
 }
 
-function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
+function findPasskeyStrategy(factors: SignInFirstFactor[]) {
   if (isWebAuthnSupported()) {
     const passkeyFactor = factors.find(({ strategy }) => strategy === 'passkey');
 
@@ -38,66 +80,38 @@ function findPasskeyStrategy(factors: SignInFactor[]): SignInFactor | null {
   return null;
 }
 
-function determineStrategyWhenPasswordIsPreferred(
-  factors: SignInFactor[],
-  identifier: string | null,
-): SignInFactor | null {
+function determineStrategyWhenPasswordIsPreferred(factors: SignInFirstFactor[], identifier: string | null) {
   const passkeyFactor = findPasskeyStrategy(factors);
   if (passkeyFactor) {
     return passkeyFactor;
   }
-
-  // Prefer the password factor if it's available
-  const passwordFactor = factors.find(factor => factor.strategy === 'password');
-  if (passwordFactor) {
-    return passwordFactor;
+  const selected = factors.sort(passwordPrefFactorComparator)[0];
+  if (selected.strategy === 'password') {
+    return selected;
   }
-
-  // Otherwise, find the factor for the provided identifier, or the next factor based on the preference list
-  const factorForIdentifier = factors.find(findFactorForIdentifier(identifier));
-  if (factorForIdentifier) {
-    return factorForIdentifier;
-  }
-
-  for (const preferredFactor of ORDER_WHEN_PASSWORD_PREFERRED) {
-    const factor = factors.find(factor => factor.strategy === preferredFactor);
-    if (factor) {
-      return factor;
-    }
-  }
-
-  return null;
+  return factors.find(findFactorForIdentifier(identifier)) || selected || null;
 }
 
-function determineStrategyWhenOTPIsPreferred(factors: SignInFactor[], identifier: string | null): SignInFactor | null {
+function determineStrategyWhenOTPIsPreferred(factors: SignInFirstFactor[], identifier: string | null) {
   const passkeyFactor = findPasskeyStrategy(factors);
   if (passkeyFactor) {
     return passkeyFactor;
   }
 
-  const factorForIdentifier = factors.find(findFactorForIdentifier(identifier));
-  if (factorForIdentifier) {
-    return factorForIdentifier;
+  const sortedBasedOnPrefFactor = factors.sort(otpPrefFactorComparator);
+  const forIdentifier = sortedBasedOnPrefFactor.find(findFactorForIdentifier(identifier));
+  if (forIdentifier) {
+    return forIdentifier;
   }
-
-  // Prefer the password factor if it's available
-  const emailLinkFactor = factors.find(factor => factor.strategy === 'email_link');
-  if (emailLinkFactor) {
-    return emailLinkFactor;
+  const firstBasedOnPref = sortedBasedOnPrefFactor[0];
+  if (firstBasedOnPref.strategy === 'email_link') {
+    return firstBasedOnPref;
   }
-
-  for (const preferredFactor of ORDER_WHEN_OTP_PREFERRED) {
-    const factor = factors.find(factor => factor.strategy === preferredFactor);
-    if (factor) {
-      return factor;
-    }
-  }
-
-  return null;
+  return factors.find(findFactorForIdentifier(identifier)) || firstBasedOnPref || null;
 }
 
 // The priority of second factors is: TOTP -> Phone code -> any other factor
-export function determineStartingSignInSecondFactor(secondFactors: SignInFactor[]): SignInFactor | null {
+export function determineStartingSignInSecondFactor(secondFactors: SignInSecondFactor[] | null) {
   if (!secondFactors || secondFactors.length === 0) {
     return null;
   }

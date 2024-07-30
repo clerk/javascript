@@ -307,6 +307,10 @@ export const ukUA: LocalizationResource = {
       title: 'Перевірте свою електронну пошту',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Поверніться на початкову вкладку, щоб продовжити.',
         title: 'Термін дії цього посилання для підтвердження закінчився',
@@ -421,6 +425,10 @@ export const ukUA: LocalizationResource = {
       title: 'Підтвердіть свою електронну пошту',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Використовуйте посилання для підтвердження, надіслане на вашу електронну адресу',
       formTitle: 'Посилання для підтвердження',
       loading: {
@@ -447,12 +455,15 @@ export const ukUA: LocalizationResource = {
     },
     start: {
       actionLink: 'Увійти',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Уже є акаунт?',
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Створіть Ваш акаунт',
     },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -718,6 +729,7 @@ export const ukUA: LocalizationResource = {
         actionLabel__reauthorize: 'Авторизувати зараз',
         destructiveActionTitle: 'Видалити',
         primaryButton: 'Підключити акаунт',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Підключені акаунти',

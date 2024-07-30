@@ -1,5 +1,65 @@
 # Change Log
 
+## 2.0.0
+
+### Major Changes
+
+- Support for [Expo Web](https://docs.expo.dev/workflow/web/) has been added! You can now build fullstack websites with Expo, React, and Clerk. Utilize [Clerk's components](https://clerk.com/docs/components/overview) to build out your app. ([#3456](https://github.com/clerk/javascript/pull/3456)) by [@octoper](https://github.com/octoper)
+
+  You can access the components from the `/web` subpath import like so:
+
+  ```tsx
+  import { SignUp } from "@clerk/clerk-expo/web";
+
+  export default function Page() {
+    return <SignUp />;
+  }
+  ```
+
+  **Breaking change:** You need to use Expo 50 or later. The minimum required React Native version was bumped to `0.73`.
+
+### Patch Changes
+
+- Updated dependencies [[`b48689705`](https://github.com/clerk/javascript/commit/b48689705f9fc2251d2f24addec7a0d0b1da0fe1), [`17bbe0199`](https://github.com/clerk/javascript/commit/17bbe01994beb9c5e53355cc692a5d71ddf4cc8c), [`4e61f8d27`](https://github.com/clerk/javascript/commit/4e61f8d2770907f48a53d530187a7b6de09f107e)]:
+  - @clerk/clerk-js@5.10.2
+  - @clerk/types@4.9.1
+  - @clerk/clerk-react@5.2.10
+  - @clerk/shared@2.4.1
+
+## 1.2.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@5.10.1
+
+## 1.2.8
+
+### Patch Changes
+
+- Updated dependencies [[`b87f7b9e1`](https://github.com/clerk/javascript/commit/b87f7b9e163756fd43789bc7b7344d2eb24015ec), [`e1a8666b3`](https://github.com/clerk/javascript/commit/e1a8666b3e6dbd8d37905fbfeff2e65a17b0769d), [`b2788f67b`](https://github.com/clerk/javascript/commit/b2788f67b75cce17af1a2f91a984bb826a5a42e1), [`b2788f67b`](https://github.com/clerk/javascript/commit/b2788f67b75cce17af1a2f91a984bb826a5a42e1), [`c5d01525d`](https://github.com/clerk/javascript/commit/c5d01525d72f2b131441bfef90d1145b03be3d13), [`86c75e50c`](https://github.com/clerk/javascript/commit/86c75e50cba9c4efb480672f1b8c6a6fff4ef477)]:
+  - @clerk/clerk-js@5.10.0
+  - @clerk/shared@2.4.0
+  - @clerk/types@4.9.0
+  - @clerk/clerk-react@5.2.9
+
+## 1.2.7
+
+### Patch Changes
+
+- Updated dependencies [[`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7), [`df7d856d5`](https://github.com/clerk/javascript/commit/df7d856d56bc3b1dcbdbf9155b4ef1b1ea5971f7)]:
+  - @clerk/clerk-js@5.9.0
+  - @clerk/types@4.8.0
+  - @clerk/clerk-react@5.2.8
+  - @clerk/shared@2.3.3
+
+## 1.2.6
+
+### Patch Changes
+
+- Updated dependencies [[`09f905a89`](https://github.com/clerk/javascript/commit/09f905a8915a39179cbffb2149342ca138bedb77), [`6a98c084e`](https://github.com/clerk/javascript/commit/6a98c084e89afb3800edb3d0136c396e020be6b7)]:
+  - @clerk/clerk-js@5.8.1
+
 ## 1.2.5
 
 ### Patch Changes

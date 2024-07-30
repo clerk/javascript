@@ -11,14 +11,15 @@ export const createSignInComponentPageObject = (testArgs: TestArgs) => {
   const { page } = testArgs;
   const self = {
     ...common(testArgs),
-    goTo: async (opts?: { searchParams?: URLSearchParams; headlessSelector?: string }) => {
-      await page.goToRelative('/sign-in', { searchParams: opts?.searchParams });
+    goTo: async (opts?: { searchParams?: URLSearchParams; headlessSelector?: string; timeout?: number }) => {
+      const navRes = await page.goToRelative('/sign-in', opts);
 
       if (typeof opts?.headlessSelector !== 'undefined') {
-        return self.waitForMounted(opts.headlessSelector);
+        await self.waitForMounted(opts.headlessSelector);
       } else {
-        return self.waitForMounted();
+        await self.waitForMounted();
       }
+      return navRes;
     },
     waitForMounted: (selector = '.cl-signIn-root') => {
       return page.waitForSelector(selector, { state: 'attached' });

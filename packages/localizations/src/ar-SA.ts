@@ -305,6 +305,10 @@ export const arSA: LocalizationResource = {
       title: 'التحقق من البريد الإلكتروني',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'ارجع إلى علامة التبويب الرئيسية للمتابعة.',
         title: 'انتهت صلاحية رابط التحقق هذا.',
@@ -420,6 +424,10 @@ export const arSA: LocalizationResource = {
       title: 'تحقق من بريدك الإلكتروني',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'أستعمل رابط التحقق المرسل إلى بريدك الإلكتروني',
       formTitle: 'رابط التحقق',
       loading: {
@@ -446,12 +454,15 @@ export const arSA: LocalizationResource = {
     },
     start: {
       actionLink: 'تسجيل الدخول',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'لديك حساب بالفعل؟',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'أنشاء حساب جديد',
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'لا يمكن تسجيل الحساب بسبب مشاكل تحقق أمنية. الرجاء تحديث الصفحة للمحاولة مرة أخرى أو تواصل معنا للمزيد من المساعدة',
@@ -712,6 +723,7 @@ export const arSA: LocalizationResource = {
         actionLabel__reauthorize: 'أعطى الصلاحية الآن',
         destructiveActionTitle: 'حذف',
         primaryButton: 'ربط حساب',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'الحسابات المتصلة',

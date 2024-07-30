@@ -12,6 +12,7 @@ type Scripts = { dev: string; build: string; setup: string; serve: string };
 
 export const applicationConfig = () => {
   let name = '';
+  let serverUrl = '';
   const templates: string[] = [];
   const files = new Map<string, string>();
   const scripts: Scripts = { dev: 'npm run dev', serve: 'npm run serve', build: 'npm run build', setup: 'npm i' };
@@ -33,6 +34,10 @@ export const applicationConfig = () => {
     },
     setName: (_name: string) => {
       name = _name;
+      return self;
+    },
+    setServerUrl: (_serverUrl: string) => {
+      serverUrl = _serverUrl;
       return self;
     },
     addFile: (filePath: string, cbOrPath: (helpers: Helpers) => string) => {
@@ -96,7 +101,7 @@ export const applicationConfig = () => {
         await fs.writeJSON(packageJsonPath, contents, { spaces: 2 });
       }
 
-      return application(self, appDirPath, appDirName);
+      return application(self, appDirPath, appDirName, serverUrl);
     },
     setEnvWriter: () => {
       throw new Error('not implemented');
@@ -115,9 +120,15 @@ export const applicationConfig = () => {
         logger.info(`Creating env file ".env" -> ${envDest}`);
         await fs.writeFile(
           path.join(appDir, '.env'),
-          [...env.publicVariables].map(([k, v]) => `${envFormatters.public(k)}=${v}`).join('\n') +
+          [...env.publicVariables]
+            .filter(([_, v]) => v)
+            .map(([k, v]) => `${envFormatters.public(k)}=${v}`)
+            .join('\n') +
             '\n' +
-            [...env.privateVariables].map(([k, v]) => `${envFormatters.private(k)}=${v}`).join('\n'),
+            [...env.privateVariables]
+              .filter(([_, v]) => v)
+              .map(([k, v]) => `${envFormatters.private(k)}=${v}`)
+              .join('\n'),
         );
       };
       return defaultWriter;

@@ -36,10 +36,10 @@
     "bundlewatch": "npx bundlewatch --config bundlewatch.config.json"
   },
   "dependencies": {
-    "@clerk/clerk-react": "*",
-    "@clerk/elements": "*",
-    "@clerk/shared": "*",
-    "@clerk/types": "*",
+    "@clerk/clerk-react": "file:../react",
+    "@clerk/elements": "file:../elements",
+    "@clerk/shared": "file:../shared",
+    "@clerk/types": "file:../types",
     "@radix-ui/react-slot": "^1.1.0",
     "cmdk": "^1.0.0",
     "cva": "^1.0.0-beta.1",

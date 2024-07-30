@@ -309,6 +309,10 @@ export const mnMN: LocalizationResource = {
       title: 'Имэйлээ шалгана уу',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Үргэлжлүүлэхийн тулд анхны таб руу буцна уу.',
         title: 'Энэ баталгаажуулах холбоосын хугацаа дууссан',
@@ -424,6 +428,10 @@ export const mnMN: LocalizationResource = {
       title: 'Имэйлээ баталгаажуулна уу',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Таны имэйл хаяг руу илгээсэн баталгаажуулах холбоосыг ашиглана уу',
       formTitle: 'Баталгаажуулах холбоос',
       loading: {
@@ -450,12 +458,15 @@ export const mnMN: LocalizationResource = {
     },
     start: {
       actionLink: 'Нэвтрэх',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Бүртгэлтэй юу?',
       subtitle: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
       title: 'Бүртгэл үүсгэх',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Аюулгүй байдлын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
@@ -722,6 +733,7 @@ export const mnMN: LocalizationResource = {
         actionLabel__reauthorize: 'Зөвшөөрөх',
         destructiveActionTitle: 'Устгах',
         primaryButton: 'Бүртгэлийг холбоно уу',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'Шаардлагатай хамрах хүрээг шинэчилсэн бөгөөд танд хязгаарлагдмал ажиллагаатай байж магадгүй. Асуудлаас зайлсхийхийн тулд энэ аппликешныг дахин зөвшөөрнө үү',
         title: 'Холбогдсон бүртгэлүүд',

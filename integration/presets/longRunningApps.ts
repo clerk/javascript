@@ -3,6 +3,7 @@ import { longRunningApplication } from '../models/longRunningApplication';
 import { astro } from './astro';
 import { elements } from './elements';
 import { envs } from './envs';
+import { expo } from './expo';
 import { express } from './express';
 import { next } from './next';
 import { react } from './react';
@@ -23,7 +24,8 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouter.withCustomRoles', config: next.appRouter, env: envs.withCustomRoles },
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
     { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
-    { id: 'astro.node.withEmailCodes', config: astro.node, env: envs.withEmailCodes },
+    { id: 'astro.node.withCustomRoles', config: astro.node, env: envs.withCustomRoles },
+    { id: 'expo.expo-web', config: expo.expoWeb, env: envs.withEmailCodes },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

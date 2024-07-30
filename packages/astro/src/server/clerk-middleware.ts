@@ -1,7 +1,14 @@
 import type { ClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, AuthObject, ClerkRequest, RequestState } from '@clerk/backend/internal';
+import type {
+  AuthenticateRequestOptions,
+  AuthObject,
+  ClerkRequest,
+  RedirectFun,
+  RequestState,
+} from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { handleValueOrFn, isDevelopmentFromSecretKey, isHttpOrHttps } from '@clerk/shared';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { APIContext } from 'astro';
 
 // @ts-ignore
@@ -33,9 +40,9 @@ type ClerkAstroMiddlewareHandler = (
   auth: () => ClerkMiddlewareAuthObject,
   context: AstroMiddlewareContextParam,
   next: AstroMiddlewareNextParam,
-) => AstroMiddlewareReturn;
+) => AstroMiddlewareReturn | undefined;
 
-type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions & { debug?: boolean };
+type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions;
 
 /**
  * Middleware for Astro that handles authentication and authorization with Clerk.
@@ -60,6 +67,14 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const astroMiddleware: AstroMiddleware = async (context, next) => {
     const clerkRequest = createClerkRequest(context.request);
 
+    clerkClient(context).telemetry.record(
+      eventMethodCalled('clerkMiddleware', {
+        handler: Boolean(handler),
+        satellite: Boolean(options.isSatellite),
+        proxy: Boolean(options.proxyUrl),
+      }),
+    );
+
     const requestState = await clerkClient(context).authenticateRequest(
       clerkRequest,
       createAuthenticateRequestOptions(clerkRequest, options, context),
@@ -78,7 +93,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
     const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
     const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
 
-    decorateAstroLocal(context.request, context, requestState);
+    decorateAstroLocal(clerkRequest, context, requestState);
 
     /**
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.
@@ -195,8 +210,8 @@ Missing domain and proxyUrl. A satellite application needs to specify a domain o
 1) With middleware
    e.g. export default clerkMiddleware({domain:'YOUR_DOMAIN',isSatellite:true});
 2) With environment variables e.g.
-   PUBLIC_ASTRO_APP_CLERK_DOMAIN='YOUR_DOMAIN'
-   PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'
+   PUBLIC_CLERK_DOMAIN='YOUR_DOMAIN'
+   PUBLIC_CLERK_IS_SATELLITE='true'
    `;
 
 export const missingSignInUrlInDev = `
@@ -206,17 +221,51 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
 1) With middleware
    e.g. export default clerkMiddleware({signInUrl:'SOME_URL', isSatellite:true});
 2) With environment variables e.g.
-   PUBLIC_ASTRO_APP_CLERK_SIGN_IN_URL='SOME_URL'
-   PUBLIC_ASTRO_APP_CLERK_IS_SATELLITE='true'`;
+   PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
+   PUBLIC_CLERK_IS_SATELLITE='true'`;
 
-function decorateAstroLocal(req: Request, context: APIContext, requestState: RequestState) {
+function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, requestState: RequestState) {
   const { reason, message, status, token } = requestState;
   context.locals.authToken = token;
   context.locals.authStatus = status;
   context.locals.authMessage = message;
   context.locals.authReason = reason;
-  context.locals.auth = () => getAuth(req, context.locals);
-  context.locals.currentUser = createCurrentUser(req, context);
+  context.locals.auth = () => {
+    const authObject = getAuth(clerkRequest, context.locals);
+
+    const clerkUrl = clerkRequest.clerkUrl;
+
+    const redirectToSignIn: RedirectFun<Response> = (opts = {}) => {
+      const devBrowserToken =
+        clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
+        clerkRequest.cookies.get(constants.Cookies.DevBrowser);
+
+      return createRedirect({
+        redirectAdapter,
+        devBrowserToken: devBrowserToken,
+        baseUrl: clerkUrl.toString(),
+        publishableKey: getSafeEnv(context).pk!,
+        signInUrl: requestState.signInUrl,
+        signUpUrl: requestState.signUpUrl,
+      }).redirectToSignIn({
+        returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
+      });
+    };
+
+    return Object.assign(authObject, { redirectToSignIn });
+  };
+
+  context.locals.currentUser = createCurrentUser(clerkRequest, context);
+}
+
+/**
+ * Find the index of the closing head tag in the chunk.
+ *
+ * Note: This implementation uses a simple approach that works for most of our
+ * current use cases.
+ */
+function findClosingHeadTagIndex(chunk: Uint8Array, endHeadTag: Uint8Array) {
+  return chunk.findIndex((_, i) => endHeadTag.every((value, j) => value === chunk[i + j]));
 }
 
 async function decorateRequest(
@@ -236,48 +285,40 @@ async function decorateRequest(
    * without sucrificing DX and having developers wrap each page with a Layout that would handle this.
    */
   if (res.headers.get('content-type') === 'text/html') {
-    const reader = res.body?.getReader();
-    const stream = new ReadableStream({
-      async start(controller) {
-        let { value, done } = await reader!.read();
-        const encoder = new TextEncoder();
-        const decoder = new TextDecoder();
-        while (!done) {
-          const decodedValue = decoder.decode(value);
+    const encoder = new TextEncoder();
+    const closingHeadTag = encoder.encode('</head>');
+    const clerkAstroData = encoder.encode(
+      `<script id="__CLERK_ASTRO_DATA__" type="application/json">${JSON.stringify(locals.auth())}</script>\n`,
+    );
+    const clerkSafeEnvVariables = encoder.encode(
+      `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${JSON.stringify(getClientSafeEnv(locals))}</script>\n`,
+    );
+    const hotloadScript = encoder.encode(buildClerkHotloadScript(locals));
+
+    const stream = res.body!.pipeThrough(
+      new TransformStream({
+        transform(chunk, controller) {
+          const index = findClosingHeadTagIndex(chunk, closingHeadTag);
+          const isClosingHeadTagFound = index !== -1;
 
           /**
            * Hijack html response to position `__CLERK_ASTRO_DATA__` before the closing `head` html tag
            */
-          if (decodedValue.includes('</head>')) {
-            const [p1, p2] = decodedValue.split('</head>');
-            controller.enqueue(encoder.encode(p1));
-            controller.enqueue(
-              encoder.encode(
-                `<script id="__CLERK_ASTRO_DATA__" type="application/json">${JSON.stringify(locals.auth())}</script>\n`,
-              ),
-            );
+          if (isClosingHeadTagFound) {
+            controller.enqueue(chunk.slice(0, index));
+            controller.enqueue(clerkAstroData);
+            controller.enqueue(clerkSafeEnvVariables);
 
-            controller.enqueue(
-              encoder.encode(
-                `<script id="__CLERK_ASTRO_SAFE_VARS__" type="application/json">${JSON.stringify(getClientSafeEnv(locals))}</script>\n`,
-              ),
-            );
+            controller.enqueue(hotloadScript);
 
-            if (__HOTLOAD__) {
-              controller.enqueue(encoder.encode(buildClerkHotloadScript(locals)));
-            }
-
-            controller.enqueue(encoder.encode('</head>'));
-            controller.enqueue(encoder.encode(p2));
+            controller.enqueue(closingHeadTag);
+            controller.enqueue(chunk.slice(index + closingHeadTag.length));
           } else {
-            controller.enqueue(value);
+            controller.enqueue(chunk);
           }
-
-          ({ value, done } = await reader!.read());
-        }
-        controller.close();
-      },
-    });
+        },
+      }),
+    );
 
     const modifiedResponse = new Response(stream, {
       status: res.status,

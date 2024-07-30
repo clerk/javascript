@@ -308,6 +308,10 @@ export const bgBG: LocalizationResource = {
       title: 'Проверете вашия имейл',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Върнете се в оригиналния таб, за да продължите.',
         title: 'Този линк за потвърждение е изтекъл',
@@ -423,6 +427,10 @@ export const bgBG: LocalizationResource = {
       title: 'Потвърдете вашия имейл',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Използвайте линка за потвърждение, изпратен на вашия имейл адрес',
       formTitle: 'Линк за потвърждение',
       loading: {
@@ -449,12 +457,15 @@ export const bgBG: LocalizationResource = {
     },
     start: {
       actionLink: 'Влезте',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Вече имате акаунт?',
       subtitle: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',
     },
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Регистрацията неуспешна поради неуспешни проверки за сигурност. Моля, презаредете страницата, за да опитате отново, или се свържете с поддръжката за повече помощ.',
@@ -721,6 +732,7 @@ export const bgBG: LocalizationResource = {
         actionLabel__reauthorize: 'Авторизирайте сега',
         destructiveActionTitle: 'Премахни',
         primaryButton: 'Свържи акаунт',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Свързани акаунти',

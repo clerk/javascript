@@ -304,6 +304,10 @@ export const zhTW: LocalizationResource = {
       title: '查看您的電子郵件',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: '返回原始標籤頁繼續。',
         title: '此驗證連結已過期',
@@ -418,6 +422,10 @@ export const zhTW: LocalizationResource = {
       title: '驗證您的電子郵件',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: '使用發送到您的電子郵件地址的驗證連結',
       formTitle: '驗證連結',
       loading: {
@@ -444,12 +452,15 @@ export const zhTW: LocalizationResource = {
     },
     start: {
       actionLink: '登錄',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: '已經有帳戶了？',
       subtitle: '繼續使用 {{applicationName}}',
       title: '創建您的帳戶',
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登錄',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請刷新頁面重試或聯絡支持獲取更多幫助。',
     captcha_unavailable:
@@ -703,6 +714,7 @@ export const zhTW: LocalizationResource = {
         actionLabel__reauthorize: '立即授權',
         destructiveActionTitle: '移除',
         primaryButton: '連接帳戶',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: '已連接的帳戶',

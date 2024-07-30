@@ -11,12 +11,14 @@ export function PasswordField({
   label = 'Password',
   name = 'password',
   ...props
-}: { alternativeFieldTrigger?: React.ReactNode; name?: 'password' | 'confirmPassword'; label?: React.ReactNode } & Omit<
-  React.ComponentProps<typeof Common.Input>,
-  'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'
->) {
+}: {
+  alternativeFieldTrigger?: React.ReactNode;
+  validatePassword?: boolean;
+  name?: 'password' | 'confirmPassword';
+  label?: React.ReactNode;
+} & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>) {
   const [type, setType] = React.useState('password');
-  const [touched, setTouched] = React.useState(false);
+  const id = React.useId();
 
   return (
     <Common.Field
@@ -36,16 +38,9 @@ export function PasswordField({
               <div className='relative'>
                 <Common.Input
                   type={type}
-                  // note: we set `type` to `text` to show the password, but our
-                  //       mutually exclusive prop `validatePassword` requires a
-                  //      `type` of `password`. `validatePassword` does however
-                  //       behave as expected when `type` is `text`, so we can
-                  //       safely ignore the TS error.
-                  // @ts-expect-error – see above
-                  validatePassword
                   className={cx('pe-7', className)}
-                  onBlur={() => setTouched(true)}
                   {...props}
+                  aria-describedby={props.validatePassword && state !== 'idle' ? id : undefined}
                   asChild
                 >
                   <Field.Input intent={state} />
@@ -55,7 +50,7 @@ export function PasswordField({
                   className={cx(
                     'text-icon-sm text-gray-11 absolute end-1 top-1 aspect-square rounded-sm p-1 outline-none disabled:cursor-not-allowed disabled:opacity-50',
                     'hover:enabled:text-gray-12 hover:enabled:bg-gray-3',
-                    'focus-visible:ring-default focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring-2',
+                    'focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring',
                   )}
                   onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
                   title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
@@ -68,30 +63,29 @@ export function PasswordField({
             );
           }}
         </Common.FieldState>
-        <Common.FieldError asChild>
-          {({ message }) => {
-            return <Field.Message intent='error'>{message}</Field.Message>;
-          }}
-        </Common.FieldError>
-        <Common.FieldState>
-          {({ state, message }) => {
-            if (state === 'idle') {
-              return;
-            }
-
-            // Confirm success states immediately
-            if (state === 'success') {
-              return <Field.Message intent={state}>{message}</Field.Message>;
-            }
-
-            // Show errors and warnings only if the field has been interacted with
-            if (!touched) {
-              return;
-            }
-
-            return <Field.Message intent={state}>{message}</Field.Message>;
-          }}
-        </Common.FieldState>
+        {props.validatePassword ? (
+          <Common.FieldState>
+            {({ state, message }) => {
+              if (state === 'idle') {
+                return;
+              }
+              return (
+                <Field.Message
+                  id={id}
+                  intent={state}
+                >
+                  {message}
+                </Field.Message>
+              );
+            }}
+          </Common.FieldState>
+        ) : (
+          <Common.FieldError asChild>
+            {({ message }) => {
+              return <Field.Message intent='error'>{message}</Field.Message>;
+            }}
+          </Common.FieldError>
+        )}
       </Field.Root>
     </Common.Field>
   );

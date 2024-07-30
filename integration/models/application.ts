@@ -6,7 +6,12 @@ import type { EnvironmentConfig } from './environment.js';
 
 export type Application = ReturnType<typeof application>;
 
-export const application = (config: ApplicationConfig, appDirPath: string, appDirName: string) => {
+export const application = (
+  config: ApplicationConfig,
+  appDirPath: string,
+  appDirName: string,
+  serverUrl: string | undefined,
+) => {
   const { name, scripts, envWriter } = config;
   const logger = createLogger({ prefix: `${appDirName}` });
   const state = { completedSetup: false, serverUrl: '', env: {} as EnvironmentConfig };
@@ -39,18 +44,24 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
         state.completedSetup = true;
       }
     },
-    dev: async (opts: { port?: number; manualStart?: boolean; detached?: boolean } = {}) => {
+    dev: async (opts: { port?: number; manualStart?: boolean; detached?: boolean; serverUrl?: string } = {}) => {
       const log = logger.child({ prefix: 'dev' }).info;
       const port = opts.port || (await getPort());
-      const serverUrl = `http://localhost:${port}`;
-      log(`Will try to serve app at ${serverUrl}`);
+      const getServerUrl = () => {
+        if (opts.serverUrl) {
+          return opts.serverUrl.includes(':') ? opts.serverUrl : `${opts.serverUrl}:${port}`;
+        }
+        return serverUrl || `http://localhost:${port}`;
+      };
+      const runtimeServerUrl = getServerUrl();
+      log(`Will try to serve app at ${runtimeServerUrl}`);
       if (opts.manualStart) {
         // for debugging, you can start the dev server manually by cd'ing into the temp dir
         // and running the corresponding dev command
         // this allows the test to run as normally, while setup is controlled by you,
         // so you can inspect the running up outside the PW lifecycle
-        state.serverUrl = serverUrl;
-        return { port, serverUrl };
+        state.serverUrl = runtimeServerUrl;
+        return { port, serverUrl: runtimeServerUrl };
       }
 
       const proc = run(scripts.dev, {
@@ -61,12 +72,13 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
         log: opts.detached ? undefined : log,
       });
+
       const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
-      await waitForServer(serverUrl, { log, maxAttempts: Infinity, shouldExit });
-      log(`Server started at ${serverUrl}, pid: ${proc.pid}`);
+      await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+      log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
-      state.serverUrl = serverUrl;
-      return { port, serverUrl, pid: proc.pid };
+      state.serverUrl = runtimeServerUrl;
+      return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
     },
     build: async () => {
       const log = logger.child({ prefix: 'build' }).info;
@@ -83,10 +95,14 @@ export const application = (config: ApplicationConfig, appDirPath: string, appDi
     },
     serve: async (opts: { port?: number; manualStart?: boolean } = {}) => {
       const port = opts.port || (await getPort());
+      // TODO: get serverUrl as in dev()
       const serverUrl = `http://localhost:${port}`;
       // If this is ever used as a background process, we need to make sure
       // it's not using the log function. See the dev() method above
-      const proc = run(scripts.serve, { cwd: appDirPath, env: { PORT: port.toString() } });
+      const proc = run(scripts.serve, {
+        cwd: appDirPath,
+        env: { PORT: port.toString() },
+      });
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       await waitForIdleProcess(proc);
       state.serverUrl = serverUrl;

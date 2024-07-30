@@ -11,12 +11,20 @@ const createClerkClientWithOptions: CreateClerkClientWithOptions = (context, opt
     publishableKey: getSafeEnv(context).pk,
     apiUrl: getSafeEnv(context).apiUrl,
     apiVersion: getSafeEnv(context).apiVersion,
-    // userAgent
     proxyUrl: getSafeEnv(context).proxyUrl,
     domain: getSafeEnv(context).domain,
     isSatellite: getSafeEnv(context).isSatellite,
-    // TODO: Support telemetry and sdkMetadata
-
+    userAgent: `${PACKAGE_NAME}@${PACKAGE_VERSION}`,
+    sdkMetadata: {
+      name: PACKAGE_NAME,
+      version: PACKAGE_VERSION,
+      // eslint-disable-next-line turbo/no-undeclared-env-vars
+      environment: import.meta.env.MODE,
+    },
+    telemetry: {
+      disabled: getSafeEnv(context).telemetryDisabled,
+      debug: getSafeEnv(context).telemetryDebug,
+    },
     ...options,
   });
 

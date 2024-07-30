@@ -307,6 +307,10 @@ export const daDK: LocalizationResource = {
       title: 'Tjek din email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       expired: {
         subtitle: 'Vend tilbage til den oprindelige fane for at fortsætte.',
         title: 'Dette bekræftelseslink er udløbet',
@@ -421,6 +425,10 @@ export const daDK: LocalizationResource = {
       title: 'Bekræft din email',
     },
     emailLink: {
+      clientMismatch: {
+        subtitle: undefined,
+        title: undefined,
+      },
       formSubtitle: 'Brug bekræftelseslinket sendt til din e-mailadresse',
       formTitle: 'Bekræftelseslink',
       loading: {
@@ -447,12 +455,15 @@ export const daDK: LocalizationResource = {
     },
     start: {
       actionLink: 'Log ind',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Har du en konto?',
       subtitle: 'Forsæt til {{applicationName}}',
       title: 'Opret din konto',
     },
   },
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
+  socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
@@ -717,6 +728,7 @@ export const daDK: LocalizationResource = {
         actionLabel__reauthorize: 'Godkend nu',
         destructiveActionTitle: 'Fjern',
         primaryButton: 'Tilknyt konto',
+        subtitle__disconnected: undefined,
         subtitle__reauthorize:
           'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
         title: 'Tilknyttede konti',
