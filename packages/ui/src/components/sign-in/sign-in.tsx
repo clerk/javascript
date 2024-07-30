@@ -1,3 +1,4 @@
+import { useSignIn } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 import * as React from 'react';
@@ -106,6 +107,26 @@ function SignInGetHelp() {
       <Card.Footer branded={branded} />
     </Card.Root>
   );
+}
+
+function FirstFactorConnections({
+  isGlobalLoading,
+  hasConnection,
+}: {
+  isGlobalLoading: boolean;
+  hasConnection: boolean;
+}) {
+  const { t } = useLocalizations();
+  const { signIn } = useSignIn();
+  if (signIn?.status === 'needs_first_factor') {
+    return (
+      <>
+        <Connections disabled={isGlobalLoading} />
+        {hasConnection ? <Separator>{t('dividerText')}</Separator> : null}
+      </>
+    );
+  }
+  return null;
 }
 
 export function SignInComponentLoaded() {
@@ -887,10 +908,10 @@ export function SignInComponentLoaded() {
                       }}
                     </Common.GlobalError>
                     <div className='flex flex-col gap-6'>
-                      <Connections disabled={isGlobalLoading} />
-
-                      {hasConnection ? <Separator>{t('dividerText')}</Separator> : null}
-
+                      <FirstFactorConnections
+                        isGlobalLoading={isGlobalLoading}
+                        hasConnection={hasConnection}
+                      />
                       <div className='flex flex-col gap-3'>
                         <div className='flex flex-col gap-2'>
                           <SignIn.SupportedStrategy
