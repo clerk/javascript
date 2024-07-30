@@ -8,7 +8,7 @@
  * @param packageVersion - The version of `@clerk/clerk-js` that will be used if an explicit version is not provided
  * @returns The npm tag, version or major version to use
  */
-export const versionSelector = (clerkJSVersion: string | undefined, packageVersion = JS_PACKAGE_VERSION) => {
+export const versionSelector = (clerkJSVersion: string | undefined, packageVersion: string) => {
   if (clerkJSVersion) {
     return clerkJSVersion;
   }
