@@ -6,7 +6,7 @@ import { useLocalizations } from '~/hooks/use-localizations';
 import * as Field from '../primitives/field';
 
 export function LastNameField(props: Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
-  const { t } = useLocalizations();
+  const { t, translateError } = useLocalizations();
 
   return (
     <Common.Field
@@ -34,8 +34,8 @@ export function LastNameField(props: Omit<React.ComponentProps<typeof Common.Inp
           }}
         </Common.FieldState>
         <Common.FieldError asChild>
-          {({ message }) => {
-            return <Field.Message intent='error'>{message}</Field.Message>;
+          {({ message, code }) => {
+            return <Field.Message intent='error'>{translateError(message, code, 'last_name')}</Field.Message>;
           }}
         </Common.FieldError>
       </Field.Root>

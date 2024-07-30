@@ -10,7 +10,7 @@ export function UsernameField({
   name = 'username',
   ...props
 }: { alternativeFieldTrigger?: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
-  const { t } = useLocalizations();
+  const { t, translateError } = useLocalizations();
 
   return (
     <Common.Field
@@ -42,8 +42,8 @@ export function UsernameField({
           }}
         </Common.FieldState>
         <Common.FieldError asChild>
-          {({ message }) => {
-            return <Field.Message intent='error'>{message}</Field.Message>;
+          {({ message, code }) => {
+            return <Field.Message intent='error'>{translateError(message, code, 'username')}</Field.Message>;
           }}
         </Common.FieldError>
       </Field.Root>

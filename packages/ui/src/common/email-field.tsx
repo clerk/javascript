@@ -7,28 +7,22 @@ import { useLocalizations } from '~/hooks/use-localizations';
 import * as Field from '../primitives/field';
 
 const DEFAULT_FIELD_NAME = 'emailAddress';
-const DEFAULT_ERROR_NAME = 'email_address';
 
 export function EmailField({
   alternativeFieldTrigger,
   name = DEFAULT_FIELD_NAME,
   enabled,
-  error,
   required,
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
   enabled?: boolean;
-  error?: (message: string, code: string, name: string) => string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t, translateError } = useLocalizations();
   const { enabled: attributeEnabled, required: attributeRequired } = useAttributes('email_address');
 
-  const renderError = error ? error : translateError;
   const isEnabled = enabled !== undefined ? enabled : attributeEnabled;
   const isRequired = required !== undefined ? required : attributeRequired;
-
-  const hintText = isRequired ? null : t('formFieldHintText__optional');
 
   if (!isEnabled) {
     return null;
@@ -45,8 +39,8 @@ export function EmailField({
             {t('formFieldLabel__emailAddress')}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
-            ) : hintText ? (
-              <Field.Hint>{hintText}</Field.Hint>
+            ) : !isRequired ? (
+              <Field.Hint>{t('formFieldHintText__optional')}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>
@@ -66,7 +60,7 @@ export function EmailField({
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{renderError(message, code, DEFAULT_ERROR_NAME)}</Field.Message>;
+            return <Field.Message intent='error'>{translateError(message, code, 'email_address')}</Field.Message>;
           }}
         </Common.FieldError>
       </Field.Root>
