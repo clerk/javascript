@@ -15,6 +15,9 @@ export function PasswordField({
   alternativeFieldTrigger?: React.ReactNode;
   validatePassword?: boolean;
   name?: 'password' | 'confirmPassword';
+  /**
+   * **Note:** this prop is required as the `label` differs depending on the context (e.g. new password)
+   */
   label: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>) {
   const [type, setType] = React.useState('password');

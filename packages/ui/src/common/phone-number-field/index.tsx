@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import { Command } from 'cmdk';
 import { cx } from 'cva';
@@ -9,7 +10,7 @@ import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { mergeRefs } from '~/utils/merge-refs';
 
-import { type CountryIso, IsoToCountryMap } from './data';
+import { IsoToCountryMap } from './data';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
 
 const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
@@ -21,23 +22,20 @@ const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
 export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   {
     alternativeFieldTrigger,
-    label,
     name = 'phoneNumber',
-    hintText,
     initPhoneWithCode = '',
-    locationBasedCountryIso,
     onChange,
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
     alternativeFieldTrigger?: React.ReactNode;
-    label: React.ReactNode;
-    hintText: React.ReactNode;
     initPhoneWithCode?: string;
-    locationBasedCountryIso: CountryIso;
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
-  const { translateError } = useLocalizations();
+  const clerk = useClerk();
+  // TODO to fix IsomorphicClerk
+  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
+  const { t, translateError } = useLocalizations();
   const [isOpen, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const id = React.useId();
@@ -97,11 +95,11 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
       <Field.Root>
         <Common.Label asChild>
           <Field.Label htmlFor={id}>
-            {label}{' '}
+            {t('formFieldLabel__phoneNumber')}{' '}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
             ) : !props?.required ? (
-              <Field.Hint>{hintText}</Field.Hint>
+              <Field.Hint>{t('formFieldHintText__optional')}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>

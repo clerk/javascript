@@ -11,36 +11,25 @@ const DEFAULT_ERROR_NAME = 'email_address';
 
 export function EmailField({
   alternativeFieldTrigger,
-  label,
   name = DEFAULT_FIELD_NAME,
-  hintText,
   enabled,
   error,
   required,
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
-  label: React.ReactNode;
-  hintText?: React.ReactNode;
   enabled?: boolean;
   error?: (message: string, code: string, name: string) => string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t, translateError } = useLocalizations();
   const { enabled: attributeEnabled, required: attributeRequired } = useAttributes('email_address');
 
-  const renderLabel = label ? label : t('formFieldLabel__emailAddress');
   const renderError = error ? error : translateError;
   const isEnabled = enabled !== undefined ? enabled : attributeEnabled;
   const isRequired = required !== undefined ? required : attributeRequired;
-  const renderHintText = () => {
-    if (hintText) {
-      return hintText;
-    }
-    if (!isRequired) {
-      return t('formFieldHintText__optional');
-    }
-    return null;
-  };
+
+  const hintText = isRequired ? null : t('formFieldHintText__optional');
+
   if (!isEnabled) {
     return null;
   }
@@ -53,11 +42,11 @@ export function EmailField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {renderLabel}
+            {t('formFieldLabel__emailAddress')}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
-            ) : renderHintText ? (
-              <Field.Hint>{renderHintText()}</Field.Hint>
+            ) : hintText ? (
+              <Field.Hint>{hintText}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>

@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 import * as React from 'react';
@@ -15,7 +14,6 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
-import { LOCALIZATION_NEEDED } from '~/constants';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -111,9 +109,6 @@ function SignInGetHelp() {
 }
 
 export function SignInComponentLoaded() {
-  const clerk = useClerk();
-  // TODO to fix IsomorphicClerk
-  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
   const enabledConnections = useEnabledConnections();
   const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
@@ -165,7 +160,6 @@ export function SignInComponentLoaded() {
                         {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
                           <EmailField
                             name='identifier'
-                            label={t('formFieldLabel__emailAddress')}
                             disabled={isGlobalLoading}
                             required
                           />
@@ -174,8 +168,6 @@ export function SignInComponentLoaded() {
                         {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
                           <UsernameField
                             name='identifier'
-                            label={t('formFieldLabel__username')}
-                            hintText={t('formFieldHintText__optional')}
                             disabled={isGlobalLoading}
                             required
                           />
@@ -184,10 +176,7 @@ export function SignInComponentLoaded() {
                         {phoneNumberEnabled && !emailAddressEnabled && !usernameEnabled ? (
                           <PhoneNumberField
                             name='identifier'
-                            label={t('formFieldLabel__phoneNumber')}
-                            hintText={t('formFieldHintText__optional')}
                             disabled={isGlobalLoading}
-                            locationBasedCountryIso={locationBasedCountryIso}
                             required
                           />
                         ) : null}
@@ -195,7 +184,6 @@ export function SignInComponentLoaded() {
                         {emailAddressEnabled && usernameEnabled && !phoneNumberEnabled ? (
                           <EmailOrUsernameField
                             name='identifier'
-                            label={t('formFieldLabel__emailAddress_username')}
                             disabled={isGlobalLoading}
                             required
                           />
@@ -204,13 +192,9 @@ export function SignInComponentLoaded() {
                         {emailAddressEnabled && phoneNumberEnabled && !usernameEnabled ? (
                           <EmailOrPhoneNumberField
                             name='identifier'
-                            labelEmail={t('formFieldLabel__emailAddress')}
-                            hintText={t('formFieldHintText__optional')}
                             toggleLabelEmail={t('signIn.start.actionLink__use_email')}
-                            labelPhoneNumber={t('formFieldLabel__phoneNumber')}
                             toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
                             disabled={isGlobalLoading}
-                            locationBasedCountryIso={locationBasedCountryIso}
                             required
                           />
                         ) : null}
@@ -218,14 +202,9 @@ export function SignInComponentLoaded() {
                         {usernameEnabled && phoneNumberEnabled && !emailAddressEnabled ? (
                           <PhoneNumberOrUsernameField
                             name='identifier'
-                            labelPhoneNumber={t('formFieldLabel__phoneNumber')}
                             toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
-                            hintText={t('formFieldHintText__optional')}
-                            labelUsername={t('formFieldLabel__username')}
                             toggleLabelUsername={t('signIn.start.actionLink__use_username')}
-                            toggleDescription={LOCALIZATION_NEEDED.formFieldAccessibleLabel__phoneOrUsername}
                             disabled={isGlobalLoading}
-                            locationBasedCountryIso={locationBasedCountryIso}
                             required
                           />
                         ) : null}
@@ -233,14 +212,9 @@ export function SignInComponentLoaded() {
                         {emailAddressEnabled && usernameEnabled && phoneNumberEnabled ? (
                           <EmailOrUsernameOrPhoneNumberField
                             name='identifier'
-                            labelEmailOrUsername={t('formFieldLabel__emailAddress_username')}
-                            labelPhoneNumber={t('formFieldLabel__phoneNumber')}
                             toggleLabelEmailOrUsername={t('signIn.start.actionLink__use_email_username')}
-                            hintText={t('formFieldHintText__optional')}
                             toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
-                            toggleDescription={LOCALIZATION_NEEDED.formFieldAccessibleLabel__emailOrUsernameOrPhone}
                             disabled={isGlobalLoading}
-                            locationBasedCountryIso={locationBasedCountryIso}
                             required
                           />
                         ) : null}
@@ -497,7 +471,7 @@ export function SignInComponentLoaded() {
                         }}
                       </Common.GlobalError>
 
-                      <BackupCodeField label={t('formFieldLabel__backupCode')} />
+                      <BackupCodeField />
 
                       <Common.Loading>
                         {isSubmitting => {

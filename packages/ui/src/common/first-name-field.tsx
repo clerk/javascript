@@ -1,13 +1,13 @@
 import * as Common from '@clerk/elements/common';
 import React from 'react';
 
+import { useLocalizations } from '~/hooks/use-localizations';
+
 import * as Field from '../primitives/field';
 
-export function FirstNameField({
-  label,
-  hintText,
-  ...props
-}: { label: React.ReactNode; hintText: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+export function FirstNameField(props: Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+  const { t } = useLocalizations();
+
   return (
     <Common.Field
       name='firstName'
@@ -16,7 +16,8 @@ export function FirstNameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {label} {!props?.required ? <Field.Hint>{hintText}</Field.Hint> : null}
+            {t('formFieldLabel__firstName')}{' '}
+            {!props?.required ? <Field.Hint>{t('formFieldHintText__optional')}</Field.Hint> : null}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>

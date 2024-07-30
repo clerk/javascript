@@ -8,6 +8,9 @@ export function OTPField({
   resend,
   ...props
 }: React.ComponentProps<typeof Common.Input> & {
+  /**
+   * **Note:** this prop is required as the `label` differs depending on the context (e.g. email code vs. link code)
+   */
   label: React.ReactNode;
   resend?: React.ReactNode;
 }) {

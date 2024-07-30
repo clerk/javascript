@@ -1,12 +1,13 @@
 import * as Common from '@clerk/elements/common';
 import React from 'react';
 
+import { useLocalizations } from '~/hooks/use-localizations';
+
 import * as Field from '../primitives/field';
 
-export function BackupCodeField({
-  label,
-  ...props
-}: { label: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+export function BackupCodeField(props: Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+  const { t } = useLocalizations();
+
   return (
     <Common.Field
       name='backup_code'
@@ -14,7 +15,7 @@ export function BackupCodeField({
     >
       <Field.Root>
         <Common.Label asChild>
-          <Field.Label>{label}</Field.Label>
+          <Field.Label>{t('formFieldLabel__backupCode')}</Field.Label>
         </Common.Label>
         <Common.FieldState>
           {({ state }) => {
