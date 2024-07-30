@@ -887,10 +887,9 @@ export function SignInComponentLoaded() {
                       }}
                     </Common.GlobalError>
                     <div className='flex flex-col gap-6'>
-                      <SignIn.FirstFactor>
-                        <Connections disabled={isGlobalLoading} />
-                        {hasConnection ? <Separator>{t('dividerText')}</Separator> : null}
-                      </SignIn.FirstFactor>
+                      <Connections disabled={isGlobalLoading} />
+
+                      {hasConnection ? <Separator>{t('dividerText')}</Separator> : null}
 
                       <div className='flex flex-col gap-3'>
                         <div className='flex flex-col gap-2'>
