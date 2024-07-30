@@ -53,7 +53,7 @@ const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
 };
 
 const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
-  const { clerkJSUrl, clerkJSVariant, clerkJSVersion = '5', proxyUrl, domain, publishableKey } = opts;
+  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
     return clerkJSUrl;
