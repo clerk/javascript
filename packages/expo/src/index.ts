@@ -2,11 +2,6 @@ import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 
 export { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react/errors';
 
-export {
-  LocalCredentialsProvider as __experimental_LocalCredentialsProvider,
-  useLocalCredentials as __experimental_useLocalCredentials,
-} from './experimental';
-
 /**
  * @deprecated Use `getClerkInstance()` instead.
  */

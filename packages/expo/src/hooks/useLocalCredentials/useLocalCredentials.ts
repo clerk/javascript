@@ -1,5 +1,4 @@
 import { useClerk, useSignIn, useUser } from '@clerk/clerk-react';
-import type { SignInResource } from '@clerk/types';
 import { AuthenticationType, isEnrolledAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
 import {
   deleteItemAsync,
@@ -8,37 +7,10 @@ import {
   setItemAsync,
   WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
 } from 'expo-secure-store';
-import type { PropsWithChildren } from 'react';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-type LocalCredentials = {
-  identifier?: string;
-  password: string;
-};
-
-type BiometricType = 'fingerprint' | 'face-recognition';
-
-export const LocalAuthContext = createContext<{
-  setCredentials: (creds: LocalCredentials) => Promise<void>;
-  hasCredentials: boolean;
-  userOwnsCredentials: boolean | null;
-  clearCredentials: () => void;
-  authenticate: () => Promise<SignInResource>;
-  biometryType: BiometricType | null;
-}>({
-  // @ts-expect-error Initial value cannot return what the type expects
-  setCredentials: () => {},
-  hasCredentials: false,
-  userOwnsCredentials: null,
-  clearCredentials: () => {},
-  // @ts-expect-error Initial value cannot return what the type expects
-  authenticate: () => {},
-  biometryType: null,
-});
-
-export const useLocalCredentials = () => {
-  return useContext(LocalAuthContext);
-};
+import { errorThrower } from '../../utils';
+import type { BiometricType, LocalCredentials, LocalCredentialsReturn } from './shared';
 
 const useEnrolledBiometric = () => {
   const [isEnrolled, setIsEnrolled] = useState(false);
@@ -129,7 +101,7 @@ const useUserOwnsCredentials = ({ storeKey }: { storeKey: string }) => {
   return [userOwnsCredentials, setUserOwnsCredentials] as const;
 };
 
-export function LocalCredentialsProvider(props: PropsWithChildren): JSX.Element {
+export const useLocalCredentials = (): LocalCredentialsReturn => {
   const { isLoaded, signIn } = useSignIn();
   const { publishableKey } = useClerk();
 
@@ -148,7 +120,9 @@ export function LocalCredentialsProvider(props: PropsWithChildren): JSX.Element 
     }
 
     if (creds.identifier && !creds.password) {
-      throw 'when setting identifier the password is required';
+      return errorThrower.throw(
+        `useLocalCredentials: setCredentials() A password is required when specifying an identifier.`,
+      );
     }
 
     if (creds.identifier) {
@@ -158,7 +132,9 @@ export function LocalCredentialsProvider(props: PropsWithChildren): JSX.Element 
     const storedIdentifier = await getItemAsync(key).catch(() => null);
 
     if (!storedIdentifier) {
-      throw 'an identifier should already be set in order to update its password';
+      return errorThrower.throw(
+        `useLocalCredentials: setCredentials() an identifier should already be set in order to update its password.`,
+      );
     }
 
     setHasLocalAuthCredentials(true);
@@ -176,19 +152,18 @@ export function LocalCredentialsProvider(props: PropsWithChildren): JSX.Element 
 
   const authenticate = async () => {
     if (!isLoaded) {
-      // TODO: improve error
-      throw 'not loaded';
+      return errorThrower.throw(
+        `useLocalCredentials: authenticate() Clerk has not loaded yet. Wait for clerk to load before calling this function`,
+      );
     }
     const identifier = await getItemAsync(key).catch(() => null);
     if (!identifier) {
-      // TODO: improve error
-      throw 'Identifier not found';
+      return errorThrower.throw(`useLocalCredentials: authenticate() the identifier could not be found`);
     }
     const password = await getItemAsync(pkey).catch(() => null);
 
     if (!password) {
-      // TODO: improve error
-      throw 'password not found';
+      return errorThrower.throw(`useLocalCredentials: authenticate() cannot retrieve a password for that identifier`);
     }
 
     return signIn.create({
@@ -197,19 +172,12 @@ export function LocalCredentialsProvider(props: PropsWithChildren): JSX.Element 
       password,
     });
   };
-
-  return (
-    <LocalAuthContext.Provider
-      value={{
-        setCredentials,
-        hasCredentials: hasLocalAuthCredentials,
-        userOwnsCredentials,
-        clearCredentials,
-        authenticate,
-        biometryType,
-      }}
-    >
-      {props.children}
-    </LocalAuthContext.Provider>
-  );
-}
+  return {
+    setCredentials,
+    hasCredentials: hasLocalAuthCredentials,
+    userOwnsCredentials,
+    clearCredentials,
+    authenticate,
+    biometryType,
+  };
+};
