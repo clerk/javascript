@@ -1,11 +1,4 @@
-import type {
-  CheckAuthorizationWithCustomPermissions,
-  ClerkOptions,
-  MultiDomainAndOrProxyPrimitives,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-  Without,
-} from '@clerk/types';
+import type { ClerkOptions, MultiDomainAndOrProxyPrimitives, Without } from '@clerk/types';
 
 type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
 
@@ -32,31 +25,4 @@ declare global {
   }
 }
 
-type ProtectComponentDefaultProps =
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-    };
-
-export type {
-  AstroClerkUpdateOptions,
-  AstroClerkIntegrationParams,
-  AstroClerkCreateInstanceParams,
-  ProtectComponentDefaultProps,
-};
+export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams };
