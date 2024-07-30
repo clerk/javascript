@@ -108,8 +108,11 @@ export const SignInSupportedStrategy = React.forwardRef<SignInSupportedStrategyE
     const routerRef = SignInRouterCtx.useActorRef();
     const snapshot = routerRef.getSnapshot();
 
-    const supportedFirstFactors = snapshot.context.clerk.client.signIn.supportedFirstFactors || [];
-    const supportedSecondFactors = snapshot.context.clerk.client.signIn.supportedSecondFactors || [];
+    const status = snapshot.context.clerk.client.signIn.status;
+    const supportedFirstFactors =
+      status === 'needs_first_factor' ? snapshot.context.clerk.client.signIn.supportedFirstFactors || [] : [];
+    const supportedSecondFactors =
+      status === 'needs_second_factor' ? snapshot.context.clerk.client.signIn.supportedSecondFactors || [] : [];
     const factor = [...supportedFirstFactors, ...supportedSecondFactors].find(factor => name === factor.strategy);
 
     const currentFactor = useSelector(
