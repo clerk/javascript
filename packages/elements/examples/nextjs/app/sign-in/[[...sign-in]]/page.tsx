@@ -9,6 +9,31 @@ import { H1, H3, P } from '@/components/design';
 import { CustomField } from '@/components/form';
 import { Spinner } from '@/components/spinner';
 
+function CustomSamlConnection({ children }: { children: string }) {
+  return (
+    <Clerk.Loading scope='provider:saml'>
+      {isLoading => (
+        <Clerk.Connection
+          className='relative flex h-14 w-full cursor-pointer items-center justify-center text-xs text-[rgb(243,243,243)] transition-all duration-150'
+          disabled={isLoading}
+          name='saml'
+          type='button'
+        >
+          <span className='inline-flex items-center justify-center leading-loose'>
+            {isLoading ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              children
+            )}
+          </span>
+        </Clerk.Connection>
+      )}
+    </Clerk.Loading>
+  );
+}
+
 function CustomProvider({
   children,
   provider,
@@ -139,7 +164,10 @@ export default function SignInPage() {
                   )}
                 </Clerk.Field>
 
-                <CustomSubmit>Sign in with Email</CustomSubmit>
+                <div className='flex w-full justify-between'>
+                  <CustomSubmit>Sign in with Email</CustomSubmit>
+                  <CustomSamlConnection>Continue with SAML</CustomSamlConnection>
+                </div>
               </>
             ) : (
               <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>
@@ -200,7 +228,10 @@ export default function SignInPage() {
                   )}
                 </Clerk.Field>
 
-                <CustomSubmit>Sign in with Email</CustomSubmit>
+                <div className='flex w-full justify-between'>
+                  <CustomSubmit>Sign in with Email</CustomSubmit>
+                  <CustomSamlConnection>Continue with SAML</CustomSamlConnection>
+                </div>
               </>
             ) : (
               <TextButton onClick={() => setContinueWithEmail(true)}>Continue with Email</TextButton>

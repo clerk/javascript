@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/clerk-react';
-import type { OAuthProvider, Web3Provider } from '@clerk/types';
+import type { OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
 import type React from 'react';
 import { useCallback } from 'react';
 import type { ActorRef } from 'xstate';
@@ -11,16 +11,21 @@ import type { UseThirdPartyProviderReturn } from '~/react/common/connections';
 import {
   getEnabledThirdPartyProviders,
   isAuthenticatableOauthStrategy,
+  isSamlStrategy,
   isWeb3Strategy,
   providerToDisplayData,
 } from '~/utils/third-party-strategies';
 
-const useIsProviderEnabled = (provider: OAuthProvider | Web3Provider): boolean | null => {
+const useIsProviderEnabled = (provider: OAuthProvider | Web3Provider | SamlStrategy): boolean | null => {
   const clerk = useClerk();
 
   // null indicates we don't know for sure
   if (!clerk.loaded) {
     return null;
+  }
+
+  if (provider === 'saml') {
+    return clerk.__unstable__environment?.userSettings.saml.enabled ?? false;
   }
 
   const data = getEnabledThirdPartyProviders(clerk.__unstable__environment);
@@ -35,10 +40,16 @@ export const useThirdPartyProvider = <
   TActor extends ActorRef<any, SignInRouterEvents> | ActorRef<any, SignUpRouterEvents>,
 >(
   ref: TActor,
-  provider: OAuthProvider | Web3Provider,
+  provider: OAuthProvider | Web3Provider | SamlStrategy,
 ): UseThirdPartyProviderReturn => {
   const isProviderEnabled = useIsProviderEnabled(provider);
-  const details = providerToDisplayData[provider];
+  const isSaml = isSamlStrategy(provider);
+  const details = isSaml
+    ? {
+        name: 'SAML',
+        strategy: 'saml' as SamlStrategy,
+      }
+    : providerToDisplayData[provider];
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {
@@ -48,13 +59,17 @@ export const useThirdPartyProvider = <
 
       event.preventDefault();
 
+      if (isSaml) {
+        return ref.send({ type: 'AUTHENTICATE.SAML' });
+      }
+
       if (provider === 'metamask') {
         return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_metamask_signature' });
       }
 
       return ref.send({ type: 'AUTHENTICATE.OAUTH', strategy: `oauth_${provider}` });
     },
-    [provider, isProviderEnabled, ref],
+    [provider, isProviderEnabled, isSaml, ref],
   );
 
   if (isProviderEnabled === false) {

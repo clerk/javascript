@@ -1,21 +1,40 @@
 // c.f. vendor/clerk-js/src/ui/hooks/useEnabledThirdPartyProviders.tsx [Modified]
 
-import type { EnvironmentResource, OAuthProvider, OAuthStrategy, Web3Provider, Web3Strategy } from '@clerk/types';
+import type {
+  EnvironmentResource,
+  OAuthProvider,
+  OAuthStrategy,
+  SamlStrategy,
+  Web3Provider,
+  Web3Strategy,
+} from '@clerk/types';
 import { OAUTH_PROVIDERS, WEB3_PROVIDERS } from '@clerk/types'; // TODO: This import shouldn't be part of @clerk/types
 
 import { fromEntries, iconImageUrl } from './clerk-js';
 
-export interface ThirdPartyStrategy {
-  id: Web3Strategy | OAuthStrategy;
-  iconUrl: string;
-  name: string;
-}
+export type ThirdPartyStrategy =
+  | {
+      id: Web3Strategy | OAuthStrategy;
+      iconUrl: string;
+      name: string;
+    }
+  | {
+      strategy: SamlStrategy;
+      iconUrl?: never;
+      name: string;
+    };
 
-export interface ThirdPartyProvider {
-  strategy: Web3Strategy | OAuthStrategy;
-  iconUrl: string;
-  name: string;
-}
+export type ThirdPartyProvider =
+  | {
+      strategy: Web3Strategy | OAuthStrategy;
+      iconUrl: string;
+      name: string;
+    }
+  | {
+      strategy: SamlStrategy;
+      iconUrl?: never;
+      name: string;
+    };
 
 type ThirdPartyStrategyToDataMap = {
   [k in Web3Strategy | OAuthStrategy]: ThirdPartyStrategy;
@@ -46,6 +65,10 @@ const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
     return [p.strategy, { iconUrl: iconImageUrl(p.provider), id: p.provider, name: p.name }];
   }),
 ) as ThirdPartyStrategyToDataMap;
+
+export function isSamlStrategy(strategy: any): strategy is SamlStrategy {
+  return strategy === 'saml';
+}
 
 export function isWeb3Strategy(
   strategy: any,
