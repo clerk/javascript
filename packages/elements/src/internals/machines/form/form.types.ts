@@ -1,12 +1,12 @@
 import type { ClerkElementsFieldError } from '~/internals/errors';
 import type { FieldStates } from '~/react/common/form/types';
 import type { PasswordConfig } from '~/react/hooks/use-password.hook';
-import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
+import type { ErrorCodeOrTuple } from '~/react/utils/generate-password-error-text';
 
 export type FormDefaultValues = Map<string, FieldDetails['value']>;
 
 interface FeedbackBase {
-  codes?: Array<ErrorMessagesKey>;
+  codes?: Array<ErrorCodeOrTuple>;
 }
 
 export interface FeedbackErrorType extends FeedbackBase {

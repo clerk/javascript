@@ -3,7 +3,7 @@ import { noop } from '@clerk/shared';
 import type { PasswordSettingsData, PasswordValidation } from '@clerk/types';
 import * as React from 'react';
 
-import type { ErrorMessagesKey } from '../utils/generate-password-error-text';
+import type { ErrorCodeOrTuple } from '../utils/generate-password-error-text';
 import { generatePasswordErrorText } from '../utils/generate-password-error-text';
 
 // This hook should mimic the already existing usePassword hook in the clerk-js package
@@ -12,10 +12,10 @@ import { generatePasswordErrorText } from '../utils/generate-password-error-text
 export type PasswordConfig = Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>;
 
 type UsePasswordCallbacks = {
-  onValidationError?: (error: string | undefined, keys: ErrorMessagesKey[], config: PasswordConfig) => void;
+  onValidationError?: (error: string | undefined, keys: ErrorCodeOrTuple[]) => void;
   onValidationSuccess?: () => void;
-  onValidationWarning?: (warning: string, keys: string[], config: PasswordConfig) => void;
-  onValidationInfo?: (info: string, keys: ErrorMessagesKey[], config: PasswordConfig) => void;
+  onValidationWarning?: (warning: string, keys: ErrorCodeOrTuple[]) => void;
+  onValidationInfo?: (info: string, keys: ErrorCodeOrTuple[]) => void;
   onValidationComplexity?: (b: boolean) => void;
 };
 
@@ -45,9 +45,9 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
           });
 
           if (res.complexity?.min_length) {
-            return onValidationInfo(message, keys, config);
+            return onValidationInfo(message, keys);
           }
-          return onValidationError(message, keys, config);
+          return onValidationError(message, keys);
         }
       }
 
@@ -57,7 +57,7 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
       if (res?.strength?.state === 'fail') {
         const keys = res.strength.keys;
         const error = keys.map(key => get(zxcvbnKeys, key)).join(' ');
-        return onValidationError(error, keys, config);
+        return onValidationError(error, keys);
       }
 
       /**
@@ -66,7 +66,7 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
       if (res?.strength?.state === 'pass') {
         const keys = res.strength.keys;
         const error = keys.map(key => get(zxcvbnKeys, key)).join(' ');
-        return onValidationWarning(error, keys, config);
+        return onValidationWarning(error, keys);
       }
 
       /**
