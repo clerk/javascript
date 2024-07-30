@@ -29,6 +29,8 @@ import { LinkButton } from '~/primitives/link';
 import { Separator } from '~/primitives/separator';
 import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
+import { FirstFactorConnections } from './first-factor-connections';
+
 /**
  * Implementation Details:
  *
@@ -887,10 +889,10 @@ export function SignInComponentLoaded() {
                       }}
                     </Common.GlobalError>
                     <div className='flex flex-col gap-6'>
-                      <Connections disabled={isGlobalLoading} />
-
-                      {hasConnection ? <Separator>{t('dividerText')}</Separator> : null}
-
+                      <FirstFactorConnections
+                        isGlobalLoading={isGlobalLoading}
+                        hasConnection={hasConnection}
+                      />
                       <div className='flex flex-col gap-3'>
                         <div className='flex flex-col gap-2'>
                           <SignIn.SupportedStrategy
