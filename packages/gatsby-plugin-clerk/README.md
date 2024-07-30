@@ -29,7 +29,7 @@
 ---
 
 > [!IMPORTANT]
-> Starting August 1, 2024, the Gatsby SDK is entering a one-month notice period. We are actively seeking a community maintainer to take over the project. For full details, please see our [changelog](https://clerk-git-rob-eco-93-changelog-entry-about-the-start-of-f25dc8.clerkstage.dev/changelog/2024-08-01-gatsby-eol).
+> Starting August 1, 2024, the Gatsby SDK is entering a one-month notice period. We are actively seeking a new community maintainer. For full details, please see our [changelog](https://clerk-git-rob-eco-93-changelog-entry-about-the-start-of-f25dc8.clerkstage.dev/changelog/2024-08-01-gatsby-eol).
 
 ## Overview
 
