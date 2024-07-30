@@ -1,6 +1,7 @@
 import type { Organization, Session, User, VerifyTokenOptions } from '@clerk/backend';
-import type { AuthObject, RequestState } from '@clerk/backend/internal';
+import type { RequestState } from '@clerk/backend/internal';
 import type {
+  AuthObject,
   LegacyRedirectProps,
   MultiDomainAndOrProxy,
   SignInFallbackRedirectUrl,
