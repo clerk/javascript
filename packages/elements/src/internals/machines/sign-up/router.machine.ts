@@ -139,6 +139,7 @@ export const SignUpRouterMachine = setup({
     hasClerkTransfer: ({ context }) => Boolean(context.router?.searchParams().get(SEARCH_PARAMS.transfer)),
     hasResource: ({ context }) => Boolean(context.clerk.client.signUp),
 
+    isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', not('isExampleMode')]),
     isStatusAbandoned: needsStatus('abandoned'),
     isStatusComplete: ({ context, event }) => {
       const resource = (event as SignUpRouterNextEvent)?.resource;
@@ -152,6 +153,7 @@ export const SignUpRouterMachine = setup({
     isStatusMissingRequirements: needsStatus('missing_requirements'),
 
     isLoggedIn: or(['isStatusComplete', ({ context }) => Boolean(context.clerk.user)]),
+    isSingleSessionMode: ({ context }) => Boolean(context.clerk?.__unstable__environment?.authConfig.singleSessionMode),
     isExampleMode: ({ context }) => Boolean(context.exampleMode),
     isMissingRequiredFields: and(['isStatusMissingRequirements', 'areFieldsMissing']),
     isMissingRequiredUnverifiedFields: and(['isStatusMissingRequirements', 'areFieldsUnverified']),
@@ -254,7 +256,7 @@ export const SignUpRouterMachine = setup({
       }),
       always: [
         {
-          guard: and(['isLoggedIn', not('isExampleMode')]),
+          guard: 'isLoggedInAndSingleSession',
           actions: [
             log('Already logged in'),
             {

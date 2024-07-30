@@ -2,7 +2,7 @@ import { joinURL } from '@clerk/shared/url';
 import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, fromPromise, not, or, raise, sendTo, setup } from 'xstate';
+import { and, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -272,15 +272,12 @@ export const SignInRouterMachine = setup({
         {
           guard: 'isLoggedInAndSingleSession',
           actions: [
-            () => console.warn('logged-in-single-session-mode'),
+            log('Already logged in'),
             {
-              type: 'setError',
-              params: {
-                error: new ClerkElementsError('logged-in-single-session-mode', 'You are already logged in.'),
-              },
+              type: 'navigateExternal',
+              params: ({ context }) => ({ path: context.clerk.buildAfterSignInUrl() }),
             },
           ],
-          target: 'Start',
         },
         {
           guard: 'needsStart',
