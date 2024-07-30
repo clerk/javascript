@@ -1,6 +1,6 @@
-import type { AuthObject } from '@clerk/backend/internal';
 import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
+import type { AuthObject } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
 import { API_URL, API_VERSION, SECRET_KEY } from './constants';

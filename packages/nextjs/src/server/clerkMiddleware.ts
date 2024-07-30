@@ -1,14 +1,9 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-import type {
-  AuthenticateRequestOptions,
-  AuthObject,
-  ClerkRequest,
-  RedirectFun,
-  RequestState,
-} from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type { AuthObject } from '@clerk/types';
 import type { NextMiddleware } from 'next/server';
 import { NextResponse } from 'next/server';
 
