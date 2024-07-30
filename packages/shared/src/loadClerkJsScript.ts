@@ -22,7 +22,10 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   domain?: string;
 };
 
-const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
+/*
+ * Loads the Clerk JS script.
+ */
+const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions, packageVersion: string) => {
   const { publishableKey } = opts;
 
   if (!publishableKey) {
@@ -43,7 +46,7 @@ const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
     });
   }
 
-  return loadScript(clerkJsScriptUrl(opts), {
+  return loadScript(clerkJsScriptUrl(opts, packageVersion), {
     async: true,
     crossOrigin: 'anonymous',
     beforeLoad: applyClerkJsScriptAttributes(opts),
@@ -52,7 +55,10 @@ const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
   });
 };
 
-const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
+/*
+ * Generates the Clerk JS script URL.
+ */
+const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions, packageVersion: string) => {
   const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
@@ -69,10 +75,13 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
-  const version = versionSelector(clerkJSVersion);
+  const version = versionSelector(clerkJSVersion, packageVersion);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 
+/*
+ * Builds an object of Clerk JS script attributes.
+ */
 const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
   const obj: Record<string, string> = {};
 
