@@ -7,6 +7,7 @@ import { Organization, TickShield, User, Users } from '../icons';
 import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
+import { sanitizeCustomLinkURL } from './sanitizeCustomLinkURL';
 
 export type CustomPageContent = {
   url: string;
@@ -219,16 +220,6 @@ const sanitizeCustomPageURL = (url: string): string => {
     throw new Error('Clerk: Absolute URLs are not supported for custom pages');
   }
   return (url as string).charAt(0) === '/' && (url as string).length > 1 ? (url as string).substring(1) : url;
-};
-
-const sanitizeCustomLinkURL = (url: string): string => {
-  if (!url) {
-    throw new Error('Clerk: URL is required for custom links');
-  }
-  if (isValidUrl(url)) {
-    return url;
-  }
-  return (url as string).charAt(0) === '/' ? url : `/${url}`;
 };
 
 const assertExternalLinkAsRoot = (routes: NavbarRoute[]) => {
