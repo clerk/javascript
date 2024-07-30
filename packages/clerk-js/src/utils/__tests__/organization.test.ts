@@ -10,6 +10,11 @@ describe('isOrganizationId(string)', () => {
     expect(isOrganizationId('user_123')).toBe(false);
     expect(isOrganizationId('123org_')).toBe(false);
     expect(isOrganizationId('ORG_123')).toBe(false);
+  });
+
+  it('should handle falsy values', () => {
+    expect(isOrganizationId(undefined)).toBe(false);
+    expect(isOrganizationId(null)).toBe(false);
     expect(isOrganizationId('')).toBe(false);
   });
 });

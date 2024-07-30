@@ -712,7 +712,7 @@ export class Clerk implements ClerkInterface {
     if (newSession && shouldSwitchOrganization) {
       const organizationIdOrSlug = typeof organization === 'string' ? organization : organization?.id;
 
-      if (isOrganizationId(organizationIdOrSlug!)) {
+      if (isOrganizationId(organizationIdOrSlug)) {
         newSession.lastActiveOrganizationId = organizationIdOrSlug || null;
       } else {
         const matchingOrganization = newSession.user.organizationMemberships.find(
