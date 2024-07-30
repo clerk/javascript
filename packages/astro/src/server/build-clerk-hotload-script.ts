@@ -7,7 +7,6 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   const publishableKey = getSafeEnv(locals).pk!;
   const proxyUrl = getSafeEnv(locals).proxyUrl!;
   const domain = getSafeEnv(locals).domain!;
-
   const scriptSrc = clerkJsScriptUrl({
     clerkJSUrl: getSafeEnv(locals).clerkJsUrl,
     clerkJSVariant: getSafeEnv(locals).clerkJsVariant,
