@@ -1,19 +1,17 @@
 import type {
-  ActClaim,
+  AuthObject,
+  AuthObjectDebugData,
   CheckAuthorizationWithCustomPermissions,
   JwtPayload,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
   ServerGetToken,
   ServerGetTokenOptions,
+  SignedInAuthObject,
+  SignedOutAuthObject,
 } from '@clerk/types';
 
 import type { CreateBackendApiOptions } from '../api';
 import { createBackendApiClient } from '../api';
 import type { AuthenticateContext } from './authenticateContext';
-
-type AuthObjectDebugData = Record<string, any>;
-type AuthObjectDebug = () => AuthObjectDebugData;
 
 /**
  * @internal
@@ -21,45 +19,6 @@ type AuthObjectDebug = () => AuthObjectDebugData;
 export type SignedInAuthObjectOptions = CreateBackendApiOptions & {
   token: string;
 };
-
-/**
- * @internal
- */
-export type SignedInAuthObject = {
-  sessionClaims: JwtPayload;
-  sessionId: string;
-  actor: ActClaim | undefined;
-  userId: string;
-  orgId: string | undefined;
-  orgRole: OrganizationCustomRoleKey | undefined;
-  orgSlug: string | undefined;
-  orgPermissions: OrganizationCustomPermissionKey[] | undefined;
-  getToken: ServerGetToken;
-  has: CheckAuthorizationWithCustomPermissions;
-  debug: AuthObjectDebug;
-};
-
-/**
- * @internal
- */
-export type SignedOutAuthObject = {
-  sessionClaims: null;
-  sessionId: null;
-  actor: null;
-  userId: null;
-  orgId: null;
-  orgRole: null;
-  orgSlug: null;
-  orgPermissions: null;
-  getToken: ServerGetToken;
-  has: CheckAuthorizationWithCustomPermissions;
-  debug: AuthObjectDebug;
-};
-
-/**
- * @internal
- */
-export type AuthObject = SignedInAuthObject | SignedOutAuthObject;
 
 const createDebug = (data: AuthObjectDebugData | undefined) => {
   return () => {
