@@ -193,6 +193,45 @@ ${error.getFullMessage()}`,
     }
   }
 
+  function handleHandshakeTokenVerificationErrorInDevelopment(error: TokenVerificationError) {
+    // In development, the handshake token is being transferred in the URL as a query parameter, so there is no
+    // possibility of collision with a handshake token of another app running on the same local domain
+    // (etc one app on localhost:3000 and one on localhost:3001).
+    // Therefore, if the handshake token is invalid, it is likely that the user has switched Clerk keys locally.
+    // We make sure to throw a descriptive error message and then stop the handshake flow in every case,
+    // to avoid the possibility of an infinite loop.
+    if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
+      const msg = `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`;
+      throw new Error(msg);
+    }
+    throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
+  }
+
+  function handleHandshakeTokenVerificationErrorInProduction(error: TokenVerificationError) {
+    // In production, the handshake token is being transferred as a cookie, so there is a possibility of collision
+    // with a handshake token of another app running on the same etld+1 domain.
+    // For example, if one app is running on sub1.clerk.com and another on sub2.clerk.com, the handshake token
+    // cookie for both apps will be set on etld+1 (clerk.com) so there's a possibility that one app will accidentally
+    // use the handshake token of a different app during the handshake flow.
+    // In this scenario, verification will fail with TokenInvalidSignature. In contrast to the development case,
+    // we need to allow the flow to continue so the app eventually retries another handshake with the correct token.
+    // We need to make sure, however, that we don't allow the flow to continue indefinitely, so we throw an error after X
+    // retries to avoid an infinite loop. An infinite loop can happen if the customer switched Clerk keys for their prod app.
+    if (
+      error.reason === TokenVerificationErrorReason.TokenInvalidSignature ||
+      error.reason === TokenVerificationErrorReason.InvalidSecretKey ||
+      error.reason === TokenVerificationErrorReason.JWKKidMismatch ||
+      error.reason === TokenVerificationErrorReason.JWKFailedToResolve
+    ) {
+      // Let the request go through and eventually retry another handshake
+      // TODO: set a cookie so break the infinite loop
+      return;
+    }
+    // TODO: if N retries reached, return signedOut
+    const msg = `Clerk: Handshake token verification failed with "${error.reason}"`;
+    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError, msg);
+  }
+
   async function authenticateRequestWithTokenInCookie() {
     const hasActiveClient = authenticateContext.clientUat;
     const hasSessionToken = !!authenticateContext.sessionTokenInCookie;
@@ -210,30 +249,10 @@ ${error.getFullMessage()}`,
       try {
         return await resolveHandshake();
       } catch (error) {
-        // If for some reason the handshake token is invalid or stale, we ignore it and continue trying to authenticate the request.
-        // Worst case, the handshake will trigger again and return a refreshed token.
         if (error instanceof TokenVerificationError) {
-          if (authenticateContext.instanceType === 'development') {
-            if (error.reason === TokenVerificationErrorReason.TokenInvalidSignature) {
-              throw new Error(
-                `Clerk: Handshake token verification failed due to an invalid signature. If you have switched Clerk keys locally, clear your cookies and try again.`,
-              );
-            }
-
-            throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
-          }
-
-          if (
-            error.reason === TokenVerificationErrorReason.TokenInvalidSignature ||
-            error.reason === TokenVerificationErrorReason.InvalidSecretKey
-          ) {
-            // Avoid infinite redirect loops due to incorrect secret-keys
-            return signedOut(
-              authenticateContext,
-              AuthErrorReason.UnexpectedError,
-              `Clerk: Handshake token verification failed with "${error.reason}"`,
-            );
-          }
+          authenticateContext.instanceType === 'development'
+            ? handleHandshakeTokenVerificationErrorInDevelopment(error)
+            : handleHandshakeTokenVerificationErrorInProduction(error);
         }
       }
     }
