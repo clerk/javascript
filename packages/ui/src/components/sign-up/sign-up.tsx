@@ -37,8 +37,6 @@ function SignUpComponentLoaded() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
   const { isDevelopmentOrStaging, userSettings } = useEnvironment();
-  // TODO to fix IsomorphicClerk
-  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
@@ -91,14 +89,10 @@ function SignUpComponentLoaded() {
                         {firstNameEnabled && lastNameEnabled ? (
                           <div className='flex gap-4'>
                             <FirstNameField
-                              label={t('formFieldLabel__firstName')}
-                              hintText={t('formFieldHintText__optional')}
                               required={firstNameRequired}
                               disabled={isGlobalLoading}
                             />
                             <LastNameField
-                              label={t('formFieldLabel__lastName')}
-                              hintText={t('formFieldHintText__optional')}
                               required={lastNameRequired}
                               disabled={isGlobalLoading}
                             />
@@ -107,27 +101,25 @@ function SignUpComponentLoaded() {
 
                         {usernameEnabled ? (
                           <UsernameField
-                            label={t('formFieldLabel__username')}
-                            hintText={t('formFieldHintText__optional')}
                             required={usernameRequired}
                             disabled={isGlobalLoading}
                           />
                         ) : null}
 
                         {emailAddressEnabled && !emailAddressRequired && phoneNumberEnabled && !phoneNumberRequired ? (
-                          <EmailOrPhoneNumberField locationBasedCountryIso={locationBasedCountryIso} />
+                          <EmailOrPhoneNumberField
+                            toggleLabelEmail={t('signUp.start.actionLink__use_email')}
+                            toggleLabelPhoneNumber={t('signUp.start.actionLink__use_phone')}
+                          />
                         ) : (
                           <>
                             <EmailField disabled={isGlobalLoading} />
 
                             {phoneNumberEnabled ? (
                               <PhoneNumberField
-                                label={t('formFieldLabel__phoneNumber')}
-                                hintText={t('formFieldHintText__optional')}
                                 required={phoneNumberRequired}
                                 disabled={isGlobalLoading}
                                 initPhoneWithCode={clerk.client.signUp.phoneNumber || ''}
-                                locationBasedCountryIso={locationBasedCountryIso}
                               />
                             ) : null}
                           </>
@@ -213,6 +205,7 @@ function SignUpComponentLoaded() {
                         }}
                       </Common.GlobalError>
                       <OTPField
+                        label={t('signUp.phoneCode.formTitle')}
                         disabled={isGlobalLoading}
                         resend={
                           <SignUp.Action
@@ -284,6 +277,7 @@ function SignUpComponentLoaded() {
                         }}
                       </Common.GlobalError>
                       <OTPField
+                        label={t('signUp.emailCode.formTitle')}
                         disabled={isGlobalLoading}
                         resend={
                           <SignUp.Action
@@ -401,14 +395,10 @@ function SignUpComponentLoaded() {
                       {firstNameEnabled && lastNameEnabled ? (
                         <div className='flex gap-4'>
                           <FirstNameField
-                            label={t('formFieldLabel__firstName')}
-                            hintText={t('formFieldHintText__optional')}
                             required={firstNameRequired}
                             disabled={isGlobalLoading}
                           />
                           <LastNameField
-                            label={t('formFieldLabel__lastName')}
-                            hintText={t('formFieldHintText__optional')}
                             required={lastNameRequired}
                             disabled={isGlobalLoading}
                           />
@@ -417,8 +407,6 @@ function SignUpComponentLoaded() {
 
                       {usernameEnabled ? (
                         <UsernameField
-                          label={t('formFieldLabel__username')}
-                          hintText={t('formFieldHintText__optional')}
                           required={usernameRequired}
                           disabled={isGlobalLoading}
                         />
@@ -426,11 +414,8 @@ function SignUpComponentLoaded() {
 
                       {phoneNumberEnabled ? (
                         <PhoneNumberField
-                          label={t('formFieldLabel__phoneNumber')}
-                          hintText={t('formFieldHintText__optional')}
                           required={phoneNumberRequired}
                           disabled={isGlobalLoading}
-                          locationBasedCountryIso={locationBasedCountryIso}
                         />
                       ) : null}
 

@@ -1,6 +1,6 @@
 import * as Common from '@clerk/elements/common';
 
-import { PROVIDERS } from '~/constants';
+import { PROVIDERS } from '~/constants/providers';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import * as Connection from '~/primitives/connection';
 import * as Icon from '~/primitives/icon';
