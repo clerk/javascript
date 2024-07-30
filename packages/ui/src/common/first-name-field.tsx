@@ -2,8 +2,7 @@ import * as Common from '@clerk/elements/common';
 import React from 'react';
 
 import { useLocalizations } from '~/hooks/use-localizations';
-
-import * as Field from '../primitives/field';
+import * as Field from '~/primitives/field';
 
 export function FirstNameField(props: Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t, translateError } = useLocalizations();

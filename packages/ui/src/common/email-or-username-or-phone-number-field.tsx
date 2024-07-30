@@ -2,7 +2,7 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
-import { LOCALIZATION_NEEDED } from '~/constants';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { link } from '~/primitives/link';
 
 import { EmailOrUsernameField } from './email-or-username-field';

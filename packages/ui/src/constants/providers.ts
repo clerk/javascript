@@ -1,12 +1,6 @@
 import type { OAuthProvider, Web3Provider } from '@clerk/types';
 
-// As part of https://linear.app/clerk/issue/SDKI-191
-export const LOCALIZATION_NEEDED = {
-  formFieldAccessibleLabel__emailOrUsernameOrPhone: 'Toggle between email or username, and phone.',
-  formFieldAccessibleLabel__phoneOrUsername: 'Toggle between phone and username.',
-};
-
-import type * as Icon from './primitives/icon';
+import type * as Icon from '~/primitives/icon';
 
 type IconName = keyof typeof Icon;
 type Provider = {

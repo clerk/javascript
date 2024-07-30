@@ -2,8 +2,8 @@ import * as Common from '@clerk/elements/common';
 import { cx } from 'cva';
 import React from 'react';
 
-import * as Field from '../primitives/field';
-import * as Icon from '../primitives/icon';
+import * as Field from '~/primitives/field';
+import * as Icon from '~/primitives/icon';
 
 export function PasswordField({
   alternativeFieldTrigger,

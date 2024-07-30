@@ -3,8 +3,7 @@ import React from 'react';
 
 import { useAttributes } from '~/hooks/use-attributes';
 import { useLocalizations } from '~/hooks/use-localizations';
-
-import * as Field from '../primitives/field';
+import * as Field from '~/primitives/field';
 
 const DEFAULT_FIELD_NAME = 'emailAddress';
 

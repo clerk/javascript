@@ -1,7 +1,7 @@
 import * as Common from '@clerk/elements/common';
 import React from 'react';
 
-import * as Field from '../primitives/field';
+import * as Field from '~/primitives/field';
 
 export function OTPField({
   label,
