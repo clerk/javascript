@@ -191,10 +191,19 @@ export const SignInRouterMachine = setup({
       })),
     },
     'AUTHENTICATE.SAML': {
-      actions: sendTo(ThirdPartyMachineId, {
+      actions: sendTo(ThirdPartyMachineId, ({ context }) => ({
         type: 'REDIRECT',
-        params: { strategy: 'saml' },
-      }),
+        params: {
+          strategy: 'saml',
+          identifier: context.formRef.getSnapshot().context.fields.get('identifier')?.value,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete: context.clerk.buildAfterSignInUrl(),
+        },
+      })),
     },
     'FORM.ATTACH': {
       description: 'Attach/re-attach the form to the router.',
