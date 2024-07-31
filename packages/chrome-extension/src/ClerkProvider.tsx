@@ -1,37 +1,32 @@
-import { Clerk } from '@clerk/clerk-js';
-import type { ClerkProp, ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
+import type { Clerk } from '@clerk/clerk-js';
+import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import React from 'react';
 
-import { buildClerk } from './singleton';
+import { createClerkClient } from './clerk';
+import type { ClerkClientExtensionFeatures } from './types';
 import type { StorageCache } from './utils/storage';
 
-Clerk.sdkMetadata = {
-  name: PACKAGE_NAME,
-  version: PACKAGE_VERSION,
+type ChromeExtensionClerkProviderProps = ClerkReactProviderProps & {
+  extensionFeatures?: ClerkClientExtensionFeatures;
+  storageCache?: StorageCache;
+  /** @deprecated Please use extensionFeatures.sync instead */
+  syncSessionWithTab?: boolean;
 };
 
-type WebSSOClerkProviderCustomProps =
-  | {
-      syncSessionWithTab?: false;
-      storageCache?: never;
-    }
-  | {
-      syncSessionWithTab: true;
-      storageCache?: StorageCache;
-    };
-
-type WebSSOClerkProviderProps = ClerkReactProviderProps & WebSSOClerkProviderCustomProps;
-
-const WebSSOClerkProvider = (props: WebSSOClerkProviderProps): JSX.Element | null => {
-  const { children, storageCache: runtimeStorageCache, syncSessionWithTab, ...rest } = props;
+export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
+  const { children, extensionFeatures = {}, storageCache, syncSessionWithTab, ...rest } = props;
   const { publishableKey = '' } = props;
 
-  const [clerkInstance, setClerkInstance] = React.useState<ClerkProp>(null);
+  const [clerkInstance, setClerkInstance] = React.useState<Clerk | null>(null);
 
   React.useEffect(() => {
     void (async () => {
-      setClerkInstance(await buildClerk({ publishableKey, storageCache: runtimeStorageCache }));
+      if (syncSessionWithTab) {
+        extensionFeatures.sync = true;
+      }
+
+      setClerkInstance(await createClerkClient({ publishableKey, storageCache, extensionFeatures }));
     })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -43,29 +38,9 @@ const WebSSOClerkProvider = (props: WebSSOClerkProviderProps): JSX.Element | nul
     <ClerkReactProvider
       {...rest}
       Clerk={clerkInstance}
-      standardBrowser={false}
+      standardBrowser={!syncSessionWithTab}
     >
       {children}
     </ClerkReactProvider>
   );
-};
-
-const StandaloneClerkProvider = (props: ClerkReactProviderProps): JSX.Element => {
-  const { children, ...rest } = props;
-
-  return (
-    <ClerkReactProvider
-      {...rest}
-      Clerk={Clerk}
-    >
-      {children}
-    </ClerkReactProvider>
-  );
-};
-
-type ChromeExtensionClerkProviderProps = WebSSOClerkProviderProps;
-
-export function ClerkProvider(props: ChromeExtensionClerkProviderProps): JSX.Element | null {
-  const { storageCache, syncSessionWithTab, ...rest } = props;
-  return syncSessionWithTab ? <WebSSOClerkProvider {...props} /> : <StandaloneClerkProvider {...rest} />;
 }
