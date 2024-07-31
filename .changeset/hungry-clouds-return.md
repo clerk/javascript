@@ -1,5 +1,6 @@
 ---
 '@clerk/clerk-js': patch
+"@clerk/types": patch
 ---
 
-Add a dev mode notice to components.
+Add a development mode notice to components and also introducing `popoverBox` descriptor.
