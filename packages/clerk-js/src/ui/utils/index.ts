@@ -23,3 +23,4 @@ export * from './passwordUtils';
 export * from './createCustomPages';
 export * from './ExternalElementMounter';
 export * from './colorOptionToHslaScale';
+export * from './createCustomMenuItems';

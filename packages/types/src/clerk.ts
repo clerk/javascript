@@ -12,6 +12,7 @@ import type {
   UserProfileTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
@@ -927,6 +928,11 @@ export type UserButtonProps = UserButtonProfileMode & {
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
+
+  /*
+   * Provide custom menu actions and links to be rendered inside the UserButton.
+   */
+  customMenuItems?: CustomMenuItem[];
 };
 
 type PrimitiveKeys<T> = {
