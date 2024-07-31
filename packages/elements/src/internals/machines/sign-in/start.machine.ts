@@ -1,4 +1,4 @@
-import type { SignInResource } from '@clerk/types';
+import type { SignInResource, Web3Strategy } from '@clerk/types';
 import { fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
@@ -23,6 +23,14 @@ export const SignInStartMachine = setup({
         flow,
       });
     }),
+    attemptWeb3: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; strategy: Web3Strategy }>(
+      ({ input: { parent, strategy } }) => {
+        if (strategy === 'web3_metamask_signature') {
+          return parent.getSnapshot().context.clerk.client.signIn.authenticateWithMetamask();
+        }
+        throw new Error();
+      },
+    ),
     attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const clerk = parent.getSnapshot().context.clerk;
@@ -94,6 +102,11 @@ export const SignInStartMachine = setup({
           target: 'AttemptingPasskeyAutoFill',
           reenter: false,
         },
+        'AUTHENTICATE.WEB3': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingWeb3',
+          reenter: true,
+        },
       },
     },
     Attempting: {
@@ -159,6 +172,26 @@ export const SignInStartMachine = setup({
         },
         onError: {
           actions: ['setFormErrors'],
+          target: 'Pending',
+        },
+      },
+    },
+    AttemptingWeb3: {
+      tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
+      invoke: {
+        id: 'attemptWeb3',
+        src: 'attemptWeb3',
+        input: ({ context, event }) => ({
+          parent: context.parent,
+          // TODO: figure out how to type this correctly
+          strategy: event.strategy,
+        }),
+        onDone: {
+          actions: ['sendToNext', 'sendToLoading'],
+        },
+        onError: {
+          actions: ['setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },

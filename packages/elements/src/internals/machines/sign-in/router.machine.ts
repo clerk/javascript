@@ -334,6 +334,9 @@ export const SignInRouterMachine = setup({
         'AUTHENTICATE.PASSKEY.AUTOFILL': {
           actions: sendTo('start', ({ event }) => event),
         },
+        'AUTHENTICATE.WEB3': {
+          actions: sendTo('start', ({ event }) => event),
+        },
         NEXT: [
           {
             guard: 'isComplete',

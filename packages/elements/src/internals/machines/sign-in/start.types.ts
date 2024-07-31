@@ -1,4 +1,5 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
+import type { Web3Strategy } from '@clerk/types';
 import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';
@@ -14,12 +15,14 @@ export type SignInStartTags = 'state:pending' | 'state:attempting' | 'state:load
 export type SignInStartSubmitEvent = { type: 'SUBMIT' };
 export type SignInStartPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };
 export type SignInStartPasskeyAutofillEvent = { type: 'AUTHENTICATE.PASSKEY.AUTOFILL' };
+export type SignInStartWeb3Event = { type: 'AUTHENTICATE.WEB3'; strategy: Web3Strategy };
 
 export type SignInStartEvents =
   | ErrorActorEvent
   | SignInStartSubmitEvent
   | SignInStartPasskeyEvent
   | SignInStartPasskeyAutofillEvent
+  | SignInStartWeb3Event
   | DoneActorEvent;
 
 // ---------------------------------- Input ---------------------------------- //
