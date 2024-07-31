@@ -168,10 +168,10 @@ export const arSA: LocalizationResource = {
       },
     },
     navbar: {
-      description: 'Manage your organization.',
-      general: 'General',
-      members: 'Members',
-      title: 'Organization',
+      description: 'إدارة منظمتك.',
+      general: 'عام',
+      members: 'الأعضاء',
+      title: 'المنظمة',
     },
     profilePage: {
       dangerSection: {
@@ -210,11 +210,11 @@ export const arSA: LocalizationResource = {
       title: 'حذف النطاق',
     },
     start: {
-      headerTitle__general: 'General',
+      headerTitle__general: 'عام',
       headerTitle__members: 'الأعضاء',
       profileSection: {
         primaryButton: '',
-        title: 'Organization Profile',
+        title: 'ملف المنظمة',
         uploadAction__title: 'Logo',
       },
     },
