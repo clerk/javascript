@@ -31,6 +31,7 @@ export const CardClerkAndPagesTag = React.memo(
           {
             width: '100%',
             position: 'relative',
+            isolation: 'isolate',
           },
           outerSx,
         ]}
@@ -44,6 +45,8 @@ export const CardClerkAndPagesTag = React.memo(
             width: '100%',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: 1,
+            position: 'relative',
           })}
         >
           {(displayConfig.branded || withFooterPages) && (
