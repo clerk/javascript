@@ -457,6 +457,8 @@ export const nbNO: LocalizationResource = {
     },
     start: {
       actionLink: 'Logg inn',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Har du allerede en konto?',
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Opprett kontoen din',

@@ -246,6 +246,9 @@ export type ElementsConfig = {
   userButtonPopoverActionButton: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverActionButtonIconBox: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
   userButtonPopoverActionButtonIcon: WithOptions<'manageAccount' | 'addAccount' | 'signOut' | 'signOutAll'>;
+  userButtonPopoverCustomItemButton: WithOptions<string>;
+  userButtonPopoverCustomItemButtonIconBox: WithOptions<string>;
+  userButtonPopoverActionItemButtonIcon: WithOptions<string>;
   userButtonPopoverFooter: WithOptions;
   userButtonPopoverFooterPagesLink: WithOptions<'terms' | 'privacy'>;
 

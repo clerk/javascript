@@ -1,16 +1,18 @@
 import * as Common from '@clerk/elements/common';
 import React from 'react';
 
-import * as Field from '../primitives/field';
+import { useLocalizations } from '~/hooks/use-localizations';
+import * as Field from '~/primitives/field';
 
 export function EmailOrUsernameField({
   alternativeFieldTrigger,
-  label = 'Email address or username',
+
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
-  label?: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+  const { t } = useLocalizations();
+
   return (
     <Common.Field
       name='identifier'
@@ -19,7 +21,7 @@ export function EmailOrUsernameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {label}{' '}
+            {t('formFieldLabel__emailAddress_username')}{' '}
             {alternativeFieldTrigger && <span className='flex-grow self-end text-end'>{alternativeFieldTrigger}</span>}
           </Field.Label>
         </Common.Label>

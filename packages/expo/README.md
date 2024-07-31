@@ -36,23 +36,26 @@ Clerk is the easiest way to add authentication and user management to your Expo 
 
 ### Prerequisites
 
-- React v18+
+- React 18 or later
+- Expo 50 or later
+- React Native 0.73 or later
 - Node.js `>=18.17.0` or later
 - An application built using Expo
 
-If an expo app already exists, you can skip this section and go straight to Installation.
+If an Expo app already exists, you can skip this section and go straight to installation.
 Otherwise, you can create a new Expo app by running:
 
-```
-npx create-expo-app my-app
+```shell
+npx create-expo-app@latest my-app --template blank
 cd my-app
+npx expo install react-dom react-native-web @expo/metro-runtime
 ```
 
 ### Installation
 
 Next, install the Clerk Expo SDK:
 
-```sh
+```shell
 npm install @clerk/clerk-expo
 ```
 
@@ -90,8 +93,8 @@ const styles = StyleSheet.create({
 
 A token cache is required to work with Clerk and Expo. This is entirely up to you how you handle the token cache - in this example we're going to use the `expo-secure-store` library. First, install it by running
 
-```
-npm i expo-secure-store
+```shell
+npm install expo-secure-store
 ```
 
 and then add the tokenCache to your entry file, as shown here:

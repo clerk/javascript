@@ -2,20 +2,23 @@ import * as Common from '@clerk/elements/common';
 import { cx } from 'cva';
 import React from 'react';
 
-import * as Field from '../primitives/field';
-import * as Icon from '../primitives/icon';
+import * as Field from '~/primitives/field';
+import * as Icon from '~/primitives/icon';
 
 export function PasswordField({
   alternativeFieldTrigger,
   className,
-  label = 'Password',
+  label,
   name = 'password',
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
   validatePassword?: boolean;
   name?: 'password' | 'confirmPassword';
-  label?: React.ReactNode;
+  /**
+   * **Note:** this prop is required as the `label` differs depending on the context (e.g. new password)
+   */
+  label: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'autoCapitalize' | 'autoComplete' | 'spellCheck' | 'type'>) {
   const [type, setType] = React.useState('password');
   const id = React.useId();

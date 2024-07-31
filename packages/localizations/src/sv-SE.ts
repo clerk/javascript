@@ -456,6 +456,8 @@ export const svSE: LocalizationResource = {
     },
     start: {
       actionLink: 'Logga in',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Har du redan ett konto?',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Skapa ditt konto',

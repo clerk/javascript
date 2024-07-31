@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.9.1
+
+### Patch Changes
+
+- Add support for opening the `UserProfileModal` and `OrganizationProfileModal` to specific navigation items through the `UserButton` and `OrganizationSwitcher`. ([#3732](https://github.com/clerk/javascript/pull/3732)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
 ## 4.9.0
 
 ### Minor Changes

@@ -452,6 +452,8 @@ export const heIL: LocalizationResource = {
     },
     start: {
       actionLink: 'התחבר',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'יש לך חשבון?',
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'צור את החשבון שלך',

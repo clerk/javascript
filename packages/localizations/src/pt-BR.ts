@@ -458,6 +458,8 @@ export const ptBR: LocalizationResource = {
     },
     start: {
       actionLink: 'Entrar',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Possui uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Criar sua conta',

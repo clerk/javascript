@@ -457,6 +457,8 @@ export const itIT: LocalizationResource = {
     },
     start: {
       actionLink: 'Accedi',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Hai giá un account?',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',

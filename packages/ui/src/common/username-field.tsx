@@ -1,18 +1,16 @@
 import * as Common from '@clerk/elements/common';
 import React from 'react';
 
-import * as Field from '../primitives/field';
+import { useLocalizations } from '~/hooks/use-localizations';
+import * as Field from '~/primitives/field';
 
 export function UsernameField({
   alternativeFieldTrigger,
-  label = 'Username',
   name = 'username',
-  hintText = 'Optional',
   ...props
-}: { alternativeFieldTrigger?: React.ReactNode; label?: React.ReactNode; hintText?: string } & Omit<
-  React.ComponentProps<typeof Common.Input>,
-  'type'
->) {
+}: { alternativeFieldTrigger?: React.ReactNode } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+  const { t, translateError } = useLocalizations();
+
   return (
     <Common.Field
       name={name}
@@ -21,11 +19,11 @@ export function UsernameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {label}{' '}
+            {t('formFieldLabel__username')}{' '}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
             ) : !props?.required ? (
-              <Field.Hint>{hintText}</Field.Hint>
+              <Field.Hint>{t('formFieldHintText__optional')}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>
@@ -43,8 +41,8 @@ export function UsernameField({
           }}
         </Common.FieldState>
         <Common.FieldError asChild>
-          {({ message }) => {
-            return <Field.Message intent='error'>{message}</Field.Message>;
+          {({ message, code }) => {
+            return <Field.Message intent='error'>{translateError(message, code, 'username')}</Field.Message>;
           }}
         </Common.FieldError>
       </Field.Root>

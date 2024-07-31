@@ -99,6 +99,8 @@ type _LocalizationResource = {
       subtitle: LocalizationValue;
       actionText: LocalizationValue;
       actionLink: LocalizationValue;
+      actionLink__use_phone: LocalizationValue;
+      actionLink__use_email: LocalizationValue;
     };
     emailLink: {
       title: LocalizationValue;

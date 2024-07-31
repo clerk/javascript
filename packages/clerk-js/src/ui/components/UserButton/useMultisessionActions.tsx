@@ -41,8 +41,24 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
         })();
       });
     }
-
     openUserProfile(opts.userProfileProps);
+    return opts.actionCompleteCallback?.();
+  };
+
+  const handleUserProfileActionClicked = (__experimental_startPath?: string) => {
+    if (opts.userProfileMode === 'navigation') {
+      return navigate(opts.userProfileUrl || '').finally(() => {
+        void (async () => {
+          await sleep(300);
+          opts.actionCompleteCallback?.();
+        })();
+      });
+    }
+    openUserProfile({
+      ...opts.userProfileProps,
+      ...(__experimental_startPath && { __experimental_startPath }),
+    });
+
     return opts.actionCompleteCallback?.();
   };
 
@@ -66,6 +82,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   return {
     handleSignOutSessionClicked,
     handleManageAccountClicked,
+    handleUserProfileActionClicked,
     handleSignOutAllClicked,
     handleSessionClicked,
     handleAddAccountClicked,

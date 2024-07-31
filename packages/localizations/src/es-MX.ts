@@ -461,6 +461,8 @@ export const esMX: LocalizationResource = {
     },
     start: {
       actionLink: 'Acceder',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: '¿Tienes una cuenta?',
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Crea tu cuenta',
@@ -591,7 +593,7 @@ export const esMX: LocalizationResource = {
       title: 'Agregar cuenta conectada',
     },
     deletePage: {
-      actionDescription: 'Escribe "Delete account" a continuación para continuar',
+      actionDescription: 'Escribe "Eliminar cuenta" a continuación para continuar',
       confirm: 'Eliminar cuenta',
       messageLine1: '¿Estas seguro que quieres eliminar tu cuenta?',
       messageLine2: 'Esta acción es permanente e irreversible.',

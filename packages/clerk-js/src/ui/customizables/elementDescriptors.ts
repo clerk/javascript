@@ -126,6 +126,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'userButtonPopoverActionButton',
   'userButtonPopoverActionButtonIconBox',
   'userButtonPopoverActionButtonIcon',
+  'userButtonPopoverCustomItemButton',
+  'userButtonPopoverCustomItemButtonIconBox',
+  'userButtonPopoverActionItemButtonIcon',
   'userButtonPopoverFooter',
   'userButtonPopoverFooterPagesLink',
 

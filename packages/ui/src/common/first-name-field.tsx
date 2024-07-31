@@ -1,13 +1,12 @@
 import * as Common from '@clerk/elements/common';
 import React from 'react';
 
-import * as Field from '../primitives/field';
+import { useLocalizations } from '~/hooks/use-localizations';
+import * as Field from '~/primitives/field';
 
-export function FirstNameField({
-  label = 'First name',
-  hintText = 'Optional',
-  ...props
-}: { label?: React.ReactNode; hintText?: string } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+export function FirstNameField(props: Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
+  const { t, translateError } = useLocalizations();
+
   return (
     <Common.Field
       name='firstName'
@@ -16,7 +15,8 @@ export function FirstNameField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {label} {!props?.required ? <Field.Hint>{hintText}</Field.Hint> : null}
+            {t('formFieldLabel__firstName')}{' '}
+            {!props?.required ? <Field.Hint>{t('formFieldHintText__optional')}</Field.Hint> : null}
           </Field.Label>
         </Common.Label>
         <Common.FieldState>
@@ -33,8 +33,8 @@ export function FirstNameField({
           }}
         </Common.FieldState>
         <Common.FieldError asChild>
-          {({ message }) => {
-            return <Field.Message intent='error'>{message}</Field.Message>;
+          {({ message, code }) => {
+            return <Field.Message intent='error'>{translateError(message, code, 'first_name')}</Field.Message>;
           }}
         </Common.FieldError>
       </Field.Root>

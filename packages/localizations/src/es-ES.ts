@@ -457,6 +457,8 @@ export const esES: LocalizationResource = {
     },
     start: {
       actionLink: 'Entrar',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: '¿Tienes una cuenta?',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Crea tu cuenta',
