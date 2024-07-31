@@ -21,10 +21,11 @@ describe('Session', () => {
       global.fetch?.mockClear();
     });
 
-    it('dispatches token:update event on initilization with lastActiveToken', () => {
+    it('dispatches token:update event on initialization with lastActiveToken', () => {
       new Session({
         status: 'active',
         id: 'session_1',
+
         object: 'session',
         user: createUser({}),
         last_active_organization_id: 'activeOrganization',
@@ -34,7 +35,7 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      expect(dispatchSpy).toBeCalledTimes(1);
+      expect(dispatchSpy).toHaveBeenCalledTimes(1);
       expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
     });
   });
@@ -66,7 +67,7 @@ describe('Session', () => {
 
       await session.getToken();
 
-      expect(dispatchSpy).toBeCalledTimes(1);
+      expect(dispatchSpy).toHaveBeenCalledTimes(1);
       expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
     });
 
@@ -105,7 +106,7 @@ describe('Session', () => {
 
         const token = await session.getToken();
 
-        expect(dispatchSpy).toBeCalledTimes(1);
+        expect(dispatchSpy).toHaveBeenCalledTimes(1);
         expect(token).toEqual(null);
       });
     });

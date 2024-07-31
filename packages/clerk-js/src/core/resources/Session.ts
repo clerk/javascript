@@ -157,6 +157,7 @@ export class Session extends BaseResource implements SessionResource {
       skipCache = false,
       organizationId = Session.clerk.organization?.id,
     } = options || {};
+
     if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
     }
@@ -164,21 +165,24 @@ export class Session extends BaseResource implements SessionResource {
     const tokenId = this.#getCacheId(template, organizationId);
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
+    // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
+    const shouldDispatchTokenUpdate = !template && options?.organizationId === Session.clerk.organization?.id;
+
     if (cachedEntry) {
       const cachedToken = await cachedEntry.tokenResolver;
-      if (!template) {
+      if (shouldDispatchTokenUpdate) {
         eventBus.dispatch(events.TokenUpdate, { token: cachedToken });
       }
       // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
     }
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
-    const params = { ...(organizationId && { organizationId }) };
+    // TODO: update template endpoint to accept organizationId
+    const params = template ? {} : { ...(organizationId && { organizationId }) };
     const tokenResolver = Token.create(path, params);
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {
-      // Dispatch tokenUpdate only for __session tokens and not JWT templates
-      if (!template) {
+      if (shouldDispatchTokenUpdate) {
         eventBus.dispatch(events.TokenUpdate, { token });
       }
       // Return null when raw string is empty to indicate that there it's signed-out
