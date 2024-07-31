@@ -222,7 +222,8 @@ export function SignInComponentLoaded() {
                         ) : null}
                       </div>
                     ) : null}
-
+                  </Card.Body>
+                  <Card.Actions>
                     <Common.Loading>
                       {isSubmitting => {
                         return (
@@ -266,7 +267,7 @@ export function SignInComponentLoaded() {
                         </Common.Loading>
                       ) : null
                     }
-                  </Card.Body>
+                  </Card.Actions>
                   {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
 
@@ -339,38 +340,38 @@ export function SignInComponentLoaded() {
                           ) : null
                         }
                       />
-
-                      <Common.Loading>
-                        {isSubmitting => {
-                          return (
-                            <>
-                              <SignIn.Action
-                                submit
-                                asChild
-                              >
-                                <Button
-                                  busy={isSubmitting}
-                                  disabled={isGlobalLoading}
-                                  iconEnd={<Icon.CaretRightLegacy />}
-                                  spinnerWhenBusy
-                                >
-                                  {t('formButtonPrimary')}
-                                </Button>
-                              </SignIn.Action>
-
-                              <SignIn.Action
-                                navigate='choose-strategy'
-                                asChild
-                              >
-                                <LinkButton disabled={isGlobalLoading || isSubmitting}>
-                                  {t('signIn.password.actionLink')}
-                                </LinkButton>
-                              </SignIn.Action>
-                            </>
-                          );
-                        }}
-                      </Common.Loading>
                     </Card.Body>
+
+                    <Common.Loading>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignIn.Action>
+
+                            <SignIn.Action
+                              navigate='choose-strategy'
+                              asChild
+                            >
+                              <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                {t('signIn.password.actionLink')}
+                              </LinkButton>
+                            </SignIn.Action>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignIn.Strategy>
 
                   <SignIn.Strategy name='passkey'>
@@ -408,50 +409,50 @@ export function SignInComponentLoaded() {
                           return <Alert>{message}</Alert>;
                         }}
                       </Common.GlobalError>
-
-                      <Common.Loading>
-                        {isSubmitting => {
-                          return (
-                            <>
-                              {
-                                // Note:
-                                // 1. Currently this triggers the loading
-                                //    spinner for "Continue" which is a little
-                                //    confusing. We could use a manual setState
-                                //    on click, but we'll need to find a way to
-                                //    clean up the state based on `isSubmitting`
-                                // 2. This button doesn't currently work; it's
-                                //    being tracked here:
-                                //    https://linear.app/clerk/issue/SDKI-172
-                              }
-
-                              <SignIn.Action
-                                submit
-                                asChild
-                              >
-                                <Button
-                                  busy={isSubmitting}
-                                  disabled={isGlobalLoading}
-                                  iconEnd={<Icon.CaretRightLegacy />}
-                                  spinnerWhenBusy
-                                >
-                                  {t('formButtonPrimary')}
-                                </Button>
-                              </SignIn.Action>
-
-                              <SignIn.Action
-                                navigate='choose-strategy'
-                                asChild
-                              >
-                                <LinkButton disabled={isGlobalLoading || isSubmitting}>
-                                  {t('footerActionLink__useAnotherMethod')}
-                                </LinkButton>
-                              </SignIn.Action>
-                            </>
-                          );
-                        }}
-                      </Common.Loading>
                     </Card.Body>
+
+                    <Common.Loading>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
+                            {
+                              // Note:
+                              // 1. Currently this triggers the loading
+                              //    spinner for "Continue" which is a little
+                              //    confusing. We could use a manual setState
+                              //    on click, but we'll need to find a way to
+                              //    clean up the state based on `isSubmitting`
+                              // 2. This button doesn't currently work; it's
+                              //    being tracked here:
+                              //    https://linear.app/clerk/issue/SDKI-172
+                            }
+
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignIn.Action>
+
+                            <SignIn.Action
+                              navigate='choose-strategy'
+                              asChild
+                            >
+                              <LinkButton disabled={isGlobalLoading || isSubmitting}>
+                                {t('footerActionLink__useAnotherMethod')}
+                              </LinkButton>
+                            </SignIn.Action>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignIn.Strategy>
 
                   <SignIn.Strategy name='backup_code'>
@@ -474,41 +475,41 @@ export function SignInComponentLoaded() {
                       </Common.GlobalError>
 
                       <BackupCodeField />
-
-                      <Common.Loading>
-                        {isSubmitting => {
-                          return (
-                            <>
-                              <SignIn.Action
-                                submit
-                                asChild
-                              >
-                                <Button
-                                  busy={isSubmitting}
-                                  disabled={isGlobalLoading}
-                                  iconEnd={<Icon.CaretRightLegacy />}
-                                  spinnerWhenBusy
-                                >
-                                  {t('formButtonPrimary')}
-                                </Button>
-                              </SignIn.Action>
-
-                              <SignIn.Action
-                                navigate='choose-strategy'
-                                asChild
-                              >
-                                <LinkButton
-                                  disabled={isGlobalLoading || isSubmitting}
-                                  type='button'
-                                >
-                                  {t('footerActionLink__useAnotherMethod')}
-                                </LinkButton>
-                              </SignIn.Action>
-                            </>
-                          );
-                        }}
-                      </Common.Loading>
                     </Card.Body>
+
+                    <Common.Loading>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignIn.Action>
+
+                            <SignIn.Action
+                              navigate='choose-strategy'
+                              asChild
+                            >
+                              <LinkButton
+                                disabled={isGlobalLoading || isSubmitting}
+                                type='button'
+                              >
+                                {t('footerActionLink__useAnotherMethod')}
+                              </LinkButton>
+                            </SignIn.Action>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignIn.Strategy>
 
                   <SignIn.Strategy name='email_code'>
@@ -569,35 +570,35 @@ export function SignInComponentLoaded() {
                           </SignIn.Action>
                         }
                       />
-                      <Common.Loading scope='step:verifications'>
-                        {isSubmitting => {
-                          return (
-                            <div className='flex flex-col gap-4'>
-                              <SignIn.Action
-                                submit
-                                asChild
-                              >
-                                <Button
-                                  busy={isSubmitting}
-                                  disabled={isGlobalLoading}
-                                  iconEnd={<Icon.CaretRightLegacy />}
-                                  spinnerWhenBusy
-                                >
-                                  {t('formButtonPrimary')}
-                                </Button>
-                              </SignIn.Action>
-
-                              <SignIn.Action
-                                asChild
-                                navigate='choose-strategy'
-                              >
-                                <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
-                              </SignIn.Action>
-                            </div>
-                          );
-                        }}
-                      </Common.Loading>
                     </Card.Body>
+                    <Common.Loading scope='step:verifications'>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignIn.Action>
+
+                            <SignIn.Action
+                              asChild
+                              navigate='choose-strategy'
+                            >
+                              <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                            </SignIn.Action>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignIn.Strategy>
 
                   <SignIn.Strategy name='phone_code'>
@@ -658,35 +659,36 @@ export function SignInComponentLoaded() {
                           </SignIn.Action>
                         }
                       />
-                      <Common.Loading scope='step:verifications'>
-                        {isSubmitting => {
-                          return (
-                            <div className='flex flex-col gap-4'>
-                              <SignIn.Action
-                                submit
-                                asChild
-                              >
-                                <Button
-                                  busy={isSubmitting}
-                                  disabled={isGlobalLoading}
-                                  iconEnd={<Icon.CaretRightLegacy />}
-                                  spinnerWhenBusy
-                                >
-                                  {t('formButtonPrimary')}
-                                </Button>
-                              </SignIn.Action>
-
-                              <SignIn.Action
-                                asChild
-                                navigate='choose-strategy'
-                              >
-                                <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
-                              </SignIn.Action>
-                            </div>
-                          );
-                        }}
-                      </Common.Loading>
                     </Card.Body>
+
+                    <Common.Loading scope='step:verifications'>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignIn.Action>
+
+                            <SignIn.Action
+                              asChild
+                              navigate='choose-strategy'
+                            >
+                              <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                            </SignIn.Action>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignIn.Strategy>
 
                   <SignIn.Strategy name='email_link'>
@@ -741,14 +743,15 @@ export function SignInComponentLoaded() {
                       >
                         <LinkButton type='button'>{t('signIn.emailLink.resendButton')}</LinkButton>
                       </SignIn.Action>
-
+                    </Card.Body>
+                    <Card.Actions>
                       <SignIn.Action
                         navigate='choose-strategy'
                         asChild
                       >
                         <LinkButton>{t('backButton')}</LinkButton>
                       </SignIn.Action>
-                    </Card.Body>
+                    </Card.Actions>
                   </SignIn.Strategy>
 
                   <SignIn.Strategy name='reset_password_email_code'>
@@ -787,9 +790,12 @@ export function SignInComponentLoaded() {
                           </SignIn.Action>
                         }
                       />
-                      <Common.Loading scope='step:verifications'>
-                        {isSubmitting => {
-                          return (
+                    </Card.Body>
+
+                    <Common.Loading scope='step:verifications'>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
                             <SignIn.Action
                               submit
                               asChild
@@ -803,10 +809,10 @@ export function SignInComponentLoaded() {
                                 {t('formButtonPrimary')}
                               </Button>
                             </SignIn.Action>
-                          );
-                        }}
-                      </Common.Loading>
-                    </Card.Body>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignIn.Strategy>
 
                   <SignIn.Strategy name='totp'>
@@ -832,35 +838,36 @@ export function SignInComponentLoaded() {
                         label={t('signIn.totpMfa.formTitle')}
                         disabled={isGlobalLoading}
                       />
-                      <Common.Loading scope='step:verifications'>
-                        {isSubmitting => {
-                          return (
-                            <div className='flex flex-col gap-4'>
-                              <SignIn.Action
-                                submit
-                                asChild
-                              >
-                                <Button
-                                  busy={isSubmitting}
-                                  disabled={isGlobalLoading}
-                                  iconEnd={<Icon.CaretRightLegacy />}
-                                  spinnerWhenBusy
-                                >
-                                  {t('formButtonPrimary')}
-                                </Button>
-                              </SignIn.Action>
-
-                              <SignIn.Action
-                                asChild
-                                navigate='choose-strategy'
-                              >
-                                <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
-                              </SignIn.Action>
-                            </div>
-                          );
-                        }}
-                      </Common.Loading>
                     </Card.Body>
+
+                    <Common.Loading scope='step:verifications'>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading}
+                                iconEnd={<Icon.CaretRightLegacy />}
+                                spinnerWhenBusy
+                              >
+                                {t('formButtonPrimary')}
+                              </Button>
+                            </SignIn.Action>
+
+                            <SignIn.Action
+                              asChild
+                              navigate='choose-strategy'
+                            >
+                              <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
+                            </SignIn.Action>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignIn.Strategy>
                   {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
@@ -1167,53 +1174,56 @@ export function SignInComponentLoaded() {
                         return <Alert>{message}</Alert>;
                       }}
                     </Common.GlobalError>
-                    <div className='flex flex-col justify-center gap-6'>
-                      <div className='flex flex-col justify-center gap-4'>
-                        <PasswordField
-                          validatePassword
-                          name='password'
-                          label={t('formFieldLabel__newPassword')}
-                        />
-                        <PasswordField
-                          name='confirmPassword'
-                          label={t('formFieldLabel__confirmPassword')}
-                        />
 
-                        <CheckboxField
-                          name='signOutOfOtherSessions'
-                          label={t('formFieldLabel__signOutOfOtherSessions')}
-                          defaultChecked
-                        />
-                      </div>
-                      <Common.Loading>
-                        {isSubmitting => {
-                          return (
-                            <div className='flex flex-col justify-center gap-4'>
-                              <SignIn.Action
-                                submit
-                                asChild
-                              >
-                                <Button
-                                  busy={isSubmitting}
-                                  disabled={isGlobalLoading || isSubmitting}
-                                  spinnerWhenBusy
-                                >
-                                  {t('signIn.resetPassword.formButtonPrimary')}
-                                </Button>
-                              </SignIn.Action>
+                    <div className='flex flex-col justify-center gap-4'>
+                      <PasswordField
+                        validatePassword
+                        name='password'
+                        label={t('formFieldLabel__newPassword')}
+                      />
+                      <PasswordField
+                        name='confirmPassword'
+                        label={t('formFieldLabel__confirmPassword')}
+                      />
 
-                              <SignIn.Action
-                                navigate='start'
-                                asChild
-                              >
-                                <LinkButton>{t('backButton')}</LinkButton>
-                              </SignIn.Action>
-                            </div>
-                          );
-                        }}
-                      </Common.Loading>
+                      <CheckboxField
+                        name='signOutOfOtherSessions'
+                        label={t('formFieldLabel__signOutOfOtherSessions')}
+                        defaultChecked
+                      />
                     </div>
                   </Card.Body>
+
+                  <Card.Actions>
+                    <Common.Loading>
+                      {isSubmitting => {
+                        return (
+                          <>
+                            <SignIn.Action
+                              submit
+                              asChild
+                            >
+                              <Button
+                                busy={isSubmitting}
+                                disabled={isGlobalLoading || isSubmitting}
+                                spinnerWhenBusy
+                              >
+                                {t('signIn.resetPassword.formButtonPrimary')}
+                              </Button>
+                            </SignIn.Action>
+
+                            <SignIn.Action
+                              navigate='start'
+                              asChild
+                            >
+                              <LinkButton>{t('backButton')}</LinkButton>
+                            </SignIn.Action>
+                          </>
+                        );
+                      }}
+                    </Common.Loading>
+                  </Card.Actions>
+
                   {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded} />

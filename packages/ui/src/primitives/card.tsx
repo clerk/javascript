@@ -79,7 +79,7 @@ export const Logo = React.forwardRef(function Logo(
     />
   );
   return (
-    <div className='z-1 mb-4 flex size-8 justify-center'>
+    <div className='z-1 mb-5 flex size-8 justify-center'>
       {href ? (
         <a
           href={href}
@@ -140,6 +140,23 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   );
 });
 
+export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Actions(
+  { children, className, ...props },
+  forwardedRef,
+) {
+  return (
+    <div
+      ref={forwardedRef}
+      data-card-actions=''
+      x
+      {...props}
+      className={cx('z-1 flex flex-col gap-3', className)}
+    >
+      {children}
+    </div>
+  );
+});
+
 export const Banner = React.forwardRef(function CardBanner(
   { children, className, ...props }: React.HTMLAttributes<HTMLParagraphElement>,
   forwardedRef: React.ForwardedRef<HTMLParagraphElement>,
@@ -184,8 +201,12 @@ export const Footer = React.forwardRef(function Footer(
     >
       {children}
       {branded ? (
-        <div className='grid place-content-center px-6 py-4'>
-          <p className='text-gray-a11 inline-flex items-center gap-x-1 text-sm font-medium'>
+        <div className='grid place-content-center p-4'>
+          <p
+            // Note:
+            // We don't use `items-center` here for a more optical fit
+            className='text-gray-a11 inline-flex gap-2 text-sm font-medium'
+          >
             Secured by{' '}
             <a
               aria-label='Clerk logo'
