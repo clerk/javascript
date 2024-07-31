@@ -173,9 +173,17 @@ ${error.getFullMessage()}`,
     if (isRequestEligibleForHandshake(authenticateContext)) {
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      return handshake(authenticateContext, reason, message, headers ?? buildRedirectToHandshake());
+      const handshakeHeaders = headers ?? buildRedirectToHandshake();
+      // Introduce the mechanism to protect for infinite handshake redirect loops
+      // using a cookie and returning true if it's infinite redirect loop or false if we can
+      // proceed with triggering handshake.
+      const isRedirectLoop = setHandshakeInfiniteRedirectionLoopHeaders(handshakeHeaders);
+      if (isRedirectLoop) {
+        return signedOut(authenticateContext, reason, message);
+      }
+      return handshake(authenticateContext, reason, message, handshakeHeaders);
     }
-    return signedOut(authenticateContext, reason, message, new Headers());
+    return signedOut(authenticateContext, reason, message);
   }
 
   async function authenticateRequestWithTokenInHeader() {
@@ -191,6 +199,20 @@ ${error.getFullMessage()}`,
     } catch (err) {
       return handleError(err, 'header');
     }
+  }
+
+  // We want to prevent infinite handshake redirection loops.
+  // We incrementally set a `__clerk_redirection_loop` cookie, and when it loops 3 times, we throw an error.
+  // We also utilize the `referer` header to skip the prefetch requests.
+  function setHandshakeInfiniteRedirectionLoopHeaders(headers: Headers): boolean {
+    if (authenticateContext.handshakeRedirectLoopCounter === 3) {
+      return true;
+    }
+
+    const newCounterValue = authenticateContext.handshakeRedirectLoopCounter + 1;
+    const cookieName = constants.Cookies.InfiniteRedirectionLoopCookie;
+    headers.append('Set-Cookie', `${cookieName}=${newCounterValue}; SameSite=Lax; HttpOnly; Max-Age=3`);
+    return false;
   }
 
   function handleHandshakeTokenVerificationErrorInDevelopment(error: TokenVerificationError) {
@@ -223,12 +245,11 @@ ${error.getFullMessage()}`,
       error.reason === TokenVerificationErrorReason.JWKKidMismatch ||
       error.reason === TokenVerificationErrorReason.JWKFailedToResolve
     ) {
-      // Let the request go through and eventually retry another handshake
-      // TODO: set a cookie so break the infinite loop
+      // Let the request go through and eventually retry another handshake,
+      // only if needed - a handshake will be thrown if another rule matches
       return;
     }
-    // TODO: if N retries reached, return signedOut
-    const msg = `Clerk: Handshake token verification failed with "${error.reason}"`;
+    const msg = `Clerk: Handshake token verification failed with "${error.getFullMessage()}"`;
     return signedOut(authenticateContext, AuthErrorReason.UnexpectedError, msg);
   }
 
@@ -249,10 +270,15 @@ ${error.getFullMessage()}`,
       try {
         return await resolveHandshake();
       } catch (error) {
-        if (error instanceof TokenVerificationError) {
-          authenticateContext.instanceType === 'development'
-            ? handleHandshakeTokenVerificationErrorInDevelopment(error)
-            : handleHandshakeTokenVerificationErrorInProduction(error);
+        if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'development') {
+          handleHandshakeTokenVerificationErrorInDevelopment(error);
+        }
+
+        if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'production') {
+          const terminateEarly = handleHandshakeTokenVerificationErrorInProduction(error);
+          if (terminateEarly) {
+            return terminateEarly;
+          }
         }
       }
     }

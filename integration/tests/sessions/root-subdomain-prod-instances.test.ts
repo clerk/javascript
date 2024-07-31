@@ -311,7 +311,7 @@ test.describe('root and subdomain production apps @sessions', () => {
    * sub2.test.com <> clerk-instance-2
    *
    */
-  test.describe('multiple apps same domain for different production instances', () => {
+  test.describe('multiple apps different same-level subdomains  for different production instances', () => {
     const hosts = ['sub-1.multiple-apps-e2e.clerk.app', 'sub-2.multiple-apps-e2e.clerk.app'];
     let fakeUsers: FakeUser[];
     let server: Server;
