@@ -10,7 +10,7 @@ module.exports = {
   injectGlobals: true,
   roots: ['<rootDir>/src'],
   testMatch: ['**/?(*.)+(spec|test).+(ts|tsx|js)'],
-  transform: { '^.+\\.m?tsx?$': 'ts-jest' },
+  transform: { '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }] },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testPathIgnorePatterns: ['/node_modules/', '/jest/', '/.turbo', '/dist/', '/examples'],
 };

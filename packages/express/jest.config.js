@@ -9,7 +9,7 @@ module.exports = {
   roots: ['<rootDir>/src'],
   testMatch: ['**/?(*.)+(test).+(ts)'],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }],
   },
   setupFiles: ['<rootDir>/jest.setup.js'],
   collectCoverage: true,
