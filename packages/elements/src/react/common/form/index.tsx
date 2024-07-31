@@ -36,11 +36,10 @@ import {
   useFormSelector,
   useFormStore,
 } from '~/internals/machines/form/form.context';
-import type { PasswordConfig } from '~/react/hooks/use-password.hook';
 import { usePassword } from '~/react/hooks/use-password.hook';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 import { useSignInPasskeyAutofill } from '~/react/sign-in/context/router.context';
-import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
+import type { ErrorCodeOrTuple } from '~/react/utils/generate-password-error-text';
 import { isReactFragment } from '~/react/utils/is-react-fragment';
 
 import type { OTPInputProps } from './otp';
@@ -234,7 +233,7 @@ const useInput = ({
         field: { name, feedback: { type: 'success', message: 'Your password meets all the necessary requirements.' } },
       });
     },
-    onValidationError: (error, keys, config) => {
+    onValidationError: (error, keys) => {
       if (error) {
         ref.send({
           type: 'FIELD.FEEDBACK.SET',
@@ -244,18 +243,17 @@ const useInput = ({
               type: 'error',
               message: new ClerkElementsFieldError('password-validation-error', error),
               codes: keys,
-              config,
             },
           },
         });
       }
     },
-    onValidationWarning: (warning, keys, config) =>
+    onValidationWarning: (warning, keys) =>
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'warning', message: warning, codes: keys, config } },
+        field: { name, feedback: { type: 'warning', message: warning, codes: keys } },
       }),
-    onValidationInfo: (info, keys, config) => {
+    onValidationInfo: (info, keys) => {
       // TODO: If input is not focused, make this info an error
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
@@ -265,7 +263,6 @@ const useInput = ({
             type: 'info',
             message: info,
             codes: keys,
-            config,
           },
         },
       });
@@ -523,8 +520,7 @@ type FieldStateRenderFn = {
   children: (state: {
     state: FieldStates;
     message: string | undefined;
-    codes: ErrorMessagesKey[] | undefined;
-    config?: PasswordConfig;
+    codes: ErrorCodeOrTuple[] | undefined;
   }) => React.ReactNode;
 };
 
@@ -565,9 +561,8 @@ function FieldState({ children }: FieldStateRenderFn) {
 
   const message = feedback?.message instanceof ClerkElementsFieldError ? feedback.message.message : feedback?.message;
   const codes = feedback?.codes;
-  const config = feedback && 'config' in feedback ? feedback?.config : undefined;
 
-  const fieldState = { state: enrichFieldState(validity, state), message, codes, config };
+  const fieldState = { state: enrichFieldState(validity, state), message, codes };
 
   return children(fieldState);
 }

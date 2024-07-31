@@ -273,13 +273,11 @@ const errorMessages: Record<keyof Omit<ComplexityErrors, 'allowed_special_charac
 };
 
 export const translatePasswordError = ({
-  config,
   failedValidations,
   locale,
   t,
 }: {
-  config: UsePasswordComplexityConfig;
-  failedValidations: string[];
+  failedValidations: (string | [string, Record<string, string | number>])[];
   locale: string;
   t: ReturnType<typeof makeLocalizeable>['t'];
 }) => {
@@ -295,16 +293,22 @@ export const translatePasswordError = ({
     return failedValidations.map(v => t(v as any)).join(' ');
   }
 
-  // show min length error first by itself
-  const hasMinLengthError = failedValidations?.includes('min_length') || false;
+  // show min length error first by itself. Since the min_length error will always be a tuple, we check for both
+  // isArray and that the first element is min_length
+  const hasMinLengthError = failedValidations?.some(v => Array.isArray(v) && v[0] === 'min_length') || false;
 
   const messages = failedValidations
-    .filter(k => (hasMinLengthError ? k === 'min_length' : true))
+    .filter(k => (hasMinLengthError ? Array.isArray(k) && k[0] === 'min_length' : true))
     .map(k => {
-      const localizedKey = errorMessages[k as keyof typeof errorMessages];
-      if (Array.isArray(localizedKey)) {
+      const key = Array.isArray(k) ? k[0] : k;
+      const localizedKey = errorMessages[key as keyof typeof errorMessages];
+      if (Array.isArray(localizedKey) && Array.isArray(k)) {
         const [lk, attr] = localizedKey;
-        return t(lk as any, { [attr]: config[k as keyof UsePasswordComplexityConfig] });
+        // Because our translations use `{{ length }}` instead of `{{ min_length }}` and `{{ max_length}}`, we simply
+        // take the value of the first key. This is safe to do currently because the tuple object will only ever
+        // contain one key. In the future when we update our translated strings, this can be changed to simply pass
+        // through k[1] as the second argument to `t()`.
+        return t(lk as any, { [attr]: Object.values(k[1])[0] });
       }
       return t(localizedKey as any);
     });

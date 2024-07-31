@@ -69,7 +69,7 @@ export function PasswordField({
         </Common.FieldState>
         {props.validatePassword ? (
           <Common.FieldState>
-            {({ state, codes, config }) => {
+            {({ state, codes }) => {
               if (state === 'idle') {
                 return;
               }
@@ -88,7 +88,7 @@ export function PasswordField({
                   id={id}
                   intent={state}
                 >
-                  {translatePasswordError({ config, failedValidations: codes, locale, t })}
+                  {translatePasswordError({ failedValidations: codes, locale, t })}
                 </Field.Message>
               );
             }}
