@@ -682,7 +682,7 @@ export type SetActiveParams = {
   session?: ActiveSessionResource | string | null;
 
   /**
-   * The organization resource or organization id (string version) to be set as active in the current session.
+   * The organization resource or organization ID/slug (string version) to be set as active in the current session.
    * If `null`, the currently active organization is removed as active.
    */
   organization?: OrganizationResource | string | null;
