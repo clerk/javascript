@@ -148,7 +148,6 @@ export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
     <div
       ref={forwardedRef}
       data-card-actions=''
-      x
       {...props}
       className={cx('z-1 flex flex-col gap-3', className)}
     >
