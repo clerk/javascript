@@ -3,7 +3,6 @@
 "@clerk/backend": patch
 "@clerk/express": patch
 "@clerk/fastify": patch
-"gatsby-plugin-clerk": patch
 "@clerk/nextjs": patch
 "@clerk/remix": patch
 "@clerk/clerk-sdk-node": patch
