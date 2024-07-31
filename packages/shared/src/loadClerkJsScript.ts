@@ -102,7 +102,7 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
-  const version = versionSelector(clerkJSVersion, packageVersion);
+  const version = versionSelector(clerkJSVersion, _packageVersion);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 
