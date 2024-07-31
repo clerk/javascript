@@ -52,7 +52,7 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
       ref={forwardedRef}
       data-card-header=''
       {...props}
-      className={cx('z-1 flex flex-col gap-1 text-center', className)}
+      className={cx('z-1 flex flex-col items-center gap-1 text-center', className)}
     >
       {children}
     </div>
@@ -75,11 +75,11 @@ export const Logo = React.forwardRef(function Logo(
       data-card-logo=''
       crossOrigin='anonymous'
       {...props}
-      className={cx('max-h-24 max-w-24 object-contain', className)}
+      className={cx('size-full object-contain', className)}
     />
   );
   return (
-    <div className='z-1 mb-4 flex justify-center'>
+    <div className='z-1 mb-4 flex size-8 justify-center'>
       {href ? (
         <a
           href={href}
