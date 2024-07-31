@@ -8,7 +8,7 @@ exports[`constants from environment variables 1`] = `
     "ClientUat": "__client_uat",
     "DevBrowser": "__clerk_db_jwt",
     "Handshake": "__clerk_handshake",
-    "InfiniteRedirectionLoopCookie": "__clerk_redirection_loop",
+    "RedirectCount": "__clerk_redirect_count",
     "Session": "__session",
   },
   "Headers": {

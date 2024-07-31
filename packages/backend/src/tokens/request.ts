@@ -179,6 +179,8 @@ ${error.getFullMessage()}`,
       // proceed with triggering handshake.
       const isRedirectLoop = setHandshakeInfiniteRedirectionLoopHeaders(handshakeHeaders);
       if (isRedirectLoop) {
+        const msg = `Clerk: Refreshing the session token resulted in an infinite redirect loop. This usually means that your Clerk instance keys do not match - make sure to copy the correct publishable and secret keys from the Clerk dashboard.`;
+        console.log(msg);
         return signedOut(authenticateContext, reason, message);
       }
       return handshake(authenticateContext, reason, message, handshakeHeaders);
@@ -210,7 +212,7 @@ ${error.getFullMessage()}`,
     }
 
     const newCounterValue = authenticateContext.handshakeRedirectLoopCounter + 1;
-    const cookieName = constants.Cookies.InfiniteRedirectionLoopCookie;
+    const cookieName = constants.Cookies.RedirectCount;
     headers.append('Set-Cookie', `${cookieName}=${newCounterValue}; SameSite=Lax; HttpOnly; Max-Age=3`);
     return false;
   }
@@ -227,30 +229,6 @@ ${error.getFullMessage()}`,
       throw new Error(msg);
     }
     throw new Error(`Clerk: Handshake token verification failed: ${error.getFullMessage()}.`);
-  }
-
-  function handleHandshakeTokenVerificationErrorInProduction(error: TokenVerificationError) {
-    // In production, the handshake token is being transferred as a cookie, so there is a possibility of collision
-    // with a handshake token of another app running on the same etld+1 domain.
-    // For example, if one app is running on sub1.clerk.com and another on sub2.clerk.com, the handshake token
-    // cookie for both apps will be set on etld+1 (clerk.com) so there's a possibility that one app will accidentally
-    // use the handshake token of a different app during the handshake flow.
-    // In this scenario, verification will fail with TokenInvalidSignature. In contrast to the development case,
-    // we need to allow the flow to continue so the app eventually retries another handshake with the correct token.
-    // We need to make sure, however, that we don't allow the flow to continue indefinitely, so we throw an error after X
-    // retries to avoid an infinite loop. An infinite loop can happen if the customer switched Clerk keys for their prod app.
-    if (
-      error.reason === TokenVerificationErrorReason.TokenInvalidSignature ||
-      error.reason === TokenVerificationErrorReason.InvalidSecretKey ||
-      error.reason === TokenVerificationErrorReason.JWKKidMismatch ||
-      error.reason === TokenVerificationErrorReason.JWKFailedToResolve
-    ) {
-      // Let the request go through and eventually retry another handshake,
-      // only if needed - a handshake will be thrown if another rule matches
-      return;
-    }
-    const msg = `Clerk: Handshake token verification failed with "${error.getFullMessage()}"`;
-    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError, msg);
   }
 
   async function authenticateRequestWithTokenInCookie() {
@@ -270,19 +248,22 @@ ${error.getFullMessage()}`,
       try {
         return await resolveHandshake();
       } catch (error) {
+        // In production, the handshake token is being transferred as a cookie, so there is a possibility of collision
+        // with a handshake token of another app running on the same etld+1 domain.
+        // For example, if one app is running on sub1.clerk.com and another on sub2.clerk.com, the handshake token
+        // cookie for both apps will be set on etld+1 (clerk.com) so there's a possibility that one app will accidentally
+        // use the handshake token of a different app during the handshake flow.
+        // In this scenario, verification will fail with TokenInvalidSignature. In contrast to the development case,
+        // we need to allow the flow to continue so the app eventually retries another handshake with the correct token.
+        // We need to make sure, however, that we don't allow the flow to continue indefinitely, so we throw an error after X
+        // retries to avoid an infinite loop. An infinite loop can happen if the customer switched Clerk keys for their prod app.
+
+        // Check the handleHandshakeTokenVerificationErrorInDevelopment function for the development case.
         if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'development') {
           handleHandshakeTokenVerificationErrorInDevelopment(error);
         }
-
-        if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'production') {
-          const terminateEarly = handleHandshakeTokenVerificationErrorInProduction(error);
-          if (terminateEarly) {
-            return terminateEarly;
-          }
-        }
       }
     }
-
     /**
      * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
      */

@@ -19,7 +19,7 @@ const Cookies = {
   ClientUat: '__client_uat',
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
-  InfiniteRedirectionLoopCookie: '__clerk_redirection_loop',
+  RedirectCount: '__clerk_redirect_count',
 } as const;
 
 const QueryParameters = {
