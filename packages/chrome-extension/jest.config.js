@@ -10,7 +10,7 @@ module.exports = {
 
   moduleDirectories: ['node_modules', '<rootDir>/src'],
   transform: {
-    '^.+\\.m?tsx?$': ['ts-jest', { diagnostics: false }],
+    '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json', diagnostics: false }],
   },
   clearMocks: true,
   testRegex: ['/src/.*.test.[jt]sx?$'],

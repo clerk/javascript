@@ -5,6 +5,7 @@
     "jsx": "react",
     "noImplicitReturns": false,
     "strict": false,
-    "importHelpers": false
+    "importHelpers": false,
+    "sourceMap": true
   }
 }

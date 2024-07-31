@@ -13,7 +13,7 @@ module.exports = {
   roots: ['<rootDir>'],
   testMatch: ['**/?(*.)+(spec|test).+(ts|tsx|js)'],
   testEnvironment: 'jsdom',
-  transform: { '^.+\\.m?tsx?$': 'ts-jest' },
+  transform: { '^.+\\.m?tsx?$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }] },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testPathIgnorePatterns: ['/node_modules/', '/jest/', '/.turbo', '/dist/', '/examples'],
   modulePaths: [compilerOptions.baseUrl],
