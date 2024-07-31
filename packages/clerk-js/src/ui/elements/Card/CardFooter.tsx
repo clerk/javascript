@@ -12,12 +12,14 @@ type CardFooterProps = PropsOfComponent<typeof Flex> & {
 };
 export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((props, ref) => {
   const { children, isProfileFooter = false, sx, ...rest } = props;
-  const { branded } = useEnvironment().displayConfig;
+  const { displayConfig, isDevelopmentOrStaging } = useEnvironment();
+  const { branded } = displayConfig;
+  const withDevModeNotice = isDevelopmentOrStaging();
   const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
   const sponsorOrLinksExist = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
   const showSponsorAndLinks = isProfileFooter ? branded : sponsorOrLinksExist;
 
-  if (!children && !showSponsorAndLinks) {
+  if (!children && !(showSponsorAndLinks || withDevModeNotice)) {
     return null;
   }
 
@@ -64,7 +66,13 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
     >
       {children}
 
-      {showSponsorAndLinks && <Card.ClerkAndPagesTag withFooterPages={!isProfileFooter} />}
+      <Card.ClerkAndPagesTag
+        withFooterPages={showSponsorAndLinks && !isProfileFooter}
+        devModeNoticeSx={t => ({
+          padding: t.space.$none,
+        })}
+        withDevOverlay
+      />
     </Flex>
   );
 });

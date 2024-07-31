@@ -143,6 +143,7 @@ export type ElementsConfig = {
   cardBox: WithOptions;
   card: WithOptions;
   actionCard: WithOptions;
+  popoverBox: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
