@@ -3,7 +3,7 @@ import { loadScript } from '../loadScript';
 
 jest.mock('../loadScript');
 
-describe('loadClerkJsScript()', () => {
+describe('loadClerkJsScript(options)', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
 
   beforeEach(() => {

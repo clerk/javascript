@@ -22,11 +22,17 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   domain?: string;
 };
 
-/*
- * Loads the Clerk JS script.
+/**
+ * Hotloads the Clerk JS script.
+ *
+ * @param options - The options to use when building the Clerk JS script URL.
+ * @param packageVersion - The version of `@clerk/clerk-js` that will be used if an explicit version is not provided.
+ *
+ * @example
+ * loadClerkJsScript({ publishableKey: 'pk_' }, '1.0.0');
  */
-const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions, packageVersion: string) => {
-  const { publishableKey } = opts;
+const loadClerkJsScript = async (options: LoadClerkJsScriptOptions, packageVersion?: string) => {
+  const { publishableKey } = options;
 
   if (!publishableKey) {
     throw new Error(MISSING_PUBLISHABLE_KEY_ERROR);
@@ -46,19 +52,25 @@ const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions, packageVersion:
     });
   }
 
-  return loadScript(clerkJsScriptUrl(opts, packageVersion), {
+  return loadScript(clerkJsScriptUrl(options, packageVersion), {
     async: true,
     crossOrigin: 'anonymous',
-    beforeLoad: applyClerkJsScriptAttributes(opts),
+    beforeLoad: applyClerkJsScriptAttributes(options),
   }).catch(() => {
     throw new Error(FAILED_TO_LOAD_ERROR);
   });
 };
 
-/*
- * Generates the Clerk JS script URL.
+/**
+ * Generates a Clerk JS script URL.
+ *
+ * @param options - The options to use when building the Clerk JS script URL.
+ * @param packageVersion - The version of `@clerk/clerk-js` that will be used if an explicit version is not provided.
+ *
+ * @example
+ * clerkJsScriptUrl({ publishableKey: 'pk_' }, '1.0.0');
  */
-const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions, packageVersion: string) => {
+const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions, packageVersion?: string) => {
   const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
