@@ -77,7 +77,6 @@ type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<typeof
 type LocalizationKeyToParams<P extends DefaultLocalizationKey> = GetICUArgs<LocalizationKeyToValue<P>>;
 
 const readObjectPath = <O extends Record<string, any>>(obj: O, path: string) => {
-  console.log({ path });
   const props = (path || '').split('.');
   let cur = obj;
   for (let i = 0; i < props.length; i++) {
