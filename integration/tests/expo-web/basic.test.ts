@@ -36,9 +36,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
 
-      await u.page.pause();
+      await u.po.signIn.waitForMounted();
+
       await u.po.signIn.setIdentifier(fakeUser.email);
-      await u.po.signIn.continue();
       await u.po.signIn.setPassword(fakeUser.password);
       await u.po.signIn.continue();
       await u.po.expect.toBeSignedIn();
