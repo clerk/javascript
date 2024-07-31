@@ -1,11 +1,11 @@
+import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/types';
 
 import { $clerk, $csrState } from '../stores/internal';
-import type { AstroClerkIntegrationParams, AstroClerkUpdateOptions } from '../types';
+import type { AstroClerkCreateInstanceParams, AstroClerkUpdateOptions } from '../types';
 import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
-import { waitForClerkScript } from './utils/loadClerkJSScript';
 
 let initOptions: ClerkOptions | undefined;
 
@@ -35,10 +35,10 @@ function createNavigationHandler(
  */
 const createClerkInstance = runOnce(createClerkInstanceInternal);
 
-async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams) {
+async function createClerkInstanceInternal(options: AstroClerkCreateInstanceParams) {
   let clerkJSInstance = window.Clerk;
   if (!clerkJSInstance) {
-    await waitForClerkScript();
+    await loadClerkJsScript(options);
 
     if (!window.Clerk) {
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
@@ -47,7 +47,6 @@ async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams
   }
 
   if (!$clerk.get()) {
-    // @ts-ignore
     $clerk.set(clerkJSInstance);
   }
 
@@ -57,8 +56,7 @@ async function createClerkInstanceInternal(options?: AstroClerkIntegrationParams
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
   };
 
-  // TODO: Update Clerk type from @clerk/types to include this method
-  return (clerkJSInstance as any)
+  return clerkJSInstance
     .load(initOptions)
     .then(() => {
       $csrState.setKey('isLoaded', true);

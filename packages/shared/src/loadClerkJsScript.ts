@@ -20,18 +20,23 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;
   domain?: string;
+  /**
+   * @internal
+   * The version of `@clerk/clerk-js` that will be used if an explicit version
+   * is not provided. Used for prerelease tags.
+   */
+  _packageVersion?: string;
 };
 
 /**
  * Hotloads the Clerk JS script.
  *
  * @param options - The options to use when building the Clerk JS script URL.
- * @param packageVersion - The version of `@clerk/clerk-js` that will be used if an explicit version is not provided.
  *
  * @example
- * loadClerkJsScript({ publishableKey: 'pk_' }, '1.0.0');
+ * loadClerkJsScript({ publishableKey: 'pk_' });
  */
-const loadClerkJsScript = async (options: LoadClerkJsScriptOptions, packageVersion?: string) => {
+const loadClerkJsScript = async (options: LoadClerkJsScriptOptions) => {
   const { publishableKey } = options;
 
   if (!publishableKey) {
@@ -52,7 +57,7 @@ const loadClerkJsScript = async (options: LoadClerkJsScriptOptions, packageVersi
     });
   }
 
-  return loadScript(clerkJsScriptUrl(options, packageVersion), {
+  return loadScript(clerkJsScriptUrl(options), {
     async: true,
     crossOrigin: 'anonymous',
     beforeLoad: applyClerkJsScriptAttributes(options),
@@ -65,13 +70,12 @@ const loadClerkJsScript = async (options: LoadClerkJsScriptOptions, packageVersi
  * Generates a Clerk JS script URL.
  *
  * @param options - The options to use when building the Clerk JS script URL.
- * @param packageVersion - The version of `@clerk/clerk-js` that will be used if an explicit version is not provided.
  *
  * @example
- * clerkJsScriptUrl({ publishableKey: 'pk_' }, '1.0.0');
+ * clerkJsScriptUrl({ publishableKey: 'pk_' });
  */
-const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions, packageVersion?: string) => {
-  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
+const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
+  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey, _packageVersion } = opts;
 
   if (clerkJSUrl) {
     return clerkJSUrl;
@@ -87,11 +91,11 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions, packageVersion?: strin
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
-  const version = versionSelector(clerkJSVersion, packageVersion);
+  const version = versionSelector(clerkJSVersion, _packageVersion);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 
-/*
+/**
  * Builds an object of Clerk JS script attributes.
  */
 const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
