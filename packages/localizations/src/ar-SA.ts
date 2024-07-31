@@ -50,7 +50,8 @@ export const arSA: LocalizationResource = {
   formFieldError__notMatchingPasswords: 'كلمة المرور لا تتطابق',
   formFieldError__verificationLinkExpired: 'صلاحية رمز التأكيد أنتهت. يرجى طلب رابط جديد',
   formFieldHintText__optional: 'إختياري',
-  formFieldHintText__slug: '(slug) هو معرف يمكن قراءته بواسطة الإنسان ويجب أن يكون فريدًا. غالبًا ما يتم استخدامه في الروابط الإلكترونية.',
+  formFieldHintText__slug:
+    '(slug) هو معرف يمكن قراءته بواسطة الإنسان ويجب أن يكون فريدًا. غالبًا ما يتم استخدامه في الروابط الإلكترونية.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'حذف الحساب',
   formFieldInputPlaceholder__emailAddress: '',
@@ -358,7 +359,8 @@ export const arSA: LocalizationResource = {
       title: 'لا يمكن تسجيل الدخول',
     },
     passkey: {
-      subtitle: 'يؤدي استخدام مفتاح المرور الخاص بك إلى تأكيد هويتك. جهازك الخاص قد يقوم بسؤالك عن بصمة الإصبع, او معرف الوجة او كلمة مرور قفل الشاشة',
+      subtitle:
+        'يؤدي استخدام مفتاح المرور الخاص بك إلى تأكيد هويتك. جهازك الخاص قد يقوم بسؤالك عن بصمة الإصبع, او معرف الوجة او كلمة مرور قفل الشاشة',
       title: 'إستخدم مفتاح المرور',
     },
     password: {
