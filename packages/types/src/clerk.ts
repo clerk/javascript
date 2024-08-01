@@ -866,6 +866,7 @@ export type CreateOrganizationProps = RoutingOptions & {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: CreateOrganizationTheme;
+  hideSlugField?: boolean;
 };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
