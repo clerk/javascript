@@ -1102,6 +1102,24 @@ export function SignInComponentLoaded() {
                       </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
+                        name='reset_password_phone_code'
+                        asChild
+                      >
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.SMSSm />}
+                        >
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__phoneCode', {
+                                identifier,
+                              })
+                            }
+                          />
+                        </Button>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
                         name='passkey'
                         asChild
                       >
