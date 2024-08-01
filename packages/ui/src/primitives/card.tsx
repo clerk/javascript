@@ -15,7 +15,8 @@ export const Root = React.forwardRef(function CardRoot(
       className={cx(
         '[--card-body-padding:theme(spacing.10)]',
         '[--card-content-rounded-b:theme(borderRadius.lg)]',
-        'bg-gray-2 border-gray-a6 shadow-gray-a5 relative w-96 overflow-hidden rounded-xl border bg-clip-padding shadow-xl',
+        'bg-gray-2 border-gray-a3 relative w-96 overflow-hidden rounded-xl border bg-clip-padding',
+        'shadow-gray-a5 shadow-lg',
         className,
       )}
     >
@@ -34,7 +35,8 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       data-card-content=''
       {...props}
       className={cx(
-        'bg-gray-surface shadow-gray-a3 border-gray-a6 relative -m-px flex flex-col gap-8 rounded-[inherit] rounded-b-[--card-content-rounded-b] border p-[--card-body-padding] shadow-sm',
+        'bg-gray-surface relative flex flex-col gap-8 rounded-b-[--card-content-rounded-b] rounded-t-none bg-clip-padding p-[--card-body-padding]',
+        'ring-gray-a3 shadow-[0px_0px_2px_0px_theme(colors.gray.a4),0px_1px_2px_0px_theme(colors.gray.a3)] ring-1',
         className,
       )}
     >
