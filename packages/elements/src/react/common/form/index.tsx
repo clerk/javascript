@@ -233,7 +233,7 @@ const useInput = ({
         field: { name, feedback: { type: 'success', message: 'Your password meets all the necessary requirements.' } },
       });
     },
-    onValidationError: (error, keys) => {
+    onValidationError: (error, codes) => {
       if (error) {
         ref.send({
           type: 'FIELD.FEEDBACK.SET',
@@ -242,18 +242,18 @@ const useInput = ({
             feedback: {
               type: 'error',
               message: new ClerkElementsFieldError('password-validation-error', error),
-              codes: keys,
+              codes,
             },
           },
         });
       }
     },
-    onValidationWarning: (warning, keys) =>
+    onValidationWarning: (warning, codes) =>
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'warning', message: warning, codes: keys } },
+        field: { name, feedback: { type: 'warning', message: warning, codes } },
       }),
-    onValidationInfo: (info, keys) => {
+    onValidationInfo: (info, codes) => {
       // TODO: If input is not focused, make this info an error
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
@@ -262,7 +262,7 @@ const useInput = ({
           feedback: {
             type: 'info',
             message: info,
-            codes: keys,
+            codes,
           },
         },
       });

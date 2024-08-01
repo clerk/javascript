@@ -88,7 +88,7 @@ export function PasswordField({
                   id={id}
                   intent={state}
                 >
-                  {translatePasswordError({ failedValidations: codes, locale, t })}
+                  {translatePasswordError({ codes, locale, t })}
                 </Field.Message>
               );
             }}

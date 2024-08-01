@@ -58,11 +58,11 @@ function buildErrorTuple(key: ErrorMessagesKey, config: ComplexityConfig): Error
 }
 
 export const generatePasswordErrorText = ({ config, failedValidations }: GeneratePasswordErrorTextProps) => {
-  const keys: ErrorCodeOrTuple[] = [];
+  const codes: ErrorCodeOrTuple[] = [];
 
   if (!failedValidations || Object.keys(failedValidations).length === 0) {
     return {
-      keys,
+      codes,
       message: '',
     };
   }
@@ -76,7 +76,7 @@ export const generatePasswordErrorText = ({ config, failedValidations }: Generat
     .map(([k]) => {
       const entry = k as keyof typeof errorMessages;
       const errorTuple = buildErrorTuple(entry, config);
-      keys.push(errorTuple);
+      codes.push(errorTuple);
       const errorKey = errorMessages[entry];
 
       if (Array.isArray(errorKey)) {
@@ -89,7 +89,7 @@ export const generatePasswordErrorText = ({ config, failedValidations }: Generat
   const messageWithPrefix = createListFormat(messages);
 
   return {
-    keys,
+    codes,
     message: `Your password must contain ${messageWithPrefix}.`,
   };
 };

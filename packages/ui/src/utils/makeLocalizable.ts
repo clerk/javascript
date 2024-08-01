@@ -273,31 +273,31 @@ const errorMessages: Record<keyof Omit<ComplexityErrors, 'allowed_special_charac
 };
 
 export const translatePasswordError = ({
-  failedValidations,
+  codes,
   locale,
   t,
 }: {
-  failedValidations: (string | [string, Record<string, string | number>])[];
+  codes: (string | [string, Record<string, string | number>])[];
   locale: string;
   t: ReturnType<typeof makeLocalizeable>['t'];
 }) => {
-  if (!failedValidations || Object.keys(failedValidations).length === 0) {
+  if (!codes || Object.keys(codes).length === 0) {
     return '';
   }
 
   // Because we perform strength validations only if complexity validations have passed, the presence of the string
-  // zxcvbn in any of the failedValidations indicates that _all_ of the validations are from zxcvbn. Thus, we need to
+  // zxcvbn in any of the failed validations indicates that _all_ of the validations are from zxcvbn. Thus, we need to
   // concat the localized strings together since they are each individual complete sentences.
-  const hasStrengthErrors = failedValidations.some(v => v.includes('zxcvbn'));
+  const hasStrengthErrors = codes.some(v => v.includes('zxcvbn'));
   if (hasStrengthErrors) {
-    return failedValidations.map(v => t(v as any)).join(' ');
+    return codes.map(v => t(v as any)).join(' ');
   }
 
   // show min length error first by itself. Since the min_length error will always be a tuple, we check for both
   // isArray and that the first element is min_length
-  const hasMinLengthError = failedValidations?.some(v => Array.isArray(v) && v[0] === 'min_length') || false;
+  const hasMinLengthError = codes?.some(v => Array.isArray(v) && v[0] === 'min_length') || false;
 
-  const messages = failedValidations
+  const messages = codes
     .filter(k => (hasMinLengthError ? Array.isArray(k) && k[0] === 'min_length' : true))
     .map(k => {
       const key = Array.isArray(k) ? k[0] : k;
