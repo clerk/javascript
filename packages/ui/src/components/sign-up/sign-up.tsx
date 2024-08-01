@@ -37,7 +37,7 @@ function SignUpComponentLoaded() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
   const { isDevelopmentOrStaging, userSettings } = useEnvironment();
-  const { t } = useLocalizations();
+  const { t, translateError } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
@@ -75,8 +75,8 @@ function SignUpComponentLoaded() {
                   </Card.Header>
 
                   <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
+                    {({ message, code }) => {
+                      return <Alert>{translateError(message, code)}</Alert>;
                     }}
                   </Common.GlobalError>
 
@@ -399,8 +399,8 @@ function SignUpComponentLoaded() {
                   </Card.Header>
 
                   <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
+                    {({ message, code }) => {
+                      return <Alert>{translateError(message, code)}</Alert>;
                     }}
                   </Common.GlobalError>
 

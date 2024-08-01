@@ -111,7 +111,7 @@ function SignInGetHelp() {
 export function SignInComponentLoaded() {
   const enabledConnections = useEnabledConnections();
   const { isDevelopmentOrStaging } = useEnvironment();
-  const { t } = useLocalizations();
+  const { t, translateError } = useLocalizations();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
@@ -145,8 +145,8 @@ export function SignInComponentLoaded() {
                   </Card.Header>
 
                   <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
+                    {({ message, code }) => {
+                      return <Alert>{translateError(message, code)}</Alert>;
                     }}
                   </Common.GlobalError>
 
@@ -315,7 +315,7 @@ export function SignInComponentLoaded() {
 
                     <Common.GlobalError>
                       {({ message }) => {
-                        return <Alert>{message}</Alert>;
+                        return <Alert>{translateError(message, code)}</Alert>;
                       }}
                     </Common.GlobalError>
 
@@ -404,8 +404,8 @@ export function SignInComponentLoaded() {
                     </Card.Header>
 
                     <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
+                      {({ message, code }) => {
+                        return <Alert>{translateError(message, code)}</Alert>;
                       }}
                     </Common.GlobalError>
 
@@ -467,8 +467,8 @@ export function SignInComponentLoaded() {
                     </Card.Header>
 
                     <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
+                      {({ message, code }) => {
+                        return <Alert>{translateError(message, code)}</Alert>;
                       }}
                     </Common.GlobalError>
 
@@ -542,8 +542,8 @@ export function SignInComponentLoaded() {
                     </Card.Header>
 
                     <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
+                      {({ message, code }) => {
+                        return <Alert>{translateError(message, code)}</Alert>;
                       }}
                     </Common.GlobalError>
 
@@ -632,8 +632,8 @@ export function SignInComponentLoaded() {
                     </Card.Header>
 
                     <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
+                      {({ message, code }) => {
+                        return <Alert>{translateError(message, code)}</Alert>;
                       }}
                     </Common.GlobalError>
 
@@ -723,8 +723,8 @@ export function SignInComponentLoaded() {
                     </Card.Header>
 
                     <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
+                      {({ message, code }) => {
+                        return <Alert>{translateError(message, code)}</Alert>;
                       }}
                     </Common.GlobalError>
 
@@ -766,8 +766,8 @@ export function SignInComponentLoaded() {
                     </Card.Header>
 
                     <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
+                      {({ message, code }) => {
+                        return <Alert>{translateError(message, code)}</Alert>;
                       }}
                     </Common.GlobalError>
 
@@ -833,8 +833,8 @@ export function SignInComponentLoaded() {
                     </Card.Header>
 
                     <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
+                      {({ message, code }) => {
+                        return <Alert>{translateError(message, code)}</Alert>;
                       }}
                     </Common.GlobalError>
 
