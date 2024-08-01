@@ -1101,18 +1101,23 @@ export function SignInComponentLoaded() {
                         </Button>
                       </SignIn.SupportedStrategy>
 
-                      <Button
-                        intent='secondary'
-                        iconStart={<Icon.SMSSm />}
+                      <SignIn.SupportedStrategy
+                        name='reset_password_phone_code'
+                        asChild
                       >
-                        <SignIn.SafeIdentifier
-                          transform={(identifier: string) =>
-                            t('signIn.alternativeMethods.blockButton__phoneCode', {
-                              identifier,
-                            })
-                          }
-                        />
-                      </Button>
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.SMSSm />}
+                        >
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__phoneCode', {
+                                identifier,
+                              })
+                            }
+                          />
+                        </Button>
+                      </SignIn.SupportedStrategy>
 
                       <SignIn.SupportedStrategy
                         name='passkey'
