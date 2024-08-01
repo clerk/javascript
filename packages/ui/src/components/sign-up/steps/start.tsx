@@ -39,7 +39,7 @@ export function SignUpStart() {
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = isDevelopmentOrStaging();
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignUp.Step name='start'>
@@ -53,9 +53,7 @@ export function SignUpStart() {
                       alt={applicationName}
                     />
                   ) : null}
-                  <Card.Title>
-                    {t('signUp.start.title')} {isGlobalLoading ? 'true' : 'false'}
-                  </Card.Title>
+                  <Card.Title>{t('signUp.start.title')}</Card.Title>
                   <Card.Description>
                     {t('signUp.start.subtitle', {
                       applicationName,

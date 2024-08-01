@@ -22,7 +22,7 @@ export function SignUpVerifications() {
   const isDev = isDevelopmentOrStaging();
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignUp.Step name='verifications'>
