@@ -79,6 +79,20 @@ describe('CreateOrganization', () => {
     expect(getByRole('heading', { name: 'Create organization', level: 1 })).toBeInTheDocument();
   });
 
+  it('renders component without slug', async () => {
+    const { wrapper, props } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+      });
+    });
+
+    props.setProps({ hideSlugField: true });
+    const { getByLabelText } = render(<CreateOrganization />, { wrapper });
+
+    expect(getByLabelText(/Slug/i)).not.toBeInTheDocument();
+  });
+
   it('skips invitation screen', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withOrganizations();
