@@ -1,5 +1,17 @@
 # @clerk/astro
 
+## 1.0.5
+
+### Patch Changes
+
+- Fixed a bug where the `<Protect />` component would not validate any properties passed ([#3846](https://github.com/clerk/javascript/pull/3846)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`fde5b5e7e`](https://github.com/clerk/javascript/commit/fde5b5e7e6fb5faa4267e06d82a38a176165b4f4), [`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/backend@1.5.0
+  - @clerk/clerk-js@5.11.0
+  - @clerk/types@4.10.0
+  - @clerk/shared@2.4.2
+
 ## 1.0.4
 
 ### Patch Changes

@@ -1,5 +1,39 @@
 # Change Log
 
+## 4.10.0
+
+### Minor Changes
+
+- Introduce support for custom menu items in `<UserButton/>`. ([#3784](https://github.com/clerk/javascript/pull/3784)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Use `<UserButton.MenuItems>` as a child component to wrap custom menu items.
+  - Use `<UserButton.Link/>` for creating external or internal links.
+  - Use `<UserButton.Action/>` for opening a specific custom page of "UserProfile" or to trigger your own custom logic via `onClick`.
+  - If needed, reorder existing items like `manageAccount` and `signOut`
+
+  New usage example:
+
+  ```jsx
+  <UserButton>
+    <UserButton.MenuItems>
+      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
+      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
+      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
+      custom page to have been set in `/help`)
+      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
+      <UserButton.Action
+        label="Chat Modal"
+        labelIcon={<Icon />}
+        onClick={() => setModal(true)}
+      />
+    </UserButton.MenuItems>
+  </UserButton>
+  ```
+
+### Patch Changes
+
+- Introduce ability to set an active organization by slug ([#3825](https://github.com/clerk/javascript/pull/3825)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.9.1
 
 ### Patch Changes

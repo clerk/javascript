@@ -1,5 +1,44 @@
 # Change Log
 
+## 5.11.0
+
+### Minor Changes
+
+- Introduce support for custom menu items in `<UserButton/>`. ([#3784](https://github.com/clerk/javascript/pull/3784)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Use `<UserButton.MenuItems>` as a child component to wrap custom menu items.
+  - Use `<UserButton.Link/>` for creating external or internal links.
+  - Use `<UserButton.Action/>` for opening a specific custom page of "UserProfile" or to trigger your own custom logic via `onClick`.
+  - If needed, reorder existing items like `manageAccount` and `signOut`
+
+  New usage example:
+
+  ```jsx
+  <UserButton>
+    <UserButton.MenuItems>
+      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
+      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
+      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
+      custom page to have been set in `/help`)
+      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
+      <UserButton.Action
+        label="Chat Modal"
+        labelIcon={<Icon />}
+        onClick={() => setModal(true)}
+      />
+    </UserButton.MenuItems>
+  </UserButton>
+  ```
+
+### Patch Changes
+
+- Introduce ability to set an active organization by slug ([#3825](https://github.com/clerk/javascript/pull/3825)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`d3d38e206`](https://github.com/clerk/javascript/commit/d3d38e2061fdbdfcc8a24b58f180ecbed3f1145a), [`a3e9c2fb8`](https://github.com/clerk/javascript/commit/a3e9c2fb8d71d4c80402ceb87c8ed8a6e2e6e98a), [`fb302bb64`](https://github.com/clerk/javascript/commit/fb302bb64608d5f06c9a53c8e20c9d0ec61d99ec), [`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/localizations@2.5.3
+  - @clerk/types@4.10.0
+  - @clerk/shared@2.4.2
+
 ## 5.10.2
 
 ### Patch Changes

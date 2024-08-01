@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.5.0
+
+### Minor Changes
+
+- Added a `locked` property to the User object in the SDK ([#3748](https://github.com/clerk/javascript/pull/3748)) by [@iamjameswalters](https://github.com/iamjameswalters)
+
+### Patch Changes
+
+- Updated dependencies [[`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/types@4.10.0
+  - @clerk/shared@2.4.2
+
 ## 1.4.3
 
 ### Patch Changes

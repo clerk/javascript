@@ -1,5 +1,22 @@
 # @clerk/elements
 
+## 0.11.0
+
+### Minor Changes
+
+- Add full SAML support ([#3842](https://github.com/clerk/javascript/pull/3842)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update signin `isLoggedInAndSingleSession` guard to navigate using `buildAfterSignInUrl` when true. ([#3841](https://github.com/clerk/javascript/pull/3841)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Fixes issue where the incorrect sign in first factor strategy was being returned during sign in. ([#3828](https://github.com/clerk/javascript/pull/3828)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Ensure correct supported strategies are rendered based on first or second factor needs. ([#3843](https://github.com/clerk/javascript/pull/3843)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/types@4.10.0
+
 ## 0.10.7
 
 ### Patch Changes

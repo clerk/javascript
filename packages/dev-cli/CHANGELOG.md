@@ -1,5 +1,11 @@
 # @clerk/dev-cli
 
+## 0.0.4
+
+### Patch Changes
+
+- Use configured monorepo root when calculating Clerk packages ([#3856](https://github.com/clerk/javascript/pull/3856)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.0.3
 
 ### Patch Changes
