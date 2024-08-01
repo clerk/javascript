@@ -3,8 +3,8 @@ import { DEV_BROWSER_JWT_KEY } from '@clerk/shared';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import browser from 'webextension-polyfill';
 
+import { SCOPE, type Scope } from '../types';
 import { AUTH_HEADER, CLIENT_JWT_KEY, DEFAULT_LOCAL_HOST_PERMISSION } from './constants';
-import type { ClerkClientExtensionFeatures } from './types';
 import type { GetClientCookieParams } from './utils/cookies';
 import { assertPublishableKey } from './utils/errors';
 import { JWTHandler } from './utils/jwt-handler';
@@ -18,17 +18,19 @@ Clerk.sdkMetadata = {
   version: PACKAGE_VERSION,
 };
 
-type ClerkClientOptions = {
-  extensionFeatures?: ClerkClientExtensionFeatures;
+export type CreateClerkClientOptions = {
   publishableKey: string;
+  scope?: Scope;
   storageCache?: StorageCache;
+  syncSessionWithTab?: boolean;
 };
 
 export async function createClerkClient({
-  extensionFeatures = {},
   publishableKey,
+  scope,
   storageCache = BrowserStorageCache,
-}: ClerkClientOptions): Promise<Clerk> {
+  syncSessionWithTab = false,
+}: CreateClerkClientOptions): Promise<Clerk> {
   if (clerk) {
     return clerk;
   }
@@ -41,11 +43,14 @@ export async function createClerkClient({
   const manifest = browser.runtime.getManifest();
 
   // Will throw if manifest is invalid
-  validateManifest(manifest, extensionFeatures);
+  validateManifest(manifest, {
+    sync: syncSessionWithTab,
+    background: scope === SCOPE.background,
+  });
 
   let jwt: JWTHandler | undefined;
 
-  if (extensionFeatures.sync) {
+  if (syncSessionWithTab) {
     const hostHint = isProd ? key.frontendApi : DEFAULT_LOCAL_HOST_PERMISSION;
     const validHosts = getValidPossibleManifestHosts(manifest);
 
@@ -76,17 +81,11 @@ export async function createClerkClient({
   // Create Clerk instance
   clerk = new Clerk(publishableKey);
 
-  if (extensionFeatures.background) {
-    Clerk.mountComponentRenderer = undefined;
-  }
-
   // Append appropriate query params to all Clerk requests
   clerk.__unstable__onBeforeRequest(async requestInit => {
     requestInit.credentials = 'omit';
 
     const currentJWT = await jwt.get();
-
-    console.log('__unstable__onBeforeRequest currentJWT', currentJWT);
 
     if (!currentJWT) {
       requestInit.url?.searchParams.append('_is_native', '1');
@@ -118,10 +117,6 @@ export async function createClerkClient({
       await jwt.set(authHeader);
     }
   });
-
-  if (extensionFeatures.background) {
-    await clerk.load({ standardBrowser: false });
-  }
 
   return clerk;
 }

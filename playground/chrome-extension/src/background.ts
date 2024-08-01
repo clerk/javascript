@@ -1,4 +1,4 @@
-import { createClerkClient } from '@clerk/chrome-extension';
+import { __unstable__createClerkClient } from '@clerk/chrome-extension/background';
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
@@ -7,7 +7,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 async function getToken() {
-  const clerk = await createClerkClient({ publishableKey, extensionFeatures: { background: true, sync: true } });
+  const clerk = await __unstable__createClerkClient({ publishableKey, syncSessionWithTab: true });
   return await clerk.session?.getToken();
 }
 
@@ -16,6 +16,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.greeting === 'hello') {
     getToken().then(token => {
+      console.log('Background Token:', token);
       sendResponse({ token });
     });
   }
