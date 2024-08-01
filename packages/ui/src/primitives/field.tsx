@@ -123,11 +123,14 @@ export const Input = React.forwardRef(function Input(
       data-field-input=''
       ref={forwardedRef}
       className={cx(
-        'text-gray-12 relative flex min-w-0 rounded-md border bg-white bg-clip-padding px-2.5 py-1.5 text-base outline-none',
+        '[--field-input-border-width:1px]',
+        'px-[calc(theme(spacing.3)-var(--field-input-border-width))] py-[calc(theme(spacing[1.5])-var(--field-input-border-width))]',
+        'border-[length:--field-input-border-width] bg-clip-padding',
+        'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
         'disabled:cursor-not-allowed disabled:opacity-50',
         // variant
         {
-          default: 'min-h-8 w-full justify-start',
+          default: 'w-full justify-start',
           'otp-digit': 'aspect-square size-10 justify-center text-[calc(var(--cl-font-size)*1.4)] font-semibold',
         }[variant],
         // state
