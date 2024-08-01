@@ -2,4 +2,4 @@
 '@clerk/chrome-extension': minor
 ---
 
-Add support for background jobs
+Add support for background jobs.
