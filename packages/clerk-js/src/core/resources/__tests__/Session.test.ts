@@ -1,9 +1,9 @@
-import type { SessionJSON } from '@clerk/types';
+import type { OrganizationJSON, SessionJSON } from '@clerk/types';
 
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { clerkMock, createUser, mockDevClerkInstance, mockJwt, mockNetworkFailedFetch } from '../../test/fixtures';
-import { BaseResource, Session } from '../internal';
+import { BaseResource, Organization, Session } from '../internal';
 
 describe('Session', () => {
   describe('creating new session', () => {
@@ -69,6 +69,63 @@ describe('Session', () => {
 
       expect(dispatchSpy).toHaveBeenCalledTimes(1);
       expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
+    });
+
+    it('does not dispatch token:update if template is provided', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'activeOrganization',
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      await session.getToken({ template: 'foobar' });
+
+      expect(dispatchSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('dispatches token:update when provided organization ID matches current active organization', async () => {
+      BaseResource.clerk = clerkMock({
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
+      }) as any;
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'activeOrganization',
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      await session.getToken({ organizationId: 'activeOrganization' });
+
+      expect(dispatchSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not dispatch token:update when provided organization ID does not match current active organization', async () => {
+      BaseResource.clerk = clerkMock({
+        organization: new Organization({ id: 'anotherOrganization' } as OrganizationJSON),
+      }) as any;
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'activeOrganization',
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      await session.getToken({ organizationId: 'activeOrganization' });
+
+      expect(dispatchSpy).toHaveBeenCalledTimes(0);
     });
 
     describe('with offline browser and network failure', () => {
