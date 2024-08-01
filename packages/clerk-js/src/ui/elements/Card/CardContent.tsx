@@ -9,6 +9,7 @@ import {
   localizationKeys,
   useLocalizations,
 } from '../../customizables';
+import { useDevMode } from '../../hooks/useDevMode';
 import { Close } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { useCardState, useFlowMetadata } from '../contexts';
@@ -24,7 +25,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
   const { maintenanceMode } = useEnvironment();
   const card = useCardState();
   const { t } = useLocalizations();
-  const { displayConfig } = useEnvironment();
+  const { showDevModeNotice } = useDevMode();
 
   return (
     <Flex
@@ -44,7 +45,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           boxShadow: t.shadows.$cardContentShadow,
           borderRadius: t.radii.$lg,
           position: 'relative',
-          padding: `${t.space.$8} ${t.space.$10} ${displayConfig.showDevModeWarning ? t.space.$12 : t.space.$8} ${t.space.$10}`,
+          padding: `${t.space.$8} ${t.space.$10} ${showDevModeNotice ? t.space.$12 : t.space.$8} ${t.space.$10}`,
           justifyContent: 'center',
           alignContent: 'center',
         }),

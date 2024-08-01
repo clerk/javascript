@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { descriptors, Flex, Link, localizationKeys, useAppearance } from '../../customizables';
+import { useDevMode } from '../../hooks/useDevMode';
 import type { InternalTheme, PropsOfComponent } from '../../styledSystem';
 import { common, mqu } from '../../styledSystem';
 import { colors } from '../../utils';
@@ -14,12 +15,12 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
   const { children, isProfileFooter = false, sx, ...rest } = props;
   const { displayConfig } = useEnvironment();
   const { branded } = displayConfig;
-  const withDevModeNotice = displayConfig.showDevModeWarning;
+  const { showDevModeNotice } = useDevMode();
   const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
   const sponsorOrLinksExist = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
   const showSponsorAndLinks = isProfileFooter ? branded : sponsorOrLinksExist;
 
-  if (!children && !(showSponsorAndLinks || withDevModeNotice)) {
+  if (!children && !(showSponsorAndLinks || showDevModeNotice)) {
     return null;
   }
 

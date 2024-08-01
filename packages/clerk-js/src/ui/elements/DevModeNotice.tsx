@@ -1,7 +1,7 @@
 import type { ThemableCssProp } from 'ui/styledSystem';
 
-import { useEnvironment } from '../contexts';
 import { Box, Text } from '../customizables';
+import { useDevMode } from '../hooks/useDevMode';
 
 type DevModeOverlayProps = {
   gradient?: number;
@@ -9,9 +9,9 @@ type DevModeOverlayProps = {
 
 export const DevModeOverlay = (props: DevModeOverlayProps) => {
   const { gradient = 60 } = props;
-  const { displayConfig } = useEnvironment();
+  const { showDevModeNotice } = useDevMode();
 
-  if (!displayConfig.showDevModeWarning) {
+  if (!showDevModeNotice) {
     return null;
   }
 
@@ -32,9 +32,9 @@ export const DevModeOverlay = (props: DevModeOverlayProps) => {
 type DevModeNoticeProps = { sx?: ThemableCssProp };
 export const DevModeNotice = (props: DevModeNoticeProps) => {
   const { sx } = props;
-  const { displayConfig } = useEnvironment();
+  const { showDevModeNotice } = useDevMode();
 
-  if (!displayConfig.showDevModeWarning) {
+  if (!showDevModeNotice) {
     return null;
   }
 
