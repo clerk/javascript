@@ -31,13 +31,13 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
 /**
  * Hotloads the Clerk JS script.
  *
- * @param options - The options to use when building the Clerk JS script URL.
+ * @param opts - The options to use when building the Clerk JS script URL.
  *
  * @example
  * loadClerkJsScript({ publishableKey: 'pk_' });
  */
-const loadClerkJsScript = async (options: LoadClerkJsScriptOptions) => {
-  const { publishableKey } = options;
+const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
+  const { publishableKey } = opts;
 
   if (!publishableKey) {
     throw new Error(MISSING_PUBLISHABLE_KEY_ERROR);
@@ -57,10 +57,10 @@ const loadClerkJsScript = async (options: LoadClerkJsScriptOptions) => {
     });
   }
 
-  return loadScript(clerkJsScriptUrl(options), {
+  return loadScript(clerkJsScriptUrl(opts), {
     async: true,
     crossOrigin: 'anonymous',
-    beforeLoad: applyClerkJsScriptAttributes(options),
+    beforeLoad: applyClerkJsScriptAttributes(opts),
   }).catch(() => {
     throw new Error(FAILED_TO_LOAD_ERROR);
   });
@@ -69,7 +69,7 @@ const loadClerkJsScript = async (options: LoadClerkJsScriptOptions) => {
 /**
  * Generates a Clerk JS script URL.
  *
- * @param options - The options to use when building the Clerk JS script URL.
+ * @param opts - The options to use when building the Clerk JS script URL.
  *
  * @example
  * clerkJsScriptUrl({ publishableKey: 'pk_' });
