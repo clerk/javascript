@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.2.10
+
+### Patch Changes
+
+- Fix debug logs on `debug: true` parameter of `clerkMiddleware()` ([#3871](https://github.com/clerk/javascript/pull/3871)) by [@dimkl](https://github.com/dimkl)
+
 ## 5.2.9
 
 ### Patch Changes
