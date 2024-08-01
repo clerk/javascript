@@ -1,20 +1,17 @@
 import React from 'react';
 
 import { useEnvironment } from '../contexts';
-import { Col, descriptors, Flex, Flow, useAppearance } from '../customizables';
-import type { ElementDescriptor } from '../customizables/elementDescriptors';
+import { Col, Flex, Flow, useAppearance } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';
 import { animations, common } from '../styledSystem';
 import { colors } from '../utils';
 import { Card } from '.';
 
 const PopoverCardRoot = React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Card.Content>>((props, ref) => {
-  const { elementDescriptor, ...rest } = props;
   return (
     <Flow.Part part='popover'>
       <Card.Root
-        elementDescriptor={[descriptors.popoverBox, elementDescriptor as ElementDescriptor]}
-        {...rest}
+        {...props}
         ref={ref}
         sx={t => ({
           width: t.sizes.$94,
@@ -73,6 +70,8 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
           ),
           marginTop: `-${t.space.$2}`,
           paddingTop: t.space.$2,
+          borderBottomLeftRadius: 'inherit',
+          borderBottomRightRadius: 'inherit',
           '&:empty': {
             padding: 0,
             marginTop: 0,
@@ -90,16 +89,12 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
     >
       {children}
 
-      <Card.ClerkAndPagesTag
-        outerSx={t => ({
-          padding: `${t.space.$4} ${t.space.$none}`,
-        })}
-        withFooterPages={!!shouldShowTagOrLinks}
-        devModeNoticeSx={t => ({
-          padding: t.space.$none,
-        })}
-        withDevOverlay
-      />
+      {shouldShowTagOrLinks && (
+        <Card.ClerkAndPagesTag
+          withFooterPages
+          sx={t => ({ padding: `${t.space.$4} ${t.space.$8}` })}
+        />
+      )}
     </Col>
   );
 };

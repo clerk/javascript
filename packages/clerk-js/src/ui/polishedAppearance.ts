@@ -164,10 +164,6 @@ export const polishedAppearance: Appearance = {
         borderWidth: 0,
         boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
       },
-      popoverBox: {
-        borderWidth: 0,
-        boxShadow: `${theme.shadows.$cardBoxShadow}, ${BORDER_SHADOW_LENGTH} ${theme.colors.$neutralAlpha100}`,
-      },
       card: {
         ...cardContentStyles(theme),
       },

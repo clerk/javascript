@@ -12,7 +12,6 @@ import { animations, common, mqu } from '../styledSystem';
 import { colors } from '../utils';
 import { Card } from './Card';
 import { withFloatingTree } from './contexts';
-import { DevModeOverlay } from './DevModeNotice';
 import { Popover } from './Popover';
 
 type NavbarContextValue = { isOpen: boolean; open: () => void; close: () => void };
@@ -141,7 +140,6 @@ const NavbarContainer = (
         },
         flex: `0 0 ${t.space.$57}`,
         width: t.sizes.$57,
-        position: 'relative',
         maxWidth: t.space.$57,
         background: common.mergedColorsBackground(
           colors.setAlpha(t.colors.$colorBackground, 1),
@@ -153,8 +151,6 @@ const NavbarContainer = (
         justifyContent: 'space-between',
       })}
     >
-      <DevModeOverlay />
-
       <Col sx={t => ({ gap: t.space.$6, flex: `0 0 ${t.space.$60}` })}>
         <Col
           sx={t => ({
@@ -176,9 +172,10 @@ const NavbarContainer = (
       </Col>
 
       <Card.ClerkAndPagesTag
-        sx={{
+        sx={theme => ({
           width: 'fit-content',
-        }}
+          paddingLeft: theme.space.$3,
+        })}
       />
     </Col>
   );
