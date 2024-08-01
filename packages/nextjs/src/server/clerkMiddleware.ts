@@ -73,12 +73,9 @@ interface ClerkMiddleware {
 
 export const clerkMiddlewareRequestDataStore = new AsyncLocalStorage<Partial<AuthenticateRequestOptions>>();
 
-export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', logger => (...args: unknown[]): any => {
+export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
-  if (params.debug) {
-    logger.enable();
-  }
 
   const publishableKey = assertKey(params.publishableKey || PUBLISHABLE_KEY, () =>
     errorThrower.throwMissingPublishableKeyError(),
@@ -104,7 +101,10 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
       }),
     );
 
-    const nextMiddleware: NextMiddleware = async (request, event) => {
+    const nextMiddleware: NextMiddleware = withLogger('clerkMiddleware', logger => async (request, event) => {
+      if (params.debug) {
+        logger.enable();
+      }
       const clerkRequest = createClerkRequest(request);
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());
@@ -164,7 +164,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
       decorateRequest(clerkRequest, handlerResult, requestState, params);
 
       return handlerResult;
-    };
+    });
 
     // If we have a request and event, we're being called as a middleware directly
     // eg, export default clerkMiddleware;
@@ -176,7 +176,7 @@ export const clerkMiddleware: ClerkMiddleware = withLogger('clerkMiddleware', lo
     // eg, export default clerkMiddleware(auth => { ... });
     return nextMiddleware;
   });
-});
+};
 
 const parseRequestAndEvent = (args: unknown[]) => {
   return [args[0] instanceof Request ? args[0] : undefined, args[0] instanceof Request ? args[1] : undefined] as [
