@@ -6,7 +6,7 @@ import * as Icon from './icon';
 
 type FieldIntent = 'error' | 'idle' | 'info' | 'success' | 'warning';
 
-export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Root(
+export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function FieldRoot(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -26,7 +26,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   );
 });
 
-export const Label = React.forwardRef(function Label(
+export const Label = React.forwardRef(function FieldLabel(
   {
     className,
     children,
@@ -55,7 +55,7 @@ export const Label = React.forwardRef(function Label(
   );
 });
 
-export const LabelEnd = React.forwardRef(function Label(
+export const LabelEnd = React.forwardRef(function FieldLabelEnd(
   { className, children, ...props }: React.HTMLAttributes<HTMLSpanElement>,
   forwardedRef: React.ForwardedRef<HTMLSpanElement>,
 ) {
@@ -70,7 +70,7 @@ export const LabelEnd = React.forwardRef(function Label(
   );
 });
 
-export const Hint = React.forwardRef(function Hint(
+export const Hint = React.forwardRef(function FieldHint(
   { className, children, ...props }: React.ComponentProps<typeof LabelEnd>,
   forwardedRef: React.ForwardedRef<React.ComponentRef<typeof LabelEnd>>,
 ) {
@@ -100,7 +100,7 @@ export const Checkbox = React.forwardRef(function FieldCheckbox(
   );
 });
 
-export const Input = React.forwardRef(function Input(
+export const Input = React.forwardRef(function FieldInput(
   {
     asChild,
     className,
@@ -182,7 +182,7 @@ export const Message = React.forwardRef<
     children?: React.ReactNode;
     intent?: FieldIntent;
   }
->(function Message({ className, children, justify = 'start', intent = 'idle', ...props }, forwardedRef) {
+>(function FieldMessage({ className, children, justify = 'start', intent = 'idle', ...props }, forwardedRef) {
   return (
     <p
       ref={forwardedRef}
