@@ -149,7 +149,14 @@ export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       ref={forwardedRef}
       data-card-actions=''
       {...props}
-      className={cx('z-1 flex flex-col gap-3', className)}
+      className={cx(
+        'z-1 flex flex-col gap-3',
+        // Note:
+        // Prevents underline interractions triggering outside of the link text
+        // https://linear.app/clerk/issue/SDKI-192/#comment-ebf943b0
+        '[&_[data-link]]:self-center',
+        className,
+      )}
     >
       {children}
     </div>
