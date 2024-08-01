@@ -2,4 +2,4 @@
 "@clerk/elements": patch
 ---
 
-Provide password configuration to usePassword hooks
+Return password validation errors with additional supporting information from instance configuration
