@@ -195,6 +195,9 @@ export const SignUpRouterMachine = setup({
         params: { strategy: 'saml' },
       }),
     },
+    'AUTHENTICATE.WEB3': {
+      actions: sendTo('start', ({ event }) => event),
+    },
     'FORM.ATTACH': {
       description: 'Attach/re-attach the form to the router.',
       actions: enqueueActions(({ enqueue, event }) => {
