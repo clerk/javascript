@@ -1,7 +1,8 @@
 import type { SignInResource, Web3Strategy } from '@clerk/types';
-import { fromPromise, not, sendTo, setup } from 'xstate';
+import { assertEvent, fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
@@ -28,7 +29,7 @@ export const SignInStartMachine = setup({
         if (strategy === 'web3_metamask_signature') {
           return parent.getSnapshot().context.clerk.client.signIn.authenticateWithMetamask();
         }
-        throw new Error();
+        throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
       },
     ),
     attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
@@ -182,11 +183,13 @@ export const SignInStartMachine = setup({
       invoke: {
         id: 'attemptWeb3',
         src: 'attemptWeb3',
-        input: ({ context, event }) => ({
-          parent: context.parent,
-          // TODO: figure out how to type this correctly
-          strategy: event.strategy,
-        }),
+        input: ({ context, event }) => {
+          assertEvent(event, 'AUTHENTICATE.WEB3');
+          return {
+            parent: context.parent,
+            strategy: event.strategy,
+          };
+        },
         onDone: {
           actions: ['sendToNext', 'sendToLoading'],
         },
