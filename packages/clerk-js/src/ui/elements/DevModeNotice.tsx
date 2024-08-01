@@ -9,9 +9,9 @@ type DevModeOverlayProps = {
 
 export const DevModeOverlay = (props: DevModeOverlayProps) => {
   const { gradient = 60 } = props;
-  const { isDevelopmentOrStaging } = useEnvironment();
+  const { displayConfig } = useEnvironment();
 
-  if (!isDevelopmentOrStaging()) {
+  if (!displayConfig.showDevModeWarning) {
     return null;
   }
 
@@ -32,9 +32,9 @@ export const DevModeOverlay = (props: DevModeOverlayProps) => {
 type DevModeNoticeProps = { sx?: ThemableCssProp };
 export const DevModeNotice = (props: DevModeNoticeProps) => {
   const { sx } = props;
-  const { isDevelopmentOrStaging } = useEnvironment();
+  const { displayConfig } = useEnvironment();
 
-  if (!isDevelopmentOrStaging()) {
+  if (!displayConfig.showDevModeWarning) {
     return null;
   }
 

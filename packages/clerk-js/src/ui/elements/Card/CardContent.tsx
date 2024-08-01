@@ -24,7 +24,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
   const { maintenanceMode } = useEnvironment();
   const card = useCardState();
   const { t } = useLocalizations();
-  const { isDevelopmentOrStaging } = useEnvironment();
+  const { displayConfig } = useEnvironment();
 
   return (
     <Flex
@@ -44,7 +44,7 @@ export const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>((p
           boxShadow: t.shadows.$cardContentShadow,
           borderRadius: t.radii.$lg,
           position: 'relative',
-          padding: `${t.space.$8} ${t.space.$10} ${isDevelopmentOrStaging() ? t.space.$12 : t.space.$8} ${t.space.$10}`,
+          padding: `${t.space.$8} ${t.space.$10} ${displayConfig.showDevModeWarning ? t.space.$12 : t.space.$8} ${t.space.$10}`,
           justifyContent: 'center',
           alignContent: 'center',
         }),

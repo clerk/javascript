@@ -18,8 +18,8 @@ export const CardClerkAndPagesTag = React.memo(
     }
   >((props, ref) => {
     const { sx, outerSx, withFooterPages = false, withDevOverlay = false, devModeNoticeSx, ...rest } = props;
-    const { displayConfig, isDevelopmentOrStaging } = useEnvironment();
-    const withDevModeNotice = isDevelopmentOrStaging();
+    const { displayConfig } = useEnvironment();
+    const withDevModeNotice = displayConfig.showDevModeWarning;
 
     if (!(displayConfig.branded || withFooterPages) && !withDevModeNotice) {
       return null;
