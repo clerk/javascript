@@ -8,7 +8,7 @@ type IconProps = Omit<React.HTMLAttributes<IconRef>, 'viewBox'>;
 const rtlIcons = ['IconCaretRightLegacy'];
 
 function createIcon({ displayName, viewBox, path }: { displayName: string; viewBox: string; path: React.ReactNode }) {
-  const Icon = React.forwardRef(function ({ className, ...props }: IconProps, ref: React.ForwardedRef<IconRef>) {
+  const Icon = React.forwardRef(function Icon({ className, ...props }: IconProps, ref: React.ForwardedRef<IconRef>) {
     return (
       <svg
         ref={ref}
