@@ -28,6 +28,9 @@
 
 ---
 
+> [!IMPORTANT]
+> Starting August 1, 2024, the Gatsby SDK is entering a one-month notice period. We are actively seeking a new community maintainer. For full details, please see our [changelog](https://clerk.com/changelog/2024-08-01-gatsby-eol).
+
 ## Overview
 
 Clerk is the easiest way to add authentication and user management to your Gatsby application. Add sign up, sign in, and profile management to your application in minutes.
