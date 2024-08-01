@@ -89,20 +89,18 @@ function SignInGetHelp() {
           <Card.Title>{t('signIn.alternativeMethods.getHelp.title')}</Card.Title>
           <Card.Description>{t('signIn.alternativeMethods.getHelp.content')}</Card.Description>
         </Card.Header>
-        <Card.Body>
-          <div className='flex flex-col gap-4'>
-            <Button
-              onClick={() => {
-                window.location.href = `mailto:${supportEmail}`;
-              }}
-              iconEnd={<Icon.CaretRightLegacy />}
-            >
-              Email support
-            </Button>
+        <Card.Actions>
+          <Button
+            onClick={() => {
+              window.location.href = `mailto:${supportEmail}`;
+            }}
+            iconEnd={<Icon.CaretRightLegacy />}
+          >
+            Email support
+          </Button>
 
-            <LinkButton onClick={() => setShowHelp(false)}>{t('backButton')}</LinkButton>
-          </div>
-        </Card.Body>
+          <LinkButton onClick={() => setShowHelp(false)}>{t('backButton')}</LinkButton>
+        </Card.Actions>
         {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
       </Card.Content>
       <Card.Footer branded={branded} />
@@ -1194,36 +1192,33 @@ export function SignInComponentLoaded() {
                     </div>
                   </Card.Body>
 
-                  <Card.Actions>
-                    <Common.Loading>
-                      {isSubmitting => {
-                        return (
-                          <>
-                            <SignIn.Action
-                              submit
-                              asChild
+                  <Common.Loading>
+                    {isSubmitting => {
+                      return (
+                        <Card.Actions>
+                          <SignIn.Action
+                            submit
+                            asChild
+                          >
+                            <Button
+                              busy={isSubmitting}
+                              disabled={isGlobalLoading || isSubmitting}
+                              spinnerWhenBusy
                             >
-                              <Button
-                                busy={isSubmitting}
-                                disabled={isGlobalLoading || isSubmitting}
-                                spinnerWhenBusy
-                              >
-                                {t('signIn.resetPassword.formButtonPrimary')}
-                              </Button>
-                            </SignIn.Action>
+                              {t('signIn.resetPassword.formButtonPrimary')}
+                            </Button>
+                          </SignIn.Action>
 
-                            <SignIn.Action
-                              navigate='start'
-                              asChild
-                            >
-                              <LinkButton>{t('backButton')}</LinkButton>
-                            </SignIn.Action>
-                          </>
-                        );
-                      }}
-                    </Common.Loading>
-                  </Card.Actions>
-
+                          <SignIn.Action
+                            navigate='start'
+                            asChild
+                          >
+                            <LinkButton>{t('backButton')}</LinkButton>
+                          </SignIn.Action>
+                        </Card.Actions>
+                      );
+                    }}
+                  </Common.Loading>
                   {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded} />

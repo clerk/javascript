@@ -137,11 +137,12 @@ function SignUpComponentLoaded() {
                     ) : null}
 
                     {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
-
-                    {hasConnection || hasIdentifier ? (
-                      <Common.Loading scope='step:start'>
-                        {isSubmitting => {
-                          return (
+                  </Card.Body>
+                  {hasConnection || hasIdentifier ? (
+                    <Common.Loading scope='step:start'>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
                             <SignUp.Action
                               submit
                               asChild
@@ -155,11 +156,11 @@ function SignUpComponentLoaded() {
                                 {t('formButtonPrimary')}
                               </Button>
                             </SignUp.Action>
-                          );
-                        }}
-                      </Common.Loading>
-                    ) : null}
-                  </Card.Body>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
+                  ) : null}
                   {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded}>
@@ -226,9 +227,11 @@ function SignUpComponentLoaded() {
                           </SignUp.Action>
                         }
                       />
-                      <Common.Loading scope='step:verifications'>
-                        {isSubmitting => {
-                          return (
+                    </Card.Body>
+                    <Common.Loading scope='step:verifications'>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
                             <SignUp.Action
                               submit
                               asChild
@@ -242,10 +245,10 @@ function SignUpComponentLoaded() {
                                 {t('formButtonPrimary')}
                               </Button>
                             </SignUp.Action>
-                          );
-                        }}
-                      </Common.Loading>
-                    </Card.Body>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignUp.Strategy>
 
                   <SignUp.Strategy name='email_code'>
@@ -298,9 +301,11 @@ function SignUpComponentLoaded() {
                           </SignUp.Action>
                         }
                       />
-                      <Common.Loading scope='step:verifications'>
-                        {isSubmitting => {
-                          return (
+                    </Card.Body>
+                    <Common.Loading scope='step:verifications'>
+                      {isSubmitting => {
+                        return (
+                          <Card.Actions>
                             <SignUp.Action
                               submit
                               asChild
@@ -314,10 +319,10 @@ function SignUpComponentLoaded() {
                                 {t('formButtonPrimary')}
                               </Button>
                             </SignUp.Action>
-                          );
-                        }}
-                      </Common.Loading>
-                    </Card.Body>
+                          </Card.Actions>
+                        );
+                      }}
+                    </Common.Loading>
                   </SignUp.Strategy>
 
                   <SignUp.Strategy name='email_link'>
@@ -430,10 +435,11 @@ function SignUpComponentLoaded() {
                         />
                       ) : null}
                     </div>
-
-                    <Common.Loading scope='step:continue'>
-                      {isSubmitting => {
-                        return (
+                  </Card.Body>
+                  <Common.Loading scope='step:continue'>
+                    {isSubmitting => {
+                      return (
+                        <Card.Actions>
                           <SignUp.Action
                             submit
                             asChild
@@ -447,10 +453,10 @@ function SignUpComponentLoaded() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignUp.Action>
-                        );
-                      }}
-                    </Common.Loading>
-                  </Card.Body>
+                        </Card.Actions>
+                      );
+                    }}
+                  </Common.Loading>
                   {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
                 <Card.Footer branded={branded}>
