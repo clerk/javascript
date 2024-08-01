@@ -144,13 +144,13 @@ export function SignInComponentLoaded() {
                     <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                   </Card.Header>
 
-                  <Card.Body>
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                  <Common.GlobalError>
+                    {({ message }) => {
+                      return <Alert>{message}</Alert>;
+                    }}
+                  </Common.GlobalError>
 
+                  <Card.Body>
                     <Connections disabled={isGlobalLoading} />
 
                     {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
@@ -312,13 +312,14 @@ export function SignInComponentLoaded() {
                         </span>
                       </Card.Description>
                     </Card.Header>
-                    <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
 
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
+                    <Card.Body>
                       <PasswordField
                         label={t('formFieldLabel__password')}
                         alternativeFieldTrigger={
@@ -401,13 +402,12 @@ export function SignInComponentLoaded() {
                         </span>
                       </Card.Description>
                     </Card.Header>
-                    <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
-                    </Card.Body>
+
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
 
                     <Common.Loading>
                       {isSubmitting => {
@@ -465,13 +465,14 @@ export function SignInComponentLoaded() {
                       <Card.Title>{t('signIn.backupCodeMfa.title')}</Card.Title>
                       <Card.Description>{t('signIn.backupCodeMfa.subtitle')}</Card.Description>
                     </Card.Header>
-                    <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
 
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
+                    <Card.Body>
                       <BackupCodeField />
                     </Card.Body>
 
@@ -540,12 +541,13 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
                       <OTPField
                         label={t('signIn.emailCode.formTitle')}
                         disabled={isGlobalLoading}
@@ -629,12 +631,13 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
                       <OTPField
                         label={t('signIn.phoneCode.formTitle')}
                         disabled={isGlobalLoading}
@@ -719,12 +722,13 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
                       <SignIn.Action
                         asChild
                         resend
@@ -760,12 +764,14 @@ export function SignInComponentLoaded() {
                         <SignIn.SafeIdentifier />
                       </Card.Description>
                     </Card.Header>
+
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
                       <OTPField
                         label={t('signIn.forgotPassword.formTitle')}
                         disabled={isGlobalLoading}
@@ -826,12 +832,13 @@ export function SignInComponentLoaded() {
                       <Card.Description>{t('signIn.totpMfa.subtitle', { applicationName })}</Card.Description>
                     </Card.Header>
 
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
                       <OTPField
                         label={t('signIn.totpMfa.formTitle')}
                         disabled={isGlobalLoading}
@@ -887,12 +894,14 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.alternativeMethods.title')}</Card.Title>
                     <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
                   </Card.Header>
+
+                  <Common.GlobalError>
+                    {({ message }) => {
+                      return <Alert>{message}</Alert>;
+                    }}
+                  </Common.GlobalError>
+
                   <Card.Body>
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
                     <div className='flex flex-col gap-6'>
                       <FirstFactorConnections
                         isGlobalLoading={isGlobalLoading}
@@ -1036,106 +1045,106 @@ export function SignInComponentLoaded() {
                     ) : null}
                     <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
                   </Card.Header>
+
+                  <Common.GlobalError>
+                    {({ message }) => {
+                      return <Alert>{message}</Alert>;
+                    }}
+                  </Common.GlobalError>
+
                   <Card.Body>
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
-                    <div className='flex flex-col justify-center gap-4'>
+                    <SignIn.SupportedStrategy
+                      name='reset_password_email_code'
+                      asChild
+                    >
+                      <Button>{t('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword')}</Button>
+                    </SignIn.SupportedStrategy>
+
+                    <Separator>{t('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}</Separator>
+
+                    <div className='flex flex-col gap-2'>
+                      <Connections disabled={isGlobalLoading} />
+
                       <SignIn.SupportedStrategy
-                        name='reset_password_email_code'
+                        name='email_link'
                         asChild
                       >
-                        <Button>{t('signIn.forgotPasswordAlternativeMethods.blockButton__resetPassword')}</Button>
-                      </SignIn.SupportedStrategy>
-
-                      <Separator>{t('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}</Separator>
-
-                      <div className='flex flex-col gap-2'>
-                        <Connections disabled={isGlobalLoading} />
-
-                        <SignIn.SupportedStrategy
-                          name='email_link'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.LinkSm />}
-                          >
-                            <SignIn.SafeIdentifier
-                              transform={(identifier: string) =>
-                                t('signIn.alternativeMethods.blockButton__emailLink', {
-                                  identifier,
-                                })
-                              }
-                            />
-                          </Button>
-                        </SignIn.SupportedStrategy>
-
-                        <SignIn.SupportedStrategy
-                          name='reset_password_email_code'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.Envelope />}
-                          >
-                            <SignIn.SafeIdentifier
-                              transform={(identifier: string) =>
-                                t('signIn.alternativeMethods.blockButton__emailCode', {
-                                  identifier,
-                                })
-                              }
-                            />
-                          </Button>
-                        </SignIn.SupportedStrategy>
-
                         <Button
                           intent='secondary'
-                          iconStart={<Icon.SMSSm />}
+                          iconStart={<Icon.LinkSm />}
                         >
                           <SignIn.SafeIdentifier
                             transform={(identifier: string) =>
-                              t('signIn.alternativeMethods.blockButton__phoneCode', {
+                              t('signIn.alternativeMethods.blockButton__emailLink', {
                                 identifier,
                               })
                             }
                           />
                         </Button>
+                      </SignIn.SupportedStrategy>
 
-                        <SignIn.SupportedStrategy
-                          name='passkey'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.FingerprintSm />}
-                          >
-                            {t('signIn.alternativeMethods.blockButton__passkey')}
-                          </Button>
-                        </SignIn.SupportedStrategy>
-
-                        <SignIn.SupportedStrategy
-                          name='password'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.LockSm />}
-                          >
-                            {t('signIn.alternativeMethods.blockButton__password')}
-                          </Button>
-                        </SignIn.SupportedStrategy>
-                      </div>
-
-                      <SignIn.Action
-                        navigate='start'
+                      <SignIn.SupportedStrategy
+                        name='reset_password_email_code'
                         asChild
                       >
-                        <LinkButton>{t('backButton')}</LinkButton>
-                      </SignIn.Action>
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.Envelope />}
+                        >
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__emailCode', {
+                                identifier,
+                              })
+                            }
+                          />
+                        </Button>
+                      </SignIn.SupportedStrategy>
+
+                      <Button
+                        intent='secondary'
+                        iconStart={<Icon.SMSSm />}
+                      >
+                        <SignIn.SafeIdentifier
+                          transform={(identifier: string) =>
+                            t('signIn.alternativeMethods.blockButton__phoneCode', {
+                              identifier,
+                            })
+                          }
+                        />
+                      </Button>
+
+                      <SignIn.SupportedStrategy
+                        name='passkey'
+                        asChild
+                      >
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.FingerprintSm />}
+                        >
+                          {t('signIn.alternativeMethods.blockButton__passkey')}
+                        </Button>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='password'
+                        asChild
+                      >
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.LockSm />}
+                        >
+                          {t('signIn.alternativeMethods.blockButton__password')}
+                        </Button>
+                      </SignIn.SupportedStrategy>
                     </div>
+
+                    <SignIn.Action
+                      navigate='start'
+                      asChild
+                    >
+                      <LinkButton>{t('backButton')}</LinkButton>
+                    </SignIn.Action>
                   </Card.Body>
                   {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
                 </Card.Content>
@@ -1166,13 +1175,14 @@ export function SignInComponentLoaded() {
                     ) : null}
                     <Card.Title>{t('signIn.resetPassword.title')}</Card.Title>
                   </Card.Header>
-                  <Card.Body>
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
 
+                  <Common.GlobalError>
+                    {({ message }) => {
+                      return <Alert>{message}</Alert>;
+                    }}
+                  </Common.GlobalError>
+
+                  <Card.Body>
                     <div className='flex flex-col justify-center gap-4'>
                       <PasswordField
                         validatePassword

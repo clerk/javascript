@@ -73,13 +73,14 @@ function SignUpComponentLoaded() {
                       })}
                     </Card.Description>
                   </Card.Header>
-                  <Card.Body>
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
 
+                  <Common.GlobalError>
+                    {({ message }) => {
+                      return <Alert>{message}</Alert>;
+                    }}
+                  </Common.GlobalError>
+
+                  <Card.Body>
                     <Connections disabled={isGlobalLoading} />
 
                     {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
@@ -199,12 +200,14 @@ function SignUpComponentLoaded() {
                         </span>
                       </Card.Description>
                     </Card.Header>
+
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
                       <OTPField
                         label={t('signUp.phoneCode.formTitle')}
                         disabled={isGlobalLoading}
@@ -273,12 +276,14 @@ function SignUpComponentLoaded() {
                         </span>
                       </Card.Description>
                     </Card.Header>
+
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
                       <OTPField
                         label={t('signUp.emailCode.formTitle')}
                         disabled={isGlobalLoading}
@@ -351,12 +356,14 @@ function SignUpComponentLoaded() {
                         </span>
                       </Card.Description>
                     </Card.Header>
+
+                    <Common.GlobalError>
+                      {({ message }) => {
+                        return <Alert>{message}</Alert>;
+                      }}
+                    </Common.GlobalError>
+
                     <Card.Body>
-                      <Common.GlobalError>
-                        {({ message }) => {
-                          return <Alert>{message}</Alert>;
-                        }}
-                      </Common.GlobalError>
                       <SignUp.Action
                         resend
                         asChild
@@ -390,12 +397,14 @@ function SignUpComponentLoaded() {
                     <Card.Title>{t('signUp.continue.title')}</Card.Title>
                     <Card.Description>{t('signUp.continue.subtitle')}</Card.Description>
                   </Card.Header>
+
+                  <Common.GlobalError>
+                    {({ message }) => {
+                      return <Alert>{message}</Alert>;
+                    }}
+                  </Common.GlobalError>
+
                   <Card.Body>
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
                     <div className='space-y-4'>
                       {firstNameEnabled && lastNameEnabled ? (
                         <div className='flex gap-4'>

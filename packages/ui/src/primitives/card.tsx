@@ -24,7 +24,7 @@ export const Root = React.forwardRef(function CardRoot(
   );
 });
 
-export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Content(
+export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardContent(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -43,7 +43,7 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
   );
 });
 
-export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Header(
+export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardHeader(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -59,7 +59,7 @@ export const Header = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
   );
 });
 
-export const Logo = React.forwardRef(function Logo(
+export const Logo = React.forwardRef(function CardLogo(
   {
     className,
     href,
@@ -94,7 +94,7 @@ export const Logo = React.forwardRef(function Logo(
   );
 });
 
-export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function Title(
+export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(function CardTitle(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -111,7 +111,7 @@ export const Title = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<H
 });
 
 export const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  function Description({ children, className, ...props }, forwardedRef) {
+  function CardDescription({ children, className, ...props }, forwardedRef) {
     return (
       <p
         ref={forwardedRef}
@@ -124,7 +124,7 @@ export const Description = React.forwardRef<HTMLHeadingElement, React.HTMLAttrib
   },
 );
 
-export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Body(
+export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardBody(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -140,7 +140,7 @@ export const Body = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   );
 });
 
-export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Actions(
+export const Actions = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function CardActions(
   { children, className, ...props },
   forwardedRef,
 ) {
@@ -187,7 +187,7 @@ export const Banner = React.forwardRef(function CardBanner(
   );
 });
 
-export const Footer = React.forwardRef(function Footer(
+export const Footer = React.forwardRef(function CardFooter(
   { branded = true, children, className, ...props }: { branded?: boolean } & React.HTMLAttributes<HTMLDivElement>,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
@@ -223,7 +223,7 @@ export const Footer = React.forwardRef(function Footer(
 });
 
 export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  function FooterAction({ children, className, ...props }, forwardedRef) {
+  function CardFooterAction({ children, className, ...props }, forwardedRef) {
     return (
       <div
         ref={forwardedRef}
@@ -238,7 +238,7 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
 );
 
 export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  function FooterActionText({ children, className, ...props }, forwardedRef) {
+  function CardFooterActionText({ children, className, ...props }, forwardedRef) {
     return (
       <p
         ref={forwardedRef}
@@ -255,7 +255,7 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
 const footerActionButton = cva({ base: 'text-accent-a10 text-base font-medium hover:underline' });
 
 export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-  function FooterActionButton({ children, className, type = 'button', ...props }, forwardedRef) {
+  function CardFooterActionButton({ children, className, type = 'button', ...props }, forwardedRef) {
     return (
       <button
         ref={forwardedRef}
@@ -272,7 +272,7 @@ export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.Butt
 );
 
 export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
-  function FooterActionLink({ children, className, ...props }, forwardedRef) {
+  function CardFooterActionLink({ children, className, ...props }, forwardedRef) {
     return (
       <a
         ref={forwardedRef}
