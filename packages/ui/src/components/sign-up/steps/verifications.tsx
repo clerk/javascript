@@ -17,7 +17,7 @@ import { GlobalError } from '~/common/global-error';
 export function SignUpVerifications() {
   const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
-  const { applicationName, branded } = useDisplayConfig();
+  const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
 
   const isDev = isDevelopmentOrStaging();
 
@@ -30,6 +30,13 @@ export function SignUpVerifications() {
               <Card.Content>
                 <SignUp.Strategy name='phone_code'>
                   <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
                     <Card.Title>{t('signUp.phoneCode.title')}</Card.Title>
                     <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                     <Card.Description>
@@ -102,6 +109,13 @@ export function SignUpVerifications() {
 
                 <SignUp.Strategy name='email_code'>
                   <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
                     <Card.Title>{t('signUp.emailCode.title')}</Card.Title>
                     <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                     <Card.Description>
@@ -174,6 +188,13 @@ export function SignUpVerifications() {
 
                 <SignUp.Strategy name='email_link'>
                   <Card.Header>
+                    {logoImageUrl ? (
+                      <Card.Logo
+                        href={homeUrl}
+                        src={logoImageUrl}
+                        alt={applicationName}
+                      />
+                    ) : null}
                     <Card.Title>{t('signUp.emailLink.title')}</Card.Title>
                     <Card.Description>
                       {t('signUp.emailLink.subtitle', {

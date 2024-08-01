@@ -24,7 +24,7 @@ export function SignUpContinue() {
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
-  const { branded } = useDisplayConfig();
+  const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
 
   const isDev = isDevelopmentOrStaging();
 
@@ -36,6 +36,13 @@ export function SignUpContinue() {
             <Card.Root>
               <Card.Content>
                 <Card.Header>
+                  {logoImageUrl ? (
+                    <Card.Logo
+                      href={homeUrl}
+                      src={logoImageUrl}
+                      alt={applicationName}
+                    />
+                  ) : null}
                   <Card.Title>{t('signUp.continue.title')}</Card.Title>
                   <Card.Description>{t('signUp.continue.subtitle')}</Card.Description>
                 </Card.Header>
