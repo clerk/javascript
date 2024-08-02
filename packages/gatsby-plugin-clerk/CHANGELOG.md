@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.4.48
+
+### Patch Changes
+
+- Clerk plans to transition `gatsby-plugin-clerk` into an End-of-life (EOL) state. Notice added to the README. ([#3877](https://github.com/clerk/javascript/pull/3877)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.4.47
 
 ### Patch Changes
