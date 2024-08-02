@@ -1001,6 +1001,10 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
+     * Hides the slug field in the form.
+     */
+    hideSlug?: boolean;
+    /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvided (if one is provided)
