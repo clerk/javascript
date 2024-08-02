@@ -1,18 +1,46 @@
+import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
 
+import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
+import { parsePhoneString } from '~/common/phone-number-field/utils';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
-import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link';
+import type { RequireExactlyOne } from '~/types/utils';
 
-import { SignUpIdentifier } from '../indentifiers';
-import { GlobalError } from '~/common/global-error';
+/* Internal
+  ============================================ */
+
+type Identifiers = {
+  emailAddress: boolean;
+  phoneNumber: boolean;
+};
+
+type Identifier = RequireExactlyOne<Identifiers>;
+
+function SignUpIdentifier({ emailAddress, phoneNumber }: Identifier) {
+  const { client } = useClerk();
+
+  if (emailAddress) {
+    return <span>{client.signUp.emailAddress}</span>;
+  }
+
+  if (phoneNumber) {
+    const { formattedNumberWithCode } = parsePhoneString(client.signUp.phoneNumber || '');
+    return <span>{formattedNumberWithCode}</span>;
+  }
+
+  return null;
+}
+
+/* Public
+  ============================================ */
 
 export function SignUpVerifications() {
   const { isDevelopmentOrStaging } = useEnvironment();
