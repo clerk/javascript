@@ -868,6 +868,7 @@ export type CreateOrganizationProps = RoutingOptions & {
   appearance?: CreateOrganizationTheme;
   /**
    * Hides the slug field in the form.
+   * @default undefined
    */
   hideSlug?: boolean;
 };
@@ -1002,6 +1003,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     skipInvitationScreen?: boolean;
     /**
      * Hides the slug field in the form.
+     * @default undefined
      */
     hideSlug?: boolean;
     /**
