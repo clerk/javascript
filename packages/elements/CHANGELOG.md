@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.12.0
+
+### Minor Changes
+
+- Add Metamask (Web3) support for sign in and sign up ([#3879](https://github.com/clerk/javascript/pull/3879)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.11.0
 
 ### Minor Changes

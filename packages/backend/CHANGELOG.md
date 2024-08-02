@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.5.1
+
+### Patch Changes
+
+- Retry handshake in case of handshake cookie collision in order to support multiple apps on same-level subdomains ([#3848](https://github.com/clerk/javascript/pull/3848)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 1.5.0
 
 ### Minor Changes

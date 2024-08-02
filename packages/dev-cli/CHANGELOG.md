@@ -1,5 +1,11 @@
 # @clerk/dev-cli
 
+## 0.0.5
+
+### Patch Changes
+
+- Remove macOS-specific Terminal functionality ([#3859](https://github.com/clerk/javascript/pull/3859)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.0.4
 
 ### Patch Changes
