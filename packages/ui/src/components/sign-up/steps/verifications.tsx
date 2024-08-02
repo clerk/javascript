@@ -4,7 +4,6 @@ import * as SignUp from '@clerk/elements/sign-up';
 
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
-import { parsePhoneString } from '~/common/phone-number-field/utils';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -13,6 +12,7 @@ import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link';
 import type { RequireExactlyOne } from '~/types/utils';
+import { parsePhoneString } from '~/utils/phone-number';
 
 /* Internal
   ============================================ */

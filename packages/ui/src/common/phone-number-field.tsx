@@ -5,13 +5,70 @@ import { cx } from 'cva';
 import * as React from 'react';
 import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
+import { type CountryIso, IsoToCountryMap } from '~/constants/phone-number';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { mergeRefs } from '~/utils/merge-refs';
+import { extractDigits, formatPhoneNumber, parsePhoneString } from '~/utils/phone-number';
 
-import { IsoToCountryMap } from './data';
-import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
+type UseFormattedPhoneNumberProps = {
+  initPhoneWithCode: string;
+  locationBasedCountryIso?: CountryIso;
+};
+
+const format = (str: string, iso: CountryIso) => {
+  if (!str) {
+    return '';
+  }
+  const country = IsoToCountryMap.get(iso);
+  return formatPhoneNumber(str, country?.pattern, country?.code);
+};
+
+const useFormattedPhoneNumber = (props: UseFormattedPhoneNumberProps) => {
+  const [number, setNumber] = React.useState(() => {
+    const { number } = parsePhoneString(props.initPhoneWithCode || '');
+    return number;
+  });
+
+  const [iso, setIso] = React.useState(
+    parsePhoneString(props.initPhoneWithCode || '').number
+      ? parsePhoneString(props.initPhoneWithCode || '').iso
+      : props.locationBasedCountryIso || 'us',
+  );
+
+  React.useEffect(() => {
+    setNumber(extractDigits(number));
+  }, [iso, number]);
+
+  const numberWithCode = React.useMemo(() => {
+    if (!number) {
+      return '';
+    }
+    const dialCode = IsoToCountryMap.get(iso)?.code || '1';
+    return '+' + extractDigits(`${dialCode}${number}`);
+  }, [iso, number]);
+
+  const formattedNumber = React.useMemo(() => {
+    return format(number, iso);
+  }, [iso, number]);
+
+  const setNumberAndIso = React.useCallback((str: string) => {
+    const { iso, number } = parsePhoneString(str);
+    setNumber(number);
+    setIso(iso);
+  }, []);
+
+  return {
+    setNumber,
+    setIso,
+    setNumberAndIso,
+    iso,
+    number,
+    numberWithCode,
+    formattedNumber,
+  };
+};
 
 const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
   return {
