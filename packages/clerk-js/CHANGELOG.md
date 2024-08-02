@@ -1,5 +1,34 @@
 # Change Log
 
+## 5.12.0
+
+### Minor Changes
+
+- Introducing a development mode warning when in development mode in order to mitigate going to production with development keys. ([#3870](https://github.com/clerk/javascript/pull/3870)) by [@octoper](https://github.com/octoper)
+
+  In case need to deactivate this UI change temporarily to simulate how components will look in production, you can do so by adding the `unsafe_disableDevelopmentModeWarnings` layout appearance prop to `<ClerkProvider>`
+
+  Example:
+
+  ```tsx
+  <ClerkProvider
+    appearance={{
+      layout: {
+        unsafe_disableDevelopmentModeWarnings: true,
+      },
+    }}
+  />
+  ```
+
+- Removed `__experimental_startPath` from `OrganizationProfileProps` in `@clerk/clerk-js` and `@clerk/types`. ([#3888](https://github.com/clerk/javascript/pull/3888)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Updated dependencies [[`568186cad`](https://github.com/clerk/javascript/commit/568186cad29acaf0b084a9f86ccb9d29bd23fcf4), [`407195270`](https://github.com/clerk/javascript/commit/407195270ed8aab6eef18c64a4918e3870fef471)]:
+  - @clerk/types@4.11.0
+  - @clerk/localizations@2.5.4
+  - @clerk/shared@2.4.3
+
 ## 5.11.0
 
 ### Minor Changes
