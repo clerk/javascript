@@ -48,7 +48,7 @@ export function PasswordField({
                 >
                   <Field.Input intent={state} />
                 </Common.Input>
-                <Field.InputEnd>
+                <Field.InputGroupEnd>
                   <button
                     type='button'
                     className={cx(
@@ -63,7 +63,7 @@ export function PasswordField({
                     <span className='sr-only'>{[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}</span>
                     {type === 'password' ? <Icon.EyeSlashSm /> : <Icon.EyeSm />}
                   </button>
-                </Field.InputEnd>
+                </Field.InputGroupEnd>
               </Field.InputGroup>
             );
           }}
