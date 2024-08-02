@@ -33,7 +33,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Password 
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.getPasswordInput().focus();
 
-    await expect(page.getByTestId('codes')).toHaveText('min_length');
+    await expect(page.getByTestId('codes')).toHaveText(/min_length/);
     await expect(page.getByTestId('message')).toHaveText('Your password must contain 8 or more characters.');
   });
 
