@@ -1,8 +1,9 @@
+import { useSignIn } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
+import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
-import { FirstFactorConnections } from '~/components/sign-in/first-factor-connections';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -12,6 +13,35 @@ import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link';
+import { Separator } from '~/primitives/separator';
+
+/* Internal
+  ============================================ */
+
+function FirstFactorConnections({
+  isGlobalLoading,
+  hasConnection,
+}: {
+  isGlobalLoading: boolean;
+  hasConnection: boolean;
+}) {
+  const { t } = useLocalizations();
+  const { signIn } = useSignIn();
+  const isFirstFactor = signIn?.status === 'needs_first_factor';
+
+  if (isFirstFactor) {
+    return (
+      <>
+        <Connections disabled={isGlobalLoading} />
+        {hasConnection ? <Separator>{t('dividerText')}</Separator> : null}
+      </>
+    );
+  }
+  return null;
+}
+
+/* Public
+  ============================================ */
 
 export function SignInChooseStrategy() {
   const enabledConnections = useEnabledConnections();
