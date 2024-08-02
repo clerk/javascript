@@ -3,44 +3,26 @@ import React from 'react';
 
 import { useAttributes } from '~/hooks/use-attributes';
 import { useLocalizations } from '~/hooks/use-localizations';
-
-import * as Field from '../primitives/field';
+import * as Field from '~/primitives/field';
 
 const DEFAULT_FIELD_NAME = 'emailAddress';
-const DEFAULT_ERROR_NAME = 'email_address';
 
 export function EmailField({
   alternativeFieldTrigger,
-  label,
   name = DEFAULT_FIELD_NAME,
-  hintText,
   enabled,
-  error,
   required,
   ...props
 }: {
   alternativeFieldTrigger?: React.ReactNode;
-  label?: React.ReactNode;
-  hintText?: string;
   enabled?: boolean;
-  error?: (message: string, code: string, name: string) => string;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const { t, translateError } = useLocalizations();
   const { enabled: attributeEnabled, required: attributeRequired } = useAttributes('email_address');
 
-  const renderLabel = label ? label : t('formFieldLabel__emailAddress');
-  const renderError = error ? error : translateError;
   const isEnabled = enabled !== undefined ? enabled : attributeEnabled;
   const isRequired = required !== undefined ? required : attributeRequired;
-  const renderHintText = () => {
-    if (hintText) {
-      return hintText;
-    }
-    if (!isRequired) {
-      return t('formFieldHintText__optional');
-    }
-    return null;
-  };
+
   if (!isEnabled) {
     return null;
   }
@@ -53,11 +35,11 @@ export function EmailField({
       <Field.Root>
         <Common.Label asChild>
           <Field.Label>
-            {renderLabel}
+            {t('formFieldLabel__emailAddress')}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
-            ) : renderHintText ? (
-              <Field.Hint>{renderHintText()}</Field.Hint>
+            ) : !isRequired ? (
+              <Field.Hint>{t('formFieldHintText__optional')}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>
@@ -77,7 +59,9 @@ export function EmailField({
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{renderError(message, code, DEFAULT_ERROR_NAME)}</Field.Message>;
+            return (
+              <Field.Message intent='error'>{translateError({ message, code, name: 'email_address' })}</Field.Message>
+            );
           }}
         </Common.FieldError>
       </Field.Root>

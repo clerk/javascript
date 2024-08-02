@@ -54,7 +54,7 @@ export const Root = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & {
     columns?: number;
   }
->(function Root({ children, className, ...props }, forwardedRef) {
+>(function ConnectionsRoot({ children, className, ...props }, forwardedRef) {
   const cols = getColumnCount(React.Children.count(children));
   return (
     <div>
@@ -73,7 +73,7 @@ export const Root = React.forwardRef<
   );
 });
 
-export const Button = React.forwardRef(function Button(
+export const Button = React.forwardRef(function ConnectionsButton(
   {
     busy,
     children,

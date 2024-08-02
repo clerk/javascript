@@ -41,3 +41,23 @@ export const noPathProvidedError = (componentName: string) =>
 
 export const incompatibleRoutingWithPathProvidedError = (componentName: string) =>
   `The \`path\` prop will only be respected when the Clerk component uses path-based routing. To resolve this error, pass \`routing='path'\` to the <${componentName}/> component, or drop the \`path\` prop to switch to hash-based routing. For more details please refer to our docs: https://clerk.com/docs`;
+
+export const userButtonIgnoredComponent = `<UserButton /> can only accept <UserButton.UserProfilePage />, <UserButton.UserProfileLink /> and <UserButton.MenuItems /> as its children. Any other provided component will be ignored.`;
+
+export const customMenuItemsIgnoredComponent =
+  '<UserButton.MenuItems /> component can only accept <UserButton.Action /> and <UserButton.Link /> as its children. Any other provided component will be ignored.';
+
+export const userButtonMenuItemsRenderedError =
+  '<UserButton.MenuItems /> component needs to be a direct child of `<UserButton />`.';
+
+export const userButtonMenuActionRenderedError =
+  '<UserButton.Action /> component needs to be a direct child of `<UserButton.MenuItems />`.';
+
+export const userButtonMenuLinkRenderedError =
+  '<UserButton.Link /> component needs to be a direct child of `<UserButton.MenuItems />`.';
+
+export const userButtonMenuItemLinkWrongProps =
+  'Missing props. <UserButton.Link /> component requires the following props: href, label and labelIcon.';
+
+export const userButtonMenuItemsActionWrongsProps =
+  'Missing props. <UserButton.Action /> component requires the following props: label.';

@@ -1,5 +1,88 @@
 # Change Log
 
+## 5.12.0
+
+### Minor Changes
+
+- Introducing a development mode warning when in development mode in order to mitigate going to production with development keys. ([#3870](https://github.com/clerk/javascript/pull/3870)) by [@octoper](https://github.com/octoper)
+
+  In case need to deactivate this UI change temporarily to simulate how components will look in production, you can do so by adding the `unsafe_disableDevelopmentModeWarnings` layout appearance prop to `<ClerkProvider>`
+
+  Example:
+
+  ```tsx
+  <ClerkProvider
+    appearance={{
+      layout: {
+        unsafe_disableDevelopmentModeWarnings: true,
+      },
+    }}
+  />
+  ```
+
+- Removed `__experimental_startPath` from `OrganizationProfileProps` in `@clerk/clerk-js` and `@clerk/types`. ([#3888](https://github.com/clerk/javascript/pull/3888)) by [@nikospapcom](https://github.com/nikospapcom)
+
+### Patch Changes
+
+- Updated dependencies [[`568186cad`](https://github.com/clerk/javascript/commit/568186cad29acaf0b084a9f86ccb9d29bd23fcf4), [`407195270`](https://github.com/clerk/javascript/commit/407195270ed8aab6eef18c64a4918e3870fef471)]:
+  - @clerk/types@4.11.0
+  - @clerk/localizations@2.5.4
+  - @clerk/shared@2.4.3
+
+## 5.11.0
+
+### Minor Changes
+
+- Introduce support for custom menu items in `<UserButton/>`. ([#3784](https://github.com/clerk/javascript/pull/3784)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Use `<UserButton.MenuItems>` as a child component to wrap custom menu items.
+  - Use `<UserButton.Link/>` for creating external or internal links.
+  - Use `<UserButton.Action/>` for opening a specific custom page of "UserProfile" or to trigger your own custom logic via `onClick`.
+  - If needed, reorder existing items like `manageAccount` and `signOut`
+
+  New usage example:
+
+  ```jsx
+  <UserButton>
+    <UserButton.MenuItems>
+      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
+      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
+      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
+      custom page to have been set in `/help`)
+      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
+      <UserButton.Action
+        label="Chat Modal"
+        labelIcon={<Icon />}
+        onClick={() => setModal(true)}
+      />
+    </UserButton.MenuItems>
+  </UserButton>
+  ```
+
+### Patch Changes
+
+- Introduce ability to set an active organization by slug ([#3825](https://github.com/clerk/javascript/pull/3825)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`d3d38e206`](https://github.com/clerk/javascript/commit/d3d38e2061fdbdfcc8a24b58f180ecbed3f1145a), [`a3e9c2fb8`](https://github.com/clerk/javascript/commit/a3e9c2fb8d71d4c80402ceb87c8ed8a6e2e6e98a), [`fb302bb64`](https://github.com/clerk/javascript/commit/fb302bb64608d5f06c9a53c8e20c9d0ec61d99ec), [`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/localizations@2.5.3
+  - @clerk/types@4.10.0
+  - @clerk/shared@2.4.2
+
+## 5.10.2
+
+### Patch Changes
+
+- Add support for opening the `UserProfileModal` and `OrganizationProfileModal` to specific navigation items through the `UserButton` and `OrganizationSwitcher`. ([#3732](https://github.com/clerk/javascript/pull/3732)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Adjust how we pass captcha tokens to the Clerk API when signing in with Google, Microsoft, and Apple ([#3806](https://github.com/clerk/javascript/pull/3806)) by [@BRKalow](https://github.com/BRKalow)
+
+- Add `signUp.start.actionLink__use_email` and `signUp.start.actionLink__use_phone` localization keys. ([#3826](https://github.com/clerk/javascript/pull/3826)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`b48689705`](https://github.com/clerk/javascript/commit/b48689705f9fc2251d2f24addec7a0d0b1da0fe1), [`4e61f8d27`](https://github.com/clerk/javascript/commit/4e61f8d2770907f48a53d530187a7b6de09f107e)]:
+  - @clerk/types@4.9.1
+  - @clerk/localizations@2.5.2
+  - @clerk/shared@2.4.1
+
 ## 5.10.1
 
 ### Patch Changes

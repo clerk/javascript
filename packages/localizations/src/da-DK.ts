@@ -455,6 +455,8 @@ export const daDK: LocalizationResource = {
     },
     start: {
       actionLink: 'Log ind',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Har du en konto?',
       subtitle: 'Forsæt til {{applicationName}}',
       title: 'Opret din konto',

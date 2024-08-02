@@ -1,5 +1,34 @@
 # Change Log
 
+## 2.5.4
+
+### Patch Changes
+
+- Updated dependencies [[`568186cad`](https://github.com/clerk/javascript/commit/568186cad29acaf0b084a9f86ccb9d29bd23fcf4), [`407195270`](https://github.com/clerk/javascript/commit/407195270ed8aab6eef18c64a4918e3870fef471)]:
+  - @clerk/types@4.11.0
+
+## 2.5.3
+
+### Patch Changes
+
+- Translate ar-SA localization strings for Organization Profile ([#3797](https://github.com/clerk/javascript/pull/3797)) by [@mahsayedsalem](https://github.com/mahsayedsalem)
+
+- Updated missing and untranslated Arabic localizations ([#3821](https://github.com/clerk/javascript/pull/3821)) by [@MhndMousa](https://github.com/MhndMousa)
+
+- Replaced "Delete account" with spanish translation "Eliminar cuenta" ([#3832](https://github.com/clerk/javascript/pull/3832)) by [@martin-dos-santos](https://github.com/martin-dos-santos)
+
+- Updated dependencies [[`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/types@4.10.0
+
+## 2.5.2
+
+### Patch Changes
+
+- Add `signUp.start.actionLink__use_email` and `signUp.start.actionLink__use_phone` localization keys. ([#3826](https://github.com/clerk/javascript/pull/3826)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`b48689705`](https://github.com/clerk/javascript/commit/b48689705f9fc2251d2f24addec7a0d0b1da0fe1)]:
+  - @clerk/types@4.9.1
+
 ## 2.5.1
 
 ### Patch Changes

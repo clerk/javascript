@@ -456,6 +456,8 @@ export const srRS: LocalizationResource = {
     },
     start: {
       actionLink: 'Prijavi se',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Već imaš nalog?',
       subtitle: 'Dobrodošao! Molimo popuni detalje da započneš.',
       title: 'Kreiraj svoj nalog',

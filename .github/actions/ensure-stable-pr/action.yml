@@ -1,0 +1,21 @@
+name: Ensure Stable PR
+description: Ensure that the PR hasn't changed since the commented command was initiated
+inputs:
+  cmd:
+    description: 'The command used in the comment'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Ensure the PR hasn't changed since initiating the commented command.
+      uses: actions/github-script@v7
+      env:
+        CMD: ${{ inputs.cmd }}
+      with:
+        script: |
+          const prLastUpdated = new Date(github.pull_request.pushed_at);
+          const commentCreated = new Date(github.issue_comment.created_at);
+
+          if (prLastUpdated > commentCreated) {
+            core.setFailed("The PR has been updated since $CMD was initiated. Please review the changes and re-run the $CMD command.");
+          }

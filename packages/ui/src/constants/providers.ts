@@ -1,6 +1,6 @@
 import type { OAuthProvider, Web3Provider } from '@clerk/types';
 
-import type * as Icon from './primitives/icon';
+import type * as Icon from '~/primitives/icon';
 
 type IconName = keyof typeof Icon;
 type Provider = {

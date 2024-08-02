@@ -1,5 +1,23 @@
 # @clerk/dev-cli
 
+## 0.0.5
+
+### Patch Changes
+
+- Remove macOS-specific Terminal functionality ([#3859](https://github.com/clerk/javascript/pull/3859)) by [@dstaley](https://github.com/dstaley)
+
+## 0.0.4
+
+### Patch Changes
+
+- Use configured monorepo root when calculating Clerk packages ([#3856](https://github.com/clerk/javascript/pull/3856)) by [@dstaley](https://github.com/dstaley)
+
+## 0.0.3
+
+### Patch Changes
+
+- Fix a bug where `clerk-dev init` would error if the config directory did not already exist. ([#3804](https://github.com/clerk/javascript/pull/3804)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 0.0.2
 
 ### Patch Changes

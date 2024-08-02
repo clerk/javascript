@@ -453,6 +453,8 @@ export const thTH: LocalizationResource = {
     },
     start: {
       actionLink: 'เข้าสู่ระบบ',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'มีบัญชีอยู่แล้วใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับ! กรุณากรอกข้อมูลเพื่อเริ่มต้น',
       title: 'สร้างบัญชีของคุณ',

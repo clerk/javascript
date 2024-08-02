@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import { Command } from 'cmdk';
 import { cx } from 'cva';
@@ -9,7 +10,7 @@ import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { mergeRefs } from '~/utils/merge-refs';
 
-import { type CountryIso, IsoToCountryMap } from './data';
+import { IsoToCountryMap } from './data';
 import { useFormattedPhoneNumber } from './useFormattedPhoneNumber';
 
 const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
@@ -21,23 +22,20 @@ const countryOptions = Array.from(IsoToCountryMap.values()).map(country => {
 export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   {
     alternativeFieldTrigger,
-    label = 'Phone number',
     name = 'phoneNumber',
-    hintText = 'Optional',
     initPhoneWithCode = '',
-    locationBasedCountryIso,
     onChange,
     ...props
   }: React.InputHTMLAttributes<HTMLInputElement> & {
     alternativeFieldTrigger?: React.ReactNode;
-    label?: React.ReactNode;
-    hintText?: string;
     initPhoneWithCode?: string;
-    locationBasedCountryIso: CountryIso;
   },
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
-  const { translateError } = useLocalizations();
+  const clerk = useClerk();
+  // TODO to fix IsomorphicClerk
+  const locationBasedCountryIso = (clerk as any)?.clerkjs.__internal_country;
+  const { t, translateError } = useLocalizations();
   const [isOpen, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
   const id = React.useId();
@@ -45,7 +43,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   const inputRef = React.useRef<HTMLInputElement>(null);
   const commandListRef = React.useRef<HTMLDivElement>(null);
   const commandInputRef = React.useRef<HTMLInputElement>(null);
-  const contentWidth = containerRef.current?.clientWidth || 0;
+  const contentWidth = containerRef.current?.getBoundingClientRect()?.width || 0;
   const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
     initPhoneWithCode,
     locationBasedCountryIso,
@@ -97,11 +95,11 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
       <Field.Root>
         <Common.Label asChild>
           <Field.Label htmlFor={id}>
-            {label}{' '}
+            {t('formFieldLabel__phoneNumber')}{' '}
             {alternativeFieldTrigger ? (
               <Field.LabelEnd>{alternativeFieldTrigger}</Field.LabelEnd>
             ) : !props?.required ? (
-              <Field.Hint>{hintText}</Field.Hint>
+              <Field.Hint>{t('formFieldHintText__optional')}</Field.Hint>
             ) : null}
           </Field.Label>
         </Common.Label>
@@ -111,25 +109,53 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
               <div
                 ref={containerRef}
                 className={cx(
-                  'text-gray-12 border-gray-a6 flex w-full rounded-md border bg-white bg-clip-padding text-base outline-none',
-                  'focus-within:ring-[0.1875rem] has-[[data-field-input][disabled]]:cursor-not-allowed has-[[data-field-input][disabled]]:opacity-50',
+                  '[--phone-number-field-border-width:1px]',
+                  '[--phone-number-field-py:calc(theme(spacing[1.5])-var(--phone-number-field-border-width))]',
+                  '[--phone-number-field-px:calc(theme(spacing.3)-var(--phone-number-field-border-width))]',
+                  'border-[length:--phone-number-field-border-width] border-[--cl-phone-number-field-border] bg-clip-padding',
+                  'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
+                  'has-[[data-field-input][disabled]]:cursor-not-allowed has-[[data-field-input][disabled]]:opacity-50',
+                  // hover
+                  'hover:has-[[data-field-input]:enabled]:border-[--cl-phone-number-field-border-active]',
+                  // focus
+                  'has-[[data-field-input]:focus-visible]:border-[--cl-phone-number-field-border-active]',
+                  'has-[[data-field-input]:focus-visible]:ring-[0.1875rem]',
+                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring]',
                   // intent
                   {
-                    idle: 'hover:border-gray-a8 focus-within:ring-gray-a3 focus-within:border-gray-a8',
-                    info: 'hover:border-gray-a8 focus-within:ring-gray-a3 focus-within:border-gray-a8',
-                    error: 'border-danger focus-within:ring-danger/20',
-                    success: 'border-success focus-within:ring-success/25', // (optically adjusted ring to 25 opacity)
-                    warning: 'border-warning focus-within:ring-warning/20',
+                    idle: [
+                      '[--cl-phone-number-field-border:theme(colors.gray.a6)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.gray.a8)]',
+                      '[--cl-phone-number-field-ring:theme(colors.gray.a3)]',
+                    ],
+                    info: [
+                      '[--cl-phone-number-field-border:theme(colors.gray.a8)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.gray.a8)]',
+                      '[--cl-phone-number-field-ring:theme(colors.gray.a3)]',
+                    ],
+                    error: [
+                      '[--cl-phone-number-field-border:theme(colors.danger.DEFAULT)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.danger.DEFAULT)]',
+                      '[--cl-phone-number-field-ring:theme(colors.danger.DEFAULT/0.2)]',
+                    ],
+                    success: [
+                      '[--cl-phone-number-field-border:theme(colors.success.DEFAULT)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.success.DEFAULT)]',
+                      '[--cl-phone-number-field-ring:theme(colors.success.DEFAULT/0.25)]', // (optically adjusted ring to 25 opacity)
+                    ],
+                    warning: [
+                      '[--cl-phone-number-field-border:theme(colors.warning.DEFAULT)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.warning.DEFAULT)]',
+                      '[--cl-phone-number-field-ring:theme(colors.warning.DEFAULT/0.2)]',
+                    ],
                   }[intent],
-                  // data-[invalid] overrides all
-                  'has-[[data-field-input][invalid]]:border-danger has-[[data-field-input][invalid]]:hover:border-danger has-[[data-field-input][invalid]]:focus-within:border-danger has-[[data-field-input][invalid]]:focus-within:ring-danger/30',
                 )}
               >
                 <DialogTrigger>
                   <Button
                     onPress={() => setOpen(true)}
                     isDisabled={props.disabled}
-                    className='hover:enabled:bg-gray-2 focus-visible:bg-gray-2 flex items-center gap-x-2 rounded-l-md px-2 py-1 text-base outline-none'
+                    className='hover:enabled:bg-gray-2 focus-visible:bg-gray-2 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
                     <Icon.ChevronUpDown className='text-gray-11 size-4' />
@@ -138,6 +164,8 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                     isOpen={isOpen}
                     onOpenChange={setOpen}
                     placement='bottom start'
+                    // Note: manual xOffset to ensure optical alignment
+                    crossOffset={-1}
                   >
                     <Dialog
                       className='outline-none'
@@ -207,7 +235,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   onPaste={handlePaste}
                   onChange={handlePhoneNumberChange}
                   {...props}
-                  className='w-full rounded-r-md bg-white py-1.5 pr-2.5 text-base outline-none'
+                  className='w-full rounded-r-md bg-white py-[--phone-number-field-py] pr-[--phone-number-field-px] text-base outline-none'
                   data-field-input
                 />
               </div>
@@ -216,7 +244,9 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{translateError(message, code, 'phone_number')}</Field.Message>;
+            return (
+              <Field.Message intent='error'>{translateError({ message, code, name: 'phone_number' })}</Field.Message>
+            );
           }}
         </Common.FieldError>
       </Field.Root>

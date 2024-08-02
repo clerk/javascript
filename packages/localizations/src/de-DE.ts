@@ -463,6 +463,8 @@ export const deDE: LocalizationResource = {
     },
     start: {
       actionLink: 'Einloggen',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Haben Sie ein Konto?',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Erstelle deinen Account',

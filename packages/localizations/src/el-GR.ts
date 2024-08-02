@@ -457,6 +457,8 @@ export const elGR: LocalizationResource = {
     },
     start: {
       actionLink: 'Σύνδεση',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Έχετε ήδη λογαριασμό;',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Δημιουργήστε τον λογαριασμό σας',

@@ -1,52 +1,91 @@
 import React from 'react';
 
 import { useEnvironment } from '../../contexts';
-import { Flex, Icon, Link, Text } from '../../customizables';
+import { Box, Col, Flex, Icon, Link, Text } from '../../customizables';
+import { useDevMode } from '../../hooks/useDevMode';
 import { LogoMark } from '../../icons';
-import type { PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
+import { DevModeNotice, DevModeOverlay } from '../DevModeNotice';
 import { Card } from '.';
 
 export const CardClerkAndPagesTag = React.memo(
-  React.forwardRef<HTMLDivElement, PropsOfComponent<typeof Flex> & { withFooterPages?: boolean }>((props, ref) => {
-    const { sx, withFooterPages = false, ...rest } = props;
-    const { branded } = useEnvironment().displayConfig;
+  React.forwardRef<
+    HTMLDivElement,
+    PropsOfComponent<typeof Flex> & {
+      withFooterPages?: boolean;
+      devModeNoticeSx?: ThemableCssProp;
+      outerSx?: ThemableCssProp;
+      withDevOverlay?: boolean;
+    }
+  >((props, ref) => {
+    const { sx, outerSx, withFooterPages = false, withDevOverlay = false, devModeNoticeSx, ...rest } = props;
+    const { displayConfig } = useEnvironment();
+    const { showDevModeNotice } = useDevMode();
 
-    if (!(branded || withFooterPages)) {
+    if (!(displayConfig.branded || withFooterPages) && !showDevModeNotice) {
       return null;
     }
 
     return (
-      <Flex
+      <Box
         sx={[
-          t => ({
-            ':has(div:only-child)': {
-              justifyContent: 'center',
-            },
-            justifyContent: 'space-between',
+          {
             width: '100%',
-            padding: `0 ${t.space.$8}`,
-          }),
-          sx,
+            position: 'relative',
+            isolation: 'isolate',
+          },
+          outerSx,
         ]}
-        {...rest}
-        ref={ref}
       >
-        {branded && (
-          <Flex
-            gap={1}
-            align='center'
-            justify='center'
-            sx={t => ({ color: t.colors.$colorTextSecondary })}
-          >
-            <>
-              <Text variant='buttonSmall'>Secured by</Text>
-              <LogoMarkIconLink />
-            </>
-          </Flex>
-        )}
+        {withDevOverlay && <DevModeOverlay gradient={0} />}
+        <Col
+          sx={t => ({
+            gap: displayConfig.branded || withFooterPages ? t.space.$2 : 0,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1,
+            position: 'relative',
+          })}
+        >
+          {(displayConfig.branded || withFooterPages) && (
+            <Flex
+              sx={[
+                {
+                  ':has(div:only-child)': {
+                    justifyContent: 'center',
+                  },
+                  justifyContent: 'space-between',
+                  width: '100%',
+                },
+                sx,
+              ]}
+              {...rest}
+              ref={ref}
+            >
+              {displayConfig.branded && (
+                <Flex
+                  gap={1}
+                  align='center'
+                  justify='center'
+                  sx={t => ({ color: t.colors.$colorTextSecondary })}
+                >
+                  <>
+                    <Text variant='buttonSmall'>Secured by</Text>
+                    <LogoMarkIconLink />
+                  </>
+                </Flex>
+              )}
 
-        {withFooterPages && <Card.FooterLinks />}
-      </Flex>
+              {withFooterPages && <Card.FooterLinks />}
+            </Flex>
+          )}
+
+          <DevModeNotice sx={devModeNoticeSx} />
+        </Col>
+      </Box>
     );
   }),
 );

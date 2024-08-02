@@ -88,11 +88,12 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       return openCreateOrganization({ afterCreateOrganizationUrl, skipInvitationScreen });
     };
 
-    const handleManageOrganizationClicked = () => {
+    const handleItemClick = () => {
       close();
       if (organizationProfileMode === 'navigation') {
         return navigateOrganizationProfile();
       }
+
       return openOrganizationProfile({
         ...organizationProfileProps,
         afterLeaveOrganizationUrl,
@@ -112,7 +113,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
         iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
         icon={CogFilled}
-        onClick={handleManageOrganizationClicked}
+        onClick={() => handleItemClick()}
         trailing={<NotificationCountBadgeManageButton />}
       />
     );
@@ -127,7 +128,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('manageOrganization')}
         icon={CogFilled}
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
-        onClick={handleManageOrganizationClicked}
+        onClick={() => handleItemClick()}
         trailing={<NotificationCountBadgeManageButton />}
       />
     );

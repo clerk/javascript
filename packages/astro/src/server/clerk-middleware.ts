@@ -40,7 +40,7 @@ type ClerkAstroMiddlewareHandler = (
   auth: () => ClerkMiddlewareAuthObject,
   context: AstroMiddlewareContextParam,
   next: AstroMiddlewareNextParam,
-) => AstroMiddlewareReturn;
+) => AstroMiddlewareReturn | undefined;
 
 type ClerkAstroMiddlewareOptions = AuthenticateRequestOptions;
 

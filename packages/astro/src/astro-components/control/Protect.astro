@@ -1,6 +1,31 @@
 ---
-import { ProtectComponentDefaultProps } from "../../types";
-type Props = ProtectComponentDefaultProps
+import type {
+  CheckAuthorizationWithCustomPermissions,
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
+} from '@clerk/types';
+
+type Props =
+  | {
+      condition?: never;
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+    }
+  | {
+      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+      role?: never;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+    };
 
 const { has, userId } = Astro.locals.auth();
 const isUnauthorized =

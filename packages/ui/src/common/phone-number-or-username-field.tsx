@@ -2,6 +2,7 @@ import type * as Common from '@clerk/elements/common';
 import * as React from 'react';
 import { ToggleButton } from 'react-aria-components';
 
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { link } from '~/primitives/link';
 
 import { PhoneNumberField } from './phone-number-field';
@@ -10,16 +11,12 @@ import { UsernameField } from './username-field';
 export function PhoneNumberOrUsernameField({
   className,
   name = undefined,
-  labelPhoneNumber = 'Phone number',
-  labelUsername = 'Username',
-  locationBasedCountryIso,
-  toggleDescription = 'Toggle between phone and username.',
+  toggleLabelPhoneNumber,
+  toggleLabelUsername,
   ...props
 }: {
-  labelUsername?: React.ReactNode;
-  labelPhoneNumber?: React.ReactNode;
-  locationBasedCountryIso: React.ComponentProps<typeof PhoneNumberField>['locationBasedCountryIso'];
-  toggleDescription?: string;
+  toggleLabelPhoneNumber: React.ReactNode;
+  toggleLabelUsername: React.ReactNode;
 } & Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
   const [showUsernameField, setShowUsernameField] = React.useState(false);
 
@@ -29,8 +26,8 @@ export function PhoneNumberOrUsernameField({
       onChange={setShowUsernameField}
       className={link({ size: 'sm', disabled: props.disabled, focusVisible: 'data-attribute' })}
     >
-      <span className='sr-only'>{toggleDescription}</span>
-      {showUsernameField ? 'Use phone' : 'Use username'}
+      <span className='sr-only'>{LOCALIZATION_NEEDED.formFieldAccessibleLabel__phoneOrUsername}</span>
+      {showUsernameField ? toggleLabelPhoneNumber : toggleLabelUsername}
     </ToggleButton>
   );
 
@@ -38,14 +35,11 @@ export function PhoneNumberOrUsernameField({
     <UsernameField
       {...props}
       name={name}
-      label={labelUsername}
       alternativeFieldTrigger={toggle}
     />
   ) : (
     <PhoneNumberField
       name={name}
-      label={labelPhoneNumber}
-      locationBasedCountryIso={locationBasedCountryIso}
       alternativeFieldTrigger={toggle}
       {...props}
     />

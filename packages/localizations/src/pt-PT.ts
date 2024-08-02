@@ -455,6 +455,8 @@ export const ptPT: LocalizationResource = {
     },
     start: {
       actionLink: 'Entrar',
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Já tem uma conta?',
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Criar a sua conta',

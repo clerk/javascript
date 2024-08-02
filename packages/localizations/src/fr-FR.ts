@@ -457,6 +457,8 @@ export const frFR: LocalizationResource = {
     },
     start: {
       actionLink: "S'identifier",
+      actionLink__use_email: undefined,
+      actionLink__use_phone: undefined,
       actionText: 'Vous avez déjà un compte ?',
       subtitle: 'pour continuer à {{applicationName}}',
       title: 'Créez votre compte',

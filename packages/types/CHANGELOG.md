@@ -1,5 +1,67 @@
 # Change Log
 
+## 4.11.0
+
+### Minor Changes
+
+- Introducing a development mode warning when in development mode in order to mitigate going to production with development keys. ([#3870](https://github.com/clerk/javascript/pull/3870)) by [@octoper](https://github.com/octoper)
+
+  In case need to deactivate this UI change temporarily to simulate how components will look in production, you can do so by adding the `unsafe_disableDevelopmentModeWarnings` layout appearance prop to `<ClerkProvider>`
+
+  Example:
+
+  ```tsx
+  <ClerkProvider
+    appearance={{
+      layout: {
+        unsafe_disableDevelopmentModeWarnings: true,
+      },
+    }}
+  />
+  ```
+
+- Removed `__experimental_startPath` from `OrganizationProfileProps` in `@clerk/clerk-js` and `@clerk/types`. ([#3888](https://github.com/clerk/javascript/pull/3888)) by [@nikospapcom](https://github.com/nikospapcom)
+
+## 4.10.0
+
+### Minor Changes
+
+- Introduce support for custom menu items in `<UserButton/>`. ([#3784](https://github.com/clerk/javascript/pull/3784)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Use `<UserButton.MenuItems>` as a child component to wrap custom menu items.
+  - Use `<UserButton.Link/>` for creating external or internal links.
+  - Use `<UserButton.Action/>` for opening a specific custom page of "UserProfile" or to trigger your own custom logic via `onClick`.
+  - If needed, reorder existing items like `manageAccount` and `signOut`
+
+  New usage example:
+
+  ```jsx
+  <UserButton>
+    <UserButton.MenuItems>
+      <UserButton.Link label="Terms" labelIcon={<Icon />} href="/terms" />
+      <UserButton.Action label="Help" labelIcon={<Icon />} open="help" /> //
+      Navigate to `/help` page when UserProfile opens as a modal. (Requires a
+      custom page to have been set in `/help`)
+      <UserButton.Action label="manageAccount" labelIcon={<Icon />} />
+      <UserButton.Action
+        label="Chat Modal"
+        labelIcon={<Icon />}
+        onClick={() => setModal(true)}
+      />
+    </UserButton.MenuItems>
+  </UserButton>
+  ```
+
+### Patch Changes
+
+- Introduce ability to set an active organization by slug ([#3825](https://github.com/clerk/javascript/pull/3825)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.9.1
+
+### Patch Changes
+
+- Add support for opening the `UserProfileModal` and `OrganizationProfileModal` to specific navigation items through the `UserButton` and `OrganizationSwitcher`. ([#3732](https://github.com/clerk/javascript/pull/3732)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
 ## 4.9.0
 
 ### Minor Changes

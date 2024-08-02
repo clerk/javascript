@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`992e5960c`](https://github.com/clerk/javascript/commit/992e5960c785eace83f3bad7c34d589fa313dcaf)]:
+  - @clerk/backend@1.5.1
+  - @clerk/clerk-sdk-node@5.0.22
+
 ## 5.0.0-beta.45
 
 ### Patch Changes
@@ -319,7 +327,7 @@
       sanitizeAuthObject,
       signedInAuthObject,
       signedOutAuthObject,
-    } from '@clerk/backend/internal';
+    } from "@clerk/backend/internal";
     ```
   - Drop the above exports from the top-level api:
     ```typescript
@@ -358,13 +366,19 @@
       Token,
       User,
       Verification,
-    } from '@clerk/backend';
+    } from "@clerk/backend";
     // After : no alternative since there is no need to use those classes
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
   - Keep those 3 resource related type exports
     ```typescript
-    import type { Organization, Session, User, WebhookEvent, WebhookEventType } from '@clerk/backend';
+    import type {
+      Organization,
+      Session,
+      User,
+      WebhookEvent,
+      WebhookEventType,
+    } from "@clerk/backend";
     ```
 
 ### Patch Changes
@@ -391,39 +405,44 @@
   Inside your code, search for occurrences like these:
 
   ```js
-  import { Clerk } from 'gatsby-plugin-clerk';
-  const clerk = Clerk({ secretKey: '...' });
+  import { Clerk } from "gatsby-plugin-clerk";
+  const clerk = Clerk({ secretKey: "..." });
   ```
 
   You need to rename the import from `Clerk` to `createClerkClient` and change its usage:
 
   ```js
-  import { createClerkClient } from 'gatsby-plugin-clerk';
-  const clerk = createClerkClient({ secretKey: '...' });
+  import { createClerkClient } from "gatsby-plugin-clerk";
+  const clerk = createClerkClient({ secretKey: "..." });
   ```
 
 - - Introduce `@clerk/clerk-react/errors` and `@clerk/clerk-react/internal` subpath exports to expose some internal utilities. Eg ([#2328](https://github.com/clerk/javascript/pull/2328)) by [@dimkl](https://github.com/dimkl)
 
     ```typescript
     // Before
-    import { __internal__setErrorThrowerOptions } from '@clerk/clerk-react';
+    import { __internal__setErrorThrowerOptions } from "@clerk/clerk-react";
     // After
-    import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+    import { setErrorThrowerOptions } from "@clerk/clerk-react/internal";
 
     // Before
-    import { isClerkAPIResponseError, isEmailLinkError, isKnownError, isMetamaskError } from '@clerk/clerk-react';
+    import {
+      isClerkAPIResponseError,
+      isEmailLinkError,
+      isKnownError,
+      isMetamaskError,
+    } from "@clerk/clerk-react";
     // After
     import {
       isClerkAPIResponseError,
       isEmailLinkError,
       isKnownError,
       isMetamaskError,
-    } from '@clerk/clerk-react/errors';
+    } from "@clerk/clerk-react/errors";
 
     // Before
-    import { MultisessionAppSupport } from '@clerk/clerk-react';
+    import { MultisessionAppSupport } from "@clerk/clerk-react";
     // After
-    import { MultisessionAppSupport } from '@clerk/clerk-react/internal';
+    import { MultisessionAppSupport } from "@clerk/clerk-react/internal";
     ```
 
   - Drop from the `@clerk/clerk-react` and all other clerk-react wrapper packages:

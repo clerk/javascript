@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
-import { writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 
 import { CONFIG_FILE } from '../utils/getConfiguration.js';
 import { getCLIRoot } from '../utils/getMonorepoRoot.js';
@@ -25,6 +25,8 @@ export async function init() {
       },
     },
   };
+
+  await mkdir(dirname(CONFIG_FILE), { recursive: true });
 
   await writeFile(CONFIG_FILE, JSON.stringify(configuration, null, 2), 'utf-8');
 

@@ -26,6 +26,7 @@ interface AuthenticateContextInterface extends AuthenticateRequestOptions {
   // handshake-related values
   devBrowserToken: string | undefined;
   handshakeToken: string | undefined;
+  handshakeRedirectLoopCounter: number;
   // url derived from headers
   clerkUrl: URL;
   // cookie or header session token
@@ -106,6 +107,7 @@ class AuthenticateContext {
     // Using getCookie since we don't suffix the handshake token cookie
     this.handshakeToken =
       this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
+    this.handshakeRedirectLoopCounter = Number(this.getCookie(constants.Cookies.RedirectCount)) || 0;
   }
 
   private stripAuthorizationHeader(authValue: string | undefined | null): string | undefined {

@@ -1,20 +1,29 @@
-import './polyfills';
+import '../polyfills';
 
-import type { ClerkProviderProps as ClerkReactProviderProps } from '@clerk/clerk-react';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
-import React from 'react';
+import * as WebBrowser from 'expo-web-browser';
 
-import type { TokenCache } from './cache';
-import { isReactNative } from './runtime';
+import type { TokenCache } from '../cache/types';
+import { isNative, isWeb } from '../utils/runtime';
 import { getClerkInstance } from './singleton';
 
-export type ClerkProviderProps = ClerkReactProviderProps & {
+export type ClerkProviderProps = React.ComponentProps<typeof ClerkReactProvider> & {
   tokenCache?: TokenCache;
+};
+
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
 };
 
 export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
   const { children, tokenCache, publishableKey, ...rest } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
+
+  if (isWeb()) {
+    // This is needed in order for useOAuth to work correctly on web.
+    WebBrowser.maybeCompleteAuthSession();
+  }
 
   return (
     <ClerkReactProvider
@@ -23,8 +32,9 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
       key={pk}
       {...rest}
       publishableKey={pk}
-      Clerk={getClerkInstance({ publishableKey: pk, tokenCache })}
-      standardBrowser={!isReactNative()}
+      sdkMetadata={SDK_METADATA}
+      Clerk={isNative() ? getClerkInstance({ publishableKey: pk, tokenCache }) : null}
+      standardBrowser={!isNative()}
     >
       {children}
     </ClerkReactProvider>
