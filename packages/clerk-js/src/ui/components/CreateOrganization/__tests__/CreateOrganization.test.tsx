@@ -79,18 +79,36 @@ describe('CreateOrganization', () => {
     expect(getByRole('heading', { name: 'Create organization', level: 1 })).toBeInTheDocument();
   });
 
-  it('renders component without slug', async () => {
-    const { wrapper, props } = await createFixtures(f => {
+  it('renders component without slug field', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.com'],
       });
     });
 
-    props.setProps({ hideSlug: true });
-    const { getByLabelText } = render(<CreateOrganization />, { wrapper });
+    fixtures.clerk.createOrganization.mockReturnValue(
+      Promise.resolve(
+        getCreatedOrg({
+          maxAllowedMemberships: 1,
+          slug: 'new-org-1722578361',
+        }),
+      ),
+    );
 
-    expect(getByLabelText(/Slug/i)).not.toBeInTheDocument();
+    props.setProps({ hideSlug: true });
+    const { userEvent, getByRole, queryByText, queryByLabelText, getByLabelText } = render(<CreateOrganization />, {
+      wrapper,
+    });
+
+    expect(queryByLabelText('Slug')).toBeNull();
+
+    await userEvent.type(getByLabelText(/Name/i), 'new org');
+    await userEvent.click(getByRole('button', { name: /create organization/i }));
+
+    await waitFor(() => {
+      expect(queryByText(/Invite new members/i)).toBeInTheDocument();
+    });
   });
 
   it('skips invitation screen', async () => {
