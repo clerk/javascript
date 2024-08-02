@@ -38,7 +38,7 @@ export function PasswordField({
         <Common.FieldState>
           {({ state }) => {
             return (
-              <div className='relative'>
+              <Field.InputGroup>
                 <Common.Input
                   type={type}
                   className={cx('pe-7', className)}
@@ -48,21 +48,23 @@ export function PasswordField({
                 >
                   <Field.Input intent={state} />
                 </Common.Input>
-                <button
-                  type='button'
-                  className={cx(
-                    'text-icon-sm text-gray-11 absolute end-1 top-1 aspect-square rounded-sm p-1 outline-none disabled:cursor-not-allowed disabled:opacity-50',
-                    'hover:enabled:text-gray-12 hover:enabled:bg-gray-3',
-                    'focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring',
-                  )}
-                  onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
-                  title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
-                  disabled={props.disabled}
-                >
-                  <span className='sr-only'>{[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}</span>
-                  {type === 'password' ? <Icon.EyeSlashSm /> : <Icon.EyeSm />}
-                </button>
-              </div>
+                <Field.InputGroupEnd>
+                  <button
+                    type='button'
+                    className={cx(
+                      'text-icon-sm text-gray-11 start-auto m-[0.1875rem] inline-flex aspect-square h-6 items-center justify-center rounded-sm p-0 outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                      'hover:enabled:text-gray-12 hover:enabled:bg-gray-3',
+                      'focus-visible:rounded-[calc(var(--cl-radius)*0.5)] focus-visible:ring',
+                    )}
+                    onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
+                    title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
+                    disabled={props.disabled}
+                  >
+                    <span className='sr-only'>{[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}</span>
+                    {type === 'password' ? <Icon.EyeSlashSm /> : <Icon.EyeSm />}
+                  </button>
+                </Field.InputGroupEnd>
+              </Field.InputGroup>
             );
           }}
         </Common.FieldState>
