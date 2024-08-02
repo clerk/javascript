@@ -6,6 +6,7 @@ import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
 import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { FirstNameField } from '~/common/first-name-field';
+import { GlobalError } from '~/common/global-error';
 import { LastNameField } from '~/common/last-name-field';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
@@ -16,7 +17,6 @@ import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
-import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
@@ -74,11 +74,7 @@ function SignUpComponentLoaded() {
                     </Card.Description>
                   </Card.Header>
 
-                  <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
-                    }}
-                  </Common.GlobalError>
+                  <GlobalError />
 
                   <Card.Body>
                     <Connections disabled={isGlobalLoading} />
@@ -201,11 +197,7 @@ function SignUpComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <OTPField
@@ -277,11 +269,7 @@ function SignUpComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <OTPField
@@ -357,11 +345,7 @@ function SignUpComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <SignUp.Action
@@ -398,11 +382,7 @@ function SignUpComponentLoaded() {
                     <Card.Description>{t('signUp.continue.subtitle')}</Card.Description>
                   </Card.Header>
 
-                  <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
-                    }}
-                  </Common.GlobalError>
+                  <GlobalError />
 
                   <Card.Body>
                     <div className='space-y-4'>

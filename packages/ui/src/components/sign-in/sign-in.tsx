@@ -9,6 +9,7 @@ import { EmailField } from '~/common/email-field';
 import { EmailOrPhoneNumberField } from '~/common/email-or-phone-number-field';
 import { EmailOrUsernameField } from '~/common/email-or-username-field';
 import { EmailOrUsernameOrPhoneNumberField } from '~/common/email-or-username-or-phone-number-field';
+import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
@@ -21,7 +22,6 @@ import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { useSupportEmail } from '~/hooks/use-support-email';
-import { Alert } from '~/primitives/alert';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
@@ -144,11 +144,7 @@ export function SignInComponentLoaded() {
                     <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                   </Card.Header>
 
-                  <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
-                    }}
-                  </Common.GlobalError>
+                  <GlobalError />
 
                   <Card.Body>
                     <Connections disabled={isGlobalLoading} />
@@ -313,11 +309,7 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <PasswordField
@@ -403,11 +395,7 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Common.Loading>
                       {isSubmitting => {
@@ -466,11 +454,7 @@ export function SignInComponentLoaded() {
                       <Card.Description>{t('signIn.backupCodeMfa.subtitle')}</Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <BackupCodeField />
@@ -541,11 +525,7 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <OTPField
@@ -631,11 +611,7 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <OTPField
@@ -722,11 +698,7 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <SignIn.Action
@@ -765,11 +737,7 @@ export function SignInComponentLoaded() {
                       </Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <OTPField
@@ -832,11 +800,7 @@ export function SignInComponentLoaded() {
                       <Card.Description>{t('signIn.totpMfa.subtitle', { applicationName })}</Card.Description>
                     </Card.Header>
 
-                    <Common.GlobalError>
-                      {({ message }) => {
-                        return <Alert>{message}</Alert>;
-                      }}
-                    </Common.GlobalError>
+                    <GlobalError />
 
                     <Card.Body>
                       <OTPField
@@ -895,11 +859,7 @@ export function SignInComponentLoaded() {
                     <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
                   </Card.Header>
 
-                  <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
-                    }}
-                  </Common.GlobalError>
+                  <GlobalError />
 
                   <Card.Body>
                     <div className='flex flex-col gap-6'>
@@ -1046,11 +1006,7 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
                   </Card.Header>
 
-                  <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
-                    }}
-                  </Common.GlobalError>
+                  <GlobalError />
 
                   <Card.Body>
                     <SignIn.SupportedStrategy
@@ -1181,11 +1137,7 @@ export function SignInComponentLoaded() {
                     <Card.Title>{t('signIn.resetPassword.title')}</Card.Title>
                   </Card.Header>
 
-                  <Common.GlobalError>
-                    {({ message }) => {
-                      return <Alert>{message}</Alert>;
-                    }}
-                  </Common.GlobalError>
+                  <GlobalError />
 
                   <Card.Body>
                     <div className='flex flex-col justify-center gap-4'>
