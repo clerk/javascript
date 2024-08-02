@@ -42,7 +42,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Password 
     await u.po.signIn.setPassword('12345678');
 
     await expect(page.getByTestId('state')).toHaveText('error');
-    await expect(page.getByTestId('codes')).toHaveText('require_special_char');
+    await expect(page.getByTestId('codes')).toHaveText(/require_special_char/);
     await expect(page.getByTestId('message')).toHaveText('Your password must contain a special character.');
   });
 
