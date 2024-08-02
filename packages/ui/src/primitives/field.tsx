@@ -12,9 +12,15 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 ) {
   return (
     <div
+      data-field-root=''
       ref={forwardedRef}
       {...props}
       className={cx(
+        '[--field-input-border-width:1px]',
+        '[--field-input-height:1.875rem]',
+        '[--field-input-px:calc(theme(spacing.3)-var(--field-input-border-width))]',
+        '[--field-input-py:calc(theme(spacing[1.5])-var(--field-input-border-width))]',
+        '[--field-input-end-size:--field-input-height]',
         'has-[[data-field-checkbox]]:[--cl-field-label-cursor:pointer]',
         'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
         'flex flex-col gap-2',
@@ -37,6 +43,7 @@ export const Label = React.forwardRef(function FieldLabel(
 ) {
   return (
     <label
+      data-field-label=''
       ref={forwardedRef}
       {...props}
       className={cx(
@@ -61,6 +68,7 @@ export const LabelEnd = React.forwardRef(function FieldLabelEnd(
 ) {
   return (
     <span
+      data-field-label-end=''
       ref={forwardedRef}
       {...props}
       className={cx('flex-grow self-end text-end', className)}
@@ -76,6 +84,7 @@ export const Hint = React.forwardRef(function FieldHint(
 ) {
   return (
     <LabelEnd
+      data-field-hint=''
       ref={forwardedRef}
       {...props}
       className={cx('text-gray-10 text-sm font-medium', className)}
@@ -91,10 +100,42 @@ export const Checkbox = React.forwardRef(function FieldCheckbox(
 ) {
   return (
     <input
+      data-field-checkbox=''
       ref={forwardedRef}
       type='checkbox'
-      data-field-checkbox
       className={cx('accent-accent-9 mt-[0.1875em] size-3 cursor-pointer')}
+      {...props}
+    />
+  );
+});
+
+export const InputGroup = React.forwardRef(function FieldInputGroup(
+  { className, ...props }: React.HTMLAttributes<HTMLDivElement>,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
+  return (
+    <div
+      data-field-input-group=''
+      ref={ref}
+      className={cx(
+        'has-[[data-field-input-end]]:[--field-input-group-pe:--field-input-end-size]',
+        'relative',
+        className,
+      )}
+      {...props}
+    />
+  );
+});
+
+export const InputEnd = React.forwardRef(function FieldInputEnd(
+  { className, ...props }: React.HTMLAttributes<HTMLDivElement>,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) {
+  return (
+    <div
+      data-field-input-end=''
+      ref={ref}
+      className={cx('absolute inset-0 start-auto size-[--field-input-end-size]', className)}
       {...props}
     />
   );
@@ -123,8 +164,11 @@ export const Input = React.forwardRef(function FieldInput(
       data-field-input=''
       ref={forwardedRef}
       className={cx(
-        '[--field-input-border-width:1px]',
-        'px-[calc(theme(spacing.3)-var(--field-input-border-width))] py-[calc(theme(spacing[1.5])-var(--field-input-border-width))]',
+        'py-[--field-input-py]',
+        'ps-[--field-input-px]',
+        // If an `InputGroup` exists, use the `pe` value, or fallback to the
+        // standard input `px` value
+        'pe-[var(--field-input-group-pe,var(--field-input-px))]',
         'border-[length:--field-input-border-width] bg-clip-padding',
         'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
         'disabled:cursor-not-allowed disabled:opacity-50',
@@ -185,6 +229,7 @@ export const Message = React.forwardRef<
 >(function FieldMessage({ className, children, justify = 'start', intent = 'idle', ...props }, forwardedRef) {
   return (
     <p
+      data-field-message=''
       ref={forwardedRef}
       {...props}
       className={cx(
