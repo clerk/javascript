@@ -211,7 +211,7 @@ export const makeLocalizeable = (resource: LocalizationResource) => {
    * @example
    * translateError('Invalid email address', 'form_param_format_invalid', 'email_address')
    */
-  const translateError = (message: string, code: string, name?: string) => {
+  const translateError = ({ message, code, name }: { message: string; code: string; name?: string }) => {
     return t(`unstable__errors.${code}__${name}` as any) || t(`unstable__errors.${code}` as any) || message;
   };
 

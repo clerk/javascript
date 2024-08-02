@@ -214,7 +214,9 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{translateError(message, code, 'phone_number')}</Field.Message>;
+            return (
+              <Field.Message intent='error'>{translateError({ message, code, name: 'phone_number' })}</Field.Message>
+            );
           }}
         </Common.FieldError>
       </Field.Root>

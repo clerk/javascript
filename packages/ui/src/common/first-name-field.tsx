@@ -34,7 +34,9 @@ export function FirstNameField(props: Omit<React.ComponentProps<typeof Common.In
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{translateError(message, code, 'first_name')}</Field.Message>;
+            return (
+              <Field.Message intent='error'>{translateError({ message, code, name: 'first_name' })}</Field.Message>
+            );
           }}
         </Common.FieldError>
       </Field.Root>
