@@ -3,6 +3,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 
 import { EmailField } from '~/common/email-field';
 import { FirstNameField } from '~/common/first-name-field';
+import { GlobalError } from '~/common/global-error';
 import { LastNameField } from '~/common/last-name-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
@@ -11,7 +12,6 @@ import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
-import { GlobalError } from '~/common/global-error';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
