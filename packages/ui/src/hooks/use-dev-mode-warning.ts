@@ -7,10 +7,11 @@ export function useDevModeWarning() {
   const { displayConfig, isDevelopmentOrStaging } = useEnvironment();
   const isDevelopment = isDevelopmentOrStaging();
   const { layout } = useAppearance();
-  const developmentUiDisabled = isDevelopment && layout?.unsafe_disableDevelopmentModeWarnings;
-  const showDevModeNotice = useMemo(
+  const unsafeDisabled = layout?.unsafe_disableDevelopmentModeWarnings || false;
+  const developmentUiDisabled = isDevelopment && unsafeDisabled;
+  const showDevModeWarning = useMemo(
     () => !developmentUiDisabled && displayConfig.showDevModeWarning,
     [developmentUiDisabled, displayConfig],
   );
-  return showDevModeNotice;
+  return showDevModeWarning;
 }
