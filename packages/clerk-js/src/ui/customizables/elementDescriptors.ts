@@ -24,6 +24,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'cardBox',
   'card',
   'footerItem',
+  'popoverBox',
 
   'actionCard',
 

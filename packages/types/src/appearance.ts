@@ -143,6 +143,7 @@ export type ElementsConfig = {
   cardBox: WithOptions;
   card: WithOptions;
   actionCard: WithOptions;
+  popoverBox: WithOptions;
 
   logoBox: WithOptions;
   logoImage: WithOptions;
@@ -611,6 +612,13 @@ export type Layout = {
    * @default true
    */
   animations?: boolean;
+
+  /**
+   * This option disables development mode warning.
+   * We don't recommend disabling this unless you want to see a preview of how the components will look in production.
+   * @default false
+   */
+  unsafe_disableDevelopmentModeWarnings?: boolean;
 };
 
 export type SignInTheme = Theme;

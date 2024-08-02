@@ -55,3 +55,4 @@ export * from './Card';
 export * from './ProfileCard';
 export * from './Gauge';
 export * from './Animated';
+export * from './DevModeNotice';
