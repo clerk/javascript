@@ -9,7 +9,7 @@ import { CreateOrganizationForm } from './CreateOrganizationForm';
 export const CreateOrganizationPage = withCardStateProvider(() => {
   const { closeCreateOrganization } = useClerk();
 
-  const { mode, navigateAfterCreateOrganization, skipInvitationScreen, hideSlugField } = useCreateOrganizationContext();
+  const { mode, navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useCreateOrganizationContext();
   const card = useCardState();
   const { showDevModeNotice } = useDevMode();
 
@@ -31,7 +31,7 @@ export const CreateOrganizationPage = withCardStateProvider(() => {
               closeCreateOrganization();
             }
           }}
-          hideSlugField={hideSlugField}
+          hideSlug={hideSlug}
         />
       </Card.Content>
       <Card.Footer />

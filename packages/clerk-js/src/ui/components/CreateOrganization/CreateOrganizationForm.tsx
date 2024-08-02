@@ -33,7 +33,7 @@ type CreateOrganizationFormProps = {
     headerTitle?: LocalizationKey;
     headerSubtitle?: LocalizationKey;
   };
-  hideSlugField?: boolean;
+  hideSlug?: boolean;
 };
 
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
@@ -75,7 +75,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
     try {
       const createOrgParams: CreateOrganizationParams = { name: nameField.value };
 
-      if (!props.hideSlugField) {
+      if (!props.hideSlug) {
         createOrgParams.slug = slugField.value;
       }
 
@@ -188,7 +188,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
               ignorePasswordManager
             />
           </Form.ControlRow>
-          {!props.hideSlugField && (
+          {!props.hideSlug && (
             <Form.ControlRow elementId={slugField.id}>
               <Form.PlainInput
                 {...slugField.props}

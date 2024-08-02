@@ -87,7 +87,7 @@ describe('CreateOrganization', () => {
       });
     });
 
-    props.setProps({ hideSlugField: true });
+    props.setProps({ hideSlug: true });
     const { getByLabelText } = render(<CreateOrganization />, { wrapper });
 
     expect(getByLabelText(/Slug/i)).not.toBeInTheDocument();
