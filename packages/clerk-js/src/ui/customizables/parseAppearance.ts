@@ -22,7 +22,7 @@ type PublicAppearanceTopLevelKey = keyof Omit<Appearance, 'baseTheme' | 'element
 export type AppearanceCascade = {
   globalAppearance?: Appearance;
   appearance?: Appearance;
-  appearanceKey: PublicAppearanceTopLevelKey | 'impersonationFab';
+  appearanceKey: PublicAppearanceTopLevelKey | 'impersonationFab' | 'devToolbar';
 };
 
 export type ParsedAppearance = {

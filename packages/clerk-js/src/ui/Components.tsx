@@ -31,6 +31,7 @@ import {
 } from './lazyModules/components';
 import {
   LazyComponentRenderer,
+  LazyDevToolbarRenderer,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
   LazyOneTapRenderer,
@@ -128,7 +129,7 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
           void preloadComponent(preloadHint);
         }
         componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
-          createRoot(clerkRoot!).render(
+          createRoot(clerkRoot).render(
             <Components
               clerk={clerk}
               environment={environment}
@@ -366,6 +367,7 @@ const Components = (props: ComponentsProps) => {
             <ImpersonationFab />
           </LazyImpersonationFabProvider>
         )}
+        <LazyDevToolbarRenderer globalAppearance={state.appearance} />
       </LazyProviders>
     </Suspense>
   );

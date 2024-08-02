@@ -2,6 +2,7 @@ import type { Appearance } from '@clerk/types';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements';
+import { useDevMode } from '../hooks/useDevMode';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
@@ -153,5 +154,43 @@ export const LazyOneTapRenderer = (props: LazyOneTapRendererProps) => {
         componentName={'GoogleOneTap'}
       />
     </AppearanceProvider>
+  );
+};
+
+const DevToolbar = () => {
+  const dev = useDevMode();
+
+  if (!dev.showDevModeNotice) {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 5,
+        right: 5,
+        zIndex: 9999,
+        backgroundColor: 'orange',
+        color: 'white',
+        padding: '8px',
+        borderRadius: '4px',
+      }}
+    >
+      Clerk instance is in development mode!
+    </div>
+  );
+};
+
+export const LazyDevToolbarRenderer = (props: { globalAppearance: Appearance | undefined }) => {
+  return (
+    <Suspense fallback={''}>
+      <AppearanceProvider
+        globalAppearance={props.globalAppearance}
+        appearanceKey={'devToolbar'}
+      >
+        <DevToolbar />
+      </AppearanceProvider>
+    </Suspense>
   );
 };
