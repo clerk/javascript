@@ -8,7 +8,7 @@ export function GlobalError() {
   return (
     <ElementsGlobalError>
       {({ message, code }) => {
-        return <Alert>{translateError(message, code)}</Alert>;
+        return <Alert>{translateError({ message, code })}</Alert>;
       }}
     </ElementsGlobalError>
   );
