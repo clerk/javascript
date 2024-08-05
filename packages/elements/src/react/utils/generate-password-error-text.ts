@@ -18,6 +18,7 @@ const errorMessages: Record<keyof Omit<ComplexityErrors, 'allowed_special_charac
 };
 
 export type ErrorMessagesKey = Autocomplete<keyof typeof errorMessages>;
+export type ErrorCodeOrTuple = ErrorMessagesKey | [ErrorMessagesKey, Record<string, string | number>];
 
 const createListFormat = (message: string[]) => {
   let messageWithPrefix: string;
@@ -36,12 +37,32 @@ type GeneratePasswordErrorTextProps = {
   failedValidations: ComplexityErrors | undefined;
 };
 
+/**
+ * This function builds a single entry in the error array returned from generatePasswordErrorText. It returns either a
+ * string or a tuple containing the error code and relevant entries from the instance's password complexity conrfig.
+ * @param key The string respresentation of a possible error during password validation
+ * @param config The instance's password complexity configuration
+ * @returns The error code or a tuple containing the error code and relevant entries from the config
+ */
+function buildErrorTuple(key: ErrorMessagesKey, config: ComplexityConfig): ErrorCodeOrTuple {
+  switch (key) {
+    case 'max_length':
+      return [key, { max_length: config.max_length }];
+    case 'min_length':
+      return [key, { min_length: config.min_length }];
+    case 'require_special_char':
+      return [key, { allowed_special_characters: config.allowed_special_characters }];
+    default:
+      return key;
+  }
+}
+
 export const generatePasswordErrorText = ({ config, failedValidations }: GeneratePasswordErrorTextProps) => {
-  const keys: ErrorMessagesKey[] = [];
+  const codes: ErrorCodeOrTuple[] = [];
 
   if (!failedValidations || Object.keys(failedValidations).length === 0) {
     return {
-      keys,
+      codes,
       message: '',
     };
   }
@@ -54,7 +75,8 @@ export const generatePasswordErrorText = ({ config, failedValidations }: Generat
     .filter(([, v]) => !!v)
     .map(([k]) => {
       const entry = k as keyof typeof errorMessages;
-      keys.push(entry);
+      const errorTuple = buildErrorTuple(entry, config);
+      codes.push(errorTuple);
       const errorKey = errorMessages[entry];
 
       if (Array.isArray(errorKey)) {
@@ -67,7 +89,7 @@ export const generatePasswordErrorText = ({ config, failedValidations }: Generat
   const messageWithPrefix = createListFormat(messages);
 
   return {
-    keys,
+    codes,
     message: `Your password must contain ${messageWithPrefix}.`,
   };
 };

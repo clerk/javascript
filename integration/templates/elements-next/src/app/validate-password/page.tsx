@@ -69,7 +69,7 @@ export default function ValitePassword() {
                           className='border-b p-2 pl-4 text-left font-medium'
                           data-testid='codes'
                         >
-                          {codes?.join(', ')}
+                          {JSON.stringify(codes)}
                         </td>
                       </tr>
                       <tr>

@@ -4,8 +4,8 @@ import * as SignUp from '@clerk/elements/sign-up';
 
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -43,11 +43,10 @@ function SignUpIdentifier({ emailAddress, phoneNumber }: Identifier) {
   ============================================ */
 
 export function SignUpVerifications() {
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
   const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
 
-  const isDev = isDevelopmentOrStaging();
+  const renderDevModeNotice = useDevModeWarning();
 
   return (
     <Common.Loading scope='global'>
@@ -271,7 +270,7 @@ export function SignUpVerifications() {
                     </SignUp.Action>
                   </Card.Body>
                 </SignUp.Strategy>
-                {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
+                {renderDevModeNotice ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
               <Card.Footer branded={branded} />
             </Card.Root>

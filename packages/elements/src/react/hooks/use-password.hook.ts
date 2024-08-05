@@ -3,17 +3,19 @@ import { noop } from '@clerk/shared';
 import type { PasswordSettingsData, PasswordValidation } from '@clerk/types';
 import * as React from 'react';
 
-import type { ErrorMessagesKey } from '../utils/generate-password-error-text';
+import type { ErrorCodeOrTuple } from '../utils/generate-password-error-text';
 import { generatePasswordErrorText } from '../utils/generate-password-error-text';
 
 // This hook should mimic the already existing usePassword hook in the clerk-js package
 // @see packages/clerk-js/src/ui/hooks/usePassword.ts
 
+export type PasswordConfig = Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>;
+
 type UsePasswordCallbacks = {
-  onValidationError?: (error: string | undefined, keys: ErrorMessagesKey[]) => void;
+  onValidationError?: (error: string | undefined, codes: ErrorCodeOrTuple[]) => void;
   onValidationSuccess?: () => void;
-  onValidationWarning?: (warning: string, keys: string[]) => void;
-  onValidationInfo?: (info: string, keys: ErrorMessagesKey[]) => void;
+  onValidationWarning?: (warning: string, codes: ErrorCodeOrTuple[]) => void;
+  onValidationInfo?: (info: string, codes: ErrorCodeOrTuple[]) => void;
   onValidationComplexity?: (b: boolean) => void;
 };
 
@@ -37,16 +39,15 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
        */
       if (res.complexity) {
         if (Object.values(res?.complexity).length > 0) {
-          const { message, keys } = generatePasswordErrorText({
+          const { message, codes } = generatePasswordErrorText({
             config,
             failedValidations: res.complexity,
           });
 
           if (res.complexity?.min_length) {
-            return onValidationInfo(message, keys);
+            return onValidationInfo(message, codes);
           }
-
-          return onValidationError(message, keys);
+          return onValidationError(message, codes);
         }
       }
 
@@ -73,7 +74,7 @@ export const usePassword = (callbacks?: UsePasswordCallbacks) => {
        */
       return onValidationSuccess();
     },
-    [callbacks],
+    [callbacks, config],
   );
 
   const validatePassword = React.useMemo(() => {
