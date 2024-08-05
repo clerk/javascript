@@ -20,12 +20,6 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;
   domain?: string;
-  /**
-   * @internal
-   * The version of `@clerk/clerk-js` that will be used if an explicit version
-   * is not provided. For `@clerk/clerk-react`, this will be the PACKAGE_VERSION.
-   */
-  __internal_packageVersion?: string;
 };
 
 /**
@@ -78,8 +72,7 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
  * clerkJsScriptUrl({ publishableKey: 'pk_' });
  */
 const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
-  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey, __internal_packageVersion } =
-    opts;
+  const { clerkJSUrl, clerkJSVariant, clerkJSVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkJSUrl) {
     return clerkJSUrl;
@@ -95,7 +88,7 @@ const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
   }
 
   const variant = clerkJSVariant ? `${clerkJSVariant.replace(/\.+$/, '')}.` : '';
-  const version = versionSelector(clerkJSVersion, __internal_packageVersion);
+  const version = versionSelector(clerkJSVersion);
   return `https://${scriptHost}/npm/@clerk/clerk-js@${version}/dist/clerk.${variant}browser.js`;
 };
 
