@@ -866,6 +866,11 @@ export type CreateOrganizationProps = RoutingOptions & {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: CreateOrganizationTheme;
+  /**
+   * Hides the optional "slug" field in the organization creation screen.
+   * @default false
+   */
+  hideSlug?: boolean;
 };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
@@ -997,6 +1002,11 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
+     * Hides the optional "slug" field in the organization creation screen.
+     * @default false
+     */
+    hideSlug?: boolean;
+    /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvided (if one is provided)
@@ -1051,6 +1061,11 @@ export type OrganizationListProps = {
    * @default undefined`
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
+  /**
+   * Hides the optional "slug" field in the organization creation screen.
+   * @default false
+   */
+  hideSlug?: boolean;
 };
 
 export interface HandleEmailLinkVerificationParams {

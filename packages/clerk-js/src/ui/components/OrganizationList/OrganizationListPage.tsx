@@ -109,7 +109,7 @@ export const OrganizationListPage = withCardStateProvider(() => {
 });
 
 const OrganizationListFlows = ({ showListInitially }: { showListInitially: boolean }) => {
-  const { navigateAfterCreateOrganization, skipInvitationScreen } = useOrganizationListContext();
+  const { navigateAfterCreateOrganization, skipInvitationScreen, hideSlug } = useOrganizationListContext();
   const [isCreateOrganizationFlow, setCreateOrganizationFlow] = useState(!showListInitially);
   return (
     <>
@@ -133,6 +133,7 @@ const OrganizationListFlows = ({ showListInitially }: { showListInitially: boole
             onCancel={
               showListInitially && isCreateOrganizationFlow ? () => setCreateOrganizationFlow(false) : undefined
             }
+            hideSlug={hideSlug}
           />
         </Box>
       )}
