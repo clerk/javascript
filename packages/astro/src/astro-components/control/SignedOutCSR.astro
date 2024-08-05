@@ -1,0 +1,26 @@
+<signed-out-csr style="display: none;">
+  <slot />
+</signed-out-csr>
+
+<script>
+  import { $authStore } from '@clerk/astro/client';
+
+  class SignedOutCSR extends HTMLElement {
+    constructor() {
+      super();
+      this.subscribe();
+    }
+
+    subscribe() {
+      $authStore.subscribe((state) => {
+        if (state.userId) {
+          this.style.display = 'none';
+        } else {
+          this.style.display = 'block';
+        }
+      });
+    }
+  }
+
+  customElements.define('signed-out-csr', SignedOutCSR);
+</script>

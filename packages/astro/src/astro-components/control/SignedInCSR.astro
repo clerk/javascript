@@ -1,0 +1,26 @@
+<signed-in-csr style="display: none;">
+  <slot />
+</signed-in-csr>
+
+<script>
+  import { $authStore } from '@clerk/astro/client';
+
+  class SignedInCSR extends HTMLElement {
+    constructor() {
+      super();
+      this.subscribe();
+    }
+
+    subscribe() {
+      $authStore.subscribe((state) => {
+        if (state.userId) {
+          this.style.display = 'block';
+        } else {
+          this.style.display = 'none';
+        }
+      });
+    }
+  }
+
+  customElements.define('signed-in-csr', SignedInCSR);
+</script>
