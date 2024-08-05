@@ -259,14 +259,14 @@ const wrapperStyle = {
 const inputStyle = {
   display: 'block',
   background: 'transparent',
-  opacity: 1,
+  opacity: 0,
   outline: 'transparent solid 0px',
   appearance: 'none',
   color: 'transparent',
   position: 'absolute',
   inset: 0,
   caretColor: 'transparent',
-  border: '0 px solid transparent',
+  border: '0px solid transparent',
   // width is handled inline
   height: '100%',
   letterSpacing: '-1rem',
