@@ -1,14 +1,11 @@
 ---
-import ProtectCSR from './ProtectCSR.astro';
-import ProtectSSR from './ProtectSSR.astro';
-
 import type {
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
 } from '@clerk/types';
 
-type ProtectProps =
+type Props =
   | {
       condition?: never;
       role: OrganizationCustomRoleKey;
@@ -30,14 +27,12 @@ type ProtectProps =
       permission?: never;
     };
 
-type Props = ProtectProps & {
-  client?: boolean
-}
-
-const { role, permission, condition, client = false } = Astro.props
+const { has, userId } = Astro.locals.auth();
+const isUnauthorized =
+  !userId ||
+  (typeof Astro.props.condition === "function" &&
+    !Astro.props.condition(has)) ||
+  ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
 ---
 
-{client
-  ? <ProtectCSR role={role} permission={permission}><slot /><Fragment slot="fallback"><slot name="fallback" /></Fragment></ProtectCSR>
-  : <ProtectSSR role={role} permission={permission} condition={condition}><slot /><Fragment slot="fallback"><slot name="fallback" /></Fragment></ProtectSSR>
-}
+{isUnauthorized ? <slot name="fallback" /> : <slot />}

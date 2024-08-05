@@ -1,0 +1,80 @@
+---
+import type {
+  OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
+} from '@clerk/types';
+
+type Props =
+  | {
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+    }
+  | {
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+    }
+  | {
+      role?: never;
+      permission?: never;
+    }
+  | {
+      role?: never;
+      permission?: never;
+    };
+
+const { role, permission } = Astro.props
+---
+
+<protect-csr data-role={role} data-permissions={permission} style="display: none;">
+  <slot />
+</protect-csr>
+
+<script>
+  import { $authStore } from '@clerk/astro/client';
+  import type { CheckAuthorizationWithCustomPermissions	} from '@clerk/types';
+
+  class ProtectCSR extends HTMLElement {
+    constructor() {
+      super();
+      this.subscribe();
+    }
+
+    subscribe() {
+      $authStore.subscribe((state) => {
+        const has = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
+          if (!params?.permission && !params?.role) {
+            throw new Error(
+              'Missing parameters. The prop permission or role is required to be passed. Example usage: `has({permission: "org:posts:edit"})`'
+   			)
+          }
+
+          if (!state.orgId || !state.userId || !state.orgRole || !state?.orgPermissions) {
+            return false;
+          }
+
+          if (params.permission) {
+            return state.orgPermissions.includes(params.permission);
+          }
+
+          if (params.role) {
+            return state.orgRole === params.role;
+          }
+
+          return false;
+        };
+
+        const role = this.dataset.role;
+        const permission = this.dataset.permission;
+        const isUnauthorized = !state.userId || ((role || permission) && !has({ role, permission }));
+
+        if (isUnauthorized) {
+          this.style.display = 'none';
+        } else {
+          this.style.display = 'block';
+        }
+      });
+    }
+  }
+
+  customElements.define('protect-csr', ProtectCSR);
+</script>

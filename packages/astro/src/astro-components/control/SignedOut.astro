@@ -1,6 +1,12 @@
 ---
-const { userId } = Astro.locals.auth()
+import SignedOutSSR from './SignedOutSSR.astro';
+import SignedOutCSR from './SignedOutCSR.astro';
+
+type Props = {
+  client?: boolean;
+}
+
+const { client = false } = Astro.props;
 ---
 
-
-{ !userId ? <slot /> : null }
+{client ? <SignedOutCSR><slot /></SignedOutCSR> : <SignedOutSSR><slot /></SignedOutSSR> }
