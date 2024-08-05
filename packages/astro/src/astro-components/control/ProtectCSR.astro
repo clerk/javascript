@@ -25,7 +25,7 @@ type Props =
 const { role, permission } = Astro.props
 ---
 
-<protect-csr data-role={role} data-permissions={permission} style="display: none;">
+<protect-csr data-role={role} data-permission={permission} style="display: none;">
   <slot />
 </protect-csr>
 

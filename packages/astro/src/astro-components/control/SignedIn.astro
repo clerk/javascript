@@ -1,12 +1,14 @@
 ---
-import SignedInSSR from './SignedInSSR.astro';
-import SignedInCSR from './SignedInCSR.astro';
+import SignedInSSR from "./SignedInSSR.astro";
+import SignedInCSR from "./SignedInCSR.astro";
 
 type Props = {
   client?: boolean;
-}
+};
 
-const { client = false } = Astro.props;
+const SignedInComponent = Astro.props.client ? SignedInCSR : SignedInSSR;
 ---
 
-{client ? <SignedInCSR><slot /></SignedInCSR> : <SignedInSSR><slot /></SignedInSSR> }
+<SignedInComponent>
+  <slot />
+</SignedInComponent>
