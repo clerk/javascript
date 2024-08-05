@@ -1,5 +1,11 @@
 # @clerk/dev-cli
 
+## 0.0.6
+
+### Patch Changes
+
+- Correctly return package version ([#3896](https://github.com/clerk/javascript/pull/3896)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.0.5
 
 ### Patch Changes

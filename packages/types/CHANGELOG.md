@@ -1,5 +1,24 @@
 # Change Log
 
+## 4.12.0
+
+### Minor Changes
+
+- Add `createOrganizationsLimit` param in `@clerk/backend` method `User.updateUser()` ([#3823](https://github.com/clerk/javascript/pull/3823)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  Example:
+
+  ```typescript
+      import { createClerkClient }  from '@clerk/backend';
+
+      const clerkClient = createClerkClient({...});
+      // Update user with createOrganizationsLimit equals 10
+      await clerkClient.users.updateUser('user_...', { createOrganizationsLimit: 10 })
+
+      // Remove createOrganizationsLimit
+      await clerkClient.users.updateUser('user_...', { createOrganizationsLimit: 0 })
+  ```
+
 ## 4.11.0
 
 ### Minor Changes
