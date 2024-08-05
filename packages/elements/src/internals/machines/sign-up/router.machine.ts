@@ -78,7 +78,8 @@ export const SignUpRouterMachine = setup({
         (params?.useLastActiveSession && context.clerk.client.lastActiveSessionId) ||
         ((event as SignUpRouterNextEvent)?.resource || context.clerk.client.signUp).createdSessionId;
 
-      const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignUpUrl());
+      const beforeEmit = () =>
+        context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl());
       void context.clerk.setActive({ session, beforeEmit });
     },
     delayedReset: raise({ type: 'RESET' }, { delay: 3000 }), // Reset machine after 3s delay.
@@ -187,7 +188,8 @@ export const SignUpRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete: context.clerk.buildAfterSignUpUrl(),
+          redirectUrlComplete:
+            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
         },
       })),
     },
@@ -202,7 +204,8 @@ export const SignUpRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete: context.clerk.buildAfterSignUpUrl(),
+          redirectUrlComplete:
+            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
         },
       })),
     },
@@ -273,7 +276,9 @@ export const SignUpRouterMachine = setup({
             log('Already logged in'),
             {
               type: 'navigateExternal',
-              params: ({ context }) => ({ path: context.clerk.buildAfterSignUpUrl() }),
+              params: ({ context }) => ({
+                path: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignUpUrl(),
+              }),
             },
           ],
         },
