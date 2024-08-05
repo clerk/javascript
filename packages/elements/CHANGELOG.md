@@ -1,5 +1,16 @@
 # @clerk/elements
 
+## 0.12.2
+
+### Patch Changes
+
+- Return password validation errors with additional supporting information from instance configuration ([#3812](https://github.com/clerk/javascript/pull/3812)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes a bug that briefly showed the underlying primitive input for OTPs when auto-filled in MacOS ([#3899](https://github.com/clerk/javascript/pull/3899)) by [@joe-bell](https://github.com/joe-bell)
+
+- Updated dependencies [[`7e94fcf0f`](https://github.com/clerk/javascript/commit/7e94fcf0fcbee8842a54f7931c45190370aa870d)]:
+  - @clerk/types@4.12.0
+
 ## 0.12.1
 
 ### Patch Changes
