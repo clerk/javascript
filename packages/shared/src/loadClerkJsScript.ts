@@ -31,7 +31,12 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
 /**
  * Hotloads the Clerk JS script.
  *
- * @param opts - The options to use when building the Clerk JS script URL.
+ * Checks for an existing Clerk JS script. If found, it returns a promise
+ * that resolves when the script loads. If not found, it uses the provided options to
+ * build the Clerk JS script URL and load the script.
+ *
+ * @param opts - The options used to build the Clerk JS script URL and load the script.
+ *               Must include a `publishableKey` if no existing script is found.
  *
  * @example
  * loadClerkJsScript({ publishableKey: 'pk_' });
