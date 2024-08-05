@@ -1002,7 +1002,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-   * Hides the optional "slug" field in the organization creation screen.
+     * Hides the optional "slug" field in the organization creation screen.
      * @default false
      */
     hideSlug?: boolean;
