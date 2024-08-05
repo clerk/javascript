@@ -3,4 +3,4 @@
 "@clerk/types": patch
 ---
 
-Add option to hide the slug field from the `<CreateOrganization />`, `<OrganizationSwitcher />` and `<OrganizationList />` components
+Add option to hide the slug field in the `<CreateOrganization />`, `<OrganizationSwitcher />`, and `<OrganizationList />` components
