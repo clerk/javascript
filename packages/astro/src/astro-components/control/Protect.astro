@@ -40,8 +40,6 @@ const ProtectComponent = client ? ProtectCSR : ProtectSSR;
 ---
 
 <ProtectComponent {...rest}>
-  <slot />
-  <Fragment slot="fallback">
-    <slot name="fallback" />
-  </Fragment>
+  <slot slot="default" />
+  <slot name="fallback" slot="fallback" />
 </ProtectComponent>
