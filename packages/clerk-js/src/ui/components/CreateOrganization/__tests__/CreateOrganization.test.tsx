@@ -101,7 +101,7 @@ describe('CreateOrganization', () => {
       wrapper,
     });
 
-    expect(queryByLabelText(/Slug/i)).toBeNull();
+    expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
 
     await userEvent.type(getByLabelText(/Name/i), 'new org');
     await userEvent.click(getByRole('button', { name: /create organization/i }));

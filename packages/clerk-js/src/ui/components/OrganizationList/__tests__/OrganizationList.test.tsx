@@ -273,7 +273,7 @@ describe('OrganizationList', () => {
       );
       await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
       expect(queryByLabelText(/Name/i)).toBeInTheDocument();
-      expect(queryByLabelText(/Slug/i)).toBeNull();
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
     });
 
     it('does not display CreateOrganization within OrganizationList when disabled', async () => {

@@ -237,7 +237,7 @@ describe('OrganizationSwitcher', () => {
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
       await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
-      expect(queryByLabelText(/Slug/i)).toBeNull();
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
     });
 
     it('does not display create organization button if permissions not present', async () => {
