@@ -1061,6 +1061,11 @@ export type OrganizationListProps = {
    * @default undefined`
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
+  /**
+   * Hides the slug field in the form.
+   * @default false
+   */
+  hideSlug?: boolean;
 };
 
 export interface HandleEmailLinkVerificationParams {
