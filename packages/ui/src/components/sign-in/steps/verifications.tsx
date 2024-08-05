@@ -5,6 +5,7 @@ import { BackupCodeField } from '~/common/backup-code-field';
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
+import { useAppearance } from '~/hooks/use-appearance';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -18,10 +19,17 @@ import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 export function SignInVerifications() {
   const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
+  const { layout } = useAppearance();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
 
   const isDev = isDevelopmentOrStaging();
   const isPasswordResetSupported = useResetPasswordFactor();
+  const cardFooterProps = {
+    branded,
+    helpPageUrl: layout?.helpPageUrl,
+    privacyPageUrl: layout?.privacyPageUrl,
+    termsPageUrl: layout?.termsPageUrl,
+  };
 
   return (
     <Common.Loading>
@@ -590,7 +598,7 @@ export function SignInVerifications() {
                 </SignIn.Strategy>
                 {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
-              <Card.Footer branded={branded} />
+              <Card.Footer {...cardFooterProps} />
             </Card.Root>
           </SignIn.Step>
         );

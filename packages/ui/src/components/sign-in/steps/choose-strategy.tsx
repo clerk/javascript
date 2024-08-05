@@ -5,6 +5,7 @@ import * as SignIn from '@clerk/elements/sign-in';
 import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
+import { useAppearance } from '~/hooks/use-appearance';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useEnvironment } from '~/hooks/use-environment';
@@ -47,11 +48,18 @@ export function SignInChooseStrategy() {
   const enabledConnections = useEnabledConnections();
   const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
+  const { layout } = useAppearance();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { setShowHelp } = useGetHelp();
 
   const hasConnection = enabledConnections.length > 0;
   const isDev = isDevelopmentOrStaging();
+  const cardFooterProps = {
+    branded,
+    helpPageUrl: layout?.helpPageUrl,
+    privacyPageUrl: layout?.privacyPageUrl,
+    termsPageUrl: layout?.termsPageUrl,
+  };
 
   return (
     <Common.Loading>
@@ -191,7 +199,7 @@ export function SignInChooseStrategy() {
                 </Card.Body>
                 {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
-              <Card.Footer branded={branded}>
+              <Card.Footer {...cardFooterProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signIn.alternativeMethods.actionText')}{' '}
