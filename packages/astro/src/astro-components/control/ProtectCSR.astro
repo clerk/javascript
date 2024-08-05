@@ -2,7 +2,7 @@
 import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
-} from '@clerk/types';
+} from "@clerk/types";
 
 type Props =
   | {
@@ -16,22 +16,22 @@ type Props =
   | {
       role?: never;
       permission?: never;
-    }
-  | {
-      role?: never;
-      permission?: never;
     };
 
-const { role, permission } = Astro.props
+const { role, permission } = Astro.props;
 ---
 
-<protect-csr data-role={role} data-permission={permission} style="display: none;">
+<protect-csr
+  data-role={role}
+  data-permission={permission}
+  style="display: none;"
+>
   <slot />
 </protect-csr>
 
 <script>
-  import { $authStore } from '@clerk/astro/client';
-  import type { CheckAuthorizationWithCustomPermissions	} from '@clerk/types';
+  import { $authStore } from "@clerk/astro/client";
+  import type { CheckAuthorizationWithCustomPermissions } from "@clerk/types";
 
   class ProtectCSR extends HTMLElement {
     constructor() {
@@ -41,14 +41,21 @@ const { role, permission } = Astro.props
 
     subscribe() {
       $authStore.subscribe((state) => {
-        const has = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
+        const has = (
+          params: Parameters<CheckAuthorizationWithCustomPermissions>[0],
+        ) => {
           if (!params?.permission && !params?.role) {
             throw new Error(
-              'Missing parameters. The prop permission or role is required to be passed. Example usage: `has({permission: "org:posts:edit"})`'
-   			)
+              'Missing parameters. The prop permission or role is required to be passed. Example usage: `has({permission: "org:posts:edit"})`',
+            );
           }
 
-          if (!state.orgId || !state.userId || !state.orgRole || !state?.orgPermissions) {
+          if (
+            !state.orgId ||
+            !state.userId ||
+            !state.orgRole ||
+            !state?.orgPermissions
+          ) {
             return false;
           }
 
@@ -65,16 +72,17 @@ const { role, permission } = Astro.props
 
         const role = this.dataset.role;
         const permission = this.dataset.permission;
-        const isUnauthorized = !state.userId || ((role || permission) && !has({ role, permission }));
+        const isUnauthorized =
+          !state.userId || ((role || permission) && !has({ role, permission }));
 
         if (isUnauthorized) {
-          this.style.display = 'none';
+          this.style.display = "none";
         } else {
-          this.style.display = 'block';
+          this.style.display = "block";
         }
       });
     }
   }
 
-  customElements.define('protect-csr', ProtectCSR);
+  customElements.define("protect-csr", ProtectCSR);
 </script>
