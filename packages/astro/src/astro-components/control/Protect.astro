@@ -1,12 +1,12 @@
 ---
-import ProtectCSR from './ProtectCSR.astro';
-import ProtectSSR from './ProtectSSR.astro';
+import ProtectCSR from "./ProtectCSR.astro";
+import ProtectSSR from "./ProtectSSR.astro";
 
 import type {
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
-} from '@clerk/types';
+} from "@clerk/types";
 
 type ProtectProps =
   | {
@@ -31,13 +31,17 @@ type ProtectProps =
     };
 
 type Props = ProtectProps & {
-  client?: boolean
-}
+  client?: boolean;
+};
 
-const { role, permission, condition, client = false } = Astro.props
+const { role, permission, condition, client = false } = Astro.props;
+
+const ProtectComponent = client ? ProtectCSR : ProtectSSR;
 ---
 
-{client
-  ? <ProtectCSR role={role} permission={permission}><slot /><Fragment slot="fallback"><slot name="fallback" /></Fragment></ProtectCSR>
-  : <ProtectSSR role={role} permission={permission} condition={condition}><slot /><Fragment slot="fallback"><slot name="fallback" /></Fragment></ProtectSSR>
-}
+<ProtectComponent role={role} permission={permission} condition={condition}>
+  <slot />
+  <Fragment slot="fallback">
+    <slot name="fallback" />
+  </Fragment>
+</ProtectComponent>

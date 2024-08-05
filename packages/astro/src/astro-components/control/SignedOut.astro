@@ -6,7 +6,9 @@ type Props = {
   client?: boolean;
 }
 
-const { client = false } = Astro.props;
+const SignedOutComponent = Astro.props.client ? SignedOutCSR : SignedOutSSR;
 ---
 
-{client ? <SignedOutCSR><slot /></SignedOutCSR> : <SignedOutSSR><slot /></SignedOutSSR> }
+<SignedOutComponent>
+  <slot />
+</SignedOutComponent>
