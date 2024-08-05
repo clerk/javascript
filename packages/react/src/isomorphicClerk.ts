@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
+import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
@@ -49,7 +50,7 @@ import type {
   HeadlessBrowserClerkConstructor,
   IsomorphicClerkOptions,
 } from './types';
-import { isConstructor, loadClerkJsScript } from './utils';
+import { isConstructor } from './utils';
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
