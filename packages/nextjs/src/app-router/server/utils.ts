@@ -77,7 +77,7 @@ export function getScriptNonceFromHeader(cspHeaderValue: string): string | undef
   // extra layer.
   if (/[&><\u2028\u2029]/g.test(nonce)) {
     throw new Error(
-      'Nonce value from Content-Security-Policy contained HTML escape characters.\nLearn more: https://nextjs.org/docs/messages/nonce-contained-invalid-characters',
+      'Nonce value from Content-Security-Policy contained invalid HTML escape characters, which is disallowed for security reasons. Make sure that your nonce value does not contain the following characters: `<`, `>`, `&`',
     );
   }
 
