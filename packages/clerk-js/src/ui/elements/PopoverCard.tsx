@@ -92,7 +92,7 @@ const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
 
       <Card.ClerkAndPagesTag
         outerSx={t => ({
-          padding: `${t.space.$4} ${t.space.$none}`,
+          padding: `${t.space.$4} ${t.space.$8}`,
         })}
         withFooterPages={!!shouldShowTagOrLinks}
         devModeNoticeSx={t => ({
