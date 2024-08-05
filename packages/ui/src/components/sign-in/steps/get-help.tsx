@@ -1,4 +1,5 @@
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
+import { useAppearance } from '~/hooks/use-appearance';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -12,9 +13,17 @@ export function SignInGetHelp() {
   const { t } = useLocalizations();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { isDevelopmentOrStaging } = useEnvironment();
+  const { layout } = useAppearance();
   const isDev = isDevelopmentOrStaging();
   const supportEmail = useSupportEmail();
   const { setShowHelp } = useGetHelp();
+
+  const cardFooterProps = {
+    branded,
+    helpPageUrl: layout?.helpPageUrl,
+    privacyPageUrl: layout?.privacyPageUrl,
+    termsPageUrl: layout?.termsPageUrl,
+  };
 
   return (
     <Card.Root>
@@ -44,7 +53,7 @@ export function SignInGetHelp() {
         </Card.Actions>
         {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
       </Card.Content>
-      <Card.Footer branded={branded} />
+      <Card.Footer {...cardFooterProps} />
     </Card.Root>
   );
 }

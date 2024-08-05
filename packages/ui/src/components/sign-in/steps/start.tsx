@@ -10,6 +10,7 @@ import { GlobalError } from '~/common/global-error';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
+import { useAppearance } from '~/hooks/use-appearance';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -25,6 +26,7 @@ export function SignInStart() {
   const enabledConnections = useEnabledConnections();
   const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
+  const { layout } = useAppearance();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
@@ -34,6 +36,12 @@ export function SignInStart() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = isDevelopmentOrStaging();
+  const cardFooterProps = {
+    branded,
+    helpPageUrl: layout?.helpPageUrl,
+    privacyPageUrl: layout?.privacyPageUrl,
+    termsPageUrl: layout?.termsPageUrl,
+  };
 
   return (
     <Common.Loading>
@@ -175,7 +183,7 @@ export function SignInStart() {
                 {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
 
-              <Card.Footer branded={branded}>
+              <Card.Footer {...cardFooterProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signIn.start.actionText')}{' '}
