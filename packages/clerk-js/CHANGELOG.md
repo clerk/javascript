@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.13.1
+
+### Patch Changes
+
+- Fix missing horizonatal padding when page urls are used within `<UserButton />`. ([#3903](https://github.com/clerk/javascript/pull/3903)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.13.0
 
 ### Minor Changes
