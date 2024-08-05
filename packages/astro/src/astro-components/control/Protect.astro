@@ -34,12 +34,12 @@ type Props = ProtectProps & {
   client?: boolean;
 };
 
-const { role, permission, condition, client = false } = Astro.props;
+const { client = false, ...rest } = Astro.props;
 
 const ProtectComponent = client ? ProtectCSR : ProtectSSR;
 ---
 
-<ProtectComponent role={role} permission={permission} condition={condition}>
+<ProtectComponent {...rest}>
   <slot />
   <Fragment slot="fallback">
     <slot name="fallback" />
