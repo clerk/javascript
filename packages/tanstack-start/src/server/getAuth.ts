@@ -5,15 +5,18 @@ import type { FetchFnCtx } from '@tanstack/start';
 import { noFetchFnCtxPassedInGetAuth } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
+import type { LoaderOptions } from './types';
 
 export type GetAuthReturn = Promise<AuthObject>;
 
-export async function getAuth(ctx: FetchFnCtx): GetAuthReturn {
+type GetAuthOptions = Pick<LoaderOptions, 'secretKey'>;
+
+export async function getAuth(ctx: FetchFnCtx, opts?: GetAuthOptions): GetAuthReturn {
   if (!ctx || (ctx && !ctx.request)) {
     throw new Error(noFetchFnCtxPassedInGetAuth);
   }
 
-  const loadedOptions = loadOptions(ctx.request);
+  const loadedOptions = loadOptions(ctx.request, opts);
 
   const requestState = await authenticateRequest(ctx.request, loadedOptions);
 
