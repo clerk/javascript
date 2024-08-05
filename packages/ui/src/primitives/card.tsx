@@ -195,9 +195,23 @@ export const Banner = React.forwardRef(function CardBanner(
 });
 
 export const Footer = React.forwardRef(function CardFooter(
-  { branded = true, children, className, ...props }: { branded?: boolean } & React.HTMLAttributes<HTMLDivElement>,
+  {
+    branded = true,
+    helpPageUrl,
+    privacyPageUrl,
+    termsPageUrl,
+    children,
+    className,
+    ...props
+  }: {
+    branded?: boolean;
+    helpPageUrl?: string;
+    privacyPageUrl?: string;
+    termsPageUrl?: string;
+  } & React.HTMLAttributes<HTMLDivElement>,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const hasPageLinks = helpPageUrl || privacyPageUrl || termsPageUrl;
   return branded || children ? (
     <div
       ref={forwardedRef}
@@ -207,7 +221,12 @@ export const Footer = React.forwardRef(function CardFooter(
     >
       {children}
       {branded ? (
-        <div className='grid place-content-center p-4'>
+        <div
+          className={cx(
+            'flex items-center justify-center px-6 py-4',
+            hasPageLinks ? 'justify-between' : 'justify-center',
+          )}
+        >
           <p
             // Note:
             // We don't use `items-center` here for a more optical fit
@@ -223,6 +242,14 @@ export const Footer = React.forwardRef(function CardFooter(
               <ClerkLogo />
             </a>
           </p>
+
+          {hasPageLinks ? (
+            <div className='flex gap-2'>
+              {helpPageUrl ? <FooterPageLink href={helpPageUrl}>Help</FooterPageLink> : null}
+              {privacyPageUrl ? <FooterPageLink href={privacyPageUrl}>Privacy</FooterPageLink> : null}
+              {termsPageUrl ? <FooterPageLink href={termsPageUrl}>Terms</FooterPageLink> : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
@@ -286,6 +313,22 @@ export const FooterActionLink = React.forwardRef<HTMLAnchorElement, React.Anchor
         data-card-footer-action-link=''
         {...props}
         className={footerActionButton({ className })}
+      >
+        {children}
+      </a>
+    );
+  },
+);
+
+const FooterPageLink = React.forwardRef<HTMLAnchorElement, React.AnchorHTMLAttributes<HTMLAnchorElement>>(
+  function CardFooterPageLink({ children, className, ...props }, forwardedRef) {
+    return (
+      <a
+        ref={forwardedRef}
+        {...props}
+        target='_blank'
+        rel='noopener'
+        className={cx('text-gray-a11 text-sm font-medium hover:underline', className)}
       >
         {children}
       </a>

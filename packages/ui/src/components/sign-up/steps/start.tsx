@@ -11,6 +11,7 @@ import { LastNameField } from '~/common/last-name-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
+import { useAppearance } from '~/hooks/use-appearance';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
@@ -26,6 +27,7 @@ export function SignUpStart() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
   const { userSettings } = useEnvironment();
+  const { layout } = useAppearance();
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
@@ -38,6 +40,12 @@ export function SignUpStart() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const renderDevModeWarning = useDevModeWarning();
+  const cardFooterProps = {
+    branded,
+    helpPageUrl: layout?.helpPageUrl,
+    privacyPageUrl: layout?.privacyPageUrl,
+    termsPageUrl: layout?.termsPageUrl,
+  };
 
   return (
     <Common.Loading scope='global'>
@@ -148,7 +156,7 @@ export function SignUpStart() {
                 ) : null}
                 {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
-              <Card.Footer branded={branded}>
+              <Card.Footer {...cardFooterProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signUp.start.actionText')}{' '}
