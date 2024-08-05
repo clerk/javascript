@@ -1,5 +1,7 @@
 ---
-'@clerk/backend': minor
+"@clerk/backend": minor
+"@clerk/clerk-js": minor
+"@clerk/types": minor
 ---
 
 Add `createOrganizationsLimit` param in `@clerk/backend` method `User.updateUser()`
