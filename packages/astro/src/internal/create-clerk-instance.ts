@@ -35,7 +35,7 @@ function createNavigationHandler(
  */
 const createClerkInstance = runOnce(createClerkInstanceInternal);
 
-async function createClerkInstanceInternal(options: AstroClerkCreateInstanceParams) {
+async function createClerkInstanceInternal(options?: AstroClerkCreateInstanceParams) {
   let clerkJSInstance = window.Clerk;
   if (!clerkJSInstance) {
     await loadClerkJsScript(options);

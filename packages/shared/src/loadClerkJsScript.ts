@@ -36,13 +36,7 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
  * @example
  * loadClerkJsScript({ publishableKey: 'pk_' });
  */
-const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
-  const { publishableKey } = opts;
-
-  if (!publishableKey) {
-    throw new Error(MISSING_PUBLISHABLE_KEY_ERROR);
-  }
-
+const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
   const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
 
   if (existingScript) {
@@ -55,6 +49,10 @@ const loadClerkJsScript = async (opts: LoadClerkJsScriptOptions) => {
         reject(FAILED_TO_LOAD_ERROR);
       });
     });
+  }
+
+  if (!opts?.publishableKey) {
+    throw new Error(MISSING_PUBLISHABLE_KEY_ERROR);
   }
 
   return loadScript(clerkJsScriptUrl(opts), {

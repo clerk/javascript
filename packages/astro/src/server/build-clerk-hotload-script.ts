@@ -17,7 +17,7 @@ function buildClerkHotloadScript(locals: APIContext['locals']) {
   });
   return `
   <script src="${scriptSrc}"
-  data-clerk-script
+  data-clerk-js-script
   async
   crossOrigin='anonymous'
   ${publishableKey ? `data-clerk-publishable-key="${publishableKey}"` : ``}
