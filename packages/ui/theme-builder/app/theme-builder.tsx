@@ -254,8 +254,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </aside>
           <figure
             className={cx('relative isolate grid w-full flex-1 place-content-center overflow-y-auto', {
-              'bg-white': appearance === 'light',
-              // 'bg-neutral-50': appearance === 'light',
+              'bg-neutral-50': appearance === 'light',
               'dark bg-neutral-950': appearance === 'dark',
             })}
           >
