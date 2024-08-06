@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.13.2
+
+### Patch Changes
+
+- Add option to hide the slug field in the `<CreateOrganization />`, `<OrganizationSwitcher />`, and `<OrganizationList />` components ([#3882](https://github.com/clerk/javascript/pull/3882)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`9b2aeacb3`](https://github.com/clerk/javascript/commit/9b2aeacb32fff7c300bda458636a1cc81a42ee7b)]:
+  - @clerk/types@4.12.1
+  - @clerk/localizations@2.5.6
+  - @clerk/shared@2.4.5
+
 ## 5.13.1
 
 ### Patch Changes

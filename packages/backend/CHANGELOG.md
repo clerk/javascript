@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.6.1
+
+### Patch Changes
+
+- Export the type `AuthObject`. You can now use it like so: ([#3844](https://github.com/clerk/javascript/pull/3844)) by [@kduprey](https://github.com/kduprey)
+
+  ```ts
+  import type { AuthObject } from "@clerk/backend";
+  ```
+
+- Updated dependencies [[`9b2aeacb3`](https://github.com/clerk/javascript/commit/9b2aeacb32fff7c300bda458636a1cc81a42ee7b)]:
+  - @clerk/types@4.12.1
+  - @clerk/shared@2.4.5
+
 ## 1.6.0
 
 ### Minor Changes
