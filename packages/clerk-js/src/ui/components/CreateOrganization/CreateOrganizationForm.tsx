@@ -1,5 +1,5 @@
 import { useOrganization, useOrganizationList } from '@clerk/shared/react';
-import type { OrganizationResource } from '@clerk/types';
+import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
 import React from 'react';
 
 import { useWizard, Wizard } from '../../common';
@@ -33,6 +33,7 @@ type CreateOrganizationFormProps = {
     headerTitle?: LocalizationKey;
     headerSubtitle?: LocalizationKey;
   };
+  hideSlug?: boolean;
 };
 
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
@@ -72,7 +73,13 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
     }
 
     try {
-      const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
+      const createOrgParams: CreateOrganizationParams = { name: nameField.value };
+
+      if (!props.hideSlug) {
+        createOrgParams.slug = slugField.value;
+      }
+
+      const organization = await createOrganization(createOrgParams);
       if (file) {
         await organization.setLogo({ file });
       }
@@ -181,15 +188,17 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
               ignorePasswordManager
             />
           </Form.ControlRow>
-          <Form.ControlRow elementId={slugField.id}>
-            <Form.PlainInput
-              {...slugField.props}
-              onChange={onChangeSlug}
-              isRequired
-              pattern='^[a-z0-9\-]+$'
-              ignorePasswordManager
-            />
-          </Form.ControlRow>
+          {!props.hideSlug && (
+            <Form.ControlRow elementId={slugField.id}>
+              <Form.PlainInput
+                {...slugField.props}
+                onChange={onChangeSlug}
+                isRequired
+                pattern='^[a-z0-9\-]+$'
+                ignorePasswordManager
+              />
+            </Form.ControlRow>
+          )}
           <FormButtonContainer sx={t => ({ marginTop: t.space.$none })}>
             <Form.SubmitButton
               block={false}

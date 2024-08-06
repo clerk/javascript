@@ -43,6 +43,7 @@ const defaultLayout: ParsedLayout = {
   termsPageUrl: '',
   shimmer: true,
   animations: true,
+  unsafe_disableDevelopmentModeWarnings: false,
 };
 
 /**

@@ -23,12 +23,14 @@ export const Alert = React.forwardRef<
       )}
     >
       <div className='flex gap-x-2'>
-        {
+        <span className='mt-0.5 shrink-0 *:size-4'>
           {
-            error: <Icon.ExclamationOctagonSm className='size-4 shrink-0' />,
-            warning: <Icon.ExclamationTriangleSm className='size-4 shrink-0' />,
-          }[intent]
-        }
+            {
+              error: <Icon.ExclamationOctagonSm />,
+              warning: <Icon.ExclamationTriangleSm />,
+            }[intent]
+          }
+        </span>
         {children}
       </div>
     </div>

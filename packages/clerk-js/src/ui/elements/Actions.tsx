@@ -33,7 +33,7 @@ export const SmallActions = (props: PropsOfComponent<typeof Flex>) => {
 type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
   icon: React.ComponentType;
   trailing?: React.ReactNode;
-  label: LocalizationKey;
+  label: string | LocalizationKey;
   iconBoxElementDescriptor?: ElementDescriptor;
   iconBoxElementId?: ElementId;
   iconBoxSx?: ThemableCssProp;

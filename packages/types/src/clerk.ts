@@ -12,6 +12,7 @@ import type {
   UserProfileTheme,
 } from './appearance';
 import type { ClientResource } from './client';
+import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
@@ -682,7 +683,7 @@ export type SetActiveParams = {
   session?: ActiveSessionResource | string | null;
 
   /**
-   * The organization resource or organization id (string version) to be set as active in the current session.
+   * The organization resource or organization ID/slug (string version) to be set as active in the current session.
    * If `null`, the currently active organization is removed as active.
    */
   organization?: OrganizationResource | string | null;
@@ -852,11 +853,6 @@ export type OrganizationProfileProps = RoutingOptions & {
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
   customPages?: CustomPage[];
-  /**
-   * @experimental
-   * Specify on which page the organization profile modal will open.
-   **/
-  __experimental_startPath?: string;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -881,6 +877,11 @@ export type CreateOrganizationProps = RoutingOptions & {
    * prop of ClerkProvided (if one is provided)
    */
   appearance?: CreateOrganizationTheme;
+  /**
+   * Hides the optional "slug" field in the organization creation screen.
+   * @default false
+   */
+  hideSlug?: boolean;
 };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
@@ -938,6 +939,11 @@ export type UserButtonProps = UserButtonProfileMode & {
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
+
+  /*
+   * Provide custom menu actions and links to be rendered inside the UserButton.
+   */
+  customMenuItems?: CustomMenuItem[];
 };
 
 type PrimitiveKeys<T> = {
@@ -1007,6 +1013,11 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
+     * Hides the optional "slug" field in the organization creation screen.
+     * @default false
+     */
+    hideSlug?: boolean;
+    /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvided (if one is provided)
@@ -1061,6 +1072,11 @@ export type OrganizationListProps = {
    * @default undefined`
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
+  /**
+   * Hides the optional "slug" field in the organization creation screen.
+   * @default false
+   */
+  hideSlug?: boolean;
 };
 
 export interface HandleEmailLinkVerificationParams {

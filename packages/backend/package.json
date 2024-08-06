@@ -1,6 +1,6 @@
 {
   "name": "@clerk/backend",
-  "version": "1.4.3",
+  "version": "1.6.1",
   "description": "Clerk Backend SDK - REST Client for Backend API & JWT verification utilities",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -95,8 +95,8 @@
     "test:cloudflare-workerd": "tests/cloudflare-workerd/run.sh"
   },
   "dependencies": {
-    "@clerk/shared": "2.4.1",
-    "@clerk/types": "4.9.1",
+    "@clerk/shared": "2.4.5",
+    "@clerk/types": "4.12.1",
     "cookie": "0.5.0",
     "snakecase-keys": "5.4.4",
     "tslib": "2.4.1"
@@ -105,13 +105,13 @@
     "@clerk/eslint-config-custom": "*",
     "@cloudflare/workers-types": "^3.18.0",
     "@types/chai": "^4.3.3",
-    "@types/cookie": "^0.5.1",
+    "@types/cookie": "^0.6.0",
     "@types/node": "^18.19.33",
     "@types/qunit": "^2.19.7",
     "@types/sinon": "^10.0.13",
     "chai": "^4.3.6",
     "edge-runtime": "^2.5.9",
-    "esbuild": "^0.15.12",
+    "esbuild": "^0.23.0",
     "esbuild-register": "^3.3.3",
     "miniflare": "^2.14.2",
     "npm-run-all": "^4.1.5",

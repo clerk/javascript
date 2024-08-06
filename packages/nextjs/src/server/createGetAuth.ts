@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend';
 import { AuthStatus, constants, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 

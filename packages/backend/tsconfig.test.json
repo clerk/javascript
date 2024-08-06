@@ -8,6 +8,7 @@
     "noImplicitAny": false,
     "outDir": "./tests/dist",
     "target": "ES2020",
+    "sourceMap": true,
     "paths": {
       "@clerk/shared/*": ["../shared/dist/*.js"]
     }

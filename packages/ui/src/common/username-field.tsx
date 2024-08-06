@@ -42,7 +42,7 @@ export function UsernameField({
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{translateError(message, code, 'username')}</Field.Message>;
+            return <Field.Message intent='error'>{translateError({ message, code, name: 'username' })}</Field.Message>;
           }}
         </Common.FieldError>
       </Field.Root>

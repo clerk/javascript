@@ -6,11 +6,12 @@ import { Spinner } from './spinner';
 
 const button = cva({
   base: [
+    '[--button-border-width:1px]',
     'appearance-none relative isolate select-none',
     'text-base font-medium',
-    'px-3 py-1.5',
-    'inline-flex w-full items-center justify-center gap-2',
-    'border rounded-md',
+    'px-[calc(theme(spacing.3)-var(--button-border-width))] py-[calc(theme(spacing[1.5])-var(--button-border-width))]',
+    'inline-flex w-full items-center justify-center gap-3',
+    'border-[length:--button-border-width] rounded-md bg-clip-padding',
     'outline-none focus-visible:ring',
     '*:min-w-0',
   ],
@@ -23,7 +24,6 @@ const button = cva({
         'focus-visible:ring-accent-a7',
       ],
       secondary: [
-        'bg-clip-padding',
         'text-gray-12 border-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
         'focus-visible:border-gray-a8 focus-visible:ring-accent-a3',
       ],
@@ -73,6 +73,7 @@ export const Button = React.forwardRef(function Button(
 ) {
   return (
     <button
+      data-button=''
       ref={forwardedRef}
       className={button({ busy, disabled, intent, className })}
       disabled={busy || disabled}

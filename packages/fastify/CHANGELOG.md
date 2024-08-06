@@ -1,5 +1,50 @@
 # Change Log
 
+## 1.0.28
+
+### Patch Changes
+
+- Internal change: Use `AuthObject` type import from `@clerk/backend`. ([#3844](https://github.com/clerk/javascript/pull/3844)) by [@kduprey](https://github.com/kduprey)
+
+- Updated dependencies [[`d7bf0f87c`](https://github.com/clerk/javascript/commit/d7bf0f87c4c50bc19d2796bca32bd694046a23b0), [`9b2aeacb3`](https://github.com/clerk/javascript/commit/9b2aeacb32fff7c300bda458636a1cc81a42ee7b)]:
+  - @clerk/backend@1.6.1
+  - @clerk/types@4.12.1
+  - @clerk/shared@2.4.5
+
+## 1.0.27
+
+### Patch Changes
+
+- Updated dependencies [[`7e94fcf0f`](https://github.com/clerk/javascript/commit/7e94fcf0fcbee8842a54f7931c45190370aa870d)]:
+  - @clerk/backend@1.6.0
+  - @clerk/types@4.12.0
+  - @clerk/shared@2.4.4
+
+## 1.0.26
+
+### Patch Changes
+
+- Updated dependencies [[`568186cad`](https://github.com/clerk/javascript/commit/568186cad29acaf0b084a9f86ccb9d29bd23fcf4), [`407195270`](https://github.com/clerk/javascript/commit/407195270ed8aab6eef18c64a4918e3870fef471)]:
+  - @clerk/types@4.11.0
+  - @clerk/backend@1.5.2
+  - @clerk/shared@2.4.3
+
+## 1.0.25
+
+### Patch Changes
+
+- Updated dependencies [[`992e5960c`](https://github.com/clerk/javascript/commit/992e5960c785eace83f3bad7c34d589fa313dcaf)]:
+  - @clerk/backend@1.5.1
+
+## 1.0.24
+
+### Patch Changes
+
+- Updated dependencies [[`fde5b5e7e`](https://github.com/clerk/javascript/commit/fde5b5e7e6fb5faa4267e06d82a38a176165b4f4), [`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/backend@1.5.0
+  - @clerk/types@4.10.0
+  - @clerk/shared@2.4.2
+
 ## 1.0.23
 
 ### Patch Changes

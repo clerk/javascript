@@ -302,4 +302,77 @@ test.describe('root and subdomain production apps @sessions', () => {
       await u[1].po.expect.toBeSignedIn();
     });
   });
+
+  /**
+   * This smoke test verifies that the session is not shared between different apps running on different same-level subdomains, while
+   * using different Clerk instances. For extra details, look at the previous test.
+   *
+   * sub1.test.com <> clerk-instance-1
+   * sub2.test.com <> clerk-instance-2
+   *
+   */
+  test.describe('multiple apps different same-level subdomains  for different production instances', () => {
+    const hosts = ['sub-1.multiple-apps-e2e.clerk.app', 'sub-2.multiple-apps-e2e.clerk.app'];
+    let fakeUsers: FakeUser[];
+    let server: Server;
+    let apps: Array<{ app: Application; serverUrl: string }>;
+
+    test.beforeAll(async () => {
+      apps = await Promise.all([prepareApplication('sessions-prod-1'), prepareApplication('sessions-prod-2')]);
+
+      // TODO: Move this into createProxyServer
+      const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
+        cert: fs.readFileSync(constants.CERTS_DIR + '/sessions.pem'),
+        key: fs.readFileSync(constants.CERTS_DIR + '/sessions-key.pem'),
+      };
+
+      server = createProxyServer({
+        ssl,
+        targets: {
+          [hosts[0]]: apps[0].serverUrl,
+          [hosts[1]]: apps[1].serverUrl,
+        },
+      });
+
+      const u = apps.map(a => createTestUtils({ app: a.app }));
+      fakeUsers = await Promise.all(u.map(u => u.services.users.createFakeUser()));
+      await Promise.all([
+        await u[0].services.users.createBapiUser(fakeUsers[0]),
+        await u[1].services.users.createBapiUser(fakeUsers[1]),
+      ]);
+    });
+
+    test.afterAll(async () => {
+      await Promise.all(fakeUsers.map(u => u.deleteIfExists()));
+      await Promise.all(apps.map(({ app }) => app.teardown()));
+      server.close();
+    });
+
+    test('the cookies are independent for the root and sub domains', async ({ context }) => {
+      const pages = await Promise.all([context.newPage(), context.newPage()]);
+      const u = [
+        createTestUtils({ app: apps[0].app, page: pages[0], context }),
+        createTestUtils({ app: apps[1].app, page: pages[1], context }),
+      ];
+
+      await u[0].page.goto(`https://${hosts[0]}`);
+      await u[0].po.signIn.goTo();
+      await u[0].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[0]);
+      await u[0].po.expect.toBeSignedIn();
+      const tab0User = await u[0].po.clerk.getClientSideUser();
+      // make sure that the backend user now matches the user we signed in with on the client
+      expect((await u[0].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab0User.id);
+
+      u[1].po.expect.toBeHandshake(await u[1].page.goto(`https://${hosts[1]}`));
+      await u[1].po.expect.toBeSignedOut();
+      expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(null);
+
+      await u[1].po.signIn.goTo();
+      await u[1].po.signIn.signInWithEmailAndInstantPassword(fakeUsers[1]);
+      await u[1].po.expect.toBeSignedIn();
+      const tab1User = await u[1].po.clerk.getClientSideUser();
+      // make sure that the backend user now matches the user we signed in with on the client
+      expect((await u[1].page.evaluate(() => fetch('/api/me').then(r => r.json()))).userId).toBe(tab1User.id);
+    });
+  });
 });

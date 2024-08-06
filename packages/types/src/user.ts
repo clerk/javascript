@@ -80,6 +80,7 @@ export interface UserResource extends ClerkResource {
   unsafeMetadata: UserUnsafeMetadata;
   lastSignInAt: Date | null;
   createOrganizationEnabled: boolean;
+  createOrganizationsLimit: number | null;
   deleteSelfEnabled: boolean;
   updatedAt: Date | null;
   createdAt: Date | null;

@@ -1,6 +1,8 @@
+// This file contains code originally found in packages/clerk-js/src/ui/localization and modified for use within UI.
+
 import { enUS } from '@clerk/localizations';
 import { normalizeDate, titleize } from '@clerk/shared';
-import type { DeepRequired, LocalizationResource, PathValue, RecordToPath } from '@clerk/types';
+import type { DeepRequired, LocalizationResource, PasswordSettingsData, PathValue, RecordToPath } from '@clerk/types';
 
 const defaultResource = enUS as DeepRequired<typeof enUS>;
 
@@ -211,7 +213,7 @@ export const makeLocalizeable = (resource: LocalizationResource) => {
    * @example
    * translateError('Invalid email address', 'form_param_format_invalid', 'email_address')
    */
-  const translateError = (message: string, code: string, name: string) => {
+  const translateError = ({ message, code, name }: { message: string; code: string; name?: string }) => {
     return t(`unstable__errors.${code}__${name}` as any) || t(`unstable__errors.${code}` as any) || message;
   };
 
@@ -219,4 +221,99 @@ export const makeLocalizeable = (resource: LocalizationResource) => {
     t,
     translateError,
   };
+};
+
+export type ComplexityErrors = {
+  [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]?: boolean;
+};
+
+export type UsePasswordComplexityConfig = Omit<
+  PasswordSettingsData,
+  'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'
+>;
+
+function listFormatSupportedLocalesOf(locale?: string | string[]) {
+  if (!locale) {
+    return false;
+  }
+  const locales = Array.isArray(locale) ? locale : [locale];
+  return (Intl as any).ListFormat.supportedLocalesOf(locales).length === locales.length;
+}
+
+/**
+ * Intl.ListFormat was introduced in 2021
+ * It is recommended to first check for browser support before using it
+ */
+export function canUseListFormat(locale: string | undefined) {
+  return 'ListFormat' in Intl && listFormatSupportedLocalesOf(locale);
+}
+export const addFullStop = (string: string | undefined) => {
+  return !string ? '' : string.endsWith('.') ? string : `${string}.`;
+};
+
+export const createListFormat = (message: string[], locale: string) => {
+  let messageWithPrefix: string;
+  if (canUseListFormat(locale)) {
+    const formatter = new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' });
+    messageWithPrefix = formatter.format(message);
+  } else {
+    messageWithPrefix = message.join(', ');
+  }
+
+  return messageWithPrefix;
+};
+
+const errorMessages: Record<keyof Omit<ComplexityErrors, 'allowed_special_characters'>, [string, string] | string> = {
+  max_length: ['unstable__errors.passwordComplexity.maximumLength', 'length'],
+  min_length: ['unstable__errors.passwordComplexity.minimumLength', 'length'],
+  require_numbers: 'unstable__errors.passwordComplexity.requireNumbers',
+  require_lowercase: 'unstable__errors.passwordComplexity.requireLowercase',
+  require_uppercase: 'unstable__errors.passwordComplexity.requireUppercase',
+  require_special_char: 'unstable__errors.passwordComplexity.requireSpecialCharacter',
+};
+
+export const translatePasswordError = ({
+  codes,
+  locale,
+  t,
+}: {
+  codes: (string | [string, Record<string, string | number>])[];
+  locale: string;
+  t: ReturnType<typeof makeLocalizeable>['t'];
+}) => {
+  if (!codes || Object.keys(codes).length === 0) {
+    return '';
+  }
+
+  // Because we perform strength validations only if complexity validations have passed, the presence of the string
+  // zxcvbn in any of the failed validations indicates that _all_ of the validations are from zxcvbn. Thus, we need to
+  // concat the localized strings together since they are each individual complete sentences.
+  const hasStrengthErrors = codes.some(v => v.includes('zxcvbn'));
+  if (hasStrengthErrors) {
+    return codes.map(v => t(v as any)).join(' ');
+  }
+
+  // show min length error first by itself. Since the min_length error will always be a tuple, we check for both
+  // isArray and that the first element is min_length
+  const hasMinLengthError = codes?.some(v => Array.isArray(v) && v[0] === 'min_length') || false;
+
+  const messages = codes
+    .filter(k => (hasMinLengthError ? Array.isArray(k) && k[0] === 'min_length' : true))
+    .map(k => {
+      const key = Array.isArray(k) ? k[0] : k;
+      const localizedKey = errorMessages[key as keyof typeof errorMessages];
+      if (Array.isArray(localizedKey) && Array.isArray(k)) {
+        const [lk, attr] = localizedKey;
+        // Because our translations use `{{ length }}` instead of `{{ min_length }}` and `{{ max_length}}`, we simply
+        // take the value of the first key. This is safe to do currently because the tuple object will only ever
+        // contain one key. In the future when we update our translated strings, this can be changed to simply pass
+        // through k[1] as the second argument to `t()`.
+        return t(lk as any, { [attr]: Object.values(k[1])[0] });
+      }
+      return t(localizedKey as any);
+    });
+
+  const messageWithPrefix = createListFormat(messages, locale);
+
+  return addFullStop(`${t('unstable__errors.passwordComplexity.sentencePrefix')} ${messageWithPrefix}`);
 };

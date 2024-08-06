@@ -59,7 +59,9 @@ export function EmailField({
         </Common.FieldState>
         <Common.FieldError asChild>
           {({ message, code }) => {
-            return <Field.Message intent='error'>{translateError(message, code, 'email_address')}</Field.Message>;
+            return (
+              <Field.Message intent='error'>{translateError({ message, code, name: 'email_address' })}</Field.Message>
+            );
           }}
         </Common.FieldError>
       </Field.Root>

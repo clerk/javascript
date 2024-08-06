@@ -38,7 +38,8 @@ async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Pro
 }
 
 /**
- * Similar to our verifyToken flow for Clerk-issued JWTs, but this verification flow is for our signed handshake payload. The handshake payload requires fewer verification steps.
+ * Similar to our verifyToken flow for Clerk-issued JWTs, but this verification flow is for our signed handshake payload.
+ * The handshake payload requires fewer verification steps.
  */
 export async function verifyHandshakeToken(
   token: string,

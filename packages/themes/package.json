@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "2.1.14",
+  "version": "2.1.18",
   "description": "Themes for the Clerk auth components",
   "keywords": [
     "react",
@@ -37,7 +37,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@clerk/types": "4.9.1",
+    "@clerk/types": "4.12.1",
     "tslib": "2.4.1"
   },
   "devDependencies": {
