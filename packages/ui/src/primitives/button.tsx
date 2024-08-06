@@ -32,6 +32,12 @@ const button = cva({
         'text-gray-12 border-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
         'focus-visible:border-gray-a8 focus-visible:ring-accent-a3',
       ],
+      connection: [
+        '[--button-icon-color:theme(colors.gray.12)]',
+        '[--button-icon-opacity:1]',
+        'text-gray-12 border-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
+        'focus-visible:border-gray-a8 focus-visible:ring-accent-a3',
+      ],
     },
     busy: {
       false: null,
@@ -45,27 +51,22 @@ const button = cva({
   compoundVariants: [
     { busy: false, disabled: false, intent: 'primary', className: 'hover:bg-accent-10 hover:after:opacity-0' },
     { busy: false, disabled: false, intent: 'secondary', className: 'hover:bg-gray-2' },
+    { busy: false, disabled: false, intent: 'connection', className: 'hover:bg-gray-2' },
     { busy: false, disabled: true, className: 'disabled:cursor-not-allowed disabled:opacity-50' },
     { busy: true, disabled: false, className: 'cursor-wait' },
   ],
-  defaultVariants: {
-    busy: false,
-    disabled: false,
-    intent: 'primary',
-  },
 });
 
 export const Button = React.forwardRef(function Button(
   {
-    busy,
+    busy = false,
     children,
     className,
-    disabled,
+    disabled = false,
     iconStart,
     iconEnd,
-    intent,
+    intent = 'primary',
     type = 'button',
-    spinnerWhenBusy,
     textVisuallyHidden,
     ...props
   }: React.ButtonHTMLAttributes<HTMLButtonElement> &
@@ -73,11 +74,12 @@ export const Button = React.forwardRef(function Button(
     Omit<VariantProps<typeof button>, 'disabled'> & {
       iconStart?: React.ReactNode;
       iconEnd?: React.ReactNode;
-      spinnerWhenBusy?: boolean;
       textVisuallyHidden?: boolean;
     },
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
+  const spinner = <Spinner className='shrink-0 text-[1.125rem]'>Loading…</Spinner>;
+
   return (
     <button
       data-button=''
@@ -88,17 +90,21 @@ export const Button = React.forwardRef(function Button(
       type={type}
       {...props}
     >
-      {busy && spinnerWhenBusy ? (
-        <Spinner className='shrink-0 text-[1.125rem]'>Loading…</Spinner>
+      {busy && intent === 'primary' ? (
+        spinner
       ) : (
         <>
           {iconStart ? (
-            <span
-              data-button-icon=''
-              className='shrink-0 text-[--button-icon-color] opacity-[--button-icon-opacity]'
-            >
-              {iconStart}
-            </span>
+            busy && intent === 'connection' ? (
+              spinner
+            ) : (
+              <span
+                data-button-icon=''
+                className='shrink-0 text-[--button-icon-color] opacity-[--button-icon-opacity]'
+              >
+                {iconStart}
+              </span>
+            )
           ) : null}
           {children ? <span className={cx('truncate', textVisuallyHidden && 'sr-only')}>{children}</span> : null}
           {iconEnd ? (

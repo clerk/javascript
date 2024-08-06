@@ -77,7 +77,6 @@ export function SignInResetPassword() {
                           <Button
                             busy={isSubmitting}
                             disabled={isGlobalLoading || isSubmitting}
-                            spinnerWhenBusy
                           >
                             {t('signIn.resetPassword.formButtonPrimary')}
                           </Button>

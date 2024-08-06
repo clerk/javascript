@@ -89,7 +89,7 @@ export function Connections(
                       asChild
                     >
                       <Button
-                        intent='secondary'
+                        intent='connection'
                         busy={isConnectionLoading}
                         disabled={props?.disabled || isConnectionLoading}
                         iconStart={IconComponent ? <IconComponent className='text-base' /> : null}
