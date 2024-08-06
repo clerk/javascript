@@ -138,6 +138,7 @@ export const SignUpRouterMachine = setup({
     },
     hasClerkTransfer: ({ context }) => Boolean(context.router?.searchParams().get(SEARCH_PARAMS.transfer)),
     hasResource: ({ context }) => Boolean(context.clerk.client.signUp),
+    hasTicket: ({ context }) => Boolean(context.ticket),
 
     isLoggedInAndSingleSession: and(['isLoggedIn', 'isSingleSessionMode', not('isExampleMode')]),
     isStatusAbandoned: needsStatus('abandoned'),
@@ -237,16 +238,24 @@ export const SignUpRouterMachine = setup({
     Idle: {
       on: {
         INIT: {
-          actions: assign(({ event }) => ({
-            clerk: event.clerk,
-            router: event.router,
-            signInPath: event.signInPath || SIGN_IN_DEFAULT_BASE_PATH,
-            loading: {
-              isLoading: false,
-            },
-            exampleMode: event.exampleMode || false,
-            formRef: event.formRef,
-          })),
+          actions: assign(({ event }) => {
+            const searchParams = event.router?.searchParams();
+
+            return {
+              clerk: event.clerk,
+              router: event.router,
+              signInPath: event.signInPath || SIGN_IN_DEFAULT_BASE_PATH,
+              loading: {
+                isLoading: false,
+              },
+              exampleMode: event.exampleMode || false,
+              formRef: event.formRef,
+              ticket:
+                searchParams?.get(SEARCH_PARAMS.ticket) ||
+                searchParams?.get(SEARCH_PARAMS.invitationToken) ||
+                undefined,
+            };
+          }),
           target: 'Init',
         },
       },
@@ -282,6 +291,11 @@ export const SignUpRouterMachine = setup({
           target: 'Callback',
         },
         {
+          guard: 'hasTicket',
+          actions: { type: 'navigateInternal', params: { force: true, path: '/' } },
+          target: 'Start',
+        },
+        {
           guard: 'needsVerification',
           actions: { type: 'navigateInternal', params: { force: true, path: '/verify' } },
           target: 'Verification',
@@ -307,6 +321,7 @@ export const SignUpRouterMachine = setup({
           basePath: context.router?.basePath,
           formRef: context.formRef,
           parent: self,
+          ticket: context.ticket,
         }),
         onDone: {
           actions: 'raiseNext',
@@ -321,6 +336,11 @@ export const SignUpRouterMachine = setup({
           {
             guard: 'isStatusComplete',
             actions: ['setActive', 'delayedReset'],
+          },
+          {
+            guard: and(['hasTicket', 'statusNeedsContinue']),
+            actions: { type: 'navigateInternal', params: { path: '/' } },
+            target: 'Start',
           },
           {
             guard: 'statusNeedsVerification',
