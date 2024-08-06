@@ -47,10 +47,13 @@ const useAuthenticationType = () => {
         return;
       }
 
-      if (numericTypes.includes(AuthenticationType.FINGERPRINT)) {
-        setAuthenticationType('fingerprint');
-      } else {
+      if (
+        numericTypes.includes(AuthenticationType.IRIS) ||
+        numericTypes.includes(AuthenticationType.FACIAL_RECOGNITION)
+      ) {
         setAuthenticationType('face-recognition');
+      } else {
+        setAuthenticationType('fingerprint');
       }
     });
 
