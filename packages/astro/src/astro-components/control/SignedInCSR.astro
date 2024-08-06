@@ -1,4 +1,4 @@
-<signed-in-csr style="display: none;">
+<signed-in-csr hidden>
   <slot />
 </signed-in-csr>
 
@@ -18,9 +18,9 @@
         }
 
         if (state.userId) {
-          this.style.display = 'block';
+          this.removeAttribute('hidden');
         } else {
-          this.style.display = 'none';
+          this.setAttribute('hidden', '');
         }
       });
     }
