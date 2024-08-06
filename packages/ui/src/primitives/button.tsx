@@ -32,6 +32,10 @@ const button = cva({
         'text-gray-12 border-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
         'focus-visible:border-gray-a8 focus-visible:ring-accent-a3',
       ],
+      // Note:
+      // This currently looks the same as `secondary`, but we've intentfully
+      // kept this as a separate variant for now, due to its nuances in `busy`
+      // behavior
       connection: [
         '[--button-icon-color:theme(colors.gray.12)]',
         '[--button-icon-opacity:1]',
