@@ -183,7 +183,7 @@ describe('Clerk singleton', () => {
       await sut.setActive({ session: null });
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
-        expect(evenBusSpy).toBeCalledWith('token:update', { token: null });
+        expect(evenBusSpy).toHaveBeenCalledWith('token:update', { token: null });
       });
     });
 
@@ -207,7 +207,7 @@ describe('Clerk singleton', () => {
       await sut.setActive({ session: mockSession as any as ActiveSessionResource });
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
-        expect(mockSession.getToken).toBeCalled();
+        expect(mockSession.getToken).toHaveBeenCalled();
       });
     });
 
@@ -308,7 +308,7 @@ describe('Clerk singleton', () => {
         expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
         expect(mockSession2.touch).toHaveBeenCalled();
         expect(mockSession2.getToken).toHaveBeenCalled();
-        expect(beforeEmitMock).toBeCalledWith(mockSession2);
+        expect(beforeEmitMock).toHaveBeenCalledWith(mockSession2);
         expect(sut.session).toMatchObject(mockSession2);
       });
     });
@@ -342,7 +342,7 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
         expect(mockSession.getToken).toHaveBeenCalled();
         expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
-        expect(beforeEmitMock).toBeCalledWith(mockSession);
+        expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
         expect(sut.session).toMatchObject(mockSession);
       });
     });
@@ -370,8 +370,8 @@ describe('Clerk singleton', () => {
         expect(executionOrder).toEqual(['session.touch', 'before emit']);
         expect(mockSession.touch).toHaveBeenCalled();
         expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org-id');
-        expect(mockSession.getToken).toBeCalled();
-        expect(beforeEmitMock).toBeCalledWith(mockSession);
+        expect(mockSession.getToken).toHaveBeenCalled();
+        expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
         expect(sut.session).toMatchObject(mockSession);
       });
     });
@@ -581,7 +581,7 @@ describe('Clerk singleton', () => {
       const toUrl = 'http://test.host/';
       await sut.navigate(toUrl);
       expect(mockHref).toHaveBeenCalledWith(toUrl);
-      expect(logSpy).not.toBeCalled();
+      expect(logSpy).not.toHaveBeenCalled();
     });
 
     it('uses window location if a custom navigate is defined but destination has different origin', async () => {
@@ -589,7 +589,7 @@ describe('Clerk singleton', () => {
       const toUrl = 'https://www.origindifferent.com/';
       await sut.navigate(toUrl);
       expect(mockHref).toHaveBeenCalledWith(toUrl);
-      expect(logSpy).not.toBeCalled();
+      expect(logSpy).not.toHaveBeenCalled();
     });
 
     it('wraps custom navigate method in a promise if provided and it sync', async () => {
@@ -599,7 +599,7 @@ describe('Clerk singleton', () => {
       expect(res.then).toBeDefined();
       expect(mockHref).not.toHaveBeenCalled();
       expect(mockNavigate.mock.calls[0][0]).toBe('/path#hash');
-      expect(logSpy).not.toBeCalled();
+      expect(logSpy).not.toHaveBeenCalled();
     });
 
     it('logs navigation external navigation when routerDebug is enabled', async () => {
@@ -608,8 +608,8 @@ describe('Clerk singleton', () => {
       await sut.navigate(toUrl);
       expect(mockHref).toHaveBeenCalledWith(toUrl);
 
-      expect(logSpy).toBeCalledTimes(1);
-      expect(logSpy).toBeCalledWith(`Clerk is navigating to: ${toUrl}`);
+      expect(logSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledWith(`Clerk is navigating to: ${toUrl}`);
     });
 
     it('logs navigation custom navigation when routerDebug is enabled', async () => {
@@ -620,8 +620,8 @@ describe('Clerk singleton', () => {
       expect(mockHref).not.toHaveBeenCalled();
       expect(mockNavigate.mock.calls[0][0]).toBe('/path#hash');
 
-      expect(logSpy).toBeCalledTimes(1);
-      expect(logSpy).toBeCalledWith(`Clerk is navigating to: ${toUrl}`);
+      expect(logSpy).toHaveBeenCalledTimes(1);
+      expect(logSpy).toHaveBeenCalledWith(`Clerk is navigating to: ${toUrl}`);
     });
   });
 
@@ -687,6 +687,66 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true });
         expect(mockSetActive).toHaveBeenCalled();
+      });
+    });
+
+    it('does not initiate the transfer flow when transferable: false is passed', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          activeSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: {
+                code: 'external_account_not_found',
+                long_message: 'The External Account was not found.',
+                message: 'Invalid external account',
+              },
+            },
+            second_factor_verification: null,
+            identifier: '',
+            user_data: null,
+            created_session_id: null,
+            created_user_id: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSetActive = jest.fn();
+      const mockSignUpCreate = jest
+        .fn()
+        .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+      sut.setActive = mockSetActive;
+
+      await sut.handleRedirectCallback({ transferable: false });
+
+      await waitFor(() => {
+        expect(mockSignUpCreate).not.toHaveBeenCalledWith({ transfer: true });
+        expect(mockSetActive).not.toHaveBeenCalled();
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in', undefined);
       });
     });
 
