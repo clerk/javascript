@@ -1,4 +1,4 @@
-<signed-out-csr style="display: none;">
+<signed-out-csr hidden>
   <slot />
 </signed-out-csr>
 
@@ -18,9 +18,9 @@
         }
 
         if (state.userId) {
-          this.style.display = 'none';
+          this.setAttribute('hidden', '');
         } else {
-          this.style.display = 'block';
+          this.removeAttribute('hidden');
         }
       });
     }
