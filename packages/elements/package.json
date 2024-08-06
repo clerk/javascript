@@ -63,7 +63,7 @@
     "build:declarations": "tsc --env.NODE_ENV production -p tsconfig.json",
     "dev": "tsup --env.NODE_ENV development --watch",
     "dev:example": "concurrently \"npm run dev\" \"npm run app:dev\"",
-    "dev:theme-builder": "concurrently --prefix-colors auto --names \"elements,ui,theme-builder\" \"npm run dev -w @clerk/elements\" \"npm run dev -w @clerk/ui\" \"cd ../ui/theme-builder && npm run dev\"",
+    "dev:theme-builder": "TURBO_UI=0 concurrently --prefix-colors auto --names \"elements,ui,theme-builder\" \"turbo dev --filter=@clerk/elements\" \"npm run dev -w @clerk/ui\" \"cd ../ui/theme-builder && npm run dev\"",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
