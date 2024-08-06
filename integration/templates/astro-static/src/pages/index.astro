@@ -1,0 +1,15 @@
+---
+import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/astro/components";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Home">
+    <div>
+        <SignedOut client>
+            <SignInButton />
+        </SignedOut>
+        <SignedIn client>
+            <UserButton />
+        </SignedIn>
+    </div>
+</Layout>

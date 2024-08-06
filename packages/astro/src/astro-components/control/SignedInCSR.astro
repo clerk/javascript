@@ -13,6 +13,10 @@
 
     subscribe() {
       $authStore.subscribe((state) => {
+        if (state.userId === undefined) {
+          return;
+        }
+
         if (state.userId) {
           this.style.display = 'block';
         } else {

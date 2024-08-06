@@ -17,6 +17,17 @@ const astroNode = applicationConfig()
   .addDependency('@clerk/types', clerkTypesLocal)
   .addDependency('@clerk/localizations', clerkLocalizationLocal);
 
+const astroStatic = applicationConfig()
+  .setName('astro-static')
+  .useTemplate(templates['astro-static'])
+  .setEnvFormatter('public', key => `PUBLIC_${key}`)
+  .addScript('setup', 'npm i')
+  .addScript('dev', 'npm run dev')
+  .addScript('build', 'npm run build')
+  .addScript('serve', 'npm run preview')
+  .addDependency('@clerk/astro', clerkAstroLocal);
+
 export const astro = {
   node: astroNode,
+  static: astroStatic,
 };
