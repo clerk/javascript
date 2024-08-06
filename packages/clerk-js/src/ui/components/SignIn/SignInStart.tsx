@@ -205,6 +205,11 @@ export function _SignInStart(): JSX.Element {
 
   useEffect(() => {
     async function handleOauthError() {
+      const defaultErrorHandler = () => {
+        // Error from server may be too much information for the end user, so set a generic error
+        card.setError('Unable to complete action at this time. If the problem persists please contact support.');
+      };
+
       const error = signIn?.firstFactorVerification?.error;
       if (error) {
         switch (error.code) {
@@ -214,12 +219,13 @@ export function _SignInStart(): JSX.Element {
           case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
           case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
           case ERROR_CODES.USER_LOCKED:
+          case ERROR_CODES.EXTERNAL_ACCOUNT_NOT_FOUND:
             card.setError(error);
             break;
           default:
-            // Error from server may be too much information for the end user, so set a generic error
-            card.setError('Unable to complete action at this time. If the problem persists please contact support.');
+            defaultErrorHandler();
         }
+
         // TODO: This is a workaround in order to reset the sign in attempt
         // so that the oauth error does not persist on full page reloads.
         void (await signIn.create({}));

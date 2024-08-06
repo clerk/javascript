@@ -501,7 +501,8 @@ export interface Clerk {
   handleUnauthenticated: () => Promise<unknown>;
 }
 
-export type HandleOAuthCallbackParams = SignInForceRedirectUrl &
+export type HandleOAuthCallbackParams = TransferableOption &
+  SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
@@ -729,10 +730,20 @@ export type SignInProps = RoutingOptions & {
    * Initial values that are used to prefill the sign in form.
    */
   initialValues?: SignInInitialValues;
-} & SignUpForceRedirectUrl &
+} & TransferableOption &
+  SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl;
+
+interface TransferableOption {
+  /**
+   * Indicates whether or not sign in attempts are transferable to the sign up flow.
+   * Prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.
+   * @default true
+   */
+  transferable?: boolean;
+}
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
