@@ -120,3 +120,8 @@ export type {
   WebhookEvent,
   WebhookEventType,
 } from './api/resources/Webhooks';
+
+/**
+ * Auth objects
+ */
+export type { AuthObject } from './tokens/authObjects';
