@@ -5,11 +5,12 @@ type LoadScriptOptions = {
   async?: boolean;
   defer?: boolean;
   crossOrigin?: 'anonymous' | 'use-credentials';
+  nonce?: string;
   beforeLoad?: (script: HTMLScriptElement) => void;
 };
 
 export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTMLScriptElement> {
-  const { async, defer, beforeLoad, crossOrigin } = opts || {};
+  const { async, defer, beforeLoad, crossOrigin, nonce } = opts || {};
   return new Promise((resolve, reject) => {
     if (!src) {
       reject(NO_SRC_ERROR);
@@ -36,6 +37,7 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
     });
 
     script.src = src;
+    script.nonce = nonce;
     beforeLoad?.(script);
     document.body.appendChild(script);
   });

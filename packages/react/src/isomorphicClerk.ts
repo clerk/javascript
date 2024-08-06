@@ -424,6 +424,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
             publishableKey: this.#publishableKey,
             proxyUrl: this.proxyUrl,
             domain: this.domain,
+            nonce: this.options.nonce,
           });
         }
 
