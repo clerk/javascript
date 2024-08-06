@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend';
 import type { FastifyRequest } from 'fastify';
 
 import { pluginRegistrationRequired } from './errors';

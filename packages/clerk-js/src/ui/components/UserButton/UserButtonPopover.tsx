@@ -22,6 +22,7 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
     handleSessionClicked,
     handleSignOutAllClicked,
     handleSignOutSessionClicked,
+    handleUserProfileActionClicked,
     otherSessions,
   } = useMultisessionActions({ ...useUserButtonContext(), actionCompleteCallback: close, user });
 
@@ -47,7 +48,9 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
             <SingleSessionActions
               handleManageAccountClicked={handleManageAccountClicked}
               handleSignOutSessionClicked={handleSignOutSessionClicked}
+              handleUserProfileActionClicked={handleUserProfileActionClicked}
               session={session}
+              completedCallback={close}
             />
           ) : (
             <MultiSessionActions
@@ -57,6 +60,8 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
               handleSignOutSessionClicked={handleSignOutSessionClicked}
               handleSessionClicked={handleSessionClicked}
               handleAddAccountClicked={handleAddAccountClicked}
+              handleUserProfileActionClicked={handleUserProfileActionClicked}
+              completedCallback={close}
             />
           )}
         </PopoverCard.Content>

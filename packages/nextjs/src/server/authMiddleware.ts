@@ -1,4 +1,5 @@
-import type { AuthenticateRequestOptions, AuthObject, ClerkRequest } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend';
+import type { AuthenticateRequestOptions, ClerkRequest } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';

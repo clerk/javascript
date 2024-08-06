@@ -1,5 +1,53 @@
 # @clerk/elements
 
+## 0.12.3
+
+### Patch Changes
+
+- Updated dependencies [[`9b2aeacb3`](https://github.com/clerk/javascript/commit/9b2aeacb32fff7c300bda458636a1cc81a42ee7b)]:
+  - @clerk/types@4.12.1
+
+## 0.12.2
+
+### Patch Changes
+
+- Return password validation errors with additional supporting information from instance configuration ([#3812](https://github.com/clerk/javascript/pull/3812)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes a bug that briefly showed the underlying primitive input for OTPs when auto-filled in MacOS ([#3899](https://github.com/clerk/javascript/pull/3899)) by [@joe-bell](https://github.com/joe-bell)
+
+- Updated dependencies [[`7e94fcf0f`](https://github.com/clerk/javascript/commit/7e94fcf0fcbee8842a54f7931c45190370aa870d)]:
+  - @clerk/types@4.12.0
+
+## 0.12.1
+
+### Patch Changes
+
+- Updated dependencies [[`568186cad`](https://github.com/clerk/javascript/commit/568186cad29acaf0b084a9f86ccb9d29bd23fcf4), [`407195270`](https://github.com/clerk/javascript/commit/407195270ed8aab6eef18c64a4918e3870fef471)]:
+  - @clerk/types@4.11.0
+
+## 0.12.0
+
+### Minor Changes
+
+- Add Metamask (Web3) support for sign in and sign up ([#3879](https://github.com/clerk/javascript/pull/3879)) by [@dstaley](https://github.com/dstaley)
+
+## 0.11.0
+
+### Minor Changes
+
+- Add full SAML support ([#3842](https://github.com/clerk/javascript/pull/3842)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update signin `isLoggedInAndSingleSession` guard to navigate using `buildAfterSignInUrl` when true. ([#3841](https://github.com/clerk/javascript/pull/3841)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+### Patch Changes
+
+- Fixes issue where the incorrect sign in first factor strategy was being returned during sign in. ([#3828](https://github.com/clerk/javascript/pull/3828)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Ensure correct supported strategies are rendered based on first or second factor needs. ([#3843](https://github.com/clerk/javascript/pull/3843)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/types@4.10.0
+
 ## 0.10.7
 
 ### Patch Changes

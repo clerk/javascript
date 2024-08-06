@@ -55,6 +55,7 @@ export interface MountProps {
   updateProps: (props: any) => void;
   props?: any;
   customPagesPortals?: any[];
+  customMenuItemsPortals?: any[];
 }
 
 export interface OpenProps {
@@ -127,3 +128,31 @@ export type UserProfileLinkProps = {
 
 export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
 export type OrganizationProfileLinkProps = UserProfileLinkProps;
+
+type ButtonActionProps<T extends string> =
+  | {
+      label: string;
+      labelIcon: React.ReactNode;
+      onClick: () => void;
+      open?: never;
+    }
+  | {
+      label: T;
+      labelIcon?: never;
+      onClick?: never;
+      open?: never;
+    }
+  | {
+      label: string;
+      labelIcon: React.ReactNode;
+      onClick?: never;
+      open: string;
+    };
+
+export type UserButtonActionProps = ButtonActionProps<'manageAccount' | 'signOut'>;
+
+export type UserButtonLinkProps = {
+  href: string;
+  label: string;
+  labelIcon: React.ReactNode;
+};

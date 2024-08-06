@@ -1,7 +1,8 @@
-import type { SignInResource } from '@clerk/types';
-import { fromPromise, not, sendTo, setup } from 'xstate';
+import type { SignInResource, Web3Strategy } from '@clerk/types';
+import { assertEvent, fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';
+import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
 import { sendToLoading } from '~/internals/machines/shared';
 import { assertActorEventError } from '~/internals/machines/utils/assert';
@@ -23,6 +24,14 @@ export const SignInStartMachine = setup({
         flow,
       });
     }),
+    attemptWeb3: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; strategy: Web3Strategy }>(
+      ({ input: { parent, strategy } }) => {
+        if (strategy === 'web3_metamask_signature') {
+          return parent.getSnapshot().context.clerk.client.signIn.authenticateWithMetamask();
+        }
+        throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
+      },
+    ),
     attempt: fromPromise<SignInResource, { parent: SignInRouterMachineActorRef; fields: FormFields }>(
       ({ input: { fields, parent } }) => {
         const clerk = parent.getSnapshot().context.clerk;
@@ -94,6 +103,11 @@ export const SignInStartMachine = setup({
           target: 'AttemptingPasskeyAutoFill',
           reenter: false,
         },
+        'AUTHENTICATE.WEB3': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingWeb3',
+          reenter: true,
+        },
       },
     },
     Attempting: {
@@ -159,6 +173,28 @@ export const SignInStartMachine = setup({
         },
         onError: {
           actions: ['setFormErrors'],
+          target: 'Pending',
+        },
+      },
+    },
+    AttemptingWeb3: {
+      tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
+      invoke: {
+        id: 'attemptWeb3',
+        src: 'attemptWeb3',
+        input: ({ context, event }) => {
+          assertEvent(event, 'AUTHENTICATE.WEB3');
+          return {
+            parent: context.parent,
+            strategy: event.strategy,
+          };
+        },
+        onDone: {
+          actions: ['sendToNext', 'sendToLoading'],
+        },
+        onError: {
+          actions: ['setFormErrors', 'sendToLoading'],
           target: 'Pending',
         },
       },

@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend';
 import type { Application, Request as ExpressRequest, RequestHandler, Response as ExpressResponse } from 'express';
 import express from 'express';
 import supertest from 'supertest';

@@ -128,7 +128,7 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
           void preloadComponent(preloadHint);
         }
         componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
-          createRoot(clerkRoot!).render(
+          createRoot(clerkRoot).render(
             <Components
               clerk={clerk}
               environment={environment}
@@ -307,7 +307,7 @@ const Components = (props: ComponentsProps) => {
       onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
       startPath={buildVirtualRouterUrl({
         base: '/organizationProfile',
-        path: organizationProfileModal?.__experimental_startPath || urlStateParam?.path,
+        path: urlStateParam?.path,
       })}
       componentName={'OrganizationProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}

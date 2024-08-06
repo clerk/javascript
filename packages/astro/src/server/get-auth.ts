@@ -1,4 +1,5 @@
-import { type AuthObject, AuthStatus, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend';
+import { AuthStatus, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
 import type { APIContext } from 'astro';
 

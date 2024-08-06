@@ -39,7 +39,7 @@ import {
 import { usePassword } from '~/react/hooks/use-password.hook';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 import { useSignInPasskeyAutofill } from '~/react/sign-in/context/router.context';
-import type { ErrorMessagesKey } from '~/react/utils/generate-password-error-text';
+import type { ErrorCodeOrTuple } from '~/react/utils/generate-password-error-text';
 import { isReactFragment } from '~/react/utils/is-react-fragment';
 
 import type { OTPInputProps } from './otp';
@@ -233,7 +233,7 @@ const useInput = ({
         field: { name, feedback: { type: 'success', message: 'Your password meets all the necessary requirements.' } },
       });
     },
-    onValidationError: (error, keys) => {
+    onValidationError: (error, codes) => {
       if (error) {
         ref.send({
           type: 'FIELD.FEEDBACK.SET',
@@ -242,22 +242,29 @@ const useInput = ({
             feedback: {
               type: 'error',
               message: new ClerkElementsFieldError('password-validation-error', error),
-              codes: keys,
+              codes,
             },
           },
         });
       }
     },
-    onValidationWarning: (warning, keys) =>
+    onValidationWarning: (warning, codes) =>
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'warning', message: warning, codes: keys } },
+        field: { name, feedback: { type: 'warning', message: warning, codes } },
       }),
-    onValidationInfo: (info, keys) => {
+    onValidationInfo: (info, codes) => {
       // TODO: If input is not focused, make this info an error
       ref.send({
         type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'info', message: info, codes: keys } },
+        field: {
+          name,
+          feedback: {
+            type: 'info',
+            message: info,
+            codes,
+          },
+        },
       });
     },
   });
@@ -513,7 +520,7 @@ type FieldStateRenderFn = {
   children: (state: {
     state: FieldStates;
     message: string | undefined;
-    codes: ErrorMessagesKey[] | undefined;
+    codes: ErrorCodeOrTuple[] | undefined;
   }) => React.ReactNode;
 };
 

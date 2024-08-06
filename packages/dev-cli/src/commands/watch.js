@@ -1,5 +1,6 @@
-import { spawn } from 'node:child_process';
 import { join } from 'node:path';
+
+import concurrently from 'concurrently';
 
 import { getClerkPackages } from '../utils/getClerkPackages.js';
 import { getDependencies } from '../utils/getDependencies.js';
@@ -9,7 +10,7 @@ import { getMonorepoRoot } from '../utils/getMonorepoRoot.js';
  * Starts long-running watchers for Clerk dependencies.
  * @param {object} args
  * @param {boolean | undefined} args.js If `true`, only spawn the builder for `@clerk/clerk-js`.
- * @returns {Promise<void>}
+ * @returns {Promise<import('concurrently').CloseEvent[]>}
  */
 export async function watch({ js }) {
   const { dependencies, devDependencies } = await getDependencies(join(process.cwd(), 'package.json'));
@@ -24,54 +25,35 @@ export async function watch({ js }) {
 
   const cwd = await getMonorepoRoot();
 
+  /** @type {import('concurrently').ConcurrentlyCommandInput} */
+  const clerkJsCommand = {
+    name: 'clerk-js',
+    command: 'turbo run dev --filter=@clerk/clerk-js -- --env devOrigin=http://localhost:4000',
+    cwd,
+    env: { TURBO_UI: '0', ...process.env },
+  };
+
+  /** @type {import('concurrently').ConcurrentlyCommandInput} */
+  const packagesCommand = {
+    name: 'packages',
+    command: `turbo ${args.join(' ')}`,
+    cwd,
+    env: { TURBO_UI: '0', ...process.env },
+  };
+
   if (js) {
-    return new Promise((resolve, reject) => {
-      const child = spawn(
-        'turbo',
-        ['run', 'dev', '--filter=@clerk/clerk-js', '--', '--env', 'devOrigin=http://localhost:4000'],
-        {
-          cwd,
-          stdio: 'inherit',
-          env: { ...process.env },
-        },
-      );
-
-      child.on('close', code => {
-        if (code !== 0) {
-          reject();
-          return;
-        }
-        resolve();
-      });
-    });
+    //@ts-expect-error The TypeScript types for the ESM version of concurrently are wrong. https://github.com/open-cli-tools/concurrently/issues/494
+    const { result } = concurrently([clerkJsCommand], { prefixColors: 'auto' });
+    return result;
   }
 
+  /** @type {import('concurrently').ConcurrentlyCommandInput[]} */
+  const commands = [packagesCommand];
   if (typeof js === 'undefined') {
-    // On macOS, we spawn a new Terminal.app instance containing the watcher for clerk-js. This is because clerk-js is
-    // not declared as a dependency for any other packages, so Turborepo is unable to automatically start it.
-    if (process.platform === 'darwin') {
-      spawn('osascript', [
-        '-e',
-        `tell app "Terminal" to do script "cd ${cwd} && turbo run dev --filter=@clerk/clerk-js -- --env devOrigin=http://localhost:4000"`,
-      ]);
-    }
+    commands.push(clerkJsCommand);
   }
 
-  return new Promise((resolve, reject) => {
-    const child = spawn('turbo', args, {
-      cwd,
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-      },
-    });
-
-    child.on('close', code => {
-      if (code !== 0) {
-        reject();
-        return;
-      }
-      resolve();
-    });
-  });
+  //@ts-expect-error The TypeScript types for the ESM version of concurrently are wrong. https://github.com/open-cli-tools/concurrently/issues/494
+  const { result } = concurrently(commands, { prefixColors: 'auto' });
+  return result;
 }

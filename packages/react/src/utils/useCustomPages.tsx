@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 import React from 'react';
 
 import {
+  MenuItems,
   OrganizationProfileLink,
   OrganizationProfilePage,
   UserProfileLink,
@@ -11,12 +12,9 @@ import {
 } from '../components/uiComponents';
 import { customLinkWrongProps, customPagesIgnoredComponent, customPageWrongProps } from '../errors/messages';
 import type { UserProfilePageProps } from '../types';
+import { isThatComponent } from './componentValidation';
 import type { UseCustomElementPortalParams, UseCustomElementPortalReturn } from './useCustomElementPortal';
 import { useCustomElementPortal } from './useCustomElementPortal';
-
-const isThatComponent = (v: any, component: React.ReactNode): v is React.ReactNode => {
-  return !!v && React.isValidElement(v) && (v as React.ReactElement)?.type === component;
-};
 
 export const useUserProfileCustomPages = (children: React.ReactNode | React.ReactNode[]) => {
   const reorderItemsLabels = ['account', 'security'];
@@ -25,6 +23,7 @@ export const useUserProfileCustomPages = (children: React.ReactNode | React.Reac
     reorderItemsLabels,
     LinkComponent: UserProfileLink,
     PageComponent: UserProfilePage,
+    MenuItemsComponent: MenuItems,
     componentName: 'UserProfile',
   });
 };
@@ -44,6 +43,7 @@ type UseCustomPagesParams = {
   children: React.ReactNode | React.ReactNode[];
   LinkComponent: any;
   PageComponent: any;
+  MenuItemsComponent?: any;
   reorderItemsLabels: string[];
   componentName: string;
 };
@@ -54,13 +54,18 @@ const useCustomPages = ({
   children,
   LinkComponent,
   PageComponent,
+  MenuItemsComponent,
   reorderItemsLabels,
   componentName,
 }: UseCustomPagesParams) => {
   const validChildren: CustomPageWithIdType[] = [];
 
   React.Children.forEach(children, child => {
-    if (!isThatComponent(child, PageComponent) && !isThatComponent(child, LinkComponent)) {
+    if (
+      !isThatComponent(child, PageComponent) &&
+      !isThatComponent(child, LinkComponent) &&
+      !isThatComponent(child, MenuItemsComponent)
+    ) {
       if (child) {
         logErrorInDevMode(customPagesIgnoredComponent(componentName));
       }
