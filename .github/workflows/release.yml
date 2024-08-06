@@ -78,6 +78,7 @@ jobs:
             const preMode = require("fs").existsSync("./.changeset/pre.json");
             if (!preMode) {
               const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+              const nextjsVersion = require('./packages/nextjs/package.json').version;
 
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
@@ -85,6 +86,14 @@ jobs:
                 workflow_id: 'prepare-prod-clerkjs-proxy-pr.yml',
                 ref: 'main',
                 inputs: { version: clerkjsVersion }
+              })
+
+              github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'dashboard',
+                workflow_id: 'prepare-nextjs-sdk-update.yml',
+                ref: 'main',
+                inputs: { version: nextjsVersion }
               })
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
