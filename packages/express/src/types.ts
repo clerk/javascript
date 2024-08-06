@@ -1,7 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { createClerkClient } from '@clerk/backend';
+import type { AuthObject, createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
-import type { AuthObject } from '@clerk/types';
 import type { Request as ExpressRequest, RequestHandler } from 'express';
 
 export type ExpressRequestWithAuth = ExpressRequest & { auth: AuthObject };

@@ -9,7 +9,7 @@ export { debugRequestState } from './tokens/request';
 
 export type { AuthenticateRequestOptions } from './tokens/types';
 
-export type { SignedInAuthObjectOptions } from './tokens/authObjects';
+export type { SignedInAuthObjectOptions, SignedInAuthObject, SignedOutAuthObject } from './tokens/authObjects';
 export { makeAuthObjectSerializable, signedOutAuthObject, signedInAuthObject } from './tokens/authObjects';
 
 export { AuthStatus } from './tokens/authStatus';

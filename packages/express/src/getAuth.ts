@@ -1,4 +1,4 @@
-import type { AuthObject } from '@clerk/types';
+import type { AuthObject } from '@clerk/backend';
 import type { Request as ExpressRequest } from 'express';
 
 import { middlewareRequired } from './errors';

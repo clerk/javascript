@@ -1,8 +1,9 @@
-import type { JwtPayload, SignedInAuthObject, SignedOutAuthObject } from '@clerk/types';
+import type { JwtPayload } from '@clerk/types';
 
 import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';
 import type { AuthenticateContext } from './authenticateContext';
+import type { SignedInAuthObject, SignedOutAuthObject } from './authObjects';
 import { signedInAuthObject, signedOutAuthObject } from './authObjects';
 
 export const AuthStatus = {

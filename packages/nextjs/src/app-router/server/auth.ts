@@ -1,6 +1,6 @@
+import type { AuthObject } from '@clerk/backend';
 import type { RedirectFun } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
-import type { AuthObject } from '@clerk/types';
 import { notFound, redirect } from 'next/navigation';
 
 import { buildClerkProps } from '../../server/buildClerkProps';

@@ -1,10 +1,9 @@
-import type { RedirectFun } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend';
+import type { RedirectFun, SignedInAuthObject } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import type {
-  AuthObject,
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
-  SignedInAuthObject,
 } from '@clerk/types';
 
 import { constants as nextConstants } from '../constants';

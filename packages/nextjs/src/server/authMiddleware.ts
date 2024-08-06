@@ -1,8 +1,8 @@
+import type { AuthObject } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { AuthObject } from '@clerk/types';
 import type { NextFetchEvent, NextMiddleware, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 

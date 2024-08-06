@@ -1,6 +1,6 @@
+import type { AuthObject } from '@clerk/backend';
 import { AuthStatus, signedInAuthObject, signedOutAuthObject } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
-import type { AuthObject } from '@clerk/types';
 import type { APIContext } from 'astro';
 
 import { getSafeEnv } from './get-safe-env';

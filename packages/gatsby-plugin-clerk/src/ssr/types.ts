@@ -1,6 +1,5 @@
-import type { Organization, Session, User } from '@clerk/backend';
+import type { AuthObject, Organization, Session, User } from '@clerk/backend';
 import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
-import type { AuthObject } from '@clerk/types';
 import type { GetServerDataProps } from 'gatsby';
 
 export type WithServerAuthResult<CallbackReturn> = (props: GetServerDataProps) => Promise<Awaited<CallbackReturn>>;
