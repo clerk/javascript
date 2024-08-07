@@ -1,5 +1,7 @@
 export * from './middlewareHandler';
 
+export * from './getAuth';
+
 /**
  * Re-export resource types from @clerk/backend
  */

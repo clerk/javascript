@@ -58,18 +58,18 @@
     "@clerk/clerk-react": "5.3.3",
     "@clerk/shared": "2.4.5",
     "@clerk/types": "4.12.1",
-    "@vinxi/server-functions": "^0.3.2",
     "tslib": "2.4.1"
   },
   "devDependencies": {
     "@clerk/eslint-config-custom": "*",
-    "@tanstack/react-router": "^1.34.9",
-    "@tanstack/start": "^1.34.9",
-    "@types/node": "^18.17.0",
+    "@tanstack/react-router": "^1.46.4",
+    "@tanstack/start": "^1.46.4",
+    "@types/node": "^18.19.43",
     "@types/react": "*",
     "@types/react-dom": "*",
-    "esbuild-plugin-file-path-extensions": "^2.1.1",
-    "typescript": "*"
+    "esbuild-plugin-file-path-extensions": "^2.1.2",
+    "typescript": "*",
+    "vinxi": "^0.4.1"
   },
   "peerDependencies": {
     "@tanstack/react-router": ">=1.34.9",
