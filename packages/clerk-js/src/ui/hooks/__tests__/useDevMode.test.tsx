@@ -65,7 +65,7 @@ describe('useDevMode', () => {
     expect(result.current.showDevModeNotice).toBe(false);
   });
 
-  test("should not show dev mode notice when showDevModeWarning is false even if it's ad dev instance", () => {
+  test("should not show dev mode notice when showDevModeWarning is false even if it's a dev instance", () => {
     mockUseEnvironment.mockImplementationOnce(
       () =>
         ({
