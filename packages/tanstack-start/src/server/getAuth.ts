@@ -2,18 +2,17 @@ import type { AuthObject } from '@clerk/backend/internal';
 import { stripPrivateDataFromObject } from '@clerk/backend/internal';
 import type { FetchFnCtx } from '@tanstack/start';
 
+import { errorThrower } from '../utils';
 import { noFetchFnCtxPassedInGetAuth } from '../utils/errors';
 import { authenticateRequest } from './authenticateRequest';
 import { loadOptions } from './loadOptions';
 import type { LoaderOptions } from './types';
 
-export type GetAuthReturn = Promise<AuthObject>;
-
 type GetAuthOptions = Pick<LoaderOptions, 'secretKey'>;
 
-export async function getAuth(ctx: FetchFnCtx, opts?: GetAuthOptions): GetAuthReturn {
+export async function getAuth(ctx: FetchFnCtx, opts?: GetAuthOptions): Promise<AuthObject> {
   if (!ctx || (ctx && !ctx.request)) {
-    throw new Error(noFetchFnCtxPassedInGetAuth);
+    errorThrower.throw(noFetchFnCtxPassedInGetAuth);
   }
 
   const loadedOptions = loadOptions(ctx.request, opts);
