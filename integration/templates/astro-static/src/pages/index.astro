@@ -4,12 +4,10 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Home">
-    <div>
-        <SignedOut client>
-            <SignInButton />
-        </SignedOut>
-        <SignedIn client>
-            <UserButton />
-        </SignedIn>
-    </div>
+    <SignedOut client>
+        <SignInButton />
+    </SignedOut>
+    <SignedIn client>
+        <UserButton />
+    </SignedIn>
 </Layout>
