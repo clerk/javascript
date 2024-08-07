@@ -127,6 +127,7 @@ export type SignInContextType = SignInCtx & {
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
+  transferable: boolean;
 };
 
 export const useSignInContext = (): SignInContextType => {
@@ -175,6 +176,7 @@ export const useSignInContext = (): SignInContextType => {
 
   return {
     ...ctx,
+    transferable: ctx.transferable ?? true,
     componentName,
     signUpUrl,
     signInUrl,

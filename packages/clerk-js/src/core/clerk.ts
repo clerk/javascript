@@ -1207,6 +1207,10 @@ export class Clerk implements ClerkInterface {
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
     if (userNeedsToBeCreated) {
+      if (params.transferable === false) {
+        return navigateToSignIn();
+      }
+
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':
