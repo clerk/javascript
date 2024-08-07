@@ -104,7 +104,6 @@ export function SignInVerifications() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
                               iconEnd={<Icon.CaretRightLegacy />}
-                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -180,7 +179,6 @@ export function SignInVerifications() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
                               iconEnd={<Icon.CaretRightLegacy />}
-                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -231,7 +229,6 @@ export function SignInVerifications() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
                               iconEnd={<Icon.CaretRightLegacy />}
-                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -322,7 +319,6 @@ export function SignInVerifications() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
                               iconEnd={<Icon.CaretRightLegacy />}
-                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -409,7 +405,6 @@ export function SignInVerifications() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
                               iconEnd={<Icon.CaretRightLegacy />}
-                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -534,7 +529,6 @@ export function SignInVerifications() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
                               iconEnd={<Icon.CaretRightLegacy />}
-                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
@@ -579,7 +573,6 @@ export function SignInVerifications() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
                               iconEnd={<Icon.CaretRightLegacy />}
-                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>
