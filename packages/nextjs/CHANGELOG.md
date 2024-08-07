@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.3.0
+
+### Minor Changes
+
+- Add a `nonce` to clerk-js' script loading options. Also adds a `nonce` prop to `ClerkProvider`. This can be used to thread a nonce value through to the clerk-js script load to support apps using a `strict-dynamic` content security policy. For next.js applications, the nonce will be automatically pulled from the CSP header and threaded through without needing any props so long as the provider is server-rendered. ([#3858](https://github.com/clerk/javascript/pull/3858)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Updated dependencies [[`59d5f19d3`](https://github.com/clerk/javascript/commit/59d5f19d333bf4a35c244886e93b4368e215225c), [`4e6c94e3f`](https://github.com/clerk/javascript/commit/4e6c94e3f4cc92cbba8bddcd2b90fcc9cfb83763)]:
+  - @clerk/shared@2.5.0
+  - @clerk/clerk-react@5.4.0
+  - @clerk/types@4.13.0
+  - @clerk/backend@1.6.2
+
 ## 5.2.14
 
 ### Patch Changes
