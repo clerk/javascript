@@ -31,6 +31,7 @@ type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   sdkMetadata?: SDKMetadata;
   proxyUrl?: string;
   domain?: string;
+  nonce?: string;
 };
 
 /**
