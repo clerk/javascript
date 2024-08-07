@@ -87,6 +87,12 @@ export function PasswordField({
                   </Field.Message>
                 );
               }
+              // Note:
+              // If `codes` is `undefined`, the error is likely a native one
+              // (e.g. `required`)
+              if (typeof codes === 'undefined') {
+                return;
+              }
               return (
                 <Field.Message
                   id={id}
