@@ -171,7 +171,7 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
     const password = await getItemAsync(pkey).catch(() => null);
 
     if (!password) {
-      return errorThrower.throw(`useLocalCredentials: authenticate() cannot retrieve a password for that identifier`);
+      return errorThrower.throw(`useLocalCredentials: authenticate() cannot retrieve a password for ${identifier}`);
     }
 
     return signIn.create({
@@ -180,7 +180,7 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
       password,
     });
   };
-  
+
   return {
     /**
      * Stores the provided credentials on the device if the device has enrolled biometrics.
