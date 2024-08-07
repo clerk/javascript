@@ -5,7 +5,7 @@ import React from 'react';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
-import { translatePasswordError } from '~/utils/makeLocalizable';
+import { translatePasswordError } from '~/utils/make-localizable';
 
 export function PasswordField({
   alternativeFieldTrigger,
