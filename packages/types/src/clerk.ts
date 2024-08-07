@@ -739,7 +739,7 @@ export type SignInProps = RoutingOptions & {
 interface TransferableOption {
   /**
    * Indicates whether or not sign in attempts are transferable to the sign up flow.
-   * Prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.
+   * When set to false, prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.
    * @default true
    */
   transferable?: boolean;
