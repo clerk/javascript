@@ -10,7 +10,10 @@ import { getMajorVersion } from '../versionSelector';
 jest.mock('../loadScript');
 
 setClerkJsLoadingErrorPackageName('@clerk/clerk-react');
+<<<<<<< HEAD
 const jsPackageMajorVersion = getMajorVersion(JS_PACKAGE_VERSION);
+=======
+>>>>>>> 230433523 (chore(shared,astro,react,nextjs): Use built-in error thrower when ClerkJS script loading fails)
 
 describe('loadClerkJsScript(options)', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
