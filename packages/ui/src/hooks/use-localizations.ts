@@ -1,6 +1,6 @@
 import { enUS } from '@clerk/localizations';
 
-import { makeLocalizeable } from '~/utils/makeLocalizable';
+import { makeLocalizeable } from '~/utils/make-localizable';
 
 import { useOptions } from './use-options';
 
