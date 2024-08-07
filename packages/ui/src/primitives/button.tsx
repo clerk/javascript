@@ -7,6 +7,7 @@ import { Spinner } from './spinner';
 const button = cva({
   base: [
     '[--button-border-width:1px]',
+    '[--button-icon-size:calc(var(--cl-font-size)*1.24)]', // 16px
     'appearance-none relative isolate select-none',
     'text-base font-medium',
     'px-[calc(theme(spacing.3)-var(--button-border-width))] py-[calc(theme(spacing[1.5])-var(--button-border-width))]',
@@ -82,7 +83,9 @@ export const Button = React.forwardRef(function Button(
     },
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
-  const spinner = <Spinner className='shrink-0 text-[1.125rem]'>Loading…</Spinner>;
+  const spinner = (
+    <Spinner className='shrink-0 text-[length:--button-icon-size] text-[--button-icon-color]'>Loading…</Spinner>
+  );
 
   return (
     <button
@@ -104,7 +107,7 @@ export const Button = React.forwardRef(function Button(
             ) : (
               <span
                 data-button-icon=''
-                className='shrink-0 text-[--button-icon-color] opacity-[--button-icon-opacity]'
+                className='shrink-0 text-[length:--button-icon-size] text-[--button-icon-color] opacity-[--button-icon-opacity]'
               >
                 {iconStart}
               </span>
@@ -114,7 +117,7 @@ export const Button = React.forwardRef(function Button(
           {iconEnd ? (
             <span
               data-button-icon=''
-              className='shrink-0 text-[--button-icon-color] opacity-[--button-icon-opacity]'
+              className='shrink-0 text-[length:--button-icon-size] text-[--button-icon-color] opacity-[--button-icon-opacity]'
             >
               {iconEnd}
             </span>

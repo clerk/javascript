@@ -471,7 +471,7 @@ export const CaretRightLegacy = createIcon({
   viewBox: '0 0 16 16',
   path: (
     <path
-      d='M10.6667 8L6 5V11L10.6667 8Z'
+      d='M10 8.25L6.5 6V10.5L10 8.25Z'
       fill='currentColor'
       stroke='currentColor'
       strokeWidth='1.5'

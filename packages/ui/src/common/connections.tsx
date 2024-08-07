@@ -92,7 +92,7 @@ export function Connections(
                         intent='connection'
                         busy={isConnectionLoading}
                         disabled={props?.disabled || isConnectionLoading}
-                        iconStart={IconComponent ? <IconComponent className='text-base' /> : null}
+                        iconStart={IconComponent ? <IconComponent /> : null}
                         textVisuallyHidden={textVisuallyHidden}
                       >
                         {connection?.name || c.provider}
