@@ -180,6 +180,7 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
       password,
     });
   };
+  
   return {
     /**
      * Stores the provided credentials on the device if the device has enrolled biometrics.
