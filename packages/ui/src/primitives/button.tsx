@@ -4,17 +4,22 @@ import * as React from 'react';
 
 import { Spinner } from './spinner';
 
+// Note:
+// - To create the overlapping border/shadow effect"
+//   - `ring` – "focus ring"
+//   - `ring-offset` - border
 const button = cva({
   base: [
     '[--button-border-width:1px]',
     '[--button-icon-size:calc(var(--cl-font-size)*1.24)]', // 16px
     'appearance-none relative isolate select-none',
     'text-base font-medium',
-    'px-[calc(theme(spacing.3)-var(--button-border-width))] py-[calc(theme(spacing[1.5])-var(--button-border-width))]',
+    'px-3 py-1.5',
     'min-h-[1.875rem]',
     'inline-flex w-full items-center justify-center gap-3',
-    'border-[length:--button-border-width] rounded-md bg-clip-padding',
-    'outline-none focus-visible:ring',
+    'ring ring-offset-[length:--button-border-width] rounded-md bg-clip-padding',
+    '[&:not(:focus-visible)]:ring-transparent',
+    'outline-none',
     '*:min-w-0',
   ],
   variants: {
@@ -22,7 +27,7 @@ const button = cva({
       primary: [
         '[--button-icon-color:currentColor]',
         '[--button-icon-opacity:0.6]',
-        'text-accent-contrast bg-accent-9 border-accent-9 shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
+        'text-accent-contrast bg-accent-9 ring-offset-accent-9 shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
         'before:absolute before:inset-0 before:rounded-[calc(theme(borderRadius.md)-1px)] before:shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
         'after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:rounded-[calc(theme(borderRadius.md)-1px)] after:bg-gradient-to-b after:from-white/10 after:to-transparent',
         'focus-visible:ring-accent-a7',
@@ -30,8 +35,8 @@ const button = cva({
       secondary: [
         '[--button-icon-color:theme(colors.gray.12)]',
         '[--button-icon-opacity:1]',
-        'text-gray-12 border-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
-        'focus-visible:border-gray-a8 focus-visible:ring-accent-a3',
+        'text-gray-12 ring-offset-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
+        'focus-visible:ring-gray-a8',
       ],
       // Note:
       // This currently looks the same as `secondary`, but we've intentfully
@@ -40,8 +45,8 @@ const button = cva({
       connection: [
         '[--button-icon-color:theme(colors.gray.12)]',
         '[--button-icon-opacity:1]',
-        'text-gray-12 border-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
-        'focus-visible:border-gray-a8 focus-visible:ring-accent-a3',
+        'text-gray-12 ring-offset-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
+        'focus-visible:ring-gray-a8',
       ],
     },
     busy: {
