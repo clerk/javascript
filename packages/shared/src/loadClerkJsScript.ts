@@ -1,5 +1,7 @@
 import type { ClerkOptions, SDKMetadata, Without } from '@clerk/types';
 
+import type { ErrorThrowerOptions } from './error';
+import { buildErrorThrower } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
@@ -7,10 +9,20 @@ import { addClerkPrefix } from './url';
 import { versionSelector } from './versionSelector';
 
 const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
-const MISSING_PUBLISHABLE_KEY_ERROR =
-  'Clerk: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.';
 
 const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
+
+const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
+
+/**
+ * Overrides options of the internal errorThrower (eg setting packageName prefix).
+ *
+ * @example
+ * setErrorThrowerOptions({ packageName: '@clerk/clerk-react' });
+ */
+export function setErrorThrowerOptions(options: ErrorThrowerOptions) {
+  errorThrower.setMessages(options).setPackageName(options);
+}
 
 type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   publishableKey: string;
@@ -51,7 +63,8 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
   }
 
   if (!opts?.publishableKey) {
-    throw new Error(MISSING_PUBLISHABLE_KEY_ERROR);
+    errorThrower.throwMissingPublishableKeyError();
+    return;
   }
 
   return loadScript(clerkJsScriptUrl(opts), {
