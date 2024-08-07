@@ -1,7 +1,13 @@
 import type { SignInResource } from '@clerk/types';
 
 type LocalCredentials = {
+  /**
+   * The identifier of the credentials to be stored on the device. It can be a username, email, phone number, etc.
+   */
   identifier?: string;
+  /**
+   * The password for the identifier to be stored on the device. If an identifier already exists on the device passing only password would update the password for the stored identifier.
+   */
   password: string;
 };
 
@@ -13,7 +19,7 @@ type LocalCredentialsReturn = {
   userOwnsCredentials: boolean | null;
   clearCredentials: () => Promise<void>;
   authenticate: () => Promise<SignInResource>;
-  biometryType: BiometricType | null;
+  biometricType: BiometricType | null;
 };
 
 const LocalCredentialsInitValues: LocalCredentialsReturn = {
@@ -23,7 +29,7 @@ const LocalCredentialsInitValues: LocalCredentialsReturn = {
   clearCredentials: () => Promise.resolve(),
   // @ts-expect-error Initial value cannot return what the type expects
   authenticate: () => Promise.resolve({}),
-  biometryType: null,
+  biometricType: null,
 };
 
 export { LocalCredentialsInitValues };

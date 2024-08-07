@@ -1,4 +1,5 @@
 import { useClerk, useSignIn, useUser } from '@clerk/clerk-react';
+import type { SignInResource } from '@clerk/types';
 import { AuthenticationType, isEnrolledAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
 import {
   deleteItemAsync,
@@ -104,6 +105,10 @@ const useUserOwnsCredentials = ({ storeKey }: { storeKey: string }) => {
   return [userOwnsCredentials, setUserOwnsCredentials] as const;
 };
 
+/**
+ * Exposes utilities that allow for storing and accessing an identifier, and it's password securely on the device.
+ * In order to access the stored credentials, the end user will be prompted to verify themselves via biometrics.
+ */
 export const useLocalCredentials = (): LocalCredentialsReturn => {
   const { isLoaded, signIn } = useSignIn();
   const { publishableKey } = useClerk();
@@ -115,7 +120,7 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
   const hasEnrolledBiometric = useEnrolledBiometric();
   const authenticationType = useAuthenticationType();
 
-  const biometryType = hasEnrolledBiometric ? authenticationType : null;
+  const biometricType = hasEnrolledBiometric ? authenticationType : null;
 
   const setCredentials = async (creds: LocalCredentials) => {
     if (!(await isEnrolledAsync())) {
@@ -153,7 +158,7 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
     setUserOwnsCredentials(false);
   };
 
-  const authenticate = async () => {
+  const authenticate = async (): Promise<SignInResource> => {
     if (!isLoaded) {
       return errorThrower.throw(
         `useLocalCredentials: authenticate() Clerk has not loaded yet. Wait for clerk to load before calling this function`,
@@ -176,11 +181,35 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
     });
   };
   return {
+    /**
+     * Stores the provided credentials on the device if the device has enrolled biometrics.
+     * The end user needs to have a passcode set in order for the credentials to be stored, and those credentials will be removed if the passcode gets removed.
+     * @param credentials An [`LocalCredentials`](#localcredentials) object.
+     * @return A promise that will reject if value cannot be stored on the device.
+     */
     setCredentials,
+    /**
+     * A Boolean that indicates if there are any credentials stored on the device.
+     */
     hasCredentials: hasLocalAuthCredentials,
+    /**
+     * A Boolean that indicates if the stored credentials belong to the signed in uer. When there is no signed-in user the value will always be `false`.
+     */
     userOwnsCredentials,
+    /**
+     * Removes the stored credentials from the device.
+     * @return A promise that will reject if value cannot be deleted from the device.
+     */
     clearCredentials,
+    /**
+     * Attempts to read the stored credentials and creates a sign in attempt with the password strategy.
+     * @return A promise with a SignInResource if the stored credentials were accessed, otherwise the promise will reject.
+     */
     authenticate,
-    biometryType,
+    /**
+     * Indicates the supported enrolled biometric authenticator type.
+     * Can be `facial-recognition`, `fingerprint` or null.
+     */
+    biometricType,
   };
 };
