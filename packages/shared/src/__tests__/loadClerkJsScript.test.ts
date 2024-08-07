@@ -5,10 +5,12 @@ import {
   setClerkJsLoadingErrorPackageName,
 } from '../loadClerkJsScript';
 import { loadScript } from '../loadScript';
+import { getMajorVersion } from '../versionSelector';
 
 jest.mock('../loadScript');
 
 setClerkJsLoadingErrorPackageName('@clerk/clerk-react');
+const jsPackageMajorVersion = getMajorVersion(JS_PACKAGE_VERSION);
 
 describe('loadClerkJsScript(options)', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
@@ -29,7 +31,9 @@ describe('loadClerkJsScript(options)', () => {
     await loadClerkJsScript({ publishableKey: mockPublishableKey });
 
     expect(loadScript).toHaveBeenCalledWith(
-      expect.stringContaining('https://foo-bar-13.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js'),
+      expect.stringContaining(
+        `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
+      ),
       expect.objectContaining({
         async: true,
         crossOrigin: 'anonymous',
@@ -81,17 +85,23 @@ describe('clerkJsScriptUrl()', () => {
 
   test('constructs URL correctly for development key', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey });
-    expect(result).toBe('https://foo-bar-13.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js');
+    expect(result).toBe(
+      `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
+    );
   });
 
   test('constructs URL correctly for production key', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockProdPublishableKey });
-    expect(result).toBe('https://example.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js');
+    expect(result).toBe(
+      `https://example.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
+    );
   });
 
   test('includes clerkJSVariant in URL when provided', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockProdPublishableKey, clerkJSVariant: 'headless' });
-    expect(result).toBe('https://example.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.headless.browser.js');
+    expect(result).toBe(
+      `https://example.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.headless.browser.js`,
+    );
   });
 
   test('uses provided clerkJSVersion', () => {

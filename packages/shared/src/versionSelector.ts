@@ -31,4 +31,4 @@ const getPrereleaseTag = (packageVersion: string) =>
     .replace(/^v/, '')
     .match(/-(.+?)(\.|$)/)?.[1];
 
-const getMajorVersion = (packageVersion: string) => packageVersion.trim().replace(/^v/, '').split('.')[0];
+export const getMajorVersion = (packageVersion: string) => packageVersion.trim().replace(/^v/, '').split('.')[0];
