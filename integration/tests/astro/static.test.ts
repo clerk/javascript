@@ -31,8 +31,9 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await u.page.waitForClerkJsLoaded();
 
       await u.po.expect.toBeSignedOut();
+      console.log('contents', await page.content());
 
-      await expect(u.page.getByRole('link', { name: /Login/i })).toBeVisible();
+      await expect(u.page.getByRole('button', { name: /Sign in/i })).toBeVisible();
     });
   },
 );
