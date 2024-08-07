@@ -1,6 +1,5 @@
 import type { ClerkOptions, SDKMetadata, Without } from '@clerk/types';
 
-import type { ErrorThrowerOptions } from './error';
 import { buildErrorThrower } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
@@ -15,13 +14,13 @@ const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
 
 /**
- * Overrides options of the internal errorThrower (eg setting packageName prefix).
+ * Sets the package name for error messages during ClerkJS script loading.
  *
  * @example
- * setErrorThrowerOptions({ packageName: '@clerk/clerk-react' });
+ * setClerkJsLoadingErrorPackage('@clerk/clerk-react');
  */
-export function setErrorThrowerOptions(options: ErrorThrowerOptions) {
-  errorThrower.setMessages(options).setPackageName(options);
+export function setClerkJsLoadingErrorPackageName(packageName: string) {
+  errorThrower.setPackageName({ packageName });
 }
 
 type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {

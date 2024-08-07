@@ -1,7 +1,14 @@
-import { buildClerkJsScriptAttributes, clerkJsScriptUrl, loadClerkJsScript } from '../loadClerkJsScript';
+import {
+  buildClerkJsScriptAttributes,
+  clerkJsScriptUrl,
+  loadClerkJsScript,
+  setClerkJsLoadingErrorPackageName,
+} from '../loadClerkJsScript';
 import { loadScript } from '../loadScript';
 
 jest.mock('../loadScript');
+
+setClerkJsLoadingErrorPackageName('@clerk/clerk-react');
 
 describe('loadClerkJsScript(options)', () => {
   const mockPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
@@ -14,7 +21,7 @@ describe('loadClerkJsScript(options)', () => {
 
   test('throws error when publishableKey is missing', () => {
     expect(() => loadClerkJsScript({} as any)).rejects.toThrow(
-      'Clerk: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+      '@clerk/clerk-react: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
     );
   });
 

@@ -1,4 +1,4 @@
-import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJsScript, setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/types';
 
 import { $clerk, $csrState } from '../stores/internal';
@@ -11,6 +11,8 @@ let initOptions: ClerkOptions | undefined;
 
 // TODO-SHARED: copied from `clerk-js`
 export const CLERK_BEFORE_UNLOAD_EVENT = 'clerk:beforeunload';
+
+setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
 function windowNavigate(to: URL | string): void {
   const toURL = new URL(to, window.location.href);
