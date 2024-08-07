@@ -144,7 +144,6 @@ export function SignUpStart() {
                               busy={isSubmitting}
                               disabled={isGlobalLoading}
                               iconEnd={<Icon.CaretRightLegacy />}
-                              spinnerWhenBusy
                             >
                               {t('formButtonPrimary')}
                             </Button>

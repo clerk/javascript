@@ -3,17 +3,18 @@ import { useRouteContext } from '@tanstack/react-router';
 import { Asset } from '@tanstack/start';
 import { useEffect } from 'react';
 
-import { isClient } from '../utils';
+import { errorThrower, isClient } from '../utils';
+import { clerkHandlerNotConfigured } from '../utils/errors';
 import { ClerkOptionsProvider } from './OptionsContext';
 import type { TanstackStartClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
+
+export * from '@clerk/clerk-react';
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
   version: PACKAGE_VERSION,
 };
-
-export * from '@clerk/clerk-react';
 
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
@@ -26,6 +27,10 @@ export function ClerkProvider({ children, ...providerProps }: TanstackStartClerk
   useEffect(() => {
     awaitableNavigateRef.current = awaitableNavigate;
   }, [awaitableNavigate]);
+
+  if (!routerContext?.clerkInitialState?.__internal_clerk_state) {
+    errorThrower.throw(clerkHandlerNotConfigured);
+  }
 
   const clerkInitState = isClient() ? (window as any).__clerk_init_state : routerContext?.clerkInitialState;
 

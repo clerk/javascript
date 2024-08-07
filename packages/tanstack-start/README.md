@@ -119,7 +119,9 @@ function RootComponent() {
 function RootDocument({ children }: { children: React.ReactNode }) { ... }
 ```
 
-Also you will need to make on more modification to `app/ssr.tsx`:
+### Setup `clerkHandler` in the SSR entrypoint
+
+You will also need to make on more modification to you SSR entrypoint (default: `app/ssr.tsx`):
 
 - Wrap the `createStartHandler` with `createClerkHandler`
 

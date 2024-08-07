@@ -60,7 +60,11 @@ export function SignInForgotPassword() {
                   <Separator>{t('signIn.forgotPasswordAlternativeMethods.label__alternativeMethods')}</Separator>
 
                   <div className='flex flex-col gap-2'>
-                    <Connections disabled={isGlobalLoading} />
+                    <Connections
+                      columns={1}
+                      textVisuallyHidden={false}
+                      disabled={isGlobalLoading}
+                    />
 
                     <SignIn.SupportedStrategy
                       name='email_link'

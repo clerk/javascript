@@ -5,7 +5,7 @@ import React from 'react';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
-import { translatePasswordError } from '~/utils/makeLocalizable';
+import { translatePasswordError } from '~/utils/make-localizable';
 
 export function PasswordField({
   alternativeFieldTrigger,
@@ -86,6 +86,12 @@ export function PasswordField({
                     {t('unstable__errors.zxcvbn.goodPassword')}
                   </Field.Message>
                 );
+              }
+              // Note:
+              // If `codes` is `undefined`, the error is likely a native one
+              // (e.g. `required`)
+              if (typeof codes === 'undefined') {
+                return;
               }
               return (
                 <Field.Message
