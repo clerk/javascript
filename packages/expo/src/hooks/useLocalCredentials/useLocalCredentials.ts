@@ -185,7 +185,7 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
     /**
      * Stores the provided credentials on the device if the device has enrolled biometrics.
      * The end user needs to have a passcode set in order for the credentials to be stored, and those credentials will be removed if the passcode gets removed.
-     * @param credentials An [`LocalCredentials`](#localcredentials) object.
+     * @param credentials A [`LocalCredentials`](#localcredentials) object.
      * @return A promise that will reject if value cannot be stored on the device.
      */
     setCredentials,
