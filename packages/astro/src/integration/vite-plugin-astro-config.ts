@@ -3,7 +3,9 @@ import type { ViteUserConfig } from 'astro/config';
 
 type ExtractPluginOption<T> = T extends (infer U)[] ? U : never;
 
-export function vitePluginAstroConfig(astroConfig: AstroConfig): ExtractPluginOption<NonNullable<ViteUserConfig['plugins']>> {
+export function vitePluginAstroConfig(
+  astroConfig: AstroConfig,
+): ExtractPluginOption<NonNullable<ViteUserConfig['plugins']>> {
   const virtualModuleId = 'virtual:@clerk/astro/config';
   const resolvedVirtualModuleId = '\0' + virtualModuleId;
 
@@ -32,6 +34,6 @@ export function vitePluginAstroConfig(astroConfig: AstroConfig): ExtractPluginOp
           }
         `;
       }
-    }
+    },
   };
 }
