@@ -29,3 +29,9 @@ declare namespace App {
     runtime: { env: InternalEnv };
   }
 }
+
+declare module "virtual:astro/config" {
+  import type { AstroConfig } from "astro";
+	const config: AstroConfig;
+	export default config;
+}
