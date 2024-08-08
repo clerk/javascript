@@ -25,4 +25,4 @@ const astroStatic = astroNode
 export const astro = {
   node: astroNode,
   static: astroStatic,
-};
+} as const;
