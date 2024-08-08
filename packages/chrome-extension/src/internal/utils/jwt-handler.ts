@@ -6,11 +6,22 @@ import { getClientCookie } from './cookies';
 import { errorLogger } from './errors';
 import type { StorageCache } from './storage';
 
-type JWTHandlerParams = GetClientCookieParams & {
-  frontendApi: string;
-};
+type JWTHandlerParams = { frontendApi: string } & (
+  | {
+      sync?: false;
+    }
+  | ({ sync: true } & GetClientCookieParams)
+);
 
-export function JWTHandler(store: StorageCache, { frontendApi, ...cookieParams }: JWTHandlerParams) {
+export type JWTHandler = ReturnType<typeof JWTHandler>;
+
+function shouldSync(sync: boolean | undefined, _params: unknown): _params is GetClientCookieParams {
+  return Boolean(sync);
+}
+
+export function JWTHandler(store: StorageCache, params: JWTHandlerParams) {
+  const { sync, frontendApi, ...cookieParams } = params;
+
   const CACHE_KEY = store.createKey(frontendApi, STORAGE_KEY_CLIENT_JWT, 'v2');
 
   /**
@@ -22,17 +33,26 @@ export function JWTHandler(store: StorageCache, { frontendApi, ...cookieParams }
   };
 
   /**
+   * Remove the JWT value
+   */
+  const remove = async (): Promise<void> => {
+    return await store.remove(CACHE_KEY).catch(errorLogger);
+  };
+
+  /**
    * Gets the JWT value to the active store.
    * If not set, attempt to get it from the synced session and save for later use.
    */
   const get = async () => {
-    // Get client cookie from browser
-    const syncedJWT = await getClientCookie(cookieParams).catch(errorLogger);
+    if (shouldSync(sync, cookieParams)) {
+      // Get client cookie from browser
+      const syncedJWT = await getClientCookie(cookieParams).catch(errorLogger);
 
-    if (syncedJWT) {
-      // Set client cookie in StorageCache
-      await set(syncedJWT.value);
-      return syncedJWT.value;
+      if (syncedJWT) {
+        // Set client cookie in StorageCache
+        await set(syncedJWT.value);
+        return syncedJWT.value;
+      }
     }
 
     // Get current JWT from StorageCache
@@ -44,7 +64,7 @@ export function JWTHandler(store: StorageCache, { frontendApi, ...cookieParams }
    *
    * @param delayInMs: Polling delay in milliseconds (default: 1500ms)
    */
-  const poll = async (delayInMs: number = 1500) => {
+  const poll = async (delayInMs = 1500) => {
     const { run, stop } = Poller({ delayInMs });
 
     void run(async () => {
@@ -56,5 +76,5 @@ export function JWTHandler(store: StorageCache, { frontendApi, ...cookieParams }
     });
   };
 
-  return { get, poll, set };
+  return { get, poll, set, remove };
 }
