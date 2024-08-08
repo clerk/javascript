@@ -1,12 +1,10 @@
 ---
 import SignedOutSSR from './SignedOutSSR.astro';
 import SignedOutCSR from './SignedOutCSR.astro';
+// @ts-expect-error: Fix types later
+import config from "virtual:astro/config";
 
-type Props = {
-  client?: boolean;
-}
-
-const SignedOutComponent = Astro.props.client ? SignedOutCSR : SignedOutSSR;
+const SignedOutComponent = config.output === 'static' ? SignedOutCSR : SignedOutSSR;
 ---
 
 <SignedOutComponent>
