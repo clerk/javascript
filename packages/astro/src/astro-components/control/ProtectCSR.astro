@@ -24,7 +24,7 @@ const { role, permission } = Astro.props;
 <protect-csr
   data-role={role}
   data-permission={permission}
-  style="display: none;"
+  hidden
 >
   <slot />
 </protect-csr>
@@ -76,9 +76,9 @@ const { role, permission } = Astro.props;
           !state.userId || ((role || permission) && !has({ role, permission }));
 
         if (isUnauthorized) {
-          this.style.display = "none";
+          this.setAttribute('hidden', '');
         } else {
-          this.style.display = "block";
+          this.removeAttribute('hidden');
         }
       });
     }
