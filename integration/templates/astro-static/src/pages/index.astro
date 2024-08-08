@@ -5,9 +5,11 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout title="Home">
     <SignedOut>
+        <h1>Signed out</h1>
         <SignIn />
     </SignedOut>
     <SignedIn>
+        <h1>Signed in</h1>
         <UserButton />
         <OrganizationSwitcher />
     </SignedIn>
