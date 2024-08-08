@@ -2,8 +2,8 @@ import type { ClerkOptions } from '@clerk/types';
 import type { AstroIntegration } from 'astro';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
-import { vitePluginAstroConfig } from '../internal/vite-plugin-astro-config';
 import type { AstroClerkIntegrationParams } from '../types';
+import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
   return valueToBeStored ? { [`import.meta.env.${envName}`]: JSON.stringify(valueToBeStored) } : {};
