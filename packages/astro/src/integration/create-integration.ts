@@ -2,6 +2,7 @@ import type { ClerkOptions } from '@clerk/types';
 import type { AstroIntegration } from 'astro';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
+import { vitePluginAstroConfig } from '../internal/vite-plugin-astro-config';
 import type { AstroClerkIntegrationParams } from '../types';
 
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
@@ -27,14 +28,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
       name: '@clerk/astro/integration',
       hooks: {
         'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
-          if (config.output === 'static') {
-            logger.error(`${packageName} requires SSR to be turned on. Please update output to "server"`);
-          }
-
-          if (!config.adapter) {
-            logger.error('Missing adapter, please update your Astro config to use one.');
-          }
-
           if (typeof clerkJSVariant !== 'undefined' && clerkJSVariant !== 'headless' && clerkJSVariant !== '') {
             logger.error('Invalid value for clerkJSVariant. Acceptable values are `"headless"`, `""`, and `undefined`');
           }
@@ -53,6 +46,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
           // Set params as envs so backend code has access to them
           updateConfig({
             vite: {
+              plugins: [vitePluginAstroConfig(config)],
               define: {
                 /**
                  * Convert the integration params to environment variable in order for it to be readable from the server

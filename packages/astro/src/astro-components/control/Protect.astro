@@ -8,7 +8,10 @@ import type {
   OrganizationCustomRoleKey,
 } from "@clerk/types";
 
-type ProtectProps =
+// @ts-expect-error: Fix types later
+import config from "virtual:astro/config";
+
+type Props =
   | {
       condition?: never;
       role: OrganizationCustomRoleKey;
@@ -30,16 +33,10 @@ type ProtectProps =
       permission?: never;
     };
 
-type Props = ProtectProps & {
-  client?: boolean;
-};
-
-const { client = false, ...rest } = Astro.props;
-
-const ProtectComponent = client ? ProtectCSR : ProtectSSR;
+const ProtectComponent = config.output === 'static' ? ProtectCSR : ProtectSSR;
 ---
 
-<ProtectComponent {...rest}>
-  <slot slot="default" />
+<ProtectComponent {...Astro.props}>
+  <slot />
   <slot name="fallback" slot="fallback" />
 </ProtectComponent>

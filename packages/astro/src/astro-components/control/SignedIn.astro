@@ -1,12 +1,10 @@
 ---
 import SignedInSSR from "./SignedInSSR.astro";
 import SignedInCSR from "./SignedInCSR.astro";
+// @ts-expect-error: Fix types later
+import config from "virtual:astro/config";
 
-type Props = {
-  client?: boolean;
-};
-
-const SignedInComponent = Astro.props.client ? SignedInCSR : SignedInSSR;
+const SignedInComponent = config.output === 'static' ? SignedInCSR : SignedInSSR;
 ---
 
 <SignedInComponent>
