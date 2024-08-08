@@ -1,13 +1,14 @@
 ---
-import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/astro/components";
+import { OrganizationSwitcher, UserButton, SignIn, SignedIn, SignedOut } from "@clerk/astro/components";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Home">
     <SignedOut>
-        <SignInButton />
+        <SignIn />
     </SignedOut>
     <SignedIn>
         <UserButton />
+        <OrganizationSwitcher />
     </SignedIn>
 </Layout>
