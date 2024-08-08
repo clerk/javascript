@@ -17,10 +17,7 @@ const astroNode = applicationConfig()
   .addDependency('@clerk/types', clerkTypesLocal)
   .addDependency('@clerk/localizations', clerkLocalizationLocal);
 
-const astroStatic = astroNode
-  .clone()
-  .setName('astro-static')
-  .useTemplate(templates['astro-static']);
+const astroStatic = astroNode.clone().setName('astro-static').useTemplate(templates['astro-static']);
 
 export const astro = {
   node: astroNode,

@@ -15,22 +15,22 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
 
     test.beforeAll(async () => {
       const m = createTestUtils({ app });
-        fakeAdmin = m.services.users.createFakeUser();
-        const admin = await m.services.users.createBapiUser(fakeAdmin);
-        fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
+      fakeAdmin = m.services.users.createFakeUser();
+      const admin = await m.services.users.createBapiUser(fakeAdmin);
+      fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
 
-        fakeAdmin2 = m.services.users.createFakeUser();
-        const admin2 = await m.services.users.createBapiUser(fakeAdmin2);
-        fakeOrganization2 = await m.services.users.createFakeOrganization(admin2.id);
+      fakeAdmin2 = m.services.users.createFakeUser();
+      const admin2 = await m.services.users.createBapiUser(fakeAdmin2);
+      fakeOrganization2 = await m.services.users.createFakeOrganization(admin2.id);
     });
 
     test.afterAll(async () => {
       await fakeOrganization.delete();
-        await fakeAdmin.deleteIfExists();
+      await fakeAdmin.deleteIfExists();
 
-        await fakeOrganization2.delete();
-        await fakeAdmin2.deleteIfExists();
-        await app.teardown();
+      await fakeOrganization2.delete();
+      await fakeAdmin2.deleteIfExists();
+      await app.teardown();
     });
 
     test('render SignedIn and SignedOut contents', async ({ page, context }) => {
