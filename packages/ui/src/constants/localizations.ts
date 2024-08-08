@@ -2,4 +2,5 @@
 export const LOCALIZATION_NEEDED = {
   formFieldAccessibleLabel__emailOrUsernameOrPhone: 'Toggle between email or username, and phone.',
   formFieldAccessibleLabel__phoneOrUsername: 'Toggle between phone and username.',
+  accessibleLabel__startOver: 'Start again',
 };

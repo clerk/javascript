@@ -2,35 +2,22 @@ import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
 import { BackupCodeField } from '~/common/backup-code-field';
-import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { Card } from '~/common/sign-in-or-up/card';
-import { useAppearance } from '~/hooks/use-appearance';
+import { StartOver } from '~/components/sign-in/components/start-over';
 import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { Button } from '~/primitives/button';
-import * as Bard from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link';
-import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
 export function SignInVerifications() {
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
-  const isDev = isDevelopmentOrStaging();
   const isPasswordResetSupported = useResetPasswordFactor();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
 
   return (
     <Common.Loading>
@@ -42,24 +29,10 @@ export function SignInVerifications() {
                 title={t('signIn.password.title')}
                 description={[
                   t('signIn.password.subtitle'),
-                  <span
-                    key='password-safe-identifier'
-                    className='flex items-center justify-center gap-2'
-                  >
-                    <SignIn.SafeIdentifier transform={formatSafeIdentifier} />
-                    <SignIn.Action
-                      navigate='start'
-                      asChild
-                    >
-                      <button
-                        type='button'
-                        className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
-                        aria-label='Start again'
-                      >
-                        <Icon.PencilUnderlined />
-                      </button>
-                    </SignIn.Action>
-                  </span>,
+                  <StartOver
+                    key='password-start-again'
+                    shouldFormatSafeIdentifier
+                  />,
                 ]}
                 body={
                   <PasswordField
@@ -116,44 +89,15 @@ export function SignInVerifications() {
               />
             </SignIn.Strategy>
 
-            <Bard.Root>
-              <Bard.Content>
-                <SignIn.Strategy name='passkey'>
-                  <Bard.Header>
-                    {logoImageUrl ? (
-                      <Bard.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
-                    <Bard.Title>{t('signIn.passkey.title')}</Bard.Title>
-                    <Bard.Description>{t('signIn.passkey.subtitle')}</Bard.Description>
-                    <Bard.Description>
-                      <span className='flex items-center justify-center gap-2'>
-                        <SignIn.SafeIdentifier />
-                        <SignIn.Action
-                          navigate='start'
-                          asChild
-                        >
-                          <button
-                            type='button'
-                            className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
-                            aria-label='Start again'
-                          >
-                            <Icon.PencilUnderlined />
-                          </button>
-                        </SignIn.Action>
-                      </span>
-                    </Bard.Description>
-                  </Bard.Header>
-
-                  <GlobalError />
-
+            <SignIn.Strategy name='passkey'>
+              <Card
+                title={t('signIn.passkey.title')}
+                description={[t('signIn.passkey.subtitle'), <StartOver key='passkey-start-again' />]}
+                actions={
                   <Common.Loading>
                     {isSubmitting => {
                       return (
-                        <Bard.Actions>
+                        <>
                           {
                             // Note:
                             // 1. Currently this triggers the loading
@@ -187,35 +131,24 @@ export function SignInVerifications() {
                               {t('footerActionLink__useAnotherMethod')}
                             </LinkButton>
                           </SignIn.Action>
-                        </Bard.Actions>
+                        </>
                       );
                     }}
                   </Common.Loading>
-                </SignIn.Strategy>
+                }
+              />
+            </SignIn.Strategy>
 
-                <SignIn.Strategy name='backup_code'>
-                  <Bard.Header>
-                    {logoImageUrl ? (
-                      <Bard.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
-                    <Bard.Title>{t('signIn.backupCodeMfa.title')}</Bard.Title>
-                    <Bard.Description>{t('signIn.backupCodeMfa.subtitle')}</Bard.Description>
-                  </Bard.Header>
-
-                  <GlobalError />
-
-                  <Bard.Body>
-                    <BackupCodeField />
-                  </Bard.Body>
-
+            <SignIn.Strategy name='backup_code'>
+              <Card
+                title={t('signIn.backupCodeMfa.title')}
+                description={t('signIn.backupCodeMfa.subtitle')}
+                body={<BackupCodeField />}
+                actions={
                   <Common.Loading>
                     {isSubmitting => {
                       return (
-                        <Bard.Actions>
+                        <>
                           <SignIn.Action
                             submit
                             asChild
@@ -240,72 +173,50 @@ export function SignInVerifications() {
                               {t('footerActionLink__useAnotherMethod')}
                             </LinkButton>
                           </SignIn.Action>
-                        </Bard.Actions>
+                        </>
                       );
                     }}
                   </Common.Loading>
-                </SignIn.Strategy>
+                }
+              />
+            </SignIn.Strategy>
 
-                <SignIn.Strategy name='email_code'>
-                  <Bard.Header>
-                    {logoImageUrl ? (
-                      <Bard.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
-                    <Bard.Title>{t('signIn.emailCode.title')}</Bard.Title>
-                    <Bard.Description>{t('signIn.emailCode.subtitle', { applicationName })}</Bard.Description>
-                    <Bard.Description>
-                      <span className='flex items-center justify-center gap-2'>
-                        <SignIn.SafeIdentifier />
-                        <SignIn.Action
-                          navigate='start'
-                          asChild
-                        >
-                          <button
+            <SignIn.Strategy name='email_code'>
+              <Card
+                title={t('signIn.emailCode.title')}
+                description={[
+                  t('signIn.emailCode.subtitle', { applicationName }),
+                  <StartOver key='email-code-start-again' />,
+                ]}
+                body={
+                  <OTPField
+                    label={t('signIn.emailCode.formTitle')}
+                    disabled={isGlobalLoading}
+                    resend={
+                      <SignIn.Action
+                        asChild
+                        resend
+                        // eslint-disable-next-line react/no-unstable-nested-components
+                        fallback={({ resendableAfter }) => (
+                          <LinkButton
                             type='button'
-                            className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
-                            aria-label='Start again'
+                            disabled
                           >
-                            <Icon.PencilUnderlined />
-                          </button>
-                        </SignIn.Action>
-                      </span>
-                    </Bard.Description>
-                  </Bard.Header>
-
-                  <GlobalError />
-
-                  <Bard.Body>
-                    <OTPField
-                      label={t('signIn.emailCode.formTitle')}
-                      disabled={isGlobalLoading}
-                      resend={
-                        <SignIn.Action
-                          asChild
-                          resend
-                          // eslint-disable-next-line react/no-unstable-nested-components
-                          fallback={({ resendableAfter }) => (
-                            <LinkButton
-                              type='button'
-                              disabled
-                            >
-                              {t('signIn.emailCode.resendButton')} (
-                              <span className='tabular-nums'>{resendableAfter}</span>)
-                            </LinkButton>
-                          )}
-                        >
-                          <LinkButton type='button'>{t('signIn.emailCode.resendButton')}</LinkButton>
-                        </SignIn.Action>
-                      }
-                    />
-                  </Bard.Body>
+                            {t('signIn.emailCode.resendButton')} (
+                            <span className='tabular-nums'>{resendableAfter}</span>)
+                          </LinkButton>
+                        )}
+                      >
+                        <LinkButton type='button'>{t('signIn.emailCode.resendButton')}</LinkButton>
+                      </SignIn.Action>
+                    }
+                  />
+                }
+                actions={
                   <Common.Loading scope='step:verifications'>
                     {isSubmitting => {
                       return (
-                        <Bard.Actions>
+                        <>
                           <SignIn.Action
                             submit
                             asChild
@@ -325,73 +236,53 @@ export function SignInVerifications() {
                           >
                             <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
                           </SignIn.Action>
-                        </Bard.Actions>
+                        </>
                       );
                     }}
                   </Common.Loading>
-                </SignIn.Strategy>
+                }
+              />
+            </SignIn.Strategy>
 
-                <SignIn.Strategy name='phone_code'>
-                  <Bard.Header>
-                    {logoImageUrl ? (
-                      <Bard.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
-                    <Bard.Title>{t('signIn.phoneCode.title')}</Bard.Title>
-                    <Bard.Description>{t('signIn.phoneCode.subtitle', { applicationName })}</Bard.Description>
-                    <Bard.Description>
-                      <span className='flex items-center justify-center gap-2'>
-                        <SignIn.SafeIdentifier transform={formatSafeIdentifier} />
-                        <SignIn.Action
-                          navigate='start'
-                          asChild
-                        >
-                          <button
+            <SignIn.Strategy name='phone_code'>
+              <Card
+                title={t('signIn.phoneCode.title')}
+                description={[
+                  t('signIn.phoneCode.subtitle', { applicationName }),
+                  <StartOver
+                    key='phone-code-start-again'
+                    shouldFormatSafeIdentifier
+                  />,
+                ]}
+                body={
+                  <OTPField
+                    label={t('signIn.phoneCode.formTitle')}
+                    disabled={isGlobalLoading}
+                    resend={
+                      <SignIn.Action
+                        asChild
+                        resend
+                        // eslint-disable-next-line react/no-unstable-nested-components
+                        fallback={({ resendableAfter }) => (
+                          <LinkButton
                             type='button'
-                            className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
-                            aria-label='Start again'
+                            disabled
                           >
-                            <Icon.PencilUnderlined />
-                          </button>
-                        </SignIn.Action>
-                      </span>
-                    </Bard.Description>
-                  </Bard.Header>
-
-                  <GlobalError />
-
-                  <Bard.Body>
-                    <OTPField
-                      label={t('signIn.phoneCode.formTitle')}
-                      disabled={isGlobalLoading}
-                      resend={
-                        <SignIn.Action
-                          asChild
-                          resend
-                          // eslint-disable-next-line react/no-unstable-nested-components
-                          fallback={({ resendableAfter }) => (
-                            <LinkButton
-                              type='button'
-                              disabled
-                            >
-                              {t('signIn.phoneCode.resendButton')} (
-                              <span className='tabular-nums'>{resendableAfter}</span>)
-                            </LinkButton>
-                          )}
-                        >
-                          <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
-                        </SignIn.Action>
-                      }
-                    />
-                  </Bard.Body>
-
+                            {t('signIn.phoneCode.resendButton')} (
+                            <span className='tabular-nums'>{resendableAfter}</span>)
+                          </LinkButton>
+                        )}
+                      >
+                        <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
+                      </SignIn.Action>
+                    }
+                  />
+                }
+                actions={
                   <Common.Loading scope='step:verifications'>
                     {isSubmitting => {
                       return (
-                        <Bard.Actions>
+                        <>
                           <SignIn.Action
                             submit
                             asChild
@@ -411,155 +302,118 @@ export function SignInVerifications() {
                           >
                             <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
                           </SignIn.Action>
-                        </Bard.Actions>
+                        </>
                       );
                     }}
                   </Common.Loading>
-                </SignIn.Strategy>
+                }
+              />
+            </SignIn.Strategy>
 
-                <SignIn.Strategy name='email_link'>
-                  <Bard.Header>
-                    {logoImageUrl ? (
-                      <Bard.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
-                    <Bard.Title>{t('signIn.emailLink.title')}</Bard.Title>
-                    <Bard.Description>{t('signIn.emailLink.formSubtitle', { applicationName })}</Bard.Description>
-                    <Bard.Description>
-                      <span className='flex items-center justify-center gap-2'>
-                        <SignIn.SafeIdentifier />
-                        <SignIn.Action
-                          navigate='start'
-                          asChild
-                        >
-                          <button
+            <SignIn.Strategy name='email_link'>
+              <Card
+                title={t('signIn.emailLink.title')}
+                description={[
+                  t('signIn.emailLink.formSubtitle', { applicationName }),
+                  <StartOver key='email-link-start-again' />,
+                ]}
+                body={
+                  <SignIn.Action
+                    asChild
+                    resend
+                    // eslint-disable-next-line react/no-unstable-nested-components
+                    fallback={({ resendableAfter }) => (
+                      <LinkButton
+                        type='button'
+                        disabled
+                      >
+                        {t('signIn.emailLink.resendButton')} (<span className='tabular-nums'>{resendableAfter}</span>)
+                      </LinkButton>
+                    )}
+                  >
+                    <LinkButton type='button'>{t('signIn.emailLink.resendButton')}</LinkButton>
+                  </SignIn.Action>
+                }
+                actions={
+                  <SignIn.Action
+                    navigate='choose-strategy'
+                    asChild
+                  >
+                    <LinkButton>{t('backButton')}</LinkButton>
+                  </SignIn.Action>
+                }
+              />
+            </SignIn.Strategy>
+
+            <SignIn.Strategy name='reset_password_email_code'>
+              <Card
+                title={t('signIn.forgotPassword.title')}
+                description={[
+                  t('signIn.forgotPassword.subtitle_email'),
+                  <SignIn.SafeIdentifier key='reset-password-email-code-safe-identifier' />,
+                ]}
+                body={
+                  <OTPField
+                    label={t('signIn.forgotPassword.formTitle')}
+                    disabled={isGlobalLoading}
+                    resend={
+                      <SignIn.Action
+                        asChild
+                        resend
+                        // eslint-disable-next-line react/no-unstable-nested-components
+                        fallback={({ resendableAfter }) => (
+                          <LinkButton
                             type='button'
-                            className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
-                            aria-label='Start again'
+                            disabled
                           >
-                            <Icon.PencilUnderlined />
-                          </button>
-                        </SignIn.Action>
-                      </span>
-                    </Bard.Description>
-                  </Bard.Header>
-
-                  <GlobalError />
-
-                  <Bard.Body>
-                    <SignIn.Action
-                      asChild
-                      resend
-                      // eslint-disable-next-line react/no-unstable-nested-components
-                      fallback={({ resendableAfter }) => (
-                        <LinkButton
-                          type='button'
-                          disabled
-                        >
-                          {t('signIn.emailLink.resendButton')} (<span className='tabular-nums'>{resendableAfter}</span>)
-                        </LinkButton>
-                      )}
-                    >
-                      <LinkButton type='button'>{t('signIn.emailLink.resendButton')}</LinkButton>
-                    </SignIn.Action>
-                  </Bard.Body>
-                  <Bard.Actions>
-                    <SignIn.Action
-                      navigate='choose-strategy'
-                      asChild
-                    >
-                      <LinkButton>{t('backButton')}</LinkButton>
-                    </SignIn.Action>
-                  </Bard.Actions>
-                </SignIn.Strategy>
-
-                <SignIn.Strategy name='reset_password_email_code'>
-                  <Bard.Header>
-                    <Bard.Title>{t('signIn.forgotPassword.title')}</Bard.Title>
-                    <Bard.Description>{t('signIn.forgotPassword.subtitle_email')}</Bard.Description>
-                    <Bard.Description>
-                      <SignIn.SafeIdentifier />
-                    </Bard.Description>
-                  </Bard.Header>
-
-                  <GlobalError />
-
-                  <Bard.Body>
-                    <OTPField
-                      label={t('signIn.forgotPassword.formTitle')}
-                      disabled={isGlobalLoading}
-                      resend={
-                        <SignIn.Action
-                          asChild
-                          resend
-                          // eslint-disable-next-line react/no-unstable-nested-components
-                          fallback={({ resendableAfter }) => (
-                            <LinkButton
-                              type='button'
-                              disabled
-                            >
-                              {t('signIn.phoneCode.resendButton')} (
-                              <span className='tabular-nums'>{resendableAfter}</span>)
-                            </LinkButton>
-                          )}
-                        >
-                          <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
-                        </SignIn.Action>
-                      }
-                    />
-                  </Bard.Body>
-
+                            {t('signIn.phoneCode.resendButton')} (
+                            <span className='tabular-nums'>{resendableAfter}</span>)
+                          </LinkButton>
+                        )}
+                      >
+                        <LinkButton type='button'>{t('signIn.phoneCode.resendButton')}</LinkButton>
+                      </SignIn.Action>
+                    }
+                  />
+                }
+                actions={
                   <Common.Loading scope='step:verifications'>
                     {isSubmitting => {
                       return (
-                        <Bard.Actions>
-                          <SignIn.Action
-                            submit
-                            asChild
+                        <SignIn.Action
+                          submit
+                          asChild
+                        >
+                          <Button
+                            busy={isSubmitting}
+                            disabled={isGlobalLoading}
+                            iconEnd={<Icon.CaretRightLegacy />}
                           >
-                            <Button
-                              busy={isSubmitting}
-                              disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
-                            >
-                              {t('formButtonPrimary')}
-                            </Button>
-                          </SignIn.Action>
-                        </Bard.Actions>
+                            {t('formButtonPrimary')}
+                          </Button>
+                        </SignIn.Action>
                       );
                     }}
                   </Common.Loading>
-                </SignIn.Strategy>
+                }
+              />
+            </SignIn.Strategy>
 
-                <SignIn.Strategy name='totp'>
-                  <Bard.Header>
-                    {logoImageUrl ? (
-                      <Bard.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
-                    <Bard.Title>{t('signIn.totpMfa.formTitle')}</Bard.Title>
-                    <Bard.Description>{t('signIn.totpMfa.subtitle', { applicationName })}</Bard.Description>
-                  </Bard.Header>
-
-                  <GlobalError />
-
-                  <Bard.Body>
-                    <OTPField
-                      label={t('signIn.totpMfa.formTitle')}
-                      disabled={isGlobalLoading}
-                    />
-                  </Bard.Body>
-
+            <SignIn.Strategy name='totp'>
+              <Card
+                title={t('signIn.totpMfa.formTitle')}
+                description={t('signIn.totpMfa.subtitle', { applicationName })}
+                body={
+                  <OTPField
+                    label={t('signIn.totpMfa.formTitle')}
+                    disabled={isGlobalLoading}
+                  />
+                }
+                actions={
                   <Common.Loading scope='step:verifications'>
                     {isSubmitting => {
                       return (
-                        <Bard.Actions>
+                        <>
                           <SignIn.Action
                             submit
                             asChild
@@ -579,15 +433,13 @@ export function SignInVerifications() {
                           >
                             <LinkButton type='button'>{t('footerActionLink__useAnotherMethod')}</LinkButton>
                           </SignIn.Action>
-                        </Bard.Actions>
+                        </>
                       );
                     }}
                   </Common.Loading>
-                </SignIn.Strategy>
-                {isDev ? <Bard.Banner>Development mode</Bard.Banner> : null}
-              </Bard.Content>
-              <Bard.Footer {...cardFooterProps} />
-            </Bard.Root>
+                }
+              />
+            </SignIn.Strategy>
           </SignIn.Step>
         );
       }}

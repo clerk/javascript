@@ -5,10 +5,10 @@ import { useEnvironment } from '~/hooks/use-environment';
 import * as CardPrimitive from '~/primitives/card';
 
 export function Card(props: {
-  children?: React.ReactNode;
+  body?: React.ReactNode;
   actions?: React.ReactNode;
   title?: React.ReactNode;
-  description: React.ReactNode | React.ReactNode[];
+  description?: React.ReactNode | React.ReactNode[];
 }) {
   const { isDevelopmentOrStaging } = useEnvironment();
   const { layout } = useAppearance();
@@ -43,7 +43,7 @@ export function Card(props: {
           ) : null}
         </CardPrimitive.Header>
         <GlobalError />
-        {props?.children ? <CardPrimitive.Body>{props?.children}</CardPrimitive.Body> : null}
+        {props?.body ? <CardPrimitive.Body>{props?.body}</CardPrimitive.Body> : null}
         {props?.actions ? <CardPrimitive.Actions>{props?.actions}</CardPrimitive.Actions> : null}
         {isDev ? <CardPrimitive.Banner>Development mode</CardPrimitive.Banner> : null}
       </CardPrimitive.Content>
