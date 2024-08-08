@@ -67,12 +67,10 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
     return;
   }
 
-  const { nonce } = opts;
-
   return loadScript(clerkJsScriptUrl(opts), {
     async: true,
     crossOrigin: 'anonymous',
-    nonce,
+    nonce: opts.nonce,
     beforeLoad: applyClerkJsScriptAttributes(opts),
   }).catch(() => {
     throw new Error(FAILED_TO_LOAD_ERROR);
@@ -124,6 +122,10 @@ const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
 
   if (options.domain) {
     obj['data-clerk-domain'] = options.domain;
+  }
+
+  if (options.nonce) {
+    obj.nonce = options.nonce;
   }
 
   return obj;
