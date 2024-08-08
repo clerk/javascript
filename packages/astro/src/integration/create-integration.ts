@@ -28,6 +28,10 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
       name: '@clerk/astro/integration',
       hooks: {
         'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
+          if (['server', 'hybrid'].includes(config.output) && !config.adapter) {
+            logger.error('Missing adapter, please update your Astro config to use one.');
+          }
+
           if (typeof clerkJSVariant !== 'undefined' && clerkJSVariant !== 'headless' && clerkJSVariant !== '') {
             logger.error('Invalid value for clerkJSVariant. Acceptable values are `"headless"`, `""`, and `undefined`');
           }
