@@ -23,6 +23,7 @@ export const ObjectType = {
   PhoneNumber: 'phone_number',
   RedirectUrl: 'redirect_url',
   SamlAccount: 'saml_account',
+  SamlConnection: 'saml_connection',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
   SignInToken: 'sign_in_token',
