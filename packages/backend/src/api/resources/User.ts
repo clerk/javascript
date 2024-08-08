@@ -13,6 +13,7 @@ export class User {
     readonly backupCodeEnabled: boolean,
     readonly twoFactorEnabled: boolean,
     readonly banned: boolean,
+    readonly locked: boolean,
     readonly createdAt: number,
     readonly updatedAt: number,
     readonly imageUrl: string,
@@ -35,6 +36,7 @@ export class User {
     readonly samlAccounts: SamlAccount[] = [],
     readonly lastActiveAt: number | null,
     readonly createOrganizationEnabled: boolean,
+    readonly createOrganizationsLimit: number | null = null,
   ) {}
 
   static fromJSON(data: UserJSON): User {
@@ -45,6 +47,7 @@ export class User {
       data.backup_code_enabled,
       data.two_factor_enabled,
       data.banned,
+      data.locked,
       data.created_at,
       data.updated_at,
       data.image_url,
@@ -67,6 +70,7 @@ export class User {
       (data.saml_accounts || []).map((x: SamlAccountJSON) => SamlAccount.fromJSON(x)),
       data.last_active_at,
       data.create_organization_enabled,
+      data.create_organizations_limit,
     );
   }
 

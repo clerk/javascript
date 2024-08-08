@@ -10,7 +10,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { Close } from '../../icons';
-import { type PropsOfComponent } from '../../styledSystem';
+import type { PropsOfComponent } from '../../styledSystem';
 import { useCardState, useFlowMetadata } from '../contexts';
 import { IconButton } from '../IconButton';
 import { useUnsafeModalContext } from '../Modal';

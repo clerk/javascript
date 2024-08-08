@@ -55,6 +55,7 @@ export const LinkButton = React.forwardRef(function LinkButton(
     // eslint-disable-next-line react/button-has-type
     <button
       ref={forwardedRef}
+      data-link
       className={link({ busy, disabled, size, className })}
       disabled={busy || disabled}
       {...props}

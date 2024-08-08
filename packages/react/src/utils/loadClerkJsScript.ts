@@ -13,10 +13,11 @@ const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
 type LoadClerkJsScriptOptions = Omit<IsomorphicClerkOptions, 'proxyUrl' | 'domain'> & {
   proxyUrl?: string;
   domain?: string;
+  nonce?: string;
 };
 
 const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
-  const { publishableKey } = opts;
+  const { publishableKey, nonce } = opts;
 
   if (!publishableKey) {
     errorThrower.throwMissingPublishableKeyError();
@@ -39,6 +40,7 @@ const loadClerkJsScript = (opts: LoadClerkJsScriptOptions) => {
   return loadScript(clerkJsScriptUrl(opts), {
     async: true,
     crossOrigin: 'anonymous',
+    nonce,
     beforeLoad: applyClerkJsScriptAttributes(opts),
   }).catch(() => {
     throw new Error(FAILED_TO_LOAD_ERROR);
@@ -79,6 +81,10 @@ const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {
 
   if (options.domain) {
     obj['data-clerk-domain'] = options.domain;
+  }
+
+  if (options.nonce) {
+    obj.nonce = options.nonce;
   }
 
   return obj;

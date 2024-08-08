@@ -1,5 +1,5 @@
-import type { CountryEntry, CountryIso } from './data';
-import { CodeToCountriesMap, IsoToCountryMap, SubAreaCodeSets } from './data';
+import type { CountryEntry, CountryIso } from '~/constants/phone-number';
+import { CodeToCountriesMap, IsoToCountryMap, SubAreaCodeSets } from '~/constants/phone-number';
 
 // offset between uppercase ascii and regional indicator symbols
 const OFFSET = 127397;

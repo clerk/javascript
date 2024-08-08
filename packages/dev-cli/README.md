@@ -74,14 +74,7 @@ clerk-dev watch
 
 This will run the `build` task for any `@clerk/*` packages in the `package.json` of the current working directory, including any of their dependencies.
 
-> [!NOTE]
-> On macOS, this command will automatically spawn a new Terminal.app window running the dev task for `clerk-js`. On other operating systems, you will need to run the following command in a new terminal:
->
-> ```sh
-> clerk-dev watch --js
-> ```
-
-If you do not want to spawn the watcher for `@clerk/clerk-js`, you can instead pass `--no-js`.
+If you do not want to start the watcher for `@clerk/clerk-js`, you can instead pass `--no-js`.
 
 ```sh
 clerk-dev watch --no-js

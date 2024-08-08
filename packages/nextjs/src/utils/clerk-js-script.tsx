@@ -10,7 +10,7 @@ type ClerkJSScriptProps = {
 };
 
 function ClerkJSScript(props: ClerkJSScriptProps) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant } = useClerkNextOptions();
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce } = useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
   const options = {
     domain,
@@ -19,6 +19,7 @@ function ClerkJSScript(props: ClerkJSScriptProps) {
     clerkJSUrl,
     clerkJSVersion,
     clerkJSVariant,
+    nonce,
   };
   const scriptUrl = clerkJsScriptUrl(options);
 

@@ -47,6 +47,7 @@ function SignInRoutes(): JSX.Element {
             signInForceRedirectUrl={signInContext.afterSignInUrl}
             signUpForceRedirectUrl={signInContext.afterSignUpUrl}
             continueSignUpUrl={signInContext.signUpContinueUrl}
+            transferable={signInContext.transferable}
             firstFactorUrl={'../factor-one'}
             secondFactorUrl={'../factor-two'}
             resetPasswordUrl={'../reset-password'}

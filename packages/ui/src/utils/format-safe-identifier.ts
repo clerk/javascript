@@ -1,4 +1,4 @@
-import { stringToFormattedPhoneString } from '~/common/phone-number-field/utils';
+import { stringToFormattedPhoneString } from '~/utils/phone-number';
 
 export const isMaskedIdentifier = (str: string | undefined | null) => str && str.includes('**');
 

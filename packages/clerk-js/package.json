@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.10.2",
+  "version": "5.13.2",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -50,9 +50,9 @@
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "dependencies": {
-    "@clerk/localizations": "2.5.2",
-    "@clerk/shared": "2.4.1",
-    "@clerk/types": "4.9.1",
+    "@clerk/localizations": "2.5.6",
+    "@clerk/shared": "2.4.5",
+    "@clerk/types": "4.12.1",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.25.4",
@@ -83,7 +83,7 @@
     "@types/webpack-env": "^1.16.4",
     "babel-loader": "^9.1.2",
     "babel-plugin-module-resolver": "^5.0.0",
-    "bundlewatch": "^0.3.3",
+    "bundlewatch": "^0.4.0",
     "react-refresh": "^0.14.0",
     "react-refresh-typescript": "^2.0.5",
     "terser-webpack-plugin": "^5.3.10",

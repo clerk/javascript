@@ -7,7 +7,6 @@ import { Add } from '../../icons';
 import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
 import { UserMembershipList } from './UserMembershipList';
-
 export interface OrganizationActionListProps extends UserMembershipListProps {
   onCreateOrganizationClick: React.MouseEventHandler;
 }

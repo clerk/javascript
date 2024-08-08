@@ -1,7 +1,7 @@
 {
   "name": "@clerk/dev-cli",
   "description": "CLI tool designed to simplify the process of iterating on packages within the clerk/javascript repository",
-  "version": "0.0.3",
+  "version": "0.0.6",
   "license": "MIT",
   "type": "module",
   "author": "Clerk",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
+    "concurrently": "^8.2.2",
     "dotenv": "^16.4.5",
     "globby": "^14.0.2",
     "jscodeshift": "^0.16.1"

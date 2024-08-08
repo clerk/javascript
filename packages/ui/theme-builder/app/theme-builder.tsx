@@ -8,11 +8,11 @@ import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 import { ToggleGroup } from './toggle-group';
 
-const lightAccentDefault = '#2F3037';
+const lightAccentDefault = '#6C47FF';
 const lightGrayDefault = '#2f3037';
 const lightBackgroundDefault = '#fff';
 
-const darkAccentDefault = '#2F3037';
+const darkAccentDefault = '#6C47FF';
 const darkGrayDefault = '#2f3037';
 const darkBackgroundDefault = '#111';
 

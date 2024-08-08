@@ -1,4 +1,5 @@
-import type { AuthObject, RedirectFun, SignedInAuthObject } from '@clerk/backend/internal';
+import type { AuthObject } from '@clerk/backend';
+import type { RedirectFun, SignedInAuthObject } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import type {
   CheckAuthorizationParamsWithCustomPermissions,

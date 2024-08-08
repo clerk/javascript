@@ -2,7 +2,7 @@ import { joinURL } from '@clerk/shared/url';
 import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
-import { and, assign, enqueueActions, fromPromise, not, or, raise, sendTo, setup } from 'xstate';
+import { and, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
   ERROR_CODES,
@@ -84,7 +84,8 @@ export const SignInRouterMachine = setup({
 
       const session = createdSessionId || lastActiveSessionId || null;
 
-      const beforeEmit = () => context.router?.push(context.clerk.buildAfterSignInUrl());
+      const beforeEmit = () =>
+        context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl());
       void context.clerk.setActive({ session, beforeEmit });
 
       enqueue.raise({ type: 'RESET' }, { delay: 2000 }); // Reset machine after 2s delay.
@@ -186,15 +187,26 @@ export const SignInRouterMachine = setup({
               ? context.clerk.__unstable__environment?.displayConfig.signInUrl
               : context.router?.basePath
           }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete: context.clerk.buildAfterSignInUrl(),
+          redirectUrlComplete:
+            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
         },
       })),
     },
     'AUTHENTICATE.SAML': {
-      actions: sendTo(ThirdPartyMachineId, {
+      actions: sendTo(ThirdPartyMachineId, ({ context }) => ({
         type: 'REDIRECT',
-        params: { strategy: 'saml' },
-      }),
+        params: {
+          strategy: 'saml',
+          identifier: context.formRef.getSnapshot().context.fields.get('identifier')?.value,
+          redirectUrl: `${
+            context.router?.mode === ROUTING.virtual
+              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+              : context.router?.basePath
+          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrlComplete:
+            context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+        },
+      })),
     },
     'FORM.ATTACH': {
       description: 'Attach/re-attach the form to the router.',
@@ -272,15 +284,14 @@ export const SignInRouterMachine = setup({
         {
           guard: 'isLoggedInAndSingleSession',
           actions: [
-            () => console.warn('logged-in-single-session-mode'),
+            log('Already logged in'),
             {
-              type: 'setError',
-              params: {
-                error: new ClerkElementsError('logged-in-single-session-mode', 'You are already logged in.'),
-              },
+              type: 'navigateExternal',
+              params: ({ context }) => ({
+                path: context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl(),
+              }),
             },
           ],
-          target: 'Start',
         },
         {
           guard: 'needsStart',
@@ -332,6 +343,9 @@ export const SignInRouterMachine = setup({
           actions: sendTo('start', ({ event }) => event),
         },
         'AUTHENTICATE.PASSKEY.AUTOFILL': {
+          actions: sendTo('start', ({ event }) => event),
+        },
+        'AUTHENTICATE.WEB3': {
           actions: sendTo('start', ({ event }) => event),
         },
         NEXT: [

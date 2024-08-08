@@ -9,6 +9,31 @@ import { H1, HR as Hr, P } from '@/components/design';
 import { CustomField } from '@/components/form';
 import { Spinner } from '@/components/spinner';
 
+function CustomSamlConnection({ children }: { children: string }) {
+  return (
+    <Clerk.Loading scope='provider:saml'>
+      {isLoading => (
+        <Clerk.Connection
+          className='relative flex h-14 w-full cursor-pointer items-center justify-center text-xs text-[rgb(243,243,243)] transition-all duration-150'
+          disabled={isLoading}
+          name='saml'
+          type='button'
+        >
+          <span className='inline-flex items-center justify-center leading-loose'>
+            {isLoading ? (
+              <>
+                <Spinner /> Loading...
+              </>
+            ) : (
+              children
+            )}
+          </span>
+        </Clerk.Connection>
+      )}
+    </Clerk.Loading>
+  );
+}
+
 function CustomSubmit({ children }: ComponentProps<'button'>) {
   return (
     <SignUp.Action
@@ -85,19 +110,11 @@ export default function SignUpPage() {
                 label='Phone Number'
                 name='phoneNumber'
               />
-              <CustomSubmit>
-                <Clerk.Loading>
-                  {isLoading =>
-                    isLoading ? (
-                      <>
-                        <Spinner /> Loading...
-                      </>
-                    ) : (
-                      'Sign Up'
-                    )
-                  }
-                </Clerk.Loading>
-              </CustomSubmit>
+
+              <div className='flex w-full justify-between'>
+                <CustomSubmit>Sign Up</CustomSubmit>
+                <CustomSamlConnection>Continue with SAML</CustomSamlConnection>
+              </div>
             </div>
           </div>
         </div>
@@ -154,7 +171,10 @@ export default function SignUpPage() {
 
               <SignUp.Captcha id='test' />
 
-              <CustomSubmit>Sign Up</CustomSubmit>
+              <div className='flex w-full justify-between'>
+                <CustomSubmit>Sign Up</CustomSubmit>
+                <CustomSamlConnection>Continue with SAML</CustomSamlConnection>
+              </div>
             </div>
           </div>
         </SignUp.Step>

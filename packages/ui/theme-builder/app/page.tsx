@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 
 function Button({ children }: { children: React.ReactNode }) {
   return (
@@ -12,9 +12,7 @@ export default function Home() {
   return (
     <div className='relative'>
       <SignedIn>
-        <SignOutButton>
-          <Button>Sign out</Button>
-        </SignOutButton>
+        <UserButton />
       </SignedIn>
       <SignedOut>
         <div className='flex flex-col gap-4'>

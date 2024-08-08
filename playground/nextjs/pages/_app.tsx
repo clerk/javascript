@@ -22,6 +22,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [styleReset, setStyleReset] = useState<boolean>(false);
   const [animations, setAnimations] = useState<boolean>(true);
   const [primaryColor, setPrimaryColor] = useState<string | undefined>(undefined);
+  const [disableDevMode, setDisableDevMode] = useState<boolean>(false);
 
   const onToggleDark = () => {
     if (window.document.body.classList.contains('dark-mode')) {
@@ -36,6 +37,10 @@ function MyApp({ Component, pageProps }: AppProps) {
   const onToggleAnimations = () => {
     setAnimations(s => !s);
   };
+
+  const onToggleDevMode = () => {
+    setDisableDevMode(s => !s);
+  }
 
   const onToggleSmooth = () => {
     if (window.document.body.classList.contains('font-smoothing')) {
@@ -62,6 +67,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         },
         layout: {
           animations,
+          unsafe_disableDevelopmentModeWarnings: disableDevMode,
         },
       }}
       {...pageProps}
@@ -72,6 +78,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         onToggleSmooth={onToggleSmooth}
         onResetStyles={() => setStyleReset(s => !s)}
         onToggleAnimations={onToggleAnimations}
+        devMode={disableDevMode}
+        onToggleDevMode={onToggleDevMode}
         animations={animations}
         styleReset={styleReset}
         smooth={selectedSmoothing}
@@ -88,9 +96,11 @@ type AppBarProps = {
   onToggleSmooth: React.MouseEventHandler<HTMLButtonElement>;
   onResetStyles: React.MouseEventHandler<HTMLButtonElement>;
   onToggleAnimations: React.MouseEventHandler<HTMLButtonElement>;
+  onToggleDevMode: React.MouseEventHandler<HTMLButtonElement>;
   smooth: boolean;
   styleReset: boolean;
   animations: boolean;
+  devMode: boolean;
   onPrimaryColorChange: (primaryColor: string | undefined) => void;
 };
 
@@ -128,11 +138,12 @@ const AppBar = (props: AppBarProps) => {
         <option value='neobrutalism'>neobrutalism</option>
         <option value='shadesOfPurple'>shadesOfPurple</option>
       </select>
-      <button onClick={props.onToggleDark}>toggle dark mode</button>
-      <button onClick={props.onToggleSmooth}>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
+      <button onClick={props.onToggleDark} type='button'>toggle dark mode</button>
+      <button onClick={props.onToggleSmooth} type='button'>font-smoothing: {props.smooth ? 'On' : 'Off'}</button>
       <div style={{ position: 'fixed', left: '10px', bottom: '10px', display: 'inline-flex', gap: '10px' }}>
-        <button onClick={props.onResetStyles}>simple styles: {props.styleReset ? 'On' : 'Off'}</button>
-        <button onClick={props.onToggleAnimations}>animations: {props.animations ? 'On' : 'Off'}</button>
+        <button onClick={props.onResetStyles} type='button'>simple styles: {props.styleReset ? 'On' : 'Off'}</button>
+        <button onClick={props.onToggleAnimations} type='button'>animations: {props.animations ? 'On' : 'Off'}</button>
+        <button onClick={props.onToggleDevMode} type='button'>dev mode: {props.devMode ? 'On' : 'Off'}</button>
       </div>
       <input
         type='color'

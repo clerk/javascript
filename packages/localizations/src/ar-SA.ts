@@ -44,15 +44,16 @@ export const arSA: LocalizationResource = {
   footerPageLink__privacy: 'الخصوصية',
   footerPageLink__terms: 'الشروط',
   formButtonPrimary: 'متابعة',
-  formButtonPrimary__verify: 'Verify',
+  formButtonPrimary__verify: 'تحقق',
   formFieldAction__forgotPassword: 'نسيت كلمة المرور؟',
   formFieldError__matchingPasswords: 'كلمة المرور مطابقة',
   formFieldError__notMatchingPasswords: 'كلمة المرور لا تتطابق',
   formFieldError__verificationLinkExpired: 'صلاحية رمز التأكيد أنتهت. يرجى طلب رابط جديد',
   formFieldHintText__optional: 'إختياري',
-  formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldHintText__slug:
+    '(slug) هو معرف يمكن قراءته بواسطة الإنسان ويجب أن يكون فريدًا. غالبًا ما يتم استخدامه في الروابط الإلكترونية.',
   formFieldInputPlaceholder__backupCode: '',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'حذف الحساب',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddress_username: '',
   formFieldInputPlaceholder__emailAddresses: 'أدخل أو لصق عنوان بريد إلكتروني واحد أو أكثر ، مفصولة بمسافات أو فواصل',
@@ -83,7 +84,7 @@ export const arSA: LocalizationResource = {
     'أدخل البريد الإلكتروني الخاص بالنطاق للحصول على  الرمز والتحقق من النطاق',
   formFieldLabel__organizationName: 'اسم المنظمة',
   formFieldLabel__organizationSlug: 'رابط المنظمة',
-  formFieldLabel__passkeyName: undefined,
+  formFieldLabel__passkeyName: 'اسم مفتاح المرور (Passkey)',
   formFieldLabel__password: 'كلمة المرور',
   formFieldLabel__phoneNumber: 'رقم الجوال',
   formFieldLabel__role: 'دور',
@@ -93,7 +94,7 @@ export const arSA: LocalizationResource = {
     action__signOut: 'تسجيل الخروج',
     title: 'تسجيل الدخول بأسم {{identifier}}',
   },
-  maintenanceMode: undefined,
+  maintenanceMode: 'نحن نقوم بعمل بعض التعديلات في الوقت الحالي. سوف نعود في غضون دقائق قليلة',
   membershipRole__admin: 'المسؤول',
   membershipRole__basicMember: 'عضو',
   membershipRole__guestMember: 'ضيف',
@@ -121,7 +122,7 @@ export const arSA: LocalizationResource = {
     invitePage: {
       detailsTitle__inviteFailed: 'لا يمكن إرسال الدعوات. انظر لتفاصيل المشكلة وحاول مرة أخرى:',
       formButtonPrimary__continue: 'إرسال الدعوات',
-      selectDropdown__role: 'Select role',
+      selectDropdown__role: 'إختر دور',
       subtitle: 'دعوة أعضاء جدد لهذه المنظمة',
       successMessage: 'تم إرسال الدعوات بنجاح',
       title: 'دعوة أعضاء',
@@ -168,10 +169,10 @@ export const arSA: LocalizationResource = {
       },
     },
     navbar: {
-      description: 'Manage your organization.',
-      general: 'General',
-      members: 'Members',
-      title: 'Organization',
+      description: 'إدارة منظمتك.',
+      general: 'عام',
+      members: 'الأعضاء',
+      title: 'المنظمة',
     },
     profilePage: {
       dangerSection: {
@@ -192,9 +193,9 @@ export const arSA: LocalizationResource = {
         title: 'خطر',
       },
       domainSection: {
-        menuAction__manage: 'Manage',
-        menuAction__remove: 'Delete',
-        menuAction__verify: 'Verify',
+        menuAction__manage: 'إدارة',
+        menuAction__remove: 'حذف',
+        menuAction__verify: 'تحقق',
         primaryButton: 'أضافة نطاق',
         subtitle:
           'السماح للمستخدمين للأنضمام للمنظمة بشكل تلقائي أو عن طريق دعوة للأنضمام على نطاق بريد إلكتروني تم التحقق منه',
@@ -210,12 +211,12 @@ export const arSA: LocalizationResource = {
       title: 'حذف النطاق',
     },
     start: {
-      headerTitle__general: 'General',
+      headerTitle__general: 'عام',
       headerTitle__members: 'الأعضاء',
       profileSection: {
-        primaryButton: '',
-        title: 'Organization Profile',
-        uploadAction__title: 'Logo',
+        primaryButton: 'تحديث الملف الشخصي',
+        title: 'ملف المنظمة',
+        uploadAction__title: 'شعار',
       },
     },
     verifiedDomainPage: {
@@ -270,18 +271,18 @@ export const arSA: LocalizationResource = {
   paginationRowText__of: 'من',
   signIn: {
     accountSwitcher: {
-      action__addAccount: 'Add account',
-      action__signOutAll: 'Sign out of all accounts',
-      subtitle: 'Select the account with which you wish to continue.',
-      title: 'Choose an account',
+      action__addAccount: 'إضافة حساب',
+      action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
+      subtitle: 'قم بإختيار الحساب الذي تريد المتابعة به',
+      title: 'إختر حساب',
     },
     alternativeMethods: {
       actionLink: 'الحصول على المساعدة',
-      actionText: 'Don’t have any of these?',
+      actionText: 'لا تملك اي من هؤلاء?',
       blockButton__backupCode: 'استخدم رمز النسخ الاحتياطي',
       blockButton__emailCode: 'رمز البريد الإلكتروني ل  {{identifier}}',
       blockButton__emailLink: 'رابط البريد الإلكتروني ل {{identifier}}',
-      blockButton__passkey: undefined,
+      blockButton__passkey: 'تسجيل الدخول بمفتاح المرور الخاص بك',
       blockButton__password: 'تسجيل الدخول بكلمة السر الخاصة بك',
       blockButton__phoneCode: 'أرسال رسالة نصية ل{{identifier}}',
       blockButton__totp: 'استخدم تطبيق المصادقة الخاص بك',
@@ -291,7 +292,7 @@ export const arSA: LocalizationResource = {
           'إذا كنت تواجه صعوبة في تسجيل الدخول إلى حسابك ، راسلنا عبر البريد الإلكتروني وسنعمل معك لاستعادة الوصول في أقرب وقت ممكن.',
         title: 'الحصول على المساعدة',
       },
-      subtitle: 'Facing issues? You can use any of these methods to sign in.',
+      subtitle: 'تواجه مشكلة؟ تستطيع استخدام أي من هذه الطرق لتسجيل الدخول',
       title: 'أستخدام طريقة أخرى',
     },
     backupCodeMfa: {
@@ -306,8 +307,8 @@ export const arSA: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'للمتابعة, قم بفتح رابط التحقق عبر نفس الجهاز والمتصفح الذي انشأت محاولة تسجيل الدخول منه',
+        title: 'رابط التحقق غير صالح على هذا الجهاز',
       },
       expired: {
         subtitle: 'ارجع إلى علامة التبويب الرئيسية للمتابعة.',
@@ -340,15 +341,15 @@ export const arSA: LocalizationResource = {
       },
     },
     forgotPassword: {
-      formTitle: 'رمز تحقق لأعادة تعيين كلمة المرور',
-      resendButton: 'لم يصلك اي رمز؟ حاول مرة أخرى.',
-      subtitle: 'to reset your password',
-      subtitle_email: 'First, enter the code sent to your email ID',
-      subtitle_phone: 'First, enter the code sent to your phone',
-      title: 'Reset password',
+      formTitle: 'رمز تحقق لإعادة تعيين كلمة المرور',
+      resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
+      subtitle: 'لأعادة تعيين كلمة المرور',
+      subtitle_email: 'أولاً, قم بإدخال الرمز المرسل إلى الايميل الخاص بك',
+      subtitle_phone: 'أولاً, قم بإدخال الرمز المرسل إلى رقم الهاتف الخاص بك',
+      title: 'إعادة تعيين كلمة المرور',
     },
     forgotPasswordAlternativeMethods: {
-      blockButton__resetPassword: 'أعادة تعيين كلمة المرور',
+      blockButton__resetPassword: 'إعادة تعيين كلمة المرور',
       label__alternativeMethods: 'أو سجل الدخول بطريقة أخرى',
       title: 'نسيت كلمة المرور؟',
     },
@@ -358,8 +359,9 @@ export const arSA: LocalizationResource = {
       title: 'لا يمكن تسجيل الدخول',
     },
     passkey: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle:
+        'يؤدي استخدام مفتاح المرور الخاص بك إلى تأكيد هويتك. جهازك الخاص قد يقوم بسؤالك عن بصمة الإصبع, او معرف الوجة او كلمة مرور قفل الشاشة',
+      title: 'إستخدم مفتاح المرور',
     },
     password: {
       actionLink: 'أستعمل طريقة أخرى',
@@ -367,7 +369,7 @@ export const arSA: LocalizationResource = {
       title: 'ادخل كلمة المرور',
     },
     passwordPwned: {
-      title: undefined,
+      title: 'كلمة المرور غير آمنة',
     },
     phoneCode: {
       formTitle: 'رمز التحقق',
@@ -378,7 +380,7 @@ export const arSA: LocalizationResource = {
     phoneCodeMfa: {
       formTitle: 'رمز التحقق',
       resendButton: 'لم يصلك الرمز؟ حاول مرة أخرى',
-      subtitle: '',
+      subtitle: 'للمتابعة، يرجى إدخال رمز التحقق المرسل إلى هاتفك',
       title: 'تحقق من هاتفك',
     },
     resetPassword: {
@@ -395,7 +397,7 @@ export const arSA: LocalizationResource = {
       actionLink: 'إنشاء حساب جديد',
       actionLink__use_email: 'استخدم البريد الإلكتروني',
       actionLink__use_email_username: 'استخدم البريد الإلكتروني أو اسم المستخدم',
-      actionLink__use_passkey: undefined,
+      actionLink__use_passkey: 'استخدم مفتاح المرور بدلاً من ذلك',
       actionLink__use_phone: 'استخدم رقم الجوال',
       actionLink__use_username: 'استخدم اسم المستخدم',
       actionText: 'ليس لديك حساب؟',
@@ -404,7 +406,7 @@ export const arSA: LocalizationResource = {
     },
     totpMfa: {
       formTitle: 'رمز التحقق',
-      subtitle: '',
+      subtitle: 'للمتابعة، يرجى إدخال رمز التحقق الذي تم إنشاؤه بواسطة تطبيق المصادقة الخاص بك',
       title: 'نظام التحقق بخطوتين',
     },
   },
@@ -425,8 +427,8 @@ export const arSA: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle: 'للمتابعة، افتح رابط التحقق على الجهاز والمتصفح الذي أنشأت محاولة عملية التسجيل منه',
+        title: 'رابط التحقق غير صالح على هذا الجهاز',
       },
       formSubtitle: 'أستعمل رابط التحقق المرسل إلى بريدك الإلكتروني',
       formTitle: 'رابط التحقق',
@@ -462,17 +464,17 @@ export const arSA: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: undefined,
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     captcha_invalid:
       'لا يمكن تسجيل الحساب بسبب مشاكل تحقق أمنية. الرجاء تحديث الصفحة للمحاولة مرة أخرى أو تواصل معنا للمزيد من المساعدة',
     captcha_unavailable:
-      'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
+      'التسجيل غير ناجح بسبب فشل التحقق من صحة الروبوت. يُرجى تحديث الصفحة للمحاولة مرة أخرى أو التواصل مع فريق الدعم للحصول على مزيد من المساعدة',
     form_code_incorrect: '',
     form_identifier_exists: '',
-    form_identifier_exists__email_address: undefined,
-    form_identifier_exists__phone_number: undefined,
-    form_identifier_exists__username: undefined,
+    form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
+    form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
+    form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
     form_identifier_not_found: '',
     form_param_format_invalid: '',
     form_param_format_invalid__email_address: 'يجب أستعمال بريد إلكتروني صالح',
@@ -485,7 +487,7 @@ export const arSA: LocalizationResource = {
     form_password_length_too_short: '',
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
     form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
-    form_password_pwned__sign_in: undefined,
+    form_password_pwned__sign_in: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_size_in_bytes_exceeded:
       'تجاوزت كلمة المرور الحد الأقصى للحروف المدخلة, الرجاء أدخال كلمة مرور أقصر أو حذف بعض الأحرف الخاصة',
     form_password_validation_failed: 'كلمة مرور خاطئة',
@@ -493,11 +495,11 @@ export const arSA: LocalizationResource = {
     form_username_invalid_length: '',
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
     not_allowed_access: '',
-    passkey_already_exists: undefined,
-    passkey_not_supported: undefined,
-    passkey_pa_not_supported: undefined,
-    passkey_registration_cancelled: undefined,
-    passkey_retrieval_cancelled: undefined,
+    passkey_already_exists: 'تم تسجيل مفتاح المرور مسبقاً مع هذا الجهاز',
+    passkey_not_supported: 'مفاتيح المرور غير مدعومة على هذا الجهاز',
+    passkey_pa_not_supported: 'يتطلب التسجيل أداة مصادقة النظام الأساسي ولكن الجهاز لا يدعمها',
+    passkey_registration_cancelled: 'تم إلغاء تسجيل مفتاح المرور أو انتهت مهلته',
+    passkey_retrieval_cancelled: 'تم إلغاء تسجيل مفتاح المرور أو انتهت مهلته',
     passwordComplexity: {
       maximumLength: 'أقل من {{length}} حروف',
       minimumLength: '{{length}} حروف أو أكثر',
@@ -615,18 +617,18 @@ export const arSA: LocalizationResource = {
       title: 'أضافة البريد الإلكتروني',
       verifyTitle: 'Verify email address',
     },
-    formButtonPrimary__add: 'Add',
+    formButtonPrimary__add: 'إضافة',
     formButtonPrimary__continue: 'متابعة',
     formButtonPrimary__finish: 'انهاء',
-    formButtonPrimary__remove: 'Remove',
-    formButtonPrimary__save: 'Save',
+    formButtonPrimary__remove: 'إزالة',
+    formButtonPrimary__save: 'حفظ',
     formButtonReset: 'الغاء',
     mfaPage: {
       formHint: 'أختر طريقة للأضافة',
       title: 'أضافة التحقق بخطوتين',
     },
     mfaPhoneCodePage: {
-      backButton: 'Use existing number',
+      backButton: 'إستخدم الرقم الموجود',
       primaryButton__addPhoneNumber: 'إضافة رقم جوال',
       removeResource: {
         messageLine1: 'لن يتم إستلام اي رموز تحقق على {{identifier}} عند تسجيل الدخول',
@@ -637,10 +639,10 @@ export const arSA: LocalizationResource = {
       subtitle__availablePhoneNumbers: 'أختر رقم جوال لأضافة التحقق بخطوتين عن طريق الرسائل النصية',
       subtitle__unavailablePhoneNumbers: 'لا يوجد رقم جوال لأضافة التحقق بخطوتين عن طريق الرسائل النصية',
       successMessage1:
-        'When signing in, you will need to enter a verification code sent to this phone number as an additional step.',
+        'عند تسجيل الدخول، سوف تحتاج إلى إدخال رمز التحقق الذي تم إرساله إلى رقم الهاتف هذا كخطوة إضافية.',
       successMessage2:
-        'Save these backup codes and store them somewhere safe. If you lose access to your authentication device, you can use backup codes to sign in.',
-      successTitle: 'SMS code verification enabled',
+        'احفظ هذه الرموز الاحتياطية وقم بتخزينها في مكان آمن." إذا فقدت إمكانية الوصول إلى جهاز المصادقة الخاص بك، فيمكنك استخدام الرموز الاحتياطية لتسجيل الدخول.',
+      successTitle: 'تم تمكين التحقق من رمز الرسائل القصيرة',
       title: 'أضافة التحقق عن طريق رمز الرسائل النصية',
     },
     mfaTOTPPage: {
@@ -668,22 +670,22 @@ export const arSA: LocalizationResource = {
     },
     mobileButton__menu: 'القائمة',
     navbar: {
-      account: 'Profile',
-      description: 'Manage your account info.',
-      security: 'Security',
-      title: 'Account',
+      account: 'الملف الشخصي',
+      description: 'إدارة معلومات ملفك الشخصي.',
+      security: 'حماية',
+      title: 'الملف الشخصي',
     },
     passkeyScreen: {
       removeResource: {
-        messageLine1: undefined,
-        title: undefined,
+        messageLine1: '{{name}} سوف يتم حذفه من هذا الحساب.',
+        title: 'إزالة مفتاح المرور',
       },
-      subtitle__rename: undefined,
-      title__rename: undefined,
+      subtitle__rename: 'يمكنك تغيير اسم مفتاح المرور لتسهيل العثور عليه',
+      title__rename: 'إعادة تسمية مفتاح المرور',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
-        'It is recommended to sign out of all other devices which may have used your old password.',
+        'يوصى بتسجيل الخروج من جميع الأجهزة الأخرى التي ربما قد استخدمت كلمة المرور القديمة الخاصة بك.',
       readonly: 'لا يمكن تعديل كلمة المرور لأنه لا يمكنك تسجيل الدخول إلى عن طريق حساب المؤسسة',
       successMessage__set: 'تم تعيين كلمة السر.',
       successMessage__signOutOfOtherSessions: 'تم تسجيل الخروج من جميع الأجهزة.',
@@ -701,8 +703,8 @@ export const arSA: LocalizationResource = {
       },
       successMessage: 'تم إضافة رقم الجوال هذا {{identifier}}',
       title: 'إضافة رقم جوال',
-      verifySubtitle: 'Enter the verification code sent to {{identifier}}',
-      verifyTitle: 'Verify phone number',
+      verifySubtitle: 'أدخل رمز التحقق المرسل إلى {{identifier}}',
+      verifyTitle: 'التحقق من رقم الهاتف',
     },
     profilePage: {
       fileDropAreaHint: 'أرفع صورة بصيغة JPG, PNG, GIF أو WEBP أقل من 10 ميغابايت',
@@ -725,7 +727,7 @@ export const arSA: LocalizationResource = {
         primaryButton: 'ربط حساب',
         subtitle__disconnected: undefined,
         subtitle__reauthorize:
-          'The required scopes have been updated, and you may be experiencing limited functionality. Please re-authorize this application to avoid any issues',
+          'تم تحديث النطاقات المطلوبة. هذا التحديث قد يحد من العمليات الوظيفية. يرجى إعادة ترخيص هذا التطبيق لتجنب أي مشاكل',
         title: 'الحسابات المتصلة',
       },
       dangerSection: {
@@ -765,9 +767,9 @@ export const arSA: LocalizationResource = {
         },
       },
       passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
+        menuAction__destructive: 'إزالة',
+        menuAction__rename: 'إعادة تسمية',
+        title: 'مفاتيح المرور',
       },
       passwordSection: {
         primaryButton__setPassword: 'تعيين كلمة المرور',
@@ -783,7 +785,7 @@ export const arSA: LocalizationResource = {
         title: 'رقم الجوال',
       },
       profileSection: {
-        primaryButton: '',
+        primaryButton: 'تحديث الملف الشخصي',
         title: 'الملف الشخصي',
       },
       usernameSection: {

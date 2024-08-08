@@ -84,6 +84,7 @@ export class User extends BaseResource implements UserResource {
   publicMetadata: UserPublicMetadata = {};
   unsafeMetadata: UserUnsafeMetadata = {};
   createOrganizationEnabled = false;
+  createOrganizationsLimit: number | null = null;
   deleteSelfEnabled = false;
   lastSignInAt: Date | null = null;
   updatedAt: Date | null = null;
@@ -348,6 +349,7 @@ export class User extends BaseResource implements UserResource {
     this.twoFactorEnabled = data.two_factor_enabled;
 
     this.createOrganizationEnabled = data.create_organization_enabled;
+    this.createOrganizationsLimit = data.create_organizations_limit;
     this.deleteSelfEnabled = data.delete_self_enabled;
 
     if (data.last_sign_in_at) {

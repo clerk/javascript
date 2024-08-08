@@ -1,5 +1,5 @@
-import type { createClerkClient } from '@clerk/backend';
-import type { AuthenticateRequestOptions, AuthObject, SignedInAuthObject } from '@clerk/backend/internal';
+import type { AuthObject, createClerkClient } from '@clerk/backend';
+import type { AuthenticateRequestOptions, SignedInAuthObject } from '@clerk/backend/internal';
 import type { MultiDomainAndOrProxy } from '@clerk/types';
 import type { NextFunction, Request, Response } from 'express';
 import type { IncomingMessage } from 'http';

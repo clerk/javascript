@@ -75,6 +75,7 @@ import {
   inBrowser,
   isDevAccountPortalOrigin,
   isError,
+  isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
   noOrganizationExists,
   noUserExists,
@@ -707,9 +708,18 @@ export class Clerk implements ClerkInterface {
     // However, if the `organization` parameter is not given (i.e. `undefined`), we want
     // to keep the organization id that the session had.
     const shouldSwitchOrganization = organization !== undefined;
+
     if (newSession && shouldSwitchOrganization) {
-      const organizationId = typeof organization === 'string' ? organization : organization?.id;
-      newSession.lastActiveOrganizationId = organizationId || null;
+      const organizationIdOrSlug = typeof organization === 'string' ? organization : organization?.id;
+
+      if (isOrganizationId(organizationIdOrSlug)) {
+        newSession.lastActiveOrganizationId = organizationIdOrSlug || null;
+      } else {
+        const matchingOrganization = newSession.user.organizationMemberships.find(
+          mem => mem.organization.slug === organizationIdOrSlug,
+        );
+        newSession.lastActiveOrganizationId = matchingOrganization?.organization.id || null;
+      }
     }
 
     // If this.session exists, then signOut was triggered by the current tab
@@ -1197,6 +1207,10 @@ export class Clerk implements ClerkInterface {
     const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
 
     if (userNeedsToBeCreated) {
+      if (params.transferable === false) {
+        return navigateToSignIn();
+      }
+
       const res = await signUp.create({ transfer: true });
       switch (res.status) {
         case 'complete':

@@ -593,7 +593,7 @@ export const esMX: LocalizationResource = {
       title: 'Agregar cuenta conectada',
     },
     deletePage: {
-      actionDescription: 'Escribe "Delete account" a continuación para continuar',
+      actionDescription: 'Escribe "Eliminar cuenta" a continuación para continuar',
       confirm: 'Eliminar cuenta',
       messageLine1: '¿Estas seguro que quieres eliminar tu cuenta?',
       messageLine2: 'Esta acción es permanente e irreversible.',

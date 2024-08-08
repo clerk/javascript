@@ -25,7 +25,11 @@ import type {
   UserProfileCtx,
 } from '../types';
 import type { CustomPageContent } from '../utils';
-import { createOrganizationProfileCustomPages, createUserProfileCustomPages } from '../utils';
+import {
+  createOrganizationProfileCustomPages,
+  createUserButtonCustomMenuItems,
+  createUserProfileCustomPages,
+} from '../utils';
 
 const populateParamFromObject = createDynamicParamParser({ regex: /:(\w+)/ });
 
@@ -123,6 +127,7 @@ export type SignInContextType = SignInCtx & {
   authQueryString: string | null;
   afterSignUpUrl: string;
   afterSignInUrl: string;
+  transferable: boolean;
 };
 
 export const useSignInContext = (): SignInContextType => {
@@ -171,6 +176,7 @@ export const useSignInContext = (): SignInContextType => {
 
   return {
     ...ctx,
+    transferable: ctx.transferable ?? true,
     componentName,
     signUpUrl,
     signInUrl,
@@ -234,7 +240,7 @@ export const useUserProfileContext = (): UserProfileContextType => {
 };
 
 export const useUserButtonContext = () => {
-  const { componentName, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
+  const { componentName, customMenuItems, ...ctx } = (React.useContext(ComponentContext) || {}) as UserButtonCtx;
   const clerk = useClerk();
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
@@ -270,6 +276,10 @@ export const useUserButtonContext = () => {
 
   const userProfileMode = !!ctx.userProfileUrl && !ctx.userProfileMode ? 'navigation' : ctx.userProfileMode;
 
+  const menuItems = useMemo(() => {
+    return createUserButtonCustomMenuItems(customMenuItems || [], clerk);
+  }, []);
+
   return {
     ...ctx,
     componentName,
@@ -282,6 +292,7 @@ export const useUserButtonContext = () => {
     afterSignOutUrl,
     afterSwitchSessionUrl,
     userProfileMode: userProfileMode || 'modal',
+    menutItems: menuItems,
   };
 };
 
@@ -352,6 +363,7 @@ export const useOrganizationSwitcherContext = () => {
     organizationProfileMode: organizationProfileMode || 'modal',
     createOrganizationMode: createOrganizationMode || 'modal',
     skipInvitationScreen: ctx.skipInvitationScreen || false,
+    hideSlug: ctx.hideSlug || false,
     afterCreateOrganizationUrl,
     afterLeaveOrganizationUrl,
     navigateOrganizationProfile,
@@ -431,6 +443,7 @@ export const useOrganizationListContext = () => {
     ...ctx,
     afterCreateOrganizationUrl,
     skipInvitationScreen: ctx.skipInvitationScreen || false,
+    hideSlug: ctx.hideSlug || false,
     hidePersonal: ctx.hidePersonal || false,
     navigateAfterCreateOrganization,
     navigateAfterSelectOrganization,
@@ -506,6 +519,7 @@ export const useCreateOrganizationContext = () => {
   return {
     ...ctx,
     skipInvitationScreen: ctx.skipInvitationScreen || false,
+    hideSlug: ctx.hideSlug || false,
     navigateAfterCreateOrganization,
     componentName,
   };

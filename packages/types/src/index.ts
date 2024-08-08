@@ -57,3 +57,4 @@ export * from './web3Wallet';
 export * from './customPages';
 export * from './pagination';
 export * from './passkey';
+export * from './customMenuItems';

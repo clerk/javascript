@@ -6,11 +6,12 @@ import { setInstance } from './commands/set-instance.js';
 import { setRoot } from './commands/set-root.js';
 import { setup } from './commands/setup.js';
 import { watch } from './commands/watch.js';
+import { getPackageVersion } from './utils/getPackageVersion.js';
 
 export default function cli() {
   const program = new Command();
 
-  program.name('clerk-dev').description('CLI to make developing Clerk packages easier').version('0.0.0');
+  program.name('clerk-dev').description('CLI to make developing Clerk packages easier').version(getPackageVersion());
 
   program
     .command('init')

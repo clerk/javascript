@@ -1,5 +1,70 @@
 # Change Log
 
+## 1.6.1
+
+### Patch Changes
+
+- Export the type `AuthObject`. You can now use it like so: ([#3844](https://github.com/clerk/javascript/pull/3844)) by [@kduprey](https://github.com/kduprey)
+
+  ```ts
+  import type { AuthObject } from "@clerk/backend";
+  ```
+
+- Updated dependencies [[`9b2aeacb3`](https://github.com/clerk/javascript/commit/9b2aeacb32fff7c300bda458636a1cc81a42ee7b)]:
+  - @clerk/types@4.12.1
+  - @clerk/shared@2.4.5
+
+## 1.6.0
+
+### Minor Changes
+
+- Add `createOrganizationsLimit` param in `@clerk/backend` method `User.updateUser()` ([#3823](https://github.com/clerk/javascript/pull/3823)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  Example:
+
+  ```typescript
+      import { createClerkClient }  from '@clerk/backend';
+
+      const clerkClient = createClerkClient({...});
+      // Update user with createOrganizationsLimit equals 10
+      await clerkClient.users.updateUser('user_...', { createOrganizationsLimit: 10 })
+
+      // Remove createOrganizationsLimit
+      await clerkClient.users.updateUser('user_...', { createOrganizationsLimit: 0 })
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`7e94fcf0f`](https://github.com/clerk/javascript/commit/7e94fcf0fcbee8842a54f7931c45190370aa870d)]:
+  - @clerk/types@4.12.0
+  - @clerk/shared@2.4.4
+
+## 1.5.2
+
+### Patch Changes
+
+- Updated dependencies [[`568186cad`](https://github.com/clerk/javascript/commit/568186cad29acaf0b084a9f86ccb9d29bd23fcf4), [`407195270`](https://github.com/clerk/javascript/commit/407195270ed8aab6eef18c64a4918e3870fef471)]:
+  - @clerk/types@4.11.0
+  - @clerk/shared@2.4.3
+
+## 1.5.1
+
+### Patch Changes
+
+- Retry handshake in case of handshake cookie collision in order to support multiple apps on same-level subdomains ([#3848](https://github.com/clerk/javascript/pull/3848)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 1.5.0
+
+### Minor Changes
+
+- Added a `locked` property to the User object in the SDK ([#3748](https://github.com/clerk/javascript/pull/3748)) by [@iamjameswalters](https://github.com/iamjameswalters)
+
+### Patch Changes
+
+- Updated dependencies [[`aa06f3ba7`](https://github.com/clerk/javascript/commit/aa06f3ba7e725071c90d4a1d6840060236da3c23), [`80e647731`](https://github.com/clerk/javascript/commit/80e64773135865434cf0e6c220e287397aa07937)]:
+  - @clerk/types@4.10.0
+  - @clerk/shared@2.4.2
+
 ## 1.4.3
 
 ### Patch Changes

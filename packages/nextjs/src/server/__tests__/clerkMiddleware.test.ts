@@ -7,7 +7,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const publishableKey = 'pk_test_Y2xlcmsuaW5jbHVkZWQua2F0eWRpZC05Mi5sY2wuZGV2JA';
 const authenticateRequestMock = jest.fn().mockResolvedValue({
-  toAuth: () => ({}),
+  toAuth: () => ({
+    debug: (d: any) => d,
+  }),
   headers: new Headers(),
   publishableKey,
 });
@@ -33,12 +35,15 @@ import { decryptClerkRequestData } from '../utils';
  * Disable console warnings about config matchers
  */
 const consoleWarn = console.warn;
-global.console.warn = jest.fn();
+const consoleLog = console.log;
+
 beforeAll(() => {
   global.console.warn = jest.fn();
+  global.console.log = jest.fn();
 });
 afterAll(() => {
   global.console.warn = consoleWarn;
+  global.console.log = consoleLog;
 });
 
 // Removing this mock will cause the clerkMiddleware tests to fail due to missing publishable key
@@ -168,24 +173,6 @@ describe('createRouteMatcher', () => {
   });
 });
 
-describe('authenticateRequest & handshake', () => {
-  beforeEach(() => {
-    authenticateRequestMock.mockClear();
-  });
-
-  it('returns 307 and starts the handshake flow for handshake requestState status', async () => {
-    const mockLocationUrl = 'https://example.com';
-    authenticateRequestMock.mockResolvedValueOnce({
-      publishableKey,
-      status: AuthStatus.Handshake,
-      headers: new Headers({ Location: mockLocationUrl }),
-    });
-    const resp = await clerkMiddleware()(mockRequest({ url: '/protected' }), {} as NextFetchEvent);
-    expect(resp?.status).toEqual(307);
-    expect(resp?.headers.get('Location')).toEqual(mockLocationUrl);
-  });
-});
-
 describe('clerkMiddleware(params)', () => {
   it('renders route as normally when used without params', async () => {
     const signInResp = await clerkMiddleware()(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
@@ -203,7 +190,7 @@ describe('clerkMiddleware(params)', () => {
     expect(signInResp?.headers.get('a-custom-header')).toEqual('1');
   });
 
-  it('renders route when when exported directly without being called', async () => {
+  it('renders route when exported directly without being called', async () => {
     // This is equivalent to export default clerkMiddleware;
     const signInResp = await clerkMiddleware(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
     expect(signInResp?.status).toEqual(200);
@@ -565,6 +552,32 @@ describe('clerkMiddleware(params)', () => {
       expect(resp?.headers.get('location')).toContain('https://www.clerk.com/unauthorizedUrl');
       expect(resp?.headers.get(constants.Headers.ClerkRedirectTo)).toEqual('true');
       expect(clerkClient().authenticateRequest).toBeCalled();
+    });
+  });
+
+  describe('debug', () => {
+    beforeEach(() => {
+      (global.console.log as jest.Mock).mockClear();
+    });
+
+    it('outputs debug logs when used with only params', async () => {
+      const signInResp = await clerkMiddleware({ debug: true })(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+      expect(signInResp?.status).toEqual(200);
+      // 6 times results from header, footer, options, url, requestState, auth logs
+      expect(global.console.log).toBeCalledTimes(6);
+    });
+
+    it('outputs debug logs when used with a custom handler', async () => {
+      const signInResp = await clerkMiddleware(
+        (_, request) => {
+          expect(request.url).toContain('/sign-in');
+          return NextResponse.next({ headers: { 'a-custom-header': '1' } });
+        },
+        { debug: true },
+      )(mockRequest({ url: '/sign-in' }), {} as NextFetchEvent);
+      expect(signInResp?.status).toEqual(200);
+      // 6 times results from header, footer, options, url, requestState, auth logs
+      expect(global.console.log).toBeCalledTimes(6);
     });
   });
 });
