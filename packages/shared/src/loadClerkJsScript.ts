@@ -67,9 +67,12 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions) => {
     return;
   }
 
+  const { nonce } = opts;
+
   return loadScript(clerkJsScriptUrl(opts), {
     async: true,
     crossOrigin: 'anonymous',
+    nonce,
     beforeLoad: applyClerkJsScriptAttributes(opts),
   }).catch(() => {
     throw new Error(FAILED_TO_LOAD_ERROR);
