@@ -331,8 +331,8 @@ export interface Web3WalletJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
 }
 
-export type DeletedObjectJSON<TObjectType extends string = string> = {
-  object: TObjectType;
+export type DeletedObjectJSON<T extends ObjectType> = {
+  object: T;
   id?: string;
   slug?: string;
   deleted: boolean;

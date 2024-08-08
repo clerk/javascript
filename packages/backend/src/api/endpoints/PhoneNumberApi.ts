@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import type { DeletedObjectJSON, ObjectType, PhoneNumber } from '../resources';
+import type { DeletedObject, ObjectType, PhoneNumber } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/phone_numbers';
@@ -47,7 +47,7 @@ export class PhoneNumberAPI extends AbstractAPI {
   public async deletePhoneNumber(phoneNumberId: string) {
     this.requireId(phoneNumberId);
 
-    return this.request<DeletedObjectJSON<typeof ObjectType.PhoneNumber>>({
+    return this.request<DeletedObject<typeof ObjectType.PhoneNumber>>({
       method: 'DELETE',
       path: joinPaths(basePath, phoneNumberId),
     });

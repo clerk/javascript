@@ -1,7 +1,7 @@
 import type { SamlIdpSlug } from '@clerk/types';
 
 import { joinPaths } from '../../util/path';
-import type { DeletedObjectJSON, ObjectType, SamlConnection } from '../resources';
+import type { DeletedObject, ObjectType, SamlConnection } from '../resources';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/saml_connections';
@@ -84,7 +84,7 @@ export class SamlConnectionAPI extends AbstractAPI {
   }
   public async deleteSamlConnection(samlConnectionId: string) {
     this.requireId(samlConnectionId);
-    return this.request<DeletedObjectJSON<typeof ObjectType.SamlAccount>>({
+    return this.request<DeletedObject<typeof ObjectType.SamlConnection>>({
       method: 'DELETE',
       path: joinPaths(basePath, samlConnectionId),
     });

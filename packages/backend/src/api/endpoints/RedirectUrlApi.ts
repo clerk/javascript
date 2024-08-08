@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import type { DeletedObjectJSON, ObjectType } from '../resources';
+import type { DeletedObject, ObjectType } from '../resources';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { RedirectUrl } from '../resources/RedirectUrl';
 import { AbstractAPI } from './AbstractApi';
@@ -37,7 +37,7 @@ export class RedirectUrlAPI extends AbstractAPI {
 
   public async deleteRedirectUrl(redirectUrlId: string) {
     this.requireId(redirectUrlId);
-    return this.request<DeletedObjectJSON<typeof ObjectType.RedirectUrl>>({
+    return this.request<DeletedObject<typeof ObjectType.RedirectUrl>>({
       method: 'DELETE',
       path: joinPaths(basePath, redirectUrlId),
     });

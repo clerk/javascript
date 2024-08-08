@@ -1,5 +1,5 @@
 import { joinPaths } from '../../util/path';
-import type { DeletedObjectJSON, ObjectType } from '../resources';
+import type { DeletedObject, ObjectType } from '../resources';
 import type { AllowlistIdentifier } from '../resources/AllowlistIdentifier';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
@@ -30,7 +30,7 @@ export class AllowlistIdentifierAPI extends AbstractAPI {
 
   public async deleteAllowlistIdentifier(allowlistIdentifierId: string) {
     this.requireId(allowlistIdentifierId);
-    return this.request<DeletedObjectJSON<typeof ObjectType.AllowlistIdentifier>>({
+    return this.request<DeletedObject<typeof ObjectType.AllowlistIdentifier>>({
       method: 'DELETE',
       path: joinPaths(basePath, allowlistIdentifierId),
     });

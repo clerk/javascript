@@ -3,7 +3,7 @@ import type { ClerkPaginationRequest } from '@clerk/types';
 import runtime from '../../runtime';
 import { joinPaths } from '../../util/path';
 import type {
-  DeletedObjectJSON,
+  DeletedObject,
   ObjectType,
   Organization,
   OrganizationInvitation,
@@ -169,7 +169,7 @@ export class OrganizationAPI extends AbstractAPI {
   }
 
   public async deleteOrganization(organizationId: string) {
-    return this.request<DeletedObjectJSON<typeof ObjectType.Organization>>({
+    return this.request<DeletedObject<typeof ObjectType.Organization>>({
       method: 'DELETE',
       path: joinPaths(basePath, organizationId),
     });
