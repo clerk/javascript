@@ -1,5 +1,16 @@
 # @clerk/astro
 
+## 1.0.12
+
+### Patch Changes
+
+- Introduce functions that can be reused across front-end SDKs ([#3849](https://github.com/clerk/javascript/pull/3849)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`7e0ced3da`](https://github.com/clerk/javascript/commit/7e0ced3da94f41056bc4445d163d3b615afb6ab1), [`def3a3894`](https://github.com/clerk/javascript/commit/def3a38948969bddc94a0b5a045ad63e2a97b8f3)]:
+  - @clerk/shared@2.5.1
+  - @clerk/clerk-js@5.14.1
+  - @clerk/backend@1.6.3
+
 ## 1.0.11
 
 ### Patch Changes
