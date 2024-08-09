@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.14.1
+
+### Patch Changes
+
+- Fix unresponsive behavior when clicking placeholder logo in the `<CreateOrganization />` component ([#3921](https://github.com/clerk/javascript/pull/3921)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`7e0ced3da`](https://github.com/clerk/javascript/commit/7e0ced3da94f41056bc4445d163d3b615afb6ab1)]:
+  - @clerk/shared@2.5.1
+
 ## 5.14.0
 
 ### Minor Changes

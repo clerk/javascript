@@ -1,5 +1,11 @@
 # @clerk/elements
 
+## 0.13.0
+
+### Minor Changes
+
+- Handle ticket-based invitation sign-up workflows ([#3910](https://github.com/clerk/javascript/pull/3910)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 0.12.4
 
 ### Patch Changes

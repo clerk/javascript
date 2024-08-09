@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.3.1
+
+### Patch Changes
+
+- Introduce functions that can be reused across front-end SDKs ([#3849](https://github.com/clerk/javascript/pull/3849)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`7e0ced3da`](https://github.com/clerk/javascript/commit/7e0ced3da94f41056bc4445d163d3b615afb6ab1)]:
+  - @clerk/shared@2.5.1
+  - @clerk/clerk-react@5.4.1
+  - @clerk/backend@1.6.3
+
 ## 5.3.0
 
 ### Minor Changes
