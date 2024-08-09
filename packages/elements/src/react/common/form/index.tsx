@@ -162,7 +162,7 @@ const useFieldState = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
 /**
  * Provides the form submission handler along with the form's validity via a data attribute
  */
-const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
+const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT'; action: 'submit' }> }) => {
   const { errors } = useGlobalErrors();
 
   // Register the onSubmit handler for form submission
@@ -171,7 +171,7 @@ const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }
     (event: React.FormEvent<Element>) => {
       event.preventDefault();
       if (flowActor) {
-        flowActor.send({ type: 'SUBMIT' });
+        flowActor.send({ type: 'SUBMIT', action: 'submit' });
       }
     },
     [flowActor],
@@ -412,7 +412,7 @@ const FORM_NAME = 'ClerkElementsForm';
 type FormElement = React.ElementRef<typeof RadixForm>;
 type FormProps = Omit<RadixFormProps, 'children'> & {
   children: React.ReactNode;
-  flowActor?: BaseActorRef<{ type: 'SUBMIT' }>;
+  flowActor?: BaseActorRef<{ type: 'SUBMIT'; action: 'submit' }>;
 };
 
 const Form = React.forwardRef<FormElement, FormProps>(({ flowActor, onSubmit, ...rest }, forwardedRef) => {

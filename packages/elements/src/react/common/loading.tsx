@@ -16,7 +16,13 @@ import { SIGN_UP_STEPS } from '~/react/sign-up/step';
 import { isProviderStrategyScope, mapScopeToStrategy } from '~/react/utils/map-scope-to-strategy';
 
 type Strategy = OAuthProvider | SamlStrategy | 'metamask';
-type LoadingScope<T extends TSignInStep | TSignUpStep> = 'global' | `step:${T}` | `provider:${Strategy}` | undefined;
+type LoadingScope<T extends TSignInStep | TSignUpStep> =
+  | 'global'
+  | `step:${T}`
+  | `provider:${Strategy}`
+  | 'submit'
+  | 'passkey'
+  | undefined;
 
 type LoadingProps = {
   scope?: LoadingScope<TSignInStep | TSignUpStep>;
@@ -134,7 +140,7 @@ type SignInLoadingProps = {
 };
 
 function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
-  const [isLoading, { step: loadingStep, strategy }] = useLoading(routerRef);
+  const [isLoading, { step: loadingStep, strategy, action }] = useLoading(routerRef);
   const tags = useSelector(routerRef, s => s.tags);
 
   const isStepLoading = (step: TSignInStep) => isLoading && loadingStep === step;
@@ -150,7 +156,7 @@ function SignInLoading({ children, scope, routerRef }: SignInLoadingProps) {
     loadingResult = isLoading && loadingStep === undefined && strategy === mapScopeToStrategy(scope);
   } else if (scope) {
     // Specified Loading Scope
-    loadingResult = isStepLoading(scope.replace('step:', '') as TSignInStep);
+    loadingResult = isStepLoading(scope.replace('step:', '') as TSignInStep) || scope === action;
   } else {
     // Inferred Loading Scope
     loadingResult =

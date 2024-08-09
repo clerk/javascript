@@ -42,6 +42,7 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
   // Unrelated to the `context` of each machine, the step passed to the loading event must use BaseRouterLoadingStep
   let step: BaseRouterLoadingStep | undefined;
   let strategy: SignInStrategy | undefined;
+  let action: string | undefined;
 
   // By default the loading state is set to `true` when this function is called
   // Only if these events are received, the loading state is set to `false`
@@ -89,6 +90,18 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
       isLoading: true,
       step,
       strategy,
+    });
+  } else if (context.loadingStep === 'start') {
+    step = 'start';
+    strategy = undefined;
+    action = event.type === 'AUTHENTICATE.PASSKEY' ? 'passkey' : event.type === 'SUBMIT' ? 'submit' : undefined;
+
+    return context.parent.send({
+      type: 'LOADING',
+      isLoading: true,
+      step,
+      strategy,
+      action,
     });
   } else {
     step = context.loadingStep;
