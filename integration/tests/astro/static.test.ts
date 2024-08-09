@@ -40,15 +40,15 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await u.page.waitForClerkJsLoaded();
 
       await u.po.expect.toBeSignedOut();
-      await expect(u.page.getByText("Signed out")).toBeVisible();
-      await expect(u.page.getByText("Signed in")).toBeHidden();
+      await expect(u.page.getByText('Signed out')).toBeVisible();
+      await expect(u.page.getByText('Signed in')).toBeHidden();
 
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
       await u.po.expect.toBeSignedIn();
 
-      await expect(u.page.getByText("Signed out")).toBeHidden();
-      await expect(u.page.getByText("Signed in")).toBeVisible();
+      await expect(u.page.getByText('Signed out')).toBeHidden();
+      await expect(u.page.getByText('Signed in')).toBeVisible();
     });
 
     test('render Protect contents for admin', async ({ page, context }) => {
