@@ -52,11 +52,16 @@ export class AuthCookieService {
   ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
+      // only update session cookie from active tab
+      if (!document.hasFocus()) {
+        return;
+      }
+
       this.updateSessionCookie(token && token.getRawString());
       this.setClientUatCookieForDevelopmentInstances();
     });
 
-    this.refreshTokenOnVisibilityChange();
+    this.refreshTokenOnFocus();
     this.startPollingForToken();
 
     this.clientUat = createClientUatCookie(cookieSuffix);
@@ -110,8 +115,8 @@ export class AuthCookieService {
     this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
   }
 
-  private refreshTokenOnVisibilityChange() {
-    document.addEventListener('visibilitychange', () => {
+  private refreshTokenOnFocus() {
+    document.addEventListener('focus', () => {
       if (document.visibilityState === 'visible') {
         void this.refreshSessionToken();
       }

@@ -16,22 +16,22 @@ const noop = () => {
  */
 export const createPageLifecycle = () => {
   if (!inBrowser()) {
-    return { isUnloading: noop, onPageVisible: noop };
+    return { onPageFocus: noop };
   }
 
   const callbackQueue: Record<string, Array<() => void>> = {
-    'visibilitychange:visible': [],
+    focus: [],
   };
 
-  document.addEventListener('visibilitychange', () => {
+  window.addEventListener('focus', () => {
     if (document.visibilityState === 'visible') {
-      callbackQueue['visibilitychange:visible'].forEach(cb => cb());
+      callbackQueue['focus'].forEach(cb => cb());
     }
   });
 
-  const onPageVisible = (cb: () => void) => {
-    callbackQueue['visibilitychange:visible'].push(cb);
+  const onPageFocus = (cb: () => void) => {
+    callbackQueue['focus'].push(cb);
   };
 
-  return { onPageVisible };
+  return { onPageFocus };
 };
