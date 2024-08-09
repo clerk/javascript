@@ -72,7 +72,7 @@ export interface SignUpResource extends ClerkResource {
 
   attemptPhoneNumberVerification: (params: AttemptPhoneNumberVerificationParams) => Promise<SignUpResource>;
 
-  prepareWeb3WalletVerification: () => Promise<SignUpResource>;
+  prepareWeb3WalletVerification: (strategy: Web3Strategy) => Promise<SignUpResource>;
 
   attemptWeb3WalletVerification: (params: AttemptWeb3WalletVerificationParams) => Promise<SignUpResource>;
 
@@ -89,6 +89,7 @@ export interface SignUpResource extends ClerkResource {
   ) => Promise<SignUpResource>;
 
   authenticateWithMetamask: (params?: SignUpAuthenticateWithMetamaskParams) => Promise<SignUpResource>;
+  authenticateWithCoinbase: (params?: SignUpAuthenticateWithMetamaskParams) => Promise<SignUpResource>;
 }
 
 export type SignUpStatus = 'missing_requirements' | 'complete' | 'abandoned';

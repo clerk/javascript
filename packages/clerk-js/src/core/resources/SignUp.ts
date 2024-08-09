@@ -19,9 +19,16 @@ import type {
   SignUpStatus,
   SignUpUpdateParams,
   StartEmailLinkFlowParams,
+  Web3Strategy,
 } from '@clerk/types';
 
-import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import {
+  generateSignatureWithCoinbase,
+  generateSignatureWithMetamask,
+  getCoinbaseIdentifier,
+  getMetamaskIdentifier,
+  windowNavigate,
+} from '../../utils';
 import { getCaptchaToken, retrieveCaptchaInfo } from '../../utils/captcha';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
@@ -170,22 +177,22 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptVerification({ ...params, strategy: 'phone_code' });
   };
 
-  prepareWeb3WalletVerification = (): Promise<SignUpResource> => {
-    return this.prepareVerification({ strategy: 'web3_metamask_signature' });
+  prepareWeb3WalletVerification = (strategy: Web3Strategy): Promise<SignUpResource> => {
+    return this.prepareVerification({ strategy });
   };
 
   attemptWeb3WalletVerification = async (params: AttemptWeb3WalletVerificationParams): Promise<SignUpResource> => {
-    const { signature } = params;
-    return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
+    const { signature, strategy } = params;
+    return this.attemptVerification({ signature, strategy });
   };
 
   public authenticateWithWeb3 = async (
     params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
   ): Promise<SignUpResource> => {
-    const { generateSignature, identifier, unsafeMetadata } = params || {};
+    const { generateSignature, identifier, strategy, unsafeMetadata } = params || {};
     const web3Wallet = identifier || this.web3wallet!;
     await this.create({ web3Wallet, unsafeMetadata });
-    await this.prepareWeb3WalletVerification();
+    await this.prepareWeb3WalletVerification(strategy);
 
     const { nonce } = this.verifications.web3Wallet;
     if (!nonce) {
@@ -193,7 +200,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     const signature = await generateSignature({ identifier, nonce });
-    return this.attemptWeb3WalletVerification({ signature });
+    return this.attemptWeb3WalletVerification({ signature, strategy });
   };
 
   public authenticateWithMetamask = async (params?: SignUpAuthenticateWithMetamaskParams): Promise<SignUpResource> => {
@@ -201,6 +208,17 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
+      strategy: 'web3_metamask_signature',
+      unsafeMetadata: params?.unsafeMetadata,
+    });
+  };
+
+  public authenticateWithCoinbase = async (params?: SignUpAuthenticateWithMetamaskParams): Promise<SignUpResource> => {
+    const identifier = await getCoinbaseIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithCoinbase,
+      strategy: 'web3_coinbase_signature',
       unsafeMetadata: params?.unsafeMetadata,
     });
   };

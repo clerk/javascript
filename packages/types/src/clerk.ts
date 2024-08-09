@@ -36,6 +36,7 @@ import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import { Web3Strategy } from './strategies';
 
 export type SDKMetadata = {
   name: string;
@@ -1117,6 +1118,7 @@ export interface AuthenticateWithMetamaskParams {
   redirectUrl?: string;
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
+  strategy?: Web3Strategy;
 }
 
 export interface AuthenticateWithGoogleOneTapParams {

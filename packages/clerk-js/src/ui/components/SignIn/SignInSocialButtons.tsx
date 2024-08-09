@@ -28,12 +28,13 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
           .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete })
           .catch(err => handleError(err, [], card.setError));
       }}
-      web3Callback={() => {
+      web3Callback={strategy => {
         return clerk
           .authenticateWithMetamask({
             customNavigate: navigate,
             redirectUrl: redirectUrlComplete,
             signUpContinueUrl: ctx.signUpContinueUrl,
+            strategy,
           })
           .catch(err => handleError(err, [], card.setError));
       }}

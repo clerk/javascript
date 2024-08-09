@@ -1326,6 +1326,7 @@ export class Clerk implements ClerkInterface {
     signUpContinueUrl,
     customNavigate,
     unsafeMetadata,
+    strategy,
   }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
@@ -1336,10 +1337,18 @@ export class Clerk implements ClerkInterface {
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
-      signInOrSignUp = await this.client.signIn.authenticateWithMetamask();
+      if (strategy === 'web3_metamask_signature') {
+        signInOrSignUp = await this.client.signIn.authenticateWithMetamask();
+      } else {
+        signInOrSignUp = await this.client.signIn.authenticateWithCoinbase();
+      }
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
-        signInOrSignUp = await this.client.signUp.authenticateWithMetamask({ unsafeMetadata });
+        if (strategy === 'web3_metamask_signature') {
+          signInOrSignUp = await this.client.signUp.authenticateWithMetamask({ unsafeMetadata });
+        } else {
+          signInOrSignUp = await this.client.signUp.authenticateWithCoinbase({ unsafeMetadata });
+        }
 
         if (
           signUpContinueUrl &&

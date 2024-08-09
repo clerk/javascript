@@ -8,6 +8,7 @@ export type PrepareWeb3WalletVerificationParams = {
 
 export type AttemptWeb3WalletVerificationParams = {
   signature: string;
+  strategy: Web3Strategy;
 };
 
 export interface Web3WalletResource extends ClerkResource {
@@ -26,6 +27,7 @@ export type GenerateSignature = (opts: GenerateSignatureParams) => Promise<strin
 export interface AuthenticateWithWeb3Params {
   identifier: string;
   generateSignature: GenerateSignature;
+  strategy: Web3Strategy;
 }
 
 export interface GenerateSignatureParams {

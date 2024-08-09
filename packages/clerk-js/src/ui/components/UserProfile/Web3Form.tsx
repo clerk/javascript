@@ -32,7 +32,7 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
       web3Wallet = await web3Wallet.prepareVerification({ strategy: 'web3_metamask_signature' });
       const nonce = web3Wallet.verification.nonce as string;
       const signature = await generateSignatureWithMetamask({ identifier, nonce });
-      await web3Wallet.attemptVerification({ signature });
+      await web3Wallet.attemptVerification({ signature, strategy });
       card.setIdle();
     } catch (err) {
       card.setIdle();

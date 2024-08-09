@@ -31,7 +31,13 @@ import type {
   Web3SignatureFactor,
 } from '@clerk/types';
 
-import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import {
+  generateSignatureWithCoinbase,
+  generateSignatureWithMetamask,
+  getCoinbaseIdentifier,
+  getMetamaskIdentifier,
+  windowNavigate,
+} from '../../utils';
 import {
   ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
@@ -223,16 +229,14 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
-    const { identifier, generateSignature } = params || {};
+    const { identifier, generateSignature, strategy } = params || {};
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');
     }
 
     await this.create({ identifier });
 
-    const web3FirstFactor = this.supportedFirstFactors.find(
-      f => f.strategy === 'web3_metamask_signature',
-    ) as Web3SignatureFactor;
+    const web3FirstFactor = this.supportedFirstFactors.find(f => f.strategy === strategy) as Web3SignatureFactor;
 
     if (!web3FirstFactor) {
       clerkVerifyWeb3WalletCalledBeforeCreate('SignIn');
@@ -248,7 +252,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     return this.attemptFirstFactor({
       signature,
-      strategy: 'web3_metamask_signature',
+      strategy,
     });
   };
 
@@ -257,6 +261,16 @@ export class SignIn extends BaseResource implements SignInResource {
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
+      strategy: 'web3_metamask_signature',
+    });
+  };
+
+  public authenticateWithCoinbase = async (): Promise<SignInResource> => {
+    const identifier = await getCoinbaseIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithCoinbase,
+      strategy: 'web3_coinbase_signature',
     });
   };
 
