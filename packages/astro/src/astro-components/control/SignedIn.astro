@@ -1,6 +1,16 @@
 ---
-const { userId } = Astro.locals.auth()
+import SignedInSSR from "./SignedInSSR.astro";
+import SignedInCSR from "./SignedInCSR.astro";
+// @ts-expect-error: Virtual module
+import { isStaticOutput } from "virtual:@clerk/astro/config";
+
+type Props = {
+  isStatic?: boolean
+}
+
+const SignedInComponent = isStaticOutput(Astro.props.isStatic) ? SignedInCSR : SignedInSSR;
 ---
 
-
-{ userId ? <slot /> : null }
+<SignedInComponent>
+  <slot />
+</SignedInComponent>

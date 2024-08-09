@@ -1,11 +1,20 @@
 ---
+import ProtectCSR from "./ProtectCSR.astro";
+import ProtectSSR from "./ProtectSSR.astro";
+
+// @ts-expect-error: Virtual module
+import { isStaticOutput } from "virtual:@clerk/astro/config";
+
 import type {
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
-} from '@clerk/types';
+} from "@clerk/types";
 
-type Props =
+// @ts-expect-error: Virtual module
+import { isStaticOutput } from "virtual:@clerk/astro/config";
+
+type ProtectProps =
   | {
       condition?: never;
       role: OrganizationCustomRoleKey;
@@ -27,12 +36,16 @@ type Props =
       permission?: never;
     };
 
-const { has, userId } = Astro.locals.auth();
-const isUnauthorized =
-  !userId ||
-  (typeof Astro.props.condition === "function" &&
-    !Astro.props.condition(has)) ||
-  ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
+type Props = ProtectProps & {
+  isStatic?: boolean
+}
+
+const { isStatic, ...props } = Astro.props;
+
+const ProtectComponent = isStaticOutput(isStatic) ? ProtectCSR : ProtectSSR;
 ---
 
-{isUnauthorized ? <slot name="fallback" /> : <slot />}
+<ProtectComponent {...props}>
+  <slot />
+  <slot name="fallback" slot="fallback" />
+</ProtectComponent>

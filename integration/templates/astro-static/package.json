@@ -1,0 +1,22 @@
+{
+  "name": "astro-clerk-static-playground",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev --port $PORT",
+    "build": "astro check && astro build",
+    "preview": "astro preview --port $PORT",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.7.0",
+    "@astrojs/react": "^3.6.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.11.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.5.3"
+  }
+}
