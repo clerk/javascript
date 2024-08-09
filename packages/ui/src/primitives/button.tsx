@@ -4,6 +4,9 @@ import * as React from 'react';
 
 import { Spinner } from './spinner';
 
+// ! TODO
+// - [ ] Chat with Alvish about hover states
+
 // Note:
 // - To create the overlapping border/shadow effect"
 //   - `ring` – "focus ring"
@@ -35,7 +38,8 @@ const button = cva({
       secondary: [
         '[--button-icon-color:theme(colors.gray.12)]',
         '[--button-icon-opacity:1]',
-        'text-gray-12 ring-offset-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
+        'text-gray-12 bg-gray-surface ring-offset-gray-a4',
+        'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
         'focus-visible:ring-gray-a8',
       ],
       // Note:
@@ -45,7 +49,8 @@ const button = cva({
       connection: [
         '[--button-icon-color:theme(colors.gray.12)]',
         '[--button-icon-opacity:1]',
-        'text-gray-12 ring-offset-gray-a6 bg-gray-surface shadow-sm shadow-gray-a3',
+        'text-gray-12 bg-gray-surface ring-offset-gray-a4',
+        'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
         'focus-visible:ring-gray-a8',
       ],
     },
