@@ -1,22 +1,7 @@
 ---
-import type {
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-} from "@clerk/types";
+import type { ProtectProps } from '../../types';
 
-type Props =
-  | {
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-    }
-  | {
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      role?: never;
-      permission?: never;
-    };
+type Props = Omit<ProtectProps, 'condition'>;
 
 const { role, permission } = Astro.props;
 ---

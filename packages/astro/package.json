@@ -30,7 +30,7 @@
     "dev": "tsup --watch --onSuccess \"npm run build:dts\"",
     "build": "tsup --onSuccess \"npm run build:dts\" && npm run copy:components",
     "build:dts": "tsc --emitDeclarationOnly --declaration",
-    "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/",
+    "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
@@ -42,7 +42,8 @@
     "server",
     "internal",
     "components",
-    "env.d.ts"
+    "env.d.ts",
+    "types.ts"
   ],
   "exports": {
     ".": {

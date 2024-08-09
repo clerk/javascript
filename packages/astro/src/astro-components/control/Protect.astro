@@ -4,34 +4,7 @@ import ProtectSSR from "./ProtectSSR.astro";
 
 // @ts-expect-error: Virtual module
 import { isStaticOutput } from "virtual:@clerk/astro/config";
-
-import type {
-  CheckAuthorizationWithCustomPermissions,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-} from "@clerk/types";
-
-type ProtectProps =
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-    };
+import type { ProtectProps } from '../../types';
 
 type Props = ProtectProps & {
   isStatic?: boolean
