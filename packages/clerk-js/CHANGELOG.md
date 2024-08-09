@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.73.5
+
+### Patch Changes
+
+- Allow users to display the email address field after selecting to input a phone number. Previously that was not possible when passkeys were enabled. (v4) ([#3920](https://github.com/clerk/javascript/pull/3920)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Updated dependencies [[`f18ca132d`](https://github.com/clerk/javascript/commit/f18ca132d745b0b2bdeff0ea9ab4f8e586cf8a84)]:
+  - @clerk/types@3.65.3
+  - @clerk/localizations@1.28.8
+
 ## 4.73.4
 
 ### Patch Changes
