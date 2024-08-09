@@ -19,7 +19,7 @@ import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 import {
   MAGIC_LINK_VERIFY_PATH_ROUTE,
   RESENDABLE_COUNTDOWN_DEFAULT,
-  SIGN_UP_DEFAULT_BASE_PATH,
+  SIGN_IN_DEFAULT_BASE_PATH,
 } from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
@@ -182,7 +182,7 @@ const SignInVerificationMachine = setup({
   id: SignInVerificationMachineId,
   context: ({ input }) => ({
     currentFactor: null,
-    basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
+    basePath: input.basePath || SIGN_IN_DEFAULT_BASE_PATH,
     formRef: input.formRef,
     loadingStep: 'verifications',
     parent: input.parent,
