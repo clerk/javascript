@@ -11,9 +11,6 @@ import type {
   OrganizationCustomRoleKey,
 } from "@clerk/types";
 
-// @ts-expect-error: Virtual module
-import { isStaticOutput } from "virtual:@clerk/astro/config";
-
 type ProtectProps =
   | {
       condition?: never;
