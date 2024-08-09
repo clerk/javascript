@@ -87,7 +87,7 @@ export const Hint = React.forwardRef(function FieldHint(
       data-field-hint=''
       ref={forwardedRef}
       {...props}
-      className={cx('text-gray-10 text-sm font-medium', className)}
+      className={cx('text-gray-9 text-sm font-medium', className)}
     >
       {children}
     </LabelEnd>

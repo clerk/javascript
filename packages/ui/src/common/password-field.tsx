@@ -55,7 +55,7 @@ export function PasswordField({
                   <button
                     type='button'
                     className={cx(
-                      'text-icon-sm text-gray-11 start-auto m-[0.1875rem] inline-flex aspect-square h-6 items-center justify-center rounded-sm p-0 outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                      'text-icon-sm text-gray-10 start-auto m-[0.1875rem] inline-flex aspect-square h-6 items-center justify-center rounded-sm p-0 outline-none disabled:cursor-not-allowed disabled:opacity-50',
                       'hover:enabled:text-gray-12 hover:enabled:bg-gray-3',
                       'focus-visible:rounded-[calc(var(--cl-radius)*0.5)] focus-visible:ring',
                     )}
