@@ -1,6 +1,7 @@
 import type {
   DeletedObjectJSON,
   EmailJSON,
+  ObjectType,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -13,7 +14,7 @@ type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data };
 
 export type UserWebhookEvent =
   | Webhook<'user.created' | 'user.updated', UserJSON>
-  | Webhook<'user.deleted', DeletedObjectJSON>;
+  | Webhook<'user.deleted', DeletedObjectJSON<typeof ObjectType.User>>;
 
 export type EmailWebhookEvent = Webhook<'email.created', EmailJSON>;
 
@@ -26,7 +27,7 @@ export type SessionWebhookEvent = Webhook<
 
 export type OrganizationWebhookEvent =
   | Webhook<'organization.created' | 'organization.updated', OrganizationJSON>
-  | Webhook<'organization.deleted', DeletedObjectJSON>;
+  | Webhook<'organization.deleted', DeletedObjectJSON<typeof ObjectType.Organization>>;
 
 export type OrganizationMembershipWebhookEvent = Webhook<
   'organizationMembership.created' | 'organizationMembership.deleted' | 'organizationMembership.updated',
