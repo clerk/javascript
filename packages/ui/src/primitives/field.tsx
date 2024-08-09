@@ -19,7 +19,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
         '[--field-input-border-width:1px]',
         '[--field-input-height:1.875rem]',
         '[--field-input-px:calc(theme(spacing.3)-var(--field-input-border-width))]',
-        '[--field-input-py:calc(theme(spacing[1.5])-var(--field-input-border-width))]',
+        '[--field-input-py:calc(theme(spacing.1)-var(--field-input-border-width))]',
         '[--field-input-group-end-size:--field-input-height]',
         'has-[[data-field-checkbox]]:[--cl-field-label-cursor:pointer]',
         'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
@@ -170,11 +170,11 @@ export const Input = React.forwardRef(function FieldInput(
         // standard input `px` value
         'pe-[var(--field-input-group-pe,var(--field-input-px))]',
         'border-[length:--field-input-border-width] bg-clip-padding',
-        'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
+        'text-gray-12 relative flex min-w-0 rounded-md bg-white outline-none',
         'disabled:cursor-not-allowed disabled:opacity-50',
         // variant
         {
-          default: 'w-full justify-start',
+          default: 'w-full justify-start text-[length:1rem] leading-[1.38462]',
           'otp-digit': 'aspect-square size-10 justify-center text-[calc(var(--cl-font-size)*1.4)] font-semibold',
         }[variant],
         // state
