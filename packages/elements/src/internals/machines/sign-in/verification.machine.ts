@@ -16,7 +16,11 @@ import type {
 import type { DoneActorEvent } from 'xstate';
 import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
-import { RESENDABLE_COUNTDOWN_DEFAULT } from '~/internals/constants';
+import {
+  MAGIC_LINK_VERIFY_PATH_ROUTE,
+  RESENDABLE_COUNTDOWN_DEFAULT,
+  SIGN_UP_DEFAULT_BASE_PATH,
+} from '~/internals/constants';
 import { ClerkElementsRuntimeError } from '~/internals/errors';
 import type { FormFields } from '~/internals/machines/form';
 import type { SignInStrategyName, WithParams } from '~/internals/machines/shared';
@@ -178,6 +182,7 @@ const SignInVerificationMachine = setup({
   id: SignInVerificationMachineId,
   context: ({ input }) => ({
     currentFactor: null,
+    basePath: input.basePath || SIGN_UP_DEFAULT_BASE_PATH,
     formRef: input.formRef,
     loadingStep: 'verifications',
     parent: input.parent,
@@ -236,7 +241,10 @@ const SignInVerificationMachine = setup({
         input: ({ context }) => ({
           parent: context.parent,
           resendable: context.resendable,
-          params: context.currentFactor as PrepareFirstFactorParams,
+          params: {
+            ...context.currentFactor,
+            redirectUrl: `${window.location.origin}${context.basePath}${MAGIC_LINK_VERIFY_PATH_ROUTE}`,
+          } as PrepareFirstFactorParams,
         }),
         onDone: {
           actions: 'resendableReset',
