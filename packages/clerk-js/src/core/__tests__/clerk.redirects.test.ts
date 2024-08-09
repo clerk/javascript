@@ -124,34 +124,30 @@ describe('Clerk singleton - Redirects', () => {
 
       it('redirects to signInUrl for development instance', async () => {
         await clerkForDevelopmentInstance.redirectToSignIn({ redirectUrl: '/example' });
-        expect(mockNavigate).toHaveBeenCalledWith(
-          '/sign-in#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample',
-          undefined,
-        );
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample', {
+          windowNavigate: expect.any(Function),
+        });
       });
 
       it('redirects to signInUrl for production instance', async () => {
         await clerkForProductionInstance.redirectToSignIn({ redirectUrl: '/example' });
-        expect(mockNavigate).toHaveBeenCalledWith(
-          '/sign-in#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample',
-          undefined,
-        );
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample', {
+          windowNavigate: expect.any(Function),
+        });
       });
 
       it('redirects to signUpUrl for development instance', async () => {
         await clerkForDevelopmentInstance.redirectToSignUp({ redirectUrl: '/example' });
-        expect(mockNavigate).toHaveBeenCalledWith(
-          '/sign-up#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample',
-          undefined,
-        );
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample', {
+          windowNavigate: expect.any(Function),
+        });
       });
 
       it('redirects to signUpUrl for production instance', async () => {
         await clerkForProductionInstance.redirectToSignUp({ redirectUrl: '/example' });
-        expect(mockNavigate).toHaveBeenCalledWith(
-          '/sign-up#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample',
-          undefined,
-        );
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-up#/?redirect_url=http%3A%2F%2Ftest.host%2Fexample', {
+          windowNavigate: expect.any(Function),
+        });
       });
 
       it('redirects to userProfileUrl', async () => {

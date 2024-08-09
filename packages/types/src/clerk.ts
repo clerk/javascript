@@ -641,7 +641,10 @@ type NavigationType =
 
 type RouterMetadata = { routing?: RoutingStrategy; navigationType?: NavigationType };
 
-type RouterFn = (to: string, metadata?: { __internal_metadata?: RouterMetadata }) => Promise<unknown> | unknown;
+type RouterFn = (
+  to: string,
+  metadata?: { __internal_metadata?: RouterMetadata; windowNavigate: (to: URL | string) => void },
+) => Promise<unknown> | unknown;
 
 export type WithoutRouting<T> = Omit<T, 'path' | 'routing'>;
 
