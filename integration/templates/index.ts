@@ -13,6 +13,7 @@ export const templates = {
   'elements-next': resolve(__dirname, './elements-next'),
   'astro-node': resolve(__dirname, './astro-node'),
   'expo-web': resolve(__dirname, './expo-web'),
+  'tanstack-start': resolve(__dirname, './tanstack-start'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {
