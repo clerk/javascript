@@ -43,9 +43,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
 
     await u.po.organizationSwitcher.goTo();
     await u.po.organizationSwitcher.waitForMounted();
-    await u.po.organizationSwitcher.expectNoOrganizationSelected();
-    await u.po.organizationSwitcher.toggleTrigger();
-    await u.page.locator('.cl-organizationSwitcherPreviewButton').click();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
     await u.page.goToRelative('/settings/rsc-protect');
