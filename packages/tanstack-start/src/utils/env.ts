@@ -1,4 +1,4 @@
-import { isTruthy } from "@clerk/shared";
+import { isTruthy } from '@clerk/shared';
 
 /**
  *
@@ -29,17 +29,23 @@ export const getPublicEnvVariables = () => {
   return {
     publishableKey: getEnvVariable('VITE_PUBLIC_CLERK_PUBLISHABLE_KEY') || getEnvVariable('CLERK_PUBLISHABLE_KEY'),
     domain: getEnvVariable('VITE_PUBLIC_CLERK_DOMAIN') || getEnvVariable('CLERK_DOMAIN'),
-    isSatellite: isTruthy(getEnvVariable('VITE_PUBLIC_CLERK_IS_SATELLITE')) || isTruthy(getEnvVariable('CLERK_IS_SATELLITE')),
+    isSatellite:
+      isTruthy(getEnvVariable('VITE_PUBLIC_CLERK_IS_SATELLITE')) || isTruthy(getEnvVariable('CLERK_IS_SATELLITE')),
     proxyUrl: getEnvVariable('VITE_PUBLIC_CLERK_PROXY_URL') || getEnvVariable('CLERK_PROXY_URL'),
     pk: getEnvVariable('VITE_PUBLIC_CLERK_PUBLISHABLE_KEY') || getEnvVariable('CLERK_PUBLISHABLE_KEY'),
     signInUrl: getEnvVariable('VITE_PUBLIC_CLERK_SIGN_IN_URL') || getEnvVariable('CLERK_SIGN_IN_URL'),
     signUpUrl: getEnvVariable('VITE_PUBLIC_CLERK_SIGN_UP_URL') || getEnvVariable('CLERK_SIGN_UP_URL'),
     clerkJsUrl: getEnvVariable('VITE_PUBLIC_CLERK_JS_URL') || getEnvVariable('CLERK_JS'),
-    clerkJsVariant: (getEnvVariable('VITE_PUBLIC_CLERK_JS_VARIANT') || getEnvVariable('CLERK_JS_VARIANT')) as "" | "headless" | undefined,
+    clerkJsVariant: (getEnvVariable('VITE_PUBLIC_CLERK_JS_VARIANT') || getEnvVariable('CLERK_JS_VARIANT')) as
+      | ''
+      | 'headless'
+      | undefined,
     clerkJsVersion: getEnvVariable('VITE_PUBLIC_CLERK_JS_VERSION') || getEnvVariable('CLERK_JS_VERSION'),
-    telemetryDisabled: isTruthy(getEnvVariable('VITE_PUBLIC_CLERK_TELEMETRY_DISABLED')) || isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
+    telemetryDisabled:
+      isTruthy(getEnvVariable('VITE_PUBLIC_CLERK_TELEMETRY_DISABLED')) ||
+      isTruthy(getEnvVariable('CLERK_TELEMETRY_DISABLED')),
     telemetryDebug: getEnvVariable('VITE_PUBLIC_CLERK_TELEMETRY_DEBUG') || getEnvVariable('CLERK_TELEMETRY_DEBUG'),
     afterSignInUrl: getEnvVariable('VITE_PUBLIC_CLERK_AFTER_SIGN_IN_URL') || getEnvVariable('CLERK_AFTER_SIGN_IN_URL'),
     afterSignUpUrl: getEnvVariable('VITE_PUBLIC_CLERK_AFTER_SIGN_UP_URL') || getEnvVariable('CLERK_AFTER_SIGN_UP_URL'),
-  }
-}
+  };
+};
