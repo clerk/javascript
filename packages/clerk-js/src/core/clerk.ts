@@ -14,7 +14,7 @@ import {
   proxyUrlToAbsoluteURL,
   stripScheme,
 } from '@clerk/shared';
-import { logger } from "@clerk/shared/logger"
+import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
@@ -274,7 +274,9 @@ export class Clerk implements ClerkInterface {
 
     // Log a development mode warning once
     if (this.#instanceType === 'development') {
-      logger.warnOnce('Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview')
+      logger.warnOnce(
+        'Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview',
+      );
     }
 
     this.#options = {
