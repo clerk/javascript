@@ -7,6 +7,7 @@ module.exports = {
   globals: {
     PACKAGE_NAME: '@clerk/elements',
     PACKAGE_VERSION: '0.0.0-test',
+    __DEV__: false,
   },
   displayName: name.replace('@clerk', ''),
   injectGlobals: true,
