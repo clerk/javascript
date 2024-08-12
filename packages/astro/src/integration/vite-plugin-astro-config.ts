@@ -27,7 +27,7 @@ export function vitePluginAstroConfig(
             }
 
             if (forceStatic !== undefined) {
-              return forceClient;
+              return forceStatic;
             }
 
             return astroConfig.output === 'static';
