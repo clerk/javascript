@@ -45,7 +45,7 @@ export function SignInAccountSwitcher() {
         <Card.Body>
           <div className='-mx-[--card-body-padding] -mb-[--card-body-padding] overflow-hidden rounded-b-[--card-content-rounded-b]'>
             {activeSessions?.map(session => {
-              const { userId, identifier, firstName, lastName } = session.publicUserData;
+              const { userId, identifier, firstName, lastName, hasImage, imageUrl } = session.publicUserData;
               let title = '';
               let subtitle = '';
               if (firstName || lastName) {
@@ -60,8 +60,17 @@ export function SignInAccountSwitcher() {
                   type='button'
                   className='text-gray-11 hover:bg-gray-2 flex w-full items-center gap-x-3 border-t px-10 py-4 text-left text-base'
                 >
-                  <span className='bg-gray-2 grid size-9 shrink-0 place-content-center rounded-full border'>
-                    <span className='text-gray-11 text-base font-medium'>{getInitials(firstName, lastName)}</span>
+                  <span className='bg-gray-2 relative grid size-9 shrink-0 place-content-center overflow-hidden rounded-full border'>
+                    {hasImage ? (
+                      <img
+                        src={imageUrl}
+                        className='absolute inset-0 object-cover'
+                        // TODO: Add alt text
+                        alt=''
+                      />
+                    ) : (
+                      <span className='text-gray-11 text-base font-medium'>{getInitials(firstName, lastName)}</span>
+                    )}
                   </span>
                   <span className='flex min-w-0 flex-1 flex-col'>
                     {title ? <span className='text-gray-12 font-medium'>{title}</span> : null}
