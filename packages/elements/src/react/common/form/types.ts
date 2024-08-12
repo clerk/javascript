@@ -1,5 +1,7 @@
 import type { HTMLInputTypeAttribute } from 'react';
 
+import type { ClerkElementsError } from '~/internals/errors';
+
 /** Extracted relevant fields from @clerk/types  */
 export type ClerkFieldId =
   | 'code'
@@ -37,3 +39,19 @@ export const FIELD_VALIDITY = {
 } as const;
 
 export type FieldValidity = (typeof FIELD_VALIDITY)[keyof typeof FIELD_VALIDITY];
+
+export type FormErrorRenderProps = Pick<ClerkElementsError, 'code' | 'message'>;
+
+type FormErrorPropsAsChild = {
+  asChild?: true | never;
+  children?: React.ReactElement | ((error: FormErrorRenderProps) => React.ReactNode);
+  code?: string;
+};
+
+type FormErrorPropsStd = {
+  asChild?: false;
+  children: React.ReactNode;
+  code: string;
+};
+
+export type FormErrorProps<T> = Omit<T, 'asChild' | 'children'> & (FormErrorPropsStd | FormErrorPropsAsChild);
