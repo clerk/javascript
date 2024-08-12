@@ -10,14 +10,13 @@ import { Spinner } from './spinner';
 //   - `ring-offset` - border
 const button = cva({
   base: [
-    '[--button-border-width:1px]',
     '[--button-icon-size:calc(var(--cl-font-size)*1.24)]', // 16px
     'appearance-none relative isolate select-none',
     'text-base font-medium',
     'px-3 py-1.5',
     'min-h-[1.875rem]',
     'inline-flex w-full items-center justify-center gap-3',
-    'ring ring-offset-[length:--button-border-width] rounded-md bg-clip-padding',
+    'ring ring-offset-1 rounded-md',
     '[&:not(:focus-visible)]:ring-transparent',
     'outline-none',
     '*:min-w-0',
