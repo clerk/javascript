@@ -20,7 +20,7 @@ export const noFetchFnCtxPassedInGetAuth = createErrorMessage(`
 export const clerkHandlerNotConfigured = createErrorMessage(`
     It looks like you're trying to use Clerk without configuring the Clerk handler.
 
-    To fix this, make sure you have the \`clerkHandler()\` configure in you SSR entry file (example: app/ssr.tsx).
+To fix this, make sure you have the \`clerkHandler()\` configure in you SSR entry file (example: app/ssr.tsx).
 
-    For more info, check out the docs: https://github.com/clerk/javascript/tree/main/packages/tanstack-start#setup-clerkhandler-in-the-ssr-entrypoint,
+For more info, check out the docs: https://github.com/clerk/javascript/tree/main/packages/tanstack-start#setup-clerkhandler-in-the-ssr-entrypoint,
     `);
