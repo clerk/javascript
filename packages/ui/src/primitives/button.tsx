@@ -4,9 +4,6 @@ import * as React from 'react';
 
 import { Spinner } from './spinner';
 
-// ! TODO
-// - [ ] Chat with Alvish about hover states
-
 // Note:
 // - To create the overlapping border/shadow effect"
 //   - `ring` – "focus ring"
@@ -30,17 +27,16 @@ const button = cva({
       primary: [
         '[--button-icon-color:currentColor]',
         '[--button-icon-opacity:0.6]',
-        'text-accent-contrast bg-accent-9 ring-offset-accent-9 shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
-        'before:absolute before:inset-0 before:rounded-[calc(theme(borderRadius.md)-1px)] before:shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
-        'after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:rounded-[calc(theme(borderRadius.md)-1px)] after:bg-gradient-to-b after:from-white/10 after:to-transparent',
-        'focus-visible:ring-accent-a7',
+        'text-accent-contrast bg-accent-9 ring-offset-accent-9',
+        'shadow-[0px_1px_1px_0px_theme(colors.white/.07)_inset,0px_2px_3px_0px_theme(colors.gray.a7),0px_1px_1px_0px_theme(colors.gray.a9)]',
+        'before:absolute before:inset-0 before:rounded-[inherit] before:shadow-[0_1px_1px_0_theme(colors.white/.07)_inset]',
+        'after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:rounded-[inherit] after:bg-gradient-to-b after:from-white/10 after:to-transparent',
       ],
       secondary: [
         '[--button-icon-color:theme(colors.gray.12)]',
         '[--button-icon-opacity:1]',
         'text-gray-12 bg-gray-surface ring-offset-gray-a4',
         'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
-        'focus-visible:ring-gray-a8',
       ],
       // Note:
       // This currently looks the same as `secondary`, but we've intentfully
@@ -51,7 +47,6 @@ const button = cva({
         '[--button-icon-opacity:1]',
         'text-gray-12 bg-gray-surface ring-offset-gray-a4',
         'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
-        'focus-visible:ring-gray-a8',
       ],
     },
     busy: {
