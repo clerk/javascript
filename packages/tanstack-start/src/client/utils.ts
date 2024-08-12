@@ -1,7 +1,7 @@
-import { getPublicEnvVariables } from "../utils/env";
-import type { TanstackStartClerkProviderProps } from "./types";
+import { getPublicEnvVariables } from '../utils/env';
+import type { TanstackStartClerkProviderProps } from './types';
 
-type TanStackProviderAndInitialProps = Omit<TanstackStartClerkProviderProps,'children'>
+type TanStackProviderAndInitialProps = Omit<TanstackStartClerkProviderProps, 'children'>;
 
 export const pickFromClerkInitState = (
   clerkInitState: any,
