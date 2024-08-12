@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from 'react';
 
+import { isAbsoluteUrl } from '~/utils/is-absolute-url';
+
 import type { ClerkHostRouter } from './router';
 
 const DUMMY_ORIGIN = 'https://clerk.dummy';
@@ -21,11 +23,15 @@ class VirtualRouter implements ClerkHostRouter {
   }
 
   push(path: string) {
-    const newUrl = new URL(this.#url.toString());
-    newUrl.pathname = path;
+    if (typeof window !== 'undefined' && isAbsoluteUrl(path)) {
+      window.location.href = path;
+    } else {
+      const newUrl = new URL(this.#url.toString());
+      newUrl.pathname = path;
 
-    this.#url = newUrl;
-    this.emit();
+      this.#url = newUrl;
+      this.emit();
+    }
   }
 
   replace(path: string) {

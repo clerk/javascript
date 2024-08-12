@@ -1,6 +1,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { NEXT_WINDOW_HISTORY_SUPPORT_VERSION } from '~/internals/constants';
+import { isAbsoluteUrl } from '~/utils/is-absolute-url';
 
 import type { ClerkHostRouter } from './router';
 
@@ -21,7 +22,13 @@ export const useNextRouter = (): ClerkHostRouter => {
   return {
     mode: 'path',
     name: 'NextRouter',
-    push: (path: string) => router.push(path),
+    push: (path: string) => {
+      if (isAbsoluteUrl(path)) {
+        window.location.href = path;
+      } else {
+        router.push(path);
+      }
+    },
     replace: (path: string) =>
       canUseWindowHistoryAPIs ? window.history.replaceState(null, '', path) : router.replace(path),
     shallowPush(path: string) {
