@@ -183,7 +183,6 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
     await u.po.organizationSwitcher.waitForMounted();
-    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
     await u.page.goToRelative('/react/only-admins');
     await expect(u.page.getByText("I'm an admin")).toBeVisible();
   });
