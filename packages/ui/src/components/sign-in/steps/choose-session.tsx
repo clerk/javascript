@@ -19,7 +19,7 @@ function getInitials(firstName?: string | null, lastName?: string | null): strin
   return initials;
 }
 
-export function SignInAccountSwitcher() {
+export function SignInChooseSession() {
   const clerk = useClerk();
   const { t } = useLocalizations();
   const { layout } = useAppearance();
@@ -58,7 +58,7 @@ export function SignInAccountSwitcher() {
                 <Button
                   key={userId}
                   type='button'
-                  className='text-gray-11 hover:bg-gray-2 flex w-full items-center gap-x-3 border-t px-10 py-4 text-left text-base [--session-icon-opacity:0] data-[hovered]:[--session-icon-opacity:1]'
+                  className='text-gray-11 hover:bg-gray-2 data-[focus-visible]:bg-gray-2 flex w-full items-center gap-x-3 border-t px-10 py-4 text-left text-base outline-none [--session-icon-opacity:0] data-[hovered]:[--session-icon-opacity:1]'
                 >
                   <span className='bg-gray-2 relative grid size-9 shrink-0 place-content-center overflow-hidden rounded-full border'>
                     {hasImage ? (
@@ -84,7 +84,7 @@ export function SignInAccountSwitcher() {
             })}
             <Button
               type='button'
-              className='text-gray-11 hover:bg-gray-2 flex w-full items-center gap-x-3 border-t px-10 py-4 text-base font-medium'
+              className='text-gray-11 hover:bg-gray-2 data-[focus-visible]:bg-gray-2 flex w-full items-center gap-x-3 border-t px-10 py-4 text-base font-medium outline-none'
             >
               <span className='grid size-9 place-content-center'>
                 <svg
@@ -112,7 +112,7 @@ export function SignInAccountSwitcher() {
             </Button>
           </div>
         </Card.Body>
-        {/* {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null} */}
+        {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null}
       </Card.Content>
       <Card.Footer {...cardFooterProps}>
         <Card.FooterAction>
