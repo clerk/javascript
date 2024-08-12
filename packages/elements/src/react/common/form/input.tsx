@@ -14,7 +14,8 @@ import { useSignInPasskeyAutofill } from '~/react/sign-in/context/router.context
 import { useInput } from './hooks';
 import type { OTPInputProps } from './otp';
 
-const INPUT_NAME = 'ClerkElementsInput';
+const DISPLAY_NAME = 'ClerkElementsInput';
+const DISPLAY_NAME_PASSKEYS_AUTOFILL = 'ClerkElementsInputWithPasskeyAutofill';
 
 type PasswordInputProps = Exclude<FormControlProps, 'type'> & {
   validatePassword?: boolean;
@@ -109,7 +110,7 @@ export const Input = React.forwardRef<React.ElementRef<typeof RadixControl>, For
   },
 );
 
-Input.displayName = INPUT_NAME;
+Input.displayName = DISPLAY_NAME;
 
 const InputWithPasskeyAutofill = React.forwardRef<React.ElementRef<typeof RadixControl>, FormInputProps>(
   (props: FormInputProps, forwardedRef) => {
@@ -131,3 +132,5 @@ const InputWithPasskeyAutofill = React.forwardRef<React.ElementRef<typeof RadixC
     );
   },
 );
+
+InputWithPasskeyAutofill.displayName = DISPLAY_NAME_PASSKEYS_AUTOFILL;
