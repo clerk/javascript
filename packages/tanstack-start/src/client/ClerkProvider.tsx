@@ -1,13 +1,12 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 import { useRouteContext } from '@tanstack/react-router';
-import { Asset } from '@tanstack/start';
 import { useEffect } from 'react';
 
-import { errorThrower, isClient } from '../utils';
-import { clerkHandlerNotConfigured } from '../utils/errors';
+import { isClient } from '../utils';
 import { ClerkOptionsProvider } from './OptionsContext';
 import type { TanstackStartClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
+import { mergeWithPublicEnvs, pickFromClerkInitState } from './utils';
 
 export * from '@clerk/clerk-react';
 
@@ -28,61 +27,27 @@ export function ClerkProvider({ children, ...providerProps }: TanstackStartClerk
     awaitableNavigateRef.current = awaitableNavigate;
   }, [awaitableNavigate]);
 
-  if (!routerContext?.clerkInitialState?.__internal_clerk_state) {
-    errorThrower.throw(clerkHandlerNotConfigured);
-  }
-
   const clerkInitState = isClient() ? (window as any).__clerk_init_state : routerContext?.clerkInitialState;
 
-  const {
-    __clerk_ssr_state,
-    __publishableKey,
-    __proxyUrl,
-    __domain,
-    __isSatellite,
-    __signInUrl,
-    __signUpUrl,
-    __afterSignInUrl,
-    __afterSignUpUrl,
-    __clerkJSUrl,
-    __clerkJSVersion,
-    __telemetryDisabled,
-    __telemetryDebug,
-    __signInForceRedirectUrl,
-    __signUpForceRedirectUrl,
-    __signInFallbackRedirectUrl,
-    __signUpFallbackRedirectUrl,
-  } = clerkInitState.__internal_clerk_state || {};
+  const { clerkSsrState, ...restInitState } = pickFromClerkInitState(clerkInitState?.__internal_clerk_state);
 
   const mergedProps = {
-    publishableKey: __publishableKey,
-    proxyUrl: __proxyUrl,
-    domain: __domain,
-    isSatellite: __isSatellite,
-    signInUrl: __signInUrl,
-    signUpUrl: __signUpUrl,
-    afterSignInUrl: __afterSignInUrl,
-    afterSignUpUrl: __afterSignUpUrl,
-    clerkJSUrl: __clerkJSUrl,
-    clerkJSVersion: __clerkJSVersion,
-    telemetry: {
-      disabled: __telemetryDisabled,
-      debug: __telemetryDebug,
-    },
-    signInForceRedirectUrl: __signInForceRedirectUrl,
-    signUpForceRedirectUrl: __signUpForceRedirectUrl,
-    signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
-    signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
+    ...mergeWithPublicEnvs(restInitState),
     ...providerProps,
   };
 
   return (
     <>
-      {/* TODO: revisit window.__clerk_init_state */}
-      <Asset tag='script'>{`window.__clerk_init_state = ${JSON.stringify(routerContext?.clerkInitialState)}`}</Asset>
+      {routerContext?.clerkInitialState && (
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__clerk_init_state = ${JSON.stringify(routerContext?.clerkInitialState)};`,
+          }}
+        />
+      )}
       <ClerkOptionsProvider options={mergedProps}>
         <ReactClerkProvider
-          initialState={__clerk_ssr_state}
+          initialState={clerkSsrState}
           sdkMetadata={SDK_METADATA}
           {...mergedProps}
           routerPush={(to: string) =>
