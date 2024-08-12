@@ -52,14 +52,11 @@ export class AuthCookieService {
   ) {
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
-      // only update session cookie from active tab
-      if (!document.hasFocus()) {
-        return;
-      }
-
       this.updateSessionCookie(token && token.getRawString());
       this.setClientUatCookieForDevelopmentInstances();
     });
+
+    this.markActiveTab();
 
     this.refreshTokenOnFocus();
     this.startPollingForToken();
@@ -136,6 +133,11 @@ export class AuthCookieService {
   }
 
   private updateSessionCookie(token: string | null) {
+    // only update session cookie from active tab
+    if (!document.hasFocus()) {
+      return;
+    }
+
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
   }
 
@@ -167,5 +169,10 @@ export class AuthCookieService {
     }
 
     clerkCoreErrorTokenRefreshFailed(e.toString());
+  }
+
+  private markActiveTab() {
+    const current = Number.parseInt(sessionStorage.getItem('__clerk_active_tabs') ?? '0', 10);
+    sessionStorage.setItem('__clerk_active_tabs', String(current + 1));
   }
 }
