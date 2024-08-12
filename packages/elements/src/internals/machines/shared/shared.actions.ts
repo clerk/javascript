@@ -94,7 +94,7 @@ export function sendToLoading({ context, event }: SendToLoadingProps): void {
   } else if (context.loadingStep === 'start') {
     step = 'start';
     strategy = undefined;
-    action = event.type === 'AUTHENTICATE.PASSKEY' ? 'passkey' : event.type === 'SUBMIT' ? 'submit' : undefined;
+    action = 'action' in event ? event.action : undefined;
 
     return context.parent.send({
       type: 'LOADING',
