@@ -5,9 +5,8 @@ export function assertNoLegacyProp(props: Record<string, any>) {
   const legacyProp = Object.keys(props).find(key => legacyProps.includes(key));
 
   if (legacyProp && props[legacyProp]) {
-    // TODO: @nikos update with the docs link
     logger.warnOnce(
-      `Clerk: The prop "${legacyProp}" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead.`,
+      `Clerk: The prop "${legacyProp}" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props`,
     );
   }
 }
@@ -19,9 +18,8 @@ export function warnForNewPropShadowingLegacyProp(
   legacyValue: string | undefined | null,
 ) {
   if (newValue && legacyValue) {
-    // TODO: @nikos update with the docs link
     logger.warnOnce(
-      `Clerk: The "${newKey}" prop ("${newValue}") has priority over the legacy "${legacyKey}" (or "redirectUrl") ("${legacyValue}"), which will be completely ignored in this case. "${legacyKey}" (or "redirectUrl" prop) should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead.`,
+      `Clerk: The "${newKey}" prop ("${newValue}") has priority over the legacy "${legacyKey}" (or "redirectUrl") ("${legacyValue}"), which will be completely ignored in this case. "${legacyKey}" (or "redirectUrl" prop) should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props`,
     );
   }
 }
