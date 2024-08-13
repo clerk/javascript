@@ -186,7 +186,7 @@ export const Banner = React.forwardRef(function CardBanner(
       <div className='absolute inset-x-0 bottom-0 z-10 flex h-[--card-body-padding] w-full items-center justify-center'>
         <p
           ref={forwardedRef}
-          className={cx('text-sm font-medium text-orange-500', className)}
+          className={cx('pointer-events-auto text-sm font-medium text-orange-500', className)}
           {...props}
         >
           {children}
