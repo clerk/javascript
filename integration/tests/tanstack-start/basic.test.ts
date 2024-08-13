@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../../presets';
 import type { FakeUser } from '../../testUtils';
@@ -67,9 +67,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
       await u.page.waitForAppUrl('/');
 
-      const clerkInitialState = await u.page.waitForFunction(() => window.__clerk_init_state !== undefined);
+      const clerkInitialState = await u.page.waitForFunction(() => window.__clerk_init_state);
 
-      expect(clerkInitialState).toBeTruthy();
+      expect(clerkInitialState !== undefined).toBeTruthy();
     });
   },
 );
