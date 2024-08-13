@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.13.0
+
+### Minor Changes
+
+- Introduce `transferable` prop for `<SignIn />` to disable the automatic transfer of a sign in attempt to a sign up attempt when attempting to sign in with a social provider when the account does not exist. Also adds a `transferable` option to `Clerk.handleRedirectCallback()` with the same functionality. ([#3845](https://github.com/clerk/javascript/pull/3845)) by [@BRKalow](https://github.com/BRKalow)
+
 ## 4.12.1
 
 ### Patch Changes

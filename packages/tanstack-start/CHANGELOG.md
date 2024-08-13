@@ -1,5 +1,39 @@
 # @clerk/tanstack-start
 
+## 0.2.0
+
+### Minor Changes
+
+- Introduce `getAuth` that can be used in server functions. ([#3900](https://github.com/clerk/javascript/pull/3900)) by [@octoper](https://github.com/octoper)
+
+  Example usage:
+
+  ```tsx
+  import { getAuth } from '@clerk/tanstack-start/server'
+  import { createServerFn } from '@tanstack/start'
+
+
+  export const fetchCurrentUserPosts = createServerFn('GET', async (_payload, ctx) => {
+    const { userId } = await getAuth(ctx)
+
+    if (!userId) {
+      ...
+    }
+
+    ...
+  })
+  ```
+
+- Throw a more useful error when `clerkHandler()` is not configured in the SSR entrypoint ([#3918](https://github.com/clerk/javascript/pull/3918)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies [[`59d5f19d3`](https://github.com/clerk/javascript/commit/59d5f19d333bf4a35c244886e93b4368e215225c), [`4e6c94e3f`](https://github.com/clerk/javascript/commit/4e6c94e3f4cc92cbba8bddcd2b90fcc9cfb83763)]:
+  - @clerk/shared@2.5.0
+  - @clerk/clerk-react@5.4.0
+  - @clerk/types@4.13.0
+  - @clerk/backend@1.6.2
+
 ## 0.1.16
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @clerk/elements
 
+## 0.12.4
+
+### Patch Changes
+
+- Add support for redirect_url URL parameter ([#3906](https://github.com/clerk/javascript/pull/3906)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`4e6c94e3f`](https://github.com/clerk/javascript/commit/4e6c94e3f4cc92cbba8bddcd2b90fcc9cfb83763)]:
+  - @clerk/types@4.13.0
+
 ## 0.12.3
 
 ### Patch Changes
