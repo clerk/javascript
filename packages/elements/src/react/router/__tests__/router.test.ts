@@ -101,6 +101,16 @@ describe('createClerkRouter', () => {
     expect(mockRouter.replace).toHaveBeenCalledWith('/app/dashboard?after_sign_in_url=foobar');
   });
 
+  it('pushes absolute URLs unmodified', () => {
+    const path = 'https://example.com';
+    const clerkRouter = createClerkRouter(mockRouter, '/app');
+
+    mockRouter.searchParams.mockImplementation(() => new URLSearchParams('after_sign_in_url=foobar&foo=bar'));
+    clerkRouter.push(path);
+
+    expect(mockRouter.push).toHaveBeenCalledWith('https://example.com');
+  });
+
   it('returns the correct pathname', () => {
     const clerkRouter = createClerkRouter(mockRouter, '/app');
 
