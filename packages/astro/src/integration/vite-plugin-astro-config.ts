@@ -18,6 +18,7 @@ export function vitePluginAstroConfig(
     },
     config(config) {
       // This is necessary because it does not work in dev mode without pre-bundling.
+      // We use it in our CSR control components.
       config.optimizeDeps?.include?.push('@clerk/astro/client');
     },
     load(id) {
