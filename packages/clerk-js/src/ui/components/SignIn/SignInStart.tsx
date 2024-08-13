@@ -263,7 +263,7 @@ export function _SignInStart(): JSX.Element {
        * For SAML enabled instances, perform sign in with password only when it is allowed for the identified user.
        */
       const passwordField = fields.find(f => f.name === 'password')?.value;
-      if (!passwordField || signInResource.supportedFirstFactors.some(ff => ff.strategy === 'saml')) {
+      if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml')) {
         return signInResource;
       }
       return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
@@ -277,7 +277,7 @@ export function _SignInStart(): JSX.Element {
       switch (res.status) {
         case 'needs_identifier':
           // Check if we need to initiate a saml flow
-          if (res.supportedFirstFactors.some(ff => ff.strategy === 'saml')) {
+          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'saml')) {
             await authenticateWithSaml();
           }
           break;

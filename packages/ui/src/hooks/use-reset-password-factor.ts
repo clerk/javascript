@@ -8,7 +8,7 @@ export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null
 export function useResetPasswordFactor() {
   const clerk = useClerk();
 
-  return clerk.client.signIn.supportedFirstFactors.find(({ strategy }) => isResetPasswordStrategy(strategy)) as
+  return clerk.client.signIn.supportedFirstFactors?.find(({ strategy }) => isResetPasswordStrategy(strategy)) as
     | ResetPasswordCodeFactor
     | undefined;
 }

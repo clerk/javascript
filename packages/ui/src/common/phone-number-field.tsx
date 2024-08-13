@@ -166,29 +166,30 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
               <div
                 ref={containerRef}
                 className={cx(
-                  '[--phone-number-field-border-width:1px]',
-                  '[--phone-number-field-py:calc(theme(spacing[1.5])-var(--phone-number-field-border-width))]',
-                  '[--phone-number-field-px:calc(theme(spacing.3)-var(--phone-number-field-border-width))]',
-                  'border-[length:--phone-number-field-border-width] border-[--cl-phone-number-field-border] bg-clip-padding',
+                  // Note:
+                  // - To create the overlapping border/shadow effect"
+                  //   - `ring` – "focus ring"
+                  //   - `ring-offset` - border
+                  '[--phone-number-field-py:theme(spacing[1.5])]',
+                  '[--phone-number-field-px:theme(spacing.3)]',
+                  'ring ring-transparent ring-offset-1 ring-offset-[--cl-phone-number-field-border]',
                   'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
+                  'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
                   'has-[[data-field-input][disabled]]:cursor-not-allowed has-[[data-field-input][disabled]]:opacity-50',
                   // hover
-                  'hover:has-[[data-field-input]:enabled]:border-[--cl-phone-number-field-border-active]',
+                  'hover:has-[[data-field-input]:enabled]:ring-offset-[--cl-phone-number-field-border-active]',
                   // focus
-                  'has-[[data-field-input]:focus-visible]:border-[--cl-phone-number-field-border-active]',
-                  'has-[[data-field-input]:focus-visible]:ring-[0.1875rem]',
-                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring]',
+                  'has-[[data-field-input]:focus-visible]:ring-offset-[--cl-phone-number-field-border-active]',
+                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring,theme(ringColor.DEFAULT)]',
                   // intent
                   {
                     idle: [
-                      '[--cl-phone-number-field-border:theme(colors.gray.a6)]',
-                      '[--cl-phone-number-field-border-active:theme(colors.gray.a8)]',
-                      '[--cl-phone-number-field-ring:theme(colors.gray.a3)]',
+                      '[--cl-phone-number-field-border:theme(colors.gray.a4)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.gray.a7)]',
                     ],
                     info: [
-                      '[--cl-phone-number-field-border:theme(colors.gray.a8)]',
-                      '[--cl-phone-number-field-border-active:theme(colors.gray.a8)]',
-                      '[--cl-phone-number-field-ring:theme(colors.gray.a3)]',
+                      '[--cl-phone-number-field-border:theme(colors.gray.a7)]',
+                      '[--cl-phone-number-field-border-active:theme(colors.gray.a7)]',
                     ],
                     error: [
                       '[--cl-phone-number-field-border:theme(colors.danger.DEFAULT)]',
@@ -215,7 +216,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                     className='hover:enabled:bg-gray-2 focus-visible:bg-gray-2 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
-                    <Icon.ChevronUpDown className='text-gray-11 size-4' />
+                    <Icon.ChevronUpDown className='text-gray-9 size-4' />
                   </Button>
                   <Popover
                     isOpen={isOpen}
