@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 
+import cssnanoPlugin from 'cssnano';
 import postcss, { type Plugin } from 'postcss';
 import * as recast from 'recast';
 import * as tsParser from 'recast/parsers/babel-ts.js';
@@ -139,7 +140,11 @@ export async function generateStylesheet(
     stylesheet += `.${cn} { @apply ${value} }\n`;
   }
 
-  const result = await postcss([tailwindcss(ctx.tailwindConfig) as Plugin, replaceVariableScope]).process(stylesheet, {
+  const result = await postcss([
+    tailwindcss(ctx.tailwindConfig) as Plugin,
+    replaceVariableScope,
+    cssnanoPlugin,
+  ]).process(stylesheet, {
     from: undefined,
   });
 

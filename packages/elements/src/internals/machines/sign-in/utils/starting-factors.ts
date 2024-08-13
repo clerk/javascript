@@ -56,7 +56,7 @@ const findFactorForIdentifier = (i: string | null) => (f: SignInFactor) => {
 // The algorithm can be found at
 // https://www.notion.so/clerkdev/Implement-sign-in-alt-methods-e6e60ffb644645b3a0553b50556468ce
 export function determineStartingSignInFactor(
-  firstFactors: SignInFirstFactor[],
+  firstFactors: SignInFirstFactor[] | null,
   identifier: string | null,
   preferredSignInStrategy?: PreferredSignInStrategy,
 ) {

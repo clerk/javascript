@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.1.20
+
+### Patch Changes
+
+- Updated dependencies [[`b6f0613dc`](https://github.com/clerk/javascript/commit/b6f0613dc9d8b0bab41cfabbaa8621b126e3bdf5)]:
+  - @clerk/types@4.13.1
+
 ## 2.1.19
 
 ### Patch Changes

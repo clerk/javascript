@@ -11,14 +11,14 @@ export function useAlternativeStrategies({ filterOutFactor }: { filterOutFactor:
 
   const { strategies: OAuthStrategies } = useEnabledThirdPartyProviders();
 
-  const firstFactors = supportedFirstFactors.filter(
+  const firstFactors = supportedFirstFactors?.filter(
     f => f.strategy !== filterOutFactor?.strategy && !isResetPasswordStrategy(f.strategy),
   );
 
-  const shouldAllowForAlternativeStrategies = firstFactors.length + OAuthStrategies.length > 0;
+  const shouldAllowForAlternativeStrategies = firstFactors && firstFactors.length + OAuthStrategies.length > 0;
 
   const firstPartyFactors = supportedFirstFactors
-    .filter(f => !f.strategy.startsWith('oauth_') && !(f.strategy === filterOutFactor?.strategy))
+    ?.filter(f => !f.strategy.startsWith('oauth_') && !(f.strategy === filterOutFactor?.strategy))
     .filter(factor => factorHasLocalStrategy(factor))
     // Only include passkey if the device supports it.
     // @ts-ignore Types are not public yet.

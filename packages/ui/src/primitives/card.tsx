@@ -15,7 +15,8 @@ export const Root = React.forwardRef(function CardRoot(
       className={cx(
         '[--card-body-padding:theme(spacing.10)]',
         '[--card-content-rounded-b:theme(borderRadius.lg)]',
-        'bg-gray-2 border-gray-a6 shadow-gray-a5 relative w-96 overflow-hidden rounded-xl border bg-clip-padding shadow-xl',
+        'bg-gray-2 ring-gray-a3 relative mx-auto block w-full max-w-[25rem] overflow-hidden rounded-xl ring-1',
+        'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
         className,
       )}
     >
@@ -34,7 +35,8 @@ export const Content = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       data-card-content=''
       {...props}
       className={cx(
-        'bg-gray-surface shadow-gray-a3 border-gray-a6 relative -m-px flex flex-col gap-8 rounded-[inherit] rounded-b-[--card-content-rounded-b] border p-[--card-body-padding] shadow-sm',
+        'bg-gray-surface relative flex flex-col gap-8 rounded-b-[--card-content-rounded-b] rounded-t-none p-[--card-body-padding]',
+        'ring-gray-a3 shadow-[0px_0px_2px_0px_theme(colors.gray.a4),0px_1px_2px_0px_theme(colors.gray.a3)] ring-1',
         className,
       )}
     >
@@ -177,7 +179,7 @@ export const Banner = React.forwardRef(function CardBanner(
           'pointer-events-none absolute inset-0 w-full',
           // manually nudge the radius by `1px` for a snug fit
           'rounded-b-[calc(var(--card-content-rounded-b)-1px)]',
-          '[background-image:repeating-linear-gradient(-45deg,theme(colors.orange.50),theme(colors.orange.50)_6px,theme(colors.orange.100/0.75)_6px,theme(colors.orange.100/0.75)_12px)]',
+          '[background-image:repeating-linear-gradient(-45deg,theme(colors.orange.100/0.4),theme(colors.orange.100/0.4)_6px,theme(colors.orange.100/0.75)_6px,theme(colors.orange.100/0.75)_12px)]',
           '[mask-image:linear-gradient(to_top,black,transparent_128px)]',
         )}
       />
@@ -263,7 +265,7 @@ export const FooterAction = React.forwardRef<HTMLDivElement, React.HTMLAttribute
         ref={forwardedRef}
         data-card-footer-action=''
         {...props}
-        className={cx('border-gray-a6 border-b px-6 py-4 last-of-type:border-b-transparent', className)}
+        className={cx('border-gray-a3 border-b px-6 py-4 last-of-type:border-b-transparent', className)}
       >
         {children}
       </div>
