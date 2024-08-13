@@ -134,7 +134,7 @@ const isAppRouterInternalNavigation = (req: Request) =>
 
 const isPagePathAvailable = () => {
   const __fetch = globalThis.fetch;
-  return Boolean(isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore().pagePath : false);
+  return Boolean(isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore()?.pagePath : false);
 };
 
 const isPagesRouterInternalNavigation = (req: Request) => !!req.headers.get(nextConstants.Headers.NextjsData);

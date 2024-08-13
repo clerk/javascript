@@ -5,7 +5,7 @@ type Fetcher = typeof globalThis.fetch;
  */
 type NextFetcher = Fetcher & {
   readonly __nextPatched: true;
-  readonly __nextGetStaticStore: () => { getStore: () => StaticGenerationAsyncStorage };
+  readonly __nextGetStaticStore: () => { getStore: () => StaticGenerationAsyncStorage | undefined };
 };
 
 /**
