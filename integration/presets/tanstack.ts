@@ -1,3 +1,4 @@
+import { constants } from '../constants.js';
 import { applicationConfig } from '../models/applicationConfig.js';
 import { templates } from '../templates/index.js';
 
@@ -11,7 +12,9 @@ const start = applicationConfig()
   .addScript('dev', 'npm run dev')
   .addScript('build', 'npm run build')
   .addScript('serve', 'npm run start')
-  .addDependency('@clerk/tanstack-start', clerkTanStackLocal);
+  .addDependency('react', constants.E2E_REACT_VERSION)
+  .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
+  .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || clerkTanStackLocal);
 
 export const tanstack = {
   start,
