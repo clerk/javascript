@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/clerk-react';
+import { cva } from 'cva';
 import { Button } from 'react-aria-components';
 
 import { useAppearance } from '~/hooks/use-appearance';
@@ -29,6 +30,10 @@ function getInitials({
   }
   return initials;
 }
+
+const sessionAction = cva({
+  base: 'text-left text-gray-11 hover:bg-gray-2 data-[focus-visible]:bg-gray-2 flex w-full items-center gap-x-3 px-10 py-4 text-base outline-none [--session-icon-opacity:0] data-[hovered]:[--session-icon-opacity:1]',
+});
 
 export function SignInChooseSession() {
   const clerk = useClerk();
@@ -72,15 +77,14 @@ export function SignInChooseSession() {
                 >
                   <Button
                     type='button'
-                    className='text-gray-11 hover:bg-gray-2 data-[focus-visible]:bg-gray-2 flex w-full items-center gap-x-3 px-10 py-4 text-left text-base outline-none [--session-icon-opacity:0] data-[hovered]:[--session-icon-opacity:1]'
+                    className={sessionAction()}
                   >
                     <span className='bg-gray-2 border-gray-a4 relative grid size-9 shrink-0 place-content-center overflow-hidden rounded-full border'>
                       {hasImage ? (
                         <img
                           src={imageUrl}
                           className='absolute inset-0 object-cover'
-                          // TODO: Add alt text
-                          alt=''
+                          alt={`Avatar for ${title}`}
                         />
                       ) : (
                         <span className='text-gray-11 text-base font-medium'>
@@ -104,7 +108,7 @@ export function SignInChooseSession() {
             <li className='border-gray-a4 border-t'>
               <Button
                 type='button'
-                className='text-gray-11 hover:bg-gray-2 data-[focus-visible]:bg-gray-2 flex w-full items-center gap-x-3 px-10 py-4 text-base font-medium outline-none'
+                className={sessionAction()}
               >
                 <span className='grid size-9 place-content-center'>
                   <svg
