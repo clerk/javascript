@@ -83,22 +83,23 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
                     enableWeb3Providers
                     enableOAuthProviders
                   />
-                  {firstPartyFactors.map((factor, i) => (
-                    <ArrowBlockButton
-                      leftIcon={getButtonIcon(factor)}
-                      textLocalizationKey={getButtonLabel(factor)}
-                      elementDescriptor={descriptors.alternativeMethodsBlockButton}
-                      textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
-                      arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
-                      key={i}
-                      textVariant='buttonLarge'
-                      isDisabled={card.isLoading}
-                      onClick={() => {
-                        card.setError(undefined);
-                        onFactorSelected(factor);
-                      }}
-                    />
-                  ))}
+                  {firstPartyFactors &&
+                    firstPartyFactors.map((factor, i) => (
+                      <ArrowBlockButton
+                        leftIcon={getButtonIcon(factor)}
+                        textLocalizationKey={getButtonLabel(factor)}
+                        elementDescriptor={descriptors.alternativeMethodsBlockButton}
+                        textElementDescriptor={descriptors.alternativeMethodsBlockButtonText}
+                        arrowElementDescriptor={descriptors.alternativeMethodsBlockButtonArrow}
+                        key={i}
+                        textVariant='buttonLarge'
+                        isDisabled={card.isLoading}
+                        onClick={() => {
+                          card.setError(undefined);
+                          onFactorSelected(factor);
+                        }}
+                      />
+                    ))}
                 </Flex>
               )}
               {onBackLinkClick && (

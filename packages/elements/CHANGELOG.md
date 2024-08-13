@@ -1,5 +1,20 @@
 # @clerk/elements
 
+## 0.13.0
+
+### Minor Changes
+
+- Handle ticket-based invitation sign-up workflows ([#3910](https://github.com/clerk/javascript/pull/3910)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Refactor form hooks and utils into separate files ([#3931](https://github.com/clerk/javascript/pull/3931)) by [@tmilewski](https://github.com/tmilewski)
+
+- In certain situations the Frontend API response contains [`supported_first_factors`](https://clerk.com/docs/reference/frontend-api/tag/Sign-Ins#operation/createSignIn!c=200&path=response/supported_first_factors&t=response) with a `null` value while the current code always assumed to receive an array. `SignInResource['supportedFirstFactors']` has been updated to account for that and any code accessing this value has been made more resilient against `null` values. ([#3938](https://github.com/clerk/javascript/pull/3938)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`b6f0613dc`](https://github.com/clerk/javascript/commit/b6f0613dc9d8b0bab41cfabbaa8621b126e3bdf5)]:
+  - @clerk/types@4.13.1
+
 ## 0.12.4
 
 ### Patch Changes

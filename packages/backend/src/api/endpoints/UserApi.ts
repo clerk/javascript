@@ -47,6 +47,7 @@ type UserMetadataParams = {
 type PasswordHasher =
   | 'argon2i'
   | 'argon2id'
+  | 'awscognito'
   | 'bcrypt'
   | 'bcrypt_sha256_django'
   | 'md5'

@@ -3,6 +3,7 @@ import { transform } from 'esbuild';
 import { readFile } from 'fs/promises';
 import { defineConfig } from 'tsup';
 
+import { version as clerkJsVersion } from '../clerk-js/package.json';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
@@ -21,6 +22,7 @@ export default defineConfig(overrideOptions => {
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
+      JS_PACKAGE_VERSION: `"${clerkJsVersion}"`,
       __DEV__: `${isWatch}`,
     },
   };

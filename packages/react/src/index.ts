@@ -1,5 +1,7 @@
 import './polyfills';
 
+import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
+
 import { setErrorThrowerOptions } from './errors/errorThrower';
 
 export * from './components';
@@ -10,3 +12,4 @@ export { useEmailLink } from './hooks/useEmailLink';
 export type { BrowserClerk, ClerkProp, HeadlessBrowserClerk, ClerkProviderProps } from './types';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
+setClerkJsLoadingErrorPackageName(PACKAGE_NAME);

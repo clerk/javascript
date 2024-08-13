@@ -7,30 +7,27 @@ describe('versionSelector', () => {
   });
 
   it('should use the major version if there is no prerelease tag', () => {
-    // @ts-ignore
-    global.PACKAGE_VERSION = '1.0.0';
+    const PACKAGE_VERSION = '1.0.0';
     // @ts-ignore
     global.JS_PACKAGE_VERSION = '2.0.0';
 
-    expect(versionSelector(undefined)).toEqual('1');
+    expect(versionSelector(undefined, PACKAGE_VERSION)).toEqual('1');
   });
 
   it('should use the prerelease tag when it is not snapshot', () => {
-    // @ts-ignore
-    global.PACKAGE_VERSION = '1.0.0-next.0';
+    const PACKAGE_VERSION = '1.0.0-next.0';
     // @ts-ignore
     global.JS_PACKAGE_VERSION = '2.0.0-next.0';
 
-    expect(versionSelector(undefined)).toEqual('next');
+    expect(versionSelector(undefined, PACKAGE_VERSION)).toEqual('next');
   });
 
   it('should use the exact JS version if tag is snapshot', () => {
-    // @ts-ignore
-    global.PACKAGE_VERSION = '1.0.0-snapshot.0';
+    const PACKAGE_VERSION = '1.0.0-snapshot.0';
     // @ts-ignore
     global.JS_PACKAGE_VERSION = '2.0.0-snapshot.0';
 
-    expect(versionSelector(undefined)).toEqual('2.0.0-snapshot.0');
+    expect(versionSelector(undefined, PACKAGE_VERSION)).toEqual('2.0.0-snapshot.0');
   });
 
   // We replaced semver with 2 custom regexes
