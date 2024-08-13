@@ -1,5 +1,17 @@
 # @clerk/ui
 
+## 0.1.8
+
+### Patch Changes
+
+- In certain situations the Frontend API response contains [`supported_first_factors`](https://clerk.com/docs/reference/frontend-api/tag/Sign-Ins#operation/createSignIn!c=200&path=response/supported_first_factors&t=response) with a `null` value while the current code always assumed to receive an array. `SignInResource['supportedFirstFactors']` has been updated to account for that and any code accessing this value has been made more resilient against `null` values. ([#3938](https://github.com/clerk/javascript/pull/3938)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`1743e49db`](https://github.com/clerk/javascript/commit/1743e49dbe79a53b334a40e8133dd1b9b19b8962), [`7e0ced3da`](https://github.com/clerk/javascript/commit/7e0ced3da94f41056bc4445d163d3b615afb6ab1), [`755b3d02b`](https://github.com/clerk/javascript/commit/755b3d02b7117919ff9ae93fa5093ef49b13a5f8), [`b6f0613dc`](https://github.com/clerk/javascript/commit/b6f0613dc9d8b0bab41cfabbaa8621b126e3bdf5)]:
+  - @clerk/elements@0.13.0
+  - @clerk/shared@2.5.1
+  - @clerk/clerk-react@5.4.1
+  - @clerk/types@4.13.1
+
 ## 0.1.7
 
 ### Patch Changes

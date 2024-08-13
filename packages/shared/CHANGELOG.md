@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.5.1
+
+### Patch Changes
+
+- Introduce functions that can be reused across front-end SDKs ([#3849](https://github.com/clerk/javascript/pull/3849)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b6f0613dc`](https://github.com/clerk/javascript/commit/b6f0613dc9d8b0bab41cfabbaa8621b126e3bdf5)]:
+  - @clerk/types@4.13.1
+
 ## 2.5.0
 
 ### Minor Changes

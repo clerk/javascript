@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.14.1
+
+### Patch Changes
+
+- Add development mode warning in the browser console when `load()` happens. Companion PR for [Add dev mode warning to components](https://github.com/clerk/javascript/pull/3870). ([#3930](https://github.com/clerk/javascript/pull/3930)) by [@LekoArts](https://github.com/LekoArts)
+
+- Fix unresponsive behavior when clicking placeholder logo in the `<CreateOrganization />` component ([#3921](https://github.com/clerk/javascript/pull/3921)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- In certain situations the Frontend API response contains [`supported_first_factors`](https://clerk.com/docs/reference/frontend-api/tag/Sign-Ins#operation/createSignIn!c=200&path=response/supported_first_factors&t=response) with a `null` value while the current code always assumed to receive an array. `SignInResource['supportedFirstFactors']` has been updated to account for that and any code accessing this value has been made more resilient against `null` values. ([#3938](https://github.com/clerk/javascript/pull/3938)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`7e0ced3da`](https://github.com/clerk/javascript/commit/7e0ced3da94f41056bc4445d163d3b615afb6ab1), [`b6f0613dc`](https://github.com/clerk/javascript/commit/b6f0613dc9d8b0bab41cfabbaa8621b126e3bdf5)]:
+  - @clerk/shared@2.5.1
+  - @clerk/types@4.13.1
+  - @clerk/localizations@2.5.8
+
 ## 5.14.0
 
 ### Minor Changes
