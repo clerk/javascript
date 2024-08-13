@@ -172,11 +172,11 @@ export const Banner = React.forwardRef(function CardBanner(
   return (
     <div
       data-card-banner=''
-      className={cx('absolute inset-0 isolate')}
+      className={cx('pointer-events-none absolute inset-0 isolate', className)}
     >
       <div
         className={cx(
-          'pointer-events-none absolute inset-0 w-full',
+          'absolute inset-0 w-full',
           // manually nudge the radius by `1px` for a snug fit
           'rounded-b-[calc(var(--card-content-rounded-b)-1px)]',
           '[background-image:repeating-linear-gradient(-45deg,theme(colors.orange.100/0.4),theme(colors.orange.100/0.4)_6px,theme(colors.orange.100/0.75)_6px,theme(colors.orange.100/0.75)_12px)]',
