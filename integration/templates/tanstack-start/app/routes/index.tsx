@@ -5,6 +5,7 @@ import {
   SignedOut,
   SignInButton,
   SignUpButton,
+  SignIn,
 } from '@clerk/tanstack-start'
 import { createFileRoute } from '@tanstack/react-router'
 
@@ -29,9 +30,7 @@ function Home() {
       <SignedOut>
         <p>You are signed out</p>
 
-        <SignInButton mode="modal" />
-
-        <SignUpButton mode="modal" />
+        <SignIn />
       </SignedOut>
     </div>
   )
