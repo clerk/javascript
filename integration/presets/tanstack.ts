@@ -14,7 +14,7 @@ const start = applicationConfig()
   .addScript('serve', 'npm run start')
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
-  .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || clerkTanStackLocal);
+  .addDependency('@clerk/tanstack-start', constants.E2E_CLERK_VERSION || clerkTanStackLocal);
 
 export const tanstack = {
   start,
