@@ -14,6 +14,7 @@ export const templates = {
   'astro-node': resolve(__dirname, './astro-node'),
   'astro-hybrid': resolve(__dirname, './astro-hybrid'),
   'expo-web': resolve(__dirname, './expo-web'),
+  'tanstack-start': resolve(__dirname, './tanstack-start'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {

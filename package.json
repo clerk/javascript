@@ -42,6 +42,7 @@
     "test:integration:expo-web": "E2E_APP_ID=expo.expo-web npm run test:integration:base -- --grep @expo-web",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* npm run test:integration:base -- --grep @quickstart",
     "test:integration:sessions": "npm run test:integration:base -- --grep @sessions",
+    "test:integration:tanstack-start": "E2E_APP_ID=tanstack.start npm run test:integration:base -- --grep @tanstack-start",
     "test:integration:remix": "echo 'placeholder'",
     "turbo:clean": "turbo daemon clean",
     "update:lockfile": "npm run nuke && npm install -D --arch=x64 --platform=linux turbo && npm install -D --arch=arm64 --platform=darwin turbo",

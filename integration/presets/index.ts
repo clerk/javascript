@@ -7,6 +7,7 @@ import { createLongRunningApps } from './longRunningApps';
 import { next } from './next';
 import { react } from './react';
 import { remix } from './remix';
+import { tanstack } from './tanstack';
 
 export const appConfigs = {
   envs,
@@ -18,6 +19,7 @@ export const appConfigs = {
   elements,
   expo,
   astro,
+  tanstack,
   secrets: {
     instanceKeys,
   },
