@@ -15,7 +15,7 @@ export const Root = React.forwardRef(function CardRoot(
       className={cx(
         '[--card-body-padding:theme(spacing.10)]',
         '[--card-content-rounded-b:theme(borderRadius.lg)]',
-        'bg-gray-2 ring-gray-a3 relative w-96 overflow-hidden rounded-xl ring-1',
+        'bg-gray-2 ring-gray-a3 relative mx-auto block w-full max-w-[25rem] overflow-hidden rounded-xl ring-1',
         'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
         className,
       )}
