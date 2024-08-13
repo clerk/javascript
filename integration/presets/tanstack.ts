@@ -4,8 +4,8 @@ import { templates } from '../templates/index.js';
 const clerkTanStackLocal = `file:${process.cwd()}/packages/tanstack-start`;
 
 const router = applicationConfig()
-  .setName('tanstack-start-ssr')
-  .useTemplate(templates['tanstack-start'])
+  .setName('tanstack-router')
+  .useTemplate(templates['tanstack-router'])
   .setEnvFormatter('public', key => `VITE_${key}`)
   .addScript('setup', 'npm i --install-links')
   .addScript('dev', 'npm run dev')
@@ -13,7 +13,15 @@ const router = applicationConfig()
   .addScript('serve', 'npm run start')
   .addDependency('@clerk/tanstack-start', clerkTanStackLocal);
 
-const start = applicationConfig().clone().setName('tanstack-router').useTemplate(templates['tanstack-router']);
+const start = applicationConfig()
+  .setName('tanstack-start')
+  .useTemplate(templates['tanstack-start'])
+  .setEnvFormatter('public', key => `VITE_${key}`)
+  .addScript('setup', 'npm i --install-links')
+  .addScript('dev', 'npm run dev')
+  .addScript('build', 'npm run build')
+  .addScript('serve', 'npm run start')
+  .addDependency('@clerk/tanstack-start', clerkTanStackLocal);
 
 export const tanstack = {
   start,

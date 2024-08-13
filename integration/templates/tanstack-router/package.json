@@ -3,11 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port=3001",
+    "dev": "vite --port=$PORT",
     "build": "vite build",
-    "serve": "vite preview",
-    "start": "vite",
-    "test:e2e": "playwright test --project=chromium"
+    "serve": "vite preview --port=$PORT",
+    "start": "vite"
   },
   "dependencies": {
     "@tanstack/react-router": "^1.47.1",

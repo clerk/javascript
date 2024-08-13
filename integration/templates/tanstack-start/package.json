@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev",
+    "dev": "vinxi dev --port=$PORT",
     "build": "vinxi build",
-    "start": "vinxi start"
+    "start": "vinxi start --port=$PORT"
   },
   "dependencies": {
     "@tanstack/react-router": "^1.46.4",
