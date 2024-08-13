@@ -3,7 +3,6 @@ import { cva } from 'cva';
 import { Button } from 'react-aria-components';
 
 import { useAppearance } from '~/hooks/use-appearance';
-import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Card from '~/primitives/card';
@@ -39,7 +38,7 @@ export function SignInChooseSession() {
   const clerk = useClerk();
   const { t } = useLocalizations();
   const { layout } = useAppearance();
-  const renderDevModeWarning = useDevModeWarning();
+  // const renderDevModeWarning = useDevModeWarning();
   const { branded } = useDisplayConfig();
 
   const cardFooterProps = {
@@ -134,7 +133,7 @@ export function SignInChooseSession() {
             </li>
           </ul>
         </Card.Body>
-        {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null}
+        {/* {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null} */}
       </Card.Content>
       <Card.Footer {...cardFooterProps}>
         <Card.FooterAction>
