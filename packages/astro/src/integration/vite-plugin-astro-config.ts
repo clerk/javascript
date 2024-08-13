@@ -16,6 +16,10 @@ export function vitePluginAstroConfig(
         return resolvedVirtualModuleId;
       }
     },
+    config(config) {
+      // This is necessary because it does not work in dev mode without pre-bundling.
+      config.optimizeDeps?.include?.push('@clerk/astro/client');
+    },
     load(id) {
       if (id === resolvedVirtualModuleId) {
         return `
