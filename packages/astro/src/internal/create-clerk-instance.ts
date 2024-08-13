@@ -9,31 +9,22 @@ import { runOnce } from './run-once';
 
 let initOptions: ClerkOptions | undefined;
 
-// TODO-SHARED: copied from `clerk-js`
-export const CLERK_BEFORE_UNLOAD_EVENT = 'clerk:beforeunload';
-
 setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
-
-function windowNavigate(to: URL | string): void {
-  const toURL = new URL(to, window.location.href);
-  window.dispatchEvent(new CustomEvent(CLERK_BEFORE_UNLOAD_EVENT));
-  window.location.href = toURL.href;
-}
 
 function createNavigationHandler(
   windowNav: typeof window.history.pushState | typeof window.history.replaceState,
 ): Exclude<ClerkOptions['routerPush'], undefined> | Exclude<ClerkOptions['routerReplace'], undefined> {
-  return (to, metadata) => {
-    if (metadata?.__internal_metadata?.navigationType === 'internal') {
+  return (to, opts) => {
+    if (opts?.__internal_metadata?.navigationType === 'internal') {
       windowNav(history.state, '', to);
     } else {
-      windowNavigate(to);
+      opts?.windowNavigate(to);
     }
   };
 }
 
 /**
- * Prevents firing clerk.load multiple times
+ * Prevents firing clerk.load() multiple times
  */
 const createClerkInstance = runOnce(createClerkInstanceInternal);
 

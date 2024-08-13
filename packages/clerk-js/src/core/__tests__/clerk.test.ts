@@ -784,7 +784,9 @@ describe('Clerk singleton', () => {
       await waitFor(() => {
         expect(mockSignUpCreate).not.toHaveBeenCalledWith({ transfer: true });
         expect(mockSetActive).not.toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith('/sign-in', undefined);
+        expect(mockNavigate).toHaveBeenCalledWith('/sign-in', {
+          windowNavigate: expect.any(Function),
+        });
       });
     });
 
