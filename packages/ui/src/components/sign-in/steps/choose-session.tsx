@@ -13,9 +13,9 @@ function getInitials({
   lastName,
   identifier,
 }: {
-  firstName?: string;
-  lastName?: string;
-  identifier?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  identifier?: string | null;
 }): string {
   let initials: string = '';
   if (firstName) {
