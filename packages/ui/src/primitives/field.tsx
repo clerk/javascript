@@ -16,10 +16,9 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
       ref={forwardedRef}
       {...props}
       className={cx(
-        '[--field-input-border-width:1px]',
         '[--field-input-height:1.875rem]',
-        '[--field-input-px:calc(theme(spacing.3)-var(--field-input-border-width))]',
-        '[--field-input-py:calc(theme(spacing[1.5])-var(--field-input-border-width))]',
+        '[--field-input-px:theme(spacing.3)]',
+        '[--field-input-py:theme(spacing[1.5])]',
         '[--field-input-group-end-size:--field-input-height]',
         'has-[[data-field-checkbox]]:[--cl-field-label-cursor:pointer]',
         'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
@@ -87,7 +86,7 @@ export const Hint = React.forwardRef(function FieldHint(
       data-field-hint=''
       ref={forwardedRef}
       {...props}
-      className={cx('text-gray-10 text-sm font-medium', className)}
+      className={cx('text-gray-9 text-sm font-medium', className)}
     >
       {children}
     </LabelEnd>
@@ -141,6 +140,10 @@ export const InputGroupEnd = React.forwardRef(function FieldInputGroupEnd(
   );
 });
 
+// Note:
+// - To create the overlapping border/shadow effect"
+//   - `ring` – "focus ring"
+//   - `ring-offset` - border
 export const Input = React.forwardRef(function FieldInput(
   {
     asChild,
@@ -169,8 +172,8 @@ export const Input = React.forwardRef(function FieldInput(
         // If an `InputGroup` exists, use the `pe` value, or fallback to the
         // standard input `px` value
         'pe-[var(--field-input-group-pe,var(--field-input-px))]',
-        'border-[length:--field-input-border-width] bg-clip-padding',
-        'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
+        'text-gray-12 relative flex min-w-0 items-center rounded-md bg-white text-base outline-none ring ring-offset-1',
+        'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
         // variant
         {
@@ -180,21 +183,20 @@ export const Input = React.forwardRef(function FieldInput(
         // state
         {
           native:
-            'border-[--cl-field-input-border] focus-visible:border-[--cl-field-input-border-active] focus-visible:ring-[0.1875rem] focus-visible:ring-[--cl-field-input-ring] hover:enabled:border-[--cl-field-input-border-active]',
-          hover: 'border-[--cl-field-input-border-active]',
-          'focus-visible': 'border-[--cl-field-input-border-active] ring-[0.1875rem] ring-[--cl-field-input-ring]',
+            'ring-offset-[--cl-field-input-border] focus-visible:ring focus-visible:ring-[--cl-field-input-ring,theme(ringColor.DEFAULT)] focus-visible:ring-offset-[--cl-field-input-border-active] hover:enabled:ring-offset-[--cl-field-input-border-active] [&:not(:focus-visible)]:ring-transparent',
+          hover: 'ring-transparent ring-offset-[--cl-field-input-border-active]',
+          'focus-visible':
+            'ring-[--cl-field-input-ring,theme(ringColor.DEFAULT)] ring-offset-[--cl-field-input-border-active]',
         }[state],
         // intent
         {
           idle: [
-            '[--cl-field-input-border:theme(colors.gray.a6)]',
-            '[--cl-field-input-border-active:theme(colors.gray.a8)]',
-            '[--cl-field-input-ring:theme(colors.gray.a3)]',
+            '[--cl-field-input-border:theme(colors.gray.a4)]',
+            '[--cl-field-input-border-active:theme(colors.gray.a7)]',
           ],
           info: [
-            '[--cl-field-input-border:theme(colors.gray.a8)]',
-            '[--cl-field-input-border-active:theme(colors.gray.a8)]',
-            '[--cl-field-input-ring:theme(colors.gray.a3)]',
+            '[--cl-field-input-border:theme(colors.gray.a7)]',
+            '[--cl-field-input-border-active:theme(colors.gray.a7)]',
           ],
           error: [
             '[--cl-field-input-border:theme(colors.danger.DEFAULT)]',

@@ -10,13 +10,13 @@ interface FeedbackBase {
 }
 
 export interface FeedbackErrorType extends FeedbackBase {
-  type: Extract<FieldStates, 'error'>;
   message: ClerkElementsFieldError;
+  type: Extract<FieldStates, 'error'>;
 }
 
 export interface FeedbackOtherType extends FeedbackBase {
-  type: Exclude<FieldStates, 'idle' | 'error'>;
   message: string;
+  type: Exclude<FieldStates, 'idle' | 'error'>;
 }
 
 export interface FeedbackPasswordErrorType extends FeedbackErrorType {
@@ -28,11 +28,12 @@ export interface FeedbackPasswordInfoType extends FeedbackOtherType {
 }
 
 export type FieldDetails = {
+  checked?: boolean;
+  disabled?: boolean;
+  feedback?: FeedbackErrorType | FeedbackOtherType | FeedbackPasswordErrorType | FeedbackPasswordInfoType;
   name?: string;
   type: React.HTMLInputTypeAttribute;
   value?: string | readonly string[] | number;
-  checked?: boolean;
-  feedback?: FeedbackErrorType | FeedbackOtherType | FeedbackPasswordErrorType | FeedbackPasswordInfoType;
 };
 
 export type FormFields = Map<string, FieldDetails>;

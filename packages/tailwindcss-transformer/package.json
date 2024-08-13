@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@babel/parser": "^7.24.5",
+    "cssnano": "7.0.5",
     "postcss": "^8.4.38",
     "postcss-value-parser": "^4.2.0",
     "recast": "^0.23.7",

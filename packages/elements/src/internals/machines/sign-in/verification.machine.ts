@@ -100,6 +100,7 @@ const SignInVerificationMachine = setup({
       // Only show these warnings in development!
       if (process.env.NODE_ENV === 'development') {
         if (
+          clerk.client.signIn.supportedFirstFactors &&
           !clerk.client.signIn.supportedFirstFactors.every(factor => context.registeredStrategies.has(factor.strategy))
         ) {
           console.warn(
@@ -125,7 +126,7 @@ const SignInVerificationMachine = setup({
         }
 
         const strategiesUsedButNotActivated = Array.from(context.registeredStrategies).filter(
-          strategy => !clerk.client.signIn.supportedFirstFactors.some(supported => supported.strategy === strategy),
+          strategy => !clerk.client.signIn.supportedFirstFactors?.some(supported => supported.strategy === strategy),
         );
 
         if (strategiesUsedButNotActivated.length > 0) {

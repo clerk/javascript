@@ -98,10 +98,10 @@ const config = {
         },
       },
       ringWidth: {
-        DEFAULT: '0.125rem',
+        DEFAULT: '0.1875rem',
       },
       ringColor: {
-        DEFAULT: 'var(--cl-accent-a9)',
+        DEFAULT: 'var(--cl-gray-a4)',
       },
       animation: {
         spin: 'cl-spin linear infinite',

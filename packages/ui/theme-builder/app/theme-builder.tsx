@@ -74,8 +74,8 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           __html: css,
         }}
       />
-      <div className='flex h-dvh flex-col overflow-hidden'>
-        <header className='flex h-16 shrink-0 items-center justify-end border-b px-4'>
+      <div className='grid h-dvh grid-cols-[min-content,minmax(0,1fr)] grid-rows-[min-content,minmax(0,1fr)] overflow-hidden'>
+        <header className='col-span-full flex h-16 shrink-0 items-center justify-end border-b px-4'>
           <div className='inline-flex items-center gap-x-2 text-xs'>
             <label htmlFor='component'>Component</label>
             <div className='relative'>
@@ -113,164 +113,164 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-        <div className='flex flex-1'>
-          <aside className='relative isolate flex h-full w-[17rem] shrink-0 flex-col border-e bg-white p-4'>
-            <div className='space-y-4'>
-              <ToggleGroup
-                items={[
-                  {
-                    label: 'Light',
-                    value: 'light',
-                  },
-                  {
-                    label: 'Dark',
-                    value: 'dark',
-                  },
-                ]}
-                value={appearance}
-                onValueChange={setAppearance}
-              />
-              <ToggleGroup
-                items={[
-                  {
-                    label: 'LTR',
-                    value: 'ltr',
-                  },
-                  {
-                    label: 'RTL',
-                    value: 'rtl',
-                  },
-                ]}
-                value={dir}
-                onValueChange={setDir}
-              />
-              {appearance === 'light' ? (
-                <>
-                  <ColorPicker
-                    label='Accent'
-                    description='The accent color used for interactive elements.'
-                    color={lightAccent}
-                    onChange={setLightAccent}
-                  />
-                  <ColorPicker
-                    label='Gray'
-                    description='The accent color used for interactive elements.'
-                    color={lightGray}
-                    onChange={setLightGray}
-                  />
-                  <ColorPicker
-                    label='Background'
-                    description='The accent color used for interactive elements.'
-                    color={lightBackground}
-                    onChange={setLightBackground}
-                  />
-                </>
-              ) : (
-                <>
-                  <ColorPicker
-                    label='Accent'
-                    description='The accent color used for interactive elements.'
-                    color={darkAccent}
-                    onChange={setDarkAccent}
-                  />
-                  <ColorPicker
-                    label='Gray'
-                    description='The accent color used for interactive elements.'
-                    color={darkGray}
-                    onChange={setDarkGray}
-                  />
-                  <ColorPicker
-                    label='Background'
-                    description='The accent color used for interactive elements.'
-                    color={darkBackground}
-                    onChange={setDarkBackground}
-                  />
-                </>
-              )}
-              <div>
-                <label
-                  htmlFor='radius'
-                  className='text-xs font-medium text-neutral-700'
-                >
-                  Radius
-                </label>
-                <input
-                  id='radius'
-                  value={radius}
-                  onChange={e => setRadius(e.target.value)}
-                  className='w-full rounded border p-2 text-xs'
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor='spacing-unit'
-                  className='text-xs font-medium text-neutral-700'
-                >
-                  Spacing unit
-                </label>
-                <input
-                  id='spacing-unit'
-                  value={spacingUnit}
-                  onChange={e => setSpacingUnit(e.target.value)}
-                  className='w-full rounded border p-2 text-xs'
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor='font-size'
-                  className='text-xs font-medium text-neutral-700'
-                >
-                  Font size
-                </label>
-                <input
-                  id='font-size'
-                  value={fontSize}
-                  onChange={e => setFontSize(e.target.value)}
-                  className='w-full rounded border p-2 text-xs'
-                />
-              </div>
-            </div>
-            <div className='mt-auto space-y-2'>
-              <button
-                type='button'
-                className='w-full rounded border bg-white p-1.5 text-xs'
-                onClick={handleReset}
-              >
-                Reset
-              </button>
-              <ThemeDialog
-                trigger={
-                  <button
-                    type='button'
-                    className='w-full rounded border bg-white p-1.5 text-xs'
-                  >
-                    View CSS
-                  </button>
-                }
-              >
-                {css}
-              </ThemeDialog>
-            </div>
-          </aside>
-          <figure
-            className={cx('relative isolate grid w-full flex-1 place-content-center overflow-y-auto', {
-              'bg-neutral-50': appearance === 'light',
-              'dark bg-neutral-950': appearance === 'dark',
-            })}
-          >
-            <div
-              className={cx(
-                'absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),var(--line-color)),linear-gradient(to_right,transparent_calc(56px-1px),_var(--line-color))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]',
+
+        <aside className='relative isolate flex h-full w-[17rem] shrink-0 flex-col overflow-y-auto border-e bg-white p-4'>
+          <div className='space-y-4'>
+            <ToggleGroup
+              items={[
                 {
-                  '[--line-color:theme(colors.neutral.400)]': appearance === 'light',
-                  '[--line-color:theme(colors.neutral.600)]': appearance === 'dark',
+                  label: 'Light',
+                  value: 'light',
                 },
-              )}
-              aria-hidden='true'
+                {
+                  label: 'Dark',
+                  value: 'dark',
+                },
+              ]}
+              value={appearance}
+              onValueChange={setAppearance}
             />
-            {children}
-          </figure>
-        </div>
+            <ToggleGroup
+              items={[
+                {
+                  label: 'LTR',
+                  value: 'ltr',
+                },
+                {
+                  label: 'RTL',
+                  value: 'rtl',
+                },
+              ]}
+              value={dir}
+              onValueChange={setDir}
+            />
+            {appearance === 'light' ? (
+              <>
+                <ColorPicker
+                  label='Accent'
+                  description='The accent color used for interactive elements.'
+                  color={lightAccent}
+                  onChange={setLightAccent}
+                />
+                <ColorPicker
+                  label='Gray'
+                  description='The accent color used for interactive elements.'
+                  color={lightGray}
+                  onChange={setLightGray}
+                />
+                <ColorPicker
+                  label='Background'
+                  description='The accent color used for interactive elements.'
+                  color={lightBackground}
+                  onChange={setLightBackground}
+                />
+              </>
+            ) : (
+              <>
+                <ColorPicker
+                  label='Accent'
+                  description='The accent color used for interactive elements.'
+                  color={darkAccent}
+                  onChange={setDarkAccent}
+                />
+                <ColorPicker
+                  label='Gray'
+                  description='The accent color used for interactive elements.'
+                  color={darkGray}
+                  onChange={setDarkGray}
+                />
+                <ColorPicker
+                  label='Background'
+                  description='The accent color used for interactive elements.'
+                  color={darkBackground}
+                  onChange={setDarkBackground}
+                />
+              </>
+            )}
+            <div>
+              <label
+                htmlFor='radius'
+                className='text-xs font-medium text-neutral-700'
+              >
+                Radius
+              </label>
+              <input
+                id='radius'
+                value={radius}
+                onChange={e => setRadius(e.target.value)}
+                className='w-full rounded border p-2 text-xs'
+              />
+            </div>
+            <div>
+              <label
+                htmlFor='spacing-unit'
+                className='text-xs font-medium text-neutral-700'
+              >
+                Spacing unit
+              </label>
+              <input
+                id='spacing-unit'
+                value={spacingUnit}
+                onChange={e => setSpacingUnit(e.target.value)}
+                className='w-full rounded border p-2 text-xs'
+              />
+            </div>
+            <div>
+              <label
+                htmlFor='font-size'
+                className='text-xs font-medium text-neutral-700'
+              >
+                Font size
+              </label>
+              <input
+                id='font-size'
+                value={fontSize}
+                onChange={e => setFontSize(e.target.value)}
+                className='w-full rounded border p-2 text-xs'
+              />
+            </div>
+          </div>
+          <div className='mt-auto space-y-2'>
+            <button
+              type='button'
+              className='w-full rounded border bg-white p-1.5 text-xs'
+              onClick={handleReset}
+            >
+              Reset
+            </button>
+            <ThemeDialog
+              trigger={
+                <button
+                  type='button'
+                  className='w-full rounded border bg-white p-1.5 text-xs'
+                >
+                  View CSS
+                </button>
+              }
+            >
+              {css}
+            </ThemeDialog>
+          </div>
+        </aside>
+
+        <figure
+          className={cx('relative isolate grid items-center overflow-y-auto p-4', {
+            'bg-neutral-50': appearance === 'light',
+            'dark bg-neutral-950': appearance === 'dark',
+          })}
+        >
+          <div
+            className={cx(
+              'pointer-events-none absolute inset-0 isolate [background-image:linear-gradient(to_bottom,transparent_calc(56px-1px),var(--line-color)),linear-gradient(to_right,transparent_calc(56px-1px),_var(--line-color))] [background-size:56px_56px] [mask-image:repeating-linear-gradient(to_right,transparent,black_1px_1px,transparent_1px_4px),repeating-linear-gradient(to_bottom,transparent,black_1px_1px,transparent_1px_4px)]',
+              {
+                '[--line-color:theme(colors.neutral.400)]': appearance === 'light',
+                '[--line-color:theme(colors.neutral.600)]': appearance === 'dark',
+              },
+            )}
+            aria-hidden='true'
+          />
+          <div className='mx-auto w-full'>{children}</div>
+        </figure>
       </div>
     </>
   );
