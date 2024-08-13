@@ -60,8 +60,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(isSatellite, 'PUBLIC_CLERK_IS_SATELLITE'),
                 ...buildEnvVarFromOption(proxyUrl, 'PUBLIC_CLERK_PROXY_URL'),
                 ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
-                ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
-                ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
                 ...buildEnvVarFromOption(clerkJSVariant, 'PUBLIC_CLERK_JS_VARIANT'),
                 ...buildEnvVarFromOption(clerkJSVersion, 'PUBLIC_CLERK_JS_VERSION'),
