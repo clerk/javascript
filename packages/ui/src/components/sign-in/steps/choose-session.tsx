@@ -30,6 +30,26 @@ function getInitials({
   return initials;
 }
 
+function getTitleAndSubtitle({
+  firstName,
+  lastName,
+  identifier,
+}: {
+  firstName?: string | null;
+  lastName?: string | null;
+  identifier?: string | null;
+}) {
+  let title = '';
+  let subtitle = '';
+  if (firstName || lastName) {
+    title = `${firstName} ${lastName}`;
+    subtitle = identifier || '';
+  } else {
+    title = identifier || '';
+  }
+  return { title, subtitle };
+}
+
 const sessionAction = cva({
   base: 'text-left text-gray-11 hover:bg-gray-2 data-[focus-visible]:bg-gray-2 flex w-full items-center gap-x-3 px-10 py-4 text-base outline-none [--session-icon-opacity:0] data-[hovered]:[--session-icon-opacity:1]',
 });
@@ -61,14 +81,7 @@ export function SignInChooseSession() {
           <ul className='-mx-[--card-body-padding] -mb-[--card-body-padding] overflow-hidden rounded-b-[--card-content-rounded-b]'>
             {activeSessions?.map(session => {
               const { userId, identifier, firstName, lastName, hasImage, imageUrl } = session.publicUserData;
-              let title = '';
-              let subtitle = '';
-              if (firstName || lastName) {
-                title = `${firstName} ${lastName}`;
-                subtitle = identifier;
-              } else {
-                title = identifier;
-              }
+              const { title, subtitle } = getTitleAndSubtitle({ firstName, lastName, identifier });
               return (
                 <li
                   key={userId}
