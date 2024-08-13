@@ -29,6 +29,7 @@ export const createLongRunningApps = () => {
     { id: 'astro.static.withCustomRoles', config: astro.static, env: envs.withCustomRoles },
     { id: 'expo.expo-web', config: expo.expoWeb, env: envs.withEmailCodes },
     { id: 'tanstack.start', config: tanstack.start, env: envs.withEmailCodes },
+    { id: 'tanstack.router', config: tanstack.router, env: envs.withEmailCodes },
   ] as const;
 
   const apps = configs.map(longRunningApplication);
