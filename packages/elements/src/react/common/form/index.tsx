@@ -4,6 +4,7 @@ import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { Autocomplete } from '@clerk/types';
 import { composeEventHandlers } from '@radix-ui/primitive';
 import type {
+  Control as RadixControl,
   FormControlProps,
   FormControlProps as RadixFormControlProps,
   FormFieldProps as RadixFormFieldProps,
@@ -12,7 +13,6 @@ import type {
   FormSubmitProps as RadixFormSubmitProps,
 } from '@radix-ui/react-form';
 import {
-  Control as RadixControl,
   Field as RadixField,
   Form as RadixForm,
   FormMessage as RadixFormMessage,
@@ -27,381 +27,27 @@ import type { BaseActorRef } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';
 import { ClerkElementsFieldError, ClerkElementsRuntimeError } from '~/internals/errors';
-import type { FieldDetails } from '~/internals/machines/form';
-import {
-  fieldFeedbackSelector,
-  fieldHasValueSelector,
-  fieldValueSelector,
-  globalErrorsSelector,
-  useFormSelector,
-  useFormStore,
-} from '~/internals/machines/form/form.context';
-import { usePassword } from '~/react/hooks/use-password.hook';
+import { useFormStore } from '~/internals/machines/form/form.context';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 import { useSignInPasskeyAutofill } from '~/react/sign-in/context/router.context';
 import type { ErrorCodeOrTuple } from '~/react/utils/generate-password-error-text';
 import { isReactFragment } from '~/react/utils/is-react-fragment';
 
+import {
+  FieldContext,
+  useField,
+  useFieldContext,
+  useFieldFeedback,
+  useFieldState,
+  useForm,
+  useGlobalErrors,
+  useInput,
+  useValidityStateContext,
+  ValidityStateContext,
+} from './hooks';
 import type { OTPInputProps } from './otp';
-import { OTP_LENGTH_DEFAULT, OTPInput } from './otp';
-import { type ClerkFieldId, FIELD_STATES, type FieldStates } from './types';
-
-/* -------------------------------------------------------------------------------------------------
- * Context
- * -----------------------------------------------------------------------------------------------*/
-
-const FieldContext = React.createContext<Pick<FieldDetails, 'name'> | null>(null);
-const useFieldContext = () => React.useContext(FieldContext);
-
-const ValidityStateContext = React.createContext<ValidityState | undefined>(undefined);
-const useValidityStateContext = () => React.useContext(ValidityStateContext);
-
-/* -------------------------------------------------------------------------------------------------
- * Utils
- * -----------------------------------------------------------------------------------------------*/
-
-const determineInputTypeFromName = (name: FormFieldProps['name']) => {
-  if (name === 'password' || name === 'confirmPassword' || name === 'currentPassword' || name === 'newPassword') {
-    return 'password' as const;
-  }
-  if (name === 'emailAddress') {
-    return 'email' as const;
-  }
-  if (name === 'phoneNumber') {
-    return 'tel' as const;
-  }
-  if (name === 'code') {
-    return 'otp' as const;
-  }
-  if (name === 'backup_code') {
-    return 'backup_code' as const;
-  }
-
-  return 'text' as const;
-};
-
-/**
- * Radix can return the ValidityState object, which contains the validity of the field. We need to merge this with our existing fieldState.
- * When the ValidityState is valid: false, the fieldState should be overriden. Otherwise, it shouldn't change at all.
- * @see https://www.radix-ui.com/primitives/docs/components/form#validitystate
- * @see https://developer.mozilla.org/en-US/docs/Web/API/ValidityState
- */
-const enrichFieldState = (validity: ValidityState | undefined, fieldState: FieldStates) => {
-  return validity?.valid === false ? FIELD_STATES.error : fieldState;
-};
-
-/* -------------------------------------------------------------------------------------------------
- * Hooks
- * -----------------------------------------------------------------------------------------------*/
-
-function usePrevious<T>(value: T): T | undefined {
-  const ref = React.useRef<T>();
-
-  React.useEffect(() => {
-    ref.current = value;
-  }, [value]);
-
-  return ref.current;
-}
-
-const useGlobalErrors = () => {
-  const errors = useFormSelector(globalErrorsSelector);
-
-  return {
-    errors,
-  };
-};
-
-const useFieldFeedback = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
-  const feedback = useFormSelector(fieldFeedbackSelector(name));
-
-  return {
-    feedback,
-  };
-};
-
-/**
- * Given a field name, determine the current state of the field
- */
-const useFieldState = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
-  const { feedback } = useFieldFeedback({ name });
-  const hasValue = useFormSelector(fieldHasValueSelector(name));
-
-  /**
-   * If hasValue is false, the state should be idle
-   * The rest depends on the feedback type
-   */
-  let state: FieldStates = FIELD_STATES.idle;
-
-  if (!hasValue) {
-    state = FIELD_STATES.idle;
-  }
-
-  switch (feedback?.type) {
-    case 'error':
-      state = FIELD_STATES.error;
-      break;
-    case 'warning':
-      state = FIELD_STATES.warning;
-      break;
-    case 'info':
-      state = FIELD_STATES.info;
-      break;
-    case 'success':
-      state = FIELD_STATES.success;
-      break;
-    default:
-      break;
-  }
-
-  return {
-    state,
-  };
-};
-
-/**
- * Provides the form submission handler along with the form's validity via a data attribute
- */
-const useForm = ({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) => {
-  const { errors } = useGlobalErrors();
-
-  // Register the onSubmit handler for form submission
-  // TODO: merge user-provided submit handler
-  const onSubmit = React.useCallback(
-    (event: React.FormEvent<Element>) => {
-      event.preventDefault();
-      if (flowActor) {
-        flowActor.send({ type: 'SUBMIT' });
-      }
-    },
-    [flowActor],
-  );
-
-  return {
-    props: {
-      ...(errors.length > 0 ? { 'data-global-error': true } : {}),
-      onSubmit,
-    },
-  };
-};
-
-const useField = ({ name }: Partial<Pick<FieldDetails, 'name'>>) => {
-  const hasValue = useFormSelector(fieldHasValueSelector(name));
-  const { feedback } = useFieldFeedback({ name });
-
-  const shouldBeHidden = false; // TODO: Implement clerk-js utils
-  const hasError = feedback ? feedback.type === 'error' : false;
-
-  return {
-    hasValue,
-    props: {
-      'data-hidden': shouldBeHidden ? true : undefined,
-      serverInvalid: hasError,
-    },
-  };
-};
-
-const useInput = ({
-  name: inputName,
-  value: providedValue,
-  checked: providedChecked,
-  type: inputType,
-  onChange: onChangeProp,
-  onBlur: onBlurProp,
-  onFocus: onFocusProp,
-  ...passthroughProps
-}: FormInputProps) => {
-  // Inputs can be used outside a <Field> wrapper if desired, so safely destructure here
-  const fieldContext = useFieldContext();
-  const rawName = inputName || fieldContext?.name;
-  const name = rawName === 'backup_code' ? 'code' : rawName; // `backup_code` is a special case of `code`
-  const { state: fieldState } = useFieldState({ name });
-  const validity = useValidityStateContext();
-
-  if (!rawName || !name) {
-    throw new Error('Clerk: <Input /> must be wrapped in a <Field> component or have a name prop.');
-  }
-
-  const ref = useFormStore();
-  const [hasPassedValiation, setHasPassedValidation] = React.useState(false);
-
-  const { validatePassword } = usePassword({
-    onValidationComplexity: hasPassed => setHasPassedValidation(hasPassed),
-    onValidationSuccess: () => {
-      ref.send({
-        type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'success', message: 'Your password meets all the necessary requirements.' } },
-      });
-    },
-    onValidationError: (error, codes) => {
-      if (error) {
-        ref.send({
-          type: 'FIELD.FEEDBACK.SET',
-          field: {
-            name,
-            feedback: {
-              type: 'error',
-              message: new ClerkElementsFieldError('password-validation-error', error),
-              codes,
-            },
-          },
-        });
-      }
-    },
-    onValidationWarning: (warning, codes) =>
-      ref.send({
-        type: 'FIELD.FEEDBACK.SET',
-        field: { name, feedback: { type: 'warning', message: warning, codes } },
-      }),
-    onValidationInfo: (info, codes) => {
-      // TODO: If input is not focused, make this info an error
-      ref.send({
-        type: 'FIELD.FEEDBACK.SET',
-        field: {
-          name,
-          feedback: {
-            type: 'info',
-            message: info,
-            codes,
-          },
-        },
-      });
-    },
-  });
-  const value = useFormSelector(fieldValueSelector(name));
-  const prevValue = usePrevious(value);
-  const hasValue = Boolean(value);
-  const type = inputType ?? determineInputTypeFromName(rawName);
-  let nativeFieldType = type;
-  let shouldValidatePassword = false;
-
-  if (type === 'password' || type === 'text') {
-    shouldValidatePassword = Boolean((passthroughProps as PasswordInputProps).validatePassword);
-  }
-
-  if (nativeFieldType === 'otp' || nativeFieldType === 'backup_code') {
-    nativeFieldType = 'text';
-  }
-
-  // Register the field in the machine context
-  React.useEffect(() => {
-    if (!name) {
-      return;
-    }
-
-    ref.send({
-      type: 'FIELD.ADD',
-      field: { name, type: nativeFieldType, value: providedValue, checked: providedChecked },
-    });
-
-    return () => ref.send({ type: 'FIELD.REMOVE', field: { name } });
-  }, [ref]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Register the onChange handler for field updates to persist to the machine context
-  const onChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChangeProp?.(event);
-      if (!name) {
-        return;
-      }
-      ref.send({ type: 'FIELD.UPDATE', field: { name, value: event.target.value, checked: event.target.checked } });
-      if (shouldValidatePassword) {
-        validatePassword(event.target.value);
-      }
-    },
-    [ref, name, onChangeProp, shouldValidatePassword, validatePassword],
-  );
-
-  const onBlur = React.useCallback(
-    (event: React.FocusEvent<HTMLInputElement>) => {
-      onBlurProp?.(event);
-      if (shouldValidatePassword && event.target.value !== prevValue) {
-        validatePassword(event.target.value);
-      }
-    },
-    [onBlurProp, shouldValidatePassword, validatePassword, prevValue],
-  );
-
-  const onFocus = React.useCallback(
-    (event: React.FocusEvent<HTMLInputElement>) => {
-      onFocusProp?.(event);
-      if (shouldValidatePassword && event.target.value !== prevValue) {
-        validatePassword(event.target.value);
-      }
-    },
-    [onFocusProp, shouldValidatePassword, validatePassword, prevValue],
-  );
-
-  React.useEffect(() => {
-    if (!name) {
-      return;
-    }
-
-    if (
-      (type === 'checkbox' && providedChecked !== undefined) ||
-      (type !== 'checkbox' && providedValue !== undefined)
-    ) {
-      ref.send({ type: 'FIELD.UPDATE', field: { name, value: providedValue, checked: providedChecked } });
-    }
-  }, [name, type, ref, providedValue, providedChecked]);
-
-  // TODO: Implement clerk-js utils
-  const shouldBeHidden = false;
-
-  const Element = type === 'otp' ? OTPInput : RadixControl;
-
-  let props = {};
-  if (type === 'otp') {
-    const p = passthroughProps as Omit<OTPInputProps, 'name' | 'value' | 'type'>;
-    const length = p.length || OTP_LENGTH_DEFAULT;
-
-    props = {
-      'data-otp-input': true,
-      autoComplete: 'one-time-code',
-      inputMode: 'numeric',
-      pattern: `[0-9]{${length}}`,
-      minLength: length,
-      maxLength: length,
-      onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-        // Only accept numbers
-        event.currentTarget.value = event.currentTarget.value.replace(/\D+/g, '');
-        onChange(event);
-      },
-      type: 'text',
-      spellCheck: false,
-    };
-  } else if (type === 'backup_code') {
-    props = {
-      autoComplete: 'off',
-      type: 'text',
-      spellCheck: false,
-    };
-  } else if (type === 'password' && shouldValidatePassword) {
-    props = {
-      'data-has-passed-validation': hasPassedValiation ? true : undefined,
-    };
-  }
-
-  // Filter out invalid props that should not be passed through
-  // @ts-expect-error - Doesn't know about type narrowing by type here
-  const { validatePassword: _1, ...rest } = passthroughProps;
-
-  return {
-    Element,
-    props: {
-      type,
-      value: value ?? '',
-      onChange,
-      onBlur,
-      onFocus,
-      'data-hidden': shouldBeHidden ? true : undefined,
-      'data-has-value': hasValue ? true : undefined,
-      'data-state': enrichFieldState(validity, fieldState),
-      ...props,
-      ...rest,
-    },
-  };
-};
+import type { ClerkFieldId, FieldStates } from './types';
+import { enrichFieldState } from './utils';
 
 /* -------------------------------------------------------------------------------------------------
  * Form
