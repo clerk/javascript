@@ -8,13 +8,24 @@ import { useLocalizations } from '~/hooks/use-localizations';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 
-function getInitials(firstName?: string | null, lastName?: string | null): string {
+function getInitials({
+  firstName,
+  lastName,
+  identifier,
+}: {
+  firstName?: string;
+  lastName?: string;
+  identifier?: string;
+}): string {
   let initials: string = '';
   if (firstName) {
     initials += firstName[0].toUpperCase();
   }
   if (lastName) {
     initials += lastName[0].toUpperCase();
+  }
+  if (!initials && identifier) {
+    initials += identifier[0].toUpperCase();
   }
   return initials;
 }
@@ -69,7 +80,9 @@ export function SignInChooseSession() {
                         alt=''
                       />
                     ) : (
-                      <span className='text-gray-11 text-base font-medium'>{getInitials(firstName, lastName)}</span>
+                      <span className='text-gray-11 text-base font-medium'>
+                        {getInitials({ firstName, lastName, identifier })}
+                      </span>
                     )}
                   </span>
                   <span className='flex min-w-0 flex-1 flex-col'>
