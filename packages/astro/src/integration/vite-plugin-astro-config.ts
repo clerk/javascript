@@ -28,7 +28,7 @@ export function vitePluginAstroConfig(
 
           export function isStaticOutput(forceStatic) {
             if (astroConfig.output === 'hybrid' && forceStatic === undefined) {
-              throw new Error('Please specify if component should be in static or server mode.');
+              return 'server';
             }
 
             if (forceStatic !== undefined) {
