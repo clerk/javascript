@@ -269,7 +269,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             )}
             aria-hidden='true'
           />
-          <div className='mx-auto w-full'>{children}</div>
+          {children}
         </figure>
       </div>
     </>

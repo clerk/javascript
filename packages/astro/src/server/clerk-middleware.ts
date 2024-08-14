@@ -104,11 +104,11 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
         handlerResult = handleControlFlowErrors(e, clerkRequest, requestState, context);
       }
 
-      if (isRedirect(handlerResult!)) {
-        return serverRedirectWithAuth(context, clerkRequest, handlerResult!, options);
+      if (isRedirect(handlerResult)) {
+        return serverRedirectWithAuth(context, clerkRequest, handlerResult, options);
       }
 
-      const response = await decorateRequest(context.locals, handlerResult!, requestState);
+      const response = decorateRequest(context.locals, handlerResult);
       if (requestState.headers) {
         requestState.headers.forEach((value, key) => {
           response.headers.append(key, value);
@@ -262,18 +262,7 @@ function findClosingHeadTagIndex(chunk: Uint8Array, endHeadTag: Uint8Array) {
   return chunk.findIndex((_, i) => endHeadTag.every((value, j) => value === chunk[i + j]));
 }
 
-async function decorateRequest(
-  locals: APIContext['locals'],
-  res: Response,
-  requestState: RequestState,
-): Promise<Response> {
-  const { reason, message, status, token } = requestState;
-
-  res.headers.set(constants.Headers.AuthToken, token || '');
-  res.headers.set(constants.Headers.AuthStatus, status);
-  res.headers.set(constants.Headers.AuthMessage, message || '');
-  res.headers.set(constants.Headers.AuthReason, reason || '');
-
+function decorateRequest(locals: APIContext['locals'], res: Response): Response {
   /**
    * Populate every page with the authObject. This allows for SSR to work properly
    * without sucrificing DX and having developers wrap each page with a Layout that would handle this.
