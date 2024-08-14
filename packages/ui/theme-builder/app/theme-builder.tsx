@@ -35,7 +35,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const [radius, setRadius] = useState(radiusDefault);
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [fontSize, setFontSize] = useState(fontSizeDefault);
-  const [devMode, setDevMode] = useState<'on' | 'off'>('on')
+  const [devMode, setDevMode] = useState('on')
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
@@ -166,7 +166,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 },
               ]}
               value={devMode}
-              onValueChange={v => setDevMode(v as 'on' | 'off')}
+              onValueChange={setDevMode}
             />
             {appearance === 'light' ? (
               <>
