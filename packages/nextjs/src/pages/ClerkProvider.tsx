@@ -1,6 +1,6 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
-import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/clerk-react/internal';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -12,6 +12,7 @@ import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
+setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
 export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;

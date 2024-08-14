@@ -56,7 +56,7 @@ export class SignIn extends BaseResource implements SignInResource {
   id?: string;
   status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
-  supportedFirstFactors: SignInFirstFactor[] = [];
+  supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
@@ -230,7 +230,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     await this.create({ identifier });
 
-    const web3FirstFactor = this.supportedFirstFactors.find(
+    const web3FirstFactor = this.supportedFirstFactors?.find(
       f => f.strategy === 'web3_metamask_signature',
     ) as Web3SignatureFactor;
 
@@ -338,7 +338,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.status = data.status;
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
-      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[];
+      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);

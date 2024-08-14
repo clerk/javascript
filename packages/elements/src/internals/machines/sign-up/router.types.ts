@@ -92,6 +92,7 @@ export interface SignUpRouterContext extends BaseRouterContext {
   formRef: ActorRefFrom<TFormMachine>;
   loading: SignUpRouterLoadingContext;
   signInPath: string;
+  ticket: string | undefined;
 }
 
 // ---------------------------------- Schema ---------------------------------- //

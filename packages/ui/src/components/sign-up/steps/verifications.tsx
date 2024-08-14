@@ -4,6 +4,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/hooks/use-appearance';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
@@ -48,7 +49,7 @@ export function SignUpVerifications() {
   const { layout } = useAppearance();
   const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
 
-  const renderDevModeNotice = useDevModeWarning();
+  const isDev = useDevModeWarning();
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -61,7 +62,7 @@ export function SignUpVerifications() {
       {isGlobalLoading => {
         return (
           <SignUp.Step name='verifications'>
-            <Card.Root>
+            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <SignUp.Strategy name='phone_code'>
                   <Card.Header>
@@ -276,7 +277,6 @@ export function SignUpVerifications() {
                     </SignUp.Action>
                   </Card.Body>
                 </SignUp.Strategy>
-                {renderDevModeNotice ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
               <Card.Footer {...cardFooterProps} />
             </Card.Root>

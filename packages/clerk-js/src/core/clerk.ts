@@ -14,6 +14,7 @@ import {
   proxyUrlToAbsoluteURL,
   stripScheme,
 } from '@clerk/shared';
+import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
@@ -269,6 +270,13 @@ export class Clerk implements ClerkInterface {
   public load = async (options?: ClerkOptions): Promise<void> => {
     if (this.loaded) {
       return;
+    }
+
+    // Log a development mode warning once
+    if (this.#instanceType === 'development') {
+      logger.warnOnce(
+        'Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview',
+      );
     }
 
     this.#options = {
@@ -820,7 +828,10 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    const metadata = options?.metadata ? { __internal_metadata: options?.metadata } : undefined;
+    const metadata = {
+      ...(options?.metadata ? { __internal_metadata: options?.metadata } : {}),
+      windowNavigate,
+    };
     // React router only wants the path, search or hash portion.
     return await customNavigate(stripOrigin(toURL), metadata);
   };

@@ -4,9 +4,10 @@ import * as SignIn from '@clerk/elements/sign-in';
 import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/hooks/use-appearance';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -15,13 +16,12 @@ import { LinkButton } from '~/primitives/link';
 import { Separator } from '~/primitives/separator';
 
 export function SignInForgotPassword() {
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
   const { layout } = useAppearance();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { setShowHelp } = useGetHelp();
 
-  const isDev = isDevelopmentOrStaging();
+  const isDev = useDevModeWarning();
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -34,7 +34,7 @@ export function SignInForgotPassword() {
       {isGlobalLoading => {
         return (
           <SignIn.Step name='forgot-password'>
-            <Card.Root>
+            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
                   {logoImageUrl ? (
@@ -152,7 +152,6 @@ export function SignInForgotPassword() {
                     <LinkButton>{t('backButton')}</LinkButton>
                   </SignIn.Action>
                 </Card.Body>
-                {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
               <Card.Footer {...cardFooterProps}>
                 <Card.FooterAction>

@@ -79,7 +79,7 @@ export function Connections(
           return (
             <li
               key={c.provider}
-              className='w-[calc(100%/var(--cl-connection-columns))] p-[calc(var(--cl-connection-gap)/2)]'
+              className='w-full p-[calc(var(--cl-connection-gap)/2)] sm:w-[calc(100%/var(--cl-connection-columns))]'
             >
               <Common.Loading scope={`provider:${c.provider}`}>
                 {isConnectionLoading => {
