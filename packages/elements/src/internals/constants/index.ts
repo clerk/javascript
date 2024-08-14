@@ -1,4 +1,5 @@
 export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
+export const CHOOSE_SESSION_PATH_ROUTE = '/choose';
 export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 
 export const SIGN_IN_DEFAULT_BASE_PATH =

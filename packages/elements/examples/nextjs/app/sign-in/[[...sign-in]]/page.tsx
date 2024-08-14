@@ -240,6 +240,42 @@ export default function SignInPage() {
         </SignIn.Step>
 
         <SignIn.Step
+          name='choose-session'
+          className='flex w-96 flex-col items-center gap-6'
+        >
+          <H3>CHOOSE SESSION:</H3>
+
+          <SignIn.SessionList
+            asChild
+            id='all-asChild'
+          >
+            <section>
+              <SignIn.SessionListItem asChild>{({ session }) => <p>{session.id}</p>}</SignIn.SessionListItem>
+            </section>
+          </SignIn.SessionList>
+
+          <SignIn.SessionList
+            asChild
+            id='default-with-root-asChild'
+          >
+            <section>
+              <SignIn.SessionListItem>{({ session }) => <>{session.id}</>}</SignIn.SessionListItem>
+            </section>
+          </SignIn.SessionList>
+
+          <SignIn.SessionList id='default'>
+            <SignIn.SessionListItem>{({ session }) => <>{session.id}</>}</SignIn.SessionListItem>
+          </SignIn.SessionList>
+
+          <SignIn.SessionList id='default-item-with-child'>
+            <SignIn.SessionListItem>{({ session }) => <strong>{session.id}</strong>}</SignIn.SessionListItem>
+          </SignIn.SessionList>
+
+          <SignIn.SessionList id='default-item-with-child'>
+            <SignIn.SessionListItem asChild>{({ session }) => <p>{session.id}</p>}</SignIn.SessionListItem>
+          </SignIn.SessionList>
+        </SignIn.Step>
+        <SignIn.Step
           name='choose-strategy'
           className='flex w-96 flex-col items-center gap-6'
         >
