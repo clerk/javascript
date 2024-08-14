@@ -51,7 +51,7 @@ function getTitleAndSubtitle({
 }
 
 const sessionAction = cva({
-  base: 'text-left text-gray-11 hover:bg-gray-2 data-[focus-visible]:bg-gray-2 flex w-full items-center gap-x-3 px-10 py-4 text-base outline-none [--session-icon-opacity:0] data-[hovered]:[--session-icon-opacity:1]',
+  base: 'text-start text-gray-11 hover:bg-gray-2 data-[focus-visible]:bg-gray-2 flex w-full items-center gap-x-3 px-10 py-4 text-base outline-none [--session-icon-opacity:0] data-[hovered]:[--session-icon-opacity:1]',
 });
 
 export function SignInChooseSession() {
@@ -156,7 +156,7 @@ export function SignInChooseSession() {
                 xmlns='http://www.w3.org/2000/svg'
                 fill='none'
                 viewBox='0 0 36 24'
-                className='w-9'
+                className='w-9 rtl:rotate-180'
               >
                 <path
                   fill='currentColor'
