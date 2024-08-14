@@ -5,6 +5,15 @@ import { computed, onMount, type Store } from 'nanostores';
 import { $clerk, $csrState, $initialState } from './internal';
 
 /**
+ * A client side store that is set to `true` after clerk-js has loaded.
+ * @example
+ * A simple example:
+ *
+ * $clerkLoadedStore.subscribe((loaded) => console.log(loaded))
+ */
+export const $clerkLoadedStore = computed($csrState, (state) => state.isLoaded)
+
+/**
  * A client side store that is prepopulated with the authentication context during SSR.
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *

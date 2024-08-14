@@ -1,7 +1,4 @@
 ---
-import ProtectCSR from "./ProtectCSR.astro";
-import ProtectSSR from "./ProtectSSR.astro";
-
 // @ts-expect-error: Virtual module
 import { isStaticOutput } from "virtual:@clerk/astro/config";
 import type { ProtectProps } from '../../types';
@@ -12,7 +9,8 @@ type Props = ProtectProps & {
 
 const { isStatic, ...props } = Astro.props;
 
-const ProtectComponent = isStaticOutput(isStatic) ? ProtectCSR : ProtectSSR;
+const module = isStaticOutput(isStatic) ? await import('./ProtectCSR.astro') : await import('./ProtectSSR.astro');
+const ProtectComponent = module.default;
 ---
 
 <ProtectComponent {...props}>

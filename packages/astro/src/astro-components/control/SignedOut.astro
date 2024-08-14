@@ -1,6 +1,4 @@
 ---
-import SignedOutSSR from './SignedOutSSR.astro';
-import SignedOutCSR from './SignedOutCSR.astro';
 // @ts-expect-error: Virtual module
 import { isStaticOutput } from "virtual:@clerk/astro/config";
 
@@ -8,7 +6,8 @@ type Props = {
   isStatic?: boolean
 }
 
-const SignedOutComponent = isStaticOutput(Astro.props.isStatic) ? SignedOutCSR : SignedOutSSR;
+const module = isStaticOutput(Astro.props.isStatic) ? await import('./SignedOutCSR.astro') : await import('./SignedOutSSR.astro');
+const SignedOutComponent = module.default;
 ---
 
 <SignedOutComponent>

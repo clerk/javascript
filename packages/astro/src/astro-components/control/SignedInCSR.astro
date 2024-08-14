@@ -3,20 +3,23 @@
 </signed-in-csr>
 
 <script>
-  import { $authStore } from '@clerk/astro/client';
+  import { $authStore, $clerkLoadedStore } from '@clerk/astro/client';
 
   class SignedInCSR extends HTMLElement {
     constructor() {
       super();
-      this.subscribe();
     }
 
-    subscribe() {
-      $authStore.subscribe((state) => {
-        if (state.userId === undefined) {
-          return;
+    connectedCallback() {
+      $clerkLoadedStore.subscribe((loaded) => {
+        if (loaded) {
+          this.subscribeToAuthStore();
         }
+      });
+    }
 
+    subscribeToAuthStore() {
+      $authStore.subscribe((state) => {
         if (state.userId) {
           this.removeAttribute('hidden');
         } else {

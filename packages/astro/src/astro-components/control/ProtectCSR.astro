@@ -15,16 +15,23 @@ const { role, permission } = Astro.props;
 </protect-csr>
 
 <script>
-  import { $authStore } from "@clerk/astro/client";
+  import { $authStore, $clerkLoadedStore } from "@clerk/astro/client";
   import type { CheckAuthorizationWithCustomPermissions } from "@clerk/types";
 
   class ProtectCSR extends HTMLElement {
     constructor() {
       super();
-      this.subscribe();
     }
 
-    subscribe() {
+    connectedCallback() {
+      $clerkLoadedStore.subscribe((loaded) => {
+        if (loaded) {
+          this.subscribeToAuthStore();
+        }
+      });
+    }
+
+    subscribeToAuthStore() {
       $authStore.subscribe((state) => {
         const has = (
           params: Parameters<CheckAuthorizationWithCustomPermissions>[0],

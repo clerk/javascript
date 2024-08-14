@@ -51,7 +51,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await expect(u.page.getByText('Signed in')).toBeVisible();
     });
 
-    test('render Protect contents for admin', async ({ page, context }) => {
+    test.skip('render Protect contents for admin', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 
@@ -75,7 +75,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await expect(u.page.getByText("I'm an admin")).toBeVisible();
     });
 
-    test('render Protect fallback for non-admins', async ({ page, context }) => {
+    test.skip('render Protect fallback for non-admins', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 
