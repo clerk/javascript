@@ -19,7 +19,7 @@ export type SignInVerificationTags =
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignInVerificationSubmitEvent = { type: 'SUBMIT' };
+export type SignInVerificationSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
 export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
 export type SignInVerificationRetryEvent = { type: 'RETRY' };
 export type SignInVerificationStrategyRegisterEvent = { type: 'STRATEGY.REGISTER'; factor: SignInStrategyName };

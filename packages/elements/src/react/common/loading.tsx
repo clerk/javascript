@@ -177,7 +177,7 @@ type SignUpLoadingProps = {
 };
 
 function SignUpLoading({ children, scope, routerRef }: SignUpLoadingProps) {
-  const [isLoading, { step: loadingStep, strategy }] = useLoading(routerRef);
+  const [isLoading, { step: loadingStep, strategy, action }] = useLoading(routerRef);
   const tags = useSelector(routerRef, s => s.tags);
 
   const isStepLoading = (step: TSignUpStep) => isLoading && loadingStep === step;
@@ -192,7 +192,7 @@ function SignUpLoading({ children, scope, routerRef }: SignUpLoadingProps) {
     // Provider-Specific Loading Scope
     loadingResult = isLoading && loadingStep === undefined && strategy === mapScopeToStrategy(scope);
   } else if (scope) {
-    loadingResult = isStepLoading(scope.replace('step:', '') as TSignUpStep);
+    loadingResult = isStepLoading(scope.replace('step:', '') as TSignUpStep) || scope === action;
   } else {
     // Inferred Loading Scope
     loadingResult =
