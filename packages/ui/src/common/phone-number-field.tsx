@@ -180,7 +180,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   'hover:has-[[data-field-input]:enabled]:ring-offset-[--cl-phone-number-field-border-active]',
                   // focus
                   'has-[[data-field-input]:focus-visible]:ring-offset-[--cl-phone-number-field-border-active]',
-                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring,theme(colors.gray.a4)]',
+                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring,theme(ringColor.light)]',
                   // intent
                   {
                     idle: [
