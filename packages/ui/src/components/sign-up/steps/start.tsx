@@ -11,6 +11,7 @@ import { LastNameField } from '~/common/last-name-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/hooks/use-appearance';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
@@ -39,7 +40,7 @@ export function SignUpStart() {
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
-  const renderDevModeWarning = useDevModeWarning();
+  const isDev = useDevModeWarning();
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -52,7 +53,7 @@ export function SignUpStart() {
       {isGlobalLoading => {
         return (
           <SignUp.Step name='start'>
-            <Card.Root>
+            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
                   {logoImageUrl ? (
@@ -153,7 +154,6 @@ export function SignUpStart() {
                     }}
                   </Common.Loading>
                 ) : null}
-                {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
               <Card.Footer {...cardFooterProps}>
                 <Card.FooterAction>

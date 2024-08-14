@@ -1,8 +1,10 @@
 import { useClerk } from '@clerk/clerk-react';
 import { cva } from 'cva';
 import { Button } from 'react-aria-components';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 
 import { useAppearance } from '~/hooks/use-appearance';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Card from '~/primitives/card';
@@ -58,7 +60,7 @@ export function SignInChooseSession() {
   const clerk = useClerk();
   const { t } = useLocalizations();
   const { layout } = useAppearance();
-  // const renderDevModeWarning = useDevModeWarning();
+  const isDev = useDevModeWarning();
   const { branded } = useDisplayConfig();
 
   const cardFooterProps = {
@@ -71,14 +73,14 @@ export function SignInChooseSession() {
   const activeSessions = clerk.client.activeSessions;
 
   return (
-    <Card.Root>
+    <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
       <Card.Content>
         <Card.Header>
           <Card.Title>{t('signIn.accountSwitcher.title')}</Card.Title>
           <Card.Description>{t('signIn.accountSwitcher.subtitle')}</Card.Description>
         </Card.Header>
         <Card.Body>
-          <ul className='-mx-[--card-body-padding] -mb-[--card-body-padding] overflow-hidden rounded-b-[--card-content-rounded-b]'>
+          <ul className='-mx-[--card-body-px] -mb-[--card-body-py] overflow-hidden rounded-b-[--card-content-rounded-b]'>
             {activeSessions?.map(session => {
               const { userId, identifier, firstName, lastName, hasImage, imageUrl } = session.publicUserData;
               const { title, subtitle } = getTitleAndSubtitle({ firstName, lastName, identifier });
@@ -146,7 +148,6 @@ export function SignInChooseSession() {
             </li>
           </ul>
         </Card.Body>
-        {/* {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null} */}
       </Card.Content>
       <Card.Footer {...cardFooterProps}>
         <Card.FooterAction>
