@@ -15,5 +15,7 @@ const ProtectComponent = module.default;
 
 <ProtectComponent {...props}>
   <slot />
-  <slot name="fallback" slot="fallback" />
+  <Fragment slot="fallback">
+    <slot name="fallback"  />
+  </Fragment>
 </ProtectComponent>
