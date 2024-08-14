@@ -81,7 +81,7 @@ export const Logo = React.forwardRef(function CardLogo(
     />
   );
   return (
-    <div className='z-1 mb-5 flex size-8 justify-center'>
+    <div className='z-1 mb-5 flex h-8 justify-center'>
       {href ? (
         <a
           href={href}
