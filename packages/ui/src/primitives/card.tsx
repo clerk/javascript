@@ -172,11 +172,11 @@ export const Banner = React.forwardRef(function CardBanner(
   return (
     <div
       data-card-banner=''
-      className={cx('absolute inset-0 isolate')}
+      className={cx('pointer-events-none absolute inset-0 isolate', className)}
     >
       <div
         className={cx(
-          'pointer-events-none absolute inset-0 w-full',
+          'absolute inset-0 w-full',
           // manually nudge the radius by `1px` for a snug fit
           'rounded-b-[calc(var(--card-content-rounded-b)-1px)]',
           '[background-image:repeating-linear-gradient(-45deg,theme(colors.orange.100/0.4),theme(colors.orange.100/0.4)_6px,theme(colors.orange.100/0.75)_6px,theme(colors.orange.100/0.75)_12px)]',
@@ -186,7 +186,7 @@ export const Banner = React.forwardRef(function CardBanner(
       <div className='absolute inset-x-0 bottom-0 z-10 flex h-[--card-body-padding] w-full items-center justify-center'>
         <p
           ref={forwardedRef}
-          className={cx('text-sm font-medium text-orange-500', className)}
+          className={cx('pointer-events-auto text-sm font-medium text-orange-500', className)}
           {...props}
         >
           {children}
