@@ -32,7 +32,7 @@ export function SignInVerifications() {
   };
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignIn.Step name='verifications'>

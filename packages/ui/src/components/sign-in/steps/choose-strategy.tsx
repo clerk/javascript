@@ -62,7 +62,7 @@ export function SignInChooseStrategy() {
   };
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignIn.Step name='choose-strategy'>
