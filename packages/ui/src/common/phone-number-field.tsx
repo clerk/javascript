@@ -180,7 +180,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   'hover:has-[[data-field-input]:enabled]:ring-offset-[--cl-phone-number-field-border-active]',
                   // focus
                   'has-[[data-field-input]:focus-visible]:ring-offset-[--cl-phone-number-field-border-active]',
-                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring,theme(ringColor.DEFAULT)]',
+                  'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring,theme(colors.gray.a4)]',
                   // intent
                   {
                     idle: [
@@ -213,7 +213,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   <Button
                     onPress={() => setOpen(true)}
                     isDisabled={props.disabled}
-                    className='hover:enabled:bg-gray-2 focus-visible:bg-gray-2 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none'
+                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
                     <Icon.ChevronUpDown className='text-gray-9 size-4' />
