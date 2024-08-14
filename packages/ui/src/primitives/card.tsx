@@ -20,9 +20,9 @@ export const Root = React.forwardRef(function CardRoot(
         'bg-gray-2 ring-gray-a3 relative mx-auto block w-full max-w-[25rem] rounded-xl ring-1',
         banner
           ? [
-              'mt-[calc(var(--card-banner-height)/2)]',
-              'shadow-[0px_-1.5px_0px_0px_theme(colors.warning.DEFAULT),0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
-            ]
+            'mt-[calc(var(--card-banner-height)/2)]',
+            'shadow-[0px_-1.5px_0px_0px_theme(colors.warning.DEFAULT),0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
+          ]
           : 'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
         className,
       )}
@@ -236,7 +236,11 @@ export const Footer = React.forwardRef(function CardFooter(
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const hasPageLinks = helpPageUrl || privacyPageUrl || termsPageUrl;
-  return branded || children ? (
+  const renderFooter = branded || hasPageLinks || children
+  const renderSubFooter = branded || hasPageLinks
+  const hasBrandingAndPageLinks = branded && hasPageLinks
+
+  return renderFooter ? (
     <div
       ref={forwardedRef}
       data-card-footer=''
@@ -244,28 +248,31 @@ export const Footer = React.forwardRef(function CardFooter(
       className={cx('grid', className)}
     >
       {children}
-      {branded ? (
+
+      {renderSubFooter ? (
         <div
           className={cx(
-            'flex items-center justify-center px-6 py-4',
-            hasPageLinks ? 'justify-between' : 'justify-center',
+            'flex items-center px-6 py-4',
+            hasBrandingAndPageLinks ? 'justify-between' : 'justify-center'
           )}
         >
-          <p
-            // Note:
-            // We don't use `items-center` here for a more optical fit
-            className='text-gray-a11 inline-flex gap-2 text-sm font-medium'
-          >
-            Secured by{' '}
-            <a
-              aria-label='Clerk logo'
-              href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
-              target='_blank'
-              rel='noopener'
+          {branded ? (
+            <p
+              // Note:
+              // We don't use `items-center` here for a more optical fit
+              className='text-gray-a11 inline-flex gap-2 text-sm font-medium'
             >
-              <ClerkLogo />
-            </a>
-          </p>
+              Secured by{' '}
+              <a
+                aria-label='Clerk logo'
+                href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
+                target='_blank'
+                rel='noopener'
+              >
+                <ClerkLogo />
+              </a>
+            </p>
+          ) : null}
 
           {hasPageLinks ? (
             <div className='flex gap-2'>
