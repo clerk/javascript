@@ -20,9 +20,9 @@ export const Root = React.forwardRef(function CardRoot(
         'bg-gray-2 ring-gray-a3 relative mx-auto block w-full max-w-[25rem] rounded-xl ring-1',
         banner
           ? [
-            'mt-[calc(var(--card-banner-height)/2)]',
-            'shadow-[0px_-1.5px_0px_0px_theme(colors.warning.DEFAULT),0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
-          ]
+              'mt-[calc(var(--card-banner-height)/2)]',
+              'shadow-[0px_-1.5px_0px_0px_theme(colors.warning.DEFAULT),0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
+            ]
           : 'shadow-[0px_5px_15px_0px_theme(colors.gray.a4),0px_15px_35px_-5px_theme(colors.gray.a4)]',
         className,
       )}
@@ -236,9 +236,9 @@ export const Footer = React.forwardRef(function CardFooter(
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const hasPageLinks = helpPageUrl || privacyPageUrl || termsPageUrl;
-  const renderFooter = branded || hasPageLinks || children
-  const renderSubFooter = branded || hasPageLinks
-  const hasBrandingAndPageLinks = branded && hasPageLinks
+  const renderFooter = branded || hasPageLinks || children;
+  const renderSubFooter = branded || hasPageLinks;
+  const hasBrandingAndPageLinks = branded && hasPageLinks;
 
   return renderFooter ? (
     <div
@@ -251,10 +251,7 @@ export const Footer = React.forwardRef(function CardFooter(
 
       {renderSubFooter ? (
         <div
-          className={cx(
-            'flex items-center px-6 py-4',
-            hasBrandingAndPageLinks ? 'justify-between' : 'justify-center'
-          )}
+          className={cx('flex items-center px-6 py-4', hasBrandingAndPageLinks ? 'justify-between' : 'justify-center')}
         >
           {branded ? (
             <p
