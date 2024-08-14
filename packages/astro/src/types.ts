@@ -52,6 +52,6 @@ type ProtectProps =
       condition?: never;
       role?: never;
       permission?: never;
-    }
+    };
 
 export type { AstroClerkUpdateOptions, AstroClerkIntegrationParams, AstroClerkCreateInstanceParams, ProtectProps };

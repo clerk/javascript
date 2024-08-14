@@ -1,7 +1,4 @@
-import type {
-  CheckAuthorizationWithCustomPermissions,
-  HandleOAuthCallbackParams,
-} from '@clerk/types';
+import type { CheckAuthorizationWithCustomPermissions, HandleOAuthCallbackParams } from '@clerk/types';
 import { computed } from 'nanostores';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
