@@ -16,7 +16,5 @@ const ProtectComponent = isStaticOutput(isStatic) ? ProtectCSR : ProtectSSR;
 
 <ProtectComponent {...props}>
   <slot />
-  <Fragment slot="fallback">
-    <slot name="fallback"  />
-  </Fragment>
+  <slot name="fallback" slot="fallback" />
 </ProtectComponent>
