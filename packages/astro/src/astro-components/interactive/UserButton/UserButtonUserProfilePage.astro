@@ -1,0 +1,54 @@
+---
+interface Props {
+  url: string
+  label: string
+}
+
+const { url, label } = Astro.props
+
+let labelIcon = '';
+let content = ''
+
+if (Astro.slots.has('label-icon')) {
+  labelIcon = await Astro.slots.render('label-icon');
+}
+
+if (Astro.slots.has('default')) {
+  content = await Astro.slots.render('default');
+}
+---
+
+<script is:inline define:vars={{ url, label, content, labelIcon }}>
+// Get the user button map from window that we set in the `<InternalUIComponentRenderer />`.
+const userButtonComponentMap = window.__astro_clerk_component_props.get('user-button');
+// Get all available user buttons in current page.
+const userButtonElements = document.querySelectorAll('[data-clerk-id^="clerk-user-button"]');
+// It doesn't make sense to have multiple user buttons in page, so first one should be safe.
+const userButton = userButtonElements[0];
+
+const safeId = userButton.getAttribute('data-clerk-id');
+const currentOptions = userButtonComponentMap.get(safeId);
+
+const newCustomPage = {
+  label,
+  url,
+  mountIcon: (el) => {
+    el.innerHTML = labelIcon
+  },
+  unmountIcon: () => { /* What to clean up? */},
+  mount: (el) => {
+    el.innerHTML = content
+  },
+  unmount: () => { /* What to clean up? */},
+}
+
+userButtonComponentMap.set(safeId, {
+  ...currentOptions,
+  userProfileProps: {
+    customPages: [
+      ...(currentOptions?.userProfileProps?.customPages ?? []),
+      newCustomPage,
+    ]
+  }
+})
+</script>
