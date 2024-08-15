@@ -2,6 +2,7 @@ import { join } from 'node:path';
 
 import concurrently from 'concurrently';
 
+import { NULL_ROOT_ERROR } from '../utils/errors.js';
 import { getClerkPackages } from '../utils/getClerkPackages.js';
 import { getDependencies } from '../utils/getDependencies.js';
 import { getMonorepoRoot } from '../utils/getMonorepoRoot.js';
@@ -24,6 +25,9 @@ export async function watch({ js }) {
   const args = ['watch', 'build', ...filterArgs];
 
   const cwd = await getMonorepoRoot();
+  if (!cwd) {
+    throw new Error(NULL_ROOT_ERROR);
+  }
 
   /** @type {import('concurrently').ConcurrentlyCommandInput} */
   const clerkJsCommand = {
