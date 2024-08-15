@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
 
 function generateColorScale(name: string) {
   const scale = Array.from({ length: 12 }, (_, i) => {
@@ -111,6 +112,11 @@ const config = {
       },
     },
   },
+  plugins: [
+    plugin(function ({ addVariant }) {
+      addVariant('starting-style', '@starting-style');
+    }),
+  ],
 } satisfies Config;
 
 export default config;
