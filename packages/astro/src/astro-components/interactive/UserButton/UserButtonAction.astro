@@ -3,12 +3,12 @@ import MenuItemRenderer from './MenuItemRenderer.astro';
 
 interface Props {
   label: string
-  action: string
+  open?: string
 }
 
-const { label, action } = Astro.props
+const { label, open } = Astro.props
 ---
 
-<MenuItemRenderer label={label} action={action}>
+<MenuItemRenderer label={label} open={open}>
   <slot name="label-icon" slot="label-icon" />
 </MenuItemRenderer>

@@ -1,11 +1,9 @@
 ---
-interface Props {
-  label: string
-  href?: string
-  action?: string
-}
+import type { CustomMenuItem } from '@clerk/types'
 
-const { label, href, action } = Astro.props
+type Props = Pick<CustomMenuItem, 'label' | 'href' | 'open'>
+
+const { label, href, open } = Astro.props
 
 let labelIcon = '';
 
@@ -14,7 +12,7 @@ if (Astro.slots.has('label-icon')) {
 }
 ---
 
-<script is:inline define:vars={{ label, href, action, labelIcon }}>
+<script is:inline define:vars={{ label, href, open, labelIcon }}>
 // Get the user button map from window that we set in the `<InternalUIComponentRenderer />`.
 const userButtonComponentMap = window.__astro_clerk_component_props.get('user-button');
 // Get all available user buttons in current page.
@@ -37,8 +35,8 @@ if (href) {
   newMenuItem.href = href;
 }
 
-if (action) {
-  newMenuItem.action = action;
+if (open) {
+  newMenuItem.open = open.startsWith('/') ? open : `/${open}`;
 }
 
 userButtonComponentMap.set(safeId, {
