@@ -1,13 +1,18 @@
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 
-import { useActiveTags } from '../hooks';
-import { createContextForDomValidation } from '../utils/create-context-for-dom-validation';
-import { isValidComponentType } from '../utils/is-valid-component-type';
-import { SignInRouterCtx } from './context';
+import { createContextForDomValidation } from '~/react/utils/create-context-for-dom-validation';
+import { isValidComponentType } from '~/react/utils/is-valid-component-type';
+
+import {
+  SignInActiveSessionContext,
+  useSignInActiveSessionContext,
+  useSignInActiveSessionList,
+  useSignInChooseSessionIsActive,
+} from './choose-session.hooks';
 
 // ----------------------------------- TYPES ------------------------------------
-//
+
 export type SignInChooseSessionProps = React.HTMLAttributes<HTMLDivElement>;
 export type SignInSessionListProps = React.HTMLAttributes<HTMLUListElement> & { asChild?: boolean };
 export type SignInSessionListItemProps = Omit<React.HTMLAttributes<HTMLLIElement>, 'children'> & {
@@ -18,34 +23,11 @@ export type SignInSessionListItemProps = Omit<React.HTMLAttributes<HTMLLIElement
 // ---------------------------------- CONTEXT -----------------------------------
 
 export const SignInChooseSessionCtx = createContextForDomValidation('SignInChooseSessionCtx');
-const SignInActiveSessionContext = React.createContext<any>(null);
-
-// ----------------------------------- HOOKS ------------------------------------
-
-function useSignInActiveSessionContext() {
-  const ctx = React.useContext(SignInActiveSessionContext);
-
-  if (!ctx) {
-    throw new Error('SignInActiveSessionContext must be used within a SessionList/SignInSessionListItem');
-  }
-
-  return ctx;
-}
-
-function useSignInActiveSessionList() {
-  return SignInRouterCtx.useSelector(state =>
-    state.context.clerk.client.activeSessions.map(s => ({
-      id: s.id,
-      ...s.publicUserData,
-    })),
-  );
-}
 
 // --------------------------------- COMPONENTS ---------------------------------
 
 export function SignInChooseSession({ children, ...props }: SignInChooseSessionProps) {
-  const routerRef = SignInRouterCtx.useActorRef();
-  const activeState = useActiveTags(routerRef, 'step:choose-session');
+  const activeState = useSignInChooseSessionIsActive();
 
   return activeState ? (
     <SignInChooseSessionCtx.Provider>
@@ -65,7 +47,7 @@ export function SignInSessionList({ asChild, children, ...props }: SignInSession
     return React.Children.only(null);
   }
 
-  if (asChild && !isValidComponentType(children, SignInSessionListItem)) {
+  if (asChild && isValidComponentType(children, SignInSessionListItem)) {
     // TODO: Update error message
     throw new Error('asChild cannot be used with SessionListItem as the direct child');
   }
