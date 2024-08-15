@@ -183,10 +183,10 @@ export const Input = React.forwardRef(function FieldInput(
         // state
         {
           native:
-            'ring-offset-[--cl-field-input-border] focus-visible:ring focus-visible:ring-[--cl-field-input-ring,theme(ringColor.DEFAULT)] focus-visible:ring-offset-[--cl-field-input-border-active] hover:enabled:ring-offset-[--cl-field-input-border-active] [&:not(:focus-visible)]:ring-transparent',
+            'ring-offset-[--cl-field-input-border] focus-visible:ring focus-visible:ring-[--cl-field-input-ring,theme(ringColor.light)] focus-visible:ring-offset-[--cl-field-input-border-active] hover:enabled:ring-offset-[--cl-field-input-border-active] [&:not(:focus-visible)]:ring-transparent',
           hover: 'ring-transparent ring-offset-[--cl-field-input-border-active]',
           'focus-visible':
-            'ring-[--cl-field-input-ring,theme(ringColor.DEFAULT)] ring-offset-[--cl-field-input-border-active]',
+            'ring-[--cl-field-input-ring,theme(ringColor.light)] ring-offset-[--cl-field-input-border-active]',
         }[state],
         // intent
         {

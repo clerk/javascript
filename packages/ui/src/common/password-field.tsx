@@ -55,9 +55,13 @@ export function PasswordField({
                   <button
                     type='button'
                     className={cx(
-                      'text-icon-sm text-gray-10 start-auto m-[0.1875rem] inline-flex aspect-square h-6 items-center justify-center rounded-sm p-0 outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                      // Note:
+                      // We set to `1.375rem` (22px) here for a hairline border
+                      // around the focus ring to keep it distinct from the
+                      // "surrounding" input
+                      'text-icon-sm text-gray-10 start-auto m-1 inline-flex aspect-square h-[1.375rem] items-center justify-center rounded-sm p-0 outline-none disabled:cursor-not-allowed disabled:opacity-50',
                       'hover:enabled:text-gray-12 hover:enabled:bg-gray-3',
-                      'focus-visible:rounded-[calc(var(--cl-radius)*0.5)] focus-visible:ring',
+                      'focus-visible:rounded-[calc(var(--cl-radius)*0.4)] focus-visible:ring',
                     )}
                     onClick={() => setType(prev => (prev === 'password' ? 'text' : 'password'))}
                     title={[type === 'password' ? 'Show' : 'Hide', 'password'].join(' ')}
