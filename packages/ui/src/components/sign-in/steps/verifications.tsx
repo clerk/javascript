@@ -61,7 +61,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -146,7 +146,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -274,7 +274,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -359,7 +359,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -445,7 +445,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>

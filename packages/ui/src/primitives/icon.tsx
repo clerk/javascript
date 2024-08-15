@@ -466,21 +466,6 @@ export const Xero = createIcon({
 /* UI
   ============================================ */
 
-export const CaretRightLegacy = createIcon({
-  displayName: 'IconCaretRightLegacy',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      d='M10 8.25L6.5 6V10.5L10 8.25Z'
-      fill='currentColor'
-      stroke='currentColor'
-      strokeWidth='1.5'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
-  ),
-});
-
 export const CheckmarkCircleSm = createIcon({
   displayName: 'IconCheckmarkCircleSm',
   viewBox: '0 0 16 16',
@@ -506,45 +491,17 @@ export const CheckmarkCircleSm = createIcon({
   ),
 });
 
-export const Checkmark = createIcon({
-  displayName: 'IconCheckmark',
-  viewBox: '0 0 10 10',
+export const CheckmarkSm = createIcon({
+  displayName: 'IconCheckmarkSm',
+  viewBox: '0 0 16 16',
   path: (
     <path
-      d='m1 6 3 3 5-8'
+      d='M4.25 8.75L7.25 11.75L11.75 4.25'
       stroke='currentColor'
-      strokeWidth='1.25'
+      strokeWidth='1.5'
       strokeLinecap='round'
       strokeLinejoin='round'
     />
-  ),
-});
-
-export const ChevronUpDown = createIcon({
-  displayName: 'IconChevronUpDown',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      fill='currentColor'
-      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
-    />
-  ),
-});
-
-export const Envelope = createIcon({
-  displayName: 'IconEnvelope',
-  viewBox: '0 0 16 16',
-  path: (
-    <>
-      <path
-        fill='currentColor'
-        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
-      />
-      <path
-        fill='currentColor'
-        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
-      />
-    </>
   ),
 });
 
@@ -677,6 +634,105 @@ export const FingerprintSm = createIcon({
   ),
 });
 
+export const LinkSm = createIcon({
+  displayName: 'IconLinkSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M7.75 3.7891L7.86522 3.67388C9.09706 2.44204 11.0943 2.44204 12.3261 3.67388C13.558 4.90572 13.558 6.90294 12.3261 8.13478L12.2109 8.25M6.75 9.25L9.25 6.75M8.25 12.2109L8.13478 12.3261C6.90294 13.558 4.90572 13.558 3.67388 12.3261C2.44204 11.0943 2.44204 9.09706 3.67388 7.86522L3.78911 7.75'
+      stroke='currentColor'
+      strokeWidth={1.5}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  ),
+});
+
+export const LockSm = createIcon({
+  displayName: 'IconLockSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M5.25 7.75H3.75V11.25C3.75 12.3546 4.64543 13.25 5.75 13.25H10.25C11.3546 13.25 12.25 12.3546 12.25 11.25V7.75H10.75M5.25 7.75V5.5C5.25 3.98122 6.48122 2.75 8 2.75V2.75C9.51878 2.75 10.75 3.98122 10.75 5.5V7.75M5.25 7.75H10.75'
+      stroke='currentColor'
+      strokeWidth={1.5}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  ),
+});
+
+export const PenSm = createIcon({
+  displayName: 'IconPenSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M9.23664 3.44288L4.18161 8.33251C3.90008 8.60483 3.70471 8.95383 3.61974 9.33619L2.75 13.25L6.45529 12.3782C6.81159 12.2943 7.13805 12.1143 7.3991 11.8578L12.6265 6.72023C13.4824 5.78723 13.4537 4.34072 12.5614 3.44288C11.6433 2.51904 10.1547 2.51904 9.23664 3.44288Z'
+      stroke='currentColor'
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  ),
+});
+
+export const RightArrowSm = createIcon({
+  displayName: 'IconRightArrowSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M9.53033 4.94233C9.23744 4.64943 8.76256 4.64943 8.46967 4.94233C8.17678 5.23522 8.17678 5.71009 8.46967 6.00299L10.1893 7.72266H4C3.58579 7.72266 3.25 8.05844 3.25 8.47266C3.25 8.88687 3.58579 9.22266 4 9.22266H10.1893L8.46967 10.9423C8.17678 11.2352 8.17678 11.7101 8.46967 12.003C8.76256 12.2959 9.23744 12.2959 9.53033 12.003L12.5303 9.00299C12.8232 8.71009 12.8232 8.23522 12.5303 7.94233L9.53033 4.94233Z'
+      fill='currentColor'
+    />
+  ),
+});
+
+/* Legacy
+  ---------------------------------- */
+
+export const CaretRightLegacy = createIcon({
+  displayName: 'IconCaretRightLegacy',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M10 8.25L6.5 6V10.5L10 8.25Z'
+      fill='currentColor'
+      stroke='currentColor'
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  ),
+});
+
+export const ChevronUpDownLegacy = createIcon({
+  displayName: 'IconChevronUpDownLegacy',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      fill='currentColor'
+      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
+    />
+  ),
+});
+
+export const EnvelopeLegacy = createIcon({
+  displayName: 'IconEnvelopeLegacy',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        fill='currentColor'
+        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
+      />
+      <path
+        fill='currentColor'
+        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
+      />
+    </>
+  ),
+});
+
 export const InformationLegacy = createIcon({
   displayName: 'IconInformationLegacy',
   viewBox: '0 0 20 20',
@@ -707,49 +763,8 @@ export const InformationLegacy = createIcon({
   ),
 });
 
-export const LockSm = createIcon({
-  displayName: 'IconLockSm',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      d='M5.25 7.75H3.75V11.25C3.75 12.3546 4.64543 13.25 5.75 13.25H10.25C11.3546 13.25 12.25 12.3546 12.25 11.25V7.75H10.75M5.25 7.75V5.5C5.25 3.98122 6.48122 2.75 8 2.75V2.75C9.51878 2.75 10.75 3.98122 10.75 5.5V7.75M5.25 7.75H10.75'
-      stroke='currentColor'
-      strokeWidth={1.5}
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
-  ),
-});
-
-export const LinkSm = createIcon({
-  displayName: 'IconLinkSm',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      d='M7.75 3.7891L7.86522 3.67388C9.09706 2.44204 11.0943 2.44204 12.3261 3.67388C13.558 4.90572 13.558 6.90294 12.3261 8.13478L12.2109 8.25M6.75 9.25L9.25 6.75M8.25 12.2109L8.13478 12.3261C6.90294 13.558 4.90572 13.558 3.67388 12.3261C2.44204 11.0943 2.44204 9.09706 3.67388 7.86522L3.78911 7.75'
-      stroke='currentColor'
-      strokeWidth={1.5}
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
-  ),
-});
-
-export const PencilUnderlined = createIcon({
-  displayName: 'IconPencilUnderlined',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      fill='currentColor'
-      d='M13.098 5.108c-.418.419-.628.628-.847.669-.22.04-.364-.104-.652-.392l-.984-.984c-.288-.288-.432-.432-.392-.652.04-.22.25-.428.669-.847l.226-.227c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-.227.226ZM4.16 13.688l-1.206.223c-.5.092-.75.138-.876.011-.127-.126-.08-.376.011-.876l.223-1.206c.04-.217.06-.325.118-.43.058-.105.15-.196.33-.377l5.554-5.554c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-5.554 5.553c-.181.182-.272.273-.377.331-.105.058-.213.078-.43.118ZM8.75 12.5a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z'
-    />
-  ),
-});
-
-// Note: this will be replaced
-// https://linear.app/clerk/issue/DES-1140
-export const SMSSm = createIcon({
-  displayName: 'IconSMSSm',
+export const SMSLegacy = createIcon({
+  displayName: 'IconSMSLegacy',
   viewBox: '0 0 16 16',
   path: (
     <path
@@ -757,17 +772,6 @@ export const SMSSm = createIcon({
       fillRule='evenodd'
       d='M14.4 4v6.4a1.6 1.6 0 0 1-1.6 1.6h-4l-4 3.2V12H3.2a1.6 1.6 0 0 1-1.6-1.6V4a1.6 1.6 0 0 1 1.6-1.6h9.6A1.6 1.6 0 0 1 14.4 4ZM5.6 6.4H4V8h1.6V6.4Zm1.6 0h1.6V8H7.2V6.4Zm4.8 0h-1.6V8H12V6.4Z'
       clipRule='evenodd'
-    />
-  ),
-});
-
-export const RightArrowSm = createIcon({
-  displayName: 'IconRightArrowSm',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      d='M9.53033 4.94233C9.23744 4.64943 8.76256 4.64943 8.46967 4.94233C8.17678 5.23522 8.17678 5.71009 8.46967 6.00299L10.1893 7.72266H4C3.58579 7.72266 3.25 8.05844 3.25 8.47266C3.25 8.88687 3.58579 9.22266 4 9.22266H10.1893L8.46967 10.9423C8.17678 11.2352 8.17678 11.7101 8.46967 12.003C8.76256 12.2959 9.23744 12.2959 9.53033 12.003L12.5303 9.00299C12.8232 8.71009 12.8232 8.23522 12.5303 7.94233L9.53033 4.94233Z'
-      fill='currentColor'
     />
   ),
 });
