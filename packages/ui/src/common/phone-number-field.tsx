@@ -216,7 +216,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                     className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
-                    <Icon.ChevronUpDown className='text-gray-9 size-4' />
+                    <Icon.ChevronUpDownSm className='text-gray-9 text-[length:theme(size.4)]' />
                   </Button>
                   <Popover
                     isOpen={isOpen}
@@ -258,7 +258,9 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                                 className='leading-small aria-selected:bg-gray-2 flex cursor-pointer gap-x-2 px-4 py-1.5 text-base'
                               >
                                 <span className='grid w-3 shrink-0 place-content-center'>
-                                  {selectedCountry === countryOptions[index] && <Icon.Checkmark className='w-3' />}
+                                  {selectedCountry === countryOptions[index] && (
+                                    <Icon.CheckmarkSm className='text-[length:theme(size.4)]' />
+                                  )}
                                 </span>
                                 <span className='grow truncate'>{name}</span>
                                 <span className='text-gray-11 ms-auto'>+{code}</span>
