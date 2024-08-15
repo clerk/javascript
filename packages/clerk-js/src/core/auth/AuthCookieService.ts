@@ -107,7 +107,19 @@ export class AuthCookieService {
     if (!this.poller) {
       this.poller = new SessionCookiePoller();
     }
-    this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
+
+    this.poller?.startPollingForSessionToken(() => this.refreshSessionToken());
+
+    // Attempt to detect connectivity, if offline stop polling for the session token to avoid guaranteed network errors.
+    // If reconnected, immediately refresh the session token and restart the poller
+    window.addEventListener('online', () => {
+      this.refreshSessionToken();
+      this.poller?.startPollingForSessionToken(() => this.refreshSessionToken());
+    });
+
+    window.addEventListener('offline', () => {
+      this.poller?.stopPollingForSessionToken();
+    });
   }
 
   private refreshTokenOnVisibilityChange() {
