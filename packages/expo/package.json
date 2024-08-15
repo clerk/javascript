@@ -31,6 +31,10 @@
     "./web": {
       "types": "./dist/web/index.d.ts",
       "default": "./dist/web/index.js"
+    },
+    "./local-credentials": {
+      "types": "./dist/local-credentials/index.d.ts",
+      "default": "./dist/local-credentials/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -38,7 +42,8 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "web"
+    "web",
+    "local-credentials"
   ],
   "scripts": {
     "build": "tsup",

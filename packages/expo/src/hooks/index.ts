@@ -12,4 +12,3 @@ export {
 } from '@clerk/clerk-react';
 
 export * from './useOAuth';
-export * from './useLocalCredentials';
