@@ -1,20 +1,12 @@
 import { $authStore } from '../../stores/external';
-import { $csrState } from '../../stores/internal';
+import { BaseElement } from './base-element';
 
-export class SignedOut extends HTMLElement {
+export class SignedOut extends BaseElement {
   constructor() {
     super();
   }
 
-  connectedCallback() {
-    $csrState.subscribe(state => {
-      if (state.isLoaded) {
-        this.toggleContentVisibility();
-      }
-    });
-  }
-
-  toggleContentVisibility() {
+  onLoaded() {
     $authStore.subscribe(state => {
       if (state.userId) {
         this.setAttribute('hidden', '');
