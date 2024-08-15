@@ -1,0 +1,14 @@
+---
+import MenuItemRenderer from './MenuItemRenderer.astro';
+
+interface Props {
+  label: string
+  href: string
+}
+
+const { label, href } = Astro.props
+---
+
+<MenuItemRenderer label={label} href={href}>
+    <slot name="label-icon" slot="label-icon" />
+</MenuItemRenderer>

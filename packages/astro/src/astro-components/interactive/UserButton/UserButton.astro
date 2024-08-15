@@ -1,0 +1,10 @@
+---
+import type { UserButtonProps } from "@clerk/types";
+type Props = UserButtonProps
+
+import InternalUIComponentRenderer from '../InternalUIComponentRenderer.astro'
+---
+
+<InternalUIComponentRenderer {...Astro.props} component="user-button" />
+
+<slot />

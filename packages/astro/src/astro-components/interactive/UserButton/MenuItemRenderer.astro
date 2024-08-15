@@ -1,0 +1,51 @@
+---
+interface Props {
+  label: string
+  href?: string
+  action?: string
+}
+
+const { label, href, action } = Astro.props
+
+let labelIcon = '';
+
+if (Astro.slots.has('label-icon')) {
+  labelIcon = await Astro.slots.render('label-icon');
+}
+---
+
+<script is:inline define:vars={{ label, href, action, labelIcon }}>
+// Get the user button map from window that we set in the `<InternalUIComponentRenderer />`.
+const userButtonComponentMap = window.__astro_clerk_component_props.get('user-button');
+// Get all available user buttons in current page.
+const userButtonElements = document.querySelectorAll('[data-clerk-id^="clerk-user-button"]');
+// It doesn't make sense to have multiple user buttons in page, so first one should be safe.
+const userButton = userButtonElements[0];
+
+const safeId = userButton.getAttribute('data-clerk-id');
+const currentOptions = userButtonComponentMap.get(safeId);
+
+const newMenuItem = {
+  label,
+  mountIcon: (el) => {
+    el.innerHTML = labelIcon
+  },
+  unmountIcon: () => { /* What to clean up? */}
+}
+
+if (href) {
+  newMenuItem.href = href;
+}
+
+if (action) {
+  newMenuItem.action = action;
+}
+
+userButtonComponentMap.set(safeId, {
+  ...currentOptions,
+  customMenuItems: [
+    ...(currentOptions?.customMenuItems ?? []),
+    newMenuItem,
+  ]
+})
+</script>
