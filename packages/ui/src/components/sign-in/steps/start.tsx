@@ -44,7 +44,7 @@ export function SignInStart() {
   };
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignIn.Step name='start'>

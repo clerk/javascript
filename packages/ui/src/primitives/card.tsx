@@ -118,7 +118,7 @@ export const Logo = React.forwardRef(function CardLogo(
       {href ? (
         <a
           href={href}
-          className='outline-none focus-visible:ring'
+          className='-m-0.5 rounded-sm p-0.5 outline-none focus-visible:ring'
         >
           {img}
         </a>
@@ -262,6 +262,7 @@ export const Footer = React.forwardRef(function CardFooter(
               href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
               target='_blank'
               rel='noopener'
+              className='-m-0.5 inline-flex items-center rounded-sm p-0.5 outline-none focus-visible:ring'
             >
               <ClerkLogo />
             </a>
@@ -310,7 +311,9 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
   },
 );
 
-const footerActionButton = cva({ base: 'text-accent-a10 text-base font-medium hover:underline' });
+const footerActionButton = cva({
+  base: 'text-accent-a10 text-base font-medium hover:underline rounded-sm outline-none focus-visible:ring -mx-0.5 px-0.5',
+});
 
 export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
   function CardFooterActionButton({ children, className, type = 'button', ...props }, forwardedRef) {
