@@ -1,33 +1,3 @@
-<signed-out-csr hidden>
+<clerk-signed-out hidden>
   <slot />
-</signed-out-csr>
-
-<script>
-  import { $authStore, $clerkLoadedStore } from '@clerk/astro/client';
-
-  class SignedOutCSR extends HTMLElement {
-    constructor() {
-      super();
-    }
-
-    connectedCallback() {
-      $clerkLoadedStore.subscribe((loaded) => {
-        if (loaded) {
-          this.subscribeToAuthStore();
-        }
-      });
-    }
-
-    subscribeToAuthStore() {
-      $authStore.subscribe((state) => {
-        if (state.userId) {
-          this.setAttribute('hidden', '');
-        } else {
-          this.removeAttribute('hidden');
-        }
-      });
-    }
-  }
-
-  customElements.define('signed-out-csr', SignedOutCSR);
-</script>
+</clerk-signed-out>

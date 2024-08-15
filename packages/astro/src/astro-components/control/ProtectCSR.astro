@@ -6,75 +6,15 @@ type Props = Omit<ProtectProps, 'condition'>;
 const { role, permission } = Astro.props;
 ---
 
-<protect-csr
+<clerk-protect
   data-role={role}
   data-permission={permission}
-  hidden
 >
-  <slot />
-</protect-csr>
-
-<script>
-  import { $authStore, $clerkLoadedStore } from "@clerk/astro/client";
-  import type { CheckAuthorizationWithCustomPermissions } from "@clerk/types";
-
-  class ProtectCSR extends HTMLElement {
-    constructor() {
-      super();
-    }
-
-    connectedCallback() {
-      $clerkLoadedStore.subscribe((loaded) => {
-        if (loaded) {
-          this.subscribeToAuthStore();
-        }
-      });
-    }
-
-    subscribeToAuthStore() {
-      $authStore.subscribe((state) => {
-        const has = (
-          params: Parameters<CheckAuthorizationWithCustomPermissions>[0],
-        ) => {
-          if (!params?.permission && !params?.role) {
-            throw new Error(
-              'Missing parameters. The prop permission or role is required to be passed. Example usage: `has({permission: "org:posts:edit"})`',
-            );
-          }
-
-          if (
-            !state.orgId ||
-            !state.userId ||
-            !state.orgRole ||
-            !state?.orgPermissions
-          ) {
-            return false;
-          }
-
-          if (params.permission) {
-            return state.orgPermissions.includes(params.permission);
-          }
-
-          if (params.role) {
-            return state.orgRole === params.role;
-          }
-
-          return false;
-        };
-
-        const role = this.dataset.role;
-        const permission = this.dataset.permission;
-        const isUnauthorized =
-          !state.userId || ((role || permission) && !has({ role, permission }));
-
-        if (isUnauthorized) {
-          this.setAttribute('hidden', '');
-        } else {
-          this.removeAttribute('hidden');
-        }
-      });
-    }
-  }
-
-  customElements.define("protect-csr", ProtectCSR);
-</script>
+  <!-- TODO: Can't have a data attribute in a Fragment. Remove div wrapper later. -->
+  <div data-default-slot>
+    <slot />
+  </div>
+  <div data-fallback-slot>
+    <slot name="fallback" />
+  </div>
+</clerk-protect>

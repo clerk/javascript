@@ -3,6 +3,7 @@ import type { ClerkOptions } from '@clerk/types';
 
 import { $clerk, $csrState } from '../stores/internal';
 import type { AstroClerkCreateInstanceParams, AstroClerkUpdateOptions } from '../types';
+import { defineCustomElements } from './define-custom-elements';
 import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import { runOnce } from './run-once';
@@ -56,6 +57,7 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
 
       mountAllClerkAstroJSComponents();
       invokeClerkAstroJSFunctions();
+      void defineCustomElements();
 
       clerkJSInstance.addListener(payload => {
         $csrState.setKey('client', payload.client);

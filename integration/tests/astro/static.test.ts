@@ -43,6 +43,8 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await expect(u.page.getByText('Signed out')).toBeVisible();
       await expect(u.page.getByText('Signed in')).toBeHidden();
 
+      await u.page.getByRole('button', { name: /Sign in/i }).click();
+
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
       await u.po.expect.toBeSignedIn();
@@ -51,43 +53,40 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await expect(u.page.getByText('Signed in')).toBeVisible();
     });
 
-    test.skip('render Protect contents for admin', async ({ page, context }) => {
+    test('render Protect contents for admin', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 
       await u.page.waitForClerkJsLoaded();
 
       // Sign in
+      await u.page.getByRole('button', { name: /Sign in/i }).click();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
       await u.po.expect.toBeSignedIn();
 
       // Select an organization
       await u.po.organizationSwitcher.waitForMounted();
-      await u.po.organizationSwitcher.expectPersonalAccount();
-      await u.po.organizationSwitcher.toggleTrigger();
-      await u.page.locator('.cl-organizationSwitcherPreviewButton').click();
       await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
       await u.page.goToRelative('/protected');
-      await u.page.waitForClerkJsLoaded();
 
       await expect(u.page.getByText("I'm an admin")).toBeVisible();
     });
 
-    test.skip('render Protect fallback for non-admins', async ({ page, context }) => {
+    test('render Protect fallback for non-admins', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 
       await u.page.waitForClerkJsLoaded();
 
       // Sign in
+      await u.page.getByRole('button', { name: /Sign in/i }).click();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin2.email, password: fakeAdmin2.password });
       await u.po.expect.toBeSignedIn();
 
       await u.page.goToRelative('/protected');
-      await u.page.waitForClerkJsLoaded();
 
       await expect(u.page.getByText('Not an admin')).toBeVisible();
     });

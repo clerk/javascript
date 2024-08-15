@@ -1,13 +1,14 @@
 ---
+import SignedOutCSR from './SignedOutCSR.astro';
+import SignedOutSSR from './SignedOutSSR.astro';
 // @ts-expect-error: Virtual module
-import { isStaticOutput } from "virtual:@clerk/astro/config";
+import { isStaticOutput } from 'virtual:@clerk/astro/config';
 
 type Props = {
   isStatic?: boolean
 }
 
-const module = isStaticOutput(Astro.props.isStatic) ? await import('./SignedOutCSR.astro') : await import('./SignedOutSSR.astro');
-const SignedOutComponent = module.default;
+const SignedOutComponent = isStaticOutput(Astro.props.isStatic) ? SignedOutCSR : SignedOutSSR;
 ---
 
 <SignedOutComponent>

@@ -1,12 +1,12 @@
 ---
-import { OrganizationSwitcher, UserButton, SignIn, SignedIn, SignedOut } from "@clerk/astro/components";
+import { OrganizationSwitcher, UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/astro/components";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Home">
     <SignedOut>
         <h1>Signed out</h1>
-        <SignIn />
+        <SignInButton mode="modal" fallbackRedirectUrl="/" />
     </SignedOut>
     <SignedIn>
         <h1>Signed in</h1>

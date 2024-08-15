@@ -5,9 +5,7 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout title="Protected">
     <Protect role="admin">
-        <Fragment slot="fallback">
-            <h1>Not an admin</h1>
-        </Fragment>
         <h1>I'm an admin</h1>
+        <h1 slot="fallback">Not an admin</h1>
     </Protect>
 </Layout>
