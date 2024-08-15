@@ -1,21 +1,29 @@
 import type { CheckAuthorizationWithCustomPermissions } from '@clerk/types';
 
 import { $authStore } from '../../stores/external';
-import { BaseElement } from './base-element';
 
-export class Protect extends BaseElement {
+export class Protect extends HTMLElement {
   private defaultSlot: HTMLDivElement | null = null;
   private fallbackSlot: HTMLDivElement | null = null;
+  private authStoreListener: (() => void) | null = null;
 
   constructor() {
     super();
   }
 
-  onClerkLoaded() {
+  connectedCallback() {
+    this.toggleContentVisibility();
+  }
+
+  disconnectedCallback() {
+    this.authStoreListener?.();
+  }
+
+  toggleContentVisibility() {
     this.defaultSlot = this.querySelector('[data-default-slot]');
     this.fallbackSlot = this.querySelector('[data-fallback-slot]');
 
-    $authStore.subscribe(state => {
+    this.authStoreListener = $authStore.subscribe(state => {
       const has = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
         if (!params?.permission && !params?.role) {
           throw new Error(

@@ -1,13 +1,22 @@
 import { $authStore } from '../../stores/external';
-import { BaseElement } from './base-element';
 
-export class SignedOut extends BaseElement {
+export class SignedOut extends HTMLElement {
+  private authStoreListener: (() => void) | null = null;
+
   constructor() {
     super();
   }
 
-  onClerkLoaded() {
-    $authStore.subscribe(state => {
+  connectedCallback() {
+    this.toggleContentVisibility();
+  }
+
+  disconnectedCallback() {
+    this.authStoreListener?.();
+  }
+
+  toggleContentVisibility() {
+    this.authStoreListener = $authStore.subscribe(state => {
       if (state.userId) {
         this.setAttribute('hidden', '');
       } else {
