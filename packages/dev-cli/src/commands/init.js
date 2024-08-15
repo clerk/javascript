@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
@@ -9,6 +10,12 @@ import { getCLIRoot } from '../utils/getMonorepoRoot.js';
  * Performs one-time machine-level configuration tasks such as creating a blank config file.
  */
 export async function init() {
+  // If the config file already exists, print a warning and exit.
+  if (existsSync(CONFIG_FILE)) {
+    console.warn('Configuration file already exists. Run `clerk-dev config` to open it.');
+    return;
+  }
+
   const cliRoot = getCLIRoot();
 
   /** @type import('../utils/getConfiguration.js').Configuration */
