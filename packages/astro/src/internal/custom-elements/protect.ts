@@ -11,7 +11,7 @@ export class Protect extends BaseElement {
     super();
   }
 
-  onLoaded() {
+  onClerkLoaded() {
     this.defaultSlot = this.querySelector('[data-default-slot]');
     this.fallbackSlot = this.querySelector('[data-fallback-slot]');
 

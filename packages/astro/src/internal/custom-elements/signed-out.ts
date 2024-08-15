@@ -6,7 +6,7 @@ export class SignedOut extends BaseElement {
     super();
   }
 
-  onLoaded() {
+  onClerkLoaded() {
     $authStore.subscribe(state => {
       if (state.userId) {
         this.setAttribute('hidden', '');

@@ -8,12 +8,12 @@ export class BaseElement extends HTMLElement {
   connectedCallback() {
     $csrState.subscribe(state => {
       if (state.isLoaded) {
-        this.onLoaded();
+        this.onClerkLoaded();
       }
     });
   }
 
-  onLoaded() {
-    console.log('BaseElement.onLoaded()');
+  onClerkLoaded() {
+    // This will be overridden by child classes
   }
 }
