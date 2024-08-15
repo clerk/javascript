@@ -5,9 +5,10 @@ import { BackupCodeField } from '~/common/backup-code-field';
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/hooks/use-appearance';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useResetPasswordFactor } from '~/hooks/use-reset-password-factor';
 import { Button } from '~/primitives/button';
@@ -17,12 +18,11 @@ import { LinkButton } from '~/primitives/link';
 import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
 export function SignInVerifications() {
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
   const { layout } = useAppearance();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
 
-  const isDev = isDevelopmentOrStaging();
+  const isDev = useDevModeWarning();
   const isPasswordResetSupported = useResetPasswordFactor();
   const cardFooterProps = {
     branded,
@@ -32,11 +32,11 @@ export function SignInVerifications() {
   };
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignIn.Step name='verifications'>
-            <Card.Root>
+            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <SignIn.Strategy name='password'>
                   <Card.Header>
@@ -61,7 +61,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -146,7 +146,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -274,7 +274,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -359,7 +359,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -445,7 +445,7 @@ export function SignInVerifications() {
                             className='text-accent-9 size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignIn.Action>
                       </span>
@@ -589,7 +589,6 @@ export function SignInVerifications() {
                     }}
                   </Common.Loading>
                 </SignIn.Strategy>
-                {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
               <Card.Footer {...cardFooterProps} />
             </Card.Root>

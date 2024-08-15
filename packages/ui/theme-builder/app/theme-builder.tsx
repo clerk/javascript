@@ -1,4 +1,5 @@
 'use client';
+import { ClerkProvider } from '@clerk/nextjs';
 import { cx } from 'cva';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -34,6 +35,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const [radius, setRadius] = useState(radiusDefault);
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [fontSize, setFontSize] = useState(fontSizeDefault);
+  const [devMode, setDevMode] = useState('on');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
@@ -44,6 +46,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     setRadius(radiusDefault);
     setSpacingUnit(spacingUnitDefault);
     setFontSize(fontSizeDefault);
+    setDevMode('on');
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -68,7 +71,14 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     document.documentElement.dir = dir;
   }, [dir]);
   return (
-    <>
+    <ClerkProvider
+      key={devMode}
+      appearance={{
+        layout: {
+          unsafe_disableDevelopmentModeWarnings: devMode === 'off',
+        },
+      }}
+    >
       <style
         dangerouslySetInnerHTML={{
           __html: css,
@@ -117,6 +127,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
         <aside className='relative isolate flex h-full w-[17rem] shrink-0 flex-col overflow-y-auto border-e bg-white p-4'>
           <div className='space-y-4'>
             <ToggleGroup
+              label='Appearance'
               items={[
                 {
                   label: 'Light',
@@ -131,6 +142,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               onValueChange={setAppearance}
             />
             <ToggleGroup
+              label='Direction'
               items={[
                 {
                   label: 'LTR',
@@ -143,6 +155,21 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               ]}
               value={dir}
               onValueChange={setDir}
+            />
+            <ToggleGroup
+              label='Dev mode'
+              items={[
+                {
+                  label: 'On',
+                  value: 'on',
+                },
+                {
+                  label: 'Off',
+                  value: 'off',
+                },
+              ]}
+              value={devMode}
+              onValueChange={setDevMode}
             />
             {appearance === 'light' ? (
               <>
@@ -269,9 +296,9 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             )}
             aria-hidden='true'
           />
-          <div className='mx-auto w-full'>{children}</div>
+          {children}
         </figure>
       </div>
-    </>
+    </ClerkProvider>
   );
 }

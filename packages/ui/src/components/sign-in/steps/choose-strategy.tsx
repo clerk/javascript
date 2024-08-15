@@ -5,10 +5,11 @@ import * as SignIn from '@clerk/elements/sign-in';
 import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/hooks/use-appearance';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -46,14 +47,13 @@ function FirstFactorConnections({
 
 export function SignInChooseStrategy() {
   const enabledConnections = useEnabledConnections();
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { t } = useLocalizations();
   const { layout } = useAppearance();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { setShowHelp } = useGetHelp();
 
   const hasConnection = enabledConnections.length > 0;
-  const isDev = isDevelopmentOrStaging();
+  const isDev = useDevModeWarning();
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -62,11 +62,11 @@ export function SignInChooseStrategy() {
   };
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignIn.Step name='choose-strategy'>
-            <Card.Root>
+            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
                   {logoImageUrl ? (
@@ -114,7 +114,7 @@ export function SignInChooseStrategy() {
                         >
                           <Button
                             intent='secondary'
-                            iconStart={<Icon.Envelope />}
+                            iconStart={<Icon.EnvelopeSm />}
                           >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
@@ -197,7 +197,6 @@ export function SignInChooseStrategy() {
                     </div>
                   </div>
                 </Card.Body>
-                {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
               <Card.Footer {...cardFooterProps}>
                 <Card.FooterAction>

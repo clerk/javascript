@@ -1,7 +1,8 @@
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/hooks/use-appearance';
+import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
-import { useEnvironment } from '~/hooks/use-environment';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { useSupportEmail } from '~/hooks/use-support-email';
 import { Button } from '~/primitives/button';
@@ -12,9 +13,8 @@ import { LinkButton } from '~/primitives/link';
 export function SignInGetHelp() {
   const { t } = useLocalizations();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
-  const { isDevelopmentOrStaging } = useEnvironment();
   const { layout } = useAppearance();
-  const isDev = isDevelopmentOrStaging();
+  const isDev = useDevModeWarning();
   const supportEmail = useSupportEmail();
   const { setShowHelp } = useGetHelp();
 
@@ -26,7 +26,7 @@ export function SignInGetHelp() {
   };
 
   return (
-    <Card.Root>
+    <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
       <Card.Content>
         <Card.Header>
           {logoImageUrl ? (
@@ -51,7 +51,6 @@ export function SignInGetHelp() {
 
           <LinkButton onClick={() => setShowHelp(false)}>{t('backButton')}</LinkButton>
         </Card.Actions>
-        {isDev ? <Card.Banner>Development mode</Card.Banner> : null}
       </Card.Content>
       <Card.Footer {...cardFooterProps} />
     </Card.Root>

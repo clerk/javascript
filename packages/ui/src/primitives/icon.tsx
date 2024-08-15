@@ -466,21 +466,6 @@ export const Xero = createIcon({
 /* UI
   ============================================ */
 
-export const CaretRightLegacy = createIcon({
-  displayName: 'IconCaretRightLegacy',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      d='M10 8.25L6.5 6V10.5L10 8.25Z'
-      fill='currentColor'
-      stroke='currentColor'
-      strokeWidth='1.5'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
-  ),
-});
-
 export const CheckmarkCircleSm = createIcon({
   displayName: 'IconCheckmarkCircleSm',
   viewBox: '0 0 16 16',
@@ -506,43 +491,61 @@ export const CheckmarkCircleSm = createIcon({
   ),
 });
 
-export const Checkmark = createIcon({
-  displayName: 'IconCheckmark',
-  viewBox: '0 0 10 10',
+export const CheckmarkSm = createIcon({
+  displayName: 'IconCheckmarkSm',
+  viewBox: '0 0 16 16',
   path: (
     <path
-      d='m1 6 3 3 5-8'
+      d='M4.25 8.75L7.25 11.75L11.75 4.25'
       stroke='currentColor'
-      strokeWidth='1.25'
+      strokeWidth='1.5'
       strokeLinecap='round'
       strokeLinejoin='round'
     />
   ),
 });
 
-export const ChevronUpDown = createIcon({
-  displayName: 'IconChevronUpDown',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      fill='currentColor'
-      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
-    />
-  ),
-});
-
-export const Envelope = createIcon({
-  displayName: 'IconEnvelope',
+export const ChevronUpDownSm = createIcon({
+  displayName: 'IconChevronUpDownSm',
   viewBox: '0 0 16 16',
   path: (
     <>
       <path
-        fill='currentColor'
-        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
+        d='M5.75 5.25L8 2.75L10.25 5.25'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
       <path
-        fill='currentColor'
-        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
+        d='M5.75 10.75L8 13.25L10.25 10.75'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </>
+  ),
+});
+
+export const EnvelopeSm = createIcon({
+  displayName: 'IconEnvelopeSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        d='M2.75 5.75C2.75 4.64543 3.64543 3.75 4.75 3.75H11.25C12.3546 3.75 13.25 4.64543 13.25 5.75V10.25C13.25 11.3546 12.3546 12.25 11.25 12.25H4.75C3.64543 12.25 2.75 11.3546 2.75 10.25V5.75Z'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M3 4.75L8 8.25L13 4.75'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
     </>
   ),
@@ -677,47 +680,35 @@ export const FingerprintSm = createIcon({
   ),
 });
 
-export const InformationLegacy = createIcon({
-  displayName: 'IconInformationLegacy',
-  viewBox: '0 0 20 20',
+export const InformationCircleSm = createIcon({
+  displayName: 'IconInformationCircleSm',
+  viewBox: '0 0 16 16',
   path: (
     <>
-      <path
-        d='M10 10.8984V13.3984'
+      <circle
+        cx='8'
+        cy='8'
+        r='5.25'
         stroke='currentColor'
-        strokeWidth={2}
+        strokeWidth='1.5'
         strokeLinecap='round'
         strokeLinejoin='round'
       />
       <path
-        d='M10 6.75V6.76'
+        d='M8 8.75V10.25'
         stroke='currentColor'
-        strokeWidth={2.5}
+        strokeWidth='1.5'
         strokeLinecap='round'
         strokeLinejoin='round'
       />
       <path
-        d='M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z'
+        d='M8 6.25024V6.26024'
         stroke='currentColor'
-        strokeWidth={1.5}
+        strokeWidth='1.5'
         strokeLinecap='round'
         strokeLinejoin='round'
       />
     </>
-  ),
-});
-
-export const LockSm = createIcon({
-  displayName: 'IconLockSm',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      d='M5.25 7.75H3.75V11.25C3.75 12.3546 4.64543 13.25 5.75 13.25H10.25C11.3546 13.25 12.25 12.3546 12.25 11.25V7.75H10.75M5.25 7.75V5.5C5.25 3.98122 6.48122 2.75 8 2.75V2.75C9.51878 2.75 10.75 3.98122 10.75 5.5V7.75M5.25 7.75H10.75'
-      stroke='currentColor'
-      strokeWidth={1.5}
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
   ),
 });
 
@@ -735,28 +726,30 @@ export const LinkSm = createIcon({
   ),
 });
 
-export const PencilUnderlined = createIcon({
-  displayName: 'IconPencilUnderlined',
+export const LockSm = createIcon({
+  displayName: 'IconLockSm',
   viewBox: '0 0 16 16',
   path: (
     <path
-      fill='currentColor'
-      d='M13.098 5.108c-.418.419-.628.628-.847.669-.22.04-.364-.104-.652-.392l-.984-.984c-.288-.288-.432-.432-.392-.652.04-.22.25-.428.669-.847l.226-.227c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-.227.226ZM4.16 13.688l-1.206.223c-.5.092-.75.138-.876.011-.127-.126-.08-.376.011-.876l.223-1.206c.04-.217.06-.325.118-.43.058-.105.15-.196.33-.377l5.554-5.554c.419-.418.628-.628.848-.668.22-.04.364.103.652.392l.983.983c.289.288.433.432.392.652-.04.22-.25.429-.668.848l-5.554 5.553c-.181.182-.272.273-.377.331-.105.058-.213.078-.43.118ZM8.75 12.5a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z'
+      d='M5.25 7.75H3.75V11.25C3.75 12.3546 4.64543 13.25 5.75 13.25H10.25C11.3546 13.25 12.25 12.3546 12.25 11.25V7.75H10.75M5.25 7.75V5.5C5.25 3.98122 6.48122 2.75 8 2.75V2.75C9.51878 2.75 10.75 3.98122 10.75 5.5V7.75M5.25 7.75H10.75'
+      stroke='currentColor'
+      strokeWidth={1.5}
+      strokeLinecap='round'
+      strokeLinejoin='round'
     />
   ),
 });
 
-// Note: this will be replaced
-// https://linear.app/clerk/issue/DES-1140
-export const SMSSm = createIcon({
-  displayName: 'IconSMSSm',
+export const PenSm = createIcon({
+  displayName: 'IconPenSm',
   viewBox: '0 0 16 16',
   path: (
     <path
-      fill='currentColor'
-      fillRule='evenodd'
-      d='M14.4 4v6.4a1.6 1.6 0 0 1-1.6 1.6h-4l-4 3.2V12H3.2a1.6 1.6 0 0 1-1.6-1.6V4a1.6 1.6 0 0 1 1.6-1.6h9.6A1.6 1.6 0 0 1 14.4 4ZM5.6 6.4H4V8h1.6V6.4Zm1.6 0h1.6V8H7.2V6.4Zm4.8 0h-1.6V8H12V6.4Z'
-      clipRule='evenodd'
+      d='M9.23664 3.44288L4.18161 8.33251C3.90008 8.60483 3.70471 8.95383 3.61974 9.33619L2.75 13.25L6.45529 12.3782C6.81159 12.2943 7.13805 12.1143 7.3991 11.8578L12.6265 6.72023C13.4824 5.78723 13.4537 4.34072 12.5614 3.44288C11.6433 2.51904 10.1547 2.51904 9.23664 3.44288Z'
+      stroke='currentColor'
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
     />
   ),
 });
@@ -768,6 +761,35 @@ export const RightArrowSm = createIcon({
     <path
       d='M9.53033 4.94233C9.23744 4.64943 8.76256 4.64943 8.46967 4.94233C8.17678 5.23522 8.17678 5.71009 8.46967 6.00299L10.1893 7.72266H4C3.58579 7.72266 3.25 8.05844 3.25 8.47266C3.25 8.88687 3.58579 9.22266 4 9.22266H10.1893L8.46967 10.9423C8.17678 11.2352 8.17678 11.7101 8.46967 12.003C8.76256 12.2959 9.23744 12.2959 9.53033 12.003L12.5303 9.00299C12.8232 8.71009 12.8232 8.23522 12.5303 7.94233L9.53033 4.94233Z'
       fill='currentColor'
+    />
+  ),
+});
+
+export const SMSSm = createIcon({
+  displayName: 'IconSMSSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M3.64195 10.1495L4.39134 10.1796C4.39823 10.0081 4.3461 9.83945 4.24363 9.70176L3.64195 10.1495ZM2.75 13.25L2.22719 12.7123C1.99924 12.9339 1.93578 13.2751 2.06885 13.5639C2.20191 13.8526 2.50257 14.0261 2.81915 13.9968L2.75 13.25ZM6.22735 11.9724L6.45883 11.259C6.20845 11.1778 5.93379 11.2338 5.73517 11.4065L6.22735 11.9724ZM12.5 7.5C12.5 9.64028 10.5577 11.5 8 11.5V13C11.2413 13 14 10.6064 14 7.5H12.5ZM8 3.5C10.5577 3.5 12.5 5.35972 12.5 7.5H14C14 4.39358 11.2413 2 8 2V3.5ZM3.5 7.5C3.5 5.35972 5.44233 3.5 8 3.5V2C4.75868 2 2 4.39358 2 7.5H3.5ZM4.24363 9.70176C3.7701 9.06542 3.5 8.309 3.5 7.5H2C2 8.6531 2.38735 9.71985 3.04026 10.5972L4.24363 9.70176ZM3.27281 13.7877C3.69076 13.3814 3.94476 12.767 4.10437 12.1773C4.27074 11.5626 4.36392 10.8622 4.39134 10.1796L2.89255 10.1194C2.86859 10.7159 2.78742 11.3016 2.65647 11.7854C2.51877 12.2941 2.35249 12.5904 2.22719 12.7123L3.27281 13.7877ZM5.73517 11.4065C5.01099 12.0363 3.84761 12.3952 2.68085 12.5032L2.81915 13.9968C4.13186 13.8753 5.65704 13.4624 6.71952 12.5383L5.73517 11.4065ZM8 11.5C7.45679 11.5 6.93808 11.4145 6.45883 11.259L5.99586 12.6858C6.62412 12.8897 7.29904 13 8 13V11.5Z'
+      fill='currentColor'
+    />
+  ),
+});
+
+/* Legacy
+  ---------------------------------- */
+
+export const CaretRightLegacy = createIcon({
+  displayName: 'IconCaretRightLegacy',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M10 8.25L6.5 6V10.5L10 8.25Z'
+      fill='currentColor'
+      stroke='currentColor'
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
     />
   ),
 });

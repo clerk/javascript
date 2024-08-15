@@ -8,6 +8,7 @@ import { LastNameField } from '~/common/last-name-field';
 import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/hooks/use-appearance';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
@@ -26,7 +27,7 @@ export function SignUpContinue() {
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
   const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
-  const renderDevModeWarning = useDevModeWarning();
+  const isDev = useDevModeWarning();
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -39,7 +40,7 @@ export function SignUpContinue() {
       {isGlobalLoading => {
         return (
           <SignUp.Step name='continue'>
-            <Card.Root>
+            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
                   {logoImageUrl ? (
@@ -116,7 +117,6 @@ export function SignUpContinue() {
                     );
                   }}
                 </Common.Loading>
-                {renderDevModeWarning ? <Card.Banner>Development mode</Card.Banner> : null}
               </Card.Content>
               <Card.Footer {...cardFooterProps}>
                 <Card.FooterAction>

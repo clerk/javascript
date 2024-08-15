@@ -12,10 +12,12 @@ export default function Home() {
   return (
     <div className='relative'>
       <SignedIn>
-        <UserButton />
+        <div className='flex items-center justify-center'>
+          <UserButton />
+        </div>
       </SignedIn>
       <SignedOut>
-        <div className='flex flex-col gap-4'>
+        <div className='flex flex-col items-center gap-4'>
           <SignInButton>
             <Button>Sign in</Button>
           </SignInButton>

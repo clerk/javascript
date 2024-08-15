@@ -1,6 +1,7 @@
 import { withLeadingSlash, withoutTrailingSlash } from '@clerk/shared/url';
 
 import type { ROUTING } from '~/internals/constants';
+import { isAbsoluteUrl } from '~/utils/is-absolute-url';
 
 export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up_url', 'redirect_url'];
 
@@ -87,6 +88,11 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
    * Certain query parameters need to be preserved when navigating internally. These query parameters are ultimately used by Clerk to dictate behavior, so we keep them around.
    */
   function makeDestinationUrlWithPreservedQueryParameters(path: string) {
+    // If the provided path is an absolute URL, return it unmodified.
+    if (isAbsoluteUrl(path)) {
+      return path;
+    }
+
     const destinationUrl = new URL(path, window.location.origin);
     const currentSearchParams = router.searchParams();
 
