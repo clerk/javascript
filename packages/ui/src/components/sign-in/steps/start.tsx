@@ -168,7 +168,7 @@ export function SignInStart() {
                             <SignIn.Passkey asChild>
                               <LinkButton
                                 type='button'
-                                disabled={isGlobalLoading || isSubmitting}
+                                disabled={isGlobalLoading}
                               >
                                 {t('signIn.start.actionLink__use_passkey')}
                               </LinkButton>

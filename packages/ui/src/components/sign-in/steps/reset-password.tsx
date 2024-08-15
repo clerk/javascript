@@ -66,32 +66,32 @@ export function SignInResetPassword() {
                   </div>
                 </Card.Body>
 
-                <Common.Loading>
-                  {isSubmitting => {
-                    return (
-                      <Card.Actions>
+                <Card.Actions>
+                  <Common.Loading scope='submit'>
+                    {isSubmitting => {
+                      return (
                         <SignIn.Action
                           submit
                           asChild
                         >
                           <Button
                             busy={isSubmitting}
-                            disabled={isGlobalLoading || isSubmitting}
+                            disabled={isGlobalLoading}
                           >
                             {t('signIn.resetPassword.formButtonPrimary')}
                           </Button>
                         </SignIn.Action>
+                      );
+                    }}
+                  </Common.Loading>
 
-                        <SignIn.Action
-                          navigate='start'
-                          asChild
-                        >
-                          <LinkButton>{t('backButton')}</LinkButton>
-                        </SignIn.Action>
-                      </Card.Actions>
-                    );
-                  }}
-                </Common.Loading>
+                  <SignIn.Action
+                    navigate='start'
+                    asChild
+                  >
+                    <LinkButton>{t('backButton')}</LinkButton>
+                  </SignIn.Action>
+                </Card.Actions>
               </Card.Content>
               <Card.Footer {...cardFooterProps} />
             </Card.Root>
