@@ -101,7 +101,9 @@ const config = {
         DEFAULT: '0.1875rem',
       },
       ringColor: {
-        DEFAULT: 'var(--cl-gray-a4)',
+        DEFAULT: 'var(--cl-gray-a7)',
+        light: 'var(--cl-gray-a4)',
+        'light-opaque': 'var(--cl-gray-4)',
       },
       animation: {
         spin: 'cl-spin linear infinite',

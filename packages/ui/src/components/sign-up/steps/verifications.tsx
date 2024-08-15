@@ -87,7 +87,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -165,7 +165,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -247,7 +247,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>

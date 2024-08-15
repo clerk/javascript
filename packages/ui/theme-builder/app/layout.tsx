@@ -1,7 +1,6 @@
 import './globals.css';
 import '../../dist/styles.css';
 
-import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 
 import { ThemeBuilder } from './theme-builder';
@@ -17,15 +16,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html
-        lang='en'
-        className='h-full'
-      >
-        <body className='flex min-h-full flex-col'>
-          <ThemeBuilder>{children}</ThemeBuilder>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html
+      lang='en'
+      className='h-full'
+    >
+      <body className='flex min-h-full flex-col'>
+        <ThemeBuilder>{children}</ThemeBuilder>
+      </body>
+    </html>
   );
 }

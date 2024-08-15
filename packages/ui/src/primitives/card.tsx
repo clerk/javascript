@@ -118,7 +118,7 @@ export const Logo = React.forwardRef(function CardLogo(
       {href ? (
         <a
           href={href}
-          className='outline-none focus-visible:ring'
+          className='-m-0.5 rounded-sm p-0.5 outline-none focus-visible:ring'
         >
           {img}
         </a>
@@ -236,7 +236,11 @@ export const Footer = React.forwardRef(function CardFooter(
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const hasPageLinks = helpPageUrl || privacyPageUrl || termsPageUrl;
-  return branded || children ? (
+  const renderFooter = branded || hasPageLinks || children;
+  const renderSubFooter = branded || hasPageLinks;
+  const hasBrandingAndPageLinks = branded && hasPageLinks;
+
+  return renderFooter ? (
     <div
       ref={forwardedRef}
       data-card-footer=''
@@ -244,28 +248,29 @@ export const Footer = React.forwardRef(function CardFooter(
       className={cx('grid', className)}
     >
       {children}
-      {branded ? (
+
+      {renderSubFooter ? (
         <div
-          className={cx(
-            'flex items-center justify-center px-6 py-4',
-            hasPageLinks ? 'justify-between' : 'justify-center',
-          )}
+          className={cx('flex items-center px-6 py-4', hasBrandingAndPageLinks ? 'justify-between' : 'justify-center')}
         >
-          <p
-            // Note:
-            // We don't use `items-center` here for a more optical fit
-            className='text-gray-a11 inline-flex gap-2 text-sm font-medium'
-          >
-            Secured by{' '}
-            <a
-              aria-label='Clerk logo'
-              href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
-              target='_blank'
-              rel='noopener'
+          {branded ? (
+            <p
+              // Note:
+              // We don't use `items-center` here for a more optical fit
+              className='text-gray-a11 inline-flex gap-2 text-sm font-medium'
             >
-              <ClerkLogo />
-            </a>
-          </p>
+              Secured by{' '}
+              <a
+                aria-label='Clerk logo'
+                href='https://www.clerk.com?utm_source=clerk&amp;utm_medium=components'
+                target='_blank'
+                rel='noopener'
+                className='-m-0.5 inline-flex items-center rounded-sm p-0.5 outline-none focus-visible:ring'
+              >
+                <ClerkLogo />
+              </a>
+            </p>
+          ) : null}
 
           {hasPageLinks ? (
             <div className='flex gap-2'>
@@ -310,7 +315,9 @@ export const FooterActionText = React.forwardRef<HTMLParagraphElement, React.HTM
   },
 );
 
-const footerActionButton = cva({ base: 'text-accent-a10 text-base font-medium hover:underline' });
+const footerActionButton = cva({
+  base: 'text-accent-a10 text-base font-medium hover:underline rounded-sm outline-none focus-visible:ring -mx-0.5 px-0.5',
+});
 
 export const FooterActionButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
   function CardFooterActionButton({ children, className, type = 'button', ...props }, forwardedRef) {

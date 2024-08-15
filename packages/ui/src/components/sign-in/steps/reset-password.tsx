@@ -27,7 +27,7 @@ export function SignInResetPassword() {
   };
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignIn.Step name='reset-password'>
