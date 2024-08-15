@@ -1,5 +1,3 @@
-import type { Clerk } from '@clerk/clerk-js';
-
 import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
 import { mountAllClerkAstroJSComponents } from './mount-clerk-astro-js-components';
 import type { CreateClerkInstanceInternalFn } from './types';
@@ -12,7 +10,7 @@ const runOnce = (onFirst: CreateClerkInstanceInternalFn) => {
   let hasRun = false;
   return (params: Parameters<CreateClerkInstanceInternalFn>[0]) => {
     if (hasRun) {
-      const clerkJSInstance = window.Clerk as Clerk;
+      const clerkJSInstance = window.Clerk;
       return new Promise(res => {
         if (!clerkJSInstance) {
           return res(false);
