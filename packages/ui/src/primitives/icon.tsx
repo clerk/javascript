@@ -505,6 +505,52 @@ export const CheckmarkSm = createIcon({
   ),
 });
 
+export const ChevronUpDownSm = createIcon({
+  displayName: 'IconChevronUpDownSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        d='M5.75 5.25L8 2.75L10.25 5.25'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M5.75 10.75L8 13.25L10.25 10.75'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </>
+  ),
+});
+
+export const EnvelopeSm = createIcon({
+  displayName: 'IconEnvelopeSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <path
+        d='M2.75 5.75C2.75 4.64543 3.64543 3.75 4.75 3.75H11.25C12.3546 3.75 13.25 4.64543 13.25 5.75V10.25C13.25 11.3546 12.3546 12.25 11.25 12.25H4.75C3.64543 12.25 2.75 11.3546 2.75 10.25V5.75Z'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M3 4.75L8 8.25L13 4.75'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </>
+  ),
+});
+
 export const ExclamationOctagonSm = createIcon({
   displayName: 'IconExclamationOctagonSm',
   viewBox: '0 0 16 16',
@@ -634,6 +680,38 @@ export const FingerprintSm = createIcon({
   ),
 });
 
+export const InformationCircleSm = createIcon({
+  displayName: 'IconInformationCircleSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <>
+      <circle
+        cx='8'
+        cy='8'
+        r='5.25'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M8 8.75V10.25'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+      <path
+        d='M8 6.25024V6.26024'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </>
+  ),
+});
+
 export const LinkSm = createIcon({
   displayName: 'IconLinkSm',
   viewBox: '0 0 16 16',
@@ -687,6 +765,17 @@ export const RightArrowSm = createIcon({
   ),
 });
 
+export const SMSSm = createIcon({
+  displayName: 'IconSMSSm',
+  viewBox: '0 0 16 16',
+  path: (
+    <path
+      d='M3.64195 10.1495L4.39134 10.1796C4.39823 10.0081 4.3461 9.83945 4.24363 9.70176L3.64195 10.1495ZM2.75 13.25L2.22719 12.7123C1.99924 12.9339 1.93578 13.2751 2.06885 13.5639C2.20191 13.8526 2.50257 14.0261 2.81915 13.9968L2.75 13.25ZM6.22735 11.9724L6.45883 11.259C6.20845 11.1778 5.93379 11.2338 5.73517 11.4065L6.22735 11.9724ZM12.5 7.5C12.5 9.64028 10.5577 11.5 8 11.5V13C11.2413 13 14 10.6064 14 7.5H12.5ZM8 3.5C10.5577 3.5 12.5 5.35972 12.5 7.5H14C14 4.39358 11.2413 2 8 2V3.5ZM3.5 7.5C3.5 5.35972 5.44233 3.5 8 3.5V2C4.75868 2 2 4.39358 2 7.5H3.5ZM4.24363 9.70176C3.7701 9.06542 3.5 8.309 3.5 7.5H2C2 8.6531 2.38735 9.71985 3.04026 10.5972L4.24363 9.70176ZM3.27281 13.7877C3.69076 13.3814 3.94476 12.767 4.10437 12.1773C4.27074 11.5626 4.36392 10.8622 4.39134 10.1796L2.89255 10.1194C2.86859 10.7159 2.78742 11.3016 2.65647 11.7854C2.51877 12.2941 2.35249 12.5904 2.22719 12.7123L3.27281 13.7877ZM5.73517 11.4065C5.01099 12.0363 3.84761 12.3952 2.68085 12.5032L2.81915 13.9968C4.13186 13.8753 5.65704 13.4624 6.71952 12.5383L5.73517 11.4065ZM8 11.5C7.45679 11.5 6.93808 11.4145 6.45883 11.259L5.99586 12.6858C6.62412 12.8897 7.29904 13 8 13V11.5Z'
+      fill='currentColor'
+    />
+  ),
+});
+
 /* Legacy
   ---------------------------------- */
 
@@ -701,77 +790,6 @@ export const CaretRightLegacy = createIcon({
       strokeWidth='1.5'
       strokeLinecap='round'
       strokeLinejoin='round'
-    />
-  ),
-});
-
-export const ChevronUpDownLegacy = createIcon({
-  displayName: 'IconChevronUpDownLegacy',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      fill='currentColor'
-      d='M5.53 9.22a.75.75 0 0 0-1.06 1.06l3 3a.75.75 0 0 0 1.06 0l3-3a.75.75 0 1 0-1.06-1.06L8 11.69 5.53 9.22ZM5.53 6.78a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1-1.06 1.06L8 4.31 5.53 6.78Z'
-    />
-  ),
-});
-
-export const EnvelopeLegacy = createIcon({
-  displayName: 'IconEnvelopeLegacy',
-  viewBox: '0 0 16 16',
-  path: (
-    <>
-      <path
-        fill='currentColor'
-        d='M2.75 2.75A1.75 1.75 0 0 0 1 4.5v1.016l6.51 3.693a1.094 1.094 0 0 0 .98 0L15 5.517V4.5a1.75 1.75 0 0 0-1.75-1.75H2.75Z'
-      />
-      <path
-        fill='currentColor'
-        d='m15 6.984-5.924 3.4a2.406 2.406 0 0 1-2.152 0L1 6.983V11.5a1.75 1.75 0 0 0 1.75 1.75h10.5A1.75 1.75 0 0 0 15 11.5V6.984Z'
-      />
-    </>
-  ),
-});
-
-export const InformationLegacy = createIcon({
-  displayName: 'IconInformationLegacy',
-  viewBox: '0 0 20 20',
-  path: (
-    <>
-      <path
-        d='M10 10.8984V13.3984'
-        stroke='currentColor'
-        strokeWidth={2}
-        strokeLinecap='round'
-        strokeLinejoin='round'
-      />
-      <path
-        d='M10 6.75V6.76'
-        stroke='currentColor'
-        strokeWidth={2.5}
-        strokeLinecap='round'
-        strokeLinejoin='round'
-      />
-      <path
-        d='M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z'
-        stroke='currentColor'
-        strokeWidth={1.5}
-        strokeLinecap='round'
-        strokeLinejoin='round'
-      />
-    </>
-  ),
-});
-
-export const SMSLegacy = createIcon({
-  displayName: 'IconSMSLegacy',
-  viewBox: '0 0 16 16',
-  path: (
-    <path
-      fill='currentColor'
-      fillRule='evenodd'
-      d='M14.4 4v6.4a1.6 1.6 0 0 1-1.6 1.6h-4l-4 3.2V12H3.2a1.6 1.6 0 0 1-1.6-1.6V4a1.6 1.6 0 0 1 1.6-1.6h9.6A1.6 1.6 0 0 1 14.4 4ZM5.6 6.4H4V8h1.6V6.4Zm1.6 0h1.6V8H7.2V6.4Zm4.8 0h-1.6V8H12V6.4Z'
-      clipRule='evenodd'
     />
   ),
 });

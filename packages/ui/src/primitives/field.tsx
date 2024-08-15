@@ -256,7 +256,7 @@ export const Message = React.forwardRef<
           {
             {
               error: <Icon.ExclamationOctagonSm />,
-              info: <Icon.InformationLegacy />,
+              info: <Icon.InformationCircleSm />,
               success: <Icon.CheckmarkCircleSm />,
               warning: <Icon.ExclamationTriangleSm />,
             }[intent]

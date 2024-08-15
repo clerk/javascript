@@ -216,7 +216,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                     className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
                   >
                     <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
-                    <Icon.ChevronUpDownLegacy className='text-gray-9 text-[length:theme(size.4)]' />
+                    <Icon.ChevronUpDownSm className='text-gray-9 text-[length:theme(size.4)]' />
                   </Button>
                   <Popover
                     isOpen={isOpen}

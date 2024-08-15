@@ -114,7 +114,7 @@ export function SignInChooseStrategy() {
                         >
                           <Button
                             intent='secondary'
-                            iconStart={<Icon.EnvelopeLegacy />}
+                            iconStart={<Icon.EnvelopeSm />}
                           >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
@@ -132,7 +132,7 @@ export function SignInChooseStrategy() {
                         >
                           <Button
                             intent='secondary'
-                            iconStart={<Icon.SMSLegacy />}
+                            iconStart={<Icon.SMSSm />}
                           >
                             <SignIn.SafeIdentifier
                               transform={(identifier: string) =>
