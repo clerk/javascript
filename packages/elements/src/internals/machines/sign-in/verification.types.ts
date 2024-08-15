@@ -38,6 +38,7 @@ export type SignInVerificationEvents =
 export interface SignInVerificationInput {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
+  basePath?: string;
 }
 
 // ---------------------------------- Context ---------------------------------- //
@@ -51,6 +52,7 @@ export interface SignInVerificationContext {
   registeredStrategies: Set<SignInStrategyName>;
   resendable: boolean;
   resendableAfter: number;
+  basePath?: string;
 }
 
 // ---------------------------------- Delays ---------------------------------- //
