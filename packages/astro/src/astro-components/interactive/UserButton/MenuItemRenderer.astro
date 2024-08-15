@@ -15,10 +15,8 @@ if (Astro.slots.has('label-icon')) {
 <script is:inline define:vars={{ label, href, open, labelIcon }}>
 // Get the user button map from window that we set in the `<InternalUIComponentRenderer />`.
 const userButtonComponentMap = window.__astro_clerk_component_props.get('user-button');
-// Get all available user buttons in current page.
-const userButtonElements = document.querySelectorAll('[data-clerk-id^="clerk-user-button"]');
 // It doesn't make sense to have multiple user buttons in page, so first one should be safe.
-const userButton = userButtonElements[0];
+const userButton = document.querySelector('[data-clerk-id^="clerk-user-button"]');
 
 const safeId = userButton.getAttribute('data-clerk-id');
 const currentOptions = userButtonComponentMap.get(safeId);
