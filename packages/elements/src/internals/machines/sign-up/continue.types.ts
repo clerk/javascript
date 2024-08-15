@@ -11,7 +11,7 @@ export type SignUpContinueTags = 'state:pending' | 'state:attempting' | 'state:l
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignUpContinueSubmitEvent = { type: 'SUBMIT' };
+export type SignUpContinueSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
 
 export type SignUpContinueEvents = ErrorActorEvent | SignUpContinueSubmitEvent;
 
