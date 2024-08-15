@@ -10,11 +10,11 @@ export function ToggleGroup({
   value,
   onValueChange,
 }: Pick<ToggleGroupSingleProps, 'value' | 'onValueChange'> & {
-  label: string,
-  description?: string
+  label: string;
+  description?: string;
   items: { label: string; value: string }[];
 }) {
-  const id = useId()
+  const id = useId();
   return (
     <div>
       <div className='mb-1 flex items-center gap-x-1'>
@@ -55,7 +55,6 @@ export function ToggleGroup({
               </Tooltip.Portal>
             </Tooltip.Root>
           </Tooltip.Provider>
-
         ) : null}
       </div>
       <RadixToggleGroup.Root
