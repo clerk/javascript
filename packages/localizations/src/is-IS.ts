@@ -1,3 +1,15 @@
+/*
+ * =====================================================================================
+ * DISCLAIMER:
+ * =====================================================================================
+ * This localization file is a community contribution and is not officially maintained
+ * by Clerk. It has been provided by the community and may not be fully aligned
+ * with the current or future states of the main application. Clerk does not guarantee
+ * the accuracy, completeness, or timeliness of the translations in this file.
+ * Use of this file is at your own risk and discretion.
+ * =====================================================================================
+ */
+
 import type { LocalizationResource } from '@clerk/types';
 
 export const isIS: LocalizationResource = {
@@ -35,10 +47,11 @@ export const isIS: LocalizationResource = {
   formButtonPrimary__verify: 'Staðfesta',
   formFieldAction__forgotPassword: 'Gleymt lykilorð?',
   formFieldError__matchingPasswords: 'Lykilorð passa saman.',
-  formFieldError__notMatchingPasswords: "Lykilorð passa ekki saman.",
+  formFieldError__notMatchingPasswords: 'Lykilorð passa ekki saman.',
   formFieldError__verificationLinkExpired: 'Staðfestingartengillinn er útrunninn. Vinsamlegast biðjið um nýjan tengil.',
   formFieldHintText__optional: 'Valfrjálst',
-  formFieldHintText__slug: 'Stubbur (e. slug) er auðlesanlegt auðkenni sem verður að vera einstakt. Það er oft notað í vefslóðum.',
+  formFieldHintText__slug:
+    'Stubbur (e. slug) er auðlesanlegt auðkenni sem verður að vera einstakt. Það er oft notað í vefslóðum.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Eyða aðgangi',
   formFieldInputPlaceholder__emailAddress: '',
@@ -81,8 +94,7 @@ export const isIS: LocalizationResource = {
     action__signOut: 'Skrá út',
     title: 'Skráður inn sem {{identifier}}',
   },
-  maintenanceMode:
-    "Við erum nú í viðhaldi, en ekki hafa áhyggjur, það ætti ekki að taka meira en nokkrar mínútur.",
+  maintenanceMode: 'Við erum nú í viðhaldi, en ekki hafa áhyggjur, það ætti ekki að taka meira en nokkrar mínútur.',
   membershipRole__admin: 'Stjórnandi',
   membershipRole__basicMember: 'Meðlimur',
   membershipRole__guestMember: 'Gestur',
@@ -240,9 +252,10 @@ export const isIS: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á netfangið þitt',
       formTitle: 'Staðfestingarkóði',
-      resendButton: "Fékkstu ekki kóða? Senda aftur",
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Lénið {{domainName}} þarf að vera staðfest með tölvupósti.',
-      subtitleVerificationCodeScreen: 'Staðfestingarkóði var sendur á {{emailAddress}}. Sláðu inn kóðann til að halda áfram.',
+      subtitleVerificationCodeScreen:
+        'Staðfestingarkóði var sendur á {{emailAddress}}. Sláðu inn kóðann til að halda áfram.',
       title: 'Staðfesta lén',
     },
   },
@@ -291,7 +304,7 @@ export const isIS: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'Staðfestingarkóði',
-      resendButton: "Fékkstu ekki kóða? Senda aftur",
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Athugaðu tölvupóstinn þinn',
     },
@@ -315,7 +328,7 @@ export const isIS: LocalizationResource = {
         subtitle: 'Þú verður fljótlega vísað áfram',
         title: 'Skrá inn...',
       },
-      resendButton: "Fékkstu ekki tengil? Senda aftur",
+      resendButton: 'Fékkstu ekki tengil? Senda aftur',
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Athugaðu tölvupóstinn þinn',
       unusedTab: {
@@ -323,7 +336,7 @@ export const isIS: LocalizationResource = {
       },
       verified: {
         subtitle: 'Þú verður fljótlega vísað áfram',
-                title: 'Tókst að skrá inn',
+        title: 'Tókst að skrá inn',
       },
       verifiedSwitchTab: {
         subtitle: 'Farðu aftur í upprunalega flipann til að halda áfram',
@@ -333,7 +346,7 @@ export const isIS: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'Endurstilla lykilorð kóða',
-      resendButton: "Fékkstu ekki kóða? Senda aftur",
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'til að endurstilla lykilorðið þitt',
       subtitle_email: 'Fyrst, sláðu inn kóðann sem sendur var á netfangið þitt',
       subtitle_phone: 'Fyrst, sláðu inn kóðann sem sendur var á símann þinn',
@@ -345,12 +358,13 @@ export const isIS: LocalizationResource = {
       title: 'Gleymt lykilorð?',
     },
     noAvailableMethods: {
-      message: "Ekki er hægt að halda áfram með innskráningu. Engin tiltæk auðkenningaraðferð.",
+      message: 'Ekki er hægt að halda áfram með innskráningu. Engin tiltæk auðkenningaraðferð.',
       subtitle: 'Villa kom upp',
       title: 'Ekki hægt að skrá inn',
     },
     passkey: {
-      subtitle: "Að nota lykilinn þinn staðfestir að þú ert það. Tækið þitt gæti beðið um fingrafar, andlit eða skjálás.",
+      subtitle:
+        'Að nota lykilinn þinn staðfestir að þú ert það. Tækið þitt gæti beðið um fingrafar, andlit eða skjálás.',
       title: 'Nota lykilinn þinn',
     },
     password: {
@@ -363,13 +377,13 @@ export const isIS: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'Staðfestingarkóði',
-      resendButton: "Fékkstu ekki kóða? Senda aftur",
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Athugaðu símann þinn',
     },
     phoneCodeMfa: {
       formTitle: 'Staðfestingarkóði',
-      resendButton: "Fékkstu ekki kóða? Senda aftur",
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Til að halda áfram, vinsamlegast sláðu inn staðfestingarkóðann sem sendur var á símann þinn',
       title: 'Athugaðu símann þinn',
     },
@@ -410,7 +424,7 @@ export const isIS: LocalizationResource = {
     emailCode: {
       formSubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á netfangið þitt',
       formTitle: 'Staðfestingarkóði',
-      resendButton: "Fékkstu ekki kóða? Senda aftur",
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á netfangið þitt',
       title: 'Staðfesta netfang',
     },
@@ -425,7 +439,7 @@ export const isIS: LocalizationResource = {
       loading: {
         title: 'Skrá sig...',
       },
-      resendButton: "Fékkstu ekki tengil? Senda aftur",
+      resendButton: 'Fékkstu ekki tengil? Senda aftur',
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Staðfesta netfang',
       verified: {
@@ -440,7 +454,7 @@ export const isIS: LocalizationResource = {
     phoneCode: {
       formSubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á símanúmerið þitt',
       formTitle: 'Staðfestingarkóði',
-      resendButton: "Fékkstu ekki kóða? Senda aftur",
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
       subtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á símanúmerið þitt',
       title: 'Staðfesta símanúmer',
     },
@@ -591,18 +605,18 @@ export const isIS: LocalizationResource = {
         formHint: 'Tölvupóstur sem inniheldur staðfestingarkóða verður sendur á þetta netfang.',
         formSubtitle: 'Sláðu inn staðfestingarkóðann sem sendur var á {{identifier}}',
         formTitle: 'Staðfestingarkóði',
-        resendButton: "Fékkstu ekki kóða? Senda aftur",
+        resendButton: 'Fékkstu ekki kóða? Senda aftur',
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
       emailLink: {
         formHint: 'Tölvupóstur sem inniheldur staðfestingartengil verður sendur á þetta netfang.',
         formSubtitle: 'Smelltu á staðfestingartengilinn í tölvupóstinum sem sendur var á {{identifier}}',
         formTitle: 'Staðfestingartengill',
-        resendButton: "Fékkstu ekki tengil? Senda aftur",
+        resendButton: 'Fékkstu ekki tengil? Senda aftur',
         successMessage: 'Netfangið {{identifier}} hefur verið bætt við reikninginn þinn.',
       },
       removeResource: {
-                messageLine1: '{{identifier}} verður fjarlægt úr þessum reikningi.',
+        messageLine1: '{{identifier}} verður fjarlægt úr þessum reikningi.',
         messageLine2: 'Þú munt ekki lengur geta skráð þig inn með þessu netfangi.',
         successMessage: '{{emailAddress}} hefur verið fjarlægt úr reikningnum þínum.',
         title: 'Fjarlægja netfang',
@@ -646,7 +660,8 @@ export const isIS: LocalizationResource = {
         buttonUnableToScan__nonPrimary: 'Getur ekki skannað QR kóða?',
         infoText__ableToScan:
           'Settu upp nýja innskráningaraðferð í auðkennisforritinu þínu og skannaðu eftirfarandi QR kóða til að tengja það við reikninginn þinn.',
-        infoText__unableToScan: 'Settu upp nýja innskráningaraðferð í auðkennisforritinu þínu og sláðu inn lykilinn hér að neðan.',
+        infoText__unableToScan:
+          'Settu upp nýja innskráningaraðferð í auðkennisforritinu þínu og sláðu inn lykilinn hér að neðan.',
         inputLabel__unableToScan1:
           'Gakktu úr skugga um að Tímatengdir eða Einnota lykilorð séu virkjað, og ljúktu síðan við að tengja reikninginn þinn.',
         inputLabel__unableToScan2:
@@ -682,7 +697,8 @@ export const isIS: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Mælt er með að skrá þig út af öllum öðrum tækjum sem gætu hafa notað gamla lykilorðið þitt.',
-      readonly: 'Lykilorðið þitt er ekki hægt að breyta núna vegna þess að þú getur aðeins skráð þig inn í gegnum fyrirtækjatengingu.',
+      readonly:
+        'Lykilorðið þitt er ekki hægt að breyta núna vegna þess að þú getur aðeins skráð þig inn í gegnum fyrirtækjatengingu.',
       successMessage__set: 'Lykilorðið þitt hefur verið sett.',
       successMessage__signOutOfOtherSessions: 'Öll önnur tæki hafa verið skráð út.',
       successMessage__update: 'Lykilorðið þitt hefur verið uppfært.',
