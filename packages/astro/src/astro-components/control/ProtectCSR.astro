@@ -10,11 +10,10 @@ const { role, permission } = Astro.props;
   data-role={role}
   data-permission={permission}
 >
-  <!-- TODO: Can't have a data attribute in a Fragment. Remove div wrapper later. -->
-  <div data-default-slot>
+  <div data-clerk-control-slot-default>
     <slot />
   </div>
-  <div data-fallback-slot>
+  <div data-clerk-control-slot-fallback>
     <slot name="fallback" />
   </div>
 </clerk-protect>

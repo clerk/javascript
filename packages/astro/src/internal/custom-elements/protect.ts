@@ -1,6 +1,6 @@
-import type { CheckAuthorizationWithCustomPermissions } from '@clerk/types';
+import type { CheckAuthorization } from '@clerk/types';
 
-import { $authStore } from '../../stores/external';
+import { $authStore, $sessionStore } from '../../stores/external';
 
 export class Protect extends HTMLElement {
   private defaultSlot: HTMLDivElement | null = null;
@@ -20,37 +20,17 @@ export class Protect extends HTMLElement {
   }
 
   toggleContentVisibility() {
-    this.defaultSlot = this.querySelector('[data-default-slot]');
-    this.fallbackSlot = this.querySelector('[data-fallback-slot]');
+    this.defaultSlot = this.querySelector('[data-clerk-control-slot-default]');
+    this.fallbackSlot = this.querySelector('[data-clerk-control-slot-fallback]');
 
     this.authStoreListener = $authStore.subscribe(state => {
-      const has = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => {
-        if (!params?.permission && !params?.role) {
-          throw new Error(
-            'Missing parameters. The prop permission or role is required to be passed. Example usage: `has({permission: "org:posts:edit"})`',
-          );
-        }
-
-        if (!state.orgId || !state.userId || !state.orgRole || !state?.orgPermissions) {
-          return false;
-        }
-
-        if (params.permission) {
-          return state.orgPermissions.includes(params.permission);
-        }
-
-        if (params.role) {
-          return state.orgRole === params.role;
-        }
-
-        return false;
-      };
+      const has = $sessionStore.get()?.checkAuthorization;
 
       const role = this.dataset.role;
       const permission = this.dataset.permission;
       const isUnauthorized =
         !state.userId ||
-        ((role || permission) && !has({ role, permission } as Parameters<CheckAuthorizationWithCustomPermissions>[0]));
+        ((role || permission) && !has?.({ role, permission } as Parameters<CheckAuthorization>[0]));
 
       if (this.defaultSlot) {
         isUnauthorized ? this.defaultSlot.setAttribute('hidden', '') : this.defaultSlot.removeAttribute('hidden');
