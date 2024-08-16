@@ -221,6 +221,11 @@ export const Input = React.forwardRef(function FieldInput(
   );
 });
 
+// ! TODO
+// - [x] Enter
+// - [ ] Exit
+// - [ ] Animate height with JS (via a custom property)
+// - [ ] Cross animate
 export const Message = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
@@ -236,6 +241,11 @@ export const Message = React.forwardRef<
       {...props}
       className={cx(
         'flex gap-x-1 text-base',
+        'opacity-100 blur-none transition-[opacity,filter] duration-[250ms] ease-out will-change-[opacity,filter]',
+        // Note:
+        // `starting-style` **must** come last for our tailwindcss-transformer
+        // to generate in the correct order
+        'starting-style:opacity-0 starting-style:blur-sm allow-discrete',
         {
           start: 'justify-start',
           center: 'justify-center',

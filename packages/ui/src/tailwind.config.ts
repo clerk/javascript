@@ -113,8 +113,13 @@ const config = {
     },
   },
   plugins: [
-    plugin(function ({ addVariant }) {
+    plugin(function ({ addUtilities, addVariant }) {
       addVariant('starting-style', '@starting-style');
+      addUtilities({
+        '.allow-discrete': {
+          'transition-behavior': 'allow-discrete',
+        },
+      });
     }),
   ],
 } satisfies Config;
