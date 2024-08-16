@@ -23,7 +23,8 @@ export function vitePluginAstroConfig(
 
           export function isStaticOutput(forceStatic) {
             if (astroConfig.output === 'hybrid' && forceStatic === undefined) {
-              return 'server';
+              // Default page is prerendered in hybrid mode
+              return true;
             }
 
             if (forceStatic !== undefined) {

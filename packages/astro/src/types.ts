@@ -1,6 +1,6 @@
 import type {
-  Clerk,
   CheckAuthorizationWithCustomPermissions,
+  Clerk,
   ClerkOptions,
   ClientResource,
   MultiDomainAndOrProxyPrimitives,
