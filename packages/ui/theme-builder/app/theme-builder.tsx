@@ -8,6 +8,7 @@ import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 import { ToggleGroup } from './toggle-group';
+import { Logo } from './components/logo';
 
 const lightAccentDefault = '#6C47FF';
 const lightGrayDefault = '#2f3037';
@@ -85,7 +86,12 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
         }}
       />
       <div className='grid h-dvh grid-cols-[min-content,minmax(0,1fr)] grid-rows-[min-content,minmax(0,1fr)] overflow-hidden'>
-        <header className='col-span-full flex h-16 shrink-0 items-center justify-end border-b px-4'>
+        <header className='col-span-full flex shrink-0 items-center justify-between border-b p-3 ps-4'>
+          <h1 className='inline-flex items-center gap-3 text-neutral-800'>
+            <Logo className='h-4' />
+            <span className='mt-px font-semibold'>Theme Builder</span>
+          </h1>
+
           <div className='inline-flex items-center gap-x-2 text-xs'>
             <label htmlFor='component'>Component</label>
             <div className='relative'>
@@ -124,7 +130,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <aside className='relative isolate flex h-full w-[17rem] shrink-0 flex-col overflow-y-auto border-e bg-white p-4'>
+        <aside className='relative isolate flex h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4'>
           <div className='space-y-4'>
             <ToggleGroup
               label='Appearance'
@@ -257,7 +263,8 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               />
             </div>
           </div>
-          <div className='mt-auto space-y-2'>
+
+          <div className='space-y-2'>
             <button
               type='button'
               className='w-full rounded border bg-white p-1.5 text-xs'
@@ -281,7 +288,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
         </aside>
 
         <figure
-          className={cx('relative isolate grid items-center overflow-y-auto p-4', {
+          className={cx('relative isolate grid items-center overflow-y-auto p-8', {
             'bg-neutral-50': appearance === 'light',
             'dark bg-neutral-950': appearance === 'dark',
           })}
