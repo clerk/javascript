@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#FFF',
+  themeColor: '#f5f5f5',
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
       lang='en'
       className='h-full'
     >
-      <body className='flex min-h-full flex-col'>
+      <body className='flex min-h-full flex-col bg-neutral-100'>
         <ThemeBuilder>{children}</ThemeBuilder>
       </body>
     </html>
