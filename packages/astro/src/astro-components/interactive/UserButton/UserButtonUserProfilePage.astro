@@ -2,9 +2,10 @@
 interface Props {
   url: string
   label: string
+  parent?: string
 }
 
-const { url, label } = Astro.props
+const { url, label, parent } = Astro.props
 
 let labelIcon = '';
 let content = ''
@@ -18,11 +19,16 @@ if (Astro.slots.has('default')) {
 }
 ---
 
-<script is:inline define:vars={{ url, label, content, labelIcon }}>
+<script is:inline define:vars={{ url, label, content, labelIcon, parent }}>
 // Get the user button map from window that we set in the `<InternalUIComponentRenderer />`.
 const userButtonComponentMap = window.__astro_clerk_component_props.get('user-button');
-// It doesn't make sense to have multiple user buttons in page, so first one should be safe.
-const userButton = document.querySelector('[data-clerk-id^="clerk-user-button"]');
+
+let userButton
+if (parent) {
+  userButton = document.querySelector(`[data-clerk-id="clerk-user-button-${parent}"]`);
+} else {
+  userButton = document.querySelector('[data-clerk-id^="clerk-user-button"]');
+}
 
 const safeId = userButton.getAttribute('data-clerk-id');
 const currentOptions = userButtonComponentMap.get(safeId);

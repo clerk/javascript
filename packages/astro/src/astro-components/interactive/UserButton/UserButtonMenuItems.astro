@@ -1,20 +1,20 @@
-<user-button-menu-items data-clerk-user-button-menu-items>
+<user-button-menu-items>
  <slot />
 </user-button-menu-items>
 
 <script is:inline>
-/**
- * In the React version, menu items need to be wrapped in a `<UserButton.MenuItems>` component.
- * We are trying to replicate that behavior here by adding a wrapper component
- * and check if it exists inside the menu items components.
- */
-class UserButtonMenuItems extends HTMLElement {
-  constructor() {
-    super();
-  }
-}
-
 if (!customElements.get('user-button-menu-items')) {
+  /**
+   * In the React version, menu items need to be wrapped in a `<UserButton.MenuItems>` component.
+   * We are trying to replicate that behavior here by adding a wrapper component
+   * and check if it exists inside the menu items components.
+   */
+  class UserButtonMenuItems extends HTMLElement {
+    constructor() {
+      super();
+    }
+  }
+
   customElements.define('user-button-menu-items', UserButtonMenuItems);
 }
 </script>
