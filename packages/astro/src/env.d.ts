@@ -33,6 +33,6 @@ declare namespace App {
 declare module 'virtual:@clerk/astro/config' {
   import type { AstroConfig } from 'astro';
 
-	export const astroConfig: AstroConfig;
-	export function isStaticOutput(forceStatic?: boolean): boolean;
+  export const astroConfig: AstroConfig;
+  export function isStaticOutput(forceStatic?: boolean): boolean;
 }

@@ -29,8 +29,7 @@ export class Protect extends HTMLElement {
       const role = this.dataset.role;
       const permission = this.dataset.permission;
       const isUnauthorized =
-        !state.userId ||
-        ((role || permission) && !has?.({ role, permission } as Parameters<CheckAuthorization>[0]));
+        !state.userId || ((role || permission) && !has?.({ role, permission } as Parameters<CheckAuthorization>[0]));
 
       if (this.defaultSlot) {
         isUnauthorized ? this.defaultSlot.setAttribute('hidden', '') : this.defaultSlot.removeAttribute('hidden');
