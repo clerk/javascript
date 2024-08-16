@@ -1,11 +1,8 @@
 import type { AstroConfig } from 'astro';
-import type { ViteUserConfig } from 'astro/config';
 
-type ExtractPluginOption<T> = T extends (infer U)[] ? U : never;
+type VitePlugin = Required<AstroConfig['vite']>['plugins'][number];
 
-export function vitePluginAstroConfig(
-  astroConfig: AstroConfig,
-): ExtractPluginOption<NonNullable<ViteUserConfig['plugins']>> {
+export function vitePluginAstroConfig(astroConfig: AstroConfig): VitePlugin {
   const virtualModuleId = 'virtual:@clerk/astro/config';
   const resolvedVirtualModuleId = '\0' + virtualModuleId;
 
