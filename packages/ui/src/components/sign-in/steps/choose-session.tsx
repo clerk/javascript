@@ -153,7 +153,7 @@ export function SignInChooseSession() {
                         />
                       </svg>
                     </span>
-                    {t('signIn.accountSwitcher.action__addAccount')}
+                    <span className='font-medium'>{t('signIn.accountSwitcher.action__addAccount')}</span>
                   </Button>
                 </SignIn.Action>
               </div>
