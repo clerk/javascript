@@ -45,7 +45,7 @@ function getTitleAndSubtitle({
   let title = '';
   let subtitle = '';
   if (firstName || lastName) {
-    title = `${firstName} ${lastName}`;
+    title = [firstName, lastName].filter(Boolean).join(' ');
     subtitle = identifier || '';
   } else {
     title = identifier || '';
