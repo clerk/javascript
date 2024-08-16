@@ -8,6 +8,7 @@ import { ColorPicker } from './color-picker';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 import { ToggleGroup } from './toggle-group';
+import { Logo } from './components/logo';
 
 const lightAccentDefault = '#6C47FF';
 const lightGrayDefault = '#2f3037';
@@ -84,8 +85,21 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           __html: css,
         }}
       />
-      <div className='grid h-dvh grid-cols-[min-content,minmax(0,1fr)] grid-rows-[min-content,minmax(0,1fr)] overflow-hidden'>
-        <header className='col-span-full flex h-16 shrink-0 items-center justify-end border-b px-4'>
+      <div className='z-1 pointer-events-none fixed inset-x-0 top-0 z-50 h-[calc(theme(size.1)-theme(ringWidth.1))] bg-neutral-100'></div>
+      <div
+        className={cx(
+          'm-1 mb-0 grid h-[calc(100dvh-theme(size.1))] grid-cols-[min-content,minmax(0,1fr)] grid-rows-[min-content,minmax(0,1fr)] overflow-hidden rounded-t-xl bg-white ring-1 ring-neutral-900/[0.075]',
+          'shadow-[0_1px_1px_rgba(0,0,0,0.05),0_4px_6px_rgba(32,42,54,0.04),0_24px_68px_rgba(47,48,56,0.15),0_2px_3px_rgba(0,0,0,0.09)]',
+        )}
+      >
+        <header className='col-span-full flex shrink-0 items-center justify-between border-b p-4'>
+          <h1 className='inline-flex items-center gap-3'>
+            <Logo className='h-4 text-neutral-950' />
+            <span className='mt-0.5 bg-gradient-to-r from-[#6C47FF] to-[#056D99] bg-clip-text text-sm font-medium text-transparent'>
+              Theme Builder
+            </span>
+          </h1>
+
           <div className='inline-flex items-center gap-x-2 text-xs'>
             <label htmlFor='component'>Component</label>
             <div className='relative'>
@@ -124,7 +138,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <aside className='relative isolate flex h-full w-[17rem] shrink-0 flex-col overflow-y-auto border-e bg-white p-4'>
+        <aside className='relative isolate flex h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4'>
           <div className='space-y-4'>
             <ToggleGroup
               label='Appearance'
@@ -214,7 +228,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 />
               </>
             )}
-            <div>
+            <div className='flex flex-col gap-1'>
               <label
                 htmlFor='radius'
                 className='text-xs font-medium text-neutral-700'
@@ -228,7 +242,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 className='w-full rounded border p-2 text-xs'
               />
             </div>
-            <div>
+            <div className='flex flex-col gap-1'>
               <label
                 htmlFor='spacing-unit'
                 className='text-xs font-medium text-neutral-700'
@@ -242,7 +256,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 className='w-full rounded border p-2 text-xs'
               />
             </div>
-            <div>
+            <div className='flex flex-col gap-1'>
               <label
                 htmlFor='font-size'
                 className='text-xs font-medium text-neutral-700'
@@ -257,10 +271,11 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               />
             </div>
           </div>
-          <div className='mt-auto space-y-2'>
+
+          <div className='space-y-2'>
             <button
               type='button'
-              className='w-full rounded border bg-white p-1.5 text-xs'
+              className='w-full rounded border bg-white p-1.5 text-xs font-medium hover:bg-neutral-50 active:bg-neutral-100'
               onClick={handleReset}
             >
               Reset
@@ -269,7 +284,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               trigger={
                 <button
                   type='button'
-                  className='w-full rounded border bg-white p-1.5 text-xs'
+                  className='w-full rounded border bg-white p-1.5 text-xs font-medium hover:bg-neutral-50 active:bg-neutral-100'
                 >
                   View CSS
                 </button>
@@ -281,8 +296,8 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
         </aside>
 
         <figure
-          className={cx('relative isolate grid items-center overflow-y-auto p-4', {
-            'bg-neutral-50': appearance === 'light',
+          className={cx('relative isolate grid items-center overflow-y-auto p-8', {
+            'bg-white': appearance === 'light',
             'dark bg-neutral-950': appearance === 'dark',
           })}
         >
