@@ -11,14 +11,14 @@ type Props<Label extends string> = {
       selector?: string
     }
   : (
-      | { open: string; selector?: string }
-      | { open?: string; selector: string }
+      | { open: string; clickIdentifier?: string }
+      | { open?: string; clickIdentifier: string }
     )
 )
 
-const { label, open, selector } = Astro.props
+const { label, open, clickIdentifier } = Astro.props
 ---
 
-<MenuItemRenderer label={label} open={open} selector={selector}>
+<MenuItemRenderer label={label} open={open} clickIdentifier={clickIdentifier}>
   <slot name="label-icon" slot="label-icon" />
 </MenuItemRenderer>
