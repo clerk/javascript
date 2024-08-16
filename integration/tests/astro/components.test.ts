@@ -120,7 +120,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.waitForPopover();
 
     // First item should now be the sign out button
-    await u.page.getByRole('menuitem').first().click()
+    await u.page.getByRole('menuitem').first().click();
     await u.po.expect.toBeSignedOut();
   });
 
