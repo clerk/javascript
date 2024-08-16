@@ -9,7 +9,7 @@ Example:
 
 ```tsx
 <SignIn.Step name='choose-session'>
-  <SignIn.SessionList asChild>
+  <SignIn.SessionList>
     <SignIn.SessionListItem>
       {({ session }) => <>{session.identifier} | <SignIn.Action setActiveSession>Switch...</SignIn.Action></>}
     </SignIn.SessionListItem>
