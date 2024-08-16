@@ -89,14 +89,22 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.toggleTrigger();
     await u.po.userButton.waitForPopover();
 
+    // Check if custom menu items are visible
     await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action$/i]);
 
-    // TODO: Test custom link and check if it navigates to the href provided
-
+    // Click custom action and check for custom page availbility
     await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
     await u.po.userProfile.waitForUserProfileModal();
-
     await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Close the modal and trigger the popover again
+    await u.page.locator('.cl-modalCloseButton').click();
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('menuitem', { name: /Custom link/i }).click();
+    await u.page.waitForAppUrl('/user');
   });
 
   test('render user profile with streamed data', async ({ page, context }) => {
