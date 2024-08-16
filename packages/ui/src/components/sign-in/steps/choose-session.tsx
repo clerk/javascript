@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/clerk-react';
 import * as SignIn from '@clerk/elements/sign-in';
 import { cva } from 'cva';
 import { Button } from 'react-aria-components';
@@ -57,6 +58,7 @@ const sessionAction = cva({
 });
 
 export function SignInChooseSession() {
+  const { signOut } = useClerk();
   const { t } = useLocalizations();
   const { layout } = useAppearance();
   const isDev = useDevModeWarning();
@@ -160,7 +162,12 @@ export function SignInChooseSession() {
         </Card.Content>
         <Card.Footer {...cardFooterProps}>
           <Card.FooterAction>
-            <Button className='text-gray-11 hover:bg-gray-3 data-[focus-visible]:bg-gray-3 -my-1 flex w-full items-center gap-x-3 rounded-md px-4 py-1 text-base font-medium outline-none'>
+            <Button
+              onPress={() => {
+                void signOut();
+              }}
+              className='text-gray-11 hover:bg-gray-3 data-[focus-visible]:bg-gray-3 -my-1 flex w-full items-center gap-x-3 rounded-md px-4 py-1 text-base font-medium outline-none'
+            >
               <span className='grid w-9 place-content-center'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
