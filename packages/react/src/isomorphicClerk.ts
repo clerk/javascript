@@ -146,7 +146,26 @@ type IsomorphicLoadedClerk = Without<
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
   client: ClientResource | undefined;
+  suspendedSignIn: Promise<unknown>;
 };
+
+function customPromiseWithResolves<T = unknown>() {
+  let resolve: (value: T | PromiseLike<T>) => void;
+  let reject: (reason?: any) => void;
+
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return {
+    promise,
+    // @ts-ignore
+    resolve,
+    // @ts-ignore
+    reject,
+  };
+}
 
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly mode: 'browser' | 'server';
@@ -169,6 +188,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private loadedListeners: Array<() => void> = [];
+  private suspenseSignInMounted = customPromiseWithResolves();
 
   #loaded = false;
   #domain: DomainOrProxyUrl['domain'];
@@ -181,6 +201,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get loaded(): boolean {
     return this.#loaded;
+  }
+
+  get suspendedSignIn(): Promise<unknown> {
+    return this.suspenseSignInMounted.promise;
   }
 
   static #instance: IsomorphicClerk | null | undefined;
@@ -475,6 +499,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     this.clerkjs = clerkjs;
+
+    (clerkjs as any).__unstable_onSuspendedSignIn(() => {
+      this.suspenseSignInMounted.resolve(true);
+    });
 
     this.premountMethodCalls.forEach(cb => cb());
 

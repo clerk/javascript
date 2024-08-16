@@ -13,8 +13,10 @@ import type {
   Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-import React, { createElement } from 'react';
+// @ts-expect-error
+import React, { createElement, use } from 'react';
 
+import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import {
   organizationProfileLinkRenderedError,
   organizationProfilePageRenderedError,
@@ -130,6 +132,7 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
   componentDidMount() {
     if (this.portalRef.current) {
       if (isMountProps(this.props)) {
+        console.log('-- portal calling mount');
         this.props.mount(this.portalRef.current, this.props.props);
       }
 
@@ -173,6 +176,72 @@ export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>
     />
   );
 }, 'SignIn');
+
+const Dump = () => {
+  const clerk = useIsomorphicClerkContext();
+  console.log('------clerk', clerk?.suspendedSignIn);
+  use(clerk.suspendedSignIn);
+  return null;
+};
+
+export const SignIn3 = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
+  console.log('----- SignIn3');
+  return (
+    <Portal
+      mount={clerk.mountSignIn}
+      unmount={clerk.unmountSignIn}
+      updateProps={(clerk as any).__unstable__updateProps}
+      props={props}
+    />
+  );
+}, 'SignIn3');
+
+export const SignIn2 = (props: SignInProps) => {
+  return (
+    <>
+      <SignIn3 {...props} />
+      <Dump />
+    </>
+  );
+};
+
+// const ClerkSuspencer = () => {
+//   const clerk = useIsomorphicClerkContext();
+//   console.log('------clerk', clerk);
+//   // use(clerk.suspendedSignIn);
+//   return null;
+// };
+//
+// export const SignInSuspended = (props: SignInProps) => {
+//   const clerk = useIsomorphicClerkContext();
+//
+//   if (!clerk.loaded) {
+//     return null;
+//   }
+//
+//   return (
+//     <>
+//       <Portal
+//         mount={clerk.mountSignIn}
+//         unmount={clerk.unmountSignIn}
+//         updateProps={(clerk as any).__unstable__updateProps}
+//         props={props}
+//       />
+//       <ClerkSuspencer />
+//     </>
+//   );
+// };
+
+// export const SignInSuspended = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>) => {
+//   return (
+//     <Portal
+//       mount={clerk.mountSignIn}
+//       unmount={clerk.unmountSignIn}
+//       updateProps={(clerk as any).__unstable__updateProps}
+//       props={props}
+//     />
+//   );
+// }, 'SignInSuspended');
 
 export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>) => {
   return (

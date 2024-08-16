@@ -15,6 +15,8 @@ export const withClerk = <P extends { clerk: LoadedClerk }>(
   const HOC = (props: Without<P, 'clerk'>) => {
     useAssertWrappedByClerkProvider(displayName || 'withClerk');
 
+    console.log('----- HOC Clerk');
+
     const clerk = useIsomorphicClerkContext();
 
     if (!clerk.loaded) {

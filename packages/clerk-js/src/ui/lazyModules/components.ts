@@ -15,7 +15,13 @@ const componentImportPaths = {
   GoogleOneTap: () => import(/* webpackChunkName: "oneTap" */ './../components/GoogleOneTap'),
 } as const;
 
-export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
+export const SignIn = lazy(() =>
+  componentImportPaths.SignIn().then(module => {
+    console.log('react lazy() Clerk:', window.Clerk);
+    (window.Clerk as any).__unstable_notifySuspendedSignIn();
+    return { default: module.SignIn };
+  }),
+);
 
 export const SignInModal = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignInModal })));
 export const GoogleOneTap = lazy(() =>

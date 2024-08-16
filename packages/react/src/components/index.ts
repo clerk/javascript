@@ -1,6 +1,7 @@
 export {
   SignUp,
   SignIn,
+  SignIn2,
   UserProfile,
   UserButton,
   OrganizationSwitcher,
