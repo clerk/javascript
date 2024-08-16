@@ -232,6 +232,7 @@ export const SignUpRouterMachine = setup({
           isLoading: event.isLoading,
           step: event.step,
           strategy: event.strategy,
+          action: event.action,
         },
       })),
     },

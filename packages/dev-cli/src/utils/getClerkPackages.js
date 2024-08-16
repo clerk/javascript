@@ -3,6 +3,7 @@ import { dirname, posix } from 'node:path';
 
 import { globby } from 'globby';
 
+import { NULL_ROOT_ERROR } from './errors.js';
 import { getMonorepoRoot } from './getMonorepoRoot.js';
 
 /**
@@ -11,6 +12,9 @@ import { getMonorepoRoot } from './getMonorepoRoot.js';
  */
 export async function getClerkPackages() {
   const monorepoRoot = await getMonorepoRoot();
+  if (!monorepoRoot) {
+    throw new Error(NULL_ROOT_ERROR);
+  }
   /** @type {Record<string, string>} */
   const packages = {};
   const clerkPackages = await globby([posix.join(monorepoRoot, 'packages', '*', 'package.json'), '!*node_modules*']);

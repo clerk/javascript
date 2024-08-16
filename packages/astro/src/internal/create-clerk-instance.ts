@@ -74,7 +74,7 @@ function updateClerkOptions(options: AstroClerkUpdateOptions) {
   if (!clerk) {
     throw new Error('Missing clerk instance');
   }
-  // TODO: Update Clerk type from @clerk/types to include this method
+  // `__unstable__updateProps` is not exposed as public API from `@clerk/types`
   void (clerk as any).__unstable__updateProps({
     options: { ...initOptions, ...options },
     appearance: { ...initOptions?.appearance, ...options.appearance },

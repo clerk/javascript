@@ -136,7 +136,7 @@ export function SignInStart() {
                   ) : null}
                 </Card.Body>
                 <Card.Actions>
-                  <Common.Loading>
+                  <Common.Loading scope='submit'>
                     {isSubmitting => {
                       return (
                         <SignIn.Action
@@ -162,13 +162,13 @@ export function SignInStart() {
                     // setState on click, but we'll need to find a way to clean
                     // up the state based on `isSubmitting`
                     passkeyEnabled ? (
-                      <Common.Loading>
+                      <Common.Loading scope='passkey'>
                         {isSubmitting => {
                           return (
                             <SignIn.Passkey asChild>
                               <LinkButton
                                 type='button'
-                                disabled={isGlobalLoading || isSubmitting}
+                                disabled={isGlobalLoading}
                               >
                                 {t('signIn.start.actionLink__use_passkey')}
                               </LinkButton>

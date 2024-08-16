@@ -16,7 +16,7 @@ export function ColorPicker({
 }) {
   const id = useId();
   return (
-    <div>
+    <div className='flex flex-col gap-0.5'>
       <div className='mb-1 flex items-center gap-x-1'>
         <label
           className='text-xs font-medium text-neutral-700'

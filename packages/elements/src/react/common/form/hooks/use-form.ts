@@ -6,7 +6,7 @@ import { useGlobalErrors } from './use-global-errors';
 /**
  * Provides the form submission handler along with the form's validity via a data attribute
  */
-export function useForm({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT' }> }) {
+export function useForm({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMIT'; action: 'submit' }> }) {
   const { errors } = useGlobalErrors();
 
   // Register the onSubmit handler for form submission
@@ -15,7 +15,7 @@ export function useForm({ flowActor }: { flowActor?: BaseActorRef<{ type: 'SUBMI
     (event: React.FormEvent<Element>) => {
       event.preventDefault();
       if (flowActor) {
-        flowActor.send({ type: 'SUBMIT' });
+        flowActor.send({ type: 'SUBMIT', action: 'submit' });
       }
     },
     [flowActor],

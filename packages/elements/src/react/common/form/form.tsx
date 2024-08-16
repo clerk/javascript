@@ -11,7 +11,7 @@ const DISPLAY_NAME = 'ClerkElementsForm';
 type FormElement = React.ElementRef<typeof RadixForm>;
 export type FormProps = Omit<RadixFormProps, 'children'> & {
   children: React.ReactNode;
-  flowActor?: BaseActorRef<{ type: 'SUBMIT' }>;
+  flowActor?: BaseActorRef<{ type: 'SUBMIT'; action: 'submit' }>;
 };
 
 export const Form = React.forwardRef<FormElement, FormProps>(({ flowActor, onSubmit, ...rest }, forwardedRef) => {

@@ -97,10 +97,10 @@ export function SignUpContinue() {
                     ) : null}
                   </div>
                 </Card.Body>
-                <Common.Loading scope='step:continue'>
-                  {isSubmitting => {
-                    return (
-                      <Card.Actions>
+                <Card.Actions>
+                  <Common.Loading scope='submit'>
+                    {isSubmitting => {
+                      return (
                         <SignUp.Action
                           submit
                           asChild
@@ -113,10 +113,10 @@ export function SignUpContinue() {
                             {t('formButtonPrimary')}
                           </Button>
                         </SignUp.Action>
-                      </Card.Actions>
-                    );
-                  }}
-                </Common.Loading>
+                      );
+                    }}
+                  </Common.Loading>
+                </Card.Actions>
               </Card.Content>
               <Card.Footer {...cardFooterProps}>
                 <Card.FooterAction>

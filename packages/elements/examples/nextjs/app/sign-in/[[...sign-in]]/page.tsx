@@ -240,6 +240,24 @@ export default function SignInPage() {
         </SignIn.Step>
 
         <SignIn.Step
+          name='choose-session'
+          className='flex w-96 flex-col items-center gap-6'
+        >
+          <H3>CHOOSE SESSION:</H3>
+
+          <SignIn.SessionList asChild>
+            <section>
+              <SignIn.SessionListItem asChild>
+                {({ session }) => (
+                  <p>
+                    {session.identifier} | <SignIn.Action setActiveSession>Switch...</SignIn.Action>{' '}
+                  </p>
+                )}
+              </SignIn.SessionListItem>
+            </section>
+          </SignIn.SessionList>
+        </SignIn.Step>
+        <SignIn.Step
           name='choose-strategy'
           className='flex w-96 flex-col items-center gap-6'
         >

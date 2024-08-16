@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { parse } from 'dotenv';
 
 import { applyCodemod } from '../codemods/index.js';
+import { INVALID_INSTANCE_KEYS_ERROR } from '../utils/errors.js';
 import { getClerkPackages } from '../utils/getClerkPackages.js';
 import { getConfiguration } from '../utils/getConfiguration.js';
 import { getDependencies } from '../utils/getDependencies.js';
@@ -64,7 +65,11 @@ async function detectFramework() {
  */
 async function getInstanceConfiguration(configuration) {
   const { activeInstance, instances } = configuration;
-  return instances[activeInstance];
+  const activeInstanceConfig = instances[activeInstance];
+  if (!activeInstanceConfig.publishableKey.startsWith('pk_') || !activeInstanceConfig.secretKey.startsWith('sk_')) {
+    throw new Error(INVALID_INSTANCE_KEYS_ERROR);
+  }
+  return activeInstanceConfig;
 }
 
 /**
