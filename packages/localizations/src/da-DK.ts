@@ -754,6 +754,7 @@ export const daDK: LocalizationResource = {
       headerTitle__account: 'Konto',
       headerSubtitle__account: 'Administrer dine kontooplysninger',
       headerTitle__security: 'Sikkerhed',
+      headerSubtitle__security: 'Administrer dine sikkerhedsindstillinger',
       mfaSection: {
         backupCodes: {
           actionLabel__regenerate: 'Generer koder',
