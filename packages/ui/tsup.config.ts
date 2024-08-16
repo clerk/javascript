@@ -45,6 +45,7 @@ export default defineConfig(overrideOptions => {
     entry: {
       'components/sign-in': 'src/components/sign-in/index.tsx',
       'components/sign-up': 'src/components/sign-up/index.tsx',
+      contexts: 'src/contexts/index.ts',
     },
     external: ['react', 'react-dom'],
     format: ['cjs', 'esm'],

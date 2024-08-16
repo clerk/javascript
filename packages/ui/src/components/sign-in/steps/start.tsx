@@ -11,7 +11,7 @@ import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
@@ -26,7 +26,7 @@ import { Separator } from '~/primitives/separator';
 export function SignInStart() {
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
+  const { layout } = useAppearance().parsedAppearance;
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');

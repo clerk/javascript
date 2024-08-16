@@ -8,6 +8,7 @@ import { SignInGetHelp } from '~/components/sign-in/steps/get-help';
 import { SignInResetPassword } from '~/components/sign-in/steps/reset-password';
 import { SignInStart } from '~/components/sign-in/steps/start';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
+import { useAppearance, AppearanceProvider, type Appearance } from '~/contexts';
 
 /**
  * Implementation Details:
@@ -20,24 +21,30 @@ import { SignInVerifications } from '~/components/sign-in/steps/verifications';
  *   where we'll consider its integration within Elements, as well as ensure
  *   bulletproof a11y.
  */
-export function SignIn() {
+export function SignIn({ appearance }: { appearance?: Appearance }) {
   const [showHelp, setShowHelp] = React.useState(false);
+  const { appearance: globalAppearance } = useAppearance();
 
   return (
-    <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
-      <SignInRoot>
-        {showHelp ? (
-          <SignInGetHelp />
-        ) : (
-          <>
-            <SignInStart />
-            <SignInVerifications />
-            <SignInChooseStrategy />
-            <SignInForgotPassword />
-            <SignInResetPassword />
-          </>
-        )}
-      </SignInRoot>
-    </GetHelpContext.Provider>
+    <AppearanceProvider
+      globalAppearance={globalAppearance}
+      appearance={appearance}
+    >
+      <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
+        <SignInRoot>
+          {showHelp ? (
+            <SignInGetHelp />
+          ) : (
+            <>
+              <SignInStart />
+              <SignInVerifications />
+              <SignInChooseStrategy />
+              <SignInForgotPassword />
+              <SignInResetPassword />
+            </>
+          )}
+        </SignInRoot>
+      </GetHelpContext.Provider>
+    </AppearanceProvider>
   );
 }
