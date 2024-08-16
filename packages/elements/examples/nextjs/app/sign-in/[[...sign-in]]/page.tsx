@@ -247,7 +247,13 @@ export default function SignInPage() {
 
           <SignIn.SessionList asChild>
             <section>
-              <SignIn.SessionListItem asChild>{({ session }) => <p>{session.id}</p>}</SignIn.SessionListItem>
+              <SignIn.SessionListItem asChild>
+                {({ session }) => (
+                  <p>
+                    {session.identifier} | <SignIn.Action setActiveSession>Switch...</SignIn.Action>{' '}
+                  </p>
+                )}
+              </SignIn.SessionListItem>
             </section>
           </SignIn.SessionList>
         </SignIn.Step>

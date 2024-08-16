@@ -6,6 +6,7 @@ import { isValidComponentType } from '~/react/utils/is-valid-component-type';
 
 import {
   SignInActiveSessionContext,
+  type SignInActiveSessionListItem,
   useSignInActiveSessionContext,
   useSignInActiveSessionList,
   useSignInChooseSessionIsActive,
@@ -14,10 +15,13 @@ import {
 // ----------------------------------- TYPES ------------------------------------
 
 export type SignInChooseSessionProps = React.HTMLAttributes<HTMLDivElement>;
-export type SignInSessionListProps = React.HTMLAttributes<HTMLUListElement> & { asChild?: boolean };
+export type SignInSessionListProps = React.HTMLAttributes<HTMLUListElement> & {
+  asChild?: boolean;
+  includeCurrentSession?: true;
+};
 export type SignInSessionListItemProps = Omit<React.HTMLAttributes<HTMLLIElement>, 'children'> & {
   asChild?: boolean;
-  children: (session: any) => React.ReactNode;
+  children: ({ session }: { session: SignInActiveSessionListItem }) => React.ReactNode;
 };
 
 // ---------------------------------- CONTEXT -----------------------------------
@@ -36,8 +40,8 @@ export function SignInChooseSession({ children, ...props }: SignInChooseSessionP
   ) : null;
 }
 
-export function SignInSessionList({ asChild, children, ...props }: SignInSessionListProps) {
-  const sessions = useSignInActiveSessionList();
+export function SignInSessionList({ asChild, children, includeCurrentSession, ...props }: SignInSessionListProps) {
+  const sessions = useSignInActiveSessionList({ omitCurrent: !includeCurrentSession });
 
   if (!children || !sessions?.length) {
     return null;
@@ -76,9 +80,10 @@ export function SignInSessionList({ asChild, children, ...props }: SignInSession
   return <ul {...props}>{childrenWithCtx}</ul>;
 }
 
-export function SignInSessionListItem({ asChild, children, ...props }: SignInSessionListItemProps) {
+export function SignInSessionListItem(props: SignInSessionListItemProps) {
+  const { asChild = false, children, ...passthroughProps } = props;
   const session = useSignInActiveSessionContext();
   const Comp = asChild ? Slot : 'li';
 
-  return <Comp {...props}>{children({ session })}</Comp>;
+  return <Comp {...passthroughProps}>{children({ session })}</Comp>;
 }

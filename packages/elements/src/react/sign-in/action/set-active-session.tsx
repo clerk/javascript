@@ -4,6 +4,8 @@ import * as React from 'react';
 import type { SignInRouterSessionSetActiveEvent } from '~/internals/machines/sign-in';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
+import { useSignInActiveSessionContext } from '../choose-session/choose-session.hooks';
+
 const DISPLAY_NAME = 'SignInSetActiveSession';
 
 export type SignInSetActiveSessionElement = React.ElementRef<'button'>;
@@ -25,12 +27,13 @@ export type SignInSetActiveSessionProps = {
 export const SignInSetActiveSession = React.forwardRef<SignInSetActiveSessionElement, SignInSetActiveSessionProps>(
   ({ asChild, ...rest }, forwardedRef) => {
     const actorRef = SignInRouterCtx.useActorRef();
+    const session = useSignInActiveSessionContext();
 
     const Comp = asChild ? Slot : 'button';
     const defaultProps = asChild ? {} : { type: 'button' as const };
 
     const sendEvent = React.useCallback(() => {
-      const event: SignInRouterSessionSetActiveEvent = { type: 'SESSION.SET_ACTIVE', id: 'abc123' };
+      const event: SignInRouterSessionSetActiveEvent = { type: 'SESSION.SET_ACTIVE', id: session.id };
 
       if (actorRef.getSnapshot().can(event)) {
         actorRef.send(event);
@@ -39,7 +42,7 @@ export const SignInSetActiveSession = React.forwardRef<SignInSetActiveSessionEle
           `Clerk: <SignIn.Action setActiveSession> is an invalid event. You can only choose an active session from <SignIn.Step name="choose-session">.`,
         );
       }
-    }, [actorRef]);
+    }, [actorRef, session.id]);
 
     return (
       <Comp

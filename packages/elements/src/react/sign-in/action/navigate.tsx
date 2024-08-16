@@ -5,10 +5,10 @@ import { SignInRouterCtx } from '~/react/sign-in/context';
 
 const SIGN_IN_NAVIGATE_NAME = 'SignInNavigate';
 const SignInNavigationEventMap = {
-  start: `NAVIGATE.START`,
-  previous: `NAVIGATE.PREVIOUS`,
-  'choose-strategy': `NAVIGATE.CHOOSE_STRATEGY`,
-  'forgot-password': `NAVIGATE.FORGOT_PASSWORD`,
+  start: 'NAVIGATE.START',
+  previous: 'NAVIGATE.PREVIOUS',
+  'choose-strategy': 'NAVIGATE.CHOOSE_STRATEGY',
+  'forgot-password': 'NAVIGATE.FORGOT_PASSWORD',
 } as const;
 
 export type SignInNavigateElementKey = keyof typeof SignInNavigationEventMap;

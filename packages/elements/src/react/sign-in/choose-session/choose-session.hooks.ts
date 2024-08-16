@@ -1,11 +1,14 @@
+import type { ActiveSessionResource, PublicUserData } from '@clerk/types';
 import * as React from 'react';
 
 import { useActiveTags } from '../../hooks';
 import { SignInRouterCtx } from '../context';
 
-export const SignInActiveSessionContext = React.createContext<any>(null);
+export type SignInActiveSessionListItem = Pick<ActiveSessionResource, 'id'> & PublicUserData;
 
-export function useSignInActiveSessionContext() {
+export const SignInActiveSessionContext = React.createContext<SignInActiveSessionListItem | null>(null);
+
+export function useSignInActiveSessionContext(): SignInActiveSessionListItem {
   const ctx = React.useContext(SignInActiveSessionContext);
 
   if (!ctx) {
@@ -20,12 +23,21 @@ export function useSignInChooseSessionIsActive() {
   return useActiveTags(routerRef, 'step:choose-session');
 }
 
-export function useSignInActiveSessionList() {
-  return SignInRouterCtx.useSelector(
-    state =>
-      state.context.clerk?.client?.activeSessions?.map(s => ({
-        id: s.id,
-        ...s.publicUserData,
-      })) || [],
-  );
+export type UseSignInActiveSessionListParams = {
+  omitCurrent: boolean;
+};
+
+export function useSignInActiveSessionList(params?: UseSignInActiveSessionListParams): SignInActiveSessionListItem[] {
+  const { omitCurrent = true } = params || {};
+
+  return SignInRouterCtx.useSelector(state => {
+    const activeSessions = state.context.clerk?.client?.activeSessions || [];
+    const currentSessionId = state.context.clerk?.session?.id;
+    const filteredSessions = omitCurrent ? activeSessions.filter(s => s.id !== currentSessionId) : activeSessions;
+
+    return filteredSessions.map(s => ({
+      id: s.id,
+      ...s.publicUserData,
+    }));
+  });
 }
