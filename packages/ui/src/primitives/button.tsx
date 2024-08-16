@@ -34,7 +34,7 @@ const button = cva({
       secondary: [
         '[--button-icon-color:theme(colors.gray.12)]',
         '[--button-icon-opacity:1]',
-        'text-gray-12 bg-gray-surface ring-offset-gray-a4',
+        'text-gray-12 bg-gray-surface ring-light ring-offset-gray-a4',
         'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
       ],
       // Note:
@@ -44,7 +44,7 @@ const button = cva({
       connection: [
         '[--button-icon-color:theme(colors.gray.12)]',
         '[--button-icon-opacity:1]',
-        'text-gray-12 bg-gray-surface ring-offset-gray-a4',
+        'text-gray-12 bg-gray-surface ring-light ring-offset-gray-a4',
         'shadow-[0px_1px_0px_0px_theme(colors.gray.a2),0px_2px_3px_-1px_theme(colors.gray.a3)]',
       ],
     },

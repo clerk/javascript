@@ -30,7 +30,7 @@ export function SignInForgotPassword() {
   };
 
   return (
-    <Common.Loading>
+    <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
           <SignIn.Step name='forgot-password'>
@@ -90,7 +90,7 @@ export function SignInForgotPassword() {
                     >
                       <Button
                         intent='secondary'
-                        iconStart={<Icon.Envelope />}
+                        iconStart={<Icon.EnvelopeSm />}
                       >
                         <SignIn.SafeIdentifier
                           transform={(identifier: string) =>

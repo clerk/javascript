@@ -19,7 +19,7 @@ export type SignInVerificationTags =
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignInVerificationSubmitEvent = { type: 'SUBMIT' };
+export type SignInVerificationSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
 export type SignInVerificationFactorUpdateEvent = { type: 'STRATEGY.UPDATE'; factor: SignInFactor | undefined };
 export type SignInVerificationRetryEvent = { type: 'RETRY' };
 export type SignInVerificationStrategyRegisterEvent = { type: 'STRATEGY.REGISTER'; factor: SignInStrategyName };
@@ -38,6 +38,7 @@ export type SignInVerificationEvents =
 export interface SignInVerificationInput {
   formRef: ActorRefFrom<typeof FormMachine>;
   parent: SignInRouterMachineActorRef;
+  basePath?: string;
 }
 
 // ---------------------------------- Context ---------------------------------- //
@@ -51,6 +52,7 @@ export interface SignInVerificationContext {
   registeredStrategies: Set<SignInStrategyName>;
   resendable: boolean;
   resendableAfter: number;
+  basePath?: string;
 }
 
 // ---------------------------------- Delays ---------------------------------- //

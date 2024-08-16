@@ -133,10 +133,10 @@ export function SignUpStart() {
                   {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
                 </Card.Body>
                 {hasConnection || hasIdentifier ? (
-                  <Common.Loading scope='step:start'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignUp.Action
                             submit
                             asChild
@@ -149,10 +149,10 @@ export function SignUpStart() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignUp.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                  </Card.Actions>
                 ) : null}
               </Card.Content>
               <Card.Footer {...cardFooterProps}>

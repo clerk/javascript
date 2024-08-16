@@ -227,6 +227,7 @@ export const SignInRouterMachine = setup({
           isLoading: event.isLoading,
           step: event.step,
           strategy: event.strategy,
+          action: event.action,
         },
       })),
     },
@@ -379,6 +380,7 @@ export const SignInRouterMachine = setup({
         input: ({ context, self }) => ({
           formRef: context.formRef,
           parent: self,
+          basePath: context.router?.basePath,
         }),
         onDone: {
           actions: 'raiseNext',

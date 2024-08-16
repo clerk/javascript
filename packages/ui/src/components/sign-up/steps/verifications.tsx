@@ -87,7 +87,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -120,10 +120,10 @@ export function SignUpVerifications() {
                       }
                     />
                   </Card.Body>
-                  <Common.Loading scope='step:verifications'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignUp.Action
                             submit
                             asChild
@@ -136,10 +136,10 @@ export function SignUpVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignUp.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                  </Card.Actions>
                 </SignUp.Strategy>
 
                 <SignUp.Strategy name='email_code'>
@@ -165,7 +165,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>
@@ -198,10 +198,10 @@ export function SignUpVerifications() {
                       }
                     />
                   </Card.Body>
-                  <Common.Loading scope='step:verifications'>
-                    {isSubmitting => {
-                      return (
-                        <Card.Actions>
+                  <Card.Actions>
+                    <Common.Loading scope='submit'>
+                      {isSubmitting => {
+                        return (
                           <SignUp.Action
                             submit
                             asChild
@@ -214,10 +214,10 @@ export function SignUpVerifications() {
                               {t('formButtonPrimary')}
                             </Button>
                           </SignUp.Action>
-                        </Card.Actions>
-                      );
-                    }}
-                  </Common.Loading>
+                        );
+                      }}
+                    </Common.Loading>
+                  </Card.Actions>
                 </SignUp.Strategy>
 
                 <SignUp.Strategy name='email_link'>
@@ -247,7 +247,7 @@ export function SignUpVerifications() {
                             className='size-4 rounded-sm outline-none focus-visible:ring'
                             aria-label='Start again'
                           >
-                            <Icon.PencilUnderlined />
+                            <Icon.PenSm />
                           </button>
                         </SignUp.Action>
                       </span>

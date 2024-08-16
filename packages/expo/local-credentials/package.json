@@ -1,0 +1,4 @@
+{
+  "main": "../dist/local-credentials/index.js",
+  "types": "../dist/local-credentials/index.d.ts"
+}
