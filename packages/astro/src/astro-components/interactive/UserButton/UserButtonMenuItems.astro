@@ -3,6 +3,11 @@
 </user-button-menu-items>
 
 <script is:inline>
+/**
+ * In the React version, menu items need to be wrapped in a `<UserButton.MenuItems>` component.
+ * We are trying to replicate that behavior here by adding a wrapper component
+ * and check if it exists inside the menu items components.
+ */
 class UserButtonMenuItems extends HTMLElement {
   constructor() {
     super();
