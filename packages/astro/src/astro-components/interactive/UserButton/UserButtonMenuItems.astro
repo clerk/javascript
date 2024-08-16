@@ -1,20 +1,20 @@
-<user-button-menu-items>
+<clerk-user-button-menu-items>
  <slot />
-</user-button-menu-items>
+</clerk-user-button-menu-items>
 
 <script is:inline>
-if (!customElements.get('user-button-menu-items')) {
+if (!customElements.get('clerk-user-button-menu-items')) {
   /**
    * In the React version, menu items need to be wrapped in a `<UserButton.MenuItems>` component.
    * We are trying to replicate that behavior here by adding a wrapper component
    * and check if it exists inside the menu items components.
    */
-  class UserButtonMenuItems extends HTMLElement {
+  class ClerkUserButtonMenuItems extends HTMLElement {
     constructor() {
       super();
     }
   }
 
-  customElements.define('user-button-menu-items', UserButtonMenuItems);
+  customElements.define('clerk-user-button-menu-items', ClerkUserButtonMenuItems);
 }
 </script>

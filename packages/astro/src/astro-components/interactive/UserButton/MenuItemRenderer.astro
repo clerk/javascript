@@ -22,7 +22,7 @@ const isDevMode = import.meta.env.DEV;
 const parentElement = document.currentScript.parentElement;
 
 // We used a web component in the `<UserButton.MenuItems>` component.
-const hasParentMenuItem = parentElement.tagName.toLowerCase() === 'user-button-menu-items';
+const hasParentMenuItem = parentElement.tagName.toLowerCase() === 'clerk-user-button-menu-items';
 if (!hasParentMenuItem) {
   if (isDevMode) {
     throw new Error(
