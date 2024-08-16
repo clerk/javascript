@@ -57,7 +57,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.expect.toBeSignedIn();
   });
 
-  test('render user button', async ({ page, context }) => {
+  test('renders user button', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -77,7 +77,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await expect(u.page.getByText(/profile details/i)).toBeVisible();
   });
 
-  test('user button with custom menu items', async ({ page, context }) => {
+  test('renders user button with custom menu items', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -105,6 +105,23 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     // Click custom link and check navigation
     await u.page.getByRole('menuitem', { name: /Custom link/i }).click();
     await u.page.waitForAppUrl('/user');
+  });
+
+  test('reorders user button menu items and functions as expected', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.page.waitForAppUrl('/');
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userButton.waitForMounted();
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    // First item should now be the sign out button
+    await u.page.getByRole('menuitem').first().click()
+    await u.po.expect.toBeSignedOut();
   });
 
   test('render user profile with streamed data', async ({ page, context }) => {

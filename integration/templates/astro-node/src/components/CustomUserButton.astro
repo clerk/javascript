@@ -4,6 +4,8 @@ import { UserButton } from '@clerk/astro/components';
 
 <UserButton afterSignOutUrl="/">
     <UserButton.MenuItems>
+        <UserButton.Action label="signOut" />
+        <UserButton.Action label="manageAccount" />
         <UserButton.Link label="Custom link" href="/user">
             <div slot="label-icon">Icon</div>
         </UserButton.Link>

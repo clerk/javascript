@@ -9,16 +9,15 @@ type Props = {
 const { label, href, open, clickIdentifier } = Astro.props
 
 let labelIcon = '';
-const hasLabelIcon = Astro.slots.has('label-icon');
 
-if (hasLabelIcon) {
+if (Astro.slots.has('label-icon')) {
   labelIcon = await Astro.slots.render('label-icon');
 }
 
 const isDevMode = import.meta.env.DEV;
 ---
 
-<script is:inline define:vars={{ label, href, open, clickIdentifier, labelIcon, hasLabelIcon, isDevMode }}>
+<script is:inline define:vars={{ label, href, open, clickIdentifier, labelIcon, isDevMode }}>
 const isParentExists = document.querySelector('[data-clerk-user-button-menu-items]');
 
 // There's no current way to get the parent element of the current component in Astro.
@@ -41,7 +40,7 @@ const safeId = userButton.getAttribute('data-clerk-id');
 const currentOptions = userButtonComponentMap.get(safeId);
 
 const reorderItemsLabels = ['manageAccount', 'signOut'];
-const isReorderItem = !hasLabelIcon && reorderItemsLabels.includes(label);
+const isReorderItem = reorderItemsLabels.includes(label);
 
 let newMenuItem = {
   label,
