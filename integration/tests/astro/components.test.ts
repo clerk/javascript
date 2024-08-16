@@ -77,6 +77,28 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await expect(u.page.getByText(/profile details/i)).toBeVisible();
   });
 
+  test('user button with custom menu items', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.page.waitForAppUrl('/');
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userButton.waitForMounted();
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action$/i]);
+
+    // TODO: Test custom link and check if it navigates to the href provided
+
+    await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
+    await u.po.userProfile.waitForUserProfileModal();
+
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+  });
+
   test('render user profile with streamed data', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
