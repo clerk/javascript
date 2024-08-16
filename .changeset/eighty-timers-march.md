@@ -2,4 +2,4 @@
 "@clerk/astro": patch
 ---
 
-Add custom menu items to `<UserButton />` Astro component.
+Add support for custom menu items in the `<UserButton />` Astro component.
