@@ -187,6 +187,11 @@ export default function SignUpPage() {
             name='password'
           />
 
+          <CustomField
+            label='Phone Number'
+            name='phoneNumber'
+          />
+
           <CustomSubmit>Sign Up</CustomSubmit>
         </SignUp.Step>
 

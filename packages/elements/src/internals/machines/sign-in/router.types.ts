@@ -31,6 +31,7 @@ export const SignInRouterSteps = {
   error: 'step:error',
   forgotPassword: 'step:forgot-password',
   resetPassword: 'step:reset-password',
+  chooseSession: 'step:choose-session',
   chooseStrategy: 'step:choose-strategy',
 } as const;
 
@@ -70,6 +71,7 @@ export type SignInRouterPasskeyEvent = { type: 'AUTHENTICATE.PASSKEY' };
 export type SignInRouterPasskeyAutofillEvent = {
   type: 'AUTHENTICATE.PASSKEY.AUTOFILL';
 };
+export type SignInRouterSessionSetActiveEvent = { type: 'SESSION.SET_ACTIVE'; id: string };
 
 export interface SignInRouterInitEvent extends BaseRouterInput {
   type: 'INIT';
@@ -95,6 +97,7 @@ export type SignInRouterEvents =
   | SignInRouterResetStepEvent
   | SignInVerificationFactorUpdateEvent
   | SignInRouterLoadingEvent
+  | SignInRouterSessionSetActiveEvent
   | SignInRouterSetClerkEvent
   | SignInRouterSubmitEvent
   | SignInRouterPasskeyEvent
