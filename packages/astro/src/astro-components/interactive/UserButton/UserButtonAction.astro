@@ -9,7 +9,6 @@ type Props<Label extends string> = {
 } & (Label extends ReorderItemsLabels
   ? {
       open?: string
-      selector?: string
     }
   : (
       | { open: string; clickIdentifier?: string }
