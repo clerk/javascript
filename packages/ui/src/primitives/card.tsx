@@ -2,6 +2,7 @@ import { cva, cx } from 'cva';
 import * as React from 'react';
 
 import { ClerkLogo } from './clerk-logo';
+import { Image } from './image';
 
 export const Root = React.forwardRef(function CardRoot(
   { banner, children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { banner?: React.ReactNode },
@@ -98,6 +99,7 @@ export const Logo = React.forwardRef(function CardLogo(
   {
     className,
     href,
+    src,
     ...props
   }: React.ImgHTMLAttributes<HTMLImageElement> & {
     href?: string;
@@ -105,10 +107,11 @@ export const Logo = React.forwardRef(function CardLogo(
   forwardedRef: React.ForwardedRef<HTMLImageElement>,
 ) {
   const img = (
-    <img
+    <Image
       ref={forwardedRef}
       data-card-logo=''
-      crossOrigin='anonymous'
+      src={src}
+      size={200}
       {...props}
       className={cx('size-full object-contain', className)}
     />
