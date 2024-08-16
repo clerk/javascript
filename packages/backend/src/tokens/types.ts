@@ -9,4 +9,13 @@ export type AuthenticateRequestOptions = {
   signUpUrl?: string;
   afterSignInUrl?: string;
   afterSignUpUrl?: string;
+  organizationSync?: OrganizationSyncOptions;
 } & VerifyTokenOptions;
+
+// OrganizationSyncOptions define the options for syncing an organization
+// or personal workspace state from the URL to the clerk session
+export type OrganizationSyncOptions = {
+  organizationPattern: string,
+  personalWorkspacePattern: string,
+  invalidOrganizationRedirectURL: string
+}

@@ -66,6 +66,7 @@ export const AuthErrorReason = {
   SessionTokenMissing: 'session-token-missing',
   SessionTokenOutdated: 'session-token-outdated',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
+  ActiveOrganizationMismatch: 'active-organization-mismatch',
   UnexpectedError: 'unexpected-error',
 } as const;
 

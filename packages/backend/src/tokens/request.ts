@@ -11,8 +11,11 @@ import { AuthErrorReason, handshake, signedIn, signedOut } from './authStatus';
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
-import type { AuthenticateRequestOptions } from './types';
+import type { AuthenticateRequestOptions, OrganizationSyncOptions } from './types';
 import { verifyToken } from './verify';
+import { ClerkUrl } from './clerkUrl';
+import { Clerk } from '@clerk/types';
+import { match } from 'path-to-regexp';
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
   if (!signInUrl && isDevelopmentFromSecretKey(key)) {
@@ -84,7 +87,7 @@ export async function authenticateRequest(
     return updatedURL;
   }
 
-  function buildRedirectToHandshake() {
+  function buildRedirectToHandshake(requestURL: URL) {
     const redirectUrl = removeDevBrowserFromURL(authenticateContext.clerkUrl);
     const frontendApiNoProtocol = authenticateContext.frontendApi.replace(/http(s)?:\/\//, '');
 
@@ -94,6 +97,16 @@ export async function authenticateRequest(
 
     if (authenticateContext.instanceType === 'development' && authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, authenticateContext.devBrowserToken);
+    }
+
+    if (options.organizationSync) {
+      const toActivate = getActivationEntity(requestURL, options.organizationSync);
+      if (toActivate) {
+        const params = getActivationParam(toActivate);
+        Object.entries(params).forEach(([key, value]) => {
+          url.searchParams.append(key, value);
+        });
+      }
     }
 
     return new Headers({ location: url.href });
@@ -173,7 +186,7 @@ ${error.getFullMessage()}`,
     if (isRequestEligibleForHandshake(authenticateContext)) {
       // Right now the only usage of passing in different headers is for multi-domain sync, which redirects somewhere else.
       // In the future if we want to decorate the handshake redirect with additional headers per call we need to tweak this logic.
-      const handshakeHeaders = headers ?? buildRedirectToHandshake();
+      const handshakeHeaders = headers ?? buildRedirectToHandshake(authenticateContext.clerkUrl);
       // Introduce the mechanism to protect for infinite handshake redirect loops
       // using a cookie and returning true if it's infinite redirect loop or false if we can
       // proceed with triggering handshake.
@@ -381,10 +394,36 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
+
+  let requestState = null;
+
   if (authenticateContext.sessionTokenInHeader) {
-    return authenticateRequestWithTokenInHeader();
+    requestState = await authenticateRequestWithTokenInHeader();
   }
-  return authenticateRequestWithTokenInCookie();
+  else {
+    requestState = await authenticateRequestWithTokenInCookie();
+  }
+
+  if (options.organizationSync) {
+    const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSync);
+    if (toActivate) {
+      const auth = requestState.toAuth()
+      if (auth) {
+        let mustActivate = false;
+        if (toActivate.organizationSlug && auth.orgSlug && toActivate.organizationSlug !== auth.orgSlug) {
+          mustActivate = true;
+        }
+        if (toActivate.organizationId && auth.orgId && toActivate.organizationId !== auth.orgId) {
+          mustActivate = true;
+        }
+        if (mustActivate) {
+          return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ActiveOrganizationMismatch, '');
+        }
+      }
+
+    }
+  }
+  return requestState
 }
 
 /**
@@ -394,3 +433,55 @@ export const debugRequestState = (params: RequestState) => {
   const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
+
+
+
+function getActivationEntity(url: URL, options: OrganizationSyncOptions): ActivatibleEntity | null {
+  // Check for personal workspace activation
+  if (options.personalWorkspacePattern) {
+    const personalResult = match(options.personalWorkspacePattern)(url.pathname);
+    if (personalResult) {
+      return { type: 'personalWorkspace' };
+    }
+  }
+
+  // Check for organization activation
+  if (options.organizationPattern) {
+    const orgResult = match(options.organizationPattern)(url.pathname);
+    if (orgResult) {
+      const { slug = '', id = '' } = orgResult.params as { slug?: string; id?: string };
+      if (id) {
+        return { type: 'organization', organizationId: id };
+      }
+      if (slug) {
+        return { type: 'organization', organizationSlug: slug };
+      }
+    }
+  }
+  return null;
+}
+
+type ActivatibleEntity = {
+  type: 'personalWorkspace' | 'organization' | 'none';
+  organizationId?: string;
+  organizationSlug?: string;
+};
+
+// TODO(izaak): Find a better spot for this?
+function getActivationParam(toActivate: ActivatibleEntity): Map<string, string> {
+  const ret = new Map();
+  if (toActivate.type === 'personalWorkspace') {
+    ret.set('type', 'personalWorkspace');
+  }
+  if (toActivate.type === 'organization') {
+    if (toActivate.organizationId) {
+      ret.set('type', 'organization');
+      ret.set('organizationId', toActivate.organizationId);
+    }
+    if (toActivate.organizationSlug) {
+      ret.set('type', 'organization');
+      ret.set('organizationSlug', toActivate.organizationSlug);
+    }
+  }
+  return ret;
+}
