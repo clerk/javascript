@@ -1,9 +1,12 @@
 ---
-import type { CustomMenuItem } from '@clerk/types'
+type Props = {
+  label: string
+  href?: string
+  open?: string
+  selector?: string
+}
 
-type Props = Pick<CustomMenuItem, 'label' | 'href' | 'open'>
-
-const { label, href, open } = Astro.props
+const { label, href, open, selector } = Astro.props
 
 let labelIcon = '';
 const hasLabelIcon = Astro.slots.has('label-icon');
@@ -15,7 +18,7 @@ if (hasLabelIcon) {
 const isDevMode = import.meta.env.DEV;
 ---
 
-<script is:inline define:vars={{ label, href, open, labelIcon, hasLabelIcon, isDevMode }}>
+<script is:inline define:vars={{ label, href, open, selector, labelIcon, hasLabelIcon, isDevMode }}>
 const isParentExists = document.querySelector('[data-clerk-user-button-menu-items]');
 
 // There's no current way to get the parent element of the current component in Astro.
@@ -60,6 +63,13 @@ if (href) {
 
 if (open) {
   newMenuItem.open = open.startsWith('/') ? open : `/${open}`;
+}
+
+if (selector) {
+  const clickEvent = new CustomEvent('clerkUserButtonItemClick', { detail: selector });
+  newMenuItem.onClick = () => {
+    document.dispatchEvent(clickEvent);
+  }
 }
 
 userButtonComponentMap.set(safeId, {

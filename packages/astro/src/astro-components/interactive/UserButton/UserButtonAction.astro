@@ -1,14 +1,24 @@
 ---
 import MenuItemRenderer from './MenuItemRenderer.astro';
 
-interface Props {
-  label: string
-  open?: string
-}
+type ReorderItemsLabels = 'manageAccount' | 'signOut'
 
-const { label, open } = Astro.props
+type Props<Label extends string> = {
+  label: Label
+} & (Label extends ReorderItemsLabels
+  ? {
+      open?: string
+      selector?: string
+    }
+  : (
+      | { open: string; selector?: string }
+      | { open?: string; selector: string }
+    )
+)
+
+const { label, open, selector } = Astro.props
 ---
 
-<MenuItemRenderer label={label} open={open}>
+<MenuItemRenderer label={label} open={open} selector={selector}>
   <slot name="label-icon" slot="label-icon" />
 </MenuItemRenderer>
