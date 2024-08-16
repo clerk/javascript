@@ -49,5 +49,29 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
 
       await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
     });
+
+    test('can sign out successfully', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.po.signIn.goTo();
+
+      await u.po.signIn.setIdentifier(fakeUser.email);
+      await u.po.signIn.setPassword(fakeUser.password);
+      await u.po.signIn.continue();
+      await u.po.expect.toBeSignedIn();
+
+      await u.page.waitForAppUrl('/');
+
+      await u.po.userButton.waitForMounted();
+      await u.po.userButton.toggleTrigger();
+      await u.po.userButton.waitForPopover();
+
+      await u.po.userButton.toHaveVisibleMenuItems([/Manage account/i, /Sign out$/i]);
+
+      await u.po.userButton.triggerSignOut();
+
+      await u.page.waitForAppUrl('/');
+
+      await u.po.expect.toBeSignedOut();
+    });
   },
 );
