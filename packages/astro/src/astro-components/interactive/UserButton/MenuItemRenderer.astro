@@ -11,9 +11,24 @@ const hasLabelIcon = Astro.slots.has('label-icon');
 if (hasLabelIcon) {
   labelIcon = await Astro.slots.render('label-icon');
 }
+
+const isDevMode = import.meta.env.DEV;
 ---
 
-<script is:inline define:vars={{ label, href, open, labelIcon, hasLabelIcon }}>
+<script is:inline define:vars={{ label, href, open, labelIcon, hasLabelIcon, isDevMode }}>
+const isParentExists = document.querySelector('[data-clerk-user-button-menu-items]');
+
+// There's no current way to get the parent element of the current component in Astro.
+// We used a web component in the parent with a data attribute that we can query here.
+if (!isParentExists) {
+  if (isDevMode) {
+    throw new Error(
+      `Clerk: <UserButton.MenuItems /> component can only accept <UserButton.Action /> and <UserButton.Link /> as its children. Any other provided component will be ignored.`
+    );
+  }
+  return
+}
+
 // Get the user button map from window that we set in the `<InternalUIComponentRenderer />`.
 const userButtonComponentMap = window.__astro_clerk_component_props.get('user-button');
 // It doesn't make sense to have multiple user buttons in page, so first one should be safe.
@@ -23,15 +38,13 @@ const safeId = userButton.getAttribute('data-clerk-id');
 const currentOptions = userButtonComponentMap.get(safeId);
 
 const reorderItemsLabels = ['manageAccount', 'signOut'];
-function isReorderItem() {
-  return !hasLabelIcon && reorderItemsLabels.includes(label);
-}
+const isReorderItem = !hasLabelIcon && reorderItemsLabels.includes(label);
 
 let newMenuItem = {
   label,
 }
 
-if (!isReorderItem()) {
+if (!isReorderItem) {
   newMenuItem = {
     ...newMenuItem,
     mountIcon: (el) => {
