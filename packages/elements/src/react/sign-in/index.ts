@@ -6,6 +6,7 @@ export { SignInStep as Step } from './step';
 export { SignInAction as Action } from './action';
 export { SignInPasskey as Passkey } from './passkey';
 export { SignInSupportedStrategy as SupportedStrategy } from './choose-strategy';
+export { SignInSessionList as SessionList, SignInSessionListItem as SessionListItem } from './choose-session';
 
 export {
   SignInFirstFactor as FirstFactor,
