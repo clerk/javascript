@@ -6,6 +6,20 @@ import { isStaticOutput } from "virtual:@clerk/astro/config";
 import type { ProtectProps } from '../../types';
 
 type Props = ProtectProps & {
+  /**
+   * Determines whether the component should render for static or server output.
+   *
+   * - Set to `true` for static/prerendered output
+   * - Set to `false` for server-side rendering
+   *
+   * In Astro's hybrid mode:
+   * - If not specified, defaults to `true` (pages are prerendered by default)
+   * - Can be explicitly set to override the default behavior
+   *
+   * In static or server-only output modes:
+   * - If specified, it will override the default output behavior
+   * - If not specified, it follows the project's output mode
+   */
   isStatic?: boolean
 }
 
