@@ -9,6 +9,8 @@ import { SignInResetPassword } from '~/components/sign-in/steps/reset-password';
 import { SignInStart } from '~/components/sign-in/steps/start';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
 
+import { SignInChooseSession } from './steps/choose-session';
+
 /**
  * Implementation Details:
  *
@@ -35,6 +37,7 @@ export function SignIn() {
             <SignInChooseStrategy />
             <SignInForgotPassword />
             <SignInResetPassword />
+            <SignInChooseSession />
           </>
         )}
       </SignInRoot>
