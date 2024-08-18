@@ -28,7 +28,7 @@
   },
   "scripts": {
     "dev": "tsup --watch --onSuccess \"npm run build:dts\"",
-    "build": "tsup --onSuccess \"npm run build:dts\" && npm run copy:components",
+    "build": "tsup && npm run copy:components",
     "build:dts": "tsc --emitDeclarationOnly --declaration",
     "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
     "lint": "eslint src/",
