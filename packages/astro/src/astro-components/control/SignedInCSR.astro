@@ -3,31 +3,15 @@
 </clerk-signed-in>
 
 <script>
-import { $authStore } from '@clerk/astro/client';
+import { type AuthState, BaseClerkControlElement } from './BaseClerkControlElement';
 
-class ClerkSignedIn extends HTMLElement {
-  private authStoreListener: (() => void) | null = null;
-
-  constructor() {
-    super();
-  }
-
-  connectedCallback() {
-    this.toggleContentVisibility();
-  }
-
-  disconnectedCallback() {
-    this.authStoreListener?.();
-  }
-
-  toggleContentVisibility() {
-    this.authStoreListener = $authStore.subscribe(state => {
-      if (state.userId) {
-        this.removeAttribute('hidden');
-      } else {
-        this.setAttribute('hidden', '');
-      }
-    });
+class ClerkSignedIn extends BaseClerkControlElement {
+  protected onAuthStateChange(state: AuthState): void {
+    if (state.userId) {
+      this.removeAttribute('hidden');
+    } else {
+      this.setAttribute('hidden', '');
+    }
   }
 }
 
