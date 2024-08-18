@@ -24,5 +24,11 @@
     "declarationDir": "dist/types",
     "noUncheckedIndexedAccess": true
   },
-  "exclude": ["dist", "build", "node_modules", "src/astro-components/index.ts", "src/astro-components/control/BaseClerkControlComponent.ts"]
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules",
+    "src/astro-components/index.ts",
+    "src/astro-components/control/BaseClerkControlComponent.ts"
+  ]
 }
