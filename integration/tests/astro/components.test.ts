@@ -90,7 +90,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.waitForPopover();
 
     // Check if custom menu items are visible
-    await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action$/i]);
+    await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action/i, /Custom click/i]);
 
     // Click custom action and check for custom page availbility
     await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
@@ -102,12 +102,31 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userButton.toggleTrigger();
     await u.po.userButton.waitForPopover();
 
+    // Click custom action with click handler
+    const eventPromise = u.page.evaluate(() => {
+      return new Promise<string>(resolve => {
+        document.addEventListener(
+          'clerk:menu-item-click',
+          (e: CustomEvent<string>) => {
+            resolve(e.detail);
+          },
+          { once: true },
+        );
+      });
+    });
+    await u.page.getByRole('menuitem', { name: /Custom click/i }).click();
+    expect(await eventPromise).toBe('custom_click');
+
+    // Trigger the popover again
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
     // Click custom link and check navigation
     await u.page.getByRole('menuitem', { name: /Custom link/i }).click();
     await u.page.waitForAppUrl('/user');
   });
 
-  test('reorders user button menu items and functions as expected', async ({ page, context }) => {
+  test('reorders default user button menu items and functions as expected', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();

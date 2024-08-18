@@ -12,6 +12,9 @@ import { UserButton } from '@clerk/astro/components';
         <UserButton.Action label="Custom action" open="terms">
             <div slot="label-icon">Icon</div>
         </UserButton.Action>
+        <UserButton.Action label="Custom click" clickIdentifier="custom_click">
+            <div slot="label-icon">Icon</div>
+        </UserButton.Action>
     </UserButton.MenuItems>
     <UserButton.UserProfilePage label="Terms" url="terms">
         <div slot="label-icon">Icon</div>
