@@ -8,7 +8,7 @@ import { SignInGetHelp } from '~/components/sign-in/steps/get-help';
 import { SignInResetPassword } from '~/components/sign-in/steps/reset-password';
 import { SignInStart } from '~/components/sign-in/steps/start';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
-import { type Appearance, AppearanceProvider, useAppearance } from '~/contexts';
+import { type Appearance, AppearanceProvider } from '~/contexts';
 
 import { SignInChooseSession } from './steps/choose-session';
 
@@ -25,13 +25,9 @@ import { SignInChooseSession } from './steps/choose-session';
  */
 export function SignIn({ appearance }: { appearance?: Appearance }) {
   const [showHelp, setShowHelp] = React.useState(false);
-  const { appearance: globalAppearance } = useAppearance();
 
   return (
-    <AppearanceProvider
-      globalAppearance={globalAppearance}
-      appearance={appearance}
-    >
+    <AppearanceProvider appearance={appearance}>
       <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
         <SignInRoot>
           {showHelp ? (
