@@ -28,8 +28,8 @@ const userProfile = document.querySelector('[data-clerk-id^="clerk-user-profile"
 const safeId = userProfile.getAttribute('data-clerk-id');
 const currentOptions = userProfileComponentMap.get(safeId);
 
-const REORDER_ITEM_LABELS = ['account', 'security'];
-const isReorderItem = REORDER_ITEM_LABELS.includes(label);
+const reorderItemsLabels = ['account', 'security'];
+const isReorderItem = reorderItemsLabels.includes(label);
 
 let newCustomPage = { label }
 
