@@ -299,7 +299,9 @@ type _LocalizationResource = {
     };
     start: {
       headerTitle__account: LocalizationValue;
+      headerSubtitle__account: LocalizationValue;
       headerTitle__security: LocalizationValue;
+      headerSubtitle__security: LocalizationValue;
       profileSection: {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
@@ -374,6 +376,8 @@ type _LocalizationResource = {
       activeDevicesSection: {
         title: LocalizationValue;
         destructiveAction: LocalizationValue;
+        detailsTitle: LocalizationValue;
+        detailsSubtitle: LocalizationValue;
       };
       web3WalletsSection: {
         title: LocalizationValue;
@@ -437,6 +441,7 @@ type _LocalizationResource = {
       verifySubtitle: LocalizationValue;
       successMessage: LocalizationValue;
       infoText: LocalizationValue;
+      infoText__secondary: LocalizationValue;
       removeResource: {
         title: LocalizationValue;
         messageLine1: LocalizationValue;
