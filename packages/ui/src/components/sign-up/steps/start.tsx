@@ -12,8 +12,8 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -28,7 +28,6 @@ export function SignUpStart() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
   const { userSettings } = useEnvironment();
-  const { layout } = useAppearance().parsedAppearance;
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
@@ -36,22 +35,12 @@ export function SignUpStart() {
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled, required: emailAddressRequired } = useAttributes('email_address');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
-  const { applicationName, branded, homeUrl, logoImageUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
-  const cardLogoProps = {
-    href: layout?.logoLinkUrl || homeUrl,
-    src: layout?.logoImageUrl || logoImageUrl,
-    alt: applicationName,
-  };
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
@@ -61,7 +50,7 @@ export function SignUpStart() {
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  <Card.Logo {...cardLogoProps} />
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signUp.start.title')}</Card.Title>
                   <Card.Description>
                     {t('signUp.start.subtitle', {
@@ -154,7 +143,7 @@ export function SignUpStart() {
                   </Card.Actions>
                 ) : null}
               </Card.Content>
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signUp.start.actionText')}{' '}

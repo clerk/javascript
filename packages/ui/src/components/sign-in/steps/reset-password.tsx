@@ -5,9 +5,8 @@ import { CheckboxField } from '~/common/checkbox-field';
 import { GlobalError } from '~/common/global-error';
 import { PasswordField } from '~/common/password-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/contexts';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
-import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -15,21 +14,9 @@ import { LinkButton } from '~/primitives/link';
 
 export function SignInResetPassword() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance().parsedAppearance;
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
 
   const isDev = useDevModeWarning();
-  const cardLogoProps = {
-    href: layout?.logoLinkUrl || homeUrl,
-    src: layout?.logoImageUrl || logoImageUrl,
-    alt: applicationName,
-  };
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
@@ -39,7 +26,7 @@ export function SignInResetPassword() {
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  <Card.Logo {...cardLogoProps} />
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signIn.resetPassword.title')}</Card.Title>
                 </Card.Header>
 
@@ -92,7 +79,7 @@ export function SignInResetPassword() {
                   </SignIn.Action>
                 </Card.Actions>
               </Card.Content>
-              <Card.Footer {...cardFooterProps} />
+              <Card.Footer {...footerProps} />
             </Card.Root>
           </SignIn.Step>
         );
