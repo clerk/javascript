@@ -88,7 +88,7 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
 
       await u.page.goToRelative('/only-members');
 
-      await expect(u.page.getByText("Not a member")).toBeVisible();
+      await expect(u.page.getByText('Not a member')).toBeVisible();
     });
   },
 );
