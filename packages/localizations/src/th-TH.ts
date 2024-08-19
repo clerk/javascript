@@ -83,7 +83,7 @@ export const thTH: LocalizationResource = {
     'กรอกที่อยู่อีเมลภายใต้โดเมนนี้เพื่อรับรหัสและตรวจสอบโดเมน',
   formFieldLabel__organizationName: 'ชื่อ',
   formFieldLabel__organizationSlug: 'Slug',
-  formFieldLabel__passkeyName: undefined,
+  formFieldLabel__passkeyName: 'ชื่อของพาสคีย์',
   formFieldLabel__password: 'รหัสผ่าน',
   formFieldLabel__phoneNumber: 'หมายเลขโทรศัพท์',
   formFieldLabel__role: 'บทบาท',
@@ -93,7 +93,8 @@ export const thTH: LocalizationResource = {
     action__signOut: 'ออกจากระบบ',
     title: 'เข้าสู่ระบบในฐานะ {{identifier}}',
   },
-  maintenanceMode: undefined,
+  maintenanceMode:
+    "ขณะนี้เรากำลังปรับปรุงระบบ แต่ไม่ต้องกังวลไป เพราะไม่น่าจะใช้เวลานานเกินกว่าสองสามนาที",
   membershipRole__admin: 'ผู้ดูแลระบบ',
   membershipRole__basicMember: 'สมาชิก',
   membershipRole__guestMember: 'ผู้เยี่ยมชม',
@@ -178,14 +179,14 @@ export const thTH: LocalizationResource = {
       dangerSection: {
         deleteOrganization: {
           actionDescription: 'พิมพ์ "{{organizationName}}" ด้านล่างเพื่อดำเนินการต่อ',
-          messageLine1: 'คุณแน่ใจหรือไม่ว่าต้องการลบองค์กรนี้?',
+          messageLine1: 'คุณแน่ใจหรือไม่ว่าต้องการลบองค์กรนี้',
           messageLine2: 'การกระทำนี้ถาวรและไม่สามารถย้อนกลับได้',
           successMessage: 'คุณได้ลบองค์กรแล้ว',
           title: 'ลบองค์กร',
         },
         leaveOrganization: {
           actionDescription: 'พิมพ์ "{{organizationName}}" ด้านล่างเพื่อดำเนินการต่อ',
-          messageLine1: 'คุณแน่ใจหรือไม่ว่าต้องการออกจากองค์กรนี้? คุณจะสูญเสียการเข้าถึงองค์กรและแอปพลิเคชันของมัน',
+          messageLine1: 'คุณแน่ใจหรือไม่ว่าต้องการออกจากองค์กรนี้ คุณจะสูญเสียการเข้าถึงองค์กรและแอปพลิเคชันของมัน',
           messageLine2: 'การกระทำนี้ถาวรและไม่สามารถย้อนกลับได้',
           successMessage: 'คุณได้ออกจากองค์กรแล้ว',
           title: 'ออกจากองค์กร',
@@ -249,7 +250,7 @@ export const thTH: LocalizationResource = {
     verifyDomainPage: {
       formSubtitle: 'ป้อนรหัสการตรวจสอบที่ส่งไปยังที่อยู่อีเมลของคุณ',
       formTitle: 'รหัสการตรวจสอบ',
-      resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
+      resendButton: 'ไม่ได้รับรหัสใช่หรือไม่ ส่งรหัสใหม่อีกครั้ง',
       subtitle: 'โดเมน {{domainName}} ต้องได้รับการตรวจสอบผ่านทางอีเมล',
       subtitleVerificationCodeScreen: 'รหัสการตรวจสอบถูกส่งไปยัง {{emailAddress}} ป้อนรหัสเพื่อดำเนินการต่อ',
       title: 'ตรวจสอบโดเมน',
@@ -300,14 +301,15 @@ export const thTH: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'รหัสการตรวจสอบ',
-      resendButton: 'ไม่ได้รับรหัส? ส่งอีกครั้ง',
+      resendButton: 'ไม่ได้รับรหัสใช่หรือไม่ ส่งรหัสใหม่อีกครั้ง',
       subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
       title: 'ตรวจสอบอีเมลของคุณ',
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'หากต้องการดำเนินการต่อ ให้เปิดลิงก์การยืนยันบนอุปกรณ์และเบราว์เซอร์ที่คุณใช้ในการเริ่มลงชื่อเข้าใช้',
+        title: 'ลิงก์ตรวจสอบไม่ถูกต้องสำหรับอุปกรณ์นี้',
       },
       expired: {
         subtitle: 'กลับไปที่แท็บเดิมเพื่อดำเนินการต่อ',
@@ -323,7 +325,7 @@ export const thTH: LocalizationResource = {
         subtitle: 'คุณจะถูกเปลี่ยนเส้นทางเร็ว ๆ นี้',
         title: 'กำลังเข้าสู่ระบบ...',
       },
-      resendButton: 'ไม่ได้รับลิงก์? ส่งอีกครั้ง',
+      resendButton: 'ไม่ได้รับลิงก์ใช่หรือไม่ ส่งลิงก์ใหม่อีกครั้ง',
       subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
       title: 'ตรวจสอบอีเมลของคุณ',
       unusedTab: {
@@ -341,7 +343,7 @@ export const thTH: LocalizationResource = {
     },
     forgotPassword: {
       formTitle: 'รหัสรีเซ็ตรหัสผ่าน',
-      resendButton: 'ไม่ได้รับรหัส? ส่งอีกครั้ง',
+      resendButton: 'ไม่ได้รับรหัสใช่หรือไม่ ส่งรหัสใหม่อีกครั้ง',
       subtitle: 'เพื่อรีเซ็ตรหัสผ่านของคุณ',
       subtitle_email: 'ขั้นแรก ใส่รหัสที่ส่งไปยัง ID อีเมลของคุณ',
       subtitle_phone: 'ขั้นแรก ใส่รหัสที่ส่งไปยังโทรศัพท์ของคุณ',
@@ -371,13 +373,13 @@ export const thTH: LocalizationResource = {
     },
     phoneCode: {
       formTitle: 'รหัสการตรวจสอบ',
-      resendButton: 'ไม่ได้รับรหัส? ส่งอีกครั้ง',
+      resendButton: 'ไม่ได้รับรหัสใช่หรือไม่ ส่งรหัสใหม่อีกครั้ง',
       subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
       title: 'ตรวจสอบโทรศัพท์ของคุณ',
     },
     phoneCodeMfa: {
       formTitle: 'รหัสการตรวจสอบ',
-      resendButton: 'ไม่ได้รับรหัส? ส่งอีกครั้ง',
+      resendButton: 'ไม่ได้รับรหัสใช่หรือไม่ ส่งรหัสใหม่อีกครั้ง',
       subtitle: 'เพื่อดำเนินการต่อ กรุณาใส่รหัสการตรวจสอบที่ส่งไปยังโทรศัพท์ของคุณ',
       title: 'ตรวจสอบโทรศัพท์ของคุณ',
     },
@@ -424,15 +426,16 @@ export const thTH: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: undefined,
-        title: undefined,
+        subtitle:
+          'หากต้องการดำเนินการต่อ ให้เปิดลิงก์ยืนยันบนอุปกรณ์และเบราว์เซอร์ที่คุณใช้เริ่มต้นการสมัคร',
+        title: 'ลิงก์ตรวจสอบไม่ถูกต้องสำหรับอุปกรณ์นี้',
       },
-      formSubtitle: 'ใช้ลิงค์ยืนยันที่ส่งไปยังที่อยู่อีเมลของคุณ',
-      formTitle: 'ลิงค์ยืนยัน',
+      formSubtitle: 'ใช้ลิงก์ยืนยันที่ส่งไปยังที่อยู่อีเมลของคุณ',
+      formTitle: 'ลิงก์ยืนยัน',
       loading: {
         title: 'กำลังสมัครสมาชิก...',
       },
-      resendButton: 'ไม่ได้รับลิงค์? ส่งใหม่',
+      resendButton: 'ไม่ได้รับลิงก์? ส่งใหม่',
       subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
       title: 'ยืนยันอีเมลของคุณ',
       verified: {
@@ -453,15 +456,15 @@ export const thTH: LocalizationResource = {
     },
     start: {
       actionLink: 'เข้าสู่ระบบ',
-      actionLink__use_email: undefined,
-      actionLink__use_phone: undefined,
+      actionLink__use_email: 'ใช้อีเมลแทน',
+      actionLink__use_phone: 'ใช้โทรศัพท์แทน',
       actionText: 'มีบัญชีอยู่แล้วใช่หรือไม่?',
       subtitle: 'ยินดีต้อนรับ! กรุณากรอกข้อมูลเพื่อเริ่มต้น',
       title: 'สร้างบัญชีของคุณ',
     },
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: undefined,
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   unstable__errors: {
     captcha_invalid:
       'การสมัครไม่สำเร็จเนื่องจากการตรวจสอบความปลอดภัยไม่ผ่าน กรุณารีเฟรชหน้าเว็บเพื่อลองใหม่หรือติดต่อสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
@@ -470,7 +473,7 @@ export const thTH: LocalizationResource = {
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_exists__email_address: 'ที่อยู่อีเมลนี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
-    form_identifier_exists__phone_number: 'เบอร์โทรศัพท์นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
+    form_identifier_exists__phone_number: 'หมายเลขโทรศัพท์นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
     form_identifier_exists__username: 'ชื่อผู้ใช้นี้ถูกนำไปใช้แล้ว โปรดลองอันอื่น',
     form_identifier_not_found: '',
     form_param_format_invalid: '',
@@ -596,14 +599,14 @@ export const thTH: LocalizationResource = {
         formHint: 'อีเมลที่มีรหัสยืนยันจะถูกส่งไปยังที่อยู่อีเมลนี้',
         formSubtitle: 'ป้อนรหัสยืนยันที่ถูกส่งไปยัง {{identifier}}',
         formTitle: 'รหัสยืนยัน',
-        resendButton: 'ไม่ได้รับรหัส? ส่งอีกครั้ง',
+        resendButton: 'ไม่ได้รับรหัสใช่หรือไม่ ส่งรหัสใหม่อีกครั้ง',
         successMessage: 'อีเมล {{identifier}} ได้ถูกเพิ่มเข้าในบัญชีของคุณแล้ว',
       },
       emailLink: {
         formHint: 'อีเมลที่มีลิงก์ยืนยันจะถูกส่งไปยังที่อยู่อีเมลนี้',
         formSubtitle: 'คลิกที่ลิงก์ยืนยันในอีเมลที่ถูกส่งไปยัง {{identifier}}',
         formTitle: 'ลิงก์ยืนยัน',
-        resendButton: 'ไม่ได้รับลิงก์? ส่งอีกครั้ง',
+        resendButton: 'ไม่ได้รับลิงก์ใช่หรือไม่ ส่งลิงก์ใหม่อีกครั้ง',
         successMessage: 'อีเมล {{identifier}} ได้ถูกเพิ่มเข้าในบัญชีของคุณแล้ว',
       },
       removeResource: {
@@ -630,7 +633,7 @@ export const thTH: LocalizationResource = {
       primaryButton__addPhoneNumber: 'เพิ่มหมายเลขโทรศัพท์',
       removeResource: {
         messageLine1: '{{identifier}} จะไม่ได้รับรหัสยืนยันเมื่อเข้าสู่ระบบอีกต่อไป',
-        messageLine2: 'บัญชีของคุณอาจไม่ปลอดภัยเท่าที่ควร คุณแน่ใจหรือว่าต้องการดำเนินการต่อ?',
+        messageLine2: 'บัญชีของคุณอาจไม่ปลอดภัยเท่าที่ควร คุณแน่ใจหรือว่าต้องการดำเนินการต่อ',
         successMessage: 'การยืนยันสองขั้นตอนด้วยรหัส SMS ได้ถูกนำออกสำหรับ {{mfaPhoneCode}}',
         title: 'นำการยืนยันสองขั้นตอนออก',
       },
@@ -647,7 +650,7 @@ export const thTH: LocalizationResource = {
     mfaTOTPPage: {
       authenticatorApp: {
         buttonAbleToScan__nonPrimary: 'สแกนคิวอาร์โค้ดแทน',
-        buttonUnableToScan__nonPrimary: 'ไม่สามารถสแกนคิวอาร์โค้ด?',
+        buttonUnableToScan__nonPrimary: 'ไม่สามารถสแกนคิวอาร์โค้ดใช่หรือไม่',
         infoText__ableToScan:
           'ตั้งค่าวิธีการเข้าสู่ระบบใหม่ในแอปยืนยันตัวตนของคุณและสแกนคิวอาร์โค้ดต่อไปนี้เพื่อเชื่อมโยงกับบัญชีของคุณ',
         infoText__unableToScan: 'ตั้งค่าวิธีการเข้าสู่ระบบใหม่ในตัวตรวจสอบของคุณและป้อนคีย์ที่ให้ไว้ด้านล่าง',
@@ -657,7 +660,7 @@ export const thTH: LocalizationResource = {
       },
       removeResource: {
         messageLine1: 'ไม่จำเป็นต้องใช้รหัสยืนยันจากระบบยืนยันตัวตนนี้เมื่อลงชื่อเข้าใช้อีกต่อไป',
-        messageLine2: 'บัญชีของคุณอาจไม่ปลอดภัยเท่าที่ควร คุณแน่ใจหรือว่าต้องการดำเนินการต่อ?',
+        messageLine2: 'บัญชีของคุณอาจไม่ปลอดภัยเท่าที่ควร คุณแน่ใจหรือว่าต้องการดำเนินการต่อ',
         successMessage: 'การยืนยันสองขั้นตอนผ่านแอปพลิเคชันยืนยันตัวตนได้ถูกนำออก',
         title: 'นำการยืนยันสองขั้นตอนออก',
       },
@@ -676,11 +679,11 @@ export const thTH: LocalizationResource = {
     },
     passkeyScreen: {
       removeResource: {
-        messageLine1: undefined,
-        title: undefined,
+        messageLine1: '{{name}} จะถูกลบออกจากบัญชีนี้',
+        title: 'ลบพาสคีย์',
       },
-      subtitle__rename: undefined,
-      title__rename: undefined,
+      subtitle__rename: 'คุณสามารถเปลี่ยนชื่อพาสคีย์เพื่อให้สามารถค้นหาได้ง่ายขึ้น',
+      title__rename: 'เปลี่ยนชื่อพาสคีย์',
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions: 'ขอแนะนำให้ลงชื่อออกจากอุปกรณ์อื่น ๆ ที่อาจใช้รหัสผ่านเก่าของคุณ',
@@ -724,7 +727,7 @@ export const thTH: LocalizationResource = {
         actionLabel__reauthorize: 'อนุญาตตอนนี้',
         destructiveActionTitle: 'ลบ',
         primaryButton: 'เชื่อมต่อบัญชี',
-        subtitle__disconnected: undefined,
+        subtitle__disconnected: 'บัญชีนี้ถูกตัดการเชื่อมต่อแล้ว',
         subtitle__reauthorize:
           'ขอบเขตที่ต้องการได้รับการอัปเดตและคุณอาจประสบปัญหาการใช้งานจำกัด กรุณาอนุญาตแอปพลิเคชันนี้อีกครั้งเพื่อหลีกเลี่ยงปัญหา',
         title: 'บัญชีที่เชื่อมต่อ',
@@ -765,9 +768,9 @@ export const thTH: LocalizationResource = {
         },
       },
       passkeysSection: {
-        menuAction__destructive: undefined,
-        menuAction__rename: undefined,
-        title: undefined,
+        menuAction__destructive: 'ลบ',
+        menuAction__rename: 'เปลี่ยนชื่อ',
+        title: 'พาสคีย์',
       },
       passwordSection: {
         primaryButton__setPassword: 'ตั้งรหัสผ่าน',
