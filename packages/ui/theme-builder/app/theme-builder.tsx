@@ -74,7 +74,12 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   }, [dir]);
   return (
     <ClerkProvider key={devMode}>
-      <AppearanceProvider appearance={{ layout: { unsafe_disableDevelopmentModeWarnings: devMode === 'off' } }}>
+      <AppearanceProvider
+        appearance={{
+          layout: { unsafe_disableDevelopmentModeWarnings: devMode === 'off' },
+          elements: { formButtonPrimary: 'font-mono' },
+        }}
+      >
         <style
           dangerouslySetInnerHTML={{
             __html: css,

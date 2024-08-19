@@ -1,2 +1,2 @@
 export { AppearanceProvider, useAppearance } from './AppearanceContext';
-export type { Appearance } from '@clerk/types';
+export type { Appearance } from './AppearanceContext';

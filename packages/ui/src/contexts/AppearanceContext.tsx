@@ -1,12 +1,18 @@
 import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
-import type { Appearance, Elements, Layout } from '@clerk/types';
+import type { Appearance as CurrentAppearance, Layout } from '@clerk/types';
 import React from 'react';
 
-export type ParsedElements = Elements[];
+export type ParsedElements = Record<string, { className: string; style: React.CSSProperties }>;
 export type ParsedLayout = Required<Layout>;
 
+type ElementsAppearanceConfig = string | (React.CSSProperties & { className?: string });
+
+export type Appearance = Omit<CurrentAppearance, 'elements'> & {
+  elements?: Record<string, ElementsAppearanceConfig>;
+};
+
 export type AppearanceCascade = {
-  globalAppearance?: Appearance;
+  globalAppearance?: ParsedAppearance;
   appearance?: Appearance;
 };
 
@@ -15,6 +21,7 @@ export type AppearanceCascade = {
  * appearance values, and as such will always have a value for a given key.
  */
 export type ParsedAppearance = {
+  elements: ParsedElements;
   layout: ParsedLayout;
 };
 
@@ -33,12 +40,51 @@ type AppearanceContextValue = {
   parsedAppearance: ParsedAppearance;
 };
 
+function mergeAppearenceElementsAndParsedAppearanceElements(
+  defaultAppearance: ParsedAppearance,
+  parsedAppearance?: ParsedAppearance,
+  appearance?: Appearance,
+): ParsedAppearance['elements'] {
+  const defaultElements = defaultAppearance.elements;
+  const parsedAppearanceElements = parsedAppearance?.elements;
+  const appearanceElements = appearance?.elements;
+
+  let mergedElements = { ...defaultElements };
+
+  if (parsedAppearanceElements) {
+    // If parsedAppearance is provided, it has already factored in defaultAppearance, so we can simply overwrite.
+    mergedElements = { ...parsedAppearanceElements };
+  }
+
+  if (appearanceElements) {
+    Object.entries(appearanceElements).forEach(([element, config]) => {
+      if (typeof config === 'string') {
+        mergedElements[element].className += ` ${config}`;
+      } else {
+        const { className, ...style } = config;
+        if (className) {
+          mergedElements[element].className += ` ${className}`;
+        }
+        mergedElements[element].style = { ...mergedElements[element].style, ...style };
+      }
+    });
+  }
+
+  return mergedElements;
+}
+
 /**
  * Given a `globalAppearance` and `appearance` value, calculate a resulting `ParsedAppearance` that factors in both
  * defaults and provided values.
  */
 function parseAppearance(props: AppearanceCascade): ParsedAppearance {
   const defaultAppearance: ParsedAppearance = {
+    elements: {
+      formButtonPrimary: {
+        className: 'debug',
+        style: {},
+      },
+    },
     layout: {
       logoPlacement: 'inside',
       socialButtonsPlacement: 'top',
@@ -59,6 +105,12 @@ function parseAppearance(props: AppearanceCascade): ParsedAppearance {
     ...defaultAppearance,
     // This is a plain object, so we can use spread operations to override values in order of priority.
     layout: { ...defaultAppearance.layout, ...props.globalAppearance?.layout, ...props.appearance?.layout },
+    // The `elements` prop is more complicated, so we use a dedicated function to handle that logic
+    elements: mergeAppearenceElementsAndParsedAppearanceElements(
+      defaultAppearance,
+      props.globalAppearance,
+      props.appearance,
+    ),
   };
 
   return appearance;

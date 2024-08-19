@@ -2,5 +2,5 @@
 import { SignIn } from '@clerk/ui/sign-in';
 
 export default function Page() {
-  return <SignIn />;
+  return <SignIn appearance={{ elements: { formButtonPrimary: { color: 'tomato' } } }} />;
 }

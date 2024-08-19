@@ -23,7 +23,7 @@ import { type Appearance, AppearanceProvider } from '~/contexts';
  *   bulletproof a11y.
  */
 export function SignIn({ appearance }: { appearance?: Appearance }) {
-  const [showHelp, setShowHelp] = React.useState(false);
+  const [showHelp, setShowHelp] = React.useState(true);
 
   return (
     <AppearanceProvider appearance={appearance}>
