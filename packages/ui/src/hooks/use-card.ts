@@ -21,20 +21,6 @@ import { useDisplayConfig } from './use-display-config';
  *   );
  * }
  * ```
- *
- * @returns {{
- *   logoProps: {
- *     href: string;
- *     src: string;
- *     alt: string;
- *   };
- *   footerProps: {
- *     branded: boolean;
- *     helpPageUrl: string | undefined;
- *     privacyPageUrl: string | undefined;
- *     termsPageUrl: string | undefined;
- *   };
- * }}
  */
 
 export function useCard() {
