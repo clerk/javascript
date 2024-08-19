@@ -700,7 +700,6 @@ export const daDK: LocalizationResource = {
     },
     phoneNumberPage: {
       infoText: 'En SMS, der indeholder et bekræftelseslink, sendes til dette telefonnummer.',
-      infoText__secondary: 'Takster for beskeder og data kan forekomme.',
       removeResource: {
         messageLine1: '{{identifier}} vil blive fjernet fra denne konto.',
         messageLine2: 'Du vil ikke længere kunne logge ind med dette telefonnummer.',
@@ -724,8 +723,6 @@ export const daDK: LocalizationResource = {
     start: {
       activeDevicesSection: {
         destructiveAction: 'Log ud af enhed',
-        detailsTitle: 'Nuværende enhed',
-        detailsSubtitle: 'Dette er den enhed, du bruger i øjeblikket.',
         title: 'Aktive enheder',
       },
       connectedAccountsSection: {
@@ -754,9 +751,7 @@ export const daDK: LocalizationResource = {
         title: 'Virksomhedskonti',
       },
       headerTitle__account: 'Konto',
-      headerSubtitle__account: 'Administrer dine kontooplysninger',
       headerTitle__security: 'Sikkerhed',
-      headerSubtitle__security: 'Administrer dine sikkerhedsindstillinger',
       mfaSection: {
         backupCodes: {
           actionLabel__regenerate: 'Generer koder',
