@@ -57,6 +57,8 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
         component={ClerkComponents[props.componentName as ClerkComponentName]}
         props={props.componentProps}
         componentName={props.componentName}
+        // @ts-ignore
+        promises={props.promises}
       />
     </AppearanceProvider>
   );

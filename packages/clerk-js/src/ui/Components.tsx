@@ -26,6 +26,7 @@ import {
   OrganizationProfileModal,
   preloadComponent,
   SignInModal,
+  SignInPreload,
   SignUpModal,
   UserProfileModal,
 } from './lazyModules/components';
@@ -116,6 +117,7 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
   let componentsControlsResolver: Promise<ComponentControls> | undefined;
 
   return {
+    signInPreload: SignInPreload.preload,
     ensureMounted: async (opts?: { preloadHint: ClerkComponentName }) => {
       const { preloadHint } = opts || {};
       // This mechanism ensures that mountComponentControls will only be called once
@@ -147,6 +149,24 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
 export type MountComponentRenderer = typeof mountComponentRenderer;
 
 const componentsControls = {} as ComponentControls;
+
+function customPromiseWithResolves<T = unknown>() {
+  let resolve: (value: T | PromiseLike<T>) => void;
+  let reject: (reason?: any) => void;
+
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return {
+    promise,
+    // @ts-ignore
+    resolve,
+    // @ts-ignore
+    reject,
+  };
+}
 
 const componentNodes = Object.freeze({
   SignUp: 'signUpModal',
@@ -193,10 +213,14 @@ const Components = (props: ComponentsProps) => {
     componentsControls.mountComponent = params => {
       const { node, name, props, appearanceKey } = params;
       assertDOMElement(node);
+      const promises = customPromiseWithResolves();
       setState(s => {
-        s.nodes.set(node, { key: `p${++portalCt}`, name, props, appearanceKey });
+        // @ts-ignore
+        s.nodes.set(node, { key: `p${++portalCt}`, name, props, appearanceKey, promises });
         return { ...s, nodes };
       });
+
+      return promises.promise;
     };
 
     componentsControls.unmountComponent = params => {
@@ -351,6 +375,8 @@ const Components = (props: ComponentsProps) => {
               componentAppearance={component.props?.appearance}
               componentName={component.name}
               componentProps={component.props}
+              // @ts-ignore
+              promises={component.promises}
             />
           );
         })}

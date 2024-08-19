@@ -17,6 +17,11 @@ type PortalProps<CtxType extends AvailableComponentCtx, PropsType = Omit<CtxType
 } & Pick<CtxType, 'componentName'>;
 
 export class Portal<CtxType extends AvailableComponentCtx> extends React.PureComponent<PortalProps<CtxType>> {
+  componentDidMount() {
+    // @ts-ignore
+    this.props.promises.resolve(true);
+  }
+
   render() {
     const { props, component, componentName, node } = this.props;
     const normalizedProps = { ...props, ...normalizeRoutingOptions({ routing: props?.routing, path: props?.path }) };

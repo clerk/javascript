@@ -626,6 +626,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  preloadSignIn = async (): Promise<unknown> => {
+    const clerkjs = await this.#waitForClerkJS();
+    await clerkjs.preloadSignIn();
+    return new Promise(res => {
+      setTimeout(() => {
+        res(true);
+      }, 1000);
+    });
+    // return clerkjs.preloadSignIn;
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -739,6 +750,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountSignInNodes.set(node, props);
     }
+  };
+
+  awaitableMountSignIn = async (node: HTMLDivElement, props: SignInProps): void => {
+    const clerk = await this.#waitForClerkJS();
+    // @ts-ignore
+    return clerk.awaitableMountSignIn(node, props);
   };
 
   unmountSignIn = (node: HTMLDivElement): void => {

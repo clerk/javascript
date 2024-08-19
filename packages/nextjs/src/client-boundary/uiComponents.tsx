@@ -28,6 +28,7 @@ export {
   UserButton,
   GoogleOneTap,
   SignIn2,
+  SignInWithSuspense,
 } from '@clerk/clerk-react';
 
 // The assignment of UserProfile with BaseUserProfile props is used

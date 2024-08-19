@@ -65,6 +65,7 @@
     "crypto-js": "^4.2.0",
     "dequal": "2.0.3",
     "qrcode.react": "3.1.0",
+    "react-lazy-with-preload": "^2.2.1",
     "regenerator-runtime": "0.13.11"
   },
   "devDependencies": {

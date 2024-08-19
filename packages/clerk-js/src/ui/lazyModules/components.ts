@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import lazyWithPreload from 'react-lazy-with-preload';
 
 const componentImportPaths = {
   SignIn: () => import(/* webpackChunkName: "signin" */ './../components/SignIn'),
@@ -21,6 +22,10 @@ export const SignIn = lazy(() =>
     (window.Clerk as any).__unstable_notifySuspendedSignIn();
     return { default: module.SignIn };
   }),
+);
+
+export const SignInPreload = lazyWithPreload(() =>
+  componentImportPaths.SignIn().then(module => ({ default: module.SignIn })),
 );
 
 export const SignInModal = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignInModal })));

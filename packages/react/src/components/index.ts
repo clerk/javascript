@@ -2,6 +2,7 @@ export {
   SignUp,
   SignIn,
   SignIn2,
+  SignInWithSuspense,
   UserProfile,
   UserButton,
   OrganizationSwitcher,

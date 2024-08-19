@@ -32,6 +32,7 @@ export {
   UserProfile,
   GoogleOneTap,
   SignIn2,
+  SignInWithSuspense,
 } from './client-boundary/uiComponents';
 
 /**

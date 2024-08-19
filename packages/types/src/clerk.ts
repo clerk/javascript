@@ -185,6 +185,8 @@ export interface Clerk {
    */
   closeOrganizationProfile: () => void;
 
+  preloadSignIn: () => Promise<unknown>;
+
   /**
    * Opens the Clerk CreateOrganization modal.
    * @param props Optional props that will be passed to the CreateOrganization component.

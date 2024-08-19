@@ -436,6 +436,11 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('organizationProfile', props || {}));
   };
 
+  public preloadSignIn = async (): Promise<unknown> => {
+    this.assertComponentsReady(this.#componentControls);
+    return this.#componentControls.signInPreload();
+  };
+
   public closeOrganizationProfile = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('organizationProfile'));
@@ -472,6 +477,18 @@ export class Clerk implements ClerkInterface {
       }),
     );
     this.telemetry?.record(eventPrebuiltComponentMounted('SignIn', props));
+  };
+
+  public awaitableMountSignIn = async (node: HTMLDivElement, props?: SignInProps) => {
+    this.assertComponentsReady(this.#componentControls);
+    return this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
+      controls.mountComponent({
+        name: 'SignIn',
+        appearanceKey: 'signIn',
+        node,
+        props,
+      }),
+    );
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {

@@ -13,8 +13,13 @@ import type {
   Without,
 } from '@clerk/types';
 import type { PropsWithChildren } from 'react';
-// @ts-expect-error
-import React, { createElement, use } from 'react';
+import React, {
+  createElement,
+  // @ts-ignore
+  use,
+  useCallback,
+  useRef,
+} from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import {
@@ -133,7 +138,10 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
     if (this.portalRef.current) {
       if (isMountProps(this.props)) {
         console.log('-- portal calling mount');
-        this.props.mount(this.portalRef.current, this.props.props);
+        console.log('elef', this.props.mount);
+        // @ts-ignore
+        this.props.mount(this.portalRef.current, this.props.props).then(console.log);
+        console.log('llolo');
       }
 
       if (isOpenProps(this.props)) {
@@ -201,6 +209,59 @@ export const SignIn2 = (props: SignInProps) => {
     <>
       <SignIn3 {...props} />
       <Dump />
+    </>
+  );
+};
+const WOW = (props: { lol: React.RefObject<HTMLDivElement> }) => {
+  const clerk = useIsomorphicClerkContext();
+  // @ts-ignore
+  use(clerk.awaitableMountSignIn(props.lol.current, {}));
+  return null;
+};
+
+// @ts-ignore
+export const SignInWithSuspense = (props: SignInProps) => {
+  const clerk = useIsomorphicClerkContext();
+  const ref = useRef<HTMLDivElement>(null);
+  use(clerk.preloadSignIn());
+
+  // console.log('dwadawdad', clerk.awaitableMountSignIn);
+
+  // @ts-ignore
+  // use(clerk.awaitableMountSignIn));
+  // @ts-ignore
+  const malista = useCallback(node => {
+    // @ts-ignore
+    ref.current = node;
+    return clerk.awaitableMountSignIn(node, {
+      appearance: {
+        elements: {
+          rootBox: {
+            display: 'none',
+          },
+        },
+      },
+    });
+  });
+
+  if (!clerk.loaded) {
+    return null;
+  }
+
+  return (
+    //@ts-ignore
+    <>
+      <div
+        //@ts-ignore
+        ref={malista}
+        className={'invisible'}
+      />
+      <Portal
+        mount={clerk.awaitableMountSignIn}
+        unmount={clerk.unmountSignIn}
+        updateProps={(clerk as any).__unstable__updateProps}
+        props={props}
+      />
     </>
   );
 };
