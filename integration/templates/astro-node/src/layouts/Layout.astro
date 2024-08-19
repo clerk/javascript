@@ -5,8 +5,9 @@ interface Props {
 
 const { title } = Astro.props;
 
-import { SignedIn, SignedOut, UserButton } from "@clerk/astro/components";
+import { SignedIn, SignedOut } from "@clerk/astro/components";
 import { LanguagePicker } from "../components/LanguagePicker";
+import CustomUserButton from "../components/CustomUserButton.astro";
 ---
 
 <!doctype html>
@@ -64,7 +65,7 @@ import { LanguagePicker } from "../components/LanguagePicker";
             <LanguagePicker client:idle />
 
             <SignedIn>
-              <UserButton afterSignOutUrl="/" />
+              <CustomUserButton />
             </SignedIn>
 
             <SignedOut>
