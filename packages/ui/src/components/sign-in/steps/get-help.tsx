@@ -18,6 +18,11 @@ export function SignInGetHelp() {
   const supportEmail = useSupportEmail();
   const { setShowHelp } = useGetHelp();
 
+  const cardLogoProps = {
+    href: layout?.logoLinkUrl || homeUrl,
+    src: layout?.logoImageUrl || logoImageUrl,
+    alt: applicationName,
+  };
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -29,13 +34,7 @@ export function SignInGetHelp() {
     <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
       <Card.Content>
         <Card.Header>
-          {logoImageUrl ? (
-            <Card.Logo
-              href={homeUrl}
-              src={logoImageUrl}
-              alt={applicationName}
-            />
-          ) : null}
+          <Card.Logo {...cardLogoProps} />
           <Card.Title>{t('signIn.alternativeMethods.getHelp.title')}</Card.Title>
           <Card.Description>{t('signIn.alternativeMethods.getHelp.content')}</Card.Description>
         </Card.Header>

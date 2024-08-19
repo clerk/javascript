@@ -28,6 +28,11 @@ export function SignUpContinue() {
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
   const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
   const isDev = useDevModeWarning();
+  const cardLogoProps = {
+    href: layout?.logoLinkUrl || homeUrl,
+    src: layout?.logoImageUrl || logoImageUrl,
+    alt: applicationName,
+  };
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -43,13 +48,7 @@ export function SignUpContinue() {
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...cardLogoProps} />
                   <Card.Title>{t('signUp.continue.title')}</Card.Title>
                   <Card.Description>{t('signUp.continue.subtitle')}</Card.Description>
                 </Card.Header>

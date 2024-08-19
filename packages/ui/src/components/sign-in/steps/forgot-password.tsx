@@ -22,6 +22,11 @@ export function SignInForgotPassword() {
   const { setShowHelp } = useGetHelp();
 
   const isDev = useDevModeWarning();
+  const cardLogoProps = {
+    href: layout?.logoLinkUrl || homeUrl,
+    src: layout?.logoImageUrl || logoImageUrl,
+    alt: applicationName,
+  };
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -37,13 +42,7 @@ export function SignInForgotPassword() {
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...cardLogoProps} />
                   <Card.Title>{t('signIn.forgotPasswordAlternativeMethods.title')}</Card.Title>
                 </Card.Header>
 

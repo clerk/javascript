@@ -8,7 +8,7 @@ import { SignInGetHelp } from '~/components/sign-in/steps/get-help';
 import { SignInResetPassword } from '~/components/sign-in/steps/reset-password';
 import { SignInStart } from '~/components/sign-in/steps/start';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
-import { useAppearance, AppearanceProvider, type Appearance } from '~/contexts';
+import { type Appearance, AppearanceProvider, useAppearance } from '~/contexts';
 
 /**
  * Implementation Details:
