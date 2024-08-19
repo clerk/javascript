@@ -11,8 +11,8 @@ import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -26,27 +26,16 @@ import { Separator } from '~/primitives/separator';
 export function SignInStart() {
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
-  const { layout } = useAppearance().parsedAppearance;
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passkeyEnabled } = useAttributes('passkey');
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
-  const cardLogoProps = {
-    href: layout?.logoLinkUrl || homeUrl,
-    src: layout?.logoImageUrl || logoImageUrl,
-    alt: applicationName,
-  };
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
@@ -56,7 +45,7 @@ export function SignInStart() {
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  <Card.Logo {...cardLogoProps} />
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
                   <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                 </Card.Header>
@@ -180,7 +169,7 @@ export function SignInStart() {
                 </Card.Actions>
               </Card.Content>
 
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signIn.start.actionText')}{' '}
