@@ -20,23 +20,6 @@ export type ParsedAppearance = {
 
 type AppearanceContextValue = {
   /**
-   * The appearance value provided to the AppearanceProvider. Should be passed to children `AppearanceProvider`s as the
-   * `globalAppearance` prop.
-   *
-   * Example:
-   * ```tsx
-   * function SignIn({ children }) {
-   *   const { appearance } = useAppearance();
-   *   return (<AppearanceProvider globalAppearance={appearance} appearance={{}}>{children}</AppearanceProvider>)
-   * }
-   * ```
-   */
-  appearance?: Appearance;
-
-  // TODO: This can probably be removed
-  globalAppearance?: Appearance;
-
-  /**
    * The calculated appearance value based on the provided `appearance` and `globalAppearance`.
    *
    * Example:
@@ -81,24 +64,30 @@ function parseAppearance(props: AppearanceCascade): ParsedAppearance {
   return appearance;
 }
 
-const [AppearanceContext, useAppearance] = createContextAndHook<AppearanceContextValue>('AppearanceContext');
+const [AppearanceContext, useAppearance, usePartialAppearance] =
+  createContextAndHook<AppearanceContextValue>('AppearanceContext');
 
-type AppearanceProviderProps = React.PropsWithChildren<AppearanceCascade>;
+type AppearanceProviderProps = React.PropsWithChildren<{ appearance?: Appearance }>;
 
 /**
  * Used to provide appearance values throughout an application. In typical usage, the entire application will be
  * wrapped in an `AppearanceProvider` to provide global configuration. Each top-level AIO component that accepts an
- * `appearance` prop will wrap its children in `AppearanceProvider`, and provide the `appearance` value from
- * `useAppearance` as `globalAppearance` (which ensures that global configuration is able to be accounted for as well
- * as component-level configuration). The provider handles the merging of attributes, and makes them available via the
- * `useAppearance` hook.
+ * `appearance` prop will wrap its children in `AppearanceProvider`. The provider handles the merging of attributes,
+ * and makes them available via the `useAppearance` hook.
  */
 const AppearanceProvider = (props: AppearanceProviderProps) => {
-  const ctxValue = useDeepEqualMemo(() => {
-    const parsedAppearance = parseAppearance(props);
+  // Access the parsedAppearance of the parent context provider. `undefined` if this is the top-most
+  // AppearanceProvider.
+  const { parsedAppearance: globalAppearance } = usePartialAppearance();
 
-    return { value: { appearance: props.appearance, globalAppearance: props.globalAppearance, parsedAppearance } };
-  }, [props.appearance, props.globalAppearance]);
+  const ctxValue = useDeepEqualMemo(() => {
+    const parsedAppearance = parseAppearance({
+      appearance: props.appearance,
+      globalAppearance: globalAppearance,
+    });
+
+    return { value: { parsedAppearance } };
+  }, [props.appearance, globalAppearance]);
 
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
 };
