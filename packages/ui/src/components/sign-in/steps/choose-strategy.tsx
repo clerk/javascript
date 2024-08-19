@@ -6,7 +6,7 @@ import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -48,12 +48,17 @@ function FirstFactorConnections({
 export function SignInChooseStrategy() {
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
+  const { layout } = useAppearance().parsedAppearance;
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { setShowHelp } = useGetHelp();
 
   const hasConnection = enabledConnections.length > 0;
   const isDev = useDevModeWarning();
+  const cardLogoProps = {
+    href: layout?.logoLinkUrl || homeUrl,
+    src: layout?.logoImageUrl || logoImageUrl,
+    alt: applicationName,
+  };
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -69,13 +74,7 @@ export function SignInChooseStrategy() {
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...cardLogoProps} />
                   <Card.Title>{t('signIn.alternativeMethods.title')}</Card.Title>
                   <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
                 </Card.Header>

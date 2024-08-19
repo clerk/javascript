@@ -1,9 +1,9 @@
 import { useClerk } from '@clerk/clerk-react';
 import { cva } from 'cva';
 import { Button } from 'react-aria-components';
-import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 
-import { useAppearance } from '~/hooks/use-appearance';
+import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useAppearance } from '~/contexts';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -59,7 +59,7 @@ const sessionAction = cva({
 export function SignInChooseSession() {
   const clerk = useClerk();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
+  const { layout } = useAppearance().parsedAppearance;
   const isDev = useDevModeWarning();
   const { branded } = useDisplayConfig();
 

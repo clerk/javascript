@@ -9,7 +9,7 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
@@ -20,7 +20,7 @@ import * as Icon from '~/primitives/icon';
 
 export function SignUpContinue() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
+  const { layout } = useAppearance().parsedAppearance;
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
   const { enabled: usernameEnabled, required: usernameRequired } = useAttributes('username');
@@ -28,6 +28,11 @@ export function SignUpContinue() {
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
   const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
   const isDev = useDevModeWarning();
+  const cardLogoProps = {
+    href: layout?.logoLinkUrl || homeUrl,
+    src: layout?.logoImageUrl || logoImageUrl,
+    alt: applicationName,
+  };
   const cardFooterProps = {
     branded,
     helpPageUrl: layout?.helpPageUrl,
@@ -43,13 +48,7 @@ export function SignUpContinue() {
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...cardLogoProps} />
                   <Card.Title>{t('signUp.continue.title')}</Card.Title>
                   <Card.Description>{t('signUp.continue.subtitle')}</Card.Description>
                 </Card.Header>
