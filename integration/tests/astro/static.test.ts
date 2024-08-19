@@ -69,12 +69,12 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await u.po.organizationSwitcher.waitForMounted();
       await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
-      await u.page.goToRelative('/protected');
+      await u.page.goToRelative('/only-admins');
 
       await expect(u.page.getByText("I'm an admin")).toBeVisible();
     });
 
-    test('render Protect fallback for non-admins', async ({ page, context }) => {
+    test('render Protect fallback', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToAppHome();
 
@@ -83,12 +83,12 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       // Sign in
       await u.page.getByRole('button', { name: /Sign in/i }).click();
       await u.po.signIn.waitForMounted();
-      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin2.email, password: fakeAdmin2.password });
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
       await u.po.expect.toBeSignedIn();
 
-      await u.page.goToRelative('/protected');
+      await u.page.goToRelative('/only-members');
 
-      await expect(u.page.getByText('Not an admin')).toBeVisible();
+      await expect(u.page.getByText("Not a member")).toBeVisible();
     });
   },
 );
