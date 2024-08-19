@@ -1,14 +1,15 @@
 ---
 interface Props {
   [key: string]: unknown
+  id?: string
   component: 'sign-in' | 'sign-up' | 'organization-list' | 'organization-profile' | 'organization-switcher' | 'user-button' | 'user-profile' | 'google-one-tap'
 }
 
 import { generateSafeId } from '@clerk/astro/internal';
 
-const safeId = generateSafeId();
+const { component, id, ...props } = Astro.props
 
-const { component, ...props } = Astro.props
+const safeId = id || generateSafeId();
 ---
 
 <div data-clerk-id={`clerk-${component}-${safeId}`}></div>
