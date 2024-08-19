@@ -48,11 +48,12 @@ export const csCZ: LocalizationResource = {
   formFieldAction__forgotPassword: 'Zapomněli jste heslo?',
   formFieldError__matchingPasswords: 'Hesla se shodují.',
   formFieldError__notMatchingPasswords: 'Hesla se neshodují.',
-  formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
+  formFieldError__verificationLinkExpired: 'Odkaz pro ověření již expiroval. Prosím, požádejte o nový.',
   formFieldHintText__optional: 'Volitelné',
-  formFieldHintText__slug: 'A slug is a human-readable ID that must be unique. It’s often used in URLs.',
+  formFieldHintText__slug:
+    'Slug je člověkem čitelný identifikátor, který musí být unikátní. Často použit v URL adresách.',
   formFieldInputPlaceholder__backupCode: '',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Smazat účet',
   formFieldInputPlaceholder__emailAddress: '',
   formFieldInputPlaceholder__emailAddress_username: '',
   formFieldInputPlaceholder__emailAddresses:
@@ -68,7 +69,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__username: '',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Záložní kód',
-  formFieldLabel__confirmDeletion: 'Confirmation',
+  formFieldLabel__confirmDeletion: 'Potvrzení',
   formFieldLabel__confirmPassword: 'Potvrdit heslo',
   formFieldLabel__currentPassword: 'Stávající heslo',
   formFieldLabel__emailAddress: 'Emailová adresa',
@@ -615,11 +616,11 @@ export const csCZ: LocalizationResource = {
       title: 'Přidat e-mailovou adresu',
       verifyTitle: 'Verify email address',
     },
-    formButtonPrimary__add: 'Add',
+    formButtonPrimary__add: 'Přidat',
     formButtonPrimary__continue: 'Pokračovat',
     formButtonPrimary__finish: 'Dokončit',
-    formButtonPrimary__remove: 'Remove',
-    formButtonPrimary__save: 'Save',
+    formButtonPrimary__remove: 'Odstranit',
+    formButtonPrimary__save: 'Uložit',
     formButtonReset: 'Zrušit',
     mfaPage: {
       formHint: 'Vyberte způsob přidání.',
@@ -672,10 +673,10 @@ export const csCZ: LocalizationResource = {
     },
     mobileButton__menu: 'Menu',
     navbar: {
-      account: 'Profile',
-      description: 'Manage your account info.',
-      security: 'Security',
-      title: 'Account',
+      account: 'Profil',
+      description: 'Spravujte své údaje.',
+      security: 'Zabezpečení',
+      title: 'Účet',
     },
     passkeyScreen: {
       removeResource: {
@@ -687,7 +688,7 @@ export const csCZ: LocalizationResource = {
     },
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
-        'It is recommended to sign out of all other devices which may have used your old password.',
+        'Je doporučeno se odhlásit ze všech ostatních zařízeních, která mohla použít vaše staré heslo.',
       readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
       successMessage__set: 'Vaše heslo bylo nastaveno.',
       successMessage__signOutOfOtherSessions: 'Všechna ostatní zařízení byla odhlášena.',
@@ -733,8 +734,8 @@ export const csCZ: LocalizationResource = {
         title: 'Připojené účty',
       },
       dangerSection: {
-        deleteAccountButton: 'Delete Account',
-        title: 'Account termination',
+        deleteAccountButton: 'Smazat účet',
+        title: 'Zrušení účtu',
       },
       emailAddressesSection: {
         destructiveAction: 'Odstranit emailovou adresu',

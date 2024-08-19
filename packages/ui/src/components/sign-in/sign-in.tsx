@@ -10,6 +10,8 @@ import { SignInStart } from '~/components/sign-in/steps/start';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
 import { type Appearance, AppearanceProvider, useAppearance } from '~/contexts';
 
+import { SignInChooseSession } from './steps/choose-session';
+
 /**
  * Implementation Details:
  *
@@ -41,6 +43,7 @@ export function SignIn({ appearance }: { appearance?: Appearance }) {
               <SignInChooseStrategy />
               <SignInForgotPassword />
               <SignInResetPassword />
+              <SignInChooseSession />
             </>
           )}
         </SignInRoot>

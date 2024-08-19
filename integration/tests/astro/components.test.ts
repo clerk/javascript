@@ -57,7 +57,7 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.expect.toBeSignedIn();
   });
 
-  test('render user button', async ({ page, context }) => {
+  test('renders user button', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
@@ -75,6 +75,72 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await u.po.userProfile.waitForUserProfileModal();
 
     await expect(u.page.getByText(/profile details/i)).toBeVisible();
+  });
+
+  test('renders user button with custom menu items', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.page.waitForAppUrl('/');
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userButton.waitForMounted();
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    // Check if custom menu items are visible
+    await u.po.userButton.toHaveVisibleMenuItems([/Custom link/i, /Custom action/i, /Custom click/i]);
+
+    // Click custom action and check for custom page availbility
+    await u.page.getByRole('menuitem', { name: /Custom action/i }).click();
+    await u.po.userProfile.waitForUserProfileModal();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Close the modal and trigger the popover again
+    await u.page.locator('.cl-modalCloseButton').click();
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    // Click custom action with click handler
+    const eventPromise = u.page.evaluate(() => {
+      return new Promise<string>(resolve => {
+        document.addEventListener(
+          'clerk:menu-item-click',
+          (e: CustomEvent<string>) => {
+            resolve(e.detail);
+          },
+          { once: true },
+        );
+      });
+    });
+    await u.page.getByRole('menuitem', { name: /Custom click/i }).click();
+    expect(await eventPromise).toBe('custom_click');
+
+    // Trigger the popover again
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('menuitem', { name: /Custom link/i }).click();
+    await u.page.waitForAppUrl('/user');
+  });
+
+  test('reorders default user button menu items and functions as expected', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.page.waitForAppUrl('/');
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userButton.waitForMounted();
+    await u.po.userButton.toggleTrigger();
+    await u.po.userButton.waitForPopover();
+
+    // First item should now be the sign out button
+    await u.page.getByRole('menuitem').first().click();
+    await u.po.expect.toBeSignedOut();
   });
 
   test('render user profile with streamed data', async ({ page, context }) => {
