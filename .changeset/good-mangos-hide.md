@@ -1,5 +1,5 @@
 ---
-"@clerk/types": patch
+"@clerk/localizations": patch
 ---
 
-Fix missing localization value types.
+Remove unused `da-DK` localization values.
