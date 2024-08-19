@@ -5,7 +5,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -46,7 +46,7 @@ function SignUpIdentifier({ emailAddress, phoneNumber }: Identifier) {
 
 export function SignUpVerifications() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
+  const { layout } = useAppearance().parsedAppearance;
   const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
 
   const isDev = useDevModeWarning();

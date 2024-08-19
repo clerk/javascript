@@ -6,7 +6,7 @@ import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { PasswordField } from '~/common/password-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -19,7 +19,7 @@ import { formatSafeIdentifier } from '~/utils/format-safe-identifier';
 
 export function SignInVerifications() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
+  const { layout } = useAppearance().parsedAppearance;
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
 
   const isDev = useDevModeWarning();
