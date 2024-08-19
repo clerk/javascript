@@ -50,7 +50,8 @@ export const csCZ: LocalizationResource = {
   formFieldError__notMatchingPasswords: 'Hesla se neshodují.',
   formFieldError__verificationLinkExpired: 'Odkaz pro ověření již expiroval. Prosím, požádejte o nový.',
   formFieldHintText__optional: 'Volitelné',
-  formFieldHintText__slug: 'Slug je člověkem čitelný identifikátor, který musí být unikátní. Často použit v URL adresách.',
+  formFieldHintText__slug:
+    'Slug je člověkem čitelný identifikátor, který musí být unikátní. Často použit v URL adresách.',
   formFieldInputPlaceholder__backupCode: '',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'Smazat účet',
   formFieldInputPlaceholder__emailAddress: '',

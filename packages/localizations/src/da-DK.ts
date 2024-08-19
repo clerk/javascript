@@ -253,7 +253,8 @@ export const daDK: LocalizationResource = {
       formTitle: 'Bekræftelseskode',
       resendButton: 'Modtog du ikke en kode? Send igen',
       subtitle: 'Domænet {{domainName}} skal verificeres via e-mail.',
-      subtitleVerificationCodeScreen: 'En bekræftelseskode blev sendt til {{emailAddress}}. Indtast koden for at fortsætte.',
+      subtitleVerificationCodeScreen:
+        'En bekræftelseskode blev sendt til {{emailAddress}}. Indtast koden for at fortsætte.',
       title: 'Verificer domæne',
     },
   },
@@ -689,7 +690,8 @@ export const daDK: LocalizationResource = {
     passwordPage: {
       checkboxInfoText__signOutOfOtherSessions:
         'Det anbefales at logge ud af alle andre enheder, der kan have brugt din gamle adgangskode.',
-      readonly: 'Din adgangskode kan i øjeblikket ikke redigeres, fordi du kun kan logge ind via virksomhedens forbindelse.',
+      readonly:
+        'Din adgangskode kan i øjeblikket ikke redigeres, fordi du kun kan logge ind via virksomhedens forbindelse.',
       successMessage__set: 'Din adgangskode er blevet indstillet.',
       successMessage__signOutOfOtherSessions: 'Alle andre enheder er blevet logget ud.',
       successMessage__update: 'Din adgangskode er blevet opdateret.',
