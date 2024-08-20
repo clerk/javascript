@@ -1,5 +1,6 @@
 'use client';
 import { ClerkProvider } from '@clerk/nextjs';
+import type { Layout } from '@clerk/types';
 import { AppearanceProvider } from '@clerk/ui/contexts';
 import { cx } from 'cva';
 import { usePathname, useRouter } from 'next/navigation';
@@ -82,7 +83,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
         appearance={{
           layout: {
             unsafe_disableDevelopmentModeWarnings: devMode === 'off',
-            socialButtonsPlacement: socialButtonsPlacement as 'top' | 'bottom' | undefined,
+            socialButtonsPlacement: socialButtonsPlacement as Layout['socialButtonsPlacement'],
           },
         }}
       >
