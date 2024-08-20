@@ -61,7 +61,7 @@ export const createProtect = (opts: {
       if (unauthenticatedUrl) {
         return redirect(unauthenticatedUrl);
       }
-      if (isPageRequest(request)) {
+      if (isPageRequest(request.headers)) {
         // TODO: Handle runtime values. What happens if runtime values are set in middleware and in ClerkProvider as well?
         return redirectToSignIn();
       }
@@ -110,38 +110,38 @@ export const createProtect = (opts: {
   }) as AuthProtect;
 };
 
-const isServerActionRequest = (req: Request) => {
+const isServerActionRequest = (headers: Headers) => {
   return (
-    !!req.headers.get(nextConstants.Headers.NextUrl) &&
-    (req.headers.get(constants.Headers.Accept)?.includes('text/x-component') ||
-      req.headers.get(constants.Headers.ContentType)?.includes('multipart/form-data') ||
-      !!req.headers.get(nextConstants.Headers.NextAction))
+    !!headers.get(nextConstants.Headers.NextUrl) &&
+    (headers.get(constants.Headers.Accept)?.includes('text/x-component') ||
+      headers.get(constants.Headers.ContentType)?.includes('multipart/form-data') ||
+      !!headers.get(nextConstants.Headers.NextAction))
   );
 };
 
-const isPageRequest = (req: Request): boolean => {
+const isPageRequest = (headers: Headers): boolean => {
   return (
-    req.headers.get(constants.Headers.SecFetchDest) === 'document' ||
-    req.headers.get(constants.Headers.SecFetchDest) === 'iframe' ||
-    req.headers.get(constants.Headers.Accept)?.includes('text/html') ||
-    isAppRouterInternalNavigation(req) ||
-    isPagesRouterInternalNavigation(req)
+    headers.get(constants.Headers.SecFetchDest) === 'document' ||
+    headers.get(constants.Headers.SecFetchDest) === 'iframe' ||
+    headers.get(constants.Headers.Accept)?.includes('text/html') ||
+    isAppRouterInternalNavigation(headers) ||
+    isPagesRouterInternalNavigation(headers)
   );
 };
 
-const isAppRouterInternalNavigation = (req: Request) =>
-  (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req)) || isPagePathAvailable();
+const isAppRouterInternalNavigation = (headers: Headers) =>
+  (!!headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(headers)) || isPagePathAvailable();
 
 const isPagePathAvailable = () => {
   const __fetch = globalThis.fetch;
   return Boolean(isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore()?.pagePath : false);
 };
 
-const isPagesRouterInternalNavigation = (req: Request) => !!req.headers.get(nextConstants.Headers.NextjsData);
+const isPagesRouterInternalNavigation = (headers: Headers) => !!headers.get(nextConstants.Headers.NextjsData);
 
 // /**
 //  * In case we want to handle router handlers and server actions differently in the future
 //  */
-// const isApiRouteRequest = (req: Request) => {
-//   return !isPageRequest(req) && !isServerActionRequest(req);
+// const isApiRouteRequest = (headers: Headers) => {
+//   return !isPageRequest(headers) && !isServerActionRequest(headers);
 // };

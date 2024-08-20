@@ -54,33 +54,36 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren<unknown>): JS
   return <>{children}</>;
 };
 
+type _ProtectProps = (
+  | {
+      condition?: never;
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+    }
+  | {
+      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+      role?: never;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+    }
+) & {
+  assurance?: {
+    level: 'firstFactor' | 'secondFactor' | 'multiFactor';
+    maxAge: '10m' | '1h' | '4h' | '1d' | '1w';
+  };
+};
+
 export type ProtectProps = React.PropsWithChildren<
-  (
-    | {
-        condition?: never;
-        role: OrganizationCustomRoleKey;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission: OrganizationCustomPermissionKey;
-      }
-    | {
-        condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-        role?: never;
-        permission?: never;
-      }
-    | {
-        condition?: never;
-        role?: never;
-        permission?: never;
-      }
-  ) & {
-    assurance?: {
-      level: 'firstFactor' | 'secondFactor' | 'multiFactor';
-      maxAge: '10m' | '1h' | '4h' | '1d' | '1w';
-    };
+  _ProtectProps & {
     fallback?: React.ReactNode;
   }
 >;
