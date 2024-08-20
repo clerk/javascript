@@ -3,13 +3,13 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { AppearanceProvider } from '@clerk/ui/contexts';
 import { cx } from 'cva';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { ColorPicker } from './color-picker';
+import { Logo } from './components/logo';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 import { ToggleGroup } from './toggle-group';
-import { Logo } from './components/logo';
 
 const lightAccentDefault = '#6C47FF';
 const lightGrayDefault = '#2f3037';
@@ -26,6 +26,7 @@ const fontSizeDefault = '0.8125rem';
 export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const previewRef = useRef<HTMLDivElement>(null);
   const [dir, setDir] = useState('ltr');
   const [appearance, setAppearance] = useState('light');
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
@@ -70,7 +71,9 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     fontSize,
   });
   useEffect(() => {
-    document.documentElement.dir = dir;
+    if (previewRef.current) {
+      previewRef.current.dir = dir;
+    }
   }, [dir]);
   return (
     <ClerkProvider key={devMode}>
@@ -80,7 +83,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
             __html: css,
           }}
         />
-        <div className='z-1 pointer-events-none fixed inset-x-0 top-0 z-50 h-[calc(theme(size.1)-theme(ringWidth.1))] bg-neutral-100'></div>
+        <div className='z-1 pointer-events-none fixed inset-x-0 top-0 z-50 h-[calc(theme(size.1)-theme(ringWidth.1))] bg-neutral-100' />
         <div
           className={cx(
             'm-1 mb-0 grid h-[calc(100dvh-theme(size.1))] grid-cols-[min-content,minmax(0,1fr)] grid-rows-[min-content,minmax(0,1fr)] overflow-hidden rounded-t-xl bg-white ring-1 ring-neutral-900/[0.075]',
@@ -291,6 +294,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </aside>
 
           <figure
+            ref={previewRef}
             className={cx('relative isolate grid items-center overflow-y-auto p-8', {
               'bg-white': appearance === 'light',
               'dark bg-neutral-950': appearance === 'dark',
