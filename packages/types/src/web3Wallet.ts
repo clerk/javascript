@@ -27,7 +27,7 @@ export type GenerateSignature = (opts: GenerateSignatureParams) => Promise<strin
 export interface AuthenticateWithWeb3Params {
   identifier: string;
   generateSignature: GenerateSignature;
-  strategy: Web3Strategy;
+  provider: 'metamask' | 'coinbase';
 }
 
 export interface GenerateSignatureParams {

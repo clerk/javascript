@@ -38,13 +38,14 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
           })
           .catch(err => handleError(err, [], card.setError));
       }}
-      web3Callback={() => {
+      web3Callback={strategy => {
         return clerk
           .authenticateWithMetamask({
             customNavigate: navigate,
             redirectUrl: redirectUrlComplete,
             signUpContinueUrl: 'continue',
             unsafeMetadata: ctx.unsafeMetadata,
+            strategy: strategy,
           })
           .catch(err => handleError(err, [], card.setError));
       }}

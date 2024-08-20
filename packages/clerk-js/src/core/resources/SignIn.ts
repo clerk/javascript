@@ -31,13 +31,7 @@ import type {
   Web3SignatureFactor,
 } from '@clerk/types';
 
-import {
-  generateSignatureWithCoinbase,
-  generateSignatureWithMetamask,
-  getCoinbaseIdentifier,
-  getMetamaskIdentifier,
-  windowNavigate,
-} from '../../utils';
+import { generateSignatureWithWeb3, getWeb3Identifier, windowNavigate } from '../../utils';
 import {
   ClerkWebAuthnError,
   convertJSONToPublicKeyRequestOptions,
@@ -111,6 +105,9 @@ export class SignIn extends BaseResource implements SignInResource {
         } as PhoneCodeConfig;
         break;
       case 'web3_metamask_signature':
+        config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
+        break;
+      case 'web3_coinbase_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
         break;
       case 'reset_password_phone_code':
@@ -229,8 +226,10 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
-    const { identifier, generateSignature, strategy } = params || {};
-    if (!(typeof generateSignature === 'function')) {
+    const { identifier, provider } = params || {};
+    const strategy = `web3_${provider}_signature`;
+
+    if (!(typeof generateSignatureWithWeb3 === 'function')) {
       clerkMissingOptionError('generateSignature');
     }
 
@@ -245,9 +244,10 @@ export class SignIn extends BaseResource implements SignInResource {
     await this.prepareFirstFactor(web3FirstFactor);
 
     const { nonce } = this.firstFactorVerification;
-    const signature = await generateSignature({
+    const signature = await generateSignatureWithWeb3({
       identifier: this.identifier!,
       nonce: nonce!,
+      provider: provider,
     });
 
     return this.attemptFirstFactor({
@@ -256,22 +256,21 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithMetamask = async (): Promise<SignInResource> => {
-    const identifier = await getMetamaskIdentifier();
+  public authenticateWeb3Provider = async (provider: 'metamask' | 'coinbase'): Promise<SignInResource> => {
+    const identifier = await getWeb3Identifier(provider);
+
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithMetamask,
-      strategy: 'web3_metamask_signature',
+      provider: provider,
     });
   };
 
+  public authenticateWithMetamask = async (): Promise<SignInResource> => {
+    return this.authenticateWeb3Provider('metamask');
+  };
+
   public authenticateWithCoinbase = async (): Promise<SignInResource> => {
-    const identifier = await getCoinbaseIdentifier();
-    return this.authenticateWithWeb3({
-      identifier,
-      generateSignature: generateSignatureWithCoinbase,
-      strategy: 'web3_coinbase_signature',
-    });
+    return this.authenticateWeb3Provider('coinbase');
   };
 
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
