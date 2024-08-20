@@ -42,7 +42,7 @@ export function SignInStart() {
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
-        const conntections = [
+        const connectionsWithSeperator = [
           <Connections disabled={isGlobalLoading} />,
           hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
         ];
@@ -59,7 +59,7 @@ export function SignInStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  {layout.socialButtonsPlacement === 'top' ? conntections : null}
+                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -126,7 +126,7 @@ export function SignInStart() {
                       ) : null}
                     </div>
                   ) : null}
-                  {layout.socialButtonsPlacement === 'bottom' ? conntections.reverse() : null}
+                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
                 </Card.Body>
                 <Card.Actions>
                   <Common.Loading scope='submit'>
