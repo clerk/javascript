@@ -39,6 +39,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [fontSize, setFontSize] = useState(fontSizeDefault);
   const [devMode, setDevMode] = useState('on');
+  const [socialButtonsPlacement, setSocialButtonsPlacement] = useState('top');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
@@ -77,7 +78,14 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   }, [dir]);
   return (
     <ClerkProvider key={devMode}>
-      <AppearanceProvider appearance={{ layout: { unsafe_disableDevelopmentModeWarnings: devMode === 'off' } }}>
+      <AppearanceProvider
+        appearance={{
+          layout: {
+            unsafe_disableDevelopmentModeWarnings: devMode === 'off',
+            socialButtonsPlacement: socialButtonsPlacement as 'top' | 'bottom' | undefined,
+          },
+        }}
+      >
         <style
           dangerouslySetInnerHTML={{
             __html: css,
@@ -167,6 +175,21 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 ]}
                 value={dir}
                 onValueChange={setDir}
+              />
+              <ToggleGroup
+                label='Social button placement'
+                items={[
+                  {
+                    label: 'Top',
+                    value: 'top',
+                  },
+                  {
+                    label: 'Bottom',
+                    value: 'bottom',
+                  },
+                ]}
+                value={socialButtonsPlacement}
+                onValueChange={setSocialButtonsPlacement}
               />
               <ToggleGroup
                 label='Dev mode'
