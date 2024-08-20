@@ -1613,6 +1613,8 @@ export class Clerk implements ClerkInterface {
         // set in updateClient
         this.updateEnvironment(environment);
 
+        this.#authService.setActiveOrganizationInStorage();
+
         if (await this.#redirectFAPIInitiatedFlow()) {
           return false;
         }

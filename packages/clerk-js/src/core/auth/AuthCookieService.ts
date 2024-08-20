@@ -56,8 +56,6 @@ export class AuthCookieService {
       this.setClientUatCookieForDevelopmentInstances();
     });
 
-    this.markActiveTab();
-
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
@@ -113,7 +111,7 @@ export class AuthCookieService {
   }
 
   private refreshTokenOnFocus() {
-    document.addEventListener('focus', () => {
+    window.addEventListener('focus', () => {
       if (document.visibilityState === 'visible') {
         void this.refreshSessionToken();
       }
@@ -126,17 +124,21 @@ export class AuthCookieService {
     }
 
     try {
-      await this.clerk.session.getToken();
+      const token = await this.clerk.session.getToken();
+      this.updateSessionCookie(token);
     } catch (e) {
       return this.handleGetTokenError(e);
     }
   }
 
   private updateSessionCookie(token: string | null) {
-    // only update session cookie from active tab
-    if (!document.hasFocus()) {
+    // only update session cookie from the active tab,
+    // or if the tab's selected organization matches the session's active organization
+    if (!document.hasFocus() && !this.isCurrentOrganizationActive()) {
       return;
     }
+
+    this.setActiveOrganizationInStorage();
 
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
   }
@@ -171,8 +173,27 @@ export class AuthCookieService {
     clerkCoreErrorTokenRefreshFailed(e.toString());
   }
 
-  private markActiveTab() {
-    const current = Number.parseInt(sessionStorage.getItem('__clerk_active_tabs') ?? '0', 10);
-    sessionStorage.setItem('__clerk_active_tabs', String(current + 1));
+  /**
+   * The below methods are used to determine whether or not an unfocused tab can be responsible
+   * for setting the session cookie. A session cookie should only be set by a tab who's selected
+   * organization matches the session's active organization. By storing the active organization
+   * ID in local storage, we can check the value across tabs. If a tab's organization ID does not
+   * match the value in local storage, it is not responsible for updating the session cookie.
+   */
+
+  public setActiveOrganizationInStorage() {
+    if (this.clerk.organization?.id) {
+      localStorage.setItem('clerk_active_org', this.clerk.organization.id);
+    } else {
+      localStorage.removeItem('clerk_active_org');
+    }
+  }
+
+  private isCurrentOrganizationActive() {
+    const activeOrganizationId = localStorage.getItem('clerk_active_org');
+
+    if (!activeOrganizationId && !this.clerk.organization?.id) return true;
+
+    return this.clerk.organization?.id === activeOrganizationId;
   }
 }
