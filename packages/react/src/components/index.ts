@@ -17,6 +17,7 @@ export {
   SignedOut,
   SignedIn,
   Protect,
+  protect,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToUserProfile,

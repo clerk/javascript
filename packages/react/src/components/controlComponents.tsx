@@ -12,6 +12,7 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { useAuth } from '../hooks';
 import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByClerkProvider';
 import type { RedirectToSignInProps, RedirectToSignUpProps, WithClerkProp } from '../types';
+import { UserVerificationTrigger } from './support-components';
 import { withClerk } from './withClerk';
 
 export const SignedIn = ({ children }: React.PropsWithChildren<unknown>): JSX.Element | null => {
@@ -147,6 +148,39 @@ export const Protect = ({ children, fallback, ...restAuthorizedParams }: Protect
   return authorized;
 };
 /* eslint-enable react-hooks/rules-of-hooks */
+
+type ProtectPropsWithFallback = _ProtectProps & {
+  fallback: React.ComponentType<{ UserVerificationTrigger: typeof UserVerificationTrigger }>;
+};
+
+export const protect = <P, C extends React.ComponentType<P>>(
+  handlerOrComponent: C,
+  opts: ProtectPropsWithFallback,
+): C => {
+  // @ts-ignore
+  return (...args: any[]) => {
+    const { fallback: Fallback, ...restAuthorizedParams } = opts;
+    const Component = handlerOrComponent;
+
+    // if fallback is present we want to return a Server Component
+    if (Fallback) {
+      const unauthorized = Fallback ? <Fallback UserVerificationTrigger={UserVerificationTrigger} /> : null;
+
+      const authorized = <Component {...args[0]} />;
+
+      return (
+        <Protect
+          {...restAuthorizedParams}
+          fallback={unauthorized}
+        >
+          {authorized}
+        </Protect>
+      );
+    }
+
+    throw 'Fallback is required';
+  };
+};
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
