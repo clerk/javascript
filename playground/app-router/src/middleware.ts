@@ -1,10 +1,21 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
 import { NextMiddleware, NextResponse } from 'next/server';
 
+const AUTH_VERIFY_PATH = '/verify';
 
-export default clerkMiddleware((auth)=> {
-  
-})
+export default clerkMiddleware((auth, req) => {
+  if (
+    !auth().has({
+      assurance: {
+        level: 'secondFactor',
+        maxAge: '10m',
+      },
+    }) &&
+    req.nextUrl.pathname !== AUTH_VERIFY_PATH
+  ) {
+    // return NextResponse.rewrite(new URL(AUTH_VERIFY_PATH, req.url));
+  }
+});
 
 // export default authMiddleware({
 //   publicRoutes: ['/'],
@@ -32,5 +43,10 @@ export default clerkMiddleware((auth)=> {
 // });
 
 export const config = {
-  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };
