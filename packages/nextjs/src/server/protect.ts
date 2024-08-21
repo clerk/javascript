@@ -110,6 +110,10 @@ export const createProtect = (opts: {
   }) as AuthProtect;
 };
 
+/**
+ * Detects a request that will trigger a server action
+ * Can be used from the Edge Middleware and during rendering
+ */
 const isServerActionRequest = (req: Request) => {
   return (
     req.headers.get(constants.Headers.Accept)?.includes('text/x-component') &&
@@ -117,18 +121,25 @@ const isServerActionRequest = (req: Request) => {
   );
 };
 
+/**
+ * Attempts to detect when a request results in a page being displayed
+ * *Attention*:
+ * When used within the Edge Middleware this utility will mistakenly detect a Route Handler as a Page
+ */
 const isPageRequest = (req: Request): boolean => {
   return (
-    req.headers.get(constants.Headers.SecFetchDest) === 'document' ||
-    req.headers.get(constants.Headers.SecFetchDest) === 'iframe' ||
-    req.headers.get(constants.Headers.Accept)?.includes('text/html') ||
-    isAppRouterInternalNavigation(req) ||
-    isPagesRouterInternalNavigation(req)
+    (req.headers.get(constants.Headers.SecFetchDest) === 'document' ||
+      req.headers.get(constants.Headers.SecFetchDest) === 'iframe' ||
+      req.headers.get(constants.Headers.Accept)?.includes('text/html') ||
+      isAppRouterInternalNavigation(req) ||
+      isPagesRouterInternalNavigation(req)) &&
+    !isServerActionRequest(req) &&
+    !isAppRouteRoute(getPagePathAvailable())
   );
 };
 
 const isAppRouterInternalNavigation = (req: Request) =>
-  // The header `next-url` has been dropped since next@14.2.2
+  // Since next@14.2.3 the `next-url` header is being stripped before it can reach the rendering server, and it is only available when executed inside the Next.js Edge Middleware
   (!!req.headers.get(nextConstants.Headers.NextUrl) || isAppPageRoute(getPagePathAvailable())) &&
   !isServerActionRequest(req);
 
@@ -147,12 +158,13 @@ export function isAppPageRoute(route: string): boolean {
  * github.com/vercel/next.js/blob/0ac10d79720cc950df96bd9d4958c9be0c075b6f/packages/next/src/lib/is-app-route-route.ts
  * In case we want to handle router handlers and server actions differently in the future
  */
-// export function isAppRouteRoute(route: string): boolean {
-//   return route.endsWith('/route');
-// }
+export function isAppRouteRoute(route: string): boolean {
+  return route.endsWith('/route');
+}
 
 /**
  * Returns a string that can either end with `/page` or `/route` indicating that the code run in the context of a page or a route handler.
+ * These values are only available during rendering (RSC, Route Handlers, Server Actions), and will not be populated when executed inside the Next.js Edge Middleware
  */
 const getPagePathAvailable = () => {
   const __fetch = globalThis.fetch;

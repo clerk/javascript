@@ -12,6 +12,10 @@ type NextFetcher = Fetcher & {
  * Full type can be found https://github.com/vercel/next.js/blob/6185444e0a944a82e7719ac37dad8becfed86acd/packages/next/src/client/components/static-generation-async-storage.external.ts#L4
  */
 interface StaticGenerationAsyncStorage {
+  /**
+   * Available for >=next@13.5.4
+   * A string with a suffix of `/page` or `/route` dictating usage from a page.tsx or a route.tsx file
+   */
   readonly pagePath?: string;
 }
 
