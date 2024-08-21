@@ -1,3 +1,8 @@
+// @ts-nocheck
+// We're using @ts-nocheck here because this file gets copied to the dist folder
+// when published and is not bundled with tsup. This can cause TS to throw errors
+// even though we're not bundling it.
+
 /**
  * Control Components
  */
