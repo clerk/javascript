@@ -33,9 +33,29 @@ testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
       await app.teardown();
     });
 
-    test('render SignedIn and SignedOut contents', async ({ page, context }) => {
+    test('render SignedIn and SignedOut contents (prerendered)', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.page.goToAppHome();
+
+      await u.page.waitForClerkJsLoaded();
+
+      await u.po.expect.toBeSignedOut();
+      await expect(u.page.getByText('Signed out')).toBeVisible();
+      await expect(u.page.getByText('Signed in')).toBeHidden();
+
+      await u.page.getByRole('button', { name: /Sign in/i }).click();
+
+      await u.po.signIn.waitForMounted();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+      await u.po.expect.toBeSignedIn();
+
+      await expect(u.page.getByText('Signed out')).toBeHidden();
+      await expect(u.page.getByText('Signed in')).toBeVisible();
+    });
+
+    test('render SignedIn and SignedOut contents (SSR)', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await u.page.goToRelative('/ssr');
 
       await u.page.waitForClerkJsLoaded();
 

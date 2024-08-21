@@ -32,6 +32,6 @@
     // This cause TS to throw errors even though we're not bundling it.
     "src/astro-components/index.ts",
     "src/astro-components/interactive/UserButton/index.ts",
-    "src/astro-components/control/BaseClerkControlElement.ts",
+    "src/astro-components/control/BaseClerkControlElement.ts"
   ]
 }

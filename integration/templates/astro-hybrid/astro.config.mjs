@@ -3,7 +3,7 @@ import clerk from '@clerk/astro';
 import react from '@astrojs/react';
 
 export default defineConfig({
-  output: 'static',
+  output: 'hybrid',
   integrations: [clerk(), react()],
   server: {
     port: Number(process.env.PORT),
