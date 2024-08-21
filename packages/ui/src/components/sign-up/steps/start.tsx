@@ -12,6 +12,7 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
@@ -40,11 +41,16 @@ export function SignUpStart() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
+  const { layout } = useAppearance().parsedAppearance;
   const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
+        const connectionsWithSeperator = [
+          <Connections disabled={isGlobalLoading} />,
+          hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
+        ];
         return (
           <SignUp.Step name='start'>
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
@@ -62,9 +68,7 @@ export function SignUpStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  <Connections disabled={isGlobalLoading} />
-
-                  {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
+                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -117,6 +121,8 @@ export function SignUpStart() {
                       ) : null}
                     </div>
                   ) : null}
+
+                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
 
                   {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
                 </Card.Body>
