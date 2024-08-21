@@ -277,4 +277,12 @@ export class UserAPI extends AbstractAPI {
       path: joinPaths(basePath, userId, 'unlock'),
     });
   }
+
+  public async deleteUserProfileImage(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'DELETE',
+      path: joinPaths(basePath, userId, 'profile_image'),
+    });
+  }
 }

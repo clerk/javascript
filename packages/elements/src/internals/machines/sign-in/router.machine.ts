@@ -5,6 +5,7 @@ import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
 
 import {
+  CHOOSE_SESSION_PATH_ROUTE,
   ERROR_CODES,
   ROUTING,
   SIGN_IN_DEFAULT_BASE_PATH,
@@ -22,6 +23,7 @@ import type {
   SignInRouterEvents,
   SignInRouterNextEvent,
   SignInRouterSchema,
+  SignInRouterSessionSetActiveEvent,
 } from './router.types';
 import { SignInStartMachine } from './start.machine';
 import { SignInFirstFactorMachine, SignInSecondFactorMachine } from './verification.machine';
@@ -78,11 +80,12 @@ export const SignInRouterMachine = setup({
         return;
       }
 
+      const id = (event as SignInRouterSessionSetActiveEvent)?.id;
       const lastActiveSessionId = context.clerk.client.lastActiveSessionId;
       const createdSessionId = ((event as SignInRouterNextEvent)?.resource || context.clerk.client.signIn)
         .createdSessionId;
 
-      const session = createdSessionId || lastActiveSessionId || null;
+      const session = id || createdSessionId || lastActiveSessionId || null;
 
       const beforeEmit = () =>
         context.router?.push(context.router?.searchParams().get('redirect_url') || context.clerk.buildAfterSignInUrl());
@@ -119,7 +122,7 @@ export const SignInRouterMachine = setup({
         case ERROR_CODES.SAML_USER_ATTRIBUTE_MISSING:
         case ERROR_CODES.OAUTH_EMAIL_DOMAIN_RESERVED_BY_SAML:
         case ERROR_CODES.USER_LOCKED:
-          error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
+          error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage || '');
           break;
         default:
           error = new ClerkElementsError(
@@ -163,6 +166,7 @@ export const SignInRouterMachine = setup({
     needsFirstFactor: and(['statusNeedsFirstFactor', isCurrentPath('/continue')]),
     needsSecondFactor: and(['statusNeedsSecondFactor', isCurrentPath('/continue')]),
     needsCallback: isCurrentPath(SSO_CALLBACK_PATH_ROUTE),
+    needsChooseSession: isCurrentPath(CHOOSE_SESSION_PATH_ROUTE),
     needsNewPassword: and(['statusNeedsNewPassword', isCurrentPath('/new-password')]),
 
     statusNeedsIdentifier: needsStatus('needs_identifier'),
@@ -227,6 +231,7 @@ export const SignInRouterMachine = setup({
           isLoading: event.isLoading,
           step: event.step,
           strategy: event.strategy,
+          action: event.action,
         },
       })),
     },
@@ -276,6 +281,10 @@ export const SignInRouterMachine = setup({
         {
           guard: 'needsCallback',
           target: 'Callback',
+        },
+        {
+          guard: 'needsChooseSession',
+          target: 'ChooseSession',
         },
         {
           guard: 'isComplete',
@@ -379,6 +388,7 @@ export const SignInRouterMachine = setup({
         input: ({ context, self }) => ({
           formRef: context.formRef,
           parent: self,
+          basePath: context.router?.basePath,
         }),
         onDone: {
           actions: 'raiseNext',
@@ -573,6 +583,17 @@ export const SignInRouterMachine = setup({
             target: 'ResetPassword',
           },
         ],
+      },
+    },
+    ChooseSession: {
+      tags: ['step:choose-session'],
+      on: {
+        'SESSION.SET_ACTIVE': {
+          actions: {
+            type: 'setActive',
+            params: ({ event }) => ({ id: event.id }),
+          },
+        },
       },
     },
     Error: {
