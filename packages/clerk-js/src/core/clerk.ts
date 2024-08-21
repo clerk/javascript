@@ -173,6 +173,7 @@ export class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
+  #touchThrottledUntil = 0;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -1682,6 +1683,9 @@ export class Clerk implements ClerkInterface {
 
     this.#pageLifecycle?.onPageFocus(() => {
       if (this.session) {
+        if (this.#touchThrottledUntil > Date.now()) return;
+        this.#touchThrottledUntil = Date.now() + 5_000;
+
         void this.#touchLastActiveSession(this.session);
       }
     });
@@ -1698,6 +1702,7 @@ export class Clerk implements ClerkInterface {
     if (!session || !this.#options.touchSession) {
       return Promise.resolve();
     }
+
     await session.touch().catch(e => {
       if (is4xxError(e)) {
         void this.handleUnauthenticated();

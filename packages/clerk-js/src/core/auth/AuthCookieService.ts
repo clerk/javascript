@@ -113,19 +113,28 @@ export class AuthCookieService {
   private refreshTokenOnFocus() {
     window.addEventListener('focus', () => {
       if (document.visibilityState === 'visible') {
-        void this.refreshSessionToken();
+        // Certain data-fetching libraries that refetch on focus (such as swr) use setTimeout(cb, 0) to schedule a task on the event loop.
+        // This gives us an opportunity to ensure the session cookie is updated with a fresh token before the fetch occurs, but it needs to
+        // be done with a microtask. Promises schedule microtasks, and so by using `updateCookieImmediately: true`, we ensure that the cookie
+        // is updated as part of the scheduled microtask. Our existing event-based mechanism to update the cookie schedules a task, and so the cookie
+        // is updated too late and not guaranteed to be fresh before the refetch occurs.
+        void this.refreshSessionToken({ updateCookieImmediately: true });
       }
     });
   }
 
-  private async refreshSessionToken(): Promise<void> {
+  private async refreshSessionToken({
+    updateCookieImmediately = false,
+  }: {
+    updateCookieImmediately?: boolean;
+  } = {}): Promise<void> {
     if (!this.clerk.session) {
       return;
     }
 
     try {
       const token = await this.clerk.session.getToken();
-      this.updateSessionCookie(token);
+      if (updateCookieImmediately) this.updateSessionCookie(token);
     } catch (e) {
       return this.handleGetTokenError(e);
     }
