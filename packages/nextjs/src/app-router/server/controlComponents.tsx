@@ -9,7 +9,7 @@ import React from 'react';
 import { createGetAuth } from '../../server/createGetAuth';
 import { authAuthHeaderMissing } from '../../server/errors';
 import { isServerActionRequest } from '../../server/standalone-protect';
-import { UserVerificationTrigger } from '../../support-components';
+import { UserVerificationModal, UserVerificationTrigger } from '../../support-components';
 import { auth } from './auth';
 import { buildRequestLike } from './utils';
 
@@ -176,8 +176,37 @@ type AsyncComponentType<P> = (p: P) => JSX.Element | null | Promise<JSX.Element 
 //   },
 // ): any {
 
-type ProtectPropsWithFallback = _ProtectProps & {
-  fallback: React.ComponentType<{ UserVerificationTrigger: typeof UserVerificationTrigger }>;
+// type ProtectPropsWithFallback = _ProtectProps & {
+//   fallback: React.ComponentType<{ UserVerificationTrigger: typeof UserVerificationTrigger }>;
+// };
+
+type ProtectPropsWithFallback = (
+  | {
+      condition?: never;
+      role: OrganizationCustomRoleKey;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission: OrganizationCustomPermissionKey;
+    }
+  | {
+      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
+      role?: never;
+      permission?: never;
+    }
+  | {
+      condition?: never;
+      role?: never;
+      permission?: never;
+    }
+) & {
+  assurance?: {
+    level: 'firstFactor' | 'secondFactor' | 'multiFactor';
+    maxAge: '10m' | '1h' | '4h' | '1d' | '1w';
+    fallback: 'modal' | React.ComponentType<{ UserVerificationTrigger: typeof UserVerificationTrigger }>;
+  };
 };
 
 const protect = <H extends (...args: any) => any>(
@@ -186,12 +215,19 @@ const protect = <H extends (...args: any) => any>(
 ): H => {
   // @ts-ignore
   return async (...args: any[]) => {
-    const { fallback: Fallback, ...restAuthorizedParams } = opts as ProtectPropsWithFallback;
+    const { ...restAuthorizedParams } = opts as ProtectPropsWithFallback;
     const Component = handlerOrComponent as unknown as AsyncComponentType<unknown>;
 
     // if fallback is present we want to return a Server Component
-    if (Fallback) {
-      const unauthorized = Fallback ? <Fallback UserVerificationTrigger={UserVerificationTrigger} /> : null;
+    if (restAuthorizedParams.assurance?.fallback) {
+      const Fallback = restAuthorizedParams.assurance?.fallback;
+
+      const unauthorized =
+        Fallback === 'modal' ? (
+          <UserVerificationModal />
+        ) : Fallback ? (
+          <Fallback UserVerificationTrigger={UserVerificationTrigger} />
+        ) : null;
 
       const authorized = <Component {...args[0]} />;
 

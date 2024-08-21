@@ -1,7 +1,7 @@
 'use client';
 
 import type { ComponentProps } from 'react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { useClerk } from './client-boundary/hooks';
 
@@ -9,6 +9,7 @@ const UserVerificationTrigger = (props: ComponentProps<'button'>): React.JSX.Ele
   const clerk = useClerk();
   return (
     <button
+      {...props}
       type={'button'}
       onClick={() => {
         clerk?.openUserVerification({
@@ -21,4 +22,15 @@ const UserVerificationTrigger = (props: ComponentProps<'button'>): React.JSX.Ele
   );
 };
 
-export { UserVerificationTrigger };
+const UserVerificationModal = (): React.JSX.Element | null => {
+  const clerk = useClerk();
+  useEffect(() => {
+    if (clerk.loaded) {
+      clerk.openUserVerification();
+    }
+  }, [clerk.loaded]);
+
+  return null;
+};
+
+export { UserVerificationTrigger, UserVerificationModal };

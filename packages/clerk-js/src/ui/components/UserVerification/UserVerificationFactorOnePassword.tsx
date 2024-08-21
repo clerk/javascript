@@ -36,7 +36,7 @@ export function UserVerificationFactorOnePasswordCard(): JSX.Element {
             await session?.getToken({ skipCache: true });
             return setActive({ session: session?.id });
           case 'needs_second_factor':
-            return navigate('../factor-two');
+            return navigate('./factor-two');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

@@ -49,6 +49,7 @@ export {
   useSignIn,
   useSignUp,
   useUser,
+  useAssurance,
 } from './client-boundary/hooks';
 
 /**
