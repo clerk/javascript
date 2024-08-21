@@ -112,10 +112,8 @@ export const createProtect = (opts: {
 
 const isServerActionRequest = (req: Request) => {
   return (
-    !!req.headers.get(nextConstants.Headers.NextUrl) &&
-    (req.headers.get(constants.Headers.Accept)?.includes('text/x-component') ||
-      req.headers.get(constants.Headers.ContentType)?.includes('multipart/form-data') ||
-      !!req.headers.get(nextConstants.Headers.NextAction))
+    req.headers.get(constants.Headers.Accept)?.includes('text/x-component') &&
+    !!req.headers.get(nextConstants.Headers.NextAction)
   );
 };
 
@@ -130,18 +128,35 @@ const isPageRequest = (req: Request): boolean => {
 };
 
 const isAppRouterInternalNavigation = (req: Request) =>
-  (!!req.headers.get(nextConstants.Headers.NextUrl) && !isServerActionRequest(req)) || isPagePathAvailable();
+  // The header `next-url` has been dropped since next@14.2.2
+  (!!req.headers.get(nextConstants.Headers.NextUrl) || isAppPageRoute(getPagePathAvailable())) &&
+  !isServerActionRequest(req);
 
-const isPagePathAvailable = () => {
+/**
+ * Detects usage inside a page.tsx file in App Router
+ * Found in the Next.js repo
+ * https://github.com/vercel/next.js/blob/0ac10d79720cc950df96bd9d4958c9be0c075b6f/packages/next/src/lib/is-app-page-route.ts
+ */
+export function isAppPageRoute(route: string): boolean {
+  return route.endsWith('/page');
+}
+
+/**
+ * Detects usage inside a route.tsx file in App Router
+ * Found in the Next.js repo
+ * github.com/vercel/next.js/blob/0ac10d79720cc950df96bd9d4958c9be0c075b6f/packages/next/src/lib/is-app-route-route.ts
+ * In case we want to handle router handlers and server actions differently in the future
+ */
+// export function isAppRouteRoute(route: string): boolean {
+//   return route.endsWith('/route');
+// }
+
+/**
+ * Returns a string that can either end with `/page` or `/route` indicating that the code run in the context of a page or a route handler.
+ */
+const getPagePathAvailable = () => {
   const __fetch = globalThis.fetch;
-  return Boolean(isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore()?.pagePath : false);
+  return isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore()?.pagePath || '' : '';
 };
 
 const isPagesRouterInternalNavigation = (req: Request) => !!req.headers.get(nextConstants.Headers.NextjsData);
-
-// /**
-//  * In case we want to handle router handlers and server actions differently in the future
-//  */
-// const isApiRouteRequest = (req: Request) => {
-//   return !isPageRequest(req) && !isServerActionRequest(req);
-// };
