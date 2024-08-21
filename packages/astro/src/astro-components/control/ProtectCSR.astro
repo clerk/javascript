@@ -1,19 +1,24 @@
 ---
 import type { ProtectProps } from '../../types';
 
-type Props = Omit<ProtectProps, 'condition'>;
+type Props = Omit<ProtectProps, 'condition'> & {
+  class?: string;
+  defaultSlotWrapperClass?: string;
+  fallbackSlotWrapperClass?: string;
+};
 
-const { role, permission } = Astro.props;
+const { role, permission, class: className, defaultSlotWrapperClass, fallbackSlotWrapperClass } = Astro.props;
 ---
 
 <clerk-protect
   data-role={role}
   data-permission={permission}
+  class={className}
 >
-  <div hidden data-clerk-control-slot-default>
+  <div class={defaultSlotWrapperClass} hidden data-clerk-control-slot-default>
     <slot />
   </div>
-  <div hidden data-clerk-control-slot-fallback>
+  <div class={fallbackSlotWrapperClass} hidden data-clerk-control-slot-fallback>
     <slot name="fallback" />
   </div>
 </clerk-protect>
@@ -50,9 +55,3 @@ class ClerkProtect extends BaseClerkControlElement {
 
 customElements.define('clerk-protect', ClerkProtect);
 </script>
-
-<style>
-  clerk-protect [hidden] {
-    display: none !important;
-  }
-</style>

@@ -7,6 +7,21 @@ import type { ProtectProps } from '../../types';
 
 type Props = ProtectProps & {
   isStatic?: boolean
+  /**
+   * The class name to apply to the outermost element of the component.
+   * This class is only applied to static components.
+   */
+  class?: string;
+  /**
+   * The class name to apply to the wrapper element of the default slot.
+   * This class is only applied to static components.
+   */
+  defaultSlotWrapperClass?: string;
+  /**
+   * The class name to apply to the wrapper element of the fallback slot.
+   * This class is only applied to static components.
+   */
+  fallbackSlotWrapperClass?: string;
 }
 
 const { isStatic, ...props } = Astro.props;

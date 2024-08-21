@@ -1,4 +1,12 @@
-<clerk-signed-out hidden>
+---
+type Props = {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<clerk-signed-out class={className} hidden>
   <slot />
 </clerk-signed-out>
 
@@ -17,9 +25,3 @@ class ClerkSignedOut extends BaseClerkControlElement {
 
 customElements.define('clerk-signed-out', ClerkSignedOut);
 </script>
-
-<style>
-  clerk-signed-out[hidden] {
-    display: none !important;
-  }
-</style>
