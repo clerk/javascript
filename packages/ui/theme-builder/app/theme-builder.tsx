@@ -5,10 +5,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { ColorPicker } from './color-picker';
+import { Logo } from './components/logo';
 import { generateColors, getPreviewStyles } from './generate-colors';
 import { ThemeDialog } from './theme-dialog';
 import { ToggleGroup } from './toggle-group';
-import { Logo } from './components/logo';
 
 const lightAccentDefault = '#6C47FF';
 const lightGrayDefault = '#2f3037';
@@ -85,7 +85,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           __html: css,
         }}
       />
-      <div className='z-1 pointer-events-none fixed inset-x-0 top-0 z-50 h-[calc(theme(size.1)-theme(ringWidth.1))] bg-neutral-100'></div>
+      <div className='z-1 pointer-events-none fixed inset-x-0 top-0 z-50 h-[calc(theme(size.1)-theme(ringWidth.1))] bg-neutral-100' />
       <div
         className={cx(
           'm-1 mb-0 grid h-[calc(100dvh-theme(size.1))] grid-cols-[min-content,minmax(0,1fr)] grid-rows-[min-content,minmax(0,1fr)] overflow-hidden rounded-t-xl bg-white ring-1 ring-neutral-900/[0.075]',
@@ -138,7 +138,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <aside className='relative isolate flex h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4'>
+        <aside className='relative isolate hidden h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4 sm:flex'>
           <div className='space-y-4'>
             <ToggleGroup
               label='Appearance'
@@ -296,7 +296,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
         </aside>
 
         <figure
-          className={cx('relative isolate grid items-center overflow-y-auto p-8', {
+          className={cx('relative isolate grid items-center overflow-y-auto p-8 max-sm:[grid-column:1/-1]', {
             'bg-white': appearance === 'light',
             'dark bg-neutral-950': appearance === 'dark',
           })}
