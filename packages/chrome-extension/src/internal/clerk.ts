@@ -84,26 +84,21 @@ export async function createClerkClient({
   // Append appropriate query params to all Clerk requests
   clerk.__unstable__onBeforeRequest(async requestInit => {
     requestInit.credentials = 'omit';
+    requestInit.url?.searchParams.append('_is_native', '1');
 
     const currentJWT = await jwt.get();
-
     if (!currentJWT) {
-      requestInit.url?.searchParams.append('_is_native', '1');
       return;
     }
 
-    if (isProd) {
-      requestInit.url?.searchParams.append('_is_native', '1');
-      (requestInit.headers as Headers).set('authorization', `Bearer ${currentJWT}`);
-    } else {
-      requestInit.url?.searchParams.append('__clerk_db_jwt', currentJWT);
-    }
+    (requestInit.headers as Headers).set('authorization', `Bearer ${currentJWT}`);
   });
 
   // Store updated JWT in StorageCache on Clerk responses
   clerk.__unstable__onAfterResponse(async (_, response) => {
-    const authHeaderkey = isProd ? AUTH_HEADER.production : AUTH_HEADER.development;
-    const authHeader = response?.headers.get(authHeaderkey);
+    const authHeader = response
+      ? response.headers.get(AUTH_HEADER.production) || response.headers.get(AUTH_HEADER.development)
+      : null;
 
     if (authHeader?.startsWith('Bearer')) {
       const newJWT = authHeader.split(' ')[1] || undefined;
