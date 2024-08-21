@@ -2,4 +2,4 @@
 "@clerk/tanstack-start": minor
 ---
 
-Add out-of-the-box support for the TanStack Router.
+Add support for path based routing and TanStack Router only apps
