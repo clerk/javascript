@@ -18,7 +18,7 @@ export const Root = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
       className={cx(
         '[--field-input-height:1.875rem]',
         '[--field-input-px:theme(spacing.3)]',
-        '[--field-input-py:theme(spacing[1.5])]',
+        '[--field-input-py:theme(spacing.1)]',
         '[--field-input-group-end-size:--field-input-height]',
         'has-[[data-field-checkbox]]:[--cl-field-label-cursor:pointer]',
         'has-[[data-field-input][disabled]]:[--cl-field-label-opacity:0.5]',
@@ -172,10 +172,10 @@ export const Input = React.forwardRef(function FieldInput(
         // If an `InputGroup` exists, use the `pe` value, or fallback to the
         // standard input `px` value
         'pe-[var(--field-input-group-pe,var(--field-input-px))]',
-        'text-gray-12 relative flex min-w-0 items-center rounded-md bg-white text-base outline-none ring ring-offset-1',
+        'text-gray-12 relative flex min-h-[1.875rem] min-w-0 items-center rounded-md bg-white text-base outline-none ring ring-offset-1',
         'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
-        'supports-ios:!bg-red-500',
+        'supports-ios:text-[length:1rem]',
         // variant
         {
           default: 'w-full justify-start',
