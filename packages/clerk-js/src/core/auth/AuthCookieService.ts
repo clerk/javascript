@@ -134,7 +134,9 @@ export class AuthCookieService {
 
     try {
       const token = await this.clerk.session.getToken();
-      if (updateCookieImmediately) this.updateSessionCookie(token);
+      if (updateCookieImmediately) {
+        this.updateSessionCookie(token);
+      }
     } catch (e) {
       return this.handleGetTokenError(e);
     }

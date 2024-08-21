@@ -1683,7 +1683,9 @@ export class Clerk implements ClerkInterface {
 
     this.#pageLifecycle?.onPageFocus(() => {
       if (this.session) {
-        if (this.#touchThrottledUntil > Date.now()) return;
+        if (this.#touchThrottledUntil > Date.now()) {
+          return;
+        }
         this.#touchThrottledUntil = Date.now() + 5_000;
 
         void this.#touchLastActiveSession(this.session);
