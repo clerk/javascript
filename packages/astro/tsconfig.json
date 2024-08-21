@@ -24,5 +24,14 @@
     "declarationDir": "dist/types",
     "noUncheckedIndexedAccess": true
   },
-  "exclude": ["dist", "build", "node_modules"]
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules",
+    // We're ignoring the files below because they are published and is not processed/bundled with tsup.
+    // This cause TS to throw errors even though we're not bundling it.
+    "src/astro-components/index.ts",
+    "src/astro-components/interactive/UserButton/index.ts",
+    "src/astro-components/control/BaseClerkControlElement.ts",
+  ]
 }
