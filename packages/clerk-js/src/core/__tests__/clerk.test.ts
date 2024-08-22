@@ -154,21 +154,21 @@ describe('Clerk singleton', () => {
       remove: jest.fn(),
       status: 'active',
       user: {},
-      touch: jest.fn(),
+      touch: jest.fn(() => Promise.resolve()),
       getToken: jest.fn(),
       lastActiveToken: { getRawString: () => 'mocked-token' },
     };
-    let evenBusSpy;
+    let eventBusSpy;
 
     beforeEach(() => {
-      evenBusSpy = jest.spyOn(eventBus, 'dispatch');
+      eventBusSpy = jest.spyOn(eventBus, 'dispatch');
     });
 
     afterEach(() => {
       mockSession.remove.mockReset();
       mockSession.touch.mockReset();
 
-      evenBusSpy?.mockRestore();
+      eventBusSpy?.mockRestore();
       // cleanup global window pollution
       (window as any).__unstable__onBeforeSetActive = null;
       (window as any).__unstable__onAfterSetActive = null;
@@ -183,12 +183,12 @@ describe('Clerk singleton', () => {
       await sut.setActive({ session: null });
       await waitFor(() => {
         expect(mockSession.touch).not.toHaveBeenCalled();
-        expect(evenBusSpy).toHaveBeenCalledWith('token:update', { token: null });
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: null });
       });
     });
 
     it('calls session.touch by default', async () => {
-      mockSession.touch.mockReturnValueOnce(Promise.resolve());
+      mockSession.touch.mockReturnValue(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
       const sut = new Clerk(productionPublishableKey);
@@ -236,7 +236,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
       (window as any).__unstable__onBeforeSetActive = () => {
-        expect(evenBusSpy).toHaveBeenCalledWith('token:update', { token: null });
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: null });
       };
 
       const sut = new Clerk(productionPublishableKey);
@@ -249,7 +249,7 @@ describe('Clerk singleton', () => {
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
 
       (window as any).__unstable__onBeforeSetActive = () => {
-        expect(evenBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
+        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
       };
 
       const sut = new Clerk(productionPublishableKey);

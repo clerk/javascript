@@ -13,20 +13,33 @@ type DeepJestMocked<T> = T extends FunctionLike
       }
     : T;
 
-const mockProp = <T>(obj: T, k: keyof T) => {
+type MockMap<T = any> = {
+  [K in { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T]]?: jest.Mock<
+    // @ts-expect-error -- the typing seems to be working in practice
+    T[K]
+  >;
+};
+
+const mockProp = <T>(obj: T, k: keyof T, mocks?: MockMap) => {
   if (typeof obj[k] === 'function') {
     // @ts-ignore
-    obj[k] = jest.fn();
+    obj[k] = mocks?.[k] ?? jest.fn();
   }
 };
 
-const mockMethodsOf = <T extends Record<string, any> | null = any>(obj: T, options?: { exclude: (keyof T)[] }) => {
+const mockMethodsOf = <T extends Record<string, any> | null = any>(
+  obj: T,
+  options?: {
+    exclude: (keyof T)[];
+    mocks: MockMap<T>;
+  },
+) => {
   if (!obj) {
     return;
   }
   Object.keys(obj)
     .filter(key => !options?.exclude.includes(key as keyof T))
-    .forEach(k => mockProp(obj, k));
+    .forEach(k => mockProp(obj, k, options?.mocks));
 };
 
 export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk> => {
@@ -36,6 +49,9 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepJestMocked<LoadedClerk
   clerk.client.sessions.forEach(session => {
     mockMethodsOf(session, {
       exclude: ['checkAuthorization'],
+      mocks: {
+        touch: jest.fn(() => Promise.resolve(session)),
+      },
     });
     mockMethodsOf(session.user);
     session.user?.emailAddresses.forEach(m => mockMethodsOf(m));
