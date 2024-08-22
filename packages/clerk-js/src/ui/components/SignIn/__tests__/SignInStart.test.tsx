@@ -386,15 +386,15 @@ describe('SignInStart', () => {
         value: { replaceState: jest.fn() },
       });
 
-      await act(() =>
-        render(
-          <CardStateProvider>
-            <SignInStart />
-          </CardStateProvider>,
-          { wrapper },
-        ),
+      render(
+        <CardStateProvider>
+          <SignInStart />
+        </CardStateProvider>,
+        { wrapper },
       );
-      expect(fixtures.signIn.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' });
+      await waitFor(() =>
+        expect(fixtures.signIn.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
+      );
 
       // don't remove the ticket quite yet
       expect(window.history.replaceState).not.toHaveBeenCalledWith(
@@ -420,13 +420,14 @@ describe('SignInStart', () => {
         value: { replaceState: jest.fn() },
       });
 
-      await act(() =>
-        render(
-          <CardStateProvider>
-            <SignInStart />
-          </CardStateProvider>,
-          { wrapper },
-        ),
+      render(
+        <CardStateProvider>
+          <SignInStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+      await waitFor(() =>
+        expect(fixtures.signIn.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
       );
 
       expect(window.history.replaceState).toHaveBeenCalledWith(

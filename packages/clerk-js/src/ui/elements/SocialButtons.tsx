@@ -195,7 +195,7 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
   );
 });
 
-const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
+const SocialButtonBlock = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButtonElement> | null): JSX.Element => {
   const { id, icon, isLoading, label, textLocalizationKey, ...rest } = props;
   const isIconElement = isValidElement(icon);
 
@@ -206,6 +206,7 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
       variant='outline'
       block
       isLoading={isLoading}
+      ref={ref}
       {...rest}
       sx={theme => [
         {
@@ -266,4 +267,4 @@ const SocialButtonBlock = (props: SocialButtonProps): JSX.Element => {
       </Flex>
     </SimpleButton>
   );
-};
+});

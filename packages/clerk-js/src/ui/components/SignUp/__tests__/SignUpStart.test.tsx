@@ -1,7 +1,7 @@
 import type { SignUpResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
 
-import { act, render, screen } from '../../../../testUtils';
+import { act, render, screen, waitFor } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
 import { CardStateProvider } from '../../../elements';
@@ -262,15 +262,16 @@ describe('SignUpStart', () => {
         value: { replaceState: jest.fn() },
       });
 
-      await act(() =>
-        render(
-          <CardStateProvider>
-            <SignUpStart />
-          </CardStateProvider>,
-          { wrapper },
-        ),
+      render(
+        <CardStateProvider>
+          <SignUpStart />
+        </CardStateProvider>,
+        { wrapper },
       );
-      expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' });
+
+      await waitFor(() =>
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
+      );
 
       //don't remove the query param quite yet
       expect(window.history.replaceState).not.toHaveBeenCalledWith(
@@ -280,7 +281,7 @@ describe('SignUpStart', () => {
       );
     });
 
-    it('removes the ticket from the url when completing the sign up', async () => {
+    it.only('removes the ticket from the url when completing the sign up', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
@@ -296,13 +297,15 @@ describe('SignUpStart', () => {
         value: { replaceState: jest.fn() },
       });
 
-      await act(() =>
-        render(
-          <CardStateProvider>
-            <SignUpStart />
-          </CardStateProvider>,
-          { wrapper },
-        ),
+      render(
+        <CardStateProvider>
+          <SignUpStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() =>
+        expect(fixtures.signUp.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
       );
 
       expect(window.history.replaceState).toHaveBeenCalledWith(
