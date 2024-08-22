@@ -30,11 +30,6 @@ export type PartialTheme = Record<DescriptorIdentifier, PartialDescriptor>;
 export type ParsedElementsFragment = Partial<PartialTheme>;
 
 /**
- * A full theme, minus generated descriptors.
- */
-export type PartialParsedElements = Record<DescriptorIdentifier, Omit<ParsedDescriptor, 'descriptor'>>;
-
-/**
  * A full theme, complete with descriptors. This is the value returned from useAppearance().parsedAppearance, and is
  * the main type interacted with within components.
  */
@@ -43,7 +38,8 @@ export type ParsedLayout = Required<Layout>;
 
 type ElementsAppearanceConfig = string | (React.CSSProperties & { className?: string });
 
-export type Appearance = Omit<CurrentAppearance, 'elements'> & {
+export type Appearance = Omit<CurrentAppearance, 'elements' | 'baseTheme'> & {
+  theme?: ParsedElements;
   elements?: Record<DescriptorIdentifier, ElementsAppearanceConfig>;
 };
 
@@ -57,6 +53,7 @@ export type AppearanceCascade = {
  * appearance values, and as such will always have a value for a given key.
  */
 export type ParsedAppearance = {
+  theme: ParsedElements;
   elements: ParsedElements;
   layout: ParsedLayout;
 };
@@ -74,6 +71,8 @@ type AppearanceContextValue = {
    * ```
    */
   parsedAppearance: ParsedAppearance;
+  themelessAppearance: Appearance | null;
+  theme?: ParsedElements;
 };
 
 /**
@@ -119,6 +118,83 @@ export function mergeDescriptors(...descriptors: (ParsedDescriptor | boolean)[])
   );
 }
 
+function mergeElementsAppearanceConfig(
+  a: ElementsAppearanceConfig,
+  b: ElementsAppearanceConfig,
+): ElementsAppearanceConfig {
+  let result: ElementsAppearanceConfig | undefined;
+  if (typeof a === 'string' && typeof b === 'string') {
+    result = [a, b].join(' ');
+  } else if (typeof a === 'string' && typeof b === 'object') {
+    result = { ...b };
+    result.className = [result.className, a].join(' ');
+  } else if (typeof a === 'object' && typeof b === 'string') {
+    result = { ...a };
+    result.className = [result.className, b].join(' ');
+  } else if (typeof a === 'object' && typeof b === 'object') {
+    result = { ...a, ...b, className: [a.className, b.className].join(' ') };
+  }
+
+  if (!result) {
+    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${a} and ${b}`);
+  }
+
+  return result;
+}
+
+function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null | undefined): Appearance | null {
+  if (!a && !b) return null;
+  if (!a) return b!;
+  if (!b) return a!;
+
+  const result = { ...a, theme: b.theme, layout: { ...a.layout, ...b.layout } };
+
+  if (!result.elements && b.elements) {
+    result.elements = { ...b.elements };
+  } else if (result.elements && b.elements) {
+    Object.entries(b.elements).forEach(([element, config]) => {
+      const el = element as DescriptorIdentifier;
+      if (el in result.elements!) {
+        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el], config);
+      } else {
+        result.elements![el] = config;
+      }
+    });
+  }
+
+  return result;
+}
+
+function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | null): ParsedAppearance {
+  const baseTheme = theme ?? fullTheme;
+  if (!appearance) return { theme: baseTheme, elements: baseTheme, layout: defaultAppearance.layout };
+
+  const result = {
+    theme: baseTheme,
+    elements: { ...baseTheme },
+    layout: { ...defaultAppearance.layout, ...appearance.layout },
+  };
+
+  if (appearance.elements) {
+    Object.entries(appearance.elements).forEach(([element, config]) => {
+      const el = element as DescriptorIdentifier;
+      if (el in appearance.elements!) {
+        if (typeof config === 'string') {
+          result.elements[el].className = [result.elements[el].className, config].join(' ');
+        } else {
+          const { className, ...style } = config;
+          if (className) {
+            result.elements[el].className = [result.elements[el].className, className].join(' ');
+          }
+          result.elements[el].style = { ...result.elements[el].style, ...style };
+        }
+      }
+    });
+  }
+
+  return result;
+}
+
 function mergeAppearenceElementsAndParsedAppearanceElements(
   defaultAppearance: ParsedAppearance,
   parsedAppearance?: ParsedAppearance,
@@ -156,39 +232,39 @@ function mergeAppearenceElementsAndParsedAppearanceElements(
   return mergedElements;
 }
 
+const defaultAppearance: ParsedAppearance = {
+  theme: fullTheme,
+  elements: fullTheme,
+  layout: {
+    logoPlacement: 'inside',
+    socialButtonsPlacement: 'top',
+    socialButtonsVariant: 'auto',
+    logoImageUrl: '',
+    logoLinkUrl: '',
+    showOptionalFields: true,
+    helpPageUrl: '',
+    privacyPageUrl: '',
+    termsPageUrl: '',
+    shimmer: true,
+    animations: true,
+    unsafe_disableDevelopmentModeWarnings: false,
+  },
+};
+
 /**
  * Given a `globalAppearance` and `appearance` value, calculate a resulting `ParsedAppearance` that factors in both
  * defaults and provided values.
  */
-function parseAppearance(props: AppearanceCascade): ParsedAppearance {
-  const defaultAppearance: ParsedAppearance = {
-    elements: fullTheme,
-    layout: {
-      logoPlacement: 'inside',
-      socialButtonsPlacement: 'top',
-      socialButtonsVariant: 'auto',
-      logoImageUrl: '',
-      logoLinkUrl: '',
-      showOptionalFields: true,
-      helpPageUrl: '',
-      privacyPageUrl: '',
-      termsPageUrl: '',
-      shimmer: true,
-      animations: true,
-      unsafe_disableDevelopmentModeWarnings: false,
-    },
-  };
-
+function parseAppearance(
+  props: AppearanceCascade,
+  theme: ParsedAppearance | undefined = defaultAppearance,
+): ParsedAppearance {
   const appearance = {
-    ...defaultAppearance,
+    ...theme,
     // This is a plain object, so we can use spread operations to override values in order of priority.
-    layout: { ...defaultAppearance.layout, ...props.globalAppearance?.layout, ...props.appearance?.layout },
+    layout: { ...theme.layout, ...props.globalAppearance?.layout, ...props.appearance?.layout },
     // The `elements` prop is more complicated, so we use a dedicated function to handle that logic
-    elements: mergeAppearenceElementsAndParsedAppearanceElements(
-      defaultAppearance,
-      props.globalAppearance,
-      props.appearance,
-    ),
+    elements: mergeAppearenceElementsAndParsedAppearanceElements(theme, props.globalAppearance, props.appearance),
   };
 
   return appearance;
@@ -197,7 +273,7 @@ function parseAppearance(props: AppearanceCascade): ParsedAppearance {
 const [AppearanceContext, useAppearance, usePartialAppearance] =
   createContextAndHook<AppearanceContextValue>('AppearanceContext');
 
-type AppearanceProviderProps = React.PropsWithChildren<{ appearance?: Appearance }>;
+type AppearanceProviderProps = React.PropsWithChildren<{ appearance?: Appearance; theme?: ParsedElements }>;
 
 /**
  * Used to provide appearance values throughout an application. In typical usage, the entire application will be
@@ -208,16 +284,19 @@ type AppearanceProviderProps = React.PropsWithChildren<{ appearance?: Appearance
 const AppearanceProvider = (props: AppearanceProviderProps) => {
   // Access the parsedAppearance of the parent context provider. `undefined` if this is the top-most
   // AppearanceProvider.
-  const { parsedAppearance: globalAppearance } = usePartialAppearance();
+  const {
+    parsedAppearance: globalAppearance,
+    themelessAppearance: globalThemelessAppearance,
+    theme: globalTheme,
+  } = usePartialAppearance();
 
   const ctxValue = useDeepEqualMemo(() => {
-    const parsedAppearance = parseAppearance({
-      appearance: props.appearance,
-      globalAppearance: globalAppearance,
-    });
+    const theme = props.theme ?? globalTheme;
+    const themelessAppearance = mergeAppearance(globalThemelessAppearance, props.appearance);
+    const parsedAppearance = applyTheme(theme, themelessAppearance);
 
-    return { value: { parsedAppearance } };
-  }, [props.appearance, globalAppearance]);
+    return { value: { parsedAppearance, themelessAppearance, theme: props.theme ?? globalTheme } };
+  }, [props.appearance, props.theme, globalAppearance, globalThemelessAppearance, globalTheme]);
 
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
 };
