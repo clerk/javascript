@@ -2,7 +2,7 @@ import type { SignInResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
 
-import { act, fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
+import { fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
 import { CardStateProvider } from '../../../elements';
