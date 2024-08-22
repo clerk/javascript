@@ -362,9 +362,12 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls
-      .ensureMounted({ preloadHint: 'SignIn' })
-      .then(controls => controls.openModal('signIn', props || {}));
+    void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
+      controls.openModal('signIn', {
+        ...props,
+        forceRedirectUrl: props.forceRedirectUrl || window.location.href,
+      }),
+    );
   };
 
   public closeSignIn = (): void => {
@@ -382,9 +385,12 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls
-      .ensureMounted({ preloadHint: 'SignUp' })
-      .then(controls => controls.openModal('signUp', props || {}));
+    void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
+      controls.openModal('signUp', {
+        ...props,
+        forcedRedirectUrl: props.forcedRedirectUrl || window.location.href,
+      }),
+    );
   };
 
   public closeSignUp = (): void => {
