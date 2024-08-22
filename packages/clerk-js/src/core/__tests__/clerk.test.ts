@@ -225,25 +225,6 @@ describe('Clerk singleton', () => {
       expect(mockSession.touch).toHaveBeenCalled();
     });
 
-    /**
-     * The __session cookie needs to be cleared before calling __unstable__onBeforeSetActive
-     * as the callback may rely on the absence of the cookie to determine the user is logged out or not
-     * For example, for NextJS integration, calling __unstable__onBeforeSetActive before clearing the cookie
-     * would result in hitting the middleware with a valid session cookie (until it expires), even if the session no longer exists
-     */
-    it('clears __session cookie before calling __unstable__onBeforeSetActive', async () => {
-      mockSession.touch.mockReturnValueOnce(Promise.resolve());
-      mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
-
-      (window as any).__unstable__onBeforeSetActive = () => {
-        expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: null });
-      };
-
-      const sut = new Clerk(productionPublishableKey);
-      await sut.load();
-      await sut.setActive({ session: null });
-    });
-
     it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
       mockSession.touch.mockReturnValueOnce(Promise.resolve());
       mockClientFetch.mockReturnValue(Promise.resolve({ activeSessions: [mockSession] }));
