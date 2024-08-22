@@ -33,7 +33,7 @@ export async function getMetamaskIdentifier(): Promise<string> {
 export type GenerateSignatureParams = {
   identifier: string;
   nonce: string;
-  provider: 'metamask' | 'coinbase';
+  provider?: 'metamask' | 'coinbase';
 };
 
 export async function generateSignatureWithMetamask({ identifier, nonce }: GenerateSignatureParams): Promise<string> {

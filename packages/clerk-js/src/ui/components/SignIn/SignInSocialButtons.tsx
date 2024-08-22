@@ -30,7 +30,7 @@ export const SignInSocialButtons = React.memo((props: SocialButtonsProps) => {
       }}
       web3Callback={strategy => {
         return clerk
-          .authenticateWithMetamask({
+          .authenticateWithWeb3({
             customNavigate: navigate,
             redirectUrl: redirectUrlComplete,
             signUpContinueUrl: ctx.signUpContinueUrl,

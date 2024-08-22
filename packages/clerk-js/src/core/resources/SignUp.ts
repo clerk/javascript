@@ -10,7 +10,8 @@ import type {
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
-  SignUpAuthenticateWithMetamaskParams,
+  PrepareWeb3WalletVerificationParams,
+  SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
   SignUpIdentificationField,
@@ -20,7 +21,6 @@ import type {
   SignUpUnsafeMetadata,
   SignUpUpdateParams,
   StartEmailLinkFlowParams,
-  Web3Strategy,
 } from '@clerk/types';
 
 import { generateSignatureWithWeb3, getWeb3Identifier, windowNavigate } from '../../utils';
@@ -172,8 +172,8 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptVerification({ ...params, strategy: 'phone_code' });
   };
 
-  prepareWeb3WalletVerification = (strategy: Web3Strategy): Promise<SignUpResource> => {
-    return this.prepareVerification({ strategy });
+  prepareWeb3WalletVerification = (params?: PrepareWeb3WalletVerificationParams): Promise<SignUpResource> => {
+    return this.prepareVerification(params || { strategy: 'web3_metamask_signature' });
   };
 
   attemptWeb3WalletVerification = async (params: AttemptWeb3WalletVerificationParams): Promise<SignUpResource> => {
@@ -185,7 +185,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
   ): Promise<SignUpResource> => {
     const { identifier, unsafeMetadata, provider } = params || {};
-    const strategy = `web3_${provider}_signature`;
+    const strategy = provider ? `web3_${provider}_signature` : 'web3_metamask_signature';
     const web3Wallet = identifier || this.web3wallet!;
     await this.create({ web3Wallet, unsafeMetadata });
     await this.prepareWeb3WalletVerification(strategy);
@@ -202,7 +202,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   public authenticateWeb3Provider = async (
     provider: 'metamask' | 'coinbase',
-    params?: SignUpAuthenticateWithMetamaskParams,
+    params?: SignUpAuthenticateWithWeb3Params,
   ): Promise<SignUpResource> => {
     const identifier = await getWeb3Identifier(provider);
     return this.authenticateWithWeb3({
@@ -211,11 +211,11 @@ export class SignUp extends BaseResource implements SignUpResource {
       provider,
     });
   };
-  public authenticateWithMetamask = async (params?: SignUpAuthenticateWithMetamaskParams): Promise<SignUpResource> => {
+  public authenticateWithMetamask = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
     return this.authenticateWeb3Provider('metamask', params);
   };
 
-  public authenticateWithCoinbase = async (params?: SignUpAuthenticateWithMetamaskParams): Promise<SignUpResource> => {
+  public authenticateWithCoinbase = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
     return this.authenticateWeb3Provider('coinbase', params);
   };
 

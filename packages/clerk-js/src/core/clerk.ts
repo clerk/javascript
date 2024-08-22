@@ -19,6 +19,7 @@ import type {
   ActiveSessionResource,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
+  AuthenticateWithWeb3Params,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkOptions,
@@ -1321,34 +1322,31 @@ export class Clerk implements ClerkInterface {
       }) as Promise<SignInResource | SignUpResource>;
   };
 
-  public authenticateWithMetamask = async ({
+  public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({ ...props, strategy: 'web3_metamask_signature' });
+  };
+
+  public authenticateWithWeb3 = async ({
     redirectUrl,
     signUpContinueUrl,
     customNavigate,
     unsafeMetadata,
     strategy,
-  }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+  }: AuthenticateWithWeb3Params = {}): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
     }
-
+    const provider =
+      (strategy === 'web3_metamask_signature' && 'metamask') || (strategy === 'web3_coinbase_signature' && 'coinbase');
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
-      if (strategy === 'web3_metamask_signature') {
-        signInOrSignUp = await this.client.signIn.authenticateWithMetamask();
-      } else {
-        signInOrSignUp = await this.client.signIn.authenticateWithCoinbase();
-      }
+      signInOrSignUp = await this.client.signIn.authenticateWeb3Provider(provider);
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
-        if (strategy === 'web3_metamask_signature') {
-          signInOrSignUp = await this.client.signUp.authenticateWithMetamask({ unsafeMetadata });
-        } else {
-          signInOrSignUp = await this.client.signUp.authenticateWithCoinbase({ unsafeMetadata });
-        }
+        signInOrSignUp = await this.client.signUp.authenticateWeb3Provider({ unsafeMetadata, provider });
 
         if (
           signUpContinueUrl &&

@@ -227,7 +227,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
     const { identifier, provider } = params || {};
-    const strategy = `web3_${provider}_signature`;
+    const strategy = provider ? `web3_${provider}_signature` : 'web3_metamask_signature';
 
     if (!(typeof generateSignatureWithWeb3 === 'function')) {
       clerkMissingOptionError('generateSignature');
