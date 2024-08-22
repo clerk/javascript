@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.8.0
+
+### Minor Changes
+
+- Add `deleteUserProfileImage` method to the UserAPI class. ([#3991](https://github.com/clerk/javascript/pull/3991)) by [@octoper](https://github.com/octoper)
+
 ## 1.7.0
 
 ### Minor Changes
