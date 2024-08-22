@@ -120,6 +120,9 @@ export interface SessionVerificationJSON extends ClerkResourceJSON {
   first_factor_verification: VerificationJSON;
   session: SessionJSON;
   second_factor_verification: VerificationJSON;
+  level: 'L1.firstFactor' | 'L2.secondFactor' | 'L3.multiFactor';
+  supported_first_factors: SignInFirstFactorJSON[];
+  supported_second_factors: SignInSecondFactorJSON[];
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {

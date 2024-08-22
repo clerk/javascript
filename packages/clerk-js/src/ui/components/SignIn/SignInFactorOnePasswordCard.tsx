@@ -1,6 +1,5 @@
 import { isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { ResetPasswordCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -16,7 +15,7 @@ import { useResetPasswordFactor } from './useResetPasswordFactor';
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
-  onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
+  // onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
   onPasswordPwned?: () => void;
 };
 

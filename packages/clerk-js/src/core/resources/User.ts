@@ -1,4 +1,5 @@
 import type {
+  AttemptFirstFactorParams,
   BackupCodeJSON,
   BackupCodeResource,
   CreateEmailAddressParams,
@@ -8,6 +9,8 @@ import type {
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
+  EmailCodeConfig,
+  EmailLinkConfig,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetOrganizationMemberships,
@@ -15,8 +18,11 @@ import type {
   GetUserOrganizationSuggestionsParams,
   ImageResource,
   OrganizationMembershipResource,
+  PassKeyConfig,
   PasskeyResource,
+  PhoneCodeConfig,
   PhoneNumberResource,
+  PrepareFirstFactorParams,
   RemoveUserPasswordParams,
   SamlAccountResource,
   SessionVerificationJSON,
@@ -35,6 +41,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
+import { clerkInvalidStrategy } from '../errors';
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
@@ -244,8 +251,10 @@ export class User extends BaseResource implements UserResource {
 
   verifySession = async ({
     level,
+    maxAge,
   }: {
     level: 'L1.firstFactor' | 'L2.secondFactor' | 'L3.multiFactor';
+    maxAge: 'A1.10min' | 'A2.1hr' | 'A3.4hr' | 'A4.1day' | 'A5.1wk';
   }): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
@@ -253,6 +262,7 @@ export class User extends BaseResource implements UserResource {
         path: `/me/sessions/${User.clerk.session?.id}/verify`,
         body: {
           level,
+          maxAge,
         } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
@@ -260,19 +270,70 @@ export class User extends BaseResource implements UserResource {
     return new SessionVerification(json);
   };
 
-  verifySessionAttemptFirstFactor = async ({
-    password,
-  }: {
-    password: string;
-  }): Promise<SessionVerificationResource> => {
+  // TODO: Is this the correct types or only a few are allowed ?
+  verifySessionPrepareFirstFactor = async (factor: PrepareFirstFactorParams): Promise<SessionVerificationResource> => {
+    let config;
+    switch (factor.strategy) {
+      case 'passkey':
+        config = {} as PassKeyConfig;
+        break;
+      case 'email_link':
+        config = {
+          emailAddressId: factor.emailAddressId,
+          redirectUrl: factor.redirectUrl,
+        } as EmailLinkConfig;
+        break;
+      case 'email_code':
+        config = { emailAddressId: factor.emailAddressId } as EmailCodeConfig;
+        break;
+      case 'phone_code':
+        config = {
+          phoneNumberId: factor.phoneNumberId,
+          default: factor.default,
+        } as PhoneCodeConfig;
+        break;
+      // case 'web3_metamask_signature':
+      //   config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
+      //   break;
+      // case 'reset_password_phone_code':
+      //   config = { phoneNumberId: factor.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
+      //   break;
+      // case 'reset_password_email_code':
+      //   config = { emailAddressId: factor.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
+      //   break;
+      // case 'saml':
+      //   config = {
+      //     redirectUrl: factor.redirectUrl,
+      //     actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
+      //   } as SamlConfig;
+      //   break;
+      default:
+        clerkInvalidStrategy('User.verifySessionPrepareFirstFactor', factor.strategy);
+    }
+
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify/prepare_first_factor`,
+        body: {
+          ...config,
+          strategy: factor.strategy,
+        } as any,
+      })
+    )?.response as unknown as SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  // TODO: Is this the correct types or only a few are allowed ?
+  verifySessionAttemptFirstFactor = async (
+    attemptFactor: AttemptFirstFactorParams,
+  ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_first_factor`,
-        body: {
-          strategy: 'password',
-          password,
-        } as any,
+        body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 

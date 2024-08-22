@@ -12,11 +12,11 @@ const useUserVerificationSession = () => {
   const data = useFetch(
     user ? user.verifySession : undefined,
     {
-      level: level || 'L2.secondFactor',
+      level: level || 'L1.firstFactor' || 'L2.secondFactor',
+      maxAge: 'A1.10min',
     },
     {
       throttleTime: 300,
-      staleTime: 2000,
       onSuccess() {
         setComplete(true);
       },
@@ -30,15 +30,20 @@ export function withUserVerificationSession<P>(Component: React.ComponentType<P>
   const Hoc = (props: P) => {
     const { isLoading, data } = useUserVerificationSession();
     // const { navigate } = useRouter();
+    // console.log(useRouter());
 
     if (isLoading || !data) {
       return <LoadingCard />;
     }
 
     // if (data.status === 'needs_first_factor') {
-    //   navigate('./');
+    //   if (path !== './') {
+    //     navigate('./');
+    //   }
     // } else if (data.status === 'needs_second_factor') {
-    //   navigate('./factor-two');
+    //   if (path !== './') {
+    //     navigate('./factor-two');
+    //   }
     // }
 
     return <Component {...(props as any)} />;
