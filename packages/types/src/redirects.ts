@@ -98,6 +98,9 @@ export type SignUpForceRedirectUrl = {
   signUpForceRedirectUrl?: string | null;
 };
 
+/**
+ * @deprecated This is deprecated and will be removed in a future release.
+ */
 export type SignUpFallbackRedirectUrl = {
   /**
    * Full URL or path to navigate after successful sign up.
@@ -107,6 +110,9 @@ export type SignUpFallbackRedirectUrl = {
   signUpFallbackRedirectUrl?: string | null;
 };
 
+/**
+ * @deprecated This is deprecated and will be removed in a future release.
+ */
 export type SignInFallbackRedirectUrl = {
   /**
    * Full URL or path to navigate after successful sign in.
