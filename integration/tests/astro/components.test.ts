@@ -157,6 +157,33 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
     await expect(u.page.getByText(`"firstName":"${fakeAdmin.firstName}"`)).toBeVisible();
   });
 
+  test('render user profile with custom pages and links', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToRelative('/sign-in');
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.page.goToRelative('/custom-pages');
+    await u.po.userProfile.waitForMounted();
+
+    // Check if custom pages and links are visible
+    await expect(u.page.getByRole('button', { name: /Terms/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Homepage/i })).toBeVisible();
+
+    // Navigate to custom page
+    await u.page.getByRole('button', { name: /Terms/i }).click();
+    await expect(u.page.getByRole('heading', { name: 'Custom Terms Page' })).toBeVisible();
+
+    // Check reordered default label. Security tab is now the last item.
+    await u.page.locator('.cl-navbarButton').nth(3).click();
+    await expect(u.page.getByRole('heading', { name: 'Security' })).toBeVisible();
+
+    // Click custom link and check navigation
+    await u.page.getByRole('button', { name: /Homepage/i }).click();
+    await u.page.waitForAppUrl('/');
+  });
+
   test('redirects to sign-in when unauthenticated', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/user');
