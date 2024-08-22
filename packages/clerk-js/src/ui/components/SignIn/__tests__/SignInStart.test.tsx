@@ -2,7 +2,7 @@ import type { SignInResource } from '@clerk/types';
 import { OAUTH_PROVIDERS } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
 
-import { act, fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
+import { fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
 import { CardStateProvider } from '../../../elements';
@@ -386,15 +386,15 @@ describe('SignInStart', () => {
         value: { replaceState: jest.fn() },
       });
 
-      await act(() =>
-        render(
-          <CardStateProvider>
-            <SignInStart />
-          </CardStateProvider>,
-          { wrapper },
-        ),
+      render(
+        <CardStateProvider>
+          <SignInStart />
+        </CardStateProvider>,
+        { wrapper },
       );
-      expect(fixtures.signIn.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' });
+      await waitFor(() =>
+        expect(fixtures.signIn.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
+      );
 
       // don't remove the ticket quite yet
       expect(window.history.replaceState).not.toHaveBeenCalledWith(
@@ -420,13 +420,14 @@ describe('SignInStart', () => {
         value: { replaceState: jest.fn() },
       });
 
-      await act(() =>
-        render(
-          <CardStateProvider>
-            <SignInStart />
-          </CardStateProvider>,
-          { wrapper },
-        ),
+      render(
+        <CardStateProvider>
+          <SignInStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+      await waitFor(() =>
+        expect(fixtures.signIn.create).toHaveBeenCalledWith({ strategy: 'ticket', ticket: 'test_ticket' }),
       );
 
       expect(window.history.replaceState).toHaveBeenCalledWith(
