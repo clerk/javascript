@@ -203,7 +203,9 @@ export class AuthCookieService {
   private isCurrentOrganizationActive() {
     const activeOrganizationId = localStorage.getItem('clerk_active_org');
 
-    if (!activeOrganizationId && !this.clerk.organization?.id) return true;
+    if (!activeOrganizationId && !this.clerk.organization?.id) {
+      return true;
+    }
 
     return this.clerk.organization?.id === activeOrganizationId;
   }
