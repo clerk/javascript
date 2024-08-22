@@ -365,7 +365,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
       controls.openModal('signIn', {
         ...props,
-        forceRedirectUrl: props.forceRedirectUrl || window.location.href,
+        fallbackRedirectUrl: props.fallbackRedirectUrl || window.location.href,
       }),
     );
   };
@@ -388,7 +388,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted({ preloadHint: 'SignUp' }).then(controls =>
       controls.openModal('signUp', {
         ...props,
-        forcedRedirectUrl: props.forcedRedirectUrl || window.location.href,
+        fallbackRedirectUrl: props.fallbackRedirectUrl || window.location.href,
       }),
     );
   };
