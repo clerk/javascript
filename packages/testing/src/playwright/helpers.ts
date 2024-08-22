@@ -1,9 +1,9 @@
-import { setupClerkTestingToken } from '@clerk/testing/playwright';
 import type { Clerk, SignOutOptions } from '@clerk/types';
 import type { Page } from '@playwright/test';
 
 import type { ClerkSignInParams, SetupClerkTestingTokenOptions } from '../common';
 import { signInHelper } from '../common';
+import { setupClerkTestingToken } from './setupClerkTestingToken';
 
 declare global {
   interface Window {
