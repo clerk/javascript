@@ -1,4 +1,4 @@
-import { isTruthy } from '@clerk/shared';
+import { isTruthy } from '@clerk/shared/underscore';
 
 /**
  *
