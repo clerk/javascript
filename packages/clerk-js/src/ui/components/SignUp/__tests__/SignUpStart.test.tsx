@@ -281,7 +281,7 @@ describe('SignUpStart', () => {
       );
     });
 
-    it.only('removes the ticket from the url when completing the sign up', async () => {
+    it('removes the ticket from the url when completing the sign up', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
