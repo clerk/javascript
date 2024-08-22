@@ -217,7 +217,7 @@ export const isIS: LocalizationResource = {
       headerTitle__members: 'Meðlimir',
       profileSection: {
         primaryButton: 'Uppfæra prófíl',
-        title: 'Prófíl samtaka',
+        title: 'Prófíll samtaka',
         uploadAction__title: 'Merki',
       },
     },
@@ -799,7 +799,7 @@ export const isIS: LocalizationResource = {
       },
       profileSection: {
         primaryButton: 'Uppfæra prófíl',
-        title: 'Prófíl',
+        title: 'Prófíll',
       },
       usernameSection: {
         primaryButton__setUsername: 'Setja notendanafn',
