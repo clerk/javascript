@@ -35,3 +35,14 @@ export type SetupClerkTestingTokenOptions = {
    */
   frontendApiUrl?: string;
 };
+
+export type ClerkSignInParams =
+  | {
+      strategy: 'password';
+      password: string;
+      identifier: string;
+    }
+  | {
+      strategy: 'phone_code' | 'email_code';
+      identifier: string;
+    };
