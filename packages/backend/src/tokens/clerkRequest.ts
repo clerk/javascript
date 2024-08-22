@@ -21,14 +21,7 @@ class ClerkRequest extends Request {
     // https://github.com/nodejs/undici/issues/2155
     // https://github.com/nodejs/undici/blob/7153a1c78d51840bbe16576ce353e481c3934701/lib/fetch/request.js#L854
     const url = typeof input !== 'string' && 'url' in input ? input.url : String(input);
-    const initParam = init || typeof input === 'string' ? undefined : input;
-    if (initParam?.body instanceof ReadableStream) {
-      (initParam as unknown as { duplex: 'half' }).duplex = 'half';
-    }
-    super(url, initParam);
-    if (initParam?.body instanceof ReadableStream) {
-      (initParam as unknown as { duplex: 'half' }).duplex = 'half';
-    }
+    super(url, init || typeof input === 'string' ? undefined : input);
     this.clerkUrl = this.deriveUrlFromHeaders(this);
     this.cookies = this.parseCookies(this);
   }
@@ -41,10 +34,6 @@ class ClerkRequest extends Request {
       clerkUrl: this.clerkUrl.toString(),
       cookies: JSON.stringify(Object.fromEntries(this.cookies)),
     };
-  }
-
-  get duplex() {
-    return 'half';
   }
 
   /**
