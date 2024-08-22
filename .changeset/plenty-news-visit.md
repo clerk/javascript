@@ -2,4 +2,4 @@
 "@clerk/localizations": patch
 ---
 
-Fix spelling in the Ielandic (is-IS) localization file.
+Fix spelling in the Icelandic (is-IS) localization file.
