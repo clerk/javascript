@@ -13,7 +13,7 @@ import { LinkButton } from '~/primitives/link';
 export function SignInGetHelp() {
   const { t } = useLocalizations();
   const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
-  const { layout, elements } = useAppearance().parsedAppearance;
+  const { layout } = useAppearance().parsedAppearance;
   const isDev = useDevModeWarning();
   const supportEmail = useSupportEmail();
   const { setShowHelp } = useGetHelp();
@@ -37,7 +37,6 @@ export function SignInGetHelp() {
           <Card.Logo {...cardLogoProps} />
           <Card.Title>{t('signIn.alternativeMethods.getHelp.title')}</Card.Title>
           <Card.Description>{t('signIn.alternativeMethods.getHelp.content')}</Card.Description>
-          <p {...elements.formButtonPrimary}>Demo</p>
         </Card.Header>
         <Card.Actions>
           <Button
