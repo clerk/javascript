@@ -4,7 +4,7 @@ import type { FakeOrganization, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
 testAgainstRunningApps({ withPattern: ['astro.static.withCustomRoles'] })(
-  'basic flows for @astro static output',
+  'basic flows for @astro hybrid output',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
 
