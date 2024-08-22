@@ -2,4 +2,4 @@
 "@clerk/localizations": patch
 ---
 
-Improve French translations
+Improve `fr-FR` localization values.
