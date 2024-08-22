@@ -35,10 +35,12 @@ export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
   | {
       step: TSteps | undefined;
       strategy?: never;
+      action?: string;
     }
   | {
       step?: never;
       strategy: SignInStrategy | undefined;
+      action?: never;
     }
 ) & { type: 'LOADING'; isLoading: boolean };
 

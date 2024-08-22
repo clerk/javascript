@@ -27,7 +27,7 @@ export type SignUpVerificationFriendlyTags = 'code' | 'email_link' | 'email_code
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignUpVerificationSubmitEvent = { type: 'SUBMIT' };
+export type SignUpVerificationSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
 export type SignUpVerificationNextEvent = { type: 'NEXT'; resource?: SignUpResource };
 export type SignUpVerificationRetryEvent = { type: 'RETRY' };
 

@@ -12,7 +12,7 @@ export type SignUpStartTags = 'state:pending' | 'state:attempting' | 'state:load
 
 // ---------------------------------- Events ---------------------------------- //
 
-export type SignUpStartSubmitEvent = { type: 'SUBMIT' };
+export type SignUpStartSubmitEvent = { type: 'SUBMIT'; action: 'submit' };
 
 // TODO: Consolidate with SignInStartMachine
 export type SignUpStartRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };

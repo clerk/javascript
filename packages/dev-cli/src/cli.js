@@ -66,5 +66,8 @@ export default function cli() {
       await watch({ js });
     });
 
-  program.parseAsync();
+  program.parseAsync().catch(err => {
+    console.error(err.message);
+    process.exit(1);
+  });
 }

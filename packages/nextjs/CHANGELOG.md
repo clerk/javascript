@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.3.3
+
+### Patch Changes
+
+- Updated dependencies [[`ed7baa048`](https://github.com/clerk/javascript/commit/ed7baa0488df0ee4c48add2aac934ffb47e4a6d2)]:
+  - @clerk/backend@1.8.0
+
+## 5.3.2
+
+### Patch Changes
+
+- Bug fix: Handle `nextGetStore.getStore()` returning `undefined`. Previously a TypeError would occur, when `pagePath` was accessed. ([#3939](https://github.com/clerk/javascript/pull/3939)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c), [`dc94c0834`](https://github.com/clerk/javascript/commit/dc94c08341c883fa5bf891f880fb34c4569ea820)]:
+  - @clerk/types@4.14.0
+  - @clerk/backend@1.7.0
+  - @clerk/clerk-react@5.4.2
+  - @clerk/shared@2.5.2
+
 ## 5.3.1
 
 ### Patch Changes

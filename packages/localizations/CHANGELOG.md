@@ -1,5 +1,34 @@
 # Change Log
 
+## 2.6.1
+
+### Patch Changes
+
+- Fix spelling in the Icelandic (is-IS) localization file. ([#3994](https://github.com/clerk/javascript/pull/3994)) by [@bjaben](https://github.com/bjaben)
+
+- Improve `fr-FR` localization values. ([#3993](https://github.com/clerk/javascript/pull/3993)) by [@coooola](https://github.com/coooola)
+
+- Update `tr-TR` localization values. ([#3997](https://github.com/clerk/javascript/pull/3997)) by [@ardaeker](https://github.com/ardaeker)
+
+## 2.6.0
+
+### Minor Changes
+
+- Introduce the Icelandic (is-IS) localization. ([#3953](https://github.com/clerk/javascript/pull/3953)) by [@bjaben](https://github.com/bjaben)
+
+### Patch Changes
+
+- Update `th-TH` localization values. ([#3979](https://github.com/clerk/javascript/pull/3979)) by [@ttwrpz](https://github.com/ttwrpz)
+
+- Update Czech translations ([#3978](https://github.com/clerk/javascript/pull/3978)) by [@JakubSvestka](https://github.com/JakubSvestka)
+
+- Remove unused `da-DK` localization values. ([#3983](https://github.com/clerk/javascript/pull/3983)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Update `da-DK` localization values. ([#3975](https://github.com/clerk/javascript/pull/3975)) by [@renenielsendk](https://github.com/renenielsendk)
+
+- Updated dependencies [[`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c)]:
+  - @clerk/types@4.14.0
+
 ## 2.5.8
 
 ### Patch Changes

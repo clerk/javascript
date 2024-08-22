@@ -1,0 +1,23 @@
+---
+import ProfileRenderer from './ProfileRenderer.astro'
+
+type ReorderItemsLabels = 'account' | 'security'
+
+type Props<Label extends string> = {
+  label: Label
+} & (Label extends ReorderItemsLabels
+  ? {
+      url?: string
+    }
+  : {
+    url: string
+  }
+)
+
+const { url, label } = Astro.props
+---
+
+<ProfileRenderer label={label} url={url} type="page">
+    <slot name="label-icon" slot="label-icon" />
+    <slot />
+</ProfileRenderer>

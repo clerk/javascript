@@ -16,7 +16,7 @@ export function ToggleGroup({
 }) {
   const id = useId();
   return (
-    <div>
+    <div className='flex flex-col gap-0.5'>
       <div className='mb-1 flex items-center gap-x-1'>
         <span
           className='text-xs font-medium text-neutral-700'
@@ -66,14 +66,14 @@ export function ToggleGroup({
             onValueChange?.(v);
           }
         }}
-        className='grid grid-cols-2 rounded border'
+        className='grid grid-cols-2 overflow-hidden rounded border'
       >
         {items.map(item => {
           return (
             <RadixToggleGroup.Item
               key={item.value}
               value={item.value}
-              className='p-1.5 text-xs font-medium data-[state="on"]:bg-neutral-100'
+              className='border-l p-1.5 text-xs font-medium first-of-type:border-0 hover:bg-neutral-50 data-[state="on"]:bg-neutral-100 data-[state="on"]:hover:bg-neutral-50'
             >
               {item.label}
             </RadixToggleGroup.Item>
