@@ -19,7 +19,7 @@ export { default as SignOutButton } from './unstyled/SignOutButton.astro';
 export { default as SignIn } from './interactive/SignIn.astro';
 export { default as SignUp } from './interactive/SignUp.astro';
 export { UserButton } from './interactive/UserButton';
-export { default as UserProfile } from './interactive/UserProfile.astro';
+export { UserProfile } from './interactive/UserProfile';
 export { default as OrganizationProfile } from './interactive/OrganizationProfile.astro';
 export { default as OrganizationSwitcher } from './interactive/OrganizationSwitcher.astro';
 export { default as OrganizationList } from './interactive/OrganizationList.astro';

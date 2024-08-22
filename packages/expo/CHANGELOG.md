@@ -1,5 +1,28 @@
 # Change Log
 
+## 2.2.0
+
+### Minor Changes
+
+- Change the export of `useLocalCredentials` hook from `@clerk/clerk-expo` to `@clerk/clerk-expo/local-credentials`. ([#3954](https://github.com/clerk/javascript/pull/3954)) by [@panteliselef](https://github.com/panteliselef)
+
+  In `@clerk/clerk-expo@2.1.0` a new hook called `useLocalCredentials` was introduced ([PR 3663](https://github.com/clerk/javascript/pull/3663)). This hook is optional, but Expo's bundler has problems tree-shaking this codepath so users were still required to install its peer dependencies even if they didn't use that hook.
+
+  For this **breaking** change, update your import as following:
+
+  ```diff
+  - import {  useLocalCredentials } from "@clerk/clerk-expo"
+  + import { useLocalCredentials } from "@clerk/clerk-expo/local-credentials"
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`d36b0e1b6`](https://github.com/clerk/javascript/commit/d36b0e1b6d8692e37f204aa813ccf80c9f27e94e), [`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c)]:
+  - @clerk/clerk-js@5.15.0
+  - @clerk/types@4.14.0
+  - @clerk/clerk-react@5.4.2
+  - @clerk/shared@2.5.2
+
 ## 2.1.1
 
 ### Patch Changes

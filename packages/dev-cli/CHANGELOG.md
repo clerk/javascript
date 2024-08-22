@@ -1,5 +1,15 @@
 # @clerk/dev-cli
 
+## 0.0.7
+
+### Patch Changes
+
+- Print error when the `root` property of the configuration file is `null` ([#3967](https://github.com/clerk/javascript/pull/3967)) by [@dstaley](https://github.com/dstaley)
+
+- Warn when `publishableKey` or `secretKey` are invalid ([#3967](https://github.com/clerk/javascript/pull/3967)) by [@dstaley](https://github.com/dstaley)
+
+- Warn if configuration file already exists when running `clerk-dev init` ([#3967](https://github.com/clerk/javascript/pull/3967)) by [@dstaley](https://github.com/dstaley)
+
 ## 0.0.6
 
 ### Patch Changes

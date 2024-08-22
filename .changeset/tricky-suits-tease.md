@@ -2,4 +2,4 @@
 "@clerk/localizations": patch
 ---
 
-Update Czech translations
+Improve `fr-FR` localization values.

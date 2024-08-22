@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.14.0
+
+### Minor Changes
+
+- Inject `windowNavigate` through router functions. ([#3922](https://github.com/clerk/javascript/pull/3922)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.13.1
 
 ### Patch Changes
