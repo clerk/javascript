@@ -1,14 +1,8 @@
 # build output
 dist/
-astro-components/
-!src/astro-components/
-components/
-!src/components/
-.output/
-/types.ts
 
-.vscode/
-.idea/
+# generated types
+.astro/
 
 # dependencies
 node_modules/
@@ -19,17 +13,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
 # environment variables
 .env
-.env.local
 .env.production
 
 # macOS-specific files
 .DS_Store
 
-*.d.ts
-*.d.ts.map
-!env.d.ts
-!client.d.ts
-!globals.d.ts
+# jetbrains setting folder
+.idea/
