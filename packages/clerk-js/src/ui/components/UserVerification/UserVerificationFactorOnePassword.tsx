@@ -7,14 +7,22 @@ import { Card, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
+import { HavingTrouble } from '../SignIn/HavingTrouble';
 
-export function UserVerificationFactorOnePasswordCard(): JSX.Element {
+type UserVerificationFactorOnePasswordProps = {
+  onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
+};
+
+export function UserVerificationFactorOnePasswordCard(props: UserVerificationFactorOnePasswordProps): JSX.Element {
+  const { onShowAlternativeMethodsClick } = props;
   const { user } = useUser();
   const card = useCardState();
   const supportEmail = useSupportEmail();
   const { session } = useSession();
   const { setActive } = useClerk();
   const { navigate } = useRouter();
+  const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
+  const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
 
   const passwordControl = useFormControl('password', '', {
     type: 'password',
@@ -26,6 +34,7 @@ export function UserVerificationFactorOnePasswordCard(): JSX.Element {
     e.preventDefault();
     return user
       ?.verifySessionAttemptFirstFactor({
+        strategy: 'password',
         password: passwordControl.value,
       })
       .then(async res => {
@@ -44,8 +53,13 @@ export function UserVerificationFactorOnePasswordCard(): JSX.Element {
       .catch(err => handleError(err, [passwordControl], card.setError));
   };
 
+  // TODO: Update texts
+  if (showHavingTrouble) {
+    return <HavingTrouble onBackLinkClick={toggleHavingTrouble} />;
+  }
+
   return (
-    <Flow.Part part='start'>
+    <Flow.Part part='password'>
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
@@ -80,10 +94,12 @@ export function UserVerificationFactorOnePasswordCard(): JSX.Element {
               </Form.ControlRow>
               <Form.SubmitButton hasArrow />
             </Form.Root>
-            <Card.Action elementId={'alternativeMethods'}>
+            <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
               <Card.ActionLink
-                localizationKey={localizationKeys('signIn.password.actionLink')}
-                // onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
+                localizationKey={localizationKeys(
+                  onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+                )}
+                onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
               />
             </Card.Action>
           </Col>

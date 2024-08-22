@@ -1,4 +1,4 @@
-import type { ResetPasswordCodeFactor, SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import { withRedirectToAfterSignIn } from '../../common';
@@ -123,7 +123,6 @@ export function _SignInFactorOne(): JSX.Element {
   }
 
   switch (currentFactor?.strategy) {
-    // @ts-ignore
     case 'passkey':
       return (
         <SignInFactorOnePasskey
@@ -134,15 +133,15 @@ export function _SignInFactorOne(): JSX.Element {
     case 'password':
       return (
         <SignInFactorOnePasswordCard
-          onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
-            handleFactorPrepare();
-            setFactor(prev => ({
-              currentFactor: {
-                ...factor,
-              },
-              prevCurrentFactor: prev.currentFactor,
-            }));
-          }}
+          // onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
+          //   handleFactorPrepare();
+          //   setFactor(prev => ({
+          //     currentFactor: {
+          //       ...factor,
+          //     },
+          //     prevCurrentFactor: prev.currentFactor,
+          //   }));
+          // }}
           onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
           onPasswordPwned={() => {

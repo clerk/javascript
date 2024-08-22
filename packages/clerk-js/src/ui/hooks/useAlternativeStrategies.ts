@@ -1,5 +1,5 @@
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
-import type { SignInFactor } from '@clerk/types';
+import type { SignInFactor, SignInFirstFactor } from '@clerk/types';
 
 import { factorHasLocalStrategy, isResetPasswordStrategy } from '../components/SignIn/utils';
 import { useCoreSignIn } from '../contexts';
@@ -19,6 +19,36 @@ export function useAlternativeStrategies({ filterOutFactor }: { filterOutFactor:
 
   const firstPartyFactors = supportedFirstFactors
     ?.filter(f => !f.strategy.startsWith('oauth_') && !(f.strategy === filterOutFactor?.strategy))
+    .filter(factor => factorHasLocalStrategy(factor))
+    // Only include passkey if the device supports it.
+    // @ts-ignore Types are not public yet.
+    .filter(factor => (factor.strategy === 'passkey' ? isWebAuthnSupported() : true))
+    .sort(allStrategiesButtonsComparator);
+
+  return {
+    hasAnyStrategy: shouldAllowForAlternativeStrategies,
+    hasFirstParty: !!firstPartyFactors,
+    firstPartyFactors,
+  };
+}
+
+export function useAlternativeStrategiesV({
+  filterOutFactor,
+  supportedFirstFactors,
+}: {
+  filterOutFactor: SignInFactor | null | undefined;
+  supportedFirstFactors: SignInFirstFactor[];
+}) {
+  const { strategies: OAuthStrategies } = useEnabledThirdPartyProviders();
+
+  const firstFactors = supportedFirstFactors.filter(
+    f => f.strategy !== filterOutFactor?.strategy && !isResetPasswordStrategy(f.strategy),
+  );
+
+  const shouldAllowForAlternativeStrategies = firstFactors.length + OAuthStrategies.length > 0;
+
+  const firstPartyFactors = supportedFirstFactors
+    .filter(f => !f.strategy.startsWith('oauth_') && !(f.strategy === filterOutFactor?.strategy))
     .filter(factor => factorHasLocalStrategy(factor))
     // Only include passkey if the device supports it.
     // @ts-ignore Types are not public yet.

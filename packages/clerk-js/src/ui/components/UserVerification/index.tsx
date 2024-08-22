@@ -6,7 +6,6 @@ import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
 import { UserVerificationFactorOne } from './UserVerificationFactorOne';
 import { UserVerificationFactorTwo } from './UserVerificationFactorTwo';
-import { withUserVerificationSession } from './useUserVerificationSession';
 
 function UserVerificationRoutesInner(): JSX.Element {
   return (
@@ -21,7 +20,8 @@ function UserVerificationRoutesInner(): JSX.Element {
   );
 }
 
-const UserVerificationInner: React.ComponentType = withUserVerificationSession(UserVerificationRoutesInner);
+// const UserVerificationInner: React.ComponentType = withUserVerificationSession(UserVerificationRoutesInner);
+const UserVerificationInner: React.ComponentType = UserVerificationRoutesInner;
 
 function UserVerificationRoutes(): JSX.Element {
   return (
