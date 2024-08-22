@@ -18,7 +18,7 @@ export const noFetchFnCtxPassedInGetAuth = createErrorMessage(`
   `);
 
 export const clerkHandlerNotConfigured = createErrorMessage(`
-    It looks like you're trying to use Clerk without configuring the Clerk handler.
+It looks like you're trying to use Clerk without configuring the Clerk handler.
 
 To fix this, make sure you have the \`clerkHandler()\` configure in you SSR entry file (example: app/ssr.tsx).
 
