@@ -1,6 +1,6 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import { computed, onMount, type Store } from 'nanostores';
+import { batched, computed, onMount, type Store } from 'nanostores';
 
 import { $clerk, $csrState, $initialState } from './internal';
 
@@ -13,7 +13,7 @@ import { $clerk, $csrState, $initialState } from './internal';
  *
  * $authStore.subscribe((auth) => console.log(auth.userId))
  */
-export const $authStore = computed([$csrState, $initialState], (state, initialState) => {
+export const $authStore = batched([$csrState, $initialState], (state, initialState) => {
   return deriveState(
     state.isLoaded,
     {
