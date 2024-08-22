@@ -3,7 +3,7 @@ import type { PartialTheme, ParsedElements } from '~/contexts/AppearanceContext'
 /**
  * Given a complete theme object minus descriptors, returns a full ParsedElements object with generated descriptors.
  */
-export function buildTheme(p: Partial<PartialTheme>): ParsedElements {
+export function buildTheme(p: PartialTheme): ParsedElements {
   const theme: Partial<ParsedElements> = {};
 
   for (const descriptor in p) {
@@ -18,4 +18,16 @@ export function buildTheme(p: Partial<PartialTheme>): ParsedElements {
   }
 
   return theme as ParsedElements;
+}
+
+export function mergeTheme(a: ParsedElements, b: ParsedElements): ParsedElements {
+  const mergedTheme = { ...a };
+
+  for (const d in mergedTheme) {
+    const descriptor = d as keyof ParsedElements;
+    mergedTheme[descriptor].className = [mergedTheme[descriptor].className, b[descriptor].className].join(' ');
+    mergedTheme[descriptor].style = { ...mergedTheme[descriptor].style, ...b[descriptor].style };
+  }
+
+  return mergedTheme;
 }

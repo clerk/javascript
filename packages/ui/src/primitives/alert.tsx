@@ -32,6 +32,8 @@ export const visualStyle = {
   alert__error: {
     className: 'text-danger bg-danger/[0.06] border-danger/[0.12]',
   },
+  alertRoot: {},
+  alertIcon: {},
 } satisfies ParsedElementsFragment;
 
 export const Alert = React.forwardRef<
