@@ -1,7 +1,7 @@
 {
   "name": "@clerk/astro",
   "description": "Clerk SDK for Astro",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "license": "MIT",
   "author": "Clerk",
@@ -79,7 +79,7 @@
     }
   },
   "dependencies": {
-    "@clerk/backend": "1.7.0",
+    "@clerk/backend": "1.8.0",
     "@clerk/shared": "2.5.2",
     "@clerk/types": "4.14.0",
     "nanoid": "5.0.7",

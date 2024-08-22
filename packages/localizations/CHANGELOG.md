@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.6.1
+
+### Patch Changes
+
+- Fix spelling in the Icelandic (is-IS) localization file. ([#3994](https://github.com/clerk/javascript/pull/3994)) by [@bjaben](https://github.com/bjaben)
+
+- Improve `fr-FR` localization values. ([#3993](https://github.com/clerk/javascript/pull/3993)) by [@coooola](https://github.com/coooola)
+
+- Update `tr-TR` localization values. ([#3997](https://github.com/clerk/javascript/pull/3997)) by [@ardaeker](https://github.com/ardaeker)
+
 ## 2.6.0
 
 ### Minor Changes
