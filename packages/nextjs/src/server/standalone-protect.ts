@@ -1,7 +1,7 @@
 import { constants } from '@clerk/backend/internal';
 import type { CheckAuthorizationParamsWithCustomPermissions } from '@clerk/types';
-import { actionAsyncStorage } from 'next/dist/client/components/action-async-storage.external';
 
+// import { actionAsyncStorage } from 'next/dist/client/components/action-async-storage.external';
 import { buildRequestLike } from '../app-router/server/utils';
 import { constants as nextConstants } from '../constants';
 import { createGetAuth } from './createGetAuth';
@@ -21,7 +21,7 @@ export const createStandaloneProtect = () => {
       // const { headers } = request;
       if (isPageRequest(req.headers)) {
         console.log('is page');
-        console.log('----lllllll', actionAsyncStorage.getStore());
+        // console.log('----lllllll', actionAsyncStorage.getStore());
         /**
          * User is not assured
          */
@@ -31,7 +31,7 @@ export const createStandaloneProtect = () => {
         return params?.fallback;
       } else if (isApiRouteRequest()) {
         console.log('is api');
-        console.log('----lllllll', actionAsyncStorage.getStore());
+        // console.log('----lllllll', actionAsyncStorage.getStore());
         // if (authObject.has(params!)) {
         // @ts-ignore
         return handlerOrComponent(req);
@@ -135,7 +135,7 @@ const isAppRouterInternalNavigation = (headers: Headers) =>
 
 const getPagePathAvailable = () => {
   const __fetch = globalThis.fetch;
-  return isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore().pagePath || '' : '';
+  return isNextFetcher(__fetch) ? __fetch.__nextGetStaticStore().getStore()?.pagePath || '' : '';
 };
 
 const isPagesRouterInternalNavigation = (headers: Headers) => !!headers.get(nextConstants.Headers.NextjsData);
