@@ -1,7 +1,7 @@
+import type { BackupCodeFactor, EmailCodeFactor, PasswordFactor, PhoneCodeFactor, TOTPFactor } from './factors';
 import type { ClerkResource } from './resource';
 import type { SessionResource } from './session';
 import type { VerificationResource } from './verification';
-import type { BackupCodeFactor, EmailCodeFactor, PasswordFactor, PhoneCodeFactor, TOTPFactor } from './factors';
 
 export interface __experimental_SessionVerificationResource extends ClerkResource {
   status: __experimental_SessionVerificationStatus | null;
