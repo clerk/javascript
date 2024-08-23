@@ -96,10 +96,12 @@ describe('Session', () => {
 
       const token = await session.getToken();
 
+      await session.getToken({ organizationId: 'activeOrganization' });
+
       expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
 
       expect(token).toEqual(mockJwt);
-      expect(dispatchSpy).toHaveBeenCalledTimes(2);
+      expect(dispatchSpy).toHaveBeenCalledTimes(3);
     });
 
     it('dispatches token:update event on getToken with active organization', async () => {
