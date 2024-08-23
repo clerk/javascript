@@ -1,3 +1,4 @@
+import { Resources, UnsubscribeCallback } from '@clerk/types';
 import { IsomorphicClerk } from '../isomorphicClerk';
 
 describe('isomorphicClerk', () => {
@@ -48,5 +49,54 @@ describe('isomorphicClerk', () => {
       { appearance: { baseTheme: 'green' } },
       { appearance: { baseTheme: 'white' } },
     ]);
+  });
+
+  it('handles multiple resource listeners', async () => {
+    const listenerCallHistory: Array<Resources> = [];
+    const addedListeners: Map<(payload: Resources) => void, { unsubscribe: UnsubscribeCallback }> = new Map();
+
+    const dummyClerkJS = {
+      addListener: (listener: (payload: Resources) => void) => {
+        const unsubscribe = () => {
+          addedListeners.delete(listener);
+        };
+        addedListeners.set(listener, { unsubscribe });
+        return unsubscribe;
+      },
+    };
+
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_xxx' });
+    (isomorphicClerk as any).clerkjs = dummyClerkJS as any;
+
+    const unsubscribe1 = isomorphicClerk.addListener(payload => listenerCallHistory.push(payload));
+    const unsubscribe2 = isomorphicClerk.addListener(payload => listenerCallHistory.push(payload));
+
+    // Unsubscribe one listener before ClerkJS is loaded
+    unsubscribe1();
+
+    jest.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
+    isomorphicClerk.emitLoaded();
+    const unsubscribe3 = isomorphicClerk.addListener(payload => listenerCallHistory.push(payload));
+
+    // Simulate ClerkJS triggering the listeners
+    const mockPayload = {
+      user: { id: 'user_xxx' },
+      session: { id: 'sess_xxx' },
+      client: { id: 'client_xxx' },
+      organization: undefined,
+    } as Resources;
+    addedListeners.forEach((_, listener) => listener(mockPayload));
+
+    expect(listenerCallHistory).toEqual([mockPayload, mockPayload]);
+    expect(listenerCallHistory.length).toBe(2);
+
+    // Unsubscribe all remaining listeners
+    unsubscribe2();
+    unsubscribe3();
+    listenerCallHistory.length = 0;
+    addedListeners.forEach((_, listener) => listener(mockPayload));
+
+    expect(listenerCallHistory).toEqual([]);
+    expect(listenerCallHistory.length).toBe(0);
   });
 });

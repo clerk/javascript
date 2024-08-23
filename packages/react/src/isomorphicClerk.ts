@@ -855,7 +855,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           this.premountAddListenerCalls.delete(listener);
         }
       };
-      this.premountAddListenerCalls.set(listener, { unsubscribe });
+      this.premountAddListenerCalls.set(listener, { unsubscribe, nativeUnsubscribe: undefined });
       return unsubscribe;
     }
   };
