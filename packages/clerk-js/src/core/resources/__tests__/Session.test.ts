@@ -79,7 +79,7 @@ describe('Session', () => {
 
     it('hydrates token cache from lastActiveToken', async () => {
       BaseResource.clerk = clerkMock({
-        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) ,
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
       }) as any;
 
       const session = new Session({
@@ -106,7 +106,7 @@ describe('Session', () => {
 
     it('dispatches token:update event on getToken with active organization', async () => {
       BaseResource.clerk = clerkMock({
-        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) ,
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
       }) as any;
 
       const session = new Session({
@@ -128,7 +128,7 @@ describe('Session', () => {
 
     it('does not dispatch token:update if template is provided', async () => {
       BaseResource.clerk = clerkMock({
-        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) ,
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
       }) as any;
 
       const session = new Session({
