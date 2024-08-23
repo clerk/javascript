@@ -12,7 +12,8 @@ const useUserVerificationSession = () => {
   const data = useFetch(
     user ? user.verifySession : undefined,
     {
-      level: level || 'L1.firstFactor' || 'L2.secondFactor',
+      level: level || 'L2.secondFactor',
+      // TODO: Figure out if this needs to be a prop
       maxAge: 'A1.10min',
     },
     {

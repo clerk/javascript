@@ -67,10 +67,6 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
     }));
   };
 
-  // TODO: Do we have to handle pwned passwords ?
-  // TODO: DO we have to handler forgot-password ?
-  console.log('currentFactor', currentFactor);
-
   useEffect(() => {
     if (sessionVerification.status === 'needs_second_factor') {
       void navigate('factor-two');
