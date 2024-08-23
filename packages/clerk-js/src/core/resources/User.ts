@@ -35,6 +35,7 @@ import type {
   VerifyTOTPParams,
   Web3WalletResource,
 } from '@clerk/types';
+import type { SessionVerifyAttemptSecondFactorParams, SessionVerifyPrepareSecondFactorParams } from '@clerk/types/dist';
 
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
@@ -314,15 +315,28 @@ export class User extends BaseResource implements UserResource {
     return new SessionVerification(json);
   };
 
-  verifySessionAttemptSecondFactor = async ({ code }: { code: string }): Promise<SessionVerificationResource> => {
+  verifySessionPrepareSecondFactor = async (
+    params: SessionVerifyPrepareSecondFactorParams,
+  ): Promise<SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify/prepare_second_factor`,
+        body: params as any,
+      })
+    )?.response as unknown as SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  verifySessionAttemptSecondFactor = async (
+    params: SessionVerifyAttemptSecondFactorParams,
+  ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_second_factor`,
-        body: {
-          strategy: 'totp',
-          code,
-        } as any,
+        body: params as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 

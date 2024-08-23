@@ -168,7 +168,7 @@ export function getButtonIcon(factor: SignInFactor) {
   return icons[factor.strategy as keyof typeof icons];
 }
 
-function determineFlowPart(mode: AlternativeMethodsMode) {
+function determineFlowPart(mode: AlternativeMethodsMode): 'alternativeMethods' {
   switch (mode) {
     // case 'forgot':
     //   return 'forgotPasswordMethods';

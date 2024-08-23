@@ -1,20 +1,93 @@
-import { useEffect } from 'react';
+import type { SignInFactor } from '@clerk/types';
+import React, { useEffect } from 'react';
 
-import { withCardStateProvider } from '../../elements';
+import { LoadingCard, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
+import { determineStartingSignInSecondFactor } from '../SignIn/utils';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSession } from './useUserVerificationSession';
+import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
+import { UVFactorTwoBackupCodeCard } from './UVFactorTwoBackupCodeCard';
+import { UVFactorTwoPhoneCodeCard } from './UVFactorTwoPhoneCodeCard';
+
+const factorKey = (factor: SignInFactor | null | undefined) => {
+  if (!factor) {
+    return '';
+  }
+  let key = factor.strategy;
+  if ('phoneNumberId' in factor) {
+    key += factor.phoneNumberId;
+  }
+  return key;
+};
 
 export function _UserVerificationFactorTwo(): JSX.Element {
   const { navigate } = useRouter();
   const { data } = useUserVerificationSession();
   const sessionVerification = data!;
+
+  const availableFactors = sessionVerification.supportedSecondFactors;
+
+  const lastPreparedFactorKeyRef = React.useRef('');
+  const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | null>(() =>
+    determineStartingSignInSecondFactor(availableFactors),
+  );
+  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
+  const toggleAllStrategies = () => setShowAllStrategies(s => !s);
+
+  const handleFactorPrepare = () => {
+    lastPreparedFactorKeyRef.current = factorKey(currentFactor);
+  };
+
+  const selectFactor = (factor: SignInFactor) => {
+    setCurrentFactor(factor);
+    toggleAllStrategies();
+  };
+
   useEffect(() => {
     if (sessionVerification.status === 'needs_first_factor') {
       void navigate('../');
     }
   }, []);
-  return <UserVerificationFactorTwoTOTP />;
+
+  if (!currentFactor) {
+    return <LoadingCard />;
+  }
+
+  if (showAllStrategies) {
+    return (
+      <UVFactorTwoAlternativeMethods
+        supportedSecondFactors={sessionVerification.supportedSecondFactors}
+        onBackLinkClick={toggleAllStrategies}
+        onFactorSelected={selectFactor}
+      />
+    );
+  }
+
+  switch (currentFactor?.strategy) {
+    case 'phone_code':
+      return (
+        <UVFactorTwoPhoneCodeCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+        />
+      );
+    case 'totp':
+      return (
+        <UserVerificationFactorTwoTOTP
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+        />
+      );
+    case 'backup_code':
+      return <UVFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+    default:
+      return <LoadingCard />;
+  }
 }
 
 export const UserVerificationFactorTwo = withUserVerificationSession(withCardStateProvider(_UserVerificationFactorTwo));

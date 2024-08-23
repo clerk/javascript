@@ -2,7 +2,16 @@ import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { ExternalAccountResource } from './externalAccount';
-import type { EmailCodeAttempt, EmailCodeConfig, PasswordAttempt, PhoneCodeAttempt, PhoneCodeConfig } from './factors';
+import type {
+  BackupCodeAttempt,
+  EmailCodeAttempt,
+  EmailCodeConfig,
+  PasswordAttempt,
+  PhoneCodeAttempt,
+  PhoneCodeConfig,
+  PhoneCodeSecondFactorConfig,
+  TOTPAttempt,
+} from './factors';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
 import type { OAuthScope } from './oauth';
@@ -122,7 +131,12 @@ export interface UserResource extends ClerkResource {
   verifySessionAttemptFirstFactor: (
     attemptFactor: SessionVerifyAttemptFirstFactorParams,
   ) => Promise<SessionVerificationResource>;
-  verifySessionAttemptSecondFactor: (params: { code: string }) => Promise<SessionVerificationResource>;
+  verifySessionPrepareSecondFactor: (
+    params: SessionVerifyPrepareSecondFactorParams,
+  ) => Promise<SessionVerificationResource>;
+  verifySessionAttemptSecondFactor: (
+    params: SessionVerifyAttemptSecondFactorParams,
+  ) => Promise<SessionVerificationResource>;
 
   get verifiedExternalAccounts(): ExternalAccountResource[];
 
@@ -135,6 +149,9 @@ export interface UserResource extends ClerkResource {
 
 export type SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;
 export type SessionVerifyAttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt;
+
+export type SessionVerifyPrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
+export type SessionVerifyAttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
 
 export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
