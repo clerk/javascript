@@ -40,7 +40,7 @@ type ElementsAppearanceConfig = string | (React.CSSProperties & { className?: st
 
 export type Appearance = Omit<CurrentAppearance, 'elements' | 'baseTheme'> & {
   theme?: ParsedElements;
-  elements?: Record<DescriptorIdentifier, ElementsAppearanceConfig>;
+  elements?: Partial<Record<DescriptorIdentifier, ElementsAppearanceConfig>>;
 };
 
 export type AppearanceCascade = {
@@ -132,7 +132,13 @@ function mergeElementsAppearanceConfig(
     result = { ...a };
     result.className = [result.className, b].join(' ');
   } else if (typeof a === 'object' && typeof b === 'object') {
-    result = { ...a, ...b, className: [a.className, b.className].join(' ') };
+    result = {
+      ...a,
+      ...b,
+    };
+    if (a.className || b.className) {
+      result.className = [a.className, b.className].filter(Boolean).join(' ');
+    }
   }
 
   if (!result) {
@@ -147,7 +153,11 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
   if (!a) return b!;
   if (!b) return a!;
 
-  const result = { ...a, theme: b.theme, layout: { ...a.layout, ...b.layout } };
+  const result = { ...a, layout: { ...a.layout, ...b.layout } };
+
+  if (b.theme) {
+    result.theme = b.theme;
+  }
 
   if (!result.elements && b.elements) {
     result.elements = { ...b.elements };
@@ -155,7 +165,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
     Object.entries(b.elements).forEach(([element, config]) => {
       const el = element as DescriptorIdentifier;
       if (el in result.elements!) {
-        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el], config);
+        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config);
       } else {
         result.elements![el] = config;
       }
@@ -306,6 +316,73 @@ export { AppearanceProvider, useAppearance };
 if (import.meta.vitest) {
   const { it, expect, describe } = import.meta.vitest;
 
+  describe('mergeAppearance', () => {
+    it('retains keys from both appearances', () => {
+      const a = { elements: { alert__warning: 'class-one' } };
+      const b = { elements: { alertIcon: 'class-two' } };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        elements: {
+          alert__warning: 'class-one',
+          alertIcon: 'class-two',
+        },
+      });
+    });
+
+    it('retains the theme prop', () => {
+      const a = { theme: fullTheme, elements: { alert__warning: 'class-one' } };
+      const b = {
+        elements: { alertIcon: 'class-two' },
+      };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        theme: a.theme,
+        elements: {
+          alert__warning: 'class-one',
+          alertIcon: 'class-two',
+        },
+      });
+    });
+
+    it('overrides the theme prop', () => {
+      const a = { theme: fullTheme, elements: { alert__warning: 'class-one' } };
+      const b = {
+        theme: { ...fullTheme, alertIcon: { descriptor: 'test', className: 'test-class', style: {} } },
+        elements: { alertIcon: 'class-two' },
+      };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        theme: b.theme,
+        elements: {
+          alert__warning: 'class-one',
+          alertIcon: 'class-two',
+        },
+      });
+    });
+
+    it('merges string values for the same element', () => {
+      const a = { elements: { alert__warning: 'class-one' } };
+      const b = { elements: { alert__warning: 'class-two' } };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        elements: {
+          alert__warning: 'class-one class-two',
+        },
+      });
+    });
+
+    it('merges object values for the same element', () => {
+      const a = { elements: { alert__warning: { background: 'tomato' } } };
+      const b = { elements: { alert__warning: { color: 'red' } } };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        elements: {
+          alert__warning: { color: 'red', background: 'tomato' },
+        },
+      });
+    });
+  });
+
   describe('mergeElementsAppearanceConfig', () => {
     it('merges two strings', () => {
       const a = 'class-one';
@@ -347,6 +424,41 @@ if (import.meta.vitest) {
         className: 'class-one class-two',
         color: 'red',
         backgroundColor: 'tomato',
+      });
+    });
+
+    it('correctly omits className if not present', () => {
+      const a = { color: 'red' };
+      const b = { backgroundColor: 'tomato' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({
+        color: 'red',
+        backgroundColor: 'tomato',
+      });
+    });
+  });
+
+  describe('applyTheme', () => {
+    it('adds classNames from theme', () => {
+      const appearance = {
+        elements: {
+          alert__warning: 'test-1',
+        },
+      };
+      const theme = {
+        ...fullTheme,
+        alert__warning: { descriptor: 'test', className: 'test', style: { color: 'red' } },
+      };
+      expect(applyTheme(theme, appearance)).toStrictEqual({
+        theme,
+        layout: defaultAppearance.layout,
+        elements: {
+          ...fullTheme,
+          alert__warning: {
+            className: 'test test-1',
+            descriptor: 'test',
+            style: { color: 'red' },
+          },
+        },
       });
     });
   });
