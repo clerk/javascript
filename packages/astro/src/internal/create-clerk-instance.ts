@@ -1,6 +1,7 @@
 import { loadClerkJsScript, setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/types';
 
+import { $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
 import type { AstroClerkCreateInstanceParams, AstroClerkUpdateOptions } from '../types';
 import { invokeClerkAstroJSFunctions } from './invoke-clerk-astro-js-functions';
@@ -53,6 +54,11 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
     .load(initOptions)
     .then(() => {
       $csrState.setKey('isLoaded', true);
+      // Notify subscribers that $clerkStore has been loaded.
+      // We're doing this because nanostores uses `===` for equality
+      // and just by setting the value to `window.Clerk` again won't trigger an update.
+      // We notify only once as this store is for advanced users.
+      $clerkStore.notify();
 
       mountAllClerkAstroJSComponents();
       invokeClerkAstroJSFunctions();

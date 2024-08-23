@@ -1,4 +1,5 @@
 import type {
+  Clerk,
   EmailAddressJSON,
   ExternalAccountJSON,
   OAuthProvider,
@@ -241,11 +242,12 @@ export const createSignUp = (signUpParams: Partial<SignUpJSON> = {}) => {
   } as SignUpJSON;
 };
 
-export const clerkMock = () => {
+export const clerkMock = (params?: Partial<Clerk>) => {
   return {
     getFapiClient: jest.fn().mockReturnValue({
       request: jest.fn().mockReturnValue({ payload: { object: 'token', jwt: mockJwt }, status: 200 }),
     }),
+    ...params,
   };
 };
 
