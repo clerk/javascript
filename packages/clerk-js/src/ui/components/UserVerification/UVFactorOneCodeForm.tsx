@@ -60,21 +60,11 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
             return clerk.setActive({ session: res.session.id });
           case 'needs_second_factor':
             return navigate('./factor-two');
-          // case 'needs_new_password':
-          //   return navigate('../reset-password');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
       })
-      .catch(err => {
-        // TODO: WOuld this even be possible ?
-        // if (isUserLockedError(err)) {
-        //   // @ts-expect-error -- private method for the time being
-        //   return clerk.__internal_navigateWithError('..', err.errors[0]);
-        // }
-
-        return reject(err);
-      });
+      .catch(reject);
   };
 
   return (

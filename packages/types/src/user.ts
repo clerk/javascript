@@ -2,6 +2,7 @@ import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { ExternalAccountResource } from './externalAccount';
+import type { EmailCodeAttempt, EmailCodeConfig, PasswordAttempt, PhoneCodeAttempt, PhoneCodeConfig } from './factors';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
 import type { OAuthScope } from './oauth';
@@ -15,7 +16,6 @@ import type { ClerkResource } from './resource';
 import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
 import type { SessionVerificationResource } from './sessionVerification';
-import type { AttemptFirstFactorParams, PrepareFirstFactorParams } from './signIn';
 import type { OAuthStrategy } from './strategies';
 import type { TOTPResource } from './totp';
 import type { UserOrganizationInvitationResource } from './userOrganizationInvitation';
@@ -116,8 +116,12 @@ export interface UserResource extends ClerkResource {
     level: 'L1.firstFactor' | 'L2.secondFactor' | 'L3.multiFactor';
     maxAge: 'A1.10min' | 'A2.1hr' | 'A3.4hr' | 'A4.1day' | 'A5.1wk';
   }) => Promise<SessionVerificationResource>;
-  verifySessionPrepareFirstFactor: (factor: PrepareFirstFactorParams) => Promise<SessionVerificationResource>;
-  verifySessionAttemptFirstFactor: (attemptFactor: AttemptFirstFactorParams) => Promise<SessionVerificationResource>;
+  verifySessionPrepareFirstFactor: (
+    factor: SessionVerifyPrepareFirstFactorParams,
+  ) => Promise<SessionVerificationResource>;
+  verifySessionAttemptFirstFactor: (
+    attemptFactor: SessionVerifyAttemptFirstFactorParams,
+  ) => Promise<SessionVerificationResource>;
   verifySessionAttemptSecondFactor: (params: { code: string }) => Promise<SessionVerificationResource>;
 
   get verifiedExternalAccounts(): ExternalAccountResource[];
@@ -128,6 +132,9 @@ export interface UserResource extends ClerkResource {
 
   get hasVerifiedPhoneNumber(): boolean;
 }
+
+export type SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;
+export type SessionVerifyAttemptFirstFactorParams = EmailCodeAttempt | PhoneCodeAttempt | PasswordAttempt;
 
 export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };

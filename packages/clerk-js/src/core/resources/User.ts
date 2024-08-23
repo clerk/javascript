@@ -1,5 +1,4 @@
 import type {
-  AttemptFirstFactorParams,
   BackupCodeJSON,
   BackupCodeResource,
   CreateEmailAddressParams,
@@ -10,7 +9,6 @@ import type {
   DeletedObjectResource,
   EmailAddressResource,
   EmailCodeConfig,
-  EmailLinkConfig,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetOrganizationMemberships,
@@ -18,15 +16,15 @@ import type {
   GetUserOrganizationSuggestionsParams,
   ImageResource,
   OrganizationMembershipResource,
-  PassKeyConfig,
   PasskeyResource,
   PhoneCodeConfig,
   PhoneNumberResource,
-  PrepareFirstFactorParams,
   RemoveUserPasswordParams,
   SamlAccountResource,
   SessionVerificationJSON,
   SessionVerificationResource,
+  SessionVerifyAttemptFirstFactorParams,
+  SessionVerifyPrepareFirstFactorParams,
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
@@ -270,19 +268,11 @@ export class User extends BaseResource implements UserResource {
     return new SessionVerification(json);
   };
 
-  // TODO: Is this the correct types or only a few are allowed ?
-  verifySessionPrepareFirstFactor = async (factor: PrepareFirstFactorParams): Promise<SessionVerificationResource> => {
+  verifySessionPrepareFirstFactor = async (
+    factor: SessionVerifyPrepareFirstFactorParams,
+  ): Promise<SessionVerificationResource> => {
     let config;
     switch (factor.strategy) {
-      case 'passkey':
-        config = {} as PassKeyConfig;
-        break;
-      case 'email_link':
-        config = {
-          emailAddressId: factor.emailAddressId,
-          redirectUrl: factor.redirectUrl,
-        } as EmailLinkConfig;
-        break;
       case 'email_code':
         config = { emailAddressId: factor.emailAddressId } as EmailCodeConfig;
         break;
@@ -292,23 +282,8 @@ export class User extends BaseResource implements UserResource {
           default: factor.default,
         } as PhoneCodeConfig;
         break;
-      // case 'web3_metamask_signature':
-      //   config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
-      //   break;
-      // case 'reset_password_phone_code':
-      //   config = { phoneNumberId: factor.phoneNumberId } as ResetPasswordPhoneCodeFactorConfig;
-      //   break;
-      // case 'reset_password_email_code':
-      //   config = { emailAddressId: factor.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
-      //   break;
-      // case 'saml':
-      //   config = {
-      //     redirectUrl: factor.redirectUrl,
-      //     actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
-      //   } as SamlConfig;
-      //   break;
       default:
-        clerkInvalidStrategy('User.verifySessionPrepareFirstFactor', factor.strategy);
+        clerkInvalidStrategy('User.verifySessionPrepareFirstFactor', (factor as any).strategy);
     }
 
     const json = (
@@ -325,9 +300,8 @@ export class User extends BaseResource implements UserResource {
     return new SessionVerification(json);
   };
 
-  // TODO: Is this the correct types or only a few are allowed ?
   verifySessionAttemptFirstFactor = async (
-    attemptFactor: AttemptFirstFactorParams,
+    attemptFactor: SessionVerifyAttemptFirstFactorParams,
   ): Promise<SessionVerificationResource> => {
     const json = (
       await BaseResource._fetch({
