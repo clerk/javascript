@@ -2,6 +2,7 @@ import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
+import { useUserVerification } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Card, Form, Header, useCardState } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -16,6 +17,8 @@ type UserVerificationFactorOnePasswordProps = {
 export function UserVerificationFactorOnePasswordCard(props: UserVerificationFactorOnePasswordProps): JSX.Element {
   const { onShowAlternativeMethodsClick } = props;
   const { user } = useUser();
+  const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
+  const { closeUserVerification } = useClerk();
   const card = useCardState();
   const supportEmail = useSupportEmail();
   const { session } = useSession();
@@ -30,6 +33,22 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
     placeholder: localizationKeys('formFieldInputPlaceholder__password'),
   });
 
+  const beforeEmit = async () => {
+    if (routing === 'virtual') {
+      /**
+       * if `afterVerificationUrl` and modal redirect there,
+       * else if `afterVerificationUrl` redirect there,
+       * else If modal close it,
+       */
+      afterVerification?.();
+      closeUserVerification();
+    } else {
+      if (afterVerificationUrl) {
+        await navigate(afterVerificationUrl);
+      }
+    }
+  };
+
   const handlePasswordSubmit: React.FormEventHandler = async e => {
     e.preventDefault();
     return user
@@ -42,8 +61,8 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
         // await setActive({ session: session?.id });
         switch (res.status) {
           case 'complete':
-            await session?.getToken({ skipCache: true });
-            return setActive({ session: session?.id });
+            // await session?.getToken({ skipCache: true });
+            return setActive({ session: session?.id, beforeEmit });
           case 'needs_second_factor':
             return navigate('./factor-two');
           default:
@@ -104,15 +123,7 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
             </Card.Action>
           </Col>
         </Card.Content>
-        <Card.Footer>
-          {/*<Card.Action elementId='signIn'>*/}
-          {/*  <Card.ActionText localizationKey={localizationKeys('signIn.start.actionText')} />*/}
-          {/*  <Card.ActionLink*/}
-          {/*    localizationKey={localizationKeys('signIn.start.actionLink')}*/}
-          {/*    to={clerk.buildUrlWithAuth(signUpUrl)}*/}
-          {/*  />*/}
-          {/*</Card.Action>*/}
-        </Card.Footer>
+        <Card.Footer />
       </Card.Root>
     </Flow.Part>
   );
