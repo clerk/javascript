@@ -1,5 +1,5 @@
-import { useClerk } from '@clerk/nextjs';
-import type { TOTPFactor } from '@clerk/types';
+import { useClerk, useUser } from '@clerk/shared/react';
+import type { PhoneCodeFactor } from '@clerk/types';
 
 import { useUserVerification } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
@@ -7,12 +7,18 @@ import { useRouter } from '../../router';
 import type { UVFactorTwoCodeCard } from './UVFactorTwoCodeForm';
 import { UVFactorTwoCodeForm } from './UVFactorTwoCodeForm';
 
-type UVFactorTwoTOTPCardProps = UVFactorTwoCodeCard & { factor: TOTPFactor };
+type UVFactorTwoPhoneCodeCardProps = UVFactorTwoCodeCard & { factor: PhoneCodeFactor };
 
-export function UserVerificationFactorTwoTOTP(props: UVFactorTwoTOTPCardProps): JSX.Element {
+export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) => {
+  const { user } = useUser();
   const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
   const { closeUserVerification } = useClerk();
   const { navigate } = useRouter();
+
+  const prepare = () => {
+    const { phoneNumberId, strategy } = props.factor;
+    return user!.verifySessionPrepareSecondFactor({ phoneNumberId, strategy });
+  };
 
   const beforeEmit = async () => {
     if (routing === 'virtual') {
@@ -31,14 +37,16 @@ export function UserVerificationFactorTwoTOTP(props: UVFactorTwoTOTPCardProps): 
   };
 
   return (
-    <Flow.Part part='totp2Fa'>
+    <Flow.Part part='phoneCode2Fa'>
       <UVFactorTwoCodeForm
         {...props}
         beforeEmit={beforeEmit}
-        cardTitle={localizationKeys('signIn.totpMfa.title')}
-        cardSubtitle={localizationKeys('signIn.totpMfa.subtitle')}
-        inputLabel={localizationKeys('signIn.totpMfa.formTitle')}
+        cardTitle={localizationKeys('signIn.phoneCodeMfa.title')}
+        cardSubtitle={localizationKeys('signIn.phoneCodeMfa.subtitle')}
+        inputLabel={localizationKeys('signIn.phoneCodeMfa.formTitle')}
+        resendButton={localizationKeys('signIn.phoneCodeMfa.resendButton')}
+        prepare={prepare}
       />
     </Flow.Part>
   );
-}
+};
