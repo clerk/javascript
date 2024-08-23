@@ -302,3 +302,52 @@ const AppearanceProvider = (props: AppearanceProviderProps) => {
 };
 
 export { AppearanceProvider, useAppearance };
+
+if (import.meta.vitest) {
+  const { it, expect, describe } = import.meta.vitest;
+
+  describe('mergeElementsAppearanceConfig', () => {
+    it('merges two strings', () => {
+      const a = 'class-one';
+      const b = 'class-two';
+      expect(mergeElementsAppearanceConfig(a, b)).toBe('class-one class-two');
+    });
+
+    it('merges a string and an object', () => {
+      const a = 'class-one';
+      const b = { className: 'class-two' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-two class-one' });
+    });
+
+    it('merges an object and a string', () => {
+      const a = { className: 'class-one' };
+      const b = 'class-two';
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-one class-two' });
+    });
+
+    it('merges two objects', () => {
+      const a = { className: 'class-one' };
+      const b = { className: 'class-two' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-one class-two' });
+    });
+
+    it('merges a string and an object with style', () => {
+      const a = 'class-one';
+      const b = { className: 'class-two', backgroundColor: 'tomato' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({
+        className: 'class-two class-one',
+        backgroundColor: 'tomato',
+      });
+    });
+
+    it('merges two objects with styles', () => {
+      const a = { className: 'class-one', color: 'red' };
+      const b = { className: 'class-two', backgroundColor: 'tomato' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({
+        className: 'class-one class-two',
+        color: 'red',
+        backgroundColor: 'tomato',
+      });
+    });
+  });
+}
