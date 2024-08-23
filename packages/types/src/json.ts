@@ -12,6 +12,10 @@ import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus } from './session';
+import type {
+  __experimental_SessionVerificationLevel,
+  __experimental_SessionVerificationStatus,
+} from './sessionVerification';
 import type { SignInFirstFactor, SignInJSON, SignInSecondFactor } from './signIn';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUp';
 import type { BoxShadow, Color, EmUnit, FontWeight, HexColor } from './theme';
@@ -110,6 +114,17 @@ export interface SessionJSON extends ClerkResourceJSON {
   public_user_data: PublicUserDataJSON;
   created_at: number;
   updated_at: number;
+}
+
+export interface __experimental_SessionVerificationJSON extends ClerkResourceJSON {
+  object: 'session_verification';
+  status: __experimental_SessionVerificationStatus;
+  first_factor_verification: VerificationJSON;
+  session: SessionJSON;
+  second_factor_verification: VerificationJSON;
+  level: __experimental_SessionVerificationLevel;
+  supported_first_factors: SignInFirstFactorJSON[];
+  supported_second_factors: SignInSecondFactorJSON[];
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
