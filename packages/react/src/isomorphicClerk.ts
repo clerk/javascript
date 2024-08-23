@@ -164,10 +164,18 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps>();
-  private premountCreateOrganizationNodes = new Map<HTMLDivElement, CreateOrganizationProps>();
+  private hydrateClerkJs = new Map<HTMLDivElement, CreateOrganizationProps>();
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
+  // A separate Map of `addListener` method calls to handle multiple listeners.
+  private premountAddListenerCalls = new Map<
+    ListenerCallback,
+    {
+      unsubscribe: UnsubscribeCallback;
+      nativeUnsubscribe?: UnsubscribeCallback;
+    }
+  >();
   private loadedListeners: Array<() => void> = [];
 
   #loaded = false;
@@ -477,6 +485,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.clerkjs = clerkjs;
 
     this.premountMethodCalls.forEach(cb => cb());
+    this.premountAddListenerCalls.forEach((listenerHandlers, listener) => {
+      listenerHandlers.nativeUnsubscribe = clerkjs.addListener(listener);
+    });
 
     if (this.preopenSignIn !== null) {
       clerkjs.openSignIn(this.preopenSignIn);
@@ -834,13 +845,18 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   };
 
   addListener = (listener: ListenerCallback): UnsubscribeCallback => {
-    const callback = () => this.clerkjs?.addListener(listener);
-
     if (this.clerkjs) {
-      return callback() as UnsubscribeCallback;
+      return this.clerkjs.addListener(listener);
     } else {
-      this.premountMethodCalls.set('addListener', callback);
-      return () => this.premountMethodCalls.delete('addListener');
+      const unsubscribe = () => {
+        const listenerHandlers = this.premountAddListenerCalls.get(listener);
+        if (listenerHandlers) {
+          listenerHandlers.nativeUnsubscribe?.();
+          this.premountAddListenerCalls.delete(listener);
+        }
+      };
+      this.premountAddListenerCalls.set(listener, { unsubscribe });
+      return unsubscribe;
     }
   };
 
