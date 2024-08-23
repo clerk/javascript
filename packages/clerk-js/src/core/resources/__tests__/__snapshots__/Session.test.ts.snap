@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Session creating new session dispatches token:update event on initilization with lastActiveToken 1`] = `
+exports[`Session creating new session dispatches token:update event on initialization with lastActiveToken 1`] = `
 [
   "token:update",
   {

@@ -10,11 +10,11 @@
     "test": {
       "dependsOn": ["^build"],
       "inputs": [
+        "**/__test__/**",
         "*.d.ts",
         "bundlewatch.config.json",
         "jest.*",
         "src/**",
-        "tests/**",
         "tsconfig.json",
         "tsconfig.*.json",
         "tsup.config.ts",

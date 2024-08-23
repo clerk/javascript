@@ -16,10 +16,10 @@ export const $csrState = map<{
   organization: OrganizationResource | undefined | null;
 }>({
   isLoaded: false,
-  client: null,
-  user: null,
-  session: null,
-  organization: null,
+  client: undefined,
+  user: undefined,
+  session: undefined,
+  organization: undefined,
 });
 
 export const $initialState = map<InitialState>();

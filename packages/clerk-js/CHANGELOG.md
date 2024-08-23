@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.15.1
+
+### Patch Changes
+
+- Improve the Smart CAPTCHA widget console error. ([#3989](https://github.com/clerk/javascript/pull/3989)) by [@agis](https://github.com/agis)
+
+- Updated dependencies [[`c81785972`](https://github.com/clerk/javascript/commit/c81785972c1b6fdf76b7765a4c48d1a4ca1a776b), [`05198fd17`](https://github.com/clerk/javascript/commit/05198fd1791f81b4fc36d0f7d4cec750205d8ab9), [`5818ca8bd`](https://github.com/clerk/javascript/commit/5818ca8bd0f24c29bac0876c2aa88b0fe919b418)]:
+  - @clerk/localizations@2.6.1
+
 ## 5.15.0
 
 ### Minor Changes
