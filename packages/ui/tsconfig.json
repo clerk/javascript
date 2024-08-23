@@ -23,7 +23,6 @@
     "paths": {
       "~/*": ["src/*"]
     },
-    "typeRoots": ["../../node_modules/@types", "../../node_modules", "./src/types"],
     "types": ["vitest/importMeta"]
   },
   "include": ["src"]
