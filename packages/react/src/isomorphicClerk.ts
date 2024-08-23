@@ -164,7 +164,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps>();
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps>();
-  private hydrateClerkJs = new Map<HTMLDivElement, CreateOrganizationProps>();
+  private premountCreateOrganizationNodes = new Map<HTMLDivElement, CreateOrganizationProps>();
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
