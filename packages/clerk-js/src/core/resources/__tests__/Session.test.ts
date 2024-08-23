@@ -59,7 +59,50 @@ describe('Session', () => {
       BaseResource.clerk = null as any;
     });
 
-    it('dispatches token:update event on getToken', async () => {
+    it('dispatches token:update event on getToken without active organization', async () => {
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      await session.getToken();
+
+      expect(dispatchSpy).toHaveBeenCalledTimes(1);
+      expect(dispatchSpy.mock.calls[0]).toMatchSnapshot();
+    });
+
+    it('hydrates token cache from lastActiveToken', async () => {
+      BaseResource.clerk = clerkMock({
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) as Organization,
+      }) as any;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'activeOrganization',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const token = await session.getToken();
+
+      expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
+
+      expect(token).toEqual(mockJwt);
+      expect(dispatchSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('dispatches token:update event on getToken with active organization', async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) as Organization,
       }) as any;
