@@ -4,8 +4,13 @@ import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { clerkMock, createUser, mockDevClerkInstance, mockJwt, mockNetworkFailedFetch } from '../../test/fixtures';
 import { BaseResource, Organization, Session } from '../internal';
+import { SessionTokenCache } from '../../tokenCache';
 
 describe('Session', () => {
+  afterEach(() => {
+    SessionTokenCache.clear();
+  });
+
   describe('creating new session', () => {
     let dispatchSpy;
 
@@ -19,6 +24,7 @@ describe('Session', () => {
       BaseResource.clerk = null as any;
       // @ts-ignore
       global.fetch?.mockClear();
+      SessionTokenCache.clear();
     });
 
     it('dispatches token:update event on initialization with lastActiveToken', () => {
@@ -54,6 +60,10 @@ describe('Session', () => {
     });
 
     it('dispatches token:update event on getToken', async () => {
+      BaseResource.clerk = clerkMock({
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) as Organization,
+      }) as any;
+
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -72,6 +82,10 @@ describe('Session', () => {
     });
 
     it('does not dispatch token:update if template is provided', async () => {
+      BaseResource.clerk = clerkMock({
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) as Organization,
+      }) as any;
+
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -92,6 +106,7 @@ describe('Session', () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
       }) as any;
+
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -112,6 +127,7 @@ describe('Session', () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'anotherOrganization' } as OrganizationJSON),
       }) as any;
+
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -163,6 +179,7 @@ describe('Session', () => {
 
         const token = await session.getToken();
 
+        expect(global.fetch).toHaveBeenCalled();
         expect(dispatchSpy).toHaveBeenCalledTimes(1);
         expect(token).toEqual(null);
       });
