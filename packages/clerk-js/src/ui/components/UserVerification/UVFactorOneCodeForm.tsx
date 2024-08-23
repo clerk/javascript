@@ -3,6 +3,7 @@ import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
+import { useUserVerification } from '../../contexts';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
@@ -28,6 +29,8 @@ export type UVFactorOneCodeFormProps = UVFactorOneCodeCard & {
 
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   const { user } = useUser();
+  const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
+  const { closeUserVerification } = useClerk();
   const card = useCardState();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
@@ -50,6 +53,22 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
       .catch(err => handleError(err, [], card.setError));
   };
 
+  const beforeEmit = async () => {
+    if (routing === 'virtual') {
+      /**
+       * if `afterVerificationUrl` and modal redirect there,
+       * else if `afterVerificationUrl` redirect there,
+       * else If modal close it,
+       */
+      afterVerification?.();
+      closeUserVerification();
+    } else {
+      if (afterVerificationUrl) {
+        await navigate(afterVerificationUrl);
+      }
+    }
+  };
+
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     user!
       .verifySessionAttemptFirstFactor({ strategy: props.factor.strategy, code })
@@ -57,7 +76,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
         await resolve();
         switch (res.status) {
           case 'complete':
-            return clerk.setActive({ session: res.session.id });
+            return clerk.setActive({ session: res.session.id, beforeEmit });
           case 'needs_second_factor':
             return navigate('./factor-two');
           default:
