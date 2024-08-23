@@ -3,8 +3,8 @@ import type { OrganizationJSON, SessionJSON } from '@clerk/types';
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { clerkMock, createUser, mockDevClerkInstance, mockJwt, mockNetworkFailedFetch } from '../../test/fixtures';
-import { BaseResource, Organization, Session } from '../internal';
 import { SessionTokenCache } from '../../tokenCache';
+import { BaseResource, Organization, Session } from '../internal';
 
 describe('Session', () => {
   afterEach(() => {
@@ -79,7 +79,7 @@ describe('Session', () => {
 
     it('hydrates token cache from lastActiveToken', async () => {
       BaseResource.clerk = clerkMock({
-        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) as Organization,
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) ,
       }) as any;
 
       const session = new Session({
@@ -106,7 +106,7 @@ describe('Session', () => {
 
     it('dispatches token:update event on getToken with active organization', async () => {
       BaseResource.clerk = clerkMock({
-        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) as Organization,
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) ,
       }) as any;
 
       const session = new Session({
@@ -128,7 +128,7 @@ describe('Session', () => {
 
     it('does not dispatch token:update if template is provided', async () => {
       BaseResource.clerk = clerkMock({
-        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) as Organization,
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON) ,
       }) as any;
 
       const session = new Session({
