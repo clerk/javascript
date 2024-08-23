@@ -1,4 +1,5 @@
-import { Resources, UnsubscribeCallback } from '@clerk/types';
+import type { Resources, UnsubscribeCallback } from '@clerk/types';
+
 import { IsomorphicClerk } from '../isomorphicClerk';
 
 describe('isomorphicClerk', () => {
