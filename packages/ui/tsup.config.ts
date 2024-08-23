@@ -40,6 +40,7 @@ export default defineConfig(overrideOptions => {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
       __DEV__: `${!isProd}`,
+      'import.meta.vitest': 'undefined',
     },
     dts: true,
     entry: {
@@ -52,5 +53,6 @@ export default defineConfig(overrideOptions => {
     minify: false,
     sourcemap: true,
     esbuildPlugins: [tailwindcssTransformerCode],
+    treeshake: true,
   };
 });
