@@ -180,7 +180,7 @@ export class Session extends BaseResource implements SessionResource {
     }
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
     // TODO: update template endpoint to accept organizationId
-    const params = template ? {} : { ...(typeof organizationId !== 'undefined' && { organizationId }) };
+    const params = template ? {} : { organizationId };
     const tokenResolver = Token.create(path, params);
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {
