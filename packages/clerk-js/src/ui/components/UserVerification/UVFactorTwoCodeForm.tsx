@@ -1,5 +1,5 @@
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { PhoneCodeFactor, SessionVerificationResource, TOTPFactor } from '@clerk/types';
+import type { __experimental_SessionVerificationResource, PhoneCodeFactor, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
 import { clerkInvalidFAPIResponse } from '../../../core/errors';
@@ -13,7 +13,7 @@ export type UVFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlterna
   factor: PhoneCodeFactor | TOTPFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
-  prepare?: () => Promise<SessionVerificationResource>;
+  prepare?: () => Promise<__experimental_SessionVerificationResource>;
 };
 
 type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
@@ -48,7 +48,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     user!
-      .verifySessionAttemptSecondFactor({ strategy: props.factor.strategy, code })
+      .__experimental_verifySessionAttemptSecondFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
         switch (res.status) {

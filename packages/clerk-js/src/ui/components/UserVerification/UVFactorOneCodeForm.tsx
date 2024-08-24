@@ -48,7 +48,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
 
   const prepare = () => {
     void user!
-      .verifySessionPrepareFirstFactor(props.factor)
+      .__experimental_verifySessionPrepareFirstFactor(props.factor)
       .then(() => props.onFactorPrepare())
       .catch(err => handleError(err, [], card.setError));
   };
@@ -71,7 +71,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     user!
-      .verifySessionAttemptFirstFactor({ strategy: props.factor.strategy, code })
+      .__experimental_verifySessionAttemptFirstFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
         switch (res.status) {

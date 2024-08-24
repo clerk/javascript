@@ -38,7 +38,6 @@ import type {
   VerifyTOTPParams,
   Web3WalletResource,
 } from '@clerk/types';
-import type { SessionVerifyAttemptSecondFactorParams, SessionVerifyPrepareSecondFactorParams } from '@clerk/types/dist';
 
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';

@@ -10,7 +10,7 @@ const useUserVerificationSession = () => {
   const { level } = useUserVerification();
   const [isComplete, setComplete] = useState(false);
   const data = useFetch(
-    user ? user.verifySession : undefined,
+    user ? user.__experimental_verifySession : undefined,
     {
       level: level || 'L2.secondFactor',
       // TODO: Figure out if this needs to be a prop

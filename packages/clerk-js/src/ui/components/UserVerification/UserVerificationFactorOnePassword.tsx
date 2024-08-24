@@ -52,7 +52,7 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
   const handlePasswordSubmit: React.FormEventHandler = async e => {
     e.preventDefault();
     return user
-      ?.verifySessionAttemptFirstFactor({
+      ?.__experimental_verifySessionAttemptFirstFactor({
         strategy: 'password',
         password: passwordControl.value,
       })
