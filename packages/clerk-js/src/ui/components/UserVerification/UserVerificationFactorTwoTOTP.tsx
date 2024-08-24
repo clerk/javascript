@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/nextjs';
+import { useClerk } from '@clerk/shared/react';
 import type { TOTPFactor } from '@clerk/types';
 
 import { useUserVerification } from '../../contexts';
