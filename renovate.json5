@@ -46,6 +46,65 @@
   "packageRules": [
     {
       "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "astro-dev-minor",
+      "matchFileNames": [
+        "packages/astro/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "astro"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "astro-dev-major",
+      "matchFileNames": [
+        "packages/astro/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "astro"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "astro-prod-minor",
+      "matchFileNames": [
+        "packages/astro/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "astro"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "astro-prod-major",
+      "matchFileNames": [
+        "packages/astro/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "astro"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "backend-dev-minor",
       "matchFileNames": [
         "packages/backend/package.json"
@@ -397,6 +456,65 @@
         "major"
       ],
       "semanticCommitScope": "clerk-sdk-node"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "dev-cli-dev-minor",
+      "matchFileNames": [
+        "packages/dev-cli/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "dev-cli"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "dev-cli-dev-major",
+      "matchFileNames": [
+        "packages/dev-cli/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "dev-cli"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "dev-cli-prod-minor",
+      "matchFileNames": [
+        "packages/dev-cli/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "dev-cli"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "dev-cli-prod-major",
+      "matchFileNames": [
+        "packages/dev-cli/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "dev-cli"
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
@@ -931,6 +1049,65 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "tanstack-start-dev-minor",
+      "matchFileNames": [
+        "packages/tanstack-start/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "tanstack-start"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "tanstack-start-dev-major",
+      "matchFileNames": [
+        "packages/tanstack-start/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "tanstack-start"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "tanstack-start-prod-minor",
+      "matchFileNames": [
+        "packages/tanstack-start/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "tanstack-start"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "tanstack-start-prod-major",
+      "matchFileNames": [
+        "packages/tanstack-start/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "tanstack-start"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "testing-dev-minor",
       "matchFileNames": [
         "packages/testing/package.json"
@@ -1164,6 +1341,65 @@
         "major"
       ],
       "semanticCommitScope": "ui"
+    },
+    {
+      "groupName": "[DEV] minor & patch dependencies",
+      "groupSlug": "upgrade-dev-minor",
+      "matchFileNames": [
+        "packages/upgrade/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "automerge": true,
+      "semanticCommitScope": "upgrade"
+    },
+    {
+      "groupName": "[DEV] major dependencies",
+      "groupSlug": "upgrade-dev-major",
+      "matchFileNames": [
+        "packages/upgrade/package.json"
+      ],
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "upgrade"
+    },
+    {
+      "groupName": "minor & patch dependencies",
+      "groupSlug": "upgrade-prod-minor",
+      "matchFileNames": [
+        "packages/upgrade/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
+      "semanticCommitScope": "upgrade"
+    },
+    {
+      "groupName": "major dependencies",
+      "groupSlug": "upgrade-prod-major",
+      "matchFileNames": [
+        "packages/upgrade/package.json"
+      ],
+      "matchDepTypes": [
+        "dependencies"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "semanticCommitScope": "upgrade"
     },
     {
       "matchManagers": [
