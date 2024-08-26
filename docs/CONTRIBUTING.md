@@ -79,7 +79,9 @@ To set up your development environment, please follow these steps:
 
    This ensures that all internal TypeScript types are generated and any dependencies between packages are resolving.
 
-For package specific setup, refer to the `Build` section of the specific package (e.g. `packages/<package_name>/README.md#build`).
+Once you're ready to make changes, run `npm run dev` from the monorepo root.
+
+If you want to run the `dev` script of an individual package, navigate to the folder and run the script from there.
 
 ### Documenting your changes
 
