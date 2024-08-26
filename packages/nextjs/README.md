@@ -9,35 +9,21 @@
   <h1 align="center">@clerk/nextjs</h1>
 </p>
 
-<p align="center">
-  <a href="https://clerk.com/discord">
-    <img src="https://img.shields.io/discord/856971667393609759.svg?logo=discord" alt="Chat on Discord" />
-  </a>
-  <a href="https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs">
-    <img src="https://img.shields.io/badge/documentation-clerk-green.svg" alt="Clerk documentation" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=ClerkDev">
-    <img src="https://img.shields.io/twitter/follow/ClerkDev?style=social" alt="Follow on Twitter" />
-  </a>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://github.com/clerk/javascript/blob/main/packages/nextjs/CHANGELOG.md">
-    Changelog
-  </a>
-  ·
-  <a href="https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml">
-    Report a Bug
-  </a>
-  ·
-  <a href="https://feedback.clerk.com/roadmap">
-    Request a Feature
-  </a>
-  ·
-  <a href="https://clerk.com/contact">
-    Get help
-  </a>
-</p>
+[![Chat on Discord](https://img.shields.io/discord/856971667393609759.svg?logo=discord)](https://clerk.com/discord)
+[![Clerk documentation](https://img.shields.io/badge/documentation-clerk-green.svg)](https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/ClerkDev?style=social)](https://twitter.com/intent/follow?screen_name=ClerkDev)
+
+[Changelog](https://github.com/clerk/javascript/blob/main/packages/nextjs/CHANGELOG.md)
+·
+[Report a Bug](https://github.com/clerk/javascript/issues/new?assignees=&labels=needs-triage&projects=&template=BUG_REPORT.yml)
+·
+[Request a Feature](https://feedback.clerk.com/roadmap)
+·
+[Get help](https://clerk.com/contact)
+
+</div>
 
 ---
 
