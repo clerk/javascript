@@ -41,7 +41,6 @@
     "@clerk/shared": "file:../shared",
     "@clerk/types": "file:../types",
     "@radix-ui/react-slot": "^1.1.0",
-    "cmdk": "^1.0.0",
     "cva": "^1.0.0-beta.1",
     "react-aria-components": "^1.2.1"
   },
