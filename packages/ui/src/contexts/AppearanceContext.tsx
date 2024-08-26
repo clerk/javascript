@@ -181,7 +181,9 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
 
   const result = {
     theme: baseTheme,
-    elements: { ...baseTheme },
+    // because we're going to perform modifications to deeply nested objects, we need to create a structuredClone of
+    // the theme or else subsequent usage of the baseTheme will contain our merged changes.
+    elements: structuredClone(baseTheme),
     layout: { ...defaultAppearance.layout, ...appearance.layout },
   };
 
@@ -242,7 +244,7 @@ function mergeAppearenceElementsAndParsedAppearanceElements(
   return mergedElements;
 }
 
-const defaultAppearance: ParsedAppearance = {
+export const defaultAppearance: ParsedAppearance = {
   theme: fullTheme,
   elements: fullTheme,
   layout: {
