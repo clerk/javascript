@@ -1,4 +1,11 @@
 import type {
+  __experimental_SessionVerificationJSON,
+  __experimental_SessionVerificationResource,
+  __experimental_SessionVerifyAttemptFirstFactorParams,
+  __experimental_SessionVerifyAttemptSecondFactorParams,
+  __experimental_SessionVerifyCreateParams,
+  __experimental_SessionVerifyPrepareFirstFactorParams,
+  __experimental_SessionVerifyPrepareSecondFactorParams,
   BackupCodeJSON,
   BackupCodeResource,
   CreateEmailAddressParams,
@@ -8,6 +15,7 @@ import type {
   DeletedObjectJSON,
   DeletedObjectResource,
   EmailAddressResource,
+  EmailCodeConfig,
   ExternalAccountJSON,
   ExternalAccountResource,
   GetOrganizationMemberships,
@@ -16,6 +24,7 @@ import type {
   ImageResource,
   OrganizationMembershipResource,
   PasskeyResource,
+  PhoneCodeConfig,
   PhoneNumberResource,
   RemoveUserPasswordParams,
   SamlAccountResource,
@@ -33,6 +42,7 @@ import type {
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
+import { clerkInvalidStrategy } from '../errors';
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
@@ -50,6 +60,7 @@ import {
   UserOrganizationInvitation,
   Web3Wallet,
 } from './internal';
+import { SessionVerification } from './SessionVerification';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';
@@ -237,6 +248,98 @@ export class User extends BaseResource implements UserResource {
 
   delete = (): Promise<void> => {
     return this._baseDelete({ path: '/me' });
+  };
+
+  __experimental_verifySession = async ({
+    level,
+    maxAge,
+  }: __experimental_SessionVerifyCreateParams): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify`,
+        body: {
+          level,
+          maxAge,
+        } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_verifySessionPrepareFirstFactor = async (
+    factor: __experimental_SessionVerifyPrepareFirstFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    let config;
+    switch (factor.strategy) {
+      case 'email_code':
+        config = { emailAddressId: factor.emailAddressId } as EmailCodeConfig;
+        break;
+      case 'phone_code':
+        config = {
+          phoneNumberId: factor.phoneNumberId,
+          default: factor.default,
+        } as PhoneCodeConfig;
+        break;
+      default:
+        clerkInvalidStrategy('User.verifySessionPrepareFirstFactor', (factor as any).strategy);
+    }
+
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify/prepare_first_factor`,
+        body: {
+          ...config,
+          strategy: factor.strategy,
+        } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_verifySessionAttemptFirstFactor = async (
+    attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_first_factor`,
+        body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_verifySessionPrepareSecondFactor = async (
+    params: __experimental_SessionVerifyPrepareSecondFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify/prepare_second_factor`,
+        body: params as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
+  };
+
+  __experimental_verifySessionAttemptSecondFactor = async (
+    params: __experimental_SessionVerifyAttemptSecondFactorParams,
+  ): Promise<__experimental_SessionVerificationResource> => {
+    const json = (
+      await BaseResource._fetch({
+        method: 'POST',
+        path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_second_factor`,
+        body: params as any,
+      })
+    )?.response as unknown as __experimental_SessionVerificationJSON;
+
+    return new SessionVerification(json);
   };
 
   getSessions = async (): Promise<SessionWithActivities[]> => {
