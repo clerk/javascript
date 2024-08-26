@@ -1,14 +1,26 @@
 import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
-import { Command } from 'cmdk';
+import {
+  autoUpdate,
+  FloatingFocusManager,
+  FloatingPortal,
+  offset,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useListNavigation,
+  useRole,
+} from '@floating-ui/react';
 import { cx } from 'cva';
 import * as React from 'react';
-import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
 import { type CountryIso, IsoToCountryMap } from '~/constants/phone-number';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
+import { commandScore } from '~/utils/command-score';
 import { mergeRefs } from '~/utils/merge-refs';
 import { extractDigits, formatPhoneNumber, parsePhoneString } from '~/utils/phone-number';
 
@@ -95,16 +107,37 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
   const { t, translateError } = useLocalizations();
   const [isOpen, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countryOptions[0]);
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const [inputValue, setInputValue] = React.useState('');
   const id = React.useId();
   const containerRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const commandListRef = React.useRef<HTMLDivElement>(null);
-  const commandInputRef = React.useRef<HTMLInputElement>(null);
+  const listRef = React.useRef<Array<HTMLElement | null>>([]);
   const contentWidth = containerRef.current?.getBoundingClientRect()?.width || 0;
   const { setNumber, setIso, setNumberAndIso, numberWithCode, formattedNumber, iso } = useFormattedPhoneNumber({
     initPhoneWithCode,
     locationBasedCountryIso,
   });
+
+  const { refs, floatingStyles, context } = useFloating({
+    placement: 'bottom-start',
+    open: isOpen,
+    onOpenChange: setOpen,
+    middleware: [offset(5), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+  const listNavigation = useListNavigation(context, {
+    listRef,
+    activeIndex,
+    onNavigate: setActiveIndex,
+    loop: true,
+  });
+
+  const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([click, dismiss, role, listNavigation]);
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -132,17 +165,13 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
     [iso],
   );
 
-  React.useEffect(
-    function scrollActiveCommandItemIntoView() {
-      if (isOpen) {
-        commandInputRef.current?.focus();
-        setTimeout(() => {
-          commandListRef.current?.querySelector('[data-checked=true]')?.scrollIntoView({ block: 'start' });
-        }, 0);
-      }
-    },
-    [isOpen],
-  );
+  const filteredOptions = countryOptions
+    .map(option => ({
+      ...option,
+      score: commandScore(option.name, inputValue, [option.code]),
+    }))
+    .filter(option => option.score > 0)
+    .sort((a, b) => b.score - a.score);
 
   return (
     <Common.Field
@@ -166,22 +195,15 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
               <div
                 ref={containerRef}
                 className={cx(
-                  // Note:
-                  // - To create the overlapping border/shadow effect"
-                  //   - `ring` – "focus ring"
-                  //   - `ring-offset` - border
                   '[--phone-number-field-py:theme(spacing[1.5])]',
                   '[--phone-number-field-px:theme(spacing.3)]',
                   'ring ring-transparent ring-offset-1 ring-offset-[--cl-phone-number-field-border]',
                   'text-gray-12 relative flex min-w-0 rounded-md bg-white text-base outline-none',
                   'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
                   'has-[[data-field-input][disabled]]:cursor-not-allowed has-[[data-field-input][disabled]]:opacity-50',
-                  // hover
                   'hover:has-[[data-field-input]:enabled]:ring-offset-[--cl-phone-number-field-border-active]',
-                  // focus
                   'has-[[data-field-input]:focus-visible]:ring-offset-[--cl-phone-number-field-border-active]',
                   'has-[[data-field-input]:focus-visible]:ring-[--cl-phone-number-field-ring,theme(ringColor.light)]',
-                  // intent
                   {
                     idle: [
                       '[--cl-phone-number-field-border:theme(colors.gray.a4)]',
@@ -199,7 +221,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                     success: [
                       '[--cl-phone-number-field-border:theme(colors.success.DEFAULT)]',
                       '[--cl-phone-number-field-border-active:theme(colors.success.DEFAULT)]',
-                      '[--cl-phone-number-field-ring:theme(colors.success.DEFAULT/0.25)]', // (optically adjusted ring to 25 opacity)
+                      '[--cl-phone-number-field-ring:theme(colors.success.DEFAULT/0.25)]',
                     ],
                     warning: [
                       '[--cl-phone-number-field-border:theme(colors.warning.DEFAULT)]',
@@ -209,69 +231,74 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   }[intent],
                 )}
               >
-                <DialogTrigger>
-                  <Button
-                    onPress={() => setOpen(true)}
-                    isDisabled={props.disabled}
-                    className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
-                  >
-                    <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
-                    <Icon.ChevronUpDownSm className='text-gray-9 text-[length:theme(size.4)]' />
-                  </Button>
-                  <Popover
-                    isOpen={isOpen}
-                    onOpenChange={setOpen}
-                    placement='bottom start'
-                    // Note: manual xOffset to ensure optical alignment
-                    crossOffset={-1}
-                  >
-                    <Dialog
-                      className='outline-none'
-                      style={{
-                        width: contentWidth,
-                      }}
+                <button
+                  ref={refs.setReference}
+                  {...getReferenceProps()}
+                  disabled={props.disabled}
+                  type='button'
+                  className='hover:enabled:bg-gray-2 focus-visible:ring-light-opaque focus-visible:ring-offset-gray-8 flex items-center gap-x-1 rounded-l-md px-2 py-1 text-base outline-none focus-visible:ring focus-visible:ring-offset-1'
+                >
+                  <span className='min-w-6 uppercase'>{selectedCountry.iso}</span>
+                  <Icon.ChevronUpDownSm className='text-gray-9 text-[length:theme(size.4)]' />
+                </button>
+                <FloatingPortal>
+                  {isOpen && (
+                    <FloatingFocusManager
+                      context={context}
+                      modal={false}
                     >
-                      <Command className='border-gray-a3 overflow-hidden rounded-md border bg-white bg-clip-padding shadow-lg outline-none'>
+                      <div
+                        ref={refs.setFloating}
+                        style={{ ...floatingStyles, width: contentWidth }}
+                        {...getFloatingProps()}
+                        className='border-gray-a3 overflow-hidden rounded-md border bg-white bg-clip-padding shadow-lg outline-none'
+                      >
                         <div className='p-0.5'>
-                          <Command.Input
-                            ref={commandInputRef}
+                          <input
                             placeholder='Search country or code'
+                            value={inputValue}
+                            onChange={e => setInputValue(e.target.value)}
                             className='leading-small bg-gray-2 placeholder:text-gray-9 text-gray-12 border-gray-4 w-full rounded-[calc(theme(borderRadius.md)-2px)] border px-2 py-1.5 text-base outline-none'
                           />
                         </div>
-                        <Command.List
-                          ref={commandListRef}
-                          className='max-h-80 overflow-y-auto overflow-x-hidden'
-                        >
-                          <Command.Empty className='text-gray-11 leading-small px-4 py-1.5 text-center text-base'>
-                            No countries found
-                          </Command.Empty>
-                          {countryOptions.map(({ name, iso, code }, index) => {
-                            return (
-                              <Command.Item
+                        <div className='max-h-80 overflow-y-auto overflow-x-hidden'>
+                          {filteredOptions.length === 0 ? (
+                            <div className='text-gray-11 leading-small px-4 py-1.5 text-center text-base'>
+                              No countries found
+                            </div>
+                          ) : (
+                            filteredOptions.map(({ name, iso, code }, index) => (
+                              <div
                                 key={iso}
-                                onSelect={() => {
-                                  setIso(iso);
-                                  setOpen(false);
+                                ref={node => {
+                                  listRef.current[index] = node;
                                 }}
-                                data-checked={selectedCountry === countryOptions[index]}
-                                className='leading-small aria-selected:bg-gray-2 flex cursor-pointer gap-x-2 px-4 py-1.5 text-base'
+                                {...getItemProps({
+                                  onClick: () => {
+                                    setIso(iso);
+                                    setOpen(false);
+                                  },
+                                })}
+                                className={cx(
+                                  'leading-small flex cursor-pointer gap-x-2 px-4 py-1.5 text-base',
+                                  activeIndex === index && 'bg-gray-2',
+                                )}
                               >
                                 <span className='grid w-3 shrink-0 place-content-center'>
-                                  {selectedCountry === countryOptions[index] && (
+                                  {selectedCountry.iso === iso && (
                                     <Icon.CheckmarkSm className='text-[length:theme(size.4)]' />
                                   )}
                                 </span>
                                 <span className='grow truncate'>{name}</span>
                                 <span className='text-gray-11 ms-auto'>+{code}</span>
-                              </Command.Item>
-                            );
-                          })}
-                        </Command.List>
-                      </Command>
-                    </Dialog>
-                  </Popover>
-                </DialogTrigger>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </FloatingFocusManager>
+                  )}
+                </FloatingPortal>
                 <button
                   type='button'
                   // Prevent tab stop
