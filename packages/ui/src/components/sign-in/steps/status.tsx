@@ -1,9 +1,12 @@
+import * as React from 'react';
+
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
 import { useAppearance } from '~/hooks/use-appearance';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Card from '~/primitives/card';
+import * as Icon from '~/primitives/icon';
 import { Spinner } from '~/primitives/spinner';
 
 const signInLocalizationKeys = {
@@ -33,17 +36,22 @@ const signInLocalizationKeys = {
   },
 };
 
-export function SignInStatus({
-  status,
-  loading = false,
-}: {
-  status: keyof typeof signInLocalizationKeys;
-  loading?: boolean;
-}) {
+type Status = keyof typeof signInLocalizationKeys;
+
+const statusIcon: Record<Exclude<Status, 'loading'>, React.ReactElement> = {
+  verified: <Icon.TickShieldLegacy />,
+  verified_switch_tab: <Icon.SwitchArrowsLegacy />,
+  expired: <Icon.ExclamationTriangleLegacy />,
+  failed: <Icon.ExclamationTriangleLegacy />,
+  client_mismatch: <Icon.ExclamationTriangleLegacy />,
+};
+
+export function SignInStatus() {
   const { t } = useLocalizations();
   const { branded } = useDisplayConfig();
   const { layout } = useAppearance();
   const isDev = useDevModeWarning();
+  const [status] = React.useState<Status>('client_mismatch');
 
   const cardFooterProps = {
     branded,
@@ -63,12 +71,14 @@ export function SignInStatus({
         </Card.Header>
         <Card.Body>
           <div className='flex flex-col items-center justify-center gap-y-4'>
-            {loading ? (
-              <Spinner>Loading…</Spinner>
+            {status === 'loading' ? (
+              <Spinner className='text-3xl'>Loading…</Spinner>
             ) : (
               <>
                 {/* TODO: Implement status icons */}
-                <div className='bg-gray-2 size-24 shrink-0 rounded-full' />
+                <div className='bg-gray-2 grid size-24 shrink-0 items-center justify-center rounded-full'>
+                  {statusIcon[status]}
+                </div>
                 <p className='text-gray-a11 text-base'>{t('signIn.emailLink.unusedTab.title')}</p>
               </>
             )}
