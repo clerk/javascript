@@ -7,6 +7,7 @@ import { SignInForgotPassword } from '~/components/sign-in/steps/forgot-password
 import { SignInGetHelp } from '~/components/sign-in/steps/get-help';
 import { SignInResetPassword } from '~/components/sign-in/steps/reset-password';
 import { SignInStart } from '~/components/sign-in/steps/start';
+import { SignInStatus } from '~/components/sign-in/steps/status';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
 
 import { SignInChooseSession } from './steps/choose-session';
@@ -38,6 +39,7 @@ export function SignIn() {
             <SignInForgotPassword />
             <SignInResetPassword />
             <SignInChooseSession />
+            <SignInStatus />
           </>
         )}
       </SignInRoot>
