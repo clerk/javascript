@@ -6,28 +6,28 @@ import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { errorThrower } from '../utils';
+import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
 import type { LoaderOptions } from './types';
-import { getEnvVariable } from './utils';
 
 export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => {
   const clerkRequest = createClerkRequest(request);
 
   const secretKey = overrides.secretKey || overrides.secretKey || getEnvVariable('CLERK_SECRET_KEY');
-  const publishableKey = overrides.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY');
+  const publishableKey = overrides.publishableKey || getPublicEnvVariables().publishableKey;
   const jwtKey = overrides.jwtKey || getEnvVariable('CLERK_JWT_KEY');
   const apiUrl = getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey);
-  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || getEnvVariable('CLERK_DOMAIN') || '';
+  const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || getPublicEnvVariables().domain;
   const isSatellite =
-    handleValueOrFn(overrides.isSatellite, new URL(request.url)) || isTruthy(getEnvVariable('CLERK_IS_SATELLITE'));
+    handleValueOrFn(overrides.isSatellite, new URL(request.url)) || isTruthy(getPublicEnvVariables().isSatellite);
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(
     overrides?.proxyUrl,
     clerkRequest.clerkUrl,
-    getEnvVariable('CLERK_PROXY_URL'),
+    getPublicEnvVariables().proxyUrl,
   );
-  const signInUrl = overrides.signInUrl || getEnvVariable('CLERK_SIGN_IN_URL');
-  const signUpUrl = overrides.signUpUrl || getEnvVariable('CLERK_SIGN_UP_URL');
-  const afterSignInUrl = overrides.afterSignInUrl || getEnvVariable('CLERK_AFTER_SIGN_IN_URL') || '';
-  const afterSignUpUrl = overrides.afterSignUpUrl || getEnvVariable('CLERK_AFTER_SIGN_UP_URL') || '';
+  const signInUrl = overrides.signInUrl || getPublicEnvVariables().signInUrl;
+  const signUpUrl = overrides.signUpUrl || getPublicEnvVariables().signUpUrl;
+  const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables().afterSignInUrl;
+  const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl;
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {

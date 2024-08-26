@@ -2,26 +2,8 @@ import type { RequestState } from '@clerk/backend/internal';
 import { debugRequestState } from '@clerk/backend/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
+import { getEnvVariable } from '../../utils/env';
 import type { AdditionalStateOptions } from '../types';
-
-/**
- *
- * Utility function to get env variables.
- *
- * @param name env variable name
- * @param defaultVaue default value to return if the env variable is not set
- * @returns string
- *
- * @internal
- */
-export const getEnvVariable = (name: string, defaultVaue: string = ''): string => {
-  // Node envs
-  if (typeof process !== 'undefined' && process.env && typeof process.env[name] === 'string') {
-    return (process.env[name] as string) || defaultVaue;
-  }
-
-  return defaultVaue;
-};
 
 /**
  * Wraps obscured clerk internals with a readable `clerkState` key.
@@ -40,6 +22,7 @@ export const wrapWithClerkState = (data: any) => {
  */
 export function getResponseClerkState(requestState: RequestState, additionalStateOptions: AdditionalStateOptions = {}) {
   const { reason, message, isSignedIn, ...rest } = requestState;
+
   const clerkInitialState = wrapWithClerkState({
     __clerk_ssr_state: rest.toAuth(),
     __publishableKey: requestState.publishableKey,
