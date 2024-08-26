@@ -3,6 +3,8 @@ import { handleValueOrFn } from '@clerk/shared/handleValueOrFn';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type { TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
+  __experimental_UserVerificationModalProps,
+  __experimental_UserVerificationProps,
   ActiveSessionResource,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -37,7 +39,6 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
-  UserVerificationProps,
   Without,
 } from '@clerk/types';
 
@@ -103,7 +104,7 @@ type IsomorphicLoadedClerk = Without<
   | 'mountSignUp'
   | 'mountSignIn'
   | 'mountUserProfile'
-  | 'mountUserVerification'
+  | '__experimental_mountUserVerification'
   | 'client'
 > & {
   // TODO: Align return type and parms
@@ -147,7 +148,7 @@ type IsomorphicLoadedClerk = Without<
   mountSignUp: (node: HTMLDivElement, props: SignUpProps) => void;
   mountSignIn: (node: HTMLDivElement, props: SignInProps) => void;
   mountUserProfile: (node: HTMLDivElement, props: UserProfileProps) => void;
-  mountUserVerification: (node: HTMLDivElement, props: UserVerificationProps) => void;
+  __experimental_mountUserVerification: (node: HTMLDivElement, props: __experimental_UserVerificationProps) => void;
   client: ClientResource | undefined;
 };
 
@@ -157,7 +158,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
-  private preopenUserVerification?: null | UserVerificationProps = null;
+  private preopenUserVerification?: null | __experimental_UserVerificationProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenSignUp?: null | SignUpProps = null;
   private preopenUserProfile?: null | UserProfileProps = null;
@@ -171,7 +172,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountCreateOrganizationNodes = new Map<HTMLDivElement, CreateOrganizationProps>();
   private premountOrganizationSwitcherNodes = new Map<HTMLDivElement, OrganizationSwitcherProps>();
   private premountOrganizationListNodes = new Map<HTMLDivElement, OrganizationListProps>();
-  private premountUserVerificationNodes = new Map<HTMLDivElement, UserVerificationProps>();
+  private premountUserVerificationNodes = new Map<HTMLDivElement, __experimental_UserVerificationProps>();
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
@@ -507,7 +508,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     if (this.preopenUserVerification !== null) {
-      clerkjs.openUserVerification(this.preopenUserVerification);
+      clerkjs.__experimental_openUserVerification(this.preopenUserVerification);
     }
 
     if (this.preopenOneTap !== null) {
@@ -534,8 +535,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountUserProfile(node, props);
     });
 
-    this.premountUserVerificationNodes.forEach((props: UserVerificationProps, node: HTMLDivElement) => {
-      clerkjs.mountUserVerification(node, props);
+    this.premountUserVerificationNodes.forEach((props: __experimental_UserVerificationProps, node: HTMLDivElement) => {
+      clerkjs.__experimental_mountUserVerification(node, props);
     });
 
     this.premountUserButtonNodes.forEach((props: UserButtonProps, node: HTMLDivElement) => {
@@ -649,17 +650,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  openUserVerification = (props?: UserVerificationProps): void => {
+  __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.openUserVerification(props);
+      this.clerkjs.__experimental_openUserVerification(props);
     } else {
       this.preopenUserVerification = props;
     }
   };
 
-  closeUserVerification = (): void => {
+  __experimental_closeUserVerification = (): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.closeUserVerification();
+      this.clerkjs.__experimental_closeUserVerification();
     } else {
       this.preopenUserVerification = null;
     }
@@ -761,17 +762,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountUserVerification = (node: HTMLDivElement, props: UserVerificationProps): void => {
+  __experimental_mountUserVerification = (node: HTMLDivElement, props: __experimental_UserVerificationProps): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.mountUserVerification(node, props);
+      this.clerkjs.__experimental_mountUserVerification(node, props);
     } else {
       this.premountUserVerificationNodes.set(node, props);
     }
   };
 
-  unmountUserVerification = (node: HTMLDivElement): void => {
+  __experimental_unmountUserVerification = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.#loaded) {
-      this.clerkjs.unmountUserVerification(node);
+      this.clerkjs.__experimental_unmountUserVerification(node);
     } else {
       this.premountUserVerificationNodes.delete(node);
     }

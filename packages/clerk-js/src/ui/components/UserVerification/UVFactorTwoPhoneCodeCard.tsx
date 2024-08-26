@@ -12,7 +12,7 @@ type UVFactorTwoPhoneCodeCardProps = UVFactorTwoCodeCard & { factor: PhoneCodeFa
 export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) => {
   const { user } = useUser();
   const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
-  const { closeUserVerification } = useClerk();
+  const { __experimental_closeUserVerification } = useClerk();
   const { navigate } = useRouter();
 
   const prepare = () => {
@@ -28,7 +28,7 @@ export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) =
        * else If modal close it,
        */
       afterVerification?.();
-      closeUserVerification();
+      __experimental_closeUserVerification();
     } else {
       if (afterVerificationUrl) {
         await navigate(afterVerificationUrl);

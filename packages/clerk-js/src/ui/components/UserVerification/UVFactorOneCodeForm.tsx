@@ -30,7 +30,7 @@ export type UVFactorOneCodeFormProps = UVFactorOneCodeCard & {
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   const { user } = useUser();
   const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
-  const { closeUserVerification } = useClerk();
+  const { __experimental_closeUserVerification } = useClerk();
   const card = useCardState();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
@@ -61,7 +61,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
        * else If modal close it,
        */
       afterVerification?.();
-      closeUserVerification();
+      __experimental_closeUserVerification();
     } else {
       if (afterVerificationUrl) {
         await navigate(afterVerificationUrl);

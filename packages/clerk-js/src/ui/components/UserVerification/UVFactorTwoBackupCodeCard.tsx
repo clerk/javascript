@@ -17,7 +17,7 @@ export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps)
   const { onShowAlternativeMethodsClicked } = props;
   const { user } = useUser();
   const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
-  const { setActive, closeUserVerification } = useClerk();
+  const { setActive, __experimental_closeUserVerification } = useClerk();
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const card = useCardState();
@@ -35,7 +35,7 @@ export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps)
        * else If modal close it,
        */
       afterVerification?.();
-      closeUserVerification();
+      __experimental_closeUserVerification();
     } else {
       if (afterVerificationUrl) {
         await navigate(afterVerificationUrl);

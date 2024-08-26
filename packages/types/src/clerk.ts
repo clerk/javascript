@@ -33,6 +33,7 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { ActiveSessionResource } from './session';
+import type { __experimental_SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
@@ -141,9 +142,18 @@ export interface Clerk {
    */
   closeSignIn: () => void;
 
-  openUserVerification: (props?: UserVerificationProps) => void;
+  /**
+   * Opens the Clerk UserVerification component in a modal.
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param props Optional user verification configuration parameters.
+   */
+  __experimental_openUserVerification: (props?: __experimental_UserVerificationModalProps) => void;
 
-  closeUserVerification: () => void;
+  /**
+   * Closes the Clerk user verification modal.
+   * @experimantal This API is still under active development and may change at any moment.
+   */
+  __experimental_closeUserVerification: () => void;
 
   /**
    * Opens the Google One Tap component.
@@ -216,8 +226,26 @@ export interface Clerk {
    */
   unmountSignIn: (targetNode: HTMLDivElement) => void;
 
-  mountUserVerification: (targetNode: HTMLDivElement, props?: UserVerificationProps) => void;
-  unmountUserVerification: (targetNode: HTMLDivElement) => void;
+  /**
+   * Mounts a user reverification flow component at the target element.
+   *
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param targetNode Target node to mount the UserVerification component from.
+   * @param props user verification configuration parameters.
+   */
+  __experimental_mountUserVerification: (
+    targetNode: HTMLDivElement,
+    props?: __experimental_UserVerificationProps,
+  ) => void;
+
+  /**
+   * Unmount a user reverification flow component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param targetNode Target node to unmount the UserVerification component from.
+   */
+  __experimental_unmountUserVerification: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a sign up flow component at the target element.
@@ -758,11 +786,14 @@ interface TransferableOption {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-export type UserVerificationProps = RoutingOptions & {
+/**
+ * @experimantal
+ */
+export type __experimental_UserVerificationProps = RoutingOptions & {
   afterVerification?: () => void;
   afterVerificationUrl?: string;
 
-  level?: 'L1.firstFactor' | 'L2.secondFactor' | 'L3.multiFactor';
+  level?: __experimental_SessionVerificationLevel;
 
   /**
    * Customisation options to fully match the Clerk components to your own brand.
@@ -772,7 +803,7 @@ export type UserVerificationProps = RoutingOptions & {
   appearance?: UserVerificationTheme;
 };
 
-export type UserVerificationModalProps = WithoutRouting<UserVerificationProps>;
+export type __experimental_UserVerificationModalProps = WithoutRouting<__experimental_UserVerificationProps>;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 

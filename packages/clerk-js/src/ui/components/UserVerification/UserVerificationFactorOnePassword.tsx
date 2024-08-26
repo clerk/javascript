@@ -18,7 +18,7 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
   const { onShowAlternativeMethodsClick } = props;
   const { user } = useUser();
   const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
-  const { closeUserVerification } = useClerk();
+  const { __experimental_closeUserVerification } = useClerk();
   const card = useCardState();
   const supportEmail = useSupportEmail();
   const { session } = useSession();
@@ -41,7 +41,7 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
        * else If modal close it,
        */
       afterVerification?.();
-      closeUserVerification();
+      __experimental_closeUserVerification();
     } else {
       if (afterVerificationUrl) {
         await navigate(afterVerificationUrl);

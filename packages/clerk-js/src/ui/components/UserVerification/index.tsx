@@ -1,4 +1,4 @@
-import type { UserVerificationModalProps, UserVerificationProps } from '@clerk/types';
+import type { __experimental_UserVerificationModalProps, __experimental_UserVerificationProps } from '@clerk/types';
 import React from 'react';
 
 import { ComponentContext, withCoreSessionSwitchGuard } from '../../contexts';
@@ -33,9 +33,10 @@ function UserVerificationRoutes(): JSX.Element {
 
 UserVerificationRoutes.displayName = 'UserVerification';
 
-const UserVerification: React.ComponentType<UserVerificationProps> = withCoreSessionSwitchGuard(UserVerificationRoutes);
+const UserVerification: React.ComponentType<__experimental_UserVerificationProps> =
+  withCoreSessionSwitchGuard(UserVerificationRoutes);
 
-const UserVerificationModal = (props: UserVerificationModalProps): JSX.Element => {
+const UserVerificationModal = (props: __experimental_UserVerificationModalProps): JSX.Element => {
   console.log('aaa', props);
   return (
     <Route path='user-verification'>

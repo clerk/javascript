@@ -3,7 +3,7 @@ export {
   SignIn,
   UserProfile,
   UserButton,
-  UserVerification,
+  __experimental_UserVerification,
   OrganizationSwitcher,
   OrganizationProfile,
   CreateOrganization,

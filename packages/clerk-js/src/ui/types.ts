@@ -1,4 +1,5 @@
 import type {
+  __experimental_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -8,7 +9,6 @@ import type {
   SignUpProps,
   UserButtonProps,
   UserProfileProps,
-  UserVerificationProps,
 } from '@clerk/types';
 
 export type {
@@ -21,7 +21,7 @@ export type {
   OrganizationProfileProps,
   CreateOrganizationProps,
   OrganizationListProps,
-  UserVerificationProps,
+  __experimental_UserVerificationProps,
 };
 
 export type AvailableComponentProps =
@@ -33,7 +33,7 @@ export type AvailableComponentProps =
   | OrganizationProfileProps
   | CreateOrganizationProps
   | OrganizationListProps
-  | UserVerificationProps;
+  | __experimental_UserVerificationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
@@ -42,7 +42,7 @@ export type SignInCtx = SignInProps & {
   mode?: ComponentMode;
 };
 
-export type UserVerificationCtx = UserVerificationProps & {
+export type UserVerificationCtx = __experimental_UserVerificationProps & {
   componentName: 'UserVerification';
   mode?: ComponentMode;
 };

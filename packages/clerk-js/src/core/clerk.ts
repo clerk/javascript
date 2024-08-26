@@ -17,6 +17,8 @@ import {
 import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
+  __experimental_UserVerificationModalProps,
+  __experimental_UserVerificationProps,
   ActiveSessionResource,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -57,7 +59,6 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
-  UserVerificationProps,
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -375,7 +376,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
   };
 
-  public openUserVerification = (props?: UserVerificationProps): void => {
+  public __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
@@ -390,7 +391,7 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('userVerification', props || {}));
   };
 
-  public closeUserVerification = (): void => {
+  public __experimental_closeUserVerification = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
   };
@@ -505,7 +506,10 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public mountUserVerification = (node: HTMLDivElement, props?: UserVerificationProps): void => {
+  public __experimental_mountUserVerification = (
+    node: HTMLDivElement,
+    props?: __experimental_UserVerificationProps,
+  ): void => {
     this.assertComponentsReady(this.#componentControls);
     if (noUserExists(this)) {
       if (this.#instanceType === 'development') {
@@ -525,7 +529,7 @@ export class Clerk implements ClerkInterface {
     );
   };
 
-  public unmountUserVerification = (node: HTMLDivElement): void => {
+  public __experimental_unmountUserVerification = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

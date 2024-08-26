@@ -1,6 +1,7 @@
 import { createDeferredPromise } from '@clerk/shared';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import type {
+  __experimental_UserVerificationProps,
   Appearance,
   Clerk,
   ClerkOptions,
@@ -11,7 +12,6 @@ import type {
   SignInProps,
   SignUpProps,
   UserProfileProps,
-  UserVerificationProps,
 } from '@clerk/types';
 import React, { Suspense } from 'react';
 
@@ -72,7 +72,7 @@ export type ComponentControls = {
       : T extends 'signUp'
         ? SignUpProps
         : T extends 'userVerification'
-          ? UserVerificationProps
+          ? __experimental_UserVerificationProps
           : UserProfileProps,
   ) => void;
   closeModal: (
@@ -110,7 +110,7 @@ interface ComponentsState {
   signInModal: null | SignInProps;
   signUpModal: null | SignUpProps;
   userProfileModal: null | UserProfileProps;
-  userVerificationModal: null | UserVerificationProps;
+  userVerificationModal: null | __experimental_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
   nodes: Map<HTMLDivElement, HtmlNodeOptions>;
