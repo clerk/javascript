@@ -39,6 +39,7 @@ export * from './role';
 export * from './saml';
 export * from './samlAccount';
 export * from './session';
+export * from './sessionVerification';
 export * from './signIn';
 export * from './signUp';
 export * from './ssr';

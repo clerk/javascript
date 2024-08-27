@@ -1,5 +1,15 @@
 # Change Log
 
+## 5.4.3
+
+### Patch Changes
+
+- Fix multiple `addListener` method calls ([#4010](https://github.com/clerk/javascript/pull/4010)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/shared@2.5.3
+
 ## 5.4.2
 
 ### Patch Changes

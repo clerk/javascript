@@ -1,5 +1,36 @@
 # Change Log
 
+## 5.16.0
+
+### Minor Changes
+
+- Expose `SessionVerification` as an experimental resource. ([#4011](https://github.com/clerk/javascript/pull/4011)) by [@panteliselef](https://github.com/panteliselef)
+
+  Update `UserResource` with 5 new experimental methods:
+
+  - `experimental_verifySession` for creating a new SessionVerification record and initiating a new flow.
+  - `experimental_verifySessionPrepareFirstFactor` for preparing a supported first factor like `phone_code`
+  - `experimental_verifySessionAttemptFirstFactor` for attempting a supported first factor like `password`
+  - `experimental_verifySessionPrepareSecondFactor` for preparing a supported second factor like `phone_code`
+  - `experimental_verifySessionAttemptSecondFactor` for attempting a supported second factor like `totp`
+
+- Fixes a bug where multiple tabs with different active organizations would not always respect the selected organization. Going forward, when a tab is focused the active organization will immediately be updated to the tab's last active organization. ([#3786](https://github.com/clerk/javascript/pull/3786)) by [@BRKalow](https://github.com/BRKalow)
+
+  Additionally, `Clerk.session.getToken()` now accepts an `organizationId` option. The provided organization ID will be used to set organization-related claims in the generated session token.
+
+### Patch Changes
+
+- - Fixes an issue in Connected Accounts menu that was related to Custom OAuth Providers: ([#4014](https://github.com/clerk/javascript/pull/4014)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Resolves undefined properties error that occurred when a Custom OAuth Provider was `enabled` but `authenticatable` was set to `false`.
+
+- Fix issue where MFA two-factor UI was incorrectly rendering set default action in SMS code when TOTP strategy was defined. ([#4003](https://github.com/clerk/javascript/pull/4003)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/localizations@2.6.2
+  - @clerk/shared@2.5.3
+
 ## 5.15.1
 
 ### Patch Changes
