@@ -32,7 +32,6 @@ export function _SignInFactorTwo(): JSX.Element {
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
   const toggleAllStrategies = () => setShowAllStrategies(s => !s);
 
-  // TODO
   const handleFactorPrepare = () => {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
