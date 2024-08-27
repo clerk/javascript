@@ -257,7 +257,7 @@ export class User extends BaseResource implements UserResource {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
-        path: `/me/sessions/${User.clerk.session?.id}/verify`,
+        path: `/me/sessions/verify`,
         body: {
           level,
           maxAge,
@@ -289,7 +289,7 @@ export class User extends BaseResource implements UserResource {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
-        path: `/me/sessions/${User.clerk.session?.id}/verify/prepare_first_factor`,
+        path: `/me/sessions/verify/prepare_first_factor`,
         body: {
           ...config,
           strategy: factor.strategy,
@@ -306,7 +306,7 @@ export class User extends BaseResource implements UserResource {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
-        path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_first_factor`,
+        path: `/me/sessions/verify/attempt_first_factor`,
         body: { ...attemptFactor, strategy: attemptFactor.strategy } as any,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
@@ -320,7 +320,7 @@ export class User extends BaseResource implements UserResource {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
-        path: `/me/sessions/${User.clerk.session?.id}/verify/prepare_second_factor`,
+        path: `/me/sessions/verify/prepare_second_factor`,
         body: params as any,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;
@@ -334,7 +334,7 @@ export class User extends BaseResource implements UserResource {
     const json = (
       await BaseResource._fetch({
         method: 'POST',
-        path: `/me/sessions/${User.clerk.session?.id}/verify/attempt_second_factor`,
+        path: `/me/sessions/verify/attempt_second_factor`,
         body: params as any,
       })
     )?.response as unknown as __experimental_SessionVerificationJSON;

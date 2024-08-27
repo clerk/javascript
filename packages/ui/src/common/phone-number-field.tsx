@@ -7,6 +7,7 @@ import { Button, Dialog, DialogTrigger, Popover } from 'react-aria-components';
 
 import { type CountryIso, IsoToCountryMap } from '~/constants/phone-number';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { mergeRefs } from '~/utils/merge-refs';
@@ -302,13 +303,15 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
             );
           }}
         </Common.FieldState>
-        <Common.FieldError asChild>
-          {({ message, code }) => {
-            return (
-              <Field.Message intent='error'>{translateError({ message, code, name: 'phone_number' })}</Field.Message>
-            );
-          }}
-        </Common.FieldError>
+        <Animated>
+          <Common.FieldError asChild>
+            {({ message, code }) => {
+              return (
+                <Field.Message intent='error'>{translateError({ message, code, name: 'phone_number' })}</Field.Message>
+              );
+            }}
+          </Common.FieldError>
+        </Animated>
       </Field.Root>
     </Common.Field>
   );
