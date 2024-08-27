@@ -41,6 +41,7 @@ describe('useEnabledThirdPartyProviders', () => {
       'oauth_gitlab',
       'oauth_google',
       'oauth_hubspot',
+      'oauth_huggingface',
       'oauth_instagram',
       'oauth_line',
       'oauth_linear',
