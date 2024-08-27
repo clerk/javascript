@@ -11,6 +11,7 @@ import { formatSafeIdentifier } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
+import { useCoreSignIn } from '../../contexts';
 
 type AlternativeMethodsMode = 'forgot' | 'pwned' | 'default';
 
@@ -33,8 +34,10 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected, mode = 'default' } = props;
   const card = useCardState();
   const resetPasswordFactor = useResetPasswordFactor();
+  const { supportedFirstFactors } = useCoreSignIn();
   const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: props?.currentFactor,
+    supportedFirstFactors: supportedFirstFactors,
   });
 
   const flowPart = determineFlowPart(mode);

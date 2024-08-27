@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 
 import { useEnvironment } from '../../contexts';
 import { ErrorCard, LoadingCard, useCardState, withCardStateProvider } from '../../elements';
-import { useAlternativeStrategiesV } from '../../hooks/useAlternativeStrategies';
+import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../SignIn/utils';
@@ -45,7 +45,7 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
     prevCurrentFactor: undefined,
   }));
 
-  const { hasAnyStrategy } = useAlternativeStrategiesV({
+  const { hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: currentFactor,
     supportedFirstFactors: availableFactors,
   });

@@ -37,6 +37,7 @@ export function _SignInFactorOne(): JSX.Element {
   const availableFactors = signIn.supportedFirstFactors;
   const router = useRouter();
   const card = useCardState();
+  const { supportedFirstFactors } = useCoreSignIn();
 
   const lastPreparedFactorKeyRef = React.useRef('');
   const [{ currentFactor }, setFactor] = React.useState<{
@@ -49,6 +50,7 @@ export function _SignInFactorOne(): JSX.Element {
 
   const { hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: currentFactor,
+    supportedFirstFactors,
   });
 
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(
