@@ -636,65 +636,6 @@
     },
     {
       "groupName": "[DEV] minor & patch dependencies",
-      "groupSlug": "gatsby-plugin-clerk-dev-minor",
-      "matchFileNames": [
-        "packages/gatsby-plugin-clerk/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "automerge": true,
-      "semanticCommitScope": "gatsby-plugin-clerk"
-    },
-    {
-      "groupName": "[DEV] major dependencies",
-      "groupSlug": "gatsby-plugin-clerk-dev-major",
-      "matchFileNames": [
-        "packages/gatsby-plugin-clerk/package.json"
-      ],
-      "matchDepTypes": [
-        "devDependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "gatsby-plugin-clerk"
-    },
-    {
-      "groupName": "minor & patch dependencies",
-      "groupSlug": "gatsby-plugin-clerk-prod-minor",
-      "matchFileNames": [
-        "packages/gatsby-plugin-clerk/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor"
-      ],
-      "semanticCommitScope": "gatsby-plugin-clerk"
-    },
-    {
-      "groupName": "major dependencies",
-      "groupSlug": "gatsby-plugin-clerk-prod-major",
-      "matchFileNames": [
-        "packages/gatsby-plugin-clerk/package.json"
-      ],
-      "matchDepTypes": [
-        "dependencies"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "semanticCommitScope": "gatsby-plugin-clerk"
-    },
-    {
-      "groupName": "[DEV] minor & patch dependencies",
       "groupSlug": "localizations-dev-minor",
       "matchFileNames": [
         "packages/localizations/package.json"
