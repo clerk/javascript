@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  RENOVATE_VERSION: 37.440.7 # Last version compatible with Node 18
+
 jobs:
   validate-renovate-config:
     runs-on: ubuntu-latest
@@ -26,4 +29,4 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Validate Renovate Config
-        run: npx --yes --package renovate@37.440.7 renovate-config-validator # Pin to last version compatible with Node 18
+        run: npx --yes --package renovate@${{ env.RENOVATE_VERSION }} renovate-config-validator
