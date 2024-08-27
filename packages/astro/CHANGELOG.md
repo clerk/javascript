@@ -1,5 +1,16 @@
 # @clerk/astro
 
+## 1.2.1
+
+### Patch Changes
+
+- Fixes a bug where subscribing to the `$clerkStore` nanostore would give incorrect values. ([#4008](https://github.com/clerk/javascript/pull/4008)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/backend@1.8.1
+  - @clerk/shared@2.5.3
+
 ## 1.2.0
 
 ### Minor Changes

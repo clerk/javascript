@@ -1,5 +1,14 @@
 # @clerk/elements
 
+## 0.14.1
+
+### Patch Changes
+
+- Fix `SignIn.SafeIdentifier` potentially outputting an incorrect identifier when using similar multi-session sign in strategies. ([#3974](https://github.com/clerk/javascript/pull/3974)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+
 ## 0.14.0
 
 ### Minor Changes
