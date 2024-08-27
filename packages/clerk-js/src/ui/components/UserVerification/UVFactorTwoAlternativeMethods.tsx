@@ -41,8 +41,12 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signIn.alternativeMethods.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
+            <Header.Title
+              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.title')}
+            />
+            <Header.Subtitle
+              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.subtitle')}
+            />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           {/*TODO: extract main in its own component */}
@@ -76,9 +80,11 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 
         <Card.Footer>
           <Card.Action elementId='havingTrouble'>
-            <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
+            <Card.ActionText
+              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.actionText')}
+            />
             <Card.ActionLink
-              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.actionLink')}
               onClick={onHavingTroubleClick}
             />
           </Card.Action>
@@ -91,13 +97,13 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
 export function getButtonLabel(factor: SignInFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'phone_code':
-      return localizationKeys('signIn.alternativeMethods.blockButton__phoneCode', {
+      return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__phoneCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
     case 'totp':
-      return localizationKeys('signIn.alternativeMethods.blockButton__totp');
+      return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__totp');
     case 'backup_code':
-      return localizationKeys('signIn.alternativeMethods.blockButton__backupCode');
+      return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__backupCode');
     default:
       throw `Invalid sign in strategy: "${factor.strategy}"`;
   }

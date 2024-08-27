@@ -283,6 +283,61 @@ type _LocalizationResource = {
       action__signOutAll: LocalizationValue;
     };
   };
+  __experimental_userVerification: {
+    password: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      actionLink: LocalizationValue;
+    };
+    emailCode: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    phoneCode: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    phoneCodeMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    totpMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+    };
+    backupCodeMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    alternativeMethods: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      actionLink: LocalizationValue;
+      actionText: LocalizationValue;
+      blockButton__emailCode: LocalizationValue;
+      blockButton__phoneCode: LocalizationValue;
+      blockButton__password: LocalizationValue;
+      blockButton__totp: LocalizationValue;
+      blockButton__backupCode: LocalizationValue;
+      getHelp: {
+        title: LocalizationValue;
+        content: LocalizationValue;
+        blockButton__emailSupport: LocalizationValue;
+      };
+    };
+    noAvailableMethods: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      message: LocalizationValue;
+    };
+  };
   userProfile: {
     mobileButton__menu: LocalizationValue;
     formButtonPrimary__continue: LocalizationValue;

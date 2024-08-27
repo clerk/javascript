@@ -73,13 +73,12 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
     }
   }, []);
 
-  // TODO: Update the below texts
   if (!currentFactor) {
     return (
       <ErrorCard
-        cardTitle={localizationKeys('signIn.noAvailableMethods.title')}
-        cardSubtitle={localizationKeys('signIn.noAvailableMethods.subtitle')}
-        message={localizationKeys('signIn.noAvailableMethods.message')}
+        cardTitle={localizationKeys('__experimental_userVerification.noAvailableMethods.title')}
+        cardSubtitle={localizationKeys('__experimental_userVerification.noAvailableMethods.subtitle')}
+        message={localizationKeys('__experimental_userVerification.noAvailableMethods.message')}
       />
     );
   }

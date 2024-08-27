@@ -38,7 +38,6 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
       .catch(err => handleError(err, [passwordControl], card.setError));
   };
 
-  // TODO: Update texts
   if (showHavingTrouble) {
     return <HavingTrouble onBackLinkClick={toggleHavingTrouble} />;
   }
@@ -48,10 +47,8 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title>Verification required</Header.Title>
-            <Header.Subtitle>
-              In order to make changes, please verify it’s really you by entering the password.
-            </Header.Subtitle>
+            <Header.Title localizationKey={localizationKeys('__experimental_userVerification.password.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('__experimental_userVerification.password.subtitle')} />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Col
@@ -82,7 +79,9 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
             <Card.Action elementId={onShowAlternativeMethodsClick ? 'alternativeMethods' : 'havingTrouble'}>
               <Card.ActionLink
                 localizationKey={localizationKeys(
-                  onShowAlternativeMethodsClick ? 'signIn.password.actionLink' : 'signIn.alternativeMethods.actionLink',
+                  onShowAlternativeMethodsClick
+                    ? '__experimental_userVerification.password.actionLink'
+                    : '__experimental_userVerification.alternativeMethods.actionLink',
                 )}
                 onClick={onShowAlternativeMethodsClick || toggleHavingTrouble}
               />
