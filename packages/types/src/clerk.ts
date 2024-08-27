@@ -790,9 +790,16 @@ export type SignInModalProps = WithoutRouting<SignInProps>;
  * @experimantal
  */
 export type __experimental_UserVerificationProps = RoutingOptions & {
+  // TODO(STEP-UP): Verify and write a description
   afterVerification?: () => void;
+  // TODO(STEP-UP): Verify and write a description
   afterVerificationUrl?: string;
 
+  /**
+   * Defines the steps of the verification flow.
+   * When `L3.multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
+   * @default `'L2.secondFactor'`
+   */
   level?: __experimental_SessionVerificationLevel;
 
   /**

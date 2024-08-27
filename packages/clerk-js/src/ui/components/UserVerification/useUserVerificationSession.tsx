@@ -1,5 +1,4 @@
 import { useUser } from '@clerk/shared/react';
-import { useState } from 'react';
 
 import { useUserVerification } from '../../contexts';
 import { LoadingCard } from '../../elements';
@@ -8,44 +7,28 @@ import { useFetch } from '../../hooks';
 const useUserVerificationSession = () => {
   const { user } = useUser();
   const { level } = useUserVerification();
-  const [isComplete, setComplete] = useState(false);
   const data = useFetch(
     user ? user.__experimental_verifySession : undefined,
     {
       level: level || 'L2.secondFactor',
-      // TODO: Figure out if this needs to be a prop
+      // TODO(STEP-UP): Figure out if this needs to be a prop
       maxAge: 'A1.10min',
     },
     {
       throttleTime: 300,
-      onSuccess() {
-        setComplete(true);
-      },
     },
   );
 
-  return { ...data, isComplete };
+  return { ...data };
 };
 
-export function withUserVerificationSession<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
+function withUserVerificationSessionGuard<P>(Component: React.ComponentType<P>): React.ComponentType<P> {
   const Hoc = (props: P) => {
     const { isLoading, data } = useUserVerificationSession();
-    // const { navigate } = useRouter();
-    // console.log(useRouter());
 
     if (isLoading || !data) {
       return <LoadingCard />;
     }
-
-    // if (data.status === 'needs_first_factor') {
-    //   if (path !== './') {
-    //     navigate('./');
-    //   }
-    // } else if (data.status === 'needs_second_factor') {
-    //   if (path !== './') {
-    //     navigate('./factor-two');
-    //   }
-    // }
 
     return <Component {...(props as any)} />;
   };
@@ -56,4 +39,4 @@ export function withUserVerificationSession<P>(Component: React.ComponentType<P>
   return Hoc;
 }
 
-export { useUserVerificationSession };
+export { useUserVerificationSession, withUserVerificationSessionGuard };

@@ -5,7 +5,7 @@ import { LoadingCard, withCardStateProvider } from '../../elements';
 import { useRouter } from '../../router';
 import { determineStartingSignInSecondFactor } from '../SignIn/utils';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
-import { useUserVerificationSession, withUserVerificationSession } from './useUserVerificationSession';
+import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
 import { UVFactorTwoBackupCodeCard } from './UVFactorTwoBackupCodeCard';
 import { UVFactorTwoPhoneCodeCard } from './UVFactorTwoPhoneCodeCard';
@@ -90,4 +90,6 @@ export function _UserVerificationFactorTwo(): JSX.Element {
   }
 }
 
-export const UserVerificationFactorTwo = withUserVerificationSession(withCardStateProvider(_UserVerificationFactorTwo));
+export const UserVerificationFactorTwo = withUserVerificationSessionGuard(
+  withCardStateProvider(_UserVerificationFactorTwo),
+);

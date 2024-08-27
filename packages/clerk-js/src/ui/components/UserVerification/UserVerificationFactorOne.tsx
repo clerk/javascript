@@ -9,7 +9,7 @@ import { useRouter } from '../../router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../SignIn/utils';
 import { AlternativeMethods } from './AlternativeMethods';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
-import { useUserVerificationSession, withUserVerificationSession } from './useUserVerificationSession';
+import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
@@ -125,4 +125,6 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
   }
 }
 
-export const UserVerificationFactorOne = withUserVerificationSession(withCardStateProvider(_UserVerificationFactorOne));
+export const UserVerificationFactorOne = withUserVerificationSessionGuard(
+  withCardStateProvider(_UserVerificationFactorOne),
+);

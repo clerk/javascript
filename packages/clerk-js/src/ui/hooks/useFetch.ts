@@ -62,7 +62,7 @@ const useCache = <K = any, V = any>(
 };
 
 /**
- *
+ * An in-house simpler alternative to useSWR
  * @param fetcher If fetcher is undefined no action will be performed
  * @param params
  * @param options
@@ -81,6 +81,10 @@ export const useFetch = <K, T>(
   const staleTime = options?.staleTime || 1000 * 60 * 2; //cache for 2 minutes by default
   const throttleTime = options?.throttleTime || 0;
   const fetcherRef = useRef(fetcher);
+
+  if (throttleTime < 0) {
+    throw new Error('ClerkJS: A negative value for `throttleTime` is not allowed ');
+  }
 
   const cached = useSyncExternalStore(subscribeCache, getCache);
 
@@ -108,7 +112,6 @@ export const useFetch = <K, T>(
           const n = performance.now();
           const waitTime = throttleTime - (n - d);
 
-          // TODO: sleep on it and come back later
           setTimeout(() => {
             setCache({
               data,
