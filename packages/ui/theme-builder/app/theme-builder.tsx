@@ -77,7 +77,6 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
       <AppearanceProvider
         appearance={{
           layout: { unsafe_disableDevelopmentModeWarnings: devMode === 'off' },
-          elements: { formButtonPrimary: 'font-mono' },
         }}
       >
         <style

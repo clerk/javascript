@@ -2,13 +2,45 @@ import { createContextAndHook, useDeepEqualMemo } from '@clerk/shared/react';
 import type { Appearance as CurrentAppearance, Layout } from '@clerk/types';
 import React from 'react';
 
-export type ParsedElements = Record<string, { className: string; style: React.CSSProperties }>;
+import { fullTheme } from '~/themes';
+
+/**
+ * Union of all valid descriptors used throughout the components.
+ */
+export type DescriptorIdentifier = 'alert' | 'alert__error' | 'alert__warning' | 'alertRoot' | 'alertIcon';
+
+/**
+ * The final resulting descriptor that gets passed to mergeDescriptors and spread on the element.
+ */
+export type ParsedDescriptor = { descriptor: string; className: string; style: React.CSSProperties };
+
+/**
+ * The authoring format value type for styles written within a component. Essentially { className?: string, style?: CSSProperties }
+ */
+export type PartialDescriptor = Omit<Partial<ParsedDescriptor>, 'descriptor'>;
+
+/**
+ * A full theme generated from merging ParsedElementsFragments. Has entries for each descriptor, but they're not complete.
+ */
+export type PartialTheme = Record<DescriptorIdentifier, PartialDescriptor>;
+
+/**
+ * A subset of a partial theme. This is the type used when authoring style objects within a component.
+ */
+export type ParsedElementsFragment = Partial<PartialTheme>;
+
+/**
+ * A full theme, complete with descriptors. This is the value returned from useAppearance().parsedAppearance, and is
+ * the main type interacted with within components.
+ */
+export type ParsedElements = Record<DescriptorIdentifier, ParsedDescriptor>;
 export type ParsedLayout = Required<Layout>;
 
 type ElementsAppearanceConfig = string | (React.CSSProperties & { className?: string });
 
-export type Appearance = Omit<CurrentAppearance, 'elements'> & {
-  elements?: Record<string, ElementsAppearanceConfig>;
+export type Appearance = Omit<CurrentAppearance, 'elements' | 'baseTheme'> & {
+  theme?: ParsedElements;
+  elements?: Partial<Record<DescriptorIdentifier, ElementsAppearanceConfig>>;
 };
 
 export type AppearanceCascade = {
@@ -21,6 +53,7 @@ export type AppearanceCascade = {
  * appearance values, and as such will always have a value for a given key.
  */
 export type ParsedAppearance = {
+  theme: ParsedElements;
   elements: ParsedElements;
   layout: ParsedLayout;
 };
@@ -38,7 +71,141 @@ type AppearanceContextValue = {
    * ```
    */
   parsedAppearance: ParsedAppearance;
+  themelessAppearance: Appearance | null;
+  theme?: ParsedElements;
 };
+
+/**
+ * Used to merge full themes with ParsedElementsFragments. Allows you to combine layoutStyle with multiple visualStyle
+ * elements.
+ */
+export function mergeParsedElementsFragment(...fragments: ParsedElementsFragment[]): ParsedElementsFragment {
+  const acc: ParsedElementsFragment = {};
+
+  fragments.forEach(fragment => {
+    for (const k in fragment) {
+      const key = k as keyof ParsedElementsFragment;
+      if (key in acc) {
+        acc[key]!.className = [acc[key]?.className, fragment[key]?.className].join(' ');
+        acc[key]!.style = {
+          ...acc[key]!.style,
+          ...fragment[key]?.style,
+        };
+      } else {
+        acc[key] = {
+          className: fragment[key]?.className,
+          style: fragment[key]?.style,
+        };
+      }
+    }
+  });
+
+  return acc;
+}
+
+/**
+ * Used within components to merge multiple descriptors onto a single element. Result is directly spread onto the element.
+ */
+export function mergeDescriptors(...descriptors: (ParsedDescriptor | boolean)[]): PartialDescriptor {
+  return descriptors.reduce<PartialDescriptor>(
+    (acc, el) => {
+      if (typeof el === 'boolean') return acc;
+      acc.className = [el.descriptor, acc.className, el.className].join(' ');
+      acc.style = { ...acc.style, ...el.style };
+      return acc;
+    },
+    { className: 'debug', style: {} },
+  );
+}
+
+function mergeElementsAppearanceConfig(
+  a: ElementsAppearanceConfig,
+  b: ElementsAppearanceConfig,
+): ElementsAppearanceConfig {
+  let result: ElementsAppearanceConfig | undefined;
+  if (typeof a === 'string' && typeof b === 'string') {
+    result = [a, b].join(' ');
+  } else if (typeof a === 'string' && typeof b === 'object') {
+    result = { ...b };
+    result.className = [result.className, a].join(' ');
+  } else if (typeof a === 'object' && typeof b === 'string') {
+    result = { ...a };
+    result.className = [result.className, b].join(' ');
+  } else if (typeof a === 'object' && typeof b === 'object') {
+    result = {
+      ...a,
+      ...b,
+    };
+    if (a.className || b.className) {
+      result.className = [a.className, b.className].filter(Boolean).join(' ');
+    }
+  }
+
+  if (!result) {
+    throw new Error(`Unable to merge ElementsAppearanceConfigs: ${a} and ${b}`);
+  }
+
+  return result;
+}
+
+function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null | undefined): Appearance | null {
+  if (!a && !b) return null;
+  if (!a) return b!;
+  if (!b) return a!;
+
+  const result = { ...a, layout: { ...a.layout, ...b.layout } };
+
+  if (b.theme) {
+    result.theme = b.theme;
+  }
+
+  if (!result.elements && b.elements) {
+    result.elements = { ...b.elements };
+  } else if (result.elements && b.elements) {
+    Object.entries(b.elements).forEach(([element, config]) => {
+      const el = element as DescriptorIdentifier;
+      if (el in result.elements!) {
+        result.elements![el] = mergeElementsAppearanceConfig(result.elements![el]!, config);
+      } else {
+        result.elements![el] = config;
+      }
+    });
+  }
+
+  return result;
+}
+
+function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | null): ParsedAppearance {
+  const baseTheme = theme ?? fullTheme;
+  if (!appearance) return { theme: baseTheme, elements: baseTheme, layout: defaultAppearance.layout };
+
+  const result = {
+    theme: baseTheme,
+    // because we're going to perform modifications to deeply nested objects, we need to create a structuredClone of
+    // the theme or else subsequent usage of the baseTheme will contain our merged changes.
+    elements: structuredClone(baseTheme),
+    layout: { ...defaultAppearance.layout, ...appearance.layout },
+  };
+
+  if (appearance.elements) {
+    Object.entries(appearance.elements).forEach(([element, config]) => {
+      const el = element as DescriptorIdentifier;
+      if (el in appearance.elements!) {
+        if (typeof config === 'string') {
+          result.elements[el].className = [result.elements[el].className, config].join(' ');
+        } else {
+          const { className, ...style } = config;
+          if (className) {
+            result.elements[el].className = [result.elements[el].className, className].join(' ');
+          }
+          result.elements[el].style = { ...result.elements[el].style, ...style };
+        }
+      }
+    });
+  }
+
+  return result;
+}
 
 function mergeAppearenceElementsAndParsedAppearanceElements(
   defaultAppearance: ParsedAppearance,
@@ -58,14 +225,18 @@ function mergeAppearenceElementsAndParsedAppearanceElements(
 
   if (appearanceElements) {
     Object.entries(appearanceElements).forEach(([element, config]) => {
+      const el = element as DescriptorIdentifier;
       if (typeof config === 'string') {
-        mergedElements[element].className += ` ${config}`;
+        mergedElements[el].className += [mergedElements[el].className, config].join(' ');
       } else {
         const { className, ...style } = config;
         if (className) {
-          mergedElements[element].className += ` ${className}`;
+          mergedElements[el].className = [mergedElements[el].className, className].join(' ');
         }
-        mergedElements[element].style = { ...mergedElements[element].style, ...style };
+        mergedElements[el].style = {
+          ...mergedElements[el].style,
+          ...style,
+        };
       }
     });
   }
@@ -73,44 +244,39 @@ function mergeAppearenceElementsAndParsedAppearanceElements(
   return mergedElements;
 }
 
+export const defaultAppearance: ParsedAppearance = {
+  theme: fullTheme,
+  elements: fullTheme,
+  layout: {
+    logoPlacement: 'inside',
+    socialButtonsPlacement: 'top',
+    socialButtonsVariant: 'auto',
+    logoImageUrl: '',
+    logoLinkUrl: '',
+    showOptionalFields: true,
+    helpPageUrl: '',
+    privacyPageUrl: '',
+    termsPageUrl: '',
+    shimmer: true,
+    animations: true,
+    unsafe_disableDevelopmentModeWarnings: false,
+  },
+};
+
 /**
  * Given a `globalAppearance` and `appearance` value, calculate a resulting `ParsedAppearance` that factors in both
  * defaults and provided values.
  */
-function parseAppearance(props: AppearanceCascade): ParsedAppearance {
-  const defaultAppearance: ParsedAppearance = {
-    elements: {
-      formButtonPrimary: {
-        className: 'debug',
-        style: {},
-      },
-    },
-    layout: {
-      logoPlacement: 'inside',
-      socialButtonsPlacement: 'top',
-      socialButtonsVariant: 'auto',
-      logoImageUrl: '',
-      logoLinkUrl: '',
-      showOptionalFields: true,
-      helpPageUrl: '',
-      privacyPageUrl: '',
-      termsPageUrl: '',
-      shimmer: true,
-      animations: true,
-      unsafe_disableDevelopmentModeWarnings: false,
-    },
-  };
-
+function parseAppearance(
+  props: AppearanceCascade,
+  theme: ParsedAppearance | undefined = defaultAppearance,
+): ParsedAppearance {
   const appearance = {
-    ...defaultAppearance,
+    ...theme,
     // This is a plain object, so we can use spread operations to override values in order of priority.
-    layout: { ...defaultAppearance.layout, ...props.globalAppearance?.layout, ...props.appearance?.layout },
+    layout: { ...theme.layout, ...props.globalAppearance?.layout, ...props.appearance?.layout },
     // The `elements` prop is more complicated, so we use a dedicated function to handle that logic
-    elements: mergeAppearenceElementsAndParsedAppearanceElements(
-      defaultAppearance,
-      props.globalAppearance,
-      props.appearance,
-    ),
+    elements: mergeAppearenceElementsAndParsedAppearanceElements(theme, props.globalAppearance, props.appearance),
   };
 
   return appearance;
@@ -119,7 +285,7 @@ function parseAppearance(props: AppearanceCascade): ParsedAppearance {
 const [AppearanceContext, useAppearance, usePartialAppearance] =
   createContextAndHook<AppearanceContextValue>('AppearanceContext');
 
-type AppearanceProviderProps = React.PropsWithChildren<{ appearance?: Appearance }>;
+type AppearanceProviderProps = React.PropsWithChildren<{ appearance?: Appearance; theme?: ParsedElements }>;
 
 /**
  * Used to provide appearance values throughout an application. In typical usage, the entire application will be
@@ -130,18 +296,172 @@ type AppearanceProviderProps = React.PropsWithChildren<{ appearance?: Appearance
 const AppearanceProvider = (props: AppearanceProviderProps) => {
   // Access the parsedAppearance of the parent context provider. `undefined` if this is the top-most
   // AppearanceProvider.
-  const { parsedAppearance: globalAppearance } = usePartialAppearance();
+  const {
+    parsedAppearance: globalAppearance,
+    themelessAppearance: globalThemelessAppearance,
+    theme: globalTheme,
+  } = usePartialAppearance();
 
   const ctxValue = useDeepEqualMemo(() => {
-    const parsedAppearance = parseAppearance({
-      appearance: props.appearance,
-      globalAppearance: globalAppearance,
-    });
+    const theme = props.theme ?? globalTheme;
+    const themelessAppearance = mergeAppearance(globalThemelessAppearance, props.appearance);
+    const parsedAppearance = applyTheme(theme, themelessAppearance);
 
-    return { value: { parsedAppearance } };
-  }, [props.appearance, globalAppearance]);
+    return { value: { parsedAppearance, themelessAppearance, theme: props.theme ?? globalTheme } };
+  }, [props.appearance, props.theme, globalAppearance, globalThemelessAppearance, globalTheme]);
 
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
 };
 
 export { AppearanceProvider, useAppearance };
+
+if (import.meta.vitest) {
+  const { it, expect, describe } = import.meta.vitest;
+
+  describe('mergeAppearance', () => {
+    it('retains keys from both appearances', () => {
+      const a = { elements: { alert__warning: 'class-one' } };
+      const b = { elements: { alertIcon: 'class-two' } };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        elements: {
+          alert__warning: 'class-one',
+          alertIcon: 'class-two',
+        },
+      });
+    });
+
+    it('retains the theme prop', () => {
+      const a = { theme: fullTheme, elements: { alert__warning: 'class-one' } };
+      const b = {
+        elements: { alertIcon: 'class-two' },
+      };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        theme: a.theme,
+        elements: {
+          alert__warning: 'class-one',
+          alertIcon: 'class-two',
+        },
+      });
+    });
+
+    it('overrides the theme prop', () => {
+      const a = { theme: fullTheme, elements: { alert__warning: 'class-one' } };
+      const b = {
+        theme: { ...fullTheme, alertIcon: { descriptor: 'test', className: 'test-class', style: {} } },
+        elements: { alertIcon: 'class-two' },
+      };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        theme: b.theme,
+        elements: {
+          alert__warning: 'class-one',
+          alertIcon: 'class-two',
+        },
+      });
+    });
+
+    it('merges string values for the same element', () => {
+      const a = { elements: { alert__warning: 'class-one' } };
+      const b = { elements: { alert__warning: 'class-two' } };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        elements: {
+          alert__warning: 'class-one class-two',
+        },
+      });
+    });
+
+    it('merges object values for the same element', () => {
+      const a = { elements: { alert__warning: { background: 'tomato' } } };
+      const b = { elements: { alert__warning: { color: 'red' } } };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        elements: {
+          alert__warning: { color: 'red', background: 'tomato' },
+        },
+      });
+    });
+  });
+
+  describe('mergeElementsAppearanceConfig', () => {
+    it('merges two strings', () => {
+      const a = 'class-one';
+      const b = 'class-two';
+      expect(mergeElementsAppearanceConfig(a, b)).toBe('class-one class-two');
+    });
+
+    it('merges a string and an object', () => {
+      const a = 'class-one';
+      const b = { className: 'class-two' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-two class-one' });
+    });
+
+    it('merges an object and a string', () => {
+      const a = { className: 'class-one' };
+      const b = 'class-two';
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-one class-two' });
+    });
+
+    it('merges two objects', () => {
+      const a = { className: 'class-one' };
+      const b = { className: 'class-two' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-one class-two' });
+    });
+
+    it('merges a string and an object with style', () => {
+      const a = 'class-one';
+      const b = { className: 'class-two', backgroundColor: 'tomato' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({
+        className: 'class-two class-one',
+        backgroundColor: 'tomato',
+      });
+    });
+
+    it('merges two objects with styles', () => {
+      const a = { className: 'class-one', color: 'red' };
+      const b = { className: 'class-two', backgroundColor: 'tomato' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({
+        className: 'class-one class-two',
+        color: 'red',
+        backgroundColor: 'tomato',
+      });
+    });
+
+    it('correctly omits className if not present', () => {
+      const a = { color: 'red' };
+      const b = { backgroundColor: 'tomato' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({
+        color: 'red',
+        backgroundColor: 'tomato',
+      });
+    });
+  });
+
+  describe('applyTheme', () => {
+    it('adds classNames from theme', () => {
+      const appearance = {
+        elements: {
+          alert__warning: 'test-1',
+        },
+      };
+      const theme = {
+        ...fullTheme,
+        alert__warning: { descriptor: 'test', className: 'test', style: { color: 'red' } },
+      };
+      expect(applyTheme(theme, appearance)).toStrictEqual({
+        theme,
+        layout: defaultAppearance.layout,
+        elements: {
+          ...fullTheme,
+          alert__warning: {
+            className: 'test test-1',
+            descriptor: 'test',
+            style: { color: 'red' },
+          },
+        },
+      });
+    });
+  });
+}
