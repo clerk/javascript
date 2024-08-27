@@ -91,9 +91,11 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
 
         <Card.Footer>
           <Card.Action elementId='havingTrouble'>
-            <Card.ActionText localizationKey={localizationKeys('signIn.alternativeMethods.actionText')} />
+            <Card.ActionText
+              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.actionText')}
+            />
             <Card.ActionLink
-              localizationKey={localizationKeys('signIn.alternativeMethods.actionLink')}
+              localizationKey={localizationKeys('__experimental_userVerification.alternativeMethods.actionLink')}
               onClick={onHavingTroubleClick}
             />
           </Card.Action>
