@@ -11,6 +11,7 @@ import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
+import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
 import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
@@ -35,11 +36,16 @@ export function SignInStart() {
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
+  const { layout } = useAppearance().parsedAppearance;
   const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
+        const connectionsWithSeperator = [
+          <Connections disabled={isGlobalLoading} />,
+          hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
+        ];
         return (
           <SignIn.Step name='start'>
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
@@ -53,9 +59,7 @@ export function SignInStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  <Connections disabled={isGlobalLoading} />
-
-                  {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
+                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -122,6 +126,7 @@ export function SignInStart() {
                       ) : null}
                     </div>
                   ) : null}
+                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
                 </Card.Body>
                 <Card.Actions>
                   <Common.Loading scope='submit'>
