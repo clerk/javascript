@@ -4,7 +4,7 @@ import type { StateProps, StyleVariants } from '../styledSystem';
 import { createVariants } from '../styledSystem';
 import type { BoxProps } from './Box';
 import { Box } from './Box';
-import { createSupportedFlexGapProperty } from './createSupportedFlexGapProperty';
+import { createFlexGapPropertyIosCompat } from './gapPropertyCompat';
 
 const { applyVariants, filterProps } = createVariants((theme, props) => {
   const dir =
@@ -44,15 +44,15 @@ const { applyVariants, filterProps } = createVariants((theme, props) => {
         wrapReverse: { flexWrap: 'wrap-reverse' },
       },
       gap: {
-        1: createSupportedFlexGapProperty(theme.space.$1, dir),
-        2: createSupportedFlexGapProperty(theme.space.$2, dir),
-        3: createSupportedFlexGapProperty(theme.space.$3, dir),
-        4: createSupportedFlexGapProperty(theme.space.$4, dir),
-        5: createSupportedFlexGapProperty(theme.space.$5, dir),
-        6: createSupportedFlexGapProperty(theme.space.$6, dir),
-        7: createSupportedFlexGapProperty(theme.space.$7, dir),
-        8: createSupportedFlexGapProperty(theme.space.$8, dir),
-        9: createSupportedFlexGapProperty(theme.space.$9, dir),
+        1: createFlexGapPropertyIosCompat(theme.space.$1, dir),
+        2: createFlexGapPropertyIosCompat(theme.space.$2, dir),
+        3: createFlexGapPropertyIosCompat(theme.space.$3, dir),
+        4: createFlexGapPropertyIosCompat(theme.space.$4, dir),
+        5: createFlexGapPropertyIosCompat(theme.space.$5, dir),
+        6: createFlexGapPropertyIosCompat(theme.space.$6, dir),
+        7: createFlexGapPropertyIosCompat(theme.space.$7, dir),
+        8: createFlexGapPropertyIosCompat(theme.space.$8, dir),
+        9: createFlexGapPropertyIosCompat(theme.space.$9, dir),
       },
       center: {
         true: { justifyContent: 'center', alignItems: 'center' },
