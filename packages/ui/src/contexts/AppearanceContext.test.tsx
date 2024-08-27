@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import { fullTheme } from '~/themes';
 import { AppearanceProvider, useAppearance, defaultAppearance } from './AppearanceContext';
 
 describe('AppearanceContext', () => {
@@ -76,5 +77,51 @@ describe('AppearanceContext', () => {
         layout: {},
       },
     });
+  });
+
+  it('propogates the provided baseTheme', () => {
+    const testTheme = structuredClone(fullTheme);
+    testTheme.alert__warning.className = 'alert-test-classname';
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <AppearanceProvider
+        theme={testTheme}
+        appearance={{ elements: { alert__warning: 'class-two' } }}
+      >
+        <AppearanceProvider appearance={{ elements: { alert__warning: 'class-three' } }}>{children}</AppearanceProvider>
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(useAppearance, { wrapper });
+    expect(result.current.parsedAppearance.elements.alert__warning.className).toBe(
+      'alert-test-classname class-two class-three',
+    );
+  });
+
+  it('overrides the parent baseTheme', () => {
+    const testTheme = structuredClone(fullTheme);
+    testTheme.alert__warning.className = 'alert-test-classname';
+
+    const childTheme = structuredClone(fullTheme);
+    childTheme.alert__warning.className = 'alert-child-classname';
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <AppearanceProvider
+        theme={testTheme}
+        appearance={{ elements: { alert__warning: 'class-two' } }}
+      >
+        <AppearanceProvider
+          theme={childTheme}
+          appearance={{ elements: { alert__warning: 'class-three' } }}
+        >
+          {children}
+        </AppearanceProvider>
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(useAppearance, { wrapper });
+    expect(result.current.parsedAppearance.elements.alert__warning.className).toBe(
+      'alert-child-classname class-two class-three',
+    );
   });
 });
