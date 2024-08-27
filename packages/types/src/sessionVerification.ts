@@ -4,6 +4,7 @@ import type { SessionResource } from './session';
 import type { VerificationResource } from './verification';
 
 export interface __experimental_SessionVerificationResource extends ClerkResource {
+  // TODO: Is null possible ?
   status: __experimental_SessionVerificationStatus | null;
   level: __experimental_SessionVerificationLevel;
   session: SessionResource;
