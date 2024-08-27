@@ -5,7 +5,6 @@ import React from 'react';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
 import type { LocalizationKey } from '../../localization';
-import { useRouter } from '../../router';
 import { handleError } from '../../utils';
 import { useAfterVerification } from './use-after-verification';
 
@@ -28,13 +27,8 @@ export type UVFactorOneCodeFormProps = UVFactorOneCodeCard & {
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   const { user } = useUser();
   const card = useCardState();
-  const { navigate } = useRouter();
 
   const { handleVerificationResponse } = useAfterVerification();
-
-  const goBack = () => {
-    return navigate('../');
-  };
 
   React.useEffect(() => {
     if (!props.factorAlreadyPrepared) {
@@ -71,7 +65,6 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
       profileImageUrl={user?.imageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
-      onIdentityPreviewEditClicked={goBack}
       onBackLinkClicked={props.onBackLinkClicked}
     />
   );

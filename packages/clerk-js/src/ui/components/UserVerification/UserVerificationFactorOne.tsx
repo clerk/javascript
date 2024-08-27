@@ -92,11 +92,8 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
       toggle?.();
     };
 
-    const mode = 'default';
-
     return (
       <AlternativeMethods
-        mode={mode}
         onBackLinkClick={canGoBack ? backHandler : undefined}
         onFactorSelected={f => {
           selectFactor(f);

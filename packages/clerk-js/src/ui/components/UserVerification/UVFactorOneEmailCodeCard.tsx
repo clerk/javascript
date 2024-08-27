@@ -7,7 +7,6 @@ import { UVFactorOneCodeForm } from './UVFactorOneCodeForm';
 type UVFactorOneEmailCodeCardProps = UVFactorOneCodeCard & { factor: EmailCodeFactor };
 
 export const UVFactorOneEmailCodeCard = (props: UVFactorOneEmailCodeCardProps) => {
-  // TODO: Update texts
   return (
     <Flow.Part part='emailCode'>
       <UVFactorOneCodeForm
