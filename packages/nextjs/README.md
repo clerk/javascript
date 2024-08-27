@@ -21,7 +21,7 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Get help](https://clerk.com/contact)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_nextjs)
 
 </div>
 
@@ -40,41 +40,7 @@
 
 The fastest way to get started with Clerk is by following the [Next.js Quickstart](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=clerk_nextjs).
 
-Alternatively, you can follow these steps to add minimal Clerk support to your app:
-
-1. Install `@clerk/nextjs`
-
-   ```shell
-   npm install @clerk/nextjs
-   ```
-
-1. Add `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` to your `.env.local` file. This key can always be retrieved from the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page of your Clerk dashboard.
-
-1. Add [`<ClerkProvider>`](https://clerk.com/docs/components/clerk-provider?utm_source=github&utm_medium=clerk_nextjs) and Clerk's [prebuilt components](https://clerk.com/docs/components/overview?utm_source=github&utm_medium=clerk_nextjs) to your application, for example inside your header (of your Next.js App Router application) of `app/layout.tsx`:
-
-   ```tsx
-   import { ClerkProvider, SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
-
-   export default function RootLayout({ children }) {
-     return (
-       <ClerkProvider>
-         <html lang='en'>
-           <body>
-             <header>
-               <SignedOut>
-                 <SignInButton />
-               </SignedOut>
-               <SignedIn>
-                 <UserButton />
-               </SignedIn>
-             </header>
-             <main>{children}</main>
-           </body>
-         </html>
-       </ClerkProvider>
-     );
-   }
-   ```
+You'll learn how to install `@clerk/nextjs`, set up your environment keys, add `<ClerkProvider>` to your application, use the Clerk middleware, and use Clerk's prebuilt components.
 
 ## Usage
 
@@ -85,7 +51,7 @@ For further information, guides, and examples visit the [Next.js reference docum
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_nextjs)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_nextjs)
 
 ## Contributing
 
