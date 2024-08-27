@@ -20,6 +20,9 @@ export function buildTheme(p: PartialTheme): ParsedElements {
   return theme as ParsedElements;
 }
 
+/**
+ * Given two complete theme objects, merge their className and style properties to create a new merged theme.
+ */
 export function mergeTheme(a: ParsedElements, b: ParsedElements): ParsedElements {
   const mergedTheme = { ...a };
 
