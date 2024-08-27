@@ -1,13 +1,12 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useUser } from '@clerk/shared/react';
 import type { __experimental_SessionVerificationResource, PhoneCodeFactor, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { handleError } from '../../utils';
+import { useAfterVerification } from './use-after-verification';
 
 export type UVFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   factor: PhoneCodeFactor | TOTPFactor;
@@ -17,7 +16,6 @@ export type UVFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlterna
 };
 
 type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
-  beforeEmit: () => void;
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
   inputLabel: LocalizationKey;
@@ -27,8 +25,7 @@ type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
 export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const card = useCardState();
   const { user } = useUser();
-  const supportEmail = useSupportEmail();
-  const clerk = useClerk();
+  const { handleVerificationResponse } = useAfterVerification();
 
   React.useEffect(() => {
     if (props.factorAlreadyPrepared) {
@@ -51,14 +48,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
       .__experimental_verifySessionAttemptSecondFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
-        switch (res.status) {
-          case 'complete':
-            // await session?.getToken({ skipCache: true });
-
-            return clerk.setActive({ session: res.session.id, beforeEmit: props.beforeEmit });
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
+        return handleVerificationResponse(res);
       })
       .catch(reject);
   };

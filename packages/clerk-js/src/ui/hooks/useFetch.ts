@@ -134,5 +134,6 @@ export const useFetch = <K, T>(
 
   return {
     ...cached,
+    setCache,
   };
 };

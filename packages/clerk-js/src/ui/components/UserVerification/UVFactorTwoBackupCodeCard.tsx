@@ -1,13 +1,10 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useUser } from '@clerk/shared/react';
 import React from 'react';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useUserVerification } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { Card, Form, Header, useCardState } from '../../elements';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { useRouter } from '../../router';
 import { handleError, useFormControl } from '../../utils';
+import { useAfterVerification } from './use-after-verification';
 
 type UVFactorTwoBackupCodeCardProps = {
   onShowAlternativeMethodsClicked: React.MouseEventHandler;
@@ -16,10 +13,8 @@ type UVFactorTwoBackupCodeCardProps = {
 export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps) => {
   const { onShowAlternativeMethodsClicked } = props;
   const { user } = useUser();
-  const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
-  const { setActive, __experimental_closeUserVerification } = useClerk();
-  const { navigate } = useRouter();
-  const supportEmail = useSupportEmail();
+  const { handleVerificationResponse } = useAfterVerification();
+
   const card = useCardState();
   const codeControl = useFormControl('code', '', {
     type: 'text',
@@ -27,34 +22,11 @@ export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps)
     isRequired: true,
   });
 
-  const beforeEmit = async () => {
-    if (routing === 'virtual') {
-      /**
-       * if `afterVerificationUrl` and modal redirect there,
-       * else if `afterVerificationUrl` redirect there,
-       * else If modal close it,
-       */
-      afterVerification?.();
-      __experimental_closeUserVerification();
-    } else {
-      if (afterVerificationUrl) {
-        await navigate(afterVerificationUrl);
-      }
-    }
-  };
-
   const handleBackupCodeSubmit: React.FormEventHandler = e => {
     e.preventDefault();
     return user!
       .__experimental_verifySessionAttemptSecondFactor({ strategy: 'backup_code', code: codeControl.value })
-      .then(res => {
-        switch (res.status) {
-          case 'complete':
-            return setActive({ session: res.session.id, beforeEmit });
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
-      })
+      .then(handleVerificationResponse)
       .catch(err => handleError(err, [codeControl], card.setError));
   };
 

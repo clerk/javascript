@@ -1,15 +1,13 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useUser } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { useUserVerification } from '../../contexts';
 import type { VerificationCodeCardProps } from '../../elements';
 import { useCardState, VerificationCodeCard } from '../../elements';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { handleError } from '../../utils';
+import { useAfterVerification } from './use-after-verification';
 
 export type UVFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
@@ -29,12 +27,10 @@ export type UVFactorOneCodeFormProps = UVFactorOneCodeCard & {
 
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   const { user } = useUser();
-  const { afterVerification, routing, afterVerificationUrl } = useUserVerification();
-  const { __experimental_closeUserVerification } = useClerk();
   const card = useCardState();
   const { navigate } = useRouter();
-  const supportEmail = useSupportEmail();
-  const clerk = useClerk();
+
+  const { handleVerificationResponse } = useAfterVerification();
 
   const goBack = () => {
     return navigate('../');
@@ -53,35 +49,12 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
       .catch(err => handleError(err, [], card.setError));
   };
 
-  const beforeEmit = async () => {
-    if (routing === 'virtual') {
-      /**
-       * if `afterVerificationUrl` and modal redirect there,
-       * else if `afterVerificationUrl` redirect there,
-       * else If modal close it,
-       */
-      afterVerification?.();
-      __experimental_closeUserVerification();
-    } else {
-      if (afterVerificationUrl) {
-        await navigate(afterVerificationUrl);
-      }
-    }
-  };
-
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     user!
       .__experimental_verifySessionAttemptFirstFactor({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
-        switch (res.status) {
-          case 'complete':
-            return clerk.setActive({ session: res.session.id, beforeEmit });
-          case 'needs_second_factor':
-            return navigate('./factor-two');
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
+        return handleVerificationResponse(res);
       })
       .catch(reject);
   };
