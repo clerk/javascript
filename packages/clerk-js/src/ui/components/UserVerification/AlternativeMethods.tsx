@@ -1,4 +1,4 @@
-import type { SignInFactor, SignInFirstFactor } from '@clerk/types';
+import type { __experimental_SessionVerificationFirstFactor, SignInFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
@@ -8,8 +8,8 @@ import { useCardState } from '../../elements/contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { ChatAltIcon, Email, LockClosedIcon } from '../../icons';
 import { formatSafeIdentifier } from '../../utils';
-import { withHavingTrouble } from '../SignIn/withHavingTrouble';
 import { useUserVerificationSession } from './useUserVerificationSession';
+import { withHavingTrouble } from './withHavingTrouble';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
@@ -29,10 +29,12 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected } = props;
   const card = useCardState();
   const { data } = useUserVerificationSession();
-  const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies({
-    filterOutFactor: props?.currentFactor,
-    supportedFirstFactors: data!.supportedFirstFactors,
-  });
+  const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies<__experimental_SessionVerificationFirstFactor>(
+    {
+      filterOutFactor: props?.currentFactor,
+      supportedFirstFactors: data!.supportedFirstFactors,
+    },
+  );
 
   return (
     <Flow.Part part={'alternativeMethods'}>
@@ -105,7 +107,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   );
 };
 
-export function getButtonLabel(factor: SignInFirstFactor): LocalizationKey {
+export function getButtonLabel(factor: __experimental_SessionVerificationFirstFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'email_code':
       return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__emailCode', {
@@ -118,11 +120,11 @@ export function getButtonLabel(factor: SignInFirstFactor): LocalizationKey {
     case 'password':
       return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__password');
     default:
-      throw `Invalid sign in strategy: "${factor.strategy}"`;
+      throw `Invalid sign in strategy: "${(factor as any).strategy}"`;
   }
 }
 
-export function getButtonIcon(factor: SignInFirstFactor) {
+export function getButtonIcon(factor: __experimental_SessionVerificationFirstFactor) {
   const icons = {
     email_code: Email,
     phone_code: ChatAltIcon,

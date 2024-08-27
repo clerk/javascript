@@ -5,7 +5,7 @@ import { factorHasLocalStrategy, isResetPasswordStrategy } from '../components/S
 import { allStrategiesButtonsComparator } from '../utils';
 import { useEnabledThirdPartyProviders } from './useEnabledThirdPartyProviders';
 
-export function useAlternativeStrategies({
+export function useAlternativeStrategies<T = SignInFirstFactor>({
   filterOutFactor,
   supportedFirstFactors: _supportedFirstFactors,
 }: {
@@ -27,7 +27,7 @@ export function useAlternativeStrategies({
     // Only include passkey if the device supports it.
     // @ts-ignore Types are not public yet.
     .filter(factor => (factor.strategy === 'passkey' ? isWebAuthnSupported() : true))
-    .sort(allStrategiesButtonsComparator);
+    .sort(allStrategiesButtonsComparator) as T[];
 
   return {
     hasAnyStrategy: shouldAllowForAlternativeStrategies,

@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { __experimental_SessionVerificationSecondFactor, SignInFactor } from '@clerk/types';
 import React, { useEffect } from 'react';
 
 import { LoadingCard, withCardStateProvider } from '../../elements';
@@ -29,8 +29,8 @@ export function _UserVerificationFactorTwo(): JSX.Element {
   const availableFactors = sessionVerification.supportedSecondFactors;
 
   const lastPreparedFactorKeyRef = React.useRef('');
-  const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | null>(() =>
-    determineStartingSignInSecondFactor(availableFactors),
+  const [currentFactor, setCurrentFactor] = React.useState<__experimental_SessionVerificationSecondFactor | null>(
+    () => determineStartingSignInSecondFactor(availableFactors) as __experimental_SessionVerificationSecondFactor,
   );
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
   const toggleAllStrategies = () => setShowAllStrategies(s => !s);
@@ -39,7 +39,7 @@ export function _UserVerificationFactorTwo(): JSX.Element {
     lastPreparedFactorKeyRef.current = factorKey(currentFactor);
   };
 
-  const selectFactor = (factor: SignInFactor) => {
+  const selectFactor = (factor: __experimental_SessionVerificationSecondFactor) => {
     setCurrentFactor(factor);
     toggleAllStrategies();
   };

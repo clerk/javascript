@@ -7,8 +7,8 @@ export const HavingTrouble = (props: PropsOfComponent<typeof ErrorCard>) => {
 
   return (
     <ErrorCard
-      cardTitle={localizationKeys('signIn.alternativeMethods.getHelp.title')}
-      cardSubtitle={localizationKeys('signIn.alternativeMethods.getHelp.content')}
+      cardTitle={localizationKeys('__experimental_userVerification.alternativeMethods.getHelp.title')}
+      cardSubtitle={localizationKeys('__experimental_userVerification.alternativeMethods.getHelp.content')}
       onBackLinkClick={onBackLinkClick}
     />
   );

@@ -1,4 +1,4 @@
-import type { SignInFactor, SignInSecondFactor } from '@clerk/types';
+import type { __experimental_SessionVerificationSecondFactor } from '@clerk/types';
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
@@ -6,12 +6,12 @@ import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, Card, Header } from '../../elements';
 import { useCardState } from '../../elements/contexts';
 import { backupCodePrefFactorComparator, formatSafeIdentifier } from '../../utils';
-import { HavingTrouble } from '../SignIn/HavingTrouble';
+import { HavingTrouble } from './HavingTrouble';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
-  onFactorSelected: (factor: SignInFactor) => void;
-  supportedSecondFactors: SignInSecondFactor[];
+  onFactorSelected: (factor: __experimental_SessionVerificationSecondFactor) => void;
+  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[];
 };
 
 export const UVFactorTwoAlternativeMethods = (props: AlternativeMethodsProps) => {
@@ -94,7 +94,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   );
 };
 
-export function getButtonLabel(factor: SignInFactor): LocalizationKey {
+export function getButtonLabel(factor: __experimental_SessionVerificationSecondFactor): LocalizationKey {
   switch (factor.strategy) {
     case 'phone_code':
       return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__phoneCode', {
@@ -105,6 +105,6 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
     case 'backup_code':
       return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__backupCode');
     default:
-      throw `Invalid sign in strategy: "${factor.strategy}"`;
+      throw `Invalid sign in strategy: "${(factor as any).strategy}"`;
   }
 }

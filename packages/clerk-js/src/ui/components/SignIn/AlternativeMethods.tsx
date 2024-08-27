@@ -1,6 +1,7 @@
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
+import { useCoreSignIn } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, BackLink, Card, Divider, Header } from '../../elements';
@@ -11,7 +12,6 @@ import { formatSafeIdentifier } from '../../utils';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
-import { useCoreSignIn } from '../../contexts';
 
 type AlternativeMethodsMode = 'forgot' | 'pwned' | 'default';
 
