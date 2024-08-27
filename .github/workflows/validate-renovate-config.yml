@@ -24,6 +24,6 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-      
+
       - name: Validate Renovate Config
-        run: npx --yes --package renovate renovate-config-validator
+        run: npx --yes --package renovate@37.440.7 renovate-config-validator # Pin to last version compatible with Node 18
