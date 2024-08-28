@@ -11,7 +11,7 @@ export function buildTheme(p: PartialTheme): ParsedElements {
       const { className, style } = p[descriptor as keyof PartialTheme]!;
       theme[descriptor as keyof ParsedElements] = {
         descriptor: `cl-${descriptor}`,
-        className: className ?? 'debug',
+        className: className ?? '',
         style: style ?? {},
       };
     }

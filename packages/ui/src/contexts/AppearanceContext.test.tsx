@@ -12,8 +12,8 @@ describe('AppearanceContext', () => {
     expect(result.current).toStrictEqual({
       parsedAppearance: {
         layout: defaultAppearance.layout,
-        elements: defaultAppearance.elements,
-        theme: defaultAppearance.theme,
+        elements: fullTheme,
+        theme: fullTheme,
       },
       theme: undefined,
       themelessAppearance: null,
@@ -30,14 +30,14 @@ describe('AppearanceContext', () => {
       parsedAppearance: {
         layout: defaultAppearance.layout,
         elements: {
-          ...defaultAppearance.elements,
+          ...fullTheme,
           alert__warning: {
             descriptor: 'cl-alert__warning',
-            className: [defaultAppearance.elements.alert__warning.className, 'class-two'].join(' '),
+            className: [fullTheme.alert__warning.className, 'class-two'].join(' '),
             style: {},
           },
         },
-        theme: defaultAppearance.theme,
+        theme: fullTheme,
       },
       theme: undefined,
       themelessAppearance: {
@@ -60,14 +60,14 @@ describe('AppearanceContext', () => {
       parsedAppearance: {
         layout: defaultAppearance.layout,
         elements: {
-          ...defaultAppearance.elements,
+          ...fullTheme,
           alert__warning: {
             descriptor: 'cl-alert__warning',
-            className: [defaultAppearance.elements.alert__warning.className, 'class-two', 'class-three'].join(' '),
+            className: [fullTheme.alert__warning.className, 'class-two', 'class-three'].join(' '),
             style: {},
           },
         },
-        theme: defaultAppearance.theme,
+        theme: fullTheme,
       },
       theme: undefined,
       themelessAppearance: {

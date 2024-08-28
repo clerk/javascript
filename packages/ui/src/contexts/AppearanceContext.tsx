@@ -114,7 +114,7 @@ export function mergeDescriptors(...descriptors: (ParsedDescriptor | boolean)[])
       acc.style = { ...acc.style, ...el.style };
       return acc;
     },
-    { className: 'debug', style: {} },
+    { className: '', style: {} },
   );
 }
 
@@ -177,7 +177,7 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
 
 function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | null): ParsedAppearance {
   const baseTheme = theme ?? fullTheme;
-  if (!appearance) return { theme: baseTheme, elements: baseTheme, layout: defaultAppearance.layout };
+  if (!appearance) return { theme: baseTheme, elements: structuredClone(baseTheme), layout: defaultAppearance.layout };
 
   const result = {
     theme: baseTheme,
@@ -320,55 +320,55 @@ if (import.meta.vitest) {
 
   describe('mergeAppearance', () => {
     it('retains keys from both appearances', () => {
-      const a = { elements: { alert__warning: 'class-one' } };
-      const b = { elements: { alertIcon: 'class-two' } };
+      const a = { elements: { alert__warning: 'cl-test-class-one' } };
+      const b = { elements: { alertIcon: 'cl-test-class-two' } };
       expect(mergeAppearance(a, b)).toStrictEqual({
         layout: {},
         elements: {
-          alert__warning: 'class-one',
-          alertIcon: 'class-two',
+          alert__warning: 'cl-test-class-one',
+          alertIcon: 'cl-test-class-two',
         },
       });
     });
 
     it('retains the theme prop', () => {
-      const a = { theme: fullTheme, elements: { alert__warning: 'class-one' } };
+      const a = { theme: fullTheme, elements: { alert__warning: 'cl-test-class-one' } };
       const b = {
-        elements: { alertIcon: 'class-two' },
+        elements: { alertIcon: 'cl-test-class-two' },
       };
       expect(mergeAppearance(a, b)).toStrictEqual({
         layout: {},
         theme: a.theme,
         elements: {
-          alert__warning: 'class-one',
-          alertIcon: 'class-two',
+          alert__warning: 'cl-test-class-one',
+          alertIcon: 'cl-test-class-two',
         },
       });
     });
 
     it('overrides the theme prop', () => {
-      const a = { theme: fullTheme, elements: { alert__warning: 'class-one' } };
+      const a = { theme: fullTheme, elements: { alert__warning: 'cl-test-class-one' } };
       const b = {
-        theme: { ...fullTheme, alertIcon: { descriptor: 'test', className: 'test-class', style: {} } },
-        elements: { alertIcon: 'class-two' },
+        theme: { ...fullTheme, alertIcon: { descriptor: 'test', className: 'cl-test-class', style: {} } },
+        elements: { alertIcon: 'cl-test-class-two' },
       };
       expect(mergeAppearance(a, b)).toStrictEqual({
         layout: {},
         theme: b.theme,
         elements: {
-          alert__warning: 'class-one',
-          alertIcon: 'class-two',
+          alert__warning: 'cl-test-class-one',
+          alertIcon: 'cl-test-class-two',
         },
       });
     });
 
     it('merges string values for the same element', () => {
-      const a = { elements: { alert__warning: 'class-one' } };
-      const b = { elements: { alert__warning: 'class-two' } };
+      const a = { elements: { alert__warning: 'cl-test-class-one' } };
+      const b = { elements: { alert__warning: 'cl-test-class-two' } };
       expect(mergeAppearance(a, b)).toStrictEqual({
         layout: {},
         elements: {
-          alert__warning: 'class-one class-two',
+          alert__warning: 'cl-test-class-one cl-test-class-two',
         },
       });
     });
@@ -387,43 +387,43 @@ if (import.meta.vitest) {
 
   describe('mergeElementsAppearanceConfig', () => {
     it('merges two strings', () => {
-      const a = 'class-one';
-      const b = 'class-two';
-      expect(mergeElementsAppearanceConfig(a, b)).toBe('class-one class-two');
+      const a = 'cl-test-class-one';
+      const b = 'cl-test-class-two';
+      expect(mergeElementsAppearanceConfig(a, b)).toBe('cl-test-class-one cl-test-class-two');
     });
 
     it('merges a string and an object', () => {
-      const a = 'class-one';
-      const b = { className: 'class-two' };
-      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-two class-one' });
+      const a = 'cl-test-class-one';
+      const b = { className: 'cl-test-class-two' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'cl-test-class-two cl-test-class-one' });
     });
 
     it('merges an object and a string', () => {
-      const a = { className: 'class-one' };
-      const b = 'class-two';
-      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-one class-two' });
+      const a = { className: 'cl-test-class-one' };
+      const b = 'cl-test-class-two';
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'cl-test-class-one cl-test-class-two' });
     });
 
     it('merges two objects', () => {
-      const a = { className: 'class-one' };
-      const b = { className: 'class-two' };
-      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'class-one class-two' });
+      const a = { className: 'cl-test-class-one' };
+      const b = { className: 'cl-test-class-two' };
+      expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({ className: 'cl-test-class-one cl-test-class-two' });
     });
 
     it('merges a string and an object with style', () => {
-      const a = 'class-one';
-      const b = { className: 'class-two', backgroundColor: 'tomato' };
+      const a = 'cl-test-class-one';
+      const b = { className: 'cl-test-class-two', backgroundColor: 'tomato' };
       expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({
-        className: 'class-two class-one',
+        className: 'cl-test-class-two cl-test-class-one',
         backgroundColor: 'tomato',
       });
     });
 
     it('merges two objects with styles', () => {
-      const a = { className: 'class-one', color: 'red' };
-      const b = { className: 'class-two', backgroundColor: 'tomato' };
+      const a = { className: 'cl-test-class-one', color: 'red' };
+      const b = { className: 'cl-test-class-two', backgroundColor: 'tomato' };
       expect(mergeElementsAppearanceConfig(a, b)).toStrictEqual({
-        className: 'class-one class-two',
+        className: 'cl-test-class-one cl-test-class-two',
         color: 'red',
         backgroundColor: 'tomato',
       });
@@ -443,12 +443,12 @@ if (import.meta.vitest) {
     it('adds classNames from theme', () => {
       const appearance = {
         elements: {
-          alert__warning: 'test-1',
+          alert__warning: 'cl-test-1',
         },
       };
       const theme = {
         ...fullTheme,
-        alert__warning: { descriptor: 'test', className: 'test', style: { color: 'red' } },
+        alert__warning: { descriptor: 'test', className: 'cl-test-class', style: { color: 'red' } },
       };
       expect(applyTheme(theme, appearance)).toStrictEqual({
         theme,
@@ -456,7 +456,7 @@ if (import.meta.vitest) {
         elements: {
           ...fullTheme,
           alert__warning: {
-            className: 'test test-1',
+            className: 'cl-test-class cl-test-1',
             descriptor: 'test',
             style: { color: 'red' },
           },
