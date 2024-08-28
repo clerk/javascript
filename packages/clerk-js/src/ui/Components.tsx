@@ -326,7 +326,7 @@ const Components = (props: ComponentsProps) => {
     <LazyModalRenderer
       globalAppearance={state.appearance}
       appearanceKey={'userVerification'}
-      componentAppearance={userProfileModal?.appearance}
+      componentAppearance={userVerificationModal?.appearance}
       flowName={'userVerification'}
       onClose={() => componentsControls.closeModal('userVerification')}
       onExternalNavigate={() => componentsControls.closeModal('userVerification')}

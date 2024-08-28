@@ -762,7 +762,7 @@ export type SignInProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: SignInTheme;
   /**
@@ -805,7 +805,7 @@ export type __experimental_UserVerificationProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: UserVerificationTheme;
 };
@@ -858,7 +858,7 @@ export type SignUpProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: SignUpTheme;
 
@@ -881,7 +881,7 @@ export type UserProfileProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: UserProfileTheme;
   /*
@@ -911,7 +911,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: OrganizationProfileTheme;
   /*
@@ -939,7 +939,7 @@ export type CreateOrganizationProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: CreateOrganizationTheme;
   /**
@@ -995,7 +995,7 @@ export type UserButtonProps = UserButtonProfileMode & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: UserButtonTheme;
 
@@ -1085,7 +1085,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
-     * prop of ClerkProvided (if one is provided)
+     * prop of ClerkProvider(if one is provided)
      */
     appearance?: OrganizationSwitcherTheme;
     /*
@@ -1114,7 +1114,7 @@ export type OrganizationListProps = {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: OrganizationListTheme;
   /**
