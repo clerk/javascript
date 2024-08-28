@@ -105,6 +105,6 @@ export function getButtonLabel(factor: __experimental_SessionVerificationSecondF
     case 'backup_code':
       return localizationKeys('__experimental_userVerification.alternativeMethods.blockButton__backupCode');
     default:
-      throw `Invalid sign in strategy: "${(factor as any).strategy}"`;
+      throw `Invalid verification strategy: "${(factor as any).strategy}"`;
   }
 }

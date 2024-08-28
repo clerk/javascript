@@ -563,7 +563,7 @@ export const enUS: LocalizationResource = {
           'If you’re experiencing difficulty verifying your account, email us and we will work with you to restore access as soon as possible.',
         title: 'Get help',
       },
-      subtitle: 'Facing issues? You can use any of these methods to sign in.',
+      subtitle: 'Facing issues? You can use any of these methods for verification.',
       title: 'Use another method',
     },
     backupCodeMfa: {
@@ -577,7 +577,7 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     noAvailableMethods: {
-      message: "Cannot proceed with sign in. There's no available authentication factor.",
+      message: "Cannot proceed with verification. There's no available authentication factor.",
       subtitle: 'An error occurred',
       title: 'Cannot verify your account',
     },
