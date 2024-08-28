@@ -144,6 +144,8 @@ export interface UserResource extends ClerkResource {
 
   get unverifiedExternalAccounts(): ExternalAccountResource[];
 
+  get verifiedWeb3Wallets(): Web3WalletResource[];
+
   get hasVerifiedEmailAddress(): boolean;
 
   get hasVerifiedPhoneNumber(): boolean;

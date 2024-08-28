@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/shared/react';
-import type { Web3Strategy } from '@clerk/types';
+import type { Web3Provider, Web3Strategy } from '@clerk/types';
 
-import { generateSignatureWithMetamask, getMetamaskIdentifier } from '../../../utils/web3';
+import { generateWeb3Signature, getWeb3Identifier } from '../../../utils/web3';
 import { descriptors, Image, localizationKeys } from '../../customizables';
 import { ProfileSection, useCardState, withCardStateProvider } from '../../elements';
 import { useEnabledThirdPartyProviders } from '../../hooks';
@@ -10,33 +10,33 @@ import { getFieldError, handleError } from '../../utils';
 export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
   const card = useCardState();
   const { user } = useUser();
-  const { strategyToDisplayData } = useEnabledThirdPartyProviders();
+  const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
 
-  // TODO: This logic is very similar to AddConnectedAccount but only metamask is supported right now
-  // const enabledStrategies = strategies.filter(s => s.startsWith('web3')) as Web3Strategy[];
-  // const connectedStrategies = user.web3Wallets.map(w => w.web3Wallet) as OAuthStrategy[];
-  const unconnectedStrategies: Web3Strategy[] =
-    user?.web3Wallets.filter(w => w.verification?.status === 'verified').length === 0
-      ? ['web3_metamask_signature']
-      : [];
+  const enabledStrategies = strategies.filter(s => s.startsWith('web3')) as Web3Strategy[];
+  const connectedStrategies = user?.verifiedWeb3Wallets.map(w => w.verification.strategy) as Web3Strategy[];
+  const unconnectedStrategies = enabledStrategies.filter(strategy => {
+    return !connectedStrategies.includes(strategy);
+  });
+
   const connect = async (strategy: Web3Strategy) => {
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+
     try {
       card.setLoading(strategy);
-      const identifier = await getMetamaskIdentifier();
+      const identifier = await getWeb3Identifier({ provider });
 
       if (!user) {
         throw new Error('user is not defined');
       }
 
       let web3Wallet = await user.createWeb3Wallet({ web3Wallet: identifier });
-      web3Wallet = await web3Wallet.prepareVerification({ strategy: 'web3_metamask_signature' });
+      web3Wallet = await web3Wallet.prepareVerification({ strategy });
       const nonce = web3Wallet.verification.nonce as string;
-      const signature = await generateSignatureWithMetamask({ identifier, nonce });
+      const signature = await generateWeb3Signature({ identifier, nonce, provider });
       await web3Wallet.attemptVerification({ signature });
       card.setIdle();
     } catch (err) {
       card.setIdle();
-      console.log(err);
       const fieldError = getFieldError(err);
       if (fieldError) {
         card.setError(fieldError.longMessage);
@@ -62,7 +62,13 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(() => {
           onClick={() => connect(strategy)}
           isLoading={card.loadingMetadata === strategy}
           isDisabled={card.isLoading}
-          localizationKey={`Connect ${strategyToDisplayData[strategy].name} wallet`}
+          localizationKey={localizationKeys('userProfile.web3WalletPage.web3WalletButtonsBlockButton', {
+            provider: strategyToDisplayData[strategy].name,
+          })}
+          sx={t => ({
+            justifyContent: 'start',
+            gap: t.space.$2,
+          })}
           leftIcon={
             <Image
               elementDescriptor={descriptors.providerIcon}
