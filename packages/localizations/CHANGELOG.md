@@ -1,5 +1,18 @@
 # Change Log
 
+## 2.7.0
+
+### Minor Changes
+
+- Support connecting Coinbase Wallet via <UserProfile /> ([#4030](https://github.com/clerk/javascript/pull/4030)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Improve `he-IL` localization values. ([#4025](https://github.com/clerk/javascript/pull/4025)) by [@TgMrP](https://github.com/TgMrP)
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/types@4.16.0
+
 ## 2.6.3
 
 ### Patch Changes

@@ -21,9 +21,6 @@ expo:
 fastify:
   - packages/fastify/**
 
-gatsby:
-  - packages/gatsby-plugin-clerk/**
-
 localizations:
   - packages/localizations/**
 

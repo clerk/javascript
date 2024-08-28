@@ -792,7 +792,7 @@ export const enUS: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'Remove wallet',
-        primaryButton: 'Web3 wallets',
+        primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
       },
     },
@@ -810,6 +810,7 @@ export const enUS: LocalizationResource = {
       },
       subtitle__availableWallets: 'Select a web3 wallet to connect to your account.',
       subtitle__unavailableWallets: 'There are no available web3 wallets.',
+      web3WalletButtonsBlockButton: '{{provider|titleize}}',
       successMessage: 'The wallet has been added to your account.',
       title: 'Add web3 wallet',
     },

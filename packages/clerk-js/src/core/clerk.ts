@@ -731,6 +731,12 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    if (session?.lastActiveToken) {
+      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
+    }
+
+    await onBeforeSetActive();
+
     // If this.session exists, then signOut was triggered by the current tab
     // and should emit. Other tabs should not emit the same event again
     const shouldSignOutSession = this.session && newSession === null;
@@ -738,12 +744,6 @@ export class Clerk implements ClerkInterface {
       this.#broadcastSignOutEvent();
       eventBus.dispatch(events.TokenUpdate, { token: null });
     }
-
-    if (session?.lastActiveToken) {
-      eventBus.dispatch(events.TokenUpdate, { token: session.lastActiveToken });
-    }
-
-    await onBeforeSetActive();
 
     //1. setLastActiveSession to passed user session (add a param).
     //   Note that this will also update the session's active organization

@@ -165,23 +165,6 @@ export default {
       'organizationmembershippublicuserdata-profileimageurl',
     ]),
   ),
-  // since we export clerk-react at the top level from the gatsby plugin
-  // if you're using gatsby, we also need to scan for the react changes
-  gatsby: load(
-    'gatsby',
-    dedupeMerge(changesAffectingAll, reactChanges, jsChanges, [
-      'api-key-to-secret-key',
-      'createclerkclient-apikey',
-      'apikey-to-publishable-key',
-      'createclerkclient-frontendapi',
-      'ismagiclinkerror',
-      'usemagiclink',
-      'magiclinkerrorcode',
-      'api-url-value-change',
-      'withserverauth-return-type',
-      'clerk-import-change',
-    ]),
-  ),
   remix: load(
     'remix',
     dedupeMerge(changesAffectingAll, jsChanges, [
