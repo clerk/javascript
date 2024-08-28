@@ -11,7 +11,7 @@ import { HavingTrouble } from './HavingTrouble';
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
   onFactorSelected: (factor: __experimental_SessionVerificationSecondFactor) => void;
-  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[];
+  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[] | null;
 };
 
 export const UVFactorTwoAlternativeMethods = (props: AlternativeMethodsProps) => {
@@ -55,7 +55,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
             gap={3}
           >
             <Col gap={2}>
-              {supportedSecondFactors.sort(backupCodePrefFactorComparator).map((factor, i) => (
+              {supportedSecondFactors?.sort(backupCodePrefFactorComparator).map((factor, i) => (
                 <ArrowBlockButton
                   textLocalizationKey={getButtonLabel(factor)}
                   elementDescriptor={descriptors.alternativeMethodsBlockButton}

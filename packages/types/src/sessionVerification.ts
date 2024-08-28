@@ -4,14 +4,13 @@ import type { SessionResource } from './session';
 import type { VerificationResource } from './verification';
 
 export interface __experimental_SessionVerificationResource extends ClerkResource {
-  // TODO: Is null possible ?
-  status: __experimental_SessionVerificationStatus | null;
+  status: __experimental_SessionVerificationStatus;
   level: __experimental_SessionVerificationLevel;
   session: SessionResource;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
-  supportedFirstFactors: __experimental_SessionVerificationFirstFactor[];
-  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[];
+  supportedFirstFactors: __experimental_SessionVerificationFirstFactor[] | null;
+  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[] | null;
 }
 
 export type __experimental_SessionVerificationStatus = 'needs_first_factor' | 'needs_second_factor' | 'complete';
