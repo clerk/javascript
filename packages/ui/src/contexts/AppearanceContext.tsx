@@ -109,7 +109,9 @@ export function mergeParsedElementsFragment(...fragments: ParsedElementsFragment
 export function mergeDescriptors(...descriptors: (ParsedDescriptor | boolean)[]): PartialDescriptor {
   return descriptors.reduce<PartialDescriptor>(
     (acc, el) => {
-      if (typeof el === 'boolean') return acc;
+      if (typeof el === 'boolean') {
+        return acc;
+      }
       acc.className = [el.descriptor, acc.className, el.className].join(' ');
       acc.style = { ...acc.style, ...el.style };
       return acc;
@@ -149,9 +151,15 @@ function mergeElementsAppearanceConfig(
 }
 
 function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null | undefined): Appearance | null {
-  if (!a && !b) return null;
-  if (!a) return b!;
-  if (!b) return a!;
+  if (!a && !b) {
+    return null;
+  }
+  if (!a) {
+    return b!;
+  }
+  if (!b) {
+    return a;
+  }
 
   const result = { ...a, layout: { ...a.layout, ...b.layout } };
 
@@ -177,7 +185,9 @@ function mergeAppearance(a: Appearance | null | undefined, b: Appearance | null 
 
 function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | null): ParsedAppearance {
   const baseTheme = theme ?? fullTheme;
-  if (!appearance) return { theme: baseTheme, elements: structuredClone(baseTheme), layout: defaultAppearance.layout };
+  if (!appearance) {
+    return { theme: baseTheme, elements: structuredClone(baseTheme), layout: defaultAppearance.layout };
+  }
 
   const result = {
     theme: baseTheme,
@@ -207,43 +217,6 @@ function applyTheme(theme: ParsedElements | undefined, appearance: Appearance | 
   return result;
 }
 
-function mergeAppearenceElementsAndParsedAppearanceElements(
-  defaultAppearance: ParsedAppearance,
-  parsedAppearance?: ParsedAppearance,
-  appearance?: Appearance,
-): ParsedAppearance['elements'] {
-  const defaultElements = defaultAppearance.elements;
-  const parsedAppearanceElements = parsedAppearance?.elements;
-  const appearanceElements = appearance?.elements;
-
-  let mergedElements = { ...defaultElements };
-
-  if (parsedAppearanceElements) {
-    // If parsedAppearance is provided, it has already factored in defaultAppearance, so we can simply overwrite.
-    mergedElements = { ...parsedAppearanceElements };
-  }
-
-  if (appearanceElements) {
-    Object.entries(appearanceElements).forEach(([element, config]) => {
-      const el = element as DescriptorIdentifier;
-      if (typeof config === 'string') {
-        mergedElements[el].className += [mergedElements[el].className, config].join(' ');
-      } else {
-        const { className, ...style } = config;
-        if (className) {
-          mergedElements[el].className = [mergedElements[el].className, className].join(' ');
-        }
-        mergedElements[el].style = {
-          ...mergedElements[el].style,
-          ...style,
-        };
-      }
-    });
-  }
-
-  return mergedElements;
-}
-
 export const defaultAppearance: ParsedAppearance = {
   theme: fullTheme,
   elements: fullTheme,
@@ -262,25 +235,6 @@ export const defaultAppearance: ParsedAppearance = {
     unsafe_disableDevelopmentModeWarnings: false,
   },
 };
-
-/**
- * Given a `globalAppearance` and `appearance` value, calculate a resulting `ParsedAppearance` that factors in both
- * defaults and provided values.
- */
-function parseAppearance(
-  props: AppearanceCascade,
-  theme: ParsedAppearance | undefined = defaultAppearance,
-): ParsedAppearance {
-  const appearance = {
-    ...theme,
-    // This is a plain object, so we can use spread operations to override values in order of priority.
-    layout: { ...theme.layout, ...props.globalAppearance?.layout, ...props.appearance?.layout },
-    // The `elements` prop is more complicated, so we use a dedicated function to handle that logic
-    elements: mergeAppearenceElementsAndParsedAppearanceElements(theme, props.globalAppearance, props.appearance),
-  };
-
-  return appearance;
-}
 
 const [AppearanceContext, useAppearance, usePartialAppearance] =
   createContextAndHook<AppearanceContextValue>('AppearanceContext');
