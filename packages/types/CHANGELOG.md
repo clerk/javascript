@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.16.0
+
+### Minor Changes
+
+- Support connecting Coinbase Wallet via <UserProfile /> ([#4030](https://github.com/clerk/javascript/pull/4030)) by [@chanioxaris](https://github.com/chanioxaris)
+
 ## 4.15.1
 
 ### Patch Changes

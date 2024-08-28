@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.17.0
+
+### Minor Changes
+
+- Support connecting Coinbase Wallet via <UserProfile /> ([#4030](https://github.com/clerk/javascript/pull/4030)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Fix 404s after signing out in NextJS apps by keeping the session cookie while cache is being invalidated ([#4001](https://github.com/clerk/javascript/pull/4001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`7ca43acae`](https://github.com/clerk/javascript/commit/7ca43acaeb8d0b5dc842d20f78c53dec554e4829), [`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/localizations@2.7.0
+  - @clerk/types@4.16.0
+  - @clerk/shared@2.5.5
+
 ## 5.16.1
 
 ### Patch Changes
