@@ -12,7 +12,7 @@ const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(
 
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
-    placement: 'bottom-start',
+    placement: 'bottom-end',
     offset: 8,
   });
 
