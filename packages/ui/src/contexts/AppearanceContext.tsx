@@ -337,6 +337,17 @@ if (import.meta.vitest) {
         },
       });
     });
+
+    it('overrides same style properties', () => {
+      const a = { elements: { alert__warning: { background: 'tomato' } } };
+      const b = { elements: { alert__warning: { background: 'red' } } };
+      expect(mergeAppearance(a, b)).toStrictEqual({
+        layout: {},
+        elements: {
+          alert__warning: { background: 'red' },
+        },
+      });
+    });
   });
 
   describe('mergeElementsAppearanceConfig', () => {

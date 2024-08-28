@@ -1,8 +1,10 @@
-import type { ReactNode } from 'react';
-import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { describe, expect, it } from 'vitest';
+
 import { fullTheme } from '~/themes';
-import { AppearanceProvider, useAppearance, defaultAppearance } from './AppearanceContext';
+
+import { AppearanceProvider, defaultAppearance, useAppearance } from './AppearanceContext';
 
 describe('AppearanceContext', () => {
   it('renders expected defaults', () => {
@@ -73,6 +75,41 @@ describe('AppearanceContext', () => {
       themelessAppearance: {
         elements: {
           alert__warning: 'class-two class-three',
+        },
+        layout: {},
+      },
+    });
+  });
+
+  it('overrides same properties with the nearest provider', () => {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <AppearanceProvider appearance={{ elements: { alert__warning: { background: 'tomato' } } }}>
+        <AppearanceProvider appearance={{ elements: { alert__warning: { background: 'red' } } }}>
+          {children}
+        </AppearanceProvider>
+      </AppearanceProvider>
+    );
+
+    const { result } = renderHook(useAppearance, { wrapper });
+    expect(result.current).toStrictEqual({
+      parsedAppearance: {
+        layout: defaultAppearance.layout,
+        elements: {
+          ...fullTheme,
+          alert__warning: {
+            descriptor: 'cl-alert__warning',
+            className: fullTheme.alert__warning.className,
+            style: { background: 'red' },
+          },
+        },
+        theme: fullTheme,
+      },
+      theme: undefined,
+      themelessAppearance: {
+        elements: {
+          alert__warning: {
+            background: 'red',
+          },
         },
         layout: {},
       },
