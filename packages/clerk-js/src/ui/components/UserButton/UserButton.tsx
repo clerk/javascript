@@ -8,11 +8,11 @@ import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
 const _UserButton = withFloatingTree(() => {
-  const { defaultOpen, open, onOpenChanged } = useUserButtonContext();
+  const { defaultOpen, __experimental_open, __experimental_onOpenChanged } = useUserButtonContext();
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
-    open,
-    onOpenChanged,
+    open: __experimental_open,
+    onOpenChanged: __experimental_onOpenChanged,
     placement: 'bottom-end',
     offset: 8,
   });

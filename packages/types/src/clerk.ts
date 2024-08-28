@@ -906,17 +906,13 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   showName?: boolean;
   /**
-   * Controls the default state of the UserButton.
+   * Controls the default state of the UserButton
    */
   defaultOpen?: boolean;
-  /**
-   * Controls whether the popover is visible. Should be used in conjunction with onOpenChange.
-   */
-  open?: boolean;
-  /**
-   * Callback called when the open state of the popover changes.
-   */
-  onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
+
+  __experimental_open?: boolean;
+
+  __experimental_onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
   /**
    * Full URL or path to navigate after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
@@ -974,17 +970,16 @@ type CreateOrganizationMode =
 export type OrganizationSwitcherProps = CreateOrganizationMode &
   OrganizationProfileMode & {
     /**
-     * Controls the default state of the OrganizationSwitcher.
+     * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
-    /**
-     * Controls whether the popover is visible. Should be used in conjunction with onOpenChange.
-     */
-    open?: boolean;
-    /**
-     * Callback called when the open state of the popover changes.
-     */
-    onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
+
+    __experimental_open?: boolean;
+
+    __experimental_onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
+
+    __experimental_hideTrigger?: boolean;
+    __experimental_onActionEnded?: () => void;
     /**
      * By default, users can switch between organization and their personal account.
      * This option controls whether OrganizationSwitcher will include the user's personal account

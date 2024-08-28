@@ -9,11 +9,12 @@ import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
 import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 
 const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
-  const { onOpenChanged, open, defaultOpen } = useOrganizationSwitcherContext();
+  const { __experimental_onOpenChanged, __experimental_open, defaultOpen } = useOrganizationSwitcherContext();
+
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
-    open,
-    onOpenChanged,
+    open: __experimental_open,
+    onOpenChanged: __experimental_onOpenChanged,
     placement: 'bottom-start',
     offset: 8,
   });
@@ -46,15 +47,21 @@ const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactE
 });
 
 const _OrganizationSwitcher = () => {
+  const { __experimental_hideTrigger, __experimental_onActionEnded } = useOrganizationSwitcherContext();
+
   return (
     <Flow.Root
       flow='organizationSwitcher'
       sx={{ display: 'inline-flex' }}
     >
       <AcceptedInvitationsProvider>
-        <OrganizationSwitcherWithFloatingTree>
-          <OrganizationSwitcherPopover />
-        </OrganizationSwitcherWithFloatingTree>
+        {__experimental_hideTrigger ? (
+          <OrganizationSwitcherPopover close={__experimental_onActionEnded} />
+        ) : (
+          <OrganizationSwitcherWithFloatingTree>
+            <OrganizationSwitcherPopover />
+          </OrganizationSwitcherWithFloatingTree>
+        )}
       </AcceptedInvitationsProvider>
     </Flow.Root>
   );

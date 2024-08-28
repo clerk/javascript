@@ -66,6 +66,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
   useDismiss(context, {
     bubbles,
     outsidePress,
+    //outsidePress: typeof props.open === 'undefined' ? outsidePress : false,
   });
 
   useEffect(() => {
