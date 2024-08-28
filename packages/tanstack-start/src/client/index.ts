@@ -1,2 +1,2 @@
 export * from './ClerkProvider';
-export * from './uiComponents';
+export { SignIn, SignUp, OrganizationProfile, OrganizationList, CreateOrganization, UserProfile } from './uiComponents';

@@ -56,3 +56,6 @@ actions:
 
 integration:
   - integration/**
+
+tanstack:
+  - packages/tanstack-start/**

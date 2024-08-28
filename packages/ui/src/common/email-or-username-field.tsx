@@ -2,6 +2,7 @@ import * as Common from '@clerk/elements/common';
 import React from 'react';
 
 import { useLocalizations } from '~/hooks/use-localizations';
+import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 
 export function EmailOrUsernameField({
@@ -38,11 +39,13 @@ export function EmailOrUsernameField({
             );
           }}
         </Common.FieldState>
-        <Common.FieldError asChild>
-          {({ message }) => {
-            return <Field.Message intent='error'>{message}</Field.Message>;
-          }}
-        </Common.FieldError>
+        <Animated>
+          <Common.FieldError asChild>
+            {({ message }) => {
+              return <Field.Message intent='error'>{message}</Field.Message>;
+            }}
+          </Common.FieldError>
+        </Animated>
       </Field.Root>
     </Common.Field>
   );

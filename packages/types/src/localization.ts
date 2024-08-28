@@ -516,6 +516,7 @@ type _LocalizationResource = {
       title: LocalizationValue;
       subtitle__availableWallets: LocalizationValue;
       subtitle__unavailableWallets: LocalizationValue;
+      web3WalletButtonsBlockButton: LocalizationValue;
       successMessage: LocalizationValue;
       removeResource: {
         title: LocalizationValue;

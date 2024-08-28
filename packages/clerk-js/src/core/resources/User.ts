@@ -392,6 +392,10 @@ export class User extends BaseResource implements UserResource {
     return this.externalAccounts.filter(externalAccount => externalAccount.verification?.status != 'verified');
   }
 
+  get verifiedWeb3Wallets() {
+    return this.web3Wallets.filter(web3Wallet => web3Wallet.verification?.status == 'verified');
+  }
+
   get hasVerifiedEmailAddress() {
     return this.emailAddresses.filter(email => email.verification.status === 'verified').length > 0;
   }

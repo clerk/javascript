@@ -135,15 +135,6 @@ export function _SignInFactorOne(): JSX.Element {
     case 'password':
       return (
         <SignInFactorOnePasswordCard
-          // onFactorPrepare={(factor: ResetPasswordCodeFactor) => {
-          //   handleFactorPrepare();
-          //   setFactor(prev => ({
-          //     currentFactor: {
-          //       ...factor,
-          //     },
-          //     prevCurrentFactor: prev.currentFactor,
-          //   }));
-          // }}
           onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
           onPasswordPwned={() => {

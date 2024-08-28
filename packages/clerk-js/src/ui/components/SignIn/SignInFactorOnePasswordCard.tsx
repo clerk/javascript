@@ -15,7 +15,6 @@ import { useResetPasswordFactor } from './useResetPasswordFactor';
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
-  // onFactorPrepare: (f: ResetPasswordCodeFactor) => void;
   onPasswordPwned?: () => void;
 };
 
