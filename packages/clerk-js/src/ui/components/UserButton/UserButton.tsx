@@ -44,15 +44,15 @@ const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(
 });
 
 const _UserButton = withFloatingTree(() => {
-  const { __experimental_hideTrigger, __experimental_onActionEnded } = useUserButtonContext();
+  const { __experimental_standalone, __experimental_onDismiss } = useUserButtonContext();
 
   return (
     <Flow.Root
       flow='userButton'
       sx={{ display: 'inline-flex' }}
     >
-      {__experimental_hideTrigger ? (
-        <UserButtonPopover close={__experimental_onActionEnded} />
+      {__experimental_standalone ? (
+        <UserButtonPopover close={__experimental_onDismiss} />
       ) : (
         <UserButtonWithFloatingTree>
           <UserButtonPopover />

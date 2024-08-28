@@ -910,8 +910,22 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   defaultOpen?: boolean;
 
-  __experimental_hideTrigger?: boolean;
-  __experimental_onActionEnded?: () => void;
+  /**
+   * If true the UserButton will only render the popover.
+   * Enables developers to implement a custom dialog.
+   * @experimental This API is experimental and may change at any moment.
+   * @default false
+   */
+  __experimental_standalone?: boolean;
+
+  /**
+   * Notifies the caller that it's safe to unmount UserButton.
+   * It only fires when used in conjunction with `__experimental_standalone`.
+   * @experimental This API is experimental and may change at any moment.
+   * @default undefined
+   */
+  __experimental_onDismiss?: () => void;
+
   /**
    * Full URL or path to navigate after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
@@ -972,9 +986,21 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
+    /**
+     * If true the OrganizationSwitcher will only render the popover.
+     * Enables developers to implement a custom dialog.
+     * @experimental This API is experimental and may change at any moment.
+     * @default false
+     */
+    __experimental_standalone?: boolean;
 
-    __experimental_hideTrigger?: boolean;
-    __experimental_onActionEnded?: () => void;
+    /**
+     * Notifies the caller that it's safe to unmount OrganizationSwitcher.
+     * It only fires when used in conjunction with `__experimental_standalone`.
+     * @experimental This API is experimental and may change at any moment.
+     * @default undefined
+     */
+    __experimental_onDismiss?: () => void;
     /**
      * By default, users can switch between organization and their personal account.
      * This option controls whether OrganizationSwitcher will include the user's personal account
