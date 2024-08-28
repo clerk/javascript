@@ -9,12 +9,10 @@ import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
 import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 
 const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
-  const { __experimental_onOpenChanged, __experimental_open, defaultOpen } = useOrganizationSwitcherContext();
+  const { defaultOpen } = useOrganizationSwitcherContext();
 
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
-    open: __experimental_open,
-    onOpenChanged: __experimental_onOpenChanged,
     placement: 'bottom-start',
     offset: 8,
   });

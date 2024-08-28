@@ -910,10 +910,6 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   defaultOpen?: boolean;
 
-  __experimental_open?: boolean;
-
-  __experimental_onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
-
   __experimental_hideTrigger?: boolean;
   __experimental_onActionEnded?: () => void;
   /**
@@ -976,10 +972,6 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Controls the default state of the OrganizationSwitcher
      */
     defaultOpen?: boolean;
-
-    __experimental_open?: boolean;
-
-    __experimental_onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
 
     __experimental_hideTrigger?: boolean;
     __experimental_onActionEnded?: () => void;

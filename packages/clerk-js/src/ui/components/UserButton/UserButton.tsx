@@ -8,12 +8,10 @@ import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
 const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
-  const { __experimental_onOpenChanged, __experimental_open, defaultOpen } = useUserButtonContext();
+  const { defaultOpen } = useUserButtonContext();
 
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
-    open: __experimental_open,
-    onOpenChanged: __experimental_onOpenChanged,
     placement: 'bottom-start',
     offset: 8,
   });
