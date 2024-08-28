@@ -2,4 +2,4 @@
 "@clerk/backend": patch
 ---
 
-Fix Astro middleware by accepting duplicate leading slashes in URL paths
+Fix error from duplicate leading slashes in URL path on Cloudflare Pages
