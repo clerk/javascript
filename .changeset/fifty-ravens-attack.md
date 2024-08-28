@@ -4,4 +4,4 @@
 "@clerk/clerk-react": minor
 ---
 
-Introduce UserVerification as experimental. Exposing `<__experimental_UserVerification/>`.
+Add `<__experimental_UserVerification />` component. This is an experimental feature and breaking changes can occur until it's marked as stable.
