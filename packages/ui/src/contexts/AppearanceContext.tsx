@@ -34,7 +34,7 @@ export type ParsedElementsFragment = Partial<PartialTheme>;
  * the main type interacted with within components.
  */
 export type ParsedElements = Record<DescriptorIdentifier, ParsedDescriptor>;
-export type ParsedLayout = Required<Layout>;
+export type ParsedLayout = Required<Layout & { socialButtonsIconVariant: 'color' | 'monochrome' }>;
 
 type ElementsAppearanceConfig = string | (React.CSSProperties & { className?: string });
 
@@ -224,6 +224,7 @@ export const defaultAppearance: ParsedAppearance = {
     logoPlacement: 'inside',
     socialButtonsPlacement: 'top',
     socialButtonsVariant: 'auto',
+    socialButtonsIconVariant: 'color',
     logoImageUrl: '',
     logoLinkUrl: '',
     showOptionalFields: true,

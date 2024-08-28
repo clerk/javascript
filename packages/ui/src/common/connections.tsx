@@ -6,6 +6,7 @@ import { useAppearance } from '~/contexts';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { Button } from '~/primitives/button';
 import * as Icon from '~/primitives/icon';
+import { Image } from '~/primitives/image';
 
 /**
  * Calculates the number of columns given the total number of items and the maximum columns allowed per row.
@@ -54,16 +55,21 @@ function getColumnCount({ length, max }: Record<'length' | 'max', number>): numb
   return Math.ceil(length / numRows);
 }
 
+function iconImageUrl(id: string): string {
+  return `https://img.clerk.com/static/${id}.svg`;
+}
+
 export function Connections(
   props: { columns?: number } & Pick<React.ComponentProps<typeof Button>, 'disabled' | 'textVisuallyHidden'>,
 ) {
   const enabledConnections = useEnabledConnections();
   const { layout } = useAppearance().parsedAppearance;
+  const { socialButtonsVariant, socialButtonsIconVariant } = layout;
   const hasConnection = enabledConnections.length > 0;
   const textVisuallyHidden =
     typeof props?.textVisuallyHidden !== 'undefined'
       ? props.textVisuallyHidden
-      : enabledConnections.length > 2 || layout?.socialButtonsVariant === 'iconButton';
+      : enabledConnections.length > 2 || socialButtonsVariant === 'iconButton';
   const columns = getColumnCount({ length: enabledConnections.length, max: props?.columns || 6 });
 
   return hasConnection ? (
@@ -74,8 +80,6 @@ export function Connections(
       >
         {enabledConnections.map(c => {
           const connection = PROVIDERS.find(provider => provider.id === c.provider);
-          const iconKey = connection?.icon;
-          const IconComponent = iconKey ? Icon[iconKey] : null;
           return (
             <li
               key={c.provider}
@@ -92,7 +96,17 @@ export function Connections(
                         intent='connection'
                         busy={isConnectionLoading}
                         disabled={props?.disabled || isConnectionLoading}
-                        iconStart={IconComponent ? <IconComponent /> : null}
+                        iconStart={
+                          socialButtonsIconVariant === 'color' ? (
+                            <Image
+                              src={iconImageUrl(c.provider)}
+                              className='size-[1em]'
+                              alt=''
+                            />
+                          ) : connection?.icon ? (
+                            React.createElement(Icon[connection.icon])
+                          ) : null
+                        }
                         textVisuallyHidden={textVisuallyHidden}
                       >
                         {connection?.name || c.provider}

@@ -41,6 +41,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const [fontSize, setFontSize] = useState(fontSizeDefault);
   const [devMode, setDevMode] = useState('on');
   const [socialButtonsPlacement, setSocialButtonsPlacement] = useState('top');
+  const [socialButtonsIconVariant, setSocialButtonsIconVariant] = useState('color');
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
@@ -52,6 +53,8 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     setSpacingUnit(spacingUnitDefault);
     setFontSize(fontSizeDefault);
     setDevMode('on');
+    setSocialButtonsPlacement('top');
+    setSocialButtonsIconVariant('color');
   };
   const lightResult = generateColors({
     appearance: 'light',
@@ -78,12 +81,14 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     }
   }, [dir]);
   return (
-    <ClerkProvider key={devMode}>
+    <ClerkProvider key={`${devMode}-${socialButtonsIconVariant}`}>
       <AppearanceProvider
         appearance={{
           layout: {
             unsafe_disableDevelopmentModeWarnings: devMode === 'off',
             socialButtonsPlacement: socialButtonsPlacement as Layout['socialButtonsPlacement'],
+            // @ts-ignore: TODO fix
+            socialButtonsIconVariant: socialButtonsIconVariant,
           },
         }}
       >
@@ -191,6 +196,21 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
                 ]}
                 value={socialButtonsPlacement}
                 onValueChange={setSocialButtonsPlacement}
+              />
+              <ToggleGroup
+                label='Social button icon variant'
+                items={[
+                  {
+                    label: 'Color',
+                    value: 'color',
+                  },
+                  {
+                    label: 'Monochrome',
+                    value: 'monochrome',
+                  },
+                ]}
+                value={socialButtonsIconVariant}
+                onValueChange={setSocialButtonsIconVariant}
               />
               <ToggleGroup
                 label='Dev mode'
