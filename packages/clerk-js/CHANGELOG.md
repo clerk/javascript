@@ -1,5 +1,39 @@
 # Change Log
 
+## 5.17.0
+
+### Minor Changes
+
+- Support connecting Coinbase Wallet via <UserProfile /> ([#4030](https://github.com/clerk/javascript/pull/4030)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Fix 404s after signing out in NextJS apps by keeping the session cookie while cache is being invalidated ([#4001](https://github.com/clerk/javascript/pull/4001)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`7ca43acae`](https://github.com/clerk/javascript/commit/7ca43acaeb8d0b5dc842d20f78c53dec554e4829), [`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/localizations@2.7.0
+  - @clerk/types@4.16.0
+  - @clerk/shared@2.5.5
+
+## 5.16.1
+
+### Patch Changes
+
+- Remove sessionId parameter from all **experimental** verify session methods. ([#4026](https://github.com/clerk/javascript/pull/4026)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce Coinbase Wallet Web3 provider types ([#4028](https://github.com/clerk/javascript/pull/4028)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Change the webpackChunkName of GoogleOneTap from `"oneTap"` to `"onetap"` for consistency. ([#4036](https://github.com/clerk/javascript/pull/4036)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixes issue where `createFlexGapPropertyIosCompat` was incorrectly detecting a modern Chrome for iOS user agent. ([#4034](https://github.com/clerk/javascript/pull/4034)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce support for the Hugging Face OAuth Provider. ([#4021](https://github.com/clerk/javascript/pull/4021)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/localizations@2.6.3
+  - @clerk/shared@2.5.4
+
 ## 5.16.0
 
 ### Minor Changes

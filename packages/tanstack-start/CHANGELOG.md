@@ -1,5 +1,27 @@
 # @clerk/tanstack-start
 
+## 0.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/types@4.16.0
+  - @clerk/backend@1.8.3
+  - @clerk/clerk-react@5.4.5
+  - @clerk/shared@2.5.5
+
+## 0.3.1
+
+### Patch Changes
+
+- Fix a bug when using the `getAuth` function multiple times ([#4019](https://github.com/clerk/javascript/pull/4019)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/backend@1.8.2
+  - @clerk/clerk-react@5.4.4
+  - @clerk/shared@2.5.4
+
 ## 0.3.0
 
 ### Minor Changes

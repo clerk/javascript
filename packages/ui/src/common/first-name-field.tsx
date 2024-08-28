@@ -2,6 +2,7 @@ import * as Common from '@clerk/elements/common';
 import React from 'react';
 
 import { useLocalizations } from '~/hooks/use-localizations';
+import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 
 export function FirstNameField(props: Omit<React.ComponentProps<typeof Common.Input>, 'type'>) {
@@ -32,13 +33,15 @@ export function FirstNameField(props: Omit<React.ComponentProps<typeof Common.In
             );
           }}
         </Common.FieldState>
-        <Common.FieldError asChild>
-          {({ message, code }) => {
-            return (
-              <Field.Message intent='error'>{translateError({ message, code, name: 'first_name' })}</Field.Message>
-            );
-          }}
-        </Common.FieldError>
+        <Animated>
+          <Common.FieldError asChild>
+            {({ message, code }) => {
+              return (
+                <Field.Message intent='error'>{translateError({ message, code, name: 'first_name' })}</Field.Message>
+              );
+            }}
+          </Common.FieldError>
+        </Animated>
       </Field.Root>
     </Common.Field>
   );
