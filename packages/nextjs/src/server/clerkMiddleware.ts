@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import type { AuthObject } from '@clerk/backend';
-import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
+import type { AuthenticateRequestOptions, OrganizationSyncOptions, ClerkRequest, RedirectFun, RequestState} from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextMiddleware } from 'next/server';
@@ -187,7 +187,35 @@ const parseHandlerAndOptions = (args: unknown[]) => {
   ] as [ClerkMiddlewareHandler | undefined, ClerkMiddlewareOptions];
 };
 
-export const createAuthenticateRequestOptions = (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
+export const createAuthenticateRequestOptions: (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
+  /* TODO(izaak): I get this error unless I specify the type explicitly:
+  ```
+    error TS2742: The inferred type of  'createAuthenticateRequestOptions' cannot be named without a reference to
+    '../../../../node_modules/@clerk/backend/dist/tokens/types'. This is likely not portable. A type annotation is necessary.
+  ```
+  It looks like it's because i've added OrganizationSyncOptions to AuthenticateRequestOptions (types.ts). Not sure
+  what the best workaround is, but it's likely not this.
+  */
+  publishableKey?: string;
+  audience?: string | string[];
+  debug?: boolean;
+  secretKey?: string;
+  signInUrl: string;
+  signUpUrl?: string;
+  proxyUrl: any;
+  afterSignUpUrl?: string;
+  clockSkewInMs?: number;
+  isSatellite: boolean;
+  organizationSync?: OrganizationSyncOptions;
+  apiVersion?: string;
+  apiUrl?: string;
+  domain: string;
+  afterSignInUrl?: string;
+  authorizedParties?: string[];
+  skipJwksCache?: boolean;
+  jwksCacheTtlInMs?: number;
+  jwtKey?: string
+} = (clerkRequest: ClerkRequest, options: ClerkMiddlewareOptions) => {
   return {
     ...options,
     ...handleMultiDomainAndProxy(clerkRequest, options),

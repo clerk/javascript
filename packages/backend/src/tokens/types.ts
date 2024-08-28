@@ -15,7 +15,12 @@ export type AuthenticateRequestOptions = {
 // OrganizationSyncOptions define the options for syncing an organization
 // or personal workspace state from the URL to the clerk session
 export type OrganizationSyncOptions = {
-  organizationPattern: string,
-  personalWorkspacePattern: string,
-  invalidOrganizationRedirectURL: string
+  // Must have a path component named either ":id" or ":slug".
+  // Example: "/orgs/:slug"
+  organizationPattern: Pattern,
+  personalWorkspacePattern: Pattern,
 }
+
+// Pattern is a URL Pattern API style matcher
+// Examples: "/orgs/:slug", "/orgs/:id"
+type Pattern = string;

@@ -1,3 +1,5 @@
+import { match } from 'path-to-regexp';
+
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { TokenVerificationError, TokenVerificationErrorReason } from '../errors';
@@ -13,9 +15,6 @@ import { getCookieName, getCookieValue } from './cookie';
 import { verifyHandshakeToken } from './handshake';
 import type { AuthenticateRequestOptions, OrganizationSyncOptions } from './types';
 import { verifyToken } from './verify';
-import { ClerkUrl } from './clerkUrl';
-import { Clerk } from '@clerk/types';
-import { match } from 'path-to-regexp';
 
 function assertSignInUrlExists(signInUrl: string | undefined, key: string): asserts signInUrl is string {
   if (!signInUrl && isDevelopmentFromSecretKey(key)) {
@@ -103,7 +102,8 @@ export async function authenticateRequest(
       const toActivate = getActivationEntity(requestURL, options.organizationSync);
       if (toActivate) {
         const params = getActivationParam(toActivate);
-        Object.entries(params).forEach(([key, value]) => {
+
+        params.forEach((value, key) => {
           url.searchParams.append(key, value);
         });
       }
@@ -364,7 +364,33 @@ ${error.getFullMessage()}`,
         throw errors[0];
       }
       // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data, undefined, authenticateContext.sessionTokenInCookie!);
+      const requestState = await signedIn(
+        authenticateContext,
+        data,
+        undefined,
+        authenticateContext.sessionTokenInCookie!,
+      );
+
+      // Org sync if necessary
+      // TODO(izaak): Also apply for auth in header scenario? Likely move to a standalone helper.
+      if (options.organizationSync) {
+        const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSync);
+        if (toActivate) {
+          const auth = requestState.toAuth();
+          if (auth) {
+            let mustActivate = false;
+            if (toActivate.organizationSlug && auth.orgSlug && toActivate.organizationSlug !== auth.orgSlug) {
+              mustActivate = true;
+            }
+            if (toActivate.organizationId && auth.orgId && toActivate.organizationId !== auth.orgId) {
+              mustActivate = true;
+            }
+            if (mustActivate) {
+              return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ActiveOrganizationMismatch, '');
+            }
+          }
+        }
+      }
     } catch (err) {
       return handleError(err, 'cookie');
     }
@@ -390,40 +416,13 @@ ${error.getFullMessage()}`,
       }
       return signedOut(authenticateContext, err.reason, err.getFullMessage());
     }
-
     return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
-
-  let requestState = null;
-
   if (authenticateContext.sessionTokenInHeader) {
-    requestState = await authenticateRequestWithTokenInHeader();
+    return authenticateRequestWithTokenInHeader();
   }
-  else {
-    requestState = await authenticateRequestWithTokenInCookie();
-  }
-
-  if (options.organizationSync) {
-    const toActivate = getActivationEntity(authenticateContext.clerkUrl, options.organizationSync);
-    if (toActivate) {
-      const auth = requestState.toAuth()
-      if (auth) {
-        let mustActivate = false;
-        if (toActivate.organizationSlug && auth.orgSlug && toActivate.organizationSlug !== auth.orgSlug) {
-          mustActivate = true;
-        }
-        if (toActivate.organizationId && auth.orgId && toActivate.organizationId !== auth.orgId) {
-          mustActivate = true;
-        }
-        if (mustActivate) {
-          return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.ActiveOrganizationMismatch, '');
-        }
-      }
-
-    }
-  }
-  return requestState
+  return authenticateRequestWithTokenInCookie();
 }
 
 /**
@@ -433,8 +432,6 @@ export const debugRequestState = (params: RequestState) => {
   const { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain } = params;
   return { isSignedIn, proxyUrl, reason, message, publishableKey, isSatellite, domain };
 };
-
-
 
 function getActivationEntity(url: URL, options: OrganizationSyncOptions): ActivatibleEntity | null {
   // Check for personal workspace activation
@@ -456,6 +453,7 @@ function getActivationEntity(url: URL, options: OrganizationSyncOptions): Activa
       if (slug) {
         return { type: 'organization', organizationSlug: slug };
       }
+      // TODO(izaak): Consider console warning if there's a pattern given (e.g. :orgSlug) that isn't :id or :slug
     }
   }
   return null;
@@ -471,16 +469,14 @@ type ActivatibleEntity = {
 function getActivationParam(toActivate: ActivatibleEntity): Map<string, string> {
   const ret = new Map();
   if (toActivate.type === 'personalWorkspace') {
-    ret.set('type', 'personalWorkspace');
+    ret.set('organization_id', '');
   }
   if (toActivate.type === 'organization') {
     if (toActivate.organizationId) {
-      ret.set('type', 'organization');
-      ret.set('organizationId', toActivate.organizationId);
+      ret.set('organization_id', toActivate.organizationId);
     }
     if (toActivate.organizationSlug) {
-      ret.set('type', 'organization');
-      ret.set('organizationSlug', toActivate.organizationSlug);
+      ret.set('organization_id', toActivate.organizationSlug);
     }
   }
   return ret;
