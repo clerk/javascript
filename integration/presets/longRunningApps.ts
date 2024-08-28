@@ -8,6 +8,7 @@ import { express } from './express';
 import { next } from './next';
 import { react } from './react';
 import { remix } from './remix';
+import { tanstack } from './tanstack';
 
 /**
  * A list of long-running applications that can be used in tests.
@@ -25,7 +26,10 @@ export const createLongRunningApps = () => {
     { id: 'quickstart.next.appRouter', config: next.appRouterQuickstart, env: envs.withEmailCodesQuickstart },
     { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
     { id: 'astro.node.withCustomRoles', config: astro.node, env: envs.withCustomRoles },
+    { id: 'astro.static.withCustomRoles', config: astro.static, env: envs.withCustomRoles },
     { id: 'expo.expo-web', config: expo.expoWeb, env: envs.withEmailCodes },
+    { id: 'tanstack.start', config: tanstack.start, env: envs.withEmailCodes },
+    { id: 'tanstack.router', config: tanstack.router, env: envs.withEmailCodes },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

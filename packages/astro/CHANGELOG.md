@@ -1,5 +1,61 @@
 # @clerk/astro
 
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/backend@1.8.2
+  - @clerk/shared@2.5.4
+
+## 1.2.1
+
+### Patch Changes
+
+- Fixes a bug where subscribing to the `$clerkStore` nanostore would give incorrect values. ([#4008](https://github.com/clerk/javascript/pull/4008)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/backend@1.8.1
+  - @clerk/shared@2.5.3
+
+## 1.2.0
+
+### Minor Changes
+
+- Add support for custom pages and links in the `<UserProfile />` Astro component. ([#3987](https://github.com/clerk/javascript/pull/3987)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add support for Astro `static` and `hybrid` outputs. ([#3911](https://github.com/clerk/javascript/pull/3911)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix incorrect authentication state when subscribing to client stores. ([#4000](https://github.com/clerk/javascript/pull/4000)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`ed7baa048`](https://github.com/clerk/javascript/commit/ed7baa0488df0ee4c48add2aac934ffb47e4a6d2)]:
+  - @clerk/backend@1.8.0
+
+## 1.1.0
+
+### Minor Changes
+
+- Add support for custom menu items in the `<UserButton />` Astro component. ([#3969](https://github.com/clerk/javascript/pull/3969)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Inject `windowNavigate` through router functions. ([#3922](https://github.com/clerk/javascript/pull/3922)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Remove dependency `@clerk/clerk-js`. ([#3965](https://github.com/clerk/javascript/pull/3965)) by [@panteliselef](https://github.com/panteliselef)
+
+  Since clerk-js is being hotloaded it is unnecessary to keep the npm package as a dependency.
+
+- Remove duplicate headers set in Clerk middleware ([#3948](https://github.com/clerk/javascript/pull/3948)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c), [`dc94c0834`](https://github.com/clerk/javascript/commit/dc94c08341c883fa5bf891f880fb34c4569ea820)]:
+  - @clerk/types@4.14.0
+  - @clerk/backend@1.7.0
+  - @clerk/shared@2.5.2
+
 ## 1.0.12
 
 ### Patch Changes

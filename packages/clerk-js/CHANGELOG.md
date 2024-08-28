@@ -1,5 +1,79 @@
 # Change Log
 
+## 5.16.1
+
+### Patch Changes
+
+- Remove sessionId parameter from all **experimental** verify session methods. ([#4026](https://github.com/clerk/javascript/pull/4026)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce Coinbase Wallet Web3 provider types ([#4028](https://github.com/clerk/javascript/pull/4028)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Change the webpackChunkName of GoogleOneTap from `"oneTap"` to `"onetap"` for consistency. ([#4036](https://github.com/clerk/javascript/pull/4036)) by [@panteliselef](https://github.com/panteliselef)
+
+- Fixes issue where `createFlexGapPropertyIosCompat` was incorrectly detecting a modern Chrome for iOS user agent. ([#4034](https://github.com/clerk/javascript/pull/4034)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce support for the Hugging Face OAuth Provider. ([#4021](https://github.com/clerk/javascript/pull/4021)) by [@Nikpolik](https://github.com/Nikpolik)
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/localizations@2.6.3
+  - @clerk/shared@2.5.4
+
+## 5.16.0
+
+### Minor Changes
+
+- Expose `SessionVerification` as an experimental resource. ([#4011](https://github.com/clerk/javascript/pull/4011)) by [@panteliselef](https://github.com/panteliselef)
+
+  Update `UserResource` with 5 new experimental methods:
+
+  - `experimental_verifySession` for creating a new SessionVerification record and initiating a new flow.
+  - `experimental_verifySessionPrepareFirstFactor` for preparing a supported first factor like `phone_code`
+  - `experimental_verifySessionAttemptFirstFactor` for attempting a supported first factor like `password`
+  - `experimental_verifySessionPrepareSecondFactor` for preparing a supported second factor like `phone_code`
+  - `experimental_verifySessionAttemptSecondFactor` for attempting a supported second factor like `totp`
+
+- Fixes a bug where multiple tabs with different active organizations would not always respect the selected organization. Going forward, when a tab is focused the active organization will immediately be updated to the tab's last active organization. ([#3786](https://github.com/clerk/javascript/pull/3786)) by [@BRKalow](https://github.com/BRKalow)
+
+  Additionally, `Clerk.session.getToken()` now accepts an `organizationId` option. The provided organization ID will be used to set organization-related claims in the generated session token.
+
+### Patch Changes
+
+- - Fixes an issue in Connected Accounts menu that was related to Custom OAuth Providers: ([#4014](https://github.com/clerk/javascript/pull/4014)) by [@nikospapcom](https://github.com/nikospapcom)
+
+  - Resolves undefined properties error that occurred when a Custom OAuth Provider was `enabled` but `authenticatable` was set to `false`.
+
+- Fix issue where MFA two-factor UI was incorrectly rendering set default action in SMS code when TOTP strategy was defined. ([#4003](https://github.com/clerk/javascript/pull/4003)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/localizations@2.6.2
+  - @clerk/shared@2.5.3
+
+## 5.15.1
+
+### Patch Changes
+
+- Improve the Smart CAPTCHA widget console error. ([#3989](https://github.com/clerk/javascript/pull/3989)) by [@agis](https://github.com/agis)
+
+- Updated dependencies [[`c81785972`](https://github.com/clerk/javascript/commit/c81785972c1b6fdf76b7765a4c48d1a4ca1a776b), [`05198fd17`](https://github.com/clerk/javascript/commit/05198fd1791f81b4fc36d0f7d4cec750205d8ab9), [`5818ca8bd`](https://github.com/clerk/javascript/commit/5818ca8bd0f24c29bac0876c2aa88b0fe919b418)]:
+  - @clerk/localizations@2.6.1
+
+## 5.15.0
+
+### Minor Changes
+
+- Inject `windowNavigate` through router functions. ([#3922](https://github.com/clerk/javascript/pull/3922)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes an issue where the application logo would render smaller then intended ([#3959](https://github.com/clerk/javascript/pull/3959)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`77cdf7611`](https://github.com/clerk/javascript/commit/77cdf7611869c023ff5263a0198b926f37a8289c), [`3de0a1b7e`](https://github.com/clerk/javascript/commit/3de0a1b7e3d2ba7e90eea0492e56f29ab10a24a1), [`ec6bfb5b1`](https://github.com/clerk/javascript/commit/ec6bfb5b16581e3521ff11494b288d76c875974b), [`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c), [`e5491facc`](https://github.com/clerk/javascript/commit/e5491facc6a88c1bd9236a88e3b909f0b0b9d1d3), [`072667043`](https://github.com/clerk/javascript/commit/07266704348c3cafb19f81b7d7a28a03058e2ea1)]:
+  - @clerk/localizations@2.6.0
+  - @clerk/types@4.14.0
+  - @clerk/shared@2.5.2
+
 ## 5.14.1
 
 ### Patch Changes

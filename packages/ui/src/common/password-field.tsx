@@ -3,6 +3,7 @@ import { cx } from 'cva';
 import React from 'react';
 
 import { useLocalizations } from '~/hooks/use-localizations';
+import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 import * as Icon from '~/primitives/icon';
 import { translatePasswordError } from '~/utils/make-localizable';
@@ -75,45 +76,47 @@ export function PasswordField({
             );
           }}
         </Common.FieldState>
-        {props.validatePassword ? (
-          <Common.FieldState>
-            {({ state, codes }) => {
-              if (state === 'idle') {
-                return;
-              }
-              if (state === 'success') {
+        <Animated>
+          {props.validatePassword ? (
+            <Common.FieldState>
+              {({ state, codes }) => {
+                if (state === 'idle') {
+                  return;
+                }
+                if (state === 'success') {
+                  return (
+                    <Field.Message
+                      id={id}
+                      intent='success'
+                    >
+                      {t('unstable__errors.zxcvbn.goodPassword')}
+                    </Field.Message>
+                  );
+                }
+                // Note:
+                // If `codes` is `undefined`, the error is likely a native one
+                // (e.g. `required`)
+                if (typeof codes === 'undefined') {
+                  return;
+                }
                 return (
                   <Field.Message
                     id={id}
-                    intent='success'
+                    intent={state}
                   >
-                    {t('unstable__errors.zxcvbn.goodPassword')}
+                    {translatePasswordError({ codes, locale, t })}
                   </Field.Message>
                 );
-              }
-              // Note:
-              // If `codes` is `undefined`, the error is likely a native one
-              // (e.g. `required`)
-              if (typeof codes === 'undefined') {
-                return;
-              }
-              return (
-                <Field.Message
-                  id={id}
-                  intent={state}
-                >
-                  {translatePasswordError({ codes, locale, t })}
-                </Field.Message>
-              );
-            }}
-          </Common.FieldState>
-        ) : (
-          <Common.FieldError asChild>
-            {({ message }) => {
-              return <Field.Message intent='error'>{message}</Field.Message>;
-            }}
-          </Common.FieldError>
-        )}
+              }}
+            </Common.FieldState>
+          ) : (
+            <Common.FieldError asChild>
+              {({ message }) => {
+                return <Field.Message intent='error'>{message}</Field.Message>;
+              }}
+            </Common.FieldError>
+          )}
+        </Animated>
       </Field.Root>
     </Common.Field>
   );

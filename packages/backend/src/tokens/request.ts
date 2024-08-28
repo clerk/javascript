@@ -261,6 +261,8 @@ ${error.getFullMessage()}`,
         // Check the handleHandshakeTokenVerificationErrorInDevelopment function for the development case.
         if (error instanceof TokenVerificationError && authenticateContext.instanceType === 'development') {
           handleHandshakeTokenVerificationErrorInDevelopment(error);
+        } else {
+          console.error('Clerk: unable to resolve handshake:', error);
         }
       }
     }
@@ -350,8 +352,7 @@ ${error.getFullMessage()}`,
       if (errors) {
         throw errors[0];
       }
-      // use `await` to force this try/catch handle the signedIn invocation
-      return await signedIn(authenticateContext, data, undefined, authenticateContext.sessionTokenInCookie!);
+      return signedIn(authenticateContext, data, undefined, authenticateContext.sessionTokenInCookie!);
     } catch (err) {
       return handleError(err, 'cookie');
     }

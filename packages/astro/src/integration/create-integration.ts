@@ -3,6 +3,7 @@ import type { AstroIntegration } from 'astro';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
+import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
   return valueToBeStored ? { [`import.meta.env.${envName}`]: JSON.stringify(valueToBeStored) } : {};
@@ -27,11 +28,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
       name: '@clerk/astro/integration',
       hooks: {
         'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
-          if (config.output === 'static') {
-            logger.error(`${packageName} requires SSR to be turned on. Please update output to "server"`);
-          }
-
-          if (!config.adapter) {
+          if (['server', 'hybrid'].includes(config.output) && !config.adapter) {
             logger.error('Missing adapter, please update your Astro config to use one.');
           }
 
@@ -53,6 +50,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
           // Set params as envs so backend code has access to them
           updateConfig({
             vite: {
+              plugins: [vitePluginAstroConfig(config)],
               define: {
                 /**
                  * Convert the integration params to environment variable in order for it to be readable from the server
@@ -61,8 +59,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 ...buildEnvVarFromOption(signUpUrl, 'PUBLIC_CLERK_SIGN_UP_URL'),
                 ...buildEnvVarFromOption(isSatellite, 'PUBLIC_CLERK_IS_SATELLITE'),
                 ...buildEnvVarFromOption(proxyUrl, 'PUBLIC_CLERK_PROXY_URL'),
-                ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
-                ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
                 ...buildEnvVarFromOption(domain, 'PUBLIC_CLERK_DOMAIN'),
                 ...buildEnvVarFromOption(clerkJSUrl, 'PUBLIC_CLERK_JS_URL'),
                 ...buildEnvVarFromOption(clerkJSVariant, 'PUBLIC_CLERK_JS_VARIANT'),

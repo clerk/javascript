@@ -117,8 +117,10 @@ export class Session extends BaseResource implements SessionResource {
   // and retrieve it using the session id concatenated with the jwt template name.
   // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
   // The session token ID will be 'sess_abc12345' and the jwt template token ID will be 'sess_abc12345-haris'
-  #getCacheId(template?: string) {
-    return `${template ? `${this.id}-${template}` : this.id}-${this.updatedAt.getTime()}`;
+  #getCacheId(template?: string, organizationId?: string) {
+    const resolvedOrganizationId =
+      typeof organizationId === 'undefined' ? this.lastActiveOrganizationId : organizationId;
+    return [this.id, template, resolvedOrganizationId, this.updatedAt.getTime()].filter(Boolean).join('-');
   }
 
   protected fromJSON(data: SessionJSON | null): this {
@@ -152,27 +154,37 @@ export class Session extends BaseResource implements SessionResource {
     }
 
     const { leewayInSeconds, template, skipCache = false } = options || {};
+
+    // If no organization ID is provided, default to the selected organization in memory
+    // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
+    const organizationId =
+      typeof options?.organizationId === 'undefined' ? Session.clerk.organization?.id : options?.organizationId;
+
     if (!template && Number(leewayInSeconds) >= 60) {
       throw new Error('Leeway can not exceed the token lifespan (60 seconds)');
     }
 
-    const tokenId = this.#getCacheId(template);
+    const tokenId = this.#getCacheId(template, organizationId);
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
+
+    // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
+    const shouldDispatchTokenUpdate = !template && organizationId === Session.clerk.organization?.id;
 
     if (cachedEntry) {
       const cachedToken = await cachedEntry.tokenResolver;
-      if (!template) {
+      if (shouldDispatchTokenUpdate) {
         eventBus.dispatch(events.TokenUpdate, { token: cachedToken });
       }
       // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
     }
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
-    const tokenResolver = Token.create(path);
+    // TODO: update template endpoint to accept organizationId
+    const params = template ? {} : { organizationId };
+    const tokenResolver = Token.create(path, params);
     SessionTokenCache.set({ tokenId, tokenResolver });
     return tokenResolver.then(token => {
-      // Dispatch tokenUpdate only for __session tokens and not JWT templates
-      if (!template) {
+      if (shouldDispatchTokenUpdate) {
         eventBus.dispatch(events.TokenUpdate, { token });
       }
       // Return null when raw string is empty to indicate that there it's signed-out

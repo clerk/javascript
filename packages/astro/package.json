@@ -1,7 +1,7 @@
 {
   "name": "@clerk/astro",
   "description": "Clerk SDK for Astro",
-  "version": "1.0.12",
+  "version": "1.2.2",
   "type": "module",
   "license": "MIT",
   "author": "Clerk",
@@ -30,7 +30,7 @@
     "dev": "tsup --watch --onSuccess \"npm run build:dts\"",
     "build": "tsup --onSuccess \"npm run build:dts\" && npm run copy:components",
     "build:dts": "tsc --emitDeclarationOnly --declaration",
-    "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/",
+    "copy:components": "rm -rf ./components && mkdir -p ./components/ && cp  -r ./src/astro-components/* ./components/ && cp ./src/types.ts ./",
     "lint": "eslint src/",
     "lint:attw": "attw --pack .",
     "lint:publint": "publint",
@@ -38,12 +38,12 @@
   },
   "files": [
     "dist",
-    "bundled",
     "client",
     "server",
     "internal",
     "components",
-    "env.d.ts"
+    "env.d.ts",
+    "types.ts"
   ],
   "exports": {
     ".": {
@@ -79,11 +79,11 @@
     }
   },
   "dependencies": {
-    "@clerk/backend": "1.6.3",
-    "@clerk/shared": "2.5.1",
-    "@clerk/types": "4.13.1",
+    "@clerk/backend": "1.8.2",
+    "@clerk/shared": "2.5.4",
+    "@clerk/types": "4.15.1",
     "nanoid": "5.0.7",
-    "nanostores": "0.10.3",
+    "nanostores": "0.11.2",
     "path-to-regexp": "6.2.2"
   },
   "devDependencies": {

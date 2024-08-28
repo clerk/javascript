@@ -1,5 +1,59 @@
 # @clerk/elements
 
+## 0.14.2
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+
+## 0.14.1
+
+### Patch Changes
+
+- Fix `SignIn.SafeIdentifier` potentially outputting an incorrect identifier when using similar multi-session sign in strategies. ([#3974](https://github.com/clerk/javascript/pull/3974)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+
+## 0.14.0
+
+### Minor Changes
+
+- Introduce multi-session choose account step and associated actions/components. ([#3957](https://github.com/clerk/javascript/pull/3957)) by [@tmilewski](https://github.com/tmilewski)
+
+  Example:
+
+  ```tsx
+  <SignIn.Step name="choose-session">
+    <SignIn.SessionList>
+      <SignIn.SessionListItem>
+        {({ session }) => (
+          <>
+            {session.identifier} |{" "}
+            <SignIn.Action setActiveSession>Switch...</SignIn.Action>
+          </>
+        )}
+      </SignIn.SessionListItem>
+    </SignIn.SessionList>
+  </SignIn.Step>
+  ```
+
+### Patch Changes
+
+- Refactor form hooks and utils into separate files ([#3933](https://github.com/clerk/javascript/pull/3933)) by [@tmilewski](https://github.com/tmilewski)
+
+- feat(elements): Add support for sign in with email_link via redirect_url ([#3926](https://github.com/clerk/javascript/pull/3926)) by [@dstaley](https://github.com/dstaley)
+
+- Preserve absolute URLs passed via `redirect_url` ([#3947](https://github.com/clerk/javascript/pull/3947)) by [@dstaley](https://github.com/dstaley)
+
+- Extract common Form components from single file ([#3933](https://github.com/clerk/javascript/pull/3933)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add support for submit and passkey loading scopes ([#3927](https://github.com/clerk/javascript/pull/3927)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c)]:
+  - @clerk/types@4.14.0
+
 ## 0.13.0
 
 ### Minor Changes

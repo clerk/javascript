@@ -51,6 +51,7 @@
     "@clerk/elements": "file:../elements",
     "@clerk/shared": "file:../shared",
     "@clerk/types": "file:../types",
+    "@formkit/auto-animate": "^0.8.2",
     "@radix-ui/react-slot": "^1.1.0",
     "cmdk": "^1.0.0",
     "cva": "^1.0.0-beta.1",

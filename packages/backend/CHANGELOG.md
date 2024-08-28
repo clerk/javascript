@@ -1,5 +1,39 @@
 # Change Log
 
+## 1.8.2
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/shared@2.5.4
+
+## 1.8.1
+
+### Patch Changes
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/shared@2.5.3
+
+## 1.8.0
+
+### Minor Changes
+
+- Add `deleteUserProfileImage` method to the UserAPI class. ([#3991](https://github.com/clerk/javascript/pull/3991)) by [@octoper](https://github.com/octoper)
+
+## 1.7.0
+
+### Minor Changes
+
+- Adds `awscognito` to backend `PasswordHasher` type ([#3943](https://github.com/clerk/javascript/pull/3943)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Updated dependencies [[`dc0e1c33d`](https://github.com/clerk/javascript/commit/dc0e1c33d6844b028cb1ee11c3359b886d609f3c)]:
+  - @clerk/types@4.14.0
+  - @clerk/shared@2.5.2
+
 ## 1.6.3
 
 ### Patch Changes

@@ -56,7 +56,7 @@ export class AuthCookieService {
       this.setClientUatCookieForDevelopmentInstances();
     });
 
-    this.refreshTokenOnVisibilityChange();
+    this.refreshTokenOnFocus();
     this.startPollingForToken();
 
     this.clientUat = createClientUatCookie(cookieSuffix);
@@ -110,27 +110,47 @@ export class AuthCookieService {
     this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
   }
 
-  private refreshTokenOnVisibilityChange() {
-    document.addEventListener('visibilitychange', () => {
+  private refreshTokenOnFocus() {
+    window.addEventListener('focus', () => {
       if (document.visibilityState === 'visible') {
-        void this.refreshSessionToken();
+        // Certain data-fetching libraries that refetch on focus (such as swr) use setTimeout(cb, 0) to schedule a task on the event loop.
+        // This gives us an opportunity to ensure the session cookie is updated with a fresh token before the fetch occurs, but it needs to
+        // be done with a microtask. Promises schedule microtasks, and so by using `updateCookieImmediately: true`, we ensure that the cookie
+        // is updated as part of the scheduled microtask. Our existing event-based mechanism to update the cookie schedules a task, and so the cookie
+        // is updated too late and not guaranteed to be fresh before the refetch occurs.
+        void this.refreshSessionToken({ updateCookieImmediately: true });
       }
     });
   }
 
-  private async refreshSessionToken(): Promise<void> {
+  private async refreshSessionToken({
+    updateCookieImmediately = false,
+  }: {
+    updateCookieImmediately?: boolean;
+  } = {}): Promise<void> {
     if (!this.clerk.session) {
       return;
     }
 
     try {
-      await this.clerk.session.getToken();
+      const token = await this.clerk.session.getToken();
+      if (updateCookieImmediately) {
+        this.updateSessionCookie(token);
+      }
     } catch (e) {
       return this.handleGetTokenError(e);
     }
   }
 
   private updateSessionCookie(token: string | null) {
+    // only update session cookie from the active tab,
+    // or if the tab's selected organization matches the session's active organization
+    if (!document.hasFocus() && !this.isCurrentOrganizationActive()) {
+      return;
+    }
+
+    this.setActiveOrganizationInStorage();
+
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
   }
 
@@ -162,5 +182,31 @@ export class AuthCookieService {
     }
 
     clerkCoreErrorTokenRefreshFailed(e.toString());
+  }
+
+  /**
+   * The below methods are used to determine whether or not an unfocused tab can be responsible
+   * for setting the session cookie. A session cookie should only be set by a tab who's selected
+   * organization matches the session's active organization. By storing the active organization
+   * ID in local storage, we can check the value across tabs. If a tab's organization ID does not
+   * match the value in local storage, it is not responsible for updating the session cookie.
+   */
+
+  public setActiveOrganizationInStorage() {
+    if (this.clerk.organization?.id) {
+      localStorage.setItem('clerk_active_org', this.clerk.organization.id);
+    } else {
+      localStorage.removeItem('clerk_active_org');
+    }
+  }
+
+  private isCurrentOrganizationActive() {
+    const activeOrganizationId = localStorage.getItem('clerk_active_org');
+
+    if (!activeOrganizationId && !this.clerk.organization?.id) {
+      return true;
+    }
+
+    return this.clerk.organization?.id === activeOrganizationId;
   }
 }

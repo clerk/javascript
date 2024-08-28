@@ -1,8 +1,18 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import { computed, onMount, type Store } from 'nanostores';
+import { batched, computed, onMount, type Store } from 'nanostores';
 
 import { $clerk, $csrState, $initialState } from './internal';
+
+/**
+ * A client side store that returns the loaded state of clerk-js.
+ *
+ * @example
+ * A simple example:
+ *
+ * $isLoadedStore.subscribe((authloaded => console.log(loaded))
+ */
+export const $isLoadedStore = computed([$csrState], state => state.isLoaded);
 
 /**
  * A client side store that is prepopulated with the authentication context during SSR.
@@ -13,7 +23,7 @@ import { $clerk, $csrState, $initialState } from './internal';
  *
  * $authStore.subscribe((auth) => console.log(auth.userId))
  */
-export const $authStore = computed([$csrState, $initialState], (state, initialState) => {
+export const $authStore = batched([$csrState, $initialState], (state, initialState) => {
   return deriveState(
     state.isLoaded,
     {
