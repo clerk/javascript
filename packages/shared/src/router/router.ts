@@ -1,7 +1,5 @@
-import { withLeadingSlash, withoutTrailingSlash } from '@clerk/shared/url';
-
-import type { ROUTING } from '~/internals/constants';
-import { isAbsoluteUrl } from '~/utils/is-absolute-url';
+import { isAbsoluteUrl, withLeadingSlash, withoutTrailingSlash } from '../url';
+import type { RoutingMode } from './types';
 
 export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up_url', 'redirect_url'];
 
@@ -9,7 +7,7 @@ export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up
  * This type represents a generic router interface that Clerk relies on to interact with the host router.
  */
 export type ClerkHostRouter = {
-  readonly mode: ROUTING;
+  readonly mode: RoutingMode;
   readonly name: string;
   pathname: () => string;
   push: (path: string) => void;
@@ -38,7 +36,7 @@ export type ClerkRouter = {
   /**
    * Mode of the router instance, path-based or virtual
    */
-  readonly mode: ROUTING;
+  readonly mode: RoutingMode;
 
   /**
    * Name of the router instance
