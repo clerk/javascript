@@ -41,3 +41,6 @@
 ::after {
   --cl-content: '';
 }
+
+/* empty class so Tailwind doesn't complain */
+.debug {}
