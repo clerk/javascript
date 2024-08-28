@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { cloneElement, type ReactElement, useId } from 'react';
 
 import { useUserButtonContext, withCoreUserGuard } from '../../contexts';
 import { Flow } from '../../customizables';
@@ -7,23 +7,21 @@ import { usePopover } from '../../hooks';
 import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
-const _UserButton = withFloatingTree(() => {
-  const { defaultOpen, __experimental_open, __experimental_onOpenChanged } = useUserButtonContext();
+const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
+  const { __experimental_onOpenChanged, __experimental_open, defaultOpen } = useUserButtonContext();
+
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
     open: __experimental_open,
     onOpenChanged: __experimental_onOpenChanged,
-    placement: 'bottom-end',
+    placement: 'bottom-start',
     offset: 8,
   });
 
   const userButtonMenuId = useId();
 
   return (
-    <Flow.Root
-      flow='userButton'
-      sx={{ display: 'inline-flex' }}
-    >
+    <>
       <UserButtonTrigger
         ref={reference}
         onClick={toggle}
@@ -36,13 +34,32 @@ const _UserButton = withFloatingTree(() => {
         context={context}
         isOpen={isOpen}
       >
-        <UserButtonPopover
-          id={userButtonMenuId}
-          close={toggle}
-          ref={floating}
-          style={{ ...styles }}
-        />
+        {cloneElement(children, {
+          id: userButtonMenuId,
+          close: toggle,
+          ref: floating,
+          style: styles,
+        })}
       </Popover>
+    </>
+  );
+});
+
+const _UserButton = withFloatingTree(() => {
+  const { __experimental_hideTrigger, __experimental_onActionEnded } = useUserButtonContext();
+
+  return (
+    <Flow.Root
+      flow='userButton'
+      sx={{ display: 'inline-flex' }}
+    >
+      {__experimental_hideTrigger ? (
+        <UserButtonPopover close={__experimental_onActionEnded} />
+      ) : (
+        <UserButtonWithFloatingTree>
+          <UserButtonPopover />
+        </UserButtonWithFloatingTree>
+      )}
     </Flow.Root>
   );
 });
