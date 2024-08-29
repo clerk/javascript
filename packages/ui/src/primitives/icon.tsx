@@ -776,6 +776,30 @@ export const SMSSm = createIcon({
   ),
 });
 
+export const ExclamationTrianglelg = createIcon({
+  displayName: 'IconExclamationTriangleLg',
+  viewBox: '0 0 48 48',
+  path: (
+    <path
+      fill='currentColor'
+      fillRule='evenodd'
+      d='M18.982 8.798c2.23-3.861 7.806-3.861 10.034 0l14.2 24.613c2.228 3.861-.56 8.688-5.018 8.688H9.8c-4.458 0-7.244-4.827-5.016-8.688L18.98 8.798h.002ZM24 18.928a1.448 1.448 0 0 1 1.448 1.449v7.24a1.448 1.448 0 0 1-2.896 0v-7.24A1.448 1.448 0 0 1 24 18.929Zm0 15.929a1.448 1.448 0 1 0 0-2.896 1.448 1.448 0 0 0 0 2.896Z'
+      clipRule='evenodd'
+    />
+  ),
+});
+
+export const SpinnerLg = createIcon({
+  displayName: 'IconSpinnerLg',
+  viewBox: '0 0 48 48',
+  path: (
+    <path
+      fill='currentColor'
+      d='M33.484 39.884c.425.711.195 1.638-.546 2.008a20 20 0 0 1-20.45-34.247c.678-.477 1.603-.24 2.028.471.425.711.187 1.627-.484 2.113a17 17 0 0 0 17.363 29.078c.746-.36 1.665-.134 2.09.577Z'
+    />
+  ),
+});
+
 /* Legacy
   ---------------------------------- */
 
