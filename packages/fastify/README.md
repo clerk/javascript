@@ -21,23 +21,23 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_nextjs)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_fastify)
 
 </div>
 
 ## Getting Started
 
-[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_nextjs) is the easiest way to add authentication and user management to your Fastify application. Add sign up, sign in, and profile management to your application in minutes.
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_fastify) is the easiest way to add authentication and user management to your Fastify application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
 - Fastify `^4.0.0` or later
 - Node.js `>=18.17.0` or later
-- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs).
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_fastify).
 
 ### Installation
 
-The fastest way to get started with Clerk is by following the [Fastify Quickstart](https://clerk.com/docs/quickstarts/fastify?utm_source=github&utm_medium=clerk_nextjs).
+The fastest way to get started with Clerk is by following the [Fastify Quickstart](https://clerk.com/docs/quickstarts/fastify?utm_source=github&utm_medium=clerk_fastify).
 
 You'll learn how to install `@clerk/fastify`, set up your environment keys, and configure the `clerkPlugin`.
 
@@ -46,7 +46,7 @@ You'll learn how to install `@clerk/fastify`, set up your environment keys, and 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_nextjs)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_fastify)
 
 ## Contributing
 
