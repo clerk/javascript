@@ -10,7 +10,8 @@ import type {
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
-  SignUpAuthenticateWithMetamaskParams,
+  PrepareWeb3WalletVerificationParams,
+  SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
   SignUpIdentificationField,
@@ -19,14 +20,22 @@ import type {
   SignUpStatus,
   SignUpUpdateParams,
   StartEmailLinkFlowParams,
+  Web3Provider,
 } from '@clerk/types';
 
-import { generateSignatureWithMetamask, getMetamaskIdentifier, windowNavigate } from '../../utils';
+import {
+  generateSignatureWithCoinbase,
+  generateSignatureWithMetamask,
+  getCoinbaseIdentifier,
+  getMetamaskIdentifier,
+  windowNavigate,
+} from '../../utils';
 import { getCaptchaToken, retrieveCaptchaInfo } from '../../utils/captcha';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import {
   clerkInvalidFAPIResponse,
+  clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
@@ -170,38 +179,55 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptVerification({ ...params, strategy: 'phone_code' });
   };
 
-  prepareWeb3WalletVerification = (): Promise<SignUpResource> => {
-    return this.prepareVerification({ strategy: 'web3_metamask_signature' });
+  prepareWeb3WalletVerification = (params?: PrepareWeb3WalletVerificationParams): Promise<SignUpResource> => {
+    return this.prepareVerification({ strategy: 'web3_metamask_signature', ...params });
   };
 
   attemptWeb3WalletVerification = async (params: AttemptWeb3WalletVerificationParams): Promise<SignUpResource> => {
-    const { signature } = params;
-    return this.attemptVerification({ signature, strategy: 'web3_metamask_signature' });
+    const { signature, strategy = 'web3_metamask_signature' } = params;
+    return this.attemptVerification({ signature, strategy });
   };
 
   public authenticateWithWeb3 = async (
     params: AuthenticateWithWeb3Params & { unsafeMetadata?: SignUpUnsafeMetadata },
   ): Promise<SignUpResource> => {
-    const { generateSignature, identifier, unsafeMetadata } = params || {};
+    const { generateSignature, identifier, unsafeMetadata, strategy = 'web3_metamask_signature' } = params || {};
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+
+    if (!(typeof generateSignature === 'function')) {
+      clerkMissingOptionError('generateSignature');
+    }
+
     const web3Wallet = identifier || this.web3wallet!;
     await this.create({ web3Wallet, unsafeMetadata });
-    await this.prepareWeb3WalletVerification();
+    await this.prepareWeb3WalletVerification({ strategy });
 
     const { nonce } = this.verifications.web3Wallet;
     if (!nonce) {
       clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
     }
 
-    const signature = await generateSignature({ identifier, nonce });
-    return this.attemptWeb3WalletVerification({ signature });
+    const signature = await generateSignature({ identifier, nonce, provider });
+    return this.attemptWeb3WalletVerification({ signature, strategy });
   };
 
-  public authenticateWithMetamask = async (params?: SignUpAuthenticateWithMetamaskParams): Promise<SignUpResource> => {
+  public authenticateWithMetamask = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
     const identifier = await getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithMetamask,
       unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_metamask_signature',
+    });
+  };
+
+  public authenticateWithCoinbase = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
+    const identifier = await getCoinbaseIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithCoinbase,
+      unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_coinbase_signature',
     });
   };
 
@@ -245,7 +271,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
       return createValidatePassword({
-        ...(SignUp.clerk.__unstable__environment?.userSettings.passwordSettings as any),
+        ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }
