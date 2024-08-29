@@ -46,8 +46,8 @@ type Status = keyof typeof signInStatusLocalizationKeys;
 
 const statusIcon: Record<Status, React.ReactElement> = {
   loading: <Icon.SpinnerLg className='mb-8 !size-10 motion-safe:animate-spin motion-safe:[animation-duration:1.5s]' />,
-  verified: <Icon.TickShieldLegacy />,
-  verified_switch_tab: <Icon.SwitchArrowsLegacy />,
+  verified: <Icon.ExclamationTrianglelg className='text-gray-11 mb-2 !size-10' />,
+  verified_switch_tab: <Icon.ExclamationTrianglelg className='text-gray-11 mb-2 !size-10' />,
   expired: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#F36B16]' />,
   failed: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#EF4444]' />,
   client_mismatch: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#F36B16]' />,
@@ -58,7 +58,7 @@ export function SignInStatus() {
   const { branded } = useDisplayConfig();
   const { layout } = useAppearance();
   const isDev = useDevModeWarning();
-  const [status] = React.useState<Status>('client_mismatch');
+  const [status] = React.useState<Status>('verified');
 
   const cardFooterProps = {
     branded,
