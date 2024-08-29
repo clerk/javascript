@@ -1,6 +1,7 @@
 import type { SignInFactor } from '@clerk/types';
 import React from 'react';
 
+import { useCoreSignIn } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { Button, Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { ArrowBlockButton, BackLink, Card, Divider, Header } from '../../elements';
@@ -33,8 +34,10 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
   const { onBackLinkClick, onHavingTroubleClick, onFactorSelected, mode = 'default' } = props;
   const card = useCardState();
   const resetPasswordFactor = useResetPasswordFactor();
+  const { supportedFirstFactors } = useCoreSignIn();
   const { firstPartyFactors, hasAnyStrategy } = useAlternativeStrategies({
     filterOutFactor: props?.currentFactor,
+    supportedFirstFactors: supportedFirstFactors,
   });
 
   const flowPart = determineFlowPart(mode);
