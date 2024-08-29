@@ -8,9 +8,10 @@ import { isTruthy } from '@clerk/shared/underscore';
 import { errorThrower } from '../utils';
 import { getEnvVariable, getPublicEnvVariables } from '../utils/env';
 import type { LoaderOptions } from './types';
+import { patchRequest } from './utils';
 
 export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => {
-  const clerkRequest = createClerkRequest(request);
+  const clerkRequest = createClerkRequest(patchRequest(request));
 
   const secretKey = overrides.secretKey || overrides.secretKey || getEnvVariable('CLERK_SECRET_KEY');
   const publishableKey = overrides.publishableKey || getPublicEnvVariables().publishableKey;

@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/clerk-react</h1>
 </p>
-
-# @clerk/clerk-react
 
 <div align="center">
 
@@ -22,89 +21,40 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_react)
 
 </div>
 
----
-
-## Overview
-
-Clerk is the easiest way to add authentication and user management to your React application. Add sign up, sign in, and profile management to your application in minutes.
-
 ## Getting Started
+
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_react) is the easiest way to add authentication and user management to your React application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
-- React v18+
+- React 18 or later
 - Node.js `>=18.17.0` or later
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_react).
 
 ### Installation
 
-```sh
-npm install @clerk/clerk-react
-```
+The fastest way to get started with Clerk is by following the [React Quickstart](https://clerk.com/docs/quickstarts/react?utm_source=github&utm_medium=clerk_react).
 
-### Build
-
-```sh
-npm run build
-```
-
-To build the package in watch mode, run the following:
-
-```sh
-npm run dev
-```
+You'll learn how to create a new React application, install `@clerk/clerk-react`, set up your environment keys, add `<ClerkProvider>`, and use Clerk's prebuilt components.
 
 ## Usage
 
-Clerk requires your application to be wrapped in the `<ClerkProvider/>` context.
-
-If using Vite, set `VITE_CLERK_PUBLISHABLE_KEY` to your Publishable key in your `.env.local` file to make the environment variable accessible on `process.env` and pass it as the `publishableKey` prop.
-
-```jsx
-import { render } from 'react-dom';
-
-import { ClerkProvider, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
-
-const publishableKey = process.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-render(
-  <ClerkProvider publishableKey={publishableKey}>
-    <App />
-  </ClerkProvider>,
-  document.getElementById('root'),
-);
-
-function App() {
-  return (
-    <>
-      <h1>Hello Clerk!</h1>
-      <SignedIn>
-        <UserButton afterSignOutUrl={window.location.href} />
-      </SignedIn>
-      <SignedOut>
-        <SignInButton mode='modal' />
-      </SignedOut>
-    </>
-  );
-}
-```
-
-_For further details and examples, please refer to our [Documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_react)._
+For further information, guides, and examples visit the [React reference documentation](https://clerk.com/docs/references/react/overview?utm_source=github&utm_medium=clerk_react).
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_react)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_react)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 

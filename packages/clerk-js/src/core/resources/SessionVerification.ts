@@ -16,8 +16,8 @@ export class SessionVerification extends BaseResource implements __experimental_
   status!: __experimental_SessionVerificationStatus;
   level!: __experimental_SessionVerificationLevel;
   session!: SessionResource;
-  supportedFirstFactors: __experimental_SessionVerificationFirstFactor[] = [];
-  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[] = [];
+  supportedFirstFactors: __experimental_SessionVerificationFirstFactor[] | null = [];
+  supportedSecondFactors: __experimental_SessionVerificationSecondFactor[] | null = [];
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
 
@@ -32,12 +32,12 @@ export class SessionVerification extends BaseResource implements __experimental_
       this.status = data.status;
       this.session = new Session(data.session);
       this.level = data.level;
-      this.supportedFirstFactors = deepSnakeToCamel(
-        data.supported_first_factors,
-      ) as __experimental_SessionVerificationFirstFactor[];
-      this.supportedSecondFactors = deepSnakeToCamel(
-        data.supported_second_factors,
-      ) as __experimental_SessionVerificationSecondFactor[];
+      this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as
+        | __experimental_SessionVerificationFirstFactor[]
+        | null;
+      this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as
+        | __experimental_SessionVerificationSecondFactor[]
+        | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
     }

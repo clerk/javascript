@@ -11,9 +11,6 @@ folders:
   - path: /packages/fastify
     exclude:
       - ./**/*.test.ts
-  - path: /packages/gatsby-plugin-clerk
-    exclude:
-      - ./**/*.test.ts
   - path: /packages/localizations
   - path: /packages/nextjs
     exclude:

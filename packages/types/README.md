@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/types</h1>
 </p>
-
-# @clerk/types
 
 <div align="center">
 
@@ -22,41 +21,28 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_types)
 
 </div>
 
 ---
 
-## Overview
-
-This package provides the TypeScript type declarations for Clerk libraries.
-
 ## Getting Started
 
-It is worth noting that Clerk packages automatically include their type declarations when installed so adding this package manually is not typically necessary.
+This package provides the TypeScript type declarations for Clerk's SDKs.
+
+> [!NOTE]
+> Clerk's SDKs automatically include their own type definitions so typically it's not necessary to install `@clerk/types` separately.
 
 ### Installation
 
 ```sh
-npm install --save-dev @clerk/types
-```
-
-### Build
-
-```sh
-npm run build
-```
-
-To build types in watch mode, run the following:
-
-```sh
-npm run dev
+npm install @clerk/types --save-dev
 ```
 
 ## Usage
 
-Example implementation:
+Import types from `@clerk/types` like so:
 
 ```ts
 import type { OAuthStrategy } from '@clerk/types';
@@ -68,19 +54,18 @@ export type OAuthProps = {
 };
 ```
 
-_For further details and examples, please refer to our [Documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_types)._
+You can also [override Clerk interfaces with custom types](https://clerk.com/docs/guides/custom-types?utm_source=github&utm_medium=clerk_types).
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_types)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_types)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 

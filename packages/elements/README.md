@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/elements</h1>
 </p>
-
-# @clerk/elements
 
 <div align="center">
 
@@ -22,13 +21,11 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_elements)
 
 </div>
 
----
-
-## Overview
+## Getting started
 
 Clerk Elements is a library of unstyled, composable components that can be used to build completely custom UIs on top of Clerk's APIs, without having to manage the underlying logic.
 
@@ -36,41 +33,37 @@ Clerk Elements is a library of unstyled, composable components that can be used 
 > Clerk Elements is currently in beta. It's not recommended to use it in production just yet, but it would be much appreciated if you give it a try.
 > If you have any feedback, please reach out to [beta-elements@clerk.dev](mailto:beta-elements@clerk.dev) or head over to the [GitHub Discussion](https://github.com/orgs/clerk/discussions/3315).
 
-## Getting started
-
 ### Prerequisites
 
 - Next.js `^13.5.4 || ^14.0.3` or later
 - React 18 or later
 - Node.js `>=18.17.0` or later
-- You need to use the [Core 2 version](https://clerk.com/changelog/2024-04-19) (or later) of Clerk's SDKs
+- Use the [Core 2 version](https://clerk.com/changelog/2024-04-19) (or later) of Clerk's SDKs
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_elements).
 
 ### Installation
 
-```sh
-npm install @clerk/elements
-```
-
-> [!NOTE]
-> If your project uses TypeScript, make sure that [`moduleResolution`](https://www.typescriptlang.org/tsconfig/#moduleResolution) in `tsconfig.json` is set to `bundler`. Otherwise, you might run into issues with resolving TypeScript types from Clerk Elements.
+The fastest way to get started with Clerk Elements is by following the [Clerk Elements "Getting started" guide](https://clerk.com/docs/customization/elements/overview#getting-started?utm_source=github&utm_medium=clerk_elements).
 
 ## Usage
 
-Once you've got your project set up, you can start building custom UIs with Clerk Elements. The following guides will show you how to build your own custom flows:
+For further information, guides, and examples visit the [Clerk Elements reference documentation](https://clerk.com/docs/customization/elements/overview?utm_source=github&utm_medium=clerk_elements).
 
-- [Build a sign-in flow](https://clerk.com/docs/elements/guides/sign-in?utm_source=github&utm_medium=clerk_elements)
-- [Build a sign-up flow](https://clerk.com/docs/elements/guides/sign-up?utm_source=github&utm_medium=clerk_elements)
+The following guides will show you how to build your own custom flows:
+
+- [Build a sign-in flow](https://clerk.com/docs/customization/elements/guides/sign-in?utm_source=github&utm_medium=clerk_elements)
+- [Build a sign-up flow](https://clerk.com/docs/customization/elements/guides/sign-up?utm_source=github&utm_medium=clerk_elements)
 
 If you want to see what's possible with Clerk Elements, check out these pre-built examples from the Clerk team:
 
-- [Sign-in examples](https://clerk.com/docs/elements/examples/sign-in?utm_source=github&utm_medium=clerk_elements)
-- [Sign-up examples](https://clerk.com/docs/elements/examples/sign-up?utm_source=github&utm_medium=clerk_elements)
+- [Sign-in examples](https://clerk.com/docs/customization/elements/examples/sign-in?utm_source=github&utm_medium=clerk_elements)
+- [Sign-up examples](https://clerk.com/docs/customization/elements/examples/sign-up?utm_source=github&utm_medium=clerk_elements)
 
 Finally, to learn about the available components and how to use them, check out the component reference pages:
 
-- [Common components](https://clerk.com/docs/elements/reference/common?utm_source=github&utm_medium=clerk_elements)
-- [Sign-in components](https://clerk.com/docs/elements/reference/sign-in?utm_source=github&utm_medium=clerk_elements)
-- [Sign-up components](https://clerk.com/docs/elements/reference/sign-up?utm_source=github&utm_medium=clerk_elements)
+- [Common components](https://clerk.com/docs/customization/elements/reference/common?utm_source=github&utm_medium=clerk_elements)
+- [Sign-in components](https://clerk.com/docs/customization/elements/reference/sign-in?utm_source=github&utm_medium=clerk_elements)
+- [Sign-up components](https://clerk.com/docs/customization/elements/reference/sign-up?utm_source=github&utm_medium=clerk_elements)
 
 _With the beta release, only sign-up and sign-in flows are supported. Support for building the rest of Clerk's prebuilt components with Elements is actively being worked on._
 
@@ -79,17 +72,11 @@ _With the beta release, only sign-up and sign-in flows are supported. Support fo
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_elements)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_elements)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
-
-### Package development
-
-- Navigate to `examples/nextjs` and install the dependencies
-- You can run the example app through `npm run dev:example` inside `packages/elements` afterwards
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 

@@ -17,7 +17,7 @@ export const SAML_IDPS: SamlIdpMap = {
     logo: 'google',
   },
   saml_microsoft: {
-    name: 'Microsoft Azure AD',
+    name: 'Microsoft Entra ID (Formerly AD)',
     logo: 'azure',
   },
   saml_custom: {

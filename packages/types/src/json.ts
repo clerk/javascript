@@ -119,12 +119,12 @@ export interface SessionJSON extends ClerkResourceJSON {
 export interface __experimental_SessionVerificationJSON extends ClerkResourceJSON {
   object: 'session_verification';
   status: __experimental_SessionVerificationStatus;
-  first_factor_verification: VerificationJSON;
+  first_factor_verification: VerificationJSON | null;
   session: SessionJSON;
-  second_factor_verification: VerificationJSON;
+  second_factor_verification: VerificationJSON | null;
   level: __experimental_SessionVerificationLevel;
-  supported_first_factors: SignInFirstFactorJSON[];
-  supported_second_factors: SignInSecondFactorJSON[];
+  supported_first_factors: SignInFirstFactorJSON[] | null;
+  supported_second_factors: SignInSecondFactorJSON[] | null;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
