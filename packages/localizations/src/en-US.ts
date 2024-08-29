@@ -279,7 +279,7 @@ export const enUS: LocalizationResource = {
       getHelp: {
         blockButton__emailSupport: 'Email support',
         content:
-          'If you’re experiencing difficulty signing into your account, email us and we will work with you to restore access as soon as possible.',
+          'If you have trouble signing into your account, email us and we will work with you to restore access as soon as possible.',
         title: 'Get help',
       },
       subtitle: 'Facing issues? You can use any of these methods to sign in.',
@@ -560,7 +560,7 @@ export const enUS: LocalizationResource = {
       getHelp: {
         blockButton__emailSupport: 'Email support',
         content:
-          'If you’re experiencing difficulty verifying your account, email us and we will work with you to restore access as soon as possible.',
+          'If you have trouble verifying your account, email us and we will work with you to restore access as soon as possible.',
         title: 'Get help',
       },
       subtitle: 'Facing issues? You can use any of these methods for verification.',
