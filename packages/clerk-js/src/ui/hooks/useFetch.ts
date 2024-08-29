@@ -61,10 +61,17 @@ const useCache = <K = any, V = any>(
   };
 };
 
+/**
+ * An in-house simpler alternative to useSWR
+ * @param fetcher If fetcher is undefined no action will be performed
+ * @param params
+ * @param options
+ */
 export const useFetch = <K, T>(
   fetcher: ((...args: any) => Promise<T>) | undefined,
   params: K,
   options?: {
+    throttleTime?: number;
     onSuccess?: (data: T) => void;
     staleTime?: number;
   },
@@ -72,7 +79,12 @@ export const useFetch = <K, T>(
   const { subscribeCache, getCache, setCache } = useCache<K, T>(params);
 
   const staleTime = options?.staleTime || 1000 * 60 * 2; //cache for 2 minutes by default
+  const throttleTime = options?.throttleTime || 0;
   const fetcherRef = useRef(fetcher);
+
+  if (throttleTime < 0) {
+    throw new Error('ClerkJS: A negative value for `throttleTime` is not allowed ');
+  }
 
   const cached = useSyncExternalStore(subscribeCache, getCache);
 
@@ -85,6 +97,8 @@ export const useFetch = <K, T>(
       return;
     }
 
+    const d = performance.now();
+
     setCache({
       data: null,
       isLoading: !getCache(),
@@ -95,14 +109,19 @@ export const useFetch = <K, T>(
       .then(result => {
         if (typeof result !== 'undefined') {
           const data = Array.isArray(result) ? result : typeof result === 'object' ? { ...result } : result;
-          setCache({
-            data,
-            isLoading: false,
-            isValidating: false,
-            error: null,
-            cachedAt: Date.now(),
-          });
-          options?.onSuccess?.(data);
+          const n = performance.now();
+          const waitTime = throttleTime - (n - d);
+
+          setTimeout(() => {
+            setCache({
+              data,
+              isLoading: false,
+              isValidating: false,
+              error: null,
+              cachedAt: Date.now(),
+            });
+            options?.onSuccess?.(data);
+          }, waitTime);
         }
       })
       .catch(() => {
@@ -118,5 +137,6 @@ export const useFetch = <K, T>(
 
   return {
     ...cached,
+    setCache,
   };
 };

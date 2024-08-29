@@ -1,4 +1,5 @@
 import type {
+  __experimental_UserVerificationProps,
   CreateOrganizationProps,
   GoogleOneTapProps,
   OrganizationListProps,
@@ -20,6 +21,7 @@ export type {
   OrganizationProfileProps,
   CreateOrganizationProps,
   OrganizationListProps,
+  __experimental_UserVerificationProps,
 };
 
 export type AvailableComponentProps =
@@ -30,12 +32,18 @@ export type AvailableComponentProps =
   | OrganizationSwitcherProps
   | OrganizationProfileProps
   | CreateOrganizationProps
-  | OrganizationListProps;
+  | OrganizationListProps
+  | __experimental_UserVerificationProps;
 
 type ComponentMode = 'modal' | 'mounted';
 
 export type SignInCtx = SignInProps & {
   componentName: 'SignIn';
+  mode?: ComponentMode;
+};
+
+export type UserVerificationCtx = __experimental_UserVerificationProps & {
+  componentName: 'UserVerification';
   mode?: ComponentMode;
 };
 
@@ -83,6 +91,7 @@ export type AvailableComponentCtx =
   | SignUpCtx
   | UserButtonCtx
   | UserProfileCtx
+  | UserVerificationCtx
   | OrganizationProfileCtx
   | CreateOrganizationCtx
   | OrganizationSwitcherCtx
