@@ -2,7 +2,7 @@ import { Root as SignUpRoot } from '@clerk/elements/sign-up';
 
 import { SignUpContinue } from '~/components/sign-up/steps/continue';
 import { SignUpStart } from '~/components/sign-up/steps/start';
-import { SignUpStatus } from '~/components/sign-up/steps/status';
+// import { SignUpStatus } from '~/components/sign-up/steps/status';
 import { SignUpVerifications } from '~/components/sign-up/steps/verifications';
 
 export function SignUp() {
@@ -11,7 +11,7 @@ export function SignUp() {
       <SignUpStart />
       <SignUpVerifications />
       <SignUpContinue />
-      <SignUpStatus />
+      {/* <SignUpStatus /> */}
     </SignUpRoot>
   );
 }
