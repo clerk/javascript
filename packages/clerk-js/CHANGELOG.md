@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.73.6
+
+### Patch Changes
+
+- Fixes issue where `createFlexGapPropertyIosCompat` was incorrectly detecting a modern Chrome for iOS user agent. ([#4049](https://github.com/clerk/javascript/pull/4049)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.73.5
 
 ### Patch Changes
