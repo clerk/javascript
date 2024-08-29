@@ -11,6 +11,7 @@ export interface ClientResource extends ClerkResource {
   isNew: () => boolean;
   create: () => Promise<ClientResource>;
   destroy: () => Promise<void>;
+  removeSessions: () => Promise<void>;
   clearCache: () => void;
   lastActiveSessionId: string | null;
   createdAt: Date | null;

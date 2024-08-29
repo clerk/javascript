@@ -65,6 +65,12 @@ export class Client extends BaseResource implements ClientResource {
     });
   }
 
+  removeSessions(): Promise<ClientResource> {
+    return this._baseDelete({
+      path: this.path() + '/sessions',
+    });
+  }
+
   clearCache(): void {
     return this.sessions.forEach(s => s.clearCache());
   }
