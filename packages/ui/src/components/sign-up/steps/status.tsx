@@ -46,12 +46,42 @@ const signUpStatusLocalizationKeys: Record<
 type Status = keyof typeof signUpStatusLocalizationKeys;
 
 const statusIcon: Record<Status, React.ReactElement> = {
-  loading: <Icon.SpinnerLg className='mb-8 !size-10 motion-safe:animate-spin motion-safe:[animation-duration:1.5s]' />,
-  verified: <Icon.TickShieldlg className='text-gray-11 mb-2 !size-10' />,
-  verified_switch_tab: <Icon.SwitchArrowslg className='text-gray-11 mb-2 !size-10' />,
-  expired: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#F36B16]' />,
-  failed: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#EF4444]' />,
-  client_mismatch: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#F36B16]' />,
+  loading: (
+    <Icon.SpinnerLg
+      size='lg'
+      className='mb-8 motion-safe:animate-spin motion-safe:[animation-duration:1.5s]'
+    />
+  ),
+  verified: (
+    <Icon.TickShieldlg
+      size='lg'
+      className='text-gray-11 mb-2'
+    />
+  ),
+  verified_switch_tab: (
+    <Icon.SwitchArrowslg
+      size='lg'
+      className='text-gray-11 mb-2'
+    />
+  ),
+  expired: (
+    <Icon.ExclamationTrianglelg
+      size='lg'
+      className='mb-2 text-[#F36B16]'
+    />
+  ),
+  failed: (
+    <Icon.ExclamationTrianglelg
+      size='lg'
+      className='mb-2 text-[#EF4444]'
+    />
+  ),
+  client_mismatch: (
+    <Icon.ExclamationTrianglelg
+      size='lg'
+      className='mb-2 text-[#F36B16]'
+    />
+  ),
 };
 
 export function SignUpStatus() {

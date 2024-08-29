@@ -2,20 +2,30 @@ import { cx } from 'cva';
 import * as React from 'react';
 
 type IconRef = SVGSVGElement;
-type IconProps = Omit<React.HTMLAttributes<IconRef>, 'viewBox'>;
+type IconSizes = 'default' | 'lg';
+type IconProps = Omit<React.HTMLAttributes<IconRef>, 'viewBox'> & {
+  size?: IconSizes;
+};
 
 // Icons that need to be rotated 180deg in RTL mode
-const rtlIcons = ['IconCaretRightLegacy'];
+const RTL_ICONS = ['IconCaretRightLegacy'];
+const SIZE_MAP: Record<IconSizes, string> = {
+  default: 'size-[1em]',
+  lg: 'size-10',
+};
 
 function createIcon({ displayName, viewBox, path }: { displayName: string; viewBox: string; path: React.ReactNode }) {
-  const Icon = React.forwardRef(function Icon({ className, ...props }: IconProps, ref: React.ForwardedRef<IconRef>) {
+  const Icon = React.forwardRef(function Icon(
+    { className, size = 'default', ...props }: IconProps,
+    ref: React.ForwardedRef<IconRef>,
+  ) {
     return (
       <svg
         ref={ref}
         viewBox={viewBox}
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
-        className={cx('size-[1em]', rtlIcons.includes(displayName) && 'rtl:rotate-180', className)}
+        className={cx(SIZE_MAP[size], RTL_ICONS.includes(displayName) && 'rtl:rotate-180', className)}
         aria-hidden
         {...props}
       >
