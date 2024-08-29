@@ -1,4 +1,7 @@
-import { createContext, useContext } from 'react';
+/**
+ * React-specific binding's for interacting with Clerk's router interface.
+ */
+import React, { createContext, useContext } from 'react';
 
 import type { ClerkHostRouter, ClerkRouter } from './router';
 import { createClerkRouter } from './router';
@@ -15,6 +18,9 @@ export function useClerkRouter() {
   return ctx;
 }
 
+/**
+ * Construct a Clerk Router using the provided host router. The router instance is accessible using `useClerkRouter()`.
+ */
 export function Router({
   basePath,
   children,
@@ -31,8 +37,10 @@ export function Router({
 
 type RouteProps = { path?: string; index?: boolean };
 
+/**
+ * Used to conditionally render its children based on whether or not the current path matches the provided path.
+ */
 export function Route({ path, children, index }: RouteProps & { children: React.ReactNode }) {
-  // check for parent router, if exists, create child router, otherwise create one
   const parentRouter = useClerkRouter();
 
   if (!path && !index) {

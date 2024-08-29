@@ -51,6 +51,9 @@ class ClerkRequest extends Request {
     const resolvedProtocol = this.getFirstValueFromHeader(forwardedProto) ?? protocol?.replace(/[:/]/, '');
     const origin = resolvedHost && resolvedProtocol ? `${resolvedProtocol}://${resolvedHost}` : initialUrl.origin;
 
+    if (origin === initialUrl.origin) {
+      return createClerkUrl(initialUrl);
+    }
     return createClerkUrl(initialUrl.pathname + initialUrl.search, origin);
   }
 

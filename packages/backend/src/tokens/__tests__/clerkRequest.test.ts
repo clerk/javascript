@@ -151,6 +151,14 @@ export default (QUnit: QUnit) => {
         });
         assert.equal(createClerkRequest(req).clerkUrl.toString(), 'https://example.com/path?foo=bar');
       });
+
+      it('with duplicate leading slashes in URL path', assert => {
+        const req1 = new Request('http://localhost:3000//path');
+        assert.equal(createClerkRequest(req1).clerkUrl.toString(), 'http://localhost:3000//path');
+
+        const req2 = new Request('http://localhost:3000////path');
+        assert.equal(createClerkRequest(req2).clerkUrl.toString(), 'http://localhost:3000////path');
+      });
     });
 
     module('toJSON', () => {
