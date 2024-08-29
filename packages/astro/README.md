@@ -25,7 +25,7 @@
 
 </div>
 
-[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_astro) is the easiest way to add authentication and user management to your Next.js application. Add sign up, sign in, and profile management to your application in minutes.
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_astro) is the easiest way to add authentication and user management to your Astro application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
