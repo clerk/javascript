@@ -81,7 +81,7 @@ To set up your development environment, please follow these steps:
 
 Once you're ready to make changes, run `npm run dev` from the monorepo root.
 
-If you want to run the `dev` script of an individual package, navigate to the folder and run the script from there.
+If you want to run the `dev` script of an individual package, navigate to the folder and run the script from there. This way you can also individually run the `build` script.
 
 ### Documenting your changes
 
