@@ -33,13 +33,13 @@ export function SignIn() {
           <SignInGetHelp />
         ) : (
           <>
+            <SignInStatus />
             <SignInStart />
             <SignInVerifications />
             <SignInChooseStrategy />
             <SignInForgotPassword />
             <SignInResetPassword />
             <SignInChooseSession />
-            <SignInStatus />
           </>
         )}
       </SignInRoot>
