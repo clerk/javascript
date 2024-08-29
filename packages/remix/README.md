@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/remix</h1>
 </p>
-
-# @clerk/remix
 
 <div align="center">
 
@@ -22,114 +21,41 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_remix)
 
 </div>
 
----
-
-## Overview
-
-Clerk is the easiest way to add authentication and user management to your Remix application. Add sign up, sign in, and profile management to your application in minutes.
-
 ## Getting Started
+
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_remix) is the easiest way to add authentication and user management to your Remix application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
 - Remix `^2.0.0` or later
 - React 18 or later
 - Node.js `>=18.17.0` or later
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_remix).
 
 ### Installation
 
-```sh
-npm install @clerk/remix
-```
+The fastest way to get started with Clerk is by following the [Remix Quickstart](https://clerk.com/docs/quickstarts/remix?utm_source=github&utm_medium=clerk_remix).
 
-### Build
-
-To build the package locally with the TypeScript compiler, run:
-
-```sh
-npm run build
-```
-
-To build the package in watch mode, run the following:
-
-```sh
-npm run dev
-```
+You'll learn how to install `@clerk/remix`, set up your environment keys, configure `rootAuthLoader` & `ClerkApp`, and protect your pages.
 
 ## Usage
 
-Make sure the following environment variables are set in a `.env` file:
-
-```sh
-CLERK_PUBLISHABLE_KEY=[publishable-key]
-CLERK_SECRET_KEY=[backend-secret-key]
-```
-
-You can get these from the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) screen in your Clerk dashboard.
-
-To initialize Clerk with your Remix application, you will need to make three modifications to `app/root.jsx`:
-
-1. Export `rootAuthLoader` as `loader`
-1. Wrap the default export with `ClerkApp`
-
-```jsx
-import { rootAuthLoader } from '@clerk/remix/ssr.server';
-import { ClerkApp } from '@clerk/remix';
-
-export const loader = args => rootAuthLoader(args);
-
-function App() {
-  return <html lang='en'>[...]</html>;
-}
-
-export default ClerkApp(App);
-```
-
-After those changes are made, you can use Clerk components in your routes.
-
-For example, in `app/routes/index.jsx`:
-
-```jsx
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/remix';
-
-export default function Index() {
-  return (
-    <div
-      style={{
-        fontFamily: 'system-ui, sans-serif',
-        lineHeight: '1.4',
-        textAlign: 'center',
-      }}
-    >
-      <h1>Hello Clerk!</h1>
-      <SignedIn>
-        <UserButton />
-      </SignedIn>
-      <SignedOut>
-        <SignInButton mode='modal' />
-      </SignedOut>
-    </div>
-  );
-}
-```
-
-_For further details and examples, please refer to our [Documentation](https://clerk.com/docs/quickstarts/remix?utm_source=github&utm_medium=clerk_remix)._
+For further information, guides, and examples visit the [Remix reference documentation](https://clerk.com/docs/references/remix/clerk-app?utm_source=github&utm_medium=clerk_remix).
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_remix)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_remix)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 

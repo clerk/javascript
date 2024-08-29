@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/themes</h1>
 </p>
-
-# @clerk/themes
 
 <div align="center">
 
@@ -22,45 +21,40 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_themes)
 
 </div>
 
----
-
-## Overview
-
-Clerk is the easiest way to add authentication and user management to your themes application. Add sign up, sign in, and profile management to your React Native application in minutes.
-
 ## Getting Started
+
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_themes) is the easiest way to add authentication and user management to your application. Add sign up, sign in, and profile management to your application in minutes.
+
+You can customize the appearance of Clerk components by using the [appearance prop](https://clerk.com/docs/customization/overview?utm_source=github&utm_medium=clerk_themes). `@clerk/themes` offers prebuilt themes.
 
 ### Prerequisites
 
-TODO
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_themes).
 
 ### Installation
 
-TODO
-
-### Build
-
-TODO
+```shell
+npm install @clerk/themes
+```
 
 ## Usage
 
-TODO
+Learn how to [apply custom themes](https://clerk.com/docs/customization/themes#usage?utm_source=github&utm_medium=clerk_themes) in the reference documentation.
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_themes)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_themes)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 
