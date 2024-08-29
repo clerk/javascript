@@ -2,4 +2,4 @@
 "@clerk/elements": patch
 ---
 
-Add coinbase wallet  on elements package
+Add support for sign in and sign up with Coinbase
