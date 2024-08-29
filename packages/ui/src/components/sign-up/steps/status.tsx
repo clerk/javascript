@@ -10,7 +10,7 @@ import * as Icon from '~/primitives/icon';
 import type { VerificationStatus } from '~/types/utils';
 import type { DefaultLocalizationKey } from '~/utils/make-localizable';
 
-const signInStatusLocalizationKeys: Record<
+const signUpStatusLocalizationKeys: Record<
   VerificationStatus,
   {
     title: DefaultLocalizationKey;
@@ -18,15 +18,15 @@ const signInStatusLocalizationKeys: Record<
   }
 > = {
   verified: {
-    title: 'signIn.emailLink.verified.title',
+    title: 'signUp.emailLink.verified.title',
     subtitle: 'signIn.emailLink.verified.subtitle',
   },
   verified_switch_tab: {
-    title: 'signIn.emailLink.verified.title',
+    title: 'signUp.emailLink.verified.title',
     subtitle: 'signIn.emailLink.verifiedSwitchTab.subtitle',
   },
   loading: {
-    title: 'signIn.emailLink.loading.title',
+    title: 'signUp.emailLink.loading.title',
     subtitle: 'signIn.emailLink.loading.subtitle',
   },
   failed: {
@@ -38,12 +38,12 @@ const signInStatusLocalizationKeys: Record<
     subtitle: 'signIn.emailLink.expired.subtitle',
   },
   client_mismatch: {
-    title: 'signIn.emailLink.clientMismatch.title',
+    title: 'signUp.emailLink.clientMismatch.title',
     subtitle: 'signIn.emailLink.clientMismatch.subtitle',
   },
 };
 
-type Status = keyof typeof signInStatusLocalizationKeys;
+type Status = keyof typeof signUpStatusLocalizationKeys;
 
 const statusIcon: Record<Status, React.ReactElement> = {
   loading: <Icon.SpinnerLg className='mb-8 !size-10 motion-safe:animate-spin motion-safe:[animation-duration:1.5s]' />,
@@ -54,7 +54,7 @@ const statusIcon: Record<Status, React.ReactElement> = {
   client_mismatch: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#F36B16]' />,
 };
 
-export function SignInStatus() {
+export function SignUpStatus() {
   const { t } = useLocalizations();
   const { branded } = useDisplayConfig();
   const { layout } = useAppearance();
@@ -73,8 +73,8 @@ export function SignInStatus() {
       <Card.Content>
         <Card.Header>
           {statusIcon[status]}
-          <Card.Title>{t(signInStatusLocalizationKeys[status].title)}</Card.Title>
-          <Card.Description>{t(signInStatusLocalizationKeys[status].subtitle)}</Card.Description>
+          <Card.Title>{t(signUpStatusLocalizationKeys[status].title)}</Card.Title>
+          <Card.Description>{t(signUpStatusLocalizationKeys[status].subtitle)}</Card.Description>
         </Card.Header>
         {status !== 'loading' ? (
           <Card.Body>
