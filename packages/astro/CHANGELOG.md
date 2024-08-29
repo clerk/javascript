@@ -1,5 +1,45 @@
 # @clerk/astro
 
+## 1.2.4
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`c9ef59106`](https://github.com/clerk/javascript/commit/c9ef59106c4720af3012586f5656f7b54cf2e336), [`fece72014`](https://github.com/clerk/javascript/commit/fece72014e2d39c8343a7329ae677badcba56d15), [`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3aa63dc5a`](https://github.com/clerk/javascript/commit/3aa63dc5a48161cfe92d94093ef0c32efd401342), [`9d0477781`](https://github.com/clerk/javascript/commit/9d04777814bf6d86d05506838b101e7cfc7c208d), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/backend@1.9.0
+  - @clerk/types@4.17.0
+  - @clerk/shared@2.6.0
+
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/types@4.16.0
+  - @clerk/backend@1.8.3
+  - @clerk/shared@2.5.5
+
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+  - @clerk/backend@1.8.2
+  - @clerk/shared@2.5.4
+
+## 1.2.1
+
+### Patch Changes
+
+- Fixes a bug where subscribing to the `$clerkStore` nanostore would give incorrect values. ([#4008](https://github.com/clerk/javascript/pull/4008)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+  - @clerk/backend@1.8.1
+  - @clerk/shared@2.5.3
+
 ## 1.2.0
 
 ### Minor Changes

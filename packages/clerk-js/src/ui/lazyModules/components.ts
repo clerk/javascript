@@ -12,7 +12,7 @@ const componentImportPaths = {
     import(/* webpackChunkName: "organizationswitcher" */ './../components/OrganizationSwitcher'),
   OrganizationList: () => import(/* webpackChunkName: "organizationlist" */ './../components/OrganizationList'),
   ImpersonationFab: () => import(/* webpackChunkName: "impersonationfab" */ './../components/ImpersonationFab'),
-  GoogleOneTap: () => import(/* webpackChunkName: "oneTap" */ './../components/GoogleOneTap'),
+  GoogleOneTap: () => import(/* webpackChunkName: "onetap" */ './../components/GoogleOneTap'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));

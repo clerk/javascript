@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useAttributes } from '~/hooks/use-attributes';
 import { useLocalizations } from '~/hooks/use-localizations';
+import { Animated } from '~/primitives/animated';
 import * as Field from '~/primitives/field';
 
 const DEFAULT_FIELD_NAME = 'emailAddress';
@@ -57,13 +58,15 @@ export function EmailField({
             );
           }}
         </Common.FieldState>
-        <Common.FieldError asChild>
-          {({ message, code }) => {
-            return (
-              <Field.Message intent='error'>{translateError({ message, code, name: 'email_address' })}</Field.Message>
-            );
-          }}
-        </Common.FieldError>
+        <Animated>
+          <Common.FieldError asChild>
+            {({ message, code }) => {
+              return (
+                <Field.Message intent='error'>{translateError({ message, code, name: 'email_address' })}</Field.Message>
+              );
+            }}
+          </Common.FieldError>
+        </Animated>
       </Field.Root>
     </Common.Field>
   );

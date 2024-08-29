@@ -34,6 +34,7 @@ import type {
 import type { ActiveSessionResource } from './session';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
+import type { Web3Strategy } from './strategies';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 
@@ -477,6 +478,16 @@ export interface Clerk {
    * Authenticates user using their Metamask browser extension
    */
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
+
+  /**
+   * Authenticates user using their Coinbase Wallet browser extension
+   */
+  authenticateWithCoinbase: (params?: AuthenticateWithCoinbaseParams) => Promise<unknown>;
+
+  /**
+   * Authenticates user using their Web3 Wallet browser extension
+   */
+  authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
 
   /**
    * Authenticates user using a Google token generated from Google identity services.
@@ -1115,7 +1126,22 @@ export interface CreateOrganizationParams {
   slug?: string;
 }
 
+export interface ClerkAuthenticateWithWeb3Params {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  strategy: Web3Strategy;
+}
+
 export interface AuthenticateWithMetamaskParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+}
+
+export interface AuthenticateWithCoinbaseParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;

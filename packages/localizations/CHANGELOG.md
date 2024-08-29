@@ -1,5 +1,41 @@
 # Change Log
 
+## 2.7.1
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/types@4.17.0
+
+## 2.7.0
+
+### Minor Changes
+
+- Support connecting Coinbase Wallet via <UserProfile /> ([#4030](https://github.com/clerk/javascript/pull/4030)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Improve `he-IL` localization values. ([#4025](https://github.com/clerk/javascript/pull/4025)) by [@TgMrP](https://github.com/TgMrP)
+
+- Updated dependencies [[`c1389492d`](https://github.com/clerk/javascript/commit/c1389492d8b6a9292ab04889bf776c0f45e66845)]:
+  - @clerk/types@4.16.0
+
+## 2.6.3
+
+### Patch Changes
+
+- Updated dependencies [[`0158c774a`](https://github.com/clerk/javascript/commit/0158c774af2243a2cd13b55c4d6fae877178c961), [`8be1a7abc`](https://github.com/clerk/javascript/commit/8be1a7abc8849d7d59552011bd6b25bc917d51f5)]:
+  - @clerk/types@4.15.1
+
+## 2.6.2
+
+### Patch Changes
+
+- Updated dependencies [[`247b3fd75`](https://github.com/clerk/javascript/commit/247b3fd75042365dc9f950db056b76f9fadfdcf6)]:
+  - @clerk/types@4.15.0
+
 ## 2.6.1
 
 ### Patch Changes

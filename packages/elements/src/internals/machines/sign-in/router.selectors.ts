@@ -8,18 +8,30 @@ export function SignInSafeIdentifierSelectorForStrategy(
 ): (s: SignInRouterSnapshot) => string {
   return (s: SignInRouterSnapshot) => {
     const signIn = s.context.clerk?.client.signIn;
-    const identifier = signIn.identifier || '';
 
     if (strategy) {
-      const matchingFactor = [...(signIn.supportedFirstFactors ?? []), ...(signIn.supportedSecondFactors ?? [])].find(
-        f => f.strategy === strategy,
-      );
-      if (matchingFactor && 'safeIdentifier' in matchingFactor) {
-        return matchingFactor.safeIdentifier;
+      const matchingFactors = [
+        ...(signIn.supportedFirstFactors ?? []),
+        ...(signIn.supportedSecondFactors ?? []),
+      ].filter(f => f.strategy === strategy);
+
+      const matchingFactorForIdentifier =
+        signIn.identifier && matchingFactors.length > 0
+          ? matchingFactors.find(f => 'safeIdentifier' in f && f.safeIdentifier === signIn.identifier)
+          : null;
+
+      const matchingFactorForStrategy = matchingFactors[0];
+
+      if (matchingFactorForIdentifier && 'safeIdentifier' in matchingFactorForIdentifier) {
+        return matchingFactorForIdentifier.safeIdentifier;
+      }
+
+      if (matchingFactorForStrategy && 'safeIdentifier' in matchingFactorForStrategy) {
+        return matchingFactorForStrategy.safeIdentifier;
       }
     }
 
-    return identifier;
+    return signIn.identifier || '';
   };
 }
 

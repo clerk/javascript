@@ -29,6 +29,7 @@ export const subpathNames = [
   'telemetry',
   'logger',
   'webauthn',
+  'router',
 ];
 
 export const subpathFoldersBarrel = ['react'];

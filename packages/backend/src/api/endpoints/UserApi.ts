@@ -95,6 +95,7 @@ type UpdateUserParams = {
   backupCodes?: string[];
   externalId?: string;
   createdAt?: Date;
+  deleteSelfEnabled?: boolean;
   createOrganizationEnabled?: boolean;
   createOrganizationsLimit?: number;
 } & UserMetadataParams &
