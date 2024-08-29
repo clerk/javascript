@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.6.0
+
+### Minor Changes
+
+- Moves the common `ClerkRouter` interface into `@clerk/shared/router`. Elements has been refactored internally to import the router from the shared package. ([#4045](https://github.com/clerk/javascript/pull/4045)) by [@BRKalow](https://github.com/BRKalow)
+
+### Patch Changes
+
+- Updated dependencies [[`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`13693018f`](https://github.com/clerk/javascript/commit/13693018f4f7ac5d224698aa730e20960896f68c), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/types@4.17.0
+
 ## 2.5.5
 
 ### Patch Changes
