@@ -59,7 +59,7 @@ export function SignUpStatus() {
   const { branded } = useDisplayConfig();
   const { layout } = useAppearance();
   const isDev = useDevModeWarning();
-  const [status] = React.useState<Status>('verified');
+  const [status] = React.useState<Status>('loading');
 
   const cardFooterProps = {
     branded,
