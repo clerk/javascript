@@ -9,10 +9,6 @@ type IconProps = Omit<React.HTMLAttributes<IconRef>, 'viewBox'> & {
 
 // Icons that need to be rotated 180deg in RTL mode
 const RTL_ICONS = ['IconCaretRightLegacy'];
-const SIZE_MAP: Record<IconSizes, string> = {
-  default: 'size-[1em]',
-  lg: 'size-10',
-};
 
 function createIcon({ displayName, viewBox, path }: { displayName: string; viewBox: string; path: React.ReactNode }) {
   const Icon = React.forwardRef(function Icon(
@@ -25,7 +21,14 @@ function createIcon({ displayName, viewBox, path }: { displayName: string; viewB
         viewBox={viewBox}
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
-        className={cx(SIZE_MAP[size], RTL_ICONS.includes(displayName) && 'rtl:rotate-180', className)}
+        className={cx(
+          {
+            default: 'size-[1em]',
+            lg: 'size-10',
+          }[size],
+          RTL_ICONS.includes(displayName) && 'rtl:rotate-180',
+          className,
+        )}
         aria-hidden
         {...props}
       >
