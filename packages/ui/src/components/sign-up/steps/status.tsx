@@ -47,8 +47,8 @@ type Status = keyof typeof signUpStatusLocalizationKeys;
 
 const statusIcon: Record<Status, React.ReactElement> = {
   loading: <Icon.SpinnerLg className='mb-8 !size-10 motion-safe:animate-spin motion-safe:[animation-duration:1.5s]' />,
-  verified: <Icon.ExclamationTrianglelg className='text-gray-11 mb-2 !size-10' />,
-  verified_switch_tab: <Icon.ExclamationTrianglelg className='text-gray-11 mb-2 !size-10' />,
+  verified: <Icon.TickShieldlg className='text-gray-11 mb-2 !size-10' />,
+  verified_switch_tab: <Icon.SwitchArrowslg className='text-gray-11 mb-2 !size-10' />,
   expired: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#F36B16]' />,
   failed: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#EF4444]' />,
   client_mismatch: <Icon.ExclamationTrianglelg className='mb-2 !size-10 text-[#F36B16]' />,
