@@ -27,12 +27,12 @@
 
 ## Getting Started
 
-[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_nextjs) is the easiest way to add authentication and user management to your Express application. Add sign up, sign in, and profile management to your application in minutes.
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_express) is the easiest way to add authentication and user management to your Express application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
 - Node.js `>=18.17.0` or later
-- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs).
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_express).
 - An existing Express application (follow their [Getting started](https://expressjs.com/en/starter/installing.html) guide)
 
 ### Installation
