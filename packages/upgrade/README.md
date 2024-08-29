@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/upgrade</h1>
 </p>
-
-# @clerk/upgrade
 
 <div align="center">
 
@@ -22,29 +21,29 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_upgrade)
 
 </div>
 
----
-
-## Overview
+## Getting Started
 
 A tool that helps with upgrading major versions of Clerk's SDKs.
-
-## Getting Started
 
 ### Prerequisites
 
 - Node.js `>=18.17.0` or later
 
-### Usage
+## Usage
+
+Navigate to the application you want to upgrade and run the following in your terminal:
 
 ```sh
 npx @clerk/upgrade
 ```
 
-## Caveats
+Fill out the questionnaire and the CLI will show you the required changes.
+
+### Caveats
 
 This tool uses regular expressions to scan for patterns that match breaking changes. This makes it run substantially faster and makes it more accessible for us at Clerk to author matchers for each breaking change, however it means that _we cannot gurarantee 100% accuracy of the results_. As such, it's important to treat this as a tool that can help you to complete your major version upgrades, rather than an automatic fix to all issues.
 
@@ -65,12 +64,11 @@ Overall, there's a very good chance that this tool catches everything, but it's 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_upgrade)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_upgrade)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 

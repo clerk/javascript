@@ -18,10 +18,12 @@ import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
   ActiveSessionResource,
+  AuthenticateWithCoinbaseParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
+  ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
   ClientResource,
   CreateOrganizationParams,
@@ -57,6 +59,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
+  Web3Provider,
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -69,7 +72,10 @@ import {
   createPageLifecycle,
   disabledOrganizationsFeature,
   errorThrower,
+  generateSignatureWithCoinbase,
+  generateSignatureWithMetamask,
   getClerkQueryParam,
+  getWeb3Identifier,
   hasExternalAccountSignUpError,
   ignoreEventValue,
   inActiveBrowserTab,
@@ -1333,25 +1339,41 @@ export class Clerk implements ClerkInterface {
       }) as Promise<SignInResource | SignUpResource>;
   };
 
-  public authenticateWithMetamask = async ({
+  public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({ ...props, strategy: 'web3_metamask_signature' });
+  };
+
+  public authenticateWithCoinbase = async (props: AuthenticateWithCoinbaseParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({ ...props, strategy: 'web3_coinbase_signature' });
+  };
+
+  public authenticateWithWeb3 = async ({
     redirectUrl,
     signUpContinueUrl,
     customNavigate,
     unsafeMetadata,
-  }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+    strategy,
+  }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
     }
-
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    const identifier = await getWeb3Identifier({ provider });
+    const generateSignature = provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbase;
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
-      signInOrSignUp = await this.client.signIn.authenticateWithMetamask();
+      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({ identifier, generateSignature, strategy });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
-        signInOrSignUp = await this.client.signUp.authenticateWithMetamask({ unsafeMetadata });
+        signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
+          identifier,
+          generateSignature,
+          unsafeMetadata,
+          strategy,
+        });
 
         if (
           signUpContinueUrl &&
