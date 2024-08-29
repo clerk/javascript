@@ -45,7 +45,7 @@
 
 1. Retrieve the **Publishable key** from your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys) and set it as an environment variable. For example, if you used Vite:
 
-   ```text
+   ```sh
    VITE_CLERK_PUBLISHABLE_KEY=pk_test_xxx
    ```
 
