@@ -10,7 +10,7 @@ export default defineConfig(overrideOptions => {
     onSuccess: 'tsc',
     minify: isProd,
     clean: true,
-    sourcemap: true,
+    sourcemap: false,
     format: ['cjs', 'esm'],
     legacyOutput: true,
     define: {

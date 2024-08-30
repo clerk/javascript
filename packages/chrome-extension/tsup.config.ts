@@ -13,7 +13,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     legacyOutput: true,
     treeshake: true,
     noExternal: ['@clerk/clerk-react', '@clerk/shared'],

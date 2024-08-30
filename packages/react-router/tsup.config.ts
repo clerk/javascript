@@ -15,7 +15,7 @@ export default defineConfig(overrideOptions => {
     clean: true,
     dts: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,

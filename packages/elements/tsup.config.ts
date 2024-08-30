@@ -24,6 +24,6 @@ export default defineConfig(overrideOptions => {
     external: ['react', 'react-dom', 'next', '@statelyai/inspect'],
     format: ['cjs', 'esm'],
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
   };
 });

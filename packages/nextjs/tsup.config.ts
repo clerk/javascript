@@ -23,7 +23,7 @@ export default defineConfig(overrideOptions => {
     clean: true,
     minify: false,
     external: ['#safe-node-apis'],
-    sourcemap: true,
+    sourcemap: false,
     legacyOutput: true,
     define: {
       PACKAGE_NAME: `"${name}"`,

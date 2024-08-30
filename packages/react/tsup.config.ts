@@ -19,7 +19,7 @@ export default defineConfig(overrideOptions => {
     bundle: true,
     clean: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     external: ['react', 'react-dom'],
     define: {
       PACKAGE_NAME: `"${name}"`,
