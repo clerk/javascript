@@ -1,5 +1,5 @@
 import { useAppearanceStore } from '../stores/appearance-store';
-import { ToggleGroup } from '../toggle-group';
+import { ToggleGroup } from './toggle-group';
 
 export function AppearanceOptions() {
   const appearance = useAppearanceStore(state => state.appearance);

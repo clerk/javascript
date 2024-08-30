@@ -3,7 +3,7 @@ import '../../dist/styles.css';
 
 import type { Metadata, Viewport } from 'next';
 
-import { ThemeBuilder } from './theme-builder';
+import { ThemeBuilder } from './components/theme-builder';
 
 export const metadata: Metadata = {
   title: 'Theme Builder | Clerk.com',

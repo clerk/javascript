@@ -4,11 +4,11 @@ import { cx } from 'cva';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { useAppearanceStore } from '../stores/appearance-store';
+import { generateColors, getPreviewStyles } from '../utils/generate-colors';
+import { AppearanceOptions } from './appearance-options';
 import { ColorPicker } from './color-picker';
-import { AppearanceOptions } from './components/appearance-options';
-import { Logo } from './components/logo';
-import { generateColors, getPreviewStyles } from './generate-colors';
-import { useAppearanceStore } from './stores/appearance-store';
+import { Logo } from './logo';
 import { ThemeDialog } from './theme-dialog';
 
 const lightAccentDefault = '#6C47FF';
