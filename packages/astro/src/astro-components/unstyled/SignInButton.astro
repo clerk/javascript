@@ -1,7 +1,7 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types'
 import type { SignInProps } from "@clerk/types";
-type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<SignInProps & { as: Tag; mode?: 'redirect' | 'modal' }>
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<SignInProps & { as: Tag; mode?: 'redirect' | 'modal' }>
 
 import { generateSafeId } from '@clerk/astro/internal';
 
