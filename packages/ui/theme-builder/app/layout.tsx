@@ -25,7 +25,7 @@ export default function RootLayout({
       lang='en'
       className='h-full'
     >
-      <body className='flex min-h-full flex-col bg-neutral-100'>{children}</body>
+      <body className='flex min-h-full flex-col'>{children}</body>
     </html>
   );
 }
