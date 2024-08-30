@@ -6,17 +6,9 @@ type GetWeb3IdentifierParams = {
   provider: Web3Provider;
 };
 
-// injection order: metamask, coinbase
-// global.etherem -> coinbase
-// injectedProvider(metamask), will use metamask wallet
-// generateWeb3Signature(), will use coinbase wallet
-//                      neds to be generateWeb3Signature({provider: metamask}) instead
-
 export async function getWeb3Identifier(params: GetWeb3IdentifierParams) {
   const injectedProvider = injectedWeb3Providers.get(params.provider);
   if (!injectedProvider) {
-    // TODO: discuss what happens if a plugin for the requested provider is not found in the system
-    //do we simply return '' or fall back to another plugin?
     return '';
   }
 
@@ -34,8 +26,6 @@ export async function generateWeb3Signature(params: GenerateWeb3SignatureParams)
   const { identifier, nonce, provider } = params;
   const injectedProvider = injectedWeb3Providers.get(provider);
   if (!injectedProvider) {
-    // TODO: discuss what happens if a plugin for the requested provider is not found in the system
-    //do we simply return '' or fall back to another plugin?
     return '';
   }
 

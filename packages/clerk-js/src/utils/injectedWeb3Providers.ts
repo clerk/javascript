@@ -1,4 +1,5 @@
 import type { Web3Provider } from '@clerk/types';
+//https://eips.ethereum.org/EIPS/eip-6963
 
 interface EIP6963ProviderInfo {
   walletId: string;
@@ -47,7 +48,6 @@ class InjectedWeb3Providers {
       return;
     }
     this.#providers.push(event.detail);
-    console.log(this.#providers);
   };
 }
 
