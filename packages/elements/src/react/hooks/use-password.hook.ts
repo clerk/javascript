@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import { noop } from '@clerk/shared';
 import type { PasswordSettingsData, PasswordValidation } from '@clerk/types';
 import * as React from 'react';

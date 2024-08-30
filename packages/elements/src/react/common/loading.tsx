@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { OAuthProvider, SamlStrategy } from '@clerk/types';
 import { useSelector } from '@xstate/react';

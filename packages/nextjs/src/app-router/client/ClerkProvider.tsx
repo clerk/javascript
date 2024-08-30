@@ -1,6 +1,6 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useTransition } from 'react';
 
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
@@ -11,18 +11,55 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
+import { ClerkHostRouter } from '@clerk/shared/router';
 
 declare global {
   export interface Window {
     __clerk_nav_await: Array<(value: void) => void>;
     __clerk_nav: (to: string) => Promise<void>;
     __clerk_internal_invalidateCachePromise: () => void | undefined;
+    next?: {
+      version: string;
+    };
   }
 }
+
+// The version that Next added support for the window.history.pushState and replaceState APIs.
+// ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate
+export const NEXT_WINDOW_HISTORY_SUPPORT_VERSION = '14.1.0';
+
+/**
+ * Clerk router integration with Next.js's router.
+ */
+export const useNextRouter = (): ClerkHostRouter => {
+  const router = useRouter();
+  const pathname = usePathname();
+  // eslint-disable-next-line react-hooks/rules-of-hooks -- The order doesn't differ between renders as we're checking the execution environment.
+  const searchParams = typeof window === 'undefined' ? new URLSearchParams() : useSearchParams();
+
+  // The window.history APIs seem to prevent Next.js from triggering a full page re-render, allowing us to
+  // preserve internal state between steps.
+  const canUseWindowHistoryAPIs =
+    typeof window !== 'undefined' && window.next && window.next.version >= NEXT_WINDOW_HISTORY_SUPPORT_VERSION;
+
+  return {
+    mode: 'path',
+    name: 'NextRouter',
+    push: (path: string) => router.push(path),
+    replace: (path: string) =>
+      canUseWindowHistoryAPIs ? window.history.replaceState(null, '', path) : router.replace(path),
+    shallowPush(path: string) {
+      canUseWindowHistoryAPIs ? window.history.pushState(null, '', path) : router.push(path, {});
+    },
+    pathname: () => pathname,
+    searchParams: () => searchParams,
+  };
+};
 
 export const ClientClerkProvider = (props: NextClerkProviderProps) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
+  const clerkRouter = useNextRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
@@ -57,7 +94,6 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
       return new Promise(res => {
         window.__clerk_internal_invalidateCachePromise = res;
         startTransition(() => {
-          //@ts-expect-error next exists on window
           if (window.next?.version && typeof window.next.version === 'string' && window.next.version.startsWith('13')) {
             router.refresh();
           } else {
@@ -78,6 +114,8 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     ...props,
     routerPush: push,
     routerReplace: replace,
+    // @ts-expect-error -- TODO: type
+    router: clerkRouter,
   });
 
   return (

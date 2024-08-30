@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import { logger } from '@clerk/shared/logger';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type {
