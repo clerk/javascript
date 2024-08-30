@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useSession } from '@clerk/shared/react';
 import React from 'react';
 
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
@@ -13,7 +13,7 @@ type UserVerificationFactorOnePasswordProps = {
 
 export function UserVerificationFactorOnePasswordCard(props: UserVerificationFactorOnePasswordProps): JSX.Element {
   const { onShowAlternativeMethodsClick } = props;
-  const { user } = useUser();
+  const { session } = useSession();
 
   const { handleVerificationResponse } = useAfterVerification();
   const card = useCardState();
@@ -29,8 +29,8 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
 
   const handlePasswordSubmit: React.FormEventHandler = async e => {
     e.preventDefault();
-    return user
-      ?.__experimental_verifySessionAttemptFirstFactor({
+    return session
+      ?.__experimental_attemptFirstFactorVerification({
         strategy: 'password',
         password: passwordControl.value,
       })
