@@ -2,6 +2,7 @@
 
 import type {
   ActiveSessionResource,
+  ClerkOptions,
   ClientResource,
   LoadedClerk,
   OrganizationResource,
@@ -19,6 +20,16 @@ const [ClientContext, useClientContext] = createContextAndHook<ClientResource | 
 const [SessionContext, useSessionContext] = createContextAndHook<ActiveSessionResource | null | undefined>(
   'SessionContext',
 );
+
+const OptionsContext = React.createContext<ClerkOptions>({});
+
+function useOptionsContext(): ClerkOptions {
+  const context = React.useContext(OptionsContext);
+  if (context === undefined) {
+    throw new Error('useOptions must be used within an OptionsContext');
+  }
+  return context;
+}
 
 type OrganizationContextProps = {
   organization: OrganizationResource | null | undefined;
@@ -77,4 +88,6 @@ export {
   ClerkInstanceContext,
   useClerkInstanceContext,
   useAssertWrappedByClerkProvider,
+  OptionsContext,
+  useOptionsContext,
 };

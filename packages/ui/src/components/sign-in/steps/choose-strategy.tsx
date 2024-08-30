@@ -1,4 +1,4 @@
-import { useSignIn } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
@@ -28,7 +28,7 @@ function FirstFactorConnections({
   hasConnection: boolean;
 }) {
   const { t } = useLocalizations();
-  const { signIn } = useSignIn();
+  const { signIn } = useClerk().client;
   const isFirstFactor = signIn?.status === 'needs_first_factor';
 
   if (isFirstFactor) {

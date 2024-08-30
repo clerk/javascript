@@ -120,6 +120,7 @@ import {
   Organization,
 } from './resources/internal';
 import { warnings } from './warnings';
+import { ClerkHostRouter } from '@clerk/shared/router';
 
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
@@ -182,6 +183,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #router: ClerkHostRouter;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -307,6 +309,9 @@ export class Clerk implements ClerkInterface {
         ...this.#options.telemetry,
       });
     }
+
+    // @ts-expect-error -- TODO: type
+    this.#router = this.#options.router;
 
     this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
       this.#options.allowedRedirectOrigins,

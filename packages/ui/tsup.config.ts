@@ -46,7 +46,7 @@ export default defineConfig(overrideOptions => {
       'components/sign-in': 'src/components/sign-in/index.tsx',
       'components/sign-up': 'src/components/sign-up/index.tsx',
     },
-    external: ['react', 'react-dom'],
+    external: ['react', 'react-dom', '@clerk/shared'],
     format: ['cjs', 'esm'],
     minify: false,
     sourcemap: true,

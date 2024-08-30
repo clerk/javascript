@@ -6,6 +6,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const ReactRefreshTypeScript = require('react-refresh-typescript');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const TerserPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -43,6 +44,7 @@ const common = ({ mode }) => {
         CLERK_ENV: mode,
         NODE_ENV: mode,
       }),
+      new MiniCssExtractPlugin(),
     ],
     output: {
       chunkFilename: `[name]_[fullhash:6]_${packageJSON.version}.js`,
@@ -139,12 +141,20 @@ const typescriptLoaderDev = () => {
   };
 };
 
+/** @type { () => (import('webpack').RuleSetRule) } */
+const cssLoader = () => {
+  return {
+    test: /\.css$/i,
+    use: [MiniCssExtractPlugin.loader, 'css-loader'],
+  };
+};
+
 /** @type { () => (import('webpack').Configuration) } */
 const commonForProd = () => {
   return {
     devtool: undefined,
     module: {
-      rules: [svgLoader(), typescriptLoaderProd()],
+      rules: [svgLoader(), typescriptLoaderProd(), cssLoader()],
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
@@ -260,7 +270,7 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), typescriptLoaderDev()],
+        rules: [svgLoader(), typescriptLoaderDev(), cssLoader()],
       },
       plugins: [
         new ReactRefreshWebpackPlugin({ overlay: { sockHost: devUrl.host } }),

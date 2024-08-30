@@ -1,9 +1,10 @@
-import { useClerk } from '@clerk/shared/react';
+import { OptionsContext, useClerk, useOptionsContext } from '@clerk/shared/react';
+import { SignIn as NewSignIn } from '@clerk/ui/sign-in';
 import type { SignInModalProps, SignInProps } from '@clerk/types';
 import React from 'react';
 
 import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { ComponentContext, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
+import { ComponentContext, useOptions, useSignInContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { ResetPassword } from './ResetPassword';
@@ -13,6 +14,8 @@ import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
+
+import '@clerk/ui/styles.css';
 
 function RedirectToSignIn() {
   const clerk = useClerk();
@@ -26,50 +29,53 @@ function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
 
   return (
-    <Flow.Root flow='signIn'>
-      <Switch>
-        <Route path='factor-one'>
-          <SignInFactorOne />
-        </Route>
-        <Route path='factor-two'>
-          <SignInFactorTwo />
-        </Route>
-        <Route path='reset-password'>
-          <ResetPassword />
-        </Route>
-        <Route path='reset-password-success'>
-          <ResetPasswordSuccess />
-        </Route>
-        <Route path='sso-callback'>
-          <SignInSSOCallback
-            signUpUrl={signInContext.signUpUrl}
-            signInUrl={signInContext.signInUrl}
-            signInForceRedirectUrl={signInContext.afterSignInUrl}
-            signUpForceRedirectUrl={signInContext.afterSignUpUrl}
-            continueSignUpUrl={signInContext.signUpContinueUrl}
-            transferable={signInContext.transferable}
-            firstFactorUrl={'../factor-one'}
-            secondFactorUrl={'../factor-two'}
-            resetPasswordUrl={'../reset-password'}
-          />
-        </Route>
-        <Route path='choose'>
-          <SignInAccountSwitcher />
-        </Route>
-        <Route path='verify'>
-          <SignInEmailLinkFlowComplete
-            redirectUrlComplete={signInContext.afterSignInUrl}
-            redirectUrl='../factor-two'
-          />
-        </Route>
-        <Route index>
-          <SignInStart />
-        </Route>
-        <Route>
-          <RedirectToSignIn />
-        </Route>
-      </Switch>
-    </Flow.Root>
+    <>
+      <NewSignIn />
+      {/* <Flow.Root flow='signIn'>
+        <Switch>
+          <Route path='factor-one'>
+            <SignInFactorOne />
+          </Route>
+          <Route path='factor-two'>
+            <SignInFactorTwo />
+          </Route>
+          <Route path='reset-password'>
+            <ResetPassword />
+          </Route>
+          <Route path='reset-password-success'>
+            <ResetPasswordSuccess />
+          </Route>
+          <Route path='sso-callback'>
+            <SignInSSOCallback
+              signUpUrl={signInContext.signUpUrl}
+              signInUrl={signInContext.signInUrl}
+              signInForceRedirectUrl={signInContext.afterSignInUrl}
+              signUpForceRedirectUrl={signInContext.afterSignUpUrl}
+              continueSignUpUrl={signInContext.signUpContinueUrl}
+              transferable={signInContext.transferable}
+              firstFactorUrl={'../factor-one'}
+              secondFactorUrl={'../factor-two'}
+              resetPasswordUrl={'../reset-password'}
+            />
+          </Route>
+          <Route path='choose'>
+            <SignInAccountSwitcher />
+          </Route>
+          <Route path='verify'>
+            <SignInEmailLinkFlowComplete
+              redirectUrlComplete={signInContext.afterSignInUrl}
+              redirectUrl='../factor-two'
+            />
+          </Route>
+          <Route index>
+            <SignInStart />
+          </Route>
+          <Route>
+            <RedirectToSignIn />
+          </Route>
+        </Switch>
+      </Flow.Root> */}
+    </>
   );
 }
 

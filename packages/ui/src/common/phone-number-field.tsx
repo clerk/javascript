@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import * as Common from '@clerk/elements/common';
 import { Command } from 'cmdk';
 import { cx } from 'cva';

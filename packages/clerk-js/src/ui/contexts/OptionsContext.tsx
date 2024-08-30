@@ -1,23 +1,8 @@
-import type { ClerkOptions } from '@clerk/types';
-import React from 'react';
+import { OptionsContext, useOptionsContext } from '@clerk/shared/react';
 
-export const OptionsContext = React.createContext<ClerkOptions>({});
-
-interface OptionsProviderProps {
-  children: React.ReactNode;
-  value: ClerkOptions;
+function OptionsProvider(props: React.ComponentPropsWithoutRef<typeof OptionsContext.Provider>) {
+  return <OptionsContext.Provider {...props} />;
 }
-
-function OptionsProvider({ children, value }: OptionsProviderProps): JSX.Element {
-  return <OptionsContext.Provider value={value}>{children}</OptionsContext.Provider>;
-}
-
-function useOptions(): ClerkOptions {
-  const context = React.useContext(OptionsContext);
-  if (context === undefined) {
-    throw new Error('useOptions must be used within an OptionsContext');
-  }
-  return context;
-}
+const useOptions = useOptionsContext;
 
 export { OptionsProvider, useOptions };
