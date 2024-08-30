@@ -1,23 +1,26 @@
 import type { Web3Provider } from '@clerk/types';
 
 import { toHex } from './hex';
-
+import { injectedWeb3Providers } from './injectedWeb3Providers';
 type GetWeb3IdentifierParams = {
   provider: Web3Provider;
 };
 
-export async function getWeb3Identifier(_: GetWeb3IdentifierParams): Promise<string> {
-  // @ts-ignore
-  if (!global.ethereum) {
-    // Do nothing when ethereum doesn't exist.
+// injection order: metamask, coinbase
+// global.etherem -> coinbase
+// injectedProvider(metamask), will use metamask wallet
+// generateWeb3Signature(), will use coinbase wallet
+//                      neds to be generateWeb3Signature({provider: metamask}) instead
+
+export async function getWeb3Identifier(params: GetWeb3IdentifierParams) {
+  const injectedProvider = injectedWeb3Providers.get(params.provider);
+  if (!injectedProvider) {
+    // TODO: discuss what happens if a plugin for the requested provider is not found in the system
+    //do we simply return '' or fall back to another plugin?
     return '';
   }
 
-  // @ts-ignore
-  const identifiers = await global.ethereum.request({
-    method: 'eth_requestAccounts',
-  });
-
+  const identifiers = await injectedProvider.request({ method: 'eth_requestAccounts' });
   return (identifiers && identifiers[0]) || '';
 }
 
@@ -27,15 +30,16 @@ type GenerateWeb3SignatureParams = {
   provider: Web3Provider;
 };
 
-export async function generateWeb3Signature({ identifier, nonce }: GenerateWeb3SignatureParams): Promise<string> {
-  // @ts-ignore
-  if (!global.ethereum) {
-    // Do nothing when ethereum doesn't exist.
+export async function generateWeb3Signature(params: GenerateWeb3SignatureParams): Promise<string> {
+  const { identifier, nonce, provider } = params;
+  const injectedProvider = injectedWeb3Providers.get(provider);
+  if (!injectedProvider) {
+    // TODO: discuss what happens if a plugin for the requested provider is not found in the system
+    //do we simply return '' or fall back to another plugin?
     return '';
   }
 
-  // @ts-ignore
-  return await global.ethereum.request({
+  return await injectedProvider.request({
     method: 'personal_sign',
     params: [`0x${toHex(nonce)}`, identifier],
   });
