@@ -34,6 +34,13 @@ export type SignedInAuthObject = {
   orgRole: OrganizationCustomRoleKey | undefined;
   orgSlug: string | undefined;
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
+  /**
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_fva: [number | null, number | null];
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -51,6 +58,13 @@ export type SignedOutAuthObject = {
   orgRole: null;
   orgSlug: null;
   orgPermissions: null;
+  /**
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_fva: [null, null];
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -86,6 +100,7 @@ export function signedInAuthObject(
     org_slug: orgSlug,
     org_permissions: orgPermissions,
     sub: userId,
+    fva: __experimental_fva,
   } = sessionClaims;
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
@@ -103,6 +118,7 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     orgPermissions,
+    __experimental_fva,
     getToken,
     has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
@@ -122,6 +138,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
+    __experimental_fva: [null, null],
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
