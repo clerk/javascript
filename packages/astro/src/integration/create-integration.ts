@@ -19,7 +19,7 @@ type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
 
 function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() {
   return (params?: Params): AstroIntegration => {
-    const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl } = params || {};
+    const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl, enableEnvSchema = true } = params || {};
 
     // These are not provided when the "bundled" integration is used
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
@@ -84,7 +84,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             experimental: {
               env: {
                 schema: {
-                  ...(params?.enableEnvSchema ? generateClerkEnvSchema() : {}),
+                  ...(enableEnvSchema ? generateClerkEnvSchema() : {}),
                 },
               },
             },
@@ -132,14 +132,14 @@ function generateClerkEnvSchema() {
     PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public' }),
     PUBLIC_CLERK_SIGN_IN_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_SIGN_UP_URL: envField.string({ context: 'client', access: 'public', optional: true }),
-    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
-    CLERK_JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     PUBLIC_CLERK_IS_SATELLITE: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_PROXY_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_DOMAIN: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_JS_URL: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_JS_VARIANT: envField.string({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_JS_VERSION: envField.string({ context: 'client', access: 'public', optional: true }),
+    CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
+    CLERK_JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
   };
 }
 
