@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import { useClerkHostRouter } from '@clerk/shared/router';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import React, { useEffect } from 'react';
@@ -14,7 +15,6 @@ import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
 import { usePathnameWithoutCatchAll } from '../utils/path-inference/next';
-import { useClerkHostRouter } from '@clerk/shared/router';
 
 type SignInFlowProviderProps = {
   children: React.ReactNode;
@@ -56,7 +56,7 @@ function SignInFlowProvider({ children, exampleMode, fallback, isRootPath }: Sig
     };
 
     if ('addOnLoaded' in clerk) {
-      // @ts-expect-error - who cares
+      // @ts-expect-error - addOnLoaded doesn't exist on the clerk type, but it does on IsomorphicClerk, which can be hit when Elements is used standalone
       clerk.addOnLoaded(cb);
     } else {
       cb();
