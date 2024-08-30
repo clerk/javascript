@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/nextjs</h1>
 </p>
-
-# @clerk/nextjs
 
 <div align="center">
 
@@ -22,101 +21,41 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_nextjs)
 
 </div>
 
----
-
-## Overview
-
-Clerk is the easiest way to add authentication and user management to your Next.js application. Add sign up, sign in,
-and profile management to your application in minutes.
-
 ## Getting Started
+
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_nextjs) is the easiest way to add authentication and user management to your Next.js application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
 - Next.js 13.0.4 or later
 - React 18 or later
 - Node.js `>=18.17.0` or later
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs).
 
 ### Installation
 
-```sh
-npm install @clerk/nextjs
-```
+The fastest way to get started with Clerk is by following the [Next.js Quickstart](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=clerk_nextjs).
 
-### Build
-
-To build the package locally with the TypeScript compiler, run:
-
-```sh
-npm run build
-```
-
-To build the package in watch mode, run the following:
-
-```sh
-npm run dev
-```
+You'll learn how to install `@clerk/nextjs`, set up your environment keys, add `<ClerkProvider>` to your application, use the Clerk middleware, and use Clerk's prebuilt components.
 
 ## Usage
 
-Clerk requires your application to be wrapped in the `<ClerkProvider/>` context.
-
-Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` to your Publishable Key in your `.env.local` file to make the environment
-variable accessible to the Provider.
-
-```sh
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
-```
-
-An implementation of `<ClerkProvider />` with our flexible Control Components to build an authentication flow
-in `pages/_app.js`:
-
-```jsx
-import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
-
-function MyApp({ Component, pageProps }) {
-  return (
-    <ClerkProvider>
-      <>
-        <SignedIn>
-          <>
-            <header style={{ padding: 20 }}>
-              <UserButton />
-            </header>
-            <Component {...pageProps} />
-          </>
-        </SignedIn>
-        <SignedOut>
-          <RedirectToSignIn />
-        </SignedOut>
-      </>
-    </ClerkProvider>
-  );
-}
-
-export default MyApp;
-```
-
-_For further details and examples, please refer to
-our [Documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs)._
+For further information, guides, and examples visit the [Next.js reference documentation](https://clerk.com/docs/references/nextjs/overview?utm_source=github&utm_medium=clerk_nextjs).
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_nextjs)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_nextjs)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please
-read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md))
-.
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 
@@ -124,8 +63,7 @@ read [our contribution guidelines](https://github.com/clerk/javascript/blob/main
 
 `@clerk/nextjs` is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to
-our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 

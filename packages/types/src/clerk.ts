@@ -10,6 +10,7 @@ import type {
   SignUpTheme,
   UserButtonTheme,
   UserProfileTheme,
+  UserVerificationTheme,
 } from './appearance';
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
@@ -32,8 +33,10 @@ import type {
   SignUpForceRedirectUrl,
 } from './redirects';
 import type { ActiveSessionResource } from './session';
+import type { __experimental_SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
+import type { Web3Strategy } from './strategies';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 
@@ -141,6 +144,19 @@ export interface Clerk {
   closeSignIn: () => void;
 
   /**
+   * Opens the Clerk UserVerification component in a modal.
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param props Optional user verification configuration parameters.
+   */
+  __experimental_openUserVerification: (props?: __experimental_UserVerificationModalProps) => void;
+
+  /**
+   * Closes the Clerk user verification modal.
+   * @experimantal This API is still under active development and may change at any moment.
+   */
+  __experimental_closeUserVerification: () => void;
+
+  /**
    * Opens the Google One Tap component.
    * @param props Optional props that will be passed to the GoogleOneTap component.
    */
@@ -210,6 +226,27 @@ export interface Clerk {
    * @param targetNode Target node to unmount the SignIn component from.
    */
   unmountSignIn: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts a user reverification flow component at the target element.
+   *
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param targetNode Target node to mount the UserVerification component from.
+   * @param props user verification configuration parameters.
+   */
+  __experimental_mountUserVerification: (
+    targetNode: HTMLDivElement,
+    props?: __experimental_UserVerificationProps,
+  ) => void;
+
+  /**
+   * Unmount a user reverification flow component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @experimantal This API is still under active development and may change at any moment.
+   * @param targetNode Target node to unmount the UserVerification component from.
+   */
+  __experimental_unmountUserVerification: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a sign up flow component at the target element.
@@ -479,6 +516,16 @@ export interface Clerk {
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using their Coinbase Wallet browser extension
+   */
+  authenticateWithCoinbase: (params?: AuthenticateWithCoinbaseParams) => Promise<unknown>;
+
+  /**
+   * Authenticates user using their Web3 Wallet browser extension
+   */
+  authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
+
+  /**
    * Authenticates user using a Google token generated from Google identity services.
    */
   authenticateWithGoogleOneTap: (
@@ -726,7 +773,7 @@ export type SignInProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: SignInTheme;
   /**
@@ -749,6 +796,32 @@ interface TransferableOption {
 }
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
+
+/**
+ * @experimantal
+ */
+export type __experimental_UserVerificationProps = RoutingOptions & {
+  // TODO(STEP-UP): Verify and write a description
+  afterVerification?: () => void;
+  // TODO(STEP-UP): Verify and write a description
+  afterVerificationUrl?: string;
+
+  /**
+   * Defines the steps of the verification flow.
+   * When `L3.multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
+   * @default `'L2.secondFactor'`
+   */
+  level?: __experimental_SessionVerificationLevel;
+
+  /**
+   * Customisation options to fully match the Clerk components to your own brand.
+   * These options serve as overrides and will be merged with the global `appearance`
+   * prop of ClerkProvider (if one is provided)
+   */
+  appearance?: UserVerificationTheme;
+};
+
+export type __experimental_UserVerificationModalProps = WithoutRouting<__experimental_UserVerificationProps>;
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
@@ -796,7 +869,7 @@ export type SignUpProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: SignUpTheme;
 
@@ -819,7 +892,7 @@ export type UserProfileProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: UserProfileTheme;
   /*
@@ -849,7 +922,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: OrganizationProfileTheme;
   /*
@@ -877,7 +950,7 @@ export type CreateOrganizationProps = RoutingOptions & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: CreateOrganizationTheme;
   /**
@@ -933,7 +1006,7 @@ export type UserButtonProps = UserButtonProfileMode & {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: UserButtonTheme;
 
@@ -1023,7 +1096,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
-     * prop of ClerkProvided (if one is provided)
+     * prop of ClerkProvider(if one is provided)
      */
     appearance?: OrganizationSwitcherTheme;
     /*
@@ -1052,7 +1125,7 @@ export type OrganizationListProps = {
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvided (if one is provided)
+   * prop of ClerkProvider (if one is provided)
    */
   appearance?: OrganizationListTheme;
   /**
@@ -1115,7 +1188,22 @@ export interface CreateOrganizationParams {
   slug?: string;
 }
 
+export interface ClerkAuthenticateWithWeb3Params {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  strategy: Web3Strategy;
+}
+
 export interface AuthenticateWithMetamaskParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+}
+
+export interface AuthenticateWithCoinbaseParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;
