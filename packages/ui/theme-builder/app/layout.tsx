@@ -3,8 +3,6 @@ import '../../dist/styles.css';
 
 import type { Metadata, Viewport } from 'next';
 
-import { ThemeBuilder } from './components/theme-builder';
-
 export const metadata: Metadata = {
   title: 'Theme Builder | Clerk.com',
   icons: {
@@ -27,9 +25,7 @@ export default function RootLayout({
       lang='en'
       className='h-full'
     >
-      <body className='flex min-h-full flex-col bg-neutral-100'>
-        <ThemeBuilder>{children}</ThemeBuilder>
-      </body>
+      <body className='flex min-h-full flex-col bg-neutral-100'>{children}</body>
     </html>
   );
 }
