@@ -21,6 +21,34 @@ describe('UserButton', () => {
     expect(queryByRole('button')).not.toBeNull();
   });
 
+  it('renders popover as standalone when there is a user', async () => {
+    const { wrapper, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    props.setProps({
+      __experimental_standalone: true,
+    });
+    const { getByText, queryByRole } = render(<UserButton />, { wrapper });
+    expect(queryByRole('button', { name: 'Open user button' })).toBeNull();
+    getByText('Manage account');
+  });
+
+  it('calls onDismiss when it is used as standalone', async () => {
+    const { wrapper, props, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    const onDismiss = jest.fn();
+    props.setProps({
+      __experimental_standalone: true,
+      __experimental_onDismiss: onDismiss,
+    });
+    const { getByText, userEvent, queryByRole } = render(<UserButton />, { wrapper });
+    expect(queryByRole('button', { name: 'Open user button' })).toBeNull();
+    await userEvent.click(getByText('Manage account'));
+    expect(fixtures.clerk.openUserProfile).toHaveBeenCalled();
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
   it('opens the user button popover when clicked', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({
