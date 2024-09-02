@@ -40,7 +40,7 @@ export type SignedInAuthObject = {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_fva: [number | null, number | null];
+  __experimental_factorVerificationAge: [number | null, number | null];
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -64,7 +64,7 @@ export type SignedOutAuthObject = {
    * [fistFactorAge, secondFactorAge]
    * @experimental This API is experimental and may change at any moment.
    */
-  __experimental_fva: [null, null];
+  __experimental_factorVerificationAge: [null, null];
   getToken: ServerGetToken;
   has: CheckAuthorizationWithCustomPermissions;
   debug: AuthObjectDebug;
@@ -100,7 +100,7 @@ export function signedInAuthObject(
     org_slug: orgSlug,
     org_permissions: orgPermissions,
     sub: userId,
-    fva: __experimental_fva,
+    fva: __experimental_factorVerificationAge,
   } = sessionClaims;
   const apiClient = createBackendApiClient(authenticateContext);
   const getToken = createGetToken({
@@ -118,7 +118,7 @@ export function signedInAuthObject(
     orgRole,
     orgSlug,
     orgPermissions,
-    __experimental_fva,
+    __experimental_factorVerificationAge,
     getToken,
     has: createHasAuthorization({ orgId, orgRole, orgPermissions, userId }),
     debug: createDebug({ ...authenticateContext, sessionToken }),
@@ -138,7 +138,7 @@ export function signedOutAuthObject(debugData?: AuthObjectDebugData): SignedOutA
     orgRole: null,
     orgSlug: null,
     orgPermissions: null,
-    __experimental_fva: [null, null],
+    __experimental_factorVerificationAge: [null, null],
     getToken: () => Promise.resolve(null),
     has: () => false,
     debug: createDebug(debugData),
