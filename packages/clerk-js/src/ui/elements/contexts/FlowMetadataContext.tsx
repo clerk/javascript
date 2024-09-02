@@ -7,6 +7,7 @@ type FlowMetadata = {
     | 'signUp'
     | 'userButton'
     | 'userProfile'
+    | 'userVerification'
     | 'organizationProfile'
     | 'createOrganization'
     | 'organizationSwitcher'
