@@ -119,7 +119,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('authoriz
 
     // Result of 404 response with empty body
     expect(await u.page.content()).toMatch(/^(<!DOCTYPE html>)/);
-    expect(await u.page.content()).toMatch(/(No web page was found)/);
+    expect(await u.page.content()).toMatch(/(No webpage was found)/);
     expect(await u.page.content()).toMatch(/(HTTP ERROR 404)/);
   });
 });
