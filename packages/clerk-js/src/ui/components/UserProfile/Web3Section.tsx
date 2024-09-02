@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
-import { Box, Flex, Image, localizationKeys, Text } from '../../customizables';
+import { Badge, Box, Flex, Image, localizationKeys, Text } from '../../customizables';
 import { Card, ProfileSection, ThreeDotsMenu, useCardState, withCardStateProvider } from '../../elements';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
@@ -43,6 +43,7 @@ export const Web3Section = withCardStateProvider(() => {
         <ProfileSection.ItemList id='web3Wallets'>
           {user?.web3Wallets.map(wallet => {
             const strategy = wallet.verification.strategy as keyof typeof strategyToDisplayData;
+            console.log(wallet);
 
             return (
               strategyToDisplayData[strategy] && (
@@ -69,6 +70,12 @@ export const Web3Section = withCardStateProvider(() => {
                             <Text>
                               {strategyToDisplayData[strategy].name} ({shortenWeb3Address(wallet.web3Wallet)})
                             </Text>
+                            {user?.primaryWeb3WalletId === wallet.id && (
+                              <Badge localizationKey={localizationKeys('badge__primary')} />
+                            )}
+                            {wallet.verification.status !== 'verified' && (
+                              <Badge localizationKey={localizationKeys('badge__unverified')} />
+                            )}
                           </Flex>
                         </Box>
                       </Flex>
