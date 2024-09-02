@@ -1,3 +1,13 @@
+import type {
+  BackupCodeAttempt,
+  EmailCodeAttempt,
+  EmailCodeConfig,
+  PasswordAttempt,
+  PhoneCodeAttempt,
+  PhoneCodeConfig,
+  PhoneCodeSecondFactorConfig,
+  TOTPAttempt,
+} from './factors';
 import type { ActJWTClaim } from './jwt';
 import type {
   OrganizationCustomPermissionKey,
@@ -5,6 +15,11 @@ import type {
   OrganizationPermissionKey,
 } from './organizationMembership';
 import type { ClerkResource } from './resource';
+import type {
+  __experimental_SessionVerificationLevel,
+  __experimental_SessionVerificationMaxAge,
+  __experimental_SessionVerificationResource,
+} from './sessionVerification';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 
@@ -54,6 +69,22 @@ export interface SessionResource extends ClerkResource {
   clearCache: () => void;
   createdAt: Date;
   updatedAt: Date;
+
+  __experimental_startVerification: (
+    params: __experimental_SessionVerifyCreateParams,
+  ) => Promise<__experimental_SessionVerificationResource>;
+  __experimental_prepareFirstFactorVerification: (
+    factor: __experimental_SessionVerifyPrepareFirstFactorParams,
+  ) => Promise<__experimental_SessionVerificationResource>;
+  __experimental_attemptFirstFactorVerification: (
+    attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
+  ) => Promise<__experimental_SessionVerificationResource>;
+  __experimental_prepareSecondFactorVerification: (
+    params: __experimental_SessionVerifyPrepareSecondFactorParams,
+  ) => Promise<__experimental_SessionVerificationResource>;
+  __experimental_attemptSecondFactorVerification: (
+    params: __experimental_SessionVerifyAttemptSecondFactorParams,
+  ) => Promise<__experimental_SessionVerificationResource>;
 }
 
 export interface ActiveSessionResource extends SessionResource {
@@ -102,3 +133,17 @@ export type GetTokenOptions = {
   skipCache?: boolean;
 };
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
+
+export type __experimental_SessionVerifyCreateParams = {
+  level: __experimental_SessionVerificationLevel;
+  maxAge: __experimental_SessionVerificationMaxAge;
+};
+
+export type __experimental_SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;
+export type __experimental_SessionVerifyAttemptFirstFactorParams =
+  | EmailCodeAttempt
+  | PhoneCodeAttempt
+  | PasswordAttempt;
+
+export type __experimental_SessionVerifyPrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
+export type __experimental_SessionVerifyAttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;

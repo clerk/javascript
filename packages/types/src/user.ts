@@ -2,16 +2,6 @@ import type { BackupCodeResource } from './backupCode';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { ExternalAccountResource } from './externalAccount';
-import type {
-  BackupCodeAttempt,
-  EmailCodeAttempt,
-  EmailCodeConfig,
-  PasswordAttempt,
-  PhoneCodeAttempt,
-  PhoneCodeConfig,
-  PhoneCodeSecondFactorConfig,
-  TOTPAttempt,
-} from './factors';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
 import type { OAuthScope } from './oauth';
@@ -24,11 +14,6 @@ import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
 import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
-import type {
-  __experimental_SessionVerificationLevel,
-  __experimental_SessionVerificationMaxAge,
-  __experimental_SessionVerificationResource,
-} from './sessionVerification';
 import type { OAuthStrategy } from './strategies';
 import type { TOTPResource } from './totp';
 import type { UserOrganizationInvitationResource } from './userOrganizationInvitation';
@@ -124,21 +109,6 @@ export interface UserResource extends ClerkResource {
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;
   disableTOTP: () => Promise<DeletedObjectResource>;
   createBackupCode: () => Promise<BackupCodeResource>;
-  __experimental_verifySession: (
-    params: __experimental_SessionVerifyCreateParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
-  __experimental_verifySessionPrepareFirstFactor: (
-    factor: __experimental_SessionVerifyPrepareFirstFactorParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
-  __experimental_verifySessionAttemptFirstFactor: (
-    attemptFactor: __experimental_SessionVerifyAttemptFirstFactorParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
-  __experimental_verifySessionPrepareSecondFactor: (
-    params: __experimental_SessionVerifyPrepareSecondFactorParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
-  __experimental_verifySessionAttemptSecondFactor: (
-    params: __experimental_SessionVerifyAttemptSecondFactorParams,
-  ) => Promise<__experimental_SessionVerificationResource>;
 
   get verifiedExternalAccounts(): ExternalAccountResource[];
 
@@ -150,20 +120,6 @@ export interface UserResource extends ClerkResource {
 
   get hasVerifiedPhoneNumber(): boolean;
 }
-
-export type __experimental_SessionVerifyCreateParams = {
-  level: __experimental_SessionVerificationLevel;
-  maxAge: __experimental_SessionVerificationMaxAge;
-};
-
-export type __experimental_SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig;
-export type __experimental_SessionVerifyAttemptFirstFactorParams =
-  | EmailCodeAttempt
-  | PhoneCodeAttempt
-  | PasswordAttempt;
-
-export type __experimental_SessionVerifyPrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
-export type __experimental_SessionVerifyAttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
 
 export type CreateEmailAddressParams = { email: string };
 export type CreatePhoneNumberParams = { phoneNumber: string };
