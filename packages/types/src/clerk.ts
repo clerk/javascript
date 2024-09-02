@@ -598,6 +598,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
         };
 
     sdkMetadata?: SDKMetadata;
+
+    /**
+     * Toggle experimental behaviour
+     */
+    experimental?: Autocomplete<
+      {
+        persistClient: boolean;
+      },
+      Record<string, any>
+    >;
   };
 
 export interface NavigateOptions {
