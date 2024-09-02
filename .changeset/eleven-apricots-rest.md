@@ -5,4 +5,13 @@
 "@clerk/types": minor
 ---
 
-Add a new experimental sessionClaim called `fva` that tracks the age of verified factor groups.
+Experimental support: Expect a new sessionClaim called `fva` that tracks the age of verified factor groups.
+
+### Server side
+
+This can be applied to any helper that returns the auth object
+
+**Nextjs example**
+
+```ts
+auth(). __experimental_factorVerificationAge
