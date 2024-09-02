@@ -35,6 +35,9 @@ class InjectedWeb3Providers {
   } as const;
 
   constructor() {
+    if (typeof window === 'undefined') {
+      return;
+    }
     window.addEventListener('eip6963:announceProvider', this.#onAnnouncement as EventListener);
     window.dispatchEvent(new Event('eip6963:requestProvider'));
   }
