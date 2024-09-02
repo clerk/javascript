@@ -15,3 +15,12 @@ This can be applied to any helper that returns the auth object
 
 ```ts
 auth(). __experimental_factorVerificationAge
+```
+
+### Client side
+
+**React example**
+```ts
+const { session } = useSession()
+session?. __experimental_factorVerificationAge
+```
