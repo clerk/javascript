@@ -13,5 +13,3 @@ This allows for matching a user's device with a client. To try out this new feat
 // Vanilla JS
 await clerk.load({ experimental: { persistClient: true } })
 ```
-
-Afterwards you can access `clerk.client.id` and `clerk.client.lastActiveSessionId`
