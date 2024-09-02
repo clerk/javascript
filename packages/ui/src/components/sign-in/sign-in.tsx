@@ -2,14 +2,14 @@ import { Root as SignInRoot } from '@clerk/elements/sign-in';
 import * as React from 'react';
 
 import { GetHelpContext } from '~/components/sign-in/hooks/use-get-help';
+import { SignInChooseSession } from '~/components/sign-in/steps/choose-session';
 import { SignInChooseStrategy } from '~/components/sign-in/steps/choose-strategy';
 import { SignInForgotPassword } from '~/components/sign-in/steps/forgot-password';
 import { SignInGetHelp } from '~/components/sign-in/steps/get-help';
 import { SignInResetPassword } from '~/components/sign-in/steps/reset-password';
 import { SignInStart } from '~/components/sign-in/steps/start';
+// import { SignInStatus } from '~/components/sign-in/steps/status';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
-
-import { SignInChooseSession } from './steps/choose-session';
 
 /**
  * Implementation Details:
@@ -38,6 +38,8 @@ export function SignIn() {
             <SignInForgotPassword />
             <SignInResetPassword />
             <SignInChooseSession />
+            {/* Hidden until elements work is tackled https://linear.app/clerk/issue/SDKI-593/[signin]-verification-link-is-invalid-for-this-device */}
+            {/* <SignInStatus /> */}
           </>
         )}
       </SignInRoot>

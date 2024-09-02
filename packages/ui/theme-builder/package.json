@@ -11,9 +11,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@clerk/localizations": "file:../../localizations",
     "@clerk/nextjs": "file:../../nextjs",
     "@clerk/ui": "file:..",
-    "@clerk/localizations": "file:../../localizations",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-popover": "^1.1.0",
@@ -26,7 +26,8 @@
     "next": "14.2.5",
     "react": "^18.3.1",
     "react-colorful": "^5.6.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
