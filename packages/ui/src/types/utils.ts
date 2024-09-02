@@ -3,3 +3,11 @@ export type RequireExactlyOne<ObjectType, KeysType extends keyof ObjectType = ke
   [Key in KeysType]: Required<Pick<ObjectType, Key>> & Partial<Record<Exclude<KeysType, Key>, never>>;
 }[KeysType] &
   Omit<ObjectType, KeysType>;
+
+export type VerificationStatus =
+  | 'expired'
+  | 'failed'
+  | 'loading'
+  | 'verified'
+  | 'verified_switch_tab'
+  | 'client_mismatch';
