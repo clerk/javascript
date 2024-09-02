@@ -27,17 +27,3 @@
   --cl-spacing-unit: 1rem;
   --cl-font-size: 0.8125rem;
 }
-
-*,
-::before,
-::after {
-  box-sizing: border-box;
-  border-width: 0;
-  border-style: solid;
-  border-color: #e5e7eb;
-}
-
-::before,
-::after {
-  --cl-content: '';
-}
