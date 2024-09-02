@@ -21,6 +21,13 @@ const RemoveWeb3WalletScreen = (props: RemoveWeb3WalletScreenProps) => {
   );
 };
 
+const shortenWeb3Address = (address: string) => {
+  if (address.length <= 10) {
+    return address;
+  }
+  return address.slice(0, 6) + '...' + address.slice(-4);
+};
+
 export const Web3Section = withCardStateProvider(() => {
   const { user } = useUser();
   const card = useCardState();
@@ -60,7 +67,7 @@ export const Web3Section = withCardStateProvider(() => {
                             justify='start'
                           >
                             <Text>
-                              {strategyToDisplayData[strategy].name} ({wallet.web3Wallet})
+                              {strategyToDisplayData[strategy].name} ({shortenWeb3Address(wallet.web3Wallet)})
                             </Text>
                           </Flex>
                         </Box>
