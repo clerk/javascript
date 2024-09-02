@@ -1,5 +1,7 @@
 ---
+"@clerk/types": minor
 "@clerk/clerk-js": minor
 ---
 
-Avoid deleting the client on sign-out, instead remove all sessions associated with that client.
+Experimental support: Persisting the client after signing a user out.
+`ClerkOptions` has been updated to accept `experimental: { persistClient: boolean }`
