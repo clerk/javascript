@@ -1,3 +1,4 @@
-@tailwind base;
+/* temporarily disable for testing */
+/* @tailwind base; */
 @tailwind components;
 @tailwind utilities;
