@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.2.7
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Updated dependencies [[`58e6754ad`](https://github.com/clerk/javascript/commit/58e6754ad9f9a1244b023ce1f5e5f2c1c4eb20e7), [`3aa63dc5a`](https://github.com/clerk/javascript/commit/3aa63dc5a48161cfe92d94093ef0c32efd401342), [`3304dcc0b`](https://github.com/clerk/javascript/commit/3304dcc0bc93a92a7f729f585c60ff91d2ae04f6)]:
+  - @clerk/clerk-js@5.18.0
+  - @clerk/clerk-react@5.5.0
+  - @clerk/shared@2.6.0
+
 ## 1.2.6
 
 ### Patch Changes

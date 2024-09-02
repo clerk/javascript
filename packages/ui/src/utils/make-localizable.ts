@@ -71,7 +71,7 @@ type GetICUArgs<Text extends string, T extends RemovePipeUtils<Text>> = TuplePar
   T extends readonly string[] ? TupleFindBlocks<T> : FindBlocks<T>
 >;
 
-type DefaultLocalizationKey = RecordToPath<typeof defaultResource>;
+export type DefaultLocalizationKey = RecordToPath<typeof defaultResource>;
 type LocalizationKeyToValue<P extends DefaultLocalizationKey> = PathValue<typeof defaultResource, P>;
 //@ts-ignore https://github.com/clerk/javascript/blob/5764e2911790051589bb5c4f3b1a2c79f7f30c7e/packages/clerk-js/src/ui/localization/localizationKeys.ts#L67
 type LocalizationKeyToParams<P extends DefaultLocalizationKey> = GetICUArgs<LocalizationKeyToValue<P>>;

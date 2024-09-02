@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.17.0
+
+### Minor Changes
+
+- Add support for Coinbase Wallet strategy during sign in/up flows. Users can now authenticate using their Coinbase Wallet browser extension in the same way as MetaMask ([#4052](https://github.com/clerk/javascript/pull/4052)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Update `SAML_IDPS` constant to refer to Microsoft Entra ID instead of the deprecated Azure AD ([#4041](https://github.com/clerk/javascript/pull/4041)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
 ## 4.16.0
 
 ### Minor Changes
