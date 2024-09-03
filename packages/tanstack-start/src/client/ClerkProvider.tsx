@@ -18,10 +18,10 @@ const SDK_METADATA = {
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
 export function ClerkProvider({ children, ...providerProps }: TanstackStartClerkProviderProps): JSX.Element {
+  const awaitableNavigate = useAwaitableNavigate();
   const routerContext = useRouteContext({
     strict: false,
   });
-  const awaitableNavigate = useAwaitableNavigate();
 
   useEffect(() => {
     awaitableNavigateRef.current = awaitableNavigate;
