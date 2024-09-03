@@ -1,6 +1,7 @@
 import type { AuthObject } from '@clerk/backend';
 import type { RedirectFun } from '@clerk/backend/internal';
 import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { isClerkKeyError } from '@clerk/shared';
 import { notFound, redirect } from 'next/navigation';
 
 import { buildClerkProps } from '../../server/buildClerkProps';
@@ -14,9 +15,7 @@ import { buildRequestLike } from './utils';
 
 type Auth = AuthObject & { protect: AuthProtect; redirectToSignIn: RedirectFun<ReturnType<typeof redirect>> };
 
-export const auth = (): Auth => {
-  require('server-only');
-
+const baseAuth = (): Auth => {
   const request = buildRequestLike();
   const authObject = createGetAuth({
     debugLoggerName: 'auth()',
@@ -49,6 +48,25 @@ export const auth = (): Auth => {
   const protect = createProtect({ request, authObject, redirectToSignIn, notFound, redirect });
 
   return Object.assign(authObject, { protect, redirectToSignIn });
+};
+
+export const auth = (): Auth | Record<string, any> => {
+  require('server-only');
+
+  if (process.env.NODE_ENV !== 'development') {
+    return baseAuth();
+  }
+
+  // NOTE: This is a workaround to allow the development environment to use the clerk key
+  // without having to set the environment variables.
+  try {
+    return baseAuth();
+  } catch (e: any) {
+    if (isClerkKeyError(e)) {
+      return initialState();
+    }
+    throw e;
+  }
 };
 
 export const initialState = () => {
