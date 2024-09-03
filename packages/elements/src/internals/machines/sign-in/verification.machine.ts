@@ -14,7 +14,7 @@ import type {
   Web3Attempt,
 } from '@clerk/types';
 import type { DoneActorEvent } from 'xstate';
-import { assign, fromPromise, log, sendTo, setup } from 'xstate';
+import { assign, fromPromise, log, not, sendTo, setup } from 'xstate';
 
 import {
   MAGIC_LINK_VERIFY_PATH_ROUTE,
@@ -80,6 +80,18 @@ const SignInVerificationMachine = setup({
     attempt: fromPromise<SignInResource, AttemptFirstFactorInput | AttemptSecondFactorInput>(() =>
       Promise.reject(new ClerkElementsRuntimeError('Actor `attempt` must be overridden')),
     ),
+    attemptPasskey: fromPromise<
+      SignInResource,
+      { parent: SignInRouterMachineActorRef; flow: 'autofill' | 'discoverable' | undefined }
+    >(({ input: { parent, flow } }) => {
+      return parent.getSnapshot().context.clerk.client.signIn.authenticateWithPasskey({
+        flow,
+      });
+    }),
+    // attemptPasskey: fromPromise<
+    //   SignInResource,
+    //   { parent: SignInRouterMachineActorRef; flow: 'autofill' | 'discoverable' | undefined }
+    // >(() => Promise.reject(new ClerkElementsRuntimeError('Actor `attemptPasskey` must be overridden'))),
   },
   actions: {
     resendableTick: assign(({ context }) => ({
@@ -261,6 +273,11 @@ const SignInVerificationMachine = setup({
       tags: ['state:pending'],
       description: 'Waiting for user input',
       on: {
+        'AUTHENTICATE.PASSKEY': {
+          guard: not('isExampleMode'),
+          target: 'AttemptingPasskey',
+          reenter: true,
+        },
         'NAVIGATE.CHOOSE_STRATEGY': 'ChooseStrategy',
         'NAVIGATE.FORGOT_PASSWORD': 'ChooseStrategy',
         RETRY: 'Preparing',
@@ -355,6 +372,25 @@ const SignInVerificationMachine = setup({
         },
       },
     },
+    AttemptingPasskey: {
+      tags: ['state:attempting', 'state:loading'],
+      entry: 'sendToLoading',
+      invoke: {
+        id: 'attemptPasskey',
+        src: 'attemptPasskey',
+        input: ({ context }) => ({
+          parent: context.parent,
+          flow: 'discoverable',
+        }),
+        onDone: {
+          actions: ['sendToNext', 'sendToLoading'],
+        },
+        onError: {
+          actions: ['setFormErrors', 'sendToLoading'],
+          target: 'Pending',
+        },
+      },
+    },
     Hist: {
       type: 'history',
     },
@@ -375,7 +411,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       );
     }),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input as PrepareFirstFactorInput;
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
