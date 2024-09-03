@@ -8,7 +8,7 @@ This allows for matching a user's device with a client. To try out this new feat
 
 ```js
 // React
-<ClerkProvider  experimental={{ persistClient: true }} />
+<ClerkProvider experimental={{ persistClient: true }} />
 
 // Vanilla JS
 await clerk.load({ experimental: { persistClient: true } })
