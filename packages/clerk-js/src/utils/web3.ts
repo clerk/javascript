@@ -1,7 +1,7 @@
 import type { Web3Provider } from '@clerk/types';
 
 import { toHex } from './hex';
-import { injectedWeb3Providers } from './injectedWeb3Providers';
+import { InjectedWeb3Providers } from './injectedWeb3Providers';
 
 type GetWeb3IdentifierParams = {
   provider: Web3Provider;
@@ -80,5 +80,7 @@ async function getEthereumProvider(provider: Web3Provider) {
     const sdk = new CoinbaseWalletSDK({});
     return sdk.makeWeb3Provider({ options: 'all' });
   }
+
+  const injectedWeb3Providers = new InjectedWeb3Providers();
   return injectedWeb3Providers.get(provider);
 }

@@ -29,7 +29,7 @@ interface EIP6963ProviderDetail {
 type EIP6963AnnounceProviderEvent = CustomEvent;
 type InjectedWeb3Provider = MetamaskWeb3Provider | CoinbaseWeb3Provider;
 
-class InjectedWeb3Providers {
+export class InjectedWeb3Providers {
   #providers: EIP6963ProviderDetail[] = [];
   #providerIdMap: Record<InjectedWeb3Provider, string> = {
     coinbase: 'Coinbase Wallet',
@@ -55,5 +55,3 @@ class InjectedWeb3Providers {
     this.#providers.push(event.detail);
   };
 }
-
-export const injectedWeb3Providers = new InjectedWeb3Providers();
