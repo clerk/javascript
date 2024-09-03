@@ -31,7 +31,7 @@ function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
   return (
     prev.id !== next.id ||
     prev.updatedAt.getTime() < next.updatedAt.getTime() ||
-    sessionFVaChanged(prev, next) ||
+    sessionFVAChanged(prev, next) ||
     sessionUserMembershipPermissionsChanged(prev, next)
   );
 }
@@ -50,7 +50,7 @@ function userMembershipsChanged(prev: UserResource, next: UserResource): boolean
   );
 }
 
-function sessionFVaChanged(prev: SessionResource, next: SessionResource): boolean {
+function sessionFVAChanged(prev: SessionResource, next: SessionResource): boolean {
   return (
     prev.__experimental_factorVerificationAge[0] !== next.__experimental_factorVerificationAge[0] ||
     prev.__experimental_factorVerificationAge[1] !== next.__experimental_factorVerificationAge[1]
