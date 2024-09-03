@@ -521,6 +521,11 @@ export interface Clerk {
   authenticateWithCoinbase: (params?: AuthenticateWithCoinbaseParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using their Coinbase Smart Wallet and browser extension
+   */
+  authenticateWithCoinbaseWallet: (params?: AuthenticateWithCoinbaseWalletParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -645,6 +650,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
         };
 
     sdkMetadata?: SDKMetadata;
+
+    /**
+     * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+     */
+    experimental?: Autocomplete<
+      {
+        persistClient: boolean;
+      },
+      Record<string, any>
+    >;
   };
 
 export interface NavigateOptions {
@@ -1204,6 +1219,13 @@ export interface AuthenticateWithMetamaskParams {
 }
 
 export interface AuthenticateWithCoinbaseParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+}
+
+export interface AuthenticateWithCoinbaseWalletParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;
