@@ -116,6 +116,18 @@ const config = {
   },
   plugins: [
     plugin(function ({ addBase, theme }) {
+      /**
+       * Extends Tailwind's built-in `addBase` function by scoping styles to
+       * only affect components within the `@clerk/ui` package.
+       *
+       * Currently, we do this by only applying to elements with a class that
+       * begins with `cl-` (set by the `tailwindcss-transformer`), however, we
+       * may want to explore something more rigid (e.g. data attributes) in the
+       * future.
+       *
+       * Selectors are wrapped in a `:where()` pseudo-selector to keep
+       * specificity to 0,0,0.
+       */
       const addScopedBase = (styles: Record<string, string | Record<string, string>>) => {
         const scopedStyles = Object.entries(styles).reduce(
           (acc, [selectors, properties]) => ({
@@ -135,16 +147,61 @@ const config = {
         addBase(scopedStyles);
       };
 
-      // revert to UA styles
+      /* Global Styles
+        ============================================ */
+
+      /**
+       * Keyframes (unscoped)
+       */
+      addBase({
+        '@keyframes cl-spin': {
+          from: { transform: 'rotate(0deg)' },
+          to: { transform: 'rotate(360deg)' },
+        },
+        '@keyframes cl-blink': {
+          'from, to': { opacity: '1' },
+          '50%': { opacity: '0' },
+        },
+      });
+
+      /**
+       * 1. Revert all styles to User Agent defaults (scoped)
+       *
+       *    We intentionally avoid targeting SVGs (and their children) due to
+       *    unwanted side-effects
+       *
+       *    See https://cloudfour.com/thinks/resetting-inherited-css-with-revert
+       */
       addScopedBase({
-        // https://cloudfour.com/thinks/resetting-inherited-css-with-revert/
         '*:not(svg, svg *), use': {
           all: 'revert',
         },
       });
 
-      // reset
-      // https://unpkg.com/tailwindcss@3.4.10/src/css/preflight.css
+      /**
+       * 2. Apply Tailwind's `preflight.css` (scoped)
+       *
+       *    See https://tailwindcss.com/docs/preflight
+       *
+       *    i. In the official `preflight.css`, the next ruleset would be:
+       *
+       *       ```css
+       *       ::before, ::after {
+       *         --tw-content: '';
+       *       }
+       *       ```
+       *
+       *       However, in `tailwindcss-transformer`, our variables are prefixed
+       *       with `cl` to prevent collision with consumers using Tailwind.
+       *
+       *       Additionally, all of our variables are **not scoped**. For this
+       *       reset to work effectively, we'll need to move it to `addBase`
+       *       later.
+       *
+       *    ii. `html`, `:host` and `body` won't be used within our UI
+       *        components. Instead we'll swap `html, :host` for a `*` selector,
+       *        and ditch the `body` styles completely.
+       */
       addScopedBase({
         '*, ::before, ::after': {
           boxSizing: 'border-box',
@@ -152,10 +209,9 @@ const config = {
           borderStyle: 'solid',
           borderColor: theme('borderColor.DEFAULT', 'currentColor'),
         },
-        // !IMPORTANT
-        // Here we switch `--tw-content` for `--cl-content`
-        '::before, ::after': { '--cl-content': "''" },
-        'html, :host': {
+        /* [i] */
+        /* [ii] */
+        '*': {
           lineHeight: '1.5',
           WebkitTextSizeAdjust: '100%',
           MozTabSize: '4',
@@ -168,7 +224,6 @@ const config = {
           fontVariationSettings: theme('fontFamily.sans[1].fontVariationSettings', 'normal'),
           WebkitTapHighlightColor: 'transparent',
         },
-        body: { margin: '0', lineHeight: 'inherit' },
         hr: { height: '0', color: 'inherit', borderTopWidth: '1px' },
         'abbr[title]': { textDecoration: 'underline dotted' },
         'h1, h2, h3, h4, h5, h6': { fontSize: 'inherit', fontWeight: 'inherit' },
@@ -250,7 +305,9 @@ const config = {
         '[hidden]': { display: 'none' },
       });
 
-      // theme setup
+      /**
+       * 3. Apply default theme variables (unscoped)
+       */
       addBase({
         ':where(:root)': {
           '--cl-font-family':
@@ -264,7 +321,22 @@ const config = {
         },
       });
 
-      // scoped defaults (debug)
+      /**
+       * 4. Apply aforementioned `preflight.css` pseudo resets (unscoped)
+       */
+      addBase({
+        '::before, ::after': {
+          '--cl-content': "''",
+        },
+      });
+
+      /**
+       * 5. Set page-level styling (scoped)
+       *
+       *    Ordinarily we'd opt for applying these styles to the `html` or
+       *    `body` elements, but in our case, we have no "root" element to
+       *    target. Instead, we apply these defaults to **all** of our elements.
+       */
       addScopedBase({
         '*': {
           fontFamily: 'var(--cl-font-family)',
