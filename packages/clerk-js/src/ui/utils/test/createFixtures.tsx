@@ -67,7 +67,7 @@ const unboundCreateFixtures = <N extends UnpackContext<typeof ComponentContext>[
 
     const fixtures = {
       clerk: clerkMock,
-      user: clerkMock.user,
+      session: clerkMock.session,
       signIn: clerkMock.client.signIn,
       signUp: clerkMock.client.signUp,
       environment: environmentMock,

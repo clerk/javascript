@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useSession } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
 import React from 'react';
 
@@ -25,7 +25,7 @@ export type UVFactorOneCodeFormProps = UVFactorOneCodeCard & {
 };
 
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
-  const { user } = useUser();
+  const { session } = useSession();
   const card = useCardState();
 
   const { handleVerificationResponse } = useAfterVerification();
@@ -37,15 +37,15 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   }, []);
 
   const prepare = () => {
-    void user!
-      .__experimental_verifySessionPrepareFirstFactor(props.factor)
+    void session!
+      .__experimental_prepareFirstFactorVerification(props.factor)
       .then(() => props.onFactorPrepare())
       .catch(err => handleError(err, [], card.setError));
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    user!
-      .__experimental_verifySessionAttemptFirstFactor({ strategy: props.factor.strategy, code })
+    session!
+      .__experimental_attemptFirstFactorVerification({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
         return handleVerificationResponse(res);
@@ -62,7 +62,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={user?.imageUrl}
+      profileImageUrl={session?.user?.imageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onBackLinkClicked={props.onBackLinkClicked}
