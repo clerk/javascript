@@ -56,6 +56,7 @@ export class Client extends BaseResource implements ClientResource {
     // TODO: Make it restful by introducing a DELETE /client/:id endpoint
     return this._baseDelete({ path: '/client' }).then(() => {
       SessionTokenCache.clear();
+      this.id = '';
       this.sessions = [];
       this.signUp = new SignUp(null);
       this.signIn = new SignIn(null);
@@ -63,6 +64,12 @@ export class Client extends BaseResource implements ClientResource {
       this.createdAt = null;
       this.updatedAt = null;
     });
+  }
+
+  removeSessions(): Promise<ClientResource> {
+    return this._baseDelete({
+      path: this.path() + '/sessions',
+    }) as unknown as Promise<ClientResource>;
   }
 
   clearCache(): void {

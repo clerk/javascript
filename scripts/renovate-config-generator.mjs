@@ -183,7 +183,7 @@ const renovateConfig = {
   major: {
     dependencyDashboardApproval: true,
   },
-  rangeStrategy: 'auto',
+  rangeStrategy: 'bump',
   prHourlyLimit: 4,
   prConcurrentLimit: 16,
   postUpdateOptions: ['npmDedupe'],
