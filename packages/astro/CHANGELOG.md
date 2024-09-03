@@ -1,5 +1,16 @@
 # @clerk/astro
 
+## 1.2.5
+
+### Patch Changes
+
+- Fixes an issue where not setting an element in an unstyled component causes a TypeScript error. ([#4057](https://github.com/clerk/javascript/pull/4057)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/types@4.18.0
+  - @clerk/backend@1.9.1
+  - @clerk/shared@2.6.1
+
 ## 1.2.4
 
 ### Patch Changes
