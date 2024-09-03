@@ -45,9 +45,9 @@ const _Waitlist = () => {
         </Card.Content>
         <Card.Footer>
           <Card.Action elementId='waitlist'>
-            <Card.ActionText localizationKey={localizationKeys('waitlist.start.actionText')} />
+            <Card.ActionText localizationKey={localizationKeys('__experimental_waitlist.start.actionText')} />
             <Card.ActionLink
-              localizationKey={localizationKeys('waitlist.start.actionLink')}
+              localizationKey={localizationKeys('__experimental_waitlist.start.actionLink')}
               to={clerk.buildUrlWithAuth(signInUrl)}
             />
           </Card.Action>

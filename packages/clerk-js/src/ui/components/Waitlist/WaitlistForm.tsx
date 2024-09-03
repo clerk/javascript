@@ -48,8 +48,8 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
     <Wizard {...wizard.props}>
       <Col gap={6}>
         <Header.Root>
-          <Header.Title localizationKey={localizationKeys('waitlist.start.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('waitlist.start.subtitle')} />
+          <Header.Title localizationKey={localizationKeys('__experimental_waitlist.start.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('__experimental_waitlist.start.subtitle')} />
         </Header.Root>
         <Card.Alert>{card.error}</Card.Alert>
         <Flex
@@ -72,15 +72,15 @@ export const WaitlistForm = (props: WaitlistFormProps) => {
               </Form.ControlRow>
             </Col>
             <Col center>
-              <Form.SubmitButton localizationKey={localizationKeys('waitlist.start.formButton')} />
+              <Form.SubmitButton localizationKey={localizationKeys('__experimental_waitlist.start.formButton')} />
             </Col>
           </Form.Root>
         </Flex>
       </Col>
       <Col gap={6}>
         <Header.Root>
-          <Header.Title localizationKey={localizationKeys('waitlist.success.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('waitlist.success.subtitle')} />
+          <Header.Title localizationKey={localizationKeys('__experimental_waitlist.success.title')} />
+          <Header.Subtitle localizationKey={localizationKeys('__experimental_waitlist.success.subtitle')} />
         </Header.Root>
       </Col>
     </Wizard>
