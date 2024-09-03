@@ -51,13 +51,18 @@ const common = ({ mode }) => {
       splitChunks: {
         cacheGroups: {
           zxcvbnTSCoreVendor: {
-            test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](core)[\\/]/,
+            test: /[\\/]node_modules[\\/](@zxcvbn-ts\/core|fastest-levenshtein)[\\/]/,
             name: 'zxcvbn-ts-core',
             chunks: 'all',
           },
           zxcvbnTSCommonVendor: {
             test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](language-common)[\\/]/,
             name: 'zxcvbn-common',
+            chunks: 'all',
+          },
+          coinbaseWalletSDKVendor: {
+            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|ieee754|preact|keccak|buffer|string_decoder|sha\.js|base64-js|safe-buffer|util-deprecate|inherits)[\\/]/,
+            name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
           common: {

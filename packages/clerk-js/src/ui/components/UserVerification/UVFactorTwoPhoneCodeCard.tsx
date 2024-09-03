@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useSession } from '@clerk/shared/react';
 import type { PhoneCodeFactor } from '@clerk/types';
 
 import { Flow, localizationKeys } from '../../customizables';
@@ -8,11 +8,11 @@ import { UVFactorTwoCodeForm } from './UVFactorTwoCodeForm';
 type UVFactorTwoPhoneCodeCardProps = UVFactorTwoCodeCard & { factor: PhoneCodeFactor };
 
 export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) => {
-  const { user } = useUser();
+  const { session } = useSession();
 
   const prepare = () => {
     const { phoneNumberId, strategy } = props.factor;
-    return user!.__experimental_verifySessionPrepareSecondFactor({ phoneNumberId, strategy });
+    return session!.__experimental_prepareSecondFactorVerification({ phoneNumberId, strategy });
   };
 
   return (

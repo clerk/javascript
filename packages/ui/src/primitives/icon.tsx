@@ -2,20 +2,33 @@ import { cx } from 'cva';
 import * as React from 'react';
 
 type IconRef = SVGSVGElement;
-type IconProps = Omit<React.HTMLAttributes<IconRef>, 'viewBox'>;
+type IconSizes = 'default' | 'lg';
+type IconProps = Omit<React.HTMLAttributes<IconRef>, 'viewBox'> & {
+  size?: IconSizes;
+};
 
 // Icons that need to be rotated 180deg in RTL mode
-const rtlIcons = ['IconCaretRightLegacy'];
+const RTL_ICONS = ['IconCaretRightLegacy'];
 
 function createIcon({ displayName, viewBox, path }: { displayName: string; viewBox: string; path: React.ReactNode }) {
-  const Icon = React.forwardRef(function Icon({ className, ...props }: IconProps, ref: React.ForwardedRef<IconRef>) {
+  const Icon = React.forwardRef(function Icon(
+    { className, size = 'default', ...props }: IconProps,
+    ref: React.ForwardedRef<IconRef>,
+  ) {
     return (
       <svg
         ref={ref}
         viewBox={viewBox}
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
-        className={cx('size-[1em]', rtlIcons.includes(displayName) && 'rtl:rotate-180', className)}
+        className={cx(
+          {
+            default: 'size-[1em]',
+            lg: 'size-10',
+          }[size],
+          RTL_ICONS.includes(displayName) && 'rtl:rotate-180',
+          className,
+        )}
         aria-hidden
         {...props}
       >
@@ -833,6 +846,56 @@ export const SMSSm = createIcon({
     <path
       d='M3.64195 10.1495L4.39134 10.1796C4.39823 10.0081 4.3461 9.83945 4.24363 9.70176L3.64195 10.1495ZM2.75 13.25L2.22719 12.7123C1.99924 12.9339 1.93578 13.2751 2.06885 13.5639C2.20191 13.8526 2.50257 14.0261 2.81915 13.9968L2.75 13.25ZM6.22735 11.9724L6.45883 11.259C6.20845 11.1778 5.93379 11.2338 5.73517 11.4065L6.22735 11.9724ZM12.5 7.5C12.5 9.64028 10.5577 11.5 8 11.5V13C11.2413 13 14 10.6064 14 7.5H12.5ZM8 3.5C10.5577 3.5 12.5 5.35972 12.5 7.5H14C14 4.39358 11.2413 2 8 2V3.5ZM3.5 7.5C3.5 5.35972 5.44233 3.5 8 3.5V2C4.75868 2 2 4.39358 2 7.5H3.5ZM4.24363 9.70176C3.7701 9.06542 3.5 8.309 3.5 7.5H2C2 8.6531 2.38735 9.71985 3.04026 10.5972L4.24363 9.70176ZM3.27281 13.7877C3.69076 13.3814 3.94476 12.767 4.10437 12.1773C4.27074 11.5626 4.36392 10.8622 4.39134 10.1796L2.89255 10.1194C2.86859 10.7159 2.78742 11.3016 2.65647 11.7854C2.51877 12.2941 2.35249 12.5904 2.22719 12.7123L3.27281 13.7877ZM5.73517 11.4065C5.01099 12.0363 3.84761 12.3952 2.68085 12.5032L2.81915 13.9968C4.13186 13.8753 5.65704 13.4624 6.71952 12.5383L5.73517 11.4065ZM8 11.5C7.45679 11.5 6.93808 11.4145 6.45883 11.259L5.99586 12.6858C6.62412 12.8897 7.29904 13 8 13V11.5Z'
       fill='currentColor'
+    />
+  ),
+});
+
+export const ExclamationTrianglelg = createIcon({
+  displayName: 'IconExclamationTriangleLg',
+  viewBox: '0 0 48 48',
+  path: (
+    <path
+      fill='currentColor'
+      fillRule='evenodd'
+      d='M18.982 8.798c2.23-3.861 7.806-3.861 10.034 0l14.2 24.613c2.228 3.861-.56 8.688-5.018 8.688H9.8c-4.458 0-7.244-4.827-5.016-8.688L18.98 8.798h.002ZM24 18.928a1.448 1.448 0 0 1 1.448 1.449v7.24a1.448 1.448 0 0 1-2.896 0v-7.24A1.448 1.448 0 0 1 24 18.929Zm0 15.929a1.448 1.448 0 1 0 0-2.896 1.448 1.448 0 0 0 0 2.896Z'
+      clipRule='evenodd'
+    />
+  ),
+});
+
+export const TickShieldlg = createIcon({
+  displayName: 'IconTickShieldLg',
+  viewBox: '0 0 48 48',
+  path: (
+    <path
+      fill='currentColor'
+      fillRule='evenodd'
+      d='M24 48c13.255 0 24-10.745 24-24S37.255 0 24 0 0 10.745 0 24s10.745 24 24 24Zm8.065-31.136a.69.69 0 0 0-.485-.186h-.039c-3.102 0-5.94-.946-7.4-2.464a.718.718 0 0 0-1.02 0c-1.46 1.523-4.293 2.464-7.4 2.464h-.04a.712.712 0 0 0-.48.186.618.618 0 0 0-.201.446v5.829c0 2.123.613 4.182 1.764 5.96 1.422 2.186 5.433 4.368 6.562 4.953a.646.646 0 0 0 .598 0c1.128-.585 5.137-2.767 6.559-4.953a10.896 10.896 0 0 0 1.764-5.96v-5.83a.526.526 0 0 0-.182-.445Zm-4.118 2.81c.439.402.469 1.084.067 1.523-1.181 1.29-1.748 2.075-2.602 3.601-.321.575-.678 1.374-.963 2.056a42.157 42.157 0 0 0-.44 1.095l-.025.066-.006.016-.001.004a1.08 1.08 0 0 1-1.824.328l-2.936-3.384a1.078 1.078 0 0 1 1.629-1.413l1.784 2.056c.265-.616.586-1.314.9-1.876.935-1.672 1.6-2.593 2.894-4.005a1.078 1.078 0 0 1 1.523-.067Z'
+      clipRule='evenodd'
+    />
+  ),
+});
+
+export const SwitchArrowslg = createIcon({
+  displayName: 'IconSwitchArrowsLg',
+  viewBox: '0 0 48 48',
+  path: (
+    <path
+      fill='currentColor'
+      fillRule='evenodd'
+      d='M24 48c13.255 0 24-10.745 24-24S37.255 0 24 0 0 10.745 0 24s10.745 24 24 24Zm-4.505-31.018a1.513 1.513 0 0 1 1.07-.443h8.442l-1.953-1.953a1.515 1.515 0 1 1 2.143-2.142l4.536 4.536a1.513 1.513 0 0 1 0 2.142l-4.536 4.537a1.515 1.515 0 0 1-2.143-2.142l1.954-1.953h-8.443a1.512 1.512 0 0 1-1.07-2.582Zm8.188 14.236a1.512 1.512 0 0 1-1.07.443H18.17l1.953 1.953a1.513 1.513 0 0 1-.49 2.47 1.515 1.515 0 0 1-1.652-.328l-4.536-4.536a1.512 1.512 0 0 1 0-2.142l4.536-4.537a1.515 1.515 0 1 1 2.142 2.142l-1.953 1.954h8.443a1.512 1.512 0 0 1 1.07 2.581Z'
+      clipRule='evenodd'
+    />
+  ),
+});
+
+export const SpinnerLg = createIcon({
+  displayName: 'IconSpinnerLg',
+  viewBox: '0 0 48 48',
+  path: (
+    <path
+      fill='currentColor'
+      d='M33.484 39.884c.425.711.195 1.638-.546 2.008a20 20 0 0 1-20.45-34.247c.678-.477 1.603-.24 2.028.471.425.711.187 1.627-.484 2.113a17 17 0 0 0 17.363 29.078c.746-.36 1.665-.134 2.09.577Z'
     />
   ),
 });
