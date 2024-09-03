@@ -1,6 +1,8 @@
 import type { Config } from 'tailwindcss';
 import plugin from 'tailwindcss/plugin';
 
+// fix hr
+
 function generateColorScale(name: string) {
   const scale = Array.from({ length: 12 }, (_, i) => {
     const id = i + 1;
@@ -119,8 +121,11 @@ const config = {
           (acc, [selectors, properties]) => ({
             ...acc,
             [`:where(${selectors
-              .split(',')
-              .map(s => s.trim())
+              // Splits selectors by the comma, unless that comma is in brackets
+              // e.g. a pseudo selector like :not(svg,use)
+              .match(/(?:[^,()]|\((?:[^()]|\([^()]*\))*\))+(?=\s*(?:,|$))/g)
+              ?.map(item => item.trim())
+              .filter(item => item !== '')
               .map(selector => `[class^='cl-'] ${selector}, [class*=' cl-'] ${selector}`)
               .join(', ')})`]: properties,
           }),
@@ -130,6 +135,15 @@ const config = {
         addBase(scopedStyles);
       };
 
+      // revert to UA styles
+      addScopedBase({
+        // https://cloudfour.com/thinks/resetting-inherited-css-with-revert/
+        '*:not(svg, svg *), use': {
+          all: 'revert',
+        },
+      });
+
+      // reset
       // https://unpkg.com/tailwindcss@3.4.10/src/css/preflight.css
       addScopedBase({
         '*, ::before, ::after': {
@@ -234,6 +248,27 @@ const config = {
         },
         'img, video': { maxWidth: '100%', height: 'auto' },
         '[hidden]': { display: 'none' },
+      });
+
+      // theme setup
+      addBase({
+        ':where(:root)': {
+          '--cl-font-family':
+            '-apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica,\n    Cantarell, Ubuntu, roboto, noto, arial, sans-serif',
+          '--cl-color-danger': '0 84% 60%',
+          '--cl-color-success': '142 71% 45%',
+          '--cl-color-warning': '25 95% 53%',
+          '--cl-radius': '0.375rem',
+          '--cl-spacing-unit': '1rem',
+          '--cl-font-size': '0.8125rem',
+        },
+      });
+
+      // scoped defaults (debug)
+      addScopedBase({
+        '*': {
+          fontFamily: 'var(--cl-font-family)',
+        },
       });
     }),
   ],
