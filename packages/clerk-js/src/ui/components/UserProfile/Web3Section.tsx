@@ -43,7 +43,6 @@ export const Web3Section = withCardStateProvider(() => {
         <ProfileSection.ItemList id='web3Wallets'>
           {user?.web3Wallets.map(wallet => {
             const strategy = wallet.verification.strategy as keyof typeof strategyToDisplayData;
-            console.log(wallet);
 
             return (
               strategyToDisplayData[strategy] && (
