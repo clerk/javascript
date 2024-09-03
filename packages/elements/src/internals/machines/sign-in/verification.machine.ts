@@ -88,10 +88,6 @@ const SignInVerificationMachine = setup({
         flow,
       });
     }),
-    // attemptPasskey: fromPromise<
-    //   SignInResource,
-    //   { parent: SignInRouterMachineActorRef; flow: 'autofill' | 'discoverable' | undefined }
-    // >(() => Promise.reject(new ClerkElementsRuntimeError('Actor `attemptPasskey` must be overridden'))),
   },
   actions: {
     resendableTick: assign(({ context }) => ({
