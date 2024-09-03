@@ -1,8 +1,27 @@
+import { Slot } from '@radix-ui/react-slot';
 import { cva, cx } from 'cva';
 import * as React from 'react';
 
 import { ClerkLogo } from './clerk-logo';
 import { Image } from './image';
+
+export const Wrapper = React.forwardRef(function CardRoot(
+  { asChild, className, children, ...props }: React.HTMLAttributes<HTMLDivElement> & { asChild?: boolean },
+  forwardedRef: React.ForwardedRef<HTMLDivElement>,
+) {
+  const Comp = asChild ? Slot : 'div';
+
+  return (
+    <Comp
+      ref={forwardedRef}
+      data-card-wrapper=''
+      {...props}
+      className={cx('mx-auto block w-full max-w-[25rem]', className)}
+    >
+      {children}
+    </Comp>
+  );
+});
 
 export const Root = React.forwardRef(function CardRoot(
   { banner, children, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { banner?: React.ReactNode },
