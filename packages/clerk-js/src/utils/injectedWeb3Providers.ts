@@ -35,13 +35,18 @@ export class InjectedWeb3Providers {
     coinbase: 'Coinbase Wallet',
     metamask: 'MetaMask',
   } as const;
+  #hasSetupEventListeners = false;
 
   constructor() {
     if (typeof window === 'undefined') {
       return;
     }
-    window.addEventListener('eip6963:announceProvider', this.#onAnnouncement as EventListener);
-    window.dispatchEvent(new Event('eip6963:requestProvider'));
+
+    if (!this.#hasSetupEventListeners) {
+      window.addEventListener('eip6963:announceProvider', this.#onAnnouncement as EventListener);
+      window.dispatchEvent(new Event('eip6963:requestProvider'));
+      this.#hasSetupEventListeners = true;
+    }
   }
 
   get = (provider: InjectedWeb3Provider) => {
