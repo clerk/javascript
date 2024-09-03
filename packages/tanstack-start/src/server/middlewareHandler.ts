@@ -6,18 +6,18 @@ import { loadOptions } from './loadOptions';
 import type { LoaderOptions } from './types';
 import { getResponseClerkState } from './utils';
 
-export type RequestHandler<TRouter extends AnyRouter> = (ctx: {
+export type HandlerCallback<TRouter extends AnyRouter> = (ctx: {
   request: Request;
   router: TRouter;
   responseHeaders: Headers;
-}) => Promise<Response>;
-export type CustomizeRequestHandler<TRouter extends AnyRouter> = (cb: RequestHandler<TRouter>) => EventHandler;
+}) => Response | Promise<Response>;
+export type CustomizeStartHandler<TRouter extends AnyRouter> = (cb: HandlerCallback<TRouter>) => EventHandler;
 
 export function createClerkHandler<TRouter extends AnyRouter>(
-  eventHandler: CustomizeRequestHandler<TRouter>,
+  eventHandler: CustomizeStartHandler<TRouter>,
   clerkOptions: LoaderOptions = {},
 ) {
-  return (cb: RequestHandler<TRouter>): EventHandler => {
+  return (cb: HandlerCallback<TRouter>): EventHandler => {
     return eventHandler(async ({ request, router, responseHeaders }) => {
       try {
         const loadedOptions = loadOptions(request, clerkOptions);
