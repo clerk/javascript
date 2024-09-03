@@ -1,5 +1,7 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import type { ClerkHostRouter } from '@clerk/shared/router';
+import { ClerkHostRouterContext } from '@clerk/shared/router';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useTransition } from 'react';
 
@@ -11,7 +13,6 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
-import { ClerkHostRouter } from '@clerk/shared/router';
 
 declare global {
   export interface Window {
@@ -122,7 +123,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <ClerkJSScript router='app' />
-        {children}
+        <ClerkHostRouterContext.Provider value={clerkRouter}>{children}</ClerkHostRouterContext.Provider>
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
   );
