@@ -31,7 +31,7 @@ export {
   UserButton,
   UserProfile,
   GoogleOneTap,
-  Waitlist,
+  __experimental_Waitlist,
 } from './client-boundary/uiComponents';
 
 /**

@@ -8,7 +8,7 @@ export {
   CreateOrganization,
   OrganizationList,
   GoogleOneTap,
-  Waitlist,
+  __experimental_Waitlist,
 } from './uiComponents';
 
 export {
