@@ -38,6 +38,12 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
             logger.error('Invalid value for clerkJSVariant. Acceptable values are `"headless"`, `""`, and `undefined`');
           }
 
+          if (enableEnvSchema) {
+            logger.info(
+              'Env schema enabled. To ensure that secret keys are validated, please set `experimental.env.validateSecrets` to true.',
+            );
+          }
+
           const internalParams: ClerkOptions = {
             ...params,
             sdkMetadata: {
