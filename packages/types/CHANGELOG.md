@@ -1,5 +1,27 @@
 # Change Log
 
+## 4.18.0
+
+### Minor Changes
+
+- Move SessionVerification methods from UserResource to SessionResource: ([#4073](https://github.com/clerk/javascript/pull/4073)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `user.__experimental_verifySession` -> `session.__experimental_startVerification`
+  - `user.__experimental_verifySessionPrepareFirstFactor` -> `session.__experimental_prepareFirstFactorVerification`
+  - `user.__experimental_verifySessionAttemptFirstFactor` -> `session.__experimental_attemptFirstFactorVerification`
+  - `user.__experimental_verifySessionPrepareSecondFactor` -> `session.__experimental_prepareSecondFactorVerification`
+  - `user.__experimental_verifySessionAttemptSecondFactor` -> `session.__experimental_attemptSecondFactorVerification`
+
+- Add types for newly introduced `<__experimental_UserVerification />` component (experimental feature). New types: ([#4016](https://github.com/clerk/javascript/pull/4016)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `Appearance` has a new `userVerification` property
+  - `__experimental_UserVerificationProps` and `__experimental_UserVerificationModalProps`
+  - `__experimental_openUserVerification` method under the `Clerk` interface
+  - `__experimental_closeUserVerification` method under the `Clerk` interface
+  - `__experimental_mountUserVerification` method under the `Clerk` interface
+  - `__experimental_unmountUserVerification` method under the `Clerk` interface
+  - `__experimental_userVerification` property under `LocalizationResource`
+
 ## 4.17.0
 
 ### Minor Changes

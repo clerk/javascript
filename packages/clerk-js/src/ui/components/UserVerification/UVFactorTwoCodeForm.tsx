@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useSession } from '@clerk/shared/react';
 import type { __experimental_SessionVerificationResource, PhoneCodeFactor, TOTPFactor } from '@clerk/types';
 import React from 'react';
 
@@ -24,7 +24,7 @@ type SignInFactorTwoCodeFormProps = UVFactorTwoCodeCard & {
 
 export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const card = useCardState();
-  const { user } = useUser();
+  const { session } = useSession();
   const { handleVerificationResponse } = useAfterVerification();
 
   React.useEffect(() => {
@@ -44,8 +44,8 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
     : undefined;
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    user!
-      .__experimental_verifySessionAttemptSecondFactor({ strategy: props.factor.strategy, code })
+    session!
+      .__experimental_attemptSecondFactorVerification({ strategy: props.factor.strategy, code })
       .then(async res => {
         await resolve();
         return handleVerificationResponse(res);
@@ -62,7 +62,7 @@ export const UVFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
       onCodeEntryFinishedAction={action}
       onResendCodeClicked={prepare}
       safeIdentifier={'safeIdentifier' in props.factor ? props.factor.safeIdentifier : undefined}
-      profileImageUrl={user!.imageUrl}
+      profileImageUrl={session?.user?.imageUrl}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
     />
   );
