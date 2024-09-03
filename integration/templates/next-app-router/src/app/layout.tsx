@@ -11,7 +11,11 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      experimental={{
+        persistClient: process.env.NEXT_PUBLIC_EXPERIMENTAL_PERSIST_CLIENT === 'true',
+      }}
+    >
       <html lang='en'>
         <body className={inter.className}>{children}</body>
       </html>
