@@ -59,7 +59,7 @@ export type AttemptSecondFactorInput = {
   currentFactor: SignInSecondFactor | null;
 };
 
-const isNonPreperableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
+const isNonPreparableStrategy = (strategy?: SignInFirstFactor['strategy'] | SignInSecondFactor['strategy']) => {
   if (!strategy) {
     return false;
   }
@@ -183,7 +183,7 @@ const SignInVerificationMachine = setup({
   },
   guards: {
     isResendable: ({ context }) => context.resendable || context.resendableAfter === 0,
-    isNeverResendable: ({ context }) => isNonPreperableStrategy(context.currentFactor?.strategy),
+    isNeverResendable: ({ context }) => isNonPreparableStrategy(context.currentFactor?.strategy),
   },
   delays: SignInVerificationDelays,
   types: {} as SignInVerificationSchema,
@@ -407,14 +407,14 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       );
     }),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input;
+      const { params, parent, resendable } = input as PrepareFirstFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
       const currentVerificationExpiration = clerk.client.signIn.firstFactorVerification.expireAt;
       const needsPrepare = resendable || !currentVerificationExpiration || currentVerificationExpiration < new Date();
 
-      if (isNonPreperableStrategy(params?.strategy) || !needsPrepare) {
+      if (isNonPreparableStrategy(params?.strategy) || !needsPrepare) {
         return Promise.resolve(clerk.client.signIn);
       }
 
@@ -510,7 +510,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       ),
     ),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input;
+      const { params, parent, resendable } = input as PrepareSecondFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
