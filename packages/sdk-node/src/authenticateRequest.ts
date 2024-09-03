@@ -13,8 +13,7 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, secretKey, publishableKey, req: incomingMessage, options } = opts;
   const { jwtKey, authorizedParties, audience } = options || {};
 
-  const req = incomingMessageToRequest(incomingMessage);
-  const clerkRequest = createClerkRequest(req);
+  const clerkRequest = createClerkRequest(incomingMessageToRequest(incomingMessage));
   const env = { ...loadApiEnv(), ...loadClientEnv() };
   const isSatellite = handleValueOrFn(options?.isSatellite, clerkRequest.clerkUrl, env.isSatellite);
   const domain = handleValueOrFn(options?.domain, clerkRequest.clerkUrl) || env.domain;
