@@ -1,4 +1,5 @@
-import type { Web3Provider } from '@clerk/types';
+import type { CoinbaseWeb3Provider, MetamaskWeb3Provider } from '@clerk/types';
+
 //https://eips.ethereum.org/EIPS/eip-6963
 
 interface EIP6963ProviderInfo {
@@ -26,10 +27,11 @@ interface EIP6963ProviderDetail {
 }
 
 type EIP6963AnnounceProviderEvent = CustomEvent;
+type InjectedWeb3Provider = MetamaskWeb3Provider | CoinbaseWeb3Provider;
 
 class InjectedWeb3Providers {
   #providers: EIP6963ProviderDetail[] = [];
-  #providerIdMap: Record<Web3Provider, string> = {
+  #providerIdMap: Record<InjectedWeb3Provider, string> = {
     coinbase: 'Coinbase Wallet',
     metamask: 'MetaMask',
   } as const;
@@ -42,7 +44,7 @@ class InjectedWeb3Providers {
     window.dispatchEvent(new Event('eip6963:requestProvider'));
   }
 
-  get = (provider: Web3Provider) => {
+  get = (provider: InjectedWeb3Provider) => {
     return this.#providers.find(p => p.info.name === this.#providerIdMap[provider])?.provider;
   };
 
