@@ -20,6 +20,9 @@ const Cookies = {
   ClientUat: '__client_uat',
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
+  EphemeralExpiresAt: '__clerk_ephemeral_expires_at',
+  EphemeralPublishableKey: '__clerk_ephemeral_publishable_key',
+  EphemeralSecretKey: '__clerk_ephemeral_secret_key',
   RedirectCount: '__clerk_redirect_count',
 } as const;
 
@@ -28,6 +31,9 @@ const QueryParameters = {
   ClerkRedirectUrl: '__clerk_redirect_url',
   // use the reference to Cookies to indicate that it's the same value
   DevBrowser: Cookies.DevBrowser,
+  EphemeralExpiresAt: '__clerk_ephemeral_expires_at',
+  EphemeralPublishableKey: '__clerk_ephemeral_publishable_key',
+  EphemeralSecretKey: '__clerk_ephemeral_secret_key',
   Handshake: Cookies.Handshake,
   HandshakeHelp: '__clerk_help',
   LegacyDevBrowser: '__dev_session',
