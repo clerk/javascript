@@ -13,7 +13,8 @@ export const authenticateRequest = (opts: AuthenticateRequestParams) => {
   const { clerkClient, secretKey, publishableKey, req: incomingMessage, options } = opts;
   const { jwtKey, authorizedParties, audience } = options || {};
 
-  const clerkRequest = createClerkRequest(incomingMessageToRequest(incomingMessage));
+  const req = incomingMessageToRequest(incomingMessage);
+  const clerkRequest = createClerkRequest(req);
   const env = { ...loadApiEnv(), ...loadClientEnv() };
   const isSatellite = handleValueOrFn(options?.isSatellite, clerkRequest.clerkUrl, env.isSatellite);
   const domain = handleValueOrFn(options?.domain, clerkRequest.clerkUrl) || env.domain;
@@ -50,7 +51,14 @@ const incomingMessageToRequest = (req: IncomingMessage): Request => {
   // req extends IncomingMessage in a useful way. No guarantee
   // it'll work.
   const protocol = req.connection?.encrypted ? 'https' : 'http';
-  const dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
+  let dummyOriginReqUrl: URL;
+
+  try {
+    dummyOriginReqUrl = new URL(req.url || '', `${protocol}://clerk-dummy`);
+  } catch (e) {
+    throw new Error(`Invalid request URL: ${req.url}`);
+  }
+
   return new Request(dummyOriginReqUrl, {
     method: req.method,
     headers: new Headers(headers),
