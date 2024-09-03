@@ -5,10 +5,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { ColorPicker } from './color-picker';
+import { AppearanceOptions } from './components/appearance-options';
 import { Logo } from './components/logo';
 import { generateColors, getPreviewStyles } from './generate-colors';
+import { useAppearanceStore } from './stores/appearance-store';
 import { ThemeDialog } from './theme-dialog';
-import { ToggleGroup } from './toggle-group';
 
 const lightAccentDefault = '#6C47FF';
 const lightGrayDefault = '#2f3037';
@@ -25,8 +26,12 @@ const fontSizeDefault = '0.8125rem';
 export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [dir, setDir] = useState('ltr');
-  const [appearance, setAppearance] = useState('light');
+  const appearance = useAppearanceStore(state => state.appearance);
+  const direction = useAppearanceStore(state => state.direction);
+  const devMode = useAppearanceStore(state => state.devMode);
+  const animations = useAppearanceStore(state => state.animations);
+  const reset = useAppearanceStore(state => state.reset);
+
   const [lightAccent, setLightAccent] = useState(lightAccentDefault);
   const [lightGray, setLightGray] = useState(lightGrayDefault);
   const [lightBackground, setLightBackground] = useState(lightBackgroundDefault);
@@ -36,7 +41,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
   const [radius, setRadius] = useState(radiusDefault);
   const [spacingUnit, setSpacingUnit] = useState(spacingUnitDefault);
   const [fontSize, setFontSize] = useState(fontSizeDefault);
-  const [devMode, setDevMode] = useState('on');
+
   const handleReset = () => {
     setLightAccent(lightAccentDefault);
     setLightGray(lightGrayDefault);
@@ -47,8 +52,9 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     setRadius(radiusDefault);
     setSpacingUnit(spacingUnitDefault);
     setFontSize(fontSizeDefault);
-    setDevMode('on');
+    reset();
   };
+
   const lightResult = generateColors({
     appearance: 'light',
     accent: lightAccent,
@@ -68,15 +74,21 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
     spacingUnit,
     fontSize,
   });
+
+  // A unique key for the ClerkProvider to force a re-render when the appearance changes
+  const CLERK_PROVIDER_KEY = `${devMode}-${animations}`;
+
   useEffect(() => {
-    document.documentElement.dir = dir;
-  }, [dir]);
+    document.documentElement.dir = direction;
+  }, [direction]);
+
   return (
     <ClerkProvider
-      key={devMode}
+      key={CLERK_PROVIDER_KEY}
       appearance={{
         layout: {
           unsafe_disableDevelopmentModeWarnings: devMode === 'off',
+          animations: animations === 'on' ? true : false,
         },
       }}
     >
@@ -140,51 +152,7 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
 
         <aside className='relative isolate hidden h-full w-[17rem] flex-col justify-between gap-8 overflow-y-auto border-e bg-white p-4 sm:flex'>
           <div className='space-y-4'>
-            <ToggleGroup
-              label='Appearance'
-              items={[
-                {
-                  label: 'Light',
-                  value: 'light',
-                },
-                {
-                  label: 'Dark',
-                  value: 'dark',
-                },
-              ]}
-              value={appearance}
-              onValueChange={setAppearance}
-            />
-            <ToggleGroup
-              label='Direction'
-              items={[
-                {
-                  label: 'LTR',
-                  value: 'ltr',
-                },
-                {
-                  label: 'RTL',
-                  value: 'rtl',
-                },
-              ]}
-              value={dir}
-              onValueChange={setDir}
-            />
-            <ToggleGroup
-              label='Dev mode'
-              items={[
-                {
-                  label: 'On',
-                  value: 'on',
-                },
-                {
-                  label: 'Off',
-                  value: 'off',
-                },
-              ]}
-              value={devMode}
-              onValueChange={setDevMode}
-            />
+            <AppearanceOptions />
             {appearance === 'light' ? (
               <>
                 <ColorPicker

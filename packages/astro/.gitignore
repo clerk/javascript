@@ -5,6 +5,7 @@ astro-components/
 components/
 !src/components/
 .output/
+/types.ts
 
 .vscode/
 .idea/

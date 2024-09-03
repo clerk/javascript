@@ -12,7 +12,8 @@ const componentImportPaths = {
     import(/* webpackChunkName: "organizationswitcher" */ './../components/OrganizationSwitcher'),
   OrganizationList: () => import(/* webpackChunkName: "organizationlist" */ './../components/OrganizationList'),
   ImpersonationFab: () => import(/* webpackChunkName: "impersonationfab" */ './../components/ImpersonationFab'),
-  GoogleOneTap: () => import(/* webpackChunkName: "oneTap" */ './../components/GoogleOneTap'),
+  GoogleOneTap: () => import(/* webpackChunkName: "onetap" */ './../components/GoogleOneTap'),
+  UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -20,6 +21,14 @@ export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({
 export const SignInModal = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignInModal })));
 export const GoogleOneTap = lazy(() =>
   componentImportPaths.GoogleOneTap().then(module => ({ default: module.OneTap })),
+);
+
+export const UserVerification = lazy(() =>
+  componentImportPaths.UserVerification().then(module => ({ default: module.UserVerification })),
+);
+
+export const UserVerificationModal = lazy(() =>
+  componentImportPaths.UserVerification().then(module => ({ default: module.UserVerificationModal })),
 );
 
 export const SignUp = lazy(() => componentImportPaths.SignUp().then(module => ({ default: module.SignUp })));
@@ -72,6 +81,7 @@ export const ClerkComponents = {
   SignUp,
   UserButton,
   UserProfile,
+  UserVerification,
   OrganizationSwitcher,
   OrganizationList,
   OrganizationProfile,
@@ -81,6 +91,7 @@ export const ClerkComponents = {
   UserProfileModal,
   OrganizationProfileModal,
   CreateOrganizationModal,
+  UserVerificationModal,
   GoogleOneTap,
 };
 

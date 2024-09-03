@@ -1,5 +1,85 @@
 # Change Log
 
+## 4.19.0
+
+### Minor Changes
+
+- Add support for the Coinbase Wallet web3 provider and authentication strategy. The Coinbase Wallet provider handles both Coinbase Wallet extension and Smart Wallet ([#4082](https://github.com/clerk/javascript/pull/4082)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- **Experimental:** Persist the Clerk client after signing out a user. ([#3941](https://github.com/clerk/javascript/pull/3941)) by [@panteliselef](https://github.com/panteliselef)
+
+  This allows for matching a user's device with a client. To try out this new feature, enable it in your `<ClerkProvider />` or `clerk.load()` call.
+
+  ```js
+  // React
+  <ClerkProvider experimental={{ persistClient: true }} />;
+
+  // Vanilla JS
+  await clerk.load({ experimental: { persistClient: true } });
+  ```
+
+## 4.18.0
+
+### Minor Changes
+
+- Move SessionVerification methods from UserResource to SessionResource: ([#4073](https://github.com/clerk/javascript/pull/4073)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `user.__experimental_verifySession` -> `session.__experimental_startVerification`
+  - `user.__experimental_verifySessionPrepareFirstFactor` -> `session.__experimental_prepareFirstFactorVerification`
+  - `user.__experimental_verifySessionAttemptFirstFactor` -> `session.__experimental_attemptFirstFactorVerification`
+  - `user.__experimental_verifySessionPrepareSecondFactor` -> `session.__experimental_prepareSecondFactorVerification`
+  - `user.__experimental_verifySessionAttemptSecondFactor` -> `session.__experimental_attemptSecondFactorVerification`
+
+- Add types for newly introduced `<__experimental_UserVerification />` component (experimental feature). New types: ([#4016](https://github.com/clerk/javascript/pull/4016)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `Appearance` has a new `userVerification` property
+  - `__experimental_UserVerificationProps` and `__experimental_UserVerificationModalProps`
+  - `__experimental_openUserVerification` method under the `Clerk` interface
+  - `__experimental_closeUserVerification` method under the `Clerk` interface
+  - `__experimental_mountUserVerification` method under the `Clerk` interface
+  - `__experimental_unmountUserVerification` method under the `Clerk` interface
+  - `__experimental_userVerification` property under `LocalizationResource`
+
+## 4.17.0
+
+### Minor Changes
+
+- Add support for Coinbase Wallet strategy during sign in/up flows. Users can now authenticate using their Coinbase Wallet browser extension in the same way as MetaMask ([#4052](https://github.com/clerk/javascript/pull/4052)) by [@chanioxaris](https://github.com/chanioxaris)
+
+### Patch Changes
+
+- Tidy up and improve README ([#4053](https://github.com/clerk/javascript/pull/4053)) by [@LekoArts](https://github.com/LekoArts)
+
+- Update `SAML_IDPS` constant to refer to Microsoft Entra ID instead of the deprecated Azure AD ([#4041](https://github.com/clerk/javascript/pull/4041)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.16.0
+
+### Minor Changes
+
+- Support connecting Coinbase Wallet via <UserProfile /> ([#4030](https://github.com/clerk/javascript/pull/4030)) by [@chanioxaris](https://github.com/chanioxaris)
+
+## 4.15.1
+
+### Patch Changes
+
+- Introduce Coinbase Wallet Web3 provider types ([#4028](https://github.com/clerk/javascript/pull/4028)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- Introduce support for the Hugging Face OAuth Provider. ([#4021](https://github.com/clerk/javascript/pull/4021)) by [@Nikpolik](https://github.com/Nikpolik)
+
+## 4.15.0
+
+### Minor Changes
+
+- Expose `SessionVerification` as an experimental resource. ([#4011](https://github.com/clerk/javascript/pull/4011)) by [@panteliselef](https://github.com/panteliselef)
+
+  Update `UserResource` with 5 new experimental methods:
+
+  - `experimental_verifySession` for creating a new SessionVerification record and initiating a new flow.
+  - `experimental_verifySessionPrepareFirstFactor` for preparing a supported first factor like `phone_code`
+  - `experimental_verifySessionAttemptFirstFactor` for attempting a supported first factor like `password`
+  - `experimental_verifySessionPrepareSecondFactor` for preparing a supported second factor like `phone_code`
+  - `experimental_verifySessionAttemptSecondFactor` for attempting a supported second factor like `totp`
+
 ## 4.14.0
 
 ### Minor Changes

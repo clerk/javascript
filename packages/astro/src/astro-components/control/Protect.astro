@@ -1,38 +1,35 @@
 ---
-import type {
-  CheckAuthorizationWithCustomPermissions,
-  OrganizationCustomPermissionKey,
-  OrganizationCustomRoleKey,
-} from '@clerk/types';
+import ProtectCSR from './ProtectCSR.astro';
+import ProtectSSR from './ProtectSSR.astro';
 
-type Props =
-  | {
-      condition?: never;
-      role: OrganizationCustomRoleKey;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission: OrganizationCustomPermissionKey;
-    }
-  | {
-      condition: (has: CheckAuthorizationWithCustomPermissions) => boolean;
-      role?: never;
-      permission?: never;
-    }
-  | {
-      condition?: never;
-      role?: never;
-      permission?: never;
-    };
+import { isStaticOutput } from "virtual:@clerk/astro/config";
+import type { ProtectProps } from '../../types';
 
-const { has, userId } = Astro.locals.auth();
-const isUnauthorized =
-  !userId ||
-  (typeof Astro.props.condition === "function" &&
-    !Astro.props.condition(has)) ||
-  ((Astro.props.role || Astro.props.permission) && !has(Astro.props));
+type Props = ProtectProps & {
+  isStatic?: boolean
+  /**
+   * The class name to apply to the outermost element of the component.
+   * This class is only applied to static components.
+   */
+  class?: string;
+  /**
+   * The class name to apply to the wrapper element of the default slot.
+   * This class is only applied to static components.
+   */
+  defaultSlotWrapperClass?: string;
+  /**
+   * The class name to apply to the wrapper element of the fallback slot.
+   * This class is only applied to static components.
+   */
+  fallbackSlotWrapperClass?: string;
+}
+
+const { isStatic, ...props } = Astro.props;
+
+const ProtectComponent = isStaticOutput(isStatic) ? ProtectCSR : ProtectSSR;
 ---
 
-{isUnauthorized ? <slot name="fallback" /> : <slot />}
+<ProtectComponent {...props}>
+  <slot />
+  <slot name="fallback" slot="fallback" />
+</ProtectComponent>

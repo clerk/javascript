@@ -1,6 +1,6 @@
-import type { OAuthProvider, SamlStrategy, SignInStrategy } from '@clerk/types';
+import type { OAuthProvider, SamlStrategy, SignInStrategy, Web3Provider } from '@clerk/types';
 
-type Strategy = OAuthProvider | SamlStrategy | 'metamask';
+type Strategy = OAuthProvider | SamlStrategy | Web3Provider;
 
 export function isProviderStrategyScope(value: string): value is Strategy {
   return value.startsWith('provider:');
@@ -9,6 +9,9 @@ export function isProviderStrategyScope(value: string): value is Strategy {
 export function mapScopeToStrategy<T extends `provider:${Strategy}`>(scope: T): SignInStrategy {
   if (scope === 'provider:metamask') {
     return 'web3_metamask_signature';
+  }
+  if (scope === 'provider:coinbase') {
+    return 'web3_coinbase_signature';
   }
 
   if (scope === 'provider:saml') {

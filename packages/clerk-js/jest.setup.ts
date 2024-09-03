@@ -1,6 +1,15 @@
+import crypto from 'node:crypto';
+import { TextDecoder, TextEncoder } from 'node:util';
+
 import { jest } from '@jest/globals';
 
 if (typeof window !== 'undefined') {
+  Object.defineProperties(globalThis, {
+    TextDecoder: { value: TextDecoder },
+    TextEncoder: { value: TextEncoder },
+    crypto: { value: crypto.webcrypto },
+  });
+
   window.ResizeObserver =
     window.ResizeObserver ||
     jest.fn().mockImplementation(() => ({

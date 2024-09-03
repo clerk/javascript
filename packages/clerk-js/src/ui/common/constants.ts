@@ -92,6 +92,14 @@ export const WEB3_PROVIDERS: Web3Providers = Object.freeze({
     id: 'metamask',
     name: 'MetaMask',
   },
+  coinbase: {
+    id: 'coinbase',
+    name: 'Coinbase Wallet',
+  },
+  coinbase_wallet: {
+    id: 'coinbase_wallet',
+    name: 'Coinbase Wallet',
+  },
 });
 
 export function getWeb3ProviderData(name: Web3Provider): Web3ProviderData | undefined | null {

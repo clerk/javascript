@@ -1,11 +1,11 @@
-export const createFlexGapPropertyIosCompat = (val: string) => {
+export const createFlexGapPropertyIosCompat = (val: string, dir: 'col' | 'row') => {
   // Resolve gap property compatibility issue on iOS 13
   // This is not needed for css grid, only for flex
-  // TODO: Test whether we need to make the check more generic
-  if (navigator?.userAgent?.match(/(iphone|ipad).+os.+13.+safari/i)) {
+  if (navigator?.userAgent?.match(/(iphone|ipad).+(os).*(\s13_).+safari/i)) {
     return {
-      '& > * + *': {
-        marginTop: val,
+      '& > *:not([hidden]):not([style*="visibility: hidden"]) + *:not([hidden]):not([style*="visibility: hidden"])': {
+        marginLeft: dir === 'row' ? val : undefined,
+        marginTop: dir === 'col' ? val : undefined,
       },
     };
   }

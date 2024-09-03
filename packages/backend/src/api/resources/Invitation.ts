@@ -9,6 +9,7 @@ export class Invitation {
     readonly createdAt: number,
     readonly updatedAt: number,
     readonly status: InvitationStatus,
+    readonly url?: string,
     readonly revoked?: boolean,
   ) {}
 
@@ -20,6 +21,7 @@ export class Invitation {
       data.created_at,
       data.updated_at,
       data.status,
+      data.url,
       data.revoked,
     );
   }
