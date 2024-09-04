@@ -33,10 +33,8 @@ import type {
 } from '@clerk/types';
 
 import {
-  generateSignatureWithCoinbase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
-  getCoinbaseIdentifier,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   windowNavigate,
@@ -114,9 +112,6 @@ export class SignIn extends BaseResource implements SignInResource {
         } as PhoneCodeConfig;
         break;
       case 'web3_metamask_signature':
-        config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
-        break;
-      case 'web3_coinbase_signature':
         config = { web3WalletId: factor.web3WalletId } as Web3SignatureConfig;
         break;
       case 'web3_coinbase_wallet_signature':
@@ -278,15 +273,6 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier,
       generateSignature: generateSignatureWithMetamask,
       strategy: 'web3_metamask_signature',
-    });
-  };
-
-  public authenticateWithCoinbase = async (): Promise<SignInResource> => {
-    const identifier = await getCoinbaseIdentifier();
-    return this.authenticateWithWeb3({
-      identifier,
-      generateSignature: generateSignatureWithCoinbase,
-      strategy: 'web3_coinbase_signature',
     });
   };
 

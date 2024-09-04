@@ -20,7 +20,6 @@ import type {
   __experimental_UserVerificationModalProps,
   __experimental_UserVerificationProps,
   ActiveSessionResource,
-  AuthenticateWithCoinbaseParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
@@ -75,7 +74,6 @@ import {
   createPageLifecycle,
   disabledOrganizationsFeature,
   errorThrower,
-  generateSignatureWithCoinbase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   getClerkQueryParam,
@@ -1406,10 +1404,6 @@ export class Clerk implements ClerkInterface {
     await this.authenticateWithWeb3({ ...props, strategy: 'web3_metamask_signature' });
   };
 
-  public authenticateWithCoinbase = async (props: AuthenticateWithCoinbaseParams = {}): Promise<void> => {
-    await this.authenticateWithWeb3({ ...props, strategy: 'web3_coinbase_signature' });
-  };
-
   public authenticateWithCoinbaseWallet = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
     await this.authenticateWithWeb3({ ...props, strategy: 'web3_coinbase_wallet_signature' });
   };
@@ -1427,11 +1421,8 @@ export class Clerk implements ClerkInterface {
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider });
     const generateSignature =
-      provider === 'metamask'
-        ? generateSignatureWithMetamask
-        : provider === 'coinbase'
-          ? generateSignatureWithCoinbase
-          : generateSignatureWithCoinbaseWallet;
+      provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbaseWallet;
+
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 

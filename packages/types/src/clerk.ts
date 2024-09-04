@@ -529,11 +529,6 @@ export interface Clerk {
   authenticateWithMetamask: (params?: AuthenticateWithMetamaskParams) => Promise<unknown>;
 
   /**
-   * Authenticates user using their Coinbase Wallet browser extension
-   */
-  authenticateWithCoinbase: (params?: AuthenticateWithCoinbaseParams) => Promise<unknown>;
-
-  /**
    * Authenticates user using their Coinbase Smart Wallet and browser extension
    */
   authenticateWithCoinbaseWallet: (params?: AuthenticateWithCoinbaseWalletParams) => Promise<unknown>;
@@ -1261,13 +1256,6 @@ export interface ClerkAuthenticateWithWeb3Params {
 }
 
 export interface AuthenticateWithMetamaskParams {
-  customNavigate?: (to: string) => Promise<unknown>;
-  redirectUrl?: string;
-  signUpContinueUrl?: string;
-  unsafeMetadata?: SignUpUnsafeMetadata;
-}
-
-export interface AuthenticateWithCoinbaseParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;
