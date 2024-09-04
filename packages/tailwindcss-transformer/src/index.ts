@@ -136,12 +136,12 @@ export async function generateStylesheet(
     /**
      * Global CSS to be included in the generated stylesheet
      */
-    globalCss: string;
+    globalCss?: string;
   },
 ) {
   let stylesheet = '@tailwind base;\n';
 
-  stylesheet += ctx.globalCss || '';
+  stylesheet += ctx?.globalCss || '';
 
   for (const [cn, value] of styleCache) {
     stylesheet += `.${cn} { @apply ${value} }\n`;
