@@ -11,6 +11,7 @@ import { AlternativeMethods } from './AlternativeMethods';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
+import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {
@@ -110,6 +111,15 @@ export function _UserVerificationFactorOne(): JSX.Element | null {
     case 'email_code':
       return (
         <UVFactorOneEmailCodeCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          factor={currentFactor}
+        />
+      );
+    case 'phone_code':
+      return (
+        <UVFactorOnePhoneCodeCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}

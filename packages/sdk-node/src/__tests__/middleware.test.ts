@@ -18,6 +18,26 @@ const mockClerkClient = () => ({
 });
 
 describe('ClerkExpressWithAuth', () => {
+  it('should halt middleware execution by calling next with an error when request URL is invalid', async () => {
+    const req = {
+      url: '//',
+      cookies: {},
+      headers: { host: 'example.com' },
+    } as Request;
+    const res = {} as Response;
+
+    const clerkClient = mockClerkClient() as any;
+    clerkClient.authenticateRequest.mockReturnValue({
+      toAuth: () => ({ sessionId: null }),
+      headers: new Headers(),
+    } as RequestState);
+
+    await createClerkExpressWithAuth({ clerkClient })()(req, res, mockNext as NextFunction);
+    expect((req as WithAuthProp<Request>).auth).toBe(undefined);
+    expect(mockNext.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(mockNext.mock.calls[0][0].message).toBe('Invalid request URL: //');
+  });
+
   it('should decorate request with auth and move on to the next middleware when no session token exists', async () => {
     const req = createRequest();
     const res = {} as Response;
@@ -90,6 +110,26 @@ describe('ClerkExpressRequireAuth', () => {
     expect((req as WithAuthProp<Request>).auth).toBe(undefined);
     expect(mockNext.mock.calls[0][0]).toBeInstanceOf(Error);
     expect(mockNext.mock.calls[0][0].message).toBe('Unauthenticated');
+  });
+
+  it('should halt middleware execution by calling next with an error when request URL is invalid', async () => {
+    const req = {
+      url: '//',
+      cookies: {},
+      headers: { host: 'example.com' },
+    } as Request;
+    const res = {} as Response;
+
+    const clerkClient = mockClerkClient() as any;
+    clerkClient.authenticateRequest.mockReturnValue({
+      toAuth: () => ({ sessionId: null }),
+      headers: new Headers(),
+    } as RequestState);
+
+    await createClerkExpressRequireAuth({ clerkClient })()(req, res, mockNext as NextFunction);
+    expect((req as WithAuthProp<Request>).auth).toBe(undefined);
+    expect(mockNext.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(mockNext.mock.calls[0][0].message).toBe('Invalid request URL: //');
   });
 
   it('should decorate request with auth and move on to the next middleware when a session token does exist', async () => {
