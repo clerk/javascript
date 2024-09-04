@@ -2,7 +2,13 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RedirectFun, RequestState } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import {
+  AuthStatus,
+  constants,
+  createClerkRequest,
+  createRedirect,
+  EPHEMERAL_MODE_AVAILABLE,
+} from '@clerk/backend/internal';
 import { isClerkKeyError } from '@clerk/shared';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
 import type { NextMiddleware, NextRequest } from 'next/server';
@@ -87,7 +93,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
   const [request, event] = parseRequestAndEvent(args);
   const [handler, params] = parseHandlerAndOptions(args);
 
-  const ephemeralMode = process.env.NODE_ENV === 'development';
+  const ephemeralMode = EPHEMERAL_MODE_AVAILABLE;
   let ephemeral: Ephemeral | undefined;
 
   return clerkMiddlewareRequestDataStorage.run(clerkMiddlewareRequestDataStore, () => {
@@ -127,6 +133,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       if (options.debug) {
         logger.enable();
       }
+
       const clerkRequest = createClerkRequest(request);
       logger.debug('options', options);
       logger.debug('url', () => clerkRequest.toJSON());

@@ -1,6 +1,6 @@
 import type { AuthObject } from '@clerk/backend';
 import type { RedirectFun } from '@clerk/backend/internal';
-import { constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import { constants, createClerkRequest, createRedirect, EPHEMERAL_MODE_AVAILABLE } from '@clerk/backend/internal';
 import { isClerkKeyError } from '@clerk/shared';
 import { notFound, redirect } from 'next/navigation';
 
@@ -53,7 +53,7 @@ const baseAuth = (): Auth => {
 export const auth = (): Auth | Record<string, any> => {
   require('server-only');
 
-  if (process.env.NODE_ENV !== 'development') {
+  if (!EPHEMERAL_MODE_AVAILABLE) {
     return baseAuth();
   }
 

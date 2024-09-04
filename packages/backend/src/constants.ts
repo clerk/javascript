@@ -5,6 +5,9 @@ export const USER_AGENT = `${PACKAGE_NAME}@${PACKAGE_VERSION}`;
 export const MAX_CACHE_LAST_UPDATED_AT_SECONDS = 5 * 60;
 export const JWKS_CACHE_TTL_MS = 1000 * 60 * 60;
 
+export const EPHEMERAL_MODE_AVAILABLE =
+  process.env.NODE_ENV === 'development' && process.env.CLERK_FEATURE_FLAG_EPHEMERAL_ACCOUNTS === 'true';
+
 const Attributes = {
   AuthToken: '__clerkAuthToken',
   AuthSignature: '__clerkAuthSignature',
