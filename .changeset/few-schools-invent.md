@@ -3,4 +3,4 @@
 "@clerk/types": patch
 ---
 
-Add JSDoc comments to ClerkProvider properties
+Improve JSDoc comments coverage on `<ClerkProvider>` properties
