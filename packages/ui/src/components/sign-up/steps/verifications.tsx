@@ -61,8 +61,14 @@ export function SignUpVerifications() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignUp.Step name='verifications'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignUp.Step
+            asChild
+            name='verifications'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <SignUp.Strategy name='phone_code'>
                   <Card.Header>
