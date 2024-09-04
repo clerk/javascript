@@ -10,6 +10,7 @@ import { SignInResetPassword } from '~/components/sign-in/steps/reset-password';
 import { SignInStart } from '~/components/sign-in/steps/start';
 // import { SignInStatus } from '~/components/sign-in/steps/status';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
+import { type Appearance, AppearanceProvider } from '~/contexts';
 
 /**
  * Implementation Details:
@@ -22,27 +23,29 @@ import { SignInVerifications } from '~/components/sign-in/steps/verifications';
  *   where we'll consider its integration within Elements, as well as ensure
  *   bulletproof a11y.
  */
-export function SignIn() {
+export function SignIn({ appearance }: { appearance?: Appearance }) {
   const [showHelp, setShowHelp] = React.useState(false);
 
   return (
-    <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
-      <SignInRoot>
-        {showHelp ? (
-          <SignInGetHelp />
-        ) : (
-          <>
-            <SignInStart />
-            <SignInVerifications />
-            <SignInChooseStrategy />
-            <SignInForgotPassword />
-            <SignInResetPassword />
-            <SignInChooseSession />
-            {/* Hidden until elements work is tackled https://linear.app/clerk/issue/SDKI-593/[signin]-verification-link-is-invalid-for-this-device */}
-            {/* <SignInStatus /> */}
-          </>
-        )}
-      </SignInRoot>
-    </GetHelpContext.Provider>
+    <AppearanceProvider appearance={appearance}>
+      <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
+        <SignInRoot>
+          {showHelp ? (
+            <SignInGetHelp />
+          ) : (
+            <>
+              <SignInStart />
+              <SignInVerifications />
+              <SignInChooseStrategy />
+              <SignInForgotPassword />
+              <SignInResetPassword />
+              <SignInChooseSession />
+              {/* Hidden until elements work is tackled https://linear.app/clerk/issue/SDKI-593/[signin]-verification-link-is-invalid-for-this-device */}
+              {/* <SignInStatus /> */}
+            </>
+          )}
+        </SignInRoot>
+      </GetHelpContext.Provider>
+    </AppearanceProvider>
   );
 }
