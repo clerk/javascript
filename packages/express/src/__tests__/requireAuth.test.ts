@@ -14,8 +14,8 @@ describe('requireAuth', () => {
 
     requireAuth(mockRequestWithAuth(), response, nextFn);
 
-    expect(response.status).toBeCalledWith(401);
-    expect(nextFn).not.toBeCalled();
+    expect(response.status).toHaveBeenCalledWith(401);
+    expect(nextFn).not.toHaveBeenCalled();
   });
 
   it('make application require auth - proceed with next middlewares for signed-in', async () => {
@@ -25,7 +25,7 @@ describe('requireAuth', () => {
 
     requireAuth(request, response, nextFn);
 
-    expect(response.status).not.toBeCalled();
-    expect(nextFn).toBeCalled();
+    expect(response.status).not.toHaveBeenCalled();
+    expect(nextFn).toHaveBeenCalled();
   });
 });
