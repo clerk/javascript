@@ -55,6 +55,13 @@ export interface SessionResource extends ClerkResource {
   status: SessionStatus;
   expireAt: Date;
   abandonAt: Date;
+  /**
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
+   * @experimental This API is experimental and may change at any moment.
+   */
+  __experimental_factorVerificationAge: [number | null, number | null];
   lastActiveToken: TokenResource | null;
   lastActiveOrganizationId: string | null;
   lastActiveAt: Date;

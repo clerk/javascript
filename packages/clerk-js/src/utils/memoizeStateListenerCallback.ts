@@ -31,7 +31,8 @@ function sessionChanged(prev: SessionResource, next: SessionResource): boolean {
   return (
     prev.id !== next.id ||
     prev.updatedAt.getTime() < next.updatedAt.getTime() ||
-    sessionUserMembershipPermissionsChanged(next, prev)
+    sessionFVAChanged(prev, next) ||
+    sessionUserMembershipPermissionsChanged(prev, next)
   );
 }
 
@@ -46,6 +47,13 @@ function userMembershipsChanged(prev: UserResource, next: UserResource): boolean
   return (
     prev.organizationMemberships.length !== next.organizationMemberships.length ||
     prev.organizationMemberships[0]?.updatedAt !== next.organizationMemberships[0]?.updatedAt
+  );
+}
+
+function sessionFVAChanged(prev: SessionResource, next: SessionResource): boolean {
+  return (
+    prev.__experimental_factorVerificationAge[0] !== next.__experimental_factorVerificationAge[0] ||
+    prev.__experimental_factorVerificationAge[1] !== next.__experimental_factorVerificationAge[1]
   );
 }
 
