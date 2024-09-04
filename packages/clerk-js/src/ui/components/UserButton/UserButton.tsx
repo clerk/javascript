@@ -43,8 +43,8 @@ const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(
   );
 });
 
-const _UserButton = withFloatingTree(() => {
-  const { __experimental_standalone, __experimental_onDismiss } = useUserButtonContext();
+const _UserButton = () => {
+  const { __experimental_standalone, __experimental_onDismiss, __experimental_open } = useUserButtonContext();
 
   return (
     <Flow.Root
@@ -52,7 +52,9 @@ const _UserButton = withFloatingTree(() => {
       sx={{ display: 'inline-flex' }}
     >
       {__experimental_standalone ? (
-        <UserButtonPopover close={__experimental_onDismiss} />
+        __experimental_open ? (
+          <UserButtonPopover close={__experimental_onDismiss} />
+        ) : null
       ) : (
         <UserButtonWithFloatingTree>
           <UserButtonPopover />
@@ -60,6 +62,6 @@ const _UserButton = withFloatingTree(() => {
       )}
     </Flow.Root>
   );
-});
+};
 
 export const UserButton = withCoreUserGuard(withCardStateProvider(_UserButton));

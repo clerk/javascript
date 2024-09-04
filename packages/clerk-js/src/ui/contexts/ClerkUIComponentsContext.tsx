@@ -227,6 +227,8 @@ export const useUserProfileContext = (): UserProfileContextType => {
     throw new Error('Clerk: useUserProfileContext called outside of the mounted UserProfile component.');
   }
 
+  console.log('----- profile', customPages);
+
   const pages = useMemo(() => {
     return createUserProfileCustomPages(customPages || [], clerk);
   }, [customPages]);
@@ -264,6 +266,8 @@ export const useUserButtonContext = () => {
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
   const options = useOptions();
+
+  console.log(ctx?.userProfileProps?.customPages);
 
   if (componentName !== 'UserButton') {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');

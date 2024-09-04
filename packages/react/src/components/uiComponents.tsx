@@ -111,6 +111,7 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
   private portalRef = React.createRef<HTMLDivElement>();
 
   componentDidUpdate(_prevProps: Readonly<MountProps | OpenProps>) {
+    console.log('-----Did update');
     if (!isMountProps(_prevProps) || !isMountProps(this.props)) {
       return;
     }
@@ -123,13 +124,17 @@ class Portal extends React.PureComponent<MountProps | OpenProps> {
     // instead, we simply use the length of customPages to determine if it changed or not
     const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
     const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
+
+    console.log(prevProps, newProps, isDeeplyEqual(prevProps, newProps));
     if (!isDeeplyEqual(prevProps, newProps) || customPagesChanged || customMenuItemsChanged) {
+      console.log('update');
       this.props.updateProps({ node: this.portalRef.current, props: this.props.props });
     }
   }
 
   componentDidMount() {
     if (this.portalRef.current) {
+      console.log('---- props on mount', this.props.props);
       if (isMountProps(this.props)) {
         this.props.mount(this.portalRef.current, this.props.props);
       }
@@ -222,6 +227,8 @@ const _UserButton = withClerk(
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children);
     const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
     const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children);
+
+    console.log('---- _UserButton', props, userProfileProps);
 
     return (
       <Portal

@@ -25,7 +25,11 @@ export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopo
     handleSignOutSessionClicked,
     handleUserProfileActionClicked,
     otherSessions,
-  } = useMultisessionActions({ ...useUserButtonContext(), actionCompleteCallback: close, user });
+  } = useMultisessionActions({
+    ...useUserButtonContext(),
+    actionCompleteCallback: close,
+    user,
+  });
 
   return (
     <RootBox elementDescriptor={descriptors.userButtonPopoverRootBox}>

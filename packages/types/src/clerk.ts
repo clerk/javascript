@@ -999,6 +999,10 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   __experimental_onDismiss?: () => void;
 
+  __experimental_open?: boolean;
+
+  __experimental_onOpenChanged?: (open: boolean | ((prevState: boolean) => boolean)) => void;
+
   /**
    * Full URL or path to navigate after sign out is complete
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in <ClerkProvider/> or in await Clerk.load()
