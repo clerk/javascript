@@ -448,17 +448,6 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
           break;
         }
-        case 'web3_coinbase_signature': {
-          const signature = fields.get('signature')?.value as string | undefined;
-          assertIsDefined(signature, 'Web3 Coinbase signature');
-
-          attemptParams = {
-            strategy,
-            signature,
-          } satisfies Web3Attempt;
-
-          break;
-        }
         case 'web3_coinbase_wallet_signature': {
           const signature = fields.get('signature')?.value as string | undefined;
           assertIsDefined(signature, 'Web3 Coinbase Wallet signature');
