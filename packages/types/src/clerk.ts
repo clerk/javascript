@@ -40,9 +40,22 @@ import type { Web3Strategy } from './strategies';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 
+/**
+ * Contains information about the SDK that the host application is using.
+ * For example, if Clerk is loaded through `@clerk/nextjs`, this would be `{ name: '@clerk/nextjs', version: '1.0.0' }`
+ */
 export type SDKMetadata = {
+  /**
+   * The npm package name of the SDK
+   */
   name: string;
+  /**
+   * The npm package version of the SDK
+   */
   version: string;
+  /**
+   * Typically this will be the NODE_ENV that the SDK is currently running in
+   */
   environment?: string;
 };
 
@@ -608,12 +621,24 @@ export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
  */
 type ClerkOptionsNavigation =
   | {
+      /**
+       * A function which takes the destination path as an argument and performs a "push" navigation.
+       */
       routerPush?: never;
-      routerDebug?: boolean;
+      /**
+       * A function which takes the destination path as an argument and performs a "replace" navigation.
+       */
       routerReplace?: never;
+      routerDebug?: boolean;
     }
   | {
+      /**
+       * A function which takes the destination path as an argument and performs a "push" navigation.
+       */
       routerPush: RouterFn;
+      /**
+       * A function which takes the destination path as an argument and performs a "replace" navigation.
+       */
       routerReplace: RouterFn;
       routerDebug?: boolean;
     };
@@ -626,29 +651,53 @@ export type ClerkOptions = ClerkOptionsNavigation &
   LegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
+    /**
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     */
     appearance?: Appearance;
+    /**
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     */
     localization?: LocalizationResource;
     polling?: boolean;
     selectInitialSession?: (client: ClientResource) => ActiveSessionResource | null;
     /** Controls if ClerkJS will load with the standard browser setup using Clerk cookies */
     standardBrowser?: boolean;
-    /** Optional support email for display in authentication screens */
+    /**
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/customization/account-portal/overview) pages.
+     */
     supportEmail?: string;
     touchSession?: boolean;
+    /**
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. It's required for development instances if you a use satellite application.
+     */
     signInUrl?: string;
+    /** This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances and required for development instances. */
     signUpUrl?: string;
+    /**
+     * Optional array of domains used to validate against the query param of an auth redirect. If no match is made, the redirect is considered unsafe and the default redirect will be used with a warning passed to the console.
+     */
     allowedRedirectOrigins?: Array<string | RegExp>;
+    /**
+     * This option defines that the application is a satellite application.
+     */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
-     * Telemetry options
+     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry)
      */
     telemetry?:
       | false
       | {
           disabled?: boolean;
+          /**
+           * Telemetry events are only logged to the console and not sent to Clerk
+           */
           debug?: boolean;
         };
 
+    /**
+     * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
+     */
     sdkMetadata?: SDKMetadata;
 
     /**
