@@ -1,7 +1,7 @@
 import type { Web3Provider } from '@clerk/types';
 
 import { toHex } from './hex';
-import { injectedWeb3Providers } from './injectedWeb3Providers';
+import { getInjectedWeb3Providers } from './injectedWeb3Providers';
 
 type GetWeb3IdentifierParams = {
   provider: Web3Provider;
@@ -46,10 +46,6 @@ export async function getMetamaskIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'metamask' });
 }
 
-export async function getCoinbaseIdentifier(): Promise<string> {
-  return await getWeb3Identifier({ provider: 'coinbase' });
-}
-
 export async function getCoinbaseWalletIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'coinbase_wallet' });
 }
@@ -61,10 +57,6 @@ type GenerateSignatureParams = {
 
 export async function generateSignatureWithMetamask({ identifier, nonce }: GenerateSignatureParams): Promise<string> {
   return await generateWeb3Signature({ identifier, nonce, provider: 'metamask' });
-}
-
-export async function generateSignatureWithCoinbase({ identifier, nonce }: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ identifier, nonce, provider: 'coinbase' });
 }
 
 export async function generateSignatureWithCoinbaseWallet({
@@ -80,5 +72,7 @@ async function getEthereumProvider(provider: Web3Provider) {
     const sdk = new CoinbaseWalletSDK({});
     return sdk.makeWeb3Provider({ options: 'all' });
   }
+
+  const injectedWeb3Providers = getInjectedWeb3Providers();
   return injectedWeb3Providers.get(provider);
 }
