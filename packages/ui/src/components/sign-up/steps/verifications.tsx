@@ -5,7 +5,7 @@ import * as SignUp from '@clerk/elements/sign-up';
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -46,16 +46,10 @@ function SignUpIdentifier({ emailAddress, phoneNumber }: Identifier) {
 
 export function SignUpVerifications() {
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { branded, applicationName, homeUrl, logoImageUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
   const isDev = useDevModeWarning();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
@@ -66,13 +60,7 @@ export function SignUpVerifications() {
               <Card.Content>
                 <SignUp.Strategy name='phone_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.phoneCode.title')}</Card.Title>
                     <Card.Description>{t('signUp.phoneCode.subtitle')}</Card.Description>
                     <Card.Description>
@@ -144,13 +132,7 @@ export function SignUpVerifications() {
 
                 <SignUp.Strategy name='email_code'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.emailCode.title')}</Card.Title>
                     <Card.Description>{t('signUp.emailCode.subtitle')}</Card.Description>
                     <Card.Description>
@@ -222,13 +204,7 @@ export function SignUpVerifications() {
 
                 <SignUp.Strategy name='email_link'>
                   <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
+                    <Card.Logo {...logoProps} />
                     <Card.Title>{t('signUp.emailLink.title')}</Card.Title>
                     <Card.Description>
                       {t('signUp.emailLink.subtitle', {
@@ -278,7 +254,7 @@ export function SignUpVerifications() {
                   </Card.Body>
                 </SignUp.Strategy>
               </Card.Content>
-              <Card.Footer {...cardFooterProps} />
+              <Card.Footer {...footerProps} />
             </Card.Root>
           </SignUp.Step>
         );
