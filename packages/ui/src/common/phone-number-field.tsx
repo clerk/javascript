@@ -237,7 +237,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                           <Command.Input
                             ref={commandInputRef}
                             placeholder='Search country or code'
-                            className='leading-small bg-gray-2 placeholder:text-gray-9 text-gray-12 border-gray-4 supports-ios:text-[length:1rem] min-h-[1.875rem] w-full rounded-[calc(theme(borderRadius.md)-2px)] border px-2 py-1 text-base outline-none'
+                            className='leading-small bg-gray-2 placeholder:text-gray-9 text-gray-12 border-gray-4 supports-ios:text-[length:1em] min-h-[1.875rem] w-full rounded-[calc(theme(borderRadius.md)-2px)] border px-2 py-1 text-base outline-none'
                           />
                         </div>
                         <Command.List
@@ -296,7 +296,7 @@ export const PhoneNumberField = React.forwardRef(function PhoneNumberField(
                   onPaste={handlePaste}
                   onChange={handlePhoneNumberChange}
                   {...props}
-                  className='supports-ios:text-[length:1rem] min-h-[1.875rem] w-full rounded-r-md bg-white py-[--phone-number-field-py] pr-[--phone-number-field-px] text-base outline-none'
+                  className='supports-ios:text-[length:1em] min-h-[1.875rem] w-full rounded-r-md bg-white py-[--phone-number-field-py] pr-[--phone-number-field-px] text-base outline-none'
                   data-field-input
                 />
               </div>
