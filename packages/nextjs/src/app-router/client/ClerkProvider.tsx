@@ -115,8 +115,6 @@ export const ClientClerkProvider = (props: NextClerkProviderProps) => {
     ...props,
     routerPush: push,
     routerReplace: replace,
-    // @ts-expect-error -- TODO: type
-    router: clerkRouter,
   });
 
   return (
