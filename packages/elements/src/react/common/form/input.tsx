@@ -1,5 +1,5 @@
-import { useClerk } from '@clerk/clerk-react';
 import { logger } from '@clerk/shared/logger';
+import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type {
   Control as RadixControl,

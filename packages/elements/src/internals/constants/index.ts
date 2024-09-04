@@ -1,11 +1,18 @@
+import { safeAccess } from '~/utils/safe-access';
+
 export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';
 export const CHOOSE_SESSION_PATH_ROUTE = '/choose';
 export const MAGIC_LINK_VERIFY_PATH_ROUTE = '/verify';
 
-export const SIGN_IN_DEFAULT_BASE_PATH =
-  process.env.CLERK_SIGN_IN_URL ?? process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? '/sign-in';
-export const SIGN_UP_DEFAULT_BASE_PATH =
-  process.env.CLERK_SIGN_UP_URL ?? process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? '/sign-up';
+// TODO: remove reliance on next-specific variables here
+export const SIGN_IN_DEFAULT_BASE_PATH = safeAccess(
+  () => process.env.CLERK_SIGN_IN_URL ?? process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+  '/sign-in',
+);
+export const SIGN_UP_DEFAULT_BASE_PATH = safeAccess(
+  () => process.env.CLERK_SIGN_UP_URL ?? process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
+  '/sign-up',
+);
 
 // The version that Next added support for the window.history.pushState and replaceState APIs.
 // ref: https://nextjs.org/blog/next-14-1#windowhistorypushstate-and-windowhistoryreplacestate

@@ -10,7 +10,7 @@ export const clerkLoader = fromCallback<EventObject, Clerk | LoadedClerk>(({ sen
   if (clerk.loaded) {
     reportLoaded();
   } else if ('addOnLoaded' in clerk) {
-    // @ts-expect-error - Expects `addOnLoaded` from @clerk/clerk-react's IsomorphicClerk.
+    // @ts-expect-error - Expects `addOnLoaded` from @clerk/shared/react's IsomorphicClerk.
     clerk.addOnLoaded(reportLoaded);
   } else {
     sendBack({ type: 'ERROR', message: 'Clerk client could not be loaded' });
