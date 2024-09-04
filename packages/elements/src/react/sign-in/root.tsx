@@ -1,4 +1,5 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
+import { useClerkHostRouter } from '@clerk/shared/router';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import { useSelector } from '@xstate/react';
 import React, { useEffect } from 'react';
@@ -9,7 +10,7 @@ import { FormStoreProvider, useFormStore } from '~/internals/machines/form/form.
 import type { SignInRouterInitEvent } from '~/internals/machines/sign-in';
 import { SignInRouterMachine } from '~/internals/machines/sign-in';
 import { inspect } from '~/internals/utils/inspector';
-import { Router, useClerkRouter, useNextRouter, useVirtualRouter } from '~/react/router';
+import { Router, useClerkRouter, useVirtualRouter } from '~/react/router';
 import { SignInRouterCtx } from '~/react/sign-in/context';
 
 import { Form } from '../common/form';
@@ -39,8 +40,7 @@ function SignInFlowProvider({ children, exampleMode, fallback, isRootPath }: Sig
       return;
     }
 
-    // @ts-expect-error -- This is actually an IsomorphicClerk instance
-    clerk.addOnLoaded(() => {
+    const cb = () => {
       const evt: SignInRouterInitEvent = {
         type: 'INIT',
         clerk,
@@ -53,7 +53,14 @@ function SignInFlowProvider({ children, exampleMode, fallback, isRootPath }: Sig
       if (actor.getSnapshot().can(evt)) {
         actor.send(evt);
       }
-    });
+    };
+
+    if ('addOnLoaded' in clerk) {
+      // @ts-expect-error - addOnLoaded doesn't exist on the clerk type, but it does on IsomorphicClerk, which can be hit when Elements is used standalone
+      clerk.addOnLoaded(cb);
+    } else {
+      cb();
+    }
 
     // Ensure that the latest instantiated formRef is attached to the router
     if (formRef && actor.getSnapshot().can({ type: 'RESET.STEP' })) {
@@ -123,8 +130,7 @@ export function SignInRoot({
     }),
   );
 
-  // TODO: eventually we'll rely on the framework SDK to specify its host router, but for now we'll default to Next.js
-  const router = (routing === ROUTING.virtual ? useVirtualRouter : useNextRouter)();
+  const router = (routing === ROUTING.virtual ? useVirtualRouter : useClerkHostRouter)();
   const isRootPath = path === router.pathname();
 
   return (
