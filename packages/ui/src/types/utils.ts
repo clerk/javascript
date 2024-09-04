@@ -13,6 +13,8 @@ export type VerificationStatus =
   | 'client_mismatch';
 
 /**
+ * Zero-runtime polymorphic component definitions for React
+ *
  * @link https://github.com/kripod/react-polymorphic-types
  */
 type Merge<T, U> = Omit<T, keyof U> & U;
