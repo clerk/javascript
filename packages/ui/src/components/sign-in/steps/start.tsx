@@ -11,8 +11,9 @@ import { PhoneNumberField } from '~/common/phone-number-field';
 import { PhoneNumberOrUsernameField } from '~/common/phone-number-or-username-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -26,38 +27,31 @@ import { Separator } from '~/primitives/separator';
 export function SignInStart() {
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
   const { enabled: usernameEnabled } = useAttributes('username');
   const { enabled: phoneNumberEnabled } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled } = useAttributes('email_address');
   const { enabled: passkeyEnabled } = useAttributes('passkey');
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { layout } = useAppearance().parsedAppearance;
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
+        const connectionsWithSeperator = [
+          <Connections disabled={isGlobalLoading} />,
+          hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
+        ];
         return (
           <SignIn.Step name='start'>
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
                   <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
                 </Card.Header>
@@ -65,9 +59,7 @@ export function SignInStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  <Connections disabled={isGlobalLoading} />
-
-                  {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
+                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -134,6 +126,7 @@ export function SignInStart() {
                       ) : null}
                     </div>
                   ) : null}
+                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
                 </Card.Body>
                 <Card.Actions>
                   <Common.Loading scope='submit'>
@@ -181,7 +174,7 @@ export function SignInStart() {
                 </Card.Actions>
               </Card.Content>
 
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signIn.start.actionText')}{' '}

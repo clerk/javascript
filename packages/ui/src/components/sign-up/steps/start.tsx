@@ -12,8 +12,9 @@ import { PasswordField } from '~/common/password-field';
 import { PhoneNumberField } from '~/common/phone-number-field';
 import { UsernameField } from '~/common/username-field';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useAttributes } from '~/hooks/use-attributes';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
@@ -28,7 +29,6 @@ export function SignUpStart() {
   const clerk = useClerk();
   const enabledConnections = useEnabledConnections();
   const { userSettings } = useEnvironment();
-  const { layout } = useAppearance();
   const { t } = useLocalizations();
   const { enabled: firstNameEnabled, required: firstNameRequired } = useAttributes('first_name');
   const { enabled: lastNameEnabled, required: lastNameRequired } = useAttributes('last_name');
@@ -36,33 +36,27 @@ export function SignUpStart() {
   const { enabled: phoneNumberEnabled, required: phoneNumberRequired } = useAttributes('phone_number');
   const { enabled: emailAddressEnabled, required: emailAddressRequired } = useAttributes('email_address');
   const { enabled: passwordEnabled, required: passwordRequired } = useAttributes('password');
-  const { applicationName, branded, homeUrl, logoImageUrl } = useDisplayConfig();
+  const { applicationName } = useDisplayConfig();
 
   const hasConnection = enabledConnections.length > 0;
   const hasIdentifier = emailAddressEnabled || usernameEnabled || phoneNumberEnabled;
   const isDev = useDevModeWarning();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { layout } = useAppearance().parsedAppearance;
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
       {isGlobalLoading => {
+        const connectionsWithSeperator = [
+          <Connections disabled={isGlobalLoading} />,
+          hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
+        ];
         return (
           <SignUp.Step name='start'>
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signUp.start.title')}</Card.Title>
                   <Card.Description>
                     {t('signUp.start.subtitle', {
@@ -74,9 +68,7 @@ export function SignUpStart() {
                 <GlobalError />
 
                 <Card.Body>
-                  <Connections disabled={isGlobalLoading} />
-
-                  {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
+                  {layout.socialButtonsPlacement === 'top' ? connectionsWithSeperator : null}
 
                   {hasIdentifier ? (
                     <div className='flex flex-col gap-4'>
@@ -130,6 +122,8 @@ export function SignUpStart() {
                     </div>
                   ) : null}
 
+                  {layout.socialButtonsPlacement === 'bottom' ? connectionsWithSeperator.reverse() : null}
+
                   {userSettings.signUp.captcha_enabled ? <SignUp.Captcha className='empty:hidden' /> : null}
                 </Card.Body>
                 {hasConnection || hasIdentifier ? (
@@ -155,7 +149,7 @@ export function SignUpStart() {
                   </Card.Actions>
                 ) : null}
               </Card.Content>
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signUp.start.actionText')}{' '}

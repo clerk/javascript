@@ -6,38 +6,25 @@ import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
-import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
 import { LinkButton } from '~/primitives/link';
-import { Separator } from '~/primitives/separator';
 
 /* Internal
   ============================================ */
 
-function FirstFactorConnections({
-  isGlobalLoading,
-  hasConnection,
-}: {
-  isGlobalLoading: boolean;
-  hasConnection: boolean;
-}) {
-  const { t } = useLocalizations();
+function FirstFactorConnections({ isGlobalLoading }: { isGlobalLoading: boolean }) {
   const { signIn } = useSignIn();
   const isFirstFactor = signIn?.status === 'needs_first_factor';
 
   if (isFirstFactor) {
-    return (
-      <>
-        <Connections disabled={isGlobalLoading} />
-        {hasConnection ? <Separator>{t('dividerText')}</Separator> : null}
-      </>
-    );
+    return <Connections disabled={isGlobalLoading} />;
   }
   return null;
 }
@@ -48,18 +35,11 @@ function FirstFactorConnections({
 export function SignInChooseStrategy() {
   const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
-  const { applicationName, branded, logoImageUrl, homeUrl } = useDisplayConfig();
   const { setShowHelp } = useGetHelp();
 
   const hasConnection = enabledConnections.length > 0;
   const isDev = useDevModeWarning();
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { logoProps, footerProps } = useCard();
 
   return (
     <Common.Loading scope='global'>
@@ -69,13 +49,7 @@ export function SignInChooseStrategy() {
             <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
               <Card.Content>
                 <Card.Header>
-                  {logoImageUrl ? (
-                    <Card.Logo
-                      href={homeUrl}
-                      src={logoImageUrl}
-                      alt={applicationName}
-                    />
-                  ) : null}
+                  <Card.Logo {...logoProps} />
                   <Card.Title>{t('signIn.alternativeMethods.title')}</Card.Title>
                   <Card.Description>{t('signIn.alternativeMethods.subtitle')}</Card.Description>
                 </Card.Header>
@@ -83,122 +57,117 @@ export function SignInChooseStrategy() {
                 <GlobalError />
 
                 <Card.Body>
-                  <div className='flex flex-col gap-6'>
-                    <FirstFactorConnections
-                      isGlobalLoading={isGlobalLoading}
-                      hasConnection={hasConnection}
-                    />
-                    <div className='flex flex-col gap-3'>
-                      <div className='flex flex-col gap-2'>
-                        <SignIn.SupportedStrategy
-                          name='email_link'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.LinkSm />}
-                          >
-                            <SignIn.SafeIdentifier
-                              transform={(identifier: string) =>
-                                t('signIn.alternativeMethods.blockButton__emailLink', {
-                                  identifier,
-                                })
-                              }
-                            />
-                          </Button>
-                        </SignIn.SupportedStrategy>
-
-                        <SignIn.SupportedStrategy
-                          name='email_code'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.EnvelopeSm />}
-                          >
-                            <SignIn.SafeIdentifier
-                              transform={(identifier: string) =>
-                                t('signIn.alternativeMethods.blockButton__emailCode', {
-                                  identifier,
-                                })
-                              }
-                            />
-                          </Button>
-                        </SignIn.SupportedStrategy>
-
-                        <SignIn.SupportedStrategy
-                          name='phone_code'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.SMSSm />}
-                          >
-                            <SignIn.SafeIdentifier
-                              transform={(identifier: string) =>
-                                t('signIn.alternativeMethods.blockButton__phoneCode', {
-                                  identifier,
-                                })
-                              }
-                            />
-                          </Button>
-                        </SignIn.SupportedStrategy>
-
-                        <SignIn.SupportedStrategy
-                          name='passkey'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.FingerprintSm />}
-                          >
-                            {t('signIn.alternativeMethods.blockButton__passkey')}
-                          </Button>
-                        </SignIn.SupportedStrategy>
-
-                        <SignIn.SupportedStrategy
-                          name='password'
-                          asChild
-                        >
-                          <Button
-                            intent='secondary'
-                            iconStart={<Icon.LockSm />}
-                          >
-                            {t('signIn.alternativeMethods.blockButton__password')}
-                          </Button>
-                        </SignIn.SupportedStrategy>
-
-                        {
-                          // `SupportedStrategy`s that are only intended for use
-                          // within `choose-strategy`, not the `forgot-password`
-                          // `Step
-                        }
-                        <SignIn.SupportedStrategy
-                          name='totp'
-                          asChild
-                        >
-                          <Button intent='secondary'>{t('signIn.alternativeMethods.blockButton__totp')}</Button>
-                        </SignIn.SupportedStrategy>
-
-                        <SignIn.SupportedStrategy
-                          name='backup_code'
-                          asChild
-                        >
-                          <Button intent='secondary'>{t('signIn.alternativeMethods.blockButton__backupCode')}</Button>
-                        </SignIn.SupportedStrategy>
-                      </div>
-
-                      <SignIn.Action
-                        navigate='previous'
+                  <div className='flex flex-col gap-3'>
+                    <div className='flex flex-col gap-2'>
+                      <FirstFactorConnections isGlobalLoading={isGlobalLoading} />
+                      <SignIn.SupportedStrategy
+                        name='email_link'
                         asChild
                       >
-                        <LinkButton>{t('backButton')}</LinkButton>
-                      </SignIn.Action>
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.LinkSm />}
+                        >
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__emailLink', {
+                                identifier,
+                              })
+                            }
+                          />
+                        </Button>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='email_code'
+                        asChild
+                      >
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.EnvelopeSm />}
+                        >
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__emailCode', {
+                                identifier,
+                              })
+                            }
+                          />
+                        </Button>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='phone_code'
+                        asChild
+                      >
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.SMSSm />}
+                        >
+                          <SignIn.SafeIdentifier
+                            transform={(identifier: string) =>
+                              t('signIn.alternativeMethods.blockButton__phoneCode', {
+                                identifier,
+                              })
+                            }
+                          />
+                        </Button>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='passkey'
+                        asChild
+                      >
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.FingerprintSm />}
+                        >
+                          {t('signIn.alternativeMethods.blockButton__passkey')}
+                        </Button>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='password'
+                        asChild
+                      >
+                        <Button
+                          intent='secondary'
+                          iconStart={<Icon.LockSm />}
+                        >
+                          {t('signIn.alternativeMethods.blockButton__password')}
+                        </Button>
+                      </SignIn.SupportedStrategy>
+
+                      {
+                        // `SupportedStrategy`s that are only intended for use
+                        // within `choose-strategy`, not the `forgot-password`
+                        // `Step
+                      }
+                      <SignIn.SupportedStrategy
+                        name='totp'
+                        asChild
+                      >
+                        <Button intent='secondary'>{t('signIn.alternativeMethods.blockButton__totp')}</Button>
+                      </SignIn.SupportedStrategy>
+
+                      <SignIn.SupportedStrategy
+                        name='backup_code'
+                        asChild
+                      >
+                        <Button intent='secondary'>{t('signIn.alternativeMethods.blockButton__backupCode')}</Button>
+                      </SignIn.SupportedStrategy>
                     </div>
+
+                    <SignIn.Action
+                      navigate='previous'
+                      asChild
+                    >
+                      <LinkButton>{t('backButton')}</LinkButton>
+                    </SignIn.Action>
                   </div>
                 </Card.Body>
               </Card.Content>
-              <Card.Footer {...cardFooterProps}>
+              <Card.Footer {...footerProps}>
                 <Card.FooterAction>
                   <Card.FooterActionText>
                     {t('signIn.alternativeMethods.actionText')}{' '}

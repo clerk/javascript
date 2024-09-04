@@ -1,6 +1,7 @@
-import { jest } from '@jest/globals';
-import { TextEncoder, TextDecoder } from 'node:util';
 import crypto from 'node:crypto';
+import { TextDecoder, TextEncoder } from 'node:util';
+
+import { jest } from '@jest/globals';
 
 if (typeof window !== 'undefined') {
   Object.defineProperties(globalThis, {

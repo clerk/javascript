@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useAppearance } from '~/contexts';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
 import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
@@ -87,7 +87,7 @@ const statusIcon: Record<Status, React.ReactElement> = {
 export function SignUpStatus() {
   const { t } = useLocalizations();
   const { branded } = useDisplayConfig();
-  const { layout } = useAppearance();
+  const { layout } = useAppearance().parsedAppearance;
   const isDev = useDevModeWarning();
   const [status] = React.useState<Status>('loading');
 
