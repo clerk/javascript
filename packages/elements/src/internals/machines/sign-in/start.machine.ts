@@ -32,6 +32,9 @@ export const SignInStartMachine = setup({
         if (strategy === 'web3_coinbase_signature') {
           return parent.getSnapshot().context.clerk.client.signIn.authenticateWithCoinbase();
         }
+        if (strategy === 'web3_coinbase_wallet_signature') {
+          return parent.getSnapshot().context.clerk.client.signIn.authenticateWithCoinbaseWallet();
+        }
         throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
       },
     ),
