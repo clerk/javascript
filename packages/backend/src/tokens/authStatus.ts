@@ -67,6 +67,7 @@ export const AuthErrorReason = {
   SessionTokenOutdated: 'session-token-outdated',
   SessionTokenWithoutClientUAT: 'session-token-but-no-client-uat',
   UnexpectedError: 'unexpected-error',
+  TokenRefreshFailed: 'token-refresh-failed',
 } as const;
 
 export type AuthErrorReason = (typeof AuthErrorReason)[keyof typeof AuthErrorReason];

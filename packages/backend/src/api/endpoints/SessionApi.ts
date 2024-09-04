@@ -55,4 +55,22 @@ export class SessionAPI extends AbstractAPI {
       path: joinPaths(basePath, sessionId, 'tokens', template || ''),
     });
   }
+
+  public async refreshToken(sessionId: string, token: string, refreshToken: string) {
+    // TODO: type
+    return this.request<any>({
+      method: 'POST',
+      path: joinPaths(basePath, sessionId, 'refresh'),
+      bodyParams: {
+        expiredToken: token,
+        refreshToken,
+        request: {
+          host: '',
+          proto: '',
+          ip: '',
+          headers: {},
+        },
+      },
+    });
+  }
 }

@@ -188,6 +188,63 @@ ${error.getFullMessage()}`,
     return signedOut(authenticateContext, reason, message);
   }
 
+  // Given a refresh token available on the request and an expired session token, attempt to refresh the token via BAPI.
+  // If this fails with a 401, go through the redirect-based handshake flow. Otherwise, assume signed out.
+  async function handleAttemptRefresh(authenticateContext: AuthenticateContext, message: string) {
+    if (!authenticateContext.sessionToken) {
+      throw new Error(
+        'Clerk: attempting to refresh expired session token, but no token was found. This should not happen.',
+      );
+    }
+
+    if (!authenticateContext.refreshToken) {
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenOutdated, message);
+    }
+
+    // We assume this token has already been successfully decoded and determined to be expired
+    const { data: decodedToken } = decodeJwt(authenticateContext.sessionToken);
+
+    try {
+      const headers = new Headers();
+
+      // This is a handshake payload
+      // TODO: pass request metadata
+      const result = await options?.apiClient?.sessions?.refreshToken(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+        decodedToken?.payload?.sid!,
+        authenticateContext.sessionToken,
+        authenticateContext.refreshToken,
+      );
+
+      // Pass set-cookie directives along from the response
+      let sessionToken = '';
+      result.forEach((x: string) => {
+        headers.append('Set-Cookie', x);
+        if (getCookieName(x).startsWith(constants.Cookies.Session)) {
+          sessionToken = getCookieValue(x);
+        }
+      });
+
+      if (sessionToken === '') {
+        return signedOut(authenticateContext, AuthErrorReason.SessionTokenMissing, '', headers);
+      }
+
+      // TODO: is the immediate verification necessary?
+      const { data, errors: [error] = [] } = await verifyToken(sessionToken, authenticateContext);
+      if (data) {
+        return signedIn(authenticateContext, data, headers, sessionToken);
+      }
+
+      // TODO: if verification fails, signedOut?
+      return signedOut(authenticateContext, AuthErrorReason.UnexpectedError, error?.getFullMessage());
+    } catch (err) {
+      // TODO: on 401, execute handshake (indicates expired refresh token)
+
+      // TODO: otherwise, signedOut?
+      return signedOut(authenticateContext, AuthErrorReason.TokenRefreshFailed, err.message);
+    }
+  }
+
   async function authenticateRequestWithTokenInHeader() {
     const { sessionTokenInHeader } = authenticateContext;
 
@@ -356,8 +413,6 @@ ${error.getFullMessage()}`,
     } catch (err) {
       return handleError(err, 'cookie');
     }
-
-    return signedOut(authenticateContext, AuthErrorReason.UnexpectedError);
   }
 
   function handleError(err: unknown, tokenCarrier: TokenCarrier) {
@@ -367,7 +422,12 @@ ${error.getFullMessage()}`,
       const reasonToHandshake = [
         TokenVerificationErrorReason.TokenExpired,
         TokenVerificationErrorReason.TokenNotActiveYet,
-      ].includes(err.reason);
+      ].includes(err.reason as any);
+
+      // Attempt to trigger a token refresh
+      if (err.reason === TokenVerificationErrorReason.TokenExpired) {
+        return handleAttemptRefresh(authenticateContext, err.getFullMessage());
+      }
 
       if (reasonToHandshake) {
         return handleMaybeHandshakeStatus(
@@ -376,6 +436,7 @@ ${error.getFullMessage()}`,
           err.getFullMessage(),
         );
       }
+
       return signedOut(authenticateContext, err.reason, err.getFullMessage());
     }
 

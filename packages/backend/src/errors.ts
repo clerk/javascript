@@ -21,7 +21,7 @@ export const TokenVerificationErrorReason = {
   RemoteJWKMissing: 'jwk-remote-missing',
   JWKFailedToResolve: 'jwk-failed-to-resolve',
   JWKKidMismatch: 'jwk-kid-mismatch',
-};
+} as const;
 
 export type TokenVerificationErrorReason =
   (typeof TokenVerificationErrorReason)[keyof typeof TokenVerificationErrorReason];

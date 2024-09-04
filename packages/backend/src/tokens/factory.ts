@@ -51,6 +51,7 @@ export function createAuthenticateRequest(params: CreateAuthenticateRequestOptio
     return authenticateRequestOriginal(request, {
       ...options,
       ...runTimeOptions,
+      apiClient: params.apiClient,
       // We should add all the omitted props from options here (eg apiUrl / apiVersion)
       // to avoid runtime options override them.
       apiUrl,

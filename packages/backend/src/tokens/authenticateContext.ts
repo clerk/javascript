@@ -24,6 +24,7 @@ interface AuthenticateContextInterface extends AuthenticateRequestOptions {
   clientUat: number;
   suffixedCookies: boolean;
   // handshake-related values
+  refreshToken: string | undefined;
   devBrowserToken: string | undefined;
   handshakeToken: string | undefined;
   handshakeRedirectLoopCounter: number;
@@ -97,6 +98,7 @@ class AuthenticateContext {
     // suffixedCookies needs to be set first because it's used in getMultipleAppsCookie
     this.suffixedCookies = this.shouldUseSuffixed();
     this.sessionTokenInCookie = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Session);
+    this.refreshToken = this.getSuffixedOrUnSuffixedCookie(constants.Cookies.Refresh);
     this.clientUat = Number.parseInt(this.getSuffixedOrUnSuffixedCookie(constants.Cookies.ClientUat) || '') || 0;
   }
 

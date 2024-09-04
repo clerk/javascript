@@ -20,6 +20,7 @@ const Cookies = {
   Handshake: '__clerk_handshake',
   DevBrowser: '__clerk_db_jwt',
   RedirectCount: '__clerk_redirect_count',
+  Refresh: '__refresh',
 } as const;
 
 const QueryParameters = {
