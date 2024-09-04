@@ -10,21 +10,12 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
   let fakeOrganization: FakeOrganization;
   let fakeAdmin2: FakeUser;
   let fakeOrganization2: FakeOrganization;
-  let fakeViewer: FakeUser;
 
   test.beforeAll(async () => {
     const m = createTestUtils({ app });
     fakeAdmin = m.services.users.createFakeUser();
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
-
-    fakeViewer = m.services.users.createFakeUser();
-    const viewer = await m.services.users.createBapiUser(fakeViewer);
-    await m.services.clerk.organizations.createOrganizationMembership({
-      organizationId: fakeOrganization.organization.id,
-      role: 'org:viewer',
-      userId: viewer.id,
-    });
 
     fakeAdmin2 = m.services.users.createFakeUser();
     const admin2 = await m.services.users.createBapiUser(fakeAdmin2);
@@ -34,7 +25,6 @@ testAgainstRunningApps({ withPattern: ['astro.node.withCustomRoles'] })('basic f
   test.afterAll(async () => {
     await fakeOrganization.delete();
     await fakeAdmin.deleteIfExists();
-    await fakeViewer.deleteIfExists();
 
     await fakeOrganization2.delete();
     await fakeAdmin2.deleteIfExists();
