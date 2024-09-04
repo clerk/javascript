@@ -23,7 +23,6 @@ const tailwindcssTransformerCode = {
     build.onEnd(async () => {
       const styleSheet = await generateStylesheet(styleCache, {
         tailwindConfig: path.join(process.cwd(), 'src', 'tailwind.config.ts'),
-        globalCss: fs.readFileSync(path.join(process.cwd(), 'src', 'global.css'), 'utf8'),
       });
       await fs.promises.mkdir(outDir, { recursive: true });
       await fs.promises.writeFile(path.join(outDir, 'styles.css'), styleSheet);

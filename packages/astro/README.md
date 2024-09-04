@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/astro</h1>
 </p>
-
-# @clerk/astro
 
 <div align="center">
 
@@ -22,155 +21,38 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_astro)
 
 </div>
 
----
-
-## Overview
-
-Clerk is the easiest way to add authentication and user management to your Astro application. Add sign up, sign in, and profile management to your Astro application in minutes.
-
-## Getting Started
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_astro) is the easiest way to add authentication and user management to your Astro application. Add sign up, sign in, and profile management to your application in minutes.
 
 ### Prerequisites
 
 - Astro 3.2 or later
 - Node.js `>=18.17.0` or later
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_astro).
 
 ### Installation
 
-Add `@clerk/astro` as a dependency
+The fastest way to get started with Clerk is by following the [Astro Quickstart](https://clerk.com/docs/quickstarts/astro?utm_source=github&utm_medium=clerk_astro).
 
-**With npm**
-
-```sh
-npm install @clerk/astro
-```
-
-**With yarn**
-
-```sh
-yarn add @clerk/astro
-```
-
-**With pnpm**
-
-```sh
-pnpm add @clerk/astro
-```
-
-### Build
-
-To build the package locally with the TypeScript compiler, run:
-
-```sh
-npm run build
-```
-
-To build the package in watch mode, run the following:
-
-```sh
-npm run dev
-```
+You'll learn how to install `@clerk/astro`, set up your environment keys, add the `clerk()` integration to your application, use the Clerk middleware, and use Clerk's prebuilt components.
 
 ## Usage
 
-### Set environment variables
-
-```sh
-PUBLIC_CLERK_PUBLISHABLE_KEY=pk_(test|live)_xxxxxxx
-CLERK_SECRET_KEY=sk_(test|live)_xxxxxxx
-
-PUBLIC_CLERK_SIGN_IN_URL=/sign-in # update this if sign in page exists on another path
-PUBLIC_CLERK_SIGN_UP_URL=/sign-up # update this if sign up page exists on another path
-```
-
-### Update `env.d.ts`
-
-```ts
-/// <reference types="astro/client" />
-/// <reference types="@clerk/astro/env" />
-```
-
-### Add integrations
-
-Follow [the instructions](https://clerk.com/docs/quickstarts/astro) in our documentation.
-
-Example configuration file
-
-```js
-import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
-import clerk from '@clerk/astro';
-
-export default defineConfig({
-  integrations: [clerk()],
-  adapter: node({ mode: 'standalone' }),
-  output: 'server',
-});
-```
-
-### Add a middleware file
-
-This step is required in order to use SSR or any control component. Create a `middleware.ts` file inside the `src/` directory.
-
-```ts
-import { clerkMiddleware } from '@clerk/astro/server';
-
-export const onRequest = clerkMiddleware();
-```
-
-### Use components inside .astro files
-
-```astro
----
-import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/astro/components";
----
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-  </head>
-  <body>
-    <header>
-      <h1>{title}</h1>
-      <nav>
-        <SignedOut>
-         <SignInButton mode="modal" />
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
-      </nav>
-    </header>
-    <article>
-      <slot />
-    </article>
-  </body>
-</html>
-```
-
-_For further details and examples, please refer to
-our [Documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_nextjs)._
+For further information, guides, and examples visit the [Astro reference documentation](https://clerk.com/docs/references/astro/overview?utm_source=github&utm_medium=clerk_astro).
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_astro)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_astro)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please
-read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md))
-.
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 
@@ -178,8 +60,7 @@ read [our contribution guidelines](https://github.com/clerk/javascript/blob/main
 
 `@clerk/astro` is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to
-our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
+_For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 
 ## License
 

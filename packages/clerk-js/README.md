@@ -6,9 +6,8 @@
     </picture>
   </a>
   <br />
+  <h1 align="center">@clerk/clerk-js</h1>
 </p>
-
-# @clerk/clerk-js
 
 <div align="center">
 
@@ -22,119 +21,38 @@
 ·
 [Request a Feature](https://feedback.clerk.com/roadmap)
 ·
-[Ask a Question](https://github.com/clerk/javascript/discussions)
+[Get help](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_js)
 
 </div>
 
----
-
-## Overview
-
-ClerkJS is our foundational JavaScript library for building user management and authentication. It enables you to register, sign in, verify and manage users for your application using highly customizable flows.
-
 ## Getting Started
+
+[Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_js) is the easiest way to add authentication and user management to your JavaScript application. Add sign up, sign in, and profile management to your application in minutes.
+
+### Prerequisites
+
+- An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_js).
 
 ### Installation
 
-There are two ways you can include ClerkJS in your project. You can either [import the ClerkJS npm module](#install-clerkjs-as-es-module) or [load ClerkJS with a script tag](#install-clerkjs-as-script).
+The fastest way to get started with Clerk is by following the [JavaScript Quickstart](https://clerk.com/docs/quickstarts/javascript?utm_source=github&utm_medium=clerk_js).
 
-### Install ClerkJS as ES module
-
-```sh
-npm install @clerk/clerk-js
-```
-
-Once you have installed the package, you will need to import the ClerkJS object constructor into your code and pass it your [Publishable Key](https://dashboard.clerk.com/last-active?path=api-keys) as a parameter.
-
-```js
-import Clerk from '@clerk/clerk-js';
-
-const clerkPublishableKey = 'pk_[publishable_key]';
-const clerk = new Clerk(clerkPublishableKey);
-await clerk.load({
-  // Set load options here...
-});
-```
-
-### Install ClerkJS as script
-
-ClerkJS can be loaded from a `<script />` tag with the source from your [Frontend API URL](https://dashboard.clerk.com/last-active?path=api-keys).
-
-Add the following script to your site's `<body>` element:
-
-```html
-<script>
-  // Get this URL and Publishable Key from the Clerk Dashboard
-  const clerkPublishableKey = 'pk_[publishable_key]';
-  const frontendApiUrl = '[your-domain].clerk.accounts.dev';
-  const version = '@latest'; // Set to appropriate version
-
-  // Creates asynchronous script
-  const script = document.createElement('script');
-  script.setAttribute('data-clerk-publishable-key', clerkPublishableKey);
-  script.async = true;
-  script.src = `https://${frontendApiUrl}/npm/@clerk/clerk-js${version}/dist/clerk.browser.js`;
-
-  // Adds listener to initialize ClerkJS after it's loaded
-  script.addEventListener('load', async function () {
-    await window.Clerk.load({
-      // Set load options here...
-    });
-  });
-  document.body.appendChild(script);
-</script>
-```
-
-### Build
-
-To build the package locally with Webpack, run:
-
-```sh
-npm run build
-```
+You'll learn how to add the ClerkJS SDK to your application (either through `<script>` tag or NPM module) and use Clerk's prebuilt components.
 
 ## Usage
 
-```html
-<h1>Hello Clerk!</h1>
-
-<button
-  id="sign-in-button"
-  onclick="Clerk.openSignIn()"
->
-  Sign In
-</button>
-<div id="user-button"></div>
-
-<script>
-  async function loadClerk() {
-    const userButton = document.getElementById('user-button');
-    const signInButton = document.getElementById('sign-in-button');
-
-    await window.Clerk.load();
-
-    if (Clerk.user) {
-      Clerk.mountUserButton(userButton);
-      signInButton.hidden = true;
-    }
-  }
-  // [...] Installation code
-</script>
-```
-
-_For further details and examples, please refer to our [Documentation](https://clerk.com/docs?utm_source=github&utm_medium=clerk_js)._
+For further information, guides, and examples visit the [ClerkJS reference documentation](https://clerk.com/docs/references/javascript/overview?utm_source=github&utm_medium=clerk_js).
 
 ## Support
 
 You can get in touch with us in any of the following ways:
 
 - Join our official community [Discord server](https://clerk.com/discord)
-- Create a [GitHub Discussion](https://github.com/clerk/javascript/discussions)
-- Contact options listed on [our Support page](https://clerk.com/support?utm_source=github&utm_medium=clerk_js)
+- On [our support page](https://clerk.com/contact/support?utm_source=github&utm_medium=clerk_js)
 
 ## Contributing
 
-We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md).
+We're open to all community contributions! If you'd like to contribute in any way, please read [our contribution guidelines](https://github.com/clerk/javascript/blob/main/docs/CONTRIBUTING.md) and [code of conduct](https://github.com/clerk/javascript/blob/main/docs/CODE_OF_CONDUCT.md).
 
 ## Security
 

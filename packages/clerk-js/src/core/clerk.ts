@@ -17,11 +17,15 @@ import {
 import { logger } from '@clerk/shared/logger';
 import { eventPrebuiltComponentMounted, TelemetryCollector } from '@clerk/shared/telemetry';
 import type {
+  __experimental_UserVerificationModalProps,
+  __experimental_UserVerificationProps,
   ActiveSessionResource,
+  AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   Clerk as ClerkInterface,
   ClerkAPIError,
+  ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
   ClientResource,
   CreateOrganizationParams,
@@ -57,6 +61,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   UserResource,
+  Web3Provider,
 } from '@clerk/types';
 
 import type { MountComponentRenderer } from '../ui/Components';
@@ -69,7 +74,10 @@ import {
   createPageLifecycle,
   disabledOrganizationsFeature,
   errorThrower,
+  generateSignatureWithCoinbaseWallet,
+  generateSignatureWithMetamask,
   getClerkQueryParam,
+  getWeb3Identifier,
   hasExternalAccountSignUpError,
   ignoreEventValue,
   inActiveBrowserTab,
@@ -323,7 +331,12 @@ export class Clerk implements ClerkInterface {
     const cb = typeof callbackOrOptions === 'function' ? callbackOrOptions : defaultCb;
 
     if (!opts.sessionId || this.client.activeSessions.length === 1) {
-      await this.client.destroy();
+      if (this.#options.experimental?.persistClient) {
+        await this.client.removeSessions();
+      } else {
+        await this.client.destroy();
+      }
+
       return this.setActive({
         session: null,
         beforeEmit: ignoreEventValue(cb),
@@ -342,6 +355,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
+    // TODO: add telemetry
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'GoogleOneTap' })
@@ -371,6 +385,26 @@ export class Clerk implements ClerkInterface {
   public closeSignIn = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('signIn'));
+  };
+
+  public __experimental_openUserVerification = (props?: __experimental_UserVerificationModalProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
+          code: 'cannot_render_user_missing',
+        });
+      }
+      return;
+    }
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'UserVerification' })
+      .then(controls => controls.openModal('userVerification', props || {}));
+  };
+
+  public __experimental_closeUserVerification = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
   };
 
   public openSignUp = (props?: SignUpProps): void => {
@@ -475,6 +509,38 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
+  public __experimental_mountUserVerification = (
+    node: HTMLDivElement,
+    props?: __experimental_UserVerificationProps,
+  ): void => {
+    this.assertComponentsReady(this.#componentControls);
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotOpenUserProfile, {
+          code: 'cannot_render_user_missing',
+        });
+      }
+      return;
+    }
+    void this.#componentControls.ensureMounted({ preloadHint: 'UserVerification' }).then(controls =>
+      controls.mountComponent({
+        name: 'UserVerification',
+        appearanceKey: 'userVerification',
+        node,
+        props,
+      }),
+    );
+  };
+
+  public __experimental_unmountUserVerification = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
@@ -854,6 +920,7 @@ export class Clerk implements ClerkInterface {
 
     return this.#authService.decorateUrlWithDevBrowserToken(toURL).href;
   }
+
   public buildSignInUrl(options?: SignInRedirectOptions): string {
     return this.#buildUrl(
       'signInUrl',
@@ -1333,25 +1400,43 @@ export class Clerk implements ClerkInterface {
       }) as Promise<SignInResource | SignUpResource>;
   };
 
-  public authenticateWithMetamask = async ({
+  public authenticateWithMetamask = async (props: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({ ...props, strategy: 'web3_metamask_signature' });
+  };
+
+  public authenticateWithCoinbaseWallet = async (props: AuthenticateWithCoinbaseWalletParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({ ...props, strategy: 'web3_coinbase_wallet_signature' });
+  };
+
+  public authenticateWithWeb3 = async ({
     redirectUrl,
     signUpContinueUrl,
     customNavigate,
     unsafeMetadata,
-  }: AuthenticateWithMetamaskParams = {}): Promise<void> => {
+    strategy,
+  }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
     }
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    const identifier = await getWeb3Identifier({ provider });
+    const generateSignature =
+      provider === 'metamask' ? generateSignatureWithMetamask : generateSignatureWithCoinbaseWallet;
 
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
 
     let signInOrSignUp: SignInResource | SignUpResource;
     try {
-      signInOrSignUp = await this.client.signIn.authenticateWithMetamask();
+      signInOrSignUp = await this.client.signIn.authenticateWithWeb3({ identifier, generateSignature, strategy });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
-        signInOrSignUp = await this.client.signUp.authenticateWithMetamask({ unsafeMetadata });
+        signInOrSignUp = await this.client.signUp.authenticateWithWeb3({
+          identifier,
+          generateSignature,
+          unsafeMetadata,
+          strategy,
+        });
 
         if (
           signUpContinueUrl &&
