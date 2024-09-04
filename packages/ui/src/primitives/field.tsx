@@ -175,7 +175,7 @@ export const Input = React.forwardRef(function FieldInput(
         'text-gray-12 relative flex min-h-[1.875rem] min-w-0 items-center rounded-md bg-white text-base outline-none ring ring-offset-1',
         'shadow-[0px_1px_1px_0px_theme(colors.gray.a3)]',
         'disabled:cursor-not-allowed disabled:opacity-50',
-        'supports-ios:text-[length:1em]',
+        'supports-ios:text-[length:1rem]',
         // variant
         {
           default: 'w-full justify-start',
