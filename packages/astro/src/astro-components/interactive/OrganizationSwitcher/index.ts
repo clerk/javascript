@@ -3,6 +3,6 @@ import OrganizationProfilePage from './OrganizationProfilePage.astro';
 import OrganizationProfileLink from './OrganizationProfileLink.astro';
 
 export const OrganizationSwitcher = Object.assign(_OrganizationSwitcher, {
-  OrganizationProfilePage: OrganizationProfilePage,
-  OrganizationProfileLink: OrganizationProfileLink,
+  OrganizationProfilePage,
+  OrganizationProfileLink,
 });
