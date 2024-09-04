@@ -67,10 +67,6 @@ export const useThirdPartyProvider = <
         return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_metamask_signature' });
       }
 
-      if (provider === 'coinbase') {
-        return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_coinbase_signature' });
-      }
-
       if (provider === 'coinbase_wallet') {
         return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_coinbase_wallet_signature' });
       }
