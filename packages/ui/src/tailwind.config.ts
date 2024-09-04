@@ -138,7 +138,14 @@ const config = {
               .match(/(?:[^,()]|\((?:[^()]|\([^()]*\))*\))+(?=\s*(?:,|$))/g)
               ?.map(item => item.trim())
               .filter(item => item !== '')
-              .map(selector => `[class^='cl-'] ${selector}, [class*=' cl-'] ${selector}`)
+              .map(selector => {
+                return [
+                  `${selector}[class^='cl-']`, // direct; class starts with ` cl-`
+                  `[class^='cl-'] ${selector}`, //  child; class starts with ` cl-`
+                  `${selector}[class*=' cl-']`, // direct class contains ` cl-`
+                  `[class*=' cl-'] ${selector}`, // child; class contains ` cl-`
+                ].join(', ');
+              })
               .join(', ')})`]: properties,
           }),
           {} as Record<string, string | Record<string, string>>,
