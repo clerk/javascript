@@ -448,9 +448,9 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
 
           break;
         }
-        case 'web3_coinbase_signature': {
+        case 'web3_coinbase_wallet_signature': {
           const signature = fields.get('signature')?.value as string | undefined;
-          assertIsDefined(signature, 'Web3 Coinbase signature');
+          assertIsDefined(signature, 'Web3 Coinbase Wallet signature');
 
           attemptParams = {
             strategy,
