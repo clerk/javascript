@@ -39,6 +39,7 @@ export class Session extends BaseResource implements SessionResource {
   actor!: ActJWTClaim | null;
   user!: UserResource | null;
   publicUserData!: PublicUserData;
+  __experimental_factorVerificationAge: [number | null, number | null] = [null, null];
   expireAt!: Date;
   abandonAt!: Date;
   createdAt!: Date;
@@ -235,6 +236,7 @@ export class Session extends BaseResource implements SessionResource {
     this.status = data.status;
     this.expireAt = unixEpochToDate(data.expire_at);
     this.abandonAt = unixEpochToDate(data.abandon_at);
+    this.__experimental_factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at);
     this.lastActiveOrganizationId = data.last_active_organization_id;
     this.actor = data.actor;
