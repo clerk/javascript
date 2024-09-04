@@ -5,7 +5,6 @@ import type { FlowMetadata } from '../elements';
 import type { ThemableCssProp } from '../styledSystem';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
-import { ClerkHostRouterContext } from '@clerk/shared/router';
 
 const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
 const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
@@ -24,9 +23,7 @@ export const LazyProviders = (props: LazyProvidersProps) => {
   return (
     <CoreClerkContextWrapper clerk={props.clerk}>
       <EnvironmentProvider value={props.environment}>
-        <ClerkHostRouterContext.Provider value={props.options.router}>
-          <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
-        </ClerkHostRouterContext.Provider>
+        <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
       </EnvironmentProvider>
     </CoreClerkContextWrapper>
   );
