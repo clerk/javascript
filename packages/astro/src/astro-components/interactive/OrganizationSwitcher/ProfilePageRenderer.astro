@@ -1,0 +1,56 @@
+---
+interface Props {
+  url: string
+  label: string
+  type: 'page' | 'link'
+}
+
+const { url, label, type } = Astro.props
+
+let labelIcon = '';
+let content = ''
+
+if (Astro.slots.has('label-icon')) {
+  labelIcon = await Astro.slots.render('label-icon');
+}
+
+if (Astro.slots.has('default') && type === 'page') {
+  content = await Astro.slots.render('default');
+}
+---
+
+<script is:inline define:vars={{ url, label, content, labelIcon, type }}>
+// Get the organization profile map from window that we set in the `<InternalUIComponentRenderer />`.
+const organizationSwitcherComponentMap = window.__astro_clerk_component_props.get('organization-switcher');
+
+const organizationSwitcher = document.querySelector('[data-clerk-id^="clerk-organization-switcher"]');
+
+const safeId = organizationSwitcher.getAttribute('data-clerk-id');
+const currentOptions = organizationSwitcherComponentMap.get(safeId);
+
+let newCustomPage = {
+  label,
+  url,
+  mountIcon: (el) => { el.innerHTML = labelIcon },
+  unmountIcon: () => { /* Implement cleanup if needed */ }
+}
+
+if (type === 'page') {
+  newCustomPage = {
+    ...newCustomPage,
+    mount: (el) => { el.innerHTML = content },
+    unmount: () => { /* Implement cleanup if needed */ }
+  }
+}
+
+organizationSwitcherComponentMap.set(safeId, {
+  ...currentOptions,
+  organizationProfileProps: {
+    ...currentOptions.organizationProfileProps,
+    customPages: [
+      ...currentOptions.organizationProfileProps.customPages,
+      newCustomPage
+    ]
+  }
+})
+</script>

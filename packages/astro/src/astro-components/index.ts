@@ -21,6 +21,6 @@ export { default as SignUp } from './interactive/SignUp.astro';
 export { UserButton } from './interactive/UserButton';
 export { UserProfile } from './interactive/UserProfile';
 export { OrganizationProfile } from './interactive/OrganizationProfile';
-export { default as OrganizationSwitcher } from './interactive/OrganizationSwitcher.astro';
+export { OrganizationSwitcher } from './interactive/OrganizationSwitcher';
 export { default as OrganizationList } from './interactive/OrganizationList.astro';
 export { default as GoogleOneTap } from './interactive/GoogleOneTap.astro';
