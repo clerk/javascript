@@ -106,6 +106,10 @@ export const Logo = React.forwardRef(function CardLogo(
   },
   forwardedRef: React.ForwardedRef<HTMLImageElement>,
 ) {
+  if (!src) {
+    return null;
+  }
+
   const img = (
     <Image
       ref={forwardedRef}

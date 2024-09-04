@@ -4,9 +4,8 @@ import { cva } from 'cva';
 import { Button } from 'react-aria-components';
 
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/hooks/use-appearance';
+import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
-import { useDisplayConfig } from '~/hooks/use-display-config';
 import { useLocalizations } from '~/hooks/use-localizations';
 import * as Card from '~/primitives/card';
 import * as Icon from '~/primitives/icon';
@@ -60,16 +59,8 @@ const sessionAction = cva({
 export function SignInChooseSession() {
   const { signOut } = useClerk();
   const { t } = useLocalizations();
-  const { layout } = useAppearance();
   const isDev = useDevModeWarning();
-  const { branded } = useDisplayConfig();
-
-  const cardFooterProps = {
-    branded,
-    helpPageUrl: layout?.helpPageUrl,
-    privacyPageUrl: layout?.privacyPageUrl,
-    termsPageUrl: layout?.termsPageUrl,
-  };
+  const { footerProps } = useCard();
 
   return (
     <SignIn.Step name='choose-session'>
@@ -160,7 +151,7 @@ export function SignInChooseSession() {
             </div>
           </Card.Body>
         </Card.Content>
-        <Card.Footer {...cardFooterProps}>
+        <Card.Footer {...footerProps}>
           <Card.FooterAction>
             <Button
               onPress={() => {
