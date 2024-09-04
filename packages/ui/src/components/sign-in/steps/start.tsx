@@ -47,152 +47,156 @@ export function SignInStart() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <Card.Wrapper asChild>
-            <SignIn.Step name='start'>
-              <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
-                <Card.Content>
-                  <Card.Header>
-                    {logoImageUrl ? (
-                      <Card.Logo
-                        href={homeUrl}
-                        src={logoImageUrl}
-                        alt={applicationName}
-                      />
-                    ) : null}
-                    <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
-                    <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
-                  </Card.Header>
+          <SignIn.Step
+            asChild
+            name='start'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
+              <Card.Content>
+                <Card.Header>
+                  {logoImageUrl ? (
+                    <Card.Logo
+                      href={homeUrl}
+                      src={logoImageUrl}
+                      alt={applicationName}
+                    />
+                  ) : null}
+                  <Card.Title>{t('signIn.start.title', { applicationName })}</Card.Title>
+                  <Card.Description>{t('signIn.start.subtitle', { applicationName })}</Card.Description>
+                </Card.Header>
 
-                  <GlobalError />
+                <GlobalError />
 
-                  <Card.Body>
-                    <Connections disabled={isGlobalLoading} />
+                <Card.Body>
+                  <Connections disabled={isGlobalLoading} />
 
-                    {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
+                  {hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null}
 
-                    {hasIdentifier ? (
-                      <div className='flex flex-col gap-4'>
-                        {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
-                          <EmailField
-                            name='identifier'
+                  {hasIdentifier ? (
+                    <div className='flex flex-col gap-4'>
+                      {emailAddressEnabled && !phoneNumberEnabled && !usernameEnabled ? (
+                        <EmailField
+                          name='identifier'
+                          disabled={isGlobalLoading}
+                          required
+                        />
+                      ) : null}
+
+                      {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
+                        <UsernameField
+                          name='identifier'
+                          disabled={isGlobalLoading}
+                          required
+                        />
+                      ) : null}
+
+                      {phoneNumberEnabled && !emailAddressEnabled && !usernameEnabled ? (
+                        <PhoneNumberField
+                          name='identifier'
+                          disabled={isGlobalLoading}
+                          required
+                        />
+                      ) : null}
+
+                      {emailAddressEnabled && usernameEnabled && !phoneNumberEnabled ? (
+                        <EmailOrUsernameField
+                          name='identifier'
+                          disabled={isGlobalLoading}
+                          required
+                        />
+                      ) : null}
+
+                      {emailAddressEnabled && phoneNumberEnabled && !usernameEnabled ? (
+                        <EmailOrPhoneNumberField
+                          name='identifier'
+                          toggleLabelEmail={t('signIn.start.actionLink__use_email')}
+                          toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
+                          disabled={isGlobalLoading}
+                          required
+                        />
+                      ) : null}
+
+                      {usernameEnabled && phoneNumberEnabled && !emailAddressEnabled ? (
+                        <PhoneNumberOrUsernameField
+                          name='identifier'
+                          toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
+                          toggleLabelUsername={t('signIn.start.actionLink__use_username')}
+                          disabled={isGlobalLoading}
+                          required
+                        />
+                      ) : null}
+
+                      {emailAddressEnabled && usernameEnabled && phoneNumberEnabled ? (
+                        <EmailOrUsernameOrPhoneNumberField
+                          name='identifier'
+                          toggleLabelEmailOrUsername={t('signIn.start.actionLink__use_email_username')}
+                          toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
+                          disabled={isGlobalLoading}
+                          required
+                        />
+                      ) : null}
+                    </div>
+                  ) : null}
+                </Card.Body>
+                <Card.Actions>
+                  <Common.Loading scope='submit'>
+                    {isSubmitting => {
+                      return (
+                        <SignIn.Action
+                          submit
+                          asChild
+                        >
+                          <Button
+                            busy={isSubmitting}
                             disabled={isGlobalLoading}
-                            required
-                          />
-                        ) : null}
-
-                        {usernameEnabled && !emailAddressEnabled && !phoneNumberEnabled ? (
-                          <UsernameField
-                            name='identifier'
-                            disabled={isGlobalLoading}
-                            required
-                          />
-                        ) : null}
-
-                        {phoneNumberEnabled && !emailAddressEnabled && !usernameEnabled ? (
-                          <PhoneNumberField
-                            name='identifier'
-                            disabled={isGlobalLoading}
-                            required
-                          />
-                        ) : null}
-
-                        {emailAddressEnabled && usernameEnabled && !phoneNumberEnabled ? (
-                          <EmailOrUsernameField
-                            name='identifier'
-                            disabled={isGlobalLoading}
-                            required
-                          />
-                        ) : null}
-
-                        {emailAddressEnabled && phoneNumberEnabled && !usernameEnabled ? (
-                          <EmailOrPhoneNumberField
-                            name='identifier'
-                            toggleLabelEmail={t('signIn.start.actionLink__use_email')}
-                            toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
-                            disabled={isGlobalLoading}
-                            required
-                          />
-                        ) : null}
-
-                        {usernameEnabled && phoneNumberEnabled && !emailAddressEnabled ? (
-                          <PhoneNumberOrUsernameField
-                            name='identifier'
-                            toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
-                            toggleLabelUsername={t('signIn.start.actionLink__use_username')}
-                            disabled={isGlobalLoading}
-                            required
-                          />
-                        ) : null}
-
-                        {emailAddressEnabled && usernameEnabled && phoneNumberEnabled ? (
-                          <EmailOrUsernameOrPhoneNumberField
-                            name='identifier'
-                            toggleLabelEmailOrUsername={t('signIn.start.actionLink__use_email_username')}
-                            toggleLabelPhoneNumber={t('signIn.start.actionLink__use_phone')}
-                            disabled={isGlobalLoading}
-                            required
-                          />
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </Card.Body>
-                  <Card.Actions>
-                    <Common.Loading scope='submit'>
-                      {isSubmitting => {
-                        return (
-                          <SignIn.Action
-                            submit
-                            asChild
+                            iconEnd={<Icon.CaretRightLegacy />}
                           >
-                            <Button
-                              busy={isSubmitting}
-                              disabled={isGlobalLoading}
-                              iconEnd={<Icon.CaretRightLegacy />}
-                            >
-                              {t('formButtonPrimary')}
-                            </Button>
-                          </SignIn.Action>
-                        );
-                      }}
-                    </Common.Loading>
+                            {t('formButtonPrimary')}
+                          </Button>
+                        </SignIn.Action>
+                      );
+                    }}
+                  </Common.Loading>
 
-                    {
-                      // Note:
-                      // Currently this triggers the loading spinner for "Continue"
-                      // which is a little confusing. We could use a manual
-                      // setState on click, but we'll need to find a way to clean
-                      // up the state based on `isSubmitting`
-                      passkeyEnabled ? (
-                        <Common.Loading scope='passkey'>
-                          {isSubmitting => {
-                            return (
-                              <SignIn.Passkey asChild>
-                                <LinkButton
-                                  type='button'
-                                  disabled={isGlobalLoading || isSubmitting}
-                                >
-                                  {t('signIn.start.actionLink__use_passkey')}
-                                </LinkButton>
-                              </SignIn.Passkey>
-                            );
-                          }}
-                        </Common.Loading>
-                      ) : null
-                    }
-                  </Card.Actions>
-                </Card.Content>
+                  {
+                    // Note:
+                    // Currently this triggers the loading spinner for "Continue"
+                    // which is a little confusing. We could use a manual
+                    // setState on click, but we'll need to find a way to clean
+                    // up the state based on `isSubmitting`
+                    passkeyEnabled ? (
+                      <Common.Loading scope='passkey'>
+                        {isSubmitting => {
+                          return (
+                            <SignIn.Passkey asChild>
+                              <LinkButton
+                                type='button'
+                                disabled={isGlobalLoading || isSubmitting}
+                              >
+                                {t('signIn.start.actionLink__use_passkey')}
+                              </LinkButton>
+                            </SignIn.Passkey>
+                          );
+                        }}
+                      </Common.Loading>
+                    ) : null
+                  }
+                </Card.Actions>
+              </Card.Content>
 
-                <Card.Footer {...cardFooterProps}>
-                  <Card.FooterAction>
-                    <Card.FooterActionText>
-                      {t('signIn.start.actionText')}{' '}
-                      <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
-                    </Card.FooterActionText>
-                  </Card.FooterAction>
-                </Card.Footer>
-              </Card.Root>
-            </SignIn.Step>
-          </Card.Wrapper>
+              <Card.Footer {...cardFooterProps}>
+                <Card.FooterAction>
+                  <Card.FooterActionText>
+                    {t('signIn.start.actionText')}{' '}
+                    <Card.FooterActionLink href='/sign-up'> {t('signIn.start.actionLink')}</Card.FooterActionLink>
+                  </Card.FooterActionText>
+                </Card.FooterAction>
+              </Card.Footer>
+            </Card.Root>
+          </SignIn.Step>
         );
       }}
     </Common.Loading>
