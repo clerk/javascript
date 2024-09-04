@@ -650,6 +650,16 @@ export type ClerkOptions = ClerkOptionsNavigation &
         };
 
     sdkMetadata?: SDKMetadata;
+
+    /**
+     * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+     */
+    experimental?: Autocomplete<
+      {
+        persistClient: boolean;
+      },
+      Record<string, any>
+    >;
   };
 
 export interface NavigateOptions {
