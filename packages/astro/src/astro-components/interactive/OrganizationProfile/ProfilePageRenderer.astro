@@ -28,7 +28,7 @@ const organizationProfile = document.querySelector('[data-clerk-id^="clerk-organ
 const safeId = organizationProfile.getAttribute('data-clerk-id');
 const currentOptions = organizationProfileComponentMap.get(safeId);
 
-const reorderItemsLabels = ['members', 'settings'];
+const reorderItemsLabels = ['general', 'members'];
 const isReorderItem = reorderItemsLabels.includes(label);
 
 let newCustomPage = { label }

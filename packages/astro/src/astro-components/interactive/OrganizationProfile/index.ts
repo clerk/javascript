@@ -1,8 +1,8 @@
 import _OrganizationProfile from './OrganizationProfile.astro';
-import OrganizationLink from './OrganizationLink.astro';
-import OrganizationPage from './OrganizationPage.astro';
+import OrganizationProfileLink from './OrganizationProfileLink.astro';
+import OrganizationProfilePage from './OrganizationProfilePage.astro';
 
 export const OrganizationProfile = Object.assign(_OrganizationProfile, {
-  Page: OrganizationPage,
-  Link: OrganizationLink,
+  Page: OrganizationProfilePage,
+  Link: OrganizationProfileLink,
 });

@@ -1,10 +1,18 @@
 ---
 import ProfilePageRenderer from './ProfilePageRenderer.astro'
 
-interface Props {
-  url: string
-  label: string
-}
+type ReorderItemsLabels = 'general' | 'members'
+
+type Props<Label extends string> = {
+  label: Label
+} & (Label extends ReorderItemsLabels
+  ? {
+      url?: string
+    }
+  : {
+    url: string
+  }
+)
 
 const { url, label } = Astro.props
 ---

@@ -20,7 +20,7 @@ if (Astro.slots.has('default') && type === 'page') {
 ---
 
 <script is:inline define:vars={{ url, label, content, labelIcon, type }}>
-// Get the organization profile map from window that we set in the `<InternalUIComponentRenderer />`.
+// Get the organization switcher map from window that we set in the `<InternalUIComponentRenderer />`.
 const organizationSwitcherComponentMap = window.__astro_clerk_component_props.get('organization-switcher');
 
 const organizationSwitcher = document.querySelector('[data-clerk-id^="clerk-organization-switcher"]');
@@ -28,18 +28,25 @@ const organizationSwitcher = document.querySelector('[data-clerk-id^="clerk-orga
 const safeId = organizationSwitcher.getAttribute('data-clerk-id');
 const currentOptions = organizationSwitcherComponentMap.get(safeId);
 
-let newCustomPage = {
-  label,
-  url,
-  mountIcon: (el) => { el.innerHTML = labelIcon },
-  unmountIcon: () => { /* Implement cleanup if needed */ }
-}
+const reorderItemsLabels = ['general', 'members'];
+const isReorderItem = reorderItemsLabels.includes(label);
 
-if (type === 'page') {
+let newCustomPage = { label }
+
+if (!isReorderItem) {
   newCustomPage = {
     ...newCustomPage,
-    mount: (el) => { el.innerHTML = content },
-    unmount: () => { /* Implement cleanup if needed */ }
+    url,
+    mountIcon: (el) => { el.innerHTML = labelIcon },
+    unmountIcon: () => { /* Implement cleanup if needed */ }
+  }
+
+  if (type === 'page') {
+    newCustomPage = {
+      ...newCustomPage,
+      mount: (el) => { el.innerHTML = content },
+      unmount: () => { /* Implement cleanup if needed */ }
+    }
   }
 }
 
