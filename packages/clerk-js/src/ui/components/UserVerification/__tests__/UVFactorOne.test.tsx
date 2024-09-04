@@ -49,9 +49,29 @@ describe('UserVerificationFactorOne', () => {
       getByText('Check your email');
       getByLabelText(/Enter verification code/i);
     });
+
+    expect(fixtures.session?.__experimental_prepareFirstFactorVerification).toHaveBeenCalledTimes(1);
   });
 
-  it.todo('renders the component for with strategy:phone_code');
+  it('renders the component for with strategy:phone_code', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ username: 'clerkuser' });
+      f.withPreferredSignInStrategy({ strategy: 'otp' });
+    });
+    fixtures.session?.__experimental_startVerification.mockResolvedValue({
+      status: 'needs_first_factor',
+      supportedFirstFactors: [{ strategy: 'password' }, { strategy: 'phone_code' }],
+    });
+    fixtures.session?.__experimental_prepareFirstFactorVerification.mockResolvedValue({});
+    const { getByLabelText, getByText } = render(<UserVerificationFactorOne />, { wrapper });
+
+    await waitFor(() => {
+      getByText('Check your phone');
+      getByLabelText(/Enter verification code/i);
+    });
+
+    expect(fixtures.session?.__experimental_prepareFirstFactorVerification).toHaveBeenCalledTimes(1);
+  });
 
   describe('Submitting', () => {
     it('navigates to UserVerificationFactorTwo page when user submits first factor and second factor is enabled', async () => {
@@ -110,6 +130,7 @@ describe('UserVerificationFactorOne', () => {
       await waitFor(() => {
         expect(fixtures.clerk.setActive).toHaveBeenCalled();
       });
+      expect(fixtures.session?.__experimental_attemptFirstFactorVerification).toHaveBeenCalledTimes(1);
     });
   });
 
