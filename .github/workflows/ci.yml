@@ -115,7 +115,14 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Run tests
-        run: npx turbo test $TURBO_ARGS
+        run: |
+          if [ "${{ matrix.node-version }}" == "18" ]; then
+            echo "Running tests on Node 18 only for packages with LTS support."
+            npx turbo test $TURBO_ARGS --filter="@clerk/astro" --filter="@clerk/backend" --filter="@clerk/express" --filter="@clerk/nextjs" --filter="@clerk/clerk-react" --filter="@clerk/fastify" --filter="@clerk/clerk-sdk-node" --filter="@clerk/shared" --filter="@clerk/remix" --filter="@clerk/tanstack-start" --filter="@clerk/elements"
+          else
+            echo "Running tests for all packages on Node 20."
+            npx turbo test $TURBO_ARGS
+          fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
