@@ -1,0 +1,26 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test": {
+      "dependsOn": ["^@clerk/localizations#build", "^build"],
+      "inputs": [
+        "**/__test__/**",
+        "*.d.ts",
+        "bundlewatch.config.json",
+        "jest.*",
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputLogs": "new-only",
+      "outputs": []
+    }
+  }
+}
