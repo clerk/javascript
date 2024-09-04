@@ -39,7 +39,9 @@ type PolymorphicExoticComponent<P = object, T extends React.ElementType = React.
     /**
      * **NOTE**: Exotic components are not callable.
      */
-    <InstanceT extends React.ElementType = T>(props: PolymorphicPropsWithRef<P, InstanceT>): React.ReactElement | null;
+    <InstanceT extends React.ElementType = T>(
+      props: PolymorphicPropsWithRef<P, InstanceT>,
+    ): ReturnType<React.FunctionComponent>;
   }
 >;
 
