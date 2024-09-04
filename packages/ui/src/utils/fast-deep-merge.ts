@@ -14,17 +14,11 @@ export const fastDeepMergeAndReplace = (
   for (const key in source) {
     if (source[key] !== null && typeof source[key] === `object`) {
       if (target[key] === undefined) {
-        // Guard against prototype pollution by checking if the key is a non-enumerable property
-        if (Object.prototype.hasOwnProperty.call(target, key)) {
-          target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
-        }
+        target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
       }
       fastDeepMergeAndReplace(source[key], target[key]);
     } else {
-      // Guard against prototype pollution by checking if the key is a non-enumerable property
-      if (Object.prototype.hasOwnProperty.call(target, key)) {
-        target[key] = source[key];
-      }
+      target[key] = source[key];
     }
   }
 };
@@ -40,17 +34,11 @@ export const fastDeepMergeAndKeep = (
   for (const key in source) {
     if (source[key] !== null && typeof source[key] === `object`) {
       if (target[key] === undefined) {
-        // Guard against prototype pollution by checking if the key is a non-enumerable property
-        if (Object.prototype.hasOwnProperty.call(target, key)) {
-          target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
-        }
+        target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
       }
       fastDeepMergeAndKeep(source[key], target[key]);
     } else if (target[key] === undefined) {
-      // Guard against prototype pollution by checking if the key is a non-enumerable property
-      if (Object.prototype.hasOwnProperty.call(target, key)) {
-        target[key] = source[key];
-      }
+      target[key] = source[key];
     }
   }
 };
