@@ -375,7 +375,7 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       );
     }),
     prepare: fromPromise(async ({ input }) => {
-      const { params, parent, resendable } = input as PrepareFirstFactorInput;
+      const { params, parent, resendable } = input;
       const clerk = parent.getSnapshot().context.clerk;
 
       // If a prepare call has already been fired recently, don't re-send
@@ -440,17 +440,6 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         case 'web3_metamask_signature': {
           const signature = fields.get('signature')?.value as string | undefined;
           assertIsDefined(signature, 'Web3 Metamask signature');
-
-          attemptParams = {
-            strategy,
-            signature,
-          } satisfies Web3Attempt;
-
-          break;
-        }
-        case 'web3_coinbase_signature': {
-          const signature = fields.get('signature')?.value as string | undefined;
-          assertIsDefined(signature, 'Web3 Coinbase signature');
 
           attemptParams = {
             strategy,
