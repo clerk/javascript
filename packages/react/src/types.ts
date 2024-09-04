@@ -38,11 +38,13 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSVersion?: string;
   /**
-   * The Clerk publishable key for your instance. This can be found in your Clerk Dashboard on the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) page.
+   * The Clerk publishable key for your instance
+   * @note This can be found in your Clerk Dashboard on the [API Keys](https://dashboard.clerk.com/last-active?path=api-keys) page
    */
   publishableKey: string;
   /**
-   * This nonce value will be passed through to the `@clerk/clerk-js` script tag. You can use this to implement [strict-dynamic CSP](https://clerk.com/docs/security/clerk-csp#implementing-a-strict-dynamic-csp).
+   * This nonce value will be passed through to the `@clerk/clerk-js` script tag.
+   * @note You can use this to implement [strict-dynamic CSP](https://clerk.com/docs/security/clerk-csp#implementing-a-strict-dynamic-csp)
    */
   nonce?: string;
 } & MultiDomainAndOrProxy;
