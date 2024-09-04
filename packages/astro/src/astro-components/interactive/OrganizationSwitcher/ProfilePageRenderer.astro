@@ -48,7 +48,7 @@ organizationSwitcherComponentMap.set(safeId, {
   organizationProfileProps: {
     ...currentOptions.organizationProfileProps,
     customPages: [
-      ...currentOptions.organizationProfileProps.customPages,
+      ...(currentOptions?.organizationProfileProps?.customPages ?? []),
       newCustomPage
     ]
   }
