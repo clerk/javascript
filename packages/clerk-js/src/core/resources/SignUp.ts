@@ -24,9 +24,9 @@ import type {
 } from '@clerk/types';
 
 import {
-  generateSignatureWithCoinbase,
+  generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
-  getCoinbaseIdentifier,
+  getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   windowNavigate,
 } from '../../utils';
@@ -221,13 +221,15 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  public authenticateWithCoinbase = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
-    const identifier = await getCoinbaseIdentifier();
+  public authenticateWithCoinbaseWallet = async (
+    params?: SignUpAuthenticateWithWeb3Params,
+  ): Promise<SignUpResource> => {
+    const identifier = await getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithCoinbase,
+      generateSignature: generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
-      strategy: 'web3_coinbase_signature',
+      strategy: 'web3_coinbase_wallet_signature',
     });
   };
 

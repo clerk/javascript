@@ -375,6 +375,11 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
       );
     }),
     prepare: fromPromise(async ({ input }) => {
+      // `input` is a union of PrepareFirstFactor and PrepareSecondFactor. Since we're passing params to
+      // prepareFirstFactor, we need to assert that the input is a PrepareFirstFactor. For some reason, ESLint thinks
+      // the assertion is unnecessary, and will remove it during the pre-commit hook. To prevent that, we disable the
+      // rule for the line.
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const { params, parent, resendable } = input as PrepareFirstFactorInput;
       const clerk = parent.getSnapshot().context.clerk;
 
@@ -440,6 +445,17 @@ export const SignInFirstFactorMachine = SignInVerificationMachine.provide({
         case 'web3_metamask_signature': {
           const signature = fields.get('signature')?.value as string | undefined;
           assertIsDefined(signature, 'Web3 Metamask signature');
+
+          attemptParams = {
+            strategy,
+            signature,
+          } satisfies Web3Attempt;
+
+          break;
+        }
+        case 'web3_coinbase_wallet_signature': {
+          const signature = fields.get('signature')?.value as string | undefined;
+          assertIsDefined(signature, 'Web3 Coinbase Wallet signature');
 
           attemptParams = {
             strategy,

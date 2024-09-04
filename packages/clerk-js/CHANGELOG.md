@@ -1,5 +1,64 @@
 # Change Log
 
+## 5.20.0
+
+### Minor Changes
+
+- Add support for the Coinbase Wallet web3 provider and authentication strategy. The Coinbase Wallet provider handles both Coinbase Wallet extension and Smart Wallet ([#4082](https://github.com/clerk/javascript/pull/4082)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- **Experimental:** Persist the Clerk client after signing out a user. ([#3941](https://github.com/clerk/javascript/pull/3941)) by [@panteliselef](https://github.com/panteliselef)
+
+  This allows for matching a user's device with a client. To try out this new feature, enable it in your `<ClerkProvider />` or `clerk.load()` call.
+
+  ```js
+  // React
+  <ClerkProvider experimental={{ persistClient: true }} />;
+
+  // Vanilla JS
+  await clerk.load({ experimental: { persistClient: true } });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0)]:
+  - @clerk/types@4.19.0
+  - @clerk/localizations@2.8.1
+  - @clerk/shared@2.6.2
+
+## 5.19.0
+
+### Minor Changes
+
+- Add new `UserVerification` component (experimental feature). This UI component allows for a user to "re-enter" their credentials (first factor and/or second factor) which results in them being re-verified. ([#4016](https://github.com/clerk/javascript/pull/4016)) by [@panteliselef](https://github.com/panteliselef)
+
+  New methods have been added:
+
+  - `__experimental_openUserVerification()`
+  - `__experimental_closeUserVerification()`
+  - `__experimental_mountUserVerification(targetNode: HTMLDivElement)`
+  - `__experimental_unmountUserVerification(targetNode: HTMLDivElement)`
+
+- Move SessionVerification methods from UserResource to SessionResource: ([#4073](https://github.com/clerk/javascript/pull/4073)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `user.__experimental_verifySession` -> `session.__experimental_startVerification`
+  - `user.__experimental_verifySessionPrepareFirstFactor` -> `session.__experimental_prepareFirstFactorVerification`
+  - `user.__experimental_verifySessionAttemptFirstFactor` -> `session.__experimental_attemptFirstFactorVerification`
+  - `user.__experimental_verifySessionPrepareSecondFactor` -> `session.__experimental_prepareSecondFactorVerification`
+  - `user.__experimental_verifySessionAttemptSecondFactor` -> `session.__experimental_attemptSecondFactorVerification`
+
+### Patch Changes
+
+- Bug fix: Use the EIP-6963 standard to get a Web3 provider when more than one provider is injected. ([#4059](https://github.com/clerk/javascript/pull/4059)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- chore(clerk-js): Display shortened web3 wallet address on user profile ([#4074](https://github.com/clerk/javascript/pull/4074)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- chore(clerk-js): Add 'Unverified' or 'Primary' tag next to the Web3 wallet address on the user profile. ([#4077](https://github.com/clerk/javascript/pull/4077)) by [@EmmanouelaPothitou](https://github.com/EmmanouelaPothitou)
+
+- Updated dependencies [[`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733), [`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/localizations@2.8.0
+  - @clerk/types@4.18.0
+  - @clerk/shared@2.6.1
+
 ## 5.18.0
 
 ### Minor Changes

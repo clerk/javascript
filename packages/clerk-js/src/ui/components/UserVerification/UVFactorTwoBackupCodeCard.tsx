@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useSession } from '@clerk/shared/react';
 import React from 'react';
 
 import { Col, descriptors, localizationKeys } from '../../customizables';
@@ -12,7 +12,7 @@ type UVFactorTwoBackupCodeCardProps = {
 
 export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps) => {
   const { onShowAlternativeMethodsClicked } = props;
-  const { user } = useUser();
+  const { session } = useSession();
   const { handleVerificationResponse } = useAfterVerification();
 
   const card = useCardState();
@@ -24,8 +24,8 @@ export const UVFactorTwoBackupCodeCard = (props: UVFactorTwoBackupCodeCardProps)
 
   const handleBackupCodeSubmit: React.FormEventHandler = e => {
     e.preventDefault();
-    return user!
-      .__experimental_verifySessionAttemptSecondFactor({ strategy: 'backup_code', code: codeControl.value })
+    return session!
+      .__experimental_attemptSecondFactorVerification({ strategy: 'backup_code', code: codeControl.value })
       .then(handleVerificationResponse)
       .catch(err => handleError(err, [codeControl], card.setError));
   };

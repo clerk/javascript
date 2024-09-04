@@ -1,14 +1,14 @@
-import { useUser } from '@clerk/shared/react';
+import { useSession } from '@clerk/shared/react';
 
 import { useUserVerification } from '../../contexts';
 import { LoadingCard } from '../../elements';
 import { useFetch } from '../../hooks';
 
 const useUserVerificationSession = () => {
-  const { user } = useUser();
+  const { session } = useSession();
   const { level } = useUserVerification();
   const data = useFetch(
-    user ? user.__experimental_verifySession : undefined,
+    session ? session.__experimental_startVerification : undefined,
     {
       level: level || 'L2.secondFactor',
       // TODO(STEP-UP): Figure out if this needs to be a prop
