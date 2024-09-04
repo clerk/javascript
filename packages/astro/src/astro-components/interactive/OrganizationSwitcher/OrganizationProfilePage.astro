@@ -1,7 +1,8 @@
 ---
-import ProfilePageRenderer from './ProfilePageRenderer.astro'
+import CustomProfilePageRenderer from '../CustomProfilePageRenderer.astro'
 
-type ReorderItemsLabels = 'general' | 'members'
+const reorderItemsLabels = ['general', 'members'] as const;
+type ReorderItemsLabels = typeof reorderItemsLabels[number];
 
 type Props<Label extends string> = {
   label: Label
@@ -17,7 +18,7 @@ type Props<Label extends string> = {
 const { url, label } = Astro.props
 ---
 
-<ProfilePageRenderer label={label} url={url} type="page">
+<CustomProfilePageRenderer label={label} url={url} type="page" component="organization-switcher" reorderItemsLabels={reorderItemsLabels}>
     <slot name="label-icon" slot="label-icon" />
     <slot />
-</ProfilePageRenderer>
+</CustomProfilePageRenderer>
