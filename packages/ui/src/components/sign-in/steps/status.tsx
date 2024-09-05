@@ -89,7 +89,7 @@ export function SignInStatus() {
   const { branded } = useDisplayConfig();
   const { layout } = useAppearance().parsedAppearance;
   const isDev = useDevModeWarning();
-  const [status] = React.useState<Status>('verified_switch_tab');
+  const [status] = React.useState<Status>('loading');
 
   const cardFooterProps = {
     branded,
