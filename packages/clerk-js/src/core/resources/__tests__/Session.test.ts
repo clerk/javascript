@@ -169,9 +169,7 @@ describe('Session', () => {
     });
 
     it('does not dispatch token:update when provided organization ID does not match current active organization', async () => {
-      BaseResource.clerk = clerkMock({
-        organization: new Organization({ id: 'anotherOrganization' } as OrganizationJSON),
-      }) as any;
+      BaseResource.clerk = clerkMock() as any;
 
       const session = new Session({
         status: 'active',
@@ -184,7 +182,7 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      await session.getToken({ organizationId: 'activeOrganization' });
+      await session.getToken({ organizationId: 'anotherOrganization' });
 
       expect(dispatchSpy).toHaveBeenCalledTimes(0);
     });
@@ -227,6 +225,29 @@ describe('Session', () => {
         expect(global.fetch).toHaveBeenCalled();
         expect(dispatchSpy).toHaveBeenCalledTimes(1);
         expect(token).toEqual(null);
+      });
+    });
+
+    it(`uses the current session's lastActiveOrganizationId by default, not clerk.organization.id`, async () => {
+      BaseResource.clerk = clerkMock({
+        organization: new Organization({ id: 'oldActiveOrganization' } as OrganizationJSON),
+      }) as any;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'newActiveOrganization',
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      await session.getToken();
+
+      expect((BaseResource.fapiClient.request as jest.Mock<any>).mock.calls[0][0]).toMatchObject({
+        body: { organizationId: 'newActiveOrganization' },
       });
     });
   });
