@@ -8,7 +8,7 @@ import { SignInForgotPassword } from '~/components/sign-in/steps/forgot-password
 import { SignInGetHelp } from '~/components/sign-in/steps/get-help';
 import { SignInResetPassword } from '~/components/sign-in/steps/reset-password';
 import { SignInStart } from '~/components/sign-in/steps/start';
-// import { SignInStatus } from '~/components/sign-in/steps/status';
+import { SignInStatus } from '~/components/sign-in/steps/status';
 import { SignInVerifications } from '~/components/sign-in/steps/verifications';
 import { type Appearance, AppearanceProvider } from '~/contexts';
 
@@ -41,7 +41,7 @@ export function SignIn({ appearance }: { appearance?: Appearance }) {
               <SignInResetPassword />
               <SignInChooseSession />
               {/* Hidden until elements work is tackled https://linear.app/clerk/issue/SDKI-593/[signin]-verification-link-is-invalid-for-this-device */}
-              {/* <SignInStatus /> */}
+              <SignInStatus />
             </>
           )}
         </SignInRoot>
