@@ -102,6 +102,14 @@ export interface JwtPayload extends CustomJwtSessionClaims {
   org_permissions?: OrganizationCustomPermissionKey[];
 
   /**
+   * Factor Verification Age
+   * Each item represents the minutes that have passed since the last time a first or second factor were verified.
+   * [fistFactorAge, secondFactorAge]
+   * @experimental This API is experimental and may change at any moment.
+   */
+  fva: [number | null, number | null];
+
+  /**
    * Any other JWT Claim Set member.
    */
   [propName: string]: unknown;

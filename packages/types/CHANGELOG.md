@@ -1,5 +1,45 @@
 # Change Log
 
+## 4.19.0
+
+### Minor Changes
+
+- Add support for the Coinbase Wallet web3 provider and authentication strategy. The Coinbase Wallet provider handles both Coinbase Wallet extension and Smart Wallet ([#4082](https://github.com/clerk/javascript/pull/4082)) by [@chanioxaris](https://github.com/chanioxaris)
+
+- **Experimental:** Persist the Clerk client after signing out a user. ([#3941](https://github.com/clerk/javascript/pull/3941)) by [@panteliselef](https://github.com/panteliselef)
+
+  This allows for matching a user's device with a client. To try out this new feature, enable it in your `<ClerkProvider />` or `clerk.load()` call.
+
+  ```js
+  // React
+  <ClerkProvider experimental={{ persistClient: true }} />;
+
+  // Vanilla JS
+  await clerk.load({ experimental: { persistClient: true } });
+  ```
+
+## 4.18.0
+
+### Minor Changes
+
+- Move SessionVerification methods from UserResource to SessionResource: ([#4073](https://github.com/clerk/javascript/pull/4073)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `user.__experimental_verifySession` -> `session.__experimental_startVerification`
+  - `user.__experimental_verifySessionPrepareFirstFactor` -> `session.__experimental_prepareFirstFactorVerification`
+  - `user.__experimental_verifySessionAttemptFirstFactor` -> `session.__experimental_attemptFirstFactorVerification`
+  - `user.__experimental_verifySessionPrepareSecondFactor` -> `session.__experimental_prepareSecondFactorVerification`
+  - `user.__experimental_verifySessionAttemptSecondFactor` -> `session.__experimental_attemptSecondFactorVerification`
+
+- Add types for newly introduced `<__experimental_UserVerification />` component (experimental feature). New types: ([#4016](https://github.com/clerk/javascript/pull/4016)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `Appearance` has a new `userVerification` property
+  - `__experimental_UserVerificationProps` and `__experimental_UserVerificationModalProps`
+  - `__experimental_openUserVerification` method under the `Clerk` interface
+  - `__experimental_closeUserVerification` method under the `Clerk` interface
+  - `__experimental_mountUserVerification` method under the `Clerk` interface
+  - `__experimental_unmountUserVerification` method under the `Clerk` interface
+  - `__experimental_userVerification` property under `LocalizationResource`
+
 ## 4.17.0
 
 ### Minor Changes

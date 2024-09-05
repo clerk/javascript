@@ -1,5 +1,29 @@
 # @clerk/tanstack-start
 
+## 0.3.5
+
+### Patch Changes
+
+- Types fix for `createClerkHandler` ([#4081](https://github.com/clerk/javascript/pull/4081)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`8a3b9f079`](https://github.com/clerk/javascript/commit/8a3b9f0793484b32dd609a5c80a194e62151d6ea), [`e95c28196`](https://github.com/clerk/javascript/commit/e95c2819675cea7963f2404e5f71f37ebed8d5e0), [`1fe744328`](https://github.com/clerk/javascript/commit/1fe744328d126bc597e81770119796ac18e055ed)]:
+  - @clerk/clerk-react@5.7.0
+  - @clerk/types@4.19.0
+  - @clerk/backend@1.9.2
+  - @clerk/shared@2.6.2
+
+## 0.3.4
+
+### Patch Changes
+
+- Fix to prevent hard reload for internal navigation ([#4078](https://github.com/clerk/javascript/pull/4078)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733), [`82593173a`](https://github.com/clerk/javascript/commit/82593173aafbf6646e12c5779627cdcb138a1f27), [`afad9af89`](https://github.com/clerk/javascript/commit/afad9af893984a19d7284f0ad3b36e7891d0d733)]:
+  - @clerk/clerk-react@5.6.0
+  - @clerk/types@4.18.0
+  - @clerk/backend@1.9.1
+  - @clerk/shared@2.6.1
+
 ## 0.3.3
 
 ### Patch Changes

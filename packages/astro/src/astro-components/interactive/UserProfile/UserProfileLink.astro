@@ -1,5 +1,5 @@
 ---
-import ProfileRenderer from './ProfileRenderer.astro'
+import CustomProfilePageRenderer from '../CustomProfilePageRenderer.astro'
 
 interface Props {
   url: string
@@ -9,6 +9,6 @@ interface Props {
 const { url, label } = Astro.props
 ---
 
-<ProfileRenderer label={label} url={url} type="link">
+<CustomProfilePageRenderer label={label} url={url} type="link" component="user-profile">
     <slot name="label-icon" slot="label-icon" />
-</ProfileRenderer>
+</CustomProfilePageRenderer>

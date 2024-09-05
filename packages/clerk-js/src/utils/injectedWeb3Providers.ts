@@ -1,4 +1,5 @@
-import type { Web3Provider } from '@clerk/types';
+import type { MetamaskWeb3Provider } from '@clerk/types';
+
 //https://eips.ethereum.org/EIPS/eip-6963
 
 interface EIP6963ProviderInfo {
@@ -26,15 +27,16 @@ interface EIP6963ProviderDetail {
 }
 
 type EIP6963AnnounceProviderEvent = CustomEvent;
+type InjectedWeb3Provider = MetamaskWeb3Provider;
 
 class InjectedWeb3Providers {
   #providers: EIP6963ProviderDetail[] = [];
-  #providerIdMap: Record<Web3Provider, string> = {
-    coinbase: 'Coinbase Wallet',
+  #providerIdMap: Record<InjectedWeb3Provider, string> = {
     metamask: 'MetaMask',
   } as const;
+  static #instance: InjectedWeb3Providers | null = null;
 
-  constructor() {
+  private constructor() {
     if (typeof window === 'undefined') {
       return;
     }
@@ -42,7 +44,14 @@ class InjectedWeb3Providers {
     window.dispatchEvent(new Event('eip6963:requestProvider'));
   }
 
-  get = (provider: Web3Provider) => {
+  public static getInstance(): InjectedWeb3Providers {
+    if (!InjectedWeb3Providers.#instance) {
+      InjectedWeb3Providers.#instance = new InjectedWeb3Providers();
+    }
+    return InjectedWeb3Providers.#instance;
+  }
+
+  get = (provider: InjectedWeb3Provider) => {
     return this.#providers.find(p => p.info.name === this.#providerIdMap[provider])?.provider;
   };
 
@@ -54,4 +63,4 @@ class InjectedWeb3Providers {
   };
 }
 
-export const injectedWeb3Providers = new InjectedWeb3Providers();
+export const getInjectedWeb3Providers = () => InjectedWeb3Providers.getInstance();

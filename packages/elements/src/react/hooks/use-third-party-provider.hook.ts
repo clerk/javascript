@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/shared/react';
 import type { OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
 import type React from 'react';
 import { useCallback } from 'react';
@@ -67,8 +67,8 @@ export const useThirdPartyProvider = <
         return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_metamask_signature' });
       }
 
-      if (provider === 'coinbase') {
-        return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_coinbase_signature' });
+      if (provider === 'coinbase_wallet') {
+        return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_coinbase_wallet_signature' });
       }
 
       return ref.send({ type: 'AUTHENTICATE.OAUTH', strategy: `oauth_${provider}` });
