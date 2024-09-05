@@ -31,10 +31,10 @@
   ],
   "scripts": {
     "build": "npm run build:bundle && npm run build:declarations",
-    "build:analyze": "rspack --config rspack.config.js --env production --env variant=\"clerk.browser\" --analyze",
-    "build:bundle": "npm run clean && rspack --config rspack.config.js --env production",
+    "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
+    "build:bundle": "npm run clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "build:stats": "rspack --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
+    "build:stats": "rspack build --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "bundlewatch": "npx bundlewatch --config bundlewatch.config.json",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
@@ -46,7 +46,7 @@
     "test:cache:clear": "jest --clearCache --useStderr",
     "test:ci": "jest --maxWorkers=70%",
     "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html",
-    "watch": "rspack --config rspack.config.js --env production --watch"
+    "watch": "rspack build --config rspack.config.js --env production --watch"
   },
   "browserslist": "last 2 versions, ios_saf > 12, Safari > 12, > 1%, not dead, not ie > 0",
   "dependencies": {

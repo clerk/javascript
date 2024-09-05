@@ -202,7 +202,7 @@ const entryForVariant = variant => {
 };
 
 /** @type { () => (import('webpack').Configuration)[] } */
-const prodConfig = ({ mode }) => {
+const prodConfig = ({ mode, analysis }) => {
   const clerkBrowser = merge(entryForVariant(variants.clerkBrowser), common({ mode }), commonForProd());
 
   const clerkHeadless = merge(
@@ -254,6 +254,11 @@ const prodConfig = ({ mode }) => {
       libraryTarget: 'commonjs',
     },
   });
+
+  // webpack-bundle-analyzer only supports a single build, use clerkBrowser as that's the default build we serve
+  if (analysis) {
+    return clerkBrowser;
+  }
 
   return [clerkBrowser, clerkHeadless, clerkHeadlessBrowser, clerkEsm, clerkCjs];
 };
@@ -328,5 +333,7 @@ const devConfig = ({ mode, env }) => {
 
 module.exports = env => {
   const mode = env.production ? 'production' : 'development';
-  return isProduction(mode) ? prodConfig({ mode, env }) : devConfig({ mode, env });
+  const analysis = !!env.analysis;
+
+  return isProduction(mode) ? prodConfig({ mode, env, analysis }) : devConfig({ mode, env });
 };
