@@ -7,7 +7,7 @@ import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
 
-const basePath = ['/', 'users'].join('');
+const usersEndpoint = ['/', 'users'].join('');
 
 type UserCountParams = {
   emailAddress?: string[];
@@ -124,7 +124,7 @@ export class UserAPI extends AbstractAPI {
     const [data, totalCount] = await Promise.all([
       this.request<User[]>({
         method: 'GET',
-        path: basePath,
+        path: usersEndpoint,
         queryParams: params,
       }),
       this.getCount(userCountParams),
@@ -136,14 +136,14 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<User>({
       method: 'GET',
-      path: joinPaths(basePath, userId),
+      path: joinPaths(usersEndpoint, userId),
     });
   }
 
   public async createUser(params: CreateUserParams) {
     return this.request<User>({
       method: 'POST',
-      path: basePath,
+      path: usersEndpoint,
       bodyParams: params,
     });
   }
@@ -153,7 +153,7 @@ export class UserAPI extends AbstractAPI {
 
     return this.request<User>({
       method: 'PATCH',
-      path: joinPaths(basePath, userId),
+      path: joinPaths(usersEndpoint, userId),
       bodyParams: params,
     });
   }
@@ -166,7 +166,7 @@ export class UserAPI extends AbstractAPI {
 
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'profile_image'),
+      path: joinPaths(usersEndpoint, userId, 'profile_image'),
       formData,
     });
   }
@@ -176,7 +176,7 @@ export class UserAPI extends AbstractAPI {
 
     return this.request<User>({
       method: 'PATCH',
-      path: joinPaths(basePath, userId, 'metadata'),
+      path: joinPaths(usersEndpoint, userId, 'metadata'),
       bodyParams: params,
     });
   }
@@ -185,14 +185,14 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<User>({
       method: 'DELETE',
-      path: joinPaths(basePath, userId),
+      path: joinPaths(usersEndpoint, userId),
     });
   }
 
   public async getCount(params: UserCountParams = {}) {
     return this.request<number>({
       method: 'GET',
-      path: joinPaths(basePath, 'count'),
+      path: joinPaths(usersEndpoint, 'count'),
       queryParams: params,
     });
   }
@@ -201,7 +201,7 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<PaginatedResourceResponse<OauthAccessToken[]>>({
       method: 'GET',
-      path: joinPaths(basePath, userId, 'oauth_access_tokens', provider),
+      path: joinPaths(usersEndpoint, userId, 'oauth_access_tokens', provider),
       queryParams: { paginated: true },
     });
   }
@@ -210,7 +210,7 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<User>({
       method: 'DELETE',
-      path: joinPaths(basePath, userId, 'mfa'),
+      path: joinPaths(usersEndpoint, userId, 'mfa'),
     });
   }
 
@@ -220,7 +220,7 @@ export class UserAPI extends AbstractAPI {
 
     return this.request<PaginatedResourceResponse<OrganizationMembership[]>>({
       method: 'GET',
-      path: joinPaths(basePath, userId, 'organization_memberships'),
+      path: joinPaths(usersEndpoint, userId, 'organization_memberships'),
       queryParams: { limit, offset },
     });
   }
@@ -231,7 +231,7 @@ export class UserAPI extends AbstractAPI {
 
     return this.request<{ verified: true }>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'verify_password'),
+      path: joinPaths(usersEndpoint, userId, 'verify_password'),
       bodyParams: { password },
     });
   }
@@ -242,7 +242,7 @@ export class UserAPI extends AbstractAPI {
 
     return this.request<{ verified: true; code_type: 'totp' }>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'verify_totp'),
+      path: joinPaths(usersEndpoint, userId, 'verify_totp'),
       bodyParams: { code },
     });
   }
@@ -251,7 +251,7 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'ban'),
+      path: joinPaths(usersEndpoint, userId, 'ban'),
     });
   }
 
@@ -259,7 +259,7 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'unban'),
+      path: joinPaths(usersEndpoint, userId, 'unban'),
     });
   }
 
@@ -267,7 +267,7 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'lock'),
+      path: joinPaths(usersEndpoint, userId, 'lock'),
     });
   }
 
@@ -275,7 +275,7 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'unlock'),
+      path: joinPaths(usersEndpoint, userId, 'unlock'),
     });
   }
 
@@ -283,7 +283,7 @@ export class UserAPI extends AbstractAPI {
     this.requireId(userId);
     return this.request<User>({
       method: 'DELETE',
-      path: joinPaths(basePath, userId, 'profile_image'),
+      path: joinPaths(usersEndpoint, userId, 'profile_image'),
     });
   }
 }
