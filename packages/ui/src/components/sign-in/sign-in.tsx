@@ -1,6 +1,7 @@
 import { Root as SignInRoot } from '@clerk/elements/sign-in';
 import * as React from 'react';
 
+import { FallBack } from '~/common/fallback';
 import { GetHelpContext } from '~/components/sign-in/hooks/use-get-help';
 import { SignInChooseSession } from '~/components/sign-in/steps/choose-session';
 import { SignInChooseStrategy } from '~/components/sign-in/steps/choose-strategy';
@@ -29,7 +30,7 @@ export function SignIn({ appearance }: { appearance?: Appearance }) {
   return (
     <AppearanceProvider appearance={appearance}>
       <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
-        <SignInRoot>
+        <SignInRoot fallback={<FallBack />}>
           {showHelp ? (
             <SignInGetHelp />
           ) : (
