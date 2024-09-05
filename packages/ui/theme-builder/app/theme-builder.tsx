@@ -269,6 +269,9 @@ export function ThemeBuilder({ children }: { children: React.ReactNode }) {
               'bg-white': appearance === 'light',
               'dark bg-neutral-950': appearance === 'dark',
             })}
+            style={{
+              colorScheme: appearance,
+            }}
           >
             <div
               className={cx(

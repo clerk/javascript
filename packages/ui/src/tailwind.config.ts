@@ -183,6 +183,9 @@ const config = {
         '*:not(svg, svg *), use': {
           all: 'revert',
         },
+        ':root': {
+          colorScheme: 'light dark',
+        },
       });
 
       /**
