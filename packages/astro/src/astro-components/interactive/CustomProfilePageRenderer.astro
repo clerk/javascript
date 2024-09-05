@@ -1,0 +1,76 @@
+---
+interface Props {
+  url: string
+  label: string
+  type: 'page' | 'link'
+  component: 'organization-profile' | 'user-profile' | 'organization-switcher'
+  reorderItemsLabels?: Readonly<Array<string>>
+}
+
+const { url, label, type, component, reorderItemsLabels = [] } = Astro.props
+
+let labelIcon = '';
+let content = ''
+
+if (Astro.slots.has('label-icon')) {
+  labelIcon = await Astro.slots.render('label-icon');
+}
+
+if (Astro.slots.has('default') && type === 'page') {
+  content = await Astro.slots.render('default');
+}
+---
+
+<script is:inline define:vars={{ url, label, content, labelIcon, type, component, reorderItemsLabels }}>
+// Get the component map from window that we set in the `<InternalUIComponentRenderer />`.
+const clerkComponentMap = window.__astro_clerk_component_props.get(component);
+
+const componentElement = document.querySelector(`[data-clerk-id^="clerk-${component}"]`);
+
+const safeId = componentElement.getAttribute('data-clerk-id');
+const currentOptions = clerkComponentMap.get(safeId);
+
+const isReorderItem = reorderItemsLabels.includes(label);
+
+let newCustomPage = { label }
+
+if (!isReorderItem) {
+  newCustomPage = {
+    ...newCustomPage,
+    url,
+    mountIcon: (el) => { el.innerHTML = labelIcon },
+    unmountIcon: () => { /* Implement cleanup if needed */ }
+  }
+
+  if (type === 'page') {
+    newCustomPage = {
+      ...newCustomPage,
+      mount: (el) => { el.innerHTML = content },
+      unmount: () => { /* Implement cleanup if needed */ }
+    }
+  }
+}
+
+// Custom <OrganizationProfile /> pages can be added inside
+// the <OrganizationSwitcher /> component.
+if (component === 'organization-switcher') {
+  clerkComponentMap.set(safeId, {
+    ...currentOptions,
+    organizationProfileProps: {
+      ...currentOptions.organizationProfileProps,
+      customPages: [
+        ...(currentOptions?.organizationProfileProps?.customPages ?? []),
+        newCustomPage
+      ]
+    }
+  })
+} else {
+  clerkComponentMap.set(safeId, {
+    ...currentOptions,
+    customPages: [
+      ...(currentOptions?.customPages ?? []),
+      newCustomPage,
+    ]
+  })
+}
+</script>

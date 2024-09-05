@@ -1,0 +1,22 @@
+---
+import { UserProfile as UserProfileAstro } from "@clerk/astro/components";
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Custom Pages">
+  <div class="w-full flex justify-center">
+    <UserProfileAstro path="/custom-pages/user-profile">
+        <UserProfileAstro.Page label="Terms" url="terms">
+            <div slot="label-icon">Icon</div>
+            <div>
+                <h1>Custom Terms Page</h1>
+                <p>This is the custom terms page</p>
+            </div>
+        </UserProfileAstro.Page>
+        <UserProfileAstro.Link label="Homepage" url="/">
+            <div slot="label-icon">Icon</div>
+        </UserProfileAstro.Link>
+        <UserProfileAstro.Page label="security" />
+    </UserProfileAstro>
+  </div>
+</Layout>

@@ -457,8 +457,7 @@ export const zhCN: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   unstable__errors: {
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
-    captcha_unavailable:
-      '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
+    captcha_unavailable: '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
     form_code_incorrect: '',
     form_identifier_exists: '',
     form_identifier_exists__email_address: undefined,
@@ -624,10 +623,8 @@ export const zhCN: LocalizationResource = {
       },
       subtitle__availablePhoneNumbers: '选择一个电话号码来注册短信验证码两步验证。',
       subtitle__unavailablePhoneNumbers: '没有可用的电话号码来注册短信验证码两步验证。',
-      successMessage1:
-        '登录时，您需要输入发送到此电话号码的验证码作为额外的步骤。',
-      successMessage2:
-        '请保存这些备份代码并将其妥善存放。如果您无法访问身份验证设备，可以使用备份代码进行登录。',
+      successMessage1: '登录时，您需要输入发送到此电话号码的验证码作为额外的步骤。',
+      successMessage2: '请保存这些备份代码并将其妥善存放。如果您无法访问身份验证设备，可以使用备份代码进行登录。',
       successTitle: '短信验证码验证已启用',
       title: '添加短信验证码验证',
     },
@@ -667,8 +664,7 @@ export const zhCN: LocalizationResource = {
       title__rename: undefined,
     },
     passwordPage: {
-      checkboxInfoText__signOutOfOtherSessions:
-        '建议您从所有可能使用过旧密码的其他设备上退出登录。',
+      checkboxInfoText__signOutOfOtherSessions: '建议您从所有可能使用过旧密码的其他设备上退出登录。',
       readonly: '由于您只能通过企业连接登录，当前无法编辑您的密码。',
       successMessage__set: '您的密码已设置。',
       successMessage__signOutOfOtherSessions: '所有其他设备已退出。',
