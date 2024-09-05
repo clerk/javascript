@@ -7,7 +7,7 @@ import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 import type { WithSign } from './util-types';
 
-const basePath = '/users';
+const basePath = ['/', 'users'].join('');
 
 type UserCountParams = {
   emailAddress?: string[];
