@@ -2,7 +2,10 @@ import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@cl
 
 function Button({ children }: { children: React.ReactNode }) {
   return (
-    <button className='relative isolate rounded border bg-white bg-gradient-to-b from-white to-neutral-50 px-2.5 py-1 text-sm font-medium'>
+    <button
+      className='relative isolate rounded border bg-white bg-gradient-to-b from-white to-neutral-50 px-2.5 py-1 text-sm font-medium'
+      type='button'
+    >
       {children}
     </button>
   );

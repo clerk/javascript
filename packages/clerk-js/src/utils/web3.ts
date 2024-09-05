@@ -46,10 +46,6 @@ export async function getMetamaskIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'metamask' });
 }
 
-export async function getCoinbaseIdentifier(): Promise<string> {
-  return await getWeb3Identifier({ provider: 'coinbase' });
-}
-
 export async function getCoinbaseWalletIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'coinbase_wallet' });
 }
@@ -61,10 +57,6 @@ type GenerateSignatureParams = {
 
 export async function generateSignatureWithMetamask({ identifier, nonce }: GenerateSignatureParams): Promise<string> {
   return await generateWeb3Signature({ identifier, nonce, provider: 'metamask' });
-}
-
-export async function generateSignatureWithCoinbase({ identifier, nonce }: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ identifier, nonce, provider: 'coinbase' });
 }
 
 export async function generateSignatureWithCoinbaseWallet({

@@ -1,4 +1,4 @@
-import type { RequestHandler } from 'express';
+import type { Request, RequestHandler, Response } from 'express';
 
 import { clerkMiddleware } from '../clerkMiddleware';
 import { getAuth } from '../getAuth';
@@ -151,5 +151,21 @@ describe('clerkMiddleware', () => {
 
     expect(response.header).toHaveProperty('x-clerk-auth-status', 'handshake');
     expect(response.header).toHaveProperty('location', expect.stringContaining('/v1/client/handshake?redirect_url='));
+  });
+
+  it('it calls next with an error when request URL is invalid', async () => {
+    const req = {
+      url: '//',
+      cookies: {},
+      headers: { host: 'example.com' },
+    } as Request;
+    const res = {} as Response;
+    const mockNext = jest.fn();
+
+    await clerkMiddleware()[0](req, res, mockNext);
+
+    expect(mockNext.mock.calls[0][0].message).toBe('Invalid URL');
+
+    mockNext.mockReset();
   });
 });

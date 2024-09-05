@@ -14,7 +14,9 @@ import {
 
 // ----------------------------------- TYPES ------------------------------------
 
-export type SignInChooseSessionProps = React.HTMLAttributes<HTMLDivElement>;
+export type SignInChooseSessionProps = React.HTMLAttributes<HTMLDivElement> & {
+  asChild?: boolean;
+};
 export type SignInSessionListProps = React.HTMLAttributes<HTMLUListElement> & {
   asChild?: boolean;
   includeCurrentSession?: true;
@@ -30,12 +32,13 @@ export const SignInChooseSessionCtx = createContextForDomValidation('SignInChoos
 
 // --------------------------------- COMPONENTS ---------------------------------
 
-export function SignInChooseSession({ children, ...props }: SignInChooseSessionProps) {
+export function SignInChooseSession({ asChild, children, ...props }: SignInChooseSessionProps) {
   const activeState = useSignInChooseSessionIsActive();
+  const Comp = asChild ? Slot : 'div';
 
   return activeState ? (
     <SignInChooseSessionCtx.Provider>
-      <div {...props}>{children}</div>
+      <Comp {...props}>{children}</Comp>
     </SignInChooseSessionCtx.Provider>
   ) : null;
 }
