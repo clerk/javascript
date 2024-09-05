@@ -1,6 +1,6 @@
-import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import { useClerk } from '@clerk/shared/react';
 
 import { GlobalError } from '~/common/global-error';
 import { OTPField } from '~/common/otp-field';

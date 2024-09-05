@@ -27,13 +27,16 @@
     "./*": {
       "import": {
         "types": "./dist/components/*.d.mts",
-        "default": "./dist/components/*.mjs"
+        "default": "./dist/components/*.mjs",
+        "browser": "./dist/components/*.mjs"
       },
       "require": {
         "types": "./dist/components/*.d.ts",
-        "default": "./dist/components/*.js"
+        "default": "./dist/components/*.js",
+        "browser": "./dist/components/*.js"
       }
-    }
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "main": "index.js",
   "files": [
@@ -47,7 +50,6 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@clerk/clerk-react": "file:../react",
     "@clerk/elements": "file:../elements",
     "@clerk/shared": "file:../shared",
     "@clerk/types": "file:../types",

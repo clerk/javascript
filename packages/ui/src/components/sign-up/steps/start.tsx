@@ -1,6 +1,6 @@
-import { useClerk } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignUp from '@clerk/elements/sign-up';
+import { useClerk } from '@clerk/shared/react';
 
 import { Connections } from '~/common/connections';
 import { EmailField } from '~/common/email-field';
@@ -48,7 +48,10 @@ export function SignUpStart() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         const connectionsWithSeperator = [
-          <Connections disabled={isGlobalLoading} />,
+          <Connections
+            disabled={isGlobalLoading}
+            key='connections'
+          />,
           hasConnection && hasIdentifier ? <Separator>{t('dividerText')}</Separator> : null,
         ];
         return (

@@ -1,15 +1,13 @@
-import { useSignIn } from '@clerk/clerk-react';
 import * as Common from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import { useClerk } from '@clerk/shared/react';
 
 import { Connections } from '~/common/connections';
 import { GlobalError } from '~/common/global-error';
 import { useGetHelp } from '~/components/sign-in/hooks/use-get-help';
 import { LOCALIZATION_NEEDED } from '~/constants/localizations';
-import { useAppearance } from '~/contexts';
 import { useCard } from '~/hooks/use-card';
 import { useDevModeWarning } from '~/hooks/use-dev-mode-warning';
-import { useEnabledConnections } from '~/hooks/use-enabled-connections';
 import { useLocalizations } from '~/hooks/use-localizations';
 import { Button } from '~/primitives/button';
 import * as Card from '~/primitives/card';
@@ -20,7 +18,7 @@ import { LinkButton } from '~/primitives/link';
   ============================================ */
 
 function FirstFactorConnections({ isGlobalLoading }: { isGlobalLoading: boolean }) {
-  const { signIn } = useSignIn();
+  const { signIn } = useClerk().client;
   const isFirstFactor = signIn?.status === 'needs_first_factor';
 
   if (isFirstFactor) {
@@ -33,11 +31,9 @@ function FirstFactorConnections({ isGlobalLoading }: { isGlobalLoading: boolean 
   ============================================ */
 
 export function SignInChooseStrategy() {
-  const enabledConnections = useEnabledConnections();
   const { t } = useLocalizations();
   const { setShowHelp } = useGetHelp();
 
-  const hasConnection = enabledConnections.length > 0;
   const isDev = useDevModeWarning();
   const { logoProps, footerProps } = useCard();
 

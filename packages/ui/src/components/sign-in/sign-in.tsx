@@ -1,4 +1,5 @@
 import { Root as SignInRoot } from '@clerk/elements/sign-in';
+import type { SignInProps } from '@clerk/types';
 import * as React from 'react';
 
 import { GetHelpContext } from '~/components/sign-in/hooks/use-get-help';
@@ -23,13 +24,13 @@ import { type Appearance, AppearanceProvider } from '~/contexts';
  *   where we'll consider its integration within Elements, as well as ensure
  *   bulletproof a11y.
  */
-export function SignIn({ appearance }: { appearance?: Appearance }) {
+export function SignIn({ appearance, ...rest }: { appearance?: Appearance } & SignInProps) {
   const [showHelp, setShowHelp] = React.useState(false);
 
   return (
     <AppearanceProvider appearance={appearance}>
       <GetHelpContext.Provider value={{ showHelp, setShowHelp }}>
-        <SignInRoot>
+        <SignInRoot {...rest}>
           {showHelp ? (
             <SignInGetHelp />
           ) : (
