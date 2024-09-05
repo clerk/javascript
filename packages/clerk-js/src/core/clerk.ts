@@ -121,6 +121,9 @@ import {
 } from './resources/internal';
 import { warnings } from './warnings';
 
+import { UI } from '../ui/new';
+import { ClerkHostRouter } from '@clerk/shared/router';
+
 export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
 declare global {
@@ -147,6 +150,8 @@ const defaultOptions: ClerkOptions = {
 };
 
 export class Clerk implements ClerkInterface {
+  // @ts-expect-error -- TODO: ensure defined
+  public ui: UI;
   public static mountComponentRenderer?: MountComponentRenderer;
 
   public static version: string = __PKG_VERSION__;
@@ -182,6 +187,7 @@ export class Clerk implements ClerkInterface {
   #options: ClerkOptions = {};
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
+  #router: ClerkHostRouter;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -307,6 +313,11 @@ export class Clerk implements ClerkInterface {
         ...this.#options.telemetry,
       });
     }
+
+    // @ts-expect-error -- TODO: type
+    this.#router = this.#options.router;
+    // @ts-expect-error -- TODO: type
+    this.ui = new UI({ router: this.#options.router, clerk: this, options: this.#options });
 
     this.#options.allowedRedirectOrigins = createAllowedRedirectOrigins(
       this.#options.allowedRedirectOrigins,
@@ -496,15 +507,19 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
-    this.assertComponentsReady(this.#componentControls);
-    void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
-      controls.mountComponent({
-        name: 'SignIn',
-        appearanceKey: 'signIn',
-        node,
-        props,
-      }),
-    );
+    if (props.experimental?.newComponents) {
+      this.ui.mount('SignIn', node, props);
+    } else {
+      this.assertComponentsReady(this.#componentControls);
+      void this.#componentControls.ensureMounted({ preloadHint: 'SignIn' }).then(controls =>
+        controls.mountComponent({
+          name: 'SignIn',
+          appearanceKey: 'signIn',
+          node,
+          props,
+        }),
+      );
+    }
     this.telemetry?.record(eventPrebuiltComponentMounted('SignIn', props));
   };
 

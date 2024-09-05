@@ -80,6 +80,9 @@ const common = ({ mode }) => {
         },
       },
     },
+    experiments: {
+      css: true,
+    },
   };
 };
 
