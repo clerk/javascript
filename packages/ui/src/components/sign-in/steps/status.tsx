@@ -55,13 +55,13 @@ const statusIcon: Record<Status, React.ReactElement> = {
   verified: (
     <Icon.TickShieldlg
       size='lg'
-      className='text-gray-11 mb-2'
+      className='mb-2 text-[#22C543]'
     />
   ),
   verified_switch_tab: (
     <Icon.SwitchArrowslg
       size='lg'
-      className='text-gray-11 mb-2'
+      className='mb-2 text-[#747686]'
     />
   ),
   expired: (
