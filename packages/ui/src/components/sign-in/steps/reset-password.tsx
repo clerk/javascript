@@ -22,8 +22,14 @@ export function SignInResetPassword() {
     <Common.Loading scope='global'>
       {isGlobalLoading => {
         return (
-          <SignIn.Step name='reset-password'>
-            <Card.Root banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}>
+          <SignIn.Step
+            asChild
+            name='reset-password'
+          >
+            <Card.Root
+              as='form'
+              banner={isDev ? LOCALIZATION_NEEDED.developmentMode : null}
+            >
               <Card.Content>
                 <Card.Header>
                   <Card.Logo {...logoProps} />
